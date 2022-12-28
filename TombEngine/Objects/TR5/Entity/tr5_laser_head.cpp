@@ -415,9 +415,9 @@ namespace TEN::Entities::Creatures::TR5
 								eye.RoomNumber = item->RoomNumber;
 
 								int c = MAX_VISIBILITY_DISTANCE * phd_cos(angles.x);
-								eye.x = origin1.x + c * phd_sin(item->Pose.Orientation.y);
-								eye.y = origin1.y + MAX_VISIBILITY_DISTANCE * phd_sin(-angles.x);
-								eye.z = origin1.z + c * phd_cos(item->Pose.Orientation.y);
+								eye.x = origin1.x + (c * phd_sin(item->Pose.Orientation.y));
+								eye.y = origin1.y + (MAX_VISIBILITY_DISTANCE * phd_sin(-angles.x));
+								eye.z = origin1.z + (c * phd_cos(item->Pose.Orientation.y));
 
 								if (item->ItemFlags[3] != 90 && creature->fireArcs[i])
 								{
@@ -437,7 +437,6 @@ namespace TEN::Entities::Creatures::TR5
 										creature->fireArcs[i] = nullptr;
 										item->ItemFlags[0] = 1;
 										item->TriggerFlags = 0;
-
 									}
 								}
 								else
@@ -493,7 +492,7 @@ namespace TEN::Entities::Creatures::TR5
 
 										GameVector start = GameVector(creature->fireArcs[i]->pos1.x, creature->fireArcs[i]->pos1.y, creature->fireArcs[i]->pos1.z);
 										start.RoomNumber = item->RoomNumber;
-										GameVector end = GameVector(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z,0);
+										GameVector end = GameVector(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z, 0);
 
 										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
 										{
