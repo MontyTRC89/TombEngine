@@ -177,7 +177,7 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 short AIGuard(CreatureInfo* creature) 
 {
 	auto& item = g_Level.Items[creature->ItemNumber];
-	if (item.AIBits & (MODIFY|PATROL1|PATROL2|AMBUSH|FOLLOW))
+	if (item.AIBits & MODIFY)
 		return 0;
 
 	if (Random::TestProbability(1.0f / 128.0f))
@@ -892,10 +892,11 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 {
 	if (boxNumber == NO_BOX)
 		return false;
+
 	auto* creature = GetCreatureInfo(item);
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
-	if ((creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber) || boxNumber == NO_BOX)
+	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
 	auto* box = &g_Level.Boxes[boxNumber];
@@ -1120,12 +1121,17 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	int zRange = STALK_DIST + ((box->right - box->left) * SECTOR(1));
 	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
 	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
-	
+
 	if (x > xRange || x < -xRange || z > zRange || z < -zRange)
 		return false;
 
 	int enemyQuad = (enemy->Pose.Orientation.y / ANGLE(90.0f)) + 2;
-	int boxQuad = z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1;
+	int boxQuad;
+	if (z > 0)
+		boxQuad = (x > 0) ? 2 : 1;
+	else
+		boxQuad = (x > 0) ? 3 : 0;
+
 	if (enemyQuad == boxQuad)
 		return false;
 
@@ -1703,7 +1709,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	auto* enemy = creature->Enemy;
 	auto* LOT = &creature->LOT;
 
-	if (creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+	if (item->BoxNumber == NO_BOX || creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
 		creature->LOT.RequiredBox = NO_BOX;
 
 	if (creature->Mood != MoodType::Attack && creature->LOT.RequiredBox != NO_BOX && !ValidBox(item, AI->zoneNumber, creature->LOT.TargetBox))
