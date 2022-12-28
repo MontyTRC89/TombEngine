@@ -348,7 +348,7 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 
 GameVector GetTargetPoint(ItemInfo* targetEntity)
 {
-	const auto& bounds = *(GameBoundingBox*)GetBestFrame(targetEntity);
+	const auto& bounds = GetBestFrame(targetEntity)->boundingBox;
 
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,
@@ -1102,11 +1102,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 
 	if (hitPos != nullptr)
 	{
-		if (object.hitEffect != HIT_NONE)
+		if (object.hitEffect != HitEffect::None)
 		{
 			switch (object.hitEffect)
 			{
-			case HIT_BLOOD:
+			case HitEffect::Blood:
 				if (targetEntity->ObjectNumber == ID_BADDY2 &&
 					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
@@ -1125,19 +1125,18 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 
 				break;
 
-			case HIT_RICOCHET:
+			case HitEffect::Richochet:
 				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-				break;
-
-			case HIT_SMOKE:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
-
 				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
 					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
 				{
 					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
 				}
 
+				break;
+
+			case HitEffect::Smoke:
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
 				break;
 			}
 		}

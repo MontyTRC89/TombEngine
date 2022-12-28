@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->ObjectNumber == ID_CROW)
 		{

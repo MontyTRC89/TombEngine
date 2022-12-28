@@ -86,6 +86,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
+
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);

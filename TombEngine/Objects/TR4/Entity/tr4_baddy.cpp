@@ -56,7 +56,7 @@ namespace TEN::Entities::TR4
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
 	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
 
-	#define BADDY_USE_UZI	24
+	constexpr auto BADDY_UZI_AMMO = 24;
 
 	enum BaddyState
 	{
@@ -209,8 +209,8 @@ namespace TEN::Entities::TR4
 	void InitialiseBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-	
-		ClearItem(itemNumber);
+
+		InitialiseCreature(itemNumber);
 
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
@@ -218,7 +218,7 @@ namespace TEN::Entities::TR4
 		{
 			item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN);
 			item->MeshBits = 0xFF81FFFF;
-			item->ItemFlags[2] = BADDY_USE_UZI;
+			item->ItemFlags[2] = BADDY_UZI_AMMO;
 		}
 		else
 		{
@@ -234,7 +234,7 @@ namespace TEN::Entities::TR4
 		// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 		if (ocb > 9 && ocb < 20)
 		{
-			item->ItemFlags[2] += BADDY_USE_UZI;
+			item->ItemFlags[2] += BADDY_UZI_AMMO;
 			item->TriggerFlags -= 10;
 			ocb -= 10;
 		}
@@ -1103,7 +1103,7 @@ namespace TEN::Entities::TR4
 				else if (currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM)
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				else if (currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM)
-					item->ItemFlags[2] += BADDY_USE_UZI;
+					item->ItemFlags[2] += BADDY_UZI_AMMO;
 				else
 				{
 					currentCreature->Enemy = nullptr;
@@ -1112,7 +1112,7 @@ namespace TEN::Entities::TR4
 			
 				KillItem(currentCreature->Enemy - g_Level.Items.data());
 
-				// cancel enemy pointer for other active baddys
+				// Cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)

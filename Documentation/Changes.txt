@@ -21,6 +21,17 @@ Version 1.0.5
 * Allow to freely rotate dart emitter in all directions.
 * Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
 * Draw real mesh for darts.
+* Fix inverted water and fly zones.
+* Fix CROCODILE attack range and joint rotation speed.
+* Fix CIVVY, MP_WITH_STICK, and YETI vault bugs.
+* Added warning log when one slot requires another slot which is missing.
+* Fix rare crash when smash item is inside a wall and add warning log for the scenario.
+* Fix FLAMETHROWER_BADDY and WORKER_FLAMETHROWER attack ranges + aim walking anim looping when away from the player.
+* Fix pathfinding of water creatures (partial).
+* Fix pathfinding of flying creatures (partial).
+* Fix bone rotations of some entities
+* Fix VON_CROY not using animation for 2 and 3 step vault down.
+* Fix BADDY1 and BADDY2 not using animation for 3 step vault down.
 
 Lua API changes:
 * Add new Room class and several methods for it.

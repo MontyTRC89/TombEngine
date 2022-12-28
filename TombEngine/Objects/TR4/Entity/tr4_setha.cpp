@@ -109,26 +109,10 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE = 28
 	};
 
-	void SetupSeth(ObjectInfo& object)
-	{
-		object.initialise = InitialiseSeth;
-		object.control = SethControl;
-		object.collision = CreatureCollision;
-		object.shadowType = ShadowMode::All;
-		object.HitPoints = 500;
-		object.hitEffect = HIT_NONE;
-		object.pivotLength = 50;
-		object.radius = 341;
-		object.intelligent = true;
-		object.undead = true;
-		object.ZoneType = ZoneType::Basic;
-	}
-
 	void InitialiseSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
