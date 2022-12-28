@@ -471,9 +471,9 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
 					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
 
-					int dx = p[0].x - p[3].x;
-					int dy = p[0].y - p[3].y;
-					int dz = p[0].z - p[3].z;
+					int dx = SQUARE(p[0].x - p[3].x);
+					int dy = SQUARE(p[0].y - p[3].y);
+					int dz = SQUARE(p[0].z - p[3].z);
 
 					int distance = dx + dy + dz;
 
