@@ -423,7 +423,6 @@ namespace TEN::Entities::Creatures::TR5
 								{
 									// Eye is aready firing.
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
-									arc = creature->fireArcs[i];
 									creature->fireArcs[i]->pos1.x =  origin1.x;
 									creature->fireArcs[i]->pos1.y =  origin1.y;
 									creature->fireArcs[i]->pos1.z =  origin1.z;
@@ -442,14 +441,12 @@ namespace TEN::Entities::Creatures::TR5
 								else
 								{
 									// Start firing from eye
-									origin1.RoomNumber = item->RoomNumber;
+									origin1.RoomNumber = item->RoomNumber;														
 									creature->LOS[i] = LOS(&origin1, &eye);
-									creature->fireArcs[i] = TriggerLightning((Vector3i*)&origin1, (Vector3i*)&eye, 1, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
+									creature->fireArcs[i] = TriggerLightning((Vector3i*)&origin1, (Vector3i*)&eye, (GetRandomControl() & 1) + 3, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
-									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
+									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}
-
-								arc = creature->fireArcs[i];
 
 								if (GlobalCounter & 1)
 								{
