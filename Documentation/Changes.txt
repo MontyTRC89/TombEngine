@@ -11,6 +11,7 @@ Version 1.0.5
 * Fix Flame Emitter 3 not burning player.
 * Fix TR3 Tribeman with axe not attacking Lara.
 * Fix TR3 Tribeman with dart not shooting at Lara's direction.
+* Fix TR3 Crow and TR4 Harpy death animations not performing correctly.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
 * Fix Lara's animation for cog switch release.
 * Fix incorrect picking up from plinths concealed by raising blocks.
