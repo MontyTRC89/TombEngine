@@ -172,6 +172,9 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomFlags.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomReverbTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
@@ -639,6 +642,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_punaboss.cpp" />
     <ClCompile Include="Objects\TR3\Object\tr3_boss_object.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Room\RoomObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />

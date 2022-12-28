@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, BOAR_ANIM_IDLE);
 	}
 

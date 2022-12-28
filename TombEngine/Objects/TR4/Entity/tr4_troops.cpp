@@ -24,6 +24,7 @@ namespace TEN::Entities::TR4
 
 	enum TroopState
 	{
+		// No state 0.
 		TROOP_STATE_IDLE = 1,
 		TROOP_STATE_WALK = 2,
 		TROOP_STATE_RUN = 3,
@@ -50,7 +51,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{

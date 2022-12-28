@@ -52,32 +52,29 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseTony;
 		obj->collision = CreatureCollision;
 		obj->control = TonyControl;
-		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TigerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 340;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(21, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_COBRA];
@@ -88,97 +85,97 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 8;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->nonLot = true;
-		
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(0, ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_RAPTOR];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = RaptorControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->pivotLength = 600;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(20, ROT_Y);
+		obj->SetBoneRotationFlags(21, ROT_Y);
+		obj->SetBoneRotationFlags(23, ROT_Y);
+		obj->SetBoneRotationFlags(25, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TribemanAxeControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 28;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_DARTS];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TribemanDartsControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 28;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_TYRANNOSAUR];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TRexControl;
 		obj->collision = CreatureCollision;
-		obj->HitPoints = 800;
-		obj->hitEffect = HIT_BLOOD;
 		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 800;
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
+		obj->ZoneType = ZoneType::Blockable;
+		obj->SetBoneRotationFlags(10, ROT_Y);
+		obj->SetBoneRotationFlags(11, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SCUBA_DIVER];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = ScubaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->pivotLength = 50;
 		obj->ZoneType = ZoneType::Water;
-		
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
+		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(14, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SCUBA_HARPOON];
@@ -186,24 +183,22 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = ScubaHarpoonControl;
 		obj->collision = ObjectCollision;
-		
 	}
 
 	obj = &Objects[ID_FLAMETHROWER_BADDY];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 36;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(7, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MONKEY];
@@ -214,32 +209,29 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 8;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(7, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MP_WITH_GUN];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = MPGunControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 28;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->biteOffset = 0;
-
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MP_WITH_STICK];
@@ -250,15 +242,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 28;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::HumanClassic;
-
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->ZoneType = ZoneType::Human;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SHIVA];
@@ -267,16 +257,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
-		//obj->drawRoutine = DrawStatue;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
-		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(25, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SOPHIA_LEE_BOSS];
@@ -289,13 +277,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_CIVVIE];
@@ -306,14 +292,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 15;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->ZoneType = ZoneType::Human;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_LIZARD];
@@ -387,7 +372,7 @@ static void StartTrap(ObjectInfo* obj)
 	{
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -398,8 +383,8 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseQuadBike;
 		obj->collision = QuadBikePlayerCollision;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_RUBBER_BOAT];
@@ -409,8 +394,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->control = RubberBoatControl;
 		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -419,9 +404,8 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseKayak;
 		obj->collision = KayakPlayerCollision;
-		//obj->drawRoutine = KayakDraw;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -430,8 +414,8 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseMinecart;
 		obj->collision = MinecartPlayerCollision;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -440,8 +424,8 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = BigGunInitialise;
 		obj->collision = BigGunCollision;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_UPV];
@@ -450,8 +434,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = UPVInitialise;
 		obj->control = UPVEffects;
 		obj->collision = UPVPlayerCollision;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -459,15 +443,15 @@ static void StartProjectiles(ObjectInfo* obj)
 {
 	obj = &Objects[ID_TONY_BOSS_FLAME];
 	obj->control = ControlTonyFireBall;
-	obj->drawRoutine = NULL;
+	obj->drawRoutine = nullptr;
 }
 
-static ObjectInfo* objToInit;
 void InitialiseTR3Objects()
 {
-	StartEntity(objToInit);
-	StartObject(objToInit);
-	StartTrap(objToInit);
-	StartVehicles(objToInit);
-	StartProjectiles(objToInit);
+	ObjectInfo* objectPtr = nullptr;
+	StartEntity(objectPtr);
+	StartObject(objectPtr);
+	StartTrap(objectPtr);
+	StartVehicles(objectPtr);
+	StartProjectiles(objectPtr);
 }

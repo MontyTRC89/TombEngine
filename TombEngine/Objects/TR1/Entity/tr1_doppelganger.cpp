@@ -16,12 +16,6 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	// Original:
-	void InitialiseDoppelganger(short itemNumber)
-	{
-		ClearItem(itemNumber);
-	}
-
 	ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 	{
 		bool found = false;

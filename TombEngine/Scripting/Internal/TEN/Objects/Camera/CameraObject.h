@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
+#include "Objects/Room/RoomObject.h"
 
 struct LevelCameraInfo;
 
@@ -24,8 +25,9 @@ public:
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
 
-	short GetRoom() const;
-	void SetRoom(short room);
+	std::unique_ptr<Room> GetRoom() const;
+	int GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);
