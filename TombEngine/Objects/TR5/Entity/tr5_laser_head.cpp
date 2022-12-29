@@ -138,9 +138,9 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
+					origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
 					origin.RoomNumber = item->RoomNumber;
-					auto target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i(0, 0, 0)), LaraItem->RoomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i(0, 0, 0)), LaraItem->RoomNumber);
 					target.RoomNumber = LaraItem->RoomNumber;
 
 					if (LOS(&origin, &target))
@@ -159,12 +159,12 @@ namespace TEN::Entities::Creatures::TR5
 			item->ItemFlags[2] += ANGLE(3.0f);
 
 			// Get guardian head's position.
-			auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
+			origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
 			origin.RoomNumber = item->RoomNumber;
 			if (item->ItemFlags[0] == 1)
 			{
 				// Get player head position.
-				auto target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i::Zero), LaraItem->RoomNumber);
+				target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i::Zero), LaraItem->RoomNumber);
 				target.RoomNumber = LaraItem->RoomNumber;
 
 				// Calculate distance between guardian and player.
