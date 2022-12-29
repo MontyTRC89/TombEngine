@@ -1,31 +1,38 @@
 #include "framework.h"
 #include "Objects/TR5/Entity/tr5_laser_head.h"
 
-#include "Game/items.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/effects.h"
-#include "Game/people.h"
-#include "Game/effects/debris.h"
 #include "Game/animation.h"
 #include "Game/control/los.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Sound/sound.h"
-#include "Objects/TR5/Entity/tr5_laserhead_info.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
-#include "Game/misc.h"
-#include "Math/Math.h"
-#include "Game/Lara/lara_fire.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Math/Math.h"
+#include "Objects/TR5/Entity/tr5_laserhead_info.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 
+// NOTES:
+// item.TriggerFlags stores target X orientation.
+// item.ItemFlags[3] stores target Y orientation.
+
 namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto NUM_LASER_HEAD_TENTACLES = 8;
+
 	int GuardianMeshes[2] = { 1, 2 };
 	auto LaserHeadBasePosition = Vector3i(0, -640, 0);
 	Vector3i GuardianChargePositions[4] =
@@ -39,55 +46,6 @@ namespace TEN::Entities::Creatures::TR5
 	LaserHeadInfo* GetLaserHeadInfo(ItemInfo* item)
 	{
 		return (LaserHeadInfo*)item->Data;
-	}
-
-	void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
-	{
-		int deltaAngle = angle - rotation;
-
-		if (deltaAngle < -32768)
-			deltaAngle += 65536;
-		else if (deltaAngle > 32768)
-			deltaAngle -= 65536;
-
-		if (outAngle)
-			outAngle = (short)deltaAngle;
-
-		rotation += short(deltaAngle >> shift);
-	}
-
-	void TriggerLaserHeadSparks(Vector3i* pos, int count, byte r, byte g, byte b, int unk)
-	{
-		if (count > 0)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				auto* spark = GetFreeParticle();
-
-				spark->on = 1;
-				spark->sR = r;
-				spark->sG = g;
-				spark->sB = b;
-				spark->dB = 0;
-				spark->dG = 0;
-				spark->dR = 0;
-				spark->colFadeSpeed = 9 << unk;
-				spark->fadeToBlack = 0;
-				spark->life = 9 << unk;
-				spark->sLife = 9 << unk;
-				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-				spark->x = pos->x;
-				spark->y = pos->y;
-				spark->z = pos->z;
-				spark->gravity = (GetRandomControl() / 128) & 0x1F;
-				spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-				spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-				spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-				spark->flags = SP_NONE;
-				spark->maxYvel = 0;
-				spark->friction = 34 << unk;
-			}
-		}
 	}
 
 	void LaserHeadCharge(ItemInfo* item)
@@ -130,11 +88,11 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			for (int i = 0; i < LASERHEAD_FIRE_ARCS_COUNT; i++)
 			{
-				if (1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits())
+				if (item->MeshBits.Test(GuardianMeshes[i]))
 				{
 					origin = GetJointPosition(item, GuardianMeshes[i]);
 					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), 0, g, b);
-					TriggerLaserHeadSparks(&origin, 3, 0, g, b, 0);
+					SpawnLaserHeadSparks(origin.ToVector3(), Vector3(0, g, b), 3);
 				}
 			}
 
@@ -143,9 +101,9 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		if (!(GlobalCounter & 3))
-		TriggerLightning(&target, (Vector3i*)&item->Pose.Position, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			TriggerLightning(&target, &item->Pose.Position, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
 		
-		TriggerLaserHeadSparks(&target, 3, 0, g, b, 1);
+		SpawnLaserHeadSparks(target.ToVector3(), Vector3(0, g, b), 3, 1);
 	}
 
 	void InitialiseLaserHead(short itemNumber)
@@ -166,26 +124,27 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		short rotation = 0;
-		for (int j = 0; j < 8; j++)
+		short currentYOrient = 0;
+		for (int j = 0; j < NUM_LASER_HEAD_TENTACLES; j++)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Pose.Orientation.y == rotation)
+				if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE &&
+					g_Level.Items[i].Pose.Orientation.y == currentYOrient)
 				{
 					creature->Tentacles[j] = i;
 					break;
 				}
 			}
 
-			rotation += ANGLE(45.0f);
+			currentYOrient += ANGLE(45.0f);
 		}
 
 		int y = item->Pose.Position.y - 640;
 		item->Pose.Position.y = y;
 		item->Animation.ActiveState = 0;
 		item->ItemFlags[1] = y - 640;
-		item->ItemFlags[3] = 90;
+		item->ItemFlags[3] = ANGLE(0.5f);
 	}
 
 	void LaserHeadControl(short itemNumber)
@@ -337,17 +296,21 @@ namespace TEN::Entities::Creatures::TR5
 				}
 			}
 
-			auto angles = Geometry::GetOrientToPoint(origin.ToVector3(), creature->target.ToVector3());
-			InterpolateAngle(angles.x + 3328, item->Pose.Orientation.x, creature->xRot, creature->trackSpeed);
-			InterpolateAngle(angles.y, item->Pose.Orientation.y, creature->yRot, creature->trackSpeed);
+			auto targetOrient = Geometry::GetOrientToPoint(origin.ToVector3(), creature->target.ToVector3());
+			targetOrient.x += ANGLE(18.25f);
+			auto deltaOrient = item->Pose.Orientation - targetOrient;
+
+			item->Pose.Orientation.Lerp(targetOrient, 1 / pow(2, creature->trackSpeed));
+			creature->xRot = deltaOrient.x;
+			creature->yRot = deltaOrient.y;
 
 			if (item->ItemFlags[0] == 1)
 			{
 				if (creature->trackLara)
 				{
 					if (!(GetRandomControl() & 0x1F) &&
-						abs(creature->xRot) < ANGLE(5.6f) &&
-						abs(creature->yRot) < ANGLE(5.6f) &&
+						abs(creature->xRot) <= ANGLE(5.6f) &&
+						abs(creature->yRot) <= ANGLE(5.6f) &&
 						!LaraItem->Animation.Velocity.y ||
 						!(GetRandomControl() & 0x1FF))
 					{
@@ -414,9 +377,9 @@ namespace TEN::Entities::Creatures::TR5
 								GameVector eye = GameVector::Zero;
 								eye.RoomNumber = item->RoomNumber;
 
-								int c = MAX_VISIBILITY_DISTANCE * phd_cos(angles.x);
+								int c = MAX_VISIBILITY_DISTANCE * phd_cos(targetOrient.x);
 								eye.x = origin1.x + (c * phd_sin(item->Pose.Orientation.y));
-								eye.y = origin1.y + (MAX_VISIBILITY_DISTANCE * phd_sin(-angles.x));
+								eye.y = origin1.y + (MAX_VISIBILITY_DISTANCE * phd_sin(-(targetOrient.x - ANGLE(18.25f))));
 								eye.z = origin1.z + (c * phd_cos(item->Pose.Orientation.y));
 
 								if (item->ItemFlags[3] != 90 && creature->fireArcs[i])
@@ -443,14 +406,14 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye
 									origin1.RoomNumber = item->RoomNumber;														
 									creature->LOS[i] = LOS(&origin1, &eye);
-									creature->fireArcs[i] = TriggerLightning((Vector3i*)&origin1, (Vector3i*)&eye, (GetRandomControl() & 1) + 3, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
+									creature->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}
 
 								if (GlobalCounter & 1)
 								{
-									TriggerLaserHeadSparks((Vector3i*)&origin1, 3, r, g, b, 0);
+									SpawnLaserHeadSparks(origin1.ToVector3(), Vector3(r, g, b), 3);
 									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, r, g, b);
 									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, r, g, b);
 
@@ -458,14 +421,13 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										TriggerLightningGlow(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
 										TriggerDynamicLight(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
-										TriggerLaserHeadSparks((Vector3i*)&creature->fireArcs[i]->pos4, 3, r, g, b, 0);
+										SpawnLaserHeadSparks(creature->fireArcs[i]->pos4.ToVector3(), Vector3(r, g, b), 3);
 									}
 								}
 
 								// Check if Lara was hit by energy arcs
 								if (LaraItem->Effect.Type == EffectType::None && creature->fireArcs[i] != nullptr)
 								{
-										
 									int adx = creature->fireArcs[i]->pos4.x - origin1.x;
 									int ady = creature->fireArcs[i]->pos4.y - origin1.y;
 									int adz = creature->fireArcs[i]->pos4.z - origin1.z;
@@ -558,10 +520,8 @@ namespace TEN::Entities::Creatures::TR5
 				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 			}
 
-			short temp = 0;
-			InterpolateAngle(item->ItemFlags[3], item->Pose.Orientation.y, temp, 2);
-			temp = 0;
-			InterpolateAngle(item->TriggerFlags, item->Pose.Orientation.x, temp, 2);
+			auto targetOrient = EulerAngles(item->TriggerFlags, item->ItemFlags[3], 0);
+			item->Pose.Orientation.Lerp(targetOrient, 0.25f);
 
 			// Final death
 			item->Animation.Velocity.z++;
@@ -623,6 +583,37 @@ namespace TEN::Entities::Creatures::TR5
 				item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
 				item->TriggerFlags = item->Pose.Orientation.x + (GetRandomControl() & 0x1000) - 2048;
 			}
+		}
+	}
+
+	void SpawnLaserHeadSparks(const Vector3& pos, const Vector3& color, int count, int unk)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			auto* spark = GetFreeParticle();
+
+			spark->on = true;
+			spark->sR = color.x;
+			spark->sG = color.y;
+			spark->sB = color.z;
+			spark->dB = 0;
+			spark->dG = 0;
+			spark->dR = 0;
+			spark->colFadeSpeed = 9 << unk;
+			spark->fadeToBlack = 0;
+			spark->life = 9 << unk;
+			spark->sLife = 9 << unk;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->x = pos.x;
+			spark->y = pos.y;
+			spark->z = pos.z;
+			spark->gravity = (GetRandomControl() / 128) & 0x1F;
+			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->flags = SP_NONE;
+			spark->maxYvel = 0;
+			spark->friction = 34 << unk;
 		}
 	}
 }
