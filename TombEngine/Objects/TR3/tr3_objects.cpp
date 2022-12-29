@@ -324,7 +324,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = PunaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 1;
+		obj->HitPoints = 200;
 		obj->intelligent = true;
 		obj->nonLot = true;
 		obj->radius = 102;
