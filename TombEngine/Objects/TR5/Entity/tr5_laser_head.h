@@ -5,12 +5,12 @@ struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	struct LaserHeadInfo;
+	struct GuardianInfo;
 
-	LaserHeadInfo& GetGuardianInfo(ItemInfo& item);
+	GuardianInfo& GetGuardianInfo(ItemInfo& item);
 
-	void InitialiseLaserHead(short itemNumber);
-	void LaserHeadControl(short itemNumber);
+	void InitialiseGuardian(short itemNumber);
+	void ControlGuardian(short itemNumber);
 
 	void DoGuardianLaserAttack(ItemInfo* item);
 	void DoGuardianDeath(int itemNumber, ItemInfo& item);

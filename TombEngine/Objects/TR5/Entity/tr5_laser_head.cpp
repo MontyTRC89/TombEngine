@@ -34,7 +34,6 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	constexpr auto GUARDIAN_TENTACLE_NUM  = 8;
 	constexpr auto GUARDIAN_EXPLOSION_TIME = 136;
 	const	  auto GUARDIAN_ORIENT_OFFSET  = EulerAngles(ANGLE(18.25f), 0, 0);
 
@@ -48,15 +47,15 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3i(-440, -832, -188)
 	};
 
-	LaserHeadInfo& GetGuardianInfo(ItemInfo& item)
+	GuardianInfo& GetGuardianInfo(ItemInfo& item)
 	{
-		return (LaserHeadInfo&)item.Data;
+		return (GuardianInfo&)item.Data;
 	}
 
-	void InitialiseLaserHead(short itemNumber)
+	void InitialiseGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.Data = LaserHeadInfo();
+		item.Data = GuardianInfo();
 		auto* guardian = &GetGuardianInfo(item);
 
 		int vPos = item.Pose.Position.y + GuardianBasePosition.y;
@@ -80,7 +79,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		// Initialize tentacles.
 		short currentYOrient = 0;
-		for (int j = 0; j < GUARDIAN_TENTACLE_NUM; j++)
+		for (int j = 0; j < GUARDIAN_TENTACLE_COUNT; j++)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
@@ -96,7 +95,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void LaserHeadControl(short itemNumber)
+	void ControlGuardian(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		auto* guardian = &GetGuardianInfo(*item);
@@ -311,7 +310,7 @@ namespace TEN::Entities::Creatures::TR5
 							b = (arc->life * b)  / 16;
 						}
 
-						for (int i = 0; i < LASERHEAD_FIRE_ARCS_COUNT; i++)
+						for (int i = 0; i < GUARDIAN_FIRE_ARC_COUNT; i++)
 						{
 							// If eye was not destroyed then fire from it
 							if (!(item->MeshBits.Test(GuardianMeshes[i])))
@@ -441,7 +440,7 @@ namespace TEN::Entities::Creatures::TR5
 		else
 		{
 			// Sequentially activate tentacles.
-			if (!(GlobalCounter & 7) && item->Animation.ActiveState < GUARDIAN_TENTACLE_NUM)
+			if (!(GlobalCounter & 7) && item->Animation.ActiveState < GUARDIAN_TENTACLE_COUNT)
 			{
 				short tentacleNumber = guardian->Tentacles[item->Animation.ActiveState];
 				g_Level.Items[tentacleNumber].Animation.TargetState = 2;
@@ -451,7 +450,7 @@ namespace TEN::Entities::Creatures::TR5
 			// Destroy tentacles.
 			if (item->Animation.ActiveState > 0)
 			{
-				for (int i = 0; i < GUARDIAN_TENTACLE_NUM; i++)
+				for (int i = 0; i < GUARDIAN_TENTACLE_COUNT; i++)
 				{
 					auto* tentacleItem = &g_Level.Items[guardian->Tentacles[i]];
 
@@ -486,7 +485,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (item->ItemFlags[0] < 3)
 		{
 			int i = 0;
-			for (i = 0; i < GUARDIAN_TENTACLE_NUM; i++)
+			for (i = 0; i < GUARDIAN_TENTACLE_COUNT; i++)
 			{
 				short tentacleItemNumber = guardian->Tentacles[i];
 				auto& tentacleItem = g_Level.Items[tentacleItemNumber];
@@ -499,7 +498,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			// If all tentacle animations are done and both eyes are destroyed, initiate death sequence.
-			if (i == GUARDIAN_TENTACLE_NUM && !(item->MeshBits & 6))
+			if (i == GUARDIAN_TENTACLE_COUNT && !(item->MeshBits & 6))
 			{
 				if (guardian->fireArcs[0])
 					guardian->fireArcs[0]->life = 2;
@@ -540,7 +539,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto origin = Vector3i::Zero;
 		auto target = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianBasePosition);
 
-		for (int i = 0; i < LASERHEAD_CHARGE_ARCS_COUNT; i++)
+		for (int i = 0; i < GUARDIAN_CHARGE_ARC_COUNT; i++)
 		{
 			auto* arc = guardian->chargeArcs[i];
 
@@ -559,7 +558,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (GlobalCounter & 1)
 		{
-			for (int i = 0; i < LASERHEAD_FIRE_ARCS_COUNT; i++)
+			for (int i = 0; i < GUARDIAN_FIRE_ARC_COUNT; i++)
 			{
 				if (item->MeshBits.Test(GuardianMeshes[i]))
 				{
