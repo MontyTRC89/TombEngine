@@ -241,7 +241,6 @@ namespace TEN::Entities::Creatures::TR5
 					target.y = guardian->target.y = origin.y + BLOCK(8) * phd_sin(GUARDIAN_ORIENT_OFFSET.x - item->Pose.Orientation.x);
 					target.z = guardian->target.z = origin.z + cosX * phd_cos(item->Pose.Orientation.y);
 				}
-
 			}
 
 			auto targetOrient = Geometry::GetOrientToPoint(origin.ToVector3(), guardian->target.ToVector3()) + GUARDIAN_ORIENT_OFFSET;
