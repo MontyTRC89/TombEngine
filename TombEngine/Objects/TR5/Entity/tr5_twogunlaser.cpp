@@ -3,9 +3,12 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
+#include "Game/effects/item_fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Game/control/box.h"
@@ -21,7 +24,10 @@
 #include "people.h"
 #include "Specific/setup.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/lightning.h"
 
+using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Lightning;
 using namespace TEN::Math::Random;
 using namespace TEN::Effects::Spark;
 
@@ -29,13 +35,14 @@ using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5
 {
-
 	TWOGUNINFO twogun[2];
 
-	BiteInfo TWGuns[2] =
+	int TWGunMesh[2] = {8, 5};
+
+	const Vector3i TWGunPositions[2] =
 	{
-		{0.0f, 230.0f, 40.0f, 8},
-		{8.0f, 230.0f, 40.0f, 5}
+		Vector3i(0, 230, 40),
+		Vector3i(8, 230, 40),
 	};
 
 	const auto LaserguardHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
@@ -88,17 +95,16 @@ namespace TEN::Entities::Creatures::TR5
 
 	void FireTwogunWeapon(short itemNumber, short LeftRight, short plasma)
 	{
-		auto* gun = &TWGuns[LeftRight];
 		auto* item = &g_Level.Items[itemNumber];
 
-		auto pos1 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position));
-		auto pos2 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y + 4096, gun->Position.z));
-		auto orient1 = item->Pose.Orientation;
+		auto pos1 = GetJointPosition(item, TWGunMesh[LeftRight], TWGunPositions[LeftRight]);
+		auto pos2 = GetJointPosition(item, TWGunMesh[LeftRight], Vector3i(TWGunPositions[LeftRight].x, TWGunPositions[LeftRight].y + 4096, TWGunPositions[LeftRight].z));
+		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 		if (!plasma)
 		{
-			//TODO: Laser stuff
-			/*TWOGUNINFO* tg;
+			//TODO: create additional curly laser effect
+			TWOGUNINFO* tg;
 
 			long lp;
 
@@ -107,85 +113,53 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (tg->life == 0 || lp == 3)
 					break;
-			}*/
+			}
 
-			/*tg->pos.Position.x = pos1.x;
+			tg->pos.Position.x = pos1.x;
 			tg->pos.Position.y = pos1.y;
 			tg->pos.Position.z = pos1.z;
-			tg->pos.Position.y = orient1.x;// angles[0];
-			tg->pos.Position.x = orient1.y;//angles[1];
-			tg->pos.Position.z = 0;
+			tg->pos.Orientation.x = orient.x;
+			tg->pos.Orientation.y = orient.y;
+			tg->pos.Orientation.z = orient.z;
 			tg->life = 17;
 			tg->spin = (GetRandomControl() & 31) << 11;
 			tg->dlength = 4096;
 			tg->r = 0;
 			tg->b = 255;
 			tg->g = 96;
-			tg->fadein = 8;*/
+			tg->fadein = 8;
 
-			//TriggerLightningGlow(tg->pos.x_pos, tg->pos.y_pos, tg->pos.z_pos, RGBME(0, (unsigned char)(tg->g >> 1), (unsigned char)(tg->b >> 1)) | ((64 + (GetRandomControl() & 3)) << 24));
-			//TriggerLightning(&pos1, &pos2, (GetRandomControl() & 7) + 8, RGBME(0, (unsigned char)tg->g, (unsigned char)tg->b) | (0x16 << 24), LI_THININ | LI_THINOUT, 80, 5);
+			TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
+			TriggerLightning(&pos1, &pos2, (GetRandomControl() & 7) + 255, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);//8
 
 			item->ItemFlags[LeftRight] = 16;
-			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
-			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
-			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
 
-			//TODO: Laser hit Lara stuff, not translated for TEN:
-		/*	if (!lara.burn && SCNoDrawLara == 0)
-			{
-				bounds = GetBoundsAccurate(LaraItem);
-				pos3.x = LaraItem->pos.x_pos + ((bounds[0] + bounds[1]) >> 1);
-				pos3.y = LaraItem->pos.y_pos + ((bounds[2] + bounds[3]) >> 1);
-				pos3.z = LaraItem->pos.z_pos + ((bounds[4] + bounds[5]) >> 1);
+			Vector3i hitPos;
+			MESH_INFO* hitMesh = nullptr;
 
-				dx = pos3.x - pos1.x;
-				dy = pos3.y - pos1.y;
-				dz = pos3.z - pos1.z;
-				dx = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+			GameVector start = GameVector(pos1,0);
+			start.RoomNumber = item->RoomNumber;
+			GameVector end = GameVector(pos2, 0);
 
-				dz = 0;
-				if (dx < 4096)
+			if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
+			{		
+				if (LaraItem->HitPoints < 501)
 				{
-					dx1 = (pos2.x - pos1.x) >> 4;
-					dy1 = (pos2.y - pos1.y) >> 4;
-					dz1 = (pos2.z - pos1.z) >> 4;
-					x = pos1.x;
-					y = pos1.y;
-					z = pos1.z;
-					for (lp = 0; lp < dx; lp += 256)
-					{
-						if (abs(pos3.x - x) < 320 &&
-							abs(pos3.y - y) < 320 &&
-							abs(pos3.z - z) < 320)
-						{
-							dz = 1;
-							break;
-						}
-						x += dx1;
-						y += dy1;
-						z += dz1;
-					}
-				}*/
+					ItemCustomBurn(LaraItem, Vector3(0.2f, 0.4f, 1.0f), Vector3(0.2f, 0.3f, 0.8f), 1 * FPS);
+					DoDamage(LaraItem, INT_MAX);
+				}
+				else
+					DoDamage(LaraItem, 250);
 
-				/*if (dz)
-				{
-					if (LaraItem->hit_points < 501)
-					{
-						LaraBurn();
-						lara.BurnCount = 48;
-						lara.BurnBlue = 1;
-						//if (LaraItem->hit_points > 64)
-						LaraItem->hit_points = 0;
-					}
-					else
-						LaraItem->hit_points -= 250;
-				}*/
+			}
 		}
 
 			return;
 
-			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), abs(item->ItemFlags[LeftRight]));
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), abs(item->ItemFlags[LeftRight]));
 	}
 
 	void TriggerTwogunPlasma(const Vector3i& posr, const Pose& pos, float life)
@@ -234,7 +208,6 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		auto* gun = &TWGuns[0];
 
 		angle = 0;
 		head = 0;
@@ -243,7 +216,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (item->ItemFlags[0] || item->ItemFlags[1])
 		{
-			for (int i = 0; i < 2; i++, gun++)
+			for (int i = 0; i < 2; i++)
 			{
 				if (item->ItemFlags[i])
 				{
@@ -251,7 +224,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->ItemFlags[i] > 0)
 					{
-						auto pos1 = GetJointPosition(item, gun->meshNum, gun->Position);
+						auto pos1 = GetJointPosition(item, TWGunMesh[i], TWGunPositions[i]);
 
 						short blue = item->ItemFlags[i] << 4;
 						short green = blue >> 2;
@@ -310,6 +283,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				case TWOGUN_STATE_FALLDEATH:
 					item->Pose.Position.y = item->Floor;
+
 					break;
 
 				default:
@@ -319,10 +293,6 @@ namespace TEN::Entities::Creatures::TR5
 					creature->LOT.IsJumping = true;
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					item->Pose.Position.x = room->x + ((creature->Tosspad & 0xFFFFFF00) << 2) + 512;
-					item->Pose.Position.y = room->minfloor + (item->ItemFlags[2] & 0xFFFFFF00);
-					item->Pose.Position.z = ((creature->Tosspad & 0xFF) << 10) + room->z + 512;
-					item->Pose.Orientation.y = creature->Tosspad & 57344;
 					break;
 				}
 			}
