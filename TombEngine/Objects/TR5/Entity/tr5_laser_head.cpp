@@ -225,11 +225,6 @@ namespace TEN::Entities::Creatures::TR5
 						guardian->target.y = target.y;
 						guardian->target.z = target.z;
 					}
-					else
-					{
-						target.y = guardian->target.y;
-						target.z = guardian->target.z;
-					}
 
 					guardian->trackLara = false;
 				}
@@ -246,11 +241,7 @@ namespace TEN::Entities::Creatures::TR5
 					target.y = guardian->target.y = origin.y + BLOCK(8) * phd_sin(GUARDIAN_ORIENT_OFFSET.x - item->Pose.Orientation.x);
 					target.z = guardian->target.z = origin.z + cosX * phd_cos(item->Pose.Orientation.y);
 				}
-				else
-				{					
-					target.y = guardian->target.y;
-					target.z = guardian->target.z;
-				}
+
 			}
 
 			auto targetOrient = Geometry::GetOrientToPoint(origin.ToVector3(), guardian->target.ToVector3()) + GUARDIAN_ORIENT_OFFSET;
