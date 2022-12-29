@@ -85,7 +85,8 @@ namespace TEN::Entities::Creatures::TR3
         {
             if (item->Animation.ActiveState != LIZARD_STATE_DEATH) // Avoid doing the animation if it's a summon !
                 SetAnimation(item, LIZARD_ANIMATION_DEATH);
-            if (item->ItemFlags[0] == 1 && item->Animation.FrameNumber == GetFrameNumber(item, 50))
+            // is lizard summoned ?
+            if (item->TestFlagEqual(0, 1) && item->Animation.FrameNumber == GetFrameNumber(item, 50))
                 CreatureDie(itemNumber, true); // Just explode the lizard if it's a summon !
         }
         else

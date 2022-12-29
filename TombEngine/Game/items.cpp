@@ -38,7 +38,15 @@ void ItemInfo::ClearAllOcb()
 	TriggerFlags = 0;
 }
 
-bool ItemInfo::TestFlags(short id, short value)
+bool ItemInfo::TestFlag(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return false;
+
+	return (ItemFlags[id] & value) != 0;
+}
+
+bool ItemInfo::TestFlagEqual(short id, short value)
 {
 	if (id < 0 || id > 7)
 		return false;
@@ -46,12 +54,34 @@ bool ItemInfo::TestFlags(short id, short value)
 	return (ItemFlags[id] == value);
 }
 
-void ItemInfo::SetFlags(short id, short value)
+bool ItemInfo::TestFlagDiff(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return false;
+
+	return (ItemFlags[id] != value);
+}
+
+void ItemInfo::SetFlag(short id, short value)
 {
 	if (id < 0 || id > 7)
 		return;
 
 	ItemFlags[id] = value;
+}
+
+short ItemInfo::GetFlag(short id)
+{
+	if (id < 0 || id > 7)
+		return 0;
+	return ItemFlags[id];
+}
+
+void ItemInfo::RemoveFlag(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return;
+	ItemFlags[id] &= ~value;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
@@ -230,8 +260,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 void AddActiveItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
-	item->Flags |= 0x20;
+	item->Flags |= IFLAG_TRIGGERED;
 
 	if (Objects[item->ObjectNumber].control == NULL)
 	{
@@ -461,10 +490,8 @@ void InitialiseItem(short itemNumber)
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;
 
-	item->ItemFlags[3] = 0;
-	item->ItemFlags[2] = 0;
-	item->ItemFlags[1] = 0;
-	item->ItemFlags[0] = 0;
+	for (int i = 0; i < _countof(item->ItemFlags); i++)
+		item->ItemFlags[i] = 0;
 
 	item->Active = false;
 	item->Status = ITEM_NOT_ACTIVE;
@@ -472,9 +499,7 @@ void InitialiseItem(short itemNumber)
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
-
 	item->Timer = 0;
-
 	item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
 	if (item->ObjectNumber == ID_HK_ITEM ||
@@ -506,8 +531,9 @@ void InitialiseItem(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	auto* room = &g_Level.Rooms[item->RoomNumber];
+	UpdateItemRoom(itemNumber);
 
+	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
@@ -536,13 +562,11 @@ void InitialiseItem(short itemNumber)
 
 short CreateItem()
 {
-	short itemNumber = 0;
-
-	if (NextItemFree == NO_ITEM) return NO_ITEM;
-	itemNumber = NextItemFree;
+	if (NextItemFree == NO_ITEM)
+		return NO_ITEM;
+	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
-
 	return itemNumber;
 }
 

@@ -24,7 +24,7 @@
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/tr3_lizard.h" // OK
-#include "Objects/TR3/Entity/tr3_punaboss.h" // IN_DEV
+#include "Objects/TR3/Entity/tr3_punaboss.h" // OK
 
 // Object
 #include "Objects/TR3/Object/tr3_boss_object.h"
@@ -323,9 +323,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialisePuna;
 		obj->control = PunaControl;
 		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 1;
 		obj->intelligent = true;
-		obj->shadowType = ShadowMode::All;
 		obj->nonLot = true;
 		obj->radius = 102;
 		obj->pivotLength = 50;
@@ -350,7 +350,7 @@ static void StartObject(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = nullptr;
-		obj->collision = BOSS_EffectShockwaveDummyCollision;
+		obj->collision = nullptr;
 		obj->control = BOSS_EffectShockwaveRingControl;
 		obj->shadowType = ShadowMode::None;
 	}
@@ -359,7 +359,7 @@ static void StartObject(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = nullptr;
-		obj->collision = BOSS_EffectShockwaveDummyCollision;
+		obj->collision = nullptr;
 		obj->control = BOSS_EffectShockwaveExplosionControl;
 		obj->shadowType = ShadowMode::None;
 	}

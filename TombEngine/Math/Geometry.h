@@ -23,6 +23,8 @@ namespace TEN::Math::Geometry
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
+	Vector3i    GetTargetPosition(const Vector3i& src, const Vector3i& target);
+	Vector3i    GetTargetPosition(const Vector3i& src, const Vector3i& target, int distance);
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);

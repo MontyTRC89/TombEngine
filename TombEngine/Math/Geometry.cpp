@@ -117,6 +117,21 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
+	Vector3i GetTargetPosition(const Vector3i& src, const Vector3i& target)
+	{
+		return GetTargetPosition(src, target, Vector3i::Distance(src, target));
+	}
+
+	Vector3i GetTargetPosition(const Vector3i& src, const Vector3i& target, int distance)
+	{
+		auto result = Vector3i::Zero;
+		auto orient = GetOrientToPoint(src.ToVector3(), target.ToVector3());
+		result.x = src.x + ((distance * phd_cos(orient.x)) * phd_sin(orient.y));
+		result.y = src.y + (distance * phd_sin(-orient.x));
+		result.z = src.z + ((distance * phd_cos(orient.x)) * phd_cos(orient.y));
+		return result;
+	}
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);

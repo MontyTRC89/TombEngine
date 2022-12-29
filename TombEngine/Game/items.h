@@ -39,11 +39,12 @@ enum ItemStatus
 
 enum ItemFlags
 {
+	IFLAG_TRIGGERED       = (1 << 5),
 	IFLAG_CLEAR_BODY	  = (1 << 7),
 	IFLAG_INVISIBLE		  = (1 << 8),
 	IFLAG_REVERSE		  = (1 << 14),
 	IFLAG_KILLED		  = (1 << 15),
-	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
+	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13 (IFLAG_CODEBITS)
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
@@ -106,7 +107,8 @@ struct EntityEffectData
 	int Count = -1;
 };
 
-//todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
+// TODO: we need to find good "default states" for a lot of these - squidshire 25/05/2022
+
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -156,8 +158,18 @@ struct ItemInfo
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
 
-	bool TestFlags(short id, short value);
-	void SetFlags(short id, short value);
+	// test value (ItemFlags[id] & value)
+	bool TestFlag(short id, short value);
+	// test value (ItemFlags[id] == value)
+	bool TestFlagEqual(short id, short value);
+	// test value (ItemFlags[id] != value)
+	bool TestFlagDiff(short id, short value);
+	// set value (ItemFlags[id] = value)
+	void SetFlag(short id, short value);
+	// get value (return ItemFlags[id])
+	short GetFlag(short id);
+	// remove value (ItemFlags[id] &= ~value)
+	void RemoveFlag(short id, short value);
 
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);

@@ -1082,7 +1082,7 @@ bool CreatureActive(short itemNumber)
 		return false;
 
 	// Object is already dead or body cleared.
-	if (item->Flags & IFLAG_KILLED || item->Flags & IFLAG_CLEAR_BODY)
+	if (item->Flags & IFLAG_KILLED)
 		return false;
 
 	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
@@ -1147,7 +1147,7 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	return true;
 }
 
-// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
+// TODO: Do it via Lua instead. -- TokyoSU 22.12.22
 bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)
@@ -1155,14 +1155,16 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 	case -3:
 		return (item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD);
 
 	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
 				item->ObjectNumber != ID_BADDY2 &&
 				item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD);
 	}
 
 	return true;

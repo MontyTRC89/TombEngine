@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/items.h"
-#include "Game/collision/collide_item.h"
 
 namespace TEN::Entities::Object::TR3
 {
@@ -24,20 +23,22 @@ namespace TEN::Entities::Object::TR3
         BOSS_Lizard = 0x8
     };
 
-    void BOSS_EffectShieldControl(short itemNumber);
-    void BOSS_EffectShockwaveRingControl(short itemNumber);
-    void BOSS_EffectShockwaveExplosionControl(short itemNumber);
-    void BOSS_EffectShockwaveDummyCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll);
+    extern void BOSS_EffectShieldControl(short itemNumber);
+    extern void BOSS_EffectShockwaveRingControl(short itemNumber);
+    extern void BOSS_EffectShockwaveExplosionControl(short itemNumber);
 
-    void BOSS_ExplodeBoss(ItemInfo* item, const Vector4& explosionColor);
-    void BOSS_CheckForRequiredObjects(ItemInfo* item);
+    /// <summary>
+    /// Can really die after deathCount: 60
+    /// </summary>
+    extern void BOSS_ExplodeBoss(short itemNumber, ItemInfo* item, int deathCountToDie, const Vector4& explosionColor);
+    extern void BOSS_CheckForRequiredObjects(ItemInfo* item);
 
-    void BOSS_SpawnShield(ItemInfo* item, const Vector4& shieldColor);
-    void BOSS_SpawnShockwaveExplosion(ItemInfo* item, const Vector4& explosionColor);
-    void BOSS_SpawnShockwaveRing(ItemInfo* item, const Vector4& ringColor);
+    extern void BOSS_SpawnShield(ItemInfo* item, const Vector4& shieldColor);
+    extern void BOSS_SpawnShockwaveExplosion(ItemInfo* item, const Vector4& explosionColor);
+    extern void BOSS_SpawnShockwaveRing(ItemInfo* item, const Vector3i& pos, const Vector4& ringColor);
 
     /// <summary>
     /// Used by FireWeapon() of Lara. (only used if ID_BOSS_SHIELD is loaded)
     /// </summary>
-    void BOSS_SpawnShieldAndRichochetSparksAtPosition(int x, int y, int z, ItemInfo* item, const Vector4& shieldColor);
+    extern void BOSS_SpawnShieldAndRichochetSparksAtPosition(int x, int y, int z, ItemInfo* item, const Vector4& shieldColor);
 }

@@ -14,6 +14,7 @@ using namespace TEN::Math::Random;
 namespace TEN::Effects::Spark
 {
 	std::array<SparkParticle, 128> SparkParticles;
+
 	void UpdateSparkParticles()
 	{
 		for (int i = 0; i < SparkParticles.size(); i++)
@@ -68,7 +69,7 @@ namespace TEN::Effects::Spark
 		s.active = true;
 	}
 
-	void TriggerRicochetSpark(const GameVector& pos, short angle, int count)
+	void TriggerRicochetSpark(const GameVector& pos, short angle, int count, const Vector4& sourceColor)
 	{
 		for (int i = 0; i < count; i++) 
 		{
@@ -87,7 +88,7 @@ namespace TEN::Effects::Spark
 			v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 			v.Normalize(v);
 			s.velocity = v * GenerateFloat(17, 24);
-			s.sourceColor = Vector4(1, 0.8f, 0.2f, 1) * 3;
+			s.sourceColor = sourceColor * 3;
 			s.destinationColor = Vector4(0, 0, 0, 0);
 			s.active = true;
 		}
