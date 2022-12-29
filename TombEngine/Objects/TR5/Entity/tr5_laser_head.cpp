@@ -27,7 +27,8 @@ using namespace TEN::Math;
 
 // NOTES:
 // item.Animation.Velocity.z = death explosion timer.
-// item.ItemFlags[1]		 = vertical hover offset?
+// item.ItemFlags[0];		 = a state machine. 3 = trigger death, other values still unknown.
+// item.ItemFlags[1]		 = vertical hover offset? Tentacle index?
 // item.ItemFlags[2]		 = vertical hover translation angle?
 // item.ItemFlags[3]		 = target Y orientation.
 // item.TriggerFlags		 = target X orientation.
@@ -35,9 +36,9 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto GUARDIAN_EXPLOSION_TIME = 136.0f;
-	const	  auto GUARDIAN_ORIENT_OFFSET  = EulerAngles(ANGLE(18.25f), 0, 0);
+	const	  auto GUARDIAN_ORIENT_OFFSET  = EulerAngles(ANGLE(18.25f), 0, 0); // TODO: Asset issue?
 
-	constexpr auto GuardianMeshes		   = std::array<int, 2>{ 1, 2 };
+	constexpr auto GuardianEyeJoints	   = std::array<int, 2>{ 1, 2 };
 	const	  auto GuardianBasePosition	   = Vector3i(0, -640, 0);
 	const	  auto GuardianChargePositions = std::array<Vector3i, 4>
 	{
@@ -56,7 +57,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = GuardianInfo();
-		auto* guardian = &GetGuardianInfo(item);
+		auto& guardian = GetGuardianInfo(item);
 
 		int vPos = item.Pose.Position.y + GuardianBasePosition.y;
 
@@ -65,14 +66,19 @@ namespace TEN::Entities::Creatures::TR5
 		item.Pose.Position.y = vPos;
 		item.Animation.ActiveState = 0;
 		item.ItemFlags[1] = vPos + GuardianBasePosition.y;
-		item.ItemFlags[3] = ANGLE(0.5f);
+		item.ItemFlags[3] = item.Pose.Orientation.y;
+		item.TriggerFlags = item.Pose.Orientation.x;
+		guardian.trackSpeed = Random::GenerateInt(3, 5);
+
+		// TODO: After initializing, the guardian must first see the player
+		// before it can start moving around at all.
 
 		// Initialize base.
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_BASE)
 			{
-				guardian->BaseItem = i;
+				guardian.BaseItem = i;
 				break;
 			}
 		}
@@ -86,7 +92,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE &&
 					g_Level.Items[i].Pose.Orientation.y == currentYOrient)
 				{
-					guardian->Tentacles[j] = i;
+					guardian.Tentacles[j] = i;
 					break;
 				}
 			}
@@ -103,20 +109,19 @@ namespace TEN::Entities::Creatures::TR5
 		auto origin = GameVector::Zero;
 		auto target = GameVector::Zero;
 		int farAway;
-		// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
-		// Other values still unknown
 
 		if (!item->ItemFlags[0])
 		{
-			if (item->ItemFlags[2] < 8)
+			if (item->ItemFlags[2] < GUARDIAN_TENTACLE_COUNT)
 			{
 				if (!(GlobalCounter & 7))
 				{
 					short tentacleItemNumber = guardian->Tentacles[item->ItemFlags[2]];
-					auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
+					auto& tentacleItem = g_Level.Items[tentacleItemNumber];
+
 					AddActiveItem(tentacleItemNumber);
-					tentacleItem->Status = ITEM_ACTIVE;
-					tentacleItem->Flags |= IFLAG_ACTIVATION_MASK;
+					tentacleItem.Status = ITEM_ACTIVE;
+					tentacleItem.Flags |= IFLAG_ACTIVATION_MASK;
 					item->ItemFlags[2]++;
 				}
 			}
@@ -165,8 +170,8 @@ namespace TEN::Entities::Creatures::TR5
 				// Calculate distance between guardian and player.
 				float distance = Vector3::Distance(origin.ToVector3(), target.ToVector3());
 
-				// Check if there's a clear LOS between the guardian and player,
-				// the distance is less than 8 blocks, the player is alive and not burning
+				// Check for clear LOS between the guardian and player,
+				// if the distance is less than 8 blocks, the player is alive and not burning
 				if (LOS(&origin, &target) &&
 					distance <= MAX_VISIBILITY_DISTANCE &&
 					LaraItem->HitPoints > 0 &&
@@ -195,7 +200,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (farAway)
 							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135.0f);
 						else
-							yRot = 2 * GetRandomControl();
+							yRot = Random::GenerateAngle();
 
 						int v = Random::GenerateInt(-MAX_VISIBILITY_DISTANCE, MAX_VISIBILITY_DISTANCE);
 						int cosX = v * phd_cos(-xRot);
@@ -211,7 +216,7 @@ namespace TEN::Entities::Creatures::TR5
 						}
 						else
 						{
-							guardian->trackSpeed = (GetRandomControl() & 2) + 3;
+							guardian->trackSpeed = Random::GenerateInt(3, 5);
 						}
 
 						item->ItemFlags[3] = guardian->trackSpeed * ((GetRandomControl() & 3) + 8);
@@ -312,8 +317,8 @@ namespace TEN::Entities::Creatures::TR5
 
 						for (int i = 0; i < GUARDIAN_FIRE_ARC_COUNT; i++)
 						{
-							// If eye was not destroyed then fire from it
-							if (!(item->MeshBits.Test(GuardianMeshes[i])))
+							// If eye has not been destroyed, fire from it.
+							if (!(item->MeshBits.Test(GuardianEyeJoints[i])))
 							{
 								if (item->ItemFlags[3] > 90 &&
 									guardian->fireArcs[i])
@@ -324,7 +329,7 @@ namespace TEN::Entities::Creatures::TR5
 							}
 							else
 							{
-								GameVector origin1 = GetJointPosition(item, GuardianMeshes[i], Vector3i::Zero);
+								GameVector origin1 = GetJointPosition(item, GuardianEyeJoints[i], Vector3i::Zero);
 								origin1.RoomNumber = item->RoomNumber;
 								GameVector eye = GameVector::Zero;
 								eye.RoomNumber = item->RoomNumber;
@@ -567,9 +572,9 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			for (int i = 0; i < GUARDIAN_FIRE_ARC_COUNT; i++)
 			{
-				if (item->MeshBits.Test(GuardianMeshes[i]))
+				if (item->MeshBits.Test(GuardianEyeJoints[i]))
 				{
-					origin = GetJointPosition(item, GuardianMeshes[i]);
+					origin = GetJointPosition(item, GuardianEyeJoints[i]);
 					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), color.x, color.y, color.z);
 					SpawnGuardianSparks(origin.ToVector3(), color, 3);
 				}
