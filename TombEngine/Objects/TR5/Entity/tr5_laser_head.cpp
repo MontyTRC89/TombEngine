@@ -227,7 +227,6 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else
 					{
-						target.x = guardian->target.x;
 						target.y = guardian->target.y;
 						target.z = guardian->target.z;
 					}
@@ -248,8 +247,7 @@ namespace TEN::Entities::Creatures::TR5
 					target.z = guardian->target.z = origin.z + cosX * phd_cos(item->Pose.Orientation.y);
 				}
 				else
-				{
-					target.x = guardian->target.x;
+				{					
 					target.y = guardian->target.y;
 					target.z = guardian->target.z;
 				}
