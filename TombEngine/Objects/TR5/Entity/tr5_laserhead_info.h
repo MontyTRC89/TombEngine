@@ -1,6 +1,8 @@
 #pragma once
 #include "Game/effects/lightning.h"
 
+using namespace TEN::Effects::Lightning;
+
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto GUARDIAN_TENTACLE_COUNT	 = 8;
@@ -10,15 +12,15 @@ namespace TEN::Entities::Creatures::TR5
 	struct GuardianInfo
 	{
 		Vector3i target;
-		TEN::Effects::Lightning::LIGHTNING_INFO* fireArcs[GUARDIAN_FIRE_ARC_COUNT]; // elptr
-		TEN::Effects::Lightning::LIGHTNING_INFO* chargeArcs[GUARDIAN_CHARGE_ARC_COUNT]; // blptr
+		std::array<LIGHTNING_INFO*, GUARDIAN_FIRE_ARC_COUNT> fireArcs = {}; // elptr
+		std::array<LIGHTNING_INFO*, GUARDIAN_CHARGE_ARC_COUNT> chargeArcs = {}; // blptr
 		bool LOS[2];
 		byte trackSpeed;
-		byte trackLara;
+		bool trackLara;
 		short xRot;
 		short yRot;
-		short BaseItem;
-		short Tentacles[GUARDIAN_TENTACLE_COUNT];
-		short PuzzleItem;
+		int BaseItem;
+		std::array<int, GUARDIAN_TENTACLE_COUNT> Tentacles = {};
+		int PuzzleItem;
 	};
 }

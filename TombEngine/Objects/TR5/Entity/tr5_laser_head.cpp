@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR5
 					guardian->target.y = target.y;
 					guardian->target.z = target.z;
 					guardian->trackSpeed = 3;
-					guardian->trackLara = 1;
+					guardian->trackLara = true;
 				}
 				else
 				{
@@ -227,7 +227,7 @@ namespace TEN::Entities::Creatures::TR5
 						target.z = guardian->target.z;
 					}
 
-					guardian->trackLara = 0;
+					guardian->trackLara = false;
 				}
 			}
 			else
@@ -289,17 +289,16 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ItemFlags[3] >= 90)
 				{
-					byte r = 0;
-					byte g = (GetRandomControl() & 0x1F) + 128;
-					byte b = (GetRandomControl() & 0x1F) + 64;
+					auto color = Vector3(
+						0.0f,
+						(GetRandomControl() & 0x1F) + 128,
+						(GetRandomControl() & 0x1F) + 64);
 
 					auto* arc = guardian->fireArcs[0];
 					if (guardian->fireArcs[0] == nullptr)
 						arc = guardian->fireArcs[1];
 
-					if ((item->ItemFlags[3] <= 90 ||
-						!arc ||
-						arc->life) &&
+					if ((item->ItemFlags[3] <= 90 || !arc || arc->life) &&
 						LaraItem->HitPoints > 0 &&
 						LaraItem->Effect.Type == EffectType::None)
 					{
@@ -307,8 +306,8 @@ namespace TEN::Entities::Creatures::TR5
 							arc &&
 							arc->life < 16)
 						{
-							g = (arc->life * g)  / 16;
-							b = (arc->life * b)  / 16;
+							color.y = (arc->life * color.y)  / 16;
+							color.z = (arc->life * color.z)  / 16;
 						}
 
 						for (int i = 0; i < GUARDIAN_FIRE_ARC_COUNT; i++)
@@ -362,26 +361,26 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye.
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
-									guardian->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
+									guardian->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}
 
 								if (GlobalCounter & 1)
 								{
-									SpawnGuardianSparks(origin1.ToVector3(), Vector3(r, g, b), 3);
-									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, r, g, b);
-									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, r, g, b);
+									SpawnGuardianSparks(origin1.ToVector3(), color, 3);
+									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, color.x, color.y, color.z);
+									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 
 									if (!guardian->LOS[i] && guardian->fireArcs[i] != nullptr)
 									{
-										TriggerLightningGlow(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
-										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
-										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), Vector3(r, g, b), 3);
+										TriggerLightningGlow(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
+										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
+										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), color, 3);
 									}
 								}
 
-								// Check if player was hit by energy arcs
+								// Check if player was hit by energy arcs.
 								if (LaraItem->Effect.Type == EffectType::None && guardian->fireArcs[i] != nullptr)
 								{
 									int adx = guardian->fireArcs[i]->pos4.x - origin1.x;
@@ -391,7 +390,6 @@ namespace TEN::Entities::Creatures::TR5
 									farAway = 0;
 									for (int j = 0; j < 32; j++)
 									{
-
 										if (farAway)
 										{
 											farAway--;
@@ -457,13 +455,13 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				for (int i = 0; i < GUARDIAN_TENTACLE_COUNT; i++)
 				{
-					auto* tentacleItem = &g_Level.Items[guardian->Tentacles[i]];
+					auto& tentacleItem = g_Level.Items[guardian->Tentacles[i]];
 
-					if (tentacleItem->Animation.AnimNumber == (Objects[tentacleItem->ObjectNumber].animIndex + 1) &&
-						TestLastFrame(tentacleItem) && tentacleItem->MeshBits.Test(1))
+					if (tentacleItem.Animation.AnimNumber == (Objects[tentacleItem.ObjectNumber].animIndex + 1) &&
+						TestLastFrame(&tentacleItem) && tentacleItem.MeshBits.Test(1))
 					{
 						SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
-						ExplodeItemNode(tentacleItem, 0, 0, 128);
+						ExplodeItemNode(&tentacleItem, 0, 0, 128);
 						KillItem(guardian->Tentacles[i]);
 					}
 				}
