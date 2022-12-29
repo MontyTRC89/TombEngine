@@ -25,6 +25,7 @@
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/tr3_lizard.h" // OK
 #include "Objects/TR3/Entity/tr3_punaboss.h" // OK
+#include "Objects/TR3/Entity/tr3_willard.h" // IN_DEV
 
 // Object
 #include "Objects/TR3/Object/tr3_boss_object.h"
@@ -331,6 +332,21 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->SetBoneRotationFlags(4, ROT_Y); // Puna quest object.
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_WILLARD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWillard;
+		obj->collision = CreatureCollision;
+		obj->control = WillardControl;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 200;
+		obj->intelligent = true;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->ZoneType = ZoneType::Basic;
 		obj->SetupHitEffect();
 	}
 }

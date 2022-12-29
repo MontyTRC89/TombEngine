@@ -61,19 +61,29 @@ namespace TEN::Entities::Creatures::TR3
         for (short itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
         {
             auto& result = g_Level.Items[itemNumber];
-            if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber)
+            if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber && 
+                result.HitPoints > 0 && !(result.Flags & IFLAG_KILLED) && result.Status == ITEM_INVISIBLE)
                 itemList.push_back(itemNumber);
         }
         return itemList;
     }
 
-    bool FoundAnyLizardInRooms(ItemInfo* item)
+    bool FoundAnyLizardInRooms(ItemInfo* item, bool duringInitialize = false)
     {
         int lizardCount = 0;
         for (auto& result : g_Level.Items)
         {
-            if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber)
-                lizardCount++;
+            if (duringInitialize)
+            {
+                if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber)
+                    lizardCount++;
+            }
+            else // in-game..
+            {
+                if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber &&
+                    result.HitPoints > 0 && !(result.Flags & IFLAG_KILLED) && result.Status == ITEM_INVISIBLE)
+                    lizardCount++;
+            }
         }
         return lizardCount > 0;
     }
@@ -142,7 +152,7 @@ namespace TEN::Entities::Creatures::TR3
         item->SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
         item->SetFlag(BOSSFlag_ExplodeCount, 0);
 
-        if (!FoundAnyLizardInRooms(item)) // if there is no lizard in the current room then remove the flag !
+        if (!FoundAnyLizardInRooms(item, true)) // if there is no lizard in the current room then remove the flag !
             item->RemoveFlag(BOSSFlag_Object, BOSS_Lizard);
     }
 
