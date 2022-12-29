@@ -299,6 +299,11 @@ namespace TEN::Entities::Creatures::TR5
 						(GetRandomControl() & 0x1F) + 128,
 						(GetRandomControl() & 0x1F) + 64);
 
+					auto colorSparks = Vector3(
+						(GetRandomControl() & 0x1F) + 220,
+						(GetRandomControl() & 0x1F) + 200,
+						0.0f);
+
 					auto* arc = guardian->fireArcs[0];
 					if (guardian->fireArcs[0] == nullptr)
 						arc = guardian->fireArcs[1];
@@ -373,7 +378,7 @@ namespace TEN::Entities::Creatures::TR5
 
 								if (GlobalCounter & 1)
 								{
-									SpawnGuardianSparks(origin1.ToVector3(), color, 3);
+									SpawnGuardianSparks(origin1.ToVector3(), colorSparks, 3);
 									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, color.x, color.y, color.z);
 									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 
@@ -381,7 +386,7 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										TriggerLightningGlow(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
-										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), color, 3);
+										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), colorSparks, 3);
 									}
 								}
 
@@ -537,6 +542,11 @@ namespace TEN::Entities::Creatures::TR5
 			((GetRandomControl() & 0x1F) + 128),
 			((GetRandomControl() & 0x1F) + 64));
 
+		auto colorSparks = Vector3(
+			(GetRandomControl() & 0x1F) + 220,
+			(GetRandomControl() & 0x1F) + 200,
+			0.0f);
+
 		if (size <= 32)
 		{
 			color.y = (size * color.y) / 32;
@@ -576,7 +586,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					origin = GetJointPosition(item, GuardianEyeJoints[i]);
 					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), color.x, color.y, color.z);
-					SpawnGuardianSparks(origin.ToVector3(), color, 3);
+					SpawnGuardianSparks(origin.ToVector3(), colorSparks, 3);
 				}
 			}
 
@@ -586,8 +596,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!(GlobalCounter & 3))
 			TriggerLightning(&target, &item->Pose.Position, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
-
-		SpawnGuardianSparks(target.ToVector3(), color, 3, 1);
+			
+		SpawnGuardianSparks(target.ToVector3(), colorSparks, 3, 1);
 	}
 
 	void DoGuardianDeath(int itemNumber, ItemInfo& item)
