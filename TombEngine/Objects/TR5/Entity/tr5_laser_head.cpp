@@ -34,7 +34,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	constexpr auto GUARDIAN_EXPLOSION_TIME = 136;
+	constexpr auto GUARDIAN_EXPLOSION_TIME = 136.0f;
 	const	  auto GUARDIAN_ORIENT_OFFSET  = EulerAngles(ANGLE(18.25f), 0, 0);
 
 	constexpr auto GuardianMeshes		   = std::array<int, 2>{ 1, 2 };
@@ -158,21 +158,22 @@ namespace TEN::Entities::Creatures::TR5
 			origin.RoomNumber = item->RoomNumber;
 			if (item->ItemFlags[0] == 1)
 			{
-				// Get Lara's head position
+				// Get player head position.
 				auto target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i::Zero), LaraItem->RoomNumber);
 				target.RoomNumber = LaraItem->RoomNumber;
-				// Calculate distance between guardian and Lara
-				int distance = sqrt(SQUARE(origin.x - target.x) + SQUARE(origin.y - target.y) + SQUARE(origin.z - target.z));
 
-				// Check if there's a valid LOS between guardian and Lara 
-				// and if distance is less than 8 sectors  and if Lara is alive and not burning
+				// Calculate distance between guardian and player.
+				float distance = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+
+				// Check if there's a clear LOS between the guardian and player,
+				// the distance is less than 8 blocks, the player is alive and not burning
 				if (LOS(&origin, &target) &&
 					distance <= MAX_VISIBILITY_DISTANCE &&
 					LaraItem->HitPoints > 0 &&
 					LaraItem->Effect.Type == EffectType::None &&
 					(guardian->target.x || guardian->target.y || guardian->target.z))
 				{
-					// Lock target for attacking.
+					// Lock attack target.
 					target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.RoomNumber);
 					target.RoomNumber = LaraItem->RoomNumber;
 					guardian->target.x = target.x;
@@ -183,7 +184,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					// Randomly turn head try to finding Lara
+					// Randomly turn head.
 					farAway = !(GetRandomControl() & 0x7F) && item->TriggerFlags > 150;
 					item->ItemFlags[3]--;
 					if (item->ItemFlags[3] <= 0 || farAway)
@@ -334,18 +335,20 @@ namespace TEN::Entities::Creatures::TR5
 								eye.x = origin1.x + (cosX * phd_sin(item->Pose.Orientation.y));
 								eye.y = origin1.y + (MAX_VISIBILITY_DISTANCE * phd_sin(-(targetOrient.x - GUARDIAN_ORIENT_OFFSET.x)));
 								eye.z = origin1.z + (cosX * phd_cos(item->Pose.Orientation.y));
-
+								
 								if (item->ItemFlags[3] != 90 && guardian->fireArcs[i])
 								{
-									// Eye is aready firing.
+									// Eye is already firing.
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
 									guardian->fireArcs[i]->pos1.x =  origin1.x;
 									guardian->fireArcs[i]->pos1.y =  origin1.y;
 									guardian->fireArcs[i]->pos1.z =  origin1.z;
 
-									//resets fireArcs and let head follow Lara
+									// Reset fireArcs and let head follow player.
 									if (guardian->fireArcs[i]->life > 0)
+									{
 										guardian->fireArcs[i]->life -= 2;
+									}
 									else
 									{
 										guardian->fireArcs[i]->life = 0;
@@ -356,7 +359,7 @@ namespace TEN::Entities::Creatures::TR5
 								}
 								else
 								{
-									// Start firing from eye
+									// Start firing from eye.
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
 									guardian->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
@@ -378,7 +381,7 @@ namespace TEN::Entities::Creatures::TR5
 									}
 								}
 
-								// Check if Lara was hit by energy arcs
+								// Check if player was hit by energy arcs
 								if (LaraItem->Effect.Type == EffectType::None && guardian->fireArcs[i] != nullptr)
 								{
 									int adx = guardian->fireArcs[i]->pos4.x - origin1.x;
@@ -413,7 +416,9 @@ namespace TEN::Entities::Creatures::TR5
 												ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 1 * FPS);
 											}
 											else
+											{
 												ItemSmoke(LaraItem, -1);
+											}
 
 											DoDamage(LaraItem, INT_MAX);
 											break;
@@ -467,18 +472,19 @@ namespace TEN::Entities::Creatures::TR5
 			item->Pose.Position.y = item->ItemFlags[1] - (192 - item->Animation.Velocity.z) * phd_sin(item->ItemFlags[2]);
 			item->ItemFlags[2] += ANGLE(item->Animation.Velocity.z);
 
+			// Set random target orientation.
 			if (!(GlobalCounter & 7))
 			{
-				item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - 4096;
-				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
+				item->ItemFlags[3] = Random::GenerateAngle();
+				item->TriggerFlags = Random::GenerateAngle(-ANGLE(12.0f), ANGLE(12.0f));
 			}
 
 			auto targetOrient = EulerAngles(item->TriggerFlags, item->ItemFlags[3], 0);
 			item->Pose.Orientation.Lerp(targetOrient, 0.25f);
 
-			// Death explosion.
+			// Death sequence.
 			item->Animation.Velocity.z += 1.0f;
-			if (item->Animation.Velocity.z > GUARDIAN_EXPLOSION_TIME)
+			if (item->Animation.Velocity.z >= GUARDIAN_EXPLOSION_TIME)
 				DoGuardianDeath(itemNumber, *item);
 		}
 
@@ -522,14 +528,16 @@ namespace TEN::Entities::Creatures::TR5
 		auto* guardian = &GetGuardianInfo(*item);
 
 		byte size = item->ItemFlags[3];
-		byte r = 0;
-		byte g = ((GetRandomControl() & 0x1F) + 128);
-		byte b = ((GetRandomControl() & 0x1F) + 64);
+
+		auto color = Vector3(
+			0.0f,
+			((GetRandomControl() & 0x1F) + 128),
+			((GetRandomControl() & 0x1F) + 64));
 
 		if (size <= 32)
 		{
-			g = (size * g) / 32;
-			b = (size * b) / 32;
+			color.y = (size * color.y) / 32;
+			color.z = (size * color.z) / 32;
 		}
 		else
 		{
@@ -545,15 +553,16 @@ namespace TEN::Entities::Creatures::TR5
 
 			if (item->ItemFlags[3] & 15 && arc != nullptr)
 			{
-				arc->r = b;
-				arc->g = g;
-				arc->b = 0;
+				// NOTE: x and z inverted?
+				arc->r = color.z;
+				arc->g = color.y;
+				arc->b = color.x;
 				arc->life = 50;
 				continue;
 			}
 
 			origin = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianChargePositions[i]);
-			TriggerLightning(&origin, &target, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			TriggerLightning(&origin, &target, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
 		}
 
 		if (GlobalCounter & 1)
@@ -563,19 +572,19 @@ namespace TEN::Entities::Creatures::TR5
 				if (item->MeshBits.Test(GuardianMeshes[i]))
 				{
 					origin = GetJointPosition(item, GuardianMeshes[i]);
-					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), 0, g, b);
-					SpawnGuardianSparks(origin.ToVector3(), Vector3(0, g, b), 3);
+					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), color.x, color.y, color.z);
+					SpawnGuardianSparks(origin.ToVector3(), color, 3);
 				}
 			}
 
-			TriggerLightningGlow(target.x, target.y, target.z, (GetRandomControl() & 3) + size + 8, 0, g, b);
-			TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, 0, g, b);
+			TriggerLightningGlow(target.x, target.y, target.z, (GetRandomControl() & 3) + size + 8, color.x, color.y, color.z);
+			TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 		}
 
 		if (!(GlobalCounter & 3))
-			TriggerLightning(&target, &item->Pose.Position, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			TriggerLightning(&target, &item->Pose.Position, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
 
-		SpawnGuardianSparks(target.ToVector3(), Vector3(0, g, b), 3, 1);
+		SpawnGuardianSparks(target.ToVector3(), color, 3, 1);
 	}
 
 	void DoGuardianDeath(int itemNumber, ItemInfo& item)
