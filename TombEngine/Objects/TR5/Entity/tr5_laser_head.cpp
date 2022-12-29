@@ -59,13 +59,13 @@ namespace TEN::Entities::Creatures::TR5
 		item.Data = LaserHeadInfo();
 		auto* guardian = &GetGuardianInfo(item);
 
-		int vPos = item.Pose.Position.y - 640;
+		int vPos = item.Pose.Position.y + GuardianBasePosition.y;
 
 		item.Collidable = true;
 		item.StartPose = item.Pose;
 		item.Pose.Position.y = vPos;
 		item.Animation.ActiveState = 0;
-		item.ItemFlags[1] = vPos - 640;
+		item.ItemFlags[1] = vPos + GuardianBasePosition.y;
 		item.ItemFlags[3] = ANGLE(0.5f);
 
 		// Initialize base.
