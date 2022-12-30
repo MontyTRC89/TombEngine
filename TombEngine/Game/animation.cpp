@@ -319,6 +319,11 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	return false;
 }
 
+bool TestCurrentAnimation(const ItemInfo& item, int animNumber)
+{
+	return (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + animNumber));
+}
+
 bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	if (animNumber == NO_ANIM)
@@ -328,25 +333,26 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 		return false;
 
 	const auto& anim = g_Level.Anims[animNumber];
-
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
-bool TestCurrentAnimation(ItemInfo* item, int animIndex)
+bool TestSingleFrame(const ItemInfo& item, int frameStart)
 {
-	return animIndex == NO_ANIM ? false : item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + animIndex;
+	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
+	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
 }
 
-bool TestFrameSingle(ItemInfo* item, int frameToStart)
+bool TestFrameInRange(const ItemInfo& item, int frameStart, int frameEnd)
 {
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
-	return item->Animation.FrameNumber == (anim.frameBase + frameToStart);
-}
+	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
 
-bool TestFrameBetween(ItemInfo* item, int frameStart, int frameEnd)
-{
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
-	return item->Animation.FrameNumber >= (anim.frameBase + frameStart) && item->Animation.FrameNumber <= (anim.frameBase + frameEnd);
+	if (item.Animation.FrameNumber >= (anim.frameBase + frameStart) &&
+		item.Animation.FrameNumber <= (anim.frameBase + frameEnd))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)

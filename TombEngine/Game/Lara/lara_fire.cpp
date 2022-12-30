@@ -19,11 +19,11 @@
 #include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
-#include "Objects/TR3/Object/tr3_boss_object.h"
-#include "Objects/TR3/Entity/tr3_punaboss.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/TR3/Entity/tr3_punaboss.h"
+#include "Objects/TR3/Object/tr3_boss_object.h"
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
@@ -32,9 +32,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Entities::Object::TR3;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Entities::Object::TR3;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -788,9 +788,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 	const auto& weapon = Weapons[(int)weaponType];
 
+	// TODO: Check. Might need to be half accuracy.
 	auto wobbledArmOrient = EulerAngles(
-		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
-		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
+		armOrient.x + Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy),
+		armOrient.y + Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy),
 		0);
 
 	auto muzzleOffset = GetJointPosition(laraItem, LM_RHAND);
@@ -836,19 +837,19 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	}
 	else
 	{
-
 		target = origin + (directionNorm * bestDistance);
 
 		auto vTarget = GameVector(target);
 
 		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
 		{
-			// Shield is loaded ?
-			// And puna activated it ?
-			// Then spawn it and do the richochet effect !
-			if (targetEntity->TestFlag(BOSSFlag_Object, BOSS_Shield) && targetEntity->TestFlagEqual(BOSSFlag_ShieldIsEnabled, 1))
+			// If shield is active and Puna is the activator, spawn shield with rocochet effect.
+			if (targetEntity->TestFlag(BOSSFlag_Object, BOSS_Shield) &&
+				targetEntity->TestFlagEqual(BOSSFlag_ShieldIsEnabled, 1))
 			{
-				BOSS_SpawnShieldAndRichochetSparksAtPosition(vTarget.x, vTarget.y, vTarget.z, targetEntity, Vector4(0.0f, 0.5f, 0.5f, 0.1f));
+				static constexpr auto punaShieldColor = Vector4(0.0f, 0.5f, 0.5f, 0.1f);
+
+				BOSS_SpawnShieldAndRichochetSparksAtPosition(*targetEntity, vTarget.ToVector3(), punaShieldColor);
 				return FireWeaponType::Miss;
 			}
 		}

@@ -69,7 +69,7 @@ namespace TEN::Effects::Spark
 		s.active = true;
 	}
 
-	void TriggerRicochetSpark(const GameVector& pos, short angle, int count, const Vector4& sourceColor)
+	void TriggerRicochetSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
 	{
 		for (int i = 0; i < count; i++) 
 		{
@@ -88,7 +88,7 @@ namespace TEN::Effects::Spark
 			v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 			v.Normalize(v);
 			s.velocity = v * GenerateFloat(17, 24);
-			s.sourceColor = sourceColor * 3;
+			s.sourceColor = colorStart * 3;
 			s.destinationColor = Vector4(0, 0, 0, 0);
 			s.active = true;
 		}

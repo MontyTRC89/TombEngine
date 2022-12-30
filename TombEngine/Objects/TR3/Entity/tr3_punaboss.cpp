@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
         auto* item = &g_Level.Items[itemNumber];
         InitialiseCreature(itemNumber);
         SetAnimation(item, PUNA_IDLE);
-        BOSS_CheckForRequiredObjects(item);
+        BOSS_CheckForRequiredObjects(*item);
 
         // save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
         // puna is rotated to not face lara, so add 180° to face her.
@@ -182,7 +182,7 @@ namespace TEN::Entities::Creatures::TR3
     void PunaLaser(ItemInfo* item, CreatureInfo* creature, const Vector3i& pos, const BiteInfo& bite, int intensity, bool isSummon)
     {
         GameVector src = GameVector(GetJointPosition(item, bite.meshNum, bite.Position), item->RoomNumber);
-        GameVector target = GameVector(Geometry::GetTargetPosition(src.ToVector3i(), pos, PUNABOSS_SHOOTING_DISTANCE), creature->Enemy->RoomNumber);
+        GameVector target = GameVector(Geometry::GetPointAlongLine(src.ToVector3(), pos.ToVector3(), PUNABOSS_SHOOTING_DISTANCE), creature->Enemy->RoomNumber);
         
         if (isSummon)
         {
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR3
                 if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
                     item->ItemFlags[BOSSFlag_ExplodeCount]++;
                 if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
-                    BOSS_ExplodeBoss(itemNumber, item, 61, PunaBossEffectColor); // Do explosion effect.
+                    BOSS_ExplodeBoss(itemNumber, *item, 61, PunaBossEffectColor); // Do explosion effect.
 
                 return;
             }

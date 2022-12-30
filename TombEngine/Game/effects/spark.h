@@ -5,6 +5,8 @@
 
 namespace TEN::Effects::Spark
 {
+	constexpr auto SPARK_RICOCHET_COLOR_DEFAULT = Vector4(1.0f, 0.8f, 0.2f, 1.0f);
+
 	struct SparkParticle
 	{
 		Vector3 pos;
@@ -26,7 +28,7 @@ namespace TEN::Effects::Spark
 	void UpdateSparkParticles();
 	SparkParticle& GetFreeSparkParticle();
 	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber);
-	void TriggerRicochetSpark(const GameVector& pos, short angle, int num, const Vector4& sourceColor = Vector4(1, 0.8f, 0.2f, 1)); // sourceColor is default for spark.
+	void TriggerRicochetSpark(const GameVector& pos, short angle, int num, const Vector4& colorStart = SPARK_RICOCHET_COLOR_DEFAULT);
 	void TriggerFrictionSpark(const GameVector& pos, const EulerAngles& angle, float length, int count);
 	void TriggerElectricSpark(const GameVector& pos, const EulerAngles& angle, int count);
 	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color);

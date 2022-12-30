@@ -22,10 +22,9 @@ namespace TEN::Entities::Creatures::TR2
 		EAGLE_CROW_STATE_FLY = 1,
 		EAGLE_CROW_STATE_IDLE = 2,
 		EAGLE_CROW_STATE_PLANE = 3,
-		EAGLE_CROW_STATE_START_DEATH = 4,
-		EAGLE_CROW_STATE_DEATH = 5,
-		EAGLE_CROW_STATE_ATTACK = 6,
-
+		EAGLE_CROW_STATE_DEATH_START = 4,
+		EAGLE_CROW_STATE_DEATH_END = 5,
+		EAGLE_CROW_STATE_ATTACK = 6
 	};
 
 	enum EagleOrCrowAnim
@@ -60,6 +59,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
+
 		short angle = 0;
 
 		if (item->HitPoints <= 0)

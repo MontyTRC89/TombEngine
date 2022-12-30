@@ -1147,7 +1147,7 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	return true;
 }
 
-// TODO: Do it via Lua instead. -- TokyoSU 22.12.22
+// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
 bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)

@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
+
 #include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
@@ -23,7 +24,7 @@
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-#include "Objects/TR3/Entity/tr3_lizard.h" // OK
+#include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/tr3_punaboss.h" // OK
 #include "Objects/TR3/Entity/tr3_willard.h" // IN_DEV
 
@@ -42,8 +43,8 @@
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/Utils/object_helper.h"
 
-using namespace TEN::Entities::Object::TR3;
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Object::TR3;
 
 static void StartEntity(ObjectInfo* obj)
 {

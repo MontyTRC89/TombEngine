@@ -23,7 +23,7 @@ using namespace TEN::Control::Volumes;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
-bool ItemInfo::TestOcb(short ocbFlags)
+bool ItemInfo::TestOcb(short ocbFlags) const
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
 }
@@ -38,7 +38,7 @@ void ItemInfo::ClearAllOcb()
 	TriggerFlags = 0;
 }
 
-bool ItemInfo::TestFlag(short id, short value)
+bool ItemInfo::TestFlag(short id, short value) const
 {
 	if (id < 0 || id > 7)
 		return false;
@@ -46,7 +46,7 @@ bool ItemInfo::TestFlag(short id, short value)
 	return (ItemFlags[id] & value) != 0;
 }
 
-bool ItemInfo::TestFlagEqual(short id, short value)
+bool ItemInfo::TestFlagEqual(short id, short value) const
 {
 	if (id < 0 || id > 7)
 		return false;
@@ -54,7 +54,7 @@ bool ItemInfo::TestFlagEqual(short id, short value)
 	return (ItemFlags[id] == value);
 }
 
-bool ItemInfo::TestFlagDiff(short id, short value)
+bool ItemInfo::TestFlagDiff(short id, short value) const
 {
 	if (id < 0 || id > 7)
 		return false;
@@ -564,9 +564,11 @@ short CreateItem()
 {
 	if (NextItemFree == NO_ITEM)
 		return NO_ITEM;
+
 	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
+
 	return itemNumber;
 }
 

@@ -154,16 +154,16 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	bool TestOcb(short ocbFlags);
+	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
 
 	// test value (ItemFlags[id] & value)
-	bool TestFlag(short id, short value);
+	bool TestFlag(short id, short value) const;
 	// test value (ItemFlags[id] == value)
-	bool TestFlagEqual(short id, short value);
+	bool TestFlagEqual(short id, short value) const;
 	// test value (ItemFlags[id] != value)
-	bool TestFlagDiff(short id, short value);
+	bool TestFlagDiff(short id, short value) const;
 	// set value (ItemFlags[id] = value)
 	void SetFlag(short id, short value);
 	// get value (return ItemFlags[id])

@@ -242,6 +242,7 @@ namespace TEN::Entities::TR4
 				}
 
 				auto* currentItem = &g_Level.Items[targetCreature->ItemNumber];
+
 				if (abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= CLICK(2))
 				{
 					dx = currentItem->Pose.Position.x - item->Pose.Position.x;

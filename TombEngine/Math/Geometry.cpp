@@ -109,27 +109,19 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (direction * distanceAlpha));
 	}
 
+	Vector3 GetPointAlongLine(const Vector3& linePoint0, const Vector3& linePoint1, float distance)
+	{
+		auto direction = linePoint1 - linePoint0;
+		direction.Normalize();
+		return (linePoint0 + (direction * distance));
+	}
+
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)
 			return EulerAngles::Zero;
 
 		return EulerAngles(target - origin);
-	}
-
-	Vector3i GetTargetPosition(const Vector3i& src, const Vector3i& target)
-	{
-		return GetTargetPosition(src, target, Vector3i::Distance(src, target));
-	}
-
-	Vector3i GetTargetPosition(const Vector3i& src, const Vector3i& target, int distance)
-	{
-		auto result = Vector3i::Zero;
-		auto orient = GetOrientToPoint(src.ToVector3(), target.ToVector3());
-		result.x = src.x + ((distance * phd_cos(orient.x)) * phd_sin(orient.y));
-		result.y = src.y + (distance * phd_sin(-orient.x));
-		result.z = src.z + ((distance * phd_cos(orient.x)) * phd_cos(orient.y));
-		return result;
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)

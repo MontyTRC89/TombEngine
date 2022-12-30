@@ -166,7 +166,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_punaboss.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_willard.h" />
     <ClInclude Include="Objects\TR3\Object\tr3_boss_object.h" />
@@ -639,7 +639,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_punaboss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_willard.cpp" />
     <ClCompile Include="Objects\TR3\Object\tr3_boss_object.cpp" />
