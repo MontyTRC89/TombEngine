@@ -17,7 +17,7 @@ using namespace TEN::Effects::Items;
 
 namespace TEN::Entities::Creatures::TR3
 {
-    const auto PunaBossEffectColor = Vector4(0.25f, 0.25f, 0.75f, 0.5f);
+    const auto PunaBossEffectColor = Vector4(0.0f, 0.75f, 0.75f, 1.0f);
     const auto PunaBossHeadBite = BiteInfo(0, 0, 0, 8);
     const auto PunaBossHandBite = BiteInfo(0, 0, 0, 14);
 
@@ -179,21 +179,15 @@ namespace TEN::Entities::Creatures::TR3
         }
     }
 
-    void PunaLaser(ItemInfo* item, CreatureInfo* creature, const BiteInfo& bite, int intensity, short xHeadAngle, bool isSummon) // TODO: deal with LaraItem global !
+    void PunaLaser(ItemInfo* item, CreatureInfo* creature, const Vector3i& pos, const BiteInfo& bite, int intensity, bool isSummon)
     {
-        if (!isSummon)
-            xHeadAngle -= PUMABOSS_ADJUST_LASER_XANGLE;
-
         GameVector src = GameVector(GetJointPosition(item, bite.meshNum, bite.Position), item->RoomNumber);
-        GameVector target;
-        target.x = src.x + ((PUNABOSS_SHOOTING_DISTANCE * phd_cos(xHeadAngle)) * phd_sin(item->Pose.Orientation.y));
-        target.y = src.y + (PUNABOSS_SHOOTING_DISTANCE * phd_sin(-xHeadAngle));
-        target.z = src.z + ((PUNABOSS_SHOOTING_DISTANCE * phd_cos(xHeadAngle)) * phd_cos(item->Pose.Orientation.y));
-        target.RoomNumber = creature->Enemy->RoomNumber;
-
+        GameVector target = GameVector(Geometry::GetTargetPosition(src.ToVector3i(), pos, PUNABOSS_SHOOTING_DISTANCE), creature->Enemy->RoomNumber);
+        
         if (isSummon)
         {
             TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+            TriggerDynamicLight(src.x, src.y, src.z, 20, 0, 255, 0);
             item->SetFlag(BOSSFlag_AttackType, PUNA_Wait);
             SpawnLizard(item);
         }
@@ -202,6 +196,7 @@ namespace TEN::Entities::Creatures::TR3
             Vector3i hitPos = Vector3i::Zero;
             MESH_INFO* mesh = nullptr;
             TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+            TriggerDynamicLight(src.x, src.y, src.z, 20, 0, 255, 255);
             if (ObjectOnLOS2(&src, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature->Enemy)->ItemNumber)
             {
                 if (creature->Enemy->HitPoints <= PUNABOSS_LASER_DAMAGE)
@@ -239,7 +234,8 @@ namespace TEN::Entities::Creatures::TR3
         auto* item = &g_Level.Items[itemNumber];
         auto* creature = GetCreatureInfo(item);
         auto* object = &Objects[item->ObjectNumber];
-        
+        static auto targetPosition = Vector3i::Zero;
+
         auto head = EulerAngles::Zero;
         short angle = 0, oldrotation = 0;
         bool haveTurned = false;
@@ -261,17 +257,18 @@ namespace TEN::Entities::Creatures::TR3
                 item->Animation.FrameNumber = frameMaxLess1; // avoid the object to stop working.
                 item->MeshBits.ClearAll();
 
-                if (item->ItemFlags[BOSSFlag_ExplodeCount] < PUNABOSS_EXPLOSION_COUNT_MAX)
+                if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
                     item->ItemFlags[BOSSFlag_ExplodeCount]++;
-                if (item->ItemFlags[BOSSFlag_ExplodeCount] < PUNABOSS_EXPLOSION_COUNT_MAX)
+                if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
                     BOSS_ExplodeBoss(itemNumber, item, 61, PunaBossEffectColor); // Do explosion effect.
 
                 return;
             }
             else
             {
-                item->Pose.Orientation.z = (Random::GenerateInt() % item->ItemFlags[BOSSFlag_DeathCount]) - (item->ItemFlags[BOSSFlag_DeathCount] >> 1);
-                if (item->ItemFlags[BOSSFlag_DeathCount] < 2048)
+                auto deathCount = item->GetFlag(BOSSFlag_DeathCount);
+                item->Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item->ItemFlags[BOSSFlag_DeathCount] >> 1);
+                if (deathCount < 2048)
                     item->ItemFlags[BOSSFlag_DeathCount] += 32;
             }
         }
@@ -349,7 +346,10 @@ namespace TEN::Entities::Creatures::TR3
                     item->TestFlagDiff(BOSSFlag_AttackType, PUNA_SummonLaser) && item->TestFlagDiff(BOSSFlag_AttackType, PUNA_Wait))
                 {
                     creature->MaxTurn = 0;
+                    targetPosition = creature->Target;
+                    targetPosition.y -= CLICK(2);
                     item->SetFlag(BOSSFlag_AttackType, PUNA_DeathLaser);
+
 
                     if (Random::GenerateInt(0, 2) == 1) // alternate attack with head/hand, 1/3 chance
                         item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HEAD;
@@ -364,7 +364,11 @@ namespace TEN::Entities::Creatures::TR3
                     if (item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
                     {
                         if (angleHead > -ANGLE(1) && angleHead < ANGLE(1))
+                        {
+                            targetPosition = creature->Target;
+                            targetPosition.y -= CLICK(2);
                             item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
+                        }
                     }
                 }
 
@@ -375,7 +379,7 @@ namespace TEN::Entities::Creatures::TR3
 
                 if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
                 {
-                    PunaLaser(item, creature, PunaBossHeadBite, 10, head.x, false);
+                    PunaLaser(item, creature, targetPosition, PunaBossHeadBite, 10, false);
                 }
 
                 break;
@@ -388,9 +392,9 @@ namespace TEN::Entities::Creatures::TR3
                     if (item->TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
                         item->TestFlagEqual(BOSSFlag_AttackType, PUNA_SummonLaser) &&
                         item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM) && haveAnyLizardLeft)
-                        PunaLaser(item, creature, PunaBossHandBite, 5, head.x, true);
+                        PunaLaser(item, creature, targetPosition, PunaBossHandBite, 5, true);
                     else
-                        PunaLaser(item, creature, PunaBossHandBite, 10, head.x, false);
+                        PunaLaser(item, creature, targetPosition, PunaBossHandBite, 10, false);
                 }
 
                 break;

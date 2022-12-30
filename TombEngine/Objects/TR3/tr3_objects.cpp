@@ -346,7 +346,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->ZoneType = ZoneType::Basic;
 		obj->SetupHitEffect();
 	}
 }

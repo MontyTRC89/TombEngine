@@ -247,6 +247,7 @@ namespace TEN::Entities::Object::TR3
             BOSS_SpawnShockwaveRing(item, random, explosionColor);
         }
 
+        TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z, counter / 2, explosionColor.x * 255, explosionColor.y * 255, explosionColor.z * 255);
         if (counter == deathCountToDie)
             CreatureDie(itemNumber, true);
     }
@@ -269,7 +270,7 @@ namespace TEN::Entities::Object::TR3
     {
         BOSS_SpawnShield(item, shieldColor);
         auto target = GameVector(x, y, z, item->RoomNumber);
-        auto rotY = Math::Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), target.ToVector3()).y;
+        auto rotY = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), target.ToVector3()).y;
         auto sparkColor = shieldColor;
         sparkColor.w = 1;
         TriggerRicochetSpark(target, rotY, 13, sparkColor);
