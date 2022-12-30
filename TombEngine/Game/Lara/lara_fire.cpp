@@ -846,7 +846,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			// Shield is loaded ?
 			// And puna activated it ?
 			// Then spawn it and do the richochet effect !
-			if (CHK_ANY(targetEntity->ItemFlags[BOSSFlag_Object], BOSS_Shield) && targetEntity->ItemFlags[BOSSFlag_ShieldIsEnabled] == 1)
+			if (targetEntity->TestFlag(BOSSFlag_Object, BOSS_Shield) && targetEntity->TestFlagEqual(BOSSFlag_ShieldIsEnabled, 1))
 			{
 				BOSS_SpawnShieldAndRichochetSparksAtPosition(vTarget.x, vTarget.y, vTarget.z, targetEntity, Vector4(0.0f, 0.5f, 0.5f, 0.1f));
 				return FireWeaponType::Miss;
