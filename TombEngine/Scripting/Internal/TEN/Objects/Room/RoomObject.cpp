@@ -72,6 +72,7 @@ void Room::Register(sol::table& parent)
 
 		/// Checks if specified tag is set for this room.
 		// @function Room:IsTagPresent
+		// @tparam string tag A text tag to check (case sensitive)
 		// @treturn bool true if tag is present, false if not
 		ScriptReserved_IsTagPresent, &Room::IsTagPresent);
 }
