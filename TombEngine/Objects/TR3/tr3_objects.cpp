@@ -26,6 +26,7 @@
 
 // Traps
 #include "Objects/TR3/Trap/train.h"
+#include "Objects/TR3/Trap/cleaner.h"
 
 // Vehicles
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -308,6 +309,18 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
 		obj->SetupHitEffect(true);
+	}
+
+	obj = &Objects[ID_ELECTRIC_CLEANER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCleaner;
+		obj->control = CleanerControl;
+		obj->collision = CleanerCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = NOT_TARGETABLE;
+		obj->nonLot = 1;
+		obj->radius = 512;
 	}
 }
 
