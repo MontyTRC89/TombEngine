@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR3
 
         if (item->HitPoints <= 0)
         {
-            if (item->Animation.ActiveState != LIZARD_STATE_DEATH) // Avoid doing the animation if it's a summon !
+            if (item->Animation.ActiveState != LIZARD_STATE_DEATH)
                 SetAnimation(item, LIZARD_ANIMATION_DEATH);
             // is lizard summoned ?
             if (item->TestFlagEqual(0, 1) && item->Animation.FrameNumber == GetFrameNumber(item, 50))
