@@ -40,12 +40,12 @@ void Room::Register(sol::table& parent)
 
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
-		// @treturn Objects.RoomReverbType room's reverb type
+		// @treturn Objects.RoomReverb room's reverb type
 		ScriptReserved_GetPosition, &Room::GetReverbType,
 
 		/// Set the room's reverb type.
 		// @function Room:SetReverbType
-		// @tparam Objects.RoomReverbType new reverb type of the room 
+		// @tparam Objects.RoomReverb new reverb type of the room 
 		ScriptReserved_SetReverbType, &Room::SetReverbType,
 
 		/// Get the room's unique string identifier.

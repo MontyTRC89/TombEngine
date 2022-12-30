@@ -6,7 +6,7 @@
 
 /***
 Constants for room flag IDs.
-@enum Objects.RoomFlag
+@enum Objects.RoomFlagID
 @pragma nostrip
 */
 
