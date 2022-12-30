@@ -60,13 +60,13 @@ void Room::Register(sol::table& parent)
 
 		/// Get the room's specified flag value (true or false).
 		// @function Room:GetFlag
-		// @tparam Objects.RoomFlag flagID The room's flag ID
+		// @tparam Objects.RoomFlagID flagID The room's flag ID
 		// @treturn bool the room's specified flag value
 		ScriptReserved_GetFlag, &Room::GetFlag,
 
 		/// Set the room's specified flag value.
 		// @function Room:SetFlag
-		// @tparam Objects.RoomFlag flagID The room's flag ID
+		// @tparam Objects.RoomFlagID flagID The room's flag ID
 		// @tparam bool the room's new flag value
 		ScriptReserved_SetFlag, &Room::SetFlag,
 
