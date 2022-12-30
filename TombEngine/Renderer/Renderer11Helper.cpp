@@ -22,11 +22,14 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
+#include "Math/Math.h"
 #include "Renderer/RenderView/RenderView.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math;
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
@@ -36,7 +39,7 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
@@ -407,6 +410,13 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		pos = Vector3::Transform(pos, world);
+	}
+
+	EulerAngles Renderer11::GetItemBoneOrientation(int itemNumber, int jointIndex)
+	{
+		auto& rItem = m_items[itemNumber];
+
+		return EulerAngles(rItem.AnimationTransforms[0]);
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)

@@ -521,11 +521,14 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
 {
-	// Get real item number.
-	short itemNumber = item - g_Level.Items.data();
-
 	// Use matrices done in the renderer to transform the offset vector.
 	auto pos = offset.ToVector3();
-	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
+	g_Renderer.GetItemAbsBonePosition(item->Index, pos, jointIndex);
 	return Vector3i(pos);
+}
+
+EulerAngles GetJointOrientation(const ItemInfo& item, int jointIndex)
+{
+	// Interpret matrices done in renderer as Euler angles.
+	return g_Renderer.GetItemBoneOrientation(item.Index, jointIndex);
 }

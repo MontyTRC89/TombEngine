@@ -390,28 +390,28 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j2, float heelHeight)
 {
-    // Get joint positions.
+	// Get joint positions.
 	auto origin = GetJointPosition(item, LM_HIPS).ToVector3();
 	auto absEnd = GetJointPosition(item, j2).ToVector3();
 
-    auto start = GetJointPosition(item, j0).ToVector3() - origin;
-    auto middle = GetJointPosition(item, j1).ToVector3() - origin;
-    auto end = absEnd - origin;
+	auto base = GetJointPosition(item, j0).ToVector3() - origin;
+	auto middle = GetJointPosition(item, j1).ToVector3() - origin;
+	auto end = absEnd - origin;
 
-    // Get bone lengths.
-    float length0 = (middle - start).Length();
-    float length1 = (end - middle).Length();
-	
+	// Get bone lengths.
+	float length0 = (middle - base).Length();
+	float length1 = (end - middle).Length();
+
 	// Clamp the foot position to the floor height at its position.
 	int floorHeight = GetCollision(absEnd.x, absEnd.y, absEnd.z, item->RoomNumber).Position.Floor - origin.y;
-    if (end.y > floorHeight)
-        end.y = floorHeight;
+	if (end.y > floorHeight)
+		end.y = floorHeight;
 
 	// Calculate the position of the pole vector.
 	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y - ANGLE(90.0f), BLOCK(0.5f));
 
-    // Solve the 3D IK problem.
-	auto ikSol = Solvers::SolveIK3D(start, end, pole, length0, length1);
+	// Solve the 3D IK problem.
+	auto ikSol = Solvers::SolveIK3D(base, end, pole, length0, length1);
 
 	auto offset = Geometry::TranslatePoint(Vector3::Zero, item->Pose.Orientation.y, 0);
 	auto offset2 = origin + offset;
@@ -422,26 +422,20 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 	g_Renderer.AddLine3D(ikSol.Base + offset2, ikSol.Middle + offset2, Vector4::One);
 	g_Renderer.AddLine3D(ikSol.Middle + offset2, ikSol.End + offset2, Vector4::One);
 
-	auto currentBaseOrient = Geometry::GetOrientToPoint(start, middle);
-	auto currentMiddleOrient = Geometry::GetOrientToPoint(middle, end);
-    // Store the orientations in the limb rotation data.
-	limbRot.Base = ikSol.OrientA;// -EulerAngles(-currentBaseOrient.x, 0, 0);
-	limbRot.Middle = ikSol.OrientB;// -EulerAngles(currentMiddleOrient.x, 0, 0);
+	auto currentBaseOrient = GetJointOrientation(*item, j0);
+	auto currentMiddleOrient = GetJointOrientation(*item, j1);
 
-    // Calculate the rotation of the end bone required to align it with the floor.
-    auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+    // Calculate and store required bone rotations in limb rotation data.
+	limbRot.Base = ikSol.OrientA;
+	limbRot.Middle = ikSol.OrientB;
 
-	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
-	float sinDeltaAngle = phd_sin(deltaAngle);
-	float cosDeltaAngle = phd_cos(deltaAngle);
+	// Determine relative orientation to floor normal.
+	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
-	limbRot.End = EulerAngles(
-		-steepnessAngle * cosDeltaAngle,
-		0,
-		steepnessAngle * sinDeltaAngle) -
-		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	// Apply extra rotation according to alpha.
+	auto extraRot = orient - item->Pose.Orientation;
+	limbRot.End = extraRot;
 }
 
 void DoLegIK(ItemInfo* item, CollisionInfo* coll, int threshold)
@@ -449,6 +443,9 @@ void DoLegIK(ItemInfo* item, CollisionInfo* coll, int threshold)
 	static constexpr auto heelHeight = 78.0f;
 
 	auto& player = *GetLaraInfo(item);
+
+	float lFootHeight = GetJointPosition(item, LM_LFOOT).ToVector3().y;
+	float rFootHeight = GetJointPosition(item, LM_RFOOT).ToVector3().y;
 
 	SolveLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
 	SolveLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);

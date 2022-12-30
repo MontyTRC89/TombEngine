@@ -331,7 +331,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
+	headingAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(probe.FloorTilt));
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -538,8 +538,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
+		short steepness = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(probe.FloorTilt));
+		short direction = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(probe.FloorTilt));
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -556,23 +556,12 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Calculate surface angles.
-	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
-
-	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
-	float sinDeltaAngle = phd_sin(deltaAngle);
-	float cosDeltaAngle = phd_cos(deltaAngle);
-
-	// Calculate extra rotation required.
-	auto extraRot = EulerAngles(
-		-steepnessAngle * cosDeltaAngle,
-		0,
-		steepnessAngle * sinDeltaAngle
-	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	// Determine relative orientation to floor normal.
+	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
+	auto extraRot = orient - item->Pose.Orientation;
 	item->Pose.Orientation += extraRot * alpha;
 }
 

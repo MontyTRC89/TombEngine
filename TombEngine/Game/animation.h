@@ -106,5 +106,6 @@ void ClampRotation(Pose& outPose, short angle, short rotation);
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
+EulerAngles GetJointOrientation(const ItemInfo& item, int jointIndex);
 
 void PerformAnimCommands(ItemInfo* item, bool isFrameBased);

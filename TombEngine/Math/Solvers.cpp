@@ -93,7 +93,7 @@ namespace TEN::Math::Solvers
 		float middleEndAngle = acos((SQUARE(a) + SQUARE(c) - SQUARE(b)) / (2.0f * a * c));
 		//float startEndAngle = acos((SQUARE(a) + SQUARE(b) - SQUARE(c)) / (2.0f * a * b));
 
-		// Store relative Xangles of joints.
+		// Store relative X angles of joints.
 		solution.OrientA.x = FROM_RAD(startMiddleAngle);
 		solution.OrientB.x = FROM_RAD(-middleEndAngle);
 
@@ -103,7 +103,7 @@ namespace TEN::Math::Solvers
 		auto poleDirection = pole - origin;
 		poleDirection.Normalize();
 
-		// Calculate the cross product of the ikDirection and pole direction vectors to get a vector perpendicular to both
+		// Calculate the cross product of the ikDirection and pole direction vectors to get a vector perpendicular to both.
 		auto perp = ikDirection.Cross(poleDirection);
 
 		// Calculate the middle joint position and store it.
