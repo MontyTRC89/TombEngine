@@ -146,17 +146,13 @@ void Moveable::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
-/// Enable the item, as if a trigger for it had been stepped on.
-// @function Moveable:Enable
 	ScriptReserved_Enable, &Moveable::EnableItem,
 
-/// Disable the item
-// @function Moveable:Disable
 	ScriptReserved_Disable, &Moveable::DisableItem,
 
-/// Make the item invisible. Use EnableItem to make it visible again.
-// @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
+
+	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
@@ -194,20 +190,14 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-/// Set the name of the function to be called when the moveable is shot by Lara
+/// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
 // @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-/// Set the function to be called called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
 /// Set the name of the function to be called when the moveable is destroyed/killed
@@ -327,29 +317,8 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Color color the new color of the moveable 
 	ScriptReserved_SetColor, &Moveable::SetColor,
 
-/// Get AIBits of object
-// This will return a table with six values, each corresponding to
-// an active behaviour. If the object is in a certain AI mode, the table will
-// have a *1* in the corresponding cell. Otherwise, the cell will hold
-// a *0*.
-// 1 - guard
-// 2 - ambush
-// 3 - patrol 1
-// 4 - modify
-// 5 - follow
-// 6 - patrol 2
-// @function Moveable:GetAIBits
-// @treturn table a table of AI bits
 	ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
 			
-/// Set AIBits of object
-// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
-// (or more than one) had suddenly spawned beneath their feet.
-// @function Moveable:SetAIBits
-// @tparam table bits the table of AI bits
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
 /// Get state of specified mesh visibility of object
@@ -531,11 +500,27 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
@@ -755,6 +740,20 @@ void Moveable::SetColor(ScriptColor const& col)
 	m_item->Color = col;
 }
 
+/// Get AIBits of object
+// This will return a table with six values, each corresponding to
+// an active behaviour. If the object is in a certain AI mode, the table will
+// have a *1* in the corresponding cell. Otherwise, the cell will hold
+// a *0*.
+//
+// <br />1 - guard
+// <br />2 - ambush
+// <br />3 - patrol 1
+// <br />4 - modify
+// <br />5 - follow
+// <br />6 - patrol 2
+// @function Moveable:GetAIBits
+// @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
 {
 	static_assert(63 == ALL_AIOBJ);
@@ -768,6 +767,14 @@ aiBitsType Moveable::GetAIBits() const
 	return ret;
 }
 
+/// Set AIBits of object
+// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+// (or more than one) had suddenly spawned beneath their feet.
+// @function Moveable:SetAIBits
+// @tparam table bits the table of AI bits
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 void Moveable::SetAIBits(aiBitsType const & bits)
 {
 	for (size_t i = 0; i < bits.value().size(); ++i)
@@ -973,68 +980,33 @@ void Moveable::UnswapMesh(int meshId)
 	m_item->Model.MeshIndex[meshId] = m_item->Model.BaseMesh + meshId;
 }
 
+/// Enable the item, as if a trigger for it had been stepped on.
+// @function Moveable:Enable
 void Moveable::EnableItem()
 {
-	if (!m_item->Active)
+	bool wasInvis = false;
+	if (m_item->Status == ITEM_INVISIBLE)
 	{
-		m_item->Flags |= IFLAG_ACTIVATION_MASK;
-		if (Objects[m_item->ObjectNumber].intelligent)
-		{
-			if (m_item->Status == ITEM_DEACTIVATED)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				m_item->Status = ITEM_ACTIVE;
-				AddActiveItem(m_num);
-				EnableEntityAI(m_num, 1);
-			}
-			else if (m_item->Status == ITEM_INVISIBLE)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				if (EnableEntityAI(m_num, 0))
-					m_item->Status = ITEM_ACTIVE;
-				else
-					m_item->Status = ITEM_INVISIBLE;
-				AddActiveItem(m_num);
-			}
-		}
-		else
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			AddActiveItem(m_num);
-			m_item->Status = ITEM_ACTIVE;
-		}
-
-		// Try add colliding in case the item went from invisible -> activated
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+		wasInvis = true;
 	}
+
+	m_item->Flags |= CODE_BITS;
+	Trigger(m_num);
+
+	// Try add colliding in case the item went from invisible -> activated
+	if (m_num > NO_ITEM && wasInvis)
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 }
 
+/// Disable the item, as if an antitrigger for it had been stepped on (i.e. it will close an open door or extinguish a flame emitter).
+// Note that this will not trigger an OnKilled callback.
+// @function Moveable:Disable
 void Moveable::DisableItem()
 {
-	if (!m_item->Active)
-		return;
+	Antitrigger(m_num);
 
-	m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
-	if (Objects[m_item->ObjectNumber].intelligent)
-	{
-		if (m_item->Status == ITEM_ACTIVE)
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			m_item->Status = ITEM_DEACTIVATED;
-			RemoveActiveItem(m_num);
-			DisableEntityAI(m_num);
-		}
-	}
-	else
-	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
-		m_item->Status = ITEM_DEACTIVATED;
-	}
-
-	// Try add colliding in case the item went from invisible -> deactivated
-	if (m_num > NO_ITEM)
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Explode()
@@ -1057,20 +1029,49 @@ void Moveable::Shatter()
 	CreatureDie(m_num, false);
 }
 
+/// Make the item invisible. Alias for Moveable:SetVisible(false).
+// @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
 {
-	m_item->Status = ITEM_INVISIBLE;
-	if (m_item->Active)
+	SetVisible(false);
+}
+/// Set the item's visibility. __An invisible item will have collision turned off, as if it no longer exists in the game world__.
+// @bool visible true if the caller should become visible, false if it should become invisible
+// @function Moveable:SetVisible
+void Moveable::SetVisible(bool visible)
+{
+	if (!visible)
 	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			DisableEntityAI(m_num);
+			DisableItem();
 		}
+		else
+		{
+			RemoveActiveItem(m_num);
+		}
+		m_item->Status = ITEM_INVISIBLE;
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 	}
-	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	else
+	{
+		if (Objects[m_item->ObjectNumber].intelligent)
+		{
+			EnableItem();
+		}
+		else
+		{
+			AddActiveItem(m_num);
+			m_item->Status = ITEM_ACTIVE;
+		}
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	}
 }
+
 
 void Moveable::Invalidate()
 {

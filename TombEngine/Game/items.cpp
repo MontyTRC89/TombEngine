@@ -425,8 +425,6 @@ void RemoveDrawnItem(short itemNumber)
 
 void RemoveActiveItem(short itemNumber) 
 {
-	auto& item = g_Level.Items[itemNumber];
-
 	if (g_Level.Items[itemNumber].Active)
 	{
 		g_Level.Items[itemNumber].Active = false;
@@ -446,10 +444,6 @@ void RemoveActiveItem(short itemNumber)
 				}
 			}
 		}
-
-		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item.Callbacks.OnKilled, itemNumber);
 	}
 }
 

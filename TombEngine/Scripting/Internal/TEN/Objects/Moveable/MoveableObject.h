@@ -110,6 +110,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void SetVisible(bool visible);
 	void Explode();
 	void Shatter();
 

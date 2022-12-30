@@ -264,6 +264,75 @@ short* GetTriggerIndex(ItemInfo* item)
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
 
+void Antitrigger(short const value, short const flags)
+{
+	ItemInfo* item = &g_Level.Items[value];
+	if (item->ObjectNumber == ID_EARTHQUAKE)
+	{
+		item->ItemFlags[0] = 0;
+		item->ItemFlags[1] = 100;
+	}
+
+	item->Flags &= ~(CODE_BITS | REVERSE);
+
+	if (flags & ONESHOT)
+		item->Flags |= ATONESHOT;
+
+	if (item->Active && Objects[item->ObjectNumber].intelligent)
+	{
+		DisableEntityAI(value);
+		RemoveActiveItem(value);
+		item->Active = false;
+		item->Status = ITEM_INVISIBLE;
+	}
+}
+
+void Trigger(short const value, short const flags)
+{
+	ItemInfo* item = &g_Level.Items[value];
+	item->Flags |= TRIGGERED;
+
+	if (flags & ONESHOT)
+		item->Flags |= ONESHOT;
+
+	if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
+	{
+		if (Objects[item->ObjectNumber].intelligent)
+		{
+			if (item->Status != ITEM_NOT_ACTIVE)
+			{
+				if (item->Status == ITEM_INVISIBLE)
+				{
+					item->TouchBits = NO_JOINT_BITS;
+					if (EnableEntityAI(value, 0))
+					{
+						item->Status = ITEM_ACTIVE;
+						AddActiveItem(value);
+					}
+					else
+					{
+						item->Status = ITEM_INVISIBLE;
+						AddActiveItem(value);
+					}
+				}
+			}
+			else
+			{
+				item->TouchBits = NO_JOINT_BITS;
+				item->Status = ITEM_ACTIVE;
+				AddActiveItem(value);
+				EnableEntityAI(value, 1);
+			}
+		}
+		else
+		{
+			item->TouchBits = NO_JOINT_BITS;
+			AddActiveItem(value);
+			item->Status = ITEM_ACTIVE;
+		}
+	}
+}
+
 void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
@@ -489,23 +558,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				triggerType == TRIGGER_TYPES::ANTITRIGGER ||
 				triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->ObjectNumber == ID_EARTHQUAKE)
-				{
-					item->ItemFlags[0] = 0;
-					item->ItemFlags[1] = 100;
-				}
-
-				item->Flags &= ~(CODE_BITS | REVERSE);
-
-				if (flags & ONESHOT)
-					item->Flags |= ATONESHOT;
-
-				if (item->Active && Objects[item->ObjectNumber].intelligent)
-				{
-					item->HitPoints = NOT_TARGETABLE;
-					DisableEntityAI(value);
-					KillItem(value);
-				}
+				Antitrigger(value, flags);
 			}
 			else if (flags & CODE_BITS)
 			{
@@ -514,47 +567,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if ((item->Flags & CODE_BITS) == CODE_BITS)
 			{
-				item->Flags |= TRIGGERED;
-
-				if (flags & ONESHOT)
-					item->Flags |= ONESHOT;
-
-				if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
-				{
-					if (Objects[item->ObjectNumber].intelligent)
-					{
-						if (item->Status != ITEM_NOT_ACTIVE)
-						{
-							if (item->Status == ITEM_INVISIBLE)
-							{
-								item->TouchBits = NO_JOINT_BITS;
-								if (EnableEntityAI(value, 0))
-								{
-									item->Status = ITEM_ACTIVE;
-									AddActiveItem(value);
-								}
-								else
-								{
-									item->Status = ITEM_INVISIBLE;
-									AddActiveItem(value);
-								}
-							}
-						}
-						else
-						{
-							item->TouchBits = NO_JOINT_BITS;
-							item->Status = ITEM_ACTIVE;
-							AddActiveItem(value);
-							EnableEntityAI(value, 1);
-						}
-					}
-					else
-					{
-						item->TouchBits = NO_JOINT_BITS;
-						AddActiveItem(value);
-						item->Status = ITEM_ACTIVE;
-					}
-				}
+				Trigger(value, flags);
 			}
 			break;
 

@@ -73,3 +73,6 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags = 0);
 void ProcessSectorFlags(ItemInfo* item);
+
+void Antitrigger(short const value, short const flags = 0);
+void Trigger(short const value, short const flags = 0);

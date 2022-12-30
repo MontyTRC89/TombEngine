@@ -30,6 +30,7 @@ static constexpr char ScriptReserved_Init[]					= "Init";
 static constexpr char ScriptReserved_Enable[]				= "Enable";
 static constexpr char ScriptReserved_Disable[]				= "Disable";
 static constexpr char ScriptReserved_MakeInvisible[]		= "MakeInvisible";
+static constexpr char ScriptReserved_SetVisible[]			= "SetVisible";
 static constexpr char ScriptReserved_Explode[]				= "Explode";
 static constexpr char ScriptReserved_Shatter[]				= "Shatter";
 static constexpr char ScriptReserved_SetPoison[]			= "SetPoison";
