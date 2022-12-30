@@ -1081,7 +1081,7 @@ bool CreatureActive(short itemNumber)
 	if (!Objects[item->ObjectNumber].intelligent)
 		return false;
 
-	// Object is already dead or body cleared.
+	// Object is already dead.
 	if (item->Flags & IFLAG_KILLED)
 		return false;
 
