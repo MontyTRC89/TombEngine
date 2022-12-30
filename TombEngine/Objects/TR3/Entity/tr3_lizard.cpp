@@ -194,7 +194,7 @@ namespace TEN::Entities::Creatures::TR3
                 else
                     item->Pose.Orientation.y += LIZARD_RUN_TURN_RATE_MAX;
 
-                if (AI.bite && AI.distance < LIZARD_ATTACK0_RANGE && isLaraPoisonedOrTargetBlocked) // TS - maybe we should add targetable as well?
+                if (AI.bite && AI.distance < LIZARD_ATTACK0_RANGE && isLaraPoisonedOrTargetBlocked)
                     item->Animation.TargetState = LIZARD_STATE_PUNCH0;
                 else
                     item->Animation.TargetState = LIZARD_STATE_STOP;
@@ -272,7 +272,7 @@ namespace TEN::Entities::Creatures::TR3
         CreatureJoint(item, 0, neck.x);
         CreatureJoint(item, 1, neck.y);
 
-        if (item->Animation.ActiveState < LIZARD_STATE_DEATH) //  CLIMB3 marks the start of the CLIMB states
+        if (item->Animation.ActiveState < LIZARD_STATE_DEATH)
         {
             switch (CreatureVault(itemNumber, angle, 2, LIZARD_VAULT_SHIFT))
             {
