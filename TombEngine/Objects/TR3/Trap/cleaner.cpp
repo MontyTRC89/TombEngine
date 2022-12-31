@@ -451,8 +451,6 @@ void CleanerControl(short itemNumber)
 		{
 			// No new target, so keep updating position.
 
-			//No new target, so keep updating position.
-
 			switch (item->Pose.Orientation.y)
 			{
 			case ANGLE(0):
