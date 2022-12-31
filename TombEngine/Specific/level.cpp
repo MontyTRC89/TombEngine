@@ -869,7 +869,7 @@ void FreeLevel()
 
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 			g_Level.Zones[j][i].clear();
 	}
 
