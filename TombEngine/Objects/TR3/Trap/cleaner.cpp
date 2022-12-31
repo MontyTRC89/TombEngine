@@ -24,18 +24,20 @@ ItemFlags[0]: Rotation speed + direction
 ItemFlags[1]: Flag that cleaner has reached a new sector so we can unblock the one behind us (unused right now but reserved just incase)
 ItemFlags[2]: Movement speed. No speed = lose control
 ItemFlags[3, 4, and 5]: Counters for the dynamic lights and sparks.
+ItemFlags[6]: Target rotation angle.
 
 * OCBs:
 0: Stops when killing Lara.
-anything else: does not stop when killing Lara.
+Anything else: does not stop when killing Lara.
 **************/
 
-#define CLEANER_TURN	1024
-#define CLEANER_SPEED	(SECTOR(1) / 16)
+constexpr short CLEANER_TURN = 1024;
+constexpr auto  CLEANER_SPEED = (SECTOR(1) / 16);
+constexpr auto  CLEANER_ACCELERATION = 4;
 
 static bool NeedNewTarget(ItemInfo* item)
 {
-	//Checks if cleaner is in the centre of the block and facing the proper direction.
+	// Checks if cleaner is in the centre of the block and facing the proper direction.
 
 	if ((item->Pose.Position.z & (WALL_MASK)) == (SECTOR(1) / 2) && (item->Pose.Orientation.y == ANGLE(0) || item->Pose.Orientation.y == ANGLE(180)))
 		return true;
@@ -92,8 +94,7 @@ static void CheckCleanerHeading(ItemInfo* item, long x, long y, long z, short ro
 
 static void CleanerToItemCollision(ItemInfo* item)
 {
-	long x = item->Pose.Position.x;
-	long z = item->Pose.Position.z;
+	auto backupPos = item->Pose.Position;
 
 	switch (item->Pose.Orientation.y)
 	{
@@ -130,8 +131,7 @@ static void CleanerToItemCollision(ItemInfo* item)
 		}
 	}
 
-	item->Pose.Position.x = x;
-	item->Pose.Position.z = z;
+	item->Pose.Position = backupPos;
 }
 
 static void DoCleanerEffects(ItemInfo* item)
@@ -143,7 +143,7 @@ static void DoCleanerEffects(ItemInfo* item)
 	Vector3i vel
 	(
 		(GenerateInt(0, 255) * 4) - 512,
-		GenerateInt(0, 7) - 4,
+		 GenerateInt(0, 7) - 4,
 		(GenerateInt(0, 255) * 4) - 512
 	);
 
@@ -188,14 +188,14 @@ void InitialiseCleaner(short itemNumber)
 {
 	auto item = &g_Level.Items[itemNumber];
 
-	//Align item to the middle of the block it is on.
+	// Align item to the middle of the block it is on.
 	item->Pose.Position.x = (item->Pose.Position.x & ~WALL_MASK) | (SECTOR(1) / 2);
 	item->Pose.Position.z = (item->Pose.Position.z & ~WALL_MASK) | (SECTOR(1) / 2);
 
-	//Init flags
+	// Init flags.
 	item->ItemFlags[0] = CLEANER_TURN;
 	item->ItemFlags[1] = 0;
-	item->ItemFlags[2] = CLEANER_SPEED;
+	item->ItemFlags[2] = CLEANER_ACCELERATION;
 	item->Collidable = 1;
 }
 
@@ -217,12 +217,29 @@ void CleanerControl(short itemNumber)
 	if (!item->ItemFlags[2])
 		return;
 
-	//Not facing a quadrant, keep turning
-	if (item->Pose.Orientation.y & 0x3FFF)
-		item->Pose.Orientation.y += item->ItemFlags[0];
+	static constexpr short QUADRANT_MASK = 0x3FFF;
+	short rawAngle = item->Pose.Orientation.y & QUADRANT_MASK;
+
+	// Not facing a quadrant, keep turning.
+	if (rawAngle)
+	{
+		float coeff = std::max(0.25f, float((QUADRANT_MASK / 2) - abs(rawAngle - (QUADRANT_MASK / 2))) / float(QUADRANT_MASK / 2));
+
+		float targetAngleDeg = TO_DEGREES(item->ItemFlags[6]);
+		float turnAngleDeg   = TO_DEGREES(item->ItemFlags[0]) * coeff;
+		float newAngle       = TO_DEGREES(item->Pose.Orientation.y) + turnAngleDeg;
+
+		if ((item->ItemFlags[0] > 0 && abs(abs(newAngle) - abs(targetAngleDeg)) < 5.0f) ||
+			(item->ItemFlags[0] < 0 && abs(abs(targetAngleDeg) - abs(newAngle)) < 5.0f))
+		{
+			newAngle = targetAngleDeg;
+		}
+		
+		item->Pose.Orientation.y = ANGLE((newAngle));
+	}
 	else
 	{
-		//Do we need a new target?
+		// Do we need a new target?
 		if (NeedNewTarget(item))
 		{
 			long x, y, z;
@@ -243,41 +260,45 @@ void CleanerControl(short itemNumber)
 			}
 
 
-			//Now check where we are heading and determine where to go next
+			// Now check where we are heading and determine where to go next.
 			bool left, ahead;
 			y = item->Pose.Position.y;
 
 			switch (item->Pose.Orientation.y)
 			{
-			case ANGLE(0):		//facing Z+
+			case ANGLE(0):		// Facing Z+
 
-				//Check if we can go left
+				// Check if we can go left.
 				x = item->Pose.Position.x - SECTOR(1);
 				z = item->Pose.Position.z;
 				CheckCleanerHeading(item, x, y, z, item->RoomNumber, left);
 
-				//Now check ahead
+				// Now check ahead.
 				x = item->Pose.Position.x;
 				z = item->Pose.Position.z + SECTOR(1);
 				CheckCleanerHeading(item, x, y, z, item->RoomNumber, ahead);
 
 				if (!ahead && !left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y += CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
+					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
 				}
-				else if (left && item->ItemFlags[0] > 0)	//Prioritize left first
+				else if (left && item->ItemFlags[0] > 0)	// Prioritize left first.
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
 				}
 				else
 				{
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.z += item->ItemFlags[2];
@@ -292,7 +313,7 @@ void CleanerControl(short itemNumber)
 
 				break;
 
-			case ANGLE(90):		//facing X+
+			case ANGLE(90):		// Facing X+
 				x = item->Pose.Position.x;
 				z = item->Pose.Position.z + SECTOR(1);
 				CheckCleanerHeading(item, x, y, z, item->RoomNumber, left);
@@ -303,22 +324,30 @@ void CleanerControl(short itemNumber)
 
 				if (!ahead && !left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y += CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
+					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
-				else if (left && item->ItemFlags[0] > 0)	//Prioritize left first
+				else if (left && item->ItemFlags[0] > 0)	// Prioritize left first.
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.x += item->ItemFlags[2];
 					x = item->Pose.Position.x + SECTOR(1);
@@ -332,7 +361,7 @@ void CleanerControl(short itemNumber)
 
 				break;
 
-			case ANGLE(-90):	//facing X-
+			case ANGLE(-90):	// Facing X-
 				x = item->Pose.Position.x;
 				z = item->Pose.Position.z - SECTOR(1);
 				CheckCleanerHeading(item, x, y, z, item->RoomNumber, left);
@@ -343,22 +372,30 @@ void CleanerControl(short itemNumber)
 
 				if (!ahead && !left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y += CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
+					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.x -= item->ItemFlags[2];
 					x = item->Pose.Position.x - SECTOR(1);
@@ -383,22 +420,30 @@ void CleanerControl(short itemNumber)
 
 				if (!ahead && !left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y += CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
+					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (left && item->ItemFlags[0] > 0)
 				{
-					item->Pose.Orientation.y -= CLEANER_TURN;
+					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
+					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
+					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
+					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.z -= item->ItemFlags[2];
 					x = item->Pose.Position.x;
@@ -417,7 +462,13 @@ void CleanerControl(short itemNumber)
 		}
 		else
 		{
-			//No new target, so keep updating position
+			// No new target, so keep updating position.
+
+			if (item->ItemFlags[2] < CLEANER_SPEED)
+				item->ItemFlags[2] += CLEANER_ACCELERATION;
+			else
+				item->ItemFlags[2] = CLEANER_SPEED;
+
 			switch (item->Pose.Orientation.y)
 			{
 			case ANGLE(0):
