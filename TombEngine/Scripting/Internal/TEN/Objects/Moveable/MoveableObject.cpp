@@ -426,8 +426,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
-	ScriptReserved_UpdateFloorCollision, & Moveable::UpdateFloorCollision,
-
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @tparam int index of a joint to get position
@@ -912,13 +910,6 @@ void Moveable::SetRoomNumber(short room)
 		if (m_item->IsLara())
 			m_item->Location.roomNumber = room;
 	}
-}
-
-/// Updates the floor collision of standable objects. (Note: This is one of the most expensive functions, use with caution).
-// @function Moveable:UpdateFloorCollision
-void Moveable::UpdateFloorCollision()
-{
-	TEN::Floordata::UpdateBridgeItem(m_item->Index);
 }
 
 short Moveable::GetStatus() const
