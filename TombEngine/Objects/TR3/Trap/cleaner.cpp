@@ -33,7 +33,6 @@ Anything else: does not stop when killing Lara.
 
 constexpr short CLEANER_TURN = 1024;
 constexpr auto  CLEANER_SPEED = (SECTOR(1) / 16);
-constexpr auto  CLEANER_ACCELERATION = 4;
 
 static bool NeedNewTarget(ItemInfo* item)
 {
@@ -195,7 +194,7 @@ void InitialiseCleaner(short itemNumber)
 	// Init flags.
 	item->ItemFlags[0] = CLEANER_TURN;
 	item->ItemFlags[1] = 0;
-	item->ItemFlags[2] = CLEANER_ACCELERATION;
+	item->ItemFlags[2] = CLEANER_SPEED;
 	item->Collidable = 1;
 }
 
@@ -327,27 +326,23 @@ void CleanerControl(short itemNumber)
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (left && item->ItemFlags[0] > 0)	// Prioritize left first.
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.x += item->ItemFlags[2];
 					x = item->Pose.Position.x + SECTOR(1);
@@ -375,27 +370,23 @@ void CleanerControl(short itemNumber)
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (left && item->ItemFlags[0] > 0)
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.x -= item->ItemFlags[2];
 					x = item->Pose.Position.x - SECTOR(1);
@@ -423,27 +414,23 @@ void CleanerControl(short itemNumber)
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->Pose.Orientation.y++;
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (!ahead && !left && item->ItemFlags[0] < 0)
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] -= CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else if (left && item->ItemFlags[0] > 0)
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y - ANGLE(90);
 					item->Pose.Orientation.y--;
 					item->ItemFlags[0] = -CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 				}
 				else
 				{
 					item->ItemFlags[6] = item->Pose.Orientation.y + ANGLE(90);
 					item->ItemFlags[0] = CLEANER_TURN;
-					item->ItemFlags[2] = CLEANER_ACCELERATION;
 					item->ItemFlags[1] = 1;
 					item->Pose.Position.z -= item->ItemFlags[2];
 					x = item->Pose.Position.x;
@@ -464,10 +451,7 @@ void CleanerControl(short itemNumber)
 		{
 			// No new target, so keep updating position.
 
-			if (item->ItemFlags[2] < CLEANER_SPEED)
-				item->ItemFlags[2] += CLEANER_ACCELERATION;
-			else
-				item->ItemFlags[2] = CLEANER_SPEED;
+			//No new target, so keep updating position.
 
 			switch (item->Pose.Orientation.y)
 			{
