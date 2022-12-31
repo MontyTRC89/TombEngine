@@ -122,6 +122,24 @@ namespace Misc
 	{
 		return TO_DEGREES(GetCurrentFOV());
 	}
+
+	///Shows the mode of the game camera.
+	//@function GetCameraType
+	//@treturn short ID of the camera mode.
+	//@treturn -1 Not recognized
+	//@treturn 0 Chase
+	//@treturn 1 Fixed
+	//@treturn 2 Look
+	//@treturn 3 Combat
+	//@treturn 4 Heavy
+	//@treturn 5 Object
+	//@usage
+	//MyVar = Misc.GetCameraType()
+	//print(MyVar)
+	static short GetCameraType()
+	{
+		return static_cast<short>(Camera.oldType);
+	}
 	
 	/// Play an audio track
 	//@function PlayAudioTrack
@@ -324,6 +342,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_SetFOV, &SetFOV);
 		table_misc.set_function(ScriptReserved_GetFOV, &GetFOV);
+		table_misc.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
