@@ -8,6 +8,7 @@
 #include "Game/effects/smoke.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
+#include "Game/people.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
@@ -18,6 +19,8 @@
 using std::vector;
 using TEN::Renderer::g_Renderer;
 
+using namespace TEN::Entities::Creatures::TR5;
+
 namespace TEN::Effects::Lightning
 {
 	constexpr auto MAX_ENERGYARCS = 32;
@@ -26,8 +29,92 @@ namespace TEN::Effects::Lightning
 	float FloatSinCosTable[8192];
 	Vector3i LightningPos[6];
 	short LightningBuffer[1024];
-	
+		
 	std::vector<LIGHTNING_INFO> Lightning;
+
+	 TWOGUNINFO twogun[2];
+
+	 void TriggerLaserBeam(Vector3i pos1, Vector3i pos2, EulerAngles orient)
+	 {
+		 TWOGUNINFO* tg;
+
+		 int j;
+		 for (int i = 0; i < 2; i++, i++)
+		 {
+
+			 tg = &twogun[0];
+			 for (j = 0; j < 4; j++)
+			 {
+				 if (tg->life == 0 || j == 3)
+					 break;
+			 }
+
+			 tg->pos.Position.x = pos1.x;
+			 tg->pos.Position.y = pos1.y;
+			 tg->pos.Position.z = pos1.z;
+			 tg->pos.Orientation.x = orient.x;
+			 tg->pos.Orientation.y = orient.y;
+			 tg->pos.Orientation.z = orient.z;
+			 tg->life = 17;
+			 tg->spin = (GetRandomControl() & 31) << 11;
+			 tg->dlength = 4096;
+			 tg->r = 0;
+			 tg->b = 255;
+			 tg->g = 96;
+			 tg->fadein = 8;
+
+			 TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
+			 TriggerLightning(&pos1, &pos2, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
+		 }
+	 }
+
+	void UpdateTwogunLasers()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			TWOGUNINFO* tg = &twogun[0];
+			int	j;
+
+			for (j = 0; j < 4; j++, tg++)
+			{
+				if (tg->life)
+				{
+					tg->life--;
+
+					if (tg->life < 16)
+					{
+						tg->spinadd -= tg->spinadd / 8;
+						tg->size++;
+					}
+					else if (tg->life == 16)
+					{
+						tg->spinadd = MAX_VISIBILITY_DISTANCE;
+						tg->coil = MAX_VISIBILITY_DISTANCE;
+						tg->length = tg->dlength;
+						tg->size = 4;
+					}
+					else
+					{
+						tg->coil += (MAX_VISIBILITY_DISTANCE - tg->coil) / 8;
+						if (tg->dlength - tg->length <= (tg->dlength / 4))
+						{
+							tg->spinadd += (MAX_VISIBILITY_DISTANCE - tg->spinadd) / 8;
+							tg->length = tg->dlength;
+						}
+						else
+							tg->length += (tg->dlength - tg->length) >> 2;
+						if (tg->size < 4)
+							tg->size++;
+					}
+
+					if (tg->fadein < 8)
+						tg->fadein++;
+
+					tg->spin -= tg->spinadd;
+				}
+			}
+		}
+	}
 
 	void InitialiseFloatSinCosTable()
 	{

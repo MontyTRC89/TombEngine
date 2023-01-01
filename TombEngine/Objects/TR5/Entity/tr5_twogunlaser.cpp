@@ -31,13 +31,9 @@ using namespace TEN::Effects::Lightning;
 using namespace TEN::Math::Random;
 using namespace TEN::Effects::Spark;
 
-
-
 namespace TEN::Entities::Creatures::TR5
 {
-	TWOGUNINFO twogun[2];
-
-	int TWGunMesh[2] = {8, 5};
+	int TWGunMesh[2] = { 8, 5 };
 
 	const Vector3i TWGunPositions[2] =
 	{
@@ -64,9 +60,10 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_STATE_FALLLOOP = 12,
 		TWOGUN_STATE_FALLDEATH = 13
 	};
-	
+
 	enum TwogunAnim
-	{TWOGUN_ANIM_WALK = 0,
+	{
+		TWOGUN_ANIM_WALK = 0,
 		TWOGUN_ANIM_SHOOT_RIGHT = 1,
 		TWOGUN_ANIM_SHOOT_LEFT = 2,
 		TWOGUN_ANIM_DEATH = 3,
@@ -74,7 +71,7 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_ANIM_WALK_AIM_TO_IDLE = 5,
 		TWOGUN_ANIM_IDLE = 6,
 		TWOGUN_ANIM_IDLE_TO_AIM = 7,
-		TWOGUN_ANIM_AIM= 8,
+		TWOGUN_ANIM_AIM = 8,
 		TWOGUN_ANIM_SHOOT_BOTH = 9,
 		TWOGUN_ANIM_AIM_TO_IDLE = 10,
 		TWOGUN_ANIM_TURN_180 = 11,
@@ -82,7 +79,7 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_ANIM_GUN_BLOCKAGE = 13,
 		TWOGUN_ANIM_FALLSTART = 14,
 		TWOGUN_ANIM_FALLLOOP = 15,
-		TWOGUN_ANIM_FALLDEATH = 16		
+		TWOGUN_ANIM_FALLDEATH = 16
 	};
 
 	void InitialiseTwogun(short itemNumber)
@@ -104,33 +101,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!plasma)
 		{
 			//TODO: create additional curly laser effect
-			TWOGUNINFO* tg;
-
-			long lp;
-
-			tg = &twogun[0];
-			for (lp = 0; lp < 4; lp++, tg++)
-			{
-				if (tg->life == 0 || lp == 3)
-					break;
-			}
-
-			tg->pos.Position.x = pos1.x;
-			tg->pos.Position.y = pos1.y;
-			tg->pos.Position.z = pos1.z;
-			tg->pos.Orientation.x = orient.x;
-			tg->pos.Orientation.y = orient.y;
-			tg->pos.Orientation.z = orient.z;
-			tg->life = 17;
-			tg->spin = (GetRandomControl() & 31) << 11;
-			tg->dlength = 4096;
-			tg->r = 0;
-			tg->b = 255;
-			tg->g = 96;
-			tg->fadein = 8;
-
-			TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
-			TriggerLightning(&pos1, &pos2, (GetRandomControl() & 7) + 255, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);//8
+			TriggerLaserBeam(pos1, pos2,orient);
 
 			item->ItemFlags[LeftRight] = 16;
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
@@ -140,12 +111,12 @@ namespace TEN::Entities::Creatures::TR5
 			Vector3i hitPos;
 			MESH_INFO* hitMesh = nullptr;
 
-			GameVector start = GameVector(pos1,0);
-			start.RoomNumber = item->RoomNumber;
+			GameVector start = GameVector(pos1, 0);
 			GameVector end = GameVector(pos2, 0);
+			start.RoomNumber = item->RoomNumber;
 
 			if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
-			{		
+			{
 				if (LaraItem->HitPoints < 501)
 				{
 					ItemCustomBurn(LaraItem, Vector3(0.2f, 0.4f, 1.0f), Vector3(0.2f, 0.3f, 0.8f), 1 * FPS);
@@ -153,14 +124,14 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 					DoDamage(LaraItem, 250);
-
 			}
 		}
-
+	
 			return;
 
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), abs(item->ItemFlags[LeftRight]));
 	}
+	
 
 	void TriggerTwogunPlasma(const Vector3i& posr, const Pose& pos, float life)
 	{

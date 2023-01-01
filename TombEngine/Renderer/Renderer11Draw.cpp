@@ -1521,6 +1521,7 @@ namespace TEN::Renderer
 		DrawSplashes(view);
 		DrawShockwaves(view);
 		DrawLightning(view);
+		DrawTwogunLaser(view);
 		DrawRopes(view);
 
 		// Here is where we actually output sprites

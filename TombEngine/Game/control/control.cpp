@@ -190,6 +190,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateFootprints();
 		UpdateSplashes();
 		UpdateLightning();
+		UpdateTwogunLasers();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();

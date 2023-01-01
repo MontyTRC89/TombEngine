@@ -20,6 +20,20 @@ namespace TEN::Effects::Lightning
 		LI_SPARKEND = 16
 	};
 
+	struct TWOGUNINFO
+	{
+		Pose pos;
+		short life;
+		short coil;
+		short spin, spinadd;
+		short length, dlength;
+		short size;
+		int r, g, b;
+		char fadein;
+	};
+
+	extern TWOGUNINFO twogun[2];
+
 	struct LIGHTNING_INFO
 	{
 		Vector3i pos1;
@@ -43,6 +57,7 @@ namespace TEN::Effects::Lightning
 		int type;
 		int sLife;
 	};
+
 	extern std::vector<LIGHTNING_INFO> Lightning;
 
 	extern int LightningRandomSeed;
@@ -52,6 +67,8 @@ namespace TEN::Effects::Lightning
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
+	void TriggerLaserBeam(Vector3i pos1, Vector3i pos2, EulerAngles orient);
+	void UpdateTwogunLasers();
 	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc);
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);

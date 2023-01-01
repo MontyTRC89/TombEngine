@@ -667,6 +667,7 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
+		void DrawTwogunLaser(RenderView& view);
 		std::string GetDefaultAdapterName();
 	};
 

@@ -26,10 +26,12 @@
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Objects/TR5/Entity/tr5_twogunlaser.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
+using namespace TEN::Entities::Creatures::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -74,7 +76,24 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
-	void Renderer11::DrawLightning(RenderView& view) 
+
+	void Renderer11::DrawTwogunLaser(RenderView& view)
+	{
+
+			TWOGUNINFO* tg = &twogun[0]; 
+
+			for (int lp = 0; lp < 4; lp++, tg++)
+			{
+				if (tg->life)
+				{
+
+					
+				}
+			}
+		
+	}
+
+	void Renderer11::DrawLightning(RenderView& view)
 	{
 		for (int i = 0; i < Lightning.size(); i++)
 		{
