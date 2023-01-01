@@ -114,7 +114,7 @@ static std::unique_ptr<Moveable> Create(
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
-			ptr->SetRoom(std::get<short>(room));
+			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
 			ptr->SetPos(pos, true);
@@ -381,7 +381,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
+
+	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
@@ -441,7 +443,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
-
 
 void Moveable::Init()
 {
@@ -597,7 +598,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
-				SetRoom(potentialNewRoom);
+				SetRoomNumber(potentialNewRoom);
 		}
 	}
 }
@@ -732,12 +733,12 @@ void Moveable::SetItemFlags(short value, int index)
 
 ScriptColor Moveable::GetColor() const
 {
-	return ScriptColor{ m_item->Color };
+	return ScriptColor{ m_item->Model.Color };
 }
 
-void Moveable::SetColor(ScriptColor const& col)
+void Moveable::SetColor(const ScriptColor& color)
 {
-	m_item->Color = col;
+	m_item->Model.Color = color;
 }
 
 /// Get AIBits of object
@@ -859,21 +860,29 @@ bool Moveable::GetHitStatus() const
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
+// @treturn Room current room of the object
+std::unique_ptr<Room> Moveable::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);
+}
+
+/// Get the current room number of the object
+// @function Moveable:GetRoomNumber
 // @treturn int number representing the current room of the object
-short Moveable::GetRoom() const
+int Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }
 
-/// Set room of object 
+/// Set room number of object 
 // Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
-// @function Moveable:SetRoom
+// @function Moveable:SetRoomNumber
 // @tparam int ID the ID of the new room 
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
+// sas:SetRoomNumber(destinationRoom)
 // sas:SetPosition(destinationPosition, false)
-void Moveable::SetRoom(short room)
+void Moveable::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)

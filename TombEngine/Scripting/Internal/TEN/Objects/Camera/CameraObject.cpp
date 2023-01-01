@@ -49,15 +49,20 @@ void CameraObject::Register(sol::table & parent)
 		ScriptReserved_SetName, &CameraObject::SetName,
 
 		/// Get the current room of the camera
-		// @function Camera:GetRoom
-		// @treturn int number representing the current room of the camera
+		// @function CameraObject:GetRoom
+		// @treturn Room current room of the camera
 		ScriptReserved_GetRoom, &CameraObject::GetRoom,
+
+		/// Get the current room number of the camera
+		// @function Camera:GetRoomNumber
+		// @treturn int number representing the current room of the camera
+		ScriptReserved_GetRoomNumber, &CameraObject::GetRoomNumber,
 
 		/// Set room of camera 
 		// This is used in conjunction with SetPosition to teleport the camera to a new room.
-		// @function Camera:SetRoom
+		// @function Camera:SetRoomNumber
 		// @tparam int ID the ID of the new room 
-		ScriptReserved_SetRoom, &CameraObject::SetRoom
+		ScriptReserved_SetRoomNumber, &CameraObject::SetRoomNumber
 		);
 }
 
@@ -96,12 +101,17 @@ void CameraObject::SetName(std::string const & id)
 	}
 }
 
-short CameraObject::GetRoom() const
+std::unique_ptr<Room> CameraObject::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_camera.RoomNumber]);
+}
+
+int CameraObject::GetRoomNumber() const
 {
 	return m_camera.RoomNumber;
 }
 
-void CameraObject::SetRoom(short room)
+void CameraObject::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)

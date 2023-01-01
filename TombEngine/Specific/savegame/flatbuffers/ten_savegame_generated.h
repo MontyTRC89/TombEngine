@@ -13,6 +13,10 @@ namespace Save {
 
 struct RoomVector;
 
+struct Room;
+struct RoomBuilder;
+struct RoomT;
+
 struct Item;
 struct ItemBuilder;
 struct ItemT;
@@ -420,6 +424,113 @@ FLATBUFFERS_STRUCT_END(KeyValPair, 8);
 struct KeyValPair::Traits {
   using type = KeyValPair;
 };
+
+struct RoomT : public flatbuffers::NativeTable {
+  typedef Room TableType;
+  int32_t index = 0;
+  std::string name{};
+  int32_t flags = 0;
+  int32_t reverb_type = 0;
+};
+
+struct Room FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RoomT NativeTableType;
+  typedef RoomBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_INDEX = 4,
+    VT_NAME = 6,
+    VT_FLAGS = 8,
+    VT_REVERB_TYPE = 10
+  };
+  int32_t index() const {
+    return GetField<int32_t>(VT_INDEX, 0);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  int32_t reverb_type() const {
+    return GetField<int32_t>(VT_REVERB_TYPE, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_INDEX) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
+           VerifyField<int32_t>(verifier, VT_REVERB_TYPE) &&
+           verifier.EndTable();
+  }
+  RoomT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RoomT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Room> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RoomT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RoomBuilder {
+  typedef Room Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_index(int32_t index) {
+    fbb_.AddElement<int32_t>(Room::VT_INDEX, index, 0);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(Room::VT_NAME, name);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(Room::VT_FLAGS, flags, 0);
+  }
+  void add_reverb_type(int32_t reverb_type) {
+    fbb_.AddElement<int32_t>(Room::VT_REVERB_TYPE, reverb_type, 0);
+  }
+  explicit RoomBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Room> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Room>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Room> CreateRoom(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t index = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    int32_t flags = 0,
+    int32_t reverb_type = 0) {
+  RoomBuilder builder_(_fbb);
+  builder_.add_reverb_type(reverb_type);
+  builder_.add_flags(flags);
+  builder_.add_name(name);
+  builder_.add_index(index);
+  return builder_.Finish();
+}
+
+struct Room::Traits {
+  using type = Room;
+  static auto constexpr Create = CreateRoom;
+};
+
+inline flatbuffers::Offset<Room> CreateRoomDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t index = 0,
+    const char *name = nullptr,
+    int32_t flags = 0,
+    int32_t reverb_type = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return TEN::Save::CreateRoom(
+      _fbb,
+      index,
+      name__,
+      flags,
+      reverb_type);
+}
+
+flatbuffers::Offset<Room> CreateRoom(flatbuffers::FlatBufferBuilder &_fbb, const RoomT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct ItemT : public flatbuffers::NativeTable {
   typedef Item TableType;
@@ -6228,6 +6339,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
+  std::vector<std::unique_ptr<TEN::Save::RoomT>> rooms{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
@@ -6275,42 +6387,43 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GAME = 6,
     VT_LEVEL = 8,
     VT_LARA = 10,
-    VT_ITEMS = 12,
-    VT_NEXT_ITEM_FREE = 14,
-    VT_NEXT_ITEM_ACTIVE = 16,
-    VT_ROOM_ITEMS = 18,
-    VT_FXINFOS = 20,
-    VT_NEXT_FX_FREE = 22,
-    VT_NEXT_FX_ACTIVE = 24,
-    VT_FIXED_CAMERAS = 26,
-    VT_SINKS = 28,
-    VT_STATIC_MESHES = 30,
-    VT_FLYBY_CAMERAS = 32,
-    VT_PARTICLES = 34,
-    VT_RATS = 36,
-    VT_SPIDERS = 38,
-    VT_SCARABS = 40,
-    VT_BATS = 42,
-    VT_FLIP_MAPS = 44,
-    VT_FLIP_STATS = 46,
-    VT_FLIP_EFFECT = 48,
-    VT_FLIP_TIMER = 50,
-    VT_FLIP_STATUS = 52,
-    VT_CURRENT_FOV = 54,
-    VT_ACTION_QUEUE = 56,
-    VT_AMBIENT_TRACK = 58,
-    VT_AMBIENT_POSITION = 60,
-    VT_ONESHOT_TRACK = 62,
-    VT_ONESHOT_POSITION = 64,
-    VT_CD_FLAGS = 66,
-    VT_ROPE = 68,
-    VT_PENDULUM = 70,
-    VT_ALTERNATE_PENDULUM = 72,
-    VT_VOLUMES = 74,
-    VT_CALL_COUNTERS = 76,
-    VT_SCRIPT_VARS = 78,
-    VT_CALLBACKS_PRE_CONTROL = 80,
-    VT_CALLBACKS_POST_CONTROL = 82
+    VT_ROOMS = 12,
+    VT_ITEMS = 14,
+    VT_NEXT_ITEM_FREE = 16,
+    VT_NEXT_ITEM_ACTIVE = 18,
+    VT_ROOM_ITEMS = 20,
+    VT_FXINFOS = 22,
+    VT_NEXT_FX_FREE = 24,
+    VT_NEXT_FX_ACTIVE = 26,
+    VT_FIXED_CAMERAS = 28,
+    VT_SINKS = 30,
+    VT_STATIC_MESHES = 32,
+    VT_FLYBY_CAMERAS = 34,
+    VT_PARTICLES = 36,
+    VT_RATS = 38,
+    VT_SPIDERS = 40,
+    VT_SCARABS = 42,
+    VT_BATS = 44,
+    VT_FLIP_MAPS = 46,
+    VT_FLIP_STATS = 48,
+    VT_FLIP_EFFECT = 50,
+    VT_FLIP_TIMER = 52,
+    VT_FLIP_STATUS = 54,
+    VT_CURRENT_FOV = 56,
+    VT_ACTION_QUEUE = 58,
+    VT_AMBIENT_TRACK = 60,
+    VT_AMBIENT_POSITION = 62,
+    VT_ONESHOT_TRACK = 64,
+    VT_ONESHOT_POSITION = 66,
+    VT_CD_FLAGS = 68,
+    VT_ROPE = 70,
+    VT_PENDULUM = 72,
+    VT_ALTERNATE_PENDULUM = 74,
+    VT_VOLUMES = 76,
+    VT_CALL_COUNTERS = 78,
+    VT_SCRIPT_VARS = 80,
+    VT_CALLBACKS_PRE_CONTROL = 82,
+    VT_CALLBACKS_POST_CONTROL = 84
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -6323,6 +6436,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>> *rooms() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>> *>(VT_ROOMS);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *items() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *>(VT_ITEMS);
@@ -6442,6 +6558,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(level()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
+           VerifyOffset(verifier, VT_ROOMS) &&
+           verifier.VerifyVector(rooms()) &&
+           verifier.VerifyVectorOfTables(rooms()) &&
            VerifyOffset(verifier, VT_ITEMS) &&
            verifier.VerifyVector(items()) &&
            verifier.VerifyVectorOfTables(items()) &&
@@ -6541,6 +6660,9 @@ struct SaveGameBuilder {
   }
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
+  }
+  void add_rooms(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms) {
+    fbb_.AddOffset(SaveGame::VT_ROOMS, rooms);
   }
   void add_items(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items) {
     fbb_.AddOffset(SaveGame::VT_ITEMS, items);
@@ -6667,6 +6789,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
@@ -6739,6 +6862,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
   builder_.add_items(items);
+  builder_.add_rooms(rooms);
   builder_.add_lara(lara);
   builder_.add_level(level);
   builder_.add_game(game);
@@ -6758,6 +6882,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::Room>> *rooms = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
@@ -6794,6 +6919,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_control = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_control = nullptr) {
+  auto rooms__ = rooms ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>>(*rooms) : 0;
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
   auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
@@ -6822,6 +6948,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       game,
       level,
       lara,
+      rooms__,
       items__,
       next_item_free,
       next_item_active,
@@ -6861,6 +6988,41 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline RoomT *Room::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<RoomT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Room::UnPackTo(RoomT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = index(); _o->index = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = reverb_type(); _o->reverb_type = _e; }
+}
+
+inline flatbuffers::Offset<Room> Room::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RoomT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRoom(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Room> CreateRoom(flatbuffers::FlatBufferBuilder &_fbb, const RoomT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RoomT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _index = _o->index;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _flags = _o->flags;
+  auto _reverb_type = _o->reverb_type;
+  return TEN::Save::CreateRoom(
+      _fbb,
+      _index,
+      _name,
+      _flags,
+      _reverb_type);
+}
 
 inline ItemT *Item::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<ItemT>();
@@ -8670,6 +8832,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
+  { auto _e = rooms(); if (_e) { _o->rooms.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rooms[_i] = std::unique_ptr<TEN::Save::RoomT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
@@ -8720,6 +8883,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
+  auto _rooms = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>> (_o->rooms.size(), [](size_t i, _VectorArgs *__va) { return CreateRoom(*__va->__fbb, __va->__o->rooms[i].get(), __va->__rehasher); }, &_va );
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
@@ -8762,6 +8926,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _game,
       _level,
       _lara,
+      _rooms,
       _items,
       _next_item_free,
       _next_item_active,

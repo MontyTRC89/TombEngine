@@ -100,7 +100,28 @@ private:
 		return items;
 	}
 
-	[[nodiscard]] short GetIndexByName(const std::string& name) const override
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetRoomsByTag(std::string tag)
+	{
+		std::vector<std::unique_ptr<R>> rooms = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<std::reference_wrapper<ROOM_INFO>>(val))
+				continue;
+
+			auto room = std::get<std::reference_wrapper<ROOM_INFO>>(val).get();
+			
+			if (std::any_of(room.tags.begin(), room.tags.end(),
+				[&tag](const std::string& value) { return value == tag; }))
+			{
+				rooms.push_back(GetByName<Room, ScriptReserved_Room>(key));
+			}
+		}
+
+		return rooms;
+	}
+
+	[[nodiscard]] short GetIndexByName(std::string const& name) const override
 	{
 		return std::get<short>(m_nameMap.at(name));
 	}
