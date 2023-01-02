@@ -993,17 +993,18 @@ void Moveable::UnswapMesh(int meshId)
 // @function Moveable:Enable
 void Moveable::EnableItem()
 {
+	if (m_num == NO_ITEM)
+		return;
+
 	bool wasInvis = false;
 	if (m_item->Status == ITEM_INVISIBLE)
-	{
 		wasInvis = true;
-	}
 
 	m_item->Flags |= CODE_BITS;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
-	if (m_num > NO_ITEM && wasInvis)
+	if (wasInvis)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 }
 
@@ -1012,6 +1013,9 @@ void Moveable::EnableItem()
 // @function Moveable:Disable
 void Moveable::DisableItem()
 {
+	if (m_num == NO_ITEM)
+		return;
+
 	Antitrigger(m_num);
 
 	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
@@ -1052,13 +1056,10 @@ void Moveable::SetVisible(bool visible)
 	if (!visible)
 	{
 		if (Objects[m_item->ObjectNumber].intelligent)
-		{
 			DisableItem();
-		}
 		else
-		{
-			RemoveActiveItem(m_num);
-		}
+			RemoveActiveItem(m_num, false);
+
 		m_item->Status = ITEM_INVISIBLE;
 
 		if (m_num > NO_ITEM)
@@ -1068,7 +1069,10 @@ void Moveable::SetVisible(bool visible)
 	{
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			EnableItem();
+			if(!(m_item->Flags & IFLAG_KILLED))
+				EnableItem();
+			else
+				m_item->Status = ITEM_ACTIVE;
 		}
 		else
 		{

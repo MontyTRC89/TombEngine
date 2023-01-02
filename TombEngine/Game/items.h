@@ -176,7 +176,7 @@ void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNumber);
+void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 void InitialiseFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);

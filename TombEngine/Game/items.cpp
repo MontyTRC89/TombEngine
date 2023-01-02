@@ -132,6 +132,25 @@ bool TestState(int refState, const vector<int>& stateList)
 	return false;
 }
 
+static void GameScriptHandleKilled(short itemNumber, bool destroyed)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
+	if (!item->Callbacks.OnKilled.empty())
+		g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
+
+	if (destroyed)
+	{
+		g_GameScriptEntities->NotifyKilled(item);
+		item->Name.clear();
+		item->Callbacks.OnKilled.clear();
+		item->Callbacks.OnHit.clear();
+		item->Callbacks.OnObjectCollided.clear();
+		item->Callbacks.OnRoomCollided.clear();
+	}
+}
+
 void KillItem(short const itemNumber)
 {
 	if (InItemControlLoop)
@@ -186,16 +205,7 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-		g_GameScriptEntities->NotifyKilled(item);
-		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
-
-		item->Name.clear();
-		item->Callbacks.OnKilled.clear();
-		item->Callbacks.OnHit.clear();
-		item->Callbacks.OnObjectCollided.clear();
-		item->Callbacks.OnRoomCollided.clear();
+		GameScriptHandleKilled(itemNumber, true);
 
 		if (itemNumber >= g_Level.NumItems)
 		{
@@ -417,7 +427,7 @@ void RemoveDrawnItem(short itemNumber)
 	}
 }
 
-void RemoveActiveItem(short itemNumber) 
+void RemoveActiveItem(short itemNumber, bool killed) 
 {
 	if (g_Level.Items[itemNumber].Active)
 	{
@@ -438,6 +448,9 @@ void RemoveActiveItem(short itemNumber)
 				}
 			}
 		}
+
+		if(killed)
+			GameScriptHandleKilled(itemNumber, false);
 	}
 }
 
