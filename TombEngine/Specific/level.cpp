@@ -350,7 +350,6 @@ void LoadObjects()
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
@@ -1281,8 +1280,6 @@ int LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	ReadInt32(); // SPR\0
-
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
 
