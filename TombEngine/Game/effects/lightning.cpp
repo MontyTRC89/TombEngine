@@ -86,7 +86,7 @@ namespace TEN::Effects::Lightning
 			 tg->fadein = 8;
 
 			 TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
-			// TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
+			 TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
 		 }
 	 }
 
