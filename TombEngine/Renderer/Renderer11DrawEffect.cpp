@@ -111,21 +111,21 @@ namespace TEN::Renderer
 					g = 0;
 					b = 0;
 
-					CurlyPos[0].x = tg->pos1.x;
-					CurlyPos[0].y = tg->pos1.y;
-					CurlyPos[0].z = tg->pos1.z;
+					CurlyPos[0].x = tg->pos4.x ; 
+					CurlyPos[0].y = tg->pos4.y ;
+					CurlyPos[0].z = tg->pos4.z  ;
 
 					memcpy(&CurlyPos[1], tg, 48);
 
-					CurlyPos[5].x = tg->pos4.x ;//is anders ok
-					CurlyPos[5].y =  tg->pos4.y ;
-					CurlyPos[5].z =  tg->pos4.z ;
+					CurlyPos[5].x = tg->pos1.x;// *phd_sin(TO_RAD(tg->pos.Orientation.y + tg->length));//is anders ok
+					CurlyPos[5].y = tg->pos1.y;// *phd_sin(TO_RAD(tg->pos.Orientation.x + tg->length));
+					CurlyPos[5].z = tg->pos1.z;// *phd_cos(TO_RAD(tg->pos.Orientation.y + tg->length));
 			
 					for (int j = 0; j < 6; j++)
 					{
-						CurlyPos[j].x -= tg->pos1.x;// LaraItem->Pose.Position.x;
-						CurlyPos[j].y -= tg->pos1.y;// LaraItem->Pose.Position.y;
-						CurlyPos[j].z -= tg->pos1.z;// LaraItem->Pose.Position.z;
+						CurlyPos[j].x -= tg->pos4.x; // LaraItem->Pose.Position.x;
+						CurlyPos[j].y -= tg->pos4.y; // LaraItem->Pose.Position.y;
+						CurlyPos[j].z -= tg->pos4.z; // LaraItem->Pose.Position.z;
 
 						//CurlyPos[j].x -=  LaraItem->Pose.Position.x;
 						//CurlyPos[j].y -=  LaraItem->Pose.Position.y;
@@ -143,15 +143,15 @@ namespace TEN::Renderer
 						for (int s = 0; s < 3 * tg->segments - 1; s++)
 						{
 						
-								int ix = tg->pos1.x + interpolatedPos[0];
-								int iy = tg->pos1.y + interpolatedPos[1];
-								int iz = tg->pos1.z + interpolatedPos[2];
+								int ix = tg->pos4.x + interpolatedPos[0];
+								int iy = tg->pos4.y + interpolatedPos[1];
+								int iz = tg->pos4.z + interpolatedPos[2];
 
 								interpolatedPos += 4;
 
-								int ix2 = tg->pos1.x + interpolatedPos[0];
-								int iy2 = tg->pos1.y + interpolatedPos[1];
-								int iz2 = tg->pos1.z + interpolatedPos[2];
+								int ix2 = tg->pos4.x + interpolatedPos[0];
+								int iy2 = tg->pos4.y + interpolatedPos[1];
+								int iz2 = tg->pos4.z + interpolatedPos[2];
 
 
 								/*int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
