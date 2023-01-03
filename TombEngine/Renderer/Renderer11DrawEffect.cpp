@@ -79,18 +79,116 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawTwogunLaser(RenderView& view)
 	{
-
 			TWOGUNINFO* tg = &twogun[0]; 
+			byte r, g, b;
 
-			for (int lp = 0; lp < 4; lp++, tg++)
+			for (int lp = 0; lp < 2; lp++, tg++)
 			{
 				if (tg->life)
 				{
+					if (tg->fadein < 8)
+					{
+						r = (tg->r * tg->fadein) >> 3;
+						g = (tg->g * tg->fadein) >> 3;
+						b = (tg->b * tg->fadein) >> 3;
+					}
+					else if (tg->life < 16)
+					{
+						r = (tg->r * tg->life) >> 4;
+						g = (tg->g * tg->life) >> 4;
+						b = (tg->b * tg->life) >> 4;
+					}
+					else
+					{
+						r = tg->r;
+						g = tg->g;
+						b = tg->b;
+					}
 
+
+					//I made the laser red for seeng it better while testing, should be erased after it works
+					r = 255;
+					g = 0;
+					b = 0;
+
+					CurlyPos[0].x = tg->pos1.x;
+					CurlyPos[0].y = tg->pos1.y;
+					CurlyPos[0].z = tg->pos1.z;
+
+					memcpy(&CurlyPos[1], tg, 48);
+
+					CurlyPos[5].x = tg->pos4.x ;//is anders ok
+					CurlyPos[5].y =  tg->pos4.y ;
+					CurlyPos[5].z =  tg->pos4.z ;
+			
+					for (int j = 0; j < 6; j++)
+					{
+						CurlyPos[j].x -= tg->pos1.x;// LaraItem->Pose.Position.x;
+						CurlyPos[j].y -= tg->pos1.y;// LaraItem->Pose.Position.y;
+						CurlyPos[j].z -= tg->pos1.z;// LaraItem->Pose.Position.z;
+
+						//CurlyPos[j].x -=  LaraItem->Pose.Position.x;
+						//CurlyPos[j].y -=  LaraItem->Pose.Position.y;
+						//CurlyPos[j].z -=  LaraItem->Pose.Position.z;
+					}
+
+					CurlSpline(&CurlyPos[0], CurlyBuffer, tg);
+					
+					//GenerateSpiral(&CurlyPos[0], CurlyBuffer, tg);
+
+					if (abs(CurlyPos[0].x) <= 24576 && abs(CurlyPos[0].y) <= 24576 && abs(CurlyPos[0].z) <= 24576)
+					{
+						short* interpolatedPos = &CurlyBuffer[0];
+
+						for (int s = 0; s < 3 * tg->segments - 1; s++)
+						{
+						
+								int ix = tg->pos1.x + interpolatedPos[0];
+								int iy = tg->pos1.y + interpolatedPos[1];
+								int iz = tg->pos1.z + interpolatedPos[2];
+
+								interpolatedPos += 4;
+
+								int ix2 = tg->pos1.x + interpolatedPos[0];
+								int iy2 = tg->pos1.y + interpolatedPos[1];
+								int iz2 = tg->pos1.z + interpolatedPos[2];
+
+
+								/*int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
+								int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
+								int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
+
+								interpolatedPos += 4;
+
+								int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
+								int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
+								int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];*/
+
+
+								Vector3 pos1 = Vector3(ix, iy, iz);
+								Vector3 pos2 = Vector3(ix2, iy2, iz2);
+
+								Vector3 d = pos2 - pos1;
+								d.Normalize();
+
+								Vector3 c = (pos1 + pos2) / 2;
+
+								AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+									c,
+									Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+									(PI / 2),
+									1.0f,
+									{ 5 * 8.0f,
+								Vector3::Distance(pos1, pos2) },
+									BLENDMODE_ADDITIVE,
+									d, true, view);
+							
+						}
+
+					}
 					
 				}
-			}
-		
+			}	
 	}
 
 	void Renderer11::DrawLightning(RenderView& view)
@@ -117,6 +215,7 @@ namespace TEN::Renderer
 					LightningPos[j].y -= LaraItem->Pose.Position.y;
 					LightningPos[j].z -= LaraItem->Pose.Position.z;
 				}
+
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
 

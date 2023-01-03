@@ -23,13 +23,20 @@ namespace TEN::Effects::Lightning
 	struct TWOGUNINFO
 	{
 		Pose pos;
+		Vector3i pos1;
+		Vector3i pos2;
+		Vector3i pos3;
+		Vector3i pos4;
 		short life;
 		short coil;
 		short spin, spinadd;
 		short length, dlength;
+		signed char interpolation[9];
+		byte segments = 56;
 		short size;
 		int r, g, b;
 		char fadein;
+		Pose endPos;
 	};
 
 	extern TWOGUNINFO twogun[2];
@@ -64,10 +71,14 @@ namespace TEN::Effects::Lightning
 	extern float FloatSinCosTable[8192];
 	extern Vector3i LightningPos[6];
 	extern short LightningBuffer[1024];
+	extern Vector3i CurlyPos[6];
+	extern short CurlyBuffer[1024];
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
-	void TriggerLaserBeam(Vector3i pos1, Vector3i pos2, EulerAngles orient);
+	void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient);
+	void GenerateSpiral(Vector3i* pos, Vector3i* buffer, TWOGUNINFO* tg);
+	void CurlSpline(Vector3i* pos, short* buffer, TWOGUNINFO* tg);
 	void UpdateTwogunLasers();
 	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc);

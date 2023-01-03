@@ -29,12 +29,14 @@ namespace TEN::Effects::Lightning
 	float FloatSinCosTable[8192];
 	Vector3i LightningPos[6];
 	short LightningBuffer[1024];
+	Vector3i CurlyPos[6];
+	short CurlyBuffer[1024];
 		
 	std::vector<LIGHTNING_INFO> Lightning;
 
 	 TWOGUNINFO twogun[2];
 
-	 void TriggerLaserBeam(Vector3i pos1, Vector3i pos2, EulerAngles orient)
+	 void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient)
 	 {
 		 TWOGUNINFO* tg;
 
@@ -49,12 +51,32 @@ namespace TEN::Effects::Lightning
 					 break;
 			 }
 
-			 tg->pos.Position.x = pos1.x;
-			 tg->pos.Position.y = pos1.y;
-			 tg->pos.Position.z = pos1.z;
+			 tg->pos1 = src;
+			 tg->pos2.x = (dest.x + 3 * src.x) >> 2;
+			 tg->pos2.y = (dest.y + 3 * src.y) >> 2;
+			 tg->pos2.z = (dest.z + 3 * src.z) >> 2;
+			 tg->pos3.x = (src.x + 3 * dest.x) >> 2;
+			 tg->pos3.y = (src.y + 3 * dest.y) >> 2;
+			 tg->pos3.z = (src.z + 3 * dest.z) >> 2;
+			 tg->pos4 = dest;
+			 for (int j = 0; j < 9; j++)
+			 {
+				 if ( j < 6)
+					 tg->interpolation[j] = 1;
+			 }
+
+			 tg->pos.Position.x = src.x;
+			 tg->pos.Position.y = src.y;
+			 tg->pos.Position.z = src.z;
 			 tg->pos.Orientation.x = orient.x;
 			 tg->pos.Orientation.y = orient.y;
 			 tg->pos.Orientation.z = orient.z;
+			 tg->endPos.Position.x = dest.x;
+			 tg->endPos.Position.y = dest.y;
+			 tg->endPos.Position.z = dest.z;
+			 tg->endPos.Orientation.x = orient.x;
+			 tg->endPos.Orientation.y = orient.y;
+			 tg->endPos.Orientation.z = orient.z;
 			 tg->life = 17;
 			 tg->spin = (GetRandomControl() & 31) << 11;
 			 tg->dlength = 4096;
@@ -64,7 +86,7 @@ namespace TEN::Effects::Lightning
 			 tg->fadein = 8;
 
 			 TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
-			 TriggerLightning(&pos1, &pos2, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
+			// TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
 		 }
 	 }
 
@@ -80,6 +102,14 @@ namespace TEN::Effects::Lightning
 				if (tg->life)
 				{
 					tg->life--;
+
+					int* positions = (int*)&tg->pos2;
+					for (int j = 0; j < 9; j++)
+					{
+						*positions += 2 * tg->interpolation[j];
+						tg->interpolation[j] = (signed char)(tg->interpolation[j] - (tg->interpolation[j] >> 4));
+						positions++;
+					}
 
 					if (tg->life < 16)
 					{
@@ -113,6 +143,66 @@ namespace TEN::Effects::Lightning
 					tg->spin -= tg->spinadd;
 				}
 			}
+		}
+	}
+
+	void CurlSpline(Vector3i* pos, short* buffer, TWOGUNINFO* tg)
+	{
+		int segments = 3 * tg->segments - 1;
+		int dx = (  pos[5].x - pos->x) / segments;
+		int dy = (  pos[5].y- pos->y) / segments;
+		int dz = (  pos[5].z- pos->z) / segments;
+
+		float x, y, z;
+		x = dx +pos->x;
+		y = dy+pos->y;
+		z = dz+pos->z;
+		
+		short angle = tg->spin ;
+
+		int x1;
+		int s7 = tg->size * 4;
+		//short angle = tg->spin;
+		int Size = 0;
+		short radius = Size = 0;
+
+		if (3 * tg->segments - 2 > 0)
+		{
+			for (int i = 3 * tg->segments - 2; i > 0; i--)
+			{
+				x1 = radius >> 1;
+				x= dx + radius * phd_cos(angle);//posx war dx usw
+				y= dy + radius * phd_sin(angle);
+				z +=  tg->length >> 6;
+
+				buffer[0] = x ;
+				buffer[1] = y ;
+				buffer[2] = z;
+
+				angle += tg->coil;
+				radius += tg->size;;
+
+				x += x;
+				y += y;
+				z = z;
+
+				if (i & 1)
+					radius -= tg->size;
+				buffer += 4;
+			}
+		}
+	}
+
+	void GenerateSpiral(Vector3i* pos, Vector3i* buffer, TWOGUNINFO* tg)
+	{
+		int angle = tg->spin;
+		int radius = 0;
+		for (int i = 0; i < 56; i++) {
+			buffer[i].x = pos->x + radius * cos(angle);
+			buffer[i].y = pos->y + radius * sin(angle);
+			buffer[i].z = pos->z + 0;
+			angle += tg->coil;
+			radius += tg->size * 4;
 		}
 	}
 
