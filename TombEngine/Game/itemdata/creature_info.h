@@ -16,8 +16,6 @@ enum class ZoneType
 	Water,
 	// Enable 1 block vault/fall
 	Human,
-	// Enable jump/long jump and monkey (also 1 block vault/fall)
-	VonCroy,
 	// Can fly anywhere except in water room
 	Flyer,
 	MaxZone,
