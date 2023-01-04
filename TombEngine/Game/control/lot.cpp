@@ -193,6 +193,7 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 		case ZoneType::Ape:
 			creature->LOT.Step = CLICK(2);
 			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		case ZoneType::SophiaLee:

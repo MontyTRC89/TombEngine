@@ -12,6 +12,7 @@
 #include "Objects/TR3/Object/tr3_boss_object.h"
 
 using namespace TEN::Entities::Object::TR3;
+using namespace TEN::Entities::Object::TR3::Boss;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Items;
 
@@ -140,7 +141,7 @@ namespace TEN::Entities::Creatures::TR3
         auto* item = &g_Level.Items[itemNumber];
         InitialiseCreature(itemNumber);
         SetAnimation(item, PUNA_IDLE);
-        BOSS_CheckForRequiredObjects(*item);
+        CheckForRequiredObjects(*item);
 
         // save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
         // puna is rotated to not face lara, so add 180° to face her.
@@ -260,7 +261,7 @@ namespace TEN::Entities::Creatures::TR3
                 if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
                     item->ItemFlags[BOSSFlag_ExplodeCount]++;
                 if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
-                    BOSS_ExplodeBoss(itemNumber, *item, 61, PunaBossEffectColor); // Do explosion effect.
+                    ExplodeBoss(itemNumber, *item, 61, PunaBossEffectColor); // Do explosion effect.
 
                 return;
             }

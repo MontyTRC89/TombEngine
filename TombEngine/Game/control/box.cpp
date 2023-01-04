@@ -1156,7 +1156,8 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 		return (item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
 				item->ObjectNumber != ID_YETI &&
-				item->ObjectNumber != ID_LIZARD);
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE);
 
 	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
@@ -1164,7 +1165,8 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 				item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
 				item->ObjectNumber != ID_YETI &&
-				item->ObjectNumber != ID_LIZARD);
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE);
 	}
 
 	return true;

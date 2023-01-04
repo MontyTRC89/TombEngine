@@ -35,6 +35,7 @@
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Object::TR3;
+using namespace TEN::Entities::Object::TR3::Boss;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -843,64 +844,21 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
 		{
-			// If shield is active and Puna is the activator, spawn shield with rocochet effect.
+			// If shield is active and Puna activate the shield, spawn shield with ricochet effect.
 			if (targetEntity->TestFlag(BOSSFlag_Object, BOSS_Shield) &&
 				targetEntity->TestFlagEqual(BOSSFlag_ShieldIsEnabled, 1))
 			{
-				static constexpr auto punaShieldColor = Vector4(0.0f, 0.5f, 0.5f, 0.1f);
-
-				BOSS_SpawnShieldAndRichochetSparksAtPosition(*targetEntity, vTarget.ToVector3(), punaShieldColor);
+				SpawnShieldAndRichochetSparks(*targetEntity, vTarget.ToVector3(), Vector4(0.0f, 0.5f, 0.5f, 0.1f));
 				return FireWeaponType::Miss;
 			}
 		}
 
+		// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
+		// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
+		// with weapons
+		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
+			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
 		Statistics.Game.AmmoHits++;
-
-		// TODO: Enable when slot is created.
-		/*
-		if (target->ObjectNumber == ID_TRIBEBOSS)
-		{
-			long dx, dy, dz;
-
-			dx = (vDest.x - vSrc.x) >> 5;
-			dy = (vDest.y - vSrc.y) >> 5;
-			dz = (vDest.z - vSrc.z) >> 5;
-			BOSS_SpawnShieldAndRichochetSparksAtPosition(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
-		}
-		else if (target->ObjectNumber == ID_ARMY_WINSTON || target->ObjectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
-		{
-			short ricochet_angle;
-			target->HitStatus = true; //need to do this to maintain defence state
-			target->HitPoints--;
-			ricochet_angle = (mGetAngle(lara.Pose.Position.z, lara.Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
-			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-			SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose);		// play RICOCHET Sample
-		}
-		else if (target->ObjectNumber == ID_SHIVA) //So must be Shiva
-		{
-			z = target->Pose.Position.z - lara_item->Pose.Position.z;
-			x = target->Pose.Position.x - lara_item->Pose.Position.x;
-			angle = 0x8000 + phd_atan(z, x) - target->Pose.Orientation.y;
-
-			if ((target->ActiveState > 1 && target->ActiveState < 5) && angle < 0x4000 && angle > -0x4000)
-			{
-				target->HitStatus = true; //need to do this to maintain defence state
-				ricochet_angle = (mGetAngle(lara.Pose.Position.z, lara.Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
-				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose); // play RICOCHET Sample
-			}
-			else //Shiva's not in defence mode or has its back to Lara
-				HitTarget(target, &vDest, weapon->damage, 0);
-		}
-		else
-		{*/
-			// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
-			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
-			// with weapons
-			if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-				HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
-		//}
-		
 		return FireWeaponType::PossibleHit;
 	}
 }

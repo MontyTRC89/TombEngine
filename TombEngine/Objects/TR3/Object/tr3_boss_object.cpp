@@ -11,9 +11,9 @@
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Creatures::TR3;
 
-namespace TEN::Entities::Object::TR3
+namespace TEN::Entities::Object::TR3::Boss
 {
-	void BOSS_SpawnShield(const ItemInfo& item, const Vector4& color)
+	void SpawnShield(const ItemInfo& item, const Vector4& color)
 	{
 		if (!item.TestFlag(BOSSFlag_Object, BOSS_Shield))
 			return;
@@ -42,7 +42,7 @@ namespace TEN::Entities::Object::TR3
 		AddActiveItem(itemNumber);
 	}
 
-	void BOSS_SpawnShockwaveExplosion(const ItemInfo& item, const Vector4& color)
+	void SpawnShockwaveExplosion(const ItemInfo& item, const Vector4& color)
 	{
 		if (!item.TestFlag(BOSSFlag_Object, BOSS_ShockwaveExplosion))
 			return;
@@ -79,7 +79,7 @@ namespace TEN::Entities::Object::TR3
 		SoundEffect(SFX_TR3_BLAST_CIRCLE, &spawned->Pose);
 	}
 
-	void BOSS_SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
+	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
 	{
 		if (!item.TestFlag(BOSSFlag_Object, BOSS_ShockwaveExplosion))
 			return;
@@ -116,7 +116,7 @@ namespace TEN::Entities::Object::TR3
 		SoundEffect(SFX_TR3_BLAST_CIRCLE, &ringItem.Pose);
 	}
 
-	void BOSS_EffectShieldControl(int itemNumber)
+	void ShieldControl(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -138,7 +138,7 @@ namespace TEN::Entities::Object::TR3
 
 	// Ring and Explosion wave are rotating and scaling up by default.
 
-	void BOSS_EffectShockwaveRingControl(int itemNumber)
+	void ShockwaveRingControl(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -164,7 +164,7 @@ namespace TEN::Entities::Object::TR3
 		UpdateItemRoom(itemNumber);
 	}
 
-	void BOSS_EffectShockwaveExplosionControl(int itemNumber)
+	void ShockwaveExplosionControl(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -229,7 +229,7 @@ namespace TEN::Entities::Object::TR3
 		spark->size = spark->dSize / 2;
 	}
 
-	void BOSS_ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color)
 	{
 		Vector3 random;
 
@@ -241,7 +241,7 @@ namespace TEN::Entities::Object::TR3
 		short counter = item.ItemFlags[BOSSFlag_ExplodeCount];
 		if (counter == 1)
 		{
-			BOSS_SpawnShockwaveExplosion(item, color);
+			SpawnShockwaveExplosion(item, color);
 			for (int i = 0; i < 3; i++)
 			{
 				random.x = item.Pose.Position.x + Random::GenerateInt(-512, 512);
@@ -269,7 +269,7 @@ namespace TEN::Entities::Object::TR3
 			random.x = item.Pose.Position.x + Random::GenerateInt(-64, 64);
 			random.y = (item.Pose.Position.y - CLICK(2)) + Random::GenerateInt(-64, 64);
 			random.z = item.Pose.Position.z + Random::GenerateInt(-64, 64);
-			BOSS_SpawnShockwaveRing(item, random, color);
+			SpawnShockwaveRing(item, random, color);
 		}
 
 		TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y - CLICK(2), item.Pose.Position.z, counter / 2, color.x * 255, color.y * 255, color.z * 255);
@@ -277,7 +277,7 @@ namespace TEN::Entities::Object::TR3
 			CreatureDie(itemNumber, true);
 	}
 
-	void BOSS_CheckForRequiredObjects(ItemInfo& item)
+	void CheckForRequiredObjects(ItemInfo& item)
 	{
 		short flagResult = 0;
 
@@ -297,9 +297,9 @@ namespace TEN::Entities::Object::TR3
 		item.SetFlag(BOSSFlag_Object, flagResult);
 	}
 
-	void BOSS_SpawnShieldAndRichochetSparksAtPosition(const ItemInfo& item, const Vector3& pos, const Vector4& color)
+	void SpawnShieldAndRichochetSparks(const ItemInfo& item, const Vector3& pos, const Vector4& color)
 	{
-		BOSS_SpawnShield(item, color);
+		SpawnShield(item, color);
 
 		auto target = GameVector(pos, item.RoomNumber);
 		auto yOrient = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), target.ToVector3()).y;

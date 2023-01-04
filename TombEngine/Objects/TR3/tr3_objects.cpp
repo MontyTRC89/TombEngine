@@ -26,7 +26,6 @@
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/tr3_punaboss.h" // OK
-#include "Objects/TR3/Entity/tr3_willard.h" // IN_DEV
 
 // Object
 #include "Objects/TR3/Object/tr3_boss_object.h"
@@ -45,6 +44,7 @@
 
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Object::TR3;
+using namespace TEN::Entities::Object::TR3::Boss;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -335,20 +335,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head
 		obj->SetupHitEffect();
 	}
-
-	obj = &Objects[ID_WILLARD];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWillard;
-		obj->collision = CreatureCollision;
-		obj->control = WillardControl;
-		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 200;
-		obj->intelligent = true;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->SetupHitEffect();
-	}
 }
 
 static void StartObject(ObjectInfo* obj)
@@ -358,7 +344,7 @@ static void StartObject(ObjectInfo* obj)
 	{
 		obj->initialise = nullptr;
 		obj->collision = ObjectCollision;
-		obj->control = BOSS_EffectShieldControl;
+		obj->control = ShieldControl;
 		obj->shadowType = ShadowMode::None;
 	}
 
@@ -367,7 +353,7 @@ static void StartObject(ObjectInfo* obj)
 	{
 		obj->initialise = nullptr;
 		obj->collision = nullptr;
-		obj->control = BOSS_EffectShockwaveRingControl;
+		obj->control = ShockwaveRingControl;
 		obj->shadowType = ShadowMode::None;
 	}
 
@@ -376,7 +362,7 @@ static void StartObject(ObjectInfo* obj)
 	{
 		obj->initialise = nullptr;
 		obj->collision = nullptr;
-		obj->control = BOSS_EffectShockwaveExplosionControl;
+		obj->control = ShockwaveExplosionControl;
 		obj->shadowType = ShadowMode::None;
 	}
 }

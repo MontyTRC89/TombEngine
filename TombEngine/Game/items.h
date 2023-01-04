@@ -16,6 +16,7 @@ enum GAME_OBJECT_ID : short;
 constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
+constexpr auto NUM_ITEMFLAGS_COUNT = 8;
 
 enum AIObjectType
 {
@@ -146,7 +147,7 @@ struct ItemInfo
 	BitField MeshBits	  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
-	short ItemFlags[8];
+	short ItemFlags[NUM_ITEMFLAGS_COUNT];
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?

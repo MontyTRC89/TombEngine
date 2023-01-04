@@ -490,7 +490,7 @@ void InitialiseItem(short itemNumber)
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;
 
-	for (int i = 0; i < _countof(item->ItemFlags); i++)
+	for (int i = 0; i < NUM_ITEMFLAGS_COUNT; i++)
 		item->ItemFlags[i] = 0;
 
 	item->Active = false;
@@ -530,8 +530,6 @@ void InitialiseItem(short itemNumber)
 		AddActiveItem(itemNumber);
 		item->Status = ITEM_ACTIVE;
 	}
-
-	UpdateItemRoom(itemNumber);
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->NextItem = room->itemNumber;
