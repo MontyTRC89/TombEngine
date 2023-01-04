@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!plasma)
 		{
 			//TODO: create additional curly laser effect
-			TriggerLaserBeam(pos1, pos2,orient);
+			TriggerLaserBeam(pos1, pos2, orient, LeftRight);
 
 			item->ItemFlags[LeftRight] = 16;
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);

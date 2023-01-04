@@ -79,11 +79,12 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawTwogunLaser(RenderView& view)
 	{
-			TWOGUNINFO* tg = &twogun[0]; 
 			byte r, g, b;
 
-			for (int lp = 0; lp < 2; lp++, tg++)
+			for (int i = 0; i < 2; i++)
 			{
+				TWOGUNINFO* tg = &twogun[i];
+
 				if (tg->life)
 				{
 					if (tg->fadein < 8)
@@ -105,44 +106,31 @@ namespace TEN::Renderer
 						b = tg->b;
 					}
 
-
-					//I made the laser red for seeng it better while testing, should be erased after it works
-					r = 255;
-					g = 0;
-					b = 0;
-
-					CurlyPos[0].x = tg->pos4.x ; 
-					CurlyPos[0].y = tg->pos4.y ;
-					CurlyPos[0].z = tg->pos4.z  ;
+					CurlyPos[0].x = tg->pos4.x; 
+					CurlyPos[0].y = tg->pos4.y;
+					CurlyPos[0].z = tg->pos4.z;
 
 					memcpy(&CurlyPos[1], tg, 48);
 
-					CurlyPos[5].x = tg->pos1.x;// *phd_sin(TO_RAD(tg->pos.Orientation.y + tg->length));//is anders ok
-					CurlyPos[5].y = tg->pos1.y;// *phd_sin(TO_RAD(tg->pos.Orientation.x + tg->length));
-					CurlyPos[5].z = tg->pos1.z;// *phd_cos(TO_RAD(tg->pos.Orientation.y + tg->length));
+					CurlyPos[1].x = tg->pos1.x;
+					CurlyPos[1].y = tg->pos1.y;
+					CurlyPos[1].z = tg->pos1.z;
 			
-					for (int j = 0; j < 6; j++)
+					for (int j = 0; j < 2; j++)
 					{
-						CurlyPos[j].x -= tg->pos4.x; // LaraItem->Pose.Position.x;
-						CurlyPos[j].y -= tg->pos4.y; // LaraItem->Pose.Position.y;
-						CurlyPos[j].z -= tg->pos4.z; // LaraItem->Pose.Position.z;
-
-						//CurlyPos[j].x -=  LaraItem->Pose.Position.x;
-						//CurlyPos[j].y -=  LaraItem->Pose.Position.y;
-						//CurlyPos[j].z -=  LaraItem->Pose.Position.z;
+						CurlyPos[j].x -= tg->pos4.x;
+						CurlyPos[j].y -= tg->pos4.y; 
+						CurlyPos[j].z -= tg->pos4.z;
 					}
 
 					CurlSpline(&CurlyPos[0], CurlyBuffer, tg);
-					
-					//GenerateSpiral(&CurlyPos[0], CurlyBuffer, tg);
 
 					if (abs(CurlyPos[0].x) <= 24576 && abs(CurlyPos[0].y) <= 24576 && abs(CurlyPos[0].z) <= 24576)
 					{
 						short* interpolatedPos = &CurlyBuffer[0];
 
-						for (int s = 0; s < 3 * tg->segments - 1; s++)
+						for (int s = 0; s < tg->segments ; s++)
 						{
-						
 								int ix = tg->pos4.x + interpolatedPos[0];
 								int iy = tg->pos4.y + interpolatedPos[1];
 								int iz = tg->pos4.z + interpolatedPos[2];
@@ -152,18 +140,6 @@ namespace TEN::Renderer
 								int ix2 = tg->pos4.x + interpolatedPos[0];
 								int iy2 = tg->pos4.y + interpolatedPos[1];
 								int iz2 = tg->pos4.z + interpolatedPos[2];
-
-
-								/*int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-								int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-								int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-								interpolatedPos += 4;
-
-								int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-								int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-								int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];*/
-
 
 								Vector3 pos1 = Vector3(ix, iy, iz);
 								Vector3 pos2 = Vector3(ix2, iy2, iz2);
@@ -181,12 +157,9 @@ namespace TEN::Renderer
 									{ 5 * 8.0f,
 								Vector3::Distance(pos1, pos2) },
 									BLENDMODE_ADDITIVE,
-									d, true, view);
-							
+									d, true, view);							
 						}
-
-					}
-					
+					}					
 				}
 			}	
 	}

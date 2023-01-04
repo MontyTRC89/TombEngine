@@ -36,15 +36,14 @@ namespace TEN::Effects::Lightning
 
 	 TWOGUNINFO twogun[2];
 
-	 void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient)
+	 void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient, short LeftRight)
 	 {
 		 TWOGUNINFO* tg;
 
 		 int j;
 		 for (int i = 0; i < 2; i++, i++)
 		 {
-
-			 tg = &twogun[0];
+			 tg = &twogun[LeftRight];
 			 for (j = 0; j < 4; j++)
 			 {
 				 if (tg->life == 0 || j == 3)
@@ -52,31 +51,8 @@ namespace TEN::Effects::Lightning
 			 }
 
 			 tg->pos1 = src;
-			 tg->pos2.x = (dest.x + 3 * src.x) >> 2;
-			 tg->pos2.y = (dest.y + 3 * src.y) >> 2;
-			 tg->pos2.z = (dest.z + 3 * src.z) >> 2;
-			 tg->pos3.x = (src.x + 3 * dest.x) >> 2;
-			 tg->pos3.y = (src.y + 3 * dest.y) >> 2;
-			 tg->pos3.z = (src.z + 3 * dest.z) >> 2;
 			 tg->pos4 = dest;
-			 for (int j = 0; j < 9; j++)
-			 {
-				 if ( j < 6)
-					 tg->interpolation[j] = 1;
-			 }
-
-			 tg->pos.Position.x = src.x;
-			 tg->pos.Position.y = src.y;
-			 tg->pos.Position.z = src.z;
-			 tg->pos.Orientation.x = orient.x;
-			 tg->pos.Orientation.y = orient.y;
-			 tg->pos.Orientation.z = orient.z;
-			 tg->endPos.Position.x = dest.x;
-			 tg->endPos.Position.y = dest.y;
-			 tg->endPos.Position.z = dest.z;
-			 tg->endPos.Orientation.x = orient.x;
-			 tg->endPos.Orientation.y = orient.y;
-			 tg->endPos.Orientation.z = orient.z;
+			 tg->pos.Position = src;
 			 tg->life = 17;
 			 tg->spin = (GetRandomControl() & 31) << 11;
 			 tg->dlength = 4096;
@@ -86,7 +62,8 @@ namespace TEN::Effects::Lightning
 			 tg->fadein = 8;
 
 			 TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
-			 TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 5, 5);	//straight main laser	
+			 TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
+			 TriggerLightning(&src, &dest, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);
 		 }
 	 }
 
@@ -94,7 +71,7 @@ namespace TEN::Effects::Lightning
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			TWOGUNINFO* tg = &twogun[0];
+			TWOGUNINFO* tg = &twogun[i];
 			int	j;
 
 			for (j = 0; j < 4; j++, tg++)
@@ -102,14 +79,6 @@ namespace TEN::Effects::Lightning
 				if (tg->life)
 				{
 					tg->life--;
-
-					int* positions = (int*)&tg->pos2;
-					for (int j = 0; j < 9; j++)
-					{
-						*positions += 2 * tg->interpolation[j];
-						tg->interpolation[j] = (signed char)(tg->interpolation[j] - (tg->interpolation[j] >> 4));
-						positions++;
-					}
 
 					if (tg->life < 16)
 					{
@@ -148,62 +117,80 @@ namespace TEN::Effects::Lightning
 
 	void CurlSpline(Vector3i* pos, short* buffer, TWOGUNINFO* tg)
 	{
-		int segments = 3 * tg->segments - 1;
-		int dx = (  pos[5].x - pos->x) / segments;
-		int dy = (  pos[5].y- pos->y) / segments;
-		int dz = (  pos[5].z- pos->z) / segments;
+		buffer[0] = pos[0].x;
+		buffer[1] = pos[0].y;
+		buffer[2] = pos[0].z;
+
+		buffer += 4;
+
+		int segments =  tg->segments ;
 
 		float x, y, z;
-		x = dx +pos->x;
-		y = dy+pos->y;
-		z = dz+pos->z;
+
+		z = 0;
+
+		Vector3 lineStartPoint = Vector3(pos[0].x, pos[0].y, pos[0].z);
+		Vector3 lineEndPoint = Vector3(pos[1].x, pos[1].y, pos[1].z);
+
+		// Calculate the direction vector of the line
+		Vector3 direction = (lineEndPoint - lineStartPoint) / segments;
+
+		// Normalize the direction vector
+		direction.Normalize();
+
+		// Calculate the length of the line
+		float lineLength = (lineEndPoint - lineStartPoint).Length() ;
+
+		// Calculate the step size along the line
+		float stepSize = lineLength / segments;
+
+		// Set the starting position to the line start point
+		Vector3 currentPos = lineStartPoint;
 		
 		short angle = tg->spin ;
 
 		int x1;
-		int s7 = tg->size * 4;
-		//short angle = tg->spin;
-		int Size = 0;
-		short radius = Size = 0;
+		short radius = 0;
 
-		if (3 * tg->segments - 2 > 0)
+		if (1 * tg->segments  > 0)
 		{
-			for (int i = 3 * tg->segments - 2; i > 0; i--)
+			for (int i =  tg->segments ; i > 0; i--)
 			{
 				x1 = radius >> 1;
-				x= dx + radius * phd_cos(angle);//posx war dx usw
-				y= dy + radius * phd_sin(angle);
-				z +=  tg->length >> 6;
+				if (x1 > 48)
+					x1 = 48;
+				
+					x = (currentPos.x + (tg->length /64) + (radius * phd_cos(angle)) /2) -x1;
+					y = (currentPos.y + (tg->length / 64) + (radius * phd_sin(angle)) / 2) - x1;
+					z = (tg->length / 64) + currentPos.z;
 
-				buffer[0] = x ;
-				buffer[1] = y ;
-				buffer[2] = z;
+					buffer[0] = x;
+					buffer[1] = y;
+					buffer[2] = z;
 
-				angle += tg->coil;
-				radius += tg->size;;
+					angle += tg->coil;
+					radius += tg->size;
 
-				x += x;
-				y += y;
-				z = z;
+					if (i & 1)
+						radius -= tg->size;
 
-				if (i & 1)
-					radius -= tg->size;
-				buffer += 4;
+					buffer += 4;
+
+					// Increment the current position along the line by the step size
+					currentPos += direction * stepSize;
+
+					x += currentPos.x;
+					y += currentPos.y;
+					z = currentPos.z;
+
+					if (radius < 4)
+						radius = 4;
 			}
 		}
-	}
 
-	void GenerateSpiral(Vector3i* pos, Vector3i* buffer, TWOGUNINFO* tg)
-	{
-		int angle = tg->spin;
-		int radius = 0;
-		for (int i = 0; i < 56; i++) {
-			buffer[i].x = pos->x + radius * cos(angle);
-			buffer[i].y = pos->y + radius * sin(angle);
-			buffer[i].z = pos->z + 0;
-			angle += tg->coil;
-			radius += tg->size * 4;
-		}
+		buffer[0] = pos[1].x;
+		buffer[1] = pos[1].y;
+		buffer[2] = pos[1].z;
 	}
 
 	void InitialiseFloatSinCosTable()
