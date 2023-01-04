@@ -100,7 +100,6 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!plasma)
 		{
-			//TODO: create additional curly laser effect
 			TriggerLaserBeam(pos1, pos2, orient, LeftRight);
 
 			item->ItemFlags[LeftRight] = 16;
