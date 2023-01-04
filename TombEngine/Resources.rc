@@ -45,7 +45,7 @@ BEGIN
             VALUE "CompanyName", "Tomb Engine Development Community"
             VALUE "FileVersion", "1.0.6.0"
             VALUE "InternalName", "TombEngine.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2022"
+            VALUE "LegalCopyright", "Copyright (c) 2023"
             VALUE "OriginalFilename", "TombEngine.exe"
             VALUE "ProductName", "Tomb Engine"
             VALUE "ProductVersion", "1.6.4.0"
