@@ -1,10 +1,45 @@
+Version 1.0.6
+=============
+
+* Add an option to activate lua or node events from legacy triggers.
+
 Version 1.0.5 
 =============
 
 * Fix combined items not existing in inventory upon game reload.
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
+* Fix savegame crashes when rooms with static meshes are flipped.
+* Fix discrepancies between statistics and save / load game time units.
+* Fix draw key incorrectly working in binoculars / lasersight mode.
+* Fix incorrect picking up from plinths concealed by raising blocks.
+* Fix reversed grenade rotation.
+* Fix flame emitter 3 not burning player.
+* Fix TR2 yeti, TR3 civvy and MP with stick vault bugs.
+* Fix TR2 worker with flamethrower and TR3 flamethrower baddy attack ranges and aiming issues.
+* Fix TR3 tribeman with axe not attacking Lara.
+* Fix TR3 tribeman with dart not shooting at Lara's direction.
+* Fix TR3 crow and TR4 harpy death animations not performing correctly.
+* Fix TR4 crocodile attack range and joint rotation speed.
+* Fix TR4 Von Croy not using animation for 2 and 3 step down vaults.
+* Fix TR4 baddies not using animation for 3 step down vaults.
+* Fix TR5 laserhead guardian.
+* Fix crash, water death and meshswap issues for TR5 cyborg.
+* Fix pathfinding problems for first initialized enemy of every slot.
+* Fix pathfinding of flying and water creatures (partial).
+* Fix rare crash when smash item is inside a wall and add warning log for the scenario.
+* Fix bone rotations of some entities.
+* Fix Lara's animation for cog switch release.
+* Added new OCB to cog switch object: 
+	- Use OCB 0 to have the traditional behaviour.
+	- Use any other OCB to can use the Cog Switch without need of any door linked.
+* Allow to freely rotate dart emitter in all directions.
+* Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
+* Draw real mesh for darts.
+* Added warning log when one slot requires another slot which is missing.
 
+Lua API changes:
+* Add new Room class and several methods for it.
 
 Version 1.0.4
 =============

@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR1
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		item->Animation.FrameNumber = WOLF_SLEEP_FRAME;
 	}
 

@@ -301,7 +301,7 @@ namespace TEN::Renderer
 
 			newItem->ItemNumber = itemNum;
 			newItem->ObjectNumber = item->ObjectNumber;
-			newItem->Color = item->Color;
+			newItem->Color = item->Model.Color;
 			newItem->Position = item->Pose.Position.ToVector3();
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
@@ -663,7 +663,7 @@ namespace TEN::Renderer
 		}
 
 		// Multiply calculated ambient light by object tint
-		item->AmbientLight *= nativeItem->Color;
+		item->AmbientLight *= nativeItem->Model.Color;
 	}
 
 	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)

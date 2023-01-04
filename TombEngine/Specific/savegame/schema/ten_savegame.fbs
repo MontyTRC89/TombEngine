@@ -6,6 +6,13 @@ struct RoomVector {
 	y_location: uint32;
 }
 
+table Room {
+	index: int32;
+	name: string;
+	flags: int32;
+	reverb_type: int32;
+}
+
 table Item {
 	active_state: int32;
 	anim_number: int32;
@@ -373,6 +380,7 @@ table VolumeState {
 }
 
 table Volume {
+	name: string;
 	number: int32;
 	room_number: int32;
 	enabled: bool;
@@ -454,6 +462,7 @@ table SaveGame {
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
 	lara: Lara;
+	rooms: [Room];
 	items: [Item];
 	next_item_free: int32;
 	next_item_active: int32;

@@ -14,7 +14,6 @@
 #include "Specific/level.h"
 
 using namespace TEN::Math::Random;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -22,8 +21,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
 	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
-	const vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
-	const vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
+	const std::vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
+	const std::vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
 
 	// TODO
 	enum BrownBeastState
@@ -41,7 +40,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 

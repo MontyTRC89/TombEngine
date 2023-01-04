@@ -513,7 +513,6 @@ namespace TEN::Renderer
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
-		void DrawDarts(RendererItem* item, RenderView& view);
 		void DrawLara(RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);

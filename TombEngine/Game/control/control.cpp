@@ -489,6 +489,12 @@ void InitialiseOrLoadGame(bool loadGame)
 			Statistics.Game = {};
 			GameTimer = 0;
 			InitialiseGame = false;
+
+			TENLog("Starting new game.", LogLevel::Info);
+		}
+		else
+		{
+			TENLog("Starting new level.", LogLevel::Info);
 		}
 
 		g_GameScript->OnStart();

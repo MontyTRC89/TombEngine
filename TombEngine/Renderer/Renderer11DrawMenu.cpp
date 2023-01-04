@@ -434,12 +434,6 @@ namespace TEN::Renderer
 	{
 		char buffer[40];
 
-		auto seconds = GameTimer / FPS;
-		auto days    = (seconds / (24 * 60 * 60));
-		auto hours   = (seconds % (24 * 60 * 60)) / (60 * 60);
-		auto min     = (seconds / 60) % 60;
-		auto sec     = (seconds % 60);
-
 		ScriptInterfaceLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 		auto y = MenuVerticalStatisticsTitle;
 
@@ -452,7 +446,8 @@ namespace TEN::Renderer
 		GetNextBlockPosition(&y);
 
 		// Time taken
-		sprintf(buffer, "%02d:%02d:%02d", (days * 24) + hours, min, sec);
+		auto gameTime = GetGameTime(GameTimer);
+		sprintf(buffer, "%02d:%02d:%02d", (gameTime.Days * DAY_UNIT) + gameTime.Hours, gameTime.Minutes, gameTime.Seconds);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);

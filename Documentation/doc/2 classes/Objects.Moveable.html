@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.4 Lua API</title>
+    <title>TombEngine 1.0.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -53,6 +53,7 @@
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
   <li>    <here>Objects.Moveable</here></li>
+  <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
@@ -71,6 +72,8 @@
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -306,7 +309,7 @@ associated getters and setters.</td>
 	<td class="summary">Destroy the moveable.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:AttachObjCamera">Moveable:AttachObjCamera(mesh)</a></td>
+	<td class="name" ><a href="#Moveable:AttachObjCamera">Moveable:AttachObjCamera(mesh, target, mesh)</a></td>
 	<td class="summary">Attach camera to an object.</td>
 	</tr>
 	<tr>
@@ -337,8 +340,12 @@ associated getters and setters.</td>
 	<td class="summary">Get the current room of the object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetRoom">Moveable:SetRoom(ID)</a></td>
-	<td class="summary">Set room of object
+	<td class="name" ><a href="#Moveable:GetRoomNumber">Moveable:GetRoomNumber()</a></td>
+	<td class="summary">Get the current room number of the object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetRoomNumber">Moveable:SetRoomNumber(ID)</a></td>
+	<td class="summary">Set room number of object
  Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</td>
 	</tr>
 </table>
@@ -1538,7 +1545,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:AttachObjCamera"></a>
-    <strong>Moveable:AttachObjCamera(mesh)</strong>
+    <strong>Moveable:AttachObjCamera(mesh, target, mesh)</strong>
     </dt>
     <dd>
     Attach camera to an object.
@@ -1549,7 +1556,15 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <ul>
         <li><span class="parameter">mesh</span>
             <span class="types"><span class="type">int</span></span>
-         1 for camera, mesh 2 for target
+         of a target moveable to use as a camera target
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a></span>
+         moveable to attach camera to
+        </li>
+        <li><span class="parameter">mesh</span>
+            <span class="types"><span class="type">int</span></span>
+         of a target moveable to use as a camera target
         </li>
     </ul>
 
@@ -1696,6 +1711,27 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
+           <span class="types"><span class="type">Room</span></span>
+        current room of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetRoomNumber"></a>
+    <strong>Moveable:GetRoomNumber()</strong>
+    </dt>
+    <dd>
+    Get the current room number of the object
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
            <span class="types"><span class="type">int</span></span>
         number representing the current room of the object
     </ol>
@@ -1705,11 +1741,11 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
-    <a name = "Moveable:SetRoom"></a>
-    <strong>Moveable:SetRoom(ID)</strong>
+    <a name = "Moveable:SetRoomNumber"></a>
+    <strong>Moveable:SetRoomNumber(ID)</strong>
     </dt>
     <dd>
-    Set room of object
+    Set room number of object
  Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 
 
@@ -1728,7 +1764,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
-sas:SetRoom(destinationRoom)
+sas:SetRoomNumber(destinationRoom)
 sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
     </ul>
 
@@ -1740,7 +1776,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-16 18:35:53 </i>
+<i style="float:right;">Last updated 2022-12-30 16:32:22 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

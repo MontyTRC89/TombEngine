@@ -49,7 +49,7 @@ namespace Misc
 	//@treturn bool is there a direct line of sight between the two positions?
 	//@usage
 	//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
-	//print(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))
+	//print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
 		GameVector vec1, vec2;
@@ -362,7 +362,6 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
-
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);

@@ -32,19 +32,6 @@ namespace TEN::Entities::Creatures::TR5
 	const auto AutoGunClosedHatchJoints	= std::vector<unsigned int>{ 10 };
 	const auto AutoGunFlashJoints		= std::vector<unsigned int>{ 8 };
 
-	void SetupAutoGun(ObjectInfo& object)
-	{
-		object.initialise = InitialiseAutoGuns;
-		object.control = ControlAutoGun;
-		object.intelligent = true;
-		object.hitEffect = HIT_RICOCHET;
-		object.undead = true;
-
-		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[object.boneIndex + 8 * 4] |= ROT_Y;
-	}
-
 	void InitialiseAutoGuns(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
