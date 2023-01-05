@@ -127,7 +127,6 @@ namespace Misc
 	///Shows the mode of the game camera.
 	//@function GetCameraType
 	//@treturn short ID of the camera mode, returned values can be:
-	//@treturn CameraType.Null
 	//@treturn CameraType.Chase
 	//@treturn CameraType.Fixed
 	//@treturn CameraType.Look
@@ -135,8 +134,36 @@ namespace Misc
 	//@treturn CameraType.Heavy
 	//@treturn CameraType.Object
 	//@usage
-	//MyVar = Misc.GetCameraType()
-	//print(MyVar)
+	//LevelFuncs.OnControlPhase = function() 
+	//	PrintCameraType()
+	//end
+	//
+	//function PrintCameraType()
+	//	MyCameraType = Misc.GetCameraType()
+	//
+	//	if (textCam) then
+	//		HideString(textCam)
+	//	end
+	//
+	//	if (MyCameraType == CameraType.Chase) then
+	//		stringCam = "Camera type is: CHASE"
+	//	elseif(MyCameraType == CameraType.Look) then
+	//		stringCam = "Camera type is: LOOK"
+	//	elseif(MyCameraType == CameraType.Fixed) then
+	//		stringCam = "Camera type is: FIXED"
+	//	elseif(MyCameraType == CameraType.Combat) then
+	//		stringCam = "Camera type is: COMBAT"
+	//	elseif(MyCameraType == CameraType.Heavy) then
+	//		stringCam = "Camera type is: HEAVY"
+	//	elseif(MyCameraType == CameraType.Object) then
+	//		stringCam = "Camera type is: OBJECT"
+	//	else
+	//		stringCam = "Camera type is: UNKNOWN"
+	//	end
+	//
+	//	textCam = DisplayString(stringCam, 100, 800, Color.new(200, 200, 250))
+	//	ShowString(textCam)
+	//end
 	static CameraType GetCameraType()
 	{
 		return Camera.oldType;
