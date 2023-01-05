@@ -22,17 +22,17 @@ static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_C
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
+short CameraObject::GetIndex() const
+{
+	return m_camera.Index;
+}
+
 void CameraObject::Register(sol::table & parent)
 {
 	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
 		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
-
-		/// Get the camera's index
-		// @function Camera:GetIndex
-		// @treturn short a copy of the camera index position in the level
-		ScriptReserved_GetIndex, & CameraObject::GetIndex,
 
 		/// Get the camera's position
 		// @function Camera:GetPosition
@@ -132,11 +132,6 @@ void CameraObject::SetRoomNumber(short room)
 	}
 
 	m_camera.RoomNumber = room;
-}
-
-short CameraObject::GetIndex() const
-{
-	return m_camera.Index;
 }
 
 void CameraObject::PlayCamera(sol::optional<Moveable&> TargetObj)

@@ -233,11 +233,6 @@ void Moveable::Register(sol::table & parent)
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
-/// Get the camera's index
-// @function Camera:GetIndex
-// @treturn short a copy of the camera index position in the level
-	ScriptReserved_GetIndex, &Moveable::GetIndex,
-
 /// Retrieve the index of the current state.
 // This corresponds to the number shown in the item's state ID field in WadTool.
 // @function Moveable:GetState
@@ -508,11 +503,6 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 	m_item->ResetModelToDefault();
 }
 
-short Moveable::GetIndex() const
-{
-	return m_num;
-}
-
 void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
 {
 	if (std::holds_alternative<LevelFunc>(cb))
@@ -532,6 +522,11 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 			+ callerName);
 	}
 
+}
+
+short Moveable::GetIndex() const
+{
+	return m_num;
 }
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)

@@ -40,8 +40,6 @@ public:
 	[[nodiscard]] GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
 
-	short GetIndex() const;
-
 	[[nodiscard]] std::string GetName() const;
 	bool SetName(std::string const &);
 
@@ -128,6 +126,8 @@ public:
 
 	friend bool operator==(Moveable const&, Moveable const&);
 	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
+
+	short GetIndex() const;
 
 protected:
 	ItemInfo* m_item;

@@ -22,6 +22,8 @@ public:
 	CameraObject& operator=(CameraObject const& other) = delete;
 	CameraObject(CameraObject const& other) = delete;
 
+	short GetIndex() const;
+
 	static void Register(sol::table &);
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
@@ -32,8 +34,6 @@ public:
 
 	std::string GetName() const;
 	void SetName(std::string const &);
-
-	short GetIndex() const;
 
 	void PlayCamera(sol::optional<Moveable&> TargetObj);
 
