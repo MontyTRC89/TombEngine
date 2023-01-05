@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_harpy.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -227,6 +228,7 @@ namespace TEN::Entities::TR4
 				item->Animation.IsAirborne = false;
 				item->Animation.Velocity.y = 0.0f;
 				item->Pose.Position.y = item->Floor;
+				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 
 			item->Pose.Orientation.x = 0;

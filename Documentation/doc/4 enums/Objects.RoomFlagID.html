@@ -47,7 +47,7 @@
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
-  <li>    <here>Flow.Settings</here></li>
+  <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
@@ -72,7 +72,7 @@
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
-  <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
+  <li>    <here>Objects.RoomFlagID</here></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
@@ -85,18 +85,18 @@
 
 <div id="content">
 
-<h1>Class <code>Flow.Settings</code></h1>
-<p>Settings that will be run on game startup.</p>
+<h1>Enum <code>Objects.RoomFlagID</code></h1>
+<p>Constants for room flag IDs.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Members">Members</a></h2>
+<h2><a href="#Objects_RoomFlagID_constants">Objects.RoomFlagID constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#errorMode">errorMode</a></td>
-	<td class="summary">How should the application respond to script errors?</td>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of room flag ID constants (for use with Room:SetFlag / Room:GetFlag command).</td>
 	</tr>
 </table>
 
@@ -104,29 +104,32 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
+    <h2 class="section-header has-description"><a name="Objects_RoomFlagID_constants"></a>Objects.RoomFlagID constants </h2>
 
+          <div class="section-description">
+
+
+
+<p>The following constants are inside RoomFlagID.</p>
+
+<pre><code>WATER
+QUICKSAND
+SKYBOX
+WIND
+COLD
+DAMAGE
+NOLENSFLARE
+</code></pre>
+
+
+          </div>
     <dl class="function">
     <dt>
-    <a name = "errorMode"></a>
-    <strong>errorMode</strong>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    How should the application respond to script errors?
-Must be one of the following:
-<code>ErrorMode.TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
-This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
-
-<p><code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
-Choose this one if booting to the title level is too much for you.</p>
-
-<p><code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
-Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
-working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
-an invalid argument.</p>
-
-<p>In all of these modes, an <em>unrecoverable</em> error will boot you to the title level. If the title level itself
-has an unrecoverable error, the game will close.
+    Table of room flag ID constants (for use with Room:SetFlag / Room:GetFlag command).
 
 
 

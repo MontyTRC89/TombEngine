@@ -9,8 +9,6 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Specific/level.h"
 
-using std::function;
-
 void InitSmashObject(ObjectInfo* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
@@ -19,6 +17,7 @@ void InitSmashObject(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -28,7 +27,7 @@ void InitKeyHole(ObjectInfo* obj, int objectNumber)
 	if (obj->loaded)
 	{
 		obj->collision = KeyHoleCollision;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -39,8 +38,8 @@ void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = PuzzleHoleCollision;
 		obj->control = AnimatingControl;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->isPuzzleHole = true;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -51,7 +50,7 @@ void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = PuzzleDoneCollision;
 		obj->control = AnimatingControl;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -63,9 +62,7 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseAnimating;
 		obj->control = AnimatingControl;
 		obj->collision = ObjectCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		//Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
-		//Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -78,6 +75,21 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 		obj->collision = PickupCollision;
 		obj->control = PickupControl;
 		obj->isPickup = true;
+		obj->SetupHitEffect(true);
+	}
+}
+
+void InitPickup(ObjectInfo* obj, int objectNumber, std::function<ControlFunction> func)
+{
+	obj = &Objects[objectNumber];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePickup;
+
+		obj->collision = PickupCollision;
+		obj->control = (func != nullptr) ? func : PickupControl;
+		obj->isPickup = true;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -89,13 +101,13 @@ void InitFlare(ObjectInfo* obj, int objectNumber)
 		obj->collision = PickupCollision;
 		obj->control = FlareControl;
 		obj->pivotLength = 256;
-		obj->HitPoints = 256; // Time
+		obj->HitPoints = 256; // Time.
 		obj->usingDrawAnimatingItem = false;
 		obj->isPickup = true;
 	}
 }
 
-void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool noLoad)
+void InitProjectile(ObjectInfo* obj, std::function<InitFunction> func, int objectNumber, bool noLoad)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded || noLoad)
@@ -129,6 +141,6 @@ void InitPushableObject(ObjectInfo* obj, int objectNumber)
 		obj->ceiling = PushableBlockCeiling;
 		obj->floorBorder = PushableBlockFloorBorder;
 		obj->ceilingBorder = PushableBlockCeilingBorder;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->SetupHitEffect(true);
 	}
 }

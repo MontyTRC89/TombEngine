@@ -69,18 +69,17 @@ namespace TEN::Effects::Lightning
 		}
 	}
 
-	void TriggerLightning(Vector3i* src, Vector3i* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
+	LIGHTNING_INFO* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments)
 	{
 		LIGHTNING_INFO arc;
-
-		arc.pos1 = *src;
-		arc.pos2.x = (dest->x + 3 * src->x) >> 2;
-		arc.pos2.y = (dest->y + 3 * src->y) >> 2;
-		arc.pos2.z = (dest->z + 3 * src->z) >> 2;
-		arc.pos3.x = (src->x + 3 * dest->x) >> 2;
-		arc.pos3.y = (src->y + 3 * dest->y) >> 2;
-		arc.pos3.z = (src->z + 3 * dest->z) >> 2;
-		arc.pos4 = *dest;
+		arc.pos1 = *origin;
+		arc.pos2.x = ((origin->x * 3) + target->x) >> 2;
+		arc.pos2.y = ((origin->y * 3) + target->y) >> 2;
+		arc.pos2.z = ((origin->z * 3) + target->z) >> 2;
+		arc.pos3.x = ((target->x * 3) + origin->x) >> 2;
+		arc.pos3.y = ((target->y * 3) + origin->y) >> 2;
+		arc.pos3.z = ((target->z * 3) + origin->z) >> 2;
+		arc.pos4 = *target;
 		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
@@ -100,6 +99,7 @@ namespace TEN::Effects::Lightning
 		arc.width = width;
 
 		Lightning.push_back(arc);
+		return &Lightning[Lightning.size() - 1];
 	}
 
 	// New function used in TR5, we'll decompile it in the future

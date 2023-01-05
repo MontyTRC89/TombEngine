@@ -40,12 +40,12 @@ void Room::Register(sol::table& parent)
 
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
-		// @treturn Objects.RoomReverbType room's reverb type
+		// @treturn Objects.RoomReverb room's reverb type
 		ScriptReserved_GetPosition, &Room::GetReverbType,
 
 		/// Set the room's reverb type.
 		// @function Room:SetReverbType
-		// @tparam Objects.RoomReverbType new reverb type of the room 
+		// @tparam Objects.RoomReverb new reverb type of the room 
 		ScriptReserved_SetReverbType, &Room::SetReverbType,
 
 		/// Get the room's unique string identifier.
@@ -60,18 +60,19 @@ void Room::Register(sol::table& parent)
 
 		/// Get the room's specified flag value (true or false).
 		// @function Room:GetFlag
-		// @tparam Objects.RoomFlag flagID The room's flag ID
+		// @tparam Objects.RoomFlagID flagID The room's flag ID
 		// @treturn bool the room's specified flag value
 		ScriptReserved_GetFlag, &Room::GetFlag,
 
 		/// Set the room's specified flag value.
 		// @function Room:SetFlag
-		// @tparam Objects.RoomFlag flagID The room's flag ID
+		// @tparam Objects.RoomFlagID flagID The room's flag ID
 		// @tparam bool the room's new flag value
 		ScriptReserved_SetFlag, &Room::SetFlag,
 
 		/// Checks if specified tag is set for this room.
 		// @function Room:IsTagPresent
+		// @tparam string tag A text tag to check (case sensitive)
 		// @treturn bool true if tag is present, false if not
 		ScriptReserved_IsTagPresent, &Room::IsTagPresent);
 }

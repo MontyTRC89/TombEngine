@@ -132,14 +132,6 @@ bool TestState(int refState, const vector<int>& stateList)
 	return false;
 }
 
-void ClearItem(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-	item->Collidable = true;
-	item->Data = nullptr;
-	item->StartPose = item->Pose;
-}
-
 void KillItem(short const itemNumber)
 {
 	if (InItemControlLoop)

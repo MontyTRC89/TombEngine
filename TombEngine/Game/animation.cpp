@@ -360,9 +360,11 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 	}
 
 	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
-	item->Animation.TargetState = item->Animation.ActiveState;
+	const auto& anim = g_Level.Anims[index];
+
+	item->Animation.FrameNumber = anim.frameBase + frameToStart;
+	item->Animation.ActiveState = anim.ActiveState;
+	item->Animation.TargetState = anim.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)

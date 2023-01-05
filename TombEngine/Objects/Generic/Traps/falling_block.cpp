@@ -50,7 +50,7 @@ void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 			item->ItemFlags[0] = 0;
 			item->Status = ITEM_ACTIVE;
-			item->Flags |= 0x3E00;
+			item->Flags |= CODE_BITS;
 		}
 	}
 }
