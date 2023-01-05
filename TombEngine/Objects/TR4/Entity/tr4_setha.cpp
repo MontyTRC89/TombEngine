@@ -659,7 +659,7 @@ namespace TEN::Entities::TR4
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
-		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 - flags;
 	}
 
 	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
