@@ -22,11 +22,6 @@ static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_C
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
-short CameraObject::GetIndex() const
-{
-	return m_camera.Index;
-}
-
 void CameraObject::Register(sol::table & parent)
 {
 	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
