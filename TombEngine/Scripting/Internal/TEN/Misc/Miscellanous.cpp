@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Miscellanous.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -125,20 +126,20 @@ namespace Misc
 
 	///Shows the mode of the game camera.
 	//@function GetCameraType
-	//@treturn short ID of the camera mode.
-	//@treturn -1 Not recognized
-	//@treturn 0 Chase
-	//@treturn 1 Fixed
-	//@treturn 2 Look
-	//@treturn 3 Combat
-	//@treturn 4 Heavy
-	//@treturn 5 Object
+	//@treturn short ID of the camera mode, returned values can be:
+	//@treturn CameraType.Null
+	//@treturn CameraType.Chase
+	//@treturn CameraType.Fixed
+	//@treturn CameraType.Look
+	//@treturn CameraType.Combat
+	//@treturn CameraType.Heavy
+	//@treturn CameraType.Object
 	//@usage
 	//MyVar = Misc.GetCameraType()
 	//print(MyVar)
-	static short GetCameraType()
+	static CameraType GetCameraType()
 	{
-		return static_cast<short>(Camera.oldType);
+		return Camera.oldType;
 	}
 	
 	/// Play an audio track
@@ -384,5 +385,6 @@ namespace Misc
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);
+		handler.MakeReadOnlyTable(table_misc, ScriptReserved_CameraType, kCameraType);
 	}
 }
