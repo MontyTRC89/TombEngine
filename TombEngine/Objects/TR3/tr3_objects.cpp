@@ -43,8 +43,7 @@
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Entities::Object::TR3;
-using namespace TEN::Entities::Object::TR3::Boss;
+using namespace TEN::Effects::Boss;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -331,8 +330,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->nonLot = true;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->SetBoneRotationFlags(4, ROT_Y); // Puna quest object.
-		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head
+		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
+		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetupHitEffect();
 	}
 }

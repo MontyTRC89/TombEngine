@@ -1,424 +1,489 @@
 #include "framework.h"
-#include "tr3_punaboss.h"
-#include "Specific/level.h"
-#include "Game/misc.h"
+#include "Objects/TR3/Entity/tr3_punaboss.h"
+
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/effects/lightning.h"
-#include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/item_fx.h"
+#include "Game/effects/lightning.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/setup.h"
+#include "Game/misc.h"
+#include "Math/Math.h"
 #include "Objects/TR3/Object/tr3_boss_object.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-using namespace TEN::Entities::Object::TR3;
-using namespace TEN::Entities::Object::TR3::Boss;
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Boss;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::Creatures::TR3
 {
-    const auto PunaBossEffectColor = Vector4(0.0f, 0.75f, 0.75f, 1.0f);
-    const auto PunaBossHeadBite = BiteInfo(0, 0, 0, 8);
-    const auto PunaBossHandBite = BiteInfo(0, 0, 0, 14);
+	constexpr auto PUNA_LASER_DAMAGE = 350;
 
-    constexpr auto PUNABOSS_ITEM_ROTATE_RATE_MAX = ANGLE(7.0f);
-    constexpr auto PUNABOSS_HEAD_X_ANGLE_MAX = ANGLE(20);
-    constexpr auto PUMABOSS_TURN_RATE_MAX = ANGLE(3.0f);
-    constexpr auto PUMABOSS_ADJUST_LASER_XANGLE = ANGLE(3);
-    constexpr auto PUNABOSS_EXPLOSION_COUNT_MAX = 120;
-    constexpr auto PUNABOSS_LASER_DAMAGE = 350;
-    constexpr auto PUNABOSS_MAX_HEAD_ATTACK = 4;
-    constexpr auto PUNABOSS_SHOOTING_DISTANCE = BLOCK(20);
-    constexpr auto PUNABOSS_AWAIT_LARA_DISTANCE = BLOCK(2.5f);
+	constexpr auto PUNA_ATTACK_RANGE = BLOCK(20);
+	constexpr auto PUNA_ALERT_RANGE	 = BLOCK(2.5f);
 
-    enum PunaState
-    {
-        PUNA_STATE_STOP = 0,
-        PUNA_STATE_ATTACK_WITH_HEAD = 1,
-        PUNA_STATE_ATTACK_WITH_HAND = 2,
-        PUNA_STATE_DEATH = 3,
-    };
+	constexpr auto PUNA_TURN_RATE_MAX		 = ANGLE(3.0f);
+	constexpr auto PUNA_CHAIR_TURN_RATE_MAX	 = ANGLE(7.0f);
+	constexpr auto PUNA_HEAD_X_ANGLE_MAX	 = ANGLE(20.0f);
+	constexpr auto PUNA_ADJUST_LASER_X_ANGLE = ANGLE(3.0f);
 
-    enum PunaAnim
-    {
-        PUNA_IDLE = 0,
-        PUNA_ANIMATION_ATTACK_WITH_HEAD = 1,
-        PUNA_ANIMATION_ATTACK_WITH_HAND = 2,
-        PUNA_ANIMATION_DEATH = 3,
-    };
+	constexpr auto PUNA_EXPLOSION_COUNT_MAX = 120;
+	constexpr auto PUNA_MAX_HEAD_ATTACK		= 4;
+	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.75f, 0.75f, 1.0f);
 
-    enum PunaAttackType
-    {
-        PUNA_AwaitLara,
-        PUNA_DeathLaser,
-        PUNA_SummonLaser,
-        PUNA_Wait // when the summon is fighting !
-    };
+	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
+	const auto PunaBossHandBite = BiteInfo(Vector3::Zero, 14);
 
-    std::vector<short> FoundAllLizards(ItemInfo* item)
-    {
-        std::vector<short> itemList;
-        for (short itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
-        {
-            auto& result = g_Level.Items[itemNumber];
-            if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber && 
-                result.HitPoints > 0 && !(result.Flags & IFLAG_KILLED) && result.Status == ITEM_INVISIBLE)
-                itemList.push_back(itemNumber);
-        }
-        return itemList;
-    }
+	enum PunaState
+	{
+		PUNA_STATE_IDLE = 0,
+		PUNA_STATE_HEAD_ATTACK = 1,
+		PUNA_STATE_HAND_ATTACK = 2,
+		PUNA_STATE_DEATH = 3
+	};
 
-    bool FoundAnyLizardInRooms(ItemInfo* item, bool duringInitialize = false)
-    {
-        int lizardCount = 0;
-        for (auto& result : g_Level.Items)
-        {
-            if (duringInitialize)
-            {
-                if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber)
-                    lizardCount++;
-            }
-            else // in-game..
-            {
-                if (result.ObjectNumber == ID_LIZARD && result.RoomNumber == item->RoomNumber &&
-                    result.HitPoints > 0 && !(result.Flags & IFLAG_KILLED) && result.Status == ITEM_INVISIBLE)
-                    lizardCount++;
-            }
-        }
-        return lizardCount > 0;
-    }
+	enum PunaAnim
+	{
+		PUNA_ANIM_IDLE = 0,
+		PUNA_ANIM_HEAD_ATTACK = 1,
+		PUNA_ANIM_HAND_ATTACK = 2,
+		PUNA_ANIM_DEATH = 3
+	};
 
-    void TriggerSummonSmoke(int x, int y, int z)
-    {
-        auto* sptr = GetFreeParticle();
-        sptr->sR = 16;
-        sptr->sG = 64;
-        sptr->sB = 0;
-        sptr->dR = 8;
-        sptr->dG = 32;
-        sptr->dB = 0;
-        sptr->colFadeSpeed = 16 + (GetRandomControl() & 7);
-        sptr->fadeToBlack = 64;
-        sptr->sLife = sptr->life = (GetRandomControl() & 15) + 96;
+	enum class PunaAttackType
+	{
+		AwaitPlayer,
+		DeathLaser,
+		SummonLaser,
+		Wait // Used while a summoned creature is around.
+	};
 
-        sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-        sptr->extras = 0;
-        sptr->dynamic = -1;
+	std::vector<int> GetLizardEntityList(const ItemInfo& item)
+	{
+		auto entityList = std::vector<int>{};
 
-        sptr->x = x + ((GetRandomControl() & 127) - 64);
-        sptr->y = y - (GetRandomControl() & 31);
-        sptr->z = z + ((GetRandomControl() & 127) - 64);
-        sptr->xVel = ((GetRandomControl() & 255) - 128);
-        sptr->yVel = -(GetRandomControl() & 15) - 16;
-        sptr->zVel = ((GetRandomControl() & 255) - 128);
-        sptr->friction = 0;
+		for (int entityNumber = 0; entityNumber < g_Level.NumItems; entityNumber++)
+		{
+			auto& currentEntity = g_Level.Items[entityNumber];
 
-        if (GetRandomControl() & 1)
-        {
-            sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
-            sptr->rotAng = GetRandomControl() & 4095;
-            if (GetRandomControl() & 1)
-                sptr->rotAdd = -(GetRandomControl() & 7) - 4;
-            else
-                sptr->rotAdd = (GetRandomControl() & 7) + 4;
-        }
-        else
-            sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_WIND;
+			if (currentEntity.ObjectNumber == ID_LIZARD &&
+				currentEntity.RoomNumber == item.RoomNumber &&
+				currentEntity.HitPoints > 0 &&
+				currentEntity.Status == ITEM_INVISIBLE &&
+				!(currentEntity.Flags & IFLAG_KILLED))
+			{
+				entityList.push_back(entityNumber);
+			}
+		}
 
-        sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-        sptr->scalar = 3;
-        sptr->gravity = -(GetRandomControl() & 7) - 8;
-        sptr->maxYvel = -(GetRandomControl() & 7) - 4;
-        int size = (GetRandomControl() & 128) + 256;
-        sptr->size = sptr->sSize = size >> 1;
-        sptr->dSize = size;
-        sptr->on = true;
-    }
+		return entityList;
+	}
 
-    void InitialisePuna(short itemNumber)
-    {
-        auto* item = &g_Level.Items[itemNumber];
-        InitialiseCreature(itemNumber);
-        SetAnimation(item, PUNA_IDLE);
-        CheckForRequiredObjects(*item);
+	bool FoundAnyLizardInRooms(const ItemInfo& item, bool duringInitialize = false)
+	{
+		unsigned int lizardCount = 0;
+		for (auto& currentEntity : g_Level.Items)
+		{
+			if (duringInitialize)
+			{
+				if (currentEntity.ObjectNumber == ID_LIZARD &&
+					currentEntity.RoomNumber == item.RoomNumber)
+				{
+					lizardCount++;
+				}
+			}
+			else
+			{
+				if (currentEntity.ObjectNumber == ID_LIZARD &&
+					currentEntity.RoomNumber == item.RoomNumber &&
+					currentEntity.HitPoints > 0 &&
+					!(currentEntity.Flags & IFLAG_KILLED) &&
+					currentEntity.Status == ITEM_INVISIBLE)
+				{
+					lizardCount++;
+				}
+			}
+		}
 
-        // save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
-        // puna is rotated to not face lara, so add 180° to face her.
-        item->SetFlag(BOSSFlag_Rotation, item->Pose.Orientation.y - ANGLE(180.0f));
-        item->SetFlag(BOSSFlag_AttackType, PUNA_AwaitLara); // normal behaviour at start !
-        item->SetFlag(BOSSFlag_ShieldIsEnabled, 1); // activated at start.
-        item->SetFlag(BOSSFlag_AttackCount, 0);
-        item->SetFlag(BOSSFlag_DeathCount, 0);
-        item->SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
-        item->SetFlag(BOSSFlag_ExplodeCount, 0);
+		return (lizardCount > 0);
+	}
 
-        if (!FoundAnyLizardInRooms(item, true)) // if there is no lizard in the current room then remove the flag !
-            item->RemoveFlag(BOSSFlag_Object, BOSS_Lizard);
-    }
+	void SpawnSummonSmoke(const Vector3& pos)
+	{
+		auto& smoke = *GetFreeParticle();
 
-    Vector3i GetLizardTargetPosition(ItemInfo* item, CreatureInfo* creature) // creature is in case the BOSSFlag_ItemNumber is NO_ITEM, to set the target to lara instead.
-    {
-        if (item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-        {
-            auto& target = g_Level.Items[item->GetFlag(BOSSFlag_ItemNumber)];
-            return target.Pose.Position;
-        }
-        return creature->Target; // alternative for avoiding crash or something wrong.
-    }
+		smoke.sR = 16;
+		smoke.sG = 64;
+		smoke.sB = 0;
+		smoke.dR = 8;
+		smoke.dG = 32;
+		smoke.dB = 0;
+		smoke.colFadeSpeed = 16 + (GetRandomControl() & 7);
+		smoke.fadeToBlack = 64;
+		smoke.sLife = smoke.life = (GetRandomControl() & 15) + 96;
 
-    void SpawnLizard(ItemInfo* item)
-    {
-        if (item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-        {
-            auto itemNumber = item->GetFlag(BOSSFlag_ItemNumber);
-            auto* item = &g_Level.Items[itemNumber];
-            for (int lp = 0; lp < 20; lp++)
-                TriggerSummonSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-            AddActiveItem(itemNumber);
-            item->ItemFlags[0] = 1; // spawned lizard flag !
-        }
-    }
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.extras = 0;
+		smoke.dynamic = -1;
 
-    void PunaLaser(ItemInfo* item, CreatureInfo* creature, const Vector3i& pos, const BiteInfo& bite, int intensity, bool isSummon)
-    {
-        GameVector src = GameVector(GetJointPosition(item, bite.meshNum, bite.Position), item->RoomNumber);
-        GameVector target = GameVector(Geometry::GetPointAlongLine(src.ToVector3(), pos.ToVector3(), PUNABOSS_SHOOTING_DISTANCE), creature->Enemy->RoomNumber);
-        
-        if (isSummon)
-        {
-            TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
-            TriggerDynamicLight(src.x, src.y, src.z, 20, 0, 255, 0);
-            item->SetFlag(BOSSFlag_AttackType, PUNA_Wait);
-            SpawnLizard(item);
-        }
-        else
-        {
-            Vector3i hitPos = Vector3i::Zero;
-            MESH_INFO* mesh = nullptr;
-            TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
-            TriggerDynamicLight(src.x, src.y, src.z, 20, 0, 255, 255);
-            if (ObjectOnLOS2(&src, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature->Enemy)->ItemNumber)
-            {
-                if (creature->Enemy->HitPoints <= PUNABOSS_LASER_DAMAGE)
-                {
-                    ItemElectricBurn(creature->Enemy);
-                    DoDamage(creature->Enemy, PUNABOSS_LASER_DAMAGE);
-                }
-                else
-                    DoDamage(creature->Enemy, PUNABOSS_LASER_DAMAGE);
-            }
-        }
-    }
+		smoke.x = pos.x + ((GetRandomControl() & 127) - 64);
+		smoke.y = pos.y - (GetRandomControl() & 31);
+		smoke.z = pos.z + ((GetRandomControl() & 127) - 64);
+		smoke.xVel = ((GetRandomControl() & 255) - 128);
+		smoke.yVel = -(GetRandomControl() & 15) - 16;
+		smoke.zVel = ((GetRandomControl() & 255) - 128);
+		smoke.friction = 0;
 
-    short GetPunaHeadAngleTarget(ItemInfo* item, Vector3i target)
-    {
-        if (!item->TestFlag(BOSSFlag_Object, BOSS_Lizard)) return NO_ITEM;
-        auto headJointPos = GetJointPosition(item, PunaBossHeadBite.meshNum);
-        auto headAngle = Math::Geometry::GetOrientToPoint(headJointPos.ToVector3(), target.ToVector3());
-        return headAngle.y - item->Pose.Orientation.y;
-    }
+		if (Random::TestProbability(1 / 2.0f))
+		{
+			smoke.rotAng = GetRandomControl() & 4095;
+			smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
 
-    short SelectLizardItemNumber(ItemInfo* item, CreatureInfo* creature)
-    {
-        if (!item->TestFlag(BOSSFlag_Object, BOSS_Lizard)) return NO_ITEM;
-        std::vector<short> lizardList = FoundAllLizards(item);
-        if (lizardList.size() <= 0) return NO_ITEM;
-        return lizardList.size() == 1 ? lizardList[0] : lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
-    }
+			if (GetRandomControl() & 1)
+				smoke.rotAdd = -(GetRandomControl() & 7) - 4;
+			else
+				smoke.rotAdd = (GetRandomControl() & 7) + 4;
+		}
+		else
+		{
+			smoke.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_WIND;
+		}
 
-    void PunaControl(short itemNumber)
-    {
-        if (!CreatureActive(itemNumber))
-            return;
-        
-        auto* item = &g_Level.Items[itemNumber];
-        auto* creature = GetCreatureInfo(item);
-        auto* object = &Objects[item->ObjectNumber];
-        static auto targetPosition = Vector3i::Zero;
+		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		smoke.scalar = 3;
+		smoke.gravity = -(GetRandomControl() & 7) - 8;
+		smoke.maxYvel = -(GetRandomControl() & 7) - 4;
+		int size = (GetRandomControl() & 128) + 256;
+		smoke.size = smoke.sSize = size >> 1;
+		smoke.dSize = size;
+		smoke.on = true;
+	}
 
-        auto head = EulerAngles::Zero;
-        short angle = 0, oldrotation = 0;
-        bool haveTurned = false;
-        bool haveAnyLizardLeft = FoundAnyLizardInRooms(item);
+	void InitialisePuna(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-        if (item->HitPoints <= 0)
-        {
-            if (item->Animation.ActiveState != PUNA_STATE_DEATH)
-            {
-                creature->MaxTurn = 0;
-                SetAnimation(item, PUNA_ANIMATION_DEATH);
-                SoundEffect(SFX_TR3_PUNA_BOSS_DEATH, &item->Pose);
-                item->ItemFlags[BOSSFlag_DeathCount] = 1;
-            }
+		InitialiseCreature(itemNumber);
+		SetAnimation(&item, PUNA_ANIM_IDLE);
+		CheckForRequiredObjects(item);
 
-            int frameMaxLess1 = g_Level.Anims[object->animIndex + PUNA_ANIMATION_DEATH].frameEnd;
-            if (item->Animation.FrameNumber >= frameMaxLess1)
-            {
-                item->Animation.FrameNumber = frameMaxLess1; // avoid the object to stop working.
-                item->MeshBits.ClearAll();
+		// save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
+		// puna is rotated to not face lara, so add 180° to face her.
+		item.SetFlag(BOSSFlag_Rotation, item.Pose.Orientation.y - ANGLE(180.0f));
+		item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::AwaitPlayer); // normal behaviour at start.
+		item.SetFlag(BOSSFlag_ShieldIsEnabled, 1); // activated at start.
+		item.SetFlag(BOSSFlag_AttackCount, 0);
+		item.SetFlag(BOSSFlag_DeathCount, 0);
+		item.SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
+		item.SetFlag(BOSSFlag_ExplodeCount, 0);
 
-                if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
-                    item->ItemFlags[BOSSFlag_ExplodeCount]++;
-                if (item->GetFlag(BOSSFlag_ExplodeCount) < PUNABOSS_EXPLOSION_COUNT_MAX)
-                    ExplodeBoss(itemNumber, *item, 61, PunaBossEffectColor); // Do explosion effect.
+		// If there is no lizard in current room, remove lizard flag.
+		if (!FoundAnyLizardInRooms(item, true))
+			item.RemoveFlag(BOSSFlag_Object, BOSS_Lizard);
+	}
 
-                return;
-            }
-            else
-            {
-                auto deathCount = item->GetFlag(BOSSFlag_DeathCount);
-                item->Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item->ItemFlags[BOSSFlag_DeathCount] >> 1);
-                if (deathCount < 2048)
-                    item->ItemFlags[BOSSFlag_DeathCount] += 32;
-            }
-        }
-        else
-        {
-            oldrotation = item->Pose.Orientation.y;
+	Vector3 GetLizardTargetPosition(ItemInfo& item)
+	{
+		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+		{
+			const auto& targetEntity = g_Level.Items[item.GetFlag(BOSSFlag_ItemNumber)];
+			return targetEntity.Pose.Position.ToVector3();
+		}
 
-            AI_INFO AI;
-            CreatureAIInfo(item, &AI);
-            if (AI.ahead)
-            {
-                head.x = AI.xAngle;
-                head.y = AI.angle;
-            }
+		// Failsafe.
+		const auto& creature = *GetCreatureInfo(&item);
+		return creature.Target.ToVector3();
+	}
 
-            if (item->TestFlagEqual(BOSSFlag_AttackType, PUNA_AwaitLara) && creature->Enemy)
-            {
-                float distance = Vector3i::Distance(creature->Enemy->Pose.Position, item->Pose.Position);
-                if (distance <= BLOCK(2.5f))
-                    item->SetFlag(BOSSFlag_AttackType, PUNA_DeathLaser);
-                creature->JointRotation[0] += PUNABOSS_ITEM_ROTATE_RATE_MAX; // Rotate the object on puna boss chair !
-                return;
-            }
+	void SpawnLizard(ItemInfo& item)
+	{
+		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+		{
+			auto itemNumber = item.GetFlag(BOSSFlag_ItemNumber);
+			auto& item = g_Level.Items[itemNumber];
 
-            // Get target
-            if (item->TestFlagEqual(BOSSFlag_AttackType, PUNA_DeathLaser))
-            {
-                creature->Target = creature->Enemy->Pose.Position;
-            }
-            else if (item->TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
-                     item->TestFlagEqual(BOSSFlag_AttackType, PUNA_SummonLaser) &&
-                     item->TestFlagEqual(BOSSFlag_ItemNumber, NO_ITEM) &&
-                     item->TestFlagDiff(BOSSFlag_AttackType, PUNA_Wait) && haveAnyLizardLeft)
-            {
-                // get a random lizard item number !
-                item->SetFlag(BOSSFlag_ItemNumber, SelectLizardItemNumber(item, creature));
-                creature->Target = GetLizardTargetPosition(item, creature);
-            }
-            else if (item->TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
-                     item->TestFlagEqual(BOSSFlag_AttackType, PUNA_Wait) &&
-                     item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-            {
-                // rotate to idle position (for waiting lara to die by lizard)
-                auto targetOrient = EulerAngles(item->Pose.Orientation.x, item->GetFlag(BOSSFlag_Rotation), item->Pose.Orientation.z);
-                item->Pose.Orientation.InterpolateConstant(targetOrient, ANGLE(3.0f));
+			for (int i = 0; i < 20; i++)
+				SpawnSummonSmoke(item.Pose.Position.ToVector3());
 
-                // check if target is dead !
-                auto& summonItem = g_Level.Items[item->GetFlag(BOSSFlag_ItemNumber)];
-                if (summonItem.HitPoints <= 0)
-                {
-                    // Reset the attack type, attack count and itemNumber and restart the sequence !
-                    item->SetFlag(BOSSFlag_AttackType, PUNA_DeathLaser);
-                    item->SetFlag(BOSSFlag_AttackCount, 0);
-                    item->SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
-                }
-            }
+			AddActiveItem(itemNumber);
+			item.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
+		}
+	}
 
-            // if puna take damage then he will say it
-            if (item->HitStatus)
-                SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &item->Pose);
+	void PunaLaser(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
+	{
+		const auto& creature = *GetCreatureInfo(&item);
 
-            short angleHead = GetPunaHeadAngleTarget(item, creature->Target);
-            angle = CreatureTurn(item, creature->MaxTurn);
+		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
+		auto target = GameVector(Geometry::GetPointAlongLine(origin.ToVector3(), pos, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+		
+		if (isSummon)
+		{
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
+			item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
 
-            switch (item->Animation.ActiveState)
-            {
-            case PUNA_STATE_STOP:
-                creature->MaxTurn = PUMABOSS_TURN_RATE_MAX;
-                item->SetFlag(BOSSFlag_ShieldIsEnabled, 1);
+			SpawnLizard(item);
+		}
+		else
+		{
+			Vector3i hitPos = Vector3i::Zero;
+			MESH_INFO* mesh = nullptr;
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
-                if ((item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HAND && item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HEAD) &&
-                    AI.angle > -ANGLE(1) && AI.angle < ANGLE(1) &&
-                    creature->Enemy->HitPoints > 0 &&
-                    item->GetFlag(BOSSFlag_AttackCount) < PUNABOSS_MAX_HEAD_ATTACK &&
-                    item->TestFlagDiff(BOSSFlag_AttackType, PUNA_SummonLaser) && item->TestFlagDiff(BOSSFlag_AttackType, PUNA_Wait))
-                {
-                    creature->MaxTurn = 0;
-                    targetPosition = creature->Target;
-                    targetPosition.y -= CLICK(2);
-                    item->SetFlag(BOSSFlag_AttackType, PUNA_DeathLaser);
+			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+			{
+				if (creature.Enemy->HitPoints <= PUNA_LASER_DAMAGE)
+				{
+					ItemElectricBurn(creature.Enemy);
+					DoDamage(creature.Enemy, PUNA_LASER_DAMAGE);
+				}
+				else
+				{
+					DoDamage(creature.Enemy, PUNA_LASER_DAMAGE);
+				}
+			}
+		}
+	}
 
+	short GetPunaHeadOrientToTarget(ItemInfo& item, const Vector3& target)
+	{
+		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
+			return NO_ITEM;
 
-                    if (Random::GenerateInt(0, 2) == 1) // alternate attack with head/hand, 1/3 chance
-                        item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HEAD;
-                    else
-                        item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
-                    if (item->TestFlag(BOSSFlag_Object, BOSS_Lizard) && haveAnyLizardLeft)
-                        item->ItemFlags[BOSSFlag_AttackCount]++;
-                }
-                else if (item->ItemFlags[BOSSFlag_AttackCount] >= PUNABOSS_MAX_HEAD_ATTACK && creature->Enemy->HitPoints > 0 && item->ItemFlags[BOSSFlag_AttackType] != PUNA_Wait)
-                {
-                    item->SetFlag(BOSSFlag_AttackType, PUNA_SummonLaser);
-                    if (item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-                    {
-                        if (angleHead > -ANGLE(1) && angleHead < ANGLE(1))
-                        {
-                            targetPosition = creature->Target;
-                            targetPosition.y -= CLICK(2);
-                            item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
-                        }
-                    }
-                }
+		auto pos = GetJointPosition(&item, PunaBossHeadBite.meshNum).ToVector3();
+		auto orient = Geometry::GetOrientToPoint(pos, target);
 
-                break;
-            case PUNA_STATE_ATTACK_WITH_HEAD:
-                creature->MaxTurn = 0;
-                item->SetFlag(BOSSFlag_ShieldIsEnabled, 0);
+		return (orient.y - item.Pose.Orientation.y);
+	}
 
-                if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
-                {
-                    PunaLaser(item, creature, targetPosition, PunaBossHeadBite, 10, false);
-                }
+	short SelectLizardItemNumber(const ItemInfo& item)
+	{
+		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
+			return NO_ITEM;
 
-                break;
-            case PUNA_STATE_ATTACK_WITH_HAND:
-                creature->MaxTurn = 0;
-                item->SetFlag(BOSSFlag_ShieldIsEnabled, 0);
+		auto lizardList = GetLizardEntityList(item);
+		if (lizardList.empty())
+			return NO_ITEM;
 
-                if (item->Animation.FrameNumber == GetFrameNumber(item, 30))
-                {
-                    if (item->TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
-                        item->TestFlagEqual(BOSSFlag_AttackType, PUNA_SummonLaser) &&
-                        item->TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM) && haveAnyLizardLeft)
-                        PunaLaser(item, creature, targetPosition, PunaBossHandBite, 5, true);
-                    else
-                        PunaLaser(item, creature, targetPosition, PunaBossHandBite, 10, false);
-                }
+		if (lizardList.size() == 1)
+			return lizardList[0];
+		else
+			return lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
+	}
 
-                break;
-            }
-        }
+	void PunaControl(short itemNumber)
+	{
+		if (!CreatureActive(itemNumber))
+			return;
+		
+		auto& item = g_Level.Items[itemNumber];
+		auto& object = Objects[item.ObjectNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
-        creature->JointRotation[0] += PUNABOSS_ITEM_ROTATE_RATE_MAX; // Rotate the object on puna boss chair !
-        CreatureJoint(item, 1, head.y);
-        CreatureJoint(item, 2, head.x, PUNABOSS_HEAD_X_ANGLE_MAX);
-        CreatureAnimation(itemNumber, angle, 0);
+		static auto targetPos = Vector3i::Zero;
 
-        // When puna rotate, the chair do a sound !
-        if (oldrotation != item->Pose.Orientation.y && !haveTurned)
-        {
-            haveTurned = true;
-            SoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR, &item->Pose);
-        }
-        else if (oldrotation == item->Pose.Orientation.y)
-        {
-            haveTurned = false;
-            // Remove these sound, else they will loop when puna die !
-            StopSoundEffect(SFX_TR3_PUNA_BOSS_CHAIR_2);
-            StopSoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR);
-        }
-    }
+		auto headOrient = EulerAngles::Zero;
+		short headingAngle = 0;
+		short prevYOrient = 0;
+
+		bool hasTurned = false;
+		bool haveAnyLizardLeft = FoundAnyLizardInRooms(item);
+
+		if (item.HitPoints <= 0)
+		{
+			if (item.Animation.ActiveState != PUNA_STATE_DEATH)
+			{
+				SetAnimation(&item, PUNA_ANIM_DEATH);
+				SoundEffect(SFX_TR3_PUNA_BOSS_DEATH, &item.Pose);
+				item.ItemFlags[BOSSFlag_DeathCount] = 1;
+				creature.MaxTurn = 0;
+			}
+
+			int frameEnd = g_Level.Anims[object.animIndex + PUNA_ANIM_DEATH].frameEnd;
+			if (item.Animation.FrameNumber >= frameEnd)
+			{
+				// Avoid having the object stop working.
+				item.Animation.FrameNumber = frameEnd;
+				item.MeshBits.ClearAll();
+
+				if (item.GetFlag(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_COUNT_MAX)
+					item.ItemFlags[BOSSFlag_ExplodeCount]++;
+
+				if (item.GetFlag(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_COUNT_MAX)
+					ExplodeBoss(itemNumber, item, 61, PUNA_EFFECT_COLOR); // Do explosion effect.
+
+				return;
+			}
+			else
+			{
+				auto deathCount = item.GetFlag(BOSSFlag_DeathCount);
+				item.Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item.ItemFlags[BOSSFlag_DeathCount] >> 1);
+
+				if (deathCount < 2048)
+					item.ItemFlags[BOSSFlag_DeathCount] += 32;
+			}
+		}
+		else
+		{
+			prevYOrient = item.Pose.Orientation.y;
+
+			AI_INFO AI;
+			CreatureAIInfo(&item, &AI);
+			if (AI.ahead)
+			{
+				headOrient.x = AI.xAngle;
+				headOrient.y = AI.angle;
+			}
+
+			if (item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::AwaitPlayer) && creature.Enemy != nullptr)
+			{
+				float distance = Vector3i::Distance(creature.Enemy->Pose.Position, item.Pose.Position);
+
+				if (distance <= BLOCK(2.5f))
+					item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+
+				// Rotate the object on puna boss chair.
+				creature.JointRotation[0] += PUNA_CHAIR_TURN_RATE_MAX;
+				return;
+			}
+
+			// Get target.
+			if (item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser))
+			{
+				creature.Target = creature.Enemy->Pose.Position;
+			}
+			else if (item.TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
+				item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
+				item.TestFlagEqual(BOSSFlag_ItemNumber, NO_ITEM) &&
+				item.TestFlagDiff(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && haveAnyLizardLeft)
+			{
+				// Get a random lizard item number.
+				item.SetFlag(BOSSFlag_ItemNumber, SelectLizardItemNumber(item));
+				creature.Target = GetLizardTargetPosition(item);
+			}
+			else if (item.TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
+				item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::Wait) &&
+				item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+			{
+				// Rotate to idle position while player fights lizard.
+				auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.GetFlag(BOSSFlag_Rotation), item.Pose.Orientation.z);
+				item.Pose.Orientation.InterpolateConstant(targetOrient, ANGLE(3.0f));
+
+				// Check if target is dead.
+				auto& summonItem = g_Level.Items[item.GetFlag(BOSSFlag_ItemNumber)];
+
+				if (summonItem.HitPoints <= 0)
+				{
+					// Reset the attack type, attack count, itemNumber, and restart the sequence.
+					item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+					item.SetFlag(BOSSFlag_AttackCount, 0);
+					item.SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
+				}
+			}
+
+			if (item.HitStatus)
+				SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &item.Pose);
+
+			short headYOrient = GetPunaHeadOrientToTarget(item, creature.Target.ToVector3());
+			headingAngle = CreatureTurn(&item, creature.MaxTurn);
+
+			switch (item.Animation.ActiveState)
+			{
+			case PUNA_STATE_IDLE:
+				creature.MaxTurn = PUNA_TURN_RATE_MAX;
+				item.SetFlag(BOSSFlag_ShieldIsEnabled, 1);
+
+				if ((item.Animation.TargetState != PUNA_STATE_HAND_ATTACK && item.Animation.TargetState != PUNA_STATE_HEAD_ATTACK) &&
+					AI.angle > ANGLE(-1.0f) && AI.angle < ANGLE(1.0f) &&
+					creature.Enemy->HitPoints > 0 &&
+					item.GetFlag(BOSSFlag_AttackCount) < PUNA_MAX_HEAD_ATTACK &&
+					item.TestFlagDiff(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) && item.TestFlagDiff(BOSSFlag_AttackType, (int)PunaAttackType::Wait))
+				{
+					creature.MaxTurn = 0;
+					targetPos = creature.Target;
+					targetPos.y -= CLICK(2);
+					item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+
+					if (Random::TestProbability(1 / 3.0f))
+						item.Animation.TargetState = PUNA_STATE_HEAD_ATTACK;
+					else
+						item.Animation.TargetState = PUNA_STATE_HAND_ATTACK;
+
+					if (item.TestFlag(BOSSFlag_Object, BOSS_Lizard) && haveAnyLizardLeft)
+						item.ItemFlags[BOSSFlag_AttackCount]++;
+				}
+				else if (item.ItemFlags[BOSSFlag_AttackCount] >= PUNA_MAX_HEAD_ATTACK &&
+					creature.Enemy->HitPoints > 0 && 
+					item.ItemFlags[BOSSFlag_AttackType] != (int)PunaAttackType::Wait)
+				{
+					item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser);
+
+					if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+					{
+						if (headYOrient > ANGLE(-1.0f) && headYOrient < ANGLE(1.0f))
+						{
+							targetPos = creature.Target;
+							targetPos.y -= CLICK(2);
+							item.Animation.TargetState = PUNA_STATE_HAND_ATTACK;
+						}
+					}
+				}
+
+				break;
+
+			case PUNA_STATE_HEAD_ATTACK:
+				item.SetFlag(BOSSFlag_ShieldIsEnabled, 0);
+				creature.MaxTurn = 0;
+
+				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+					PunaLaser(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
+
+				break;
+
+			case PUNA_STATE_HAND_ATTACK:
+				item.SetFlag(BOSSFlag_ShieldIsEnabled, 0);
+				creature.MaxTurn = 0;
+
+				if (item.Animation.FrameNumber == GetFrameNumber(&item, 30))
+				{
+					if (item.TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
+						item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
+						item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM) && haveAnyLizardLeft)
+					{
+						PunaLaser(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
+					}
+					else
+					{
+						PunaLaser(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
+					}
+				}
+
+				break;
+			}
+		}
+
+		// Rotate chair.
+		creature.JointRotation[0] += PUNA_CHAIR_TURN_RATE_MAX;
+
+		CreatureJoint(&item, 1, headOrient.y);
+		CreatureJoint(&item, 2, headOrient.x, PUNA_HEAD_X_ANGLE_MAX);
+		CreatureAnimation(itemNumber, headingAngle, 0);
+
+		// Emit sound while chair is rotating.
+		if (prevYOrient != item.Pose.Orientation.y && !hasTurned)
+		{
+			hasTurned = true;
+			SoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR, &item.Pose);
+		}
+		else if (prevYOrient == item.Pose.Orientation.y)
+		{
+			hasTurned = false;
+			StopSoundEffect(SFX_TR3_PUNA_BOSS_CHAIR_2);
+			StopSoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR);
+		}
+	}
 }

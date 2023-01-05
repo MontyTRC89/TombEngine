@@ -34,8 +34,7 @@
 
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Entities::Object::TR3;
-using namespace TEN::Entities::Object::TR3::Boss;
+using namespace TEN::Effects::Boss;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
