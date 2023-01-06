@@ -321,28 +321,12 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-/// Get state of specified mesh visibility of object
-// Returns true if specified mesh is visible on an object, and false
-// if it is not visible.
-// @function Moveable:MeshIsVisible
-// @tparam int index of a mesh
-// @treturn bool visibility status
-	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
+	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
 			
-/// Makes specified mesh visible
-// Use this to show specified mesh of an object.
-// @function Moveable:ShowMesh
-// @tparam int index of a mesh
-	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
-			
-/// Makes specified mesh invisible
-// Use this to hide specified mesh of an object.
-// @function Moveable:HideMesh
-// @tparam int index of a mesh
-	ScriptReserved_HideMesh, &Moveable::HideMesh,
+	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
 /// Shatters specified mesh and makes it invisible
-// Note that you can re-enable mesh later by using ShowMesh().
+// Note that you can re-enable mesh later by using SetMeshVisible().
 // @function Moveable:ShatterMesh
 // @tparam int index of a mesh
 	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
@@ -911,7 +895,13 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
-bool Moveable::MeshIsVisible(int meshId) const
+/// Get state of specified mesh visibility of object
+// Returns true if specified mesh is visible on an object, and false
+// if it is not visible.
+// @function Moveable:GetMeshVisible
+// @int index index of a mesh
+// @treturn bool visibility status
+bool Moveable::GetMeshVisible(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
@@ -919,20 +909,20 @@ bool Moveable::MeshIsVisible(int meshId) const
 	return m_item->MeshBits.Test(meshId);
 }
 
-void Moveable::ShowMesh(int meshId)
+/// Makes specified mesh visible or invisible
+// Use this to show or hide a specified mesh of an object.
+// @function Moveable:SetMeshVisible
+// @int index index of a mesh
+// @bool visible true if you want the mesh to be visible, false otherwise
+void Moveable::SetMeshVisible(int meshId, bool visible)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->MeshBits.Set(meshId);
-}
-
-void Moveable::HideMesh(int meshId)
-{
-	if (!MeshExists(meshId))
-		return;
-
-	m_item->MeshBits.Clear(meshId); 
+	if (visible)
+		m_item->MeshBits.Set(meshId);
+	else
+		m_item->MeshBits.Clear(meshId);
 }
 
 void Moveable::ShatterMesh(int meshId)
@@ -996,15 +986,15 @@ void Moveable::EnableItem()
 	if (m_num == NO_ITEM)
 		return;
 
-	bool wasInvis = false;
+	bool wasInvisible = false;
 	if (m_item->Status == ITEM_INVISIBLE)
-		wasInvis = true;
+		wasInvisible = true;
 
 	m_item->Flags |= CODE_BITS;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
-	if (wasInvis)
+	if (wasInvisible)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 }
 

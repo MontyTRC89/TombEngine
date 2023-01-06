@@ -449,7 +449,7 @@ void RemoveActiveItem(short itemNumber, bool killed)
 			}
 		}
 
-		if(killed)
+		if (killed)
 			GameScriptHandleKilled(itemNumber, false);
 	}
 }
