@@ -325,32 +325,12 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
-/// Shatters specified mesh and makes it invisible
-// Note that you can re-enable mesh later by using SetMeshVisible().
-// @function Moveable:ShatterMesh
-// @tparam int index of a mesh
 	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
 
-/// Get state of specified mesh swap of object
-// Returns true if specified mesh is swapped on an object, and false
-// if it is not swapped.
-// @function Moveable:MeshIsSwapped
-// @tparam int index of a mesh
-// @treturn bool mesh swap status
-	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
+	ScriptReserved_GetMeshSwapped, &Moveable::GetMeshSwapped,
 			
-/// Set state of specified mesh swap of object
-// Use this to swap specified mesh of an object.
-// @function Moveable:SwapMesh
-// @tparam int index of a mesh
-// @tparam int index of a slot to get meshswap from
-// @tparam int (optional) index of a mesh from meshswap slot to use
 	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
 			
-/// Set state of specified mesh swap of object
-// Use this to bring back original unswapped mesh
-// @function Moveable:UnswapMesh
-// @tparam int index of a mesh to unswap
 	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 
 /// Get the hit status of the object
@@ -925,6 +905,10 @@ void Moveable::SetMeshVisible(int meshId, bool visible)
 		m_item->MeshBits.Clear(meshId);
 }
 
+/// Shatters specified mesh and makes it invisible
+// Note that you can re-enable mesh later by using SetMeshVisible().
+// @function Moveable:ShatterMesh
+// @int index index of a mesh
 void Moveable::ShatterMesh(int meshId)
 {
 	if (!MeshExists(meshId))
@@ -933,7 +917,13 @@ void Moveable::ShatterMesh(int meshId)
 	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
-bool Moveable::MeshIsSwapped(int meshId) const
+/// Get state of specified mesh swap of object
+// Returns true if specified mesh is swapped on an object, and false
+// if it is not swapped.
+// @function Moveable:GetMeshSwapped
+// @int index index of a mesh
+// @treturn bool mesh swap status
+bool Moveable::GetMeshSwapped(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
@@ -941,6 +931,12 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	return m_item->Model.MeshIndex[meshId] == m_item->Model.BaseMesh + meshId;
 }
 
+/// Set state of specified mesh swap of object
+// Use this to swap specified mesh of an object.
+// @function Moveable:SwapMesh
+// @int index index of a mesh
+// @int slotIndex index of a slot to get meshswap from
+// @int[opt] swapIndex index of a mesh from meshswap slot to use
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
 {
 	if (!MeshExists(meshId))
@@ -971,6 +967,10 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 	m_item->Model.MeshIndex[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 }
 
+/// Set state of specified mesh swap of object
+// Use this to bring back original unswapped mesh
+// @function Moveable:UnswapMesh
+// @int index index of a mesh to unswap
 void Moveable::UnswapMesh(int meshId)
 {
 	if (!MeshExists(meshId))
