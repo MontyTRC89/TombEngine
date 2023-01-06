@@ -160,7 +160,7 @@ namespace TEN::Effects::Lightning
 				
 					x = (currentPos.x + (tg->length / 64) + (radius * phd_cos(angle)) / 2) - x1;
 					y = (currentPos.y + (tg->length / 64) + (radius * phd_sin(angle)) / 2) - x1;
-					z = (currentPos.z + (tg->length / 64) + (radius * phd_cos(angle)) / 2) - x1;;
+					z = (currentPos.z + (tg->length / 64) + (radius * phd_cos(angle)) / 2) - x1;
 
 					buffer[0] = x;
 					buffer[1] = y;
