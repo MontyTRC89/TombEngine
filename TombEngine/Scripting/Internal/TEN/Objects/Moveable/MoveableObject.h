@@ -92,7 +92,7 @@ public:
 	void SetMeshVisible(int meshId, bool visible);
 	void ShatterMesh(int meshId);
 
-	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
+	[[nodiscard]] bool GetMeshSwapped(int meshId) const;
 	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
 	void UnswapMesh(int meshId);
 
