@@ -6,6 +6,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
+#include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
@@ -353,7 +354,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 	short triggerType = (*(data++) >> 8) & 0x3F;
 	short flags = *(data++);
-	short timer = flags & 0xFF;
+	short timer = flags & TIMER_BITS;
 
 	if (Camera.type != CameraType::Heavy)
 		RefreshCamera(triggerType, data);
@@ -395,7 +396,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 		switch (triggerType)
 		{
 		case TRIGGER_TYPES::SWITCH:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 
 			if (flags & ONESHOT)
 				g_Level.Items[value].ItemFlags[0] = 1;
@@ -414,8 +415,8 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 		case TRIGGER_TYPES::MONKEY:
 			if (LaraItem->Animation.ActiveState >= LS_MONKEY_IDLE &&
 				(LaraItem->Animation.ActiveState <= LS_MONKEY_TURN_180 ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
+				 LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
+				 LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				break;
 			return;
 
@@ -457,14 +458,14 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			return;
 
 		case TRIGGER_TYPES::KEY:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 			keyResult = KeyTrigger(value);
 			if (keyResult != -1)
 				break;
 			return;
 
 		case TRIGGER_TYPES::PICKUP:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 			if (!PickupTrigger(value))
 				return;
 			break;
@@ -495,7 +496,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 	{
 		trigger = *(data++);
 		value = trigger & VALUE_BITS;
-		targetType = (trigger >> 10) & 0xF;
+		targetType = (trigger >> 10) & FUNCTION_BITS;
 
 		switch (targetType)
 		{
@@ -555,8 +556,8 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				}
 			}
 			else if (triggerType == TRIGGER_TYPES::ANTIPAD ||
-				triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-				triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
+					 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
+					 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
 				Antitrigger(value, flags);
 			}
@@ -593,7 +594,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & 0xFF) * FPS;
+				Camera.timer = (trigger & TIMER_BITS) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].Flags |= ONESHOT;
@@ -669,13 +670,13 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStats[value])
+			if ((FlipMap[value] & CODE_BITS) == CODE_BITS && !FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStats[value])
+			if ((FlipMap[value] & CODE_BITS) == CODE_BITS && FlipStats[value])
 				flip = value;
 			break;
 
@@ -703,6 +704,36 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				PlaySecretTrack();
 				Statistics.Level.Secrets |= (1 << value);
 				Statistics.Game.Secrets++;
+			}
+			break;
+
+		case TO_LUAEVENT:
+			trigger = *(data++);
+
+			if (g_Level.EventSets.size() > value)
+			{
+				auto& set = g_Level.EventSets[value];
+
+				auto activatorType = heavy ? (int)VolumeActivatorFlags::Flyby | 
+											 (int)VolumeActivatorFlags::Moveable | 
+											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
+
+				VolumeActivator dummy = nullptr;
+
+				switch (trigger & TIMER_BITS)
+				{
+				case 0:
+					HandleEvent(set.OnEnter, dummy);
+					break;
+
+				case 1:
+					HandleEvent(set.OnInside, dummy);
+					break;
+
+				case 2:
+					HandleEvent(set.OnLeave, dummy);
+					break;
+				}
 			}
 			break;
 
