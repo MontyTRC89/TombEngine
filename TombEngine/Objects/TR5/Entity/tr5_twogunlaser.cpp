@@ -100,7 +100,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!plasma)
 		{
-			TriggerLaserBeam(pos1, pos2, orient, LeftRight);
+			TriggerLaserBeam(pos1, pos2, LeftRight);
 
 			item->ItemFlags[LeftRight] = 16;
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);

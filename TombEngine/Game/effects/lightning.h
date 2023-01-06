@@ -70,7 +70,7 @@ namespace TEN::Effects::Lightning
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
-	void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient, short LeftRight);
+	void TriggerLaserBeam(Vector3i src, Vector3i dest, short LeftRight);
 	void CurlSpline(Vector3i* pos, short* buffer, TWOGUNINFO* tg);
 	void UpdateTwogunLasers();
 	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);

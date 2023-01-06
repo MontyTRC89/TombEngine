@@ -34,7 +34,7 @@ namespace TEN::Effects::Lightning
 
 	 TWOGUNINFO twogun[2];
 
-	 void TriggerLaserBeam(Vector3i src, Vector3i dest, EulerAngles orient, short LeftRight)
+	 void TriggerLaserBeam(Vector3i src, Vector3i dest, short LeftRight)
 	 {
 		 TWOGUNINFO* tg;
 
