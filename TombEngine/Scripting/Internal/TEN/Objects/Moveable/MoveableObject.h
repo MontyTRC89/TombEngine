@@ -88,9 +88,8 @@ public:
 	[[nodiscard]] short GetItemFlags(int index = 0) const;
 	void SetItemFlags(short value, int index = 0);
 
-	[[nodiscard]] bool MeshIsVisible(int meshId) const;
-	void ShowMesh(int meshId);
-	void HideMesh(int meshId);
+	[[nodiscard]] bool GetMeshVisible(int meshId) const;
+	void SetMeshVisible(int meshId, bool visible);
 	void ShatterMesh(int meshId);
 
 	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
@@ -112,6 +111,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void SetVisible(bool visible);
 	void Explode();
 	void Shatter();
 
