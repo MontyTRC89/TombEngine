@@ -10,6 +10,7 @@ Lua API changes
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
+* Moveable:MeshIsSwapped is now GetMeshSwapped
 
 Version 1.0.5 
 =============
