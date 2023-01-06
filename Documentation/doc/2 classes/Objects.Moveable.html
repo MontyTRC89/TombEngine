@@ -201,43 +201,6 @@ associated getters and setters.</td>
 	<td class="summary">Set the moveable's color</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:MeshIsVisible">Moveable:MeshIsVisible(index)</a></td>
-	<td class="summary">Get state of specified mesh visibility of object
- Returns true if specified mesh is visible on an object, and false
- if it is not visible.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:ShowMesh">Moveable:ShowMesh(index)</a></td>
-	<td class="summary">Makes specified mesh visible
- Use this to show specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:HideMesh">Moveable:HideMesh(index)</a></td>
-	<td class="summary">Makes specified mesh invisible
- Use this to hide specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:ShatterMesh">Moveable:ShatterMesh(index)</a></td>
-	<td class="summary">Shatters specified mesh and makes it invisible
- Note that you can re-enable mesh later by using ShowMesh().</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:MeshIsSwapped">Moveable:MeshIsSwapped(index)</a></td>
-	<td class="summary">Get state of specified mesh swap of object
- Returns true if specified mesh is swapped on an object, and false
- if it is not swapped.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, index, optional)</a></td>
-	<td class="summary">Set state of specified mesh swap of object
- Use this to swap specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:UnswapMesh">Moveable:UnswapMesh(index)</a></td>
-	<td class="summary">Set state of specified mesh swap of object
- Use this to bring back original unswapped mesh</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Moveable:GetHitStatus">Moveable:GetHitStatus()</a></td>
 	<td class="summary">Get the hit status of the object</td>
 	</tr>
@@ -334,6 +297,38 @@ associated getters and setters.</td>
 	<td class="name" ><a href="#Moveable:SetRoomNumber">Moveable:SetRoomNumber(ID)</a></td>
 	<td class="summary">Set room number of object
  Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetMeshVisible">Moveable:GetMeshVisible(index)</a></td>
+	<td class="summary">Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetMeshVisible">Moveable:SetMeshVisible(index, visible)</a></td>
+	<td class="summary">Makes specified mesh visible or invisible
+ Use this to show or hide a specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:ShatterMesh">Moveable:ShatterMesh(index)</a></td>
+	<td class="summary">Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using SetMeshVisible().</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetMeshSwapped">Moveable:GetMeshSwapped(index)</a></td>
+	<td class="summary">Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, slotIndex[, swapIndex])</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:UnswapMesh">Moveable:UnswapMesh(index)</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
@@ -1013,189 +1008,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
-    <a name = "Moveable:MeshIsVisible"></a>
-    <strong>Moveable:MeshIsVisible(index)</strong>
-    </dt>
-    <dd>
-    Get state of specified mesh visibility of object
- Returns true if specified mesh is visible on an object, and false
- if it is not visible.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        visibility status
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:ShowMesh"></a>
-    <strong>Moveable:ShowMesh(index)</strong>
-    </dt>
-    <dd>
-    Makes specified mesh visible
- Use this to show specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:HideMesh"></a>
-    <strong>Moveable:HideMesh(index)</strong>
-    </dt>
-    <dd>
-    Makes specified mesh invisible
- Use this to hide specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:ShatterMesh"></a>
-    <strong>Moveable:ShatterMesh(index)</strong>
-    </dt>
-    <dd>
-    Shatters specified mesh and makes it invisible
- Note that you can re-enable mesh later by using ShowMesh().
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:MeshIsSwapped"></a>
-    <strong>Moveable:MeshIsSwapped(index)</strong>
-    </dt>
-    <dd>
-    Get state of specified mesh swap of object
- Returns true if specified mesh is swapped on an object, and false
- if it is not swapped.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        mesh swap status
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SwapMesh"></a>
-    <strong>Moveable:SwapMesh(index, index, optional)</strong>
-    </dt>
-    <dd>
-    Set state of specified mesh swap of object
- Use this to swap specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a slot to get meshswap from
-        </li>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a slot to get meshswap from
-        </li>
-        <li><span class="parameter">optional</span>
-            <span class="types"><span class="type">int</span></span>
-        ) index of a mesh from meshswap slot to use
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:UnswapMesh"></a>
-    <strong>Moveable:UnswapMesh(index)</strong>
-    </dt>
-    <dd>
-    Set state of specified mesh swap of object
- Use this to bring back original unswapped mesh
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh to unswap
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "Moveable:GetHitStatus"></a>
     <strong>Moveable:GetHitStatus()</strong>
     </dt>
@@ -1743,6 +1555,171 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:GetMeshVisible"></a>
+    <strong>Moveable:GetMeshVisible(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        visibility status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetMeshVisible"></a>
+    <strong>Moveable:SetMeshVisible(index, visible)</strong>
+    </dt>
+    <dd>
+    Makes specified mesh visible or invisible
+ Use this to show or hide a specified mesh of an object.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+        <li><span class="parameter">visible</span>
+            <span class="types"><span class="type">bool</span></span>
+         true if you want the mesh to be visible, false otherwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:ShatterMesh"></a>
+    <strong>Moveable:ShatterMesh(index)</strong>
+    </dt>
+    <dd>
+    Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using SetMeshVisible().
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetMeshSwapped"></a>
+    <strong>Moveable:GetMeshSwapped(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        mesh swap status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SwapMesh"></a>
+    <strong>Moveable:SwapMesh(index, slotIndex[, swapIndex])</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+        <li><span class="parameter">slotIndex</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a slot to get meshswap from
+        </li>
+        <li><span class="parameter">swapIndex</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh from meshswap slot to use
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:UnswapMesh"></a>
+    <strong>Moveable:UnswapMesh(index)</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh to unswap
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:Enable"></a>
     <strong>Moveable:Enable()</strong>
     </dt>
@@ -1778,7 +1755,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
     <strong>Moveable:MakeInvisible()</strong>
     </dt>
     <dd>
-    Make the item invisible.  Alias for Moveable:SetVisible(false).
+    Make the item invisible.  Alias for <code>Moveable:SetVisible(false)</code>.
 
 
 
@@ -1817,7 +1794,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-01-02 19:29:11 </i>
+<i style="float:right;">Last updated 2023-01-06 20:44:50 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
