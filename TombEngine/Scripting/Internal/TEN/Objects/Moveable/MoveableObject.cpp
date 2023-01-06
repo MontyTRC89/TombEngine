@@ -1032,7 +1032,7 @@ void Moveable::Shatter()
 	CreatureDie(m_num, false);
 }
 
-/// Make the item invisible. Alias for Moveable:SetVisible(false).
+/// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
 // @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
 {
