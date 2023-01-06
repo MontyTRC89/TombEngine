@@ -29,8 +29,6 @@ namespace TEN::Effects::Lightning
 	float FloatSinCosTable[8192];
 	Vector3i LightningPos[6];
 	short LightningBuffer[1024];
-	Vector3i CurlyPos[6];
-	short CurlyBuffer[1024];
 		
 	std::vector<LIGHTNING_INFO> Lightning;
 
@@ -160,9 +158,9 @@ namespace TEN::Effects::Lightning
 				if (x1 > 48)
 					x1 = 48;
 				
-					x = (currentPos.x + (tg->length /64) + (radius * phd_cos(angle)) /2) -x1;
+					x = (currentPos.x + (tg->length / 64) + (radius * phd_cos(angle)) / 2) - x1;
 					y = (currentPos.y + (tg->length / 64) + (radius * phd_sin(angle)) / 2) - x1;
-					z = (tg->length / 64) + currentPos.z;
+					z = (currentPos.z + (tg->length / 64) + (radius * phd_cos(angle)) / 2) - x1;;
 
 					buffer[0] = x;
 					buffer[1] = y;

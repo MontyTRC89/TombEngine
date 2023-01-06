@@ -67,8 +67,6 @@ namespace TEN::Effects::Lightning
 	extern float FloatSinCosTable[8192];
 	extern Vector3i LightningPos[6];
 	extern short LightningBuffer[1024];
-	extern Vector3i CurlyPos[6];
-	extern short CurlyBuffer[1024];
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();

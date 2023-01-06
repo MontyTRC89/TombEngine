@@ -106,28 +106,28 @@ namespace TEN::Renderer
 						b = tg->b;
 					}
 
-					CurlyPos[0].x = tg->pos4.x; 
-					CurlyPos[0].y = tg->pos4.y;
-					CurlyPos[0].z = tg->pos4.z;
+					LightningPos[0].x = tg->pos4.x;
+					LightningPos[0].y = tg->pos4.y;
+					LightningPos[0].z = tg->pos4.z;
 
-					memcpy(&CurlyPos[1], tg, 48);
+					memcpy(&LightningPos[1], tg, 48);
 
-					CurlyPos[1].x = tg->pos1.x;
-					CurlyPos[1].y = tg->pos1.y;
-					CurlyPos[1].z = tg->pos1.z;
+					LightningPos[1].x = tg->pos1.x;
+					LightningPos[1].y = tg->pos1.y;
+					LightningPos[1].z = tg->pos1.z;
 			
 					for (int j = 0; j < 2; j++)
 					{
-						CurlyPos[j].x -= tg->pos4.x;
-						CurlyPos[j].y -= tg->pos4.y; 
-						CurlyPos[j].z -= tg->pos4.z;
+						LightningPos[j].x -= tg->pos4.x;
+						LightningPos[j].y -= tg->pos4.y;
+						LightningPos[j].z -= tg->pos4.z;
 					}
 
-					CurlSpline(&CurlyPos[0], CurlyBuffer, tg);
+					CurlSpline(&LightningPos[0], LightningBuffer, tg);
 
-					if (abs(CurlyPos[0].x) <= 24576 && abs(CurlyPos[0].y) <= 24576 && abs(CurlyPos[0].z) <= 24576)
+					if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
 					{
-						short* interpolatedPos = &CurlyBuffer[0];
+						short* interpolatedPos = &LightningBuffer[0];
 
 						for (int s = 0; s < tg->segments ; s++)
 						{
