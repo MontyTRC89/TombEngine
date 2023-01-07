@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <vector>
 #include "Math/Math.h"
-#include "Math/Math.h"
 
 using std::vector;
 

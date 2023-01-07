@@ -33,7 +33,7 @@
 #include "Objects/TR5/Entity/tr5_reaper.h"		 // OK
 #include "Objects/TR5/Entity/tr5_roman_statue.h" // OK
 #include "Objects/TR5/Entity/tr5_submarine.h"	 // OK
-#include "Objects/TR5/Entity/tr5_twogunlaser.h"  //under construction
+#include "Objects/TR5/Entity/tr5_twogun.h"		 // OK
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters

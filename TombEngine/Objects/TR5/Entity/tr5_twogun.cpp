@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Entity/tr5_twogunlaser.h"
+#include "Objects/TR5/Entity/tr5_twogun.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
@@ -471,5 +471,4 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 2, head);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
-
 }

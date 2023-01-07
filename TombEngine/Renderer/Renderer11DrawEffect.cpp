@@ -26,7 +26,6 @@
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Objects/TR5/Entity/tr5_twogunlaser.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
