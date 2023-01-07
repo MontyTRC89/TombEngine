@@ -256,7 +256,7 @@ namespace TEN::Entities::TR4
 		bool flagRetryNodeSearch	= ((item->ItemFlags[2] & (1 << 3)) != 0);
 		bool flagScaryInscription	= ((item->ItemFlags[2] & (1 << 4)) != 0);
 
-		short goalNode = (flagNewBehaviour) ? item->ItemFlags[4] : Lara.Location;
+		short goalNode = (flagNewBehaviour) ? creature->LocationAI : Lara.Location;
 
 		if (flagRetryNodeSearch)
 		{
