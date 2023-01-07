@@ -41,7 +41,7 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3i(8, 230, 40),
 	};
 
-	const auto LaserguardHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
+	const auto TwogunHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
 
 	enum TwogunState
 	{
@@ -100,7 +100,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!plasma)
 		{
-			TriggerLaserBeam(pos1, pos2, LeftRight);
+			TriggerLaserBeam(pos1.ToVector3(), pos2.ToVector3());
 
 			item->ItemFlags[LeftRight] = 16;
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR5
 						item->Animation.IsAirborne = false;
 						item->Animation.Velocity.y = 0.0f;
 						item->Animation.TargetState = TWOGUN_STATE_FALLDEATH;
-						CreatureEffect2(item, LaserguardHead, 10, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, TwogunHead, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
 					break;

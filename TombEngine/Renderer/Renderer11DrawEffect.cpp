@@ -81,9 +81,9 @@ namespace TEN::Renderer
 	{
 			byte r, g, b;
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < twogun.size(); i++)
 			{
-				TWOGUNINFO* tg = &twogun[i];
+				TwogunLaserInfo* tg = &twogun[i];
 
 				if (tg->life)
 				{

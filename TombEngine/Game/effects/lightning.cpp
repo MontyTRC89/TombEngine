@@ -31,49 +31,36 @@ namespace TEN::Effects::Lightning
 	short LightningBuffer[1024];
 		
 	std::vector<LIGHTNING_INFO> Lightning;
+	std::vector<TwogunLaserInfo> twogun;
 
-	 TWOGUNINFO twogun[2];
-
-	 void TriggerLaserBeam(Vector3i src, Vector3i dest, short LeftRight)
+	 void TriggerLaserBeam(Vector3i src, Vector3i dest)
 	 {
-		 TWOGUNINFO* tg;
+		 TwogunLaserInfo tg;
 
-		 int j;
-		 for (int i = 0; i < 2; i++, i++)
-		 {
-			 tg = &twogun[LeftRight];
-			 for (j = 0; j < 4; j++)
-			 {
-				 if (tg->life == 0 || j == 3)
-					 break;
-			 }
+			 tg.pos1 = src;
+			 tg.pos4 = dest;
+			 tg.pos.Position = src;
+			 tg.life = 17;
+			 tg.spin = (GetRandomControl() & 31) << 11;
+			 tg.dlength = 4096;
+			 tg.r = 0;
+			 tg.b = 255;
+			 tg.g = 96;
+			 tg.fadein = 8;
 
-			 tg->pos1 = src;
-			 tg->pos4 = dest;
-			 tg->pos.Position = src;
-			 tg->life = 17;
-			 tg->spin = (GetRandomControl() & 31) << 11;
-			 tg->dlength = 4096;
-			 tg->r = 0;
-			 tg->b = 255;
-			 tg->g = 96;
-			 tg->fadein = 8;
-
-			 TriggerLightningGlow(tg->pos.Position.x, tg->pos.Position.y, tg->pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg->g >> 1, tg->b >> 1);
-			 TriggerLightning(&src, &dest, 1, 0, tg->g, tg->b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
-			 TriggerLightning(&src, &dest, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);
-		 }
+			 twogun.push_back(tg);
+		
+			 TriggerLightningGlow(tg.pos.Position.x, tg.pos.Position.y, tg.pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg.g >> 1, tg.b >> 1);
+			 TriggerLightning(&src, &dest, 1, 0, tg.g, tg.b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
+			 TriggerLightning(&src, &dest, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);		 
 	 }
 
 	void UpdateTwogunLasers()
 	{
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < twogun.size(); i++)
 		{
-			TWOGUNINFO* tg = &twogun[i];
-			int	j;
+			TwogunLaserInfo* tg = &twogun[i];
 
-			for (j = 0; j < 4; j++, tg++)
-			{
 				if (tg->life)
 				{
 					tg->life--;
@@ -109,11 +96,18 @@ namespace TEN::Effects::Lightning
 
 					tg->spin -= tg->spinadd;
 				}
-			}
+		}
+
+		if (twogun.size() > 0)
+		{
+			twogun.erase(
+				std::remove_if(twogun.begin(), twogun.end(),
+					[](const TwogunLaserInfo& o) { return o.life == 0; }),
+				twogun.end());
 		}
 	}
 
-	void CurlSpline(Vector3i* pos, short* buffer, TWOGUNINFO* tg)
+	void CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg)
 	{
 		buffer[0] = pos[0].x;
 		buffer[1] = pos[0].y;
