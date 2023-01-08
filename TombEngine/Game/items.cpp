@@ -7,6 +7,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "lara_helpers.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -15,6 +16,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "savegame.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -754,4 +756,48 @@ void DoDamage(ItemInfo* item, int damage)
 			lastHurtTime = GlobalCounter;
 		}
 	}
+}
+
+void PartialItemHit(ItemInfo* itemHit, int damage, int grenade)
+{
+	const auto& object = Objects[itemHit->ObjectNumber];
+
+	if (!object.undead || grenade)
+	{
+		if (itemHit->HitPoints > 0)
+		{
+			Statistics.Level.AmmoHits++;
+			DoDamage(itemHit, damage);
+		}
+	}
+
+	if (!itemHit->Callbacks.OnHit.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(itemHit->Name);
+		g_GameScript->ExecuteFunction(itemHit->Callbacks.OnHit, index);
+	}
+}
+
+void DefaultItemHitRoutine(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+{
+	const auto& object = Objects[itemhit->ObjectNumber];
+	if (object.hitEffect != HitEffect::None && hitPos.has_value())
+	{
+		switch (object.hitEffect)
+		{
+		case HitEffect::Blood:
+			DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, itemhit->Pose.Orientation.y, itemhit->RoomNumber);
+			break;
+
+		case HitEffect::Richochet:
+			TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, 0);
+			break;
+
+		case HitEffect::Smoke:
+			TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, -5);
+			break;
+		}
+	}
+
+	PartialItemHit(itemhit, damage, grenade);
 }

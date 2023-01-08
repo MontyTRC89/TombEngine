@@ -632,6 +632,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->initialise = InitialiseRomanStatue;
 			obj->collision = CreatureCollision;
 			obj->control = RomanStatueControl;
+			obj->hitRoutine = RomanStatueHit;
 			obj->shadowType = ShadowMode::All;
 			obj->biteOffset = 0;
 			obj->HitPoints = 300;

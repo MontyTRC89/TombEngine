@@ -191,3 +191,6 @@ std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
+void PartialItemHit(ItemInfo* itemHit, int damage, int grenade); // only do damage and lua hit events.
+// damage, lua hit and hiteffect, meshHit is maybe -1 (if hitPos is valid, and distance is less than 64), check for it !
+void DefaultItemHitRoutine(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit);

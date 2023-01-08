@@ -16,6 +16,7 @@
 #include "Math/Random.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "lara_helpers.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
@@ -1312,7 +1313,30 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState = BADDY_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}
+	}
 
-		return;
+	void Baddy2Hit(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+	{
+		const auto& lara = *GetLaraInfo(insticator);
+		const auto& object = Objects[itemhit->ObjectNumber];
+		if (object.hitEffect != HitEffect::None && hitPos.has_value())
+		{
+			switch (object.hitEffect)
+			{
+			case HitEffect::Blood:
+				if ((itemhit->Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || GetRandomControl() & 1) &&
+					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+					 lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+					 lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
+				{
+					// Baddy2 gun hitting sword
+					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &itemhit->Pose);
+					TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, 0);
+					return;
+				}
+				break;
+			}
+		}
+		PartialItemHit(itemhit, damage, grenade);
 	}
 }
