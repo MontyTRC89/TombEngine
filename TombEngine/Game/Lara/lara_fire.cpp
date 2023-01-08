@@ -835,6 +835,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
+		// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
+		// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
+		// with weapons
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
 			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
 		return FireWeaponType::PossibleHit;
