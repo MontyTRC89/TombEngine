@@ -842,7 +842,7 @@ bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumb
 	if ((boxHeight - height) > LOT->Step || (boxHeight - height) < LOT->Drop)
 		return true;
 
-	if (boxHeight - height < -LOT->Step && height > nextHeight)
+	if ((boxHeight - height) < -LOT->Step && height > nextHeight)
 		return true;
 
 	if (LOT->Fly != NO_FLYING && y > (height + LOT->Fly))

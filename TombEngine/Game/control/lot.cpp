@@ -35,7 +35,7 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 	if (item->IsCreature())
 		return true;
 
-	InitialiseSlot(itemNum, 0, makeTarget);
+	InitialiseSlot(itemNum, makeTarget);
 	ActiveCreatures.push_back(item->Data);
 	return true;
 }
@@ -54,7 +54,7 @@ void DisableEntityAI(short itemNumber)
 	item->Data = nullptr;
 }
 
-void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
+void InitialiseSlot(short itemNumber, bool makeTarget)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
@@ -103,7 +103,7 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 		default:
 		case ZoneType::Basic:
 			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(2);
+			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Zone = ZoneType::Basic;
 			break;
 
@@ -165,15 +165,6 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 		case ZoneType::HumanJumpAndMonkey:
 			creature->LOT.Step = BLOCK(1);
 			creature->LOT.Drop = -BLOCK(1);
-			creature->LOT.CanJump = true;
-			creature->LOT.CanMonkey = true;
-			creature->LOT.Zone = ZoneType::Human;
-			break;
-
-		// Can climb, jump, monkey swing, long jump.
-		case ZoneType::HumanLongJumpAndMonkey:
-			creature->LOT.Step = BLOCK(1) + CLICK(3);
-			creature->LOT.Drop = -(BLOCK(1) + CLICK(3));
 			creature->LOT.CanJump = true;
 			creature->LOT.CanMonkey = true;
 			creature->LOT.Zone = ZoneType::Human;
