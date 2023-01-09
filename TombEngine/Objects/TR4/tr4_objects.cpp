@@ -494,6 +494,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
+			obj->undead = true;
 			obj->SetupHitEffect();
 		}
 
