@@ -195,7 +195,6 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
 				fx->pos.Orientation.y += dy;
-
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
