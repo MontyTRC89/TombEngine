@@ -442,10 +442,13 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TouchBits.Test(HarpyStingerAttackJoints) ||
-						creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
+						(item->TouchBits.Test(HarpyStingerAttackJoints) ||
+						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-						AI.distance < pow(SECTOR(2), 2)))
+						AI.distance < pow(SECTOR(2), 2) &&
+						item->Animation.ActiveState == HARPY_STATE_STINGER_ATTACK &&
+						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 17)
+					)
 				{
 					if (creature->Enemy->IsLara())
 						GetLaraInfo(creature->Enemy)->PoisonPotency += HARPY_STINGER_POISON_POTENCY;
