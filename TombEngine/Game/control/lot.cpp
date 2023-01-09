@@ -35,7 +35,7 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 	if (item->IsCreature())
 		return true;
 
-	InitialiseSlot(itemNum, 0, makeTarget);
+	InitialiseSlot(itemNum, makeTarget);
 	ActiveCreatures.push_back(item->Data);
 	return true;
 }
@@ -54,7 +54,7 @@ void DisableEntityAI(short itemNumber)
 	item->Data = nullptr;
 }
 
-void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
+void InitialiseSlot(short itemNumber, bool makeTarget)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
