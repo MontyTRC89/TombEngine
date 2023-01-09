@@ -8,6 +8,8 @@
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto SETH_BLADE_DAMAGE = 1000;
+
 	enum SethBladeState 
 	{
 		SETHBLADE_STATE_NONE = 0,
@@ -26,11 +28,15 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SETHBLADE_ANIM_IDLE;
-		item->Animation.TargetState = SETHBLADE_STATE_ACTIVE;
+		item->Animation.TargetState = SETHBLADE_STATE_IDLE;
 		item->Animation.ActiveState = SETHBLADE_STATE_IDLE;
 
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->ItemFlags[2] = abs(item->TriggerFlags);
+		item->ItemFlags[2] = abs(item->TriggerFlags);	//Blades Timer
+		item->ItemFlags[3] = SETH_BLADE_DAMAGE;				//Blades Damage
+
+		if (item->TriggerFlags >= 0)
+			item->ItemFlags[2] = 1; //To make it do the first inmediate start.
 	}
 
 	void SethBladeControl(short itemNumber)
@@ -56,25 +62,16 @@ namespace TEN::Entities::TR4
 						item->ItemFlags[2] = item->TriggerFlags;
 				}
 			}
-			else
+			else if (item->Animation.ActiveState == SETHBLADE_STATE_ACTIVE)
 			{
 				int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 				if (frameNumber >= 0 && frameNumber <= 6)
-				{
 					*((int*)&item->ItemFlags) = -1;
-					item->ItemFlags[3] = 1000;
-				}
 				else if (frameNumber >= 7 && frameNumber <= 15)
-				{
 					*((int*)&item->ItemFlags) = 448;
-					item->ItemFlags[3] = 1000;
-				}
 				else
-				{
 					*((int*)&item->ItemFlags) = 0;
-					item->ItemFlags[3] = 1000;
-				}
 			}
 
 			AnimateItem(item);
