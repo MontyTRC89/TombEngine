@@ -661,7 +661,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(6, ROT_X|ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X|ROT_Y);
 		}
