@@ -59,7 +59,7 @@ namespace TEN::Entities::Effects
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-			
+
 			spark->gravity = 0;
 			spark->maxYvel = 0;
 			spark->fxObj = fxNum;
@@ -68,7 +68,7 @@ namespace TEN::Entities::Effects
 				spark->scalar = 3;
 			else
 				spark->scalar = 2;
-			
+
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
 		}
@@ -195,7 +195,7 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
 				fx->pos.Orientation.y += dy;
-			
+
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
@@ -232,9 +232,9 @@ namespace TEN::Entities::Effects
 				if (fx->flag1)
 				{
 					if (fx->flag1 == 3 || fx->flag1 == 4)
-						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
-					else if (fx->flag1 == 5)
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
+					else if (fx->flag1 == 5)
+						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					else
 					{
 						if (fx->flag1 != 2)
@@ -251,11 +251,11 @@ namespace TEN::Entities::Effects
 
 						}
 						else
-							TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 0);
+							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
 					}
 				}
 				else
-					TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 0, 16, 0, 0);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 64, 16, 0, 0);
 			}
 
 			KillEffect(fxNum);
@@ -272,7 +272,7 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 == 1)
 			{
-				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
+				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 128, 64, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 				ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f));
 			}
@@ -282,15 +282,15 @@ namespace TEN::Entities::Effects
 				{
 				case 3:
 				case 4:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 10);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 10);
 					break;
 
 				case 5:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 5);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 5);
 					break;
 
 				case 2:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 3);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 3);//H
 					break;
 
 				case 6:
@@ -305,7 +305,7 @@ namespace TEN::Entities::Effects
 				}
 			}
 			else
-				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 1);
+				TriggerShockwave(&fx->pos, 24, 88, 48, 0, 128, 64, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 1);
 		}
 		else
 		{

@@ -231,8 +231,10 @@ void UpdateSparks()
 				int unk;
 				if (spark->flags & SP_UNDERWEXP)
 					unk = 1;
+				else if (spark->flags & SP_PLASMAEXP)
+					unk = 2;
 				else
-					unk = (spark->flags & SP_PLASMAEXP) >> 12;
+					unk = 0;
 
 				for (int j = 0; j < (spark->extras & 7); j++)
 				{
@@ -285,16 +287,14 @@ void UpdateSparks()
 				spark->z += Weather.Wind().z;
 			}
 
-			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
-			int ds = dl * (spark->dSize - spark->sSize);
-			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
-			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
+			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
+			spark->size = (spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536));
 
 			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
 				(spark->flags & SP_DAMAGE) || 
 				(spark->flags & SP_POISON))
 			{
-				ds = spark->size * (spark->scalar / 2.0);
+				int ds = spark->size * (spark->scalar / 2.0);
 
 				if (spark->x + ds > DeadlyBounds.X1 && spark->x - ds < DeadlyBounds.X2)
 				{
@@ -439,7 +439,172 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	TriggerExplosion(Vector3(x, y, z), 512, true, false, true, roomNumber);
+	int dx, dz, mirror, i, scalar;
+	unsigned char extras_table[4];
+	unsigned char r, g, b;
+
+	extras_table[0] = 0;
+	extras_table[1] = 4;
+	extras_table[2] = 7;
+	extras_table[3] = 10;
+	dx = LaraItem->Pose.Position.x - x;
+	dz = LaraItem->Pose.Position.z - z;
+	scalar = 1;
+	mirror = 0;
+
+	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+		return;
+
+	if (roomNumber < 0)
+	{
+		roomNumber = -roomNumber;
+		scalar = 1;
+	}
+
+	//if (room == gfMirrorRoom && gfLevelFlags & GF_MIRROR) //TODO: If mirror room is available, create explosion effect for mirror room too.
+		//mirror = 1;
+
+	//do
+	//{
+		auto& spark = *GetFreeParticle();
+		spark.on = true;
+		spark.sR = 255;
+
+		if (uw == 1)
+		{
+			spark.sG = (GetRandomControl() & 0x3F) + 128;
+			spark.sB = 32;
+			spark.dR = 192;
+			spark.dG = (GetRandomControl() & 0x1F) + 64;
+			spark.dB = 0;
+			spark.colFadeSpeed = 7;
+			spark.fadeToBlack = 8;
+			spark.life = (GetRandomControl() & 7) + 16;
+			spark.sLife = spark.life;
+			spark.roomNumber = roomNumber;
+		}
+		else
+		{
+			spark.sG = (GetRandomControl() & 0xF) + 32;
+			spark.sB = 0;
+			spark.dR = (GetRandomControl() & 0x3F) + 192;
+			spark.dG = (GetRandomControl() & 0x3F) + 128;
+			spark.dB = 32;
+			spark.colFadeSpeed = 8;
+			spark.fadeToBlack = 16;
+			spark.life = (GetRandomControl() & 7) + 24;
+			spark.sLife = spark.life;
+		}
+
+		spark.extras = unsigned char(extraTrig | ((extras_table[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
+		spark.dynamic = (char)dynamic;
+
+		if (dynamic == -2)
+		{
+			for (i = 0; i < 8; i++)
+			{
+				auto* spark = &Particles[i];
+				auto* dynamic = &ParticleDynamics[spark->dynamic];
+
+				if (dynamic->Flags)
+				{
+					dynamic->On = 1;
+					dynamic->Falloff = 4;
+
+					if (uw == 1)
+						dynamic->Flags = 2;
+					else
+						dynamic->Flags = 1;
+
+					spark->dynamic = (char)i;
+					break;
+				}
+
+				dynamic++;
+			}
+
+			if (i == 8)
+				spark.dynamic = -1;
+		}
+
+		spark.x = (GetRandomControl() & 0x1F) + x - 16;
+		spark.y = (GetRandomControl() & 0x1F) + y - 16;
+		spark.z = (GetRandomControl() & 0x1F) + z - 16;
+		spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
+		spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
+		spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
+
+		if (dynamic != -2 || uw == 1)
+		{
+			spark.x = (GetRandomControl() & 0x1F) + x - 16;
+			spark.y = (GetRandomControl() & 0x1F) + y - 16;
+			spark.z = (GetRandomControl() & 0x1F) + z - 16;
+		}
+		else
+		{
+			spark.x = (GetRandomControl() & 0x1FF) + x - 256;
+			spark.y = (GetRandomControl() & 0x1FF) + y - 256;
+			spark.z = (GetRandomControl() & 0x1FF) + z - 256;
+		}
+
+		if (uw == 1)
+			spark.friction = 17;
+		else
+			spark.friction = 51;
+
+		if (GetRandomControl() & 1)
+		{
+			if (uw == 1)
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
+			else
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+			spark.rotAng = GetRandomControl() & 0xFFF;
+			spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
+		}
+		else if (uw == 1)
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		else
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+		spark.scalar = 3;
+		spark.gravity = 0;
+		spark.size = (GetRandomControl() & 0xF) + 40;
+		spark.sSize = spark.size * scalar;
+		spark.dSize = spark.size * (scalar + 1);
+		spark.size *= scalar;
+		GetRandomControl();
+		spark.maxYvel = 0;
+
+		if (uw != 2)
+		{
+			if (extraTrig)
+				TriggerExplosionSmoke(x, y, z, uw);
+			else
+				TriggerExplosionSmokeEnd(x, y, z, uw);
+		}
+		else 		
+		{
+			r = spark.sR;
+			g = spark.sG;
+			b = spark.sB;
+			spark.sR = b;
+			spark.sG = r;
+			spark.sB = g;
+
+			r = spark.dR;
+			g = spark.dG;
+			b = spark.dB;
+			spark.dR = b;
+			spark.dG = r;
+			spark.dB = g;
+
+			spark.flags |= SP_PLASMAEXP;
+		}
+
+		//z = 2 * gfMirrorZPlane - z; //TODO: Mirror room
+		//mirror--;
+	//} while (mirror >= 0);
 }
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
