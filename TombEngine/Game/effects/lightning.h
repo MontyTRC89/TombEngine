@@ -10,6 +10,8 @@ struct ENERGY_ARC;
 
 namespace TEN::Effects::Lightning
 {
+	constexpr auto MAX_CURL_LASER_SEGMENTS = 56;
+
 	enum LightningFlags
 	{
 		LI_SPLINE = 1,
@@ -28,11 +30,12 @@ namespace TEN::Effects::Lightning
 		short coil;
 		short spin, spinadd;
 		short length, dlength;
-		byte segments = 56;
+		unsigned char segments = MAX_CURL_LASER_SEGMENTS;
 		short size;
 		int r, g, b;
 		char fadein;
 	};
+
 	extern std::vector<TwogunLaserInfo> twogun;
 
 	struct LIGHTNING_INFO
@@ -69,7 +72,7 @@ namespace TEN::Effects::Lightning
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
 	void TriggerLaserBeam(Vector3i src, Vector3i dest);
-	void CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg);
+	
 	void UpdateTwogunLasers();
 	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc);

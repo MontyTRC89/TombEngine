@@ -66,6 +66,8 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
+	constexpr auto MAX_LIGHTNING_RANGE = 24576;
+
 	struct RendererSpriteBucket
 	{
 		RendererSprite* Sprite;
@@ -74,7 +76,6 @@ namespace TEN::Renderer
 		bool IsBillboard;
 		bool IsSoftParticle;
 	};
-
 
 	void Renderer11::DrawTwogunLaser(RenderView& view)
 	{
@@ -124,7 +125,7 @@ namespace TEN::Renderer
 
 					CurlSpline(&LightningPos[0], LightningBuffer, tg);
 
-					if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
+					if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
 					{
 						short* interpolatedPos = &LightningBuffer[0];
 
@@ -163,6 +164,79 @@ namespace TEN::Renderer
 			}	
 	}
 
+	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg)
+	{
+		buffer[0] = pos[0].x;
+		buffer[1] = pos[0].y;
+		buffer[2] = pos[0].z;
+
+		buffer += 4;
+
+		float x, y, z;
+
+		z = 0;
+
+		Vector3 lineStartPoint = Vector3(pos[0].x, pos[0].y, pos[0].z);
+		Vector3 lineEndPoint = Vector3(pos[1].x, pos[1].y, pos[1].z);
+
+		// Calculate the direction vector of the line
+		Vector3 direction = (lineEndPoint - lineStartPoint) / tg->segments;
+
+		// Normalize the direction vector
+		direction.Normalize();
+
+		// Calculate the length of the line
+		float lineLength = (lineEndPoint - lineStartPoint).Length();
+
+		// Calculate the step size along the line
+		float stepSize = lineLength / tg->segments;
+
+		// Set the starting position to the line start point
+		Vector3 currentPos = lineStartPoint;
+
+		short angle = tg->spin;
+		short radius = 0;
+		int radiusMaxValue = 48;
+
+		if (tg->segments > 0)
+		{
+			for (int i = tg->segments; i > 0; i--)
+			{
+				int x1 = std::clamp(radius >> 1, 0, radiusMaxValue);
+
+				x = (currentPos.x + (tg->length / tg->segments) + (radius * phd_cos(angle)) / 2) - x1;
+				y = (currentPos.y + (tg->length / tg->segments) + (radius * phd_sin(angle)) / 2) - x1;
+				z = (currentPos.z + (tg->length / tg->segments) + (radius * phd_cos(angle)) / 2) - x1;
+
+				buffer[0] = x;
+				buffer[1] = y;
+				buffer[2] = z;
+
+				angle += tg->coil;
+				radius += tg->size;
+
+				if (i & 1)
+					radius -= tg->size;
+
+				buffer += 4;
+
+				// Increment the current position along the line by the step size
+				currentPos += direction * stepSize;
+
+				x += currentPos.x;
+				y += currentPos.y;
+				z = currentPos.z;
+
+				if (radius < 4)
+					radius = 4;
+			}
+		}
+
+		buffer[0] = pos[1].x;
+		buffer[1] = pos[1].y;
+		buffer[2] = pos[1].z;
+	}
+
 	void Renderer11::DrawLightning(RenderView& view)
 	{
 		for (int i = 0; i < Lightning.size(); i++)
@@ -191,7 +265,7 @@ namespace TEN::Renderer
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
 
-				if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
+				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
 				{
 					short* interpolatedPos = &LightningBuffer[0];
 

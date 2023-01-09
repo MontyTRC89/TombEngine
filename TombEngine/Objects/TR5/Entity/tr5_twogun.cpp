@@ -42,6 +42,8 @@ namespace TEN::Entities::Creatures::TR5
 	};
 
 	const auto TwogunHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
+	constexpr auto TWOGUN_TURN_ADJUST_ANGLE = ANGLE(1.0f);
+	constexpr auto TWOGUN_MAX_TURN_ANGLE = ANGLE(5.0f);
 
 	enum TwogunState
 	{
@@ -93,6 +95,7 @@ namespace TEN::Entities::Creatures::TR5
 	void FireTwogunWeapon(short itemNumber, short LeftRight, short plasma)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		const auto& creature = *GetCreatureInfo(item);
 
 		auto pos1 = GetJointPosition(item, TWGunMesh[LeftRight], TWGunPositions[LeftRight]);
 		auto pos2 = GetJointPosition(item, TWGunMesh[LeftRight], Vector3i(TWGunPositions[LeftRight].x, TWGunPositions[LeftRight].y + 4096, TWGunPositions[LeftRight].z));
@@ -113,8 +116,8 @@ namespace TEN::Entities::Creatures::TR5
 			GameVector start = GameVector(pos1, 0);
 			GameVector end = GameVector(pos2, 0);
 			start.RoomNumber = item->RoomNumber;
-
-			if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
+			
+			if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
 			{
 				if (LaraItem->HitPoints < 501)
 				{
@@ -124,9 +127,9 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					DoDamage(LaraItem, 250);
 			}
-		}
-	
+
 			return;
+		}
 
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), abs(item->ItemFlags[LeftRight]));
 	}
@@ -160,7 +163,7 @@ namespace TEN::Entities::Creatures::TR5
 		sptr->zVel =  Random::GenerateInt(-128, 128) / 5;
 		sptr->friction = 0;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		sptr->rotAng = GetRandomControl() & 4095;
+		sptr->rotAng = GetRandomControl() & SECTOR(4);
 		sptr->rotAdd = (GetRandomControl() & 127) - 64;
 		sptr->gravity = (GetRandomControl() & 31) + 32;
 		sptr->maxYvel = 0;
@@ -174,15 +177,16 @@ namespace TEN::Entities::Creatures::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
-		short angle, head, xTorso, yTorso, frame, base, roomNumber;
-
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
+		short angle, head, xTorso, yTorso, frame, roomNumber;
 
 		angle = 0;
 		head = 0;
 		xTorso = 0;
 		yTorso = 0;
+
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+		frame = item->Animation.FrameNumber;
 
 		if (item->ItemFlags[0] || item->ItemFlags[1])
 		{
@@ -208,8 +212,8 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO ai;
+		CreatureAIInfo(item, &ai);
 
 		if (item->HitPoints <= 0)
 		{
@@ -223,11 +227,9 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				switch (item->Animation.ActiveState)
 				{
-				case TWOGUN_STATE_FALLSTART:
-					frame = item->Animation.FrameNumber;
-					base = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				case TWOGUN_STATE_FALLSTART:					
 
-					if (frame == base + 48 || frame == base + 15)
+					if (frame == GetFrameNumber(item, 48) || frame == GetFrameNumber(item, 15))
 					{
 						roomNumber = item->RoomNumber;
 						GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber),
@@ -274,32 +276,32 @@ namespace TEN::Entities::Creatures::TR5
 			else
 				creature->Enemy = LaraItem;
 
-			CreatureAIInfo(item, &AI);
+			CreatureAIInfo(item, &ai);
 	
 				AI_INFO laraAI;
 				if (creature->Enemy->IsLara())
 				{
-					laraAI.angle = AI.angle;
-					laraAI.distance = AI.distance;
+					laraAI.angle = ai.angle;
+					laraAI.distance = ai.distance;
 				}
 				else
 				{
 					int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 					int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 					laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-					laraAI.distance = pow(dx, 2) + pow(dz, 2);
+					laraAI.distance = SQUARE(dx) + SQUARE(dz);
 				}
-				GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
-				CreatureMood(item, &AI, creature->Enemy != LaraItem);
+				GetCreatureMood(item, &ai, creature->Enemy != LaraItem);
+				CreatureMood(item, &ai, creature->Enemy != LaraItem);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (((laraAI.distance < pow(SECTOR(2), 2) && 
-				(laraAI.angle < 0x4000 && laraAI.angle > -16384 || 
+			if (((laraAI.distance < SQUARE(SECTOR(2)) && 
+				(laraAI.angle < ANGLE(90.0f) && laraAI.angle > -ANGLE(90.0f) ||
 					LaraItem->Animation.Velocity.z > 20)) ||
 				item->HitStatus || 
 				TargetVisible(item, &laraAI)) && 
-				abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < 1536)
+				abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < BLOCK(1.5f))
 			{
 				creature->Enemy = LaraItem;
 				AlertAllGuards(itemNumber);
@@ -313,33 +315,33 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!(item->AIBits & GUARD))
 				{
-					if (abs(AI.angle) < 364)
-						item->Pose.Orientation.y += AI.angle;
+					if (abs(ai.angle) < TWOGUN_TURN_ADJUST_ANGLE)
+						item->Pose.Orientation.y += ai.angle;
 					else
 					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += 364;
+						if (ai.angle >= 0)
+							item->Pose.Orientation.y += TWOGUN_TURN_ADJUST_ANGLE;
 						else
-							item->Pose.Orientation.y -= 364;
+							item->Pose.Orientation.y -= TWOGUN_TURN_ADJUST_ANGLE;
 					}
 
 					head = laraAI.angle >> 1;
 					yTorso = laraAI.angle >> 1;
-					xTorso = AI.xAngle >> 1;
+					xTorso = ai.xAngle >> 1;
 				}
 
 				if (item->AIBits & GUARD)
 					head = AIGuard(creature);
 				else
 				{
-					if (laraAI.angle > 20480 || laraAI.angle < -20480)
+					if (laraAI.angle > ANGLE(112.0f) || laraAI.angle < -ANGLE(112.0f))
 						item->Animation.TargetState = TWOGUN_STATE_TURN_180;
-					else if (!Targetable(item, &AI))
+					else if (!Targetable(item, &ai))
 					{
 						if (item->TriggerFlags != 1)
 							item->Animation.TargetState = TWOGUN_STATE_WALK;
 					}
-					else if (AI.distance < 0x900000 || AI.zoneNumber != AI.enemyZone)
+					else if (ai.distance < SQUARE(SECTOR(3)) || ai.zoneNumber != ai.enemyZone)
 						item->Animation.TargetState = TWOGUN_STATE_IDLE_TO_AIM;
 					else if (item->AIBits != MODIFY)
 					{
@@ -351,18 +353,18 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case TWOGUN_STATE_WALK:
-				creature->MaxTurn = 910;
+				creature->MaxTurn = TWOGUN_MAX_TURN_ANGLE;
 
-				if (Targetable(item, &AI) && laraAI.angle < 6144 && laraAI.angle > -6144)
+				if (Targetable(item, &ai) && laraAI.angle < ANGLE(33.0f) && laraAI.angle > -ANGLE(33.0f))
 				{
-					if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
+					if (frame >= GetFrameNumber(item, 29))
 						item->Animation.TargetState = TWOGUN_STATE_SHOOT_RIGHT;
 					else
 						item->Animation.TargetState = TWOGUN_STATE_SHOOT_LEFT;
 				}
 				else
 				{
-					if (laraAI.angle > 20480 || laraAI.angle < -20480)
+					if (laraAI.angle > ANGLE(112.0f) || laraAI.angle < -ANGLE(112.0f))
 						item->Animation.TargetState = TWOGUN_STATE_IDLE;
 					else
 						item->Animation.TargetState = TWOGUN_STATE_WALK;
@@ -389,20 +391,20 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				head = laraAI.angle >> 1;
 				yTorso = laraAI.angle >> 1;
-				xTorso = AI.xAngle >> 1;
+				xTorso = ai.xAngle >> 1;
 
-				if (abs(AI.angle) < 364)
-					item->Pose.Orientation.y += AI.angle;
-				else if (AI.angle >= 0)
-					item->Pose.Orientation.y += 364;
+				if (abs(ai.angle) < TWOGUN_TURN_ADJUST_ANGLE)
+					item->Pose.Orientation.y += ai.angle;
+				else if (ai.angle >= 0)
+					item->Pose.Orientation.y += TWOGUN_TURN_ADJUST_ANGLE;
 				else
-					item->Pose.Orientation.y -= 364;
+					item->Pose.Orientation.y -= TWOGUN_TURN_ADJUST_ANGLE;
 
 				if (item->TriggerFlags == 2)
 					item->Animation.TargetState = TWOGUN_STATE_MISSFIRE;
 				else if (item->TriggerFlags == 3)
 					item->Animation.TargetState = TWOGUN_STATE_GUN_BLOCKAGE;
-				else if (Targetable(item, &AI))
+				else if (Targetable(item, &ai))
 					item->Animation.TargetState = TWOGUN_STATE_SHOOT_BOTH;
 				else
 					item->Animation.TargetState = TWOGUN_STATE_IDLE;
@@ -412,19 +414,19 @@ namespace TEN::Entities::Creatures::TR5
 			case TWOGUN_STATE_SHOOT_BOTH:
 				head = laraAI.angle >> 1;
 				yTorso = laraAI.angle >> 1;
-				xTorso = AI.xAngle;
+				xTorso = ai.xAngle;
 
-				if (abs(AI.angle) < 364)
-					item->Pose.Orientation.y += AI.angle;
+				if (abs(ai.angle) < 364)
+					item->Pose.Orientation.y += ai.angle;
 				else
 				{
-					if (AI.angle >= 0)
+					if (ai.angle >= 0)
 						item->Pose.Orientation.y += 364;
 					else
 						item->Pose.Orientation.y -= 364;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17)
+				if (frame == GetFrameNumber(item, 17))
 				{
 					FireTwogunWeapon(itemNumber, 0, 0);
 					FireTwogunWeapon(itemNumber, 1, 0);
@@ -436,22 +438,22 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 				creature->MaxTurn = 0;
 
-				if (AI.angle < 0)
+				if (ai.angle < 0)
 					item->Pose.Orientation.y += 364;
 				else
 					item->Pose.Orientation.y -= 364;
 
 				if (TestLastFrame(item))
-					item->Pose.Orientation.y += 32768;
+					item->Pose.Orientation.y += ANGLE(180.0f);
 
 				break;
 
 			case TWOGUN_STATE_MISSFIRE:
-				xTorso = AI.xAngle >> 1;
+				xTorso = ai.xAngle >> 1;
 				head = laraAI.angle >> 1;
 				yTorso = laraAI.angle >> 1;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
+				if (frame == GetFrameNumber(item, 18))
 				{
 					FireTwogunWeapon(itemNumber, 0, 0);
 					item->ItemFlags[1] = -16;

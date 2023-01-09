@@ -9,6 +9,7 @@
 #include "Game/animation.h"
 #include "Game/gui.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/lightning.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
@@ -50,6 +51,7 @@ struct CAMERA_INFO;
 struct RendererRectangle;
 
 using namespace TEN::Gui;
+using namespace TEN::Effects::Lightning;
 
 namespace TEN::Renderer
 {
@@ -668,6 +670,7 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		void DrawTwogunLaser(RenderView& view);
+		void CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg);
 		std::string GetDefaultAdapterName();
 	};
 
