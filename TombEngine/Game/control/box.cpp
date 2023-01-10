@@ -318,7 +318,9 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
 		if (!Objects[item->ObjectNumber].nonLot)
+		{
 			nextBox = LOT->Node[floor->Box].exitBox;
+		}
 		else
 		{
 			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -1482,7 +1484,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	if (!object->nonLot)
 	{
-		if (g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
 			AI->enemyZone |= BLOCKED;
 		else if (creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
 			AI->enemyZone |= BLOCKED;

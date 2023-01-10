@@ -1,10 +1,12 @@
 Version 1.0.6
 =============
+
+* Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
+* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
 * Antitriggering an enemy will now cause it to vanish and pause.
 * Re-triggering an enemy will cause it to reappear and unpause.
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
 * Add an option to activate Lua or node events from legacy triggers.
-* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
 
 Lua API changes
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
