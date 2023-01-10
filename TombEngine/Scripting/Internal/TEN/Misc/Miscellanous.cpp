@@ -20,6 +20,7 @@
 #include "Vec3/Vec3.h"
 #include "ScriptAssert.h"
 #include "ActionIDs.h"
+#include "CameraTypes.h"
 
 /***
 Functions that don't fit in the other modules.

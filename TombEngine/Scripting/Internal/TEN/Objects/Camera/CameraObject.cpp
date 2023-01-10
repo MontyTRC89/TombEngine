@@ -67,7 +67,7 @@ void CameraObject::Register(sol::table & parent)
 
 		/// Active the camera during that frame.
 		// @function Camera:PlayCamera
-		ScriptReserved_PlayCamera, & CameraObject::PlayCamera
+		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
 		);
 }
 
