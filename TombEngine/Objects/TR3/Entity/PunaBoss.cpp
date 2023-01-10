@@ -306,8 +306,6 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
-			item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
-
 			SpawnLizard(item);
 		}
 		else
@@ -422,13 +420,14 @@ namespace TEN::Entities::Creatures::TR3
 		if (!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
 		{
 			auto itemNumber = item.GetFlagField(BOSSFlag_ItemNumber);
-			auto& item = g_Level.Items[itemNumber];
+			auto& currentItem = g_Level.Items[itemNumber];
 
 			for (int i = 0; i < 20; i++)
-				SpawnSummonSmoke(item.Pose.Position.ToVector3());
+				SpawnSummonSmoke(currentItem.Pose.Position.ToVector3());
 
 			AddActiveItem(itemNumber);
-			item.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
+			currentItem.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
+			item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
 		}
 	}
 
