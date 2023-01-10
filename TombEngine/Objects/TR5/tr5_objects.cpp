@@ -511,9 +511,9 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->biteOffset = 0;
-		obj->initialise = InitialiseTwogun;
+		obj->initialise = InitialiseHeavyGuard;
 		obj->collision = CreatureCollision;
-		obj->control = TwogunControl;
+		obj->control = HeavyGuardControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_RICOCHET;
