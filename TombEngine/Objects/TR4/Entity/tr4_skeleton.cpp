@@ -391,7 +391,7 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					Random::TestProbability(1 / 30.0f) &&
+					Random::TestProbability(1 / 32.0f) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
