@@ -249,7 +249,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			//obj->ZoneType = ZoneType::Human; //TODO, (Human ZoneType isn't working yet for SAS because he hasn't got climbing nor vault animations).
+			//obj->ZoneType = ZoneType::Human; // TODO: Human ZoneType isn't working yet for SAS because he has neighter climbing nor vaulting animations.
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
