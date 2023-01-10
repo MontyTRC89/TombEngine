@@ -19,7 +19,7 @@ using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto PUNA_LASER_DAMAGE = 350;
+	constexpr auto PUNA_LIGHTNING_DAMAGE = 350;
 
 	constexpr auto PUNA_ATTACK_RANGE = BLOCK(20);
 	constexpr auto PUNA_ALERT_RANGE	 = BLOCK(2.5f);
@@ -57,109 +57,8 @@ namespace TEN::Entities::Creatures::TR3
 		AwaitPlayer,
 		DeathLaser,
 		SummonLaser,
-		Wait // Used while a summoned creature is around.
+		Wait // Used while an active lizard is nearby.
 	};
-
-	std::vector<int> GetLizardEntityList(const ItemInfo& item)
-	{
-		auto entityList = std::vector<int>{};
-
-		for (int entityNumber = 0; entityNumber < g_Level.NumItems; entityNumber++)
-		{
-			auto& currentEntity = g_Level.Items[entityNumber];
-
-			if (currentEntity.ObjectNumber == ID_LIZARD &&
-				currentEntity.RoomNumber == item.RoomNumber &&
-				currentEntity.HitPoints > 0 &&
-				currentEntity.Status == ITEM_INVISIBLE &&
-				!(currentEntity.Flags & IFLAG_KILLED))
-			{
-				entityList.push_back(entityNumber);
-			}
-		}
-
-		return entityList;
-	}
-
-	bool FoundAnyLizardInRooms(const ItemInfo& item, bool duringInitialize = false)
-	{
-		unsigned int lizardCount = 0;
-		for (auto& currentEntity : g_Level.Items)
-		{
-			if (duringInitialize)
-			{
-				if (currentEntity.ObjectNumber == ID_LIZARD &&
-					currentEntity.RoomNumber == item.RoomNumber)
-				{
-					lizardCount++;
-				}
-			}
-			else
-			{
-				if (currentEntity.ObjectNumber == ID_LIZARD &&
-					currentEntity.RoomNumber == item.RoomNumber &&
-					currentEntity.HitPoints > 0 &&
-					!(currentEntity.Flags & IFLAG_KILLED) &&
-					currentEntity.Status == ITEM_INVISIBLE)
-				{
-					lizardCount++;
-				}
-			}
-		}
-
-		return (lizardCount > 0);
-	}
-
-	void SpawnSummonSmoke(const Vector3& pos)
-	{
-		auto& smoke = *GetFreeParticle();
-
-		smoke.sR = 16;
-		smoke.sG = 64;
-		smoke.sB = 0;
-		smoke.dR = 8;
-		smoke.dG = 32;
-		smoke.dB = 0;
-		smoke.colFadeSpeed = 16 + (GetRandomControl() & 7);
-		smoke.fadeToBlack = 64;
-		smoke.sLife = smoke.life = (GetRandomControl() & 15) + 96;
-
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		smoke.extras = 0;
-		smoke.dynamic = -1;
-
-		smoke.x = pos.x + ((GetRandomControl() & 127) - 64);
-		smoke.y = pos.y - (GetRandomControl() & 31);
-		smoke.z = pos.z + ((GetRandomControl() & 127) - 64);
-		smoke.xVel = ((GetRandomControl() & 255) - 128);
-		smoke.yVel = -(GetRandomControl() & 15) - 16;
-		smoke.zVel = ((GetRandomControl() & 255) - 128);
-		smoke.friction = 0;
-
-		if (Random::TestProbability(1 / 2.0f))
-		{
-			smoke.rotAng = GetRandomControl() & 4095;
-			smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
-
-			if (GetRandomControl() & 1)
-				smoke.rotAdd = -(GetRandomControl() & 7) - 4;
-			else
-				smoke.rotAdd = (GetRandomControl() & 7) + 4;
-		}
-		else
-		{
-			smoke.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_WIND;
-		}
-
-		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		smoke.scalar = 3;
-		smoke.gravity = -(GetRandomControl() & 7) - 8;
-		smoke.maxYvel = -(GetRandomControl() & 7) - 4;
-		int size = (GetRandomControl() & 128) + 256;
-		smoke.size = smoke.sSize = size >> 1;
-		smoke.dSize = size;
-		smoke.on = true;
-	}
 
 	void InitialisePuna(short itemNumber)
 	{
@@ -169,9 +68,9 @@ namespace TEN::Entities::Creatures::TR3
 		SetAnimation(&item, PUNA_ANIM_IDLE);
 		CheckForRequiredObjects(item);
 
-		// save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
-		// puna is rotated to not face lara, so add 180° to face her.
-		item.SetFlag(BOSSFlag_Rotation, item.Pose.Orientation.y - ANGLE(180.0f));
+		// Save Puna's default angle. It will be used while waiting (i.e. an active lizard is nearby).
+		// NOTE: Since Puna is oriented to face away from the player, add 180 degrees.
+		item.SetFlag(BOSSFlag_Rotation, item.Pose.Orientation.y + ANGLE(180.0f));
 		item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::AwaitPlayer); // normal behaviour at start.
 		item.SetFlag(BOSSFlag_ShieldIsEnabled, 1); // activated at start.
 		item.SetFlag(BOSSFlag_AttackCount, 0);
@@ -179,100 +78,9 @@ namespace TEN::Entities::Creatures::TR3
 		item.SetFlag(BOSSFlag_ItemNumber, NO_ITEM);
 		item.SetFlag(BOSSFlag_ExplodeCount, 0);
 
-		// If there is no lizard in current room, remove lizard flag.
-		if (!FoundAnyLizardInRooms(item, true))
+		// If there is no lizard nearby, remove the lizard flag.
+		if (!IsLizardActiveNearby(item, true))
 			item.RemoveFlag(BOSSFlag_Object, BOSS_Lizard);
-	}
-
-	Vector3 GetLizardTargetPosition(ItemInfo& item)
-	{
-		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-		{
-			const auto& targetEntity = g_Level.Items[item.GetFlag(BOSSFlag_ItemNumber)];
-			return targetEntity.Pose.Position.ToVector3();
-		}
-
-		// Failsafe.
-		const auto& creature = *GetCreatureInfo(&item);
-		return creature.Target.ToVector3();
-	}
-
-	void SpawnLizard(ItemInfo& item)
-	{
-		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
-		{
-			auto itemNumber = item.GetFlag(BOSSFlag_ItemNumber);
-			auto& item = g_Level.Items[itemNumber];
-
-			for (int i = 0; i < 20; i++)
-				SpawnSummonSmoke(item.Pose.Position.ToVector3());
-
-			AddActiveItem(itemNumber);
-			item.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
-		}
-	}
-
-	void PunaLaser(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
-	{
-		const auto& creature = *GetCreatureInfo(&item);
-
-		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
-		auto target = GameVector(Geometry::GetPointAlongLine(origin.ToVector3(), pos, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
-		
-		if (isSummon)
-		{
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
-			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
-			item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
-
-			SpawnLizard(item);
-		}
-		else
-		{
-			Vector3i hitPos = Vector3i::Zero;
-			MESH_INFO* mesh = nullptr;
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
-			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
-
-			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
-			{
-				if (creature.Enemy->HitPoints <= PUNA_LASER_DAMAGE)
-				{
-					ItemElectricBurn(creature.Enemy);
-					DoDamage(creature.Enemy, PUNA_LASER_DAMAGE);
-				}
-				else
-				{
-					DoDamage(creature.Enemy, PUNA_LASER_DAMAGE);
-				}
-			}
-		}
-	}
-
-	short GetPunaHeadOrientToTarget(ItemInfo& item, const Vector3& target)
-	{
-		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
-			return NO_ITEM;
-
-		auto pos = GetJointPosition(&item, PunaBossHeadBite.meshNum).ToVector3();
-		auto orient = Geometry::GetOrientToPoint(pos, target);
-
-		return (orient.y - item.Pose.Orientation.y);
-	}
-
-	short SelectLizardItemNumber(const ItemInfo& item)
-	{
-		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
-			return NO_ITEM;
-
-		auto lizardList = GetLizardEntityList(item);
-		if (lizardList.empty())
-			return NO_ITEM;
-
-		if (lizardList.size() == 1)
-			return lizardList[0];
-		else
-			return lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
 	}
 
 	void PunaControl(short itemNumber)
@@ -291,7 +99,7 @@ namespace TEN::Entities::Creatures::TR3
 		short prevYOrient = 0;
 
 		bool hasTurned = false;
-		bool haveAnyLizardLeft = FoundAnyLizardInRooms(item);
+		bool haveAnyLizardLeft = IsLizardActiveNearby(item);
 
 		if (item.HitPoints <= 0)
 		{
@@ -362,7 +170,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.TestFlagDiff(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && haveAnyLizardLeft)
 			{
 				// Get a random lizard item number.
-				item.SetFlag(BOSSFlag_ItemNumber, SelectLizardItemNumber(item));
+				item.SetFlag(BOSSFlag_ItemNumber, (short)GetLizardItemNumber(item));
 				creature.Target = GetLizardTargetPosition(item);
 			}
 			else if (item.TestFlag(BOSSFlag_Object, BOSS_Lizard) &&
@@ -440,7 +248,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
-					PunaLaser(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
+					FirePunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
 
 				break;
 
@@ -454,11 +262,11 @@ namespace TEN::Entities::Creatures::TR3
 						item.TestFlagEqual(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
 						item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM) && haveAnyLizardLeft)
 					{
-						PunaLaser(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
+						FirePunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
 					}
 					else
 					{
-						PunaLaser(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
+						FirePunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
 					}
 				}
 
@@ -485,5 +293,193 @@ namespace TEN::Entities::Creatures::TR3
 			StopSoundEffect(SFX_TR3_PUNA_BOSS_CHAIR_2);
 			StopSoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR);
 		}
+	}
+
+	void FirePunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
+	{
+		const auto& creature = *GetCreatureInfo(&item);
+
+		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
+		auto target = GameVector(Geometry::GetPointAlongLine(origin.ToVector3(), pos, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+
+		if (isSummon)
+		{
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
+			item.SetFlag(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
+
+			SpawnLizard(item);
+		}
+		else
+		{
+			auto hitPos = Vector3i::Zero;
+			MESH_INFO* mesh = nullptr;
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
+
+			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+			{
+				if (creature.Enemy->HitPoints <= PUNA_LIGHTNING_DAMAGE)
+				{
+					ItemElectricBurn(creature.Enemy);
+					DoDamage(creature.Enemy, PUNA_LIGHTNING_DAMAGE);
+				}
+				else
+				{
+					DoDamage(creature.Enemy, PUNA_LIGHTNING_DAMAGE);
+				}
+			}
+		}
+	}
+
+	short GetPunaHeadOrientToTarget(ItemInfo& item, const Vector3& target)
+	{
+		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
+			return NO_ITEM;
+
+		auto pos = GetJointPosition(&item, PunaBossHeadBite.meshNum).ToVector3();
+		auto orient = Geometry::GetOrientToPoint(pos, target);
+		return (orient.y - item.Pose.Orientation.y);
+	}
+
+	std::vector<int> GetLizardEntityList(const ItemInfo& item)
+	{
+		auto entityList = std::vector<int>{};
+
+		for (auto& currentEntity : g_Level.Items)
+		{
+			if (currentEntity.ObjectNumber == ID_LIZARD &&
+				currentEntity.RoomNumber == item.RoomNumber &&
+				currentEntity.HitPoints > 0 &&
+				currentEntity.Status == ITEM_INVISIBLE &&
+				!(currentEntity.Flags & IFLAG_KILLED))
+			{
+				entityList.push_back(currentEntity.Index);
+			}
+		}
+
+		return entityList;
+	}
+
+	Vector3 GetLizardTargetPosition(ItemInfo& item)
+	{
+		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+		{
+			const auto& targetEntity = g_Level.Items[item.GetFlag(BOSSFlag_ItemNumber)];
+			return targetEntity.Pose.Position.ToVector3();
+		}
+
+		// Failsafe.
+		const auto& creature = *GetCreatureInfo(&item);
+		return creature.Target.ToVector3();
+	}
+
+	int GetLizardItemNumber(const ItemInfo& item)
+	{
+		if (!item.TestFlag(BOSSFlag_Object, BOSS_Lizard))
+			return NO_ITEM;
+
+		auto lizardList = GetLizardEntityList(item);
+		if (lizardList.empty())
+			return NO_ITEM;
+
+		if (lizardList.size() == 1)
+			return lizardList[0];
+		else
+			return lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
+	}
+
+	bool IsLizardActiveNearby(const ItemInfo& item, bool isInitializing)
+	{
+		for (auto& currentEntity : g_Level.Items)
+		{
+			// Check if the entity is a lizard.
+			if (currentEntity.ObjectNumber != ID_LIZARD)
+				continue;
+
+			// Check if the entity is in the same room as Puna.
+			if (currentEntity.RoomNumber != item.RoomNumber)
+				continue;
+
+			// If the enity is currently initializing, return early.
+			if (isInitializing)
+				return true;
+
+			// Check status of entity.
+			if (currentEntity.HitPoints > 0 &&
+				currentEntity.Status == ITEM_INVISIBLE &&
+				!(currentEntity.Flags & IFLAG_KILLED))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void SpawnLizard(ItemInfo& item)
+	{
+		if (item.TestFlagDiff(BOSSFlag_ItemNumber, NO_ITEM))
+		{
+			auto itemNumber = item.GetFlag(BOSSFlag_ItemNumber);
+			auto& item = g_Level.Items[itemNumber];
+
+			for (int i = 0; i < 20; i++)
+				SpawnSummonSmoke(item.Pose.Position.ToVector3());
+
+			AddActiveItem(itemNumber);
+			item.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
+		}
+	}
+
+	void SpawnSummonSmoke(const Vector3& pos)
+	{
+		auto& smoke = *GetFreeParticle();
+
+		smoke.sR = 16;
+		smoke.sG = 64;
+		smoke.sB = 0;
+		smoke.dR = 8;
+		smoke.dG = 32;
+		smoke.dB = 0;
+		smoke.colFadeSpeed = 16 + (GetRandomControl() & 7);
+		smoke.fadeToBlack = 64;
+		smoke.sLife = smoke.life = (GetRandomControl() & 15) + 96;
+
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.extras = 0;
+		smoke.dynamic = -1;
+
+		smoke.x = pos.x + ((GetRandomControl() & 127) - 64);
+		smoke.y = pos.y - (GetRandomControl() & 31);
+		smoke.z = pos.z + ((GetRandomControl() & 127) - 64);
+		smoke.xVel = ((GetRandomControl() & 255) - 128);
+		smoke.yVel = -(GetRandomControl() & 15) - 16;
+		smoke.zVel = ((GetRandomControl() & 255) - 128);
+		smoke.friction = 0;
+
+		if (Random::TestProbability(1 / 2.0f))
+		{
+			smoke.rotAng = GetRandomControl() & 4095;
+			smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
+
+			if (GetRandomControl() & 1)
+				smoke.rotAdd = -(GetRandomControl() & 7) - 4;
+			else
+				smoke.rotAdd = (GetRandomControl() & 7) + 4;
+		}
+		else
+		{
+			smoke.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_WIND;
+		}
+
+		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		smoke.scalar = 3;
+		smoke.gravity = -(GetRandomControl() & 7) - 8;
+		smoke.maxYvel = -(GetRandomControl() & 7) - 4;
+		int size = (GetRandomControl() & 128) + 256;
+		smoke.size = smoke.sSize = size >> 1;
+		smoke.dSize = size;
+		smoke.on = true;
 	}
 }

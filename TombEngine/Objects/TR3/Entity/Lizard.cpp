@@ -166,7 +166,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case LIZARD_STATE_WALK_FORWARD:
-				if (TestCurrentAnimation(item, LIZARD_ANIM_SLIDE_1) || TestCurrentAnimation(item, LIZARD_ANIM_SLIDE_2))
+				if (TestAnimNumber(item, LIZARD_ANIM_SLIDE_1) || TestAnimNumber(item, LIZARD_ANIM_SLIDE_2))
 					creature.MaxTurn = 0;
 				else
 					creature.MaxTurn = LIZARD_WALK_TURN_RATE_MAX;
@@ -294,7 +294,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Pose.Orientation.y += LIZARD_RUN_TURN_RATE_MAX;
 				}
 
-				if (TestFrameInRange(item, 7, 28))
+				if (TestAnimFrameRange(item, 7, 28))
 				{
 					if (creature.Flags < 24)
 						creature.Flags += 2;
@@ -305,7 +305,7 @@ namespace TEN::Entities::Creatures::TR3
 						SpawnLizardGas(itemNumber, LizardGasBite, (GetRandomControl() & 15) + 8);
 				}
 
-				if (TestSingleFrame(item, 28))
+				if (TestAnimFrame(item, 28))
 					creature.Flags = 0;
 
 				break;
