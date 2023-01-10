@@ -380,7 +380,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SKELETON_STATE_WAIT:
-				if (Random::TestProbability(0.06f))
+				if (Random::TestProbability(3 / 5.0f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -395,7 +395,7 @@ namespace TEN::Entities::TR4
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
-					if (Random::TestProbability(0.0155f))
+					if (Random::TestProbability(1 / 64.0f))
 					{
 						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = 3;
@@ -449,7 +449,7 @@ namespace TEN::Entities::TR4
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (Random::TestProbability(0.0155f))
+							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
@@ -533,7 +533,7 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = 2;
 					}
-					else if (Random::TestProbability(0.0155f))
+					else if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 2;
 				}
 
@@ -595,7 +595,9 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y -= ANGLE(6.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 
 				if (!creature->Flags)
 				{
@@ -607,7 +609,8 @@ namespace TEN::Entities::TR4
 						creature->Flags = 1;
 					}
 				}
-				if (Random::TestProbability(0.0155f) || LaraItem->HitPoints <= 0)
+
+				if (Random::TestProbability(1 / 64.0f) || LaraItem->HitPoints <= 0)
 					item->Animation.TargetState = 11;
 				
 				break;
@@ -625,8 +628,11 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y -= ANGLE(6.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
+				}
+
+				if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 15))
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -678,10 +684,15 @@ namespace TEN::Entities::TR4
 							ExplodeItemNode(item, 11, 1, -24);
 					}
 					else
+					{
 						item->Animation.TargetState = 2;
+					}
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || Random::TestProbability(1.0f / 128))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 ||
+					Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || Random::TestProbability(1 / 128.0f))
+				{
 					item->Animation.TargetState = 2;
+				}
 				
 				break;
 
@@ -738,7 +749,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (Random::TestProbability(1 / 30.0f))
+					if (Random::TestProbability(1 / 32.0f))
 						item->Animation.TargetState = 14;
 				}
 				else
