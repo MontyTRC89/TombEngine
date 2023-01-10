@@ -380,7 +380,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SKELETON_STATE_WAIT:
-				if (Random::TestProbability(3 / 5.0f))
+				if (Random::TestProbability(3 / 50.0f))
 					item->Animation.TargetState = 2;
 				
 				break;
