@@ -29,12 +29,9 @@ namespace TEN::Entities::TR4
 		auto& item = g_Level.Items[itemNumber];
 
 		SetAnimation(&item, SETHBLADE_ANIM_IDLE);
-		item.ItemFlags[2] = abs(item.TriggerFlags); // NOTE: ItemFlags[2] stores blade timer.
-		item.ItemFlags[3] = SETH_BLADE_HARM_DAMAGE; // NOTE: ItemFlags[3] stored blade harm damage.
-
-		// Immediately start blades.
-		if (item.TriggerFlags >= 0)
-			item.ItemFlags[2] = 1;
+		
+		item.ItemFlags[2] = item.TriggerFlags >= 0 ? 1 : abs(item.TriggerFlags);		//ItemFlags[2] stores blade timer.
+		item.ItemFlags[3] = SETH_BLADE_HARM_DAMAGE;										//ItemFlags[3] stored blade harm damage.
 	}
 
 	void SethBladeControl(short itemNumber)
@@ -59,7 +56,7 @@ namespace TEN::Entities::TR4
 				else if (item.ItemFlags[2] == 0)
 				{
 					if (item.TriggerFlags > 0)
-						item.ItemFlags[2] = item.TriggerFlags;
+						item.ItemFlags[2] = abs(item.TriggerFlags);
 				}
 			}
 			else if (item.Animation.ActiveState == SETHBLADE_STATE_ACTIVE)
