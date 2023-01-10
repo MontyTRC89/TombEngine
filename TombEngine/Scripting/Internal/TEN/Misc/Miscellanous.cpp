@@ -127,13 +127,7 @@ namespace Misc
 
 	///Shows the mode of the game camera.
 	//@function GetCameraType
-	//@treturn short ID of the camera mode, returned values can be:
-	//@treturn CameraType.Chase
-	//@treturn CameraType.Fixed
-	//@treturn CameraType.Look
-	//@treturn CameraType.Combat
-	//@treturn CameraType.Heavy
-	//@treturn CameraType.Object
+	//@treturn Misc.CameraType value used by the Main Camera.
 	//@usage
 	//LevelFuncs.OnControlPhase = function() 
 	//	PrintCameraType()
