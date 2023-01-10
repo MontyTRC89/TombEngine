@@ -1,9 +1,11 @@
 #pragma once
-#include "Math/Math.h"
+
+class GameVector;
+struct ItemInfo;
 
 namespace TEN::Entities::TR4
 {
 	void InitialiseBaddy(short itemNumber);
 	void BaddyControl(short itemNumber);
-	void Baddy2Hit(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit);
+	void Baddy2Hit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex);
 }

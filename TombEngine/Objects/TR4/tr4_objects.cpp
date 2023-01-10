@@ -224,7 +224,7 @@ namespace TEN::Entities
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
-			obj->hitRoutine = Baddy2Hit;
+			obj->HitRoutine = Baddy2Hit;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
 			obj->pivotLength = 50;

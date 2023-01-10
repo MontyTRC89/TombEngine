@@ -835,11 +835,12 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
-		// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
-		// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
-		// with weapons
+		
+		// NOTE: It seems that items hit by the player in the normal way must have GetTargetOnLOS return false.
+		// It's strange, but this will replicate original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
 			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
+
 		return FireWeaponType::PossibleHit;
 	}
 }
@@ -1052,6 +1053,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	targetEntity->HitStatus = true;
+
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
@@ -1060,18 +1062,19 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		int foundJointID = -1;
 		for (int jointID = 0; jointID < object.nmeshes; jointID++)
 		{
-			auto position = GetJointPosition(targetEntity, jointID);
-			if (Vector3i::Distance(hitPos->ToVector3i(), position) < 64)
+			auto pos = GetJointPosition(targetEntity, jointID);
+			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < BLOCK(1 / 16.0f))
 			{
 				foundJointID = jointID;
 				break;
 			}
 		}
-		object.hitRoutine(targetEntity, laraItem, *hitPos, damage, grenade, foundJointID);
+
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, grenade, foundJointID);
 	}
 	else
 	{
-		object.hitRoutine(targetEntity, laraItem, std::nullopt, damage, grenade, -1);
+		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, grenade, -1);
 	}
 }
 

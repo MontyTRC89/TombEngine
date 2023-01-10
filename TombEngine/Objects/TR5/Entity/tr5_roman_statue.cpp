@@ -883,14 +883,16 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
-	void RomanStatueHit(ItemInfo* target, ItemInfo* source, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+	void RomanStatueHit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 	{
-		const auto& object = Objects[target->ObjectNumber];
-		if (object.hitEffect == HitEffect::Richochet && hitPos.has_value())
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
 		{
-			TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, 0);
-			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target->Pose);
+			TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, 0);
+			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
-		DoItemHit(target, damage, grenade);
+
+		DoItemHit(&target, damage, grenade);
 	}
 }

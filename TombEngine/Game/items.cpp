@@ -7,7 +7,8 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "lara_helpers.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/savegame.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -16,7 +17,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "savegame.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -778,25 +778,27 @@ void DoItemHit(ItemInfo* target, int damage, int grenade)
 	}
 }
 
-void DefaultItemHitRoutine(ItemInfo* target, ItemInfo* source, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+void DefaultItemHitRoutine(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 {
-	const auto& object = Objects[target->ObjectNumber];
-	if (object.hitEffect != HitEffect::None && hitPos.has_value())
+	const auto& object = Objects[target.ObjectNumber];
+
+	if (object.hitEffect != HitEffect::None && pos.has_value())
 	{
 		switch (object.hitEffect)
 		{
 		case HitEffect::Blood:
-			DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}
-	DoItemHit(target, damage, grenade);
+
+	DoItemHit(&target, damage, grenade);
 }

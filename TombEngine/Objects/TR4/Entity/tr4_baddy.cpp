@@ -11,14 +11,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "lara_helpers.h"
 
-using namespace TEN::Math::Random;
 using std::vector;
 
 /*
@@ -771,7 +770,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 						else if (AI.distance >= pow(SECTOR(0.5f), 2))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_FRONT;
-						else if (TestProbability(0.5f))
+						else if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 						else
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_RIGHT;
@@ -866,7 +865,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (GenerateInt(0, 30) > 20 &&
+				if (Random::GenerateInt(0, 30) > 20 &&
 					objectNumber == ID_BADDY2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
@@ -1216,7 +1215,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_BLIND:
 				if (!FlashGrenadeAftershockTimer)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 
@@ -1315,25 +1314,27 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void Baddy2Hit(ItemInfo* target, ItemInfo* source, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+	void Baddy2Hit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 	{
-		const auto& lara = *GetLaraInfo(source);
-		const auto& object = Objects[target->ObjectNumber];
-		if (object.hitEffect == HitEffect::Blood && hitPos.has_value())
+		const auto& player = *GetLaraInfo(&instigator);
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (object.hitEffect == HitEffect::Blood && pos.has_value())
 		{
-			if ((target->Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || GetRandomControl() & 1) &&
-				(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-				 lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-				 lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
-				 lara.Control.Weapon.GunType == LaraWeaponType::HK ||
-				 lara.Control.Weapon.GunType == LaraWeaponType::Revolver))
+			if ((target.Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || Random::TestProbability(1 / 2.0f)) &&
+				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+				 player.Control.Weapon.GunType == LaraWeaponType::HK ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Revolver))
 			{
-				// Baddy2 gun hitting sword
-				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target->Pose);
-				TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, 0);
+				// Baddy2 sword deflecting bullet.
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, 0);
 				return;
 			}
 		}
-		DoItemHit(target, damage, grenade);
+
+		DoItemHit(&target, damage, grenade);
 	}
 }
