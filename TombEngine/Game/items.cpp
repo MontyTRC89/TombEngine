@@ -778,7 +778,7 @@ void DoItemHit(ItemInfo* target, int damage, int grenade)
 	}
 }
 
-void DefaultItemHitRoutine(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
+void DefaultItemHit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 {
 	const auto& object = Objects[target.ObjectNumber];
 

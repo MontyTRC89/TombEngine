@@ -192,4 +192,4 @@ ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, int grenade);
-void DefaultItemHitRoutine(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex);
+void DefaultItemHit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex);
