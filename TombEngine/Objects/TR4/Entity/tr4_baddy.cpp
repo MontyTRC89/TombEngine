@@ -1314,9 +1314,9 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void Baddy2Hit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
+	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 	{
-		const auto& player = *GetLaraInfo(&instigator);
+		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
 		if (object.hitEffect == HitEffect::Blood && pos.has_value())
@@ -1330,7 +1330,7 @@ namespace TEN::Entities::TR4
 			{
 				// Baddy2 sword deflecting bullet.
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 				return;
 			}
 		}

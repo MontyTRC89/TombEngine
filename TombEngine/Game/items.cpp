@@ -778,7 +778,7 @@ void DoItemHit(ItemInfo* target, int damage, int grenade)
 	}
 }
 
-void DefaultItemHit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
 {
 	const auto& object = Objects[target.ObjectNumber];
 
@@ -791,11 +791,11 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& instigator, std::optional<GameVe
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*pos, instigator.Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}
