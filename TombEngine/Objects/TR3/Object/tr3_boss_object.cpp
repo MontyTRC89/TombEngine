@@ -16,7 +16,7 @@ namespace TEN::Effects::Boss
 {
 	void SpawnShield(const ItemInfo& item, const Vector4& color)
 	{
-		if (!item.TestFlag(BOSSFlag_Object, BOSS_Shield))
+		if (!item.TestFlags(BOSSFlag_Object, BOSS_Shield))
 			return;
 
 		int itemNumber = CreateItem();
@@ -45,7 +45,7 @@ namespace TEN::Effects::Boss
 
 	void SpawnShockwaveExplosion(const ItemInfo& item, const Vector4& color)
 	{
-		if (!item.TestFlag(BOSSFlag_Object, BOSS_ShockwaveExplosion))
+		if (!item.TestFlags(BOSSFlag_Object, BOSS_ShockwaveExplosion))
 			return;
 
 		int itemNumber = CreateItem();
@@ -82,7 +82,7 @@ namespace TEN::Effects::Boss
 
 	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
 	{
-		if (!item.TestFlag(BOSSFlag_Object, BOSS_ShockwaveExplosion))
+		if (!item.TestFlags(BOSSFlag_Object, BOSS_ShockwaveExplosion))
 			return;
 
 		int itemNumber = CreateItem();
@@ -235,7 +235,7 @@ namespace TEN::Effects::Boss
 		auto pos = Vector3::Zero;
 
 		// Disable shield.
-		item.SetFlag(BOSSFlag_ShieldIsEnabled, 0);
+		item.SetFlagField(BOSSFlag_ShieldIsEnabled, 0);
 		item.HitPoints = NOT_TARGETABLE;
 
 		// Start doing the explosion (entity will do the count).
@@ -289,22 +289,23 @@ namespace TEN::Effects::Boss
 
 	void CheckForRequiredObjects(ItemInfo& item)
 	{
-		short flagResult = 0;
+		short flags = 0;
 
 		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)
-			flagResult |= BOSS_Lizard;
+			flags |= BOSS_Lizard;
 
-		// These are only for rendering effects. Not required but highly recommended for nice aesthetics.
+		// The following are only for aesthetics.
+
 		if (Objects[ID_BOSS_EXPLOSION_RING].loaded)
-			flagResult |= BOSS_ShockwaveRing;
+			flags |= BOSS_ShockwaveRing;
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)
-			flagResult |= BOSS_ShockwaveExplosion;
+			flags |= BOSS_ShockwaveExplosion;
 
 		if (Objects[ID_BOSS_SHIELD].loaded)
-			flagResult |= BOSS_Shield;
+			flags |= BOSS_Shield;
 
-		item.SetFlag(BOSSFlag_Object, flagResult);
+		item.SetFlagField(BOSSFlag_Object, flags);
 	}
 
 	void SpawnShieldAndRichochetSparks(const ItemInfo& item, const Vector3& pos, const Vector4& color)
@@ -315,7 +316,6 @@ namespace TEN::Effects::Boss
 		auto yOrient = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), target.ToVector3()).y;
 		auto sparkColor = color;
 		sparkColor.w = 1.0f;
-
 		TriggerRicochetSpark(target, yOrient, 13, sparkColor);
 	}
 }

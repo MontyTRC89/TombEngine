@@ -158,19 +158,12 @@ struct ItemInfo
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
-
-	// test value (ItemFlags[id] & value)
-	bool TestFlag(short id, short value) const;
-	// test value (ItemFlags[id] == value)
-	bool TestFlagEqual(short id, short value) const;
-	// test value (ItemFlags[id] != value)
-	bool TestFlagDiff(short id, short value) const;
-	// set value (ItemFlags[id] = value)
-	void SetFlag(short id, short value);
-	// get value (return ItemFlags[id])
-	short GetFlag(short id);
-	// remove value (ItemFlags[id] &= ~value)
-	void RemoveFlag(short id, short value);
+	
+	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
+	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
+	short GetFlagField(int id) const;				// ItemFlags[id]
+	void  SetFlagField(int id, short flags);		// ItemFlags[id] = flags
+	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);

@@ -788,10 +788,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 	const auto& weapon = Weapons[(int)weaponType];
 
-	// TODO: Check. Might need to be half accuracy.
 	auto wobbledArmOrient = EulerAngles(
-		armOrient.x + Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy),
-		armOrient.y + Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy),
+		armOrient.x + (Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy) / 2),
+		armOrient.y + (Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy) / 2),
 		0);
 
 	auto muzzleOffset = GetJointPosition(laraItem, LM_RHAND);
@@ -843,20 +842,20 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
 		{
-			// If shield is active and Puna activate the shield, spawn shield with ricochet effect.
-			if (targetEntity->TestFlag(BOSSFlag_Object, BOSS_Shield) &&
-				targetEntity->TestFlagEqual(BOSSFlag_ShieldIsEnabled, 1))
+			// If shield is active and Puna activated the shield, spawn shield with ricochet effect.
+			if (targetEntity->TestFlags(BOSSFlag_Object, BOSS_Shield) &&
+				targetEntity->TestFlagField(BOSSFlag_ShieldIsEnabled, 1))
 			{
 				SpawnShieldAndRichochetSparks(*targetEntity, vTarget.ToVector3(), Vector4(0.0f, 0.5f, 0.5f, 0.1f));
 				return FireWeaponType::Miss;
 			}
 		}
 
-		// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
-		// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
-		// with weapons
+		// NOTE: It seems that items hit by the player in the normal way must have GetTargetOnLOS return false.
+		// It's strange, but this will replicate original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
 			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
+
 		Statistics.Game.AmmoHits++;
 		return FireWeaponType::PossibleHit;
 	}

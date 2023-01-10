@@ -38,59 +38,53 @@ void ItemInfo::ClearAllOcb()
 	TriggerFlags = 0;
 }
 
-bool ItemInfo::TestFlag(short id, short value) const
+bool ItemInfo::TestFlags(int id, short flags) const
 {
 	if (id < 0 || id > 7)
 		return false;
 
-	return (ItemFlags[id] & value) != 0;
+	return (ItemFlags[id] & flags) != 0;
 }
 
-bool ItemInfo::TestFlagEqual(short id, short value) const
+bool ItemInfo::TestFlagField(int id, short flags) const
 {
 	if (id < 0 || id > 7)
 		return false;
 
-	return (ItemFlags[id] == value);
+	return (ItemFlags[id] == flags);
 }
 
-bool ItemInfo::TestFlagDiff(short id, short value) const
-{
-	if (id < 0 || id > 7)
-		return false;
-
-	return (ItemFlags[id] != value);
-}
-
-void ItemInfo::SetFlag(short id, short value)
-{
-	if (id < 0 || id > 7)
-		return;
-
-	ItemFlags[id] = value;
-}
-
-short ItemInfo::GetFlag(short id)
+short ItemInfo::GetFlagField(int id) const
 {
 	if (id < 0 || id > 7)
 		return 0;
+
 	return ItemFlags[id];
 }
 
-void ItemInfo::RemoveFlag(short id, short value)
+void ItemInfo::SetFlagField(int id, short flags)
 {
 	if (id < 0 || id > 7)
 		return;
-	ItemFlags[id] &= ~value;
+
+	this->ItemFlags[id] = flags;
+}
+
+void ItemInfo::ClearFlags(int id, short flags)
+{
+	if (id < 0 || id > 7)
+		return;
+
+	this->ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 {
-	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
 	{
 		if (flags & (1 << i))
 		{
-			if (Model.MeshIndex[i] == Model.BaseMesh + i)
+			if (Model.MeshIndex[i] == (Model.BaseMesh + i))
 				return false;
 		}
 	}

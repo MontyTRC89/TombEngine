@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR3
 				SetAnimation(&item, LIZARD_ANIM_DEATH);
 
 			// Explode if summoned.
-			if (item.TestFlagEqual(0, 1) && item.Animation.FrameNumber == GetFrameNumber(&item, 50))
+			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == GetFrameNumber(&item, 50))
 				CreatureDie(itemNumber, true);
 		}
 		else
