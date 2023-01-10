@@ -52,32 +52,32 @@ namespace TEN::Effects::Boss
 		if (itemNumber == NO_ITEM)
 			return;
 
-		auto* spawned = &g_Level.Items[itemNumber];
+		auto& shockwaveItem = g_Level.Items[itemNumber];
 
-		spawned->Pose.Position = item.Pose.Position;
-		spawned->Pose.Position.y -= CLICK(2);
+		shockwaveItem.Pose.Position = item.Pose.Position;
+		shockwaveItem.Pose.Position.y -= CLICK(2);
 
-		spawned->Pose.Orientation = EulerAngles(
+		shockwaveItem.Pose.Orientation = EulerAngles(
 			Random::GenerateAngle(ANGLE(-20.0f), ANGLE(20.0f)),
 			Random::GenerateAngle(ANGLE(-20.0f), ANGLE(20.0f)),
 			Random::GenerateAngle(ANGLE(-20.0f), ANGLE(20.0f)));
 
-		spawned->ObjectNumber = ID_BOSS_EXPLOSION_SHOCKWAVE;
-		spawned->RoomNumber = item.RoomNumber;
-		spawned->Flags |= IFLAG_ACTIVATION_MASK;
+		shockwaveItem.ObjectNumber = ID_BOSS_EXPLOSION_SHOCKWAVE;
+		shockwaveItem.RoomNumber = item.RoomNumber;
+		shockwaveItem.Flags |= IFLAG_ACTIVATION_MASK;
 
 		InitialiseItem(itemNumber);
 
 		auto result = color;
 		result.w = 1.0f;
-		spawned->Model.Color = result;
-		spawned->Collidable = false;					 // No collision for this entity.
-		spawned->ItemFlags[0] = 70;						 // Timer before clearing; will fade out, then get destroyed.
-		spawned->Model.Mutator[0].Scale = Vector3::Zero; // Start without scale.
-		spawned->Status = ITEM_ACTIVE;
+		shockwaveItem.Model.Color = result;
+		shockwaveItem.Collidable = false;					 // No collision for this entity.
+		shockwaveItem.ItemFlags[0] = 70;						 // Timer before clearing; will fade out, then get destroyed.
+		shockwaveItem.Model.Mutator[0].Scale = Vector3::Zero; // Start without scale.
+		shockwaveItem.Status = ITEM_ACTIVE;
 
 		AddActiveItem(itemNumber);
-		SoundEffect(SFX_TR3_BLAST_CIRCLE, &spawned->Pose);
+		SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwaveItem.Pose);
 	}
 
 	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
