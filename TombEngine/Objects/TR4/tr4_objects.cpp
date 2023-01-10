@@ -333,6 +333,7 @@ namespace TEN::Entities
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
+			obj->ZoneType = ZoneType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
 

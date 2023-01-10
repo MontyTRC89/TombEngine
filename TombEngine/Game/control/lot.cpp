@@ -103,14 +103,14 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 		default:
 		case ZoneType::Basic:
 			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
 			creature->LOT.Zone = ZoneType::Basic;
 			break;
 
 		// Can jump.
 		case ZoneType::Skeleton:
 			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
 			creature->LOT.CanJump = true;
 			creature->LOT.Zone = ZoneType::Skeleton;
 			break;
