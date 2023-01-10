@@ -99,7 +99,7 @@ namespace TEN::Entities::Creatures::TR3
 		short prevYOrient = 0;
 
 		bool hasTurned = false;
-		bool haveAnyLizardLeft = IsLizardActiveNearby(item);
+		bool isLizardActiveNearby = IsLizardActiveNearby(item);
 
 		if (item.HitPoints <= 0)
 		{
@@ -167,7 +167,7 @@ namespace TEN::Entities::Creatures::TR3
 			else if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
 				item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
 				item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) &&
-				!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && haveAnyLizardLeft)
+				!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && isLizardActiveNearby)
 			{
 				// Get a random lizard item number.
 				item.SetFlagField(BOSSFlag_ItemNumber, (short)GetLizardItemNumber(item));
@@ -221,7 +221,7 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item.Animation.TargetState = PUNA_STATE_HAND_ATTACK;
 
-					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) && haveAnyLizardLeft)
+					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) && isLizardActiveNearby)
 						item.ItemFlags[BOSSFlag_AttackCount]++;
 				}
 				else if (item.ItemFlags[BOSSFlag_AttackCount] >= PUNA_MAX_HEAD_ATTACK &&
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
 						item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
-						!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) && haveAnyLizardLeft)
+						!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) && isLizardActiveNearby)
 					{
 						FirePunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
 					}
