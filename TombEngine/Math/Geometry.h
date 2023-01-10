@@ -6,8 +6,8 @@ class Vector3i;
 
 namespace TEN::Math::Geometry
 {
-	// Since Y is assumed as the vertical axis, only the Y Euler component needs to be considered and
-	// 2D vector operations can be done in the XZ plane. Maybe revise geometry functions to each take an "up" vector argument someday.
+	// Since Y is assumed as the vertical axis, 2D operations are simply done in the XZ plane.
+	// Maybe revise geometry functions to each take a "force" vector argument someday.
 
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
