@@ -55,8 +55,8 @@ namespace TEN::Entities::Creatures::TR3
 	enum class PunaAttackType
 	{
 		AwaitPlayer,
-		DeathLaser,
-		SummonLaser,
+		DeathLightning,
+		SummonLightning,
 		Wait // Used while an active lizard is nearby.
 	};
 
@@ -152,7 +152,7 @@ namespace TEN::Entities::Creatures::TR3
 				float distance = Vector3i::Distance(creature.Enemy->Pose.Position, item.Pose.Position);
 
 				if (distance <= BLOCK(2.5f))
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
 
 				// Rotate the object on puna boss chair.
 				creature.JointRotation[0] += PUNA_CHAIR_TURN_RATE_MAX;
@@ -160,12 +160,12 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Get target.
-			if (item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser))
+			if (item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning))
 			{
 				creature.Target = creature.Enemy->Pose.Position;
 			}
 			else if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
-				item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
+				item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) &&
 				item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) &&
 				!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && isLizardActiveNearby)
 			{
@@ -187,7 +187,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (summonItem.HitPoints <= 0)
 				{
 					// Reset the attack type, attack count, itemNumber, and restart the sequence.
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
 					item.SetFlagField(BOSSFlag_AttackCount, 0);
 					item.SetFlagField(BOSSFlag_ItemNumber, NO_ITEM);
 				}
@@ -209,12 +209,12 @@ namespace TEN::Entities::Creatures::TR3
 					AI.angle > ANGLE(-1.0f) && AI.angle < ANGLE(1.0f) &&
 					creature.Enemy->HitPoints > 0 &&
 					item.GetFlagField(BOSSFlag_AttackCount) < PUNA_HEAD_ATTACK_NUM_MAX &&
-					!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) && !item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait))
+					!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) && !item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait))
 				{
 					creature.MaxTurn = 0;
 					targetPos = creature.Target;
 					targetPos.y -= CLICK(2);
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLaser);
+					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
 
 					if (Random::TestProbability(1 / 3.0f))
 						item.Animation.TargetState = PUNA_STATE_HEAD_ATTACK;
@@ -228,7 +228,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature.Enemy->HitPoints > 0 && 
 					item.ItemFlags[BOSSFlag_AttackType] != (int)PunaAttackType::Wait)
 				{
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser);
+					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning);
 
 					if (!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
 					{
@@ -259,7 +259,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 30))
 				{
 					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
-						item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
+						item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) &&
 						!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) && isLizardActiveNearby)
 					{
 						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
