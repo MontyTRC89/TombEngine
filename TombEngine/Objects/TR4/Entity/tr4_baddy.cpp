@@ -1322,9 +1322,11 @@ namespace TEN::Entities::TR4
 		if (object.hitEffect == HitEffect::Blood && hitPos.has_value())
 		{
 			if ((target->Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || GetRandomControl() & 1) &&
-			   (lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-				lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-				lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
+				(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+				 lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+				 lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+				 lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+				 lara.Control.Weapon.GunType == LaraWeaponType::Revolver))
 			{
 				// Baddy2 gun hitting sword
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target->Pose);
