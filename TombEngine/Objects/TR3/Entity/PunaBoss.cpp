@@ -303,7 +303,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto direction = pos - origin.ToVector3();
 		direction.Normalize();
-		auto target = GameVector(origin.ToVector3() + (direction * PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+		auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), direction, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 
 		if (isSummon)
 		{
