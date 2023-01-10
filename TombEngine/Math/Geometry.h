@@ -10,10 +10,10 @@ namespace TEN::Math::Geometry
 	// Maybe revise geometry functions to each take a "force" vector argument someday.
 
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance);
-	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance);
+	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3	 TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
 	short GetShortestAngle(short fromAngle, short toAngle);
