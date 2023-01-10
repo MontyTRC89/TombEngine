@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 
 		if (item->HitStatus &&
 			Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun &&
-			AI.distance < pow(SECTOR(3.5f), 2) &&
+			AI.distance < pow(BLOCK(3.5f), 2) &&
 			item->Animation.ActiveState != SKELETON_STATE_USE_SHIELD &&
 			item->Animation.ActiveState != 17 &&
 			item->Animation.ActiveState != SKELETON_STATE_RECOIL_FRONT &&
@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 			creature->Enemy = LaraItem;
 
 			if (item->HitStatus ||
-				distance < pow(SECTOR(1), 2) ||
+				distance < pow(BLOCK(1), 2) ||
 				TargetVisible(item, &laraAI))
 			{
 				creature->Alerted = true;
@@ -392,7 +392,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD ||
 					Random::TestProbability(1 / 32.0f) &&
-					(AI.distance > pow(SECTOR(1), 2) ||
+					(AI.distance > pow(BLOCK(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
 					if (Random::TestProbability(1 / 64.0f))
@@ -445,7 +445,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (creature->Mood == MoodType::Bored ||
 							item->AIBits & FOLLOW &&
-							(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+							(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
@@ -453,7 +453,7 @@ namespace TEN::Entities::TR4
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
-							laraAI.angle && laraAI.distance < pow(SECTOR(2), 2) &&
+							laraAI.angle && laraAI.distance < pow(BLOCK(2), 2) &&
 							Random::TestProbability(1 / 2.0f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
@@ -520,14 +520,14 @@ namespace TEN::Entities::TR4
 					{
 						if (AI.distance >= pow(682, 2))
 						{
-							if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+							if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 								item->Animation.TargetState = 18;
 							else if (canJump1Block || canJump2Blocks)
 							{
 								item->Animation.TargetState = 2;
 								creature->MaxTurn = 0;
 							}
-							else if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+							else if (!AI.ahead || AI.distance > pow(BLOCK(2), 2))
 								item->Animation.TargetState = 16;
 						}
 						else
@@ -554,7 +554,7 @@ namespace TEN::Entities::TR4
 
 					creature->LOT.IsJumping = true;
 
-					if (GetCollision(item).Position.Floor > item->Pose.Position.y + SECTOR(1))
+					if (GetCollision(item).Position.Floor > item->Pose.Position.y + BLOCK(1))
 					{
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -571,11 +571,11 @@ namespace TEN::Entities::TR4
 						if (Lara.TargetEntity != item && AI.ahead && (item->MeshBits & 0x200))
 							item->Animation.TargetState = 2;
 					}
-					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 						item->Animation.TargetState = 2;
 					else if (creature->Mood != MoodType::Bored)
 					{
-						if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+						if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 							item->Animation.TargetState = 15;
 					}
 					else
@@ -645,8 +645,8 @@ namespace TEN::Entities::TR4
 						{
 							auto* staticMesh = &room->mesh[i];
 
-							if (abs(pos.x - staticMesh->pos.Position.x) < SECTOR(1) && 
-								abs(pos.z - staticMesh->pos.Position.z) < SECTOR(1) &&
+							if (abs(pos.x - staticMesh->pos.Position.x) < BLOCK(1) && 
+								abs(pos.z - staticMesh->pos.Position.z) < BLOCK(1) &&
 								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
@@ -747,7 +747,7 @@ namespace TEN::Entities::TR4
 
 				creature->LOT.IsJumping = false;
 
-				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
+				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + BLOCK(1)))
 				{
 					if (Random::TestProbability(1 / 32.0f))
 						item->Animation.TargetState = 14;

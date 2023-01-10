@@ -165,8 +165,8 @@ namespace TEN::Entities::TR4
 			laraAI.ahead = false;
 
 		int distance = 0;
-		if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
-			dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+		if (dx > BLOCK(31.25f) || dx < -BLOCK(31.25f) ||
+			dz > BLOCK(31.25f) || dz < -BLOCK(31.25f))
 		{
 			laraAI.distance = INT_MAX;
 		}
@@ -210,15 +210,15 @@ namespace TEN::Entities::TR4
 					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
 					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) || dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+					if (dx > BLOCK(31.25f) || dx < -BLOCK(31.25f) || dz > BLOCK(31.25f) || dz < -BLOCK(31.25f))
 						distance = INT_MAX;
 					else
 						distance = pow(dx, 2) + pow(dz, 2);
 
 					if (distance < minDistance &&
-						distance < pow(SECTOR(2), 2) &&
+						distance < pow(BLOCK(2), 2) &&
 						(abs(dy) < CLICK(1) ||
-							laraAI.distance < pow(SECTOR(2), 2) ||
+							laraAI.distance < pow(BLOCK(2), 2) ||
 							currentItem->ObjectNumber == ID_DOG)) // Here to add more entities as target.
 					{
 						foundEnemy = currentItem;
@@ -294,13 +294,13 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestMeshSwapFlags(0x40000))
 						item->Animation.TargetState = GUIDE_STATE_WALK_FORWARD_NO_TORCH;
-					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
+					else if (foundEnemy && AI.distance < pow(BLOCK(1), 2))
 					{
 						if (AI.bite)
 							item->Animation.TargetState = GUIDE_STATE_ATTACK_LOW;
 					}
-					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
-						if (flagRunDefault && AI.distance > pow(SECTOR(3), 2))
+					else if (!enemy->IsLara() || AI.distance > pow(BLOCK(2), 2))
+						if (flagRunDefault && AI.distance > pow(BLOCK(3), 2))
 							item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 						else
 							item->Animation.TargetState = GUIDE_STATE_WALK_FORWARD;
@@ -334,7 +334,7 @@ namespace TEN::Entities::TR4
 
 						// Read inscription.
 						case 0x28:
-							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
+							if (laraAI.distance < pow(BLOCK(2), 2) || flagIgnoreLaraDistance)
 							{
 								item->Animation.TargetState = GUIDE_STATE_READ_INSCRIPTION;
 								item->Animation.RequiredState = GUIDE_STATE_READ_INSCRIPTION;
@@ -344,7 +344,7 @@ namespace TEN::Entities::TR4
 
 						// Ignite pool.
 						case 0x10:
-							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
+							if (laraAI.distance < pow(BLOCK(2), 2) || flagIgnoreLaraDistance)
 							{
 								item->Animation.TargetState = GUIDE_STATE_CROUCH;
 								item->Animation.RequiredState = GUIDE_STATE_CROUCH;
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 
 						// Activate trap.
 						case 0x04:
-							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
+							if (laraAI.distance < pow(BLOCK(2), 2) || flagIgnoreLaraDistance)
 							{
 								item->Animation.TargetState = GUIDE_STATE_CROUCH;
 								item->Animation.RequiredState = GUIDE_STATE_ACTIVATE_TRAP_CROUCHING;
@@ -417,21 +417,21 @@ namespace TEN::Entities::TR4
 				if (goalNode >= item->ItemFlags[3])
 				{
 					if (!foundEnemy ||
-						AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->TestMeshSwapFlags(GuideRightHandSwapJoints) || AI.distance >= pow(SECTOR(3), 2)))
+						AI.distance >= pow(BLOCK(1.5f), 2) &&
+						(item->TestMeshSwapFlags(GuideRightHandSwapJoints) || AI.distance >= pow(BLOCK(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
-							if (AI.distance >= pow(SECTOR(2), 2))
+							if (AI.distance >= pow(BLOCK(2), 2))
 							{
-								if (AI.distance > pow(SECTOR(4), 2))
+								if (AI.distance > pow(BLOCK(4), 2))
 									item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 							}
 							else
 								item->Animation.TargetState = GUIDE_STATE_IDLE;
 						}
 						else if (goalNode > item->ItemFlags[3] &&
-							laraAI.distance > pow(SECTOR(2), 2))
+							laraAI.distance > pow(BLOCK(2), 2))
 						{
 							item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 						}
@@ -452,7 +452,7 @@ namespace TEN::Entities::TR4
 			if (AI.ahead)
 				joint2 = AI.angle;
 
-			if (AI.distance < pow(SECTOR(2), 2) ||
+			if (AI.distance < pow(BLOCK(2), 2) ||
 				goalNode < item->ItemFlags[3])
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -473,9 +473,9 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 			}
 			else if (foundEnemy &&
-				(AI.distance < pow(SECTOR(1.5f), 2) ||
+				(AI.distance < pow(BLOCK(1.5f), 2) ||
 					!(item->TestMeshSwapFlags(GuideRightHandSwapJoints)) &&
-					AI.distance < pow(SECTOR(3), 2)))
+					AI.distance < pow(BLOCK(3), 2)))
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 				break;
