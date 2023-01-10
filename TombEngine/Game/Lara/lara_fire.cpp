@@ -22,7 +22,7 @@
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Objects/TR3/Entity/tr3_punaboss.h"
+#include "Objects/TR3/Entity/PunaBoss.h"
 #include "Objects/TR3/Object/tr3_boss_object.h"
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceLevel.h"

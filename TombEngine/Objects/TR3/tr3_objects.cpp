@@ -25,7 +25,7 @@
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
-#include "Objects/TR3/Entity/tr3_punaboss.h" // OK
+#include "Objects/TR3/Entity/PunaBoss.h" // OK
 
 // Object
 #include "Objects/TR3/Object/tr3_boss_object.h"

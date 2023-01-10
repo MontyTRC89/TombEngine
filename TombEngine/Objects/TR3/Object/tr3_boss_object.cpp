@@ -6,7 +6,7 @@
 #include "Game/effects/spark.h"
 #include "Game/items.h"
 #include "Game/misc.h"
-#include "Objects/TR3/Entity/tr3_punaboss.h"
+#include "Objects/TR3/Entity/PunaBoss.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;

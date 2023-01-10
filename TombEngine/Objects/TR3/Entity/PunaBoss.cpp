@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_punaboss.h"
+#include "Objects/TR3/Entity/PunaBoss.h"
 
 #include "Game/control/box.h"
 #include "Game/control/los.h"
