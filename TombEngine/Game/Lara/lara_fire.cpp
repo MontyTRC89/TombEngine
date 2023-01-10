@@ -842,7 +842,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
 		{
-			// If shield is active and Puna activated the shield, spawn shield with ricochet effect.
+			// If shield is active and Puna activated it, spawn shield with ricochet effect.
 			if (targetEntity->TestFlags(BOSSFlag_Object, BOSS_Shield) &&
 				targetEntity->TestFlagField(BOSSFlag_ShieldIsEnabled, 1))
 			{

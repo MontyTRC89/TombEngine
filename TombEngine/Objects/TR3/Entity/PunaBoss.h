@@ -8,7 +8,7 @@ namespace TEN::Entities::Creatures::TR3
 	void InitialisePuna(short itemNumber);
 	void PunaControl(short itemNumber);
 
-	void FirePunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon);
+	void DoPunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon);
 
 	short			 GetPunaHeadOrientToTarget(ItemInfo& item, const Vector3& target);
 	std::vector<int> GetLizardEntityList(const ItemInfo& item);

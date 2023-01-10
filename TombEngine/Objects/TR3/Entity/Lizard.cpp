@@ -98,14 +98,15 @@ namespace TEN::Entities::Creatures::TR3
 
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
-			// NOTE: Avoid turning the head when he is climbing or falling.
-			if (AI.ahead && item.Animation.ActiveState < LIZARD_STATE_DEATH)
+			// Turn head. Avoid while climbing or falling.
+			if (AI.ahead &&
+				item.Animation.ActiveState < LIZARD_STATE_DEATH)
 			{
 				headOrient.x = AI.xAngle;
 				headOrient.y = AI.angle;
 			}
 
-			bool isLaraPoisonedOrTargetBlocked = 
+			bool isPlayerPoisonedOrTargetBlocked = 
 				(creature.Enemy != nullptr && GetLaraInfo(creature.Enemy)->PoisonPotency < 256) ||
 				IsLizardTargetBlocked(item);
 
@@ -139,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = LIZARD_STATE_AIM_1;
 				}
 				else if (Targetable(&item, &AI) && AI.bite &&
-					AI.distance < LIZARD_ATTACK_0_RANGE && isLaraPoisonedOrTargetBlocked)
+					AI.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_AIM_0;
 				}
@@ -192,7 +193,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = LIZARD_STATE_AIM_2;
 				}
 				else if (Targetable(&item, &AI) && AI.distance < LIZARD_ATTACK_0_RANGE &&
-					isLaraPoisonedOrTargetBlocked)
+					isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
@@ -220,7 +221,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
 				else if (Targetable(&item, &AI) && AI.distance < LIZARD_ATTACK_0_RANGE &&
-					isLaraPoisonedOrTargetBlocked)
+					isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
@@ -249,7 +250,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// Maybe we should add targetable as well? -- TokyoSU
-				if (AI.bite && AI.distance < LIZARD_ATTACK_0_RANGE && isLaraPoisonedOrTargetBlocked)
+				if (AI.bite && AI.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
 					item.Animation.TargetState = LIZARD_STATE_PUNCH_0;
 				else
 					item.Animation.TargetState = LIZARD_STATE_IDLE;

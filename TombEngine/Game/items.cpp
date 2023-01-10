@@ -491,7 +491,7 @@ void InitialiseItem(short itemNumber)
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;
 
-	for (int i = 0; i < NUM_ITEMFLAGS_COUNT; i++)
+	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
 		item->ItemFlags[i] = 0;
 
 	item->Active = false;

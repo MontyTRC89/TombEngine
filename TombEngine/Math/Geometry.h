@@ -22,7 +22,6 @@ namespace TEN::Math::Geometry
 
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
-	Vector3		GetPointAlongLine(const Vector3& linePoint0, const Vector3& linePoint1, float distance);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target);

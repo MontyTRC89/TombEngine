@@ -109,13 +109,6 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (direction * distanceAlpha));
 	}
 
-	Vector3 GetPointAlongLine(const Vector3& linePoint0, const Vector3& linePoint1, float distance)
-	{
-		auto direction = linePoint1 - linePoint0;
-		direction.Normalize();
-		return (linePoint0 + (direction * distance));
-	}
-
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)

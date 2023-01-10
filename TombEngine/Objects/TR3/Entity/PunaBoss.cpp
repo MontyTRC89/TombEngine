@@ -24,13 +24,13 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto PUNA_ATTACK_RANGE = BLOCK(20);
 	constexpr auto PUNA_ALERT_RANGE	 = BLOCK(2.5f);
 
-	constexpr auto PUNA_TURN_RATE_MAX		 = ANGLE(3.0f);
-	constexpr auto PUNA_CHAIR_TURN_RATE_MAX	 = ANGLE(7.0f);
-	constexpr auto PUNA_HEAD_X_ANGLE_MAX	 = ANGLE(20.0f);
-	constexpr auto PUNA_ADJUST_LASER_X_ANGLE = ANGLE(3.0f);
+	constexpr auto PUNA_TURN_RATE_MAX			 = ANGLE(3.0f);
+	constexpr auto PUNA_CHAIR_TURN_RATE_MAX		 = ANGLE(7.0f);
+	constexpr auto PUNA_HEAD_X_ANGLE_MAX		 = ANGLE(20.0f);
+	constexpr auto PUNA_ADJUST_LIGHTNING_X_ANGLE = ANGLE(3.0f);
 
-	constexpr auto PUNA_EXPLOSION_COUNT_MAX = 120;
-	constexpr auto PUNA_MAX_HEAD_ATTACK		= 4;
+	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 120;
+	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
 	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.75f, 0.75f, 1.0f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
@@ -118,10 +118,10 @@ namespace TEN::Entities::Creatures::TR3
 				item.Animation.FrameNumber = frameEnd;
 				item.MeshBits.ClearAll();
 
-				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_COUNT_MAX)
+				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
 					item.ItemFlags[BOSSFlag_ExplodeCount]++;
 
-				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_COUNT_MAX)
+				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
 					ExplodeBoss(itemNumber, item, 61, PUNA_EFFECT_COLOR); // Do explosion effect.
 
 				return;
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) &&
 				!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && isLizardActiveNearby)
 			{
-				// Get a random lizard item number.
+				// Get random lizard item number.
 				item.SetFlagField(BOSSFlag_ItemNumber, (short)GetLizardItemNumber(item));
 				creature.Target = GetLizardTargetPosition(item);
 			}
@@ -208,7 +208,7 @@ namespace TEN::Entities::Creatures::TR3
 				if ((item.Animation.TargetState != PUNA_STATE_HAND_ATTACK && item.Animation.TargetState != PUNA_STATE_HEAD_ATTACK) &&
 					AI.angle > ANGLE(-1.0f) && AI.angle < ANGLE(1.0f) &&
 					creature.Enemy->HitPoints > 0 &&
-					item.GetFlagField(BOSSFlag_AttackCount) < PUNA_MAX_HEAD_ATTACK &&
+					item.GetFlagField(BOSSFlag_AttackCount) < PUNA_HEAD_ATTACK_NUM_MAX &&
 					!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) && !item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait))
 				{
 					creature.MaxTurn = 0;
@@ -224,7 +224,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) && isLizardActiveNearby)
 						item.ItemFlags[BOSSFlag_AttackCount]++;
 				}
-				else if (item.ItemFlags[BOSSFlag_AttackCount] >= PUNA_MAX_HEAD_ATTACK &&
+				else if (item.ItemFlags[BOSSFlag_AttackCount] >= PUNA_HEAD_ATTACK_NUM_MAX &&
 					creature.Enemy->HitPoints > 0 && 
 					item.ItemFlags[BOSSFlag_AttackType] != (int)PunaAttackType::Wait)
 				{
@@ -248,7 +248,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
-					FirePunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
+					DoPunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
 
 				break;
 
@@ -262,11 +262,11 @@ namespace TEN::Entities::Creatures::TR3
 						item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLaser) &&
 						!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) && isLizardActiveNearby)
 					{
-						FirePunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
+						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
 					}
 					else
 					{
-						FirePunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
+						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
 					}
 				}
 
@@ -295,12 +295,15 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void FirePunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
+	void DoPunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
 		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
-		auto target = GameVector(Geometry::GetPointAlongLine(origin.ToVector3(), pos, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+
+		auto direction = pos - origin.ToVector3();
+		direction.Normalize();
+		auto target = GameVector(origin.ToVector3() + (direction * PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 
 		if (isSummon)
 		{
