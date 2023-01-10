@@ -1315,28 +1315,23 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void Baddy2Hit(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+	void Baddy2Hit(ItemInfo* target, ItemInfo* source, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
 	{
-		const auto& lara = *GetLaraInfo(insticator);
-		const auto& object = Objects[itemhit->ObjectNumber];
-		if (object.hitEffect != HitEffect::None && hitPos.has_value())
+		const auto& lara = *GetLaraInfo(source);
+		const auto& object = Objects[target->ObjectNumber];
+		if (object.hitEffect == HitEffect::Blood && hitPos.has_value())
 		{
-			switch (object.hitEffect)
+			if ((target->Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || GetRandomControl() & 1) &&
+			   (lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+				lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+				lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
 			{
-			case HitEffect::Blood:
-				if ((itemhit->Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || GetRandomControl() & 1) &&
-					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-					 lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-					 lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
-				{
-					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &itemhit->Pose);
-					TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, 0);
-					return;
-				}
-				break;
+				// Baddy2 gun hitting sword
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target->Pose);
+				TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, 0);
+				return;
 			}
 		}
-		PartialItemHit(itemhit, damage, grenade);
+		DoItemHit(target, damage, grenade);
 	}
 }

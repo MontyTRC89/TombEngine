@@ -758,46 +758,45 @@ void DoDamage(ItemInfo* item, int damage)
 	}
 }
 
-void PartialItemHit(ItemInfo* itemHit, int damage, int grenade)
+void DoItemHit(ItemInfo* target, int damage, int grenade)
 {
-	const auto& object = Objects[itemHit->ObjectNumber];
+	const auto& object = Objects[target->ObjectNumber];
 
 	if (!object.undead || grenade)
 	{
-		if (itemHit->HitPoints > 0)
+		if (target->HitPoints > 0)
 		{
 			Statistics.Level.AmmoHits++;
-			DoDamage(itemHit, damage);
+			DoDamage(target, damage);
 		}
 	}
 
-	if (!itemHit->Callbacks.OnHit.empty())
+	if (!target->Callbacks.OnHit.empty())
 	{
-		short index = g_GameScriptEntities->GetIndexByName(itemHit->Name);
-		g_GameScript->ExecuteFunction(itemHit->Callbacks.OnHit, index);
+		short index = g_GameScriptEntities->GetIndexByName(target->Name);
+		g_GameScript->ExecuteFunction(target->Callbacks.OnHit, index);
 	}
 }
 
-void DefaultItemHitRoutine(ItemInfo* itemhit, ItemInfo* insticator, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
+void DefaultItemHitRoutine(ItemInfo* target, ItemInfo* source, std::optional<GameVector> hitPos, int damage, int grenade, short meshHit)
 {
-	const auto& object = Objects[itemhit->ObjectNumber];
+	const auto& object = Objects[target->ObjectNumber];
 	if (object.hitEffect != HitEffect::None && hitPos.has_value())
 	{
 		switch (object.hitEffect)
 		{
 		case HitEffect::Blood:
-			DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, itemhit->Pose.Orientation.y, itemhit->RoomNumber);
+			DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*hitPos, insticator->Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(*hitPos, source->Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}
-
-	PartialItemHit(itemhit, damage, grenade);
+	DoItemHit(target, damage, grenade);
 }
