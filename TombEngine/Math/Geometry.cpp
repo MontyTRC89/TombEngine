@@ -102,11 +102,26 @@ namespace TEN::Math::Geometry
 		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
 
 		if (distanceAlpha < 0.0f)
+		{
 			return linePoint0;
+		}
 		else if (distanceAlpha > 1.0f)
+		{
 			return linePoint1;
+		}
 
 		return (linePoint0 + (direction * distanceAlpha));
+	}
+
+	Vector3 GetTruncatedLineEndpoint(const Vector3& linePoint0, const Vector3& linePoint1, float maxDistance)
+	{
+		auto distance = Vector3::Distance(linePoint0, linePoint1);
+		if (distance <= maxDistance)
+			return linePoint1;
+
+		auto direction = linePoint1 - linePoint0;
+		direction.Normalize();
+		return TranslatePoint(linePoint0, direction, maxDistance);
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)

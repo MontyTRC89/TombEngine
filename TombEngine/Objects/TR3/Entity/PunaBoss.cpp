@@ -300,10 +300,7 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& creature = *GetCreatureInfo(&item);
 
 		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
-
-		auto direction = pos - origin.ToVector3();
-		direction.Normalize();
-		auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), direction, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+		auto target = GameVector(Geometry::GetTruncatedLineEndpoint(origin.ToVector3(), pos, PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 
 		if (isSummon)
 		{
