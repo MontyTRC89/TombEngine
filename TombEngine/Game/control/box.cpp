@@ -251,7 +251,7 @@ void AlertAllGuards(short itemNumber)
 	}
 }
 
-bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
+bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 {
 	int xPos, zPos, ceiling, shiftX, shiftZ;
 	short top;
@@ -266,7 +266,6 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto prevPos = item->Pose.Position;
 	auto bounds = GameBoundingBox(item);
 	int y = item->Pose.Position.y + bounds.Y1;
 	short roomNumber = item->RoomNumber;
@@ -275,6 +274,7 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	auto* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 	if (floor->Box == NO_BOX)
 		return false;
+
 	int height = g_Level.Boxes[floor->Box].height;
 	int nextHeight = 0;
 
@@ -759,6 +759,8 @@ bool CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (!item->IsCreature())
 		return false;
 
+	auto prevPos = item->Pose.Position;
+
 	AnimateItem(item);
 	ProcessSectorFlags(item);
 	CreatureHealth(item);
@@ -769,7 +771,7 @@ bool CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
-	return CreaturePathfind(item, angle, tilt);
+	return CreaturePathfind(item, prevPos, angle, tilt);
 }
 
 void CreatureHealth(ItemInfo* item)
