@@ -27,8 +27,8 @@
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 
-// Object
-#include "Objects/TR3/Object/tr3_boss_object.h"
+// Effects
+#include "Objects/Effects/Boss.h"
 
 // Traps
 #include "Objects/TR3/Trap/train.h"

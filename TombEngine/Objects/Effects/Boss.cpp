@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Object/tr3_boss_object.h"
+#include "Objects/Effects/Boss.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"

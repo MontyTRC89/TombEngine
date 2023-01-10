@@ -9,7 +9,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
-#include "Objects/TR3/Object/tr3_boss_object.h"
+#include "Objects/Effects/Boss.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
