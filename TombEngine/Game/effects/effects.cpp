@@ -324,13 +324,14 @@ void UpdateSparks()
 		if (spark->on && spark->dynamic != -1)
 		{
 			auto* dynsp = &ParticleDynamics[spark->dynamic];
+
 			if (dynsp->Flags & 3)
 			{
 				int random = GetRandomControl();
 
-				byte x = spark->x + 16 * (random & 0xF);
-				byte y = spark->y + (random & 0xF0);
-				byte z = spark->z + ((random >> 4) & 0xF0);
+				int x = spark->x + 16 * (random & 0xF);
+				int y = spark->y + (random & 0xF0);
+				int z = spark->z + ((random >> 4) & 0xF0);
 
 				byte r, g, b;
 
@@ -368,7 +369,7 @@ void UpdateSparks()
 					r = 255 - (dl << 6) - (random & 0x1F);
 				}
 
-				if (spark->flags & 0x2000)
+				if (spark->flags & SP_PLASMAEXP)
 				{
 					int falloff;
 					if (dynsp->Falloff <= 28)
@@ -403,7 +404,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -439,20 +440,15 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	int dx, dz, mirror, i, scalar;
-	unsigned char extras_table[4];
+	int dx, i, dz, scalar;
 	unsigned char r, g, b;
+	unsigned char extras_table[4] = { 0, 4, 7, 10 };
 
-	extras_table[0] = 0;
-	extras_table[1] = 4;
-	extras_table[2] = 7;
-	extras_table[3] = 10;
 	dx = LaraItem->Pose.Position.x - x;
 	dz = LaraItem->Pose.Position.z - z;
 	scalar = 1;
-	mirror = 0;
 
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -ANGLE(90.0f) || dx > ANGLE(90.0f) || dz < -ANGLE(90.0f) || dz > ANGLE(90.0f))
 		return;
 
 	if (roomNumber < 0)
@@ -461,11 +457,6 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		scalar = 1;
 	}
 
-	//if (room == gfMirrorRoom && gfLevelFlags & GF_MIRROR) //TODO: If mirror room is available, create explosion effect for mirror room too.
-		//mirror = 1;
-
-	//do
-	//{
 		auto& spark = *GetFreeParticle();
 		spark.on = true;
 		spark.sR = 255;
@@ -501,35 +492,28 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 		if (dynamic == -2)
 		{
-			for (i = 0; i < 8; i++)
-			{
-				auto* spark = &Particles[i];
-				auto* dynamic = &ParticleDynamics[spark->dynamic];
-
-				if (dynamic->Flags)
+				for ( i = 0; i < 8; i++)
 				{
-					dynamic->On = 1;
-					dynamic->Falloff = 4;
+					auto dynsp = &ParticleDynamics[i];
 
-					if (uw == 1)
-						dynamic->Flags = 2;
-					else
-						dynamic->Flags = 1;
+					if (!dynsp->On)
+					{
+						dynsp->On = true;
+						dynsp->Falloff = 4;
 
-					spark->dynamic = (char)i;
-					break;
+						if (uw == 1)
+							dynsp->Flags = 2;
+						else
+							dynsp->Flags = 1;
+
+						spark.dynamic = (char)i;
+						break;
+					}							
 				}
-
-				dynamic++;
-			}
-
-			if (i == 8)
-				spark.dynamic = -1;
+				if (i == 8)
+					spark.dynamic = -1;			
 		}
 
-		spark.x = (GetRandomControl() & 0x1F) + x - 16;
-		spark.y = (GetRandomControl() & 0x1F) + y - 16;
-		spark.z = (GetRandomControl() & 0x1F) + z - 16;
 		spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
 		spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
 		spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
@@ -576,14 +560,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		GetRandomControl();
 		spark.maxYvel = 0;
 
-		if (uw != 2)
-		{
-			if (extraTrig)
-				TriggerExplosionSmoke(x, y, z, uw);
-			else
-				TriggerExplosionSmokeEnd(x, y, z, uw);
-		}
-		else 		
+		if (uw == 2)
 		{
 			r = spark.sR;
 			g = spark.sG;
@@ -601,10 +578,10 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 			spark.flags |= SP_PLASMAEXP;
 		}
-
-		//z = 2 * gfMirrorZPlane - z; //TODO: Mirror room
-		//mirror--;
-	//} while (mirror >= 0);
+		else if (extraTrig)
+			TriggerExplosionSmoke(x, y, z, uw);
+		else
+			TriggerExplosionSmokeEnd(x, y, z, uw);
 }
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
@@ -782,7 +759,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
 	{
 		int size = (GetRandomControl() & 0x1FF) - yvel;
 		auto* sptr = GetFreeParticle();

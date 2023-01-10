@@ -688,9 +688,9 @@ namespace TEN::Entities::TR4
 
 		Camera.pos.RoomNumber = laraItem->RoomNumber;
 		Camera.type = CameraType::Fixed;
-		ForcedFixedCamera.x = item->Pose.Position.x + ((2048 * phd_sin(item->Pose.Orientation.y)));
-		ForcedFixedCamera.y = item->Pose.Position.y - 1024;
-		ForcedFixedCamera.z = item->Pose.Position.z + ((2048 * phd_cos(item->Pose.Orientation.y)));
+		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
+		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);
+		ForcedFixedCamera.z = item->Pose.Position.z + ((BLOCK(2) * phd_cos(item->Pose.Orientation.y)));
 		ForcedFixedCamera.RoomNumber = item->RoomNumber;
 		UseForcedFixedCamera = true;
 
