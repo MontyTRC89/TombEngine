@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 
 		if (item->HitStatus &&
 			Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun &&
-			AI.distance < pow(BLOCK(3.5f), 2) &&
+			AI.distance < SQUARE(BLOCK(3.5f)) &&
 			item->Animation.ActiveState != SKELETON_STATE_USE_SHIELD &&
 			item->Animation.ActiveState != 17 &&
 			item->Animation.ActiveState != SKELETON_STATE_RECOIL_FRONT &&
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 			creature->Enemy = LaraItem;
 
 			if (item->HitStatus ||
-				distance < pow(BLOCK(1), 2) ||
+				distance < SQUARE(BLOCK(1)) ||
 				TargetVisible(item, &laraAI))
 			{
 				creature->Alerted = true;
@@ -392,7 +392,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD ||
 					Random::TestProbability(1 / 32.0f) &&
-					(AI.distance > pow(BLOCK(1), 2) ||
+					(AI.distance > SQUARE(BLOCK(1)) ||
 						creature->Mood != MoodType::Attack))
 				{
 					if (Random::TestProbability(1 / 64.0f))
@@ -445,7 +445,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (creature->Mood == MoodType::Bored ||
 							item->AIBits & FOLLOW &&
-							(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
+							(creature->ReachedGoal || laraAI.distance > SQUARE(BLOCK(2))))
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
@@ -453,14 +453,14 @@ namespace TEN::Entities::TR4
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
-							laraAI.angle && laraAI.distance < pow(BLOCK(2), 2) &&
+							laraAI.angle && laraAI.distance < SQUARE(BLOCK(2)) &&
 							Random::TestProbability(1 / 2.0f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
 						}
-						else if (AI.bite && AI.distance < pow(682, 2))
+						else if (AI.bite && AI.distance < SQUARE(682))
 						{
 							if (Random::TestProbability(3 / 4.0f) && LaraItem->HitPoints > 0)
 							{
@@ -518,16 +518,16 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = 16;
 					else if (creature->Mood != MoodType::Bored)
 					{
-						if (AI.distance >= pow(682, 2))
+						if (AI.distance >= SQUARE(682))
 						{
-							if (AI.bite && AI.distance < pow(BLOCK(1), 2))
+							if (AI.bite && AI.distance < SQUARE(BLOCK(1)))
 								item->Animation.TargetState = 18;
 							else if (canJump1Block || canJump2Blocks)
 							{
 								item->Animation.TargetState = 2;
 								creature->MaxTurn = 0;
 							}
-							else if (!AI.ahead || AI.distance > pow(BLOCK(2), 2))
+							else if (!AI.ahead || AI.distance > SQUARE(BLOCK(2)))
 								item->Animation.TargetState = 16;
 						}
 						else
@@ -571,11 +571,11 @@ namespace TEN::Entities::TR4
 						if (Lara.TargetEntity != item && AI.ahead && (item->MeshBits & 0x200))
 							item->Animation.TargetState = 2;
 					}
-					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
+					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > SQUARE(BLOCK(2))))
 						item->Animation.TargetState = 2;
 					else if (creature->Mood != MoodType::Bored)
 					{
-						if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
+						if (AI.ahead && AI.distance < SQUARE(BLOCK(2)))
 							item->Animation.TargetState = 15;
 					}
 					else
