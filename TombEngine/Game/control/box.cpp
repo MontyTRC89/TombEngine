@@ -1485,9 +1485,14 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	if (!object->nonLot)
 	{
 		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		{
 			AI->enemyZone |= BLOCKED;
-		else if (creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+		}
+		else if (item->BoxNumber != NO_BOX && 
+			creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+		{
 			AI->enemyZone |= BLOCKED;
+		}
 	}
 
 	auto vector = Vector3i::Zero;
