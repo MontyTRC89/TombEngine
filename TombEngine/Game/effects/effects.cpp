@@ -177,7 +177,7 @@ void UpdateSparks()
 		auto* spark = &Particles[i];
 
 		if (spark->on)
-		{
+		{	
 			spark->life--;
 
 			if (!spark->life)
@@ -188,7 +188,7 @@ void UpdateSparks()
 				spark->on = false;
 				continue;
 			}
-
+			
 			int life = spark->sLife - spark->life;
 			if (life < spark->colFadeSpeed)
 			{
@@ -201,7 +201,7 @@ void UpdateSparks()
 			{
 				spark->r = spark->dR;
 				spark->g = spark->dG;
-				spark->b = spark->dB;
+				spark->b = spark->dB;				
 			}
 			else
 			{
@@ -245,8 +245,8 @@ void UpdateSparks()
 						spark->dynamic,
 						unk,
 						(spark->extras & 7));
-
-					spark->dynamic = -1;
+					
+					spark->dynamic = -1;					
 				}
 
 				if (unk == 1)
@@ -255,7 +255,7 @@ void UpdateSparks()
 						spark->x,
 						spark->y,
 						spark->z,
-						spark->roomNumber);
+						spark->roomNumber);					
 				}
 
 				spark->extras = 0;
@@ -289,6 +289,9 @@ void UpdateSparks()
 
 			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
 			spark->size = (spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536));
+		
+			if (spark->flags & SP_EXPLOSION)
+				SetSpriteSequence(spark, ID_EXPLOSION_SPRITES);
 
 			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
 				(spark->flags & SP_DAMAGE) || 
@@ -324,7 +327,7 @@ void UpdateSparks()
 		if (spark->on && spark->dynamic != -1)
 		{
 			auto* dynsp = &ParticleDynamics[spark->dynamic];
-
+			
 			if (dynsp->Flags & 3)
 			{
 				int random = GetRandomControl();
@@ -345,7 +348,7 @@ void UpdateSparks()
 
 						b = ((random >> 4) & 0x1F) + 128;
 						g = (random & 0x1F) + 224;
-						r = (random >> 8) & 0x3F;
+						r = (random >> 8) & 0x3F;						
 					}
 					else
 					{
@@ -356,7 +359,7 @@ void UpdateSparks()
 						g = -8 * dl - (random & 0x1F) + 255;
 						r = 32 * (4 - dl);
 						if (32 * (4 - dl) < 0)
-							r = 0;
+							r = 0;						
 					}
 				}
 				else
@@ -366,7 +369,7 @@ void UpdateSparks()
 
 					g = 255 - 8 * dl - (random & 0x1F);
 					b = 255 - 16 * dl - (random & 0x1F);
-					r = 255 - (dl << 6) - (random & 0x1F);
+					r = 255 - (dl << 6) - (random & 0x1F);					
 				}
 
 				if (spark->flags & SP_PLASMAEXP)
@@ -377,7 +380,7 @@ void UpdateSparks()
 					else
 						falloff = 31;
 
-					TriggerDynamicLight(x, y, z, falloff, r, g, b);
+					TriggerDynamicLight(x, y, z, falloff, r, g, b);									
 				}
 				else
 				{
@@ -387,11 +390,27 @@ void UpdateSparks()
 					else
 						falloff = 31;
 
-					TriggerDynamicLight(x, y, z, falloff, g, b, r);
+					TriggerDynamicLight(x, y, z, falloff, g, b, r);					
 				}
 			}
 		}
 	}
+}
+
+void SetSpriteSequence(Particle* spk, GAME_OBJECT_ID slot)
+{
+	spk->age++;
+	if (spk->age > spk->life)
+	{
+		spk->on = false;
+		return;
+	};
+
+	char numSprites = -Objects[slot].nmeshes - 1;
+	float normalizedAge = spk->age / spk->life;
+
+	spk->spriteIndex = Objects[slot].meshIndex + (char)Lerp(0.0f, numSprites, normalizedAge);
+
 }
 
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
@@ -404,7 +423,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) && dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -448,7 +467,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	dz = LaraItem->Pose.Position.z - z;
 	scalar = 1;
 
-	if (dx < -ANGLE(90.0f) || dx > ANGLE(90.0f) || dz < -ANGLE(90.0f) || dz > ANGLE(90.0f))
+	if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 		return;
 
 	if (roomNumber < 0)
@@ -485,6 +504,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			spark.fadeToBlack = 16;
 			spark.life = (GetRandomControl() & 7) + 24;
 			spark.sLife = spark.life;
+			spark.age = 0;		
 		}
 
 		spark.extras = unsigned char(extraTrig | ((extras_table[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
@@ -541,7 +561,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			if (uw == 1)
 				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
 			else
-				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
 
 			spark.rotAng = GetRandomControl() & 0xFFF;
 			spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
@@ -549,7 +569,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		else if (uw == 1)
 			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
 		else
-			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
 
 		spark.scalar = 3;
 		spark.gravity = 0;
@@ -589,7 +609,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) && dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -759,7 +779,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) && dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		int size = (GetRandomControl() & 0x1FF) - yvel;
 		auto* sptr = GetFreeParticle();

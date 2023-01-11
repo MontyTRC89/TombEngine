@@ -5,6 +5,7 @@
 enum class LaraWeaponType;
 struct ItemInfo;
 struct CollisionInfo;
+enum GAME_OBJECT_ID:short;
 
 enum RIPPLE_TYPE
 {
@@ -134,6 +135,7 @@ struct Particle
 	unsigned char fxObj;
 	unsigned char roomNumber;
 	unsigned char nodeNumber;
+	float age;
 };
 
 struct SPLASH_STRUCT
@@ -229,3 +231,4 @@ void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+void SetSpriteSequence(Particle* spk, GAME_OBJECT_ID slot);
