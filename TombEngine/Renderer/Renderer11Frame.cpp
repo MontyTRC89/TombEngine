@@ -173,7 +173,8 @@ namespace TEN::Renderer
 		static constexpr int MAX_SEARCH_DEPTH = 128;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
-			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + " was reached with room " + std::to_string(to), LogLevel::Warning);
+			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
+				   " was reached with room " + std::to_string(to), LogLevel::Warning);
 			return;
 		}
 
