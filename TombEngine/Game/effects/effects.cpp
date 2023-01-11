@@ -404,7 +404,8 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+		dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -440,16 +441,20 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
+	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
+
 	int dx, i, dz, scalar;
 	unsigned char r, g, b;
-	unsigned char extras_table[4] = { 0, 4, 7, 10 };
 
 	dx = LaraItem->Pose.Position.x - x;
 	dz = LaraItem->Pose.Position.z - z;
 	scalar = 1;
 
-	if (dx < -ANGLE(90.0f) || dx > ANGLE(90.0f) || dz < -ANGLE(90.0f) || dz > ANGLE(90.0f))
+	if (dx < -BLOCK(16) || dx > BLOCK(16) ||
+		dz < -BLOCK(16) || dz > BLOCK(16))
+	{
 		return;
+	}
 
 	if (roomNumber < 0)
 	{
@@ -457,131 +462,140 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		scalar = 1;
 	}
 
-		auto& spark = *GetFreeParticle();
-		spark.on = true;
-		spark.sR = 255;
+	auto& spark = *GetFreeParticle();
+	spark.on = true;
+	spark.sR = 255;
 
+	if (uw == 1)
+	{
+		spark.sG = (GetRandomControl() & 0x3F) + 128;
+		spark.sB = 32;
+		spark.dR = 192;
+		spark.dG = (GetRandomControl() & 0x1F) + 64;
+		spark.dB = 0;
+		spark.colFadeSpeed = 7;
+		spark.fadeToBlack = 8;
+		spark.life = (GetRandomControl() & 7) + 16;
+		spark.sLife = spark.life;
+		spark.roomNumber = roomNumber;
+	}
+	else
+	{
+		spark.sG = (GetRandomControl() & 0xF) + 32;
+		spark.sB = 0;
+		spark.dR = (GetRandomControl() & 0x3F) + 192;
+		spark.dG = (GetRandomControl() & 0x3F) + 128;
+		spark.dB = 32;
+		spark.colFadeSpeed = 8;
+		spark.fadeToBlack = 16;
+		spark.life = (GetRandomControl() & 7) + 24;
+		spark.sLife = spark.life;
+	}
+
+	spark.extras = unsigned char(extraTrig | ((extrasTable[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
+	spark.dynamic = (char)dynamic;
+
+	if (dynamic == -2)
+	{
+		for ( i = 0; i < 8; i++)
+		{
+			auto dynsp = &ParticleDynamics[i];
+
+			if (!dynsp->On)
+			{
+				dynsp->On = true;
+				dynsp->Falloff = 4;
+
+				if (uw == 1)
+					dynsp->Flags = 2;
+				else
+					dynsp->Flags = 1;
+
+				spark.dynamic = (char)i;
+				break;
+			}							
+		}
+		
+		if (i == 8)
+			spark.dynamic = -1;			
+	}
+
+	spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
+	spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
+	spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
+
+	if (dynamic != -2 || uw == 1)
+	{
+		spark.x = (GetRandomControl() & 0x1F) + x - 16;
+		spark.y = (GetRandomControl() & 0x1F) + y - 16;
+		spark.z = (GetRandomControl() & 0x1F) + z - 16;
+	}
+	else
+	{
+		spark.x = (GetRandomControl() & 0x1FF) + x - 256;
+		spark.y = (GetRandomControl() & 0x1FF) + y - 256;
+		spark.z = (GetRandomControl() & 0x1FF) + z - 256;
+	}
+
+	if (uw == 1)
+		spark.friction = 17;
+	else
+		spark.friction = 51;
+
+	if (GetRandomControl() & 1)
+	{
 		if (uw == 1)
-		{
-			spark.sG = (GetRandomControl() & 0x3F) + 128;
-			spark.sB = 32;
-			spark.dR = 192;
-			spark.dG = (GetRandomControl() & 0x1F) + 64;
-			spark.dB = 0;
-			spark.colFadeSpeed = 7;
-			spark.fadeToBlack = 8;
-			spark.life = (GetRandomControl() & 7) + 16;
-			spark.sLife = spark.life;
-			spark.roomNumber = roomNumber;
-		}
+			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
 		else
-		{
-			spark.sG = (GetRandomControl() & 0xF) + 32;
-			spark.sB = 0;
-			spark.dR = (GetRandomControl() & 0x3F) + 192;
-			spark.dG = (GetRandomControl() & 0x3F) + 128;
-			spark.dB = 32;
-			spark.colFadeSpeed = 8;
-			spark.fadeToBlack = 16;
-			spark.life = (GetRandomControl() & 7) + 24;
-			spark.sLife = spark.life;
-		}
+			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		spark.extras = unsigned char(extraTrig | ((extras_table[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
-		spark.dynamic = (char)dynamic;
+		spark.rotAng = GetRandomControl() & 0xFFF;
+		spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
+	}
+	else if (uw == 1)
+	{
+		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+	}
+	else
+	{
+		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+	}
 
-		if (dynamic == -2)
-		{
-				for ( i = 0; i < 8; i++)
-				{
-					auto dynsp = &ParticleDynamics[i];
+	spark.scalar = 3;
+	spark.gravity = 0;
+	spark.size = (GetRandomControl() & 0xF) + 40;
+	spark.sSize = spark.size * scalar;
+	spark.dSize = spark.size * (scalar + 1);
+	spark.size *= scalar;
+	GetRandomControl();
+	spark.maxYvel = 0;
 
-					if (!dynsp->On)
-					{
-						dynsp->On = true;
-						dynsp->Falloff = 4;
+	if (uw == 2)
+	{
+		r = spark.sR;
+		g = spark.sG;
+		b = spark.sB;
+		spark.sR = b;
+		spark.sG = r;
+		spark.sB = g;
 
-						if (uw == 1)
-							dynsp->Flags = 2;
-						else
-							dynsp->Flags = 1;
+		r = spark.dR;
+		g = spark.dG;
+		b = spark.dB;
+		spark.dR = b;
+		spark.dG = r;
+		spark.dB = g;
 
-						spark.dynamic = (char)i;
-						break;
-					}							
-				}
-				if (i == 8)
-					spark.dynamic = -1;			
-		}
-
-		spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
-		spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
-		spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
-
-		if (dynamic != -2 || uw == 1)
-		{
-			spark.x = (GetRandomControl() & 0x1F) + x - 16;
-			spark.y = (GetRandomControl() & 0x1F) + y - 16;
-			spark.z = (GetRandomControl() & 0x1F) + z - 16;
-		}
-		else
-		{
-			spark.x = (GetRandomControl() & 0x1FF) + x - 256;
-			spark.y = (GetRandomControl() & 0x1FF) + y - 256;
-			spark.z = (GetRandomControl() & 0x1FF) + z - 256;
-		}
-
-		if (uw == 1)
-			spark.friction = 17;
-		else
-			spark.friction = 51;
-
-		if (GetRandomControl() & 1)
-		{
-			if (uw == 1)
-				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
-			else
-				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-
-			spark.rotAng = GetRandomControl() & 0xFFF;
-			spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
-		}
-		else if (uw == 1)
-			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
-		else
-			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-
-		spark.scalar = 3;
-		spark.gravity = 0;
-		spark.size = (GetRandomControl() & 0xF) + 40;
-		spark.sSize = spark.size * scalar;
-		spark.dSize = spark.size * (scalar + 1);
-		spark.size *= scalar;
-		GetRandomControl();
-		spark.maxYvel = 0;
-
-		if (uw == 2)
-		{
-			r = spark.sR;
-			g = spark.sG;
-			b = spark.sB;
-			spark.sR = b;
-			spark.sG = r;
-			spark.sB = g;
-
-			r = spark.dR;
-			g = spark.dG;
-			b = spark.dB;
-			spark.dR = b;
-			spark.dG = r;
-			spark.dB = g;
-
-			spark.flags |= SP_PLASMAEXP;
-		}
-		else if (extraTrig)
-			TriggerExplosionSmoke(x, y, z, uw);
-		else
-			TriggerExplosionSmokeEnd(x, y, z, uw);
+		spark.flags |= SP_PLASMAEXP;
+	}
+	else if (extraTrig)
+	{
+		TriggerExplosionSmoke(x, y, z, uw);
+	}
+	else
+	{
+		TriggerExplosionSmokeEnd(x, y, z, uw);
+	}
 }
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
@@ -589,7 +603,8 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+		dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -715,7 +730,8 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 	
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+		dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
@@ -759,7 +775,8 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+		dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		int size = (GetRandomControl() & 0x1FF) - yvel;
 		auto* sptr = GetFreeParticle();

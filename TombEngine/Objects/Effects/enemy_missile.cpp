@@ -29,8 +29,8 @@ namespace TEN::Entities::Effects
 		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
 		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
+		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+			dz >= -BLOCK(16) && dz <= BLOCK(16))
 		{
 			auto* spark = GetFreeParticle();
 
@@ -81,7 +81,8 @@ namespace TEN::Entities::Effects
 		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
 		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
-		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+			dz >= -BLOCK(16) && dz <= BLOCK(16))
 		{
 			auto* spark = GetFreeParticle();
 
@@ -158,7 +159,9 @@ namespace TEN::Entities::Effects
 				maxRotation = ANGLE(1.4f);
 			}
 			else
+			{
 				maxRotation = ANGLE(4.5f);
+			}
 
 			maxVelocity = CLICK(0.75f);
 		}
@@ -182,14 +185,22 @@ namespace TEN::Entities::Effects
 			dx >>= 3;
 
 			if (dy < -maxRotation)
+			{
 				dy = -maxRotation;
+			}
 			else if (dy > maxRotation)
+			{
 				dy = maxRotation;
+			}
 
 			if (dx < -maxRotation)
+			{
 				dx = -maxRotation;
+			}
 			else if (dx > maxRotation)
+			{
 				dx = maxRotation;
+			}
 
 			fx->pos.Orientation.x += dx;
 
@@ -231,9 +242,13 @@ namespace TEN::Entities::Effects
 				if (fx->flag1)
 				{
 					if (fx->flag1 == 3 || fx->flag1 == 4)
+					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
+					}
 					else if (fx->flag1 == 5)
+					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
+					}
 					else
 					{
 						if (fx->flag1 != 2)
@@ -250,11 +265,15 @@ namespace TEN::Entities::Effects
 
 						}
 						else
+						{
 							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
+						}
 					}
 				}
 				else
+				{
 					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 64, 16, 0, 0);
+				}
 			}
 
 			KillEffect(fxNum);
@@ -304,7 +323,9 @@ namespace TEN::Entities::Effects
 				}
 			}
 			else
+			{
 				TriggerShockwave(&fx->pos, 24, 88, 48, 0, 128, 64, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 1);
+			}
 		}
 		else
 		{
