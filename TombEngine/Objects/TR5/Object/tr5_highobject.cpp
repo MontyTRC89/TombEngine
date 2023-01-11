@@ -144,7 +144,7 @@ void ControlHighObject1(short itemNumber)
 			g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF].Flags < 0)
 		{
 			DoFlipMap(3);
-			FlipMap[3] ^= 0x3E00u;
+			FlipMap[3] ^= CODE_BITS;
 			item->ItemFlags[1] = 1;
 		}
 	}

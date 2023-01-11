@@ -97,7 +97,7 @@ namespace TEN::Entities::TR4
 				{
 					AddActiveItem(itemNos[i]);
 					g_Level.Items[itemNos[i]].Status = ITEM_ACTIVE;
-					g_Level.Items[itemNos[i]].Flags |= 0x3E00;
+					g_Level.Items[itemNos[i]].Flags |= CODE_BITS;
 				}
 			}
 
@@ -256,7 +256,7 @@ namespace TEN::Entities::TR4
 					AddActiveItem(itemNumber);
 					puzzleItem->Status = ITEM_ACTIVE;
 					puzzleItem->ItemFlags[0] = 3;
-					puzzleItem->Flags |= 0x3E00;
+					puzzleItem->Flags |= CODE_BITS;
 				}
 			}
 			else

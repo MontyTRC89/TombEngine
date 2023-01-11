@@ -51,7 +51,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, COBRA_ANIM_IDLE_TO_SLEEP, COBRA_SLEEP_FRAME);
 		item->ItemFlags[2] = item->HitStatus;
 	}

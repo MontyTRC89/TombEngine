@@ -132,12 +132,23 @@ bool TestState(int refState, const vector<int>& stateList)
 	return false;
 }
 
-void ClearItem(short itemNumber)
+static void GameScriptHandleKilled(short itemNumber, bool destroyed)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	item->Collidable = true;
-	item->Data = nullptr;
-	item->StartPose = item->Pose;
+
+	g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
+	if (!item->Callbacks.OnKilled.empty())
+		g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
+
+	if (destroyed)
+	{
+		g_GameScriptEntities->NotifyKilled(item);
+		item->Name.clear();
+		item->Callbacks.OnKilled.clear();
+		item->Callbacks.OnHit.clear();
+		item->Callbacks.OnObjectCollided.clear();
+		item->Callbacks.OnRoomCollided.clear();
+	}
 }
 
 void KillItem(short const itemNumber)
@@ -194,16 +205,7 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-		g_GameScriptEntities->NotifyKilled(item);
-		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
-
-		item->Name.clear();
-		item->Callbacks.OnKilled.clear();
-		item->Callbacks.OnHit.clear();
-		item->Callbacks.OnObjectCollided.clear();
-		item->Callbacks.OnRoomCollided.clear();
+		GameScriptHandleKilled(itemNumber, true);
 
 		if (itemNumber >= g_Level.NumItems)
 		{
@@ -425,10 +427,8 @@ void RemoveDrawnItem(short itemNumber)
 	}
 }
 
-void RemoveActiveItem(short itemNumber) 
+void RemoveActiveItem(short itemNumber, bool killed) 
 {
-	auto& item = g_Level.Items[itemNumber];
-
 	if (g_Level.Items[itemNumber].Active)
 	{
 		g_Level.Items[itemNumber].Active = false;
@@ -449,9 +449,8 @@ void RemoveActiveItem(short itemNumber)
 			}
 		}
 
-		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item.Callbacks.OnKilled, itemNumber);
+		if (killed)
+			GameScriptHandleKilled(itemNumber, false);
 	}
 }
 
@@ -594,7 +593,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		InitialiseItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	return itemNumber;

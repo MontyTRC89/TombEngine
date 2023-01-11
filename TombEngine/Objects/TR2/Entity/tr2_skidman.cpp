@@ -57,7 +57,7 @@ namespace TEN::Entities::Creatures::TR2
 			skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
 			skidooItem->RoomNumber = riderItem->RoomNumber;
 			skidooItem->Flags = ITEM_INVISIBLE;
-			skidooItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(skidooItemNumber);
 

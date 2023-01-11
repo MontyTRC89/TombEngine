@@ -1148,7 +1148,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				}
 
 				fx->objectNumber = ID_BODY_PART;
-				fx->color = item->Color;
+				fx->color = item->Model.Color;
 				fx->flag2 = flags;
 				fx->frameNumber = item->Model.MeshIndex[i];
 			}
@@ -1193,7 +1193,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
+		SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
 	}
 }
 
