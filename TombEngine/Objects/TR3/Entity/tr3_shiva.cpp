@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Lara/lara_helpers.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -21,16 +22,18 @@ using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE		= 150;
+	constexpr auto SHIVA_WALK_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto SHIVA_GRAB_ATTACK_RANGE = SQUARE(SECTOR(1.25f));
+	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE = 150;
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
-
-	constexpr auto LARA_ANIM_SHIVA_DEATH = 7;
-
-	#define SHIVA_WALK_TURN_RATE_MAX   ANGLE(4.0f)
-	#define SHIVA_ATTACK_TURN_RATE_MAX ANGLE(4.0f)
+	constexpr auto SHIVA_MESH_SWITCH_TIME = 50000;
+	constexpr auto LARA_ANIM_SHIVA_DEATH = 7; // TODO: move it to LaraExtraAnims enum.
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
+	const auto ShivaEffectMeshPosition = Vector3i(0, 0, 0);
 	const vector<unsigned int> ShivaAttackLeftJoints	 = { 10, 13 };
 	const vector<unsigned int> ShivaAttackRightJoints = { 22, 25 };
 
@@ -81,38 +84,36 @@ namespace TEN::Entities::Creatures::TR3
 
 	};
 
+	void SwitchShivaMeshToStone(ItemInfo& item, int meshID)
+	{
+		item.Model.MeshIndex[meshID] = Objects[ID_SHIVA_STATUE].meshIndex + meshID;
+	}
+
+	void SwitchShivaMeshToNormal(ItemInfo& item, int meshID)
+	{
+		item.Model.MeshIndex[meshID] = Objects[ID_SHIVA].meshIndex + meshID;
+	}
+
 	void InitialiseShiva(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, SHIVA_ANIM_INACTIVE);
+		item->SetFlags(0, 0); // mesh id, used for swapping mesh.
+		if (item->TestFlags(1, 0))
+		{
+			const auto& obj = Objects[item->ObjectNumber];
+			for (int meshID = 0; meshID < obj.nmeshes; meshID++)
+				SwitchShivaMeshToStone(*item, meshID);
+			item->SetFlags(2, 1); // continue transition until finished.
+		}
 	}
 
-	void TriggerShivaSmoke(long x, long y, long z, long uw)
+	void TriggerShivaSmoke(int x, int y, int z, int roomNumber)
 	{
-		long dx = LaraItem->Pose.Position.x - x;
-		long dz = LaraItem->Pose.Position.z - z;
-
-		if (dx < -SECTOR(16) || dx > SECTOR(16) ||
-			dz < -SECTOR(16) || dz > SECTOR(16))
-		{
-			return;
-		}
-
 		auto* sptr = GetFreeParticle();
-
-		sptr->on = 1;
+		bool uw = TestEnvironment(ENV_FLAG_WATER, x, y, z, roomNumber);
 		if (uw)
-		{
-			sptr->sR = 0;
-			sptr->sG = 0;
-			sptr->sB = 0;
-			sptr->dR = 192;
-			sptr->dG = 192;
-			sptr->dB = 208;
-		}
-		else
 		{
 			sptr->sR = 144;
 			sptr->sG = 144;
@@ -121,16 +122,20 @@ namespace TEN::Entities::Creatures::TR3
 			sptr->dG = 64;
 			sptr->dB = 64;
 		}
+		else
+		{
+			sptr->sR = 0;
+			sptr->sG = 0;
+			sptr->sB = 0;
+			sptr->dR = 192;
+			sptr->dG = 192;
+			sptr->dB = 208;
+		}
 
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 64;
 		sptr->sLife = sptr->life = (GetRandomControl() & 31) + 96;
-
-		if (uw)
-			sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		else
-			sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 
@@ -168,18 +173,18 @@ namespace TEN::Entities::Creatures::TR3
 			sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 		}
 
-		long size = (GetRandomControl() & 31) + 128;
-
+		int size = (GetRandomControl() & 31) + 128;
 		sptr->size = sptr->sSize = size / 4;
 		sptr->dSize = size;
 		size += (GetRandomControl() & 31) + 32;
 		sptr->size = sptr->sSize = size / 8;
 		sptr->dSize = size;
+		sptr->on = true;
 	}
 
 	void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
-		if (!(creature->Flags) && item->TouchBits.Test(ShivaAttackRightJoints))
+		if (!creature->Flags && item->TouchBits.Test(ShivaAttackRightJoints))
 		{
 			DoDamage(creature->Enemy, damage);
 			CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
@@ -187,7 +192,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->Flags = 1;
 		}
 
-		if (!(creature->Flags) && item->TouchBits.Test(ShivaAttackLeftJoints))
+		if (!creature->Flags && item->TouchBits.Test(ShivaAttackLeftJoints))
 		{
 			DoDamage(creature->Enemy, damage);
 			CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
@@ -196,29 +201,85 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	// True = dead for sure.
+	bool DoShivaSwapMesh(ItemInfo& item, bool isDeath)
+	{
+		auto& creature = *GetCreatureInfo(&item);
+
+		if (creature.Flags == 0 && (item.TestFlags(2, 1) || item.TestFlags(2, 2)))
+		{
+			creature.Flags = 1;
+
+			const auto& obj = Objects[item.ObjectNumber];
+			if (isDeath && item.ItemFlags[0] < 0)
+				item.SetFlags(2, 0);
+			else if (!isDeath && item.ItemFlags[0] >= obj.nmeshes)
+				item.SetFlags(2, 0);
+			else
+			{
+				auto pos = GetJointPosition(&item, item.ItemFlags[0], ShivaEffectMeshPosition);
+				TriggerShivaSmoke(pos.x, pos.y, pos.z, item.RoomNumber);
+				if (isDeath)
+				{
+					SwitchShivaMeshToStone(item, item.ItemFlags[0]);
+					item.ItemFlags[0]--;
+				}
+				else
+				{
+					SwitchShivaMeshToNormal(item, item.ItemFlags[0]);
+					item.ItemFlags[0]++;
+				}
+			}
+		}
+		else
+		{
+			creature.Flags--;
+		}
+
+		if (item.TestFlags(2, 0) && !isDeath)
+		{
+			item.Animation.TargetState = SHIVA_STATE_IDLE;
+			creature.Flags = -45;
+			item.SetFlags(1, 0);
+			item.SetFlags(1, 0); // is alive (for savegame).
+		}
+		else if (item.TestFlags(2, 0) && isDeath)
+		{
+			item.SetFlags(1, 0);
+			item.SetFlags(1, 2); // no more alive.
+			return true;
+		}
+
+		return false;
+	}
+
 	void ShivaControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
-		auto pos = Vector3i(0, 0, CLICK(1));
-		bool isLaraAlive = LaraItem->HitPoints > 0;
-
 		short angle = 0;
 		short tilt = 0;
-		EulerAngles extraHeadRot = EulerAngles::Zero;
-		EulerAngles extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
+			const auto& obj = Objects[item->ObjectNumber];
 			if (item->Animation.ActiveState != SHIVA_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SHIVA_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = SHIVA_STATE_DEATH;
+				SetAnimation(item, SHIVA_ANIM_DEATH);
+				item->ItemFlags[0] = obj.nmeshes - 1;
+				item->SetFlags(2, 2); // redo swap to stone.
+			}
+
+			int frameEnd = g_Level.Anims[obj.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
+			if (item->Animation.FrameNumber >= frameEnd)
+			{
+				item->Animation.FrameNumber = frameEnd; // block frame until mesh is switched.
+				if (DoShivaSwapMesh(*item, true))
+					CreatureDie(itemNumber, false);
 			}
 		}
 		else
@@ -231,63 +292,32 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (creature->Mood == MoodType::Escape)
 			{
-				creature->Target.x = LaraItem->Pose.Position.x;
-				creature->Target.z = LaraItem->Pose.Position.z;
+				creature->Target.x = creature->Enemy->Pose.Position.x;
+				creature->Target.z = creature->Enemy->Pose.Position.z;
 			}
 
+			bool isLaraAlive = creature->Enemy->HitPoints > 0;
 			angle = CreatureTurn(item, creature->MaxTurn);
-
-			if (item->Animation.ActiveState != SHIVA_STATE_INACTIVE)
-				item->MeshBits = ALL_JOINT_BITS;
-
-			int effectMesh = 0;
-			auto pos = Vector3i(0, 0, CLICK(1));
 
 			switch (item->Animation.ActiveState)
 			{
 			case SHIVA_STATE_INACTIVE:
 				creature->MaxTurn = 0;
-
-				if (!creature->Flags)
-				{
-					if (!item->MeshBits.TestAny())
-						effectMesh = 0;
-
-					item->MeshBits = (item->MeshBits.ToPackedBits() * 2) + 1;
-					creature->Flags = 1;
-
-					pos = GetJointPosition(item, effectMesh++, pos);
-					TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
-					TriggerShivaSmoke(pos.x, pos.y, pos.z, 1);
-
-				}
-				else
-					creature->Flags--;
-
-				if (item->MeshBits == 0x7FFFFFFF)
-				{
-					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					creature->Flags = -45;
-					effectMesh = 0;
-				}
-
+				DoShivaSwapMesh(*item, false);
 				break;
 
 			case SHIVA_STATE_IDLE:
 				creature->MaxTurn = 0;
-
-				if (AI.ahead)
-					extraHeadRot.y = AI.angle;
-
 				if (creature->Flags < 0)
 				{
 					creature->Flags++;
-					TriggerShivaSmoke(item->Pose.Position.x + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Pose.Position.z + (GetRandomControl() & 0x5FF) - 0x300, 1);
-					break;
+					TriggerShivaSmoke(item->Pose.Position.x + (GetRandomControl() & 0x5FF) - 0x300, (item->Pose.Position.y - CLICK(1)) - (GetRandomControl() & 0x5FF), item->Pose.Position.z + (GetRandomControl() & 0x5FF) - 0x300, item->RoomNumber);
+					return;
 				}
+				creature->Flags = 0;
 
-				if (creature->Flags == 1)
-					creature->Flags = 0;
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
 
 				if (creature->Mood == MoodType::Escape)
 				{
@@ -305,12 +335,12 @@ namespace TEN::Entities::Creatures::TR3
 					if (TestProbability(0.0325f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
+				else if (AI.bite && AI.distance < SHIVA_GRAB_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_GRAB_ATTACK;
 					creature->Flags = 0;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
+				else if (AI.bite && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_DOWNWARD_ATTACK;
 					creature->Flags = 0;
@@ -327,17 +357,15 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SHIVA_STATE_GUARD_IDLE:
 				creature->MaxTurn = 0;
-
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
 				if (item->HitStatus || creature->Mood == MoodType::Escape)
 					creature->Flags = 4;
 
-				if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
-					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!creature->Flags) ||
-					!AI.ahead)
+				if (AI.bite && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE ||
+				   (item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature->Flags) ||
+				   !AI.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 					creature->Flags = 0;
@@ -345,12 +373,8 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Flags)
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 
-
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-					creature->Flags > 1)
-				{
+				if (item->Animation.FrameNumber == GetFrameNumber(item, 0) && creature->Flags > 1)
 					creature->Flags -= 2;
-				}
 
 				break;
 
@@ -364,7 +388,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
+				else if (AI.bite && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 					creature->Flags = 0;
@@ -386,9 +410,8 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->HitStatus)
 					creature->Flags = 4;
 
-				if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2) ||
-					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!creature->Flags))
+				if ((AI.bite && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
+				    (item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature->Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 					creature->Flags = 0;
@@ -396,7 +419,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Flags)
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetFrameNumber(item, 0))
 					creature->Flags = 0;
 
 				break;
@@ -407,9 +430,9 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(4) / 3, 2) ||
-					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!creature->Flags))
+				if ((AI.ahead && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
+				    (item->Animation.FrameNumber == GetFrameNumber(item, 0) &&
+				    !creature->Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
@@ -449,9 +472,9 @@ namespace TEN::Entities::Creatures::TR3
 				extraHeadRot = EulerAngles::Zero;
 				extraTorsoRot = EulerAngles::Zero;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_FORWARD_TO_GUARDED_LEFT_1 ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_BACK_RIGHT ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 33) // TODO: Huh? No such anim index exists for the Shiva.
+				if (item->Animation.FrameNumber == GetFrameNumber(item, 10) ||
+					item->Animation.FrameNumber == GetFrameNumber(item, 21) ||
+					item->Animation.FrameNumber == GetFrameNumber(item, 33))
 				{
 					CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
 					CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
@@ -459,34 +482,16 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 			}
-		}
 
-		// Dispatch kill animation.
-		if (isLaraAlive && LaraItem->HitPoints <= 0)
-		{
-			item->Animation.TargetState = SHIVA_STATE_KILL;
-
-			if (LaraItem->RoomNumber != item->RoomNumber)
-				ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
-
-			LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;
-			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-			LaraItem->Animation.ActiveState = LS_DEATH;
-			LaraItem->Animation.TargetState = LS_DEATH;
-			LaraItem->Animation.IsAirborne = false;
-			LaraItem->Pose.Position = item->Pose.Position;
-			LaraItem->Pose.Orientation = EulerAngles(0, item->Pose.Orientation.y, 0);
-			LaraItem->HitPoints = NOT_TARGETABLE;
-			Lara.Air = -1;
-			Lara.Control.HandStatus = HandStatus::Special;
-			Lara.Control.Weapon.GunType = LaraWeaponType::None;
-			Camera.targetDistance = SECTOR(4);
-			Camera.flags = CF_FOLLOW_CENTER;
-			return;
+			// Dispatch kill animation.
+			if (isLaraAlive && LaraItem->HitPoints <= 0)
+			{
+				CreatureKill(item, SHIVA_ANIM_KILL, LARA_ANIM_SHIVA_DEATH, SHIVA_STATE_KILL, LS_DEATH);
+				return;
+			}
 		}
 
 		CreatureTilt(item, tilt);
-
 		extraHeadRot.y -= extraTorsoRot.y;
 
 		CreatureJoint(item, 0, extraTorsoRot.y);
@@ -494,5 +499,25 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureJoint(item, 3, extraHeadRot.x);
 		CreatureAnimation(itemNumber, angle, tilt);
+	}
+
+	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
+	{
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		// If shiva is guarded, then don't damage him, do the ricochet instead.
+		if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
+			target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE) && pos.has_value())
+		{
+			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+		}
+		// Else do the basic hit effect (blood + damage)
+		else if (object.hitEffect == HitEffect::Blood && pos.has_value())
+		{
+			DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+			DoItemHit(&target, damage, grenade);
+		}
 	}
 }

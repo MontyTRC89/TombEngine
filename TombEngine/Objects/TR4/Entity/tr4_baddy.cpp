@@ -1319,7 +1319,7 @@ namespace TEN::Entities::TR4
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
-		if (object.hitEffect == HitEffect::Blood && pos.has_value())
+		if (pos.has_value())
 		{
 			if ((target.Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || Random::TestProbability(1 / 2.0f)) &&
 				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
@@ -1332,6 +1332,10 @@ namespace TEN::Entities::TR4
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 				return;
+			}
+			else if (object.hitEffect == HitEffect::Blood)
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
 			}
 		}
 

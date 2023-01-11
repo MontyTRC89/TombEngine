@@ -165,7 +165,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
-void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState);
+void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int entityKillState, int laraKillState);
 short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func);
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
