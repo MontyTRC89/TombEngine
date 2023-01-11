@@ -25,7 +25,10 @@ namespace TEN::Effects::Ripple
 		for (auto& ripple : Ripples)
 		{
 			if (!ripple.IsActive)
+			{
+				ripple = {};
 				return ripple;
+			}
 
 			if (ripple.Life < shortestLife)
 			{
@@ -34,6 +37,7 @@ namespace TEN::Effects::Ripple
 			}
 		}
 
+		*oldestRipplePtr = {};
 		return *oldestRipplePtr;
 	}
 
@@ -41,7 +45,6 @@ namespace TEN::Effects::Ripple
 	{
 		auto& ripple = GetFreeRipple();
 
-		ripple = Ripple();
 		ripple.IsActive = true;
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
@@ -74,7 +77,7 @@ namespace TEN::Effects::Ripple
 					ripple.Scale += 4.0f;
 			}
 
-			if (!ripple.Init)
+			if (ripple.Init == 0.0f)
 			{
 				ripple.Life -= 3.0f;
 				if (ripple.Life > 250.0f)
@@ -95,6 +98,6 @@ namespace TEN::Effects::Ripple
 
 	void ClearRipples()
 	{
-		Ripples.fill(Ripple());
+		Ripples.fill({});
 	}
 }

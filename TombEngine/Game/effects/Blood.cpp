@@ -64,7 +64,10 @@ namespace TEN::Effects::Blood
 		for (auto& uwBlood : UnderwaterBloodParticles)
 		{
 			if (!uwBlood.IsActive)
+			{
+				uwBlood = {};
 				return uwBlood;
+			}
 
 			if (uwBlood.Life < shortestLife)
 			{
@@ -73,6 +76,7 @@ namespace TEN::Effects::Blood
 			}
 		}
 
+		*oldestUWBlood = {};
 		return *oldestUWBlood;
 	}
 	
@@ -84,7 +88,10 @@ namespace TEN::Effects::Blood
 		for (auto& mist : BloodMists)
 		{
 			if (!mist.IsActive)
+			{
+				mist = {};
 				return mist;
+			}
 
 			if (mist.Life < shortestLife)
 			{
@@ -93,6 +100,7 @@ namespace TEN::Effects::Blood
 			}
 		}
 
+		*oldestMistPtr = {};
 		return *oldestMistPtr;
 	}
 
@@ -104,7 +112,10 @@ namespace TEN::Effects::Blood
 		for (auto& drip : BloodDrips)
 		{
 			if (!drip.IsActive)
+			{
+				drip = {};
 				return drip;
+			}
 
 			if (drip.Life < shortestLife)
 			{
@@ -113,6 +124,7 @@ namespace TEN::Effects::Blood
 			}
 		}
 
+		*oldestDripPtr = {};
 		return *oldestDripPtr;
 	}
 
@@ -167,7 +179,6 @@ namespace TEN::Effects::Blood
 
 		auto sphere = BoundingSphere(pos, UW_BLOOD_SPHERE_RADIUS);
 
-		uwBlood = UnderwaterBlood();
 		uwBlood.IsActive = true;
 		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		uwBlood.Position = Random::GeneratePointInSphere(sphere);
@@ -191,7 +202,6 @@ namespace TEN::Effects::Blood
 
 		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
 
-		mist = BloodMist();
 		mist.SpriteIndex = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
 		mist.IsActive = true;
 		mist.Position = Random::GeneratePointInSphere(sphere);
@@ -204,8 +214,8 @@ namespace TEN::Effects::Blood
 		mist.Scale = Random::GenerateFloat(BLOOD_MIST_SCALE_MIN, BLOOD_MIST_SCALE_MAX);
 		mist.ScaleMax = mist.Scale * 4;
 		mist.ScaleMin = mist.Scale;
-		mist.Opacity = BLOOD_MIST_OPACITY_MAX;
-		mist.OpacityMax = mist.Opacity;
+		mist.Opacity =
+		mist.OpacityMax = BLOOD_MIST_OPACITY_MAX;
 		mist.Gravity = Random::GenerateFloat(BLOOD_MIST_GRAVITY_MIN, BLOOD_MIST_GRAVITY_MAX);
 		mist.Friction = BLOOD_MIST_FRICTION;
 		mist.Rotation = Random::GenerateAngle(-BLOOD_MIST_ROTATION_MAX, BLOOD_MIST_ROTATION_MAX);
@@ -224,7 +234,6 @@ namespace TEN::Effects::Blood
 	{
 		auto& drip = GetFreeBloodDrip();
 
-		drip = BloodDrip();
 		drip.SpriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
 		drip.IsActive = true;
 		drip.CanSpawnStain = canSpawnStain;
@@ -277,8 +286,8 @@ namespace TEN::Effects::Blood
 		stain.RoomNumber = roomNumber;
 		stain.Orientation2D = Random::GenerateAngle();
 		stain.Normal = normal;
-		stain.Color = BLOOD_COLOR_RED;
-		stain.ColorStart = stain.Color;
+		stain.Color =
+		stain.ColorStart = BLOOD_COLOR_RED;
 		stain.ColorEnd = BLOOD_COLOR_BROWN;
 		stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, 0.0f);
 		stain.Life = std::round(BLOOD_STAIN_LIFE_MAX * FPS);
@@ -286,8 +295,8 @@ namespace TEN::Effects::Blood
 		stain.Scale = 0.0f;
 		stain.ScaleMax = scaleMax;
 		stain.ScaleRate = scaleRate;
-		stain.Opacity = BLOOD_STAIN_OPACITY_MAX;
-		stain.OpacityMax = stain.Opacity;
+		stain.Opacity =
+		stain.OpacityMax = BLOOD_STAIN_OPACITY_MAX;
 		stain.DelayTime = std::round(delayTimeInSec * FPS);
 
 		if (BloodStains.size() >= BLOOD_STAIN_NUM_MAX)
@@ -496,17 +505,17 @@ namespace TEN::Effects::Blood
 
 	void ClearUnderwaterBloodParticles()
 	{
-		UnderwaterBloodParticles.fill(UnderwaterBlood());
+		UnderwaterBloodParticles.fill({});
 	}
 	
 	void ClearBloodMists()
 	{
-		BloodMists.fill(BloodMist());
+		BloodMists.fill({});
 	}
 
 	void ClearBloodDrips()
 	{
-		BloodDrips.fill(BloodDrip());
+		BloodDrips.fill({});
 	}
 
 	void ClearBloodStains()
@@ -519,31 +528,25 @@ namespace TEN::Effects::Blood
 		int numActiveUWBlood = 0;
 		for (const auto& uwBlood : UnderwaterBloodParticles)
 		{
-			if (!uwBlood.IsActive)
-				continue;
-
-			numActiveUWBlood++;
+			if (uwBlood.IsActive)
+				numActiveUWBlood++;
 		}
 		
 		int numActiveMists = 0;
 		for (const auto& mist : BloodMists)
 		{
-			if (!mist.IsActive)
-				continue;
-
-			numActiveMists++;
+			if (mist.IsActive)
+				numActiveMists++;
 		}
 		
 		int numActiveDrips = 0;
 		for (const auto& drip : BloodDrips)
 		{
-			if (!drip.IsActive)
-				continue;
-
-			numActiveDrips++;
+			if (drip.IsActive)
+				numActiveDrips++;
 		}
 
-		g_Renderer.PrintDebugMessage("Num. underwater blood: %d ", numActiveUWBlood);
+		g_Renderer.PrintDebugMessage("Num. uw. blood particles: %d ", numActiveUWBlood);
 		g_Renderer.PrintDebugMessage("Num. blood mists: %d ", numActiveMists);
 		g_Renderer.PrintDebugMessage("Num. blood drips: %d ", numActiveDrips);
 		g_Renderer.PrintDebugMessage("Num. blood stains: %d ", BloodStains.size());

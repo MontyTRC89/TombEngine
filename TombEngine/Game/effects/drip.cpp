@@ -7,6 +7,7 @@
 #include "Game/effects/weather.h"
 #include "Game/room.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 

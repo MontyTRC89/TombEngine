@@ -26,7 +26,7 @@ namespace TEN::Effects::Footprint
 
 	extern std::deque<Footprint> Footprints;
 
-	SOUND_EFFECTS		   GetFootprintSoundEffectID(FLOOR_MATERIAL material);
+	SOUND_EFFECTS		   GetFootprintSfx(FLOOR_MATERIAL material);
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
 
 	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);

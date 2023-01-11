@@ -4,6 +4,7 @@
 #include <random>
 
 #include "Math/Constants.h"
+#include "Math/Geometry.h"
 
 namespace TEN::Math::Random
 {
@@ -26,16 +27,16 @@ namespace TEN::Math::Random
 
 	Vector2 GenerateDirection2D()
 	{
-		auto vector = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
-		vector.Normalize();
-		return vector;
+		auto direction2D = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
+		direction2D.Normalize();
+		return direction2D;
 	}
 
 	Vector3 GenerateDirection()
 	{
-		auto vector = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
-		vector.Normalize();
-		return vector;
+		auto direction = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
+		direction.Normalize();
+		return direction;
 	}
 
 	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg)
@@ -43,27 +44,27 @@ namespace TEN::Math::Random
 		float x = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		float y = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		float z = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
-		auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
+		auto rotMatrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 
-		auto vector = Vector3::TransformNormal(direction, matrix);
-		vector.Normalize();
-		return vector;
+		auto directionInCone = Vector3::TransformNormal(direction, rotMatrix);
+		directionInCone.Normalize();
+		return directionInCone;
 	}
 
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box)
 	{
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
-		auto vector = Vector3(
+		auto relPoint = Vector3(
 			GenerateFloat(-box.Extents.x, box.Extents.x),
 			GenerateFloat(-box.Extents.y, box.Extents.y),
 			GenerateFloat(-box.Extents.z, box.Extents.z));
 
-		return (box.Center + Vector3::Transform(vector, rotMatrix));
+		return (box.Center + Vector3::Transform(relPoint, rotMatrix));
 	}
 
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
-		return (sphere.Center + (GenerateDirection() * GenerateFloat(0.0f, sphere.Radius)));
+		return Geometry::TranslatePoint(sphere.Center, GenerateDirection(), GenerateFloat(0.0f, sphere.Radius));
 	}
 
 	bool TestProbability(float probability)
@@ -71,9 +72,13 @@ namespace TEN::Math::Random
 		probability = std::clamp(probability, 0.0f, 1.0f);
 
 		if (probability == 0.0f)
+		{
 			return false;
+		}
 		else if (probability == 1.0f)
+		{
 			return true;
+		}
 
 		return (GenerateFloat(0.0f, 1.0f) < probability);
 	}

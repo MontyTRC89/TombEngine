@@ -38,7 +38,7 @@ namespace TEN::Effects::Footprint
 
 	std::deque<Footprint> Footprints = {};
 
-	SOUND_EFFECTS GetFootprintSoundEffectID(FLOOR_MATERIAL material)
+	SOUND_EFFECTS GetFootprintSfx(FLOOR_MATERIAL material)
 	{
 		switch (material)
 		{
@@ -145,7 +145,7 @@ namespace TEN::Effects::Footprint
 
 	bool TestFootHeight(const ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
 	{
-		static constexpr auto heightRange = CLICK(1 / 4.0f);
+		static constexpr auto heightRange = CLICK(0.25f);
 		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
 
 		auto footPos = GetJointPosition(LaraItem, meshIndex, footOffset);
@@ -157,7 +157,7 @@ namespace TEN::Effects::Footprint
 
 	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints)
 	{
-		static constexpr auto heightRange = CLICK(1 / 2.0f);
+		static constexpr auto heightRange = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
@@ -186,8 +186,8 @@ namespace TEN::Effects::Footprint
 		footprint.VertexPoints = vertexPoints;
 		footprint.Life = std::round(FOOTPRINT_LIFE_MAX * FPS);
 		footprint.LifeStartFading = std::round(FOOTPRINT_LIFE_START_FADING * FPS);
-		footprint.Opacity = FOOTPRINT_OPACITY_MAX;
-		footprint.OpacityStart = footprint.Opacity;
+		footprint.Opacity =
+		footprint.OpacityStart = FOOTPRINT_OPACITY_MAX;
 
 		if (Footprints.size() >= FOOTPRINT_NUM_MAX)
 			Footprints.pop_back();
@@ -217,7 +217,7 @@ namespace TEN::Effects::Footprint
 			return;
 
 		// Get footstep sound for floor material.
-		auto sfx = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
+		auto sfx = GetFootprintSfx(pointColl.BottomBlock->Material);
 
 		// HACK: Must be here until reference WAD2 is revised.
 		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)

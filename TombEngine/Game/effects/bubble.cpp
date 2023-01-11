@@ -26,7 +26,10 @@ namespace TEN::Effects::Bubble
 		for (auto& bubble : Bubbles)
 		{
 			if (!bubble.IsActive)
+			{
+				bubble = {};
 				return bubble;
+			}
 
 			if (oldestAge < bubble.Life)
 			{
@@ -35,6 +38,7 @@ namespace TEN::Effects::Bubble
 			}
 		}
 
+		*oldestBubblePtr = {};
 		return *oldestBubblePtr;
 	}
 
@@ -48,7 +52,6 @@ namespace TEN::Effects::Bubble
 		float shade = Random::GenerateFloat(0.3f, 0.8f);
 		float maxAmplitude = (flags & BubbleFlags::HighAmplitude) ? 256.0f : 32.0f;
 
-		bubble = Bubble();
 		bubble.IsActive = true;
 		bubble.SpriteIndex = (flags & BubbleFlags::Clump) ? SPR_UNKNOWN1 : SPR_BUBBLES;
 
@@ -77,6 +80,7 @@ namespace TEN::Effects::Bubble
 			if (!bubble.IsActive)
 				continue;
 
+			// TODO: Make life decrement like with other effects.
 			bubble.Life++;
 
 			float alpha = std::min(bubble.Life / 15.0f, 1.0f);
@@ -122,6 +126,6 @@ namespace TEN::Effects::Bubble
 
 	void ClearBubbles()
 	{
-		Bubbles.fill(Bubble());
+		Bubbles.fill({});
 	}
 }
