@@ -332,6 +332,7 @@ namespace TEN::Entities
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
+			obj->ZoneType = ZoneType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
 
@@ -661,7 +662,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(6, ROT_X|ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X|ROT_Y);
 		}
