@@ -24,17 +24,15 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SHIVA_WALK_TURN_RATE_MAX = ANGLE(4.0f);
 	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
-	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(SECTOR(4) / 3);
 	constexpr auto SHIVA_GRAB_ATTACK_RANGE = SQUARE(SECTOR(1.25f));
 	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE = 150;
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
-	constexpr auto SHIVA_MESH_SWITCH_TIME = 50000;
 	constexpr auto LARA_ANIM_SHIVA_DEATH = 7; // TODO: move it to LaraExtraAnims enum.
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
-	const auto ShivaEffectMeshPosition = Vector3i(0, 0, 0);
-	const vector<unsigned int> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<unsigned int> ShivaAttackLeftJoints = { 10, 13 };
 	const vector<unsigned int> ShivaAttackRightJoints = { 22, 25 };
 
 	enum ShivaState
@@ -218,7 +216,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.SetFlags(2, 0);
 			else
 			{
-				auto pos = GetJointPosition(&item, item.ItemFlags[0], ShivaEffectMeshPosition);
+				auto pos = GetJointPosition(&item, item.ItemFlags[0]);
 				TriggerShivaSmoke(pos.x, pos.y, pos.z, item.RoomNumber);
 				if (isDeath)
 				{
@@ -389,7 +387,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-				else if (AI.bite && AI.distance < SHIVA_DOWNWARD_ATTACK_RANGE)
+				else if (AI.bite && AI.distance < SHIVA_GRAB_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 					creature->Flags = 0;
