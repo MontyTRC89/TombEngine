@@ -68,8 +68,8 @@ namespace TEN::Entities::TR4
 		// 5
 		// 6
 		// 7
-		BADDY_STATE_UNKNOWN_8 = 8,
-		BADDY_STATE_UNKNOWN_9 = 9,
+		BADDY_STATE_DODGE = 8,
+		BADDY_STATE_DODGE_END = 9,
 		BADDY_STATE_DRAW_GUN = 10,
 		BADDY_STATE_HOLSTER_GUN = 11,
 		BADDY_STATE_DRAW_SWORD = 12,
@@ -1199,7 +1199,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDY_STATE_UNKNOWN_8:
+			case BADDY_STATE_DODGE:
 				currentCreature->MaxTurn = 0;
 
 				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
@@ -1207,7 +1207,7 @@ namespace TEN::Entities::TR4
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
 				{
-					item->Animation.TargetState = BADDY_STATE_UNKNOWN_9;
+					item->Animation.TargetState = BADDY_STATE_DODGE_END;
 				}
 
 				break;
@@ -1321,7 +1321,7 @@ namespace TEN::Entities::TR4
 
 		if (pos.has_value())
 		{
-			if ((target.Animation.ActiveState == BADDY_STATE_UNKNOWN_8 || Random::TestProbability(1 / 2.0f)) &&
+			if ((target.Animation.ActiveState == BADDY_STATE_DODGE || Random::TestProbability(1 / 2.0f)) &&
 				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
