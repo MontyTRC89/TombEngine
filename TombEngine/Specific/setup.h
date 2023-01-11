@@ -34,6 +34,24 @@ enum ShatterType
 	SHT_EXPLODE
 };
 
+// Custom LOT definition for Creature.
+// Used in InitialiseSlot() in lot.cpp.
+enum class LOTType
+{
+	Skeleton,
+	Basic,
+	Water,
+	WaterAndLand,
+	Human,
+	HumanPlusJump,
+	HumanPlusJumpAndMonkey,
+	Flyer,
+	Blockable, // For large creatures such as trex and shiva.
+	Spider,    // Only 2 block vault allowed.
+	SophiaLee, // Prevents Sophia from going to lower levels again.
+	Ape		   // Only 2 block vault allowed.
+};
+
 struct ObjectInfo
 {
 	int nmeshes;
@@ -48,7 +66,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType ZoneType;
+	LOTType lotType = LOTType::Basic;
 	int animIndex;
 	short HitPoints;
 	short pivotLength;

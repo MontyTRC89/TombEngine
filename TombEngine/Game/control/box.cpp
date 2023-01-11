@@ -41,6 +41,35 @@ constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
 
+// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
+bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
+{
+	switch (stepCount)
+	{
+	case -3:
+		return (
+			item->ObjectNumber != ID_CIVVY &&
+			item->ObjectNumber != ID_MP_WITH_STICK &&
+			item->ObjectNumber != ID_YETI &&
+			item->ObjectNumber != ID_APE &&
+			item->ObjectNumber != ID_SMALL_SPIDER
+		);
+
+	case -2:
+		return (
+			item->ObjectNumber != ID_BADDY1 &&
+			item->ObjectNumber != ID_BADDY2 &&
+			item->ObjectNumber != ID_CIVVY &&
+			item->ObjectNumber != ID_MP_WITH_STICK &&
+			item->ObjectNumber != ID_YETI &&
+			item->ObjectNumber != ID_APE &&
+			item->ObjectNumber != ID_SMALL_SPIDER
+		);
+	}
+
+	return true;
+}
+
 void DrawBox(int boxIndex, Vector3 color)
 {
 	if (boxIndex == NO_BOX)
@@ -1151,27 +1180,6 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	return true;
 }
 
-// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
-bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
-{
-	switch (stepCount)
-	{
-	case -3:
-		return (item->ObjectNumber != ID_CIVVY &&
-				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
-
-	case -2:
-		return (item->ObjectNumber != ID_BADDY1 &&
-				item->ObjectNumber != ID_BADDY2 &&
-				item->ObjectNumber != ID_CIVVY &&
-				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
-	}
-
-	return true;
-}
-
 int CreatureVault(short itemNumber, short angle, int vault, int shift)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -1435,6 +1443,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 {
 	auto* object = &Objects[item->ObjectNumber];
+	auto* creature = GetCreatureInfo(item);
 	auto* room = &g_Level.Rooms[enemy->RoomNumber];
 	auto* floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
 
@@ -1442,8 +1451,8 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
-	if (object->ZoneType == ZoneType::Flyer ||
-	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (creature->LOT.Zone == ZoneType::Flyer ||
+	   (creature->LOT.Zone == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		isReachable = true; // If NPC is flying or swimming in water, player is always reachable.
 	}
