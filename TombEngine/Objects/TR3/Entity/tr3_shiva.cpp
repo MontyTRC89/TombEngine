@@ -241,7 +241,7 @@ namespace TEN::Entities::Creatures::TR3
 			item.Animation.TargetState = SHIVA_STATE_IDLE;
 			creature.Flags = -45;
 			item.SetFlags(1, 0);
-			item.SetFlags(1, 0); // is alive (for savegame).
+			item.SetFlags(1, 1); // is alive (for savegame).
 		}
 		else if (item.TestFlags(2, 0) && isDeath)
 		{
