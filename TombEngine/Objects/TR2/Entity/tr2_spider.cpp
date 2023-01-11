@@ -20,10 +20,11 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SMALL_SPIDER_BIG_JUMP_RANGE = SQUARE(SECTOR(0.5f));
 	constexpr auto SMALL_SPIDER_TURN_RATE_MAX = ANGLE(8.0f);
 	constexpr auto SMALL_SPIDER_DAMAGE = 25;
+	constexpr auto SMALL_SPIDER_STOP_CHANCE = 0x100;
 	constexpr auto BIG_SPIDER_STOP_RANGE = SQUARE(CLICK(3)) + 15;
 	constexpr auto BIG_SPIDER_TURN_RATE_MAX = ANGLE(4.0f);
 	constexpr auto BIG_SPIDER_DAMAGE = 100;
-	constexpr auto SPIDER_STOP_CHANCE = 0x200;
+	constexpr auto BIG_SPIDER_STOP_CHANCE = 0x200;
 
 	const auto SpiderBite = BiteInfo(Vector3(0.0f, 0.0f, 41.0f), 1);
 
@@ -98,16 +99,17 @@ namespace TEN::Entities::Creatures::TR2
 
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
-			angle = CreatureTurn(item, SMALL_SPIDER_TURN_RATE_MAX);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case SPIDER_STATE_STOP:
+				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
+					if (GetRandomControl() < SMALL_SPIDER_STOP_CHANCE)
 						item->Animation.TargetState = SPIDER_STATE_WALK;
 				}
 				else if (AI.ahead && item->TouchBits.TestAny())
@@ -120,9 +122,10 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPIDER_STATE_WALK:
+				creature->MaxTurn = SMALL_SPIDER_TURN_RATE_MAX;
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
+					if (GetRandomControl() < SMALL_SPIDER_STOP_CHANCE)
 						item->Animation.TargetState = SPIDER_STATE_STOP;
 					else
 						break;
@@ -133,6 +136,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPIDER_STATE_RUN:
+				creature->MaxTurn = SMALL_SPIDER_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
@@ -149,6 +153,7 @@ namespace TEN::Entities::Creatures::TR2
 			case SPIDER_STATE_STOP_ATTACK:
 			case SPIDER_STATE_BIG_JUMP_ATTACK:
 			case SPIDER_STATE_SMALL_JUMP_ATTACK:
+				creature->MaxTurn = 0;
 				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					DoSpiderBloodEffect(item);
@@ -202,7 +207,7 @@ namespace TEN::Entities::Creatures::TR2
 			CreatureAIInfo(item, &AI);
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
-			angle = CreatureTurn(item, BIG_SPIDER_TURN_RATE_MAX);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -212,7 +217,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < SPIDER_STOP_CHANCE)
+					if (GetRandomControl() < BIG_SPIDER_STOP_CHANCE)
 						item->Animation.TargetState = SPIDER_STATE_STOP;
 					else
 						break;
@@ -227,9 +232,10 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPIDER_STATE_WALK:
+				creature->MaxTurn = BIG_SPIDER_TURN_RATE_MAX;
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < SPIDER_STOP_CHANCE)
+					if (GetRandomControl() < BIG_SPIDER_STOP_CHANCE)
 						item->Animation.TargetState = SPIDER_STATE_STOP;
 					else
 						break;
@@ -240,6 +246,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPIDER_STATE_RUN:
+				creature->MaxTurn = BIG_SPIDER_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
@@ -250,6 +257,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPIDER_STATE_STOP_ATTACK:
+				creature->MaxTurn = 0;
 				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					DoSpiderBloodEffect(item);
