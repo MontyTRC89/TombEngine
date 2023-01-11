@@ -46,6 +46,11 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)
 	{
+	case -4:
+		return (
+			item->ObjectNumber != ID_SMALL_SPIDER
+		);
+
 	case -3:
 		return (
 			item->ObjectNumber != ID_CIVVY &&
@@ -926,6 +931,7 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 	if (boxNumber == NO_BOX)
 		return false;
 
+	auto* object = &Objects[item->ObjectNumber];
 	auto* creature = GetCreatureInfo(item);
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
@@ -1195,7 +1201,7 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	// FIXME: Add climb down animations for Von Croy and baddies?
 	if (item->Floor > y + CLICK(4.5f))
 		vault = 0;
-	else if (item->Floor > y + CLICK(3.5f))
+	else if (item->Floor > y + CLICK(3.5f) && IsCreatureVaultAvailable(item, -4))
 		vault = -4;
 	else if (item->Floor > y + CLICK(2.5f) && IsCreatureVaultAvailable(item, -3))
 		vault = -3;

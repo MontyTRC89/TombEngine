@@ -251,6 +251,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->lotType = LOTType::Spider;
 		obj->SetupHitEffect();
 	}
 
