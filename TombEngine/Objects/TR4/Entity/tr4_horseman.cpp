@@ -93,7 +93,7 @@ namespace TEN::Entities::TR4
 
 	enum HorseState
 	{
-		HORSE_STATE_NONE = 0,
+		// No state 0.
 		HORSE_STATE_IDLE = 1,
 		HORSE_STATE_RUN_FORWARD = 2,
 		HORSE_STATE_WALK_FORWARD = 3,
@@ -119,7 +119,25 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	static void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
+	void InitialiseHorse(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		SetAnimation(item, HORSE_ANIM_IDLE);
+		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
+		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
+	}
+
+	void InitialiseHorseman(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, HORSEMAN_ANIM_IDLE);
+		item->ItemFlags[0] = NO_ITEM; // No horse yet.
+	}
+
+	void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
@@ -190,26 +208,6 @@ namespace TEN::Entities::TR4
 			spark->xVel = -phd_sin((random & 0x7FF) + param1 - 1024) * 4096;
 			spark->zVel = phd_cos((random & 0x7FF) + param1 - 1024) * 4096;
 		}
-	}
-
-	void InitialiseHorse(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSE];
-
-		SetAnimation(item, HORSE_ANIM_IDLE);
-		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
-		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
-	}
-
-	void InitialiseHorseman(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSEMAN];
-
-		ClearItem(itemNumber);
-		SetAnimation(item, HORSEMAN_ANIM_IDLE);
-		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}
 
 	void HorsemanControl(short itemNumber)

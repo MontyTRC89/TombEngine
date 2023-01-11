@@ -33,6 +33,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO
 	enum ChefAnim
 	{
+		CHEF_ANIM_IDLE = 0,
 		CHEF_ANIM_DEATH = 16
 	};
 
@@ -40,8 +41,8 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		SetAnimation(item, 0);
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
 	}

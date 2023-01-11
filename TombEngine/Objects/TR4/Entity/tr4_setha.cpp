@@ -109,26 +109,10 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE = 28
 	};
 
-	void SetupSeth(ObjectInfo& object)
-	{
-		object.initialise = InitialiseSeth;
-		object.control = SethControl;
-		object.collision = CreatureCollision;
-		object.shadowType = ShadowMode::All;
-		object.HitPoints = 500;
-		object.hitEffect = HIT_NONE;
-		object.pivotLength = 50;
-		object.radius = 341;
-		object.intelligent = true;
-		object.undead = true;
-		object.ZoneType = ZoneType::Basic;
-	}
-
 	void InitialiseSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
@@ -675,7 +659,7 @@ namespace TEN::Entities::TR4
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
-		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 - flags;
 	}
 
 	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)

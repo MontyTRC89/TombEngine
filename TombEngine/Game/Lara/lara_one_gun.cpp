@@ -557,7 +557,7 @@ ItemInfo* FireHarpoon(ItemInfo* laraItem)
 
 	auto& item = g_Level.Items[itemNumber];
 
-	item.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 	item.ObjectNumber = ID_HARPOON;
 	item.RoomNumber = laraItem->RoomNumber;
 
@@ -661,7 +661,7 @@ void FireGrenade(ItemInfo* laraItem)
 
 	auto& item = g_Level.Items[itemNumber];
 		
-	item.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 	item.ObjectNumber = ID_GRENADE;
 	item.RoomNumber = laraItem->RoomNumber;
 
@@ -690,7 +690,7 @@ void FireGrenade(ItemInfo* laraItem)
 
 	InitialiseItem(itemNumber);
 
-	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x;
+	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x + ANGLE(180);
 	item.Pose.Orientation.y = laraItem->Pose.Orientation.y + lara.LeftArm.Orientation.y;
 	item.Pose.Orientation.z = 0;
 
@@ -701,7 +701,7 @@ void FireGrenade(ItemInfo* laraItem)
 	}
 
 	item.Animation.Velocity.z = GRENADE_VELOCITY;
-	item.Animation.Velocity.y = -CLICK(2) * phd_sin(item.Pose.Orientation.x);
+	item.Animation.Velocity.y = CLICK(2) * phd_sin(item.Pose.Orientation.x);
 	item.Animation.ActiveState = item.Pose.Orientation.x;
 	item.Animation.TargetState = item.Pose.Orientation.y;
 	item.Animation.RequiredState = NO_STATE;
@@ -738,7 +738,7 @@ void GrenadeControl(short itemNumber)
 {
 	auto& item = g_Level.Items[itemNumber];
 
-	item.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Check if above water and update Y and Z velocities.
 	bool aboveWater = false;
@@ -907,7 +907,7 @@ void RocketControl(short itemNumber)
 		item.Pose.Orientation.z += short((item.Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f);
 	}
 
-	item.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks.
 	auto world = Matrix::CreateFromYawPitchRoll(
@@ -959,7 +959,7 @@ void FireCrossbow(ItemInfo* laraItem, Pose* pos)
 
 	auto& item = g_Level.Items[itemNumber];
 	item.ObjectNumber = ID_CROSSBOW_BOLT;
-	item.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	if (!ammo.HasInfinite())
 		ammo--;
@@ -1338,7 +1338,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 
 		auto& newGrenade = g_Level.Items[newGrenadeItemNumber];
 
-		newGrenade.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		newGrenade.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		newGrenade.ObjectNumber = ID_GRENADE;
 		newGrenade.RoomNumber = projectile.RoomNumber;
 		newGrenade.Pose.Position.x = Random::GenerateInt(0, 512) + projectile.Pose.Position.x - CLICK(1);

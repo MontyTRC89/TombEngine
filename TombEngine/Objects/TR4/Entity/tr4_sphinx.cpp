@@ -26,6 +26,7 @@ namespace TEN::Entities::TR4
 	enum SphinxState
 	{
 		// No state 0.
+		SPHINX_STATE_NONE = 0,
 		SPHINX_STATE_REST = 1,
 		SPHINX_STATE_REST_ALERTED = 2,
 		SPHINX_STATE_SLEEP_TO_IDLE = 3,
@@ -61,12 +62,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SPHINX_ANIM_REST;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SPHINX_STATE_REST;
-		item->Animation.ActiveState = SPHINX_STATE_REST;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, SPHINX_ANIM_REST);
 	}
 
 	void SphinxControl(short itemNumber)

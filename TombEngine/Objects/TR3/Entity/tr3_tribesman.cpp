@@ -382,7 +382,7 @@ namespace TEN::Entities::Creatures::TR3
 		dartItem->Pose.Orientation = orient;
 		dartItem->Animation.Velocity.z = CLICK(1);
 		dartItem->TriggerFlags = TRIBESMAN_DART_DAMAGE;
-		dartItem->Color = item->Color;
+		dartItem->Model.Color = item->Model.Color;
 
 		AddActiveItem(dartItemNumber);
 		dartItem->Status = ITEM_ACTIVE;

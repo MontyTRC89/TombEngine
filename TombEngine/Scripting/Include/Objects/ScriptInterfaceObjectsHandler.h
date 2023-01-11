@@ -12,7 +12,8 @@ using VarMapVal = std::variant<
 	std::reference_wrapper<SinkInfo>,
 	std::reference_wrapper<SoundSourceInfo>,
 	std::reference_wrapper<TriggerVolume>,
-	std::reference_wrapper<AI_OBJECT>>;
+	std::reference_wrapper<AI_OBJECT>,
+	std::reference_wrapper<ROOM_INFO>>;
 
 using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
 

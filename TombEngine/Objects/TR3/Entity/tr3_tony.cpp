@@ -729,9 +729,4 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 2, torsoY >> 1);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
-
-	void S_DrawTonyBoss(ItemInfo* item)
-	{
-		DrawAnimatingItem(item);
-	}
 }

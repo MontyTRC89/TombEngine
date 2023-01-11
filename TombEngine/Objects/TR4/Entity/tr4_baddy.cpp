@@ -208,8 +208,8 @@ namespace TEN::Entities::TR4
 	void InitialiseBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-	
-		ClearItem(itemNumber);
+
+		InitialiseCreature(itemNumber);
 
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
@@ -217,7 +217,7 @@ namespace TEN::Entities::TR4
 		{
 			item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN);
 			item->MeshBits = 0xFF81FFFF;
-			item->ItemFlags[2] = BADDY_USE_UZI;
+			item->ItemFlags[2] = BADDY_UZI_AMMO;
 		}
 		else
 		{
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR4
 		// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 		if (ocb > 9 && ocb < 20)
 		{
-			item->ItemFlags[2] += BADDY_USE_UZI;
+			item->ItemFlags[2] += BADDY_UZI_AMMO;
 			item->TriggerFlags -= 10;
 			ocb -= 10;
 		}
@@ -403,11 +403,11 @@ namespace TEN::Entities::TR4
 			{
 				currentItem = &g_Level.Items[itemNum];
 				if ((currentItem->ObjectNumber == ID_SMALLMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
+					 currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
+					 currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
 					SameZone(creature, currentItem))
 				{
-					if (item->Status != ITEM_INVISIBLE)
+					if (currentItem->Status != ITEM_INVISIBLE)
 					{
 						creature->Enemy = currentItem;
 						break;
@@ -1102,7 +1102,7 @@ namespace TEN::Entities::TR4
 				else if (currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM)
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				else if (currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM)
-					item->ItemFlags[2] += BADDY_USE_UZI;
+					item->ItemFlags[2] += BADDY_UZI_AMMO;
 				else
 				{
 					currentCreature->Enemy = nullptr;
@@ -1111,7 +1111,7 @@ namespace TEN::Entities::TR4
 			
 				KillItem(currentCreature->Enemy - g_Level.Items.data());
 
-				// cancel enemy pointer for other active baddys
+				// Cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)

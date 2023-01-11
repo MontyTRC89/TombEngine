@@ -1796,7 +1796,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
 				StaticObjects[mesh.staticNumber].shatterType != SHT_NONE)
 			{
-				SoundEffect(GetShatterSound(mesh.staticNumber), (Pose*&)mesh);
+				SoundEffect(GetShatterSound(mesh.staticNumber), &mesh.pos);
 				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)

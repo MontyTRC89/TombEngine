@@ -27,7 +27,7 @@ namespace TEN::Entities::Switches
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		switchItem->Flags |= 0x3E00;
+		switchItem->Flags |= CODE_BITS;
 
 		if (!TriggerActive(switchItem) && !(switchItem->Flags & IFLAG_INVISIBLE))
 		{

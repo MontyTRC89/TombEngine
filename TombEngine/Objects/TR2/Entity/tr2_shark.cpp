@@ -41,7 +41,6 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 

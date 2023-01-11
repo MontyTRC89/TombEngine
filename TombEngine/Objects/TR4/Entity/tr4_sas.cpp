@@ -104,46 +104,11 @@ namespace TEN::Entities::TR4
 		SAS_ANIM_BLIND_TO_STAND = 29
 	};
 
-	void SetupSas(ObjectInfo& object)
-	{
-		object.initialise = InitialiseSas;
-		object.control = SasControl;
-		object.collision = CreatureCollision;
-		object.shadowType = ShadowMode::All;
-		object.biteOffset = 10;
-		object.HitPoints = 40;
-		object.hitEffect = HIT_BLOOD;
-		object.pivotLength = 50;
-		object.radius = 102;
-		object.intelligent = true;
-		object.ZoneType = ZoneType::HumanClassic;
-
-		g_Level.Bones[object.boneIndex] |= ROT_Y;
-		g_Level.Bones[object.boneIndex] |= ROT_X;
-		g_Level.Bones[object.boneIndex + 28 * 4] |= ROT_Y;
-		g_Level.Bones[object.boneIndex + 28 * 4] |= ROT_X;
-	}
-
-	void SetupInjuredSas(ObjectInfo& object)
-	{
-		object.initialise = InitialiseInjuredSas;
-		object.control = InjuredSasControl;
-		object.collision = ObjectCollision;
-		object.hitEffect = HIT_BLOOD;
-		object.ZoneType = ZoneType::Basic;
-	}
-
-	void SetupSasDraggableSas(ObjectInfo& object)
-	{
-		object.control = AnimatingControl;
-		object.collision = SasDragBlokeCollision;
-	}
-
 	void InitialiseSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SAS_ANIM_STAND);
 	}
 
@@ -688,7 +653,7 @@ namespace TEN::Entities::TR4
 
 		auto grenadeItem = &g_Level.Items[itemNumber];
 
-		grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		grenadeItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		grenadeItem->ObjectNumber = ID_GRENADE;
 		grenadeItem->RoomNumber = item.RoomNumber;
 

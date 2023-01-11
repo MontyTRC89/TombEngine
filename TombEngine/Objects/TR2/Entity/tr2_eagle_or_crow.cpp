@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -31,7 +32,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->ObjectNumber == ID_CROW)
 		{
@@ -62,12 +63,13 @@ namespace TEN::Entities::Creatures::TR2
 			switch (item->Animation.ActiveState)
 			{
 			case 4:
-				if (item->Pose.Position.y > item->Floor)
+				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Animation.Velocity.y = 0.0f;
 					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = 5;
 					item->Pose.Position.y = item->Floor;
+					AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 				}
 
 				break;

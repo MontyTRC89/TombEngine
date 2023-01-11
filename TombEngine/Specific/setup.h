@@ -17,14 +17,14 @@ enum JointRotationFlags
 	ROT_Z = (1 << 4)
 };
 
-enum HitEffectEnum
+enum class HitEffect
 {
-    HIT_NONE,
-    HIT_BLOOD,
-    HIT_SMOKE,
-    HIT_RICOCHET,
-	HIT_SPECIAL,
-    MAX_HIT_EFFECT
+    None,
+    Blood,
+    Smoke,
+    Richochet,
+	Special,
+    Max
 };
 
 enum ShatterType
@@ -36,9 +36,9 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	int nmeshes; 
+	int nmeshes;
 	int meshIndex;
-	int boneIndex; 
+	int boneIndex;
 	int frameBase;
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
@@ -49,28 +49,70 @@ struct ObjectInfo
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 	ZoneType ZoneType;
-	int animIndex; 
-	short HitPoints; 
-	short pivotLength; 
-	short radius; 
+	int animIndex;
+	short HitPoints;
+	short pivotLength;
+	short radius;
 	ShadowMode shadowType;
-	short biteOffset; 
+	short biteOffset;
 	bool loaded;
 	bool intelligent;
 	bool nonLot;
 	bool waterCreature;
 	bool usingDrawAnimatingItem;
-	HitEffectEnum hitEffect;
+	HitEffect hitEffect;
 	bool undead;
 	bool isPickup;
 	bool isPuzzleHole;
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
-	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint().
-	void SetBoneRotation(int boneID, int flags)
+	/// <summary>
+	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
+	/// </summary>
+	/// <param name="boneID">the mesh id - 1</param>
+	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
+	void SetBoneRotationFlags(int boneID, int flags)
 	{
 		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+	}
+
+	/// <summary>
+	/// Use this to set up a hit rffect for the slot based on its value.
+	/// </summary>
+	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
+	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
+	{
+		// Avoid some objects such as ID_SAS_DYING having None.
+		if (isAlive)
+		{
+			hitEffect = HitEffect::Blood;
+			return;
+		}
+
+		if (intelligent)
+		{
+			if (isSolid && HitPoints > 0)
+			{
+				hitEffect = HitEffect::Richochet;
+			}
+			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			{
+				hitEffect = HitEffect::Smoke;
+			}
+			else if (!undead && HitPoints > 0)
+			{
+				hitEffect = HitEffect::Blood;
+			}
+		}
+		else if (isSolid && HitPoints <= 0)
+		{
+			hitEffect = HitEffect::Richochet;
+		}
+		else
+		{
+			hitEffect = HitEffect::None;
+		}
 	}
 };
 

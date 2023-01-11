@@ -62,14 +62,13 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO
 	enum CivvyAnim
 	{
-
 		CIVVY_ANIM_IDLE = 6,
 
 		CIVVY_ANIM_DEATH = 26,
 		CIVVY_CLIMB3_ANIM = 27,
 		CIVVY_CLIMB1_ANIM = 28,
 		CIVVY_CLIMB2_ANIM = 29,
-		CIVVY_FALL3_ANIM = 30
+		CIVVY_FALL4_ANIM = 30
 	};
 
 	void InitialiseCivvy(short itemNumber)
@@ -128,7 +127,7 @@ namespace TEN::Entities::Creatures::TR3
 				int laraDz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				int laraDx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				laraAI.angle = phd_atan(laraDz, laraDx) - item->Pose.Orientation.y;
-				laraAI.distance = pow(laraDx, 2) + pow(laraDz, 2);
+				laraAI.distance = SQUARE(laraDx) + SQUARE(laraDz);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -197,7 +196,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = CIVVY_STATE_RUN_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Bored ||
-					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
+					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > SQUARE(SECTOR(2)))))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -260,7 +259,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = CIVVY_STATE_IDLE;
 					break;
 				}
-				else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+				else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > SQUARE(SECTOR(2))))
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = CIVVY_STATE_WALK_FORWARD;
@@ -392,23 +391,23 @@ namespace TEN::Entities::Creatures::TR3
 			switch (CreatureVault(itemNumber, angle, 2, CIVVY_VAULT_SHIFT))
 			{
 			case 2:
-				SetAnimation(item, CIVVY_CLIMB1_ANIM);
 				creature->MaxTurn = 0;
+				SetAnimation(item, CIVVY_CLIMB1_ANIM);
 				break;
 
 			case 3:
-				SetAnimation(item, CIVVY_CLIMB2_ANIM);
 				creature->MaxTurn = 0;
+				SetAnimation(item, CIVVY_CLIMB2_ANIM);
 				break;
 
 			case 4:
-				SetAnimation(item, CIVVY_CLIMB3_ANIM);
 				creature->MaxTurn = 0;
+				SetAnimation(item, CIVVY_CLIMB3_ANIM);
 				break;
 
 			case -4:
-				SetAnimation(item, CIVVY_FALL3_ANIM);
 				creature->MaxTurn = 0;
+				SetAnimation(item, CIVVY_FALL4_ANIM);
 				break;
 			}
 		}

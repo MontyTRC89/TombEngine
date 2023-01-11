@@ -29,6 +29,7 @@ namespace TEN::Entities::TR4
 
 	enum SmallScorionState
 	{
+		// No state 0.
 		SSCORPION_STATE_IDLE = 1,
 		SSCORPION_STATE_WALK = 2,
 		SSCORPION_STATE_RUN = 3,
@@ -55,7 +56,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 

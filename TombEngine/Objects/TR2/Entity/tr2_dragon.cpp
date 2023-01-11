@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR2
 			back->Pose.Orientation.y = item->Pose.Orientation.y;
 			back->RoomNumber = item->RoomNumber;
 			back->Status = ITEM_INVISIBLE;
-			back->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			back->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(backItem);
 			back->MeshBits = 0x1FFFFF;
@@ -481,7 +481,7 @@ namespace TEN::Entities::Creatures::TR2
 			front->Pose.Orientation.y = item->Pose.Orientation.y;
 			front->RoomNumber = item->RoomNumber;
 			front->Status = ITEM_INVISIBLE;
-			front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(frontItem);
 
@@ -528,7 +528,7 @@ namespace TEN::Entities::Creatures::TR2
 					front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 					front->Pose.Position.z = item->Pose.Position.z;
 					front->RoomNumber = item->RoomNumber;
-					front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+					front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 					InitialiseItem(frontItem);
 					AddActiveItem(frontItem);

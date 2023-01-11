@@ -81,9 +81,12 @@ struct EntityAnimationData
 
 struct EntityModelData
 {
-	int BaseMesh;
-	std::vector<int> MeshIndex = {};
-	std::vector<BoneMutator> Mutator = {};
+	int BaseMesh = 0;
+
+	Vector4 Color = Vector4::Zero;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutator   = {};
 };
 
 struct EntityCallbackData
@@ -136,7 +139,6 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	Vector4 Color;
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();
@@ -172,10 +174,9 @@ bool TestState(int refState, const std::vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNumber);
+void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 void InitialiseFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);

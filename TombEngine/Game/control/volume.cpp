@@ -56,14 +56,14 @@ namespace TEN::Control::Volumes
 		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
-	void HandleEvent(VolumeEvent& evt, VolumeActivator& activator)
+	void HandleEvent(VolumeEvent& event, VolumeActivator& activator)
 	{
-		if (evt.Function.empty() || evt.CallCounter == 0)
+		if (event.Function.empty() || event.CallCounter == 0)
 			return;
 
-		g_GameScript->ExecuteFunction(evt.Function, activator, evt.Data);
-		if (evt.CallCounter != NO_CALL_COUNTER)
-			evt.CallCounter--;
+		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
+		if (event.CallCounter != NO_CALL_COUNTER)
+			event.CallCounter--;
 	}
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)

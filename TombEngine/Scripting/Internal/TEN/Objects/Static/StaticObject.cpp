@@ -156,6 +156,7 @@ void Static::SetPos(Vec3 const& pos)
 	m_mesh.pos.Position.x = pos.x;
 	m_mesh.pos.Position.y = pos.y;
 	m_mesh.pos.Position.z = pos.z;
+	m_mesh.Dirty = true;
 }
 
 float Static::GetScale() const
@@ -166,6 +167,7 @@ float Static::GetScale() const
 void Static::SetScale(float const& scale)
 {
 	m_mesh.scale = scale;
+	m_mesh.Dirty = true;
 }
 
 // This does not guarantee that the returned value will be identical
@@ -222,6 +224,7 @@ int Static::GetSlot() const
 void Static::SetSlot(int slot)
 {
 	m_mesh.staticNumber = slot;
+	m_mesh.Dirty = true;
 }
 
 ScriptColor Static::GetColor() const
@@ -232,6 +235,7 @@ ScriptColor Static::GetColor() const
 void Static::SetColor(ScriptColor const& col)
 {
 	m_mesh.color = col;
+	m_mesh.Dirty = true;
 }
 
 void Static::Shatter()
