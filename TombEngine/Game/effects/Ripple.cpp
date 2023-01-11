@@ -49,16 +49,14 @@ namespace TEN::Effects::Ripple
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
 		ripple.Normal = normal;
-		ripple.Life = Random::GenerateFloat(16.0f, 64.0f);
+		ripple.Life = Random::GenerateFloat(16.0f, ripple.Flags.Test(RippleFlags::Ground) ? 24.0f : 64.0f);
 		ripple.Init = 1.0f;
 		ripple.Scale = scale;
 		ripple.Flags.Set(flags);
 
-		if (ripple.Flags.Test(RippleFlags::NoRandom))
+		// Slightly randomize 2D ripple position.
+		if (ripple.Flags.Test(RippleFlags::RandomizePosition))
 			ripple.Position += Vector3(Random::GenerateFloat(-64.0f, 64.0f), 0.0f, Random::GenerateFloat(-64.0f, 64.0f));
-
-		if (ripple.Flags.Test(RippleFlags::Ground))
-			ripple.Life = Random::GenerateFloat(16.0f, 24.0f);
 	}
 
 	void UpdateRipples()
@@ -80,8 +78,6 @@ namespace TEN::Effects::Ripple
 			if (ripple.Init == 0.0f)
 			{
 				ripple.Life -= 3.0f;
-				if (ripple.Life > 250.0f)
-					ripple.Flags.ClearAll();
 			}
 			else if (ripple.Init < ripple.Life)
 			{

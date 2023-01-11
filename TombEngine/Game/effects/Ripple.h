@@ -9,10 +9,10 @@ namespace TEN::Effects::Ripple
 
 	enum RippleFlags
 	{
-		ShortInit  = 1,
-		LowOpacity = 2,
-		NoRandom   = 3,
-		Ground	   = 4,
+		ShortInit		  = 1,
+		LowOpacity		  = 2,
+		RandomizePosition = 3,
+		Ground			  = 4,
 
 		Count
 	};
@@ -27,9 +27,8 @@ namespace TEN::Effects::Ripple
 		Vector4 Color	 = Vector4::Zero;
 
 		float Life	  = 0.0f;
-		float Scale	  = 0.0f;
-		float Opacity = 0.0f;
 		float Init	  = 0.0f;
+		float Scale	  = 0.0f;
 
 		BitField Flags = BitField(RippleFlags::Count);
 	};
