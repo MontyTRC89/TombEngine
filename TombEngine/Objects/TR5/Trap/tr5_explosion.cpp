@@ -61,8 +61,11 @@ void ExplosionControl(short itemNumber)
 	if (TriggerActive(item))
 	{
 		item->Flags |= IFLAG_INVISIBLE;
+
 		if (item->ItemFlags[0] < item->TriggerFlags)
+		{
 			++item->ItemFlags[0];
+		}
 		else if (item->ItemFlags[0] == item->TriggerFlags)
 		{
 			int flag;
@@ -70,16 +73,26 @@ void ExplosionControl(short itemNumber)
 
 			if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) ||
 				TestEnvironment(ENV_FLAG_SWAMP, item->RoomNumber))
+			{
 				flag = 1;
+			}
 			else
+			{
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;
+			}
 			
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 1.5f);
 			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
 			
 			for (int i = 0; i < item->ItemFlags[2]; ++i)
-				TriggerExplosionSparks(item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, flag, item->RoomNumber);
+			{
+				TriggerExplosionSparks(
+					item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2],
+					item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2],
+					item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2],
+					2, 0, flag, item->RoomNumber);
+			}
 			
 			Pose pos;
 			pos.Position.x = item->Pose.Position.x;
@@ -102,12 +115,12 @@ void ExplosionControl(short itemNumber)
 				int dy = vec.y - item->Pose.Position.y;
 				int dz = vec.z - item->Pose.Position.z;
 				
-				if (abs(dx) < SECTOR(1) &&
-					abs(dy) < SECTOR(1) &&
-					abs(dz) < SECTOR(1))
+				if (abs(dx) < BLOCK(1) &&
+					abs(dy) < BLOCK(1) &&
+					abs(dz) < BLOCK(1))
 				{
 					int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
-					if (distance < SECTOR(2))
+					if (distance < BLOCK(2))
 					{
 						DoDamage(LaraItem, distance / 16);
 
@@ -177,7 +190,9 @@ void ExplosionControl(short itemNumber)
 				}
 			}
 			else
+			{
 				KillItem(itemNumber);
+			}
 		}
 	}
 }

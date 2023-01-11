@@ -459,9 +459,10 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
+	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
+
 	int dx, i, dz, scalar;
 	unsigned char r, g, b;
-	unsigned char extras_table[4] = { 0, 4, 7, 10 };
 
 	dx = LaraItem->Pose.Position.x - x;
 	dz = LaraItem->Pose.Position.z - z;
@@ -469,6 +470,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 	if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 		return;
+	}
 
 	if (roomNumber < 0)
 	{
@@ -476,9 +478,9 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		scalar = 1;
 	}
 
-		auto& spark = *GetFreeParticle();
-		spark.on = true;
-		spark.sR = 255;
+	auto& spark = *GetFreeParticle();
+	spark.on = true;
+	spark.sR = 255;
 
 		if (uw == 1)
 		{
@@ -507,54 +509,55 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			spark.age = 0;		
 		}
 
-		spark.extras = unsigned char(extraTrig | ((extras_table[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
-		spark.dynamic = (char)dynamic;
+	spark.extras = unsigned char(extraTrig | ((extrasTable[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
+	spark.dynamic = (char)dynamic;
 
-		if (dynamic == -2)
+	if (dynamic == -2)
+	{
+		for ( i = 0; i < 8; i++)
 		{
-				for ( i = 0; i < 8; i++)
-				{
-					auto dynsp = &ParticleDynamics[i];
+			auto dynsp = &ParticleDynamics[i];
 
-					if (!dynsp->On)
-					{
-						dynsp->On = true;
-						dynsp->Falloff = 4;
+			if (!dynsp->On)
+			{
+				dynsp->On = true;
+				dynsp->Falloff = 4;
 
-						if (uw == 1)
-							dynsp->Flags = 2;
-						else
-							dynsp->Flags = 1;
+				if (uw == 1)
+					dynsp->Flags = 2;
+				else
+					dynsp->Flags = 1;
 
-						spark.dynamic = (char)i;
-						break;
-					}							
-				}
-				if (i == 8)
-					spark.dynamic = -1;			
+				spark.dynamic = (char)i;
+				break;
+			}							
 		}
+		
+		if (i == 8)
+			spark.dynamic = -1;			
+	}
 
-		spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
-		spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
-		spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
+	spark.xVel = (GetRandomControl() & 0xFFF) - 2048;
+	spark.yVel = (GetRandomControl() & 0xFFF) - 2048;
+	spark.zVel = (GetRandomControl() & 0xFFF) - 2048;
 
-		if (dynamic != -2 || uw == 1)
-		{
-			spark.x = (GetRandomControl() & 0x1F) + x - 16;
-			spark.y = (GetRandomControl() & 0x1F) + y - 16;
-			spark.z = (GetRandomControl() & 0x1F) + z - 16;
-		}
-		else
-		{
-			spark.x = (GetRandomControl() & 0x1FF) + x - 256;
-			spark.y = (GetRandomControl() & 0x1FF) + y - 256;
-			spark.z = (GetRandomControl() & 0x1FF) + z - 256;
-		}
+	if (dynamic != -2 || uw == 1)
+	{
+		spark.x = (GetRandomControl() & 0x1F) + x - 16;
+		spark.y = (GetRandomControl() & 0x1F) + y - 16;
+		spark.z = (GetRandomControl() & 0x1F) + z - 16;
+	}
+	else
+	{
+		spark.x = (GetRandomControl() & 0x1FF) + x - 256;
+		spark.y = (GetRandomControl() & 0x1FF) + y - 256;
+		spark.z = (GetRandomControl() & 0x1FF) + z - 256;
+	}
 
-		if (uw == 1)
-			spark.friction = 17;
-		else
-			spark.friction = 51;
+	if (uw == 1)
+		spark.friction = 17;
+	else
+		spark.friction = 51;
 
 		if (GetRandomControl() & 1)
 		{
@@ -571,37 +574,41 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		else
 			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
 
-		spark.scalar = 3;
-		spark.gravity = 0;
-		spark.size = (GetRandomControl() & 0xF) + 40;
-		spark.sSize = spark.size * scalar;
-		spark.dSize = spark.size * (scalar + 1);
-		spark.size *= scalar;
-		GetRandomControl();
-		spark.maxYvel = 0;
+	spark.scalar = 3;
+	spark.gravity = 0;
+	spark.size = (GetRandomControl() & 0xF) + 40;
+	spark.sSize = spark.size * scalar;
+	spark.dSize = spark.size * (scalar + 1);
+	spark.size *= scalar;
+	GetRandomControl();
+	spark.maxYvel = 0;
 
-		if (uw == 2)
-		{
-			r = spark.sR;
-			g = spark.sG;
-			b = spark.sB;
-			spark.sR = b;
-			spark.sG = r;
-			spark.sB = g;
+	if (uw == 2)
+	{
+		r = spark.sR;
+		g = spark.sG;
+		b = spark.sB;
+		spark.sR = b;
+		spark.sG = r;
+		spark.sB = g;
 
-			r = spark.dR;
-			g = spark.dG;
-			b = spark.dB;
-			spark.dR = b;
-			spark.dG = r;
-			spark.dB = g;
+		r = spark.dR;
+		g = spark.dG;
+		b = spark.dB;
+		spark.dR = b;
+		spark.dG = r;
+		spark.dB = g;
 
-			spark.flags |= SP_PLASMAEXP;
-		}
-		else if (extraTrig)
-			TriggerExplosionSmoke(x, y, z, uw);
-		else
-			TriggerExplosionSmokeEnd(x, y, z, uw);
+		spark.flags |= SP_PLASMAEXP;
+	}
+	else if (extraTrig)
+	{
+		TriggerExplosionSmoke(x, y, z, uw);
+	}
+	else
+	{
+		TriggerExplosionSmokeEnd(x, y, z, uw);
+	}
 }
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
@@ -735,7 +742,8 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 	
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+		dz >= -BLOCK(16) && dz <= BLOCK(16))
 	{
 		auto* spark = GetFreeParticle();
 
