@@ -99,6 +99,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, SHIVA_ANIM_INACTIVE);
+		item->Status &= ~ITEM_INVISIBLE;
 		item->SetFlags(0, 0); // mesh id, used for swapping mesh.
 		if (item->TestFlags(1, 0))
 		{
