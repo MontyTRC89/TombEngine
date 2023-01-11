@@ -22,13 +22,12 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
 	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE		= 150;
 
-	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(BLOCK(4) / 3);
 	constexpr auto SHIVA_GRAB_ATTACK_RANGE	   = SQUARE(BLOCK(1.25f));
 
 	constexpr auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
 	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
 
-	constexpr auto SHIVA_MESH_SWITCH_TIME  = 50000;
 	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
