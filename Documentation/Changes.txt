@@ -1,8 +1,14 @@
 Version 1.0.6
 =============
 
-* Add an option to activate lua or node events from legacy triggers.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
+* Fix the double activation of TR4 seth blades when used an OCB different than 0.
+* Fix the sting attack of TR4 harpy which was not hurting nor poisoning Lara.
+* Fix TR4 skeleton spawn when used with OCB 3
+* Fix TR4 SAS teleporting over the blocks he walks by.
+* Add the undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
+* Add an option to activate lua or node events from legacy triggers.
+
 
 Version 1.0.5 
 =============
