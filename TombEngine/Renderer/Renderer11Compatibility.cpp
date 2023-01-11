@@ -168,13 +168,63 @@ namespace TEN::Renderer
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
 			
+			Vector3 boxMin = Vector3(room.x + WALL_SIZE, room.maxceiling - STEP_SIZE, room.z + WALL_SIZE);
+			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * WALL_SIZE, room.minfloor + STEP_SIZE, room.z + (room.zSize - 1) * WALL_SIZE);
+			Vector3 center = (boxMin + boxMax) / 2.0f;
+			Vector3 extents = boxMax - center;
+			r->BoundingBox = BoundingBox(center, extents);
+
 			r->Neighbors.clear();
 			for (int j : room.neighbors)
 				if (g_Level.Rooms[j].Active())
 					r->Neighbors.push_back(j);
 
-			if (room.mesh.size() > 0)
-				r->StaticsToDraw.reserve(room.mesh.size());
+			if (room.doors.size() != 0)
+			{
+				r->Doors.resize(room.doors.size());
+
+				for (int l = 0; l < room.doors.size(); l++)
+				{
+					RendererDoor* door = &r->Doors[l];
+					ROOM_DOOR* oldDoor = &room.doors[l];
+
+					door->RoomNumber = oldDoor->room;
+					door->Normal = oldDoor->normal;
+
+					for (int k = 0; k < 4; k++)
+					{
+						door->AbsoluteVertices[k] = Vector4(
+							room.x + oldDoor->vertices[k].x,
+							room.y + oldDoor->vertices[k].y,
+							room.z + oldDoor->vertices[k].z,
+							1.0f
+						);
+					}
+				}
+			}
+
+			if (room.mesh.size() != 0)
+			{
+				r->Statics.resize(room.mesh.size());
+
+				for (int l = 0; l < room.mesh.size(); l++)
+				{
+					RendererStatic* staticInfo = &r->Statics[l];
+					MESH_INFO* oldMesh = &room.mesh[l];
+
+					oldMesh->Dirty = true;
+
+					staticInfo->ObjectNumber = oldMesh->staticNumber;
+					staticInfo->RoomNumber = oldMesh->roomNumber;
+					staticInfo->Color = oldMesh->color;
+					staticInfo->AmbientLight = r->AmbientLight;
+					staticInfo->Pose = oldMesh->pos;
+					staticInfo->Scale = oldMesh->scale;
+					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+
+					staticInfo->Update();
+				}
+			}
 
 			if (room.positions.size() == 0)
 				continue;
@@ -283,6 +333,7 @@ namespace TEN::Renderer
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_POINT)
 					{
@@ -293,6 +344,7 @@ namespace TEN::Renderer
 						light->Out = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_POINT;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_SHADOW)
 					{
@@ -303,6 +355,7 @@ namespace TEN::Renderer
 						light->Out = oldLight->out;
 						light->CastShadows = false;
 						light->Type = LIGHT_TYPE_SHADOW;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_SPOT)
 					{
@@ -316,6 +369,7 @@ namespace TEN::Renderer
 						light->OutRange = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
+						light->Luma = Luma(light->Color);
 					}
 
 					// Monty's temp variables for sorting
