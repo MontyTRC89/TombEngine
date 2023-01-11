@@ -21,7 +21,6 @@
 #include "Objects/TR4/Entity/tr4_guide.h" // OK
 #include "Objects/TR4/Entity/tr4_harpy.h" // OK
 #include "Objects/TR4/Entity/tr4_horseman.h" // OFF
-#include "Objects/TR4/Entity/tr4_jean_yves.h" // OK
 #include "Objects/TR4/Entity/tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_lara_double.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
@@ -41,6 +40,7 @@
 #include "Objects/TR4/Entity/tr4_hammerhead.h"
 #include "Objects/TR4/Entity/tr4_dog.h"
 #include "Objects/TR4/Entity/tr4_setha.h"
+#include "Objects/TR4/Entity/tr4_jean_yves.h"
 
 // Objects
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
@@ -81,6 +81,8 @@
 // Effects
 #include "Objects/Effects/tr4_locusts.h" // OK
 
+using namespace TEN::Entities::TR4;
+using namespace TEN::Entities::Creatures::TR4;
 using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities
@@ -237,7 +239,7 @@ namespace TEN::Entities
 			obj->SetupHitEffect();
 		}
 
-		obj = &Objects[ID_SAS_CAIRO];
+		obj = &Objects[ID_SAS];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseSas;
@@ -249,7 +251,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			//obj->ZoneType = ZoneType::Human;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -620,15 +621,6 @@ namespace TEN::Entities
 			obj->initialise = InitialiseBeetleSwarm;
 			obj->control = BeetleSwarmControl;
 			obj->drawRoutine = NULL;
-		}
-
-		obj = &Objects[ID_SAS_DYING];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseInjuredSas;
-			obj->control = InjuredSasControl;
-			obj->collision = ObjectCollision;
-			obj->SetupHitEffect(false, true);
 		}
 
 		obj = &Objects[ID_ENEMY_JEEP];

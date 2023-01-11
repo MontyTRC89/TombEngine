@@ -244,6 +244,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
+	obj = &Objects[ID_MP_WITH_LASERSIGHT];
+	if (obj->loaded)
+	{
+		// TODO: add mp_with_lasersight code !
+		// Also add bone rotation for head/torso.
+		obj->initialise = InitialiseCreature;
+		obj->control = nullptr;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 40;
+		obj->radius = 128;
+		obj->pivotLength = 50;
+		obj->intelligent = true;
+		obj->SetupHitEffect();
+	}
+
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
@@ -272,6 +288,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->ZoneType = ZoneType::SophiaLee;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();

@@ -27,7 +27,7 @@ using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Creatures::TR4
 {
 	constexpr auto SAS_SHOT_DAMAGE = 15;
 	
@@ -107,27 +107,8 @@ namespace TEN::Entities::TR4
 	void InitialiseSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SAS_ANIM_STAND);
-	}
-
-	void InitialiseInjuredSas(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-
-		if (item.TriggerFlags)
-		{
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex;
-			item.Animation.TargetState = item.Animation.ActiveState = 1;
-		}
-		else
-		{
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + 3;
-			item.Animation.TargetState = item.Animation.ActiveState = 4;
-		}
-
-		item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 	}
 
 	void SasControl(short itemNumber)
@@ -564,34 +545,6 @@ namespace TEN::Entities::TR4
 		CreatureJoint(&item, 2, joint2);
 
 		CreatureAnimation(itemNumber, angle, 0);
-	}
-
-	void InjuredSasControl(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-
-		if (item.Animation.ActiveState == 1)
-		{
-			if (Random::TestProbability(1 / 128.0f))
-			{
-				item.Animation.TargetState = 2;
-				AnimateItem(&item);
-			}
-			else if (!(byte)GetRandomControl())
-			{
-				item.Animation.TargetState = 3;
-			}
-		}
-		else if (item.Animation.ActiveState == 4 &&
-			Random::TestProbability(1 / 128.0f))
-		{
-			item.Animation.TargetState = 5;
-			AnimateItem(&item);
-		}
-		else
-		{
-			AnimateItem(&item);
-		}
 	}
 
 	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

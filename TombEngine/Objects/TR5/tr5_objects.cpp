@@ -84,22 +84,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_SAS];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGuard;
-		obj->control = GuardControl;
-		obj->collision = CreatureCollision;
-		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 40;
-		obj->radius = 102;
-		obj->pivotLength = 50;
-		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
-		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
-	}
+	// NOTE: there was ID_SAS but it don't have any slot in TR5, only TR4.
 
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
