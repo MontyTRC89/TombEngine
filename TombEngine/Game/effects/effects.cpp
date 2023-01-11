@@ -470,7 +470,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 	if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 		return;
-	}
+	
 
 	if (roomNumber < 0)
 	{
