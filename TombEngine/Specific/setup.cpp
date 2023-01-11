@@ -350,6 +350,7 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
+		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowType = ShadowMode::None;
