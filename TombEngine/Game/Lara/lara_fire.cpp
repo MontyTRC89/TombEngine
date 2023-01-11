@@ -1047,7 +1047,7 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	lara.TargetArmOrient = orient;
 }
 
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool explosive)
 {
 	const auto& lara = *GetLaraInfo(laraItem);
 	const auto& object = Objects[targetEntity->ObjectNumber];
@@ -1070,11 +1070,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 			}
 		}
 
-		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, grenade, foundJointID);
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, explosive, foundJointID);
 	}
 	else
 	{
-		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, grenade, -1);
+		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, explosive, NO_JOINT);
 	}
 }
 

@@ -1314,7 +1314,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)
+	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
 	{
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
@@ -1339,6 +1339,6 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		DoItemHit(&target, damage, grenade);
+		DoItemHit(&target, damage, explosive);
 	}
 }

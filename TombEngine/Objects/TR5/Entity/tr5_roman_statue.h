@@ -8,6 +8,6 @@ namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseRomanStatue(short itemNumber);
 	void RomanStatueControl(short itemNumber);
-	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex);
+	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex);
 	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject);;
 }

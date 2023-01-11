@@ -67,7 +67,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, int grenade, int jointIndex)> HitRoutine;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)> HitRoutine;
 
 	/// <summary>
 	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
