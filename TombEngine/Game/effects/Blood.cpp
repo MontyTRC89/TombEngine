@@ -28,7 +28,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_MIST_GRAVITY_MAX	= 2.0f;
 	constexpr auto BLOOD_MIST_GRAVITY_MIN	= 1.0f;
 	constexpr auto BLOOD_MIST_FRICTION		= 4.0f;
-	const	  auto BLOOD_MIST_ROTATION_MAX	= ANGLE(10.0f);
+	constexpr auto BLOOD_MIST_ROTATION_MAX	= ANGLE(10.0f);
 	constexpr auto BLOOD_MIST_SPHERE_RADIUS = BLOCK(1 / 8.0f);
 	constexpr auto BLOOD_MIST_SEMIANGLE		= 20.0f;
 
