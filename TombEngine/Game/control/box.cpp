@@ -251,7 +251,7 @@ void AlertAllGuards(short itemNumber)
 	}
 }
 
-bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
+bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 {
 	int xPos, zPos, ceiling, shiftX, shiftZ;
 	short top;
@@ -266,7 +266,6 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto prevPos = item->Pose.Position;
 	auto bounds = GameBoundingBox(item);
 	int y = item->Pose.Position.y + bounds.Y1;
 	short roomNumber = item->RoomNumber;
@@ -275,6 +274,7 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	auto* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 	if (floor->Box == NO_BOX)
 		return false;
+
 	int height = g_Level.Boxes[floor->Box].height;
 	int nextHeight = 0;
 
@@ -318,7 +318,9 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
 		if (!Objects[item->ObjectNumber].nonLot)
+		{
 			nextBox = LOT->Node[floor->Box].exitBox;
+		}
 		else
 		{
 			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -759,6 +761,8 @@ bool CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (!item->IsCreature())
 		return false;
 
+	auto prevPos = item->Pose.Position;
+
 	AnimateItem(item);
 	ProcessSectorFlags(item);
 	CreatureHealth(item);
@@ -769,7 +773,7 @@ bool CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
-	return CreaturePathfind(item, angle, tilt);
+	return CreaturePathfind(item, prevPos, angle, tilt);
 }
 
 void CreatureHealth(ItemInfo* item)
@@ -842,7 +846,7 @@ bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumb
 	if ((boxHeight - height) > LOT->Step || (boxHeight - height) < LOT->Drop)
 		return true;
 
-	if (boxHeight - height < -LOT->Step && height > nextHeight)
+	if ((boxHeight - height) < -LOT->Step && height > nextHeight)
 		return true;
 
 	if (LOT->Fly != NO_FLYING && y > (height + LOT->Fly))
@@ -1480,10 +1484,15 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	if (!object->nonLot)
 	{
-		if (g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		{
 			AI->enemyZone |= BLOCKED;
-		else if (creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+		}
+		else if (item->BoxNumber != NO_BOX && 
+			creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+		{
 			AI->enemyZone |= BLOCKED;
+		}
 	}
 
 	auto vector = Vector3i::Zero;

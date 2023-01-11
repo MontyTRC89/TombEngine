@@ -1,8 +1,24 @@
 Version 1.0.6
 =============
 
-* Add an option to activate lua or node events from legacy triggers.
+* Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
+* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
+* Fix the double activation of TR4 seth blades when used an OCB different than 0.
+* Fix the sting attack of TR4 harpy which was not hurting nor poisoning Lara.
+* Fix TR4 skeleton spawn when used with OCB 3
+* Fix TR4 SAS teleporting over the blocks he walks by.
+* Add the undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
+* Add an option to activate Lua or node events from legacy triggers.
+* Antitriggering an enemy will now cause it to vanish and pause.
+* Re-triggering an enemy will cause it to reappear and unpause.
+* Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
+
+Lua API changes
+* Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
+* Moveable:MeshIsVisible is now GetMeshVisible.
+* Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
+* Moveable:MeshIsSwapped is now GetMeshSwapped
 
 Version 1.0.5 
 =============

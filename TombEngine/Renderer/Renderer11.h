@@ -44,6 +44,7 @@
 #include <Renderer/IndexBuffer/IndexBuffer.h>
 #include <Renderer/Texture2D/Texture2D.h>
 #include <Renderer/RenderTarget2D/RenderTarget2D.h>
+#include "Renderer/Structures/RendererDoor.h"
 
 class EulerAngles;
 struct CAMERA_INFO;
@@ -90,11 +91,26 @@ namespace TEN::Renderer
 	{
 		int ObjectNumber;
 		int RoomNumber;
-		Vector3 Position;
+		int IndexInRoom;
+		Pose Pose;
 		Matrix World;
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
+		std::vector<RendererLight*> CachedRoomLights;
+		bool CacheLights;
+		GameBoundingBox OriginalVisibilityBox;
+		BoundingOrientedBox VisibilityBox;
+		float Scale;
+
+		void Update()
+		{
+			World = (Pose.Orientation.ToRotationMatrix() *
+				Matrix::CreateScale(Scale) *
+				Matrix::CreateTranslation(Pose.Position.x, Pose.Position.y, Pose.Position.z));
+			CacheLights = true;
+			VisibilityBox = OriginalVisibilityBox.ToBoundingOrientedBox(Pose);
+		}
 	};
 
 	struct RendererRoomNode
@@ -374,6 +390,7 @@ namespace TEN::Renderer
 		std::vector<RendererTransparentFace> m_transparentFaces;
 
 		std::vector<RendererRoom> m_rooms;
+		bool m_invalidateCache;
 
 		std::vector<RendererLight> dynamicLights;
 		RendererLight* shadowLight;
@@ -423,6 +440,7 @@ namespace TEN::Renderer
 
 		// Times for debug
 		int m_timeUpdate;
+		int m_timeRoomsCollector;
 		int m_timeDraw;
 		int m_timeFrame;
 		float m_fps;
@@ -444,14 +462,10 @@ namespace TEN::Renderer
 		DEPTH_STATES lastDepthState;
 		CULL_MODES lastCullMode;
 
-		// Rooms culling 
-		bool m_outside = false;
-		bool m_cameraUnderwater = false;
-		short m_boundList[MAX_ROOM_BOUNDS];
-		short m_boundStart = 0;
-		short m_boundEnd = 1;
 		float m_farView = DEFAULT_FAR_VIEW;
-		RendererRectangle m_outsideClip;
+
+		int m_numCheckPortalCalls;
+		int m_numGetVisibleRoomsCalls;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
@@ -465,13 +479,12 @@ namespace TEN::Renderer
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate,
 		                     int mask, bool useObjectWorldRotation = false);
-		void GetVisibleObjects(RenderView& renderView, bool onlyRooms);
-		void GetRoomBounds(RenderView& renderView, bool onlyRooms);
-		void SetRoomBounds(ROOM_DOOR* door, short parentRoomNumber, RenderView& renderView);
+		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
+		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, std::vector<RendererLight*>& lights);
+		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights);
 		void CollectLightsForItem(RendererItem* item);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
@@ -583,7 +596,7 @@ namespace TEN::Renderer
 		Texture2D CreateDefaultNormalTexture();
 
 		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
-		bool SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
+		bool SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius);
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{

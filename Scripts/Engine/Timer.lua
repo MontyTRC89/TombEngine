@@ -120,12 +120,12 @@ Timer = {
 				t.remainingTime = t.remainingTime - dt
 
 				if t.remainingTime <= 0 then
-					t.func(table.unpack(t.funcArgs))
 					if not t.loop then
 						t.active = false
 					else
 						t.remainingTime = t.remainingTime + t.totalTime
 					end
+					t.func(table.unpack(t.funcArgs))
 				end
 			end
 

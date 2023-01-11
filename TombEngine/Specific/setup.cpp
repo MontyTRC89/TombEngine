@@ -358,7 +358,7 @@ void InitialiseObjects()
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
 		obj->waterCreature = false;
-		obj->nonLot = true;
+		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
 		obj->ZoneType = ZoneType::Basic;

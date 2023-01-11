@@ -14,11 +14,13 @@ namespace TEN::Renderer
 		float Out;
 		float InRange;
 		float OutRange;
-
+		
+		BoundingSphere BoundingSphere;
 		int RoomNumber;
 		float LocalIntensity;
 		float Distance;
 		bool AffectNeighbourRooms;
 		bool CastShadows;
+		float Luma;
 	};
 }
