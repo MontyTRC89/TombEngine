@@ -250,7 +250,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Human;
+			//obj->ZoneType = ZoneType::Human;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -496,6 +496,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
+			obj->undead = true;
 			obj->SetupHitEffect();
 		}
 
