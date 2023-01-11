@@ -3,7 +3,6 @@ Version 1.0.6
 
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
-* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
 * Fix the double activation of TR4 seth blades when used an OCB different than 0.
 * Fix the sting attack of TR4 harpy which was not hurting nor poisoning Lara.
 * Fix TR4 skeleton spawn when used with OCB 3
