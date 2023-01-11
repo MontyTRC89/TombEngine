@@ -48,6 +48,7 @@ struct MESH_INFO
 	Vector4 color;
 	short HitPoints;
 	std::string Name;
+	bool Dirty;
 };
 
 struct LIGHTINFO
