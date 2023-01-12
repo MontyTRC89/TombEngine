@@ -400,6 +400,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
+		CheckIfSlotExist(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
@@ -416,6 +417,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
+		CheckIfSlotExist(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;

@@ -257,6 +257,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
+		CheckIfSlotExist(ID_SHIVA_STATUE, "ID_SHIVA", "ID_SHIVA_STATUE");
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
