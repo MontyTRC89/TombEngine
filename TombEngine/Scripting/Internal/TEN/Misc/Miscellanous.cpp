@@ -130,34 +130,9 @@ namespace Misc
 	//@treturn Misc.CameraType value used by the Main Camera.
 	//@usage
 	//LevelFuncs.OnControlPhase = function() 
-	//	PrintCameraType()
-	//end
-	//
-	//function PrintCameraType()
-	//	MyCameraType = Misc.GetCameraType()
-	//
-	//	if (textCam) then
-	//		HideString(textCam)
+	//	if (Misc.GetCameraType() == CameraType.Combat) then
+	//		--Do your Actions here.
 	//	end
-	//
-	//	if (MyCameraType == CameraType.Chase) then
-	//		stringCam = "Camera type is: CHASE"
-	//	elseif(MyCameraType == CameraType.Look) then
-	//		stringCam = "Camera type is: LOOK"
-	//	elseif(MyCameraType == CameraType.Fixed) then
-	//		stringCam = "Camera type is: FIXED"
-	//	elseif(MyCameraType == CameraType.Combat) then
-	//		stringCam = "Camera type is: COMBAT"
-	//	elseif(MyCameraType == CameraType.Heavy) then
-	//		stringCam = "Camera type is: HEAVY"
-	//	elseif(MyCameraType == CameraType.Object) then
-	//		stringCam = "Camera type is: OBJECT"
-	//	else
-	//		stringCam = "Camera type is: UNKNOWN"
-	//	end
-	//
-	//	textCam = DisplayString(stringCam, 100, 800, Color.new(200, 200, 250))
-	//	ShowString(textCam)
 	//end
 	static CameraType GetCameraType()
 	{
