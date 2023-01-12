@@ -31,7 +31,7 @@ ItemFlags[6]: Target rotation angle.
 Anything else: does not stop when killing Lara.
 **************/
 
-constexpr short CLEANER_TURN = 1024;
+constexpr short CLEANER_TURN = 1536;
 constexpr auto  CLEANER_SPEED = (SECTOR(1) / 16);
 
 static bool NeedNewTarget(ItemInfo* item)
