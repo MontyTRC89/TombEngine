@@ -68,6 +68,8 @@ extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
+extern int ControlPhaseTime;
+
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase(bool isTitle);

@@ -893,6 +893,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
 				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
+				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
+				PrintDebugMessage("Rooms collector time: %d", m_timeRoomsCollector);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
@@ -910,6 +912,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
+				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

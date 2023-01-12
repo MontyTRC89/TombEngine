@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Miscellanous.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -19,6 +20,7 @@
 #include "Vec3/Vec3.h"
 #include "ScriptAssert.h"
 #include "ActionIDs.h"
+#include "CameraTypes.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -121,6 +123,20 @@ namespace Misc
 	static float GetFOV()
 	{
 		return TO_DEGREES(GetCurrentFOV());
+	}
+
+	///Shows the mode of the game camera.
+	//@function GetCameraType
+	//@treturn Misc.CameraType value used by the Main Camera.
+	//@usage
+	//LevelFuncs.OnControlPhase = function() 
+	//	if (Misc.GetCameraType() == CameraType.Combat) then
+	//		--Do your Actions here.
+	//	end
+	//end
+	static CameraType GetCameraType()
+	{
+		return Camera.oldType;
 	}
 	
 	/// Play an audio track
@@ -324,6 +340,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_SetFOV, &SetFOV);
 		table_misc.set_function(ScriptReserved_GetFOV, &GetFOV);
+		table_misc.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
@@ -365,5 +382,6 @@ namespace Misc
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);
+		handler.MakeReadOnlyTable(table_misc, ScriptReserved_CameraType, kCameraType);
 	}
 }

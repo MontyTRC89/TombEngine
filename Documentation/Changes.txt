@@ -1,3 +1,29 @@
+Version 1.0.6
+=============
+
+* Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
+* Fix savegame crash for disabled enemies with partially set activation mask.
+* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
+* Fix double activation of TR4 seth blades when used an OCB different than 0.
+* Fix sting attack of TR4 harpy which was neither hurting nor poisoning Lara.
+* Fix backholster weapons not updating their sound position together with player.
+* Fix black screen bug when there was an obstacle between the fixed camera and the target.
+* Fix TR4 skeleton spawn when used with OCB 3
+* Fix TR4 SAS teleporting over the blocks he walks by.
+* Add undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
+* Add an option to activate Lua or node events from legacy triggers.
+* Antitriggering an enemy will now cause it to vanish and pause.
+* Re-triggering an enemy will cause it to reappear and unpause.
+* Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
+
+Lua API changes
+* Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
+* Moveable:MeshIsVisible is now GetMeshVisible.
+* Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
+* Moveable:MeshIsSwapped is now GetMeshSwapped
+* Add new function CameraObject::PlayCamera()
+* Add new function Misc::GetCameraType()
+
 Version 1.0.5 
 =============
 
@@ -18,6 +44,7 @@ Version 1.0.5
 * Fix TR4 crocodile attack range and joint rotation speed.
 * Fix TR4 Von Croy not using animation for 2 and 3 step down vaults.
 * Fix TR4 baddies not using animation for 3 step down vaults.
+* Fix TR5 laserhead guardian.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
 * Fix pathfinding problems for first initialized enemy of every slot.
 * Fix pathfinding of flying and water creatures (partial).

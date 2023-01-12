@@ -16,8 +16,6 @@ enum class ZoneType
 	Water,
 	// Enable 1 block vault/fall
 	Human,
-	// Enable jump/long jump and monkey (also 1 block vault/fall)
-	VonCroy,
 	// Can fly anywhere except in water room
 	Flyer,
 	MaxZone,
@@ -32,8 +30,7 @@ enum class ZoneType
 	Spider,
 	Blockable, // For large creatures such as trex and shiva.
 	SophiaLee, // Prevents Sophia from going to lower levels again.
-	Ape,	   // Only 1/2 block vault.
-	HumanLongJumpAndMonkey,
+	Ape		   // Only 1/2 block vault.
 };
 
 enum class MoodType

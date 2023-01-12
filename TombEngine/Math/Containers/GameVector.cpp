@@ -66,6 +66,7 @@
 		this->x = vector.x;
 		this->y = vector.y;
 		this->z = vector.z;
+		this->RoomNumber = vector.RoomNumber;
 		return *this;
 	}
 

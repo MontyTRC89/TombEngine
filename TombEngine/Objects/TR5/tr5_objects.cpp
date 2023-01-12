@@ -632,6 +632,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->initialise = InitialiseRomanStatue;
 			obj->collision = CreatureCollision;
 			obj->control = RomanStatueControl;
+			obj->HitRoutine = RomanStatueHit;
 			obj->shadowType = ShadowMode::All;
 			obj->biteOffset = 0;
 			obj->HitPoints = 300;
@@ -649,9 +650,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LASERHEAD];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLaserHead;
+		obj->initialise = InitialiseGuardian;
 		obj->collision = CreatureCollision;
-		obj->control = LaserHeadControl;
+		obj->control = ControlGuardian;
 		obj->explodableMeshbits = 6;
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true;

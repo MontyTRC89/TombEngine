@@ -50,10 +50,10 @@
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
-  <li>    <here>Objects.Camera</here></li>
+  <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
   <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
-  <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
+  <li>    <here>Objects.Room</here></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
@@ -85,8 +85,8 @@
 
 <div id="content">
 
-<h1>Class <code>Objects.Camera</code></h1>
-<p>Basic cameras that can point at Lara or at a CAMERA_TARGET.</p>
+<h1>Class <code>Objects.Room</code></h1>
+<p>Rooms</p>
 <p>
 
 </p>
@@ -95,33 +95,36 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Camera:GetPosition">Camera:GetPosition()</a></td>
-	<td class="summary">Get the camera's position</td>
+	<td class="name" ><a href="#Room:GetActive">Room:GetActive()</a></td>
+	<td class="summary">Determine whether the room is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:SetPosition">Camera:SetPosition(position)</a></td>
-	<td class="summary">Set the camera's position</td>
+	<td class="name" ><a href="#Room:GetReverbType">Room:GetReverbType()</a></td>
+	<td class="summary">Get the room's reverb type.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:GetName">Camera:GetName()</a></td>
-	<td class="summary">Get the camera's unique string identifier</td>
+	<td class="name" ><a href="#Room:SetReverbType">Room:SetReverbType(new)</a></td>
+	<td class="summary">Set the room's reverb type.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:SetName">Camera:SetName(name)</a></td>
-	<td class="summary">Set the camera's name (its unique string identifier)</td>
+	<td class="name" ><a href="#Room:GetName">Room:GetName()</a></td>
+	<td class="summary">Get the room's unique string identifier.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CameraObject:GetRoom">CameraObject:GetRoom()</a></td>
-	<td class="summary">Get the current room of the camera</td>
+	<td class="name" ><a href="#Room:SetName">Room:SetName(name)</a></td>
+	<td class="summary">Set the room's name (its unique string identifier).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:GetRoomNumber">Camera:GetRoomNumber()</a></td>
-	<td class="summary">Get the current room number of the camera</td>
+	<td class="name" ><a href="#Room:GetFlag">Room:GetFlag(flagID)</a></td>
+	<td class="summary">Get the room's specified flag value (true or false).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:SetRoomNumber">Camera:SetRoomNumber(ID)</a></td>
-	<td class="summary">Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.</td>
+	<td class="name" ><a href="#Room:SetFlag">Room:SetFlag(flagID, the)</a></td>
+	<td class="summary">Set the room's specified flag value.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Room:IsTagPresent">Room:IsTagPresent(tag)</a></td>
+	<td class="summary">Checks if specified tag is set for this room.</td>
 	</tr>
 </table>
 
@@ -133,11 +136,11 @@
 
     <dl class="function">
     <dt>
-    <a name = "Camera:GetPosition"></a>
-    <strong>Camera:GetPosition()</strong>
+    <a name = "Room:GetActive"></a>
+    <strong>Room:GetActive()</strong>
     </dt>
     <dd>
-    Get the camera's position
+    Determine whether the room is active or not
 
 
 
@@ -145,8 +148,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the camera's position
+           <span class="types"><span class="type">bool</span></span>
+        true if the room is active
     </ol>
 
 
@@ -154,19 +157,40 @@
 
 </dd>
     <dt>
-    <a name = "Camera:SetPosition"></a>
-    <strong>Camera:SetPosition(position)</strong>
+    <a name = "Room:GetReverbType"></a>
+    <strong>Room:GetReverbType()</strong>
     </dt>
     <dd>
-    Set the camera's position
+    Get the room's reverb type.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Objects.RoomReverb.html#">RoomReverb</a></span>
+        room's reverb type
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Room:SetReverbType"></a>
+    <strong>Room:SetReverbType(new)</strong>
+    </dt>
+    <dd>
+    Set the room's reverb type.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         the new position of the camera
+        <li><span class="parameter">new</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.RoomReverb.html#">RoomReverb</a></span>
+         reverb type of the room
         </li>
     </ul>
 
@@ -176,11 +200,11 @@
 
 </dd>
     <dt>
-    <a name = "Camera:GetName"></a>
-    <strong>Camera:GetName()</strong>
+    <a name = "Room:GetName"></a>
+    <strong>Room:GetName()</strong>
     </dt>
     <dd>
-    Get the camera's unique string identifier
+    Get the room's unique string identifier.
 
 
 
@@ -189,7 +213,7 @@
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the camera's name
+        the room's name
     </ol>
 
 
@@ -197,11 +221,11 @@
 
 </dd>
     <dt>
-    <a name = "Camera:SetName"></a>
-    <strong>Camera:SetName(name)</strong>
+    <a name = "Room:SetName"></a>
+    <strong>Room:SetName(name)</strong>
     </dt>
     <dd>
-    Set the camera's name (its unique string identifier)
+    Set the room's name (its unique string identifier).
 
 
 
@@ -209,7 +233,7 @@
     <ul>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The camera's new name
+         The room's new name
         </li>
     </ul>
 
@@ -219,65 +243,82 @@
 
 </dd>
     <dt>
-    <a name = "CameraObject:GetRoom"></a>
-    <strong>CameraObject:GetRoom()</strong>
+    <a name = "Room:GetFlag"></a>
+    <strong>Room:GetFlag(flagID)</strong>
     </dt>
     <dd>
-    Get the current room of the camera
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Room</span></span>
-        current room of the camera
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:GetRoomNumber"></a>
-    <strong>Camera:GetRoomNumber()</strong>
-    </dt>
-    <dd>
-    Get the current room number of the camera
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        number representing the current room of the camera
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetRoomNumber"></a>
-    <strong>Camera:SetRoomNumber(ID)</strong>
-    </dt>
-    <dd>
-    Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.
+    Get the room's specified flag value (true or false).
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">int</span></span>
-         the ID of the new room
+        <li><span class="parameter">flagID</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.RoomFlagID.html#">RoomFlagID</a></span>
+         The room's flag ID
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        the room's specified flag value
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Room:SetFlag"></a>
+    <strong>Room:SetFlag(flagID, the)</strong>
+    </dt>
+    <dd>
+    Set the room's specified flag value.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">flagID</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.RoomFlagID.html#">RoomFlagID</a></span>
+         The room's flag ID
+        </li>
+        <li><span class="parameter">the</span>
+            <span class="types"><span class="type">bool</span></span>
+         room's new flag value
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Room:IsTagPresent"></a>
+    <strong>Room:IsTagPresent(tag)</strong>
+    </dt>
+    <dd>
+    Checks if specified tag is set for this room.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tag</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         A text tag to check (case sensitive)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if tag is present, false if not
+    </ol>
 
 
 
