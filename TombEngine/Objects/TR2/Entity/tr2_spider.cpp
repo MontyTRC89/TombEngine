@@ -190,10 +190,11 @@ namespace TEN::Entities::Creatures::TR2
 			item->Animation.ActiveState == SPIDER_STATE_WALK_FORWARD ||
 			item->Animation.ActiveState == SPIDER_STATE_RUN_FORWARD)
 		{
-			if (CreatureVault(itemNumber, headingAngle, 2, 0) == 2) // only 2 block climb.
+			// Only 2 block climb.
+			if (CreatureVault(itemNumber, headingAngle, 2, 0) == 2)
 			{
 				creature->MaxTurn = 0;
-				SetAnimation(item, SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK); // serve as climb...
+				SetAnimation(item, SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK); // HACK: Long jump serves as climb.
 				return;
 			}
 		}
