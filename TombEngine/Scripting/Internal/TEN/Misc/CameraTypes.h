@@ -2,12 +2,12 @@
 #include "Game/camera.h"
 
 /***
-Constants for action key IDs.
-@enum Misc.ActionID
+Constants for the type of the Camera.
+@enum Misc.CameraType
 @pragma nostrip
 */
 
-/*** Misc.ActionID constants.
+/*** Misc.CameraType constants.
 
 The following constants are inside CameraType.
 
