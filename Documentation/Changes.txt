@@ -2,13 +2,14 @@ Version 1.0.6
 =============
 
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
-* Fix invisible Lara after starting a new game from title flyby with hidden Lara.
+* Fix savegame crash for disabled enemies with partially set activation mask.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
 * Fix double activation of TR4 seth blades when used an OCB different than 0.
 * Fix sting attack of TR4 harpy which was neither hurting nor poisoning Lara.
+* Fix backholster weapons not updating their sound position together with player.
+* Fix black screen bug when there was an obstacle between the fixed camera and the target.
 * Fix TR4 skeleton spawn when used with OCB 3
 * Fix TR4 SAS teleporting over the blocks he walks by.
-* Fix black screen bug when there was an obstacle between the fixed camera and the target.
 * Add undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
 * Add an option to activate Lua or node events from legacy triggers.
 * Antitriggering an enemy will now cause it to vanish and pause.
