@@ -127,7 +127,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->lotType = LOTType::Water;
+			obj->LotType = LotType::Water;
 			obj->SetupHitEffect();
 		}
 
@@ -174,7 +174,7 @@ namespace TEN::Entities
 			obj->pivotLength = 10;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->lotType = LOTType::Flyer;
+			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -209,7 +209,7 @@ namespace TEN::Entities
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
-			obj->lotType = LOTType::HumanPlusJumpAndMonkey;
+			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -231,7 +231,7 @@ namespace TEN::Entities
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
-			obj->lotType = LOTType::HumanPlusJumpAndMonkey;
+			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -282,7 +282,7 @@ namespace TEN::Entities
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->lotType = LOTType::Skeleton;
+			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect();
 		}
 
@@ -315,7 +315,7 @@ namespace TEN::Entities
 			obj->radius = 204;
 			obj->intelligent = true;
 			obj->undead = false;
-			obj->lotType = LOTType::Flyer;
+			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -331,7 +331,7 @@ namespace TEN::Entities
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->lotType = LOTType::Skeleton;
+			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
 
@@ -442,7 +442,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->lotType = LOTType::Flyer;
+			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -475,7 +475,7 @@ namespace TEN::Entities
 			obj->radius = 409;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->lotType = LOTType::Water; // TODO: later, change it to WaterAndLand.
+			obj->LotType = LotType::Water; // TODO: later, change it to WaterAndLand.
 			obj->SetBoneRotationFlags(0, ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetBoneRotationFlags(9, ROT_Y);
@@ -642,7 +642,7 @@ namespace TEN::Entities
 			obj->radius = 512;
 			obj->intelligent = true;
 			obj->undead = true; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
-			obj->lotType = LOTType::HumanPlusJumpAndMonkey;
+			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
 			obj->SetBoneRotationFlags(11, ROT_X);
@@ -661,7 +661,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->lotType = LOTType::HumanPlusJumpAndMonkey;
+			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X | ROT_Y);
 		}

@@ -36,7 +36,7 @@ enum ShatterType
 
 // Custom LOT definition for Creature.
 // Used in InitialiseSlot() in lot.cpp.
-enum class LOTType
+enum class LotType
 {
 	Skeleton,
 	Basic,
@@ -66,7 +66,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	LOTType lotType = LOTType::Basic;
+	LotType LotType = LotType::Basic;
 	int animIndex;
 	short HitPoints;
 	short pivotLength;

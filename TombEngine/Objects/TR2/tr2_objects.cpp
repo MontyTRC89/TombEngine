@@ -53,7 +53,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->lotType = LOTType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(9, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -70,7 +70,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->lotType = LOTType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -86,7 +86,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->lotType = LOTType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -101,7 +101,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->lotType = LOTType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -130,7 +130,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
-		obj->lotType = LOTType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -251,7 +251,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->lotType = LOTType::Spider;
+		obj->LotType = LotType::Spider;
 		obj->SetupHitEffect();
 	}
 

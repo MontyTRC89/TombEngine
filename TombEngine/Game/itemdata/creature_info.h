@@ -3,16 +3,19 @@
 
 struct ItemInfo;
 
-// Default zone loaded by TEN, They are added by TE in compile time.
+// Default zone loaded by TEN. They are added by TE at compile time.
 enum class ZoneType
 {
-	Skeleton, // Enable jump (also 1 block vault/fall)
-	Basic, // Enable 1 click vault and 2 click fall (default)
-	// TODO: underwater creature can go on land like the crocodile which is wrong since the flag IsAmphibious was not set for them !
-	Water, // Only underwater (exception: crocodile can go on land)
-	//Amphibious, // TODO: Only for later since it's not on level file now.
-	Human, // Enable 1 block vault/fall
-	Flyer, // Can fly anywhere except in water room
+	Skeleton, // Enables jump, also 1 block vault and fall.
+	Basic,	  // Enables 1 step vault, 2 step fall (default).
+
+	// TODO: Underwater creatures can go on land like the crocodile, which is wrong since the flag IsAmphibious is not set for them.
+	Water, // Enables movement exclusively underwater (exception: crocodile can go on land)
+	// Amphibious, // TODO: For later since it's not on level file now.
+
+	Human, // Enables 1 block vault and fall.
+	Flyer, // Enables flying anywhere except water rooms.
+
 	MaxZone // Used when loading level.
 };
 
