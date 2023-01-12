@@ -6,7 +6,6 @@
 
 #include "Game/animation.h"
 #include "Game/animation.h"
-#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -181,7 +180,7 @@ void LoadItems()
 			item->Pose.Orientation.y = ReadInt16();
 			item->Pose.Orientation.x = ReadInt16();
 			item->Pose.Orientation.z = ReadInt16();
-			item->Color = ReadVector4();
+			item->Model.Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
@@ -351,7 +350,6 @@ void LoadObjects()
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
@@ -591,6 +589,7 @@ void ReadRooms()
 	int numRooms = ReadInt32();
 	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
 
+	g_Level.Rooms.reserve(numRooms);
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
@@ -757,7 +756,9 @@ void ReadRooms()
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			auto & mesh = room.mesh.emplace_back();
+			auto& mesh = room.mesh.emplace_back();
+
+			mesh.roomNumber = i;
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -769,50 +770,48 @@ void ReadRooms()
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
 			mesh.HitPoints = ReadInt16();
-			mesh.luaName = ReadString();
+			mesh.Name = ReadString();
 
-			mesh.roomNumber = i;
-			g_GameScriptEntities->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
+
+		// Reserve in advance so the vector doesn't resize itself and leave anything
+		// in the script name-to-reference map obsolete.
+		room.triggerVolumes.reserve(numTriggerVolumes);
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
-			TriggerVolume volume;
+			auto& volume = room.triggerVolumes.emplace_back();
 
-			volume.Type = (TriggerVolumeType)ReadInt32();
+			volume.Type = (VolumeType)ReadInt32();
 
-			volume.Position.x = ReadFloat();
-			volume.Position.y = ReadFloat();
-			volume.Position.z = ReadFloat();
-
-			volume.Rotation.x = ReadFloat();
-			volume.Rotation.y = ReadFloat();
-			volume.Rotation.z = ReadFloat();
-			volume.Rotation.w = ReadFloat();
-
-			volume.Scale.x = ReadFloat();
-			volume.Scale.y = ReadFloat();
-			volume.Scale.z = ReadFloat();
+			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Status = TriggerStatus::Outside;
-			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
-			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
+			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Sphere = BoundingSphere(pos, scale.x);
 
-			room.triggerVolumes.push_back(volume);
+			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
+
+			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
 		room.meshEffect = ReadInt32();
-		room.reverbType = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
+		room.index = i;
+
+		g_GameScriptEntities->AddName(room.name, room);
 	}
 }
 
@@ -869,7 +868,7 @@ void FreeLevel()
 
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 			g_Level.Zones[j][i].clear();
 	}
 
@@ -960,10 +959,18 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.boxNumber = ReadInt32();
-		obj.luaName = ReadString();
+		obj.Name = ReadString();
 
-		g_GameScriptEntities->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.Name, obj);
 	}
+}
+
+void LoadEvent(VolumeEvent& event)
+{
+	event.Mode = (VolumeEventMode)ReadInt32();
+	event.Function = ReadString();
+	event.Data = ReadString();
+	event.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
@@ -976,22 +983,11 @@ void LoadEventSets()
 		auto eventSet = VolumeEventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = ReadInt32();
+		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnEnter.Function = ReadString();
-		eventSet.OnEnter.Data = ReadString();
-		eventSet.OnEnter.CallCounter = ReadInt32();
-
-		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnInside.Function = ReadString();
-		eventSet.OnInside.Data = ReadString();
-		eventSet.OnInside.CallCounter = ReadInt32();
-
-		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnLeave.Function = ReadString();
-		eventSet.OnLeave.Data = ReadString();
-		eventSet.OnLeave.CallCounter = ReadInt32();
+		LoadEvent(eventSet.OnEnter);
+		LoadEvent(eventSet.OnInside);
+		LoadEvent(eventSet.OnLeave);
 
 		g_Level.EventSets.push_back(eventSet);
 	}
@@ -1244,16 +1240,11 @@ void LoadBoxes()
 	// Read zones
 	for (int i = 0; i < 2; i++)
 	{
-		// Ground zones
-		for (int j = 0; j < MAX_ZONES - 1; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 		{
-			g_Level.Zones[j][i].resize(numBoxes * sizeof(int));
+			g_Level.Zones[j][i].resize(numBoxes);
 			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
 		}
-
-		// Fly zone
-		g_Level.Zones[MAX_ZONES - 1][i].resize(numBoxes * sizeof(int));
-		ReadBytes(g_Level.Zones[MAX_ZONES - 1][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked
@@ -1289,8 +1280,6 @@ int LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	ReadInt32(); // SPR\0
-
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
 

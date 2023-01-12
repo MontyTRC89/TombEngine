@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_knight_templar.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -60,7 +61,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, KTEMPLAR_ANIM_IDLE);
 		item->MeshBits &= 0xF7FF;
 	}

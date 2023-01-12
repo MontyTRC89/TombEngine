@@ -17,6 +17,10 @@ constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS = 0;
+constexpr int		   NO_JOINT = -1;
+
 enum AIObjectType
 {
 	NO_AI	  = 0,
@@ -46,16 +50,6 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
-
-enum class JointBitType
-{
-	Touch,
-	Mesh,
-	MeshSwap
-};
-
 enum class EffectType
 {
 	None,
@@ -81,9 +75,12 @@ struct EntityAnimationData
 
 struct EntityModelData
 {
-	int BaseMesh;
-	std::vector<int> MeshIndex = {};
-	std::vector<BoneMutator> Mutator = {};
+	int BaseMesh = 0;
+
+	Vector4 Color = Vector4::Zero;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutator   = {};
 };
 
 struct EntityCallbackData
@@ -136,7 +133,6 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	Vector4 Color;
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();
@@ -172,10 +168,9 @@ bool TestState(int refState, const std::vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNumber);
+void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 void InitialiseFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);
@@ -190,3 +185,5 @@ std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive);
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);

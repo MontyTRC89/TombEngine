@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_AWARE_RANGE  = SQUARE(SECTOR(1.5f));
 	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(SECTOR(2.5f));
 
-	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15;
+	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15.0f;
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
@@ -51,7 +51,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, COBRA_ANIM_IDLE_TO_SLEEP, COBRA_SLEEP_FRAME);
 		item->ItemFlags[2] = item->HitStatus;
 	}

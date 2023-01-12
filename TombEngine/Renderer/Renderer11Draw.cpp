@@ -811,12 +811,10 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddBox(Vector3* corners, Vector4 color)
@@ -933,7 +931,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
@@ -973,6 +971,8 @@ namespace TEN::Renderer
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
+		dynamicLight.Luma = Luma(dynamicLight.Color);
 
 		dynamicLights.push_back(dynamicLight);
 	}
@@ -1424,6 +1424,10 @@ namespace TEN::Renderer
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
+		auto timeRoomsCollector = std::chrono::high_resolution_clock::now();
+		m_timeRoomsCollector = (std::chrono::duration_cast<ns>(timeRoomsCollector - time1)).count() / 1000000;
+		time1 = timeRoomsCollector;
+
 		UpdateLaraAnimations(false);
 		UpdateItemAnimations(view);
 
@@ -1624,10 +1628,6 @@ namespace TEN::Renderer
 					DrawLara(view, transparent);
 					break;
 
-				case ID_DARTS:
-					DrawDarts(itemToDraw, view);
-					break;
-
 				case ID_WATERFALL1:
 				case ID_WATERFALL2:
 				case ID_WATERFALL3:
@@ -1798,25 +1798,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDarts(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-
-		Vector3 start = Vector3(
-			nativeItem->Pose.Position.x,
-			nativeItem->Pose.Position.y,
-			nativeItem->Pose.Position.z);
-
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
-
-		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
-			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
-			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
-
-		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
-	}
-
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
 		// Static mesh shader is used for all forthcoming renderer routines, so we
@@ -1843,7 +1824,7 @@ namespace TEN::Renderer
 		{
 			for (auto& msh : room->StaticsToDraw)
 			{
-				RendererObject& staticObj = *m_staticObjects[msh.ObjectNumber];
+				RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
@@ -1869,7 +1850,7 @@ namespace TEN::Renderer
 								RendererPolygon* p = &bucket.Polygons[j];
 
 								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, msh.World);
+								Vector3 centre = Vector3::Transform(p->centre, msh->World);
 								int distance = (centre - cameraPosition).Length();
 
 								RendererTransparentFace face;
@@ -1879,10 +1860,10 @@ namespace TEN::Renderer
 								face.info.animated = bucket.Animated;
 								face.info.texture = bucket.Texture;
 								face.info.room = room;
-								face.info.staticMesh = &msh;
+								face.info.staticMesh = msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = msh.Position;
-								face.info.color = msh.Color;
+								face.info.position = msh->Pose.Position.ToVector3();
+								face.info.color = msh->Color;
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
 								room->TransparentFacesToDraw.push_back(face);
@@ -1890,8 +1871,8 @@ namespace TEN::Renderer
 						}
 						else
 						{
-							m_stStatic.World = msh.World;
-							m_stStatic.Color = msh.Color;
+							m_stStatic.World = msh->World;
+							m_stStatic.Color = msh->Color;
 							m_stStatic.AmbientLight = room->AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
 
@@ -1899,7 +1880,7 @@ namespace TEN::Renderer
 							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-							BindLights(msh.LightsToDraw);
+							BindLights(msh->LightsToDraw);
 
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
@@ -1999,7 +1980,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
-			SetScissor(room->Clip);
+			SetScissor(room->ClipBounds);
 
 			for (int animated = 0; animated < 2; animated++)
 			{

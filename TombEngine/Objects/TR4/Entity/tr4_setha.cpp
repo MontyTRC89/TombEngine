@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -112,7 +113,6 @@ namespace TEN::Entities::TR4
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
@@ -659,7 +659,7 @@ namespace TEN::Entities::TR4
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
-		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 - flags;
 	}
 
 	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)

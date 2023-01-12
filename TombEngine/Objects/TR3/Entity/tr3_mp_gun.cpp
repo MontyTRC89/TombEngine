@@ -24,6 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum MPGunState
 	{
+		// No state 0.
 		MPGUN_STATE_WAIT = 1,
 		MPGUN_STATE_WALK = 2,
 		MPGUN_STATE_RUN = 3,

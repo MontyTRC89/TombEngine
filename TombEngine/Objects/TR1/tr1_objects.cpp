@@ -36,11 +36,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 6;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 375;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotation(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(2, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_BEAR];
@@ -51,25 +51,26 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 500;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotation(13, ROT_Y); // head
+		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_APE];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = ApeControl;
 		obj->collision = CreatureCollision;
-		obj->HitPoints = 22;
-		obj->hitEffect = HIT_BLOOD;
 		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 22;
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Ape;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_BIG_RAT];
@@ -80,13 +81,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 5;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
-		obj->SetBoneRotation(1, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_NATLA];
@@ -98,9 +99,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 400;
 		obj->radius = 204;
-		obj->hitEffect = HIT_BLOOD;
 		obj->intelligent = true;
-		obj->SetBoneRotation(2, ROT_X | ROT_Z);
+		obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GIANT_MUTANT];
@@ -111,27 +112,24 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = GiantMutantControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 500;
-		obj->hitEffect = HIT_BLOOD;
-		obj->radius = 341;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
-		obj->SetBoneRotation(1, ROT_Y);
+		obj->ZoneType = ZoneType::Blockable;
+		obj->SetBoneRotationFlags(1, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		if (Objects[ID_LARA].loaded)
-			obj->animIndex = Objects[ID_LARA].animIndex;
-
-		obj->initialise = InitialiseDoppelganger;
+		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
-		//obj->drawRoutine = DrawEvilLara;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 1000;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
-		//obj->intelligent = true;
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_CENTAUR_MUTANT];
@@ -142,12 +140,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 120;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Blockable;
-		obj->SetBoneRotation(10, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_WINGED_MUMMY];
@@ -157,14 +155,15 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WingedMutantControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->hitEffect = HIT_BLOOD;
+		obj->hitEffect = HitEffect::Blood;
 		obj->pivotLength = 150;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Flyer;
-		obj->SetBoneRotation(1, ROT_Y); // torso
-		obj->SetBoneRotation(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y);
+		obj->SetBoneRotationFlags(2, ROT_Y);
+		obj->SetupHitEffect();
 	}
 }
 
@@ -173,9 +172,8 @@ static void StartObject(ObjectInfo* obj)
 	obj = &Objects[ID_BACON_REFERENCE];
 	if (obj->loaded)
 	{
-		obj->drawRoutine = nullptr;
 		obj->collision = AIPickupCollision;
-		obj->HitPoints = 0;
+		obj->drawRoutine = nullptr;
 	}
 }
 
@@ -183,7 +181,13 @@ static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_DAMOCLES_SWORD];
 	if (obj->loaded)
-		SetupDamoclesSword(*obj);
+	{
+		obj->initialise = InitialiseDamoclesSword;
+		obj->control = ControlDamoclesSword;
+		obj->collision = CollideDamoclesSword;
+		obj->shadowType = ShadowMode::All;
+		obj->SetupHitEffect(true);
+	}
 }
 
 static void StartProjectiles(ObjectInfo* obj)
@@ -193,11 +197,11 @@ static void StartProjectiles(ObjectInfo* obj)
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 
-static ObjectInfo* objToInit;
 void InitialiseTR1Objects()
 {
-	StartEntity(objToInit);
-	StartObject(objToInit);
-	StartTrap(objToInit);
-	StartProjectiles(objToInit);
+	ObjectInfo* objectPtr = nullptr;
+	StartEntity(objectPtr);
+	StartObject(objectPtr);
+	StartTrap(objectPtr);
+	StartProjectiles(objectPtr);
 }

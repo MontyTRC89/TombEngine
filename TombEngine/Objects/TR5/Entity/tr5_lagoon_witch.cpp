@@ -39,8 +39,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseLagoonWitch(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 1);
 		item->Pose.Position.y += CLICK(2);
 	}

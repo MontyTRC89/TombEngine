@@ -38,6 +38,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO
 	enum RomanStatueState
 	{
+		// No state 0.
 		STATUE_STATE_IDLE = 1,
 		STATUE_STATE_SCREAM = 2,
 		STATUE_STATE_ATTACK_1 = 3,
@@ -287,12 +288,8 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_START_JUMP_DOWN;
-		item->Animation.TargetState = 13;
-		item->Animation.ActiveState = 13;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, STATUE_ANIM_START_JUMP_DOWN);
 		item->Status = ITEM_NOT_ACTIVE;
 		item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.z += 486 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
@@ -884,5 +881,18 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);
+	}
+
+	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
+		{
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
+		}
+
+		DoItemHit(&target, damage, isExplosive);
 	}
 }

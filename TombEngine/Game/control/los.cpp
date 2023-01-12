@@ -166,7 +166,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								else
 								{
 									// TR5
-									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
+									if (object->hitEffect == HitEffect::Richochet)
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 								}
 							}
@@ -176,14 +176,23 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									SmashObject(itemNumber);
 								else
 								{
-									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
+									switch (object->hitEffect)
+									{
+									case HitEffect::Blood:
 										DoBloodSplat(target2.x, target2.y, target2.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										break;
 
-									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
+									case HitEffect::Smoke:
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
+										break;
+
+									case HitEffect::Richochet:
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										break;
+									}
+
+									if (!Objects[item->ObjectNumber].undead)
+										DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
 									if (!item->Callbacks.OnHit.empty())
 									{
@@ -514,7 +523,7 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
-		ShatterItem.color = item->Color;
+		ShatterItem.color = item->Model.Color;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;
 		ShatterItem.sphere.z = CreatureSpheres[sp].z;

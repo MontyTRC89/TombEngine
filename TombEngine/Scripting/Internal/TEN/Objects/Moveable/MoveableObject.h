@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptUtil.h"
+#include "Objects/Room/RoomObject.h"
 #include "Objects/NamedBase.h"
 
 class LevelFunc;
@@ -67,7 +68,7 @@ public:
 	void SetVelocity(Vec3 velocity);
 
 	[[nodiscard]] ScriptColor GetColor() const;
-	void SetColor(ScriptColor const& col);
+	void SetColor(const ScriptColor& color);
 
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
@@ -87,12 +88,11 @@ public:
 	[[nodiscard]] short GetItemFlags(int index = 0) const;
 	void SetItemFlags(short value, int index = 0);
 
-	[[nodiscard]] bool MeshIsVisible(int meshId) const;
-	void ShowMesh(int meshId);
-	void HideMesh(int meshId);
+	[[nodiscard]] bool GetMeshVisible(int meshId) const;
+	void SetMeshVisible(int meshId, bool visible);
 	void ShatterMesh(int meshId);
 
-	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
+	[[nodiscard]] bool GetMeshSwapped(int meshId) const;
 	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
 	void UnswapMesh(int meshId);
 
@@ -101,8 +101,9 @@ public:
 	[[nodiscard]] bool GetActive() const;
 	void SetActive(bool active);
 
-	[[nodiscard]] short GetRoom() const;
-	void SetRoom(short room);
+	std::unique_ptr<Room> GetRoom() const;
+	[[nodiscard]] int GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
@@ -110,6 +111,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void SetVisible(bool visible);
 	void Explode();
 	void Shatter();
 

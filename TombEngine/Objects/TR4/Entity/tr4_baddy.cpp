@@ -11,13 +11,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
 using std::vector;
 
 /*
@@ -56,7 +56,7 @@ namespace TEN::Entities::TR4
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
 	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
 
-	#define BADDY_USE_UZI	24
+	constexpr auto BADDY_UZI_AMMO = 24;
 
 	enum BaddyState
 	{
@@ -68,8 +68,8 @@ namespace TEN::Entities::TR4
 		// 5
 		// 6
 		// 7
-		BADDY_STATE_UNKNOWN_8 = 8,
-		BADDY_STATE_UNKNOWN_9 = 9,
+		BADDY_STATE_DODGE = 8,
+		BADDY_STATE_DODGE_END = 9,
 		BADDY_STATE_DRAW_GUN = 10,
 		BADDY_STATE_HOLSTER_GUN = 11,
 		BADDY_STATE_DRAW_SWORD = 12,
@@ -209,8 +209,8 @@ namespace TEN::Entities::TR4
 	void InitialiseBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-	
-		ClearItem(itemNumber);
+
+		InitialiseCreature(itemNumber);
 
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
@@ -218,7 +218,7 @@ namespace TEN::Entities::TR4
 		{
 			item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN);
 			item->MeshBits = 0xFF81FFFF;
-			item->ItemFlags[2] = BADDY_USE_UZI;
+			item->ItemFlags[2] = BADDY_UZI_AMMO;
 		}
 		else
 		{
@@ -234,7 +234,7 @@ namespace TEN::Entities::TR4
 		// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 		if (ocb > 9 && ocb < 20)
 		{
-			item->ItemFlags[2] += BADDY_USE_UZI;
+			item->ItemFlags[2] += BADDY_UZI_AMMO;
 			item->TriggerFlags -= 10;
 			ocb -= 10;
 		}
@@ -404,11 +404,11 @@ namespace TEN::Entities::TR4
 			{
 				currentItem = &g_Level.Items[itemNum];
 				if ((currentItem->ObjectNumber == ID_SMALLMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
+					 currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
+					 currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
 					SameZone(creature, currentItem))
 				{
-					if (item->Status != ITEM_INVISIBLE)
+					if (currentItem->Status != ITEM_INVISIBLE)
 					{
 						creature->Enemy = currentItem;
 						break;
@@ -770,7 +770,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 						else if (AI.distance >= pow(SECTOR(0.5f), 2))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_FRONT;
-						else if (TestProbability(0.5f))
+						else if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 						else
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_RIGHT;
@@ -865,7 +865,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (GenerateInt(0, 30) > 20 &&
+				if (Random::GenerateInt(0, 30) > 20 &&
 					objectNumber == ID_BADDY2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
@@ -1103,7 +1103,7 @@ namespace TEN::Entities::TR4
 				else if (currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM)
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				else if (currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM)
-					item->ItemFlags[2] += BADDY_USE_UZI;
+					item->ItemFlags[2] += BADDY_UZI_AMMO;
 				else
 				{
 					currentCreature->Enemy = nullptr;
@@ -1112,7 +1112,7 @@ namespace TEN::Entities::TR4
 			
 				KillItem(currentCreature->Enemy - g_Level.Items.data());
 
-				// cancel enemy pointer for other active baddys
+				// Cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
@@ -1199,7 +1199,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDY_STATE_UNKNOWN_8:
+			case BADDY_STATE_DODGE:
 				currentCreature->MaxTurn = 0;
 
 				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
@@ -1207,7 +1207,7 @@ namespace TEN::Entities::TR4
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
 				{
-					item->Animation.TargetState = BADDY_STATE_UNKNOWN_9;
+					item->Animation.TargetState = BADDY_STATE_DODGE_END;
 				}
 
 				break;
@@ -1215,7 +1215,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_BLIND:
 				if (!FlashGrenadeAftershockTimer)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 
@@ -1312,7 +1312,33 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState = BADDY_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}
+	}
 
-		return;
+	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (pos.has_value())
+		{
+			if ((target.Animation.ActiveState == BADDY_STATE_DODGE || Random::TestProbability(1 / 2.0f)) &&
+				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+				 player.Control.Weapon.GunType == LaraWeaponType::HK ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+			{
+				// Baddy2 sword deflecting bullet.
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
+			else if (object.hitEffect == HitEffect::Blood)
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+			}
+		}
+
+		DoItemHit(&target, damage, isExplosive);
 	}
 }

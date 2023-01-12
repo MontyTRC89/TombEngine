@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_harpy.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -227,6 +228,7 @@ namespace TEN::Entities::TR4
 				item->Animation.IsAirborne = false;
 				item->Animation.Velocity.y = 0.0f;
 				item->Pose.Position.y = item->Floor;
+				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 
 			item->Pose.Orientation.x = 0;
@@ -251,7 +253,7 @@ namespace TEN::Entities::TR4
 				{
 					int dx = target->Pose.Position.x - item->Pose.Position.x;
 					int dz = target->Pose.Position.z - item->Pose.Position.z;
-					int distance = pow(dx, 2) + pow(dz, 2);
+					int distance = SQUARE(dx) + SQUARE(dz);
 
 					if (distance < minDistance)
 					{
@@ -290,7 +292,7 @@ namespace TEN::Entities::TR4
 
 				if (creature->Enemy)
 				{
-					height = (item->Pose.Position.y + SECTOR(2));
+					height = (item->Pose.Position.y + BLOCK(2));
 					if (creature->Enemy->Pose.Position.y > height && item->Floor > height)
 					{
 						item->Animation.TargetState = HARPY_STATE_FLY_DOWN;
@@ -301,15 +303,15 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 				{
 					dy = abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y);
-					if (dy <= SECTOR(1))
+					if (dy <= BLOCK(1))
 					{
-						if (AI.distance < pow(341, 2))
+						if (AI.distance < SQUARE(341))
 						{
 							item->Animation.TargetState = HARPY_STATE_STINGER_ATTACK;
 							break;
 						}
 
-						if (dy <= SECTOR(1) && AI.distance < pow(SECTOR(2), 2))
+						if (dy <= BLOCK(1) && AI.distance < SQUARE(BLOCK(2)))
 						{
 							item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_DOWN;
 							break;
@@ -319,7 +321,7 @@ namespace TEN::Entities::TR4
 
 				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
-					AI.distance <= pow(SECTOR(3.5f), 2) ||
+					AI.distance <= SQUARE(BLOCK(3.5f)) ||
 					TestProbability(0.5f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
@@ -351,11 +353,11 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead)
 				{
-					if (AI.distance >= pow(341, 2))
+					if (AI.distance >= SQUARE(341))
 					{
 						if (AI.ahead && TestProbability(0.5f) &&
-							AI.distance >= pow(SECTOR(2), 2) &&
-							AI.distance > pow(SECTOR(3.5f), 2))
+							AI.distance >= SQUARE(BLOCK(2)) &&
+							AI.distance > SQUARE(BLOCK(3.5f)))
 						{
 							item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 							item->ItemFlags[0] = 0;
@@ -381,10 +383,10 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (AI.distance >= pow(341, 2))
+				if (AI.distance >= SQUARE(341))
 				{
-					if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
-						AI.distance > pow(SECTOR(3.5f), 2) &&
+					if (AI.ahead && AI.distance >= SQUARE(BLOCK(2)) &&
+						AI.distance > SQUARE(BLOCK(3.5f)) &&
 						TestProbability(0.5f))
 					{
 						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
@@ -400,7 +402,7 @@ namespace TEN::Entities::TR4
 
 			case HARPY_STATE_FLY_DOWN:
 				if (!creature->Enemy ||
-					creature->Enemy->Pose.Position.y < (item->Pose.Position.y + SECTOR(2)))
+					creature->Enemy->Pose.Position.y < (item->Pose.Position.y + BLOCK(2)))
 				{
 					item->Animation.TargetState = HARPY_STATE_IDLE;
 				}
@@ -410,7 +412,7 @@ namespace TEN::Entities::TR4
 			case HARPY_STATE_FLY_FORWARD_DOWN:
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				if (AI.ahead && AI.distance < SQUARE(BLOCK(2)))
 					item->Animation.TargetState = HARPY_STATE_SWOOP_ATTACK;
 				else
 					item->Animation.TargetState = HARPY_STATE_GLIDE;
@@ -423,8 +425,8 @@ namespace TEN::Entities::TR4
 
 				if (item->TouchBits.Test(HarpySwoopAttackJoints) ||
 					creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
-					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-					AI.distance < pow(SECTOR(2), 2))
+					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
+					AI.distance < SQUARE(BLOCK(2)))
 				{
 					DoDamage(creature->Enemy, HARPY_SWOOP_ATTACK_DAMAGE);
 
@@ -440,10 +442,13 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TouchBits.Test(HarpyStingerAttackJoints) ||
-						creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-						AI.distance < pow(SECTOR(2), 2)))
+						(item->TouchBits.Test(HarpyStingerAttackJoints) ||
+						creature->Enemy != nullptr &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
+						AI.distance < SQUARE(BLOCK(2)) &&
+						item->Animation.ActiveState == HARPY_STATE_STINGER_ATTACK &&
+						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 17)
+					)
 				{
 					if (creature->Enemy->IsLara())
 						GetLaraInfo(creature->Enemy)->PoisonPotency += HARPY_STINGER_POISON_POTENCY;
@@ -460,7 +465,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case HARPY_STATE_FLY_BACK:
-				if (AI.ahead && AI.distance > pow(SECTOR(3.5f), 2))
+				if (AI.ahead && AI.distance > SQUARE(BLOCK(3.5f)))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
