@@ -558,7 +558,6 @@ struct ItemT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::Position> pose{};
   int32_t next_item = 0;
   int32_t next_item_active = 0;
-  bool triggered = false;
   bool active = false;
   int32_t status = 0;
   bool hit_stauts = false;
@@ -609,27 +608,26 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSE = 46,
     VT_NEXT_ITEM = 48,
     VT_NEXT_ITEM_ACTIVE = 50,
-    VT_TRIGGERED = 52,
-    VT_ACTIVE = 54,
-    VT_STATUS = 56,
-    VT_HIT_STAUTS = 58,
-    VT_COLLIDABLE = 60,
-    VT_LOOKED_AT = 62,
-    VT_AI_BITS = 64,
-    VT_DATA_TYPE = 66,
-    VT_DATA = 68,
-    VT_BASE_MESH = 70,
-    VT_MESH_POINTERS = 72,
-    VT_EFFECT_TYPE = 74,
-    VT_EFFECT_LIGHT_COLOUR = 76,
-    VT_EFFECT_PRIMARY_COLOUR = 78,
-    VT_EFFECT_SECONDARY_COLOUR = 80,
-    VT_EFFECT_COUNT = 82,
-    VT_LUA_NAME = 84,
-    VT_LUA_ON_KILLED_NAME = 86,
-    VT_LUA_ON_HIT_NAME = 88,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 90,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 92
+    VT_ACTIVE = 52,
+    VT_STATUS = 54,
+    VT_HIT_STAUTS = 56,
+    VT_COLLIDABLE = 58,
+    VT_LOOKED_AT = 60,
+    VT_AI_BITS = 62,
+    VT_DATA_TYPE = 64,
+    VT_DATA = 66,
+    VT_BASE_MESH = 68,
+    VT_MESH_POINTERS = 70,
+    VT_EFFECT_TYPE = 72,
+    VT_EFFECT_LIGHT_COLOUR = 74,
+    VT_EFFECT_PRIMARY_COLOUR = 76,
+    VT_EFFECT_SECONDARY_COLOUR = 78,
+    VT_EFFECT_COUNT = 80,
+    VT_LUA_NAME = 82,
+    VT_LUA_ON_KILLED_NAME = 84,
+    VT_LUA_ON_HIT_NAME = 86,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 88,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 90
   };
   int32_t active_state() const {
     return GetField<int32_t>(VT_ACTIVE_STATE, 0);
@@ -702,9 +700,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t next_item_active() const {
     return GetField<int32_t>(VT_NEXT_ITEM_ACTIVE, 0);
-  }
-  bool triggered() const {
-    return GetField<uint8_t>(VT_TRIGGERED, 0) != 0;
   }
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
@@ -860,7 +855,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<TEN::Save::Position>(verifier, VT_POSE) &&
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM) &&
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
-           VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_STATUS) &&
            VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
@@ -1059,9 +1053,6 @@ struct ItemBuilder {
   void add_next_item_active(int32_t next_item_active) {
     fbb_.AddElement<int32_t>(Item::VT_NEXT_ITEM_ACTIVE, next_item_active, 0);
   }
-  void add_triggered(bool triggered) {
-    fbb_.AddElement<uint8_t>(Item::VT_TRIGGERED, static_cast<uint8_t>(triggered), 0);
-  }
   void add_active(bool active) {
     fbb_.AddElement<uint8_t>(Item::VT_ACTIVE, static_cast<uint8_t>(active), 0);
   }
@@ -1159,7 +1150,6 @@ inline flatbuffers::Offset<Item> CreateItem(
     const TEN::Save::Position *pose = 0,
     int32_t next_item = 0,
     int32_t next_item_active = 0,
-    bool triggered = false,
     bool active = false,
     int32_t status = 0,
     bool hit_stauts = false,
@@ -1224,7 +1214,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_collidable(collidable);
   builder_.add_hit_stauts(hit_stauts);
   builder_.add_active(active);
-  builder_.add_triggered(triggered);
   builder_.add_is_airborne(is_airborne);
   return builder_.Finish();
 }
@@ -1260,7 +1249,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     const TEN::Save::Position *pose = 0,
     int32_t next_item = 0,
     int32_t next_item_active = 0,
-    bool triggered = false,
     bool active = false,
     int32_t status = 0,
     bool hit_stauts = false,
@@ -1314,7 +1302,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       pose,
       next_item,
       next_item_active,
-      triggered,
       active,
       status,
       hit_stauts,
@@ -7057,7 +7044,6 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = pose(); if (_e) _o->pose = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
   { auto _e = next_item(); _o->next_item = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
-  { auto _e = triggered(); _o->triggered = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = status(); _o->status = _e; }
   { auto _e = hit_stauts(); _o->hit_stauts = _e; }
@@ -7112,7 +7098,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _pose = _o->pose ? _o->pose.get() : 0;
   auto _next_item = _o->next_item;
   auto _next_item_active = _o->next_item_active;
-  auto _triggered = _o->triggered;
   auto _active = _o->active;
   auto _status = _o->status;
   auto _hit_stauts = _o->hit_stauts;
@@ -7159,7 +7144,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _pose,
       _next_item,
       _next_item_active,
-      _triggered,
       _active,
       _status,
       _hit_stauts,

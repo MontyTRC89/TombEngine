@@ -305,7 +305,7 @@ void Trigger(short const value, short const flags)
 				if (item->Status == ITEM_INVISIBLE)
 				{
 					item->TouchBits = NO_JOINT_BITS;
-					if (EnableEntityAI(value, 0))
+					if (EnableEntityAI(value, false))
 					{
 						item->Status = ITEM_ACTIVE;
 						AddActiveItem(value);
@@ -322,7 +322,7 @@ void Trigger(short const value, short const flags)
 				item->TouchBits = NO_JOINT_BITS;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(value);
-				EnableEntityAI(value, 1);
+				EnableEntityAI(value, true);
 			}
 		}
 		else
