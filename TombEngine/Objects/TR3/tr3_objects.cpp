@@ -250,6 +250,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
+		obj->HitRoutine = ShivaHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->pivotLength = 0;

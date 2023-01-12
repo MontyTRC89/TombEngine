@@ -7,6 +7,8 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/savegame.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -754,4 +756,49 @@ void DoDamage(ItemInfo* item, int damage)
 			lastHurtTime = GlobalCounter;
 		}
 	}
+}
+
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
+{
+	const auto& object = Objects[target->ObjectNumber];
+
+	if (!object.undead || isExplosive)
+	{
+		if (target->HitPoints > 0)
+		{
+			Statistics.Level.AmmoHits++;
+			DoDamage(target, damage);
+		}
+	}
+
+	if (!target->Callbacks.OnHit.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(target->Name);
+		g_GameScript->ExecuteFunction(target->Callbacks.OnHit, index);
+	}
+}
+
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+{
+	const auto& object = Objects[target.ObjectNumber];
+
+	if (object.hitEffect != HitEffect::None && pos.has_value())
+	{
+		switch (object.hitEffect)
+		{
+		case HitEffect::Blood:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
+			break;
+
+		case HitEffect::Richochet:
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			break;
+
+		case HitEffect::Smoke:
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
+			break;
+		}
+	}
+
+	DoItemHit(&target, damage, isExplosive);
 }
