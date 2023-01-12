@@ -17,10 +17,12 @@
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Math/Random.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -374,6 +376,11 @@ namespace TEN::Entities::Creatures::TR5
 			int deltaFrame;
 			bool unknown;
 
+			int R = 64;
+			int B = (GetRandomControl() & 0x3F) - 64;
+			int G = B;
+			auto sparkColor = Vector3(R, G, B);
+
 			switch (item->Animation.ActiveState)
 			{
 			case STATUE_STATE_IDLE:
@@ -419,14 +426,14 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						if (Targetable(item, &AI) && GetRandomControl() & 1)
 						{
-							item->Animation.TargetState = STATUE_STATE_ENERGY_ATTACK;
+							item->Animation.TargetState = STATUE_STATE_SCREAM;// STATUE_STATE_ENERGY_ATTACK;
 							break;
 						}
 					}
 
 					if (item->TriggerFlags || AI.distance >= pow(SECTOR(2.5f), 2) || !AI.bite)
 					{
-						item->Animation.TargetState = STATUE_STATE_WALK;
+						item->Animation.TargetState = STATUE_STATE_SCREAM;// STATUE_STATE_WALK;
 						break;
 					}
 
@@ -465,10 +472,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					for (int i = 0; i < 2; i++)
 					{
-						int R = 64;
-						int B = (GetRandomControl() & 0x3F) - 64;
-						int G = B;
-						auto sparkColor = Vector3(R, G, B);
+
 
 						TriggerAttackSpark(pos.ToVector3(), sparkColor);
 					}
@@ -483,6 +487,11 @@ namespace TEN::Entities::Creatures::TR5
 					pos = Vector3i(-40, 64, GetRandomControl() % 360);
 				pos = GetJointPosition(item, 14, pos);
 
+				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
+
+				auto orient3 = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
+				auto attackPos = Pose(pos2, orient3);
+
 				color = (GetRandomControl() & 0x3F) + 128;
 
 				pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
@@ -492,6 +501,7 @@ namespace TEN::Entities::Creatures::TR5
 				for (int i = 0; i < 8; i++)
 				{
 					auto* arc = RomanStatueData.EnergyArcs[i];
+					
 
 					if (arc && arc->life)
 					{
@@ -499,47 +509,103 @@ namespace TEN::Entities::Creatures::TR5
 						arc->pos4.y = pos2.y;
 						arc->pos4.z = pos2.z;
 
+
+						if (!(GlobalCounter & 3) || unknown)
+						{
+							unknown = true;
+							continue;
+						}
+
 						if (item->TriggerFlags)
+						{
+
+							int random = (GetRandomControl() & 0x3F) + 16;
+							int width2 = GenerateInt(2, 6);
+
+								RomanStatueData.EnergyArcs[i] = TriggerLightning(
+									(Vector3i*)&pos1.x,
+									(Vector3i*)&pos,
+									random,
+									0, color, (color / 2),
+									50, (LI_THININ | LI_SPLINE | LI_THINOUT), width2, 10);
+							
+								TriggerRomanStatueShockwaveAttackSparks(
+									attackPos.Position.x,
+									attackPos.Position.y,
+									attackPos.Position.z,
+									0,
+									(((GetRandomControl() & 0x3F) + 128) / 2),
+									(((GetRandomControl() & 0x3F) + 128)),
+									64);
+
+							TriggerAttackSpark(pos.ToVector3(), sparkColor);
+
+							
 							TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color / 2);
+							unknown = 1;
+						}
 						else
 							TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color / 2, color);
 
 						continue;
 					}
 
-					if (!(GlobalCounter & 3) || unknown)
-					{
-						unknown = true;
-						continue;
-					}
+
+
 
 					if (item->TriggerFlags)
 					{
-						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-							(Vector3i*)& dest.Orientation.x,
-							(Vector3i*)& dest,
-							(GetRandomControl() & 0x3F) + 16,
-							(color >> 1) | ((color | 0x180000) << 8),
-							15,
-							48,
-							5);*/
 
+					/*	int random = (GetRandomControl() & 0x3F) + 16;
+						RomanStatueData.EnergyArcs[i] = TriggerLightning(
+							(Vector3i*)&pos1.x,
+							(Vector3i*)&pos,
+							random,
+							0, G, B,
+							50, (LI_THININ | LI_SPLINE | LI_THINOUT), 10, 10);*/
+
+					/*	RomanStatueData.EnergyArcs[i] = TriggerLightning(
+							(Vector3i*)&pos1.x,
+							(Vector3i*)&pos,
+							random,
+							0 + 130, (color / 2) + 130, color + 130,
+							50, (LI_THININ | LI_SPLINE | LI_THINOUT), 4, 10);
+
+
+
+					
+
+						TriggerAttackSpark(pos.ToVector3(), sparkColor);
+						
 						TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
 						unknown = 1;
-						continue;
+						continue; */
 					}
 
-					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-						&pos2,
-						&pos1,
-						(GetRandomControl() & 0x3F) + 16,
-						color | (((color >> 1) | 0x180000) << 8),
-						15,
-						48,
-						5);*/
+					int random = (GetRandomControl() & 0x3F) + 16;
+
+				/*	RomanStatueData.EnergyArcs[i] = TriggerLightning(
+						(Vector3i*)&pos1.x,
+						(Vector3i*)&pos,
+						random,
+						0, color / 2, color,
+						50, (LI_THININ | LI_SPLINE | LI_THINOUT), 10, 10);*/
+
+					//TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
+					//unknown = true;
+
+				/*	RomanStatueData.EnergyArcs[i] = TriggerLightning(
+						(Vector3i*)&pos1.x,
+						(Vector3i*)&pos,
+						random,
+						0 + 130, (color / 2) + 130, color +130,
+						50, (LI_THININ | LI_SPLINE | LI_THINOUT), 4, 10);*/
 
 					TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
 					unknown = true;
+
+					//TriggerAttackSpark(pos.ToVector3(), sparkColor);
+
 				}
 
 				break;
