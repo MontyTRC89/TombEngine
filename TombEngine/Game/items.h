@@ -48,6 +48,7 @@ enum ItemFlags
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
 constexpr unsigned int NO_JOINT_BITS  = 0;
+constexpr int NO_JOINT = -1;
 
 enum class JointBitType
 {
@@ -191,3 +192,5 @@ std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
+void DoItemHit(ItemInfo* target, int damage, bool explosive);
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex);

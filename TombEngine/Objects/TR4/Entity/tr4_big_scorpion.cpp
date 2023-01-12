@@ -259,7 +259,7 @@ namespace TEN::Entities::TR4
 
 					if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
 					{
-						CreatureKill(item, BSCORPION_ANIM_KILL, BSCORPION_STATE_KILL, LA_BIG_SCORPION_DEATH);
+						CreatureKill(item, BSCORPION_ANIM_KILL, 0, BSCORPION_STATE_KILL, LS_DEATH); // TODO: add big_scorpion lara extra state enum
 						creature->MaxTurn = 0;
 						return;
 					}

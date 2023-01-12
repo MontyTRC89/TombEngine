@@ -11,6 +11,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Math/Math.h"
@@ -67,8 +68,8 @@ namespace TEN::Entities::TR4
 		// 5
 		// 6
 		// 7
-		BADDY_STATE_UNKNOWN_8 = 8,
-		BADDY_STATE_UNKNOWN_9 = 9,
+		BADDY_STATE_DODGE = 8,
+		BADDY_STATE_DODGE_END = 9,
 		BADDY_STATE_DRAW_GUN = 10,
 		BADDY_STATE_HOLSTER_GUN = 11,
 		BADDY_STATE_DRAW_SWORD = 12,
@@ -1198,7 +1199,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDY_STATE_UNKNOWN_8:
+			case BADDY_STATE_DODGE:
 				currentCreature->MaxTurn = 0;
 
 				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
@@ -1206,7 +1207,7 @@ namespace TEN::Entities::TR4
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
 				{
-					item->Animation.TargetState = BADDY_STATE_UNKNOWN_9;
+					item->Animation.TargetState = BADDY_STATE_DODGE_END;
 				}
 
 				break;
@@ -1311,7 +1312,33 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState = BADDY_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}
+	}
 
-		return;
+	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
+	{
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (pos.has_value())
+		{
+			if ((target.Animation.ActiveState == BADDY_STATE_DODGE || Random::TestProbability(1 / 2.0f)) &&
+				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+				 player.Control.Weapon.GunType == LaraWeaponType::HK ||
+				 player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+			{
+				// Baddy2 sword deflecting bullet.
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
+			else if (object.hitEffect == HitEffect::Blood)
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+			}
+		}
+
+		DoItemHit(&target, damage, explosive);
 	}
 }
