@@ -17,6 +17,10 @@ constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS = 0;
+constexpr int		   NO_JOINT = -1;
+
 enum AIObjectType
 {
 	NO_AI	  = 0,
@@ -44,17 +48,6 @@ enum ItemFlags
 	IFLAG_REVERSE		  = (1 << 14),
 	IFLAG_KILLED		  = (1 << 15),
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
-};
-
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
-constexpr int NO_JOINT = -1;
-
-enum class JointBitType
-{
-	Touch,
-	Mesh,
-	MeshSwap
 };
 
 enum class EffectType
@@ -192,5 +185,5 @@ std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
-void DoItemHit(ItemInfo* target, int damage, bool explosive);
-void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex);
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive);
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);

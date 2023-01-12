@@ -883,7 +883,7 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
-	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
+	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
 		const auto& object = Objects[target.ObjectNumber];
 
@@ -893,6 +893,6 @@ namespace TEN::Entities::Creatures::TR5
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 
-		DoItemHit(&target, damage, explosive);
+		DoItemHit(&target, damage, isExplosive);
 	}
 }

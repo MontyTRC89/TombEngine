@@ -758,11 +758,11 @@ void DoDamage(ItemInfo* item, int damage)
 	}
 }
 
-void DoItemHit(ItemInfo* target, int damage, bool explosive)
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || explosive)
+	if (!object.undead || isExplosive)
 	{
 		if (target->HitPoints > 0)
 		{
@@ -778,7 +778,7 @@ void DoItemHit(ItemInfo* target, int damage, bool explosive)
 	}
 }
 
-void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 {
 	const auto& object = Objects[target.ObjectNumber];
 
@@ -800,5 +800,5 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 		}
 	}
 
-	DoItemHit(&target, damage, explosive);
+	DoItemHit(&target, damage, isExplosive);
 }

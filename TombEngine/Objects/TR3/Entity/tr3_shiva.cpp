@@ -461,7 +461,7 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 
-	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
+	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
@@ -477,7 +477,7 @@ namespace TEN::Entities::Creatures::TR3
 		else if (object.hitEffect == HitEffect::Blood && pos.has_value())
 		{
 			DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
-			DoItemHit(&target, damage, explosive);
+			DoItemHit(&target, damage, isExplosive);
 		}
 	}
 
