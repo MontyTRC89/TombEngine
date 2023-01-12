@@ -466,9 +466,6 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 {
 	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
-	int i;
-	unsigned char r, g, b;
-
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 	int scalar = 1;
@@ -521,7 +518,8 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 	if (dynamic == -2)
 	{
-		for ( i = 0; i < 8; i++)
+		int i = 0;
+		for (i = 0; i < 8; i++)
 		{
 			auto dynsp = &ParticleDynamics[i];
 
@@ -562,7 +560,9 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 
 	if (uw == 1)
+	{
 		spark.friction = 17;
+	}
 	else
 		spark.friction = 51;
 
@@ -577,9 +577,13 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
 		}
 		else if (uw == 1)
+		{
 			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		}
 		else
+		{
 			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
+		}
 
 	spark.scalar = 3;
 	spark.gravity = 0;
@@ -592,9 +596,9 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 	if (uw == 2)
 	{
-		r = spark.sR;
-		g = spark.sG;
-		b = spark.sB;
+		unsigned char r = spark.sR;
+		unsigned char g = spark.sG;
+		unsigned char b = spark.sB;
 		spark.sR = b;
 		spark.sG = r;
 		spark.sB = g;
