@@ -3,6 +3,7 @@ Version 1.0.6
 
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
 * Fix savegame crash for disabled enemies with partially set activation mask.
+* Fix certain enemies not damaging Lara if binoculars or lasersight mode is active.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
 * Fix double activation of TR4 seth blades when used an OCB different than 0.
 * Fix sting attack of TR4 harpy which was neither hurting nor poisoning Lara.
