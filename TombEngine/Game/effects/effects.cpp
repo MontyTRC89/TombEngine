@@ -166,6 +166,7 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	if (particle.Age > particle.life)
 	{
 		particle.on = false;
+		ParticleDynamics[particle.dynamic].On = false;
 		return;
 	}
 
