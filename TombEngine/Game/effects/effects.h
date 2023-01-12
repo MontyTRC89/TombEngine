@@ -3,9 +3,9 @@
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
-struct ItemInfo;
+enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
-enum GAME_OBJECT_ID:short;
+struct ItemInfo;
 
 enum RIPPLE_TYPE
 {
@@ -135,7 +135,7 @@ struct Particle
 	unsigned char fxObj;
 	unsigned char roomNumber;
 	unsigned char nodeNumber;
-	float age;
+	float Age; // TODO: Not needed, use life.
 };
 
 struct SPLASH_STRUCT
@@ -200,6 +200,8 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 
 Particle* GetFreeParticle();
 
+void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
+
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
@@ -231,4 +233,3 @@ void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
-void SetSpriteSequence(Particle* spk, GAME_OBJECT_ID slot);
