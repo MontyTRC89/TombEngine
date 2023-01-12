@@ -460,6 +460,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = HeavyGuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->HitRoutine = HeavyGuardHit;
 		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;

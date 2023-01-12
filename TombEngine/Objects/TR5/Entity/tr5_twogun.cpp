@@ -35,6 +35,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto HEAVY_GUARD_ALERT_RANGE	  = SQUARE(BLOCK(2));
 	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE = SQUARE(BLOCK(3));
+	constexpr auto HEAVY_GUARD_CLOSE_RANGE	  = SQUARE(SECTOR(1));
 
 	constexpr auto HEAVY_GUARD_IDLE_TURN_RATE_MAX = ANGLE(2.0f); // TODO: ANGLE(1.0f)?
 	constexpr auto HEAVY_GUARD_WALK_TURN_RATE_MAX = ANGLE(5.0f);
@@ -96,11 +97,38 @@ namespace TEN::Entities::Creatures::TR5
 
 	};
 
+	void HeavyGuardHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (pos.has_value())
+		{
+			if (jointIndex != 2 &&
+				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+					player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+					player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+					player.Control.Weapon.GunType == LaraWeaponType::HK ||
+					player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+			{
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
+			else if (object.hitEffect == HitEffect::Blood)
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+			}
+		}
+
+		DoItemHit(&target, damage, isExplosive);
+	}
+
+
 	void InitialiseHeavyGuard(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		SetAnimation(&item, HEAVY_GUARD_ANIM_IDLE);
 	}
 
@@ -273,7 +301,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else if (!Targetable(&item, &ai))
 					{
-						if (item.TriggerFlags != 1)
+						if (item.TriggerFlags != 1 && ai.distance > HEAVY_GUARD_CLOSE_RANGE)
 							item.Animation.TargetState = HEAVY_GUARD_STATE_WALK_FORWARD;
 					}
 					else if (ai.distance < HEAVY_GUARD_IDLE_AIM_RANGE || ai.zoneNumber != ai.enemyZone)
@@ -291,6 +319,12 @@ namespace TEN::Entities::Creatures::TR5
 
 			case HEAVY_GUARD_STATE_WALK_FORWARD:
 				creature.MaxTurn = HEAVY_GUARD_WALK_TURN_RATE_MAX;
+
+				if (ai.distance < HEAVY_GUARD_CLOSE_RANGE)
+				{
+					item.Animation.TargetState = HEAVY_GUARD_STATE_IDLE;
+					break;
+				}
 
 				if (Targetable(&item, &ai) &&
 					laraAI.angle < ANGLE(33.0f) && laraAI.angle > ANGLE(-33.0f))
@@ -354,7 +388,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					item.Animation.TargetState = HEAVY_GUARD_STATE_RATTLE_RAYGUN;
 				}
-				else if (Targetable(&item, &ai))
+				else if (Targetable(&item, &ai) && (ai.distance <= HEAVY_GUARD_IDLE_AIM_RANGE || ai.distance < HEAVY_GUARD_CLOSE_RANGE))
 				{
 					item.Animation.TargetState = HEAVY_GUARD_STATE_DUAL_RAYGUN_ATTACK;
 				}
@@ -527,7 +561,7 @@ namespace TEN::Entities::Creatures::TR5
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
 
-			Vector3i hitPos;
+			Vector3i hitPos = Vector3i::Zero;
 			MESH_INFO* hitMesh = nullptr;
 
 			GameVector start = GameVector(pos1, 0);
