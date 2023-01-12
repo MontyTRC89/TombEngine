@@ -4,6 +4,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -156,16 +157,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER2];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(obj, ID_GOON_SILENCER1, -1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -183,16 +175,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER3];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(obj, ID_GOON_SILENCER1, -1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -370,16 +353,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
 	if (obj->loaded)
 	{
-		if (Objects[ID_MERCENARY_AUTOPISTOLS1].loaded)
-		{
-			obj->animIndex = Objects[ID_MERCENARY_AUTOPISTOLS1].animIndex;
-			obj->frameBase = Objects[ID_MERCENARY_AUTOPISTOLS1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(obj, ID_MERCENARY_AUTOPISTOLS1, -1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
@@ -458,9 +432,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_DRAGON_BACK].loaded)
-			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK.", LogLevel::Warning);
-
+		CheckIfSlotExist(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -475,9 +447,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI.", LogLevel::Warning);
-
+		CheckIfSlotExist(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -488,6 +458,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
+		CheckIfSlotExist(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
 	}

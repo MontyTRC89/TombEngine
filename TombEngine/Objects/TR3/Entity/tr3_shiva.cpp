@@ -122,11 +122,11 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (isDead && item.ItemFlags[0] < 0)
 			{
-				item.SetFlags(2, 0);
+				item.SetFlagField(2, 0);
 			}
 			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
 			{
-				item.SetFlags(2, 0);
+				item.SetFlagField(2, 0);
 			}
 			else
 			{
@@ -154,13 +154,13 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			item.Animation.TargetState = SHIVA_STATE_IDLE;
 			creature.Flags = -45;
-			item.SetFlags(1, 0);
-			item.SetFlags(1, 1); // Is alive (for savegame).
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 1); // Is alive (for savegame).
 		}
 		else if (item.TestFlags(2, 0) && isDead)
 		{
-			item.SetFlags(1, 0);
-			item.SetFlags(1, 2); // Is dead.
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 2); // Is dead.
 			return true;
 		}
 
@@ -177,7 +177,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.Status &= ~ITEM_INVISIBLE;
 
 		// Joint index used for swapping mesh.
-		item.SetFlags(0, 0);
+		item.SetFlagField(0, 0);
 
 		if (item.TestFlags(1, 0))
 		{
@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR3
 				SwapShivaMeshToStone(item, jointIndex);
 
 			// Continue transition until finished.
-			item.SetFlags(2, 1);
+			item.SetFlagField(2, 1);
 		}
 	}
 
@@ -208,10 +208,10 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != SHIVA_STATE_DEATH)
 			{
 				SetAnimation(item, SHIVA_ANIM_DEATH);
-				item->ItemFlags[0] = object.nmeshes - 1;
+				item->SetFlagField(0, object.nmeshes - 1);
 
 				// Redo mesh swap to stone.
-				item->SetFlags(2, 2);
+				item->SetFlagField(2, 2);
 			}
 
 			int frameEnd = g_Level.Anims[object.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
@@ -232,6 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 			GetCreatureMood(item, &ai, true);
 			CreatureMood(item, &ai, true);
 
+			// Shiva don't resent fear.
 			if (creature->Mood == MoodType::Escape)
 			{
 				creature->Target.x = creature->Enemy->Pose.Position.x;

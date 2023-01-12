@@ -1321,7 +1321,7 @@ namespace TEN::Entities::TR4
 
 		if (pos.has_value())
 		{
-			if ((target.Animation.ActiveState == BADDY_STATE_DODGE || Random::TestProbability(1 / 2.0f)) &&
+			if (target.Animation.ActiveState == BADDY_STATE_DODGE &&
 				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
@@ -1335,7 +1335,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (object.hitEffect == HitEffect::Blood)
 			{
-				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
 			}
 		}
 

@@ -1,5 +1,6 @@
 #pragma once
 
+class GameVector;
 struct BiteInfo;
 struct ItemInfo;
 
@@ -7,6 +8,7 @@ namespace TEN::Entities::Creatures::TR3
 {
 	void InitialisePuna(short itemNumber);
 	void PunaControl(short itemNumber);
+	void PunaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 
 	void DoPunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon);
 

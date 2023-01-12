@@ -31,7 +31,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 120;
 	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
-	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.75f, 0.75f, 1.0f);
+	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.5f, 0.5f, 0.5f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
 	const auto PunaBossHandBite = BiteInfo(Vector3::Zero, 14);
@@ -193,9 +193,6 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			if (item.HitStatus)
-				SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &item.Pose);
-
 			short headYOrient = GetPunaHeadOrientToTarget(item, creature.Target.ToVector3());
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
@@ -292,6 +289,25 @@ namespace TEN::Entities::Creatures::TR3
 			hasTurned = false;
 			StopSoundEffect(SFX_TR3_PUNA_BOSS_CHAIR_2);
 			StopSoundEffect(SFX_TR3_PUNA_BOSS_TURN_CHAIR);
+		}
+	}
+
+	void PunaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		if (pos.has_value())
+		{
+			if (target.TestFlags(BOSSFlag_Object, BOSS_Shield) &&
+				target.TestFlagField(BOSSFlag_ShieldIsEnabled, 1))
+			{
+				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), PUNA_EFFECT_COLOR);
+			}
+			else
+			{
+				if (target.HitStatus)
+					SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
+				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
+				DoItemHit(&target, damage, isExplosive);
+			}
 		}
 	}
 

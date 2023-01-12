@@ -4,6 +4,9 @@
 #define InitFunction void(short itemNumber)
 #define ControlFunction void(short itemNumber)
 
+void AssignObjectMeshSwap(ObjectInfo* obj, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName);
+void CheckIfSlotExist(int requiredObj, const std::string& baseName, const std::string& requiredName);
+void AssignObjectAnimations(ObjectInfo* obj, int requiredObj, int requiredSecondObj = -1, const std::string& baseName = "NOT_SET", const std::string& requiredName = "NOT_SET", const std::string& requiredSecondName = "NOT_SET");
 void InitSmashObject(ObjectInfo* obj, int objectNumber);
 void InitKeyHole(ObjectInfo* obj, int objectNumber);
 void InitPuzzleHole(ObjectInfo* obj, int objectNumber);

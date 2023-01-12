@@ -80,7 +80,7 @@ struct ObjectInfo
 	}
 
 	/// <summary>
-	/// Use this to set up a hit rffect for the slot based on its value.
+	/// Use this to set up a hit effect for the slot based on its value.
 	/// </summary>
 	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
