@@ -277,7 +277,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!isLaraAlive)
 		{
 			info->MaxTurn = 0;
-			CreatureKill(item, 31, 14, 103);
+			CreatureKill(item, 31, 0, 14, 103); // TODO: add yeti state enum and lara extra state enum
 			return;
 		}
 

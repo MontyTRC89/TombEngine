@@ -566,13 +566,13 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 	return true;
 }
 
-void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState)
+void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int entityKillState, int laraKillState)
 {
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + entityKillAnim;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = killState;
+	item->Animation.ActiveState = entityKillState;
 
-	LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+	LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + laraExtraKillAnim;
 	LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 	LaraItem->Animation.ActiveState = 0;
 	LaraItem->Animation.TargetState = laraKillState;

@@ -19,11 +19,9 @@
 #include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
-#include "Objects/Effects/Boss.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Objects/TR3/Entity/PunaBoss.h"
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
@@ -32,9 +30,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Effects::Boss;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -789,8 +785,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	const auto& weapon = Weapons[(int)weaponType];
 
 	auto wobbledArmOrient = EulerAngles(
-		armOrient.x + (Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy) / 2),
-		armOrient.y + (Random::GenerateAngle(-weapon.ShotAccuracy, weapon.ShotAccuracy) / 2),
+		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
+		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
 		0);
 
 	auto muzzleOffset = GetJointPosition(laraItem, LM_RHAND);
@@ -836,27 +832,15 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	}
 	else
 	{
+		Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * bestDistance);
-
 		auto vTarget = GameVector(target);
-
-		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
-		{
-			// If shield is active and Puna activated it, spawn shield with ricochet effect.
-			if (targetEntity->TestFlags(BOSSFlag_Object, BOSS_Shield) &&
-				targetEntity->TestFlagField(BOSSFlag_ShieldIsEnabled, 1))
-			{
-				SpawnShieldAndRichochetSparks(*targetEntity, vTarget.ToVector3(), Vector4(0.0f, 0.5f, 0.5f, 0.1f));
-				return FireWeaponType::Miss;
-			}
-		}
-
+		
 		// NOTE: It seems that items hit by the player in the normal way must have GetTargetOnLOS return false.
 		// It's strange, but this will replicate original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
 			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
 
-		Statistics.Game.AmmoHits++;
 		return FireWeaponType::PossibleHit;
 	}
 }
@@ -1063,72 +1047,34 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	lara.TargetArmOrient = orient;
 }
 
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive)
 {
 	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	targetEntity->HitStatus = true;
 
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	const auto& object = Objects[targetEntity->ObjectNumber];
-
 	if (hitPos != nullptr)
 	{
-		if (object.hitEffect != HitEffect::None)
+		int foundJointID = -1;
+		for (int jointID = 0; jointID < object.nmeshes; jointID++)
 		{
-			switch (object.hitEffect)
+			auto pos = GetJointPosition(targetEntity, jointID);
+			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < BLOCK(1 / 16.0f))
 			{
-			case HitEffect::Blood:
-				if (targetEntity->ObjectNumber == ID_BADDY2 &&
-					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
-					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-						lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-						lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
-				{
-					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-					return;
-				}
-				else
-				{
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity->Pose.Orientation.y, targetEntity->RoomNumber);
-				}
-
-				break;
-
-			case HitEffect::Richochet:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
-					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
-				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
-				}
-
-				break;
-
-			case HitEffect::Smoke:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				foundJointID = jointID;
 				break;
 			}
 		}
-	}
 
-	if (!object.undead || grenade)
-	{
-		if (targetEntity->HitPoints > 0)
-		{
-			Statistics.Level.AmmoHits++;
-			DoDamage(targetEntity, damage);
-		}
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, foundJointID);
 	}
-
-	if (!targetEntity->Callbacks.OnHit.empty())
+	else
 	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->Name);
-		g_GameScript->ExecuteFunction(targetEntity->Callbacks.OnHit, index);
+		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, isExplosive, NO_JOINT);
 	}
 }
 
