@@ -77,91 +77,89 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
-	void Renderer11::DrawTwogunLaser(RenderView& view)
+	void Renderer11::DrawHelicalLasers(RenderView& view)
 	{
-			byte r, g, b;
+		byte r, g, b;
 
-			for (int i = 0; i < twogun.size(); i++)
+		for (int i = 0; i < HelicalLasers.size(); i++)
+		{
+			auto* tg = &HelicalLasers[i];
+
+			if (tg->life)
 			{
-				auto* tg = &twogun[i];
-
-				if (tg->life)
+				if (tg->fadein < 8)
 				{
-					if (tg->fadein < 8)
-					{
-						r = (tg->r * tg->fadein) >> 3;
-						g = (tg->g * tg->fadein) >> 3;
-						b = (tg->b * tg->fadein) >> 3;
-					}
-					else if (tg->life < 16)
-					{
-						r = (tg->r * tg->life) >> 4;
-						g = (tg->g * tg->life) >> 4;
-						b = (tg->b * tg->life) >> 4;
-					}
-					else
-					{
-						r = tg->r;
-						g = tg->g;
-						b = tg->b;
-					}
-
-					LightningPos[0].x = tg->pos4.x;
-					LightningPos[0].y = tg->pos4.y;
-					LightningPos[0].z = tg->pos4.z;
-
-					memcpy(&LightningPos[1], tg, 48);
-
-					LightningPos[1].x = tg->pos1.x;
-					LightningPos[1].y = tg->pos1.y;
-					LightningPos[1].z = tg->pos1.z;
-			
-					for (int j = 0; j < 2; j++)
-					{
-						LightningPos[j].x -= tg->pos4.x;
-						LightningPos[j].y -= tg->pos4.y;
-						LightningPos[j].z -= tg->pos4.z;
-					}
-
-					CurlSpline(&LightningPos[0], LightningBuffer, tg);
-
-					if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
-					{
-						short* interpolatedPos = &LightningBuffer[0];
-
-						for (int s = 0; s < tg->segments ; s++)
-						{
-								int ix = tg->pos4.x + interpolatedPos[0];
-								int iy = tg->pos4.y + interpolatedPos[1];
-								int iz = tg->pos4.z + interpolatedPos[2];
-
-								interpolatedPos += 4;
-
-								int ix2 = tg->pos4.x + interpolatedPos[0];
-								int iy2 = tg->pos4.y + interpolatedPos[1];
-								int iz2 = tg->pos4.z + interpolatedPos[2];
-
-								Vector3 pos1 = Vector3(ix, iy, iz);
-								Vector3 pos2 = Vector3(ix2, iy2, iz2);
-
-								Vector3 d = pos2 - pos1;
-								d.Normalize();
-
-								Vector3 c = (pos1 + pos2) / 2;
-
-								AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-									c,
-									Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-									(PI / 2),
-									1.0f,
-									{ 5 * 8.0f,
-								Vector3::Distance(pos1, pos2) },
-									BLENDMODE_ADDITIVE,
-									d, true, view);							
-						}
-					}					
+					r = (tg->r * tg->fadein) >> 3;
+					g = (tg->g * tg->fadein) >> 3;
+					b = (tg->b * tg->fadein) >> 3;
 				}
-			}	
+				else if (tg->life < 16)
+				{
+					r = (tg->r * tg->life) >> 4;
+					g = (tg->g * tg->life) >> 4;
+					b = (tg->b * tg->life) >> 4;
+				}
+				else
+				{
+					r = tg->r;
+					g = tg->g;
+					b = tg->b;
+				}
+
+				LightningPos[0].x = tg->pos4.x;
+				LightningPos[0].y = tg->pos4.y;
+				LightningPos[0].z = tg->pos4.z;
+
+				memcpy(&LightningPos[1], tg, 48);
+
+				LightningPos[1].x = tg->pos1.x;
+				LightningPos[1].y = tg->pos1.y;
+				LightningPos[1].z = tg->pos1.z;
+			
+				for (int j = 0; j < 2; j++)
+				{
+					LightningPos[j].x -= tg->pos4.x;
+					LightningPos[j].y -= tg->pos4.y;
+					LightningPos[j].z -= tg->pos4.z;
+				}
+
+				CurlSpline(&LightningPos[0], LightningBuffer, tg);
+
+				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
+					abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
+					abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+				{
+					short* interpolatedPos = &LightningBuffer[0];
+
+					for (int s = 0; s < tg->segments ; s++)
+					{
+						int ix = tg->pos4.x + interpolatedPos[0];
+						int iy = tg->pos4.y + interpolatedPos[1];
+						int iz = tg->pos4.z + interpolatedPos[2];
+
+						interpolatedPos += 4;
+
+						int ix2 = tg->pos4.x + interpolatedPos[0];
+						int iy2 = tg->pos4.y + interpolatedPos[1];
+						int iz2 = tg->pos4.z + interpolatedPos[2];
+
+						auto pos1 = Vector3(ix, iy, iz);
+						auto pos2 = Vector3(ix2, iy2, iz2);
+
+						auto d = pos2 - pos1;
+						d.Normalize();
+
+						auto c = (pos1 + pos2) / 2;
+
+						AddSpriteBillboardConstrained(
+							&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+							c,
+							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
+							{ 5 * 8.0f, Vector3::Distance(pos1, pos2) }, BLENDMODE_ADDITIVE, d, true, view);							
+					}
+				}					
+			}
+		}	
 	}
 
 	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, HelicalLaser* tg)
@@ -174,13 +172,11 @@ namespace TEN::Renderer
 
 		float x, y, z;
 
-		z = 0;
-
-		Vector3 lineStartPoint = Vector3(pos[0].x, pos[0].y, pos[0].z);
-		Vector3 lineEndPoint = Vector3(pos[1].x, pos[1].y, pos[1].z);
+		auto lineStartPoint = pos[0].ToVector3();
+		auto lineEndPoint = pos[1].ToVector3();;
 
 		// Calculate the direction vector of the line
-		Vector3 direction = (lineEndPoint - lineStartPoint) / tg->segments;
+		auto direction = (lineEndPoint - lineStartPoint) / tg->segments;
 
 		// Normalize the direction vector
 		direction.Normalize();

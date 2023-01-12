@@ -553,7 +553,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!plasma)
 		{
-			TriggerLaserBeam(pos1.ToVector3(), pos2.ToVector3());
+			SpawnHelicalLaser(pos1.ToVector3(), pos2.ToVector3());
 
 			item->ItemFlags[LeftRight] = 16;
 			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient), 16);
