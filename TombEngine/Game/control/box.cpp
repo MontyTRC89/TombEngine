@@ -1221,7 +1221,7 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	{
 		vault = 3;
 	}
-	else
+	else if (item->Pose.Position.y > (y - CLICK(4.5f)))
 	{
 		vault = 4;
 	}
