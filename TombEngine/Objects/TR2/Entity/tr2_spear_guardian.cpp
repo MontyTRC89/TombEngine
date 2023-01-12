@@ -342,7 +342,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (isLaraAlive && LaraItem->HitPoints <= 0)
 		{
-			CreatureKill(item, 49, 19, 2);
+			CreatureKill(item, 49, 0, 19, LS_DEATH); // TODO: add spear_guardian state enum and lara extra state enum
 			return;
 		}
 

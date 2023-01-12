@@ -662,7 +662,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_color(&FromVector4(itemToSerialize.Model.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
-		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
@@ -1495,7 +1494,7 @@ bool SaveGame::Load(int slot)
 			UpdateBridgeItem(i);
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
 
@@ -1531,7 +1530,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
-			SetBaddyTarget(i, savedCreature->ai_target_number());
+			SetEntityTarget(i, savedCreature->ai_target_number());
 		}
 		else if (item->Data.is<QuadBikeInfo>())
 		{
