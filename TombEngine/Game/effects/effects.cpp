@@ -162,8 +162,9 @@ Particle* GetFreeParticle()
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 {
-	particle.Age++;
-	if (particle.Age > particle.life)
+	float particleAge=  particle.sLife - particle.life;
+
+	if (particleAge > particle.life )
 	{
 		particle.on = false;
 		ParticleDynamics[particle.dynamic].On = false;
@@ -171,7 +172,7 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	}
 
 	int numSprites = -Objects[objectID].nmeshes - 1;
-	float normalizedAge = particle.Age / particle.life;
+	float normalizedAge = particleAge / particle.life;
 	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
 }
 

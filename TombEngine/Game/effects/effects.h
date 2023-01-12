@@ -135,7 +135,6 @@ struct Particle
 	unsigned char fxObj;
 	unsigned char roomNumber;
 	unsigned char nodeNumber;
-	float Age; // TODO: Not needed, use life.
 };
 
 struct SPLASH_STRUCT
