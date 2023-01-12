@@ -465,7 +465,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
-		obj->explodableMeshbits = 0x4;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);

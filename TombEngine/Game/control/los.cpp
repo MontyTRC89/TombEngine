@@ -136,23 +136,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
 							LaserSight)
 						{
-							if (item->ObjectNumber == ID_GUARD_LASER)
-							{
-								short angle = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
-								if (angle > -ANGLE(90) && angle < ANGLE(90))
-								{
-									DoDamage(item, INT_MAX);
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
-								}
-							}
-							else
-							{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = directionNorm;
 								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-							}
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
 						}
 						else
 						{

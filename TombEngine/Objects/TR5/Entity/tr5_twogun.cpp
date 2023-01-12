@@ -444,26 +444,18 @@ namespace TEN::Entities::Creatures::TR5
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
-		if (pos.has_value())
-		{
-			if (jointIndex != 2 &&
-				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-					player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-					player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
-					player.Control.Weapon.GunType == LaraWeaponType::HK ||
-					player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+			if (jointIndex == 2 && pos.has_value() )
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+				DoItemHit(&target, INT_MAX, isExplosive);
+				return;
+			}
+			else 
 			{
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 				return;
 			}
-			else if (object.hitEffect == HitEffect::Blood)
-			{
-				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
-			}
-		}
-
-		DoItemHit(&target, damage, isExplosive);
 	}
 
 	/*void FireHeavyGuardRaygun(ItemInfo& item, bool fireRight, bool spawnLaser)
