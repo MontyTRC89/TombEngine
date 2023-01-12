@@ -512,7 +512,6 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.fadeToBlack = 16;
 		spark.life = (GetRandomControl() & 7) + 24;
 		spark.sLife = spark.life;
-		spark.Age = 0.0f;		
 	}
 
 	spark.extras = unsigned char(extraTrig | ((extrasTable[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
