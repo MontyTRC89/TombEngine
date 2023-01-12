@@ -682,7 +682,7 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		void DrawTwogunLaser(RenderView& view);
-		void CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg);
+		void CurlSpline(Vector3i* pos, short* buffer, HelicalLaser* tg);
 		std::string GetDefaultAdapterName();
 	};
 

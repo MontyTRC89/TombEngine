@@ -9,109 +9,103 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
-#include "Renderer/Renderer11.h"
-#include "Sound/sound.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
-
-using std::vector;
-using TEN::Renderer::g_Renderer;
+#include "Renderer/Renderer11.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Creatures::TR5;
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Lightning
 {
 	constexpr auto MAX_ENERGYARCS = 32;
 	
 	int LightningRandomSeed = 0x0D371F947;
-	float FloatSinCosTable[8192];
 	Vector3i LightningPos[6];
 	short LightningBuffer[1024];
-		
+	
 	std::vector<LIGHTNING_INFO> Lightning;
-	std::vector<TwogunLaserInfo> twogun;
+	std::vector<HelicalLaser>	twogun;
 
-	 void TriggerLaserBeam(Vector3i src, Vector3i dest)
+	void TriggerLaserBeam(const Vector3& origin, const Vector3& target)
 	 {
-		 TwogunLaserInfo tg;
+		HelicalLaser laser;
 
-			 tg.pos1 = src;
-			 tg.pos4 = dest;
-			 tg.pos.Position = src;
-			 tg.life = 17;
-			 tg.spin = (GetRandomControl() & 31) << 11;
-			 tg.dlength = 4096;
-			 tg.r = 0;
-			 tg.b = 255;
-			 tg.g = 96;
-			 tg.fadein = 8;
+		laser.pos1 = origin;
+		laser.pos4 = target;
+		laser.pos.Position = origin;
+		laser.life = 17;
+		laser.spin = (GetRandomControl() & 31) << 11;
+		laser.dlength = 4096;
+		laser.r = 0;
+		laser.b = 255;
+		laser.g = 96;
+		laser.fadein = 8;
 
-			 twogun.push_back(tg);
-		
-			 TriggerLightningGlow(tg.pos.Position.x, tg.pos.Position.y, tg.pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, tg.g >> 1, tg.b >> 1);
-			 TriggerLightning(&src, &dest, 1, 0, tg.g, tg.b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
-			 TriggerLightning(&src, &dest, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);		 
+		twogun.push_back(laser);
+
+		auto origin2 = Vector3i(origin);
+		auto target2 = Vector3i(target);
+
+		TriggerLightningGlow(laser.pos.Position.x, laser.pos.Position.y, laser.pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, laser.g >> 1, laser.b >> 1);
+		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
+		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);		 
 	 }
 
 	void UpdateTwogunLasers()
 	{
-		for (int i = 0; i < twogun.size(); i++)
+		for (auto& laser : twogun)
 		{
-			TwogunLaserInfo* tg = &twogun[i];
+			if (laser.life)
+			{
+				laser.life--;
 
-				if (tg->life)
+				if (laser.life < 16)
 				{
-					tg->life--;
+					laser.spinadd -= laser.spinadd / 8;
+					laser.size++;
+				}
+				else if (laser.life == 16)
+				{
+					laser.spinadd = MAX_VISIBILITY_DISTANCE;
+					laser.coil = MAX_VISIBILITY_DISTANCE;
+					laser.length = laser.dlength;
+					laser.size = 4;
+				}
+				else
+				{
+					laser.coil += (MAX_VISIBILITY_DISTANCE - laser.coil) / 8;
 
-					if (tg->life < 16)
+					if ((laser.dlength - laser.length) <= (laser.dlength / 4))
 					{
-						tg->spinadd -= tg->spinadd / 8;
-						tg->size++;
-					}
-					else if (tg->life == 16)
-					{
-						tg->spinadd = MAX_VISIBILITY_DISTANCE;
-						tg->coil = MAX_VISIBILITY_DISTANCE;
-						tg->length = tg->dlength;
-						tg->size = 4;
+						laser.spinadd += (MAX_VISIBILITY_DISTANCE - laser.spinadd) / 8;
+						laser.length = laser.dlength;
 					}
 					else
 					{
-						tg->coil += (MAX_VISIBILITY_DISTANCE - tg->coil) / 8;
-						if (tg->dlength - tg->length <= (tg->dlength / 4))
-						{
-							tg->spinadd += (MAX_VISIBILITY_DISTANCE - tg->spinadd) / 8;
-							tg->length = tg->dlength;
-						}
-						else
-							tg->length += (tg->dlength - tg->length) >> 2;
-						if (tg->size < 4)
-							tg->size++;
+						laser.length += (laser.dlength - laser.length) >> 2;
 					}
 
-					if (tg->fadein < 8)
-						tg->fadein++;
-
-					tg->spin -= tg->spinadd;
+					if (laser.size < 4)
+						laser.size++;
 				}
+
+				if (laser.fadein < 8)
+					laser.fadein++;
+
+				laser.spin -= laser.spinadd;
+			}
 		}
 
 		if (twogun.size() > 0)
 		{
 			twogun.erase(
 				std::remove_if(twogun.begin(), twogun.end(),
-					[](const TwogunLaserInfo& o) { return o.life == 0; }),
+					[](const HelicalLaser& o) { return o.life == 0; }),
 				twogun.end());
-		}
-	}
-
-	void InitialiseFloatSinCosTable()
-	{
-		for (int i = 0; i < 8192; i++)
-		{
-			FloatSinCosTable[i] = sin(i * 0.000095873802f);
 		}
 	}
 
@@ -119,11 +113,11 @@ namespace TEN::Effects::Lightning
 	{
 		for (int i = 0; i < Lightning.size(); i++)
 		{
-			LIGHTNING_INFO* arc = &Lightning[i];
+			auto* arc = &Lightning[i];
 
 			if (arc->life > 0)
 			{
-				// If/when this behaviour is changed, please modify AddLightningArc accordingly
+				// If/when this behaviour is changed, please modify AddLightningArc accordingly.
 				arc->life -= 2;
 				if (arc->life)
 				{

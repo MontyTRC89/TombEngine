@@ -83,7 +83,7 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < twogun.size(); i++)
 			{
-				TwogunLaserInfo* tg = &twogun[i];
+				auto* tg = &twogun[i];
 
 				if (tg->life)
 				{
@@ -164,7 +164,7 @@ namespace TEN::Renderer
 			}	
 	}
 
-	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, TwogunLaserInfo* tg)
+	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, HelicalLaser* tg)
 	{
 		buffer[0] = pos[0].x;
 		buffer[1] = pos[0].y;

@@ -193,8 +193,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						short roomNumber = item.RoomNumber;
 						GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber),
-
-							TestTriggers(&item, true, 0);
+						TestTriggers(&item, true, 0);
 					}
 
 					break;
@@ -576,7 +575,9 @@ namespace TEN::Entities::Creatures::TR5
 					DoDamage(LaraItem, INT_MAX);
 				}
 				else
+				{
 					DoDamage(LaraItem, 250);
+				}
 			}
 
 			return;
