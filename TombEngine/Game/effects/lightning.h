@@ -10,8 +10,6 @@ struct ENERGY_ARC;
 
 namespace TEN::Effects::Lightning
 {
-	constexpr auto MAX_CURL_LASER_SEGMENTS = 56;
-
 	enum LightningFlags
 	{
 		LI_SPLINE = 1,
@@ -47,25 +45,30 @@ namespace TEN::Effects::Lightning
 
 	struct HelicalLaser
 	{
-		Pose pos;
-		Vector3i pos1;
-		Vector3i pos4;
-		short life;
-		short coil;
-		short spin, spinadd;
-		short length, dlength;
-		unsigned char segments = MAX_CURL_LASER_SEGMENTS;
-		short size;
+		unsigned int NumSegments = 0;
+
+		Vector3 Origin		  = Vector3::Zero;
+		Vector3 Target		  = Vector3::Zero;
+		short	Orientation2D = 0;
+		Vector4 Color		  = Vector4::Zero;
+		Vector3 LightPosition = Vector3::Zero; // TODO: Use a light cone instead?
+
+		float Life		= 0.0f;
+		float Scale		= 0.0f;
+		float Length	= 0.0f;
+		float LengthEnd = 0.0f;
+		float FadeIn	= 0.0f;
+		short Rotation	= 0;
+		short Coil		= 0;
+
 		int r, g, b;
-		char fadein;
 	};
 
 	extern std::vector<LIGHTNING_INFO> Lightning;
 	extern std::vector<HelicalLaser>   HelicalLasers;
 
-	extern int LightningRandomSeed;
 	extern Vector3i LightningPos[6];
-	extern short LightningBuffer[1024];
+	extern short	LightningBuffer[1024];
 
 	LIGHTNING_INFO* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void			TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);

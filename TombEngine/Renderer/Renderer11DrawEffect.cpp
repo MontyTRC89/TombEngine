@@ -79,88 +79,89 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawHelicalLasers(RenderView& view)
 	{
-		byte r, g, b;
+		// No active effects; return early.
+		if (HelicalLasers.empty())
+			return;
 
-		for (int i = 0; i < HelicalLasers.size(); i++)
+		for (const auto& laser : HelicalLasers)
 		{
-			auto* tg = &HelicalLasers[i];
+			// Set to despawn.
+			if (laser.Life <= 0.0f)
+				continue;
 
-			if (tg->life)
+			byte r, g, b;
+			if (laser.FadeIn < 8)
 			{
-				if (tg->fadein < 8)
-				{
-					r = (tg->r * tg->fadein) >> 3;
-					g = (tg->g * tg->fadein) >> 3;
-					b = (tg->b * tg->fadein) >> 3;
-				}
-				else if (tg->life < 16)
-				{
-					r = (tg->r * tg->life) >> 4;
-					g = (tg->g * tg->life) >> 4;
-					b = (tg->b * tg->life) >> 4;
-				}
-				else
-				{
-					r = tg->r;
-					g = tg->g;
-					b = tg->b;
-				}
-
-				LightningPos[0].x = tg->pos4.x;
-				LightningPos[0].y = tg->pos4.y;
-				LightningPos[0].z = tg->pos4.z;
-
-				LightningPos[1].x = tg->pos1.x;
-				LightningPos[1].y = tg->pos1.y;
-				LightningPos[1].z = tg->pos1.z;
-			
-				for (int j = 0; j < 2; j++)
-				{
-					LightningPos[j].x -= tg->pos4.x;
-					LightningPos[j].y -= tg->pos4.y;
-					LightningPos[j].z -= tg->pos4.z;
-				}
-
-				CurlSpline(&LightningPos[0], LightningBuffer, tg);
-
-				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
-					abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
-					abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
-				{
-					short* interpolatedPos = &LightningBuffer[0];
-
-					for (int s = 0; s < tg->segments ; s++)
-					{
-						int ix = tg->pos4.x + interpolatedPos[0];
-						int iy = tg->pos4.y + interpolatedPos[1];
-						int iz = tg->pos4.z + interpolatedPos[2];
-
-						interpolatedPos += 4;
-
-						int ix2 = tg->pos4.x + interpolatedPos[0];
-						int iy2 = tg->pos4.y + interpolatedPos[1];
-						int iz2 = tg->pos4.z + interpolatedPos[2];
-
-						auto pos1 = Vector3(ix, iy, iz);
-						auto pos2 = Vector3(ix2, iy2, iz2);
-
-						auto d = pos2 - pos1;
-						d.Normalize();
-
-						auto c = (pos1 + pos2) / 2;
-
-						AddSpriteBillboardConstrained(
-							&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							c,
-							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-							{ 5 * 8.0f, Vector3::Distance(pos1, pos2) }, BLENDMODE_ADDITIVE, d, true, view);							
-					}
-				}					
+				r = (laser.r * laser.FadeIn) / 8;
+				g = (laser.g * laser.FadeIn) / 8;
+				b = (laser.b * laser.FadeIn) / 8;
 			}
-		}	
+			else if (laser.Life < 16)
+			{
+				r = (laser.r * laser.Life) / 16;
+				g = (laser.g * laser.Life) / 16;
+				b = (laser.b * laser.Life) / 16;
+			}
+			else
+			{
+				r = laser.r;
+				g = laser.g;
+				b = laser.b;
+			}
+
+			LightningPos[0].x = laser.Target.x;
+			LightningPos[0].y = laser.Target.y;
+			LightningPos[0].z = laser.Target.z;
+
+			LightningPos[1].x = laser.Origin.x;
+			LightningPos[1].y = laser.Origin.y;
+			LightningPos[1].z = laser.Origin.z;
+			
+			for (int j = 0; j < 2; j++)
+			{
+				LightningPos[j].x -= laser.Target.x;
+				LightningPos[j].y -= laser.Target.y;
+				LightningPos[j].z -= laser.Target.z;
+			}
+
+			CurlSpline(&LightningPos[0], LightningBuffer, laser);
+
+			if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
+				abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
+				abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+			{
+				short* interpolatedPos = &LightningBuffer[0];
+
+				for (int s = 0; s < laser.NumSegments ; s++)
+				{
+					int ix = laser.Target.x + interpolatedPos[0];
+					int iy = laser.Target.y + interpolatedPos[1];
+					int iz = laser.Target.z + interpolatedPos[2];
+
+					interpolatedPos += 4;
+
+					int ix2 = laser.Target.x + interpolatedPos[0];
+					int iy2 = laser.Target.y + interpolatedPos[1];
+					int iz2 = laser.Target.z + interpolatedPos[2];
+
+					auto origin = Vector3(ix, iy, iz);
+					auto target = Vector3(ix2, iy2, iz2);
+
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
+						{ 5 * 8.0f, Vector3::Distance(origin, target) }, BLENDMODE_ADDITIVE, direction, true, view);							
+				}
+			}				
+		}
 	}
 
-	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, HelicalLaser* tg)
+	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, const HelicalLaser& laser)
 	{
 		buffer[0] = pos[0].x;
 		buffer[1] = pos[0].y;
@@ -168,58 +169,45 @@ namespace TEN::Renderer
 
 		buffer += 4;
 
-		float x, y, z;
+		auto origin = pos[0].ToVector3();
+		auto target = pos[1].ToVector3();;
 
-		auto lineStartPoint = pos[0].ToVector3();
-		auto lineEndPoint = pos[1].ToVector3();;
-
-		// Calculate the direction vector of the line
-		auto direction = (lineEndPoint - lineStartPoint) / tg->segments;
-
-		// Normalize the direction vector
+		float length = Vector3::Distance(origin, target);
+		float stepLength = length / laser.NumSegments;
+		auto direction = target - origin;
 		direction.Normalize();
 
-		// Calculate the length of the line
-		float lineLength = (lineEndPoint - lineStartPoint).Length();
+		// Set the starting position to the line origin point.
+		auto currentPos = origin;
 
-		// Calculate the step size along the line
-		float stepSize = lineLength / tg->segments;
-
-		// Set the starting position to the line start point
-		Vector3 currentPos = lineStartPoint;
-
-		short angle = tg->spin;
+		short angle = laser.Orientation2D;
 		short radius = 0;
-		int radiusMaxValue = 48;
+		int radiusMax = 48;
 
-		if (tg->segments > 0)
+		if (laser.NumSegments > 0)
 		{
-			for (int i = tg->segments; i > 0; i--)
+			for (int i = laser.NumSegments; i > 0; i--)
 			{
-				int x1 = std::clamp(radius >> 1, 0, radiusMaxValue);
+				int x1 = std::clamp(radius / 2, 0, radiusMax);
 
-				x = (currentPos.x + (tg->length / tg->segments) + (radius * phd_cos(angle)) / 2) - x1;
-				y = (currentPos.y + (tg->length / tg->segments) + (radius * phd_sin(angle)) / 2) - x1;
-				z = (currentPos.z + (tg->length / tg->segments) + (radius * phd_cos(angle)) / 2) - x1;
+				float x = (currentPos.x + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1;
+				float y = (currentPos.y + (laser.Length / laser.NumSegments) + (radius * phd_sin(angle)) / 2) - x1;
+				float z = (currentPos.z + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1;
 
 				buffer[0] = x;
 				buffer[1] = y;
 				buffer[2] = z;
 
-				angle += tg->coil;
-				radius += tg->size;
+				angle += laser.Coil;
+				radius += laser.Scale;
 
 				if (i & 1)
-					radius -= tg->size;
+					radius -= laser.Scale;
 
 				buffer += 4;
 
-				// Increment the current position along the line by the step size
-				currentPos += direction * stepSize;
-
-				x += currentPos.x;
-				y += currentPos.y;
-				z = currentPos.z;
+				// Increment the current position along the line.
+				currentPos += direction * stepLength;
 
 				if (radius < 4)
 					radius = 4;
@@ -255,7 +243,6 @@ namespace TEN::Renderer
 					LightningPos[j].y -= LaraItem->Pose.Position.y;
 					LightningPos[j].z -= LaraItem->Pose.Position.z;
 				}
-
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
 

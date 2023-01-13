@@ -22,10 +22,10 @@ using TEN::Renderer::g_Renderer;
 namespace TEN::Effects::Lightning
 {
 	constexpr auto MAX_ENERGYARCS = 32;
+	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
 	
-	int LightningRandomSeed = 0x0D371F947;
 	Vector3i LightningPos[6];
-	short LightningBuffer[1024];
+	short	 LightningBuffer[1024];
 	
 	std::vector<LIGHTNING_INFO> Lightning;
 	std::vector<HelicalLaser>	HelicalLasers;
@@ -96,113 +96,125 @@ namespace TEN::Effects::Lightning
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
-		HelicalLaser laser;
+		HelicalLaser laser = {};
 
-		laser.pos1 = origin;
-		laser.pos4 = target;
-		laser.pos.Position = origin;
-		laser.life = 17;
-		laser.spin = (GetRandomControl() & 31) << 11;
-		laser.dlength = 4096;
+		laser.NumSegments = HELICAL_LASER_SEGMENTS_NUM_MAX;
+		laser.Origin = origin;
+		laser.Target = target;
+		laser.Orientation2D = Random::GenerateAngle();
+		laser.Color = Vector4(0.0f, 1.0f, 0.375f, 1.0f); // Check start opacity.
+		laser.LightPosition = origin;
+		laser.Life = 17.0f;
+		laser.Scale = 0.0f;
+		laser.Length = 0.0f;
+		laser.LengthEnd = BLOCK(4);
+		laser.FadeIn = 8.0f;
+		laser.Rotation = 0.0f;
+
 		laser.r = 0;
 		laser.b = 255;
 		laser.g = 96;
-		laser.fadein = 8;
 
 		HelicalLasers.push_back(laser);
 
 		auto origin2 = Vector3i(origin);
 		auto target2 = Vector3i(target);
 
-		TriggerLightningGlow(laser.pos.Position.x, laser.pos.Position.y, laser.pos.Position.z, 64 + (GetRandomControl() & 3) << 24, 0, laser.g >> 1, laser.b >> 1);
-		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, (LI_THININ | LI_THINOUT), 19, 5);	
-		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, (LI_THININ | LI_THINOUT), 4, 5);		 
+		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, LI_THININ | LI_THINOUT, 19, 5);	
+		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, LI_THININ | LI_THINOUT, 4, 5);	
+		TriggerLightningGlow(
+			laser.LightPosition.x, laser.LightPosition.y, laser.LightPosition.z,
+			Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
 	 }
 
 	void UpdateHelicalLasers()
 	{
+		// No active effects; return early.
+		if (HelicalLasers.empty())
+			return;
+
 		for (auto& laser : HelicalLasers)
 		{
-			if (laser.life)
-			{
-				laser.life--;
+			// Set to despawn.
+			if (laser.Life <= 0.0f)
+				continue;
 
-				if (laser.life < 16)
+			laser.Life -= 1.0f;
+
+			if (laser.Life < 16.0f)
+			{
+				laser.Rotation -= laser.Rotation / 8;
+				laser.Scale += 1.0f;
+			}
+			else if ((int)round(laser.Life) == 16) // TODO: Cleaner way.
+			{
+				laser.Rotation = MAX_VISIBILITY_DISTANCE;
+				laser.Coil = MAX_VISIBILITY_DISTANCE;
+				laser.Length = laser.LengthEnd;
+				laser.Scale = 4.0f;
+			}
+			else
+			{
+				laser.Coil += (MAX_VISIBILITY_DISTANCE - laser.Coil) / 8;
+
+				if ((laser.LengthEnd - laser.Length) <= (laser.LengthEnd / 4))
 				{
-					laser.spinadd -= laser.spinadd / 8;
-					laser.size++;
-				}
-				else if (laser.life == 16)
-				{
-					laser.spinadd = MAX_VISIBILITY_DISTANCE;
-					laser.coil = MAX_VISIBILITY_DISTANCE;
-					laser.length = laser.dlength;
-					laser.size = 4;
+					laser.Rotation += (MAX_VISIBILITY_DISTANCE - laser.Rotation) / 8;
+					laser.Length = laser.LengthEnd;
 				}
 				else
 				{
-					laser.coil += (MAX_VISIBILITY_DISTANCE - laser.coil) / 8;
-
-					if ((laser.dlength - laser.length) <= (laser.dlength / 4))
-					{
-						laser.spinadd += (MAX_VISIBILITY_DISTANCE - laser.spinadd) / 8;
-						laser.length = laser.dlength;
-					}
-					else
-					{
-						laser.length += (laser.dlength - laser.length) >> 2;
-					}
-
-					if (laser.size < 4)
-						laser.size++;
+					laser.Length += (laser.LengthEnd - laser.Length) / 4;
 				}
 
-				if (laser.fadein < 8)
-					laser.fadein++;
-
-				laser.spin -= laser.spinadd;
+				if (laser.Scale < 4.0f)
+					laser.Scale += 1.0f;
 			}
+
+			if (laser.FadeIn < 8.0f)
+				laser.FadeIn += 1.0f;
+
+			laser.Orientation2D -= laser.Rotation;
 		}
 
-		if (HelicalLasers.size() > 0)
-		{
-			HelicalLasers.erase(
-				std::remove_if(HelicalLasers.begin(), HelicalLasers.end(),
-					[](const HelicalLaser& o) { return o.life == 0; }),
-				HelicalLasers.end());
-		}
+		// Despawn inactive effects.
+		HelicalLasers.erase(
+			std::remove_if(
+				HelicalLasers.begin(), HelicalLasers.end(),
+				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
 	void UpdateLightning()
 	{
-		for (int i = 0; i < Lightning.size(); i++)
-		{
-			auto* arc = &Lightning[i];
+		// No active effects; return early.
+		if (Lightning.empty())
+			return;
 
-			if (arc->life > 0)
+		for (auto& arc : Lightning)
+		{
+			// Set to despawn.
+			if (arc.life <= 0)
+				continue;
+
+			// If/when this behaviour is changed, modify AddLightningArc accordingly.
+			arc.life -= 2;
+			if (arc.life)
 			{
-				// If/when this behaviour is changed, please modify AddLightningArc accordingly.
-				arc->life -= 2;
-				if (arc->life)
+				int* positions = (int*)&arc.pos2;
+				for (int j = 0; j < 9; j++)
 				{
-					int* positions = (int*)&arc->pos2;
-					for (int j = 0; j < 9; j++)
-					{
-						*positions += 2 * arc->interpolation[j];
-						arc->interpolation[j] = (signed char)(arc->interpolation[j] - (arc->interpolation[j] >> 4));
-						positions++;
-					}
+					*positions += 2 * arc.interpolation[j];
+					arc.interpolation[j] = (signed char)(arc.interpolation[j] - (arc.interpolation[j] >> 4));
+					positions++;
 				}
 			}
 		}
 
-		if (Lightning.size() > 0)
-		{
-			Lightning.erase(
-				std::remove_if(Lightning.begin(), Lightning.end(),
-					[](const LIGHTNING_INFO& o) { return o.life == 0; }),
-				Lightning.end());
-		}
+		// Despawn inactive effects.
+		Lightning.erase(
+			std::remove_if(
+				Lightning.begin(), Lightning.end(),
+				[](const LIGHTNING_INFO& arc) { return (arc.life <= 0); }), Lightning.end());
 	}
 
 	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc)
