@@ -533,7 +533,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_INV];
 		if (obj->loaded)
 		{
-			AssignObjectAnimations(obj, ID_BABOON_NORMAL, -1, "ID_BABOON_INV", "ID_BABOON_NORMAL");
+			AssignObjectAnimations(obj, ID_BABOON_NORMAL, "ID_BABOON_INV", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
@@ -548,7 +548,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_SILENT];
 		if (obj->loaded)
 		{
-			AssignObjectAnimations(obj, ID_BABOON_NORMAL, -1, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
+			AssignObjectAnimations(obj, ID_BABOON_NORMAL, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;

@@ -18,39 +18,32 @@ void AssignObjectMeshSwap(ObjectInfo* obj, int requiredMeshSwap, const std::stri
 		TENLog("The slot: " + requiredName + " is not loaded, " + baseName + " will have problem to swapmesh (could cause problem with entity not working correctly).", LogLevel::Warning);
 }
 
-void CheckIfSlotExist(int requiredObj, const std::string& baseName, const std::string& requiredName)
+void CheckIfSlotExists(int requiredObj, const std::string& baseName, const std::string& requiredName)
 {
 	if (!Objects[requiredObj].loaded)
 		TENLog("The slot: " + requiredName + " is not loaded, " + baseName + " will have problem to work correctly (could cause crash).", LogLevel::Warning);
 }
 
-void AssignObjectAnimations(ObjectInfo* obj, int requiredObj, int requiredSecondObj, const std::string& baseName, const std::string& requiredName, const std::string& requiredSecondName)
+bool AssignObjectAnimations(ObjectInfo* obj, int requiredObj, const std::string& baseName, const std::string& requiredName)
 {
 	auto& anim = g_Level.Anims[obj->animIndex];
 	// check if object have at last one animation with more than 1 frame.
 	if (anim.frameEnd - anim.frameBase > 1)
-		return;
+		return true;
 
 	// if not then try to refer to a specified slot.
 	if (Objects[requiredObj].loaded) // if slot is loaded then use it !
 	{
 		obj->animIndex = Objects[requiredObj].animIndex;
 		obj->frameBase = Objects[requiredObj].frameBase;
-	}
-	else if (requiredSecondObj != -1) // if a second obj is valid then try to check if it's loaded.
-	{
-		if (Objects[requiredSecondObj].loaded)
-		{
-			obj->animIndex = Objects[requiredSecondObj].animIndex;
-			obj->frameBase = Objects[requiredSecondObj].frameBase;
-		}
-		else
-			TENLog("The slot: " + requiredName + " or " + requiredSecondName + " is not loaded, " + baseName + " will not have any animation.", LogLevel::Warning);
+		return true;
 	}
 	else
 	{
 		TENLog("The slot: " + requiredName + " is not loaded, " + baseName + " will not have any animation.", LogLevel::Warning);
 	}
+
+	return false;
 }
 
 void InitSmashObject(ObjectInfo* obj, int objectNumber)

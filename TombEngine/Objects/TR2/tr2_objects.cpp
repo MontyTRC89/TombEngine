@@ -157,7 +157,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER2];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_GOON_SILENCER1, -1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
+		AssignObjectAnimations(obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -175,7 +175,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER3];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_GOON_SILENCER1, -1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
+		AssignObjectAnimations(obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -353,7 +353,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_MERCENARY_AUTOPISTOLS1, -1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
+		AssignObjectAnimations(obj, ID_MERCENARY_AUTOPISTOLS1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
@@ -400,7 +400,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExist(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
@@ -417,7 +417,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExist(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
@@ -434,7 +434,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		CheckIfSlotExist(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -449,7 +449,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		CheckIfSlotExist(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
+		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -460,7 +460,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
-		CheckIfSlotExist(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
 	}
