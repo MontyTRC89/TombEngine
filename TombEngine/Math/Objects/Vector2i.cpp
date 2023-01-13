@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Math/Containers/Vector2i.h"
+#include "Math/Objects/Vector2i.h"
 
 namespace TEN::Math
 {

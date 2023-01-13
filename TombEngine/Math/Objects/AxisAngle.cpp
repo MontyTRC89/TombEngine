@@ -1,8 +1,8 @@
 #include "framework.h"
-#include "Math/Containers/AxisAngle.h"
+#include "Math/Objects/AxisAngle.h"
 
-#include "Math/Containers/EulerAngles.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/EulerAngles.h"
 
 namespace TEN::Math
 {

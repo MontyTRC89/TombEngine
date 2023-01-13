@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Containers/AxisAngle.h"
+#include "Math/Objects/AxisAngle.h"
 
 using namespace TEN::Math;
 

@@ -2,10 +2,10 @@
 #include "Math/Geometry.h"
 
 #include "Math/Constants.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
-#include "Math/Containers/Vector3i.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
+#include "Math/Objects/Vector3i.h"
 
 namespace TEN::Math::Geometry
 {

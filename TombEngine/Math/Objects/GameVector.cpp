@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "Math/Containers/GameVector.h"
+#include "Math/Objects/GameVector.h"
 
-#include "Math/Containers/Vector3i.h"
+#include "Math/Objects/Vector3i.h"
 
 //namespace TEN::Math
 //{

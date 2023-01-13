@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Containers/EulerAngles.h"
+#include "Math/Objects/EulerAngles.h"
 
 namespace sol
 {
