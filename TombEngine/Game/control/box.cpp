@@ -1092,7 +1092,7 @@ bool CreatureActive(short itemNumber)
 	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
 	{
 		// AI couldn't be activated.
-		if (!EnableEntityAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, false))
 			return false;
 
 		item->Status = ITEM_ACTIVE;

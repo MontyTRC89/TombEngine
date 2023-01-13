@@ -172,6 +172,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomFlags.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomObject.h" />

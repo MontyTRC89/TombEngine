@@ -497,7 +497,7 @@ namespace TEN::Entities::TR4
 							(item->TriggerFlags / 1000) == (possibleEnemy->TriggerFlags / 1000) - 1 &&
 							!(possibleEnemy->Flags & IFLAG_KILLED))
 						{
-							if (EnableEntityAI(i, 0))
+							if (EnableEntityAI(i, false))
 								possibleEnemy->Status = ITEM_ACTIVE;
 							else
 								possibleEnemy->Status = ITEM_INVISIBLE;

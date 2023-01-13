@@ -28,7 +28,7 @@ void InitialiseLOTarray(int itemNumber)
 	}
 }
 
-int EnableEntityAI(short itemNum, int always, bool makeTarget)
+bool EnableEntityAI(short itemNum, bool always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
@@ -37,7 +37,8 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 
 	InitialiseSlot(itemNum, makeTarget);
 	ActiveCreatures.push_back(item->Data);
-	return true;
+
+	return item->IsCreature();
 }
 
 void DisableEntityAI(short itemNumber)
@@ -201,7 +202,7 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 	SlotsUsed++;
 }
 
-void SetBaddyTarget(short itemNum, short target)
+void SetEntityTarget(short itemNum, short target)
 {
 	auto* item = &g_Level.Items[itemNum];
 	auto* creature = GetCreatureInfo(item);
