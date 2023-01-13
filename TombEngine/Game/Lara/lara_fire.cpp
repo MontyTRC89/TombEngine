@@ -1053,7 +1053,6 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	targetEntity->HitStatus = true;
-
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
@@ -1065,7 +1064,17 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		for (int jointID = 0; jointID < object.nmeshes; jointID++)
 		{
 			auto pos = GetJointPosition(targetEntity, jointID);
-			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < BLOCK(1 / 16.0f))
+
+			// does the item specify custom any mesh range ?
+			if (targetEntity->ItemFlags[7] != 0)
+			{
+				if (Vector3i::Distance(hitPos->ToVector3i(), pos) < targetEntity->ItemFlags[7])
+				{
+					foundJointID = jointID;
+					break;
+				}
+			}
+			else if (Vector3i::Distance(hitPos->ToVector3i(), pos) < BLOCK(1 / 16.0f))
 			{
 				foundJointID = jointID;
 				break;
