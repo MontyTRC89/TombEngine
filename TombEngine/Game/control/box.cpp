@@ -1439,6 +1439,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 {
 	auto* object = &Objects[item->ObjectNumber];
+	auto* creature = GetCreatureInfo(item);
 	auto* room = &g_Level.Rooms[enemy->RoomNumber];
 	auto* floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
 
@@ -1446,8 +1447,8 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
-	if (object->ZoneType == ZoneType::Flyer ||
-	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (creature->LOT.Zone == ZoneType::Flyer ||
+	   (creature->LOT.Zone == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		isReachable = true; // If NPC is flying or swimming in water, player is always reachable.
 	}
