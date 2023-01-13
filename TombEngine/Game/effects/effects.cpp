@@ -35,8 +35,6 @@ using TEN::Renderer::g_Renderer;
 // New particle class
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
-constexpr auto EXPLOSION_MAX_ROTATION_SPEED = 30;
-constexpr auto EXPLOSION_PARTICLE_LIFE = 44;
 
 FX_INFO EffectList[NUM_EFFECTS];
 
@@ -470,6 +468,9 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
+	static const auto EXPLOSION_MAX_ROTATION_SPEED = 30;
+	static const auto EXPLOSION_PARTICLE_LIFE = 44;
+
 	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
 	int dx = LaraItem->Pose.Position.x - x;
