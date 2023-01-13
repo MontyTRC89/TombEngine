@@ -211,63 +211,68 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLightning(RenderView& view)
 	{
+		// No active effects; return early.
+		if (Lightning.empty())
+			return;
+
 		for (const auto& arc : Lightning)
 		{
-			if (arc.life)
+			if (arc.life <= 0)
+				continue;
+
+			LightningPos[0] = arc.pos1;
+			memcpy(&LightningPos[1], &arc, 48);
+			LightningPos[5] = arc.pos4;
+
+			for (int j = 0; j < 6; j++)
+				LightningPos[j] -= LaraItem->Pose.Position;
+
+			CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
+
+			if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
+				abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
+				abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
 			{
-				LightningPos[0] = arc.pos1;
-				LightningPos[5] = arc.pos4;
+				short* interpolatedPos = &LightningBuffer[0];
 
-				for (int j = 0; j < 6; j++)
-					LightningPos[j] -= LaraItem->Pose.Position;
-
-				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
-
-				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
-					abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
-					abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+				for (int s = 0; s < ((3 * arc.segments) - 1); s++)
 				{
-					short* interpolatedPos = &LightningBuffer[0];
+					int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
+					int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
+					int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
 
-					for (int s = 0; s < 3 * arc.segments - 1; s++)
+					interpolatedPos += 4;
+
+					int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
+					int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
+					int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
+
+					byte r, g, b;
+					if (arc.life >= 16)
 					{
-						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						interpolatedPos += 4;
-
-						int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						byte r, g, b;
-						if (arc.life >= 16)
-						{
-							r = arc.r;
-							g = arc.g;
-							b = arc.b;
-						}
-						else
-						{
-							r = arc.life * arc.r / 16;
-							g = arc.life * arc.g / 16;
-							b = arc.life * arc.b / 16;
-						}
-
-						auto origin = Vector3(ix, iy, iz);
-						auto target = Vector3(ix2, iy2, iz2);
-
-						auto center = (origin + target) / 2;
-						auto direction = target - origin;
-						direction.Normalize();
-
-						AddSpriteBillboardConstrained(
-							&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							center,
-							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							PI_DIV_2, 1.0f, Vector2(arc.width * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
+						r = arc.r;
+						g = arc.g;
+						b = arc.b;
 					}
+					else
+					{
+						r = arc.life * arc.r / 16;
+						g = arc.life * arc.g / 16;
+						b = arc.life * arc.b / 16;
+					}
+
+					auto origin = Vector3(ix, iy, iz);
+					auto target = Vector3(ix2, iy2, iz2);
+
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
 				}
 			}
 		}
