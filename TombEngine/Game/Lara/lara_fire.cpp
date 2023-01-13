@@ -1059,6 +1059,8 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 
 	if (hitPos != nullptr)
 	{
+		hitPos->RoomNumber = targetEntity->RoomNumber;
+
 		int foundJointID = -1;
 		for (int jointID = 0; jointID < object.nmeshes; jointID++)
 		{

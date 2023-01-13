@@ -1335,7 +1335,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (object.hitEffect == HitEffect::Blood)
 			{
-				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
+				DoBloodSplat(pos->x, pos->y, pos->z, (GetRandomControl() & 3) + 3, source.Pose.Orientation.y, pos->RoomNumber);
 			}
 		}
 
