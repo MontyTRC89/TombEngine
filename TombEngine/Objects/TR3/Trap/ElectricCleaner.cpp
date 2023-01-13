@@ -29,6 +29,7 @@ using namespace TEN::Effects::Spark;
 namespace TEN::Entities::Traps
 {
 	constexpr auto ELECTRIC_CLEANER_VELOCITY	  = BLOCK(1 / 16.0f);
+	constexpr auto ELECTRIC_CLEANER_TURN_TOLERANCE = ANGLE(5.0f);
 	constexpr auto ELECTRIC_CLEANER_TURN_RATE_MAX = ANGLE(8.5f);
 
 	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
@@ -79,8 +80,8 @@ namespace TEN::Entities::Traps
 			float turnAngleDeg = TO_DEGREES(item.ItemFlags[0]) * coeff;
 			float newAngle = TO_DEGREES(item.Pose.Orientation.y) + turnAngleDeg;
 
-			if ((item.ItemFlags[0] > 0 && abs(abs(newAngle) - abs(targetAngleDeg)) < 5.0f) ||
-				(item.ItemFlags[0] < 0 && abs(abs(targetAngleDeg) - abs(newAngle)) < 5.0f))
+			if ((item.ItemFlags[0] > 0 && abs(abs(newAngle) - abs(targetAngleDeg)) < ELECTRIC_CLEANER_TURN_TOLERANCE) ||
+				(item.ItemFlags[0] < 0 && abs(abs(targetAngleDeg) - abs(newAngle)) < ELECTRIC_CLEANER_TURN_TOLERANCE))
 			{
 				newAngle = targetAngleDeg;
 			}
@@ -301,7 +302,7 @@ namespace TEN::Entities::Traps
 					break;
 				}
 
-				TestTriggers(&item, 1);
+				TestTriggers(&item, true);
 			}
 			else
 			{
@@ -413,7 +414,7 @@ namespace TEN::Entities::Traps
 		* CheckObjectAhead causes issues when item collision boxes are too big, keeping it just in case it is salvageable.
 		*/
 
-		collide = 0;
+		collide = false;
 		heading = ((h == y) && !collide && !floor->Stopper);
 	}
 
