@@ -35,6 +35,8 @@ using TEN::Renderer::g_Renderer;
 // New particle class
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
+constexpr auto EXPLOSION_MAX_ROTATION_SPEED = 30;
+constexpr auto EXPLOSION_PARTICLE_LIFE = 44;
 
 FX_INFO EffectList[NUM_EFFECTS];
 
@@ -512,7 +514,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.dB = 32;
 		spark.colFadeSpeed = 8;
 		spark.fadeToBlack = 16;
-		spark.life = (GetRandomControl() & 7) + 24;
+		spark.life = (GetRandomControl() & 7) + EXPLOSION_PARTICLE_LIFE;
 		spark.sLife = spark.life;
 	}
 
@@ -576,8 +578,8 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			else
 				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
 
-			spark.rotAng = GetRandomControl() & 0xFFF;
-			spark.rotAdd = (GetRandomControl() & 0xFF) + 128;
+			spark.rotAng = GetRandomControl() & 0xF;
+			spark.rotAdd = (GetRandomControl() & 0xF) + EXPLOSION_MAX_ROTATION_SPEED;
 		}
 		else if (uw == 1)
 		{
