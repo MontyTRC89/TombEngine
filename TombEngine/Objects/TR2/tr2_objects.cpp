@@ -157,7 +157,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER2];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
+		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -175,7 +175,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER3];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
+		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -353,7 +353,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_MERCENARY_AUTOPISTOLS1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
+		AssignObjectAnimations(*obj, ID_MERCENARY_AUTOPISTOLS1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;

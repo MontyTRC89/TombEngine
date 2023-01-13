@@ -1049,7 +1049,6 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 
 void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
 	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	targetEntity->HitStatus = true;
@@ -1060,19 +1059,20 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	{
 		hitPos->RoomNumber = targetEntity->RoomNumber;
 
-		int foundJointID = -1;
-		for (int jointID = 0; jointID < object.nmeshes; jointID++)
+		int foundJointIndex = -1;
+		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 		{
-			auto pos = GetJointPosition(targetEntity, jointID);
-			float distance = targetEntity->ItemFlags[7] != 0 ? (float)targetEntity->ItemFlags[7] : BLOCK(1 / 16.0f);
-			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < distance)
+			auto pos = GetJointPosition(targetEntity, jointIndex);
+			float maxDist = targetEntity->ItemFlags[7] != 0 ? (float)targetEntity->ItemFlags[7] : BLOCK(1 / 16.0f);
+
+			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < maxDist)
 			{
-				foundJointID = jointID;
+				foundJointIndex = jointIndex;
 				break;
 			}
 		}
 
-		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, foundJointID);
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, foundJointIndex);
 	}
 	else
 	{

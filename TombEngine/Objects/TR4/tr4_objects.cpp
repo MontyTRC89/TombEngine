@@ -196,7 +196,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BADDY1];
 		if (obj->loaded)
 		{
-			AssignObjectMeshSwap(obj, ID_MESHSWAP_BADDY1, "ID_BADDY1", "ID_MESHSWAP_BADDY1");
+			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY1, "ID_BADDY1", "ID_MESHSWAP_BADDY1");
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
@@ -215,7 +215,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BADDY2];
 		if (obj->loaded)
 		{
-			AssignObjectMeshSwap(obj, ID_MESHSWAP_BADDY2, "ID_BADDY2", "ID_MESHSWAP_BADDY2");
+			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY2, "ID_BADDY2", "ID_MESHSWAP_BADDY2");
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
@@ -533,7 +533,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_INV];
 		if (obj->loaded)
 		{
-			AssignObjectAnimations(obj, ID_BABOON_NORMAL, "ID_BABOON_INV", "ID_BABOON_NORMAL");
+			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_INV", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
@@ -548,7 +548,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_SILENT];
 		if (obj->loaded)
 		{
-			AssignObjectAnimations(obj, ID_BABOON_NORMAL, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
+			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;

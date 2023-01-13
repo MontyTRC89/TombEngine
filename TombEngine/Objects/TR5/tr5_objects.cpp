@@ -123,7 +123,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD1];
 	if (obj->loaded)
 	{
-		AssignObjectAnimations(obj, ID_SWAT, "ID_GUARD1", "ID_SWAT");
+		AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD1", "ID_SWAT");
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
@@ -143,8 +143,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SWAT_PLUS];
 	if (obj->loaded)
 	{
-		if (!AssignObjectAnimations(obj, ID_SWAT, "ID_SWAT_PLUS", "ID_SWAT"))
-			AssignObjectAnimations(obj, ID_GUARD1, "ID_SWAT_PLUS", "ID_GUARD1");
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SWAT_PLUS", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SWAT_PLUS", "ID_GUARD1");
+
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
@@ -163,8 +164,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_MAFIA];
 	if (obj->loaded)
 	{
-		if (!AssignObjectAnimations(obj, ID_SWAT, "ID_MAFIA", "ID_SWAT"))
-			AssignObjectAnimations(obj, ID_GUARD1, "ID_MAFIA", "ID_GUARD1");
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_MAFIA", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_MAFIA", "ID_GUARD1");
+
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
@@ -184,8 +186,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SCIENTIST];
 	if (obj->loaded)
 	{
-		if (!AssignObjectAnimations(obj, ID_SWAT, "ID_SCIENTIST", "ID_SWAT"))
-			AssignObjectAnimations(obj, ID_GUARD1, "ID_SCIENTIST", "ID_GUARD1");
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SCIENTIST", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SCIENTIST", "ID_GUARD1");
+
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
@@ -203,8 +206,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD2];
 	if (obj->loaded)
 	{
-		if (!AssignObjectAnimations(obj, ID_SWAT, "ID_GUARD2", "ID_SWAT"))
-			AssignObjectAnimations(obj, ID_GUARD1, "ID_GUARD2", "ID_GUARD1");
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD2", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD2", "ID_GUARD1");
+
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
@@ -224,8 +228,9 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD3];
 	if (obj->loaded)
 	{
-		if (!AssignObjectAnimations(obj, ID_SWAT, "ID_GUARD3", "ID_SWAT"))
-			AssignObjectAnimations(obj, ID_GUARD1, "ID_GUARD3", "ID_GUARD1");
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD3", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD3", "ID_GUARD1");
+
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;

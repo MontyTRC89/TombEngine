@@ -71,8 +71,8 @@ namespace TEN::Entities::Creatures::TR3
 		// Save Puna's default angle. It will be used while waiting (i.e. an active lizard is nearby).
 		// NOTE: Since Puna is oriented to face away from the player, add 180 degrees.
 		item.SetFlagField((int)BossItemFlags::Rotation, item.Pose.Orientation.y + ANGLE(180.0f));
-		item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::AwaitPlayer); // normal behaviour at start.
-		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 1); // activated at start.
+		item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::AwaitPlayer); // Normal behaviour at start.
+		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 1);							 // Activated at start.
 		item.SetFlagField((int)BossItemFlags::AttackCount, 0);
 		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
 		item.SetFlagField((int)BossItemFlags::ItemNumber, NO_ITEM);

@@ -230,6 +230,7 @@ namespace TEN::Effects::Boss
 		spark.size = spark.dSize / 2;
 	}
 
+	// NOTE: Can really die after deathCount 60.
 	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color)
 	{
 		auto pos = Vector3::Zero;
@@ -253,12 +254,7 @@ namespace TEN::Effects::Boss
 			}
 		}
 
-		if (counter == 10 ||
-			counter == 20 ||
-			counter == 30 ||
-			counter == 40 ||
-			counter == 50 ||
-			counter == 60)
+		if (counter > 0 && !(counter % 10))
 		{
 			
 			for (int i = 0; i < 3; i++)
@@ -308,6 +304,7 @@ namespace TEN::Effects::Boss
 		item.SetFlagField((int)BossItemFlags::Object, flags);
 	}
 
+	// NOTE: Used by player's FireWeapon() and only if ID_BOSS_SHIELD is loaded.
 	void SpawnShieldAndRichochetSparks(const ItemInfo& item, const Vector3& pos, const Vector4& color)
 	{
 		SpawnShield(item, color);
