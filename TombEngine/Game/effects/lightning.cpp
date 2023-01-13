@@ -17,37 +17,33 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Lightning
 {
-	constexpr auto MAX_ENERGYARCS = 32;
 	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
-	
-	Vector3i LightningPos[6];
-	short	 LightningBuffer[1024];
 	
 	std::vector<ElectricArc>  Lightning		= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
+	Vector3i LightningPos[6];
+	short	 LightningBuffer[1024];
+	
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
-		ElectricArc arc;
+		auto arc = ElectricArc();
 
 		arc.pos1 = *origin;
-		arc.pos2.x = ((origin->x * 3) + target->x) >> 2;
-		arc.pos2.y = ((origin->y * 3) + target->y) >> 2;
-		arc.pos2.z = ((origin->z * 3) + target->z) >> 2;
-		arc.pos3.x = ((target->x * 3) + origin->x) >> 2;
-		arc.pos3.y = ((target->y * 3) + origin->y) >> 2;
-		arc.pos3.z = ((target->z * 3) + origin->z) >> 2;
+		arc.pos2 = ((*origin * 3) + *target) / 4;
+		arc.pos3 = ((*target * 3) + *origin) / 4;
 		arc.pos4 = *target;
 		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
 		{
 			if (arc.flags & 2 || i < 6)
-				arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude >> 1));
+				arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude / 2));
 			else
 				arc.interpolation[i] = 0;
 		}

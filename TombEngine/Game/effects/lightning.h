@@ -1,12 +1,8 @@
 #pragma once
 #include <cstddef>
 #include <vector>
+
 #include "Math/Math.h"
-
-using std::vector;
-
-class Vector3i;
-struct ENERGY_ARC;
 
 namespace TEN::Effects::Lightning
 {
@@ -71,8 +67,8 @@ namespace TEN::Effects::Lightning
 	extern short	LightningBuffer[1024];
 
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
-	void			TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
-	void			SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
+	void		 TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
+	void		 SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
 	void UpdateLightning();
 	void UpdateHelicalLasers();
