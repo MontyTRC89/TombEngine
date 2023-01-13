@@ -12,8 +12,8 @@ namespace TEN::Entities::Creatures::TR5
 	struct GuardianInfo
 	{
 		Vector3i target;
-		std::array<LIGHTNING_INFO*, GUARDIAN_FIRE_ARC_COUNT> fireArcs = {}; // elptr
-		std::array<LIGHTNING_INFO*, GUARDIAN_CHARGE_ARC_COUNT> chargeArcs = {}; // blptr
+		std::array<ElectricArc*, GUARDIAN_FIRE_ARC_COUNT> fireArcs = {}; // elptr
+		std::array<ElectricArc*, GUARDIAN_CHARGE_ARC_COUNT> chargeArcs = {}; // blptr
 		bool LOS[2];
 		byte trackSpeed;
 		bool trackLara;

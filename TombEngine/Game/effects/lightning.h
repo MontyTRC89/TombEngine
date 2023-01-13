@@ -12,14 +12,14 @@ namespace TEN::Effects::Lightning
 {
 	enum LightningFlags
 	{
-		LI_SPLINE = 1,
-		LI_MOVEEND = 2,
-		LI_THINOUT = 4,
-		LI_THININ = 8,
-		LI_SPARKEND = 16
+		LI_SPLINE	= (1 << 0),
+		LI_MOVEEND	= (1 << 1),
+		LI_THINOUT	= (1 << 2),
+		LI_THININ	= (1 << 3),
+		LI_SPARKEND = (1 << 4),
 	};
 
-	struct LIGHTNING_INFO
+	struct ElectricArc
 	{
 		Vector3i pos1;
 		Vector3i pos2;
@@ -64,19 +64,19 @@ namespace TEN::Effects::Lightning
 		int r, g, b;
 	};
 
-	extern std::vector<LIGHTNING_INFO> Lightning;
-	extern std::vector<HelicalLaser>   HelicalLasers;
+	extern std::vector<ElectricArc>	 Lightning;
+	extern std::vector<HelicalLaser> HelicalLasers;
 
 	extern Vector3i LightningPos[6];
 	extern short	LightningBuffer[1024];
 
-	LIGHTNING_INFO* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
+	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void			TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 	void			SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
 	void UpdateLightning();
 	void UpdateHelicalLasers();
 
-	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc);
+	void CalcLightningSpline(Vector3i* pos, short* buffer, const ElectricArc& arc);
 	int LSpline(int x, int* knots, int nk);
 }

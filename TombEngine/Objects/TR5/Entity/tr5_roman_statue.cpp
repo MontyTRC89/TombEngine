@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR5
 	struct RomanStatueInfo
 	{
 		Vector3i Position;
-		LIGHTNING_INFO* EnergyArcs[8];
+		ElectricArc* EnergyArcs[8];
 		unsigned int Count;
 	};
 

@@ -109,20 +109,11 @@ namespace TEN::Renderer
 				b = laser.b;
 			}
 
-			LightningPos[0].x = laser.Target.x;
-			LightningPos[0].y = laser.Target.y;
-			LightningPos[0].z = laser.Target.z;
-
-			LightningPos[1].x = laser.Origin.x;
-			LightningPos[1].y = laser.Origin.y;
-			LightningPos[1].z = laser.Origin.z;
+			LightningPos[0] = Vector3i(laser.Target);
+			LightningPos[1] = Vector3i(laser.Origin);
 			
 			for (int j = 0; j < 2; j++)
-			{
-				LightningPos[j].x -= laser.Target.x;
-				LightningPos[j].y -= laser.Target.y;
-				LightningPos[j].z -= laser.Target.z;
-			}
+				LightningPos[j] -= Vector3i(laser.Target);
 
 			CurlSpline(&LightningPos[0], LightningBuffer, laser);
 
@@ -155,7 +146,7 @@ namespace TEN::Renderer
 						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-						{ 5 * 8.0f, Vector3::Distance(origin, target) }, BLENDMODE_ADDITIVE, direction, true, view);							
+						Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
 				}
 			}				
 		}
@@ -172,17 +163,15 @@ namespace TEN::Renderer
 		auto origin = pos[0].ToVector3();
 		auto target = pos[1].ToVector3();;
 
+		int radiusMax = 48;
 		float length = Vector3::Distance(origin, target);
 		float stepLength = length / laser.NumSegments;
 		auto direction = target - origin;
 		direction.Normalize();
 
-		// Set the starting position to the line origin point.
-		auto currentPos = origin;
-
-		short angle = laser.Orientation2D;
 		short radius = 0;
-		int radiusMax = 48;
+		short angle = laser.Orientation2D;
+		auto currentPos = origin;
 
 		if (laser.NumSegments > 0)
 		{
@@ -198,6 +187,7 @@ namespace TEN::Renderer
 				buffer[1] = y;
 				buffer[2] = z;
 
+				// Increment the radius and angle.
 				angle += laser.Coil;
 				radius += laser.Scale;
 
@@ -221,36 +211,25 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLightning(RenderView& view)
 	{
-		for (int i = 0; i < Lightning.size(); i++)
+		for (const auto& arc : Lightning)
 		{
-			LIGHTNING_INFO* arc = &Lightning[i];
-
-			if (arc->life)
+			if (arc.life)
 			{
-				LightningPos[0].x = arc->pos1.x;
-				LightningPos[0].y = arc->pos1.y;
-				LightningPos[0].z = arc->pos1.z;
-
-				memcpy(&LightningPos[1], arc, 48);
-
-				LightningPos[5].x = arc->pos4.x;
-				LightningPos[5].y = arc->pos4.y;
-				LightningPos[5].z = arc->pos4.z;
+				LightningPos[0] = arc.pos1;
+				LightningPos[5] = arc.pos4;
 
 				for (int j = 0; j < 6; j++)
-				{
-					LightningPos[j].x -= LaraItem->Pose.Position.x;
-					LightningPos[j].y -= LaraItem->Pose.Position.y;
-					LightningPos[j].z -= LaraItem->Pose.Position.z;
-				}
+					LightningPos[j] -= LaraItem->Pose.Position;
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
 
-				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE && abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+				if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
+					abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
+					abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
 				{
 					short* interpolatedPos = &LightningBuffer[0];
 
-					for (int s = 0; s < 3 * arc->segments - 1; s++)
+					for (int s = 0; s < 3 * arc.segments - 1; s++)
 					{
 						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
 						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
@@ -263,37 +242,31 @@ namespace TEN::Renderer
 						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
 
 						byte r, g, b;
-
-						if (arc->life >= 16)
+						if (arc.life >= 16)
 						{
-							r = arc->r;
-							g = arc->g;
-							b = arc->b;
+							r = arc.r;
+							g = arc.g;
+							b = arc.b;
 						}
 						else
 						{
-							r = arc->life * arc->r / 16;
-							g = arc->life * arc->g / 16;
-							b = arc->life * arc->b / 16;
+							r = arc.life * arc.r / 16;
+							g = arc.life * arc.g / 16;
+							b = arc.life * arc.b / 16;
 						}
 
-						Vector3 pos1 = Vector3(ix, iy, iz);
-						Vector3 pos2 = Vector3(ix2, iy2, iz2);
+						auto origin = Vector3(ix, iy, iz);
+						auto target = Vector3(ix2, iy2, iz2);
 
-						Vector3 d = pos2 - pos1;
-						d.Normalize();
+						auto center = (origin + target) / 2;
+						auto direction = target - origin;
+						direction.Normalize();
 
-						Vector3 c = (pos1 + pos2) / 2.0f;
-
-						AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							c,
+						AddSpriteBillboardConstrained(
+							&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+							center,
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							(PI / 2),
-							1.0f,
-							{ arc->width * 8.0f,
-							Vector3::Distance(pos1, pos2) },
-							BLENDMODE_ADDITIVE,
-							d, true, view);
+							PI_DIV_2, 1.0f, Vector2(arc.width * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
 					}
 				}
 			}

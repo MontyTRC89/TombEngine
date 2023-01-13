@@ -27,12 +27,12 @@ namespace TEN::Effects::Lightning
 	Vector3i LightningPos[6];
 	short	 LightningBuffer[1024];
 	
-	std::vector<LIGHTNING_INFO> Lightning;
-	std::vector<HelicalLaser>	HelicalLasers;
+	std::vector<ElectricArc>  Lightning		= {};
+	std::vector<HelicalLaser> HelicalLasers = {};
 
-	LIGHTNING_INFO* TriggerLightning(Vector3i* origin, Vector3i* target, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
+	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
-		LIGHTNING_INFO arc;
+		ElectricArc arc;
 
 		arc.pos1 = *origin;
 		arc.pos2.x = ((origin->x * 3) + target->x) >> 2;
@@ -96,7 +96,7 @@ namespace TEN::Effects::Lightning
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
-		HelicalLaser laser = {};
+		auto laser = HelicalLaser();
 
 		laser.NumSegments = HELICAL_LASER_SEGMENTS_NUM_MAX;
 		laser.Origin = origin;
@@ -214,10 +214,10 @@ namespace TEN::Effects::Lightning
 		Lightning.erase(
 			std::remove_if(
 				Lightning.begin(), Lightning.end(),
-				[](const LIGHTNING_INFO& arc) { return (arc.life <= 0); }), Lightning.end());
+				[](const ElectricArc& arc) { return (arc.life <= 0); }), Lightning.end());
 	}
 
-	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc)
+	void CalcLightningSpline(Vector3i* pos, short* buffer, const ElectricArc& arc)
 	{
 		buffer[0] = pos->x;
 		buffer[1] = pos->y;
@@ -225,14 +225,14 @@ namespace TEN::Effects::Lightning
 
 		buffer += 4;
 
-		if (arc->flags & 1)
+		if (arc.flags & 1)
 		{
-			int dp = 65536 / (3 * arc->segments - 1);
+			int dp = 65536 / (3 * arc.segments - 1);
 			int x = dp;
 
-			if (3 * arc->segments - 2 > 0)
+			if (3 * arc.segments - 2 > 0)
 			{
-				for (int i = 3 * arc->segments - 2; i > 0; i--)
+				for (int i = 3 * arc.segments - 2; i > 0; i--)
 				{
 					short sx = LSpline(x, &pos->x, 6);
 					buffer[0] = sx + (GetRandomControl() & 0xF) - 8;
@@ -248,27 +248,27 @@ namespace TEN::Effects::Lightning
 		}
 		else
 		{
-			int segments = 3 * arc->segments - 1;
+			int segments = 3 * arc.segments - 1;
 
 			int dx = (pos[5].x - pos->x) / segments;
 			int dy = (pos[5].y - pos->y) / segments;
 			int dz = (pos[5].z - pos->z) / segments;
 
-			int x = dx + (GetRandomControl() % (2 * arc->amplitude)) - arc->amplitude + pos->x;
-			int y = dy + (GetRandomControl() % (2 * arc->amplitude)) - arc->amplitude + pos->y;
-			int z = dz + (GetRandomControl() % (2 * arc->amplitude)) - arc->amplitude + pos->z;
+			int x = dx + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->x;
+			int y = dy + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->y;
+			int z = dz + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->z;
 
-			if (3 * arc->segments - 2 > 0)
+			if (3 * arc.segments - 2 > 0)
 			{
-				for (int i = 3 * arc->segments - 2; i > 0; i--)
+				for (int i = 3 * arc.segments - 2; i > 0; i--)
 				{
 					buffer[0] = x;
 					buffer[1] = y;
 					buffer[2] = z;
 
-					x += dx + GetRandomControl() % (2 * arc->amplitude) - arc->amplitude;
-					y += dy + GetRandomControl() % (2 * arc->amplitude) - arc->amplitude;
-					z += dz + GetRandomControl() % (2 * arc->amplitude) - arc->amplitude;
+					x += dx + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
+					y += dy + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
+					z += dz + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
 
 					buffer += 4;
 				}
