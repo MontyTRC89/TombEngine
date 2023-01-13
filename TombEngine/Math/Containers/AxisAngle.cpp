@@ -131,33 +131,7 @@ namespace TEN::Math
 
 	Matrix AxisAngle::ToRotationMatrix() const
 	{
-		float sinAngle = sin(TO_RAD(Angle));
-		float cosAngle = cos(TO_RAD(Angle));
-		float t = 1.0f - cosAngle;
-
-		float x = Axis.x;
-		float y = Axis.y;
-		float z = Axis.z;
-
-		auto rotMatrix = Matrix::Identity;
-		rotMatrix(0, 0) = (t * SQUARE(x)) + cosAngle;
-		rotMatrix(0, 1) = (t * (x * y)) - (sinAngle * z);
-		rotMatrix(0, 2) = (t * (x * z)) + (sinAngle * y);
-		rotMatrix(0, 3) = 0.0f;
-		rotMatrix(1, 0) = (t * (x * y)) + (sinAngle * z);
-		rotMatrix(1, 1) = (t * SQUARE(y)) + cosAngle;
-		rotMatrix(1, 2) = (t * (y * z)) - (sinAngle * x);
-		rotMatrix(1, 3) = 0.0f;
-		rotMatrix(2, 0) = (t * (x * z)) - (sinAngle * y);
-		rotMatrix(2, 1) = (t * (y * z)) + (sinAngle * x);
-		rotMatrix(2, 2) = (t * SQUARE(z)) + cosAngle;
-		rotMatrix(2, 3) = 0.0f;
-		rotMatrix(3, 0) = 0.0f;
-		rotMatrix(3, 1) = 0.0f;
-		rotMatrix(3, 2) = 0.0f;
-		rotMatrix(3, 3) = 1.0f;
-
-		return rotMatrix;
+		return Matrix::CreateFromAxisAngle(Axis, TO_RAD(Angle));
 	}
 
 	bool AxisAngle::operator ==(const AxisAngle& axisAngle) const
