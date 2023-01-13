@@ -316,9 +316,9 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_ELECTRIC_CLEANER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCleaner;
-		obj->control = CleanerControl;
-		obj->collision = CleanerCollision;
+		obj->initialise = InitialiseElectricCleaner;
+		obj->control = ElectricCleanerControl;
+		obj->collision = ElectricCleanerCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;
