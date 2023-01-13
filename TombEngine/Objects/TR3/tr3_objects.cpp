@@ -320,7 +320,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->radius = 204;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
 		obj->SetupHitEffect();
 	}
