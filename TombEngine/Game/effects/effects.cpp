@@ -164,12 +164,14 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 {
 	float particleAge=  particle.sLife - particle.life;
 
-	if (particleAge > particle.life )
+	if (!particle.life)
 	{
 		particle.on = false;
 		ParticleDynamics[particle.dynamic].On = false;
-		return;
 	}
+
+	if (particleAge > particle.life )
+	 return;	
 
 	int numSprites = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
