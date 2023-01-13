@@ -18,7 +18,10 @@ namespace TEN::Math
 		// Constructors
 		AxisAngle();
 		AxisAngle(const Vector3& axis, short angle);
+		AxisAngle(const Vector3& direction);
+		AxisAngle(const EulerAngles& eulers);
 		AxisAngle(const Quaternion& quat);
+		AxisAngle(const Matrix& rotMatrix);
 
 		// Getters
 		Vector3 GetAxis() const;

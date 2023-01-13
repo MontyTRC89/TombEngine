@@ -160,9 +160,7 @@ using namespace TEN::Math;
 			cosX * sinZ,
 			(-cosY * cosZ) + (sinY * sinX * sinZ));
 		axis.Normalize();
-
 		float angle = acos(std::clamp((cosX * cosY * cosZ) + (sinX * sinY * sinZ), -1.0f, 1.0f));
-
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 

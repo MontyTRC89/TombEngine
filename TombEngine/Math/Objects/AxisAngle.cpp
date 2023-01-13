@@ -21,6 +21,17 @@ namespace TEN::Math
 		this->Angle = angle;
 	}
 
+	AxisAngle::AxisAngle(const Vector3& direction)
+	{
+		this->Axis = direction;
+		this->Angle = 0;
+	}
+
+	AxisAngle::AxisAngle(const EulerAngles& eulers)
+	{
+		*this = eulers.ToAxisAngle();
+	}
+
 	AxisAngle::AxisAngle(const Quaternion& quat)
 	{
 		auto axis = Quaternion::Identity;
@@ -29,6 +40,28 @@ namespace TEN::Math
 
 		this->Axis = Vector3(axis);
 		this->Angle = FROM_RAD(angle);
+	}
+
+	AxisAngle::AxisAngle(const Matrix& rotMatrix)
+	{
+		static constexpr auto epsilon = 0.00001f;
+
+		float trace = rotMatrix(1, 1) + rotMatrix(2, 2) + rotMatrix(3, 3);
+		float cosA = 0.5f * (trace - 1.0f);
+		this->Angle = FROM_RAD(acosf(cosA));
+
+		if (abs(Angle) <= epsilon)
+		{
+			this->Axis = Vector3::UnitX;
+		}
+		else
+		{
+			float invSinA = 1.0f / sinf(Angle);
+			this->Axis = Vector3(
+				(rotMatrix(3, 2) - rotMatrix(2, 3)) * invSinA,
+				(rotMatrix(1, 3) - rotMatrix(3, 1)) * invSinA,
+				(rotMatrix(2, 1) - rotMatrix(1, 2)) * invSinA);
+		}
 	}
 
 	Vector3 AxisAngle::GetAxis() const
