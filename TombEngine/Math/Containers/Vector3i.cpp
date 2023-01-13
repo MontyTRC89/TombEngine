@@ -45,7 +45,7 @@
 
 	bool Vector3i::operator !=(const Vector3i& vector) const
 	{
-		return ((x != vector.x) || (y != vector.y) || (z != vector.z));
+		return !(*this == vector);
 	}
 
 	Vector3i& Vector3i::operator =(const Vector3i& vector)
