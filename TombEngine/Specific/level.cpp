@@ -1239,10 +1239,19 @@ void LoadBoxes()
 	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 
 	// Read zones
+	int numZoneGroups = ReadInt32();
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
+		for (int j = 0; j < numZoneGroups; j++)
 		{
+			if (j >= (int)ZoneType::MaxZone)
+			{
+				int excessiveZoneGroups = numZoneGroups - j + 1;
+				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
+					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
+				break;
+			}
+
 			g_Level.Zones[j][i].resize(numBoxes);
 			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
 		}
