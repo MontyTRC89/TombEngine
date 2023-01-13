@@ -3,34 +3,20 @@
 
 struct ItemInfo;
 
+// Default zone loaded by TEN. They are added by TE at compile time.
 enum class ZoneType
 {
-	// BASIC ZONES (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
+	Skeleton, // Enables jump, also 1 block vault and fall.
+	Basic,	  // Enables 1 step vault, 2 step fall (default).
 
-	// Enable jump (also 1 block vault/fall)
-	Skeleton,
-	// Enable 1 click vault/fall (default)
-	Basic,
-	// Only underwater (exception: crocodile can go on land)
-	// TODO: underwater creature can go on land like the crocodile which is wrong since the flag IsAmphibious was not set for them !
-	Water,
-	// Enable 1 block vault/fall
-	Human,
-	// Can fly anywhere except in water room
-	Flyer,
-	MaxZone,
+	// TODO: Underwater creatures can go on land like the crocodile, which is wrong since the flag IsAmphibious is not set for them.
+	Water, // Enables movement exclusively underwater (exception: crocodile can go on land)
+	// Amphibious, // TODO: For later since it's not on level file now.
 
-	// ADDED ZONES (above zones are used for LOT.zone):
+	Human, // Enables 1 block vault and fall.
+	Flyer, // Enables flying anywhere except water rooms.
 
-	// Enable jump (also 1 block vault/fall)
-	HumanJump,
-
-	// Enable jump and monkey swing (also 1 block climb/fall)
-	HumanJumpAndMonkey,
-	Spider,
-	Blockable, // For large creatures such as trex and shiva.
-	SophiaLee, // Prevents Sophia from going to lower levels again.
-	Ape		   // Only 1/2 block vault.
+	MaxZone // Used when loading level.
 };
 
 enum class MoodType

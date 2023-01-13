@@ -84,6 +84,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
+	// TODO: Will be moved to TR4 in ObjectCleaning branch.
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
@@ -95,7 +96,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -114,7 +114,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->explodableMeshbits = 0x4000;
-		obj->ZoneType = ZoneType::HumanJump;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -134,7 +134,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanJump;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -155,7 +155,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanJump;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -177,7 +177,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanJump;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -197,7 +197,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanJump;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -219,7 +219,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -241,7 +241,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -260,7 +260,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->undead = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(0, ROT_X);
 		obj->SetBoneRotationFlags(1, ROT_X);
 	}
@@ -277,7 +277,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->biteOffset = 0;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -341,7 +341,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetupHitEffect();
 	}
 
@@ -358,7 +358,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -377,7 +377,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -395,7 +395,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -414,7 +414,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->undead = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -506,7 +506,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
 		obj->SetupHitEffect();
@@ -542,7 +542,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
 		obj->SetupHitEffect();
@@ -560,7 +560,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -605,7 +605,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -626,7 +625,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Human;
+			obj->LotType = LotType::Human;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);

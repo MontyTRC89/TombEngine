@@ -81,23 +81,26 @@ namespace TEN::Entities::Creatures::TR1
 			SetAnimation(item, BIG_RAT_ANIM_IDLE);
 	}
 
-	bool IsRatOnWater(ItemInfo* item)
+	bool RatOnWater(ItemInfo* item)
 	{
-		auto* creature = GetCreatureInfo(item);
-		auto* object = &Objects[item->ObjectNumber];
-
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-		if (waterDepth != NO_HEIGHT)
+		
+		if (item->IsCreature())
 		{
-			creature->LOT.Step = BLOCK(20);
-			creature->LOT.Drop = -BLOCK(20);
-		}
-		else
-		{
-			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-		}
+			auto* creature = GetCreatureInfo(item);
 
+			if (waterDepth != NO_HEIGHT)
+			{
+				creature->LOT.Step = BLOCK(20);
+				creature->LOT.Drop = -BLOCK(20);
+			}
+			else
+			{
+				creature->LOT.Step = CLICK(1);
+				creature->LOT.Drop = -CLICK(1);
+			}
+		}
+		
 		return waterDepth != NO_HEIGHT;
 	}
 
@@ -114,7 +117,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		if (item->HitPoints <= 0)
 		{
-			bool doWaterDeath = IsRatOnWater(item);
+			bool doWaterDeath = RatOnWater(item);
 			if (item->Animation.ActiveState != BIG_RAT_STATE_LAND_DEATH &&
 				item->Animation.ActiveState != BIG_RAT_STATE_WATER_DEATH)
 			{
@@ -154,7 +157,7 @@ namespace TEN::Entities::Creatures::TR1
 			case BIG_RAT_STATE_RUN_FORWARD:
 				creature->MaxTurn = BIG_RAT_RUN_TURN_RATE_MAX;
 
-				if (IsRatOnWater(item))
+				if (RatOnWater(item))
 				{
 					SetAnimation(item, BIG_RAT_ANIM_SWIM);
 					break;
@@ -207,7 +210,7 @@ namespace TEN::Entities::Creatures::TR1
 			case BIG_RAT_STATE_SWIM:
 				creature->MaxTurn = BIG_RAT_SWIM_TURN_RATE_MAX;
 
-				if (!IsRatOnWater(item))
+				if (!RatOnWater(item))
 				{
 					SetAnimation(item, BIG_RAT_ANIM_RUN_FORWARD);
 					break;
@@ -234,7 +237,7 @@ namespace TEN::Entities::Creatures::TR1
 		CreatureJoint(item, 0, head);
 		CreatureAnimation(itemNumber, angle, 0);
 
-		if (IsRatOnWater(item))
+		if (RatOnWater(item))
 		{
 			CreatureUnderwater(item, 0);
 			item->Pose.Position.y = GetWaterHeight(item) - BIG_RAT_WATER_SURFACE_OFFSET;
