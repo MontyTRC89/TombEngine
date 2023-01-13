@@ -28,9 +28,9 @@ using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Traps
 {
-	constexpr auto ELECTRIC_CLEANER_VELOCITY	  = BLOCK(1 / 16.0f);
-	constexpr auto ELECTRIC_CLEANER_TURN_TOLERANCE = ANGLE(5.0f);
-	constexpr auto ELECTRIC_CLEANER_TURN_RATE_MAX = ANGLE(8.5f);
+	constexpr auto ELECTRIC_CLEANER_VELOCITY	   = BLOCK(1 / 16.0f);
+	constexpr auto ELECTRIC_CLEANER_TURN_TOLERANCE = 5.0f;
+	constexpr auto ELECTRIC_CLEANER_TURN_RATE_MAX  = ANGLE(8.5f);
 
 	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
@@ -100,9 +100,9 @@ namespace TEN::Entities::Traps
 
 				if (item.ItemFlags[1])
 				{
-					x = item.Pose.Position.x + (BLOCK(1) * phd_sin(item.Pose.Orientation.y + ANGLE(180.0F)));
+					x = item.Pose.Position.x + (BLOCK(1) * phd_sin(item.Pose.Orientation.y + ANGLE(180.0f)));
 					y = item.Pose.Position.y;
-					z = item.Pose.Position.z + (BLOCK(1) * phd_cos(item.Pose.Orientation.y + ANGLE(180.0F)));
+					z = item.Pose.Position.z + (BLOCK(1) * phd_cos(item.Pose.Orientation.y + ANGLE(180.0f)));
 					roomNumber = item.RoomNumber;
 					floor = GetFloor(x, y, z, &roomNumber);
 					r = &g_Level.Rooms[roomNumber];
@@ -110,8 +110,7 @@ namespace TEN::Entities::Traps
 					item.ItemFlags[1] = 0;
 				}
 
-
-				// Now check where we are heading and determine where to go next.
+				// Check where cleaner is heading and determine where to go next.
 				bool left, ahead;
 				y = item.Pose.Position.y;
 
@@ -120,12 +119,12 @@ namespace TEN::Entities::Traps
 				// Facing Z+
 				case ANGLE(0.0f):
 
-					// Check if we can go left.
+					// Check if cleaner can go left.
 					x = item.Pose.Position.x - BLOCK(1);
 					z = item.Pose.Position.z;
 					CheckCleanerHeading(item, x, y, z, item.RoomNumber, left);
 
-					// Now check ahead.
+					// Check ahead.
 					x = item.Pose.Position.x;
 					z = item.Pose.Position.z + BLOCK(1);
 					CheckCleanerHeading(item, x, y, z, item.RoomNumber, ahead);
@@ -188,7 +187,8 @@ namespace TEN::Entities::Traps
 						item.Pose.Orientation.y--;
 						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE_MAX;
 					}
-					else if (left && item.ItemFlags[0] > 0)	// Prioritize left first.
+					// Prioritize left.
+					else if (left && item.ItemFlags[0] > 0)
 					{
 						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
 						item.Pose.Orientation.y--;
@@ -256,7 +256,7 @@ namespace TEN::Entities::Traps
 
 					break;
 
-				//facing Z-
+				// Facing Z-
 				case ANGLE(-180.0f):
 					x = item.Pose.Position.x + BLOCK(1);
 					z = item.Pose.Position.z;
@@ -444,8 +444,7 @@ namespace TEN::Entities::Traps
 		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
 		{
 			long lp = 0;
-
-			while (CollidedItems[lp])
+			while (CollidedItems[lp] != nullptr)
 			{
 				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
 				{
@@ -462,7 +461,7 @@ namespace TEN::Entities::Traps
 
 	void SpawnElectricCleanerSparks(ItemInfo& item)
 	{
-		static auto wireEnds = std::array<int, 3>{ 5, 9, 13 };
+		static auto wireEndJoints = std::array<int, 3>{ 5, 9, 13 };
 
 		SoundEffect(SFX_TR3_CLEANER_LOOP, &item.Pose);
 
@@ -480,7 +479,7 @@ namespace TEN::Entities::Traps
 				else
 					item.ItemFlags[3 + i]--;
 
-				long joint = wireEnds[i];
+				long joint = wireEndJoints[i];
 				auto pos = GetJointPosition(&item, joint, Vector3i(-160, -8, 16));
 
 				byte c = Random::GenerateInt(0, 64) + 128;
