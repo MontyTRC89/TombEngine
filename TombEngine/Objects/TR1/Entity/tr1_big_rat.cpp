@@ -83,21 +83,24 @@ namespace TEN::Entities::Creatures::TR1
 
 	bool IsRatOnWater(ItemInfo* item)
 	{
-		auto* creature = GetCreatureInfo(item);
-		auto* object = &Objects[item->ObjectNumber];
-
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-		if (waterDepth != NO_HEIGHT)
+		
+		if (item->IsCreature())
 		{
-			creature->LOT.Step = BLOCK(20);
-			creature->LOT.Drop = -BLOCK(20);
-		}
-		else
-		{
-			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-		}
+			auto* creature = GetCreatureInfo(item);
 
+			if (waterDepth != NO_HEIGHT)
+			{
+				creature->LOT.Step = BLOCK(20);
+				creature->LOT.Drop = -BLOCK(20);
+			}
+			else
+			{
+				creature->LOT.Step = CLICK(1);
+				creature->LOT.Drop = -CLICK(1);
+			}
+		}
+		
 		return waterDepth != NO_HEIGHT;
 	}
 
