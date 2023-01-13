@@ -141,15 +141,15 @@ namespace TEN::Math
 
 		auto rotMatrix = Matrix::Identity;
 		rotMatrix(0, 0) = (t * SQUARE(x)) + cosAngle;
-		rotMatrix(0, 1) = (t * x * y) - (sinAngle * z);
-		rotMatrix(0, 2) = (t * x * z) + (sinAngle * y);
+		rotMatrix(0, 1) = (t * (x * y)) - (sinAngle * z);
+		rotMatrix(0, 2) = (t * (x * z)) + (sinAngle * y);
 		rotMatrix(0, 3) = 0.0f;
-		rotMatrix(1, 0) = (t * x * y) + (sinAngle * z);
+		rotMatrix(1, 0) = (t * (x * y)) + (sinAngle * z);
 		rotMatrix(1, 1) = (t * SQUARE(y)) + cosAngle;
-		rotMatrix(1, 2) = (t * y * z) - (sinAngle * x);
+		rotMatrix(1, 2) = (t * (y * z)) - (sinAngle * x);
 		rotMatrix(1, 3) = 0.0f;
-		rotMatrix(2, 0) = (t * x * z) - (sinAngle * y);
-		rotMatrix(2, 1) = (t * y * z) + (sinAngle * x);
+		rotMatrix(2, 0) = (t * (x * z)) - (sinAngle * y);
+		rotMatrix(2, 1) = (t * (y * z)) + (sinAngle * x);
 		rotMatrix(2, 2) = (t * SQUARE(z)) + cosAngle;
 		rotMatrix(2, 3) = 0.0f;
 		rotMatrix(3, 0) = 0.0f;

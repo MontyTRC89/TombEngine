@@ -155,10 +155,10 @@ using namespace TEN::Math;
 		float sinZ = sin(FROM_RAD(z));
 		float cosZ = cos(FROM_RAD(z));
 
-		auto axis = Vector3::Zero;
-		axis.x = (sinY * cosZ) + (cosY * sinX * sinZ);
-		axis.y = cosX * sinZ;
-		axis.z = (-cosY * cosZ) + (sinY * sinX * sinZ);
+		auto axis = Vector3(
+			(sinY * cosZ) + (cosY * sinX * sinZ),
+			cosX * sinZ,
+			(-cosY * cosZ) + (sinY * sinX * sinZ));
 		axis.Normalize();
 
 		float angle = acos(std::clamp((cosX * cosY * cosZ) + (sinX * sinY * sinZ), -1.0f, 1.0f));
