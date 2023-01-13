@@ -3,24 +3,24 @@
 
 namespace TEN::Effects::Boss
 {
-	enum BossItemFlags
+	enum class BossItemFlags
 	{
-		BOSSFlag_Object = 0,		  // BossFlagValue enum.
-		BOSSFlag_Rotation = 1,		  // Store rotation for use (e.g. Puna when summoning).
-		BOSSFlag_ShieldIsEnabled = 2,
-		BOSSFlag_AttackType = 3,
-		BOSSFlag_AttackCount = 4,	  // Change behaviour after some attack.
-		BOSSFlag_DeathCount = 5,
-		BOSSFlag_ItemNumber = 6,	  // Check if summon is dead.
-		BOSSFlag_ExplodeCount = 7
+		Object = 0,		  // BossFlagValue enum.
+		Rotation = 1,		  // Store rotation for use (e.g. Puna when summoning).
+		ShieldIsEnabled = 2,
+		AttackType = 3,
+		AttackCount = 4,	  // Change behaviour after some attack.
+		DeathCount = 5,
+		ItemNumber = 6,	  // Check if summon is dead.
+		ExplodeCount = 7
 	};
 
-	enum BossFlagValue
+	enum class BossFlagValue
 	{
-		BOSS_ShockwaveRing      = (1 << 0),
-		BOSS_ShockwaveExplosion = (1 << 1),
-		BOSS_Shield             = (1 << 2),
-		BOSS_Lizard             = (1 << 3)
+		ShockwaveRing      = (1 << 0),
+		ShockwaveExplosion = (1 << 1),
+		Shield             = (1 << 2),
+		Lizard             = (1 << 3)
 	};
 
 	void ShieldControl(int itemNumber);

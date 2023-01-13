@@ -70,17 +70,17 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Save Puna's default angle. It will be used while waiting (i.e. an active lizard is nearby).
 		// NOTE: Since Puna is oriented to face away from the player, add 180 degrees.
-		item.SetFlagField(BOSSFlag_Rotation, item.Pose.Orientation.y + ANGLE(180.0f));
-		item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::AwaitPlayer); // normal behaviour at start.
-		item.SetFlagField(BOSSFlag_ShieldIsEnabled, 1); // activated at start.
-		item.SetFlagField(BOSSFlag_AttackCount, 0);
-		item.SetFlagField(BOSSFlag_DeathCount, 0);
-		item.SetFlagField(BOSSFlag_ItemNumber, NO_ITEM);
-		item.SetFlagField(BOSSFlag_ExplodeCount, 0);
+		item.SetFlagField((int)BossItemFlags::Rotation, item.Pose.Orientation.y + ANGLE(180.0f));
+		item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::AwaitPlayer); // normal behaviour at start.
+		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 1); // activated at start.
+		item.SetFlagField((int)BossItemFlags::AttackCount, 0);
+		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
+		item.SetFlagField((int)BossItemFlags::ItemNumber, NO_ITEM);
+		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
 
 		// If there is no lizard nearby, remove the lizard flag.
 		if (!IsLizardActiveNearby(item, true))
-			item.ClearFlags(BOSSFlag_Object, BOSS_Lizard);
+			item.ClearFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard);
 	}
 
 	void PunaControl(short itemNumber)
@@ -107,7 +107,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				SetAnimation(&item, PUNA_ANIM_DEATH);
 				SoundEffect(SFX_TR3_PUNA_BOSS_DEATH, &item.Pose);
-				item.ItemFlags[BOSSFlag_DeathCount] = 1;
+				item.ItemFlags[(int)BossItemFlags::DeathCount] = 1;
 				creature.MaxTurn = 0;
 			}
 
@@ -118,21 +118,21 @@ namespace TEN::Entities::Creatures::TR3
 				item.Animation.FrameNumber = frameEnd;
 				item.MeshBits.ClearAll();
 
-				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
-					item.ItemFlags[BOSSFlag_ExplodeCount]++;
+				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
+					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
-				if (item.GetFlagField(BOSSFlag_ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
+				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
 					ExplodeBoss(itemNumber, item, 61, PUNA_EFFECT_COLOR); // Do explosion effect.
 
 				return;
 			}
 			else
 			{
-				auto deathCount = item.GetFlagField(BOSSFlag_DeathCount);
-				item.Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item.ItemFlags[BOSSFlag_DeathCount] >> 1);
+				auto deathCount = item.GetFlagField((int)BossItemFlags::DeathCount);
+				item.Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item.ItemFlags[(int)BossItemFlags::DeathCount] >> 1);
 
 				if (deathCount < 2048)
-					item.ItemFlags[BOSSFlag_DeathCount] += 32;
+					item.ItemFlags[(int)BossItemFlags::DeathCount] += 32;
 			}
 		}
 		else
@@ -147,12 +147,12 @@ namespace TEN::Entities::Creatures::TR3
 				headOrient.y = AI.angle;
 			}
 
-			if (item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::AwaitPlayer) && creature.Enemy != nullptr)
+			if (item.TestFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::AwaitPlayer) && creature.Enemy != nullptr)
 			{
 				float distance = Vector3i::Distance(creature.Enemy->Pose.Position, item.Pose.Position);
 
 				if (distance <= BLOCK(2.5f))
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
+					item.SetFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::DeathLightning);
 
 				// Rotate the object on puna boss chair.
 				creature.JointRotation[0] += PUNA_CHAIR_TURN_RATE_MAX;
@@ -160,36 +160,36 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Get target.
-			if (item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning))
+			if (item.TestFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::DeathLightning))
 			{
 				creature.Target = creature.Enemy->Pose.Position;
 			}
-			else if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
-				item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) &&
-				item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) &&
-				!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) && isLizardActiveNearby)
+			else if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) &&
+				item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) &&
+				item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM) &&
+				!item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::Wait) && isLizardActiveNearby)
 			{
 				// Get random lizard item number.
-				item.SetFlagField(BOSSFlag_ItemNumber, (short)GetLizardItemNumber(item));
+				item.SetFlagField((int)BossItemFlags::ItemNumber, (short)GetLizardItemNumber(item));
 				creature.Target = GetLizardTargetPosition(item);
 			}
-			else if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
-				item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait) &&
-				!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
+			else if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) &&
+				item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::Wait) &&
+				!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM))
 			{
 				// Rotate to idle position while player fights lizard.
-				auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.GetFlagField(BOSSFlag_Rotation), item.Pose.Orientation.z);
+				auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.GetFlagField((int)BossItemFlags::Rotation), item.Pose.Orientation.z);
 				item.Pose.Orientation.InterpolateConstant(targetOrient, ANGLE(3.0f));
 
 				// Check if target is dead.
-				auto& summonItem = g_Level.Items[item.GetFlagField(BOSSFlag_ItemNumber)];
+				auto& summonItem = g_Level.Items[item.GetFlagField((int)BossItemFlags::ItemNumber)];
 
 				if (summonItem.HitPoints <= 0)
 				{
 					// Reset the attack type, attack count, itemNumber, and restart the sequence.
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
-					item.SetFlagField(BOSSFlag_AttackCount, 0);
-					item.SetFlagField(BOSSFlag_ItemNumber, NO_ITEM);
+					item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::DeathLightning);
+					item.SetFlagField((int)BossItemFlags::AttackCount, 0);
+					item.SetFlagField((int)BossItemFlags::ItemNumber, NO_ITEM);
 				}
 			}
 
@@ -200,34 +200,34 @@ namespace TEN::Entities::Creatures::TR3
 			{
 			case PUNA_STATE_IDLE:
 				creature.MaxTurn = PUNA_TURN_RATE_MAX;
-				item.SetFlagField(BOSSFlag_ShieldIsEnabled, 1);
+				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 1);
 
 				if ((item.Animation.TargetState != PUNA_STATE_HAND_ATTACK && item.Animation.TargetState != PUNA_STATE_HEAD_ATTACK) &&
 					AI.angle > ANGLE(-1.0f) && AI.angle < ANGLE(1.0f) &&
 					creature.Enemy->HitPoints > 0 &&
-					item.GetFlagField(BOSSFlag_AttackCount) < PUNA_HEAD_ATTACK_NUM_MAX &&
-					!item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) && !item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait))
+					item.GetFlagField((int)BossItemFlags::AttackCount) < PUNA_HEAD_ATTACK_NUM_MAX &&
+					!item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) && !item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::Wait))
 				{
 					creature.MaxTurn = 0;
 					targetPos = creature.Target;
 					targetPos.y -= CLICK(2);
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::DeathLightning);
+					item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::DeathLightning);
 
 					if (Random::TestProbability(1 / 3.0f))
 						item.Animation.TargetState = PUNA_STATE_HEAD_ATTACK;
 					else
 						item.Animation.TargetState = PUNA_STATE_HAND_ATTACK;
 
-					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) && isLizardActiveNearby)
-						item.ItemFlags[BOSSFlag_AttackCount]++;
+					if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) && isLizardActiveNearby)
+						item.ItemFlags[(int)BossItemFlags::AttackCount]++;
 				}
-				else if (item.ItemFlags[BOSSFlag_AttackCount] >= PUNA_HEAD_ATTACK_NUM_MAX &&
+				else if (item.ItemFlags[(int)BossItemFlags::AttackCount] >= PUNA_HEAD_ATTACK_NUM_MAX &&
 					creature.Enemy->HitPoints > 0 && 
-					item.ItemFlags[BOSSFlag_AttackType] != (int)PunaAttackType::Wait)
+					item.ItemFlags[(int)BossItemFlags::AttackType] != (int)PunaAttackType::Wait)
 				{
-					item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning);
+					item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning);
 
-					if (!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
+					if (!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM))
 					{
 						if (headYOrient > ANGLE(-1.0f) && headYOrient < ANGLE(1.0f))
 						{
@@ -241,7 +241,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case PUNA_STATE_HEAD_ATTACK:
-				item.SetFlagField(BOSSFlag_ShieldIsEnabled, 0);
+				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
@@ -250,14 +250,14 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case PUNA_STATE_HAND_ATTACK:
-				item.SetFlagField(BOSSFlag_ShieldIsEnabled, 0);
+				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 30))
 				{
-					if (item.TestFlags(BOSSFlag_Object, BOSS_Lizard) &&
-						item.TestFlagField(BOSSFlag_AttackType, (int)PunaAttackType::SummonLightning) &&
-						!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM) && isLizardActiveNearby)
+					if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) &&
+						item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) &&
+						!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM) && isLizardActiveNearby)
 					{
 						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
 					}
@@ -296,8 +296,8 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		if (pos.has_value())
 		{
-			if (target.TestFlags(BOSSFlag_Object, BOSS_Shield) &&
-				target.TestFlagField(BOSSFlag_ShieldIsEnabled, 1))
+			if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
+				target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
 			{
 				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), PUNA_EFFECT_COLOR);
 			}
@@ -348,7 +348,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	short GetPunaHeadOrientToTarget(ItemInfo& item, const Vector3& target)
 	{
-		if (!item.TestFlags(BOSSFlag_Object, BOSS_Lizard))
+		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard))
 			return NO_ITEM;
 
 		auto pos = GetJointPosition(&item, PunaBossHeadBite.meshNum).ToVector3();
@@ -377,9 +377,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	Vector3 GetLizardTargetPosition(ItemInfo& item)
 	{
-		if (!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
+		if (!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM))
 		{
-			const auto& targetEntity = g_Level.Items[item.GetFlagField(BOSSFlag_ItemNumber)];
+			const auto& targetEntity = g_Level.Items[item.GetFlagField((int)BossItemFlags::ItemNumber)];
 			return targetEntity.Pose.Position.ToVector3();
 		}
 
@@ -390,7 +390,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	int GetLizardItemNumber(const ItemInfo& item)
 	{
-		if (!item.TestFlags(BOSSFlag_Object, BOSS_Lizard))
+		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard))
 			return NO_ITEM;
 
 		auto lizardList = GetLizardEntityList(item);
@@ -415,7 +415,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (currentEntity.RoomNumber != item.RoomNumber)
 				continue;
 
-			// If the enity is currently initializing, return early.
+			// If the entity is currently initializing, return early.
 			if (isInitializing)
 				return true;
 
@@ -433,9 +433,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	void SpawnLizard(ItemInfo& item)
 	{
-		if (!item.TestFlagField(BOSSFlag_ItemNumber, NO_ITEM))
+		if (!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM))
 		{
-			auto itemNumber = item.GetFlagField(BOSSFlag_ItemNumber);
+			auto itemNumber = item.GetFlagField((int)BossItemFlags::ItemNumber);
 			auto& currentItem = g_Level.Items[itemNumber];
 
 			for (int i = 0; i < 20; i++)
@@ -443,7 +443,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			AddActiveItem(itemNumber);
 			currentItem.ItemFlags[0] = 1; // Flag 1 = spawned lizard.
-			item.SetFlagField(BOSSFlag_AttackType, (int)PunaAttackType::Wait);
+			item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::Wait);
 		}
 	}
 

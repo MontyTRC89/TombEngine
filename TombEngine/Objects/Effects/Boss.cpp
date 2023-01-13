@@ -16,7 +16,7 @@ namespace TEN::Effects::Boss
 {
 	void SpawnShield(const ItemInfo& item, const Vector4& color)
 	{
-		if (!item.TestFlags(BOSSFlag_Object, BOSS_Shield))
+		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield))
 			return;
 
 		int itemNumber = CreateItem();
@@ -45,7 +45,7 @@ namespace TEN::Effects::Boss
 
 	void SpawnShockwaveExplosion(const ItemInfo& item, const Vector4& color)
 	{
-		if (!item.TestFlags(BOSSFlag_Object, BOSS_ShockwaveExplosion))
+		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::ShockwaveExplosion))
 			return;
 
 		int itemNumber = CreateItem();
@@ -82,7 +82,7 @@ namespace TEN::Effects::Boss
 
 	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
 	{
-		if (!item.TestFlags(BOSSFlag_Object, BOSS_ShockwaveExplosion))
+		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::ShockwaveRing))
 			return;
 
 		int itemNumber = CreateItem();
@@ -235,11 +235,11 @@ namespace TEN::Effects::Boss
 		auto pos = Vector3::Zero;
 
 		// Disable shield.
-		item.SetFlagField(BOSSFlag_ShieldIsEnabled, 0);
+		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 		item.HitPoints = NOT_TARGETABLE;
 
 		// Start doing the explosion (entity will do the count).
-		short counter = item.ItemFlags[BOSSFlag_ExplodeCount];
+		short counter = item.ItemFlags[(int)BossItemFlags::ExplodeCount];
 		if (counter == 1)
 		{
 			SpawnShockwaveExplosion(item, color);
@@ -292,20 +292,20 @@ namespace TEN::Effects::Boss
 		short flags = 0;
 
 		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)
-			flags |= BOSS_Lizard;
+			flags |= (short)BossFlagValue::Lizard;
 
 		// The following are only for aesthetics.
 
 		if (Objects[ID_BOSS_EXPLOSION_RING].loaded)
-			flags |= BOSS_ShockwaveRing;
+			flags |= (short)BossFlagValue::ShockwaveRing;
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)
-			flags |= BOSS_ShockwaveExplosion;
+			flags |= (short)BossFlagValue::ShockwaveExplosion;
 
 		if (Objects[ID_BOSS_SHIELD].loaded)
-			flags |= BOSS_Shield;
+			flags |= (short)BossFlagValue::Shield;
 
-		item.SetFlagField(BOSSFlag_Object, flags);
+		item.SetFlagField((int)BossItemFlags::Object, flags);
 	}
 
 	void SpawnShieldAndRichochetSparks(const ItemInfo& item, const Vector3& pos, const Vector4& color)
