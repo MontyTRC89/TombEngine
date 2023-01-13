@@ -25,8 +25,8 @@
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 
 // Traps
+#include "Objects/TR3/Trap/ElectricCleaner.h"
 #include "Objects/TR3/Trap/train.h"
-#include "Objects/TR3/Trap/cleaner.h"
 
 // Vehicles
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -37,6 +37,7 @@
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo* obj)
 {
