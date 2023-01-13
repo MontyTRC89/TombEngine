@@ -66,7 +66,7 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	constexpr auto MAX_LIGHTNING_RANGE = 24576;
+	constexpr auto MAX_LIGHTNING_RANGE = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -109,8 +109,6 @@ namespace TEN::Renderer
 				LightningPos[0].x = tg->pos4.x;
 				LightningPos[0].y = tg->pos4.y;
 				LightningPos[0].z = tg->pos4.z;
-
-				memcpy(&LightningPos[1], tg, 48);
 
 				LightningPos[1].x = tg->pos1.x;
 				LightningPos[1].y = tg->pos1.y;

@@ -32,6 +32,7 @@ using namespace TEN::Effects::Spark;
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto HEAVY_GUARD_RAYGUN_DAMAGE = 250;
+	constexpr auto HEAVY_GUARD_HEAD_MESH_RANGE = 260;
 
 	constexpr auto HEAVY_GUARD_ALERT_RANGE	  = SQUARE(BLOCK(2));
 	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE = SQUARE(BLOCK(3));
@@ -100,7 +101,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseHeavyGuard(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
+		item.ItemFlags[7] = HEAVY_GUARD_HEAD_MESH_RANGE;
 		SetAnimation(&item, HEAVY_GUARD_ANIM_IDLE);
 	}
 
@@ -444,18 +445,19 @@ namespace TEN::Entities::Creatures::TR5
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
-			if (jointIndex == 2 && pos.has_value() )
+		if (pos.has_value())
+		{
+			if (jointIndex == 2 )
 			{
 				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, INT_MAX, isExplosive);
-				return;
+				DoDamage(&target, INT_MAX);
 			}
-			else 
+			else
 			{
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
-				return;
 			}
+		}
 	}
 
 	/*void FireHeavyGuardRaygun(ItemInfo& item, bool fireRight, bool spawnLaser)
