@@ -90,13 +90,13 @@ namespace TEN::Renderer
 				continue;
 
 			byte r, g, b;
-			if (laser.FadeIn < 8)
+			if (laser.FadeIn < 8.0f)
 			{
 				r = (laser.r * laser.FadeIn) / 8;
 				g = (laser.g * laser.FadeIn) / 8;
 				b = (laser.b * laser.FadeIn) / 8;
 			}
-			else if (laser.Life < 16)
+			else if (laser.Life < 16.0f)
 			{
 				r = (laser.r * laser.Life) / 16;
 				g = (laser.g * laser.Life) / 16;
