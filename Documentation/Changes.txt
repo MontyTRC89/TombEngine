@@ -9,6 +9,7 @@ Version 1.0.6
 * Fix sting attack of TR4 harpy which was neither hurting nor poisoning Lara.
 * Fix backholster weapons not updating their sound position together with player.
 * Fix black screen bug when there was an obstacle between the fixed camera and the target.
+* Fix underwater caustics not appearing without visiting options menu beforehand.
 * Fix TR4 skeleton spawn when used with OCB 3
 * Fix TR4 SAS teleporting over the blocks he walks by.
 * Add undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
