@@ -47,20 +47,20 @@ namespace TEN::Math
 		static constexpr auto epsilon = 0.00001f;
 
 		float trace = rotMatrix(1, 1) + rotMatrix(2, 2) + rotMatrix(3, 3);
-		float cosA = 0.5f * (trace - 1.0f);
-		this->Angle = FROM_RAD(acosf(cosA));
+		float cosAngle = 0.5f * (trace - 1.0f);
+		this->Angle = FROM_RAD(acos(cosAngle));
 
-		if (abs(Angle) <= epsilon)
+		if (abs(TO_RAD(Angle)) <= epsilon)
 		{
 			this->Axis = Vector3::UnitX;
 		}
 		else
 		{
-			float invSinA = 1.0f / sinf(Angle);
+			float invSinAngle = 1.0f / sin(TO_RAD(Angle));
 			this->Axis = Vector3(
-				(rotMatrix(3, 2) - rotMatrix(2, 3)) * invSinA,
-				(rotMatrix(1, 3) - rotMatrix(3, 1)) * invSinA,
-				(rotMatrix(2, 1) - rotMatrix(1, 2)) * invSinA);
+				(rotMatrix(3, 2) - rotMatrix(2, 3)) * invSinAngle,
+				(rotMatrix(1, 3) - rotMatrix(3, 1)) * invSinAngle,
+				(rotMatrix(2, 1) - rotMatrix(1, 2)) * invSinAngle);
 		}
 	}
 
