@@ -115,7 +115,7 @@ namespace TEN::Renderer
 			for (int j = 0; j < 2; j++)
 				LightningPos[j] -= Vector3i(laser.Target);
 
-			CurlSpline(&LightningPos[0], LightningBuffer, laser);
+			HelixSpline(&LightningPos[0], LightningBuffer, laser);
 
 			if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
 				abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
@@ -152,7 +152,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CurlSpline(Vector3i* pos, short* buffer, const HelicalLaser& laser)
+	void Renderer11::HelixSpline(Vector3i* pos, short* buffer, const HelicalLaser& laser)
 	{
 		buffer[0] = pos[0].x;
 		buffer[1] = pos[0].y;
