@@ -1,24 +1,12 @@
 #include "framework.h"
 #include "Game/effects/lightning.h"
 
-#include "Game/animation.h"
-#include "Game/effects/bubble.h"
-#include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/smoke.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara.h"
 #include "Game/people.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Sound/sound.h"
-#include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Lightning
 {
