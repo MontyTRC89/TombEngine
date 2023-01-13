@@ -1063,7 +1063,8 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		for (int jointID = 0; jointID < object.nmeshes; jointID++)
 		{
 			auto pos = GetJointPosition(targetEntity, jointID);
-			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < BLOCK(1 / 16.0f))
+			float distance = targetEntity->ItemFlags[7] != 0 ? (float)targetEntity->ItemFlags[7] : BLOCK(1 / 16.0f);
+			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < distance)
 			{
 				foundJointID = jointID;
 				break;
