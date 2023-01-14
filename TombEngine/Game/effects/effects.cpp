@@ -467,8 +467,8 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	static const auto rotationMax = 30;
-	static const auto lifeMax	  = 44;
+	static constexpr auto rotationMax = 30;
+	static constexpr auto lifeMax	  = 44;
 
 	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
