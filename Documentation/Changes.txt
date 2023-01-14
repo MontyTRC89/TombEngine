@@ -2,6 +2,7 @@ Version 1.0.6
 =============
 
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
+* Fix potential random crashes due to incorrect rendering behaviour.
 * Fix savegame crash for disabled enemies with partially set activation mask.
 * Fix certain enemies not damaging Lara if binoculars or lasersight mode is active.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
