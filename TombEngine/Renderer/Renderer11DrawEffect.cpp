@@ -1264,11 +1264,16 @@ namespace TEN::Renderer
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
 
-		for (int i = 0; i < SmokeParticles.size(); i++) 
+		for (const auto& smoke : SmokeParticles) 
 		{
-			SmokeParticle& s = SmokeParticles[i];
-			if (!s.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, true, view);
+			if (!smoke.active)
+				continue;
+
+			// TODO: Switch back to alpha blend mode once rendering for it is refactored. -- Sezz 21.01.2023
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
+				smoke.position,
+				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
