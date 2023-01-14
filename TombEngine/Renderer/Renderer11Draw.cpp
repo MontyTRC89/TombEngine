@@ -85,14 +85,14 @@ namespace TEN::Renderer
 				else
 				{
 					auto bBox = GameBoundingBox(&nativeItem);
-					auto center = ((Vector3(bBox.X1, bBox.Y1, bBox.Z1) + Vector3(bBox.X2, bBox.Y2, bBox.Z2)) / 2) +
-						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+					auto extents = bBox.GetExtents();
+					auto center = Geometry::TranslatePoint(nativeItem.Pose.Position.ToVector3(), nativeItem.Pose.Orientation, bBox.GetCenter());
+					center = (GetJointPosition(&nativeItem, 0).ToVector3() + center) / 2.0f;
 					center.y = nativeItem.Pose.Position.y;
-					float maxExtent = std::max(bBox.X2 - bBox.X1, bBox.Z2 - bBox.Z1);
 
 					auto& newSphere = nearestSpheres.emplace_back();
 					newSphere.position = center;
-					newSphere.radius = maxExtent;
+					newSphere.radius = std::max(abs(extents.x), abs(extents.z)) * 1.5f;
 				}
 			}
 		}

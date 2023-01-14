@@ -29,6 +29,8 @@ class Pose;
 		int GetWidth() const;
 		int GetHeight() const;
 		int GetDepth() const;
+		Vector3 GameBoundingBox::GetCenter() const;
+		Vector3 GameBoundingBox::GetExtents() const;
 
 		// Utilities
 		void RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds);

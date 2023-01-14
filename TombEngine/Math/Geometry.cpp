@@ -64,6 +64,12 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& offset)
+	{
+		auto rotMatrix = orient.ToRotationMatrix();
+		return (point + Vector3::Transform(offset, rotMatrix));
+	}
+
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
