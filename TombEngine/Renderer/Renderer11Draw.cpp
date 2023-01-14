@@ -84,9 +84,9 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					auto bBox = GameBoundingBox(&nativeItem);
-					auto extents = bBox.GetExtents();
-					auto center = Geometry::TranslatePoint(nativeItem.Pose.Position.ToVector3(), nativeItem.Pose.Orientation, bBox.GetCenter());
+					auto bounds = GameBoundingBox(&nativeItem);
+					auto extents = bounds.GetExtents();
+					auto center = Geometry::TranslatePoint(nativeItem.Pose.Position.ToVector3(), nativeItem.Pose.Orientation, bounds.GetCenter());
 					center = (GetJointPosition(&nativeItem, 0).ToVector3() + center) / 2.0f;
 					center.y = nativeItem.Pose.Position.y;
 

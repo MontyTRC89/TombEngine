@@ -134,7 +134,7 @@ void DropEntityPickups(ItemInfo* item)
 
 		ItemNewRoom(pickupNumber, item->RoomNumber);
 
-		// HACK: pickup is not moved to a right room at this moment, it will only update next game loop.
+		// HACK: Pickup is not moved to a right room at this moment, it will only update next game loop.
 		// Therefore, we need to temporarily inject actual room number, so AlignEntityToSurface succeeds.
 
 		pickup->RoomNumber = item->RoomNumber;
