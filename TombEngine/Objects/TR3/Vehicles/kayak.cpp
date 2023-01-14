@@ -17,22 +17,15 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
+#include "Game/effects/boatFX.h"
 
 using std::vector;
 using namespace TEN::Input;
+using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
-	struct WAKE_PTS
-	{
-		int x[2];
-		int y;
-		int z[2];
-		short xvel[2];
-		short zvel[2];
-		byte life;
-		byte pad[3];
-	};
+
 	const vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	const vector<VehicleMountType> KayakMountTypes =
 	{
@@ -91,7 +84,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
 
-	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
+	//WAKE_PTS WakePts[NUM_WAKE_SPRITES];
 
 	enum KayakState
 	{
@@ -164,8 +157,8 @@ namespace TEN::Entities::Vehicles
 
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			WakePts[i][0].life = 0;
-			WakePts[i][1].life = 0;
+			//WakePts[i].life = 0;
+			//WakePts[i].life = 0;
 		}
 	}
 
@@ -244,8 +237,8 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		if (WakePts[kayak->CurrentStartWake][rotate].life)
-			return;
+		xOffset = 256;
+		zOffset = 256;
 
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
 		float cosY = phd_cos(kayakItem->Pose.Orientation.y);
@@ -286,22 +279,28 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			int xv[2], zv[2];
-			xv[0] = WAKE_VELOCITY * phd_sin(angle1);
-			zv[0] = WAKE_VELOCITY * phd_cos(angle1);
-			xv[1] = (WAKE_VELOCITY + 2) * phd_sin(angle2);
-			zv[1] = (WAKE_VELOCITY + 2) * phd_cos(angle2);
+			int offset1 = -128;
+			int offset2 = 0;
 
-			WakePts[kayak->CurrentStartWake][rotate].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
-			WakePts[kayak->CurrentStartWake][rotate].life = 0x40;
+			int s = phd_sin(kayakItem->Pose.Orientation.y);
+			int c = phd_cos(kayakItem->Pose.Orientation.y);
+			int x1 = (kayakItem->Pose.Position.x +  ((offset2 * s + offset1 * c) >> W2V_SHIFT));
+			int y1 = kayakItem->Pose.Position.y;
+			int z1 = (kayakItem->Pose.Position.z +  ((offset2 * c - offset1 * s) >> W2V_SHIFT));
 
-			for (int i = 0; i < 2; i++)
-			{
-				WakePts[kayak->CurrentStartWake][rotate].x[i] = x;
-				WakePts[kayak->CurrentStartWake][rotate].z[i] = z;
-				WakePts[kayak->CurrentStartWake][rotate].xvel[i] = xv[i];
-				WakePts[kayak->CurrentStartWake][rotate].zvel[i] = zv[i];
-			}
+			//Vector3 pos1 = Vector3(x1, y1, z1);
+			Vector3 pos1 = Vector3(kayakItem->Pose.Position.x , kayakItem->Pose.Position.y , kayakItem->Pose.Position.z );
+			Vector3 pos2 = Vector3(kayak->OldPose.Position.x , kayak->OldPose.Position.y , kayak->OldPose.Position.z );
+
+			int length = 64 + kayakItem->Animation.Velocity.z;
+
+			Vector4 color = Vector4(255, 255, 255, 1);
+
+			//WakePts[kayak->CurrentStartWake].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
+			//WakePts[kayak->CurrentStartWake].life = 0x40;
+
+
+			TriggerWakeFX(pos1, pos2, &color, length);
 
 			if (rotate == 1)
 			{
@@ -326,23 +325,27 @@ namespace TEN::Entities::Vehicles
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
 	}
 
-	void KayakUpdateWakeFX()
+	/*void KayakUpdateWakeFX(ItemInfo* kayakItem)
 	{
-		for (int i = 0; i < 2; i++)
-		{
+
+		auto* kayak = GetKayakInfo(kayakItem);
+
+
+			int current = (kayak->CurrentStartWake - 1);
+
 			for (int j = 0; j < NUM_WAKE_SPRITES; j++)
 			{
-				if (WakePts[j][i].life)
+				if (WakePts[j].life)
 				{
-					WakePts[j][i].life--;
-					WakePts[j][i].x[0] += WakePts[j][i].xvel[0];
-					WakePts[j][i].z[0] += WakePts[j][i].zvel[0];
-					WakePts[j][i].x[1] += WakePts[j][i].xvel[1];
-					WakePts[j][i].z[1] += WakePts[j][i].zvel[1];
+					WakePts[j].life--;
+					WakePts[j].x[0] += WakePts[j].xvel[0];
+					WakePts[j].z[0] += WakePts[j].zvel[0];
+					WakePts[j].x[1] += WakePts[j].xvel[1];
+					WakePts[j].z[1] += WakePts[j].zvel[1];
 				}
 			}
-		}
-	}
+		
+	}*/
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
 	{

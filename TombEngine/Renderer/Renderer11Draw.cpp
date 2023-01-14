@@ -1526,6 +1526,7 @@ namespace TEN::Renderer
 		DrawShockwaves(view);
 		DrawLightning(view);
 		DrawRopes(view);
+		DrawWakeFX(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);
