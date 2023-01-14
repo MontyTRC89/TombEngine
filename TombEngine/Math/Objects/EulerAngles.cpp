@@ -33,6 +33,7 @@ using namespace TEN::Math;
 		this->z = 0;
 	}
 
+	// Very wrong. Maybe convention issue?
 	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
 	{
 		float sinAngle = sin(TO_RAD(axisAngle.GetAngle()));

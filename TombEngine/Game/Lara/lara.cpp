@@ -416,8 +416,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	// ------------debug
 
-	auto convertedOrient = item->Pose.Orientation.ToRotationMatrix();
-	item->Pose.Orientation = EulerAngles(convertedOrient);
+	//auto convertedOrient = item->Pose.Orientation.ToAxisAngle().ToDirection();// .ToEulerAngles();
+	//item->Pose.Orientation = EulerAngles(convertedOrient);
+
+	//auto pos = GetJointPosition(item, LM_HEAD).ToVector3();
+	//g_Renderer.AddLine3D(pos, pos + (convertedOrient * 512), Vector4::One);
 
 	// ------------
 

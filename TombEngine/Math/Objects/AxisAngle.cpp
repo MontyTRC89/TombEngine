@@ -21,42 +21,38 @@ namespace TEN::Math
 		this->Angle = angle;
 	}
 
+	// Wrong, needs something more complex.
 	AxisAngle::AxisAngle(const Vector3& direction)
 	{
 		this->Axis = direction;
 		this->Angle = 0;
 	}
 
+	// Check. Getting it from a quat is faster? 
 	AxisAngle::AxisAngle(const EulerAngles& eulers)
 	{
-		float sinX = sin(FROM_RAD(eulers.x));
-		float cosX = cos(FROM_RAD(eulers.x));
-		float sinY = sin(FROM_RAD(eulers.y));
-		float cosY = cos(FROM_RAD(eulers.y));
-		float sinZ = sin(FROM_RAD(eulers.z));
-		float cosZ = cos(FROM_RAD(eulers.z));
+		*this = AxisAngle(eulers.ToQuaternion());
+	}
 
-		auto axis = Vector3(
-			(sinY * cosZ) + (cosY * sinX * sinZ),
-			cosX * sinZ,
-			(-cosY * cosZ) + (sinY * sinX * sinZ));
-		axis.Normalize();
-		float angle = acos(std::clamp((cosX * cosY * cosZ) + (sinX * sinY * sinZ), -1.0f, 1.0f));
+	// Check. Probably correct.
+	AxisAngle::AxisAngle(const Quaternion& quat)
+	{
+		float angle = acos(quat.w) * 2;
+		float invSinAngle = 1 / sin(angle / 2);
+		auto axis = Vector3(quat) * invSinAngle;
+
+		// Avoid angle ambiguity.
+		if (angle > PI)
+		{
+			angle = PI_MUL_2 - angle;
+			axis = -axis;
+		}
 
 		this->Axis = axis;
 		this->Angle = FROM_RAD(angle);
 	}
 
-	AxisAngle::AxisAngle(const Quaternion& quat)
-	{
-		auto axis = Quaternion::Identity;
-		float angle = 0.0f;
-		XMQuaternionToAxisAngle((XMVECTOR*)&axis, &angle, quat);
-
-		this->Axis = Vector3(axis);
-		this->Angle = FROM_RAD(angle);
-	}
-
+	// Wrong.
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
 	{
 		static constexpr auto epsilon = 0.00001f;
@@ -107,6 +103,7 @@ namespace TEN::Math
 		*this = Slerp(*this, axisAngleTo, alpha);
 	}
 
+	// Check.
 	AxisAngle AxisAngle::Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha)
 	{
 		static constexpr auto epsilon = 0.00001f;
@@ -135,6 +132,7 @@ namespace TEN::Math
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
+	// Check.
 	Vector3 AxisAngle::RotatePoint(const Vector3& point)
 	{
 		auto quat = this->ToQuaternion();
@@ -146,6 +144,7 @@ namespace TEN::Math
 		return Vector3(pointAsQuat * (quat * quatInverse));
 	}
 
+	// Wrong? Direction seems to "lag behind" the required one.
 	Vector3 AxisAngle::ToDirection() const
 	{
 		auto quat = this->ToQuaternion();
@@ -153,7 +152,7 @@ namespace TEN::Math
 		// Rotate the point (0, 0, 1) by the quaternion.
 		auto direction = Vector3(0.0f, 0.0f, 1.0f);
 		auto pointAsQuat = Quaternion(direction, 0.0f);
-		auto newPointAsQuat = quat * pointAsQuat;
+		auto newPointAsQuat = pointAsQuat * quat;
 
 		// Extract and normalize the direction vector.
 		direction = Vector3(newPointAsQuat);
@@ -193,12 +192,14 @@ namespace TEN::Math
 		return *this;
 	}
 
+	// Check.
 	AxisAngle& AxisAngle::operator *=(const AxisAngle& axisAngle)
 	{
 		*this = *this * axisAngle;
 		return *this;
 	}
 
+	// Check.
 	AxisAngle AxisAngle::operator *(const AxisAngle& axisAngle) const
 	{
 		auto axis = Axis.Cross(axisAngle.GetAxis());
