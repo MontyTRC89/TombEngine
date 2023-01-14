@@ -167,6 +167,17 @@ namespace TEN::Renderer
 
 	void Renderer11::GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView)
 	{
+		// FIXME: This is an urgent hack to fix stack overflow crashes.
+		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
+
+		static constexpr int MAX_SEARCH_DEPTH = 128;
+		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
+		{
+			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
+				   " was reached with room " + std::to_string(to), LogLevel::Warning);
+			return;
+		}
+
 		m_numGetVisibleRoomsCalls++;
 
 		RendererRoom* room = &m_rooms[to];

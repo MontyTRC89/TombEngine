@@ -88,12 +88,11 @@ public:
 	[[nodiscard]] short GetItemFlags(int index = 0) const;
 	void SetItemFlags(short value, int index = 0);
 
-	[[nodiscard]] bool MeshIsVisible(int meshId) const;
-	void ShowMesh(int meshId);
-	void HideMesh(int meshId);
+	[[nodiscard]] bool GetMeshVisible(int meshId) const;
+	void SetMeshVisible(int meshId, bool visible);
 	void ShatterMesh(int meshId);
 
-	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
+	[[nodiscard]] bool GetMeshSwapped(int meshId) const;
 	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
 	void UnswapMesh(int meshId);
 
@@ -112,6 +111,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void SetVisible(bool visible);
 	void Explode();
 	void Shatter();
 
@@ -126,6 +126,8 @@ public:
 
 	friend bool operator==(Moveable const&, Moveable const&);
 	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
+
+	short GetIndex() const;
 
 protected:
 	ItemInfo* m_item;

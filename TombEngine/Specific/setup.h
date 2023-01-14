@@ -10,6 +10,23 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
+// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+enum class LotType
+{
+	Skeleton,
+	Basic,
+	Water,
+	WaterAndLand,
+	Human,
+	HumanPlusJump,
+	HumanPlusJumpAndMonkey,
+	Flyer,
+	Blockable, // For large creatures such as trex and shiva.
+	Spider,    // Only 2 block vault allowed.
+	SophiaLee, // Prevents Sophia from going to lower levels again.
+	Ape		   // Only 2 block vault allowed.
+};
+
 enum JointRotationFlags
 {
 	ROT_X = (1 << 2),
@@ -40,15 +57,7 @@ struct ObjectInfo
 	int meshIndex;
 	int boneIndex;
 	int frameBase;
-	std::function<void(short itemNumber)> initialise;
-	std::function<void(short itemNumber)> control;
-	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
-	std::function<void(ItemInfo* item)> drawRoutine;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType ZoneType;
+	LotType LotType;
 	int animIndex;
 	short HitPoints;
 	short pivotLength;
@@ -66,6 +75,16 @@ struct ObjectInfo
 	bool isPuzzleHole;
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
+
+	std::function<void(short itemNumber)> initialise;
+	std::function<void(short itemNumber)> control;
+	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> floor;
+	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> ceiling;
+	std::function<int(short itemNumber)> floorBorder;
+	std::function<int(short itemNumber)> ceilingBorder;
+	std::function<void(ItemInfo* item)> drawRoutine;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
 
 	/// <summary>
 	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
