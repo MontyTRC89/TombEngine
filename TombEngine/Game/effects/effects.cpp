@@ -244,18 +244,18 @@ void UpdateSparks()
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
 			{
-				int unk;
+				int explosionType;
 				if (spark->flags & SP_UNDERWEXP)
 				{
-					unk = 1;
+					explosionType = 1;
 				}
 				else if (spark->flags & SP_PLASMAEXP)
 				{
-					unk = 2;
+					explosionType = 2;
 				}
 				else
 				{
-					unk = 0;
+					explosionType = 0;
 				}
 
 				for (int j = 0; j < (spark->extras & 7); j++)
@@ -265,13 +265,13 @@ void UpdateSparks()
 						spark->z,
 						(spark->extras & 7) - 1,
 						spark->dynamic,
-						unk,
+						explosionType,
 						spark->roomNumber);
 					
 					spark->dynamic = -1;
 				}
 
-				if (unk == 1)
+				if (explosionType == 1)
 				{
 					TriggerExplosionBubble(
 						spark->x,
