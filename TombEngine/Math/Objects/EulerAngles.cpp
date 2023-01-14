@@ -35,7 +35,16 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
 	{
-		*this = axisAngle.ToEulerAngles();
+		float sinAngle = sin(TO_RAD(axisAngle.GetAngle()));
+		float cosAngle = cos(TO_RAD(axisAngle.GetAngle()));
+
+		float pitch = asin(axisAngle.GetAxis().y * sinAngle);
+		float yaw = atan2(axisAngle.GetAxis().x * sinAngle, cosAngle);
+		float roll = atan2(axisAngle.GetAxis().z * sinAngle, cosAngle);
+
+		this->x = FROM_RAD(pitch);
+		this->y = FROM_RAD(yaw);
+		this->z = FROM_RAD(roll);
 	}
 
 	EulerAngles::EulerAngles(const Quaternion& quat)
@@ -148,20 +157,7 @@ using namespace TEN::Math;
 
 	AxisAngle EulerAngles::ToAxisAngle() const
 	{
-		float sinX = sin(FROM_RAD(x));
-		float cosX = cos(FROM_RAD(x));
-		float sinY = sin(FROM_RAD(y));
-		float cosY = cos(FROM_RAD(y));
-		float sinZ = sin(FROM_RAD(z));
-		float cosZ = cos(FROM_RAD(z));
-
-		auto axis = Vector3(
-			(sinY * cosZ) + (cosY * sinX * sinZ),
-			cosX * sinZ,
-			(-cosY * cosZ) + (sinY * sinX * sinZ));
-		axis.Normalize();
-		float angle = acos(std::clamp((cosX * cosY * cosZ) + (sinX * sinY * sinZ), -1.0f, 1.0f));
-		return AxisAngle(axis, FROM_RAD(angle));
+		return AxisAngle(*this);
 	}
 
 	Quaternion EulerAngles::ToQuaternion() const
