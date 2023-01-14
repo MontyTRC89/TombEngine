@@ -414,6 +414,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
+	// ------------debug
+
+	auto convertedOrient = item->Pose.Orientation.ToRotationMatrix();
+	item->Pose.Orientation = EulerAngles(convertedOrient);
+
+	// ------------
+
 	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.Weapon.HasFired)

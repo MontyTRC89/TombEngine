@@ -81,12 +81,11 @@ using namespace TEN::Math;
 		*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
 	}
 
-	// TODO: Check.
 	EulerAngles::EulerAngles(const Matrix& rotMatrix)
 	{
-		this->x = FROM_RAD(asin(rotMatrix._31));
-		this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
-		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
+		this->x = FROM_RAD(asin(-rotMatrix._32));
+		this->y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
+		this->z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
 	}
 
 	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
