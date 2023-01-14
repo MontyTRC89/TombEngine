@@ -50,6 +50,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->nonLot = true; // NOTE: Doesn't move to reach the player, only throws projectiles.
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -147,7 +148,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Blockable;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_Y);
 		obj->SetupHitEffect();
@@ -165,7 +166,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->pivotLength = 50;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -238,7 +239,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -256,6 +257,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(25, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -273,6 +275,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->LotType = LotType::SophiaLee;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -289,7 +292,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();

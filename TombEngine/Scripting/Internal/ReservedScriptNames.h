@@ -204,6 +204,7 @@ static constexpr char ScriptReserved_FadeOutComplete[]				= "FadeOutComplete";
 static constexpr char ScriptReserved_SetCineBars[]					= "SetCineBars";
 static constexpr char ScriptReserved_SetFOV[]						= "SetFOV";
 static constexpr char ScriptReserved_GetFOV[]						= "GetFOV";
+static constexpr char ScriptReserved_GetCameraType[]				= "GetCameraType";
 
 static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
 static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
@@ -213,6 +214,7 @@ static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
+static constexpr char ScriptReserved_PlayCamera[]					= "PlayCamera";
 static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
 static constexpr char ScriptReserved_UndrawWeapon[]					= "UndrawWeapon";
 static constexpr char ScriptReserved_GetHandStatus[]				= "GetHandStatus";
@@ -226,6 +228,7 @@ static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
+static constexpr char ScriptReserved_CameraType[]				= "CameraType";
 static constexpr char ScriptReserved_RoomFlagID[]				= "RoomFlagID";
 static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";

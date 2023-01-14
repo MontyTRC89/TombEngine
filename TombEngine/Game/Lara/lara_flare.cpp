@@ -2,6 +2,7 @@
 #include "Game/Lara/lara_flare.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/chaffFX.h"
@@ -390,7 +391,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(pos, flareLife))
-		TriggerChaffEffects(flareLife);
+		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
 	/* Hardcoded code */
 
