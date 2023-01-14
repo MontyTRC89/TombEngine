@@ -14,14 +14,14 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& offset)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, offset.ToVector3()));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3()));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& offset)
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, offset.ToVector3()));
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, relOffset.ToVector3()));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
@@ -40,20 +40,20 @@ namespace TEN::Math::Geometry
 			return point;
 
 		auto orient = EulerAngles(0, headingAngle, 0);
-		auto offset = Vector3(right, down, forward);
-		return TranslatePoint(point, orient, offset);
+		auto relOffset = Vector3(right, down, forward);
+		return TranslatePoint(point, orient, relOffset);
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& offset)
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
 	{
 		auto orient = EulerAngles(0, headingAngle, 0);
-		return TranslatePoint(point, orient, offset);
+		return TranslatePoint(point, orient, relOffset);
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& offset)
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset)
 	{
 		auto rotMatrix = orient.ToRotationMatrix();
-		return (point + Vector3::Transform(offset, rotMatrix));
+		return (point + Vector3::Transform(relOffset, rotMatrix));
 	}
 
 	// NOTE: Roll (Z axis) of EulerAngles orientation is disregarded.
