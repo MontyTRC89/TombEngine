@@ -87,17 +87,17 @@ namespace TEN::Entities::Creatures::TR1
 		
 		if (item->IsCreature())
 		{
-			auto* creature = GetCreatureInfo(item);
+			auto& creature = *GetCreatureInfo(item);
 
 			if (waterDepth != NO_HEIGHT)
 			{
-				creature->LOT.Step = BLOCK(20);
-				creature->LOT.Drop = -BLOCK(20);
+				creature.LOT.Step = BLOCK(20);
+				creature.LOT.Drop = -BLOCK(20);
 			}
 			else
 			{
-				creature->LOT.Step = CLICK(1);
-				creature->LOT.Drop = -CLICK(1);
+				creature.LOT.Step = CLICK(1);
+				creature.LOT.Drop = -CLICK(1);
 			}
 		}
 		
@@ -132,14 +132,14 @@ namespace TEN::Entities::Creatures::TR1
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			if (AI.ahead)
-				head = AI.angle;
+			if (ai.ahead)
+				head = ai.angle;
 
-			GetCreatureMood(item, &AI, false);
-			CreatureMood(item, &AI, false);
+			GetCreatureMood(item, &ai, false);
+			CreatureMood(item, &ai, false);
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR1
 			case BIG_RAT_STATE_IDLE:
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < BIG_RAT_LAND_BITE_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < BIG_RAT_LAND_BITE_ATTACK_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_LAND_BITE_ATTACK;
 				else
 					item->Animation.TargetState = BIG_RAT_STATE_RUN_FORWARD;
@@ -163,15 +163,15 @@ namespace TEN::Entities::Creatures::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TouchBits.Test(BigRatBite.meshNum))
+				if (ai.ahead && item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 				}
-				else if (AI.bite && AI.distance < BIG_RAT_POUNCE_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < BIG_RAT_POUNCE_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = BIG_RAT_STATE_POUNCE_ATTACK;
 				}
-				else if (AI.ahead && Random::TestProbability(BIG_RAT_REAR_POSE_CHANCE))
+				else if (ai.ahead && Random::TestProbability(BIG_RAT_REAR_POSE_CHANCE))
 				{
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 					item->Animation.RequiredState = BIG_RAT_STATE_REAR_POSE;
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_LAND_BITE_ATTACK:
-				if (!item->Animation.RequiredState && AI.ahead &&
+				if (!item->Animation.RequiredState && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_POUNCE_ATTACK:
-				if (!item->Animation.RequiredState && AI.ahead &&
+				if (!item->Animation.RequiredState && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
@@ -216,13 +216,13 @@ namespace TEN::Entities::Creatures::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TouchBits.Test(BigRatBite.meshNum))
+				if (ai.ahead && item->TouchBits.Test(BigRatBite.meshNum))
 					item->Animation.TargetState = BIG_RAT_STATE_SWIM_BITE_ATTACK;
 
 				break;
 
 			case BIG_RAT_STATE_SWIM_BITE_ATTACK:
-				if (!item->Animation.RequiredState && AI.ahead &&
+				if (!item->Animation.RequiredState && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);

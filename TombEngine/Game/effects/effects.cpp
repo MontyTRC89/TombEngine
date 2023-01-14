@@ -162,16 +162,15 @@ Particle* GetFreeParticle()
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 {
-	float particleAge=  particle.sLife - particle.life;
-
-	if (!particle.life)
+	if (particle.life <= 0)
 	{
 		particle.on = false;
 		ParticleDynamics[particle.dynamic].On = false;
 	}
 
+	float particleAge = particle.sLife - particle.life;
 	if (particleAge > particle.life )
-	 return;	
+		return;	
 
 	int numSprites = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
@@ -468,8 +467,8 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	static const auto EXPLOSION_MAX_ROTATION_SPEED = 30;
-	static const auto EXPLOSION_PARTICLE_LIFE = 44;
+	static const auto rotationMax = 30;
+	static const auto lifeMax	  = 44;
 
 	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
@@ -515,7 +514,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.dB = 32;
 		spark.colFadeSpeed = 8;
 		spark.fadeToBlack = 16;
-		spark.life = (GetRandomControl() & 7) + EXPLOSION_PARTICLE_LIFE;
+		spark.life = (GetRandomControl() & 7) + lifeMax;
 		spark.sLife = spark.life;
 	}
 
@@ -580,7 +579,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
 
 			spark.rotAng = GetRandomControl() & 0xF;
-			spark.rotAdd = (GetRandomControl() & 0xF) + EXPLOSION_MAX_ROTATION_SPEED;
+			spark.rotAdd = (GetRandomControl() & 0xF) + rotationMax;
 		}
 		else if (uw == 1)
 		{
