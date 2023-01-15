@@ -22,6 +22,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
+	enum MissileType
+	{
+		MISSILE_SETH_NORMAL = 0,		
+		MISSILE_SETH_BIG = 1,
+		MISSILE_HARPHY = 2,
+		MISSILE_DEMIGOD3_SINGLE_SHOT = 3,
+		MISSILE_DEMIGOD3_FOUNTAIN_SHOT = 4,
+		MISSILE_DEMIGOD2 = 5,
+		MISSILE_MUTANT = 6
+	};
+
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
 		auto* fx = &EffectList[fxNum];
@@ -144,14 +155,14 @@ namespace TEN::Entities::Effects
 		int maxRotation = 0;
 		int maxVelocity = 0;
 
-		if (fx->flag1 == 1)
+		if (fx->flag1 == MISSILE_SETH_BIG)
 		{
 			maxRotation = ANGLE(2.8f);
 			maxVelocity = CLICK(1);
 		}
 		else
 		{
-			if (fx->flag1 == 6)
+			if (fx->flag1 == MISSILE_MUTANT)
 			{
 				if (fx->counter)
 					fx->counter--;
@@ -168,7 +179,7 @@ namespace TEN::Entities::Effects
 
 		if (fx->speed < maxVelocity)
 		{
-			if (fx->flag1 == 6)
+			if (fx->flag1 == MISSILE_MUTANT)
 				fx->speed++;
 			else
 				fx->speed += 3;
@@ -204,12 +215,12 @@ namespace TEN::Entities::Effects
 
 			fx->pos.Orientation.x += dx;
 
-			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
+			if (fx->flag1 != MISSILE_DEMIGOD3_FOUNTAIN_SHOT && (fx->flag1 != MISSILE_MUTANT || !fx->counter))
 				fx->pos.Orientation.y += dy;
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
-		if (fx->flag1 == 6)
+		if (fx->flag1 == MISSILE_MUTANT)
 			fx->pos.Orientation.z += 16 * fx->speed;
 
 		int oldX = fx->pos.Position.x;
@@ -229,10 +240,10 @@ namespace TEN::Entities::Effects
 			fx->pos.Position.y = oldY;
 			fx->pos.Position.z = oldZ;
 
-			if (fx->flag1 != 6)
+			if (fx->flag1 != MISSILE_MUTANT)
 				BubblesShatterFunction(fx, 0, -32);
 
-			if (fx->flag1 == 1)
+			if (fx->flag1 == MISSILE_SETH_BIG)
 			{
 				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
@@ -241,32 +252,32 @@ namespace TEN::Entities::Effects
 			{
 				if (fx->flag1)
 				{
-					if (fx->flag1 == 3 || fx->flag1 == 4)
+					if (fx->flag1 == MISSILE_DEMIGOD3_SINGLE_SHOT || fx->flag1 == MISSILE_DEMIGOD3_FOUNTAIN_SHOT)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
 					}
-					else if (fx->flag1 == 5)
+					else if (fx->flag1 == MISSILE_DEMIGOD2)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					}
 					else
 					{
-						if (fx->flag1 != 2)
+						if (fx->flag1 != MISSILE_HARPHY)
 						{
-							if (fx->flag1 == 6)
+							if (fx->flag1 == MISSILE_MUTANT)
 							{
 								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 15);
 								fx->pos.Position.y -= 128;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 15);
 								fx->pos.Position.y += 256;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 15);
 							}
 
 						}
 						else
 						{
-							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
+o							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
 						}
 					}
 				}
@@ -283,12 +294,12 @@ namespace TEN::Entities::Effects
 		if (ItemNearLara(fx->pos.Position, 200))
 		{
 			LaraItem->HitStatus = true;
-			if (fx->flag1 != 6)
+			if (fx->flag1 != MISSILE_MUTANT)
 				BubblesShatterFunction(fx, 0, -32);
 
 			KillEffect(fxNum);
 
-			if (fx->flag1 == 1)
+			if (fx->flag1 == MISSILE_SETH_BIG)
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 128, 64, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
@@ -298,26 +309,26 @@ namespace TEN::Entities::Effects
 			{
 				switch (fx->flag1)
 				{
-				case 3:
-				case 4:
+				case MISSILE_DEMIGOD3_SINGLE_SHOT:
+				case MISSILE_DEMIGOD3_FOUNTAIN_SHOT:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 10);
 					break;
 
-				case 5:
+				case MISSILE_DEMIGOD2:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 5);
 					break;
 
-				case 2:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 3);//H
+				case MISSILE_HARPHY:
+					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 3);
 					break;
 
-				case 6:
+				case MISSILE_MUTANT:
 					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 0);
 					fx->pos.Position.y -= 128;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 0);
 					fx->pos.Position.y += 256;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 0);
 					ItemBurn(LaraItem);
 					break;
 				}
@@ -341,21 +352,21 @@ namespace TEN::Entities::Effects
 				switch (fx->flag1)
 				{
 				default:
-				case 1:
+				case MISSILE_SETH_BIG:
 					TriggerSethMissileFlame(fxNum, 32 * dx, 32 * dy, 32 * dz);
 					break;
 
-				case 2:
+				case MISSILE_HARPHY:
 					TriggerHarpyFlameFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 
-				case 3:
-				case 4:
-				case 5:
+				case MISSILE_DEMIGOD3_SINGLE_SHOT:
+				case MISSILE_DEMIGOD3_FOUNTAIN_SHOT:
+				case MISSILE_DEMIGOD2:
 					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 
-				case 6:
+				case MISSILE_MUTANT:
 					TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				}
