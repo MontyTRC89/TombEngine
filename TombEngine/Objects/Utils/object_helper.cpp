@@ -30,10 +30,15 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::s
 		// Check if the required object has at least 1 animation with more than 1 frame.
 		const auto& anim = g_Level.Anims[Objects[requiredObject].animIndex];
 		if ((anim.frameEnd - anim.frameBase) > 1)
+		{
+			object.animIndex = Objects[requiredObject].animIndex;
+			object.frameBase = Objects[requiredObject].frameBase;
 			return true;
-		object.animIndex = Objects[requiredObject].animIndex;
-		object.frameBase = Objects[requiredObject].frameBase;
-		return true;
+		}
+		else
+		{
+			TENLog("Slot " + requiredName + " has no animation data. " + baseName + " will have no animations.", LogLevel::Warning);
+		}
 	}
 	else
 	{
