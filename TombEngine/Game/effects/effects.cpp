@@ -266,7 +266,7 @@ void UpdateSparks()
 						(spark->extras & 7) - 1,
 						spark->dynamic,
 						unk,
-						(spark->extras & 7));
+						spark->roomNumber);
 					
 					spark->dynamic = -1;
 				}
