@@ -387,7 +387,7 @@ namespace TEN::Entities::Creatures::TR5
 						item.Pose.Orientation.y -= HEAVY_GUARD_IDLE_TURN_RATE_MAX;
 				}
 
-				if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase + 17)
+				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 17))
 				{
 					FireHeavyGuardRaygun(item, false, false);
 					FireHeavyGuardRaygun(item, true, false);
