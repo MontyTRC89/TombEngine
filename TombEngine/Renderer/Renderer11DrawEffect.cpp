@@ -113,28 +113,20 @@ namespace TEN::Renderer
 			for (int j = 0; j < 2; j++)
 				LightningPos[j] -= Vector3i(laser.Target);
 
-			HelixSpline(&LightningPos[0], LightningBuffer, laser);
+			HelixSpline(LightningPos, LightningBuffer, laser);
 
 			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
-				short* interpolatedPos = &LightningBuffer[0];
+				int bufferIndex = 0;
 
+				auto& interpPosArray = LightningBuffer;
 				for (int s = 0; s < laser.NumSegments ; s++)
 				{
-					int ix = laser.Target.x + interpolatedPos[0];
-					int iy = laser.Target.y + interpolatedPos[1];
-					int iz = laser.Target.z + interpolatedPos[2];
-
-					interpolatedPos += 4;
-
-					int ix2 = laser.Target.x + interpolatedPos[0];
-					int iy2 = laser.Target.y + interpolatedPos[1];
-					int iz2 = laser.Target.z + interpolatedPos[2];
-
-					auto origin = Vector3(ix, iy, iz);
-					auto target = Vector3(ix2, iy2, iz2);
+					auto origin = laser.Target + interpPosArray[bufferIndex].ToVector3();
+					bufferIndex++;
+					auto target = laser.Target + interpPosArray[bufferIndex].ToVector3();
 
 					auto center = (origin + target) / 2;
 					auto direction = target - origin;
@@ -150,16 +142,15 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::HelixSpline(Vector3i* pos, short* buffer, const HelicalLaser& laser)
+	void Renderer11::HelixSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const HelicalLaser& laser)
 	{
-		buffer[0] = pos[0].x;
-		buffer[1] = pos[0].y;
-		buffer[2] = pos[0].z;
+		int bufferIndex = 0;
 
-		buffer += 4;
+		bufferArray[bufferIndex] = posArray[0];
+		bufferIndex++;
 
-		auto origin = pos[0].ToVector3();
-		auto target = pos[1].ToVector3();;
+		auto origin = posArray[0].ToVector3();
+		auto target = posArray[1].ToVector3();;
 
 		int radiusMax = 48;
 		float length = Vector3::Distance(origin, target);
@@ -177,13 +168,11 @@ namespace TEN::Renderer
 			{
 				int x1 = std::clamp(radius / 2, 0, radiusMax);
 
-				float x = (currentPos.x + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1;
-				float y = (currentPos.y + (laser.Length / laser.NumSegments) + (radius * phd_sin(angle)) / 2) - x1;
-				float z = (currentPos.z + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1;
-
-				buffer[0] = x;
-				buffer[1] = y;
-				buffer[2] = z;
+				bufferArray[bufferIndex] = Vector3i(
+					(currentPos.x + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1,
+					(currentPos.y + (laser.Length / laser.NumSegments) + (radius * phd_sin(angle)) / 2) - x1,
+					(currentPos.z + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1);
+				bufferIndex++;
 
 				// Increment the radius and angle.
 				angle += laser.Coil;
@@ -191,8 +180,6 @@ namespace TEN::Renderer
 
 				if (i & 1)
 					radius -= laser.Scale;
-
-				buffer += 4;
 
 				// Increment the current position along the line.
 				currentPos += direction * stepLength;
@@ -202,9 +189,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		buffer[0] = pos[1].x;
-		buffer[1] = pos[1].y;
-		buffer[2] = pos[1].z;
+		bufferArray[bufferIndex] = posArray[1];
 	}
 
 	void Renderer11::DrawLightning(RenderView& view)
@@ -222,28 +207,27 @@ namespace TEN::Renderer
 			memcpy(&LightningPos[1], &arc, 48);
 			LightningPos[5] = arc.pos4;
 
-			for (int j = 0; j < 6; j++)
+			for (int j = 0; j < LightningPos.size(); j++)
 				LightningPos[j] -= LaraItem->Pose.Position;
 
-			CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
+			CalcLightningSpline(LightningPos, LightningBuffer, arc);
 
 			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
-				short* interpolatedPos = &LightningBuffer[0];
+				int bufferIndex = 0;
 
-				for (int s = 0; s < ((3 * arc.segments) - 1); s++)
+				auto& interpPosArray = LightningBuffer;
+				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
-					int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-					int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-					int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
+					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
+					bufferIndex++;
+					auto target = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
 
-					interpolatedPos += 4;
-
-					int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-					int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-					int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
 
 					byte r, g, b;
 					if (arc.life >= 16)
@@ -258,13 +242,6 @@ namespace TEN::Renderer
 						g = arc.life * arc.g / 16;
 						b = arc.life * arc.b / 16;
 					}
-
-					auto origin = Vector3(ix, iy, iz);
-					auto target = Vector3(ix2, iy2, iz2);
-
-					auto center = (origin + target) / 2;
-					auto direction = target - origin;
-					direction.Normalize();
 
 					AddSpriteBillboardConstrained(
 						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],

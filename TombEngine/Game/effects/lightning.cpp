@@ -15,8 +15,8 @@ namespace TEN::Effects::Lightning
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
-	Vector3i LightningPos[6];
-	short	 LightningBuffer[1024];
+	std::array<Vector3i, 6>	   LightningPos	   = {};
+	std::array<Vector3i, 1024> LightningBuffer = {};
 	
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
@@ -75,7 +75,9 @@ namespace TEN::Effects::Lightning
 		spark->maxYvel = 0;
 		spark->spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
 		spark->gravity = 0;
-		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
+		spark->dSize =
+		spark->sSize =
+		spark->size = size + (GetRandomControl() & 3);
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
@@ -187,8 +189,8 @@ namespace TEN::Effects::Lightning
 				int* positions = (int*)&arc.pos2;
 				for (int j = 0; j < 9; j++)
 				{
-					*positions += 2 * arc.interpolation[j];
-					arc.interpolation[j] = (signed char)(arc.interpolation[j] - (arc.interpolation[j] >> 4));
+					*positions += arc.interpolation[j] * 2;
+					arc.interpolation[j] = (signed char)(arc.interpolation[j] - (arc.interpolation[j] / 16));
 					positions++;
 				}
 			}
@@ -198,92 +200,85 @@ namespace TEN::Effects::Lightning
 		ElectricArcs.erase(
 			std::remove_if(
 				ElectricArcs.begin(), ElectricArcs.end(),
-				[](const ElectricArc& arc) { return (arc.life <= 0); }), ElectricArcs.end());
+				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalcLightningSpline(Vector3i* pos, short* buffer, const ElectricArc& arc)
+	void CalcLightningSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc)
 	{
-		buffer[0] = pos->x;
-		buffer[1] = pos->y;
-		buffer[2] = pos->z;
+		int bufferIndex = 0;
 
-		buffer += 4;
+		bufferArray[bufferIndex] = posArray[0];
+		bufferIndex++;
 
 		if (arc.flags & 1)
 		{
-			int dp = 65536 / (3 * arc.segments - 1);
+			int dp = 65536 / ((arc.segments * 3) - 1);
 			int x = dp;
 
-			if (3 * arc.segments - 2 > 0)
+			if (((arc.segments * 3) - 2) > 0)
 			{
-				for (int i = 3 * arc.segments - 2; i > 0; i--)
+				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					short sx = LSpline(x, &pos->x, 6);
-					buffer[0] = sx + (GetRandomControl() & 0xF) - 8;
-					short sy = LSpline(x, &pos->y, 6);
-					buffer[1] = sy + (GetRandomControl() & 0xF) - 8;
-					short sz = LSpline(x, &pos->z, 6);
-					buffer[2] = sz + (GetRandomControl() & 0xF) - 8;
+					auto spline = Vector3i(
+						LSpline(x, &posArray[0].x, posArray.size()),
+						LSpline(x, &posArray[0].y, posArray.size()),
+						LSpline(x, &posArray[0].z, posArray.size()));
 
+					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
+					auto offset = Random::GeneratePointInSphere(sphere);
+
+					bufferArray[bufferIndex] = spline + offset;
 					x += dp;
-					buffer += 4;
+					bufferIndex++;
 				}
 			}
 		}
 		else
 		{
-			int segments = 3 * arc.segments - 1;
+			int segments = (arc.segments * 3) - 1;
 
-			int dx = (pos[5].x - pos->x) / segments;
-			int dy = (pos[5].y - pos->y) / segments;
-			int dz = (pos[5].z - pos->z) / segments;
+			auto dPos = (posArray[posArray.size() - 1] - posArray[0]) / segments;
+			auto pos = Vector3i::Zero;
+			pos.x = dPos.x + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].x;
+			pos.y = dPos.y + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].y;
+			pos.z = dPos.z + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].z;
 
-			int x = dx + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->x;
-			int y = dy + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->y;
-			int z = dz + (GetRandomControl() % (2 * arc.amplitude)) - arc.amplitude + pos->z;
-
-			if (3 * arc.segments - 2 > 0)
+			if (((arc.segments * 3) - 2) > 0)
 			{
-				for (int i = 3 * arc.segments - 2; i > 0; i--)
+				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					buffer[0] = x;
-					buffer[1] = y;
-					buffer[2] = z;
+					bufferArray[bufferIndex] = pos;
+					bufferIndex++;
 
-					x += dx + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
-					y += dy + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
-					z += dz + GetRandomControl() % (2 * arc.amplitude) - arc.amplitude;
-
-					buffer += 4;
+					pos.x += dPos.x + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
+					pos.y += dPos.y + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
+					pos.z += dPos.z + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
 				}
 			}
 		}
 
-		buffer[0] = pos[5].x;
-		buffer[1] = pos[5].y;
-		buffer[2] = pos[5].z;
+		bufferArray[bufferIndex] = posArray[5];
 	}
 
-	int LSpline(int x, int* knots, int nk)
+	int LSpline(int x, int* knots, int numKnots)
 	{
-		int* k;
-		int c1, c2, c3, ret, span;
+		x *= numKnots - 3;
+		int span = x >> 16;
 
-		x *= nk - 3;
-		span = x >> 16;
-
-		if (span >= nk - 3)
-			span = nk - 4;
+		if (span >= (numKnots - 3))
+			span = numKnots - 4;
 
 		x -= 65536 * span;
-		k = &knots[3 * span];
-		c1 = k[3] + (k[3] >> 1) - (k[6] >> 1) - k[6] + (k[9] >> 1) + ((-k[0] - 1) >> 1);
-		ret = (long long)c1 * x >> 16;
-		c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] >> 1) - (k[9] >> 1) + k[0];
+
+		int* k = &knots[3 * span];
+
+		int c1 = k[3] + (k[3] / 2) - (k[6] / 2) - k[6] + (k[9] / 2) + ((-k[0] - 1) / 2);
+		int ret = (long long)c1 * x >> 16;
+		int c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] / 2) - (k[9] / 2) + k[0];
 		ret = (long long)c2 * x >> 16;
-		c3 = ret + (k[6] >> 1) + ((-k[0] - 1) >> 1);
+		int c3 = ret + (k[6] / 2) + ((-k[0] - 1) / 2);
 		ret = (long long)c3 * x >> 16;
 
-		return ret + k[3];
+		return (ret + k[3]);
 	}
 }

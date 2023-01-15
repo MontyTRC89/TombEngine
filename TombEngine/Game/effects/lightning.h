@@ -6,7 +6,7 @@
 
 namespace TEN::Effects::Lightning
 {
-	enum LightningFlags
+	enum ElectricArcFlags
 	{
 		LI_SPLINE	= (1 << 0),
 		LI_MOVEEND	= (1 << 1),
@@ -63,8 +63,8 @@ namespace TEN::Effects::Lightning
 	extern std::vector<ElectricArc>	 ElectricArcs;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
-	extern Vector3i LightningPos[6];
-	extern short	LightningBuffer[1024];
+	extern std::array<Vector3i, 6>	  LightningPos;
+	extern std::array<Vector3i, 1024> LightningBuffer;
 
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void		 TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
@@ -73,6 +73,6 @@ namespace TEN::Effects::Lightning
 	void UpdateLightning();
 	void UpdateHelicalLasers();
 
-	void CalcLightningSpline(Vector3i* pos, short* buffer, const ElectricArc& arc);
-	int LSpline(int x, int* knots, int nk);
+	void CalcLightningSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc);
+	int LSpline(int x, int* knots, int nunKnots);
 }

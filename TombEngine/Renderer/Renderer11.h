@@ -682,7 +682,7 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		void DrawHelicalLasers(RenderView& view);
-		void HelixSpline(Vector3i* pos, short* buffer, const HelicalLaser& laser);
+		void HelixSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const HelicalLaser& laser);
 		std::string GetDefaultAdapterName();
 	};
 
