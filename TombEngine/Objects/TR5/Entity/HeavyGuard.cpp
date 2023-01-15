@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item.ItemFlags[i])
 				{
-					FireHeavyGuardRaygun(item, i, 1);
+					FireHeavyGuardRaygun(item, (bool)i, true);
 
 					if (item.ItemFlags[i] > 0)
 					{
@@ -323,9 +323,9 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
 				{
 					if (item.Animation.ActiveState == HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT)
-						FireHeavyGuardRaygun(item, 0, 0);
+						FireHeavyGuardRaygun(item, false, false);
 					else
-						FireHeavyGuardRaygun(item, 1, 0);
+						FireHeavyGuardRaygun(item, true, false);
 				}
 
 				break;
@@ -389,8 +389,8 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase + 17)
 				{
-					FireHeavyGuardRaygun(item, 0, 0);
-					FireHeavyGuardRaygun(item, 1, 0);
+					FireHeavyGuardRaygun(item, false, false);
+					FireHeavyGuardRaygun(item, true, false);
 				}
 
 				break;
@@ -416,7 +416,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 18))
 				{
-					FireHeavyGuardRaygun(item, 0, 0);
+					FireHeavyGuardRaygun(item, false, false);
 					item.ItemFlags[1] = -16;
 					item.TriggerFlags = 3;
 				}
@@ -456,36 +456,33 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
-		auto pos1 = GetJointPosition(&item, HeavyGuardHandJoints[isRight], HeavyGuardRaygunLaserOffsets[isRight]).ToVector3();
-		auto pos2 = GetJointPosition(
+		auto origin = GetJointPosition(&item, HeavyGuardHandJoints[isRight], HeavyGuardRaygunLaserOffsets[isRight]).ToVector3();
+		auto target = GetJointPosition(
 			&item,
 			HeavyGuardHandJoints[isRight],
-			Vector3i(
-				HeavyGuardRaygunLaserOffsets[isRight].x,
-				HeavyGuardRaygunLaserOffsets[isRight].y + BLOCK(4),
-				HeavyGuardRaygunLaserOffsets[isRight].z)).ToVector3();
+			Vector3i(HeavyGuardRaygunLaserOffsets[isRight] + Vector3(0, BLOCK(4), 0))).ToVector3();
 
-		auto orient = Geometry::GetOrientToPoint(pos1, pos2);
+		auto orient = Geometry::GetOrientToPoint(origin, target);
 
 		if (spawnLaser)
 		{
-			SpawnRaygunLaser(Pose(pos1, orient), abs(item.ItemFlags[isRight]));
+			SpawnRaygunLaser(Pose(origin, orient), abs(item.ItemFlags[isRight]));
 			return;
 		}
 
-		SpawnHelicalLaser(pos1, pos2);
+		SpawnHelicalLaser(origin, target);
 
 		item.ItemFlags[isRight] = 16;
-		SpawnRaygunLaser(Pose(pos1, orient), 16);
-		SpawnRaygunLaser(Pose(pos1, orient), 16);
-		SpawnRaygunLaser(Pose(pos1, orient), 16);
+		SpawnRaygunLaser(Pose(origin, orient), 16);
+		SpawnRaygunLaser(Pose(origin, orient), 16);
+		SpawnRaygunLaser(Pose(origin, orient), 16);
 
-		auto origin = GameVector(pos1, item.RoomNumber);
-		auto target = GameVector(pos2);
+		auto origin2 = GameVector(origin, item.RoomNumber);
+		auto target2 = GameVector(target);
 		auto hitPos = Vector3i::Zero;
 		MESH_INFO* hitJoint = nullptr;
 
-		if (ObjectOnLOS2(&origin, &target, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
 		{
 			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
 			{
