@@ -172,6 +172,8 @@ namespace TEN::Effects::Spark
 		spark.friction = 34;
 		spark.maxYvel = 0;
 		spark.gravity = 0;
+		spark.scalar = 2;
+		spark.dSize = spark.sSize = spark.size = 44 + (GetRandomControl() & 3);
 		spark.flags = SP_NONE;
 	}
 

@@ -467,18 +467,18 @@ namespace TEN::Entities::Creatures::TR5
 					color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 
 					if (item->TriggerFlags)
-						TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color, color / 2);
 					else
-						TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
-
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color / 2, color);
 
 					for (int i = 0; i < 2; i++)
 					{
 						if (item->TriggerFlags)
-						TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color, color / 2));
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color, color / 2));
 						else
-						TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color / 2, color));
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color / 2, color));
 					}
+					
 				}
 
 				if (deltaFrame <= 90 || deltaFrame >= 130)
@@ -539,6 +539,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 84, 0, 128);
 						TriggerLightningGlow(RomanStatueData.EnergyArcs[i]->pos4.x, RomanStatueData.EnergyArcs[i]->pos4.y, RomanStatueData.EnergyArcs[i]->pos4.z, 36, 0, color, color / 2);
+
 
 					
 						unknown = 1;
