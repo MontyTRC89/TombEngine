@@ -15,6 +15,7 @@
 
 // Creatures
 #include "Objects/TR5/Entity/AutoGun.h"			 // OK
+#include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
 #include "Objects/TR5/Entity/tr5_cyborg.h"		 // OK
@@ -33,7 +34,6 @@
 #include "Objects/TR5/Entity/tr5_reaper.h"		 // OK
 #include "Objects/TR5/Entity/tr5_roman_statue.h" // OK
 #include "Objects/TR5/Entity/tr5_submarine.h"	 // OK
-#include "Objects/TR5/Entity/tr5_twogun.h"		 // OK
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
