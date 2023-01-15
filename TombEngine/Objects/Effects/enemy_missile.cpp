@@ -277,7 +277,7 @@ namespace TEN::Entities::Effects
 						}
 						else
 						{
-o							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
+							TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 0);
 						}
 					}
 				}

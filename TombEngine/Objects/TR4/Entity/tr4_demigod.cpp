@@ -23,6 +23,13 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto DEMIGOD2_MAX_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto DEMIGOD1_WALK_RANGE = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD_WALK_RANGE = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD_IDLE_RANGE = SQUARE(SECTOR(2));
+
+
 	enum DemigodState
 	{
 		DEMIGOD_STATE_IDLE = 0,
@@ -436,7 +443,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance >= SQUARE(SECTOR(3)))
+					if (AI.distance >= DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
@@ -451,7 +458,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (AI.distance <= SQUARE(SECTOR(3)))
+					if (AI.distance <= DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
@@ -473,8 +480,8 @@ namespace TEN::Entities::TR4
 
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (AI.distance <= SQUARE(SECTOR(2)) ||
-							AI.distance >= SQUARE(SECTOR(5)))
+						if (AI.distance <= DEMIGOD_IDLE_RANGE ||
+							AI.distance >= DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
 						{
 							item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 							break;
@@ -488,7 +495,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.distance > SQUARE(SECTOR(3)) && item->ObjectNumber == ID_DEMIGOD2)
+				if (AI.distance > DEMIGOD_WALK_RANGE && item->ObjectNumber == ID_DEMIGOD2)
 					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_AIM;
 				else
 					item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
@@ -498,7 +505,7 @@ namespace TEN::Entities::TR4
 			case DEMIGOD_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance < SQUARE(SECTOR(2)))
+				if (AI.distance < DEMIGOD_IDLE_RANGE)
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -506,7 +513,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance < SQUARE(SECTOR(3)))
+					if (AI.distance < DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
@@ -521,7 +528,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.distance > SQUARE(SECTOR(3)))
+				if (AI.distance > DEMIGOD_WALK_RANGE)
 				{
 					if (item->ObjectNumber == ID_DEMIGOD2)
 						item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
@@ -534,7 +541,7 @@ namespace TEN::Entities::TR4
 			case DEMIGOD_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance < SQUARE(SECTOR(2)))
+				if (AI.distance < DEMIGOD_IDLE_RANGE)
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -542,7 +549,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance < SQUARE(SECTOR(3)))
+					if (AI.distance < DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
@@ -550,13 +557,13 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > SQUARE(SECTOR(2)))
+					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > DEMIGOD_IDLE_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
 					}
 
-					if (AI.distance < SQUARE(SECTOR(3)))
+					if (AI.distance < DEMIGOD_WALK_RANGE)
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 				}
 
@@ -606,14 +613,14 @@ namespace TEN::Entities::TR4
 
 			case DEMIGOD3_STATE_RADIAL_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
-				if (!Targetable(item, &AI) && AI.distance < SQUARE(SECTOR(5)))
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_PROJECTILE_ATTACK;
 
 				break;
 
 			case DEMIGOD2_STATE_RADIAL_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
-				if (!Targetable(item, &AI) && AI.distance < SQUARE(SECTOR(5)))
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD2_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
 
 				break;
@@ -623,7 +630,7 @@ namespace TEN::Entities::TR4
 
 				DoDemigodEffects(itemNumber);
 
-				if (!Targetable(item, &AI) || AI.distance < SQUARE(SECTOR(5)) || !GetRandomControl())
+				if (!Targetable(item, &AI) || AI.distance < DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE || !GetRandomControl())
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -674,7 +681,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (AI.distance >= SQUARE(SECTOR(3)) ||
+				if (AI.distance >= DEMIGOD1_WALK_RANGE ||
 					!AI.bite &&
 					(LaraItem->Animation.ActiveState < LS_LADDER_IDLE ||
 						LaraItem->Animation.ActiveState > LS_LADDER_DOWN ||
