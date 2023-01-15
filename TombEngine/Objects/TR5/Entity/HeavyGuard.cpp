@@ -452,57 +452,54 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void FireHeavyGuardRaygun(ItemInfo& item, bool fireRight, bool spawnLaser)
+	void FireHeavyGuardRaygun(ItemInfo& item, bool isRight, bool spawnLaser)
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
-		auto pos1 = GetJointPosition(&item, HeavyGuardHandJoints[fireRight], HeavyGuardRaygunLaserOffsets[fireRight]).ToVector3();
+		auto pos1 = GetJointPosition(&item, HeavyGuardHandJoints[isRight], HeavyGuardRaygunLaserOffsets[isRight]).ToVector3();
 		auto pos2 = GetJointPosition(
 			&item,
-			HeavyGuardHandJoints[fireRight],
+			HeavyGuardHandJoints[isRight],
 			Vector3i(
-				HeavyGuardRaygunLaserOffsets[fireRight].x,
-				HeavyGuardRaygunLaserOffsets[fireRight].y + BLOCK(4),
-				HeavyGuardRaygunLaserOffsets[fireRight].z)).ToVector3();
+				HeavyGuardRaygunLaserOffsets[isRight].x,
+				HeavyGuardRaygunLaserOffsets[isRight].y + BLOCK(4),
+				HeavyGuardRaygunLaserOffsets[isRight].z)).ToVector3();
 
 		auto orient = Geometry::GetOrientToPoint(pos1, pos2);
 
-		if (!spawnLaser)
+		if (spawnLaser)
 		{
-			SpawnHelicalLaser(pos1, pos2);
-
-			item.ItemFlags[fireRight] = 16;
-			SpawnRaygunLaser(pos1, Pose(pos1, orient), 16);
-			SpawnRaygunLaser(pos1, Pose(pos1, orient), 16);
-			SpawnRaygunLaser(pos1, Pose(pos1, orient), 16);
-
-			auto hitPos = Vector3i::Zero;
-			MESH_INFO* hitMesh = nullptr;
-
-			auto origin = GameVector(pos1);
-			auto target = GameVector(pos2);
-			origin.RoomNumber = item.RoomNumber;
-
-			if (ObjectOnLOS2(&origin, &target, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
-			{
-				if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
-				{
-					ItemCustomBurn(LaraItem, Vector3(0.2f, 0.4f, 1.0f), Vector3(0.2f, 0.3f, 0.8f), 1 * FPS);
-					DoDamage(LaraItem, INT_MAX);
-				}
-				else
-				{
-					DoDamage(LaraItem, 250);
-				}
-			}
-
+			SpawnRaygunLaser(Pose(pos1, orient), abs(item.ItemFlags[isRight]));
 			return;
 		}
 
-		SpawnRaygunLaser(pos1, Pose(pos1, orient), abs(item.ItemFlags[fireRight]));
+		SpawnHelicalLaser(pos1, pos2);
+
+		item.ItemFlags[isRight] = 16;
+		SpawnRaygunLaser(Pose(pos1, orient), 16);
+		SpawnRaygunLaser(Pose(pos1, orient), 16);
+		SpawnRaygunLaser(Pose(pos1, orient), 16);
+
+		auto origin = GameVector(pos1, item.RoomNumber);
+		auto target = GameVector(pos2);
+		auto hitPos = Vector3i::Zero;
+		MESH_INFO* hitJoint = nullptr;
+
+		if (ObjectOnLOS2(&origin, &target, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+		{
+			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
+			{
+				ItemCustomBurn(LaraItem, Vector3(0.2f, 0.4f, 1.0f), Vector3(0.2f, 0.3f, 0.8f), 1 * FPS);
+				DoDamage(LaraItem, INT_MAX);
+			}
+			else
+			{
+				DoDamage(LaraItem, 250);
+			}
+		}
 	}
 
-	void SpawnRaygunLaser(const Vector3i& posr, const Pose& pos, float life)
+	void SpawnRaygunLaser(const Pose& pos, float life)
 	{
 		auto* sptr = GetFreeParticle();
 
