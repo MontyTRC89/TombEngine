@@ -350,6 +350,7 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
+		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowType = ShadowMode::None;
@@ -358,10 +359,10 @@ void InitialiseObjects()
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
 		obj->waterCreature = false;
-		obj->nonLot = true;
+		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
-		obj->ZoneType = ZoneType::Basic;
+		obj->LotType = LotType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;

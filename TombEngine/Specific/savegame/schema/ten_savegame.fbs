@@ -39,7 +39,6 @@ table Item {
 	pose: Position;
 	next_item: int32;
 	next_item_active: int32;
-	triggered: bool;
 	active: bool;
 	status: int32;
 	hit_stauts: bool;

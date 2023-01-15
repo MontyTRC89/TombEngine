@@ -1189,7 +1189,6 @@ void BinocularCamera(ItemInfo* item)
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
-			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;
 			lara->ExtraTorsoRot = EulerAngles::Zero;
@@ -1201,7 +1200,6 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits = NO_JOINT_BITS;
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
@@ -2032,13 +2030,15 @@ void HandleOptics(ItemInfo* item)
 		DbInput = 0;
 	}
 
+	auto lara = GetLaraInfo(item);
+
 	// We are standing, can use optics.
-	if (LaraItem->Animation.ActiveState == LS_IDLE || LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
 		breakOptics = false;
 
 	// We are crouching, can use optics.
-	if ((Lara.Control.IsLow || TrInput & IN_CROUCH) &&
-		(LaraItem->Animation.TargetState == LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber == LA_CROUCH_IDLE))
+	if ((lara->Control.IsLow || TrInput & IN_CROUCH) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
 
 	// If lasersight, and no look is pressed, exit optics.
@@ -2051,10 +2051,10 @@ void HandleOptics(ItemInfo* item)
 
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
 	{
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-			((Lara.Control.Weapon.GunType == LaraWeaponType::HK && Lara.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-			 (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-			 (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
+			((lara->Control.Weapon.GunType == LaraWeaponType::HK && lara->Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
+			 (lara->Control.Weapon.GunType == LaraWeaponType::Revolver && lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+			 (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow && lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
 			BinocularRange = 128;
 			BinocularOldCamera = Camera.oldType;
@@ -2079,7 +2079,6 @@ void HandleOptics(ItemInfo* item)
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);
 
-	LaraItem->MeshBits = ALL_JOINT_BITS;
 	Lara.Inventory.IsBusy = false;
 	ResetLaraFlex(LaraItem);
 
