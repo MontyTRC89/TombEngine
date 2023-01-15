@@ -29,6 +29,7 @@
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
 using namespace TEN::Math;
 using namespace TEN::Entities::Creatures::TR5;
 
@@ -56,17 +57,14 @@ BiteInfo EnemyBites[12] =
 	{ 0, -110, 480, 13 },
 	{ -20, -80, 190, -10 },
 	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 },   // Baddy 2
-	{ 20, -60, 400, 7 },    // SAS
-	{ 0, -64, 250, 7 }      // Troops
+	{ 10, -60, 200, 11 }, // Baddy 2
+	{ 20, -60, 400, 7 },  // SAS
+	{ 0, -64, 250, 7 }	  // Troops
 };
 
 namespace TEN::Renderer 
 {
-	using namespace TEN::Effects::Footprints;
-	using std::vector;
-
-	constexpr auto MAX_LIGHTNING_RANGE = BLOCK(24);
+	constexpr auto ELECTRIC_ARC_RANGE_MAX = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -117,9 +115,9 @@ namespace TEN::Renderer
 
 			HelixSpline(&LightningPos[0], LightningBuffer, laser);
 
-			if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
-				abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
-				abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
 				short* interpolatedPos = &LightningBuffer[0];
 
@@ -229,9 +227,9 @@ namespace TEN::Renderer
 
 			CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
 
-			if (abs(LightningPos[0].x) <= MAX_LIGHTNING_RANGE &&
-				abs(LightningPos[0].y) <= MAX_LIGHTNING_RANGE &&
-				abs(LightningPos[0].z) <= MAX_LIGHTNING_RANGE)
+			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
 				short* interpolatedPos = &LightningBuffer[0];
 
@@ -926,7 +924,7 @@ namespace TEN::Renderer
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
-		vector<byte> data = { 128, 128, 255, 1 };
+		std::vector<byte> data = { 128, 128, 255, 1 };
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
@@ -1306,8 +1304,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
-		extern vector<DebrisFragment> DebrisFragments;
-		vector<RendererVertex> vertices;
+		extern std::vector<DebrisFragment> DebrisFragments;
+		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 

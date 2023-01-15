@@ -32,13 +32,13 @@ using namespace TEN::Effects::Spark;
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto HEAVY_GUARD_RAYGUN_DAMAGE = 250;
-	constexpr auto HEAVY_GUARD_HEAD_MESH_RANGE = 260;
 
-	constexpr auto HEAVY_GUARD_ALERT_RANGE	  = SQUARE(BLOCK(2));
-	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE = SQUARE(BLOCK(3));
-	constexpr auto HEAVY_GUARD_CLOSE_RANGE	  = SQUARE(BLOCK(1));
+	constexpr auto HEAVY_GUARD_HEAD_JOINT_RANGE = BLOCK(0.25f);
+	constexpr auto HEAVY_GUARD_ALERT_RANGE		= SQUARE(BLOCK(2));
+	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE	= SQUARE(BLOCK(3));
+	constexpr auto HEAVY_GUARD_CLOSE_RANGE		= SQUARE(BLOCK(1));
 
-	constexpr auto HEAVY_GUARD_IDLE_TURN_RATE_MAX = ANGLE(2.0f); // TODO: ANGLE(1.0f)?
+	constexpr auto HEAVY_GUARD_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto HEAVY_GUARD_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
 	constexpr auto HEAVY_GUARD_PLAYER_ALERT_VELOCITY	 = 20.0f;
@@ -101,7 +101,8 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseHeavyGuard(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.ItemFlags[7] = HEAVY_GUARD_HEAD_MESH_RANGE;
+
+		item.ItemFlags[7] = HEAVY_GUARD_HEAD_JOINT_RANGE;
 		SetAnimation(&item, HEAVY_GUARD_ANIM_IDLE);
 	}
 
@@ -442,9 +443,6 @@ namespace TEN::Entities::Creatures::TR5
 
 	void HeavyGuardHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		const auto& player = *GetLaraInfo(&source);
-		const auto& object = Objects[target.ObjectNumber];
-
 		if (pos.has_value())
 		{
 			if (jointIndex == 2 )
