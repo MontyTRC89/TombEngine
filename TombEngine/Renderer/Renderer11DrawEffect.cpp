@@ -107,21 +107,21 @@ namespace TEN::Renderer
 				b = laser.b;
 			}
 
-			LightningPos[0] = Vector3i(laser.Target);
-			LightningPos[1] = Vector3i(laser.Origin);
+			ElectricArcKnots[0] = Vector3i(laser.Target);
+			ElectricArcKnots[1] = Vector3i(laser.Origin);
 			
 			for (int j = 0; j < 2; j++)
-				LightningPos[j] -= Vector3i(laser.Target);
+				ElectricArcKnots[j] -= Vector3i(laser.Target);
 
-			HelixSpline(LightningPos, LightningBuffer, laser);
+			HelixSpline(ElectricArcKnots, ElectricArcBuffer, laser);
 
-			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
+			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(ElectricArcKnots[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
 				int bufferIndex = 0;
 
-				auto& interpPosArray = LightningBuffer;
+				auto& interpPosArray = ElectricArcBuffer;
 				for (int s = 0; s < laser.NumSegments ; s++)
 				{
 					auto origin = laser.Target + interpPosArray[bufferIndex].ToVector3();
@@ -192,7 +192,7 @@ namespace TEN::Renderer
 		bufferArray[bufferIndex] = posArray[1];
 	}
 
-	void Renderer11::DrawLightning(RenderView& view)
+	void Renderer11::DrawElectricArcs(RenderView& view)
 	{
 		// No active effects; return early.
 		if (ElectricArcs.empty())
@@ -203,22 +203,22 @@ namespace TEN::Renderer
 			if (arc.life <= 0)
 				continue;
 
-			LightningPos[0] = arc.pos1;
-			memcpy(&LightningPos[1], &arc, 48);
-			LightningPos[5] = arc.pos4;
+			ElectricArcKnots[0] = arc.pos1;
+			memcpy(&ElectricArcKnots[1], &arc, 48);
+			ElectricArcKnots[5] = arc.pos4;
 
-			for (int j = 0; j < LightningPos.size(); j++)
-				LightningPos[j] -= LaraItem->Pose.Position;
+			for (int j = 0; j < ElectricArcKnots.size(); j++)
+				ElectricArcKnots[j] -= LaraItem->Pose.Position;
 
-			CalcLightningSpline(LightningPos, LightningBuffer, arc);
+			CalculateElectricArcSpline(ElectricArcKnots, ElectricArcBuffer, arc);
 
-			if (abs(LightningPos[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(LightningPos[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(LightningPos[0].z) <= ELECTRIC_ARC_RANGE_MAX)
+			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
+				abs(ElectricArcKnots[0].z) <= ELECTRIC_ARC_RANGE_MAX)
 			{
 				int bufferIndex = 0;
 
-				auto& interpPosArray = LightningBuffer;
+				auto& interpPosArray = ElectricArcBuffer;
 				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
 					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();

@@ -15,8 +15,8 @@ namespace TEN::Effects::Lightning
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3i, 6>	   LightningPos	   = {};
-	std::array<Vector3i, 1024> LightningBuffer = {};
+	std::array<Vector3i, 6>	   ElectricArcKnots	   = {};
+	std::array<Vector3i, 1024> ElectricArcBuffer = {};
 	
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
@@ -170,7 +170,7 @@ namespace TEN::Effects::Lightning
 				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
-	void UpdateLightning()
+	void UpdateElectricArcs()
 	{
 		// No active effects; return early.
 		if (ElectricArcs.empty())
@@ -203,7 +203,7 @@ namespace TEN::Effects::Lightning
 				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalcLightningSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc)
+	void CalculateElectricArcSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc)
 	{
 		int bufferIndex = 0;
 
@@ -212,36 +212,36 @@ namespace TEN::Effects::Lightning
 
 		if (arc.flags & 1)
 		{
-			int dp = 65536 / ((arc.segments * 3) - 1);
-			int x = dp;
+			int interpStep = 65536 / ((arc.segments * 3) - 1);
+			int x = interpStep;
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
 					auto spline = Vector3i(
-						LSpline(x, &posArray[0].x, posArray.size()),
-						LSpline(x, &posArray[0].y, posArray.size()),
-						LSpline(x, &posArray[0].z, posArray.size()));
+						ElectricArcSpline(x, &posArray[0].x, posArray.size()),
+						ElectricArcSpline(x, &posArray[0].y, posArray.size()),
+						ElectricArcSpline(x, &posArray[0].z, posArray.size()));
 
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
 					bufferArray[bufferIndex] = spline + offset;
-					x += dp;
+					x += interpStep;
 					bufferIndex++;
 				}
 			}
 		}
 		else
 		{
-			int segments = (arc.segments * 3) - 1;
+			int numSegments = (arc.segments * 3) - 1;
 
-			auto dPos = (posArray[posArray.size() - 1] - posArray[0]) / segments;
-			auto pos = Vector3i::Zero;
-			pos.x = dPos.x + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].x;
-			pos.y = dPos.y + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].y;
-			pos.z = dPos.z + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].z;
+			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
+			auto pos = Vector3i(
+				deltaPos.x + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].x,
+				deltaPos.y + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].y,
+				deltaPos.z + (GetRandomControl() % (arc.amplitude * 2)) - arc.amplitude + posArray[0].z);
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
@@ -250,9 +250,9 @@ namespace TEN::Effects::Lightning
 					bufferArray[bufferIndex] = pos;
 					bufferIndex++;
 
-					pos.x += dPos.x + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
-					pos.y += dPos.y + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
-					pos.z += dPos.z + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
+					pos.x += deltaPos.x + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
+					pos.y += deltaPos.y + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
+					pos.z += deltaPos.z + GetRandomControl() % (arc.amplitude * 2) - arc.amplitude;
 				}
 			}
 		}
@@ -261,25 +261,26 @@ namespace TEN::Effects::Lightning
 	}
 
 	// 4-point Catmull-Rom spline interpolation.
+	// NOTE: Alpha is in the range [0, 65536] rather than [0, 1].
 	// BIG TODO: Make a family of curve classes with Bezier, BSpline, Catmull-Rom.
-	int LSpline(int x, int* knots, int numKnots)
+	int ElectricArcSpline(int alpha, int* knots, int numKnots)
 	{
-		x *= numKnots - 3;
-		int span = x >> 16;
+		alpha *= numKnots - 3;
+		int span = alpha >> 16;
 
 		if (span >= (numKnots - 3))
 			span = numKnots - 4;
 
-		x -= 65536 * span;
+		alpha -= 65536 * span;
 
 		int* k = &knots[3 * span];
 
 		int c1 = k[3] + (k[3] / 2) - (k[6] / 2) - k[6] + (k[9] / 2) + ((-k[0] - 1) / 2);
-		int ret = (long long)c1 * x >> 16;
+		int ret = (long long)c1 * alpha >> 16;
 		int c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] / 2) - (k[9] / 2) + k[0];
-		ret = (long long)c2 * x >> 16;
+		ret = (long long)c2 * alpha >> 16;
 		int c3 = ret + (k[6] / 2) + ((-k[0] - 1) / 2);
-		ret = (long long)c3 * x >> 16;
+		ret = (long long)c3 * alpha >> 16;
 
 		return (ret + k[3]);
 	}

@@ -519,7 +519,7 @@ namespace TEN::Renderer
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
-		void DrawLightning(RenderView& view);
+		void DrawElectricArcs(RenderView& view);
 		void DrawBlood(RenderView& view);
 		void DrawWeatherParticles(RenderView& view);
 		void DrawDrips(RenderView& view);
