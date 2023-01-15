@@ -1063,9 +1063,8 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 		{
 			auto pos = GetJointPosition(targetEntity, jointIndex);
-			float maxDist = targetEntity->ItemFlags[7] != 0 ? (float)targetEntity->ItemFlags[7] : BLOCK(1 / 16.0f);
-
-			if (Vector3i::Distance(hitPos->ToVector3i(), pos) < maxDist)
+			auto mesh = g_Level.Meshes[object.meshIndex + jointIndex];
+			if (Vector3::Distance(hitPos->ToVector3(), pos.ToVector3()) < mesh.sphere.Radius)
 			{
 				foundJointIndex = jointIndex;
 				break;
