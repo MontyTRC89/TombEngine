@@ -60,7 +60,7 @@ namespace TEN::Effects::Lightning
 		int r, g, b;
 	};
 
-	extern std::vector<ElectricArc>	 Lightning;
+	extern std::vector<ElectricArc>	 ElectricArcs;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
 	extern Vector3i LightningPos[6];

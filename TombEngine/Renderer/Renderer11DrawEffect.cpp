@@ -210,10 +210,10 @@ namespace TEN::Renderer
 	void Renderer11::DrawLightning(RenderView& view)
 	{
 		// No active effects; return early.
-		if (Lightning.empty())
+		if (ElectricArcs.empty())
 			return;
 
-		for (const auto& arc : Lightning)
+		for (const auto& arc : ElectricArcs)
 		{
 			if (arc.life <= 0)
 				continue;

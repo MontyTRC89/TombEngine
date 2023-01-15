@@ -12,7 +12,7 @@ namespace TEN::Effects::Lightning
 {
 	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
 	
-	std::vector<ElectricArc>  Lightning		= {};
+	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
 	Vector3i LightningPos[6];
@@ -44,8 +44,8 @@ namespace TEN::Effects::Lightning
 		arc.amplitude = amplitude;
 		arc.width = width;
 
-		Lightning.push_back(arc);
-		return &Lightning[Lightning.size() - 1];
+		ElectricArcs.push_back(arc);
+		return &ElectricArcs[ElectricArcs.size() - 1];
 	}
 
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
@@ -171,10 +171,10 @@ namespace TEN::Effects::Lightning
 	void UpdateLightning()
 	{
 		// No active effects; return early.
-		if (Lightning.empty())
+		if (ElectricArcs.empty())
 			return;
 
-		for (auto& arc : Lightning)
+		for (auto& arc : ElectricArcs)
 		{
 			// Set to despawn.
 			if (arc.life <= 0)
@@ -195,10 +195,10 @@ namespace TEN::Effects::Lightning
 		}
 
 		// Despawn inactive effects.
-		Lightning.erase(
+		ElectricArcs.erase(
 			std::remove_if(
-				Lightning.begin(), Lightning.end(),
-				[](const ElectricArc& arc) { return (arc.life <= 0); }), Lightning.end());
+				ElectricArcs.begin(), ElectricArcs.end(),
+				[](const ElectricArc& arc) { return (arc.life <= 0); }), ElectricArcs.end());
 	}
 
 	void CalcLightningSpline(Vector3i* pos, short* buffer, const ElectricArc& arc)
