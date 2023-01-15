@@ -69,6 +69,11 @@ void Rotation::StoreInPHDPos(Pose& pose) const
 	pose.Orientation.z = ANGLE(z);
 }
 
+Rotation::operator Vector3() const
+{
+	return Vector3{ x, y, z };
+};
+
 /***
 @tparam Rotation rotation this rotation
 @treturn string A string showing the x, y, and z values of the rotation

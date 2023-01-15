@@ -415,6 +415,14 @@ table vec3Table {
 	vec: Vector3;
 }
 
+table rotationTable {
+	vec: Vector3;
+}
+
+table colorTable {
+	color: uint32;
+}
+
 table funcNameTable {
 	str: string;
 }
@@ -425,6 +433,8 @@ union VarUnion {
 	num: doubleTable,
 	boolean: boolTable,
 	vec3: vec3Table,
+	rotation: rotationTable,
+	color: colorTable,
 	funcName: funcNameTable
 }
 

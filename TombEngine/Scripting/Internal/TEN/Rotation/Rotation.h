@@ -20,6 +20,8 @@ public:
 	Rotation(const EulerAngles& eulers);
 	Rotation(const Pose& pose);
 
+	operator Vector3() const;
+
 	void StoreInPHDPos(Pose& pose) const;
 
 	std::string ToString() const;

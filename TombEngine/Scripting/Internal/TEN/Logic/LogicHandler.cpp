@@ -10,6 +10,8 @@
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Rotation/Rotation.h"
+#include "Color/Color.h"
 #include "LevelFunc.h"
 
 using namespace TEN::Effects::Lightning;
@@ -36,13 +38,8 @@ static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
-	switch (value.get_type())
+	auto PutVar = [](sol::table tab, sol::object key, sol::object value)
 	{
-	case sol::type::lua_nil:
-	case sol::type::boolean:
-	case sol::type::number:
-	case sol::type::string:
-	case sol::type::table:
 		switch (key.get_type())
 		{
 		case sol::type::number:
@@ -53,8 +50,10 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
 		}
-		break;
-	default:
+	};
+
+	auto UnsupportedValue = [](sol::table tab, sol::object key)
+	{
 		key.push();
 		size_t strLen;
 		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
@@ -68,7 +67,33 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
 		}
 		key.pop();
+	};
+
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+	case sol::type::boolean:
+	case sol::type::number:
+	case sol::type::string:
+	case sol::type::table:
+		PutVar(tab, key, value);
 		break;
+	case sol::type::userdata:
+	{
+		if (value.is<Vec3>() ||
+			value.is<Rotation>() ||
+			value.is<ScriptColor>())
+		{
+			PutVar(tab, key, value);
+		}
+		else
+		{
+			UnsupportedValue(tab, key);
+		}
+	}
+	break;
+	default:
+		UnsupportedValue(tab, key);
 	}
 }
 
@@ -318,6 +343,7 @@ void LogicHandler::FreeLevelScripts()
 	m_handler.GetState()->collect_garbage();
 }
 
+//Used when loading
 void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 	ResetGameTables();
@@ -357,10 +383,20 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (std::holds_alternative<Vector3i>(vars[second]))
+				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto theVec = Vec3{ std::get<Vector3i>(vars[second]) };
+					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
 					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Rotation))
+				{
+					auto theVec = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Color))
+				{
+					auto theCol = D3DCOLOR{std::get<int(SavedVarType::Color)>(vars[second]) };
+					solTables[i][vars[first]] = ScriptColor{theCol};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
@@ -392,6 +428,24 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	}
 }
 
+
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom & var, MapType & varsMap, size_t & nVars, std::vector<SavedVar> & vars)
+{
+	auto [first, second] = varsMap.insert(std::make_pair(&var, nVars));
+
+	if (second)
+	{
+		SavedVar savedVar;
+		TypeTo varTo = static_cast<TypeTo>(var);
+		savedVar.emplace<static_cast<int>(TypeEnum)>(varTo);
+		vars.push_back(varTo);
+		++nVars;
+	}
+
+	return first->second;
+}
+
+//Used when saving
 void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 	sol::table tab{ *m_handler.GetState(), sol::create };
@@ -411,22 +465,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	// The purpose of this is to only store each value once, and to fill our tables with
 	// indices to the values rather than copies of the values.
-	auto handleNum = [&](double num)
+
+	auto handleNum = [&](auto num, auto map)
 	{
-		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
-
-		if (second)
-		{
-			vars.push_back(num);
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleBool = [&](bool num)
-	{
-		auto [first, second] = boolMap.insert(std::make_pair(num, nVars));
+		auto [first, second] = map.insert(std::make_pair(num, nVars));
 
 		if (second)
 		{
@@ -445,19 +487,6 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleVec3 = [&](Vec3 const & vec)
-	{
-		auto [first, second] = varsMap.insert(std::make_pair(&vec, nVars));
-
-		if (second)
-		{
-			vars.push_back(vec);
 			++nVars;
 		}
 
@@ -498,7 +527,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					keyIndex = handleStr(first);
 					break;
 				case sol::type::number:
-					keyIndex = handleNum(first.as<double>());
+					keyIndex = handleNum(first.as<double>(), numMap);
 					break;
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a key");
@@ -519,15 +548,19 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					putInVars(handleStr(second));
 					break;
 				case sol::type::number:
-					putInVars(handleNum(second.as<double>()));
+					putInVars(handleNum(second.as<double>(), numMap));
 					break;
 				case sol::type::boolean:
-					putInVars(handleBool(second.as<bool>()));
+					putInVars(handleNum(second.as<bool>(), boolMap));
 					break;
 				case sol::type::userdata:
 				{
 					if(second.is<Vec3>())
-						putInVars(handleVec3(second.as<Vec3>()));
+						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
+					else if(second.is<Rotation>())
+						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, nVars, vars));
+					else if(second.is<ScriptColor>())
+						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, nVars, vars));
 					else if(second.is<LevelFunc>())
 						putInVars(handleFuncName(second.as<LevelFunc>()));
 					else
