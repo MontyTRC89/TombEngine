@@ -260,6 +260,8 @@ namespace TEN::Effects::Lightning
 		bufferArray[bufferIndex] = posArray[5];
 	}
 
+	// 4-point Catmull-Rom spline interpolation.
+	// BIG TODO: Make a family of curve classes with Bezier, BSpline, Catmull-Rom.
 	int LSpline(int x, int* knots, int numKnots)
 	{
 		x *= numKnots - 3;
