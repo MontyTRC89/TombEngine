@@ -466,16 +466,16 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (spawnLaser)
 		{
-			SpawnRaygunLaser(Pose(origin, orient), abs(item.ItemFlags[isRight]));
+			SpawnRaygunSmoke(origin, orient, abs(item.ItemFlags[isRight]));
 			return;
 		}
 
 		SpawnHelicalLaser(origin, target);
 
 		item.ItemFlags[isRight] = 16;
-		SpawnRaygunLaser(Pose(origin, orient), 16);
-		SpawnRaygunLaser(Pose(origin, orient), 16);
-		SpawnRaygunLaser(Pose(origin, orient), 16);
+		SpawnRaygunSmoke(origin, orient, 16);
+		SpawnRaygunSmoke(origin, orient, 16);
+		SpawnRaygunSmoke(origin, orient, 16);
 
 		auto origin2 = GameVector(origin, item.RoomNumber);
 		auto target2 = GameVector(target);
@@ -496,40 +496,43 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void SpawnRaygunLaser(const Pose& pos, float life)
+	void SpawnRaygunSmoke(const Vector3& pos, const EulerAngles& orient, float life)
 	{
-		auto* sptr = GetFreeParticle();
+		auto& smoke = *GetFreeParticle();
 
-		sptr->on = true;
+		float scale = (life * 12) * phd_cos(orient.x);
 
-		sptr->sB = (((GetRandomControl() & 127) + 128) * life) / 16;
-		sptr->sR = sptr->sB - (sptr->sB >> 2);
-		sptr->sG = sptr->sR;
-		sptr->dR = 0;
-		sptr->dB = (((GetRandomControl() & 127) + 32) * life) / 16;
-		sptr->dG = sptr->dB >> 2;
-		sptr->colFadeSpeed = 8 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 24;
+		smoke.on = true;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->x = pos.Position.x;
-		sptr->y = pos.Position.y;
-		sptr->z = pos.Position.z;
+		smoke.x = pos.x;
+		smoke.y = pos.y;
+		smoke.z = pos.z;
+		smoke.xVel = Random::GenerateInt(-25, 25);
+		smoke.yVel = life * 3;
+		smoke.zVel = Random::GenerateInt(-25, 25);
+		smoke.sB = (Random::GenerateInt(128, 256) * life) / 16;
+		smoke.sR =
+		smoke.sG = smoke.sB - (smoke.sB / 4);
+		smoke.dR = 0;
+		smoke.dB = (Random::GenerateInt(32, 160) * life) / 16;
+		smoke.dG =
+		smoke.dB / 4;
 
-		int size = ((life * 64) * phd_cos(TO_RAD(pos.Orientation.x))) / 5;
+		smoke.colFadeSpeed = Random::GenerateInt(8, 12);
+		smoke.fadeToBlack = 8;
+		smoke.sLife =
+		smoke.life = Random::GenerateFloat(24.0f, 28.0f);
 
-		sptr->xVel = Random::GenerateInt(-128, 128) / 5;
-		sptr->yVel = life * 16 / 5;
-		sptr->zVel = Random::GenerateInt(-128, 128) / 5;
-		sptr->friction = 0;
-		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		sptr->rotAng = GetRandomControl() & SECTOR(4);
-		sptr->rotAdd = (GetRandomControl() & 127) - 64;
-		sptr->gravity = (GetRandomControl() & 31) + 32;
-		sptr->maxYvel = 0;
-		sptr->scalar = 1;
-		sptr->size = sptr->sSize = size;
-		sptr->dSize = 1;
+		smoke.friction = 0;
+		smoke.rotAng = Random::GenerateAngle(0, ANGLE(22.5f));
+		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.35f), ANGLE(0.35f));
+		smoke.gravity = Random::GenerateAngle(ANGLE(0.175f), ANGLE(0.35f));
+		smoke.maxYvel = 0;
+		smoke.scalar = 1;
+		smoke.size =
+		smoke.sSize = scale;
+		smoke.dSize = 1;
+		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
