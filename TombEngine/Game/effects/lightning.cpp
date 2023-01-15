@@ -213,22 +213,22 @@ namespace TEN::Effects::Lightning
 		if (arc.flags & 1)
 		{
 			int interpStep = 65536 / ((arc.segments * 3) - 1);
-			int x = interpStep;
+			int alpha = interpStep;
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
 					auto spline = Vector3i(
-						ElectricArcSpline(x, &posArray[0].x, posArray.size()),
-						ElectricArcSpline(x, &posArray[0].y, posArray.size()),
-						ElectricArcSpline(x, &posArray[0].z, posArray.size()));
+						ElectricArcSpline(alpha, &posArray[0].x, posArray.size()),
+						ElectricArcSpline(alpha, &posArray[0].y, posArray.size()),
+						ElectricArcSpline(alpha, &posArray[0].z, posArray.size()));
 
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
 					bufferArray[bufferIndex] = spline + offset;
-					x += interpStep;
+					alpha += interpStep;
 					bufferIndex++;
 				}
 			}
