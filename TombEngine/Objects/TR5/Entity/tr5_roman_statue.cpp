@@ -63,6 +63,14 @@ namespace TEN::Entities::Creatures::TR5
 		STATUE_ANIM_START_JUMP_DOWN = 16
 	};
 
+	enum RomanStatueHitmesh
+	{
+		MS_LIGHT_DMG = 0x10,
+		MS_MEDIUM_DMG = 0x400,
+		MS_HARD_DMG = 0x100,
+		MS_HEAVY_DMG = 0x10000,
+	};
+
 	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
 	{
 		*pos = GetJointPosition(item, joint, *pos);
@@ -147,44 +155,6 @@ namespace TEN::Entities::Creatures::TR5
 		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
-	}
-
-	static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
-	{
-		auto* spark = GetFreeParticle();
-
-		spark->on = 1;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = 64;
-
-		if (flags)
-		{
-			spark->dG = (GetRandomControl() & 0x3F) - 64;
-			spark->dB = spark->dG / 2;
-		}
-		else
-		{
-			spark->dB = (GetRandomControl() & 0x3F) - 64;
-			spark->dG = spark->dB / 2;
-		}
-
-		spark->colFadeSpeed = 4;
-		spark->fadeToBlack = 4;
-		spark->life = 16;
-		spark->sLife = 16;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = xv;
-		spark->yVel = yv;
-		spark->zVel = zv;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->friction = 34;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-		spark->flags = SP_NONE;
 	}
 
 	static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
@@ -308,6 +278,7 @@ namespace TEN::Entities::Creatures::TR5
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
+		unsigned int jointBit = 0;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
@@ -315,30 +286,39 @@ namespace TEN::Entities::Creatures::TR5
 		auto prevMeshSwapBits = item->Model.MeshIndex;
 
 		// At determined HP values, roman statues sheds material.
-		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(0x10000))
+		if (item->HitPoints < 1 && !(item->ItemFlags[1] & (MS_HEAVY_DMG >> 4)))
 		{
 			ExplodeItemNode(item, 16, 0, 8);
-			item->MeshBits |= 0x10000;
-			item->SetMeshSwapFlags(0x10000);
+			jointBit =  MS_HEAVY_DMG;
+			item->MeshBits |= jointBit;
+			item->ItemFlags[1] |= jointBit >> 4;
+			jointBit |= jointBit;
+			item->SetMeshSwapFlags(jointBit);		
 		}
-		else if (item->HitPoints < 75 && !item->TestMeshSwapFlags(0x100))
+		else if (item->HitPoints < 75 && !(item->ItemFlags[1] & MS_HARD_DMG))
 		{
 			ExplodeItemNode(item, 8, 0, 8);
-			item->MeshBits |= 0x100;
-			item->SetMeshSwapFlags(0x100);
+			jointBit = MS_HARD_DMG;
+			item->MeshBits |= jointBit;
+			item->ItemFlags[1] |= jointBit;
+			item->SetMeshSwapFlags(item->ItemFlags[1]);		
 		}
-		else if (item->HitPoints < 150 && !item->TestMeshSwapFlags(0x400))
+		else if (item->HitPoints < 150 && !(item->ItemFlags[1] & MS_MEDIUM_DMG))
 		{
 			ExplodeItemNode(item, 10, 0, 32);
 			ExplodeItemNode(item, 11, 0, 32);
-			item->MeshBits |= 0x400u;
-			item->SetMeshSwapFlags(0x400);
+			jointBit = MS_MEDIUM_DMG;
+			item->MeshBits |= jointBit;
+			item->ItemFlags[1] |= jointBit;
+			item->SetMeshSwapFlags(item->ItemFlags[1]);		
 		}
-		else if (item->HitPoints < 225 && !item->TestMeshSwapFlags(0x10))
+		else if (item->HitPoints < 225 && !(item->ItemFlags[1] & MS_LIGHT_DMG))
 		{
 			ExplodeItemNode(item, 4, 0, 8);
-			item->MeshBits |= 0x10;
-			item->SetMeshSwapFlags(0x10);
+			jointBit =  MS_LIGHT_DMG;
+			item->MeshBits |= jointBit;
+			item->ItemFlags[1] |= jointBit;
+			item->SetMeshSwapFlags(item->ItemFlags[1]);		
 		}
 
 		// Play hit animation.
@@ -427,14 +407,14 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						if (Targetable(item, &AI) && GetRandomControl() & 1)
 						{
-							item->Animation.TargetState = STATUE_STATE_SCREAM;// STATUE_STATE_ENERGY_ATTACK;
+							item->Animation.TargetState = STATUE_STATE_ENERGY_ATTACK;
 							break;
 						}
 					}
 
 					if (item->TriggerFlags || AI.distance >= pow(SECTOR(2.5f), 2) || !AI.bite)
 					{
-						item->Animation.TargetState = STATUE_STATE_SCREAM;// STATUE_STATE_WALK;
+						item->Animation.TargetState = STATUE_STATE_WALK;
 						break;
 					}
 
@@ -477,8 +457,7 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color, color / 2));
 						else
 							TriggerAttackSpark(pos2.ToVector3(), Vector3(R, color / 2, color));
-					}
-					
+					}				
 				}
 
 				if (deltaFrame <= 90 || deltaFrame >= 130)
@@ -491,11 +470,6 @@ namespace TEN::Entities::Creatures::TR5
 				pos = GetJointPosition(item, 14, pos);
 
 				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
-
-			//	auto orient3 = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
-				//auto attackPos = Pose(pos2, orient3);
-
-
 
 				pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
 				pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - SECTOR(4);
@@ -516,8 +490,6 @@ namespace TEN::Entities::Creatures::TR5
 						else
 							TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
 
-						
-
 						continue;
 					}
 
@@ -526,7 +498,6 @@ namespace TEN::Entities::Creatures::TR5
 						unknown = true;
 						continue;
 					}
-
 
 					if (item->TriggerFlags)
 					{
@@ -537,11 +508,9 @@ namespace TEN::Entities::Creatures::TR5
 							0, color, (color / 2),
 							50, (LI_THININ | LI_SPLINE | LI_THINOUT), 2, 10);
 
-						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 84, 0, 128);
+						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 84, 164, 10, 128);
 						TriggerLightningGlow(RomanStatueData.EnergyArcs[i]->pos4.x, RomanStatueData.EnergyArcs[i]->pos4.y, RomanStatueData.EnergyArcs[i]->pos4.z, 36, 0, color, color / 2);
 
-
-					
 						unknown = 1;
 						RomanStatueData.EnergyArcs[i] = nullptr;
 						continue;
@@ -551,13 +520,13 @@ namespace TEN::Entities::Creatures::TR5
 						(Vector3i*)&pos1.x,
 						(Vector3i*)&pos,
 						(GetRandomControl() & 0x3F) + 16,
-						0, color, (color / 2),
+						0, (color / 2), color,
 						50, (LI_THININ | LI_SPLINE | LI_THINOUT), 2, 10);
 
-					//TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
+					TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 10, 124, 184, 128);
+					TriggerLightningGlow(RomanStatueData.EnergyArcs[i]->pos4.x, RomanStatueData.EnergyArcs[i]->pos4.y, RomanStatueData.EnergyArcs[i]->pos4.z, 36, 0, color / 2, color);
 					RomanStatueData.EnergyArcs[i] = nullptr;
-					unknown = true;
-					
+					unknown = true;					
 				}
 				
 				break;
@@ -787,38 +756,30 @@ namespace TEN::Entities::Creatures::TR5
 						if (arc && deltaFrame && deltaFrame != 24)
 						{
 							if (deltaFrame < 16)
-							{
 								arc->life = 56;
-								arc->r = 0;
-								arc->g = g;
-								arc->b = b;
-							}
-
-							arc->pos1 = pos1;
-							arc->pos4 = pos2;
+								arc->pos1 = pos1;
+								arc->pos4 = pos2;
 						}
-						else if (deltaFrame >= 16)
+						else if (deltaFrame <  16)
 						{
-							if (deltaFrame == 24)
-							{
-								/*TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
-									(((GetRandomControl() & 0x3F) + 128) / 2), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
-									ENERGY_ARC_STRAIGHT_LINE);*/
-							}
-						}
-						else
-						{
-							/*TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
-								ENERGY_ARC_STRAIGHT_LINE);*/
+							RomanStatueData.EnergyArcs[i] =	TriggerLightning(
+								(Vector3i*)&pos1,
+								(Vector3i*)&pos2,
+								(GetRandomControl() & 7) + 8,
+								84, 164, 10,
+								50, (LI_THININ | LI_SPLINE | LI_THINOUT), 6, 2);
 
-								/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-									&pos1,
-									&pos2,
-									(GetRandomControl() & 7) + 8,
-									cb | ((cg | 0x180000) << 8),
-									12,
-									64,
-									4);*/
+						}						
+						else if (deltaFrame == 24)
+						{
+							color = (GetRandomControl() & 0x3F) + 128;
+
+							 TriggerLightning(
+								(Vector3i*)&pos1,
+								(Vector3i*)&pos2,
+								(GetRandomControl() & 7) + 18,
+								0, color, color/2,
+								50, (LI_THININ | LI_SPLINE | LI_THINOUT), 8, 2);
 						}
 					}
 				}
