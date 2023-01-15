@@ -226,6 +226,7 @@ namespace TEN::Renderer
 					Camera.pos.x - (door->AbsoluteVertices[0].x),
 					Camera.pos.y - (door->AbsoluteVertices[0].y),
 					Camera.pos.z - (door->AbsoluteVertices[0].z));
+				door->CameraToDoor.Normalize();
 			}
 
 			if (door->Normal.x * door->CameraToDoor.x +
