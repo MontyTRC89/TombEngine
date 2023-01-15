@@ -452,7 +452,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void FireHeavyGuardRaygun(ItemInfo& item, bool isRight, bool spawnLaser)
+	void FireHeavyGuardRaygun(ItemInfo& item, bool isRight, bool noLaser)
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
@@ -464,7 +464,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto orient = Geometry::GetOrientToPoint(origin, target);
 
-		if (spawnLaser)
+		if (noLaser)
 		{
 			SpawnRaygunSmoke(origin, orient, abs(item.ItemFlags[isRight]));
 			return;
