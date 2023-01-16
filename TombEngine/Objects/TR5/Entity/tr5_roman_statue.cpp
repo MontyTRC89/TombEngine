@@ -27,7 +27,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR5
 {
 	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
-	constexpr auto ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER = 4;
+	constexpr auto ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER = 10;
 	constexpr auto ROMANSTATUE_EXPLOSIVE_DAMAGE_MULTIPLIER = 2;
 
 	struct RomanStatueInfo
