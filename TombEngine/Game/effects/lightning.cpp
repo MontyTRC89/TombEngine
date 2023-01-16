@@ -210,7 +210,10 @@ namespace TEN::Effects::Lightning
 		bufferArray[bufferIndex] = posArray[0];
 		bufferIndex++;
 
-		if (arc.flags & 1)
+		// TODO: Amplitude calculation is wrong? Check.
+
+		// Splined arc.
+		if (arc.flags & LI_SPLINE)
 		{
 			int interpStep = 65536 / ((arc.segments * 3) - 1);
 			int alpha = interpStep;
@@ -233,10 +236,9 @@ namespace TEN::Effects::Lightning
 				}
 			}
 		}
+		// Straight arc.
 		else
 		{
-			// TODO: Amplitude calculation is wrong? Check.
-
 			int numSegments = (arc.segments * 3) - 1;
 
 			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
