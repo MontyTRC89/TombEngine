@@ -11,6 +11,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
@@ -281,6 +282,9 @@ namespace TEN::Entities::Creatures::TR5
 		auto* creature = GetCreatureInfo(item);
 
 		auto prevMeshSwapBits = item->Model.MeshIndex;
+
+		if (item->Effect.Type == EffectType::Fire)
+			item->Effect.Type = EffectType::None;
 
 		// At determined HP values, the statue sheds material.
 		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(MS_HEAVY_DMG))
@@ -859,6 +863,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
+		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
 		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
@@ -867,6 +872,13 @@ namespace TEN::Entities::Creatures::TR5
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 
-		DoItemHit(&target, damage, isExplosive);
+		if (pos.has_value() && (player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+			player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+			player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+			player.Control.Weapon.GunType == LaraWeaponType::HK ||
+			player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+		{
+			DoItemHit(&target, damage, isExplosive);
+		}		
 	}
 }
