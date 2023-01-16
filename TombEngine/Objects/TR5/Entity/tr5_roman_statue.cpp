@@ -64,10 +64,10 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum RomanStatueHitMeshFlags
 	{
-		MS_LIGHT_DMG  = (1 << 4),
-		MS_MEDIUM_DMG = (1 << 10),
-		MS_HARD_DMG	  = (1 << 8),
-		MS_HEAVY_DMG  = (1 << 16)
+		MS_LIGHT_DMG  = 0x10,
+		MS_MEDIUM_DMG = 0x410,
+		MS_HARD_DMG	  = 0x510,
+		MS_HEAVY_DMG  = 0x10510
 	};
 
 	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
@@ -276,7 +276,6 @@ namespace TEN::Entities::Creatures::TR5
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
-		unsigned int jointBit = 0;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
@@ -284,39 +283,30 @@ namespace TEN::Entities::Creatures::TR5
 		auto prevMeshSwapBits = item->Model.MeshIndex;
 
 		// At determined HP values, the statue sheds material.
-		if (item->HitPoints < 1 && !(item->ItemFlags[1] & (MS_HEAVY_DMG >> 4)))
+		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(MS_HEAVY_DMG))
 		{
 			ExplodeItemNode(item, 16, 0, 8);
-			jointBit =  MS_HEAVY_DMG;
-			item->MeshBits |= jointBit;
-			item->ItemFlags[1] |= jointBit >> 4;
-			jointBit |= jointBit;
-			item->SetMeshSwapFlags(jointBit);		
+			item->MeshBits |= MS_HEAVY_DMG;
+			item->SetMeshSwapFlags(MS_HEAVY_DMG);
 		}
-		else if (item->HitPoints < 75 && !(item->ItemFlags[1] & MS_HARD_DMG))
+		else if (item->HitPoints < 75 && !item->TestMeshSwapFlags(MS_HARD_DMG))
 		{
 			ExplodeItemNode(item, 8, 0, 8);
-			jointBit = MS_HARD_DMG;
-			item->MeshBits |= jointBit;
-			item->ItemFlags[1] |= jointBit;
-			item->SetMeshSwapFlags(item->ItemFlags[1]);		
+			item->MeshBits |= MS_HARD_DMG;
+			item->SetMeshSwapFlags(MS_HARD_DMG);
 		}
-		else if (item->HitPoints < 150 && !(item->ItemFlags[1] & MS_MEDIUM_DMG))
+		else if (item->HitPoints < 150 && !item->TestMeshSwapFlags(MS_MEDIUM_DMG))
 		{
 			ExplodeItemNode(item, 10, 0, 32);
 			ExplodeItemNode(item, 11, 0, 32);
-			jointBit = MS_MEDIUM_DMG;
-			item->MeshBits |= jointBit;
-			item->ItemFlags[1] |= jointBit;
-			item->SetMeshSwapFlags(item->ItemFlags[1]);		
+			item->MeshBits |= MS_MEDIUM_DMG;
+			item->SetMeshSwapFlags(MS_MEDIUM_DMG);
 		}
-		else if (item->HitPoints < 225 && !(item->ItemFlags[1] & MS_LIGHT_DMG))
+		else if (item->HitPoints < 225 && !item->TestMeshSwapFlags(MS_LIGHT_DMG))
 		{
 			ExplodeItemNode(item, 4, 0, 8);
-			jointBit =  MS_LIGHT_DMG;
-			item->MeshBits |= jointBit;
-			item->ItemFlags[1] |= jointBit;
-			item->SetMeshSwapFlags(item->ItemFlags[1]);		
+			item->MeshBits |= MS_LIGHT_DMG;
+			item->SetMeshSwapFlags(MS_LIGHT_DMG);
 		}
 
 		// Set recoil animation.
@@ -348,10 +338,6 @@ namespace TEN::Entities::Creatures::TR5
 			byte color;
 			int deltaFrame;
 			bool unknown;
-
-			int r = 0;
-			int g = (GetRandomControl() & 0x3F) - 64;
-			int g = g;
 			
 			color = (GetRandomControl() & 0x3F) + 128;
 
@@ -453,9 +439,9 @@ namespace TEN::Entities::Creatures::TR5
 					for (int i = 0; i < 2; i++)
 					{
 						if (item->TriggerFlags)
-							TriggerAttackSpark(pos2.ToVector3(), Vector3(r, color, color / 2));
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(0, color, color / 2));
 						else
-							TriggerAttackSpark(pos2.ToVector3(), Vector3(r, color / 2, color));
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(0, color / 2, color));
 					}				
 				}
 
@@ -684,7 +670,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-					item->Pose.Orientation.y - ANGLE(180.0f);
+					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
 
