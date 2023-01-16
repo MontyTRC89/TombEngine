@@ -897,20 +897,20 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 	if (boxNumber == NO_BOX)
 		return false;
 
-	auto* creature = GetCreatureInfo(item);
-	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+	const auto& creature = *GetCreatureInfo(item);
+	const auto& zone = g_Level.Zones[(int)creature.LOT.Zone][FlipStatus].data();
 
-	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
+	if (creature.LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
-	auto* box = &g_Level.Boxes[boxNumber];
-	if (creature->LOT.BlockMask & box->flags)
+	const auto& box = g_Level.Boxes[boxNumber];
+	if (creature.LOT.BlockMask & box.flags)
 		return false;
 
-	if (item->Pose.Position.z > (box->left * SECTOR(1)) &&
-		item->Pose.Position.z < (box->right * SECTOR(1)) &&
-		item->Pose.Position.x > (box->top * SECTOR(1)) &&
-		item->Pose.Position.x < (box->bottom * SECTOR(1)))
+	if (item->Pose.Position.z > (box.left * BLOCK(1)) &&
+		item->Pose.Position.z < (box.right * BLOCK(1)) &&
+		item->Pose.Position.x > (box.top * BLOCK(1)) &&
+		item->Pose.Position.x < (box.bottom * BLOCK(1)))
 	{
 		return false;
 	}
@@ -922,9 +922,10 @@ bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
 	if (boxNumber == NO_BOX)
 		return false;
-	auto* box = &g_Level.Boxes[boxNumber];
-	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
-	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
+
+	const auto& box = g_Level.Boxes[boxNumber];
+	int x = ((box.top + box.bottom) * BLOCK(0.5f)) - enemy->Pose.Position.x;
+	int z = ((box.left + box.right) * BLOCK(0.5f)) - enemy->Pose.Position.z;
 
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST &&
 		z > -ESCAPE_DIST && z < ESCAPE_DIST)
@@ -1188,23 +1189,39 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	// FIXME: Add climb down animations for Von Croy and baddies?
+	// FIXME: Add vault down animations for Von Croy and baddies.
 	if (item->Floor > y + CLICK(4.5f))
+	{
 		vault = 0;
+	}
 	else if (item->Floor > y + CLICK(3.5f))
+	{
 		vault = -4;
+	}
 	else if (item->Floor > y + CLICK(2.5f) && IsCreatureVaultAvailable(item, -3))
+	{
 		vault = -3;
+	}
 	else if (item->Floor > y + CLICK(1.5f) && IsCreatureVaultAvailable(item, -2))
+	{
 		vault = -2;
+	}
 	else if (item->Pose.Position.y > y - CLICK(1.5f))
+	{
 		return 0;
+	}
 	else if (item->Pose.Position.y > y - CLICK(2.5f))
+	{
 		vault = 2;
+	}
 	else if (item->Pose.Position.y > y - CLICK(3.5f))
+	{
 		vault = 3;
+	}
 	else
+	{
 		vault = 4;
+	}
 
 	// Jump
 	int newXblock = item->Pose.Position.x / SECTOR(1);
@@ -1438,19 +1455,19 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 {
-	auto* object = &Objects[item->ObjectNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* room = &g_Level.Rooms[enemy->RoomNumber];
-	auto* floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
+	const auto& creature = *GetCreatureInfo(item);
+	auto& room = g_Level.Rooms[enemy->RoomNumber];
+	auto* floor = GetSector(&room, enemy->Pose.Position.x - room.x, enemy->Pose.Position.z - room.z);
 
-	// NEW: Only update enemy box number if it is actually reachable by enemy.
+	// NEW: Only update enemy box number if it is actually reachable by the enemy.
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
-	if (creature->LOT.Zone == ZoneType::Flyer ||
-	   (creature->LOT.Zone == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (creature.LOT.Zone == ZoneType::Flyer ||
+	   (creature.LOT.Zone == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
-		isReachable = true; // If NPC is flying or swimming in water, player is always reachable.
+		// If NPC is flying or swimming in water, player is always reachable.
+		isReachable = true;
 	}
 	else
 	{

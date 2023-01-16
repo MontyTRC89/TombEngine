@@ -1062,9 +1062,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		int foundJointIndex = -1;
 		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 		{
-			auto pos = GetJointPosition(targetEntity, jointIndex);
-			auto mesh = g_Level.Meshes[object.meshIndex + jointIndex];
-			if (Vector3::Distance(hitPos->ToVector3(), pos.ToVector3()) < mesh.sphere.Radius)
+			const auto& mesh = g_Level.Meshes[object.meshIndex + jointIndex];
+			auto jointPos = GetJointPosition(targetEntity, jointIndex);
+
+			float distance = Vector3::Distance(hitPos->ToVector3(), jointPos.ToVector3());
+			if (distance < mesh.sphere.Radius)
 			{
 				foundJointIndex = jointIndex;
 				break;
