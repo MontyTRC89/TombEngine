@@ -101,10 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 				for (auto& currentCreature : ActiveCreatures)
 				{
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
-					{
-						currentCreature++;
 						continue;
-					}
 
 					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
 
@@ -114,8 +111,6 @@ namespace TEN::Entities::Creatures::TR3
 						nearestItem = targetItem;
 						minDistance = distance;
 					}
-
-					currentCreature++;
 				}
 
 				if (nearestItem != nullptr &&
