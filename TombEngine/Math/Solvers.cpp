@@ -63,21 +63,23 @@ namespace TEN::Math::Solvers
 
 		float m = ((SQUARE(length0) - SQUARE(length1)) + (SQUARE(a) + SQUARE(b))) / (2.0f * a);
 		float n = b / a;
-		auto quadratic = SolveQuadratic(1.0f + SQUARE(n), -2.0f * (m * n), SQUARE(m) - SQUARE(length0));
 
+		auto quadratic = SolveQuadratic(1.0f + SQUARE(n), -2.0f * (m * n), SQUARE(m) - SQUARE(length0));
 		auto middle = Vector2::Zero;
 
-		// Solution is valid; return points.
+		// Solution is valid; define middle.
 		if (quadratic != INVALID_QUADRATIC_SOLUTION)
 		{
 			middle = origin + (flipXY ?
 				Vector2(quadratic.second, (m - (n * quadratic.second))) :
 				Vector2(quadratic.first, (m - (n * quadratic.first))));
-			return IK2DSolution{ origin, middle, scaledTarget };
+		}
+		// Solution is invalid: define middle as point between origin and target.
+		else
+		{
+			middle = origin + (direction * (maxLength / 2));
 		}
 
-		// Solution is invalid: return points in straight line.
-		middle = origin + (direction * (maxLength / 2));
 		return IK2DSolution{ origin, middle, scaledTarget };
 	}
 
