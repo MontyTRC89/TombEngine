@@ -150,7 +150,7 @@ Vector4 ToVector4(const Save::Vector4* vec)
 }
 
 #define SaveVec(Type, Data, TableBuilder, UnionType) \
-				auto data = std::get<static_cast<int>(Type)>(Data); \
+				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
 				Save::Vector3 saveVec = FromVector3(data); \
 				vtb.add_vec(&saveVec); \
@@ -1150,22 +1150,22 @@ bool SaveGame::Save(int slot)
 		}
 		else
 		{
-			switch (s.index())
+			switch (SavedVarType(s.index()))
 			{
-			case static_cast<int>(SavedVarType::Vec3):
+			case SavedVarType::Vec3:
 			{
 				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
 			}
 			break;
-			case static_cast<int>(SavedVarType::Rotation):
+			case SavedVarType::Rotation:
 			{
 				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
 			}
 			break;
-			case static_cast<int>(SavedVarType::Color):
+			case SavedVarType::Color:
 			{
 				Save::colorTableBuilder ctb{ fbb };
-				ctb.add_color(std::get<static_cast<int>(SavedVarType::Color)>(s));
+				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
 				auto offset = ctb.Finish();
 
 				putDataInVec(Save::VarUnion::color, offset);
@@ -1419,7 +1419,7 @@ bool SaveGame::Load(int slot)
 		bool dynamicItem = i >= g_Level.NumItems;
 
 		ItemInfo* item = &g_Level.Items[i];
-		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+		item->ObjectNumber = GAME_OBJECT_ID(savedItem->object_id());
 
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
@@ -2023,19 +2023,19 @@ bool SaveGame::Load(int slot)
 			{
 				auto stored = var->u_as_vec3()->vec();
 				SavedVar v;
-				v.emplace<static_cast<int>(SavedVarType::Vec3)>(ToVector3i(stored));
+				v.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
 				loadedVars.push_back(v);
 			}
 			else if (var->u_type() == Save::VarUnion::rotation)
 			{
 				auto stored = var->u_as_rotation()->vec();
 				SavedVar v;
-				v.emplace<static_cast<int>(SavedVarType::Rotation)>(ToVector3(stored));
+				v.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
 				loadedVars.push_back(v);
 			}
 			else if (var->u_type() == Save::VarUnion::color)
 			{
-				loadedVars.push_back(D3DCOLOR(var->u_as_color()->color()));
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

@@ -377,7 +377,7 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 					// outside of these bounds? - squidshire 30/04/2022
 					if (std::trunc(theNum) == theNum && theNum <= INT64_MAX && theNum >= INT64_MIN)
 					{
-						solTables[i][vars[first]] = static_cast<int64_t>(theNum);
+						solTables[i][vars[first]] = (int64_t)theNum;
 					}
 					else
 					{
@@ -437,8 +437,8 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 	if (second)
 	{
 		SavedVar savedVar;
-		TypeTo varTo = static_cast<TypeTo>(var);
-		savedVar.emplace<static_cast<int>(TypeEnum)>(varTo);
+		TypeTo varTo = (TypeTo)var;
+		savedVar.emplace<(int)TypeEnum>(varTo);
 		vars.push_back(varTo);
 		++nVars;
 	}
