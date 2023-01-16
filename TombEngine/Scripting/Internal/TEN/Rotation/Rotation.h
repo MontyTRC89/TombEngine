@@ -19,6 +19,7 @@ public:
 	Rotation(float aX, float aY, float aZ);
 	Rotation(const EulerAngles& eulers);
 	Rotation(const Pose& pose);
+	Rotation(const Vector3& vec);
 
 	operator Vector3() const;
 

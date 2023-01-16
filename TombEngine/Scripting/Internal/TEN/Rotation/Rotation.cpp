@@ -55,6 +55,13 @@ Rotation::Rotation(const EulerAngles& eulers)
 	z = TO_DEGREES(eulers.z);
 }
 
+Rotation::Rotation(const Vector3& vec)
+{
+	x = vec.x;
+	y = vec.y;
+	z = vec.z;
+}
+
 Rotation::Rotation(const Pose& pose)
 {
 	x = TO_DEGREES(pose.Orientation.x);
