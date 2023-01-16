@@ -324,6 +324,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 	}
 
+	item.Pose.Position = laraItem->Pose.Position;
 	AnimateItem(&item);
 
 	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
@@ -690,7 +691,7 @@ void FireGrenade(ItemInfo* laraItem)
 
 	InitialiseItem(itemNumber);
 
-	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x;
+	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x + ANGLE(180);
 	item.Pose.Orientation.y = laraItem->Pose.Orientation.y + lara.LeftArm.Orientation.y;
 	item.Pose.Orientation.z = 0;
 
@@ -701,7 +702,7 @@ void FireGrenade(ItemInfo* laraItem)
 	}
 
 	item.Animation.Velocity.z = GRENADE_VELOCITY;
-	item.Animation.Velocity.y = -CLICK(2) * phd_sin(item.Pose.Orientation.x);
+	item.Animation.Velocity.y = CLICK(2) * phd_sin(item.Pose.Orientation.x);
 	item.Animation.ActiveState = item.Pose.Orientation.x;
 	item.Animation.TargetState = item.Pose.Orientation.y;
 	item.Animation.RequiredState = 0;
@@ -1398,7 +1399,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	}
 	else
 	{
-		TriggerShockwave(&item.Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, 0, 0);
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 

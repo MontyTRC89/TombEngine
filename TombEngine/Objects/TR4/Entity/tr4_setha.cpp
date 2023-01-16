@@ -52,7 +52,7 @@ namespace TEN::Entities::TR4
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
-	constexpr auto LARA_STATE_SETH_DEATH = 13;
+	constexpr auto LARA_STATE_SETH_DEATH = 14;
 	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
 
 	enum SethState
@@ -109,26 +109,10 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE = 28
 	};
 
-	void SetupSeth(ObjectInfo& object)
-	{
-		object.initialise = InitialiseSeth;
-		object.control = SethControl;
-		object.collision = CreatureCollision;
-		object.shadowType = ShadowMode::All;
-		object.HitPoints = 500;
-		object.hitEffect = HIT_NONE;
-		object.pivotLength = 50;
-		object.radius = 341;
-		object.intelligent = true;
-		object.undead = true;
-		object.ZoneType = ZoneType::Basic;
-	}
-
 	void InitialiseSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
@@ -675,7 +659,7 @@ namespace TEN::Entities::TR4
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
-		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
 	}
 
 	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
@@ -689,7 +673,7 @@ namespace TEN::Entities::TR4
 		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
 		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
 		laraItem->Animation.IsAirborne = false;
-		laraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
 		if (item->RoomNumber != laraItem->RoomNumber)
 			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
@@ -703,9 +687,12 @@ namespace TEN::Entities::TR4
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 
 		Camera.pos.RoomNumber = laraItem->RoomNumber;
-		Camera.type = CameraType::Chase;
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(170.0f);
-		Camera.targetElevation = ANGLE(-25.0f);
+		Camera.type = CameraType::Fixed;
+		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
+		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);
+		ForcedFixedCamera.z = item->Pose.Position.z + ((BLOCK(2) * phd_cos(item->Pose.Orientation.y)));
+		ForcedFixedCamera.RoomNumber = item->RoomNumber;
+		UseForcedFixedCamera = true;
+
 	}
 }

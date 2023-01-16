@@ -57,7 +57,7 @@ class ITEM_DATA
 		LaraInfo*,
 		CreatureInfo,
 		WraithInfo,
-		LaserHeadInfo,
+		GuardianInfo,
 		QuadBikeInfo,
 		BigGunInfo,
 		MotorbikeInfo,

@@ -350,7 +350,6 @@ void LoadObjects()
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
@@ -416,6 +415,7 @@ void LoadCameras()
 	for (int i = 0; i < numCameras; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
+		camera.Index = i;
 		camera.Position.x = ReadInt32();
 		camera.Position.y = ReadInt32();
 		camera.Position.z = ReadInt32();
@@ -869,7 +869,7 @@ void FreeLevel()
 
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 			g_Level.Zones[j][i].clear();
 	}
 
@@ -1241,16 +1241,11 @@ void LoadBoxes()
 	// Read zones
 	for (int i = 0; i < 2; i++)
 	{
-		// Ground zones
-		for (int j = 0; j < MAX_ZONES - 1; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 		{
-			g_Level.Zones[j][i].resize(numBoxes * sizeof(int));
+			g_Level.Zones[j][i].resize(numBoxes);
 			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
 		}
-
-		// Fly zone
-		g_Level.Zones[MAX_ZONES - 1][i].resize(numBoxes * sizeof(int));
-		ReadBytes(g_Level.Zones[MAX_ZONES - 1][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked
@@ -1286,8 +1281,6 @@ int LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	ReadInt32(); // SPR\0
-
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
 

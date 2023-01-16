@@ -282,7 +282,7 @@ namespace TEN::Entities::Effects
 			else if (item->ItemFlags[0] == 0)
 			{
 				DoFlipMap(-item->TriggerFlags);
-				FlipMap[-item->TriggerFlags] ^= 0x3E00u;
+				FlipMap[-item->TriggerFlags] ^= CODE_BITS;
 				item->ItemFlags[0] = 1;
 			}
 		}
@@ -595,7 +595,7 @@ namespace TEN::Entities::Effects
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 
-					item->Flags |= 0x3E00;
+					item->Flags |= CODE_BITS;
 					item->ItemFlags[3] = 0;
 					item->Status = ITEM_ACTIVE;
 

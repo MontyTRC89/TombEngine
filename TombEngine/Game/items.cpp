@@ -7,6 +7,8 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/savegame.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -132,12 +134,23 @@ bool TestState(int refState, const vector<int>& stateList)
 	return false;
 }
 
-void ClearItem(short itemNumber)
+static void GameScriptHandleKilled(short itemNumber, bool destroyed)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	item->Collidable = true;
-	item->Data = nullptr;
-	item->StartPose = item->Pose;
+
+	g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
+	if (!item->Callbacks.OnKilled.empty())
+		g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
+
+	if (destroyed)
+	{
+		g_GameScriptEntities->NotifyKilled(item);
+		item->Name.clear();
+		item->Callbacks.OnKilled.clear();
+		item->Callbacks.OnHit.clear();
+		item->Callbacks.OnObjectCollided.clear();
+		item->Callbacks.OnRoomCollided.clear();
+	}
 }
 
 void KillItem(short const itemNumber)
@@ -194,16 +207,7 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-		g_GameScriptEntities->NotifyKilled(item);
-		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
-
-		item->Name.clear();
-		item->Callbacks.OnKilled.clear();
-		item->Callbacks.OnHit.clear();
-		item->Callbacks.OnObjectCollided.clear();
-		item->Callbacks.OnRoomCollided.clear();
+		GameScriptHandleKilled(itemNumber, true);
 
 		if (itemNumber >= g_Level.NumItems)
 		{
@@ -425,10 +429,8 @@ void RemoveDrawnItem(short itemNumber)
 	}
 }
 
-void RemoveActiveItem(short itemNumber) 
+void RemoveActiveItem(short itemNumber, bool killed) 
 {
-	auto& item = g_Level.Items[itemNumber];
-
 	if (g_Level.Items[itemNumber].Active)
 	{
 		g_Level.Items[itemNumber].Active = false;
@@ -449,9 +451,8 @@ void RemoveActiveItem(short itemNumber)
 			}
 		}
 
-		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.Callbacks.OnKilled.empty())
-			g_GameScript->ExecuteFunction(item.Callbacks.OnKilled, itemNumber);
+		if (killed)
+			GameScriptHandleKilled(itemNumber, false);
 	}
 }
 
@@ -755,4 +756,49 @@ void DoDamage(ItemInfo* item, int damage)
 			lastHurtTime = GlobalCounter;
 		}
 	}
+}
+
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
+{
+	const auto& object = Objects[target->ObjectNumber];
+
+	if (!object.undead || isExplosive)
+	{
+		if (target->HitPoints > 0)
+		{
+			Statistics.Level.AmmoHits++;
+			DoDamage(target, damage);
+		}
+	}
+
+	if (!target->Callbacks.OnHit.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(target->Name);
+		g_GameScript->ExecuteFunction(target->Callbacks.OnHit, index);
+	}
+}
+
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+{
+	const auto& object = Objects[target.ObjectNumber];
+
+	if (object.hitEffect != HitEffect::None && pos.has_value())
+	{
+		switch (object.hitEffect)
+		{
+		case HitEffect::Blood:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
+			break;
+
+		case HitEffect::Richochet:
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			break;
+
+		case HitEffect::Smoke:
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
+			break;
+		}
+	}
+
+	DoItemHit(&target, damage, isExplosive);
 }

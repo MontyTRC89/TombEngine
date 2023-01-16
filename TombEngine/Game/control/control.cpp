@@ -51,6 +51,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
+#include <chrono>
 
 using namespace TEN::Effects;
 using namespace TEN::Effects::Drip;
@@ -67,6 +68,11 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace std::chrono;
+
+using std::string;
+using std::unordered_map;
+using std::vector;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -91,6 +97,8 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
+int ControlPhaseTime;
+
 int DrawPhase(bool isTitle)
 {
 	if (isTitle)
@@ -108,6 +116,9 @@ int DrawPhase(bool isTitle)
 
 GameStatus ControlPhase(int numFrames)
 {
+	auto time1 = std::chrono::high_resolution_clock::now();
+
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 	bool isTitle = (CurrentLevel == 0);
 
 	RegeneratePickups();
@@ -228,6 +239,12 @@ GameStatus ControlPhase(int numFrames)
 			isFirstTime = false;
 		}
 	}
+
+	using ns = std::chrono::nanoseconds;
+	using get_time = std::chrono::steady_clock;
+
+	auto time2 = std::chrono::high_resolution_clock::now();
+	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 
 	return GameStatus::None;
 }

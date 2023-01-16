@@ -60,6 +60,9 @@ bool SpotcamOverlay = false;
 void ClearSpotCamSequences()
 {
 	UseSpotCam = false;
+	SpotcamDontDrawLara = false;
+	SpotcamOverlay = false;
+
 
 	for (int i = 0; i < MAX_SPOTCAMS; i++)
 		SpotCam[i] = {};
@@ -67,7 +70,7 @@ void ClearSpotCamSequences()
 
 void InitialiseSpotCamSequences(bool startFirstSequence)
 {
-	TrackCameraInit = 0;
+	TrackCameraInit = false;
 
 	int n = NumberSpotcams;
 	int cc = 1;
@@ -111,7 +114,7 @@ void InitialiseSpotCam(short Sequence)
 {
 	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
-		TrackCameraInit = 0;
+		TrackCameraInit = false;
 		return;
 	}
 
@@ -130,9 +133,9 @@ void InitialiseSpotCam(short Sequence)
 
 	CameraFade = -1;
 	LastSpotCamSequence = Sequence;
-	TrackCameraInit = 0;
+	TrackCameraInit = false;
 	SpotcamTimer = 0;
-	SpotcamPaused = 0;
+	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
 	Lara.Control.Locked = false;
 

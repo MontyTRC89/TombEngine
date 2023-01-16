@@ -6,7 +6,6 @@ struct ObjectInfo;
 
 namespace TEN::Entities::TR4
 {
-	void SetupSeth(ObjectInfo& object);
 	void InitialiseSeth(short itemNumber);
 	void SethControl(short itemNumber);
 

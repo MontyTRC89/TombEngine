@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/Camera/CameraObject.h"
+#include "Game/camera.h"
 
 #include "ReservedScriptNames.h"
 #include "ScriptAssert.h"
@@ -62,7 +63,11 @@ void CameraObject::Register(sol::table & parent)
 		// This is used in conjunction with SetPosition to teleport the camera to a new room.
 		// @function Camera:SetRoomNumber
 		// @tparam int ID the ID of the new room 
-		ScriptReserved_SetRoomNumber, &CameraObject::SetRoomNumber
+		ScriptReserved_SetRoomNumber, &CameraObject::SetRoomNumber,
+
+		/// Active the camera during that frame.
+		// @function Camera:PlayCamera
+		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
 		);
 }
 
@@ -123,3 +128,13 @@ void CameraObject::SetRoomNumber(short room)
 
 	m_camera.RoomNumber = room;
 }
+
+void CameraObject::PlayCamera(sol::optional<Moveable&> TargetObj)
+{
+	Camera.number = m_camera.Index;
+	Camera.type = CameraType::Fixed;
+
+	if (TargetObj.has_value()) //Otherwise, it will point to Lara by default.
+		Camera.item = &g_Level.Items[TargetObj.value().GetIndex()];
+}
+
