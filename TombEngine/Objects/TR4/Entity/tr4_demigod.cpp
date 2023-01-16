@@ -23,11 +23,11 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
-	constexpr auto DEMIGOD2_MAX_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
-	constexpr auto DEMIGOD1_WALK_RANGE = SQUARE(BLOCK(3));
-	constexpr auto DEMIGOD_WALK_RANGE = SQUARE(BLOCK(3));
-	constexpr auto DEMIGOD_IDLE_RANGE = SQUARE(SECTOR(2));
+	constexpr auto DEMIGOD_IDLE_RANGE					   = SQUARE(BLOCK(2));
+	constexpr auto DEMIGOD_WALK_RANGE					   = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD1_WALK_RANGE					   = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
 
 
 	enum DemigodState
@@ -129,8 +129,8 @@ namespace TEN::Entities::TR4
 		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
 		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
+		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+			dz >= -BLOCK(16) && dz <= BLOCK(16))
 		{
 			auto* spark = GetFreeParticle();
 
@@ -207,7 +207,7 @@ namespace TEN::Entities::TR4
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
-			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex +  (flags >= 4 ? flags - 1 : flags);
+			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + ((flags >= 4) ? flags - 1 : flags);
 		}
 	}
 
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
 						if (AI.distance <= DEMIGOD_IDLE_RANGE ||
-							AI.distance >= DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
+							AI.distance >= DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE)
 						{
 							item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 							break;
@@ -613,14 +613,15 @@ namespace TEN::Entities::TR4
 
 			case DEMIGOD3_STATE_RADIAL_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
-				if (!Targetable(item, &AI) && AI.distance < DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
+
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_PROJECTILE_ATTACK;
 
 				break;
 
 			case DEMIGOD2_STATE_RADIAL_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
-				if (!Targetable(item, &AI) && AI.distance < DEMIGOD2_MAX_RADIAL_PROJECTILE_ATTACK_RANGE)
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
 
 				break;
@@ -630,7 +631,7 @@ namespace TEN::Entities::TR4
 
 				DoDemigodEffects(itemNumber);
 
-				if (!Targetable(item, &AI) || AI.distance < DEMIGOD3_MAX_RADIAL_PROJECTILE_ATTACK_RANGE || !GetRandomControl())
+				if (!Targetable(item, &AI) || AI.distance < DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE || !GetRandomControl())
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
