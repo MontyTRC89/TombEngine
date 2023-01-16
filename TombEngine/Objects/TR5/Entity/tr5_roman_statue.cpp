@@ -27,6 +27,8 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR5
 {
 	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
+	constexpr auto ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER = 4;
+	constexpr auto ROMANSTATUE_EXPLOSIVE_DAMAGE_MULTIPLIER = 2;
 
 	struct RomanStatueInfo
 	{
@@ -879,6 +881,14 @@ namespace TEN::Entities::Creatures::TR5
 			player.Control.Weapon.GunType == LaraWeaponType::Revolver))
 		{
 			DoItemHit(&target, damage, isExplosive);
-		}		
+		}
+		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+		{
+			DoItemHit(&target, damage / ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
+		}
+		else
+		{
+			DoItemHit(&target, damage * ROMANSTATUE_EXPLOSIVE_DAMAGE_MULTIPLIER, isExplosive);
+		}
 	}
 }
