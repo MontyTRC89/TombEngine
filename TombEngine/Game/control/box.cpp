@@ -1436,9 +1436,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position.x = foundObject->pos.Position.x;
-			aiItem->Pose.Position.y = foundObject->pos.Position.y;
-			aiItem->Pose.Position.z = foundObject->pos.Position.z;
+			aiItem->Pose.Position = foundObject->pos.Position;
 			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
