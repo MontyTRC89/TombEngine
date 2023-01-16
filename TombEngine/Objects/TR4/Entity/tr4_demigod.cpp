@@ -29,7 +29,6 @@ namespace TEN::Entities::TR4
 	constexpr auto DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
 
-
 	enum DemigodState
 	{
 		DEMIGOD_STATE_IDLE = 0,
