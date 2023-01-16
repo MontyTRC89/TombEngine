@@ -338,6 +338,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
+	m_preSave = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
@@ -721,6 +722,12 @@ void LogicHandler::OnControlPhase(float dt)
 		tryCall(name);
 }
 
+void LogicHandler::PreSave()
+{
+	if (m_preSave.valid())
+		doCallback(m_preSave);
+}
+
 void LogicHandler::OnSave()
 {
 	if(m_onSave.valid())
@@ -829,10 +836,11 @@ __The order of loading is as follows:__
 5. The control loop, in which `OnControlPhase` will be called once per frame, begins.
 
 @tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
-@tfield function OnLoad Will be called when a saved game is loaded
+@tfield function OnLoad Will be called whenoa saved game is loaded, just *after* data is loaded
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
-@tfield function OnSave Will be called when the player saves the game
+@tfield function PreSave Will be called when the player saves the game, just *before* data is saved
+@tfield function OnSave Will be called when the player saves the game, just *after* data is saved
 @tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
 @table LevelFuncs
 */
@@ -863,9 +871,10 @@ void LogicHandler::InitCallbacks()
 		}
 	};
 
-	assignCB(m_onStart, "OnStart");
-	assignCB(m_onLoad, "OnLoad");
-	assignCB(m_onControlPhase, "OnControlPhase");
-	assignCB(m_onSave, "OnSave");
-	assignCB(m_onEnd, "OnEnd");
+	assignCB(m_onStart, ScriptReserved_OnStart);
+	assignCB(m_onLoad, ScriptReserved_OnLoad);
+	assignCB(m_onControlPhase, ScriptReserved_OnControlPhase);
+	assignCB(m_preSave, ScriptReserved_PreSave);
+	assignCB(m_onSave, ScriptReserved_OnSave);
+	assignCB(m_onEnd, ScriptReserved_OnEnd);
 }

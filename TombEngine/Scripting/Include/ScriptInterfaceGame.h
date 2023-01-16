@@ -63,6 +63,7 @@ public:
 	virtual void OnStart() = 0;
 	virtual void OnLoad() = 0;
 	virtual void OnControlPhase(float dt) = 0;
+	virtual void PreSave() = 0;
 	virtual void OnSave() = 0;
 	virtual void OnEnd() = 0;
 	virtual void ShortenTENCalls() = 0;

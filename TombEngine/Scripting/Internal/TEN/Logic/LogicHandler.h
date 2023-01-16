@@ -51,6 +51,7 @@ private:
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
 	sol::protected_function										m_onControlPhase{};
+	sol::protected_function										m_preSave{};
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
@@ -99,6 +100,7 @@ public:
 	void								OnStart() override;
 	void								OnLoad() override;
 	void								OnControlPhase(float dt) override;
+	void 								PreSave() override;
 	void								OnSave() override;
 	void								OnEnd() override;
 };
