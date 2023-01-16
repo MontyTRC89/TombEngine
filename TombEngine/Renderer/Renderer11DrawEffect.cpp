@@ -162,6 +162,7 @@ namespace TEN::Renderer
 		short angle = laser.Orientation2D;
 		auto currentPos = origin;
 
+		// TODO: Helix gets flattened at certain angles. Use axis-angle representation to fix.
 		if (laser.NumSegments > 0)
 		{
 			for (int i = laser.NumSegments; i > 0; i--)

@@ -235,6 +235,8 @@ namespace TEN::Effects::Lightning
 		}
 		else
 		{
+			// TODO: Amplitude calculation is wrong? Check.
+
 			int numSegments = (arc.segments * 3) - 1;
 
 			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
