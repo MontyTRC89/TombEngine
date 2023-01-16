@@ -39,6 +39,48 @@ namespace TEN::Math::Solvers
 		return solution; // Two solutions.
 	}
 
+	// Revised version to try.
+	IK2DSolution SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
+	{
+		static constexpr auto epsilon = 0.00001f;
+
+		auto scaledTarget = target;
+		auto maxLength = length0 + length1;
+		auto direction = target - origin;
+		direction.Normalize();
+
+		// Check if the target is within reach.
+		float distance = Vector2::Distance(origin, target);
+		if (distance > maxLength)
+			scaledTarget = origin + (direction * maxLength);
+
+		// Ensure line slope is well defined.
+		bool flipXY = (scaledTarget.x < scaledTarget.y);
+
+		float a = flipXY ? (scaledTarget.y - origin.y) : (scaledTarget.x - origin.x);
+		float b = flipXY ? (scaledTarget.x - origin.x) : (scaledTarget.y - origin.y);
+		assert(abs(a) >= epsilon);
+
+		float m = ((SQUARE(length0) - SQUARE(length1)) + (SQUARE(a) + SQUARE(b))) / (2.0f * a);
+		float n = b / a;
+		auto quadratic = SolveQuadratic(1.0f + SQUARE(n), -2.0f * (m * n), SQUARE(m) - SQUARE(length0));
+
+		auto middle = Vector2::Zero;
+
+		// Solution is valid; return points.
+		if (quadratic != INVALID_QUADRATIC_SOLUTION)
+		{
+			middle = origin + (flipXY ?
+				Vector2(quadratic.second, (m - (n * quadratic.second))) :
+				Vector2(quadratic.first, (m - (n * quadratic.first))));
+			return IK2DSolution{ origin, middle, scaledTarget };
+		}
+
+		// Solution is invalid: return points in straight line.
+		middle = origin + (direction * (maxLength / 2));
+		return IK2DSolution{ origin, middle, scaledTarget };
+	}
+
 	bool SolveIK2D(const Vector2& target, float length0, float length1, Vector2& middle)
 	{
 		float length = target.Length();
