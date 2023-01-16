@@ -20,7 +20,6 @@ using namespace TEN::Effects::Spark;
 // ItemFlags[1]:	   Has reached a new sector and can unblock the one behind it. Unused but reserved just in case.
 // ItemFlags[2]:	   Movement velocity.
 // ItemFlags[3, 4, 5]: Counters for dynamic lights and sparks.
-// ItemFlags[6]:	   Target heading angle.
 
 // OCB:
 // 0:			  Stop after killing the player.
@@ -28,9 +27,8 @@ using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Traps
 {
-	constexpr auto ELECTRIC_CLEANER_VELOCITY	   = BLOCK(1 / 16.0f);
-	constexpr auto ELECTRIC_CLEANER_TURN_TOLERANCE = 5.0f;
-	constexpr auto ELECTRIC_CLEANER_TURN_RATE_MAX  = ANGLE(8.5f);
+	constexpr auto ELECTRIC_CLEANER_VELOCITY  = BLOCK(1 / 16.0f);
+	constexpr auto ELECTRIC_CLEANER_TURN_RATE = 1024;
 
 	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
@@ -43,7 +41,7 @@ namespace TEN::Entities::Traps
 		item.Pose.Position.z = (item.Pose.Position.z & ~WALL_MASK) | (int)BLOCK(0.5f);
 
 		// Init flags.
-		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 		item.ItemFlags[1] = 0;
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
 		item.Collidable = 1;
@@ -51,8 +49,6 @@ namespace TEN::Entities::Traps
 
 	void ElectricCleanerControl(short itemNumber)
 	{
-		static constexpr auto quadrantMask = 16383;
-
 		auto& item = g_Level.Items[itemNumber];
 
 		if (!TriggerActive(&item))
@@ -69,24 +65,10 @@ namespace TEN::Entities::Traps
 		if (!item.ItemFlags[2])
 			return;
 
-		short rawAngle = item.Pose.Orientation.y & quadrantMask;
-
 		// Not facing a quadrant; keep turning.
-		if (rawAngle != ANGLE(0.0f))
+		if (item.Pose.Orientation.y & 0x3FFF)
 		{
-			float coeff = std::max(0.25f, float((quadrantMask / 2) - abs(rawAngle - (quadrantMask / 2))) / float(quadrantMask / 2));
-
-			float targetAngleDeg = TO_DEGREES(item.ItemFlags[6]);
-			float turnAngleDeg = TO_DEGREES(item.ItemFlags[0]) * coeff;
-			float newAngle = TO_DEGREES(item.Pose.Orientation.y) + turnAngleDeg;
-
-			if ((item.ItemFlags[0] > 0 && abs(abs(newAngle) - abs(targetAngleDeg)) < ELECTRIC_CLEANER_TURN_TOLERANCE) ||
-				(item.ItemFlags[0] < 0 && abs(abs(targetAngleDeg) - abs(newAngle)) < ELECTRIC_CLEANER_TURN_TOLERANCE))
-			{
-				newAngle = targetAngleDeg;
-			}
-
-			item.Pose.Orientation.y = ANGLE(newAngle);
+			item.Pose.Orientation.y += item.ItemFlags[0];
 		}
 		else
 		{
@@ -131,27 +113,23 @@ namespace TEN::Entities::Traps
 
 					if (!ahead && !left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90);
-						item.Pose.Orientation.y++;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (!ahead && !left && item.ItemFlags[0] < 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
 					}
 					// Prioritize left.
 					else if (left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90);
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 						item.ItemFlags[1] = 1;
 						item.Pose.Position.z += item.ItemFlags[2];
 						x = item.Pose.Position.x;
@@ -177,27 +155,23 @@ namespace TEN::Entities::Traps
 
 					if (!ahead && !left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.Pose.Orientation.y++;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (!ahead && !left && item.ItemFlags[0] < 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
 					}
 					// Prioritize left.
 					else if (left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 						item.ItemFlags[1] = 1;
 						item.Pose.Position.x += item.ItemFlags[2];
 						x = item.Pose.Position.x + BLOCK(1);
@@ -223,26 +197,22 @@ namespace TEN::Entities::Traps
 
 					if (!ahead && !left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.Pose.Orientation.y++;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (!ahead && !left && item.ItemFlags[0] < 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 						item.ItemFlags[1] = 1;
 						item.Pose.Position.x -= item.ItemFlags[2];
 						x = item.Pose.Position.x - BLOCK(1);
@@ -268,26 +238,22 @@ namespace TEN::Entities::Traps
 
 					if (!ahead && !left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.Pose.Orientation.y++;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (!ahead && !left && item.ItemFlags[0] < 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else if (left && item.ItemFlags[0] > 0)
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y - ANGLE(90.0f);
-						item.Pose.Orientation.y--;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
+						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
 					}
 					else
 					{
-						item.ItemFlags[6] = item.Pose.Orientation.y + ANGLE(90.0f);
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE_MAX;
+						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 						item.ItemFlags[1] = 1;
 						item.Pose.Position.z -= item.ItemFlags[2];
 						x = item.Pose.Position.x;
@@ -306,7 +272,7 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				// No new target; keep updating position.
+				// No new target, keep updating position.
 				switch (item.Pose.Orientation.y)
 				{
 				case ANGLE(0.0f):
