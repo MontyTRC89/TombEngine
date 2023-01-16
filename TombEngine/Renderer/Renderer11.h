@@ -580,9 +580,6 @@ namespace TEN::Renderer
 		void ResetDebugVariables();
 		float CalculateFrameRate();
 
-		bool CheckPortal2(short parentRoomNumber, ROOM_DOOR* portal, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
-		void GetVisibleRooms2(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
-
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,

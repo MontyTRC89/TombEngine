@@ -42,7 +42,6 @@ namespace TEN::Renderer
 			}
 		}
 
-		//GetVisibleRooms2(NO_ROOM, renderView.camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 		GetVisibleRooms(NO_ROOM, renderView.camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 
 		m_invalidateCache = false;
@@ -170,8 +169,9 @@ namespace TEN::Renderer
 	{
 		// FIXME: This is an urgent hack to fix stack overflow crashes.
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
+		// NOTE by MontyTRC: I'd keep this as a failsafe solution for 0.00000001% of cases we could have problems
 
-		static constexpr int MAX_SEARCH_DEPTH = 64;
+		static constexpr int MAX_SEARCH_DEPTH = 128;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
 			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
@@ -230,9 +230,12 @@ namespace TEN::Renderer
 				door->CameraToDoor.Normalize();
 			}
 
+			// IMPORTANT: dot = 0 would generate ambiguity becase door could be traversed in both directions, potentially 
+			// generating endless loops. We need to exclude this.
+
 			if (door->Normal.x * door->CameraToDoor.x +
 				door->Normal.y * door->CameraToDoor.y +
-				door->Normal.z * door->CameraToDoor.z < 0)
+				door->Normal.z * door->CameraToDoor.z <= 0)
 			{
 				continue;
 			}
@@ -764,146 +767,6 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
 			m_items[i].DoneAnimations = false;
-	}
-
-	bool Renderer11::CheckPortal2(short parentRoomNumber, ROOM_DOOR* portal, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
-	{
-		RendererRoom* room = &m_rooms[parentRoomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[parentRoomNumber];
-
-		Vector3 n = portal->normal;
-		Vector3i v = Vector3i(
-			Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
-			Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
-			Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));
-
-		if (n.x * v.x + n.y * v.y + n.z * v.z < 0)
-			return false;
-
-		int  zClip = 0;
-		Vector4 p[4];
-
-		*clipPort = Vector4(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
-
-		for (int i = 0; i < 4; i++)
-		{
-			Vector4 corner = Vector4(
-				(nativeRoom->x + portal->vertices[i].x),
-				(nativeRoom->y + portal->vertices[i].y),
-				(nativeRoom->z + portal->vertices[i].z),
-				1.0f);
-
-			p[i] = Vector4::Transform(corner, renderView.camera.ViewProjection);
-
-			if (p[i].w > 0.0f)
-			{
-				p[i].x *= (1.0f / p[i].w);
-				p[i].y *= (1.0f / p[i].w);
-
-				clipPort->x = std::min(clipPort->x, p[i].x);
-				clipPort->y = std::min(clipPort->y, p[i].y);
-				clipPort->z = std::max(clipPort->z, p[i].x);
-				clipPort->w = std::max(clipPort->w, p[i].y);
-			}
-			else
-				zClip++;
-		}
-
-		if (zClip == 4)
-			return false;
-
-		if (zClip > 0) {
-			for (int i = 0; i < 4; i++) {
-				Vector4 a = p[i];
-				Vector4 b = p[(i + 1) % 4];
-
-				if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
-
-					if (a.x < 0.0f && b.x < 0.0f)
-						clipPort->x = -1.0f;
-					else
-						if (a.x > 0.0f && b.x > 0.0f)
-							clipPort->z = 1.0f;
-						else {
-							clipPort->x = -1.0f;
-							clipPort->z = 1.0f;
-						}
-
-					if (a.y < 0.0f && b.y < 0.0f)
-						clipPort->y = -1.0f;
-					else
-						if (a.y > 0.0f && b.y > 0.0f)
-							clipPort->w = 1.0f;
-						else {
-							clipPort->y = -1.0f;
-							clipPort->w = 1.0f;
-						}
-
-				}
-			}
-		}
-
-		if (clipPort->x > viewPort.z || clipPort->y > viewPort.w || clipPort->z < viewPort.x || clipPort->w < viewPort.y)
-			return false;
-
-		clipPort->x = std::max(clipPort->x, viewPort.x);
-		clipPort->y = std::max(clipPort->y, viewPort.y);
-		clipPort->z = std::min(clipPort->z, viewPort.z);
-		clipPort->w = std::min(clipPort->w, viewPort.w);
-
-		return true;
-	}
-
-	void Renderer11::GetVisibleRooms2(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView)
-	{
-		if (count > 32)
-		{
-			return;
-		}
-
-		RendererRoom* room = &m_rooms[to];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[to];
-
-		auto cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-		float xRad = nativeRoom->xSize * SECTOR(1) / 2.0f;
-		float yRad = (nativeRoom->minfloor - nativeRoom->maxceiling) / 2.0f;
-		float zRad = nativeRoom->zSize * SECTOR(1) / 2.0f;
-
-		auto roomCentre = Vector3(nativeRoom->x + xRad, nativeRoom->minfloor - yRad, nativeRoom->z + zRad);
-
-		float roomRad = std::max(std::max(xRad, yRad), zRad);
-		float distance = std::max((roomCentre - cameraPosition).Length() - (roomRad * 1.5f), 0.0f);
-
-		if (!m_rooms[to].Visited)
-		{
-			renderView.roomsToDraw.push_back(room);
-
-			CollectLightsForRoom(to, renderView);
-
-			if (!onlyRooms)
-			{
-				CollectItems(to, renderView);
-				CollectStatics(to, renderView);
-				CollectEffects(to);
-			}
-		}
-
-		room->Distance = distance;
-		room->Visited = true;
-		room->ViewPort.x = std::min(room->ViewPort.x, viewPort.x);
-		room->ViewPort.y = std::min(room->ViewPort.y, viewPort.y);
-		room->ViewPort.z = std::max(room->ViewPort.z, viewPort.z);
-		room->ViewPort.w = std::max(room->ViewPort.w, viewPort.w);
-
-		Vector4 clipPort;
-		for (int i = 0; i < nativeRoom->doors.size(); i++)
-		{
-			ROOM_DOOR* p = &nativeRoom->doors[i];
-
-			if (from != p->room && CheckPortal2(to, p, viewPort, &clipPort, renderView))
-				GetVisibleRooms2(to, p->room, clipPort, water, count + 1, onlyRooms, renderView);
-		}
 	}
 
 } // namespace TEN::Renderer
