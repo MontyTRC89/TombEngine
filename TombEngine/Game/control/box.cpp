@@ -1190,35 +1190,35 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	CreatureAnimation(itemNumber, angle, 0);
 
 	// FIXME: Add vault down animations for Von Croy and baddies.
-	if (item->Floor > y + CLICK(4.5f))
+	if (item->Floor > (y + CLICK(4.5f)))
 	{
 		vault = 0;
 	}
-	else if (item->Floor > y + CLICK(3.5f))
+	else if (item->Floor > (y + CLICK(3.5f)))
 	{
 		vault = -4;
 	}
-	else if (item->Floor > y + CLICK(2.5f) && IsCreatureVaultAvailable(item, -3))
+	else if (item->Floor > (y + CLICK(2.5f)) && IsCreatureVaultAvailable(item, -3))
 	{
 		vault = -3;
 	}
-	else if (item->Floor > y + CLICK(1.5f) && IsCreatureVaultAvailable(item, -2))
+	else if (item->Floor > (y + CLICK(1.5f)) && IsCreatureVaultAvailable(item, -2))
 	{
 		vault = -2;
 	}
-	else if (item->Pose.Position.y > y - CLICK(1.5f))
+	else if (item->Pose.Position.y > (y - CLICK(1.5f)))
 	{
 		return 0;
 	}
-	else if (item->Pose.Position.y > y - CLICK(2.5f))
+	else if (item->Pose.Position.y > (y - CLICK(2.5f)))
 	{
 		vault = 2;
 	}
-	else if (item->Pose.Position.y > y - CLICK(3.5f))
+	else if (item->Pose.Position.y > (y - CLICK(3.5f)))
 	{
 		vault = 3;
 	}
-	else if (item->Pose.Position.y > y - CLICK(4.5f))
+	else if (item->Pose.Position.y > (y - CLICK(4.5f)))
 	{
 		vault = 4;
 	}
