@@ -1403,8 +1403,8 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
-			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item.RoomNumber);		
+		for (int j = 0; j < 2; j++)
+			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item.RoomNumber);
 	}
 
 	AlertNearbyGuards(&item);
