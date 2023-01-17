@@ -251,11 +251,11 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	bool isRightFloorSteppable = !(rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
 
 	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPosVisual) <= heightTolerance && !isLeftFloorSteppable)
+	if (abs(lFloorHeight - vPosVisual) <= heightTolerance && isLeftFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
 
 	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPosVisual) <= heightTolerance && !isRightFloorSteppable)
+	if (abs(rFloorHeight - vPosVisual) <= heightTolerance && isRightFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
 
 	// Determine vertical offset.
@@ -1000,6 +1000,21 @@ void ResetLaraFlex(ItemInfo* item, float rate)
 		lara->ExtraTorsoRot.z += lara->ExtraTorsoRot.z / -rate;
 	else
 		lara->ExtraTorsoRot.z = 0;
+}
+
+void ResetPlayerLegIK(ItemInfo& item, float alpha)
+{
+	auto& player = *GetLaraInfo(&item);
+
+	player.VerticalOffset = Lerp(player.VerticalOffset, 0, alpha);
+
+	player.ExtraJointRot.LeftLeg.Base.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.LeftLeg.Middle.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.LeftLeg.End.Lerp(EulerAngles::Zero, alpha);
+
+	player.ExtraJointRot.RightLeg.Base.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.RightLeg.Middle.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.RightLeg.End.Lerp(EulerAngles::Zero, alpha);
 }
 
 void RumbleLaraHealthCondition(ItemInfo* item)

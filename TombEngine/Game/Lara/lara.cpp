@@ -754,21 +754,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
-void ResetLegIK(ItemInfo* item, CollisionInfo* coll)
-{
-	static constexpr auto alpha = 0.3f;
-
-	/*Lara.VerticalOffset -= Lara.VerticalOffset / alpha;
-
-	Lara.ExtraJointRot.LeftLeg.Base -= Lara.ExtraJointRot.LeftLeg.Base / alpha;
-	Lara.ExtraJointRot.LeftLeg.Middle -= Lara.ExtraJointRot.LeftLeg.Middle / alpha;
-	Lara.ExtraJointRot.LeftLeg.End -= Lara.ExtraJointRot.LeftLeg.End / alpha;
-
-	Lara.ExtraJointRot.RightLeg.Base -= Lara.ExtraJointRot.RightLeg.Base / alpha;
-	Lara.ExtraJointRot.RightLeg.Middle -= Lara.ExtraJointRot.RightLeg.Middle / alpha;
-	Lara.ExtraJointRot.RightLeg.End -= Lara.ExtraJointRot.RightLeg.End / alpha;*/
-}
-
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -802,18 +787,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	if (item->Animation.ActiveState != LS_IDLE &&
-		item->Animation.ActiveState != LS_TURN_RIGHT_SLOW &&
-		item->Animation.ActiveState != LS_TURN_LEFT_SLOW &&
-		item->Animation.ActiveState != LS_TURN_LEFT_FAST &&
-		item->Animation.ActiveState != LS_TURN_RIGHT_FAST &&
-		item->Animation.ActiveState != LS_WALK_FORWARD &&
-		item->Animation.ActiveState != LS_WALK_BACK &&
-		item->Animation.ActiveState != LS_STEP_LEFT &&
-		item->Animation.ActiveState != LS_STEP_RIGHT)
-	{
-		ResetLegIK(item, coll);
-	}
+	if (!TestState(item->Animation.ActiveState, PlayerLegIKStates))
+		ResetPlayerLegIK(*item);
+
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT;
 	lara->Control.CanLook = true;

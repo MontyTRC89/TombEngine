@@ -531,6 +531,6 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset
 
 Quaternion GetJointOrientation(const ItemInfo& item, int jointIndex)
 {
-	// Interpret matrices done in renderer as Euler angles.
+	// Interpret matrices done in renderer as Quaternion.
 	return g_Renderer.GetItemBoneOrientation(item.Index, jointIndex);
 }

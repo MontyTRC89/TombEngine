@@ -84,6 +84,21 @@ constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
 constexpr auto SWIM_DEPTH		   = CLICK(3) - 38;
 constexpr auto SLOPE_DIFFERENCE	   = 60;
 
+const auto PlayerLegIKStates = std::vector<int>
+{
+	LS_IDLE,
+	LS_TURN_RIGHT_SLOW,
+	LS_TURN_LEFT_SLOW,
+	LS_TURN_LEFT_FAST,
+	LS_TURN_RIGHT_FAST,
+	LS_WALK_FORWARD,
+	LS_WALK_BACK,
+	LS_STEP_LEFT,
+	LS_STEP_RIGHT,
+	//LS_STEP_UP,
+	//LS_STEP_DOWN
+};
+
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
