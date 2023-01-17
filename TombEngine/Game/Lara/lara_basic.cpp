@@ -398,29 +398,32 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 	auto middle = GetJointPosition(item, j1).ToVector3() - origin;
 	auto end = absEnd - origin;
 
-	// Get bone lengths.
+	// Get joint lengths.
 	float length0 = (middle - base).Length();
 	float length1 = (end - middle).Length();
 
-	// Clamp the foot position to the floor height at its position.
-	int floorHeight = GetCollision(absEnd.x, absEnd.y, absEnd.z, item->RoomNumber).Position.Floor - origin.y;
+	// Clamp foot position to floor height at its position.
+	int floorHeight = (GetCollision(absEnd.x, absEnd.y, absEnd.z, item->RoomNumber).Position.Floor - heelHeight) - origin.y;
 	if (end.y > floorHeight)
 		end.y = floorHeight;
 
-	// Calculate the position of the pole vector.
-	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y, BLOCK(0.5f));
+	// Calculate pole position.
+	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y, std::max(length0, length1) * 1.5f);
 
-	// Solve the 3D IK problem.
-	auto ikSol = Solvers::SolveIK3D(base, end, pole, length0, length1);
+	// Get 3D IK solution.
+	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
 
+	// ------------Debug
 	auto offset = Geometry::TranslatePoint(Vector3::Zero, item->Pose.Orientation.y, 0);
 	auto offset2 = origin + offset;
 	g_Renderer.AddDebugSphere(pole + offset2, 50, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSol.Base + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSol.Middle + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSol.End + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddLine3D(ikSol.Base + offset2, ikSol.Middle + offset2, Vector4::One);
-	g_Renderer.AddLine3D(ikSol.Middle + offset2, ikSol.End + offset2, Vector4::One);
+	g_Renderer.AddDebugSphere(ikSolution3D.Base + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(ikSolution3D.Middle + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(ikSolution3D.End + offset2, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddLine3D(ikSolution3D.Base + offset2, ikSolution3D.Middle + offset2, Vector4::One);
+	g_Renderer.AddLine3D(ikSolution3D.Middle + offset2, ikSolution3D.End + offset2, Vector4::One);
+
+	// ------------
 
 	auto currentBaseOrient = GetJointOrientation(*item, j0);
 	auto currentMiddleOrient = GetJointOrientation(*item, j1);
@@ -440,7 +443,7 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 
 void DoLegIK(ItemInfo* item, CollisionInfo* coll, int threshold)
 {
-	static constexpr auto heelHeight = 78.0f;
+	static constexpr auto heelHeight = 56.0f;
 
 	auto& player = *GetLaraInfo(item);
 

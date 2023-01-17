@@ -39,8 +39,7 @@ namespace TEN::Math::Solvers
 		return solution; // Two solutions.
 	}
 
-	// Revised version to try.
-	IK2DSolution SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
+	IKSolution2D SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
 	{
 		auto scaledTarget = target;
 		auto maxLength = length0 + length1;
@@ -78,40 +77,51 @@ namespace TEN::Math::Solvers
 			middle = origin + (direction * (maxLength / 2));
 		}
 
-		return IK2DSolution{ origin, middle, scaledTarget };
+		return IKSolution2D{ origin, middle, scaledTarget };
 	}
 
-	IK3DSolution SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1)
+	IKSolution3D SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1)
 	{
 		auto direction = (target - origin);
 		direction.Normalize();
 		auto normal = direction.Cross(pole - origin);
 		normal.Normalize();
 
-		Matrix matrix;
-		matrix(0, 0) = normal.Cross(direction).x;
-		matrix(0, 1) = normal.Cross(direction).y;
-		matrix(0, 2) = normal.Cross(direction).z;
-		matrix(0, 3) = 0.0f;
-		matrix(1, 0) = direction.x;
-		matrix(1, 1) = direction.y;
-		matrix(1, 2) = direction.z;
-		matrix(1, 3) = 0.0f;
-		matrix(2, 0) = normal.x;
-		matrix(2, 1) = normal.y;
-		matrix(2, 2) = normal.z;
-		matrix(2, 3) = 0.0f;
-		matrix(3, 0) = origin.x;
-		matrix(3, 1) = origin.y;
-		matrix(3, 2) = origin.z;
-		matrix(3, 3) = 1.0f;
+		// Construct transform matrix.
+		Matrix tMatrix;
+		tMatrix(0, 0) = normal.Cross(direction).x;
+		tMatrix(0, 1) = normal.Cross(direction).y;
+		tMatrix(0, 2) = normal.Cross(direction).z;
+		tMatrix(0, 3) = 0.0f;
 
-		auto inverseMatrix = matrix.Invert();
-		auto endInLocalSpace = Vector3::Transform(target, inverseMatrix);
-		auto solution2D = SolveIK2D(Vector2::Zero, Vector2(endInLocalSpace), length0, length1);
-		auto middleInLocalSpace = Vector3(solution2D.Middle.x, solution2D.Middle.y, 0.0f);
-		auto middle = Vector3::Transform(middleInLocalSpace, matrix);
+		tMatrix(1, 0) = direction.x;
+		tMatrix(1, 1) = direction.y;
+		tMatrix(1, 2) = direction.z;
+		tMatrix(1, 3) = 0.0f;
 
-		return IK3DSolution{ origin, middle, target };
+		tMatrix(2, 0) = normal.x;
+		tMatrix(2, 1) = normal.y;
+		tMatrix(2, 2) = normal.z;
+		tMatrix(2, 3) = 0.0f;
+
+		tMatrix(3, 0) = origin.x;
+		tMatrix(3, 1) = origin.y;
+		tMatrix(3, 2) = origin.z;
+		tMatrix(3, 3) = 1.0f;
+
+		// Get relative 2D IK solution.
+		auto inverseMatrix = tMatrix.Invert();
+		auto relTarget = Vector3::Transform(target, inverseMatrix);
+		auto ikSolution2D = SolveIK2D(Vector2::Zero, Vector2(relTarget), length0, length1);
+
+		// Calculate absolute middle position.
+		auto relMiddle = Vector3(ikSolution2D.Middle.x, ikSolution2D.Middle.y, 0.0f);
+		auto middle = Vector3::Transform(relMiddle, tMatrix);
+
+		// Calculate absolute end position.
+		auto localEnd = Vector3(ikSolution2D.End.x, ikSolution2D.End.y, 0.0f);
+		auto end = Vector3::Transform(localEnd, tMatrix);
+
+		return IKSolution3D{ origin, middle, end };
 	}
 }
