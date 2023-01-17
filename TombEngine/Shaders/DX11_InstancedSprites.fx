@@ -40,7 +40,9 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 
 	output.Color = Sprites[InstanceID].Color;
 
-	if (input.PolyIndex == 0)
+	output.UV = float2(Sprites[InstanceID].UV[0][input.PolyIndex], Sprites[InstanceID].UV[1][input.PolyIndex]);
+
+	/*if (input.PolyIndex == 0)
 	{
 		output.UV = float2(Sprites[InstanceID].UV[0].x, Sprites[InstanceID].UV[1].x);
 	}
@@ -55,7 +57,7 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	else if (input.PolyIndex == 3)
 	{
 		output.UV = float2(Sprites[InstanceID].UV[0].w, Sprites[InstanceID].UV[1].w);
-	}
+	}*/
 	
 	float4 d = length(CamPositionWS - worldPosition);
 	if (FogMaxDistance == 0)

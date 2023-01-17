@@ -19,7 +19,7 @@ namespace TEN::Renderer
 		quadVertices[0].UV = Vector2(0, 1);
 		quadVertices[0].Color = Vector4(1, 1, 1, 1);
 		quadVertices[0].IndexInPoly = 3;
-		//Top Left
+		//Top Left 
 		quadVertices[1].Position = Vector3(-0.5, 0.5, 0);
 		quadVertices[1].Normal = Vector3(-1, 1, 1);
 		quadVertices[1].Normal.Normalize();

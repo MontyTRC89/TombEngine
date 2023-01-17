@@ -1,4 +1,4 @@
-#define MAX_SPRITES 256
+#define MAX_SPRITES 512
 
 struct InstancedSprite
 {
