@@ -180,7 +180,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	}
 }
 
-void SolveLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
+void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
 {
 	// Get joint positions.
 	auto base = GetJointPosition(&item, joint0).ToVector3();
@@ -229,37 +229,57 @@ void SolveLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint
 	limbRot.End = extraRot;
 }
 
-void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float threshold)
+// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
+void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
 {
 	static constexpr auto heelHeight = 56.0f;
 
 	auto& player = *GetLaraInfo(&item);
 
+	// Get point collision at foot positions.
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
+	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
+	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
-	int vPos = item.Pose.Position.y;
-	int lFloorHeight = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber).Position.Floor;
-	int rFloorHeight = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber).Position.Floor;
+	int vPos = item.Pose.Position.y + player.VerticalOffset; // NOTE: Vertical offset considered.
+	float lFloorHeight = lPointColl.Position.Floor;
+	float rFloorHeight = rPointColl.Position.Floor;
+	bool isLeftFloorDeath = lPointColl.BottomBlock->Flags.Death;
+	bool isRightFloorDeath = rPointColl.BottomBlock->Flags.Death;
 
 	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPos) <= threshold)
-		SolveLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
+	if (abs(lFloorHeight - vPos) <= heightTolerance && !isLeftFloorDeath)
+		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
 
 	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPos) <= threshold)
-		SolveLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
+	if (abs(rFloorHeight - vPos) <= heightTolerance && !isRightFloorDeath)
+		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
 
 	// Determine vertical offset.
-	float vOffset = ((lFloorHeight > rFloorHeight) ? lFloorHeight : rFloorHeight) - vPos;
-	if (abs(vOffset <= threshold))
+	float vOffset = 0.0f;
+	if (!isRightFloorDeath && isLeftFloorDeath)
 	{
-		vOffset = std::clamp(vOffset, -threshold, threshold);
+		vOffset = rFloorHeight - item.Pose.Position.y;
+	}
+	else if (!isLeftFloorDeath && isRightFloorDeath)
+	{
+		vOffset = lFloorHeight - item.Pose.Position.y;
+	}
+	else
+	{
+		vOffset = std::max(lFloorHeight, rFloorHeight) - item.Pose.Position.y;
+	}
+
+	// Apply vertical offset.
+	if (abs(vOffset <= heightTolerance))
+	{
+		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
 		player.VerticalOffset = vOffset;
 	}
 }
 
-void DoPlayerArmIK(ItemInfo& item, CollisionInfo* coll, float threshold)
+void DoPlayerArmIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
 {
 	static constexpr auto wristHeight = 48.0f;
 
