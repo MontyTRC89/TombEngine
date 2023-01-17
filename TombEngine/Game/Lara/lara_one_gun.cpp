@@ -36,7 +36,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 constexpr auto TRIGGER_TIMEOUT		 = 5;
-constexpr auto GRENADE_FRAG_TIMEOUT	 = 16;
+constexpr auto GRENADE_FRAG_TIMEOUT  = 4;
 constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
 constexpr auto HARPOON_VELOCITY = CLICK(1);
@@ -1403,8 +1403,8 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
-		for (int j = 0; j < 2; j++)
-			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item.RoomNumber);
+			for (int j = 0; j < 2; j++)
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item.RoomNumber);		
 	}
 
 	AlertNearbyGuards(&item);
@@ -1421,7 +1421,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	bool hasHitNotByEmitter = false;
 	bool isExplosive = type >= ProjectileType::Explosive;
 	bool isShatterable = type != ProjectileType::Harpoon;
-
+	
 	if (type < ProjectileType::Grenade)
 	{
 		// For non-grenade projectiles, check for room collision.
