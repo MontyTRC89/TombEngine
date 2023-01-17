@@ -1075,9 +1075,7 @@ namespace TEN::Renderer
 						}
 						else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
 							(oldInfo->blendMode != face.info.blendMode
-								|| oldInfo->sprite->Type != face.info.sprite->Type
-								|| oldInfo->sprite->color != face.info.sprite->color
-								|| oldInfo->sprite->Sprite != face.info.sprite->Sprite
+								|| oldInfo->sprite->Sprite->Texture != face.info.sprite->Sprite->Texture
 								|| m_transparentFacesIndices.size() + 6 > MAX_TRANSPARENT_VERTICES))
 						{
 							outputPolygons = true;
@@ -1156,7 +1154,7 @@ namespace TEN::Renderer
 					Vector2 uv0;
 					Vector2 uv1;
 					Vector2 uv2;
-					Vector2 uv3;
+					Vector2 uv3;  
 
 					if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
 					{
@@ -1165,10 +1163,7 @@ namespace TEN::Renderer
 						p2t = spr->vtx3;
 						p3t = spr->vtx4;
 
-						uv0 = spr->Sprite->UV[0];
-						uv1 = spr->Sprite->UV[1];
-						uv2 = spr->Sprite->UV[2];
-						uv3 = spr->Sprite->UV[3];
+						
 					}
 					else
 					{
@@ -1176,12 +1171,12 @@ namespace TEN::Renderer
 						p1t = Vector3(0.5, 0.5, 0);
 						p2t = Vector3(0.5, -0.5, 0);
 						p3t = Vector3(-0.5, -0.5, 0);
-
-						uv0 = Vector2(0, 0);
-						uv1 = Vector2(1, 0);
-						uv2 = Vector2(1, 1);
-						uv3 = Vector2(0, 1);
 					}
+
+					uv0 = spr->Sprite->UV[0];
+					uv1 = spr->Sprite->UV[1];
+					uv2 = spr->Sprite->UV[2];
+					uv3 = spr->Sprite->UV[3];
 
 					RendererVertex v0;
 					v0.Position = Vector3::Transform(p0t, face.info.world);

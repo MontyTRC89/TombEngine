@@ -988,7 +988,6 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
-    <None Include="Shaders\InstancedSpriteBuffer.hlsli" />
     <None Include="Shaders\Blending.hlsli" />
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>

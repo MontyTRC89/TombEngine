@@ -959,6 +959,8 @@ namespace TEN::Renderer
 				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
 				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spr.SoftParticle ? 1 : 0;
+
+				// Strange packing due to particular HLSL 16 bytes alignment requirements
 				m_stInstancedSpriteBuffer.Sprites[i].UV[0].x = spr.Sprite->UV[0].x;
 				m_stInstancedSpriteBuffer.Sprites[i].UV[0].y = spr.Sprite->UV[1].x;
 				m_stInstancedSpriteBuffer.Sprites[i].UV[0].z = spr.Sprite->UV[2].x;
@@ -1007,8 +1009,6 @@ namespace TEN::Renderer
 			if (spriteBucket.SpritesToDraw.size() == 0 || spriteBucket.IsBillboard)
 				continue;
 
-			m_stSprite.Color = Vector4::One;
-			m_stSprite.IsBillboard = 0;
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
@@ -1088,9 +1088,6 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stSprite.BillboardMatrix = Matrix::Identity;
-		m_stSprite.Color = Vector4::One;
-		m_stSprite.IsBillboard = false;
 		m_stSprite.IsSoftParticle = info->IsSoftParticle ? 1 : 0;
 		m_cbSprite.updateData(m_stSprite, m_context.Get());
 		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
@@ -1277,11 +1274,10 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
-			// TODO: Switch back to alpha blend mode once rendering for it is refactored. -- Sezz 2023.01.14
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
 				smoke.position,
-				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BLENDMODE_ADDITIVE, true, view);
+				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 
