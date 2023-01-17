@@ -191,12 +191,12 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	float length0 = (middle - base).Length();
 	float length1 = (end - middle).Length();
 
-	// Clamp foot position to floor height at its position.
+	// Clamp foot position to floor height.
 	int floorHeight = GetCollision(end.x, end.y, end.z, item.RoomNumber).Position.Floor - heelHeight;
 	if (end.y > floorHeight)
 		end.y = floorHeight;
 
-	// Calculate pole position.
+	// Calculate pole position. // TODO: Calculate heading angle hased on joint orientations.
 	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item.Pose.Orientation.y, std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
@@ -230,7 +230,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 }
 
 // TODO: When the vertical offset is applied, gun flashes appear at higher positions.
-void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
+void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 {
 	static constexpr auto heelHeight = 56.0f;
 
@@ -245,24 +245,25 @@ void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
 	int vPos = item.Pose.Position.y + player.VerticalOffset; // NOTE: Vertical offset considered.
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
-	bool isLeftFloorDeath = lPointColl.BottomBlock->Flags.Death;
-	bool isRightFloorDeath = rPointColl.BottomBlock->Flags.Death;
+
+	bool isLeftFloorSteppable = (lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
+	bool isRightFloorSteppable = (rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
 
 	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPos) <= heightTolerance && !isLeftFloorDeath)
+	if (abs(lFloorHeight - vPos) <= heightTolerance && !isLeftFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
 
 	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPos) <= heightTolerance && !isRightFloorDeath)
+	if (abs(rFloorHeight - vPos) <= heightTolerance && !isRightFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
 
 	// Determine vertical offset.
 	float vOffset = 0.0f;
-	if (!isRightFloorDeath && isLeftFloorDeath)
+	if (!isRightFloorSteppable && isLeftFloorSteppable)
 	{
 		vOffset = rFloorHeight - item.Pose.Position.y;
 	}
-	else if (!isLeftFloorDeath && isRightFloorDeath)
+	else if (!isLeftFloorSteppable && isRightFloorSteppable)
 	{
 		vOffset = lFloorHeight - item.Pose.Position.y;
 	}
@@ -277,12 +278,6 @@ void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
 		player.VerticalOffset = vOffset;
 	}
-}
-
-void DoPlayerArmIK(ItemInfo& item, CollisionInfo* coll, float heightTolerance)
-{
-	static constexpr auto wristHeight = 48.0f;
-
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.

@@ -147,7 +147,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
@@ -410,7 +410,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
@@ -882,7 +882,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1130,7 +1130,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1467,7 +1467,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
@@ -1578,7 +1578,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1706,7 +1706,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1834,7 +1834,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
@@ -1930,7 +1930,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item, coll);
+	DoPlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
