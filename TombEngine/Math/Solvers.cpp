@@ -88,11 +88,11 @@ namespace TEN::Math::Solvers
 		normal.Normalize();
 
 		// Construct transform matrix.
-		auto tMatrix = Matrix(normal.Cross(direction), direction, normal);
-		tMatrix(3, 0) = origin.x;
-		tMatrix(3, 1) = origin.y;
-		tMatrix(3, 2) = origin.z;
-		tMatrix(3, 3) = 1.0f;
+		auto tMatrix = Matrix(
+			Vector4(normal.Cross(direction)),
+			Vector4(direction),
+			Vector4(normal),
+			Vector4(origin.x, origin.y, origin.z, 1.0f));
 
 		// Get relative 2D IK solution.
 		auto inverseMatrix = tMatrix.Invert();
