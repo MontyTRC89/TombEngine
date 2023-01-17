@@ -68,27 +68,9 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const Matrix& rotMatrix)
 	{
-		static constexpr auto singularityThreshold = 0.99999f;
-
-		float pitch = NAN;
-		float yaw = -atan2(rotMatrix._21, rotMatrix._11);
-		float roll = NAN;
-
-		// Check for gimbal lock.
-		if (abs(rotMatrix._31) > singularityThreshold)
-		{
-			// In gimbal lock, the pitch and roll angles become undefined.
-			// Set the pitch angle to 0 and adjust the roll angle accordingly.
-			pitch = 0.0f;
-			roll = atan2(rotMatrix._12, rotMatrix._22);
-		}
-		else
-		{
-			pitch = atan2(rotMatrix._32, rotMatrix._33);
-			roll = asin(rotMatrix._31);
-		}
-
-		*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
+		this->x = FROM_RAD(asin(-rotMatrix._32));
+		this->y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
+		this->z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
 	}
 
 	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)

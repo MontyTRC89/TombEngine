@@ -412,8 +412,7 @@ namespace TEN::Renderer
 
 	EulerAngles Renderer11::GetItemBoneOrientation(int itemNumber, int jointIndex)
 	{
-		auto& rItem = m_items[itemNumber];
-
+		const auto& rItem = m_items[itemNumber];
 		return EulerAngles(rItem.AnimationTransforms[0]);
 	}
 
