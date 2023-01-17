@@ -421,12 +421,12 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int joint0, int joint
 
 	// ------------
 
-	auto currentBaseOrient = GetJointOrientation(*item, joint0);
-	auto currentMiddleOrient = GetJointOrientation(*item, joint1);
+	auto joint0Orient = GetJointOrientation(*item, joint0);
+	auto joint1Orient = GetJointOrientation(*item, joint1);
 
-	// Calculate and store required bone rotations in limb rotation data.
-	//limbRot.Base = ikSol.OrientA;
-	//limbRot.Middle = ikSol.OrientB;
+	// Calculate and store required joint rotations in limb rotation data.
+	//limbRot.Base = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);// -EulerAngles(joint0Orient);
+	//limbRot.Middle = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);// -EulerAngles(joint1Orient);
 
 	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);

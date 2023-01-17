@@ -410,10 +410,14 @@ namespace TEN::Renderer
 		pos = Vector3::Transform(pos, world);
 	}
 
-	EulerAngles Renderer11::GetItemBoneOrientation(int itemNumber, int jointIndex)
+	Quaternion Renderer11::GetItemBoneOrientation(int itemNumber, int jointIndex)
 	{
 		const auto& rItem = m_items[itemNumber];
-		return EulerAngles(rItem.AnimationTransforms[0]);
+
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
+
+		return Quaternion::CreateFromRotationMatrix(rItem.AnimationTransforms[jointIndex]);
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
