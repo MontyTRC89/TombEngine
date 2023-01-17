@@ -17,15 +17,10 @@ namespace TEN::Math::Solvers
 		Vector3 Base   = Vector3::Zero;
 		Vector3 Middle = Vector3::Zero;
 		Vector3 End	   = Vector3::Zero;
-
-		EulerAngles OrientA = EulerAngles::Zero;
-		EulerAngles OrientB = EulerAngles::Zero;
 	};
 
 	std::pair<float, float> SolveQuadratic(float a, float b, float c);
 
 	IK2DSolution SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1);
-
-	bool SolveIK2D(const Vector2& target, float length0, float length1, Vector2& middle);
-	IK3DSolution SolveIK3D(const Vector3& origin, const Vector3 target, const Vector3& pole, float length0, float length1);
+	IK3DSolution SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1);
 }

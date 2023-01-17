@@ -408,7 +408,7 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 		end.y = floorHeight;
 
 	// Calculate the position of the pole vector.
-	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y - ANGLE(90.0f), BLOCK(0.5f));
+	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y, BLOCK(0.5f));
 
 	// Solve the 3D IK problem.
 	auto ikSol = Solvers::SolveIK3D(base, end, pole, length0, length1);
@@ -426,8 +426,8 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 	auto currentMiddleOrient = GetJointOrientation(*item, j1);
 
     // Calculate and store required bone rotations in limb rotation data.
-	limbRot.Base = ikSol.OrientA;
-	limbRot.Middle = ikSol.OrientB;
+	//limbRot.Base = ikSol.OrientA;
+	//limbRot.Middle = ikSol.OrientB;
 
 	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
