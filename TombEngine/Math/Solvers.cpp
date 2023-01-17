@@ -88,22 +88,7 @@ namespace TEN::Math::Solvers
 		normal.Normalize();
 
 		// Construct transform matrix.
-		Matrix tMatrix;
-		tMatrix(0, 0) = normal.Cross(direction).x;
-		tMatrix(0, 1) = normal.Cross(direction).y;
-		tMatrix(0, 2) = normal.Cross(direction).z;
-		tMatrix(0, 3) = 0.0f;
-
-		tMatrix(1, 0) = direction.x;
-		tMatrix(1, 1) = direction.y;
-		tMatrix(1, 2) = direction.z;
-		tMatrix(1, 3) = 0.0f;
-
-		tMatrix(2, 0) = normal.x;
-		tMatrix(2, 1) = normal.y;
-		tMatrix(2, 2) = normal.z;
-		tMatrix(2, 3) = 0.0f;
-
+		auto tMatrix = Matrix(normal.Cross(direction), direction, normal);
 		tMatrix(3, 0) = origin.x;
 		tMatrix(3, 1) = origin.y;
 		tMatrix(3, 2) = origin.z;

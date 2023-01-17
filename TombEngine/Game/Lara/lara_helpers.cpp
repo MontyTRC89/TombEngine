@@ -146,11 +146,11 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr int   rate				 = 50;
-	static constexpr float easingAlpha		 = 0.35f;
-	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+	static constexpr auto rate				= 50;
+	static constexpr auto easingAlpha		= 0.35f;
+	static constexpr auto constantThreshold = STEPUP_HEIGHT / 2;
 
-	// Check for walls.
+	// Check for wall.
 	if (height == NO_HEIGHT)
 		return;
 
@@ -175,7 +175,94 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
 	}
 	else
+	{
 		item->Pose.Position.y += height;
+	}
+}
+
+void SolveLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
+{
+	// Get joint positions.
+	auto base = GetJointPosition(&item, joint0).ToVector3();
+	auto middle = GetJointPosition(&item, joint1).ToVector3();
+	auto end = GetJointPosition(&item, joint2).ToVector3();
+
+	// Get joint lengths.
+	float length0 = (middle - base).Length();
+	float length1 = (end - middle).Length();
+
+	// Clamp foot position to floor height at its position.
+	int floorHeight = GetCollision(end.x, end.y, end.z, item.RoomNumber).Position.Floor - heelHeight;
+	if (end.y > floorHeight)
+		end.y = floorHeight;
+
+	// Calculate pole position.
+	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item.Pose.Orientation.y, std::max(length0, length1) * 1.5f);
+
+	// Get 3D IK solution.
+	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
+
+	// ------------Debug
+	g_Renderer.AddDebugSphere(pole, 50, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(ikSolution3D.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(ikSolution3D.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(ikSolution3D.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+
+	g_Renderer.AddLine3D(ikSolution3D.Base, ikSolution3D.Middle, Vector4::One);
+	g_Renderer.AddLine3D(ikSolution3D.Middle, ikSolution3D.End, Vector4::One);
+
+	// ------------
+
+	auto joint0Orient = GetJointOrientation(item, joint0);
+	auto joint1Orient = GetJointOrientation(item, joint1);
+
+	// Calculate and store required joint rotations in limb rotation data.
+	//limbRot.Base = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);// -EulerAngles(joint0Orient);
+	//limbRot.Middle = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);// -EulerAngles(joint1Orient);
+
+	// Determine relative orientation to floor normal.
+	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
+	auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
+
+	// Apply extra rotation according to alpha.
+	auto extraRot = orient - item.Pose.Orientation;
+	limbRot.End = extraRot;
+}
+
+void DoPlayerLegIK(ItemInfo& item, CollisionInfo* coll, float threshold)
+{
+	static constexpr auto heelHeight = 56.0f;
+
+	auto& player = *GetLaraInfo(&item);
+
+	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
+	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
+
+	int vPos = item.Pose.Position.y;
+	int lFloorHeight = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber).Position.Floor;
+	int rFloorHeight = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber).Position.Floor;
+
+	// Solve IK chain for left leg.
+	if (abs(lFloorHeight - vPos) <= threshold)
+		SolveLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
+
+	// Solve IK chain for right leg.
+	if (abs(rFloorHeight - vPos) <= threshold)
+		SolveLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
+
+	// Determine vertical offset.
+	float vOffset = ((lFloorHeight > rFloorHeight) ? lFloorHeight : rFloorHeight) - vPos;
+	if (abs(vOffset <= threshold))
+	{
+		vOffset = std::clamp(vOffset, -threshold, threshold);
+		player.VerticalOffset = vOffset;
+	}
+}
+
+void DoPlayerArmIK(ItemInfo& item, CollisionInfo* coll, float threshold)
+{
+	static constexpr auto wristHeight = 48.0f;
+
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.

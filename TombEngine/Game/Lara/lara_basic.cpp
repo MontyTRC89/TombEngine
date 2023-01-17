@@ -147,7 +147,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
@@ -388,77 +388,6 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
-{
-	// Get joint positions.
-	auto base = GetJointPosition(item, joint0).ToVector3();
-	auto middle = GetJointPosition(item, joint1).ToVector3();
-	auto end = GetJointPosition(item, joint2).ToVector3();
-
-	// Get joint lengths.
-	float length0 = (middle - base).Length();
-	float length1 = (end - middle).Length();
-
-	// Clamp foot position to floor height at its position.
-	int floorHeight = GetCollision(end.x, end.y, end.z, item->RoomNumber).Position.Floor - heelHeight;
-	if (end.y > floorHeight)
-		end.y = floorHeight;
-
-	// Calculate pole position.
-	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item->Pose.Orientation.y, std::max(length0, length1) * 1.5f);
-
-	// Get 3D IK solution.
-	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
-
-	// ------------Debug
-	g_Renderer.AddDebugSphere(pole, 50, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-
-	g_Renderer.AddLine3D(ikSolution3D.Base, ikSolution3D.Middle, Vector4::One);
-	g_Renderer.AddLine3D(ikSolution3D.Middle, ikSolution3D.End, Vector4::One);
-
-	// ------------
-
-	auto joint0Orient = GetJointOrientation(*item, joint0);
-	auto joint1Orient = GetJointOrientation(*item, joint1);
-
-	// Calculate and store required joint rotations in limb rotation data.
-	//limbRot.Base = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);// -EulerAngles(joint0Orient);
-	//limbRot.Middle = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);// -EulerAngles(joint1Orient);
-
-	// Determine relative orientation to floor normal.
-	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
-	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
-
-	// Apply extra rotation according to alpha.
-	auto extraRot = orient - item->Pose.Orientation;
-	limbRot.End = extraRot;
-}
-
-void DoLegIK(ItemInfo* item, CollisionInfo* coll, int threshold)
-{
-	static constexpr auto heelHeight = 56.0f;
-
-	auto& player = *GetLaraInfo(item);
-
-	float lFootHeight = GetJointPosition(item, LM_LFOOT).ToVector3().y;
-	float rFootHeight = GetJointPosition(item, LM_RFOOT).ToVector3().y;
-
-	SolveLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
-	SolveLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
-
-	auto lFootPos = GetJointPosition(item, LM_LFOOT);
-	auto rFootPos = GetJointPosition(item, LM_RFOOT);
-	int lFoorHeight = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item->RoomNumber).Position.Floor;
-	int rFoorHeight = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item->RoomNumber).Position.Floor;
-	
-	int vOffset = ((lFoorHeight > rFoorHeight) ? lFoorHeight : rFoorHeight) - item->Pose.Position.y;
-	vOffset = std::clamp(vOffset, -CLICK(1), CLICK(1));
-	player.VerticalOffset = vOffset;
-}
-
 // State:		LS_IDLE (2), LS_SPLAT_SOFT (170)
 // Collision:	lara_col_idle()
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
@@ -481,7 +410,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
@@ -953,7 +882,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1201,7 +1130,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1538,7 +1467,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (lara->Control.IsMoving)
 	{
@@ -1649,7 +1578,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1777,7 +1706,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1905,7 +1834,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (lara->Control.IsMoving)
 	{
@@ -2001,7 +1930,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoLegIK(item, coll, CLICK(1));
+	DoPlayerLegIK(*item, coll);
 
 	if (lara->Control.IsMoving)
 	{
