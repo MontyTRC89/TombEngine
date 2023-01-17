@@ -247,8 +247,8 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
 
-	bool isLeftFloorSteppable = (lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
-	bool isRightFloorSteppable = (rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
+	bool isLeftFloorSteppable  = !(lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
+	bool isRightFloorSteppable = !(rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
 
 	// Solve IK chain for left leg.
 	if (abs(lFloorHeight - vPosVisual) <= heightTolerance && !isLeftFloorSteppable)
@@ -260,11 +260,11 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 
 	// Determine vertical offset.
 	float vOffset = 0.0f;
-	if (!isRightFloorSteppable && isLeftFloorSteppable)
+	if (isRightFloorSteppable && !isLeftFloorSteppable)
 	{
 		vOffset = rFloorHeight - vPos;
 	}
-	else if (!isLeftFloorSteppable && isRightFloorSteppable)
+	else if (isLeftFloorSteppable && !isRightFloorSteppable)
 	{
 		vOffset = lFloorHeight - vPos;
 	}
