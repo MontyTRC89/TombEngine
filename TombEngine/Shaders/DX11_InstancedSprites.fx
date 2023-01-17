@@ -4,13 +4,6 @@
 #include "./InstancedSpriteBuffer.hlsli"
 #include "./Math.hlsli"
 
-cbuffer SpriteBuffer: register(b9)
-{
-	float4x4 billboardMatrix;
-	float4 color;
-	bool isBillboard;
-}
-
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
@@ -46,8 +39,24 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.PositionCopy = output.Position;
 
 	output.Color = Sprites[InstanceID].Color;
-	output.UV = input.UV;
 
+	if (input.PolyIndex == 0)
+	{
+		output.UV = float2(Sprites[InstanceID].UV[0].x, Sprites[InstanceID].UV[1].x);
+	}
+	else if (input.PolyIndex == 1)
+	{
+		output.UV = float2(Sprites[InstanceID].UV[0].y, Sprites[InstanceID].UV[1].y);
+	}
+	else if (input.PolyIndex == 2)
+	{
+		output.UV = float2(Sprites[InstanceID].UV[0].z, Sprites[InstanceID].UV[1].z);
+	}
+	else if (input.PolyIndex == 3)
+	{
+		output.UV = float2(Sprites[InstanceID].UV[0].w, Sprites[InstanceID].UV[1].w);
+	}
+	
 	float4 d = length(CamPositionWS - worldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
@@ -82,7 +91,7 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
-	DoAlphaTest(output);
+	//DoAlphaTest(output);
 
 	if (Sprites[InstanceID].IsSoftParticle == 1)
 	{

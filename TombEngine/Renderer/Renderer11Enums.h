@@ -254,4 +254,4 @@ constexpr auto MAX_ROOM_BOUNDS = 256;
 constexpr auto MIN_FAR_VIEW = 3200.0f;
 constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
 
-constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 128;
+constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 256;

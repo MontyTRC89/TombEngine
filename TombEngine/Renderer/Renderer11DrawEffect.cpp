@@ -959,6 +959,14 @@ namespace TEN::Renderer
 				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
 				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spr.SoftParticle ? 1 : 0;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].x = spr.Sprite->UV[0].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].y = spr.Sprite->UV[1].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].z = spr.Sprite->UV[2].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].w = spr.Sprite->UV[3].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].x = spr.Sprite->UV[0].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].y = spr.Sprite->UV[1].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].z = spr.Sprite->UV[2].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].w = spr.Sprite->UV[3].y;
 			}
 
 			SetBlendMode(spriteBucket.BlendMode);

@@ -97,10 +97,10 @@ namespace TEN::Renderer::Utils
 	{
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
 
-		if constexpr(DebugBuild)
+		//if constexpr(DebugBuild)
 			flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-		else
-			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_IEEE_STRICTNESS;
+		//else
+		//	flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_IEEE_STRICTNESS;
 		
 		return flags;
 	}
