@@ -388,19 +388,19 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j2, float heelHeight)
+void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
 {
 	// Get joint positions.
-	auto base = GetJointPosition(item, j0).ToVector3();
-	auto middle = GetJointPosition(item, j1).ToVector3();
-	auto end = GetJointPosition(item, j2).ToVector3();
+	auto base = GetJointPosition(item, joint0).ToVector3();
+	auto middle = GetJointPosition(item, joint1).ToVector3();
+	auto end = GetJointPosition(item, joint2).ToVector3();
 
 	// Get joint lengths.
 	float length0 = (middle - base).Length();
 	float length1 = (end - middle).Length();
 
 	// Clamp foot position to floor height at its position.
-	int floorHeight = (GetCollision(end.x, end.y, end.z, item->RoomNumber).Position.Floor - heelHeight);
+	int floorHeight = GetCollision(end.x, end.y, end.z, item->RoomNumber).Position.Floor - heelHeight;
 	if (end.y > floorHeight)
 		end.y = floorHeight;
 
@@ -415,13 +415,14 @@ void SolveLegIK(ItemInfo* item, LimbRotationData& limbRot, int j0, int j1, int j
 	g_Renderer.AddDebugSphere(ikSolution3D.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
 	g_Renderer.AddDebugSphere(ikSolution3D.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
 	g_Renderer.AddDebugSphere(ikSolution3D.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+
 	g_Renderer.AddLine3D(ikSolution3D.Base, ikSolution3D.Middle, Vector4::One);
 	g_Renderer.AddLine3D(ikSolution3D.Middle, ikSolution3D.End, Vector4::One);
 
 	// ------------
 
-	auto currentBaseOrient = GetJointOrientation(*item, j0);
-	auto currentMiddleOrient = GetJointOrientation(*item, j1);
+	auto currentBaseOrient = GetJointOrientation(*item, joint0);
+	auto currentMiddleOrient = GetJointOrientation(*item, joint1);
 
 	// Calculate and store required bone rotations in limb rotation data.
 	//limbRot.Base = ikSol.OrientA;
