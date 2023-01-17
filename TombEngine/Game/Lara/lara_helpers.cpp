@@ -242,7 +242,8 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
 	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
-	int vPos = item.Pose.Position.y + player.VerticalOffset; // NOTE: Vertical offset considered.
+	int vPos = item.Pose.Position.y;
+	int vPosVisual = vPos + player.VerticalOffset;
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
 
@@ -250,26 +251,26 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	bool isRightFloorSteppable = (rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
 
 	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPos) <= heightTolerance && !isLeftFloorSteppable)
+	if (abs(lFloorHeight - vPosVisual) <= heightTolerance && !isLeftFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
 
 	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPos) <= heightTolerance && !isRightFloorSteppable)
+	if (abs(rFloorHeight - vPosVisual) <= heightTolerance && !isRightFloorSteppable)
 		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
 
 	// Determine vertical offset.
 	float vOffset = 0.0f;
 	if (!isRightFloorSteppable && isLeftFloorSteppable)
 	{
-		vOffset = rFloorHeight - item.Pose.Position.y;
+		vOffset = rFloorHeight - vPos;
 	}
 	else if (!isLeftFloorSteppable && isRightFloorSteppable)
 	{
-		vOffset = lFloorHeight - item.Pose.Position.y;
+		vOffset = lFloorHeight - vPos;
 	}
 	else
 	{
-		vOffset = std::max(lFloorHeight, rFloorHeight) - item.Pose.Position.y;
+		vOffset = std::max(lFloorHeight, rFloorHeight) - vPos;
 	}
 
 	// Apply vertical offset.
