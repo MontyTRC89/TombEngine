@@ -547,6 +547,7 @@ namespace TEN::Renderer
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
+		void DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit = true);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
 		void DrawDripParticles(RenderView& view);
