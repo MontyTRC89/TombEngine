@@ -455,7 +455,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
