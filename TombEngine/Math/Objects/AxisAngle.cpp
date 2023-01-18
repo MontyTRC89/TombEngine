@@ -21,11 +21,18 @@ namespace TEN::Math
 		this->Angle = angle;
 	}
 
-	// Wrong, needs something more complex.
+	// Check. ToDirection() is probably wrong.
 	AxisAngle::AxisAngle(const Vector3& direction)
 	{
-		this->Axis = direction;
-		this->Angle = 0;
+		auto directionNorm = direction;
+		directionNorm.Normalize();
+
+		float angle = acos(Vector3::UnitZ.Dot(direction));
+		auto axis = Vector3::UnitZ.Cross(direction);
+		axis.Normalize();
+
+		this->Axis = axis;
+		this->Angle = FROM_RAD(angle);
 	}
 
 	// Check. Getting it from a quat is faster? 
@@ -165,9 +172,10 @@ namespace TEN::Math
 		return EulerAngles(*this);
 	}
 
+	// TODO: Crashes.
 	Quaternion AxisAngle::ToQuaternion() const
 	{
-		return Quaternion::CreateFromAxisAngle(Axis, TO_RAD(Angle));
+		return Quaternion::Identity;// CreateFromAxisAngle(Axis, TO_RAD(Angle));
 	}
 
 	Matrix AxisAngle::ToRotationMatrix() const

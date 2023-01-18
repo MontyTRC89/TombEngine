@@ -416,7 +416,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	// ------------debug
 
-	//auto convertedOrient = item->Pose.Orientation.ToAxisAngle().ToDirection();// .ToEulerAngles();
+	//auto convertedOrient = AxisAngle(item->Pose.Orientation.ToDirection()).ToDirection();
 	//item->Pose.Orientation = EulerAngles(convertedOrient);
 
 	//auto pos = GetJointPosition(item, LM_HEAD).ToVector3();
