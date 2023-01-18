@@ -9,6 +9,8 @@
 
 cbuffer MiscBuffer : register(b3)
 {
+	float2 CausticsStartUV;
+	float2 CausticsScale;
 	int Caustics;
 };
 
@@ -170,9 +172,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 		blending /= float3(b, b, b);
 
 		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
-		float3 xaxis = CausticsTexture.Sample(Sampler, p.yz).xyz; 
-		float3 yaxis = CausticsTexture.Sample(Sampler, p.xz).xyz;  
-		float3 zaxis = CausticsTexture.Sample(Sampler, p.xy).xyz;  
+		float3 xaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 yaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 zaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}

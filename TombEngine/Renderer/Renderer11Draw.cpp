@@ -1930,6 +1930,11 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
+		// Strange packing due to particular HLSL 16 bytes alignment requirements
+		RendererSprite* causticsSprite = &m_sprites[causticsFrame];
+		m_stMisc.CausticsStartUV = causticsSprite->UV[0];
+		m_stMisc.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
+
 		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Set shadow map data

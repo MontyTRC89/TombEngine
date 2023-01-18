@@ -959,7 +959,7 @@ namespace TEN::Renderer
 				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
 				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spr.SoftParticle ? 1 : 0;
-
+				 
 				// Strange packing due to particular HLSL 16 bytes alignment requirements
 				m_stInstancedSpriteBuffer.Sprites[i].UV[0].x = spr.Sprite->UV[0].x;
 				m_stInstancedSpriteBuffer.Sprites[i].UV[0].y = spr.Sprite->UV[1].x;

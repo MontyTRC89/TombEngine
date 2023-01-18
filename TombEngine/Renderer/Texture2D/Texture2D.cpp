@@ -9,6 +9,9 @@ namespace TEN::Renderer
 
 	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data)
 	{
+		Width = w;
+		Height = h;
+
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = w;
 		desc.Height = h;
@@ -44,6 +47,11 @@ namespace TEN::Renderer
 
 		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0), L"Opening Texture file '" + fileName + L"': ");
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+
+		D3D11_TEXTURE2D_DESC desc;
+		Texture->GetDesc(&desc);
+		Width = desc.Width;
+		Height = desc.Height;
 	}
 
 	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length)
@@ -68,5 +76,10 @@ namespace TEN::Renderer
 		context->GenerateMips(ShaderResourceView.Get());
 
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+
+		D3D11_TEXTURE2D_DESC desc;
+		Texture->GetDesc(&desc);
+		Width = desc.Width;
+		Height = desc.Height;
 	}
 }

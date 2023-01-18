@@ -799,6 +799,8 @@ namespace TEN::Renderer
 			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
 			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
 			sprite.Texture = &m_spritesTextures[oldSprite->tile];
+			sprite.Width = (oldSprite->x2 - oldSprite->x1) * sprite.Texture->Width + 1;
+			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
 		}
 
 		for (int i = 0; i < MoveablesIds.size(); i++)
