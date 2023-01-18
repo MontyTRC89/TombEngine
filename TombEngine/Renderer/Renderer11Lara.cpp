@@ -101,7 +101,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	playerObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraHeadRot.x), TO_RAD(Lara.ExtraHeadRot.y), TO_RAD(Lara.ExtraHeadRot.z));
 
 	// Update extra leg rotations for IK.
-	playerObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraJointRot.LeftLeg.Base.x), TO_RAD(Lara.ExtraJointRot.LeftLeg.Base.y), TO_RAD(Lara.ExtraJointRot.LeftLeg.Base.z));
+	playerObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraJointRot.LeftLeg.Base.x), 0, 0);
 	playerObj.LinearizedBones[LM_LSHIN]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraJointRot.LeftLeg.Middle.x), 0, 0);
 	playerObj.LinearizedBones[LM_LFOOT]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraJointRot.LeftLeg.End.x), 0, TO_RAD(Lara.ExtraJointRot.LeftLeg.End.z));
 	playerObj.LinearizedBones[LM_RTHIGH]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraJointRot.RightLeg.Base.x), 0, 0);

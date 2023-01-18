@@ -180,7 +180,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	}
 }
 
-void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, float heelHeight)
+void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotOffsetAngle, float heelHeight)
 {
 	// Get joint positions.
 	auto base = GetJointPosition(&item, joint0).ToVector3();
@@ -197,7 +197,10 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 		end.y = floorHeight;
 
 	// Calculate pole position. // TODO: Calculate heading angle hased on joint orientations.
-	auto pole = Geometry::TranslatePoint((middle + (end - middle) * 0.5f), item.Pose.Orientation.y, std::max(length0, length1) * 1.5f);
+	auto pole = Geometry::TranslatePoint(
+		middle + ((end - middle) * 0.5f),
+		item.Pose.Orientation.y + pivotOffsetAngle,
+		std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
 	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
@@ -213,18 +216,20 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	// ------------
 
-	auto joint0Orient = GetJointOrientation(item, joint0);
-	auto joint1Orient = GetJointOrientation(item, joint1);
+	auto& joint0Matrix = GetJointMatrix(item, joint0);
+	auto& joint1Matrix = GetJointMatrix(item, joint1);
 
 	// Calculate and store required joint rotations in limb rotation data.
-	//limbRot.Base = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);// -EulerAngles(joint0Orient);
-	//limbRot.Middle = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);// -EulerAngles(joint1Orient);
+	auto baseOrient = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);
+	auto middleOrient = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);
+	//limbRot.Base = EulerAngles(-baseOrient.x, 0, 0);// -EulerAngles(joint0Orient);
+	//limbRot.Middle = EulerAngles(middleOrient.x, 0, 0);// -EulerAngles(joint1Orient);
 
 	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
 	auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
 
-	// Apply extra rotation according to alpha.
+	// Apply extra rotation for foot.TODO: Limit.
 	auto extraRot = orient - item.Pose.Orientation;
 	limbRot.End = extraRot;
 }
@@ -236,37 +241,46 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 
 	auto& player = *GetLaraInfo(&item);
 
-	// Get point collision at foot positions.
+	// Get point collision positions.
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
 	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
-	int vPos = item.Pose.Position.y;
-	int vPosVisual = vPos + player.VerticalOffset;
+	float vPos = item.Pose.Position.y;
+	float vPosVisual = vPos + player.VerticalOffset;
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
 
-	bool isLeftFloorSteppable  = !(lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
-	bool isRightFloorSteppable = !(rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
+	bool isPlayerUpright		=  (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
+	bool isLeftFloorSteppable	= !(lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
+	bool isRightFloorSteppable	= !(rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
 
+	// TODO: Don't allow both feet to ascend.
+	
 	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPosVisual) <= heightTolerance && isLeftFloorSteppable)
-		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, heelHeight);
+	if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
+		isPlayerUpright && isLeftFloorSteppable)
+	{
+		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight);
+	}
 
 	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPosVisual) <= heightTolerance && isRightFloorSteppable)
-		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, heelHeight);
+	if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
+		isPlayerUpright && isRightFloorSteppable)
+	{
+		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight);
+	}
 
 	// Determine vertical offset.
 	float vOffset = 0.0f;
-	if (isRightFloorSteppable && !isLeftFloorSteppable)
-	{
-		vOffset = rFloorHeight - vPos;
-	}
-	else if (isLeftFloorSteppable && !isRightFloorSteppable)
+	if (isLeftFloorSteppable && !isRightFloorSteppable)
 	{
 		vOffset = lFloorHeight - vPos;
+	}
+	else if (isRightFloorSteppable && !isLeftFloorSteppable)
+	{
+		vOffset = rFloorHeight - vPos;
 	}
 	else
 	{
@@ -274,10 +288,10 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	}
 
 	// Apply vertical offset.
-	if (abs(vOffset <= heightTolerance))
+	if (abs(vOffset <= heightTolerance) && isPlayerUpright)
 	{
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
-		player.VerticalOffset = vOffset;
+		player.VerticalOffset = Lerp(player.VerticalOffset, vOffset, 0.4f);
 	}
 }
 

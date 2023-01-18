@@ -674,7 +674,7 @@ namespace TEN::Renderer
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
-		Quaternion GetItemBoneOrientation(int itemNumber, int jointIndex);
+		Matrix& GetItemBoneMatrix(int itemNumber, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits = NO_JOINT_BITS);

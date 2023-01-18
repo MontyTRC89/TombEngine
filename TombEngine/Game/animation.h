@@ -79,6 +79,7 @@ struct BoneMutator
 
 void AnimateLara(ItemInfo* item);
 void AnimateItem(ItemInfo* item);
+void PerformAnimCommands(ItemInfo* item, bool isFrameBased);
 
 bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
 bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
@@ -107,6 +108,4 @@ void ClampRotation(Pose& outPose, short angle, short rotation);
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
-Quaternion GetJointOrientation(const ItemInfo& item, int jointIndex);
-
-void PerformAnimCommands(ItemInfo* item, bool isFrameBased);
+Matrix& GetJointMatrix(const ItemInfo& item, int jointIndex);

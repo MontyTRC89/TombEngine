@@ -529,8 +529,7 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset
 	return Vector3i(pos);
 }
 
-Quaternion GetJointOrientation(const ItemInfo& item, int jointIndex)
+Matrix& GetJointMatrix(const ItemInfo& item, int jointIndex)
 {
-	// Interpret matrices done in renderer as Quaternion.
-	return g_Renderer.GetItemBoneOrientation(item.Index, jointIndex);
+	return g_Renderer.GetItemBoneMatrix(item.Index, jointIndex);
 }

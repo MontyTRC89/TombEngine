@@ -410,14 +410,14 @@ namespace TEN::Renderer
 		pos = Vector3::Transform(pos, world);
 	}
 
-	Quaternion Renderer11::GetItemBoneOrientation(int itemNumber, int jointIndex)
+	Matrix& Renderer11::GetItemBoneMatrix(int itemNumber, int jointIndex)
 	{
-		const auto& rItem = m_items[itemNumber];
+		auto& rItem = m_items[itemNumber];
 
 		if (jointIndex >= MAX_BONES)
 			jointIndex = 0;
 
-		return Quaternion::CreateFromRotationMatrix(rItem.AnimationTransforms[jointIndex]);
+		return rItem.AnimationTransforms[jointIndex];
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
