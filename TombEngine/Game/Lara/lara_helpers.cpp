@@ -196,7 +196,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	if (end.y > floorHeight)
 		end.y = floorHeight;
 
-	// Calculate pole position. // TODO: Calculate heading angle hased on joint orientations.
+	// Calculate pole position.
 	auto pole = Geometry::TranslatePoint(
 		middle + ((end - middle) * 0.5f),
 		item.Pose.Orientation.y + pivotOffsetAngle,
@@ -216,6 +216,9 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	// ------------
 
+	// TODO: Somehow access and modify joint quat/matrix. Calculating Eulers and appllying them
+	// gives very wrong results.
+
 	auto& joint0Matrix = GetJointMatrix(item, joint0);
 	auto& joint1Matrix = GetJointMatrix(item, joint1);
 
@@ -229,15 +232,19 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
 	auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
 
-	// Apply extra rotation for foot.TODO: Limit.
+	// Apply extra rotation for foot.
+	// TODO: Limit.
+	// TODO: Only set rotation at certain threshold from floor.
 	auto extraRot = orient - item.Pose.Orientation;
 	limbRot.End = extraRot;
 }
 
 // TODO: When the vertical offset is applied, gun flashes appear at higher positions.
-void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
+void DoPlayerLegIK(ItemInfo& item)
 {
-	static constexpr auto heelHeight = 56.0f;
+	static constexpr auto heightTolerance = (float)CLICK(1);
+	static constexpr auto heelHeight	  = 56.0f;
+	static constexpr auto alpha			  = 0.4f;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -252,9 +259,9 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
 
-	bool isPlayerUpright		= (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
-	bool isLeftFloorSteppable	= (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
-	bool isRightFloorSteppable	= (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
+	bool isPlayerUpright	   = (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
+	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
+	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
 	// TODO: Don't allow both feet to ascend.
 	
@@ -287,11 +294,11 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 		vOffset = std::max(lFloorHeight, rFloorHeight) - vPos;
 	}
 
-	// Apply vertical offset.
-	if (abs(vOffset <= heightTolerance) && isPlayerUpright)
+	// Set vertical offset.
+	if (abs(vOffset) <= heightTolerance && isPlayerUpright)
 	{
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
-		player.VerticalOffset = Lerp(player.VerticalOffset, vOffset, 0.4f);
+		player.VerticalOffset = (int)round(Lerp(player.VerticalOffset, vOffset, alpha));
 	}
 }
 

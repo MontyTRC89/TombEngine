@@ -16,7 +16,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void EaseOutLaraHeight(ItemInfo* item, int height);
 void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotOffsetAngle, float heelHeight);
-void DoPlayerLegIK(ItemInfo& item, float heightTolerance = CLICK(1));
+void DoPlayerLegIK(ItemInfo& item);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);
