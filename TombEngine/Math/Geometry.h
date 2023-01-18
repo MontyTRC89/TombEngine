@@ -28,6 +28,8 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
 
+	Quaternion DirectionToQuaternion(const Vector3& direction);
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint);

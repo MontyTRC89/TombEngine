@@ -180,7 +180,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	}
 }
 
-void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotOffsetAngle, float heelHeight)
+void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
 {
 	// Get joint positions.
 	auto base = GetJointPosition(&item, joint0).ToVector3();
@@ -199,7 +199,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	// Calculate pole position.
 	auto pole = Geometry::TranslatePoint(
 		middle + ((end - middle) * 0.5f),
-		item.Pose.Orientation.y + pivotOffsetAngle,
+		item.Pose.Orientation.y + pivotAngle,
 		std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
@@ -219,14 +219,16 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	// TODO: Somehow access and modify joint quat/matrix. Calculating Eulers and appllying them
 	// gives very wrong results.
 
-	auto& joint0Matrix = GetJointMatrix(item, joint0);
-	auto& joint1Matrix = GetJointMatrix(item, joint1);
+	auto* frame = GetBestFrame(&item);
+	auto joint0Orient = frame->angles[joint0];
+	auto joint1Orient = frame->angles[joint1];
 
-	// Calculate and store required joint rotations in limb rotation data.
-	auto baseOrient = Geometry::GetOrientToPoint(ikSolution3D.Base, ikSolution3D.Middle);
-	auto middleOrient = Geometry::GetOrientToPoint(ikSolution3D.Middle, ikSolution3D.End);
-	//limbRot.Base = EulerAngles(-baseOrient.x, 0, 0);// -EulerAngles(joint0Orient);
-	//limbRot.Middle = EulerAngles(middleOrient.x, 0, 0);// -EulerAngles(joint1Orient);
+	auto baseRot = joint0Orient - Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
+	auto middleRot = joint1Orient - Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+
+	// Store required joint rotations in limb rotation data.
+	//limbRot.Base.Lerp(EulerAngles(baseRot), alpha);
+	//limbRot.Middle.Lerp(EulerAngles(middleRot), alpha);
 
 	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
@@ -235,11 +237,9 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	// Apply extra rotation for foot.
 	// TODO: Limit.
 	// TODO: Only set rotation at certain threshold from floor.
-	auto extraRot = orient - item.Pose.Orientation;
-	limbRot.End = extraRot;
+	limbRot.End.Lerp(orient - item.Pose.Orientation, alpha);
 }
 
-// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
 void DoPlayerLegIK(ItemInfo& item)
 {
 	static constexpr auto heightTolerance = (float)CLICK(1);
@@ -248,7 +248,7 @@ void DoPlayerLegIK(ItemInfo& item)
 
 	auto& player = *GetLaraInfo(&item);
 
-	// Get point collision positions.
+	// Get point collision.
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
@@ -269,14 +269,14 @@ void DoPlayerLegIK(ItemInfo& item)
 	if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
 		isPlayerUpright && isLeftFloorSteppable)
 	{
-		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight);
+		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight, alpha);
 	}
 
 	// Solve IK chain for right leg.
 	if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
 		isPlayerUpright && isRightFloorSteppable)
 	{
-		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight);
+		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight, alpha);
 	}
 
 	// Determine vertical offset.
@@ -295,6 +295,9 @@ void DoPlayerLegIK(ItemInfo& item)
 	}
 
 	// Set vertical offset.
+	// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
+	// Must use it in GetJointPosition() as well?
+	// Or: modify mutators.
 	if (abs(vOffset) <= heightTolerance && isPlayerUpright)
 	{
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);

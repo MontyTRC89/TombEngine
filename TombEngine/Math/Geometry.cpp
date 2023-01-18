@@ -153,6 +153,21 @@ namespace TEN::Math::Geometry
 			slopeAngle * sinDeltaAngle);
 	}
 
+	Quaternion DirectionToQuaternion(const Vector3& direction)
+	{
+		auto directionNorm = direction;
+		directionNorm.Normalize();
+
+		auto up = Vector3::Up;
+		auto right = up.Cross(directionNorm);
+		
+		if (right.Length() < EPSILON)
+			right = Vector3::Right;
+
+		up = directionNorm.Cross(right);
+		return Quaternion::CreateFromRotationMatrix(Matrix(right, up, directionNorm));
+	}
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
