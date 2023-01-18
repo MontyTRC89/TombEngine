@@ -252,9 +252,9 @@ void DoPlayerLegIK(ItemInfo& item, float heightTolerance)
 	float lFloorHeight = lPointColl.Position.Floor;
 	float rFloorHeight = rPointColl.Position.Floor;
 
-	bool isPlayerUpright		=  (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
-	bool isLeftFloorSteppable	= !(lPointColl.Position.FloorSlope || lPointColl.BottomBlock->Flags.Death);
-	bool isRightFloorSteppable	= !(rPointColl.Position.FloorSlope || rPointColl.BottomBlock->Flags.Death);
+	bool isPlayerUpright		= (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
+	bool isLeftFloorSteppable	= (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
+	bool isRightFloorSteppable	= (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
 	// TODO: Don't allow both feet to ascend.
 	
