@@ -432,14 +432,8 @@ namespace TEN::Renderer
 
 		if (fit)
 		{
-			ID3D11Texture2D* texture2D;
-			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2D));
-
-			D3D11_TEXTURE2D_DESC desc;
-			texture2D->GetDesc(&desc);
-
 			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
-			float imageAspect = float(desc.Width) / float(desc.Height);
+			float imageAspect = float(sprite->Width) / float(sprite->Height);
 
 			if (screenAspect > imageAspect)
 			{
