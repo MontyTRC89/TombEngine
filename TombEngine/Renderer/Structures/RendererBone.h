@@ -11,7 +11,7 @@ namespace TEN::Renderer
 		Vector3 Translation;
 		Matrix GlobalTransform;
 		Matrix Transform;
-		Vector3 ExtraRotation;
+		Quaternion ExtraRotation = Quaternion::Identity;
 		RendererBone* Parent;
 		std::vector<RendererBone*> Children;
 		byte ExtraRotationFlags;
@@ -20,7 +20,7 @@ namespace TEN::Renderer
 		{
 			Index = index;
 			Translation = Vector3::Zero;
-			ExtraRotation = Vector3::Zero;
+			ExtraRotation = Quaternion::Identity;
 			ExtraRotationFlags = 0;
 		}
 	};

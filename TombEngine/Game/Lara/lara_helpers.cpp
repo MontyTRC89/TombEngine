@@ -206,7 +206,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
 
 	// ------------Debug
-	g_Renderer.AddDebugSphere(pole, 50, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+	g_Renderer.AddDebugSphere(pole, 25, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
 	g_Renderer.AddDebugSphere(ikSolution3D.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
 	g_Renderer.AddDebugSphere(ikSolution3D.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
 	g_Renderer.AddDebugSphere(ikSolution3D.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);

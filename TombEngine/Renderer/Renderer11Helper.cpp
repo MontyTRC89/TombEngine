@@ -36,74 +36,74 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	using std::pair;
-	using std::vector;
-
 	void Renderer11::UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
-		static std::vector<int> boneIndexList;
+		static auto boneIndexList = std::vector<int>{};
 		boneIndexList.clear();
 		
-		RendererBone *Bones[MAX_BONES] = {};
+		RendererBone* Bones[MAX_BONES] = {};
 		int nextBone = 0;
 
-		Matrix rotation;
+		auto rotMatrix = Matrix::Identity;
 		
 		auto* transforms = ((item == nullptr) ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
-		// Push
+		// Push.
 		Bones[nextBone++] = obj.Skeleton;
 
 		while (nextBone != 0)
 		{
-			// Pop the last bone in the stack
-			RendererBone *bone = Bones[--nextBone];
-			if (!bone) return;//otherwise inventory crashes mm
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			// Pop last bone in stack.
+			auto* bone = Bones[--nextBone];
 
+			// Check nullptr, otherwise inventory crashes.
+			if (bone == nullptr)
+				return;
+
+			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
-
-				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				auto point = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
+				rotMatrix = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
 				
 				if (frac)
 				{
-					auto p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
-					p = Vector3::Lerp(p, p2, frac / ((float)rate));
+					auto point2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
+					point = Vector3::Lerp(point, point2, frac / (float)rate);
 
-					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
 
-					Quaternion q1, q2, q3;
+					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
+					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
+					auto quat3 = Quaternion::Slerp(quat1, quat2, frac / (float)rate);
 
-					q1 = Quaternion::CreateFromRotationMatrix(rotation);
-					q2 = Quaternion::CreateFromRotationMatrix(rotation2);
-					q3 = Quaternion::Slerp(q1, q2, frac / ((float)rate));
-
-					rotation = Matrix::CreateFromQuaternion(q3);
+					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
-				Matrix translation;
+				auto translation = Matrix::Identity;
 				if (bone == obj.Skeleton)
-					translation = Matrix::CreateTranslation(p.x, p.y, p.z);
+					translation = Matrix::CreateTranslation(point);
 
-				Matrix extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
 
 				if (useObjectWorldRotation)
 				{
-					Quaternion invertedQuat;
-					auto scale = Vector3{};
-					auto translation = Vector3{};
+					auto scale = Vector3::Zero;
+					auto invertedQuat = Quaternion::Identity;
+					auto translation = Vector3::Zero;
 					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
+
+					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(invertedQuat);
 				}
 				else
-					rotation = extraRotation * rotation;
+				{
+					rotMatrix = extraRotMatrix * rotMatrix;
+				}
 
 				if (bone != obj.Skeleton)
-					transforms[bone->Index] = rotation * bone->Transform;
+					transforms[bone->Index] = rotMatrix * bone->Transform;
 				else
-					transforms[bone->Index] = rotation * translation;
+					transforms[bone->Index] = rotMatrix * translation;
 
 				if (bone != obj.Skeleton)
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
@@ -111,15 +111,13 @@ namespace TEN::Renderer
 
 			boneIndexList.push_back(bone->Index);
 
+			// Push.
 			for (int i = 0; i < bone->Children.size(); i++)
-			{
-				// Push
 				Bones[nextBone++] = bone->Children[i];
-			}
 		}
 
-		// Apply mutations on top
-		if (item) 
+		// Apply mutators on top.
+		if (item != nullptr) 
 		{
 			auto* nativeItem = &g_Level.Items[item->ItemNumber];
 
@@ -127,7 +125,8 @@ namespace TEN::Renderer
 			{
 				for (int i : boneIndexList)
 				{
-					auto mutator = nativeItem->Model.Mutator[i];
+					const auto& mutator = nativeItem->Model.Mutator[i];
+
 					if (mutator.IsEmpty())
 						continue;
 
@@ -175,17 +174,18 @@ namespace TEN::Renderer
 			auto* currentBone = moveableObj.LinearizedBones[j];
 
 			auto prevRotation = currentBone->ExtraRotation;
-			currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+			currentBone->ExtraRotation = Quaternion::Identity;
 				
 			nativeItem->Data.apply(
 				[&j, &currentBone](QuadBikeInfo& quadBike)
 				{
 					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+					{
+						currentBone->ExtraRotation =  EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
+					}
 					else if (j == 6 || j == 7)
 					{
-						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
-						currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+						currentBone->ExtraRotation = EulerAngles(quadBike.FrontRot, quadBike.TurnRate * 2, 0).ToQuaternion();
 					}
 				},
 				[&j, &currentBone](JeepInfo& jeep)
@@ -193,21 +193,19 @@ namespace TEN::Renderer
 					switch(j)
 					{
 					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
-						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						currentBone->ExtraRotation = EulerAngles(jeep.FrontRightWheelRotation, jeep.TurnRate * 4, 0).ToQuaternion();
 						break;
 
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
-						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						currentBone->ExtraRotation = EulerAngles(jeep.FrontLeftWheelRotation, jeep.TurnRate * 4, 0).ToQuaternion();
 						break;
 
 					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+						currentBone->ExtraRotation = EulerAngles(jeep.BackRightWheelRotation, 0, 0).ToQuaternion();
 						break;
 
 					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+						currentBone->ExtraRotation = EulerAngles(jeep.BackLeftWheelRotation, 0, 0).ToQuaternion();
 						break;
 					}
 				},
@@ -216,16 +214,15 @@ namespace TEN::Renderer
 					switch (j)
 					{
 					case 2:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-						currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+						currentBone->ExtraRotation = EulerAngles(bike.RightWheelsRotation, bike.TurnRate * 8, 0).ToQuaternion();
 						break;
 
 					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						currentBone->ExtraRotation = EulerAngles(bike.RightWheelsRotation, 0, 0).ToQuaternion();
 						break;
 
 					case 8:
-						currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
+						currentBone->ExtraRotation = EulerAngles(bike.LeftWheelRotation, 0, 0).ToQuaternion();
 						break;
 					}
 				},
@@ -237,54 +234,58 @@ namespace TEN::Renderer
 					case 2:
 					case 3:
 					case 4:
-						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(prevRotation.z));
+						// TODO: Sort out this nonsense.
+						currentBone->ExtraRotation = EulerAngles(
+							0,
+							0,
+							(short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(EulerAngles(prevRotation).z)).ToQuaternion();
 						break;
 					}
 				},
 				[&j, &currentBone](RubberBoatInfo& boat)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
+						currentBone->ExtraRotation = EulerAngles(0, 0, boat.PropellerRotation).ToQuaternion();
 				},
 				[&j, &currentBone](UPVInfo& upv)
 				{
 					switch (j)
 					{
 					case 1:
-						currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
+						currentBone->ExtraRotation = EulerAngles(upv.LeftRudderRotation, 0, 0).ToQuaternion();
 						break;
 
 					case 2:
-						currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
+						currentBone->ExtraRotation = EulerAngles(upv.RightRudderRotation, 0, 0).ToQuaternion();
 						break;
 
 					case 3:
-						currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+						currentBone->ExtraRotation = EulerAngles(0, 0, upv.TurbineRotation).ToQuaternion();
 						break;
 					}
 				},
-				[&j, &currentBone](BigGunInfo& big_gun)
+				[&j, &currentBone](BigGunInfo& bigGun)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+						currentBone->ExtraRotation.z = bigGun.BarrelRotation;
 				},
 				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{
 					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+						currentBone->ExtraRotation = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+						currentBone->ExtraRotation = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_Z)
 					{
-						currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+						currentBone->ExtraRotation = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
 						lastJoint++;
 					}
 				});
