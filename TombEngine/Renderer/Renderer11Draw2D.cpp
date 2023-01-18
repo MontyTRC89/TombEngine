@@ -95,7 +95,15 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-		BindTexture(TEXTURE_HUD, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
+
+		RendererSprite* borderSprite = &m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
+		m_stHUDBar.BarStartUV = borderSprite->UV[0];
+		m_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
+		 
+		BindTexture(TEXTURE_HUD, borderSprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -113,12 +121,16 @@ namespace TEN::Renderer
 
 		m_stHUDBar.Percent = percent;
 		m_stHUDBar.Poisoned = poison;
-		m_stHUDBar.Frame = frame;
+		m_stHUDBar.Frame = frame;	
+		RendererSprite* innerSprite = &m_sprites[Objects[textureSlot].meshIndex];
+		m_stHUDBar.BarStartUV = innerSprite->UV[0];
+		m_stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
 		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
-
-		BindTexture(TEXTURE_HUD, m_sprites[Objects[textureSlot].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
+		 
+		BindTexture(TEXTURE_HUD, innerSprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
@@ -145,6 +157,12 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
 		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+
+		m_stHUDBar.BarStartUV = Vector2::Zero;
+		m_stHUDBar.BarScale = Vector2::One;
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
 
 		DrawIndexedTriangles(56, 0, 0);
 
