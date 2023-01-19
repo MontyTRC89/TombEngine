@@ -151,6 +151,10 @@ int SwitchTrigger(short itemNumber, short timer)
 	}
 	else if (item->Status)
 	{
+		if (item->ObjectNumber == ID_LOCK_SWITCH &&
+			item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + 2) &&
+			item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			return 1;
 		return (item->Flags & ONESHOT) >> 8;
 	}
 	else

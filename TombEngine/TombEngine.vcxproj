@@ -165,6 +165,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Objects\Generic\Switches\lock_switch.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
@@ -636,6 +637,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Objects\Generic\Switches\lock_switch.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Room\RoomObject.cpp" />
