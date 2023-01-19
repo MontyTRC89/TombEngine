@@ -245,7 +245,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 
 				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
-					DoPunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, 10, false);
+					DoPunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, false);
 
 				break;
 
@@ -259,11 +259,11 @@ namespace TEN::Entities::Creatures::TR3
 						item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) &&
 						!item.TestFlagField((int)BossItemFlags::ItemNumber, NO_ITEM) && isLizardActiveNearby)
 					{
-						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 5, true);
+						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, true);
 					}
 					else
 					{
-						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, 10, false);
+						DoPunaLightning(item, targetPos.ToVector3(), PunaBossHandBite, false);
 					}
 				}
 
@@ -311,7 +311,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void DoPunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, int intensity, bool isSummon)
+	void DoPunaLightning(ItemInfo& item, const Vector3& pos, const BiteInfo& bite, bool isSummon)
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
@@ -320,7 +320,12 @@ namespace TEN::Entities::Creatures::TR3
 		if (isSummon)
 		{
 			auto lizardTarget = GameVector(pos, item.RoomNumber);
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, 1, 0, 255, 180, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, 1, 180, 255, 0, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, Random::GenerateInt(25, 50), 100, 200, 200, 30, LI_THININ | LI_THINOUT, 4, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, Random::GenerateInt(25, 50), 100, 250, 255, 30, LI_THININ | LI_THINOUT, 2, 12);
+
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
 		}
@@ -329,7 +334,15 @@ namespace TEN::Entities::Creatures::TR3
 			auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 			auto hitPos = Vector3i::Zero;
 			MESH_INFO* mesh = nullptr;
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+
+			int random = Random::GenerateInt(15, 25);
+
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(25, 50), 80, 200, 200, 30, LI_THININ | LI_THINOUT  , 4, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(15, 35), 80, 255, 255, 30, LI_THININ | LI_THINOUT  , 4, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(15, 35), 180, 255, 255, 30, LI_THININ | LI_THINOUT , 2, 18);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 0, 255, 255, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 180, 255, 255, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
+
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
 			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
