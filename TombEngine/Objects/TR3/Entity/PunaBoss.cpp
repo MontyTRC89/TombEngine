@@ -332,16 +332,32 @@ namespace TEN::Entities::Creatures::TR3
 		else
 		{
 			auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
+
+			auto origin1 = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE / 4), creature.Enemy->RoomNumber);
+			auto origin2 = GameVector(Geometry::TranslatePoint(origin1.ToVector3(), pos - origin1.ToVector3(), PUNA_ATTACK_RANGE / 4), creature.Enemy->RoomNumber);
+
+			auto target2 = GameVector(Geometry::TranslatePoint(origin.ToVector3() , pos - origin.ToVector3(), PUNA_ATTACK_RANGE / 6), creature.Enemy->RoomNumber);
+			auto target3 = GameVector(Geometry::TranslatePoint(origin1.ToVector3(), pos - origin1.ToVector3(), PUNA_ATTACK_RANGE / 10), creature.Enemy->RoomNumber);
+
 			auto hitPos = Vector3i::Zero;
 			MESH_INFO* mesh = nullptr;
 
 			int random = Random::GenerateInt(15, 25);
 
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(25, 50), 80, 200, 200, 30, LI_THININ | LI_THINOUT  , 4, 12);
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(15, 35), 80, 255, 255, 30, LI_THININ | LI_THINOUT  , 4, 12);
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(15, 35), 180, 255, 255, 30, LI_THININ | LI_THINOUT , 2, 18);
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 0, 255, 255, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 180, 255, 255, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target2, Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target2, Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+
+			TriggerLightning((Vector3i*)&target2, (Vector3i*)&origin1, Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
+			TriggerLightning((Vector3i*)&target2, (Vector3i*)&origin1, Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+
+			TriggerLightning((Vector3i*)&origin1, (Vector3i*)&target3, Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 9);
+			TriggerLightning((Vector3i*)&origin1, (Vector3i*)&target3, Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 10);
+
+			TriggerLightning((Vector3i*)&origin2, (Vector3i*)&target3, Random::GenerateInt(15, 40), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 4, 7);
+			TriggerLightning((Vector3i*)&origin2, (Vector3i*)&target3, Random::GenerateInt(25, 35), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 2, 8);
+
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 20, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 12, 12);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 1, 80, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 5, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
