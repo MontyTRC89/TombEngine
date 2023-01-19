@@ -61,13 +61,28 @@ namespace TEN::Renderer
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
 
-		throwIfFailed(CreateDDSTextureFromMemory(
-			device,
-			context,
-			data,
-			length,
-			resource.GetAddressOf(),
-			ShaderResourceView.GetAddressOf()));
+		if (data[0] == 0x44 && data[1] == 0x44 && data[2] == 0x53)
+		{
+			// DDS texture
+			throwIfFailed(CreateDDSTextureFromMemory(
+				device,
+				context,
+				data,
+				length,
+				resource.GetAddressOf(),
+				ShaderResourceView.GetAddressOf()));
+		}
+		else
+		{
+			// PNG legacy texture
+			throwIfFailed(CreateWICTextureFromMemory(
+				device,
+				context,
+				data,
+				length,
+				resource.GetAddressOf(),
+				ShaderResourceView.GetAddressOf()));
+		}
 
 		context->GenerateMips(ShaderResourceView.Get());
 
