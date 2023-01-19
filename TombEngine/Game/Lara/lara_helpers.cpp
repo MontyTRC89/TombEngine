@@ -240,9 +240,10 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 void DoPlayerLegIK(ItemInfo& item)
 {
-	static constexpr auto heightTolerance = (float)CLICK(1);
-	static constexpr auto heelHeight	  = 56.0f;
-	static constexpr auto alpha			  = 0.4f;
+	static constexpr auto pivotAngleOffset = ANGLE(5.0f);
+	static constexpr auto heightTolerance  = (float)CLICK(1);
+	static constexpr auto heelHeight	   = 56.0f;
+	static constexpr auto alpha			   = 0.4f;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -271,7 +272,7 @@ void DoPlayerLegIK(ItemInfo& item)
 			if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
 				isPlayerUpright && isLeftFloorSteppable)
 			{
-				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight, alpha);
+				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -pivotAngleOffset, heelHeight, alpha);
 			}
 		}
 		else
@@ -280,7 +281,7 @@ void DoPlayerLegIK(ItemInfo& item)
 			if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
 				isPlayerUpright && isRightFloorSteppable)
 			{
-				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight, alpha);
+				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, pivotAngleOffset, heelHeight, alpha);
 			}
 		}
 	}
