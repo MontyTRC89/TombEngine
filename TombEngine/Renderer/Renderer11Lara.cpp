@@ -90,7 +90,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		bone->ExtraRotation = Quaternion::Identity;
 
 	// Player world matrix.
-	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());// +Vector3(0.0f, Lara.VerticalOffset, 0.0f));
+	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, Lara.VerticalOffset, 0.0f));
 	auto rotMatrix = LaraItem->Pose.Orientation.ToRotationMatrix();
 
 	m_LaraWorldMatrix = rotMatrix * tMatrix;
@@ -111,9 +111,10 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 	AnimFrame* framePtr[2];
-	int rate, frac;
+	
+	int rate = 0;
+	int frac = GetFrame(LaraItem, framePtr, rate);
 
-	frac = GetFrame(LaraItem, framePtr, rate);
 	UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status.

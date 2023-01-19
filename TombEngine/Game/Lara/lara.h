@@ -87,6 +87,7 @@ constexpr auto SLOPE_DIFFERENCE	   = 60;
 const auto PlayerLegIKStates = std::vector<int>
 {
 	LS_IDLE,
+	LS_TURN_180,
 	LS_TURN_RIGHT_SLOW,
 	LS_TURN_LEFT_SLOW,
 	LS_TURN_LEFT_FAST,
