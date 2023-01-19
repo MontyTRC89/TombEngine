@@ -161,7 +161,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 		return;
 	}
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1 / 64.0f));
 
 	// Regular case.
 	if (abs(height) > constantThreshold)
@@ -171,7 +171,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	}
 	else if (abs(height) > easingThreshold)
 	{
-		int vPos = item->Pose.Position.y;
+		float vPos = item->Pose.Position.y;
 		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
 	}
 	else
@@ -213,18 +213,23 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	// ------------
 
-	const auto* frame = GetBestFrame(&item);
-	auto joint0Orient = frame->angles[joint0];
-	auto joint1Orient = frame->angles[joint1];
+	// TODO: Apply the solved IK to leg joints. Everything is wrong.
 
-	auto joint0OrientConjugate = joint0Orient;
+	const auto& frame = *GetBestFrame(&item);
+
+	// Determine conjugates.
+	auto joint0OrientConjugate = frame.angles[joint0];
 	joint0OrientConjugate.Conjugate();
-	auto joint1OrientConjugate = joint1Orient;
+	auto joint1OrientConjugate = frame.angles[joint1];
 	joint1OrientConjugate.Conjugate();
+	auto playerOrientConjugate = item.Pose.Orientation.ToQuaternion();
+	playerOrientConjugate.Conjugate();
 
-	// To test, negate the animation entirely. Doesn't work here though.
-	auto baseRot = joint0Orient * joint0Orient;// Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
-	auto middleRot = joint1Orient * joint1Orient;// Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+	// Negate orientations of joints from current animation and player.
+	auto baseRot = joint0OrientConjugate * Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
+	baseRot = playerOrientConjugate * baseRot;
+	auto middleRot = joint1OrientConjugate * Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+	middleRot = playerOrientConjugate * middleRot;
 
 	// Store required joint rotations in limb rotation data.
 	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
