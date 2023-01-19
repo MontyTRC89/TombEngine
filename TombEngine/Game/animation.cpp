@@ -347,12 +347,16 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, int sourceIndex)
 {
 	if (item->Animation.AnimNumber == animIndex)
 		return;
 
 	int index = Objects[item->ObjectNumber].animIndex + animIndex;
+
+	if (sourceIndex >= 0) //To collect animation from different slots.
+		index = Objects[sourceIndex].animIndex + animIndex;
+
 	if (index < 0 || index >= g_Level.Anims.size())
 	{
 		TENLog(std::string("Attempted to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);

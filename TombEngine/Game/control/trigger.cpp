@@ -132,7 +132,7 @@ int SwitchTrigger(short itemNumber, short timer)
 				item->Timer = FPS * timer;
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
+		if (item->Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
@@ -141,8 +141,7 @@ int SwitchTrigger(short itemNumber, short timer)
 				item->Flags |= ONESHOT;
 			if (item->Animation.ActiveState != 1)
 				return 1;
-			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
-				return 1;
+			return 1;
 		}
 		else
 		{
@@ -405,8 +404,8 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				return;
 
 			objectNumber = g_Level.Items[value].ObjectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				switchFlag = 1;
+			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
+				//switchFlag = 1;
 
 			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
 

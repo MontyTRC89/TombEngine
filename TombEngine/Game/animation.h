@@ -87,7 +87,7 @@ void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0, int sourceIndex = -1);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);
 int GetFrameNumber(ItemInfo* item, int frameToStart);
