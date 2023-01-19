@@ -316,16 +316,17 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& creature = *GetCreatureInfo(&item);
 
 		auto origin = GameVector(GetJointPosition(&item, bite.meshNum, bite.Position), item.RoomNumber);
-		auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 
 		if (isSummon)
 		{
-			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
+			auto lizardTarget = GameVector(pos, item.RoomNumber);
+			TriggerLightning((Vector3i*)&origin, (Vector3i*)&lizardTarget, intensity, 0, 255, 0, 30, LI_SPLINE | LI_THINOUT, 50, 10);
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
 		}
 		else
 		{
+			auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE), creature.Enemy->RoomNumber);
 			auto hitPos = Vector3i::Zero;
 			MESH_INFO* mesh = nullptr;
 			TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, intensity, 0, 255, 255, 30, LI_SPLINE | LI_THINOUT, 50, 10);
