@@ -4,7 +4,7 @@
 
 #define EffectFunction void(ItemInfo* item)
 
-constexpr auto NUM_FLIPEFFECTS = 47;
+constexpr auto NUM_FLIPEFFECTS = 48;
 
 extern int FlipEffect;
 
@@ -41,5 +41,6 @@ void MeshSwapToPour(ItemInfo* item);
 void MeshSwapFromPour(ItemInfo* item); 
 void FlashOrange(ItemInfo* item);
 void ClearSwarmEnemies(ItemInfo* item);
+void ActiveNextAnimOnLaraSlot(ItemInfo* item);
 
 void DoFlipEffect(int number, ItemInfo* item = nullptr);

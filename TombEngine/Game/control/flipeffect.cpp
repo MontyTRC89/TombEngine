@@ -78,7 +78,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	MeshSwapToPour,				//43
 	MeshSwapFromPour,			//44
 	LaraLocationPad,			//45
-	KillActiveBaddys			//46
+	KillActiveBaddys,			//46
+	ActiveNextAnimOnLaraSlot	//47
 };
 
 void ClearSwarmEnemies(ItemInfo* item)
@@ -229,6 +230,15 @@ void KillActiveBaddys(ItemInfo* item)
 	}
 
 	FlipEffect = -1;
+}
+
+void ActiveNextAnimOnLaraSlot(ItemInfo* item)
+{
+	int AnimationIndex = abs( Objects[ID_LARA_EXTRA_ANIMS].animIndex - item->Animation.AnimNumber);
+
+	int nextAnimNumber = g_Level.Anims[AnimationIndex].JumpAnimNum;
+
+	SetAnimation(item, (LaraAnim)nextAnimNumber);
 }
 
 void LaraLocationPad(ItemInfo* item)
