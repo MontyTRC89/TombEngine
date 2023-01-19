@@ -197,10 +197,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 		end.y = floorHeight;
 
 	// Calculate pole position.
-	auto pole = Geometry::TranslatePoint(
-		middle + ((end - middle) * 0.5f),
-		item.Pose.Orientation.y + pivotAngle,
-		std::max(length0, length1) * 1.5f);
+	auto pole = Geometry::TranslatePoint(middle, item.Pose.Orientation.y + pivotAngle, std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
 	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
@@ -233,14 +230,12 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
 	//limbRot.Middle = Quaternion::Slerp(limbRot.Middle, middleRot, alpha);
 
-	// Determine relative orientation to floor normal.
-	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
-	auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
-
-	// Apply extra rotation for foot.
+	// TODO: Set extra rotation for foot.
 	// TODO: Limit.
 	// TODO: Only set rotation at certain threshold from floor.
-	limbRot.End = Quaternion::Slerp(limbRot.End, (orient - item.Pose.Orientation).ToQuaternion(), alpha);
+	//auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
+	//auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
+	//limbRot.End = Quaternion::Slerp(limbRot.End, (orient - item.Pose.Orientation).ToQuaternion(), alpha);
 }
 
 void DoPlayerLegIK(ItemInfo& item)
@@ -266,20 +261,28 @@ void DoPlayerLegIK(ItemInfo& item)
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
-	// TODO: Don't allow both feet to ascend.
-	
-	// Solve IK chain for left leg.
-	if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
-		isPlayerUpright && isLeftFloorSteppable)
+	// Check if floor is level.
+	if (lFloorHeight != rFloorHeight)
 	{
-		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight, alpha);
-	}
-
-	// Solve IK chain for right leg.
-	if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
-		isPlayerUpright && isRightFloorSteppable)
-	{
-		SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight, alpha);
+		// Allow IK for only one leg.
+		if (lFloorHeight < rFloorHeight)
+		{
+			// Solve IK chain for left leg.
+			if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
+				isPlayerUpright && isLeftFloorSteppable)
+			{
+				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, ANGLE(-5.0f), heelHeight, alpha);
+			}
+		}
+		else
+		{
+			// Solve IK chain for right leg.
+			if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
+				isPlayerUpright && isRightFloorSteppable)
+			{
+				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, ANGLE(5.0f), heelHeight, alpha);
+			}
+		}
 	}
 
 	// Determine vertical offset.

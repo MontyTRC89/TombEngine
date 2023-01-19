@@ -44,8 +44,6 @@ namespace TEN::Renderer
 		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
 
-		auto rotMatrix = Matrix::Identity;
-		
 		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0]);
 
 		// Push.
@@ -63,13 +61,13 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto point = Vector3(framePtr[0]->offsetX, framePtr[0]->offsetY, framePtr[0]->offsetZ);
-				rotMatrix = Matrix::CreateFromQuaternion(framePtr[0]->angles[bone->Index]);
+				auto offset = Vector3(framePtr[0]->offsetX, framePtr[0]->offsetY, framePtr[0]->offsetZ);
+				auto rotMatrix = Matrix::CreateFromQuaternion(framePtr[0]->angles[bone->Index]);
 				
 				if (frac)
 				{
-					auto point2 = Vector3(framePtr[1]->offsetX, framePtr[1]->offsetY, framePtr[1]->offsetZ);
-					point = Vector3::Lerp(point, point2, frac / (float)rate);
+					auto offset2 = Vector3(framePtr[1]->offsetX, framePtr[1]->offsetY, framePtr[1]->offsetZ);
+					offset = Vector3::Lerp(offset, offset2, frac / (float)rate);
 
 					auto rotMatrix2 = Matrix::CreateFromQuaternion(framePtr[1]->angles[bone->Index]);
 
@@ -80,9 +78,7 @@ namespace TEN::Renderer
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
-				auto translation = Matrix::Identity;
-				if (bone == rObject.Skeleton)
-					translation = Matrix::CreateTranslation(point);
+				auto tMatrix = (bone == rObject.Skeleton) ? Matrix::CreateTranslation(offset) : Matrix::Identity;
 
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
 
@@ -103,7 +99,7 @@ namespace TEN::Renderer
 				if (bone != rObject.Skeleton)
 					transforms[bone->Index] = rotMatrix * bone->Transform;
 				else
-					transforms[bone->Index] = rotMatrix * translation;
+					transforms[bone->Index] = rotMatrix * tMatrix;
 
 				if (bone != rObject.Skeleton)
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
@@ -130,11 +126,11 @@ namespace TEN::Renderer
 					if (mutator.IsEmpty())
 						continue;
 
-					auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
-					auto s = Matrix::CreateScale(mutator.Scale);
-					auto t = Matrix::CreateTranslation(mutator.Offset);
+					auto rotMatrix = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+					auto scaleMatrix = Matrix::CreateScale(mutator.Scale);
+					auto tMatrix = Matrix::CreateTranslation(mutator.Offset);
 
-					transforms[i] = m * s * t * transforms[i];
+					transforms[i] = rotMatrix * scaleMatrix * tMatrix * transforms[i];
 				}
 			}
 		}
