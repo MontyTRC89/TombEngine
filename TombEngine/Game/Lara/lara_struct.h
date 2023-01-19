@@ -1259,9 +1259,9 @@ struct LaraControlData
 
 struct LimbRotationData
 {
-	EulerAngles Base   = EulerAngles::Zero;
-	EulerAngles Middle = EulerAngles::Zero;
-	EulerAngles End	   = EulerAngles::Zero;
+	Quaternion Base   = Quaternion::Identity;
+	Quaternion Middle = Quaternion::Identity;
+	Quaternion End	  = Quaternion::Identity;
 };
 
 struct JointRotationData

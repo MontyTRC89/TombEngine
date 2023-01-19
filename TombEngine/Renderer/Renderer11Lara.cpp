@@ -85,12 +85,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	auto& playerObj = *m_moveableObjects[ID_LARA];
 
-	// Clear extra rotations
-	for (int i = 0; i < playerObj.LinearizedBones.size(); i++)
-		playerObj.LinearizedBones[i]->ExtraRotation = Quaternion::Identity;
+	// Clear extra rotations.
+	for (auto& bone : playerObj.LinearizedBones)
+		bone->ExtraRotation = Quaternion::Identity;
 
 	// Player world matrix.
-	auto translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y + Lara.VerticalOffset, LaraItem->Pose.Position.z);
+	auto translation = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, Lara.VerticalOffset, 0.0f));
 	auto rotation = LaraItem->Pose.Orientation.ToRotationMatrix();
 
 	m_LaraWorldMatrix = rotation * translation;
@@ -101,12 +101,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	playerObj.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
 
 	// Update extra leg rotations for IK.
-	playerObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Base.ToQuaternion();
-	playerObj.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Middle.ToQuaternion();
-	playerObj.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.End.ToQuaternion();
-	playerObj.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Base.ToQuaternion();
-	playerObj.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Middle.ToQuaternion();
-	playerObj.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.ExtraJointRot.RightLeg.End.ToQuaternion();
+	playerObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Base;
+	playerObj.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Middle;
+	playerObj.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.End;
+	playerObj.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Base;
+	playerObj.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Middle;
+	playerObj.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.ExtraJointRot.RightLeg.End;
 
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
@@ -132,12 +132,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 			Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
-			playerObj.LinearizedBones[LM_LINARM]->ExtraRotation += Lara.LeftArm.Orientation.ToQuaternion();
-			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation += Lara.RightArm.Orientation.ToQuaternion();
+			playerObj.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
+			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 		else
 		{
-			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation += Lara.RightArm.Orientation.ToQuaternion();
+			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 			playerObj.LinearizedBones[LM_LINARM]->ExtraRotation = playerObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 

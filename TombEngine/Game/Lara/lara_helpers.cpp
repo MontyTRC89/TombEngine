@@ -216,19 +216,22 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	// ------------
 
-	// TODO: Somehow access and modify joint quat/matrix. Calculating Eulers and appllying them
-	// gives very wrong results.
-
-	auto* frame = GetBestFrame(&item);
+	const auto* frame = GetBestFrame(&item);
 	auto joint0Orient = frame->angles[joint0];
 	auto joint1Orient = frame->angles[joint1];
 
-	auto baseRot = joint0Orient - Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
-	auto middleRot = joint1Orient - Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+	auto joint0OrientConjugate = joint0Orient;
+	joint0OrientConjugate.Conjugate();
+	auto joint1OrientConjugate = joint1Orient;
+	joint1OrientConjugate.Conjugate();
+
+	// To test, negate the animation entirely. Doesn't work here though.
+	auto baseRot = joint0OrientConjugate * joint0Orient;// Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
+	auto middleRot = joint1OrientConjugate * joint1Orient;// Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
 
 	// Store required joint rotations in limb rotation data.
-	//limbRot.Base.Lerp(EulerAngles(baseRot), alpha);
-	//limbRot.Middle.Lerp(EulerAngles(middleRot), alpha);
+	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
+	//limbRot.Middle = Quaternion::Slerp(limbRot.Middle, middleRot, alpha);
 
 	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
@@ -237,7 +240,7 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	// Apply extra rotation for foot.
 	// TODO: Limit.
 	// TODO: Only set rotation at certain threshold from floor.
-	limbRot.End.Lerp(orient - item.Pose.Orientation, alpha);
+	limbRot.End = Quaternion::Slerp(limbRot.End, (orient - item.Pose.Orientation).ToQuaternion(), alpha);
 }
 
 void DoPlayerLegIK(ItemInfo& item)
@@ -1032,13 +1035,13 @@ void ResetPlayerLegIK(ItemInfo& item, float alpha)
 
 	player.VerticalOffset = Lerp(player.VerticalOffset, 0, alpha);
 
-	player.ExtraJointRot.LeftLeg.Base.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraJointRot.LeftLeg.Middle.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraJointRot.LeftLeg.End.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.LeftLeg.Base = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.Base, Quaternion::Identity, alpha);
+	player.ExtraJointRot.LeftLeg.Middle = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.Middle, Quaternion::Identity, alpha);
+	player.ExtraJointRot.LeftLeg.End = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.End, Quaternion::Identity, alpha);
 
-	player.ExtraJointRot.RightLeg.Base.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraJointRot.RightLeg.Middle.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraJointRot.RightLeg.End.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraJointRot.RightLeg.Base = Quaternion::Slerp(player.ExtraJointRot.RightLeg.Base, Quaternion::Identity, alpha);
+	player.ExtraJointRot.RightLeg.Middle = Quaternion::Slerp(player.ExtraJointRot.RightLeg.Middle, Quaternion::Identity, alpha);
+	player.ExtraJointRot.RightLeg.End = Quaternion::Slerp(player.ExtraJointRot.RightLeg.End, Quaternion::Identity, alpha);
 }
 
 void RumbleLaraHealthCondition(ItemInfo* item)
