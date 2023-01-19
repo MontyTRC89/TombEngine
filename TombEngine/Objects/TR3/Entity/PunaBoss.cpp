@@ -147,12 +147,12 @@ namespace TEN::Entities::Creatures::TR3
 				headOrient.y = AI.angle;
 			}
 
-			if (item.TestFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::AwaitPlayer) && creature.Enemy != nullptr)
+			if (item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::AwaitPlayer) && creature.Enemy != nullptr)
 			{
 				float distance = Vector3i::Distance(creature.Enemy->Pose.Position, item.Pose.Position);
 
 				if (distance <= BLOCK(2.5f))
-					item.SetFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::DeathLightning);
+					item.SetFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::DeathLightning);
 
 				// Rotate the object on puna boss chair.
 				creature.JointRotation[0] += PUNA_CHAIR_TURN_RATE_MAX;
@@ -160,7 +160,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Get target.
-			if (item.TestFlagField((int)BossItemFlags::AttackCount, (int)PunaAttackType::DeathLightning))
+			if (item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::DeathLightning))
 			{
 				creature.Target = creature.Enemy->Pose.Position;
 			}
