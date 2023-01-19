@@ -36,25 +36,25 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer11::UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, AnimFrame** framePtr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static auto boneIndexList = std::vector<int>{};
 		boneIndexList.clear();
 		
-		RendererBone* Bones[MAX_BONES] = {};
+		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
 
 		auto rotMatrix = Matrix::Identity;
 		
-		auto* transforms = ((item == nullptr) ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
+		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0]);
 
 		// Push.
-		Bones[nextBone++] = obj.Skeleton;
+		bones[nextBone++] = rObject.Skeleton;
 
 		while (nextBone != 0)
 		{
 			// Pop last bone in stack.
-			auto* bone = Bones[--nextBone];
+			auto* bone = bones[--nextBone];
 
 			// Check nullptr, otherwise inventory crashes.
 			if (bone == nullptr)
@@ -63,15 +63,15 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto point = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
-				rotMatrix = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				auto point = Vector3(framePtr[0]->offsetX, framePtr[0]->offsetY, framePtr[0]->offsetZ);
+				rotMatrix = Matrix::CreateFromQuaternion(framePtr[0]->angles[bone->Index]);
 				
 				if (frac)
 				{
-					auto point2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
+					auto point2 = Vector3(framePtr[1]->offsetX, framePtr[1]->offsetY, framePtr[1]->offsetZ);
 					point = Vector3::Lerp(point, point2, frac / (float)rate);
 
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(framePtr[1]->angles[bone->Index]);
 
 					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
 					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
@@ -81,7 +81,7 @@ namespace TEN::Renderer
 				}
 
 				auto translation = Matrix::Identity;
-				if (bone == obj.Skeleton)
+				if (bone == rObject.Skeleton)
 					translation = Matrix::CreateTranslation(point);
 
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
@@ -89,43 +89,43 @@ namespace TEN::Renderer
 				if (useObjectWorldRotation)
 				{
 					auto scale = Vector3::Zero;
-					auto invertedQuat = Quaternion::Identity;
+					auto inverseQuat = Quaternion::Identity;
 					auto translation = Vector3::Zero;
-					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
+					transforms[bone->Parent->Index].Invert().Decompose(scale, inverseQuat, translation);
 
-					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(invertedQuat);
+					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(inverseQuat);
 				}
 				else
 				{
 					rotMatrix = extraRotMatrix * rotMatrix;
 				}
 
-				if (bone != obj.Skeleton)
+				if (bone != rObject.Skeleton)
 					transforms[bone->Index] = rotMatrix * bone->Transform;
 				else
 					transforms[bone->Index] = rotMatrix * translation;
 
-				if (bone != obj.Skeleton)
+				if (bone != rObject.Skeleton)
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
 			boneIndexList.push_back(bone->Index);
 
 			// Push.
-			for (int i = 0; i < bone->Children.size(); i++)
-				Bones[nextBone++] = bone->Children[i];
+			for (auto*& child : bone->Children)
+				bones[nextBone++] = child;
 		}
 
 		// Apply mutators on top.
-		if (item != nullptr) 
+		if (rItem != nullptr) 
 		{
-			auto* nativeItem = &g_Level.Items[item->ItemNumber];
+			const auto& nativeItem = g_Level.Items[rItem->ItemNumber];
 
-			if (nativeItem->Model.Mutator.size() == boneIndexList.size())
+			if (nativeItem.Model.Mutator.size() == boneIndexList.size())
 			{
 				for (int i : boneIndexList)
 				{
-					const auto& mutator = nativeItem->Model.Mutator[i];
+					const auto& mutator = nativeItem.Model.Mutator[i];
 
 					if (mutator.IsEmpty())
 						continue;

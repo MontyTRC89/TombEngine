@@ -226,8 +226,8 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	joint1OrientConjugate.Conjugate();
 
 	// To test, negate the animation entirely. Doesn't work here though.
-	auto baseRot = joint0OrientConjugate * joint0Orient;// Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
-	auto middleRot = joint1OrientConjugate * joint1Orient;// Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+	auto baseRot = joint0Orient * joint0Orient;// Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
+	auto middleRot = joint1Orient * joint1Orient;// Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
 
 	// Store required joint rotations in limb rotation data.
 	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
@@ -305,6 +305,10 @@ void DoPlayerLegIK(ItemInfo& item)
 	{
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
 		player.VerticalOffset = (int)round(Lerp(player.VerticalOffset, vOffset, alpha));
+
+		// TODO: Update mutator interpretation in renderer code.
+		//for (auto& mutator : item.Model.Mutator)
+		//	mutator.Offset += Vector3(0.0f, player.VerticalOffset, 0.0f);
 	}
 }
 

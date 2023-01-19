@@ -22,8 +22,8 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 {
-	ItemInfo& laraItem = *LaraItem;
-	LaraInfo& laraInfo = Lara;
+	const auto& nativeItem = *LaraItem;
+	auto& player = Lara;
 
 	switch (weapon)
 	{
@@ -32,11 +32,11 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	case LaraWeaponType::GrenadeLauncher:
 	case LaraWeaponType::Crossbow:
 	case LaraWeaponType::Shotgun:
-		if (LaraItem->Animation.ActiveState == LS_IDLE ||
-			LaraItem->Animation.ActiveState == LS_TURN_LEFT_FAST ||
-			LaraItem->Animation.ActiveState == LS_TURN_RIGHT_FAST ||
-			LaraItem->Animation.ActiveState == LS_TURN_LEFT_SLOW ||
-			LaraItem->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
+		if (nativeItem.Animation.ActiveState == LS_IDLE ||
+			nativeItem.Animation.ActiveState == LS_TURN_LEFT_FAST ||
+			nativeItem.Animation.ActiveState == LS_TURN_RIGHT_FAST ||
+			nativeItem.Animation.ActiveState == LS_TURN_LEFT_SLOW ||
+			nativeItem.Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 		{
 			return true;
 		}
@@ -47,19 +47,19 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	{
 		// Animate upper body if Lara is shooting from shoulder OR if Lara is standing still/turning
 		int baseAnim = Objects[GetWeaponObjectID(weapon)].animIndex;
-		if (laraInfo.RightArm.AnimNumber - baseAnim == 0 ||
-			laraInfo.RightArm.AnimNumber - baseAnim == 2 ||
-			laraInfo.RightArm.AnimNumber - baseAnim == 4)
+		if (player.RightArm.AnimNumber - baseAnim == 0 ||
+			player.RightArm.AnimNumber - baseAnim == 2 ||
+			player.RightArm.AnimNumber - baseAnim == 4)
 		{
 			return true;
 		}
 		else
 		{
-			if (LaraItem->Animation.ActiveState == LS_IDLE ||
-				LaraItem->Animation.ActiveState == LS_TURN_LEFT_FAST ||
-				LaraItem->Animation.ActiveState == LS_TURN_RIGHT_FAST ||
-				LaraItem->Animation.ActiveState == LS_TURN_LEFT_SLOW ||
-				LaraItem->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
+			if (nativeItem.Animation.ActiveState == LS_IDLE ||
+				nativeItem.Animation.ActiveState == LS_TURN_LEFT_FAST ||
+				nativeItem.Animation.ActiveState == LS_TURN_RIGHT_FAST ||
+				nativeItem.Animation.ActiveState == LS_TURN_LEFT_SLOW ||
+				nativeItem.Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 			{
 				return true;
 			}
@@ -77,36 +77,36 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 
 void Renderer11::UpdateLaraAnimations(bool force)
 {
-	auto& drawItem = m_items[Lara.ItemNumber];
-	drawItem.ItemNumber = Lara.ItemNumber;
+	auto& rItem = m_items[Lara.ItemNumber];
+	rItem.ItemNumber = Lara.ItemNumber;
 
-	if (!force && drawItem.DoneAnimations)
+	if (!force && rItem.DoneAnimations)
 		return;
 
-	auto& playerObj = *m_moveableObjects[ID_LARA];
+	auto& playerObject = *m_moveableObjects[ID_LARA];
 
 	// Clear extra rotations.
-	for (auto& bone : playerObj.LinearizedBones)
+	for (auto& bone : playerObject.LinearizedBones)
 		bone->ExtraRotation = Quaternion::Identity;
 
 	// Player world matrix.
-	auto translation = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, Lara.VerticalOffset, 0.0f));
-	auto rotation = LaraItem->Pose.Orientation.ToRotationMatrix();
+	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());// +Vector3(0.0f, Lara.VerticalOffset, 0.0f));
+	auto rotMatrix = LaraItem->Pose.Orientation.ToRotationMatrix();
 
-	m_LaraWorldMatrix = rotation * translation;
-	drawItem.World = m_LaraWorldMatrix;
+	m_LaraWorldMatrix = rotMatrix * tMatrix;
+	rItem.World = m_LaraWorldMatrix;
 
 	// Update extra head and torso rotations.
-	playerObj.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
-	playerObj.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
+	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
+	playerObject.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
 
 	// Update extra leg rotations for IK.
-	playerObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Base;
-	playerObj.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Middle;
-	playerObj.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.End;
-	playerObj.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Base;
-	playerObj.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Middle;
-	playerObj.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.ExtraJointRot.RightLeg.End;
+	playerObject.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Base;
+	playerObject.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Middle;
+	playerObject.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.End;
+	playerObject.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Base;
+	playerObject.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Middle;
+	playerObject.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.ExtraJointRot.RightLeg.End;
 
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
@@ -114,7 +114,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	int rate, frac;
 
 	frac = GetFrame(LaraItem, framePtr, rate);
-	UpdateAnimation(&drawItem, playerObj, framePtr, frac, rate, mask);
+	UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status.
 	if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
@@ -124,7 +124,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 		frac = GetFrame(LaraItem, framePtr, rate);
-		UpdateAnimation(&drawItem, playerObj, framePtr, frac, rate, mask);
+		UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -132,13 +132,13 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 			Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
-			playerObj.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
-			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
+			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
+			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 		else
 		{
-			playerObj.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
-			playerObj.LinearizedBones[LM_LINARM]->ExtraRotation = playerObj.LinearizedBones[LM_RINARM]->ExtraRotation;
+			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
+			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation = playerObject.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 
 		ArmInfo* leftArm = &Lara.LeftArm;
@@ -163,7 +163,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			shotgunframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
-			UpdateAnimation(&drawItem, playerObj, &shotgunframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &shotgunframePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -171,7 +171,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			shotgunframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
-			UpdateAnimation(&drawItem, playerObj, &shotgunframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &shotgunframePtr, 0, 1, mask);
 		}
 
 		break;
@@ -183,12 +183,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			revolverframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(&drawItem, playerObj, &revolverframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &revolverframePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			revolverframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(&drawItem, playerObj, &revolverframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &revolverframePtr, 0, 1, mask);
 		}
 
 		break;
@@ -203,15 +203,15 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			pistolframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(&drawItem, playerObj, &pistolframePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(&drawItem, playerObj, &pistolframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			pistolframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(&drawItem, playerObj, &pistolframePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(&drawItem, playerObj, &pistolframePtr, 0, 1, mask);
+			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, mask);
 		}
 
 		break;
@@ -234,23 +234,23 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			}
 
 			frac = GetFrame(&tempItem, framePtr, rate);
-			UpdateAnimation(&drawItem, playerObj, framePtr, frac, rate, mask);
+			UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			frac = GetFrame(LaraItem, framePtr, rate);
-			UpdateAnimation(&drawItem, playerObj, framePtr, frac, rate, mask);
+			UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
 			break;
 		}
 	}
 
 	// Copy matrices in player object.
 	for (int m = 0; m < 15; m++)
-		playerObj.AnimationTransforms[m] = drawItem.AnimationTransforms[m];
+		playerObject.AnimationTransforms[m] = rItem.AnimationTransforms[m];
 
 	// Copy meshswap indices.
-	drawItem.MeshIndex = LaraItem->Model.MeshIndex;
-	drawItem.DoneAnimations = true;
+	rItem.MeshIndex = LaraItem->Model.MeshIndex;
+	rItem.DoneAnimations = true;
 }
 
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
