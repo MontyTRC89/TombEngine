@@ -2019,6 +2019,8 @@ void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
+
+	DoPlayerLegIK(*item);
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
