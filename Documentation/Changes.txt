@@ -15,11 +15,14 @@ Version 1.0.6
 * Fix TR4 SKELETON spawn when used with OCB 3
 * Fix TR4 SAS teleporting over the blocks he walks by.
 * Fix enemy projectile effect colours.
+* Fix switches with ocb 3, 5 and 6 that failed to work in some circunstances.
+* Added object LOCK_SWITCH for the valves attached to doors.
 * Restore original volumetric explosion effects.
 * Add undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
 * Add an option to activate Lua or node events from legacy triggers.
 * Antitriggering an enemy will now cause it to vanish and pause.
 * Re-triggering an enemy will cause it to reappear and unpause.
+* Added flipeffect 47 ActiveNextAnimOnLara.
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
 
 Lua API changes
