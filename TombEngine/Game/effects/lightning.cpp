@@ -37,9 +37,9 @@ namespace TEN::Effects::Lightning
 			if (arc.flags & LI_MOVEEND || i < (arc.interpolation.size() - 1))
 			{
 				arc.interpolation[i] = Vector3(
-					Random::GenerateInt() % (int)amplitude,
-					Random::GenerateInt() % (int)amplitude,
-					Random::GenerateInt() % (int)amplitude) -
+					fmod(Random::GenerateInt(), amplitude),
+					fmod(Random::GenerateInt(), amplitude),
+					fmod(Random::GenerateInt(), amplitude)) -
 					Vector3(amplitude/ 2);
 			}
 			else
@@ -254,11 +254,11 @@ namespace TEN::Effects::Lightning
 			int numSegments = (arc.segments * 3) - 1;
 			
 			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
-			auto pos = deltaPos + Vector3(
-				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
-				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
-				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude) +
-				posArray[0];
+			auto pos = posArray[0] + deltaPos + Vector3(
+				fmod(Random::GenerateInt(), arc.amplitude * 2),
+				fmod(Random::GenerateInt(), arc.amplitude * 2),
+				fmod(Random::GenerateInt(), arc.amplitude * 2)) -
+				Vector3(arc.amplitude);
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
@@ -268,9 +268,10 @@ namespace TEN::Effects::Lightning
 					bufferIndex++;
 
 					pos += deltaPos + Vector3(
-						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
-						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
-						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude);
+						fmod(Random::GenerateInt(), arc.amplitude * 2),
+						fmod(Random::GenerateInt(), arc.amplitude * 2),
+						fmod(Random::GenerateInt(), arc.amplitude * 2)) -
+						Vector3(arc.amplitude);
 				}
 			}
 		}
