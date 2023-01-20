@@ -49,8 +49,8 @@ namespace TEN::Effects::Lightning
 		Vector3 Origin		  = Vector3::Zero;
 		Vector3 Target		  = Vector3::Zero;
 		short	Orientation2D = 0;
-		Vector4 Color		  = Vector4::Zero;
 		Vector3 LightPosition = Vector3::Zero; // TODO: Use a light cone instead?
+		Vector4 Color		  = Vector4::Zero;
 
 		float Life		= 0.0f;
 		float Scale		= 0.0f;

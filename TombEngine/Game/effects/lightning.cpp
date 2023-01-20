@@ -64,44 +64,46 @@ namespace TEN::Effects::Lightning
 	{
 		auto& spark = *GetFreeParticle();
 
-		spark.dG = g;
-		spark.sG = g;
-		spark.life = 4;
-		spark.sLife = 4;
-		spark.dR = r;
-		spark.sR = r;
-		spark.colFadeSpeed = 2;
+		spark.on = true;
+		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
 		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.on = 1;
-		spark.dB = b;
-		spark.sB = b;
-		spark.fadeToBlack = 0;
 		spark.x = x;
 		spark.y = y;
 		spark.z = z;
 		spark.xVel = 0;
 		spark.yVel = 0;
 		spark.zVel = 0;
-		spark.flags = SP_DEF | SP_SCALE;
+		spark.sR = r;
+		spark.sG = g;
+		spark.sB = b;
+		spark.dR = r;
+		spark.dG = g;
+		spark.dB = b;
+		spark.life = 4;
+		spark.sLife = 4;
+		spark.colFadeSpeed = 2;
+		spark.fadeToBlack = 0;
 		spark.scalar = 3;
 		spark.maxYvel = 0;
-		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
 		spark.gravity = 0;
-		spark.dSize =
 		spark.sSize =
+		spark.dSize =
 		spark.size = scale + Random::GenerateInt(0, 4);
+		spark.flags = SP_DEF | SP_SCALE;
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
+		static constexpr auto flags = LI_THININ | LI_THINOUT;
+
 		auto laser = HelicalLaser();
 
 		laser.NumSegments = HELICAL_LASER_SEGMENTS_NUM_MAX;
 		laser.Origin = origin;
 		laser.Target = target;
 		laser.Orientation2D = Random::GenerateAngle();
-		laser.Color = Vector4(0.0f, 1.0f, 0.375f, 1.0f); // Check start opacity.
 		laser.LightPosition = origin;
+		laser.Color = Vector4(0.0f, 1.0f, 0.375f, 1.0f); // TODO: Check start opacity.
 		laser.Life = 17.0f;
 		laser.Scale = 0.0f;
 		laser.Length = 0.0f;
@@ -118,8 +120,8 @@ namespace TEN::Effects::Lightning
 		auto origin2 = Vector3i(origin);
 		auto target2 = Vector3i(target);
 
-		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, LI_THININ | LI_THINOUT, 19, 5);	
-		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, LI_THININ | LI_THINOUT, 4, 5);	
+		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, flags, 19, 5);
+		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, flags, 4, 5);
 		TriggerLightningGlow(
 			laser.LightPosition.x, laser.LightPosition.y, laser.LightPosition.z,
 			Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
@@ -196,14 +198,14 @@ namespace TEN::Effects::Lightning
 
 			// If/when this behaviour is changed, modify AddLightningArc accordingly.
 			arc.life -= 2.0f;
-			if (arc.life)
+			if (arc.life > 0.0f)
 			{
 				// TODO: Find a better way for this.
 				auto* posPtr = (Vector3*)&arc.pos2;
-				for (int i = 0; i < arc.interpolation.size(); i++)
+				for (auto& interpPos : arc.interpolation)
 				{
-					*posPtr += arc.interpolation[i] * 2;
-					arc.interpolation[i] = arc.interpolation[i] - (arc.interpolation[i] / 16);
+					*posPtr += interpPos * 2;
+					interpPos -= (interpPos / 16);
 
 					posPtr++;
 				}
