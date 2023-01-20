@@ -236,15 +236,12 @@ namespace TEN::Effects::Lightning
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					auto spline = Vector3(
-						ElectricArcSpline(alpha, &posArray[0].x, posArray.size()),
-						ElectricArcSpline(alpha, &posArray[0].y, posArray.size()),
-						ElectricArcSpline(alpha, &posArray[0].z, posArray.size()));
-
+					auto spline = ElectricArcSpline(alpha, &posArray[0], posArray.size());
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
 					bufferArray[bufferIndex] = spline + offset;
+
 					alpha += interpStep;
 					bufferIndex++;
 				}
@@ -284,25 +281,43 @@ namespace TEN::Effects::Lightning
 	// 4-point Catmull-Rom spline interpolation.
 	// NOTE: Alpha is in the range [0, 65536] rather than [0, 1].
 	// BIG TODO: Make a family of curve classes with Bezier, B-Spline, Catmull-Rom.
-	int ElectricArcSpline(int alpha, float* knots, int numKnots)
+	Vector3 ElectricArcSpline(int alpha, Vector3* knots, int numKnots)
 	{
 		alpha *= numKnots - 3;
-		int span = alpha >> 16;
+		int span = alpha / pow(2, 16);
 
 		if (span >= (numKnots - 3))
 			span = numKnots - 4;
 
 		alpha -= 65536 * span;
 
-		float* k = &knots[3 * span];
+		auto* knot = &knots[span];
 
-		int c1 = k[3] + (k[3] / 2) - (k[6] / 2) - k[6] + (k[9] / 2) + ((-k[0] - 1) / 2);
-		int ret = (long long)c1 * alpha >> 16;
-		int c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] / 2) - (k[9] / 2) + k[0];
-		ret = (long long)c2 * alpha >> 16;
-		int c3 = ret + (k[6] / 2) + ((-k[0] - 1) / 2);
-		ret = (long long)c3 * alpha >> 16;
+		auto point1 = knot[1] + (knot[1] / 2) - (knot[2] / 2) - knot[2] + (knot[3] / 2) + ((-knot[0] - Vector3::One) / 2);
+		auto ret = (point1 * alpha) / pow(2, 16);
+		auto point2 = ret + Vector3(2.0f) * knot[2] - 2 * knot[1] - (knot[1] / 2) - (knot[3] / 2) + knot[0];
+		ret = (point2 * alpha) / pow(2, 16);
+		auto point3 = ret + (knot[2] / 2) + ((-knot[0] - Vector3::One) / 2);
+		ret = (point3 * alpha) / pow(2, 16);
 
-		return (ret + k[3]);
+		return (ret + knot[1]);
+	}
+
+	// More standard version. Maybe use this later.
+	Vector3 CatmullRomSpline(float alpha, const std::array<Vector3, 4>& knots)
+	{
+		auto knot0 = knots[0];
+		auto knot1 = knots[1];
+		auto knot2 = knots[2];
+		auto knot3 = knots[3];
+
+		auto point1 = knot1 + ((knot2 - knot0) * (1 / 6.0f));
+		auto point2 = knot2;
+		auto point3 = knot2 + ((knot3 - knot1) * (-1 / 6.0f));
+		auto point4 = knot3;
+
+		return (((point2 * 2) + (point3 - point1) * alpha) +
+			   (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
+			   (((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha)));
 	}
 }
