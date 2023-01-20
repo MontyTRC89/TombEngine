@@ -25,11 +25,11 @@ namespace TEN::Effects::Lightning
 		byte r;
 		byte g;
 		byte b;
-		byte life;
-		byte amplitude;
-		byte flags;
-		byte width;
-		byte segments;
+		float life;
+		float amplitude;
+		int flags;
+		float width;
+		unsigned int segments;
 
 		int sAmplitude;
 		int segmentSize;
@@ -66,7 +66,7 @@ namespace TEN::Effects::Lightning
 	extern std::array<Vector3i, 6>	  ElectricArcKnots;
 	extern std::array<Vector3i, 1024> ElectricArcBuffer;
 
-	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
+	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, float life, int flags, int width, unsigned int numSegments);
 	void		 TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 	void		 SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 

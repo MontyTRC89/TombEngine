@@ -97,6 +97,94 @@ namespace TEN::Entities::Creatures::TR5
 	{
 
 	};
+	
+	const void SpawnRaygunSmoke(const Vector3& pos, const EulerAngles& orient, float life)
+	{
+		auto& smoke = *GetFreeParticle();
+
+		float scale = (life * 12) * phd_cos(orient.x);
+
+		smoke.on = true;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+		smoke.x = pos.x;
+		smoke.y = pos.y;
+		smoke.z = pos.z;
+		smoke.xVel = Random::GenerateInt(-25, 25);
+		smoke.yVel = life * 3;
+		smoke.zVel = Random::GenerateInt(-25, 25);
+		smoke.sB = (Random::GenerateInt(128, 256) * life) / 16;
+		smoke.sR =
+		smoke.sG = smoke.sB - (smoke.sB / 4);
+		smoke.dR = 0;
+		smoke.dB = (Random::GenerateInt(32, 160) * life) / 16;
+		smoke.dG =
+		smoke.dB / 4;
+
+		smoke.colFadeSpeed = Random::GenerateInt(8, 12);
+		smoke.fadeToBlack = 8;
+		smoke.sLife =
+		smoke.life = Random::GenerateFloat(24.0f, 28.0f);
+
+		smoke.friction = 0;
+		smoke.rotAng = Random::GenerateAngle(0, ANGLE(22.5f));
+		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.35f), ANGLE(0.35f));
+		smoke.gravity = Random::GenerateAngle(ANGLE(0.175f), ANGLE(0.35f));
+		smoke.maxYvel = 0;
+		smoke.scalar = 1;
+		smoke.size =
+		smoke.sSize = scale;
+		smoke.dSize = 1;
+		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	}
+
+	const void FireHeavyGuardRaygun(ItemInfo& item, bool isRight, bool noLaser)
+	{
+		static constexpr auto raygunSmokeLife		   = 16.0f;
+		static constexpr auto raygunBurnPrimaryColor   = Vector3(0.2f, 0.4f, 1.0f);
+		static constexpr auto raygunBurnSecondaryColor = Vector3(0.2f, 0.3f, 0.8f);
+
+		const auto& creature = *GetCreatureInfo(&item);
+
+		auto origin = GetJointPosition(&item, HeavyGuardHandJoints[isRight], HeavyGuardRaygunLaserOffsets[isRight]).ToVector3();
+		auto target = GetJointPosition(
+			&item,
+			HeavyGuardHandJoints[isRight],
+			Vector3i(HeavyGuardRaygunLaserOffsets[isRight] + Vector3(0, BLOCK(4), 0))).ToVector3();
+
+		auto orient = Geometry::GetOrientToPoint(origin, target);
+
+		if (noLaser)
+		{
+			SpawnRaygunSmoke(origin, orient, abs(item.ItemFlags[isRight]));
+			return;
+		}
+
+		SpawnHelicalLaser(origin, target);
+
+		item.ItemFlags[isRight] = raygunSmokeLife;
+		SpawnRaygunSmoke(origin, orient, raygunSmokeLife);
+		SpawnRaygunSmoke(origin, orient, raygunSmokeLife);
+		SpawnRaygunSmoke(origin, orient, raygunSmokeLife);
+
+		auto origin2 = GameVector(origin, item.RoomNumber);
+		auto target2 = GameVector(target);
+		auto hitPos = Vector3i::Zero;
+		MESH_INFO* hitJoint = nullptr;
+
+		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+		{
+			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
+			{
+				ItemCustomBurn(LaraItem, raygunBurnPrimaryColor, raygunBurnSecondaryColor, 1 * FPS);
+				DoDamage(LaraItem, INT_MAX);
+			}
+			else
+			{
+				DoDamage(LaraItem, HEAVY_GUARD_RAYGUN_DAMAGE);
+			}
+		}
+	}
 
 	void InitialiseHeavyGuard(short itemNumber)
 	{
@@ -450,89 +538,5 @@ namespace TEN::Entities::Creatures::TR5
 				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 			}
 		}
-	}
-
-	void FireHeavyGuardRaygun(ItemInfo& item, bool isRight, bool noLaser)
-	{
-		const auto& creature = *GetCreatureInfo(&item);
-
-		auto origin = GetJointPosition(&item, HeavyGuardHandJoints[isRight], HeavyGuardRaygunLaserOffsets[isRight]).ToVector3();
-		auto target = GetJointPosition(
-			&item,
-			HeavyGuardHandJoints[isRight],
-			Vector3i(HeavyGuardRaygunLaserOffsets[isRight] + Vector3(0, BLOCK(4), 0))).ToVector3();
-
-		auto orient = Geometry::GetOrientToPoint(origin, target);
-
-		if (noLaser)
-		{
-			SpawnRaygunSmoke(origin, orient, abs(item.ItemFlags[isRight]));
-			return;
-		}
-
-		SpawnHelicalLaser(origin, target);
-
-		item.ItemFlags[isRight] = 16;
-		SpawnRaygunSmoke(origin, orient, 16);
-		SpawnRaygunSmoke(origin, orient, 16);
-		SpawnRaygunSmoke(origin, orient, 16);
-
-		auto origin2 = GameVector(origin, item.RoomNumber);
-		auto target2 = GameVector(target);
-		auto hitPos = Vector3i::Zero;
-		MESH_INFO* hitJoint = nullptr;
-
-		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
-		{
-			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
-			{
-				ItemCustomBurn(LaraItem, Vector3(0.2f, 0.4f, 1.0f), Vector3(0.2f, 0.3f, 0.8f), 1 * FPS);
-				DoDamage(LaraItem, INT_MAX);
-			}
-			else
-			{
-				DoDamage(LaraItem, 250);
-			}
-		}
-	}
-
-	void SpawnRaygunSmoke(const Vector3& pos, const EulerAngles& orient, float life)
-	{
-		auto& smoke = *GetFreeParticle();
-
-		float scale = (life * 12) * phd_cos(orient.x);
-
-		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-
-		smoke.x = pos.x;
-		smoke.y = pos.y;
-		smoke.z = pos.z;
-		smoke.xVel = Random::GenerateInt(-25, 25);
-		smoke.yVel = life * 3;
-		smoke.zVel = Random::GenerateInt(-25, 25);
-		smoke.sB = (Random::GenerateInt(128, 256) * life) / 16;
-		smoke.sR =
-		smoke.sG = smoke.sB - (smoke.sB / 4);
-		smoke.dR = 0;
-		smoke.dB = (Random::GenerateInt(32, 160) * life) / 16;
-		smoke.dG =
-		smoke.dB / 4;
-
-		smoke.colFadeSpeed = Random::GenerateInt(8, 12);
-		smoke.fadeToBlack = 8;
-		smoke.sLife =
-		smoke.life = Random::GenerateFloat(24.0f, 28.0f);
-
-		smoke.friction = 0;
-		smoke.rotAng = Random::GenerateAngle(0, ANGLE(22.5f));
-		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.35f), ANGLE(0.35f));
-		smoke.gravity = Random::GenerateAngle(ANGLE(0.175f), ANGLE(0.35f));
-		smoke.maxYvel = 0;
-		smoke.scalar = 1;
-		smoke.size =
-		smoke.sSize = scale;
-		smoke.dSize = 1;
-		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
