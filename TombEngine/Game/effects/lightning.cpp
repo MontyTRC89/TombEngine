@@ -10,7 +10,6 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Lightning
 {
-	constexpr auto ELECTRIC_ARC_NUM_POINTS_MAX	  = 9;
 	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
 	
 	std::vector<ElectricArc>  ElectricArcs	= {};
@@ -30,12 +29,20 @@ namespace TEN::Effects::Lightning
 		arc.pos4 = *target;
 		arc.flags = flags;
 
-		for (int i = 0; i < ELECTRIC_ARC_NUM_POINTS_MAX; i++)
+		for (int i = 0; i < arc.interpolation.size(); i++)
 		{
-			if (arc.flags & 2 || i < 6)
-				arc.interpolation[i] = unsigned char(Random::GenerateInt() % (unsigned char)amplitude) - (amplitude / 2);
+			if (arc.flags & LI_MOVEEND || i < (arc.interpolation.size() - 1))
+			{
+				arc.interpolation[i] = Vector3i(
+					Random::GenerateInt() % (int)amplitude,
+					Random::GenerateInt() % (int)amplitude,
+					Random::GenerateInt() % (int)amplitude) -
+					(Vector3i(amplitude, amplitude, amplitude) / 2);
+			}
 			else
-				arc.interpolation[i] = 0;
+			{
+				arc.interpolation[i] = Vector3i::Zero;
+			}
 		}
 
 		arc.r = r;
@@ -181,19 +188,21 @@ namespace TEN::Effects::Lightning
 		for (auto& arc : ElectricArcs)
 		{
 			// Set to despawn.
-			if (arc.life <= 0)
+			if (arc.life <= 0.0f)
 				continue;
 
 			// If/when this behaviour is changed, modify AddLightningArc accordingly.
-			arc.life -= 2;
+			arc.life -= 2.0f;
 			if (arc.life)
 			{
-				int* positions = (int*)&arc.pos2;
-				for (int j = 0; j < ELECTRIC_ARC_NUM_POINTS_MAX; j++)
+				// TODO: Find a better way for this.
+				auto* posPtr = (Vector3i*)&arc.pos2;
+				for (int i = 0; i < arc.interpolation.size(); i++)
 				{
-					*positions += arc.interpolation[j] * 2;
-					arc.interpolation[j] = signed char(arc.interpolation[j] - (arc.interpolation[j] / 16));
-					positions++;
+					*posPtr += arc.interpolation[i] * 2;
+					arc.interpolation[i] = arc.interpolation[i] - (arc.interpolation[i] / 16);
+
+					posPtr++;
 				}
 			}
 		}

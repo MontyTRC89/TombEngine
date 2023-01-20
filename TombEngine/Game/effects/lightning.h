@@ -12,7 +12,7 @@ namespace TEN::Effects::Lightning
 		LI_MOVEEND	= (1 << 1),
 		LI_THINOUT	= (1 << 2),
 		LI_THININ	= (1 << 3),
-		LI_SPARKEND = (1 << 4),
+		LI_SPARKEND = (1 << 4)
 	};
 
 	// TODO: Make sense of this struct.
@@ -22,25 +22,24 @@ namespace TEN::Effects::Lightning
 		Vector3i pos2;
 		Vector3i pos3;
 		Vector3i pos4;
-
-		signed char interpolation[9];
+		std::array<Vector3i, 3> interpolation = {};
 
 		byte r;
 		byte g;
 		byte b;
 
 		float life;
+		float sLife;
 		float amplitude;
-		int flags;
+		float sAmplitude;
 		float width;
 		unsigned int segments;
 
-		int sAmplitude;
 		int segmentSize;
 		int direction;
 		int rotation;
 		int type;
-		int sLife;
+		int flags;
 	};
 
 	struct HelicalLaser
