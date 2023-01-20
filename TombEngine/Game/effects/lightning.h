@@ -15,16 +15,20 @@ namespace TEN::Effects::Lightning
 		LI_SPARKEND = (1 << 4),
 	};
 
+	// TODO: Make sense of this struct.
 	struct ElectricArc
 	{
 		Vector3i pos1;
 		Vector3i pos2;
 		Vector3i pos3;
 		Vector3i pos4;
+
 		signed char interpolation[9];
+
 		byte r;
 		byte g;
 		byte b;
+
 		float life;
 		float amplitude;
 		int flags;
@@ -66,8 +70,8 @@ namespace TEN::Effects::Lightning
 	extern std::array<Vector3i, 6>	  ElectricArcKnots;
 	extern std::array<Vector3i, 1024> ElectricArcBuffer;
 
-	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, float life, int flags, int width, unsigned int numSegments);
-	void		 TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
+	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
+	void		 TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b);
 	void		 SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
 	void UpdateElectricArcs();

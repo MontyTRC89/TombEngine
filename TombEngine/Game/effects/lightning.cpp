@@ -10,16 +10,17 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Lightning
 {
+	constexpr auto ELECTRIC_ARC_NUM_POINTS_MAX	  = 9;
 	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
 	
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3i, 6>	   ElectricArcKnots	   = {};
+	std::array<Vector3i, 6>	   ElectricArcKnots	 = {};
 	std::array<Vector3i, 1024> ElectricArcBuffer = {};
 	
 	// TODO: Pass const Vector3 references to postions and Vector3/Vector4 for color.
-	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, byte amplitude, byte r, byte g, byte b, float life, int flags, int width, unsigned int numSegments)
+	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
 		auto arc = ElectricArc();
 
@@ -29,10 +30,10 @@ namespace TEN::Effects::Lightning
 		arc.pos4 = *target;
 		arc.flags = flags;
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < ELECTRIC_ARC_NUM_POINTS_MAX; i++)
 		{
 			if (arc.flags & 2 || i < 6)
-				arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude / 2));
+				arc.interpolation[i] = unsigned char(Random::GenerateInt() % (unsigned char)amplitude) - (amplitude / 2);
 			else
 				arc.interpolation[i] = 0;
 		}
@@ -49,36 +50,36 @@ namespace TEN::Effects::Lightning
 		return &ElectricArcs[ElectricArcs.size() - 1];
 	}
 
-	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
+	void TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b)
 	{
-		auto* spark = GetFreeParticle();
+		auto& spark = *GetFreeParticle();
 
-		spark->dG = g;
-		spark->sG = g;
-		spark->life = 4;
-		spark->sLife = 4;
-		spark->dR = r;
-		spark->sR = r;
-		spark->colFadeSpeed = 2;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->on = 1;
-		spark->dB = b;
-		spark->sB = b;
-		spark->fadeToBlack = 0;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->flags = SP_DEF | SP_SCALE;
-		spark->scalar = 3;
-		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
-		spark->gravity = 0;
-		spark->dSize =
-		spark->sSize =
-		spark->size = size + (GetRandomControl() & 3);
+		spark.dG = g;
+		spark.sG = g;
+		spark.life = 4;
+		spark.sLife = 4;
+		spark.dR = r;
+		spark.sR = r;
+		spark.colFadeSpeed = 2;
+		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.on = 1;
+		spark.dB = b;
+		spark.sB = b;
+		spark.fadeToBlack = 0;
+		spark.x = x;
+		spark.y = y;
+		spark.z = z;
+		spark.xVel = 0;
+		spark.yVel = 0;
+		spark.zVel = 0;
+		spark.flags = SP_DEF | SP_SCALE;
+		spark.scalar = 3;
+		spark.maxYvel = 0;
+		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
+		spark.gravity = 0;
+		spark.dSize =
+		spark.sSize =
+		spark.size = scale + (GetRandomControl() & 3);
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
@@ -188,10 +189,10 @@ namespace TEN::Effects::Lightning
 			if (arc.life)
 			{
 				int* positions = (int*)&arc.pos2;
-				for (int j = 0; j < 9; j++)
+				for (int j = 0; j < ELECTRIC_ARC_NUM_POINTS_MAX; j++)
 				{
 					*positions += arc.interpolation[j] * 2;
-					arc.interpolation[j] = (signed char)(arc.interpolation[j] - (arc.interpolation[j] / 16));
+					arc.interpolation[j] = signed char(arc.interpolation[j] - (arc.interpolation[j] / 16));
 					positions++;
 				}
 			}

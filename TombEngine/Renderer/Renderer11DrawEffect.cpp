@@ -205,7 +205,7 @@ namespace TEN::Renderer
 				continue;
 
 			ElectricArcKnots[0] = arc.pos1;
-			memcpy(&ElectricArcKnots[1], &arc, 48);
+			memcpy(&ElectricArcKnots[1], &arc, 48); // TODO: This is wrong.
 			ElectricArcKnots[5] = arc.pos4;
 
 			for (int j = 0; j < ElectricArcKnots.size(); j++)
@@ -239,16 +239,16 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						r = arc.life * arc.r / 16;
-						g = arc.life * arc.g / 16;
-						b = arc.life * arc.b / 16;
+						r = (arc.life * arc.r) / 16;
+						g = (arc.life * arc.g) / 16;
+						b = (arc.life * arc.b) / 16;
 					}
 
 					AddSpriteBillboardConstrained(
 						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-						PI_DIV_2, 1.0f, Vector2(arc.width * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
 				}
 			}
 		}
