@@ -374,7 +374,7 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										TriggerLightningGlow(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
-										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), colorSparks, 3);
+										SpawnGuardianSparks(guardian->fireArcs[i]->pos4, colorSparks, 3);
 									}
 								}
 

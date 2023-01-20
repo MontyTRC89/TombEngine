@@ -18,11 +18,11 @@ namespace TEN::Effects::Lightning
 	// TODO: Make sense of this struct.
 	struct ElectricArc
 	{
-		Vector3i pos1;
-		Vector3i pos2;
-		Vector3i pos3;
-		Vector3i pos4;
-		std::array<Vector3i, 3> interpolation = {};
+		Vector3 pos1;
+		Vector3 pos2;
+		Vector3 pos3;
+		Vector3 pos4;
+		std::array<Vector3, 3> interpolation = {};
 
 		byte r;
 		byte g;
@@ -66,8 +66,8 @@ namespace TEN::Effects::Lightning
 	extern std::vector<ElectricArc>	 ElectricArcs;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
-	extern std::array<Vector3i, 6>	  ElectricArcKnots;
-	extern std::array<Vector3i, 1024> ElectricArcBuffer;
+	extern std::array<Vector3, 6>	 ElectricArcKnots;
+	extern std::array<Vector3, 1024> ElectricArcBuffer;
 
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
 	void		 TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b);
@@ -76,6 +76,6 @@ namespace TEN::Effects::Lightning
 	void UpdateElectricArcs();
 	void UpdateHelicalLasers();
 
-	void CalculateElectricArcSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc);
-	int ElectricArcSpline(int alpha, int* knots, int numKnots);
+	void CalculateElectricArcSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc);
+	int ElectricArcSpline(int alpha, float* knots, int numKnots);
 }

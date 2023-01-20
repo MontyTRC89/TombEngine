@@ -107,11 +107,11 @@ namespace TEN::Renderer
 				b = laser.b;
 			}
 
-			ElectricArcKnots[0] = Vector3i(laser.Target);
-			ElectricArcKnots[1] = Vector3i(laser.Origin);
+			ElectricArcKnots[0] = laser.Target;
+			ElectricArcKnots[1] = laser.Origin;
 			
 			for (int j = 0; j < 2; j++)
-				ElectricArcKnots[j] -= Vector3i(laser.Target);
+				ElectricArcKnots[j] -= laser.Target;
 
 			HelixSpline(ElectricArcKnots, ElectricArcBuffer, laser);
 
@@ -124,9 +124,9 @@ namespace TEN::Renderer
 				auto& interpPosArray = ElectricArcBuffer;
 				for (int s = 0; s < laser.NumSegments ; s++)
 				{
-					auto origin = laser.Target + interpPosArray[bufferIndex].ToVector3();
+					auto origin = laser.Target + interpPosArray[bufferIndex];
 					bufferIndex++;
-					auto target = laser.Target + interpPosArray[bufferIndex].ToVector3();
+					auto target = laser.Target + interpPosArray[bufferIndex];
 
 					auto center = (origin + target) / 2;
 					auto direction = target - origin;
@@ -142,15 +142,15 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::HelixSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const HelicalLaser& laser)
+	void Renderer11::HelixSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const HelicalLaser& laser)
 	{
 		int bufferIndex = 0;
 
 		bufferArray[bufferIndex] = posArray[0];
 		bufferIndex++;
 
-		auto origin = posArray[0].ToVector3();
-		auto target = posArray[1].ToVector3();;
+		auto origin = posArray[0];
+		auto target = posArray[1];
 
 		int radiusMax = 48;
 		float length = Vector3::Distance(origin, target);
@@ -169,7 +169,7 @@ namespace TEN::Renderer
 			{
 				int x1 = std::clamp(radius / 2, 0, radiusMax);
 
-				bufferArray[bufferIndex] = Vector3i(
+				bufferArray[bufferIndex] = Vector3(
 					(currentPos.x + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1,
 					(currentPos.y + (laser.Length / laser.NumSegments) + (radius * phd_sin(angle)) / 2) - x1,
 					(currentPos.z + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1);
@@ -209,7 +209,7 @@ namespace TEN::Renderer
 			ElectricArcKnots[5] = arc.pos4;
 
 			for (int j = 0; j < ElectricArcKnots.size(); j++)
-				ElectricArcKnots[j] -= LaraItem->Pose.Position;
+				ElectricArcKnots[j] -= LaraItem->Pose.Position.ToVector3();
 
 			CalculateElectricArcSpline(ElectricArcKnots, ElectricArcBuffer, arc);
 

@@ -776,8 +776,8 @@ namespace TEN::Entities::Creatures::TR5
 								arc->b = b;
 							}
 
-							arc->pos1 = pos1;
-							arc->pos4 = pos2;
+							arc->pos1 = pos1.ToVector3();
+							arc->pos4 = pos2.ToVector3();
 						}
 						else if (deltaFrame >= 16)
 						{

@@ -15,33 +15,36 @@ namespace TEN::Effects::Lightning
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3i, 6>	   ElectricArcKnots	 = {};
-	std::array<Vector3i, 1024> ElectricArcBuffer = {};
+	std::array<Vector3, 6>	  ElectricArcKnots	= {};
+	std::array<Vector3, 1024> ElectricArcBuffer = {};
 	
 	// TODO: Pass const Vector3 references to postions and Vector3/Vector4 for color.
 	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
 		auto arc = ElectricArc();
 
-		arc.pos1 = *origin;
-		arc.pos2 = ((*origin * 3) + *target) / 4;
-		arc.pos3 = ((*target * 3) + *origin) / 4;
-		arc.pos4 = *target;
+		auto fltOrigin = origin->ToVector3();
+		auto fltTarget = target->ToVector3();
+
+		arc.pos1 = fltOrigin;
+		arc.pos2 = ((fltOrigin * 3) + fltTarget) / 4;
+		arc.pos3 = ((fltTarget * 3) + fltOrigin) / 4;
+		arc.pos4 = fltTarget;
 		arc.flags = flags;
 
 		for (int i = 0; i < arc.interpolation.size(); i++)
 		{
 			if (arc.flags & LI_MOVEEND || i < (arc.interpolation.size() - 1))
 			{
-				arc.interpolation[i] = Vector3i(
+				arc.interpolation[i] = Vector3(
 					Random::GenerateInt() % (int)amplitude,
 					Random::GenerateInt() % (int)amplitude,
 					Random::GenerateInt() % (int)amplitude) -
-					(Vector3i(amplitude, amplitude, amplitude) / 2);
+					Vector3(amplitude/ 2);
 			}
 			else
 			{
-				arc.interpolation[i] = Vector3i::Zero;
+				arc.interpolation[i] = Vector3::Zero;
 			}
 		}
 
@@ -86,7 +89,7 @@ namespace TEN::Effects::Lightning
 		spark.gravity = 0;
 		spark.dSize =
 		spark.sSize =
-		spark.size = scale + (GetRandomControl() & 3);
+		spark.size = scale + Random::GenerateInt(0, 4);
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
@@ -196,7 +199,7 @@ namespace TEN::Effects::Lightning
 			if (arc.life)
 			{
 				// TODO: Find a better way for this.
-				auto* posPtr = (Vector3i*)&arc.pos2;
+				auto* posPtr = (Vector3*)&arc.pos2;
 				for (int i = 0; i < arc.interpolation.size(); i++)
 				{
 					*posPtr += arc.interpolation[i] * 2;
@@ -214,7 +217,7 @@ namespace TEN::Effects::Lightning
 				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalculateElectricArcSpline(std::array<Vector3i, 6>& posArray, std::array<Vector3i, 1024>& bufferArray, const ElectricArc& arc)
+	void CalculateElectricArcSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc)
 	{
 		int bufferIndex = 0;
 
@@ -231,7 +234,7 @@ namespace TEN::Effects::Lightning
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					auto spline = Vector3i(
+					auto spline = Vector3(
 						ElectricArcSpline(alpha, &posArray[0].x, posArray.size()),
 						ElectricArcSpline(alpha, &posArray[0].y, posArray.size()),
 						ElectricArcSpline(alpha, &posArray[0].z, posArray.size()));
@@ -249,12 +252,13 @@ namespace TEN::Effects::Lightning
 		else
 		{
 			int numSegments = (arc.segments * 3) - 1;
-
+			
 			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
-			auto pos = Vector3i(
-				deltaPos.x + (Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude + posArray[0].x,
-				deltaPos.y + (Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude + posArray[0].y,
-				deltaPos.z + (Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude + posArray[0].z);
+			auto pos = deltaPos + Vector3(
+				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
+				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
+				(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude) +
+				posArray[0];
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
@@ -263,9 +267,10 @@ namespace TEN::Effects::Lightning
 					bufferArray[bufferIndex] = pos;
 					bufferIndex++;
 
-					pos.x += deltaPos.x + Random::GenerateInt() % int(arc.amplitude * 2) - arc.amplitude;
-					pos.y += deltaPos.y + Random::GenerateInt() % int(arc.amplitude * 2) - arc.amplitude;
-					pos.z += deltaPos.z + Random::GenerateInt() % int(arc.amplitude * 2) - arc.amplitude;
+					pos += deltaPos + Vector3(
+						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
+						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude,
+						(Random::GenerateInt() % int(arc.amplitude * 2)) - arc.amplitude);
 				}
 			}
 		}
@@ -276,7 +281,7 @@ namespace TEN::Effects::Lightning
 	// 4-point Catmull-Rom spline interpolation.
 	// NOTE: Alpha is in the range [0, 65536] rather than [0, 1].
 	// BIG TODO: Make a family of curve classes with Bezier, B-Spline, Catmull-Rom.
-	int ElectricArcSpline(int alpha, int* knots, int numKnots)
+	int ElectricArcSpline(int alpha, float* knots, int numKnots)
 	{
 		alpha *= numKnots - 3;
 		int span = alpha >> 16;
@@ -286,7 +291,7 @@ namespace TEN::Effects::Lightning
 
 		alpha -= 65536 * span;
 
-		int* k = &knots[3 * span];
+		float* k = &knots[3 * span];
 
 		int c1 = k[3] + (k[3] / 2) - (k[6] / 2) - k[6] + (k[9] / 2) + ((-k[0] - 1) / 2);
 		int ret = (long long)c1 * alpha >> 16;
