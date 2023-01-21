@@ -64,6 +64,24 @@ namespace TEN::Entities::Creatures::TR3
 		LIZARD_ANIM_SLIDE_2 = 31
 	};
 
+	static bool IsLizardTargetBlocked(ItemInfo& item)
+	{
+		auto& creature = *GetCreatureInfo(&item);
+
+		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
+			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
+	}
+
+	static void SpawnLizardGas(int itemNumber, const BiteInfo& bite, int speed)
+	{
+		static constexpr auto numPoisonThrows = 2;
+
+		for (int i = 0; i < numPoisonThrows; i++)
+			ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0.0f, -100.0f, speed << 2), Vector3(0.0f, 1.0f, 0.0f));
+
+		ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0.0f, -100.0f, speed << 1), Vector3(0.0f, 1.0f, 0.0f));
+	}
+
 	void LizardControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -375,21 +393,5 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			CreatureAnimation(itemNumber, headingAngle, 0);
 		}
-	}
-
-	bool IsLizardTargetBlocked(ItemInfo& item)
-	{
-		auto& creature = *GetCreatureInfo(&item);
-
-		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
-				(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
-	}
-
-	void SpawnLizardGas(int itemNumber, const BiteInfo& bite, int speed)
-	{
-		for (int i = 0; i < 2; i++)
-			ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0, -100, speed << 2), Vector3(0, 1, 0));
-
-		ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0, -100, speed << 1), Vector3(0, 1, 0));
 	}
 }
