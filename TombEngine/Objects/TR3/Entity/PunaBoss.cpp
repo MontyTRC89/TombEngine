@@ -31,7 +31,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 120;
 	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
-	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.5f, 0.5f, 0.5f);
+	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.4f, 0.5f, 0.5f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
 	const auto PunaBossHandBite = BiteInfo(Vector3::Zero, 14);
@@ -299,7 +299,11 @@ namespace TEN::Entities::Creatures::TR3
 			if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
 				target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
 			{
-				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), PUNA_EFFECT_COLOR);
+				Vector4 shieldColor = Vector4(0.0f, Random::GenerateFloat(0.0f, 0.5f), 
+											Random::GenerateFloat(0.0f, 0.5f), 
+											Random::GenerateFloat(0.5f, 0.8f));
+
+				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), shieldColor);
 			}
 			else
 			{

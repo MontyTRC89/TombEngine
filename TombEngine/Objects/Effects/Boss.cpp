@@ -4,6 +4,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Objects/TR3/Entity/PunaBoss.h"
@@ -266,11 +267,22 @@ namespace TEN::Effects::Boss
 				SpawnExplosionSmoke(pos);
 			}
 
-			pos = Vector3(
+			auto shockwavePos = Pose(
 				item.Pose.Position.x + Random::GenerateInt(-64, 64),
 				(item.Pose.Position.y - CLICK(2)) + Random::GenerateInt(-64, 64),
-				item.Pose.Position.z + Random::GenerateInt(-64, 64));
-			SpawnShockwaveRing(item, pos, color);
+				item.Pose.Position.z + Random::GenerateInt(-64, 64), 
+				item.Pose.Orientation);
+
+			float angle = Random::GenerateFloat(0.0f, 180.0f);
+			int random = Random::GenerateInt(264, 612);
+
+			unsigned char r = color.x * UCHAR_MAX;
+			unsigned char g = color.y * UCHAR_MAX;
+			unsigned char b = color.z * UCHAR_MAX;
+
+			TriggerShockwave(&shockwavePos, 300, 512, random, r, g, b, 36, ANGLE(angle), 0);
+			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
+
 		}
 
 		TriggerDynamicLight(
@@ -291,9 +303,6 @@ namespace TEN::Effects::Boss
 			flags |= (short)BossFlagValue::Lizard;
 
 		// The following are only for aesthetics.
-
-		if (Objects[ID_BOSS_EXPLOSION_RING].loaded)
-			flags |= (short)BossFlagValue::ShockwaveRing;
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)
 			flags |= (short)BossFlagValue::ShockwaveExplosion;
