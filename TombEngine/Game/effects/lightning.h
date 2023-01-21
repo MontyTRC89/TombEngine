@@ -69,9 +69,9 @@ namespace TEN::Effects::Lightning
 	extern std::array<Vector3, 6>	 ElectricArcKnots;
 	extern std::array<Vector3, 1024> ElectricArcBuffer;
 
-	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
-	void		 TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b);
-	void		 SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
+	void TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
+	void TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b);
+	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
 	void UpdateElectricArcs();
 	void UpdateHelicalLasers();

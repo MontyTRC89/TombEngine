@@ -359,7 +359,8 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye.
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
-									guardian->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, LI_THININ | LI_SPLINE | LI_THINOUT, 6, 10);
+									TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, LI_THININ | LI_SPLINE | LI_THINOUT, 6, 10);
+									guardian->fireArcs[i] = &ElectricArcs[ElectricArcs.size() - 1];
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}

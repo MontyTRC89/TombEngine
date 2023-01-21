@@ -19,7 +19,7 @@ namespace TEN::Effects::Lightning
 	std::array<Vector3, 1024> ElectricArcBuffer = {};
 	
 	// TODO: Pass const Vector3 references to postions and Vector3/Vector4 for color.
-	ElectricArc* TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
+	void TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
 		auto arc = ElectricArc();
 
@@ -57,7 +57,6 @@ namespace TEN::Effects::Lightning
 		arc.width = width;
 
 		ElectricArcs.push_back(arc);
-		return &ElectricArcs[ElectricArcs.size() - 1];
 	}
 
 	void TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b)
