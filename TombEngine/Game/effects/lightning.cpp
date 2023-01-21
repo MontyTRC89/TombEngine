@@ -280,9 +280,9 @@ namespace TEN::Effects::Lightning
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
 	// 4-point Catmull-Rom spline interpolation.
-	// NOTE: Alpha is in the range [0, 65536] rather than [0, 1].
-	// Function takes pointer to array of 6 knots and determines a subset of 4
-	// using the passed alpha value. numKnots is always 6.
+	// NOTE: Alpha is in range [0, 65536] rather than [0, 1].
+	// Function takes pointer to array of 6 knots and determines subset of 4
+	// using passed alpha value. numKnots is always 6.
 	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots)
 	{
 		alpha *= numKnots - 3;
