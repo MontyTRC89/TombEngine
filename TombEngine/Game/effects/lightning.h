@@ -76,6 +76,6 @@ namespace TEN::Effects::Lightning
 	void UpdateElectricArcs();
 	void UpdateHelicalLasers();
 
-	void CalculateElectricArcSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc);
-	Vector3 ElectricArcSpline(int alpha, Vector3* knots, int numKnots);
+	void CalculateElectricArcSpline(const std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc);
+	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots);
 }

@@ -219,7 +219,7 @@ namespace TEN::Effects::Lightning
 				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalculateElectricArcSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc)
+	void CalculateElectricArcSpline(const std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc)
 	{
 		int bufferIndex = 0;
 
@@ -281,7 +281,7 @@ namespace TEN::Effects::Lightning
 	// 4-point Catmull-Rom spline interpolation.
 	// NOTE: Alpha is in the range [0, 65536] rather than [0, 1].
 	// BIG TODO: Make a family of curve classes with Bezier, B-Spline, Catmull-Rom.
-	Vector3 ElectricArcSpline(int alpha, Vector3* knots, int numKnots)
+	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots)
 	{
 		alpha *= numKnots - 3;
 		int span = alpha / pow(2, 16);
