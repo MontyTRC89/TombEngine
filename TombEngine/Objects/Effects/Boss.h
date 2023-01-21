@@ -17,10 +17,9 @@ namespace TEN::Effects::Boss
 
 	enum class BossFlagValue
 	{
-		ShockwaveRing      = (1 << 0),
-		ShockwaveExplosion = (1 << 1),
-		Shield             = (1 << 2),
-		Lizard             = (1 << 3)
+		ShockwaveExplosion = (1 << 0),
+		Shield             = (1 << 1),
+		Lizard             = (1 << 2)
 	};
 
 	void ShieldControl(int itemNumber);
@@ -32,7 +31,6 @@ namespace TEN::Effects::Boss
 
 	void SpawnShield(const ItemInfo& item, const Vector4& color);
 	void SpawnShockwaveExplosion(const ItemInfo& item, const Vector4& color);
-	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color);
 
 	void SpawnShieldAndRichochetSparks(const ItemInfo& item, const Vector3& pos, const Vector4& color);
 }

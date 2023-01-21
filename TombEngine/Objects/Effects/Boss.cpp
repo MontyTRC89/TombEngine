@@ -81,43 +81,6 @@ namespace TEN::Effects::Boss
 		SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwaveItem.Pose);
 	}
 
-	void SpawnShockwaveRing(const ItemInfo& item, const Vector3& pos, const Vector4& color)
-	{
-		if (!item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::ShockwaveRing))
-			return;
-
-		int itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
-			return;
-
-		auto& ringItem = g_Level.Items[itemNumber];
-
-		ringItem.Pose.Position = pos;
-		ringItem.Pose.Position.y -= CLICK(2);
-
-		ringItem.Pose.Orientation = EulerAngles(
-			Random::GenerateAngle(ANGLE(-60.0f), ANGLE(60.0f)),
-			Random::GenerateAngle(),
-			Random::GenerateAngle(ANGLE(-60.0f), ANGLE(60.0f)));
-
-		ringItem.ObjectNumber = ID_BOSS_EXPLOSION_RING;
-		ringItem.RoomNumber = item.RoomNumber;
-		ringItem.Flags |= IFLAG_ACTIVATION_MASK;
-
-		InitialiseItem(itemNumber);
-
-		auto result = color;
-		result.w = 1.0f;
-		ringItem.Model.Color = result;
-		ringItem.Collidable = false;					 // No collision for this entity.
-		ringItem.ItemFlags[0] = 70;						 // Timer before clearing; will fade out, then get destroyed.
-		ringItem.Model.Mutator[0].Scale = Vector3::Zero; // Start without scale.
-		ringItem.Status = ITEM_ACTIVE;
-
-		AddActiveItem(itemNumber);
-		SoundEffect(SFX_TR3_BLAST_CIRCLE, &ringItem.Pose);
-	}
-
 	void ShieldControl(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
