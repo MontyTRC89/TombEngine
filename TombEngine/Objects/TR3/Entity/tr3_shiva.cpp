@@ -464,24 +464,24 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		if (pos.has_value())
-		{
-			const auto& player = *GetLaraInfo(&source);
-			const auto& object = Objects[target.ObjectNumber];
+		if (!pos.has_value())
+			return;
 
-			// If guarded, ricochet without damage.
-			if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
-				target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE))
-			{
-				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
-			}
-			// Do basic hit effect.
-			else if (object.hitEffect == HitEffect::Blood)
-			{
-				DoBloodSplat(pos->x, pos->y, pos->z, (GetRandomControl() & 3) + 3, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, damage, isExplosive);
-			}
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		// If guarded, ricochet without damage.
+		if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
+			 target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE))
+		{
+			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+		}
+		// Do basic hit effect.
+		else if (object.hitEffect == HitEffect::Blood)
+		{
+			DoBloodSplat(pos->x, pos->y, pos->z, (GetRandomControl() & 3) + 3, source.Pose.Orientation.y, pos->RoomNumber);
+			DoItemHit(&target, damage, isExplosive);
 		}
 	}
 

@@ -1157,12 +1157,16 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)
 	{
+	case -4:
+		return item->ObjectNumber != ID_SMALL_SPIDER;
+
 	case -3:
 		return (item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
 				item->ObjectNumber != ID_YETI &&
 				item->ObjectNumber != ID_LIZARD &&
-				item->ObjectNumber != ID_APE);
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
 
 	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
@@ -1171,7 +1175,8 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 				item->ObjectNumber != ID_MP_WITH_STICK &&
 				item->ObjectNumber != ID_YETI &&
 				item->ObjectNumber != ID_LIZARD &&
-				item->ObjectNumber != ID_APE);
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
 	}
 
 	return true;
@@ -1189,12 +1194,11 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	// FIXME: Add vault down animations for Von Croy and baddies.
 	if (item->Floor > (y + CLICK(4.5f)))
 	{
 		vault = 0;
 	}
-	else if (item->Floor > (y + CLICK(3.5f)))
+	else if (item->Floor > (y + CLICK(3.5f)) && IsCreatureVaultAvailable(item, -4))
 	{
 		vault = -4;
 	}
