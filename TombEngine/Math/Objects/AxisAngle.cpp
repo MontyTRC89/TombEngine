@@ -41,21 +41,14 @@ namespace TEN::Math
 		*this = AxisAngle(eulers.ToQuaternion());
 	}
 
-	// Check. Probably correct.
+	// Check. Probably correct, but crashes if I use ToQuat on it again.
 	AxisAngle::AxisAngle(const Quaternion& quat)
 	{
-		float angle = acos(quat.w) * 2;
-		float invSinAngle = 1 / sin(angle / 2);
-		auto axis = Vector3(quat) * invSinAngle;
+		auto axis = Quaternion::Identity;
+		float angle = 0.0f;
+		XMQuaternionToAxisAngle((XMVECTOR*)&axis, &angle, quat);
 
-		// Avoid angle ambiguity.
-		if (angle > PI)
-		{
-			angle = PI_MUL_2 - angle;
-			axis = -axis;
-		}
-
-		this->Axis = axis;
+		this->Axis = Vector3(axis);
 		this->Angle = FROM_RAD(angle);
 	}
 
@@ -139,16 +132,10 @@ namespace TEN::Math
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
-	// Check.
 	Vector3 AxisAngle::RotatePoint(const Vector3& point)
 	{
-		auto quat = this->ToQuaternion();
-		auto pointAsQuat = Quaternion(point, 0.0f);
-		auto quatInverse = quat;
-		quatInverse.Inverse(quatInverse);
-
-		// Rotate the point.
-		return Vector3(pointAsQuat * (quat * quatInverse));
+		auto rotMatrix = this->ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
 	}
 
 	// Wrong? Direction seems to "lag behind" the required one.
@@ -172,10 +159,9 @@ namespace TEN::Math
 		return EulerAngles(*this);
 	}
 
-	// TODO: Crashes.
 	Quaternion AxisAngle::ToQuaternion() const
 	{
-		return Quaternion::Identity;// CreateFromAxisAngle(Axis, TO_RAD(Angle));
+		return Quaternion::CreateFromAxisAngle(Axis, TO_RAD(Angle));
 	}
 
 	Matrix AxisAngle::ToRotationMatrix() const
