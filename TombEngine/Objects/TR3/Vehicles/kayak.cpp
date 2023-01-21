@@ -300,7 +300,7 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
 
-			TriggerWakeFX(pos1, pos2, &color, length);
+			SpawnWaveSegment(pos1, pos2, kayakItem->RoomNumber, color);
 
 			if (rotate == 1)
 			{
@@ -1263,7 +1263,7 @@ namespace TEN::Entities::Vehicles
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
 			KayakDoWake(kayakItem, -CLICK(0.5f), 0, 0);
-			KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
+		//	KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
 		}
 
 		if (Wibble & 7)

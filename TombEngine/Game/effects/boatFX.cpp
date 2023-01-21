@@ -16,122 +16,189 @@
 #include "Math/Math.h"
 
 using std::vector;
+using std::array;
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::BOATFX
 {
+
+
 	constexpr auto NUM_WAKE_SPRITES = 32;
 	constexpr auto NUM_WAKE_WITDH = 32;
 	
-	//int LightningRandomSeed = 0x0D371F947;
-	//float FloatSinCosTable[8192];
-	Vector3i WakeFXPos[6];
-	short WakeFXBuffer[1024];
-	
-	std::vector<WAKE_PTS> WakePts;
 
-	/*void InitialiseFloatSinCosTable()
-	{
-		for (int i = 0; i < 8192; i++)
-		{
-			FloatSinCosTable[i] = sin(i * 0.000095873802f);
-		}
-	}*/
+	std::array<WaveSegment, NUM_WAKE_SPRITES> Segments;
+	std::array<Wave, 1> Waves;
+
 
 	void KayakUpdateWakeFX()
 	{
-		for (int i = 0; i < WakePts.size(); i++)
-		{
-			WAKE_PTS* waves = &WakePts[i];
 
-			if (waves->life > 0)
+
+		for (int i = 0; i < Segments.size(); i++)
+		{
+			auto& segment = Segments[i];
+
+			auto& prevSegment = Segments[i];
+
+			
+				
+		
+			
+
+			if (!segment.On)
+				continue;
+
+			segment.Age++;
+			segment.Life--; // NOTE: Life tracked in frame time.
+			if (segment.Life <= 0.0f)
 			{
-				waves->life -= 1.0f; // NOTE: Life tracked in frame time.
-				if (waves->life <= 0.0f)
-				{
-					waves->IsActive = false;
-					continue;
-				}
+				segment.On = false;
+				continue;
 			}
-		}
-
-		if (WakePts.size() > 0)
-		{
-			WakePts.erase(
-				std::remove_if(WakePts.begin(), WakePts.end(),
-					[](const WAKE_PTS& o) { return o.life == 0; }),
-				WakePts.end());
-		}
-	}
-
-	WAKE_PTS* TriggerWakeFX(const Vector3& origin, const Vector3& target, Vector4* color, char length)
-	{
-		WAKE_PTS waves;
-
-
-		auto normal = target - origin;
-		normal.Normalize();
-		float length4 = Vector3::Distance(origin, target);
-		float spacing = 64;//with
-		float offset = 250.0f;
-
-
-
-		//auto offset = Vector3(0.0f, width / 2, 0.0f);
-		auto basePos = (origin + ((length / 2) * normal));
-
-		waves.IsActive = true;
-		waves.life = 64;
-		waves.pos1 = basePos ;
-		waves.pos2 = target;
-		waves.Normal = normal;
-		waves.length = length;
-		waves.width = NUM_WAKE_WITDH;
-
-
-		WakePts.push_back(waves);
-		return &WakePts[WakePts.size() - 1];
-	}
-
-
-
-	void CalcSpline(Vector3i* pos, short* buffer, WAKE_PTS* wave)
-	{
-
-
-		buffer += 4;
 
 		
-			int segments = 32 ;
 
-			int dx = (pos[1].x - pos->x) / segments;
-			int dy = (pos[1].y - pos->y) / segments;
-			int dz = (pos[1].z - pos->z) / segments;
+			segment.ScaleRate += 1.0f;
 
-			int x = dx +  pos->x;
-			int y = dy +   pos->y;
-			int z = dz +  pos->z;
+			//wave.Segments[i].Vertices[0] = wave.Segments[i - 1].Vertices[0];
+			//wave.Segments[i].Vertices[1] = wave.Segments[i - 1].Vertices[1];
+		//segment.Segments[i].ScaleRate
 
-			if (segments > 0)
+		// Update opacity.
+		//segment.Opacity = Lerp(1.0f, 0.0f, 1.0f - (segment.Life / 16));
+		//segment.Color.w = segment.Opacity;
+		}
+			
+	}
+
+	void SpawnWaveSegment(const Vector3& origin, const Vector3& target, int roomNumber, const Vector4& color)
+	{
+		Vector3 startVector = origin;
+		Vector3 targetVector = target;
+		Vector3 lineVector = targetVector - startVector;
+
+		lineVector.Normalize();;// * 64;
+		//lineVector = lineVector * 64;
+		targetVector = startVector + lineVector;
+		//g_Renderer.AddLine3D(startVector, targetVector, Vector4(255, 255, 255, 1));
+
+		//g_Renderer.AddLine3D(basePos, targetPos, Vector4(color));
+		
+
+
+			auto& segment = GetFreeWaveSegment();
+			auto& prevSegment = GetPreviousSegment();
+
+
+					if (segment.On)
+						return;
+
+
+					
+					segment.On = true;
+					segment.Age = 0;
+					segment.Vertices[0] = startVector  ;
+					segment.Vertices[1] = startVector + Vector3(47.0f, 0.0f, 0.0f);
+
+						//(g_Renderer.AddDebugSphere(wave.Segments[i].Vertices[3], 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
+
+					
+
+					segment.Vertices[3] = prevSegment.Vertices[0];
+					segment.Vertices[2] = prevSegment.Vertices[1];// +Vector3(47.0f, 0.0f, 0.0f);
+
+					segment.On = true;
+
+					segment.RoomNumber = roomNumber;
+
+					segment.Opacity = 0.2f;
+					segment.Life = 64;
+					//segment.Segments[i].ScaleRate =
+
+					/*for (int i = 0; i < 32; i++)
+					{
+
+						wave.Segments[i].On = true;
+						wave.Segments[i].Vertices[0] = startVector;
+						wave.Segments[i].Vertices[1] = startVector + Vector3(47.0f, 0.0f, 0.0f);
+
+						//(g_Renderer.AddDebugSphere(wave.Segments[i].Vertices[3], 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
+
+						wave.Segments[i].Vertices[3] = targetVector;
+						wave.Segments[i].Vertices[2] = targetVector + Vector3(47.0f, 0.0f, 0.0f);
+
+						wave.Segments[i].On = true;
+
+						wave.Segments[i].RoomNumber = roomNumber;
+
+						wave.Segments[i].Opacity = 1.0f;
+						wave.Segments[i].Life = 16;
+					}*/
+
+
+
+				
+			
+		
+	
+		
+	}
+
+	void ClearWaveSegment()
+	{
+		//for (auto& segment : Waves)
+		//	segment = {};
+	}
+
+	WaveSegment& GetFreeWaveSegment()
+	{
+
+		for (int i = 0; i < Segments.size(); i++)
 			{
-				for (int i = segments; i > 0; i--)
-				{
-					buffer[0] = x;
-					buffer[1] = y;
-					buffer[2] = z;
-
-					x += dx  ;
-					y += dy ;
-					z += dz ;
-
-					buffer += 4;
-				}
+				if (!Segments[i].On)
+					return Segments[i];
 			}
 		
 
+		return Segments[0];
 	}
 
+	WaveSegment& GetPreviousSegment()
+	{
+		int oldestLifeIndex = 0;
+		int youngestAge = 0;
 
+		for (int i = 0; i < Segments.size(); i++)
+		{
+			
+
+			if (youngestAge < Segments[i].Life)
+			{
+				youngestAge = Segments[i].Life;
+				oldestLifeIndex = i;
+			}
+
+
+			if (!Segments[i].On)
+			{
+
+
+				if (i > 0)				
+					return Segments[i - 1];
+				//else
+				//	return Segments[oldestLifeIndex];
+					
+				
+
+
+			}
+
+		}
+
+
+		return Segments[oldestLifeIndex];
+	}
 
 
 }

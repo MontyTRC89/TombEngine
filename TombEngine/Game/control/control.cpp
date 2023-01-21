@@ -51,6 +51,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
+#include "Game/effects/boatFX.h"
 #include <chrono>
 
 using namespace TEN::Effects;
@@ -69,6 +70,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace std::chrono;
+using namespace TEN::Effects::BOATFX;
 
 using std::string;
 using std::unordered_map;
@@ -213,6 +215,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
+		KayakUpdateWakeFX();
 
 		// Update screen UI and overlays.
 		UpdateBars(LaraItem);
