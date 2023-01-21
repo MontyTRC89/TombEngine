@@ -285,22 +285,22 @@ namespace TEN::Effects::Lightning
 	{
 		alpha *= numKnots - 3;
 		int span = alpha / pow(2, 16);
-
 		if (span >= (numKnots - 3))
 			span = numKnots - 4;
 
 		alpha -= 65536 * span;
+		float alphaNorm = alpha / pow(2, 16);
 
-		auto* knot = &knots[span];
+		auto* knotPtr = &knots[span];
 
-		auto point1 = knot[1] + (knot[1] / 2) - (knot[2] / 2) - knot[2] + (knot[3] / 2) + ((-knot[0] - Vector3::One) / 2);
-		auto ret = (point1 * alpha) / pow(2, 16);
-		auto point2 = ret + Vector3(2.0f) * knot[2] - 2 * knot[1] - (knot[1] / 2) - (knot[3] / 2) + knot[0];
-		ret = (point2 * alpha) / pow(2, 16);
-		auto point3 = ret + (knot[2] / 2) + ((-knot[0] - Vector3::One) / 2);
-		ret = (point3 * alpha) / pow(2, 16);
+		auto point1 = knotPtr[1] + (knotPtr[1] / 2) - (knotPtr[2] / 2) - knotPtr[2] + (knotPtr[3] / 2) + ((-knotPtr[0] - Vector3::One) / 2);
+		auto ret = point1 * alphaNorm;
+		auto point2 = ret + Vector3(2.0f) * knotPtr[2] - 2 * knotPtr[1] - (knotPtr[1] / 2) - (knotPtr[3] / 2) + knotPtr[0];
+		ret = point2 * alphaNorm;
+		auto point3 = ret + (knotPtr[2] / 2) + ((-knotPtr[0] - Vector3::One) / 2);
+		ret = point3 * alphaNorm;
 
-		return (ret + knot[1]);
+		return (ret + knotPtr[1]);
 	}
 
 	// More standard version. Maybe use this later.
