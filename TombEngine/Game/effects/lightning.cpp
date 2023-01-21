@@ -284,12 +284,12 @@ namespace TEN::Effects::Lightning
 	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots)
 	{
 		alpha *= numKnots - 3;
+
 		int span = alpha / pow(2, 16);
 		if (span >= (numKnots - 3))
 			span = numKnots - 4;
 
-		alpha -= 65536 * span;
-		float alphaNorm = alpha / pow(2, 16);
+		float alphaNorm = (alpha - (65536 * span)) / pow(2, 16);
 
 		auto* knotPtr = &knots[span];
 
