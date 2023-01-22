@@ -150,7 +150,28 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
 								if (object->intelligent)
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
+								{
+									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
+									auto target = origin->ToVector3() + (directionNorm * weapon.TargetDist);
+									auto ray = Ray(origin->ToVector3(), directionNorm);
+									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+									int bestJointIndex = NO_JOINT;
+									float bestDistance = INFINITY;
+									for (int i = 0; i < num; i++)
+									{
+										auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+										float distance = 0.0f;
+										if (ray.Intersects(sphere, distance))
+										{
+											if (distance < bestDistance)
+											{
+												bestDistance = distance;
+												bestJointIndex = i;
+											}
+										}
+									}
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+								}
 								else
 								{
 									// TR5

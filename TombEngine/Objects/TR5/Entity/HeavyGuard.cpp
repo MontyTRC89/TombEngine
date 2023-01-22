@@ -527,7 +527,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		if (pos.has_value())
 		{
-			if (jointIndex == 2 )
+			if (jointIndex == 2)
 			{
 				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
 				DoDamage(&target, INT_MAX);
