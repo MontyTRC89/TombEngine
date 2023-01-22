@@ -157,41 +157,41 @@ namespace TEN::Effects::Boss
 
 	void SpawnExplosionSmoke(const Vector3& pos)
 	{
-		auto& spark = *GetFreeParticle();
+		auto& smoke = *GetFreeParticle();
 
-		spark.on = true;
-		spark.sR = 75;
-		spark.sG = 125;
-		spark.sB = 175;
-		spark.dR = 25;
-		spark.dG = 80;
-		spark.dB = 100;
-		spark.colFadeSpeed = 8;
-		spark.fadeToBlack = 64;
-		spark.life =
-		spark.sLife = Random::GenerateInt(96, 128);
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.x = pos.x + Random::GenerateInt(-16, 16);
-		spark.y = pos.y + Random::GenerateInt(-16, 16);
-		spark.z = pos.z + Random::GenerateInt(-16, 16);
-		spark.xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-		spark.yVel = GetRandomControl() - 128;
-		spark.zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-		spark.friction = 6;
-		spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark.rotAng = GetRandomControl() & 0xFFF;
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 64.0f));
+		auto effectPos = Random::GeneratePointInSphere(sphere);
 
-		if (Random::TestProbability(1 / 2.0f))
-			spark.rotAdd = -16 - (GetRandomControl() & 0xF);
-		else
-			spark.rotAdd = (GetRandomControl() & 0xF) + 16;
+		smoke.on = true;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		spark.scalar = 3;
-		spark.gravity = -3 - (GetRandomControl() & 3);
-		spark.maxYvel = -8 - (GetRandomControl() & 3);
-		spark.dSize = (GetRandomControl() & 0x1F) + 256;
-		spark.sSize = spark.dSize / 2;
-		spark.size = spark.dSize / 2;
+		smoke.x = effectPos.x;
+		smoke.y = effectPos.y;
+		smoke.z = effectPos.z;
+		smoke.xVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.yVel = GetRandomControl() - 128;
+		smoke.zVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.sR = 75;
+		smoke.sG = 125;
+		smoke.sB = 175;
+		smoke.dR = 25;
+		smoke.dG = 80;
+		smoke.dB = 100;
+		smoke.colFadeSpeed = 8;
+		smoke.fadeToBlack = 64;
+		smoke.life =
+		smoke.sLife = Random::GenerateInt(96, 128);
+		smoke.friction = 6;
+		smoke.rotAng = Random::GenerateAngle();
+		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+
+		smoke.scalar = 3;
+		smoke.gravity = Random::GenerateInt(-8, -4);
+		smoke.maxYvel = Random::GenerateInt(-12, -8);
+		smoke.dSize = Random::GenerateInt(256, 288);
+		smoke.sSize =
+		smoke.size = smoke.dSize / 2;
+		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 
 	// NOTE: Can really die after deathCount 60.
