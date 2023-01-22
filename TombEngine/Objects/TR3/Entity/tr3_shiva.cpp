@@ -101,72 +101,6 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
-	}
-
-	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
-	}
-
-	static bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
-	{
-		const auto& object = Objects[item.ObjectNumber];
-		auto& creature = *GetCreatureInfo(&item);
-
-		if (creature.Flags == 0 && (item.TestFlags(2, 1) || item.TestFlags(2, 2)))
-		{
-			creature.Flags = 1;
-
-			if (isDead && item.ItemFlags[0] < 0)
-			{
-				item.SetFlagField(2, 0);
-			}
-			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
-			{
-				item.SetFlagField(2, 0);
-			}
-			else
-			{
-				auto pos = GetJointPosition(&item, item.ItemFlags[0]).ToVector3();
-				SpawnShivaSmoke(pos, item.RoomNumber);
-
-				if (isDead)
-				{
-					SwapShivaMeshToStone(item, item.ItemFlags[0]);
-					item.ItemFlags[0]--;
-				}
-				else
-				{
-					SwapShivaMeshToNormal(item, item.ItemFlags[0]);
-					item.ItemFlags[0]++;
-				}
-			}
-		}
-		else
-		{
-			creature.Flags--;
-		}
-
-		if (item.TestFlags(2, 0) && !isDead)
-		{
-			item.Animation.TargetState = SHIVA_STATE_IDLE;
-			creature.Flags = -45;
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 1); // Is alive (for savegame).
-		}
-		else if (item.TestFlags(2, 0) && isDead)
-		{
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 2); // Is dead.
-			return true;
-		}
-
-		return false;
-	}
-
 	static void SpawnShivaSmoke(const Vector3& pos, int roomNumber)
 	{
 		auto& smoke = *GetFreeParticle();
@@ -248,6 +182,72 @@ namespace TEN::Entities::Creatures::TR3
 		smoke.sSize = scale / 8;
 		smoke.dSize = scale;
 		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	}
+
+	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
+	}
+
+	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
+	}
+
+	static bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
+	{
+		const auto& object = Objects[item.ObjectNumber];
+		auto& creature = *GetCreatureInfo(&item);
+
+		if (creature.Flags == 0 && (item.TestFlags(2, 1) || item.TestFlags(2, 2)))
+		{
+			creature.Flags = 1;
+
+			if (isDead && item.ItemFlags[0] < 0)
+			{
+				item.SetFlagField(2, 0);
+			}
+			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
+			{
+				item.SetFlagField(2, 0);
+			}
+			else
+			{
+				auto pos = GetJointPosition(&item, item.ItemFlags[0]).ToVector3();
+				SpawnShivaSmoke(pos, item.RoomNumber);
+
+				if (isDead)
+				{
+					SwapShivaMeshToStone(item, item.ItemFlags[0]);
+					item.ItemFlags[0]--;
+				}
+				else
+				{
+					SwapShivaMeshToNormal(item, item.ItemFlags[0]);
+					item.ItemFlags[0]++;
+				}
+			}
+		}
+		else
+		{
+			creature.Flags--;
+		}
+
+		if (item.TestFlags(2, 0) && !isDead)
+		{
+			item.Animation.TargetState = SHIVA_STATE_IDLE;
+			creature.Flags = -45;
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 1); // Is alive (for savegame).
+		}
+		else if (item.TestFlags(2, 0) && isDead)
+		{
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 2); // Is dead.
+			return true;
+		}
+
+		return false;
 	}
 
 	void InitialiseShiva(short itemNumber)

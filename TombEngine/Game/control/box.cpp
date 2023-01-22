@@ -1478,7 +1478,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
 	}
 
-	return (isReachable ? floor->Box : item->BoxNumber);
+	return (isReachable ? floor->Box : NO_BOX);
 }
 
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
@@ -1504,7 +1504,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->zoneNumber = zone[item->BoxNumber];
 
 	enemy->BoxNumber = TargetReachable(item, enemy);
-	AI->enemyZone = zone[enemy->BoxNumber];
+	AI->enemyZone = enemy->BoxNumber == NO_BOX ? NO_ZONE : zone[enemy->BoxNumber];
 
 	if (!object->nonLot)
 	{
