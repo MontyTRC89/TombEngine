@@ -927,7 +927,7 @@ void DropPickups(ItemInfo* item)
 		// Therefore, we need to temporarily inject actual room number, so AlignEntityToSurface succeeds.
 
 		pickup->RoomNumber = item->RoomNumber;
-		AlignEntityToSurface(pickup, Vector2(Objects[item->ObjectNumber].radius));
+		AlignEntityToSurface(pickup, Vector2(Objects[pickup->ObjectNumber].radius));
 		pickup->RoomNumber = -1;
 		pickup->Flags |= 32;
 
