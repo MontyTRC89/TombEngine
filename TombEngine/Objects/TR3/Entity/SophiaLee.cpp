@@ -5,20 +5,24 @@
 #include "Game/animation.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
+#include "Objects/Effects/enemy_missile.h"
 #include "Game/items.h"
+#include "Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "misc.h"
-#include <setup.h>
+#include "setup.h"
 
 using namespace TEN::Effects::Boss;
+using namespace TEN::Entities::Effects;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SOPHIALEE_VAULT_SHIFT = 96;
 	constexpr auto SOPHIALEE_WALK_TURN_RATE_MAX = ANGLE(4);
 	constexpr auto SOPHIALEE_RUN_TURN_RATE_MAX = ANGLE(7);
-	constexpr auto SOPHIALEE_Y_DISTANCE_RANGE = CLICK(2);
+	constexpr auto SOPHIALEE_WALK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SOPHIALEE_Y_DISTANCE_RANGE = BLOCK(1);
 	constexpr auto SOPHIALEE_REACHED_GOAL_RANGE = CLICK(2);
 	constexpr auto SOPHIALEE_CHARGE_TIMER_DURATION = 600;
 
@@ -109,28 +113,69 @@ namespace TEN::Entities::Creatures::TR3
 		return Vector3i::Zero;
 	}
 
+	static void RotateToTarget(ItemInfo* item, AI_INFO* ai, short angleRate)
+	{
+		if (abs(ai->angle) < angleRate)
+			item->Pose.Orientation.y += ai->angle;
+		else if (ai->angle < 0)
+			item->Pose.Orientation.y -= angleRate;
+		else
+			item->Pose.Orientation.y += angleRate;
+	}
+
+	static void TriggerLaserBolt(ItemInfo* item, const BiteInfo& bite, bool isBigLaser, short angleAdd)
+	{
+		short fxNumber = CreateNewEffect(item->RoomNumber);
+		if (fxNumber == -1)
+			return;
+
+		auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
+		auto& fx = EffectList[fxNumber];
+		auto laserType = isBigLaser ? (short)MissileType::SophiaLee_Big : (short)MissileType::SophiaLee_Small;
+		fx.pos.Position.x = pos.x;
+		fx.pos.Position.y = pos.y;
+		fx.pos.Position.z = pos.z;
+		fx.pos.Orientation.x = item->Pose.Orientation.x;
+		fx.pos.Orientation.y = item->Pose.Orientation.y + angleAdd;
+		fx.pos.Orientation.z = item->Pose.Orientation.z;
+		fx.roomNumber = item->RoomNumber;
+		fx.counter = 0;
+		fx.flag1 = laserType;
+		fx.flag2 = isBigLaser ? 20 : 1; // damage
+		fx.speed = Random::GenerateInt(96, 128);
+		fx.objectNumber = ID_ENERGY_BUBBLES;
+		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (laserType - 1);
+	}
+
 	static void LondonBossTowerControl(ItemInfo* item, CreatureInfo* creature, SophiaData* data)
 	{
+		if (item->AIBits)
+			GetAITarget(creature);
+
 		AI_INFO ai;
 		CreatureAIInfo(item, &ai);
 
+		bool isEnemyAhead = ai.verticalDistance >= SOPHIALEE_Y_DISTANCE_RANGE; // If enemy is up, then sophia need to get to next AI_X2
+		bool isSophiaAhead = ai.verticalDistance <= -SOPHIALEE_Y_DISTANCE_RANGE; // If enemy is down, then sophia need to get to previous AI_X1
+
 		// Check the old and next position of ai object
 		// This will allow sophia to go down or up based on enemy y pos.
-		auto oldPosition = GetAIPosition(item, ID_AI_X1, item->ItemFlags[1]);
-		auto nextPosition = GetAIPosition(item, ID_AI_X2, item->ItemFlags[1]);
-		if (Vector3i::Distance(item->Pose.Position, nextPosition) < SOPHIALEE_REACHED_GOAL_RANGE)
+		FindAITargetObject(creature, ID_AI_X1, creature->LocationAI, false);
+		// Avoid increasing the value when a enemy shoot her.
+		if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) < SOPHIALEE_REACHED_GOAL_RANGE)
 		{
 			creature->ReachedGoal = TRUE;
+			creature->Enemy = LaraItem; // TODO: deal with LaraItem global.
+			if (isEnemyAhead)
+				creature->LocationAI++;
+			else if (isSophiaAhead)
+				creature->LocationAI--;
 		}
 		else
 		{
 			creature->ReachedGoal = FALSE;
-			if (item->ItemFlags[2] == 1) // enemy is ahead
-				creature->Target = nextPosition;
-			else if (item->ItemFlags[2] == -1)
-				creature->Target = oldPosition;
 		}
-		
+
 		if (item->Timer > 0) // Used for charge count, if 0, sophia will be able to do a new charge animation.
 			item->Timer--;
 
@@ -144,17 +189,15 @@ namespace TEN::Entities::Creatures::TR3
 			data->torsoYAngle = 0;
 		}
 
-		auto* enemy = creature->Enemy;
-		bool isEnemyAhead = ai.verticalDistance >= SOPHIALEE_Y_DISTANCE_RANGE; // If enemy is up, then sophia need to get to next AI_X2
-		bool isSophiaAhead = ai.verticalDistance <= -SOPHIALEE_Y_DISTANCE_RANGE; // If enemy is down, then sophia need to get to previous AI_X1
-		item->ItemFlags[2] = isEnemyAhead ? 1 : isSophiaAhead ? -1 : 0;
+		GetCreatureMood(item, &ai, true);
+		CreatureMood(item, &ai, true);
 
 		data->angle = CreatureTurn(item, creature->MaxTurn);
 		switch (item->Animation.ActiveState)
 		{
 		case SOPHIALEE_STATE_LAUGH:
 			creature->MaxTurn = 0;
-
+			RotateToTarget(item, &ai, SOPHIALEE_WALK_TURN_RATE_MAX);
 			break;
 		case SOPHIALEE_STATE_STAND:
 			creature->MaxTurn = 0;
@@ -183,11 +226,9 @@ namespace TEN::Entities::Creatures::TR3
 		case SOPHIALEE_STATE_WALK:
 			creature->MaxTurn = SOPHIALEE_WALK_TURN_RATE_MAX;
 			if (creature->ReachedGoal)
-			{
 				item->Animation.TargetState = SOPHIALEE_STATE_STAND;
-				break;
-			}
-
+			else if (ai.distance > SOPHIALEE_WALK_RANGE)
+				item->Animation.TargetState = SOPHIALEE_STATE_RUN;
 			break;
 		case SOPHIALEE_STATE_RUN:
 			creature->MaxTurn = SOPHIALEE_RUN_TURN_RATE_MAX;
@@ -201,6 +242,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 		case SOPHIALEE_STATE_SUMMON:
 			creature->MaxTurn = 0;
+			RotateToTarget(item, &ai, SOPHIALEE_WALK_TURN_RATE_MAX);
 
 			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + SOPHIALEE_ANIM_SUMMON_START)
 			{
@@ -216,7 +258,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = SOPHIALEE_STATE_STAND;
 				}
 			}
-			else if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + SOPHIALEE_ANIM_SUMMON && item->Animation.FrameNumber == GetFrameCount(item->Animation.AnimNumber))
+			else if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SOPHIALEE_ANIM_SUMMON) && item->Animation.FrameNumber >= GetFrameCount(item->Animation.AnimNumber) - 1)
 			{
 				item->SetFlagField(4, 1);
 			}
@@ -224,19 +266,36 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 		case SOPHIALEE_STATE_BIG_SHOOT:
 			creature->MaxTurn = 0;
+			RotateToTarget(item, &ai, SOPHIALEE_WALK_TURN_RATE_MAX);
 			if (ai.ahead)
 			{
 				data->torsoYAngle = ai.angle;
 				data->torsoXAngle = ai.xAngle;
 			}
+
 			item->SetFlagField(4, 0);
+
+			if (item->Animation.FrameNumber == GetFrameNumber(item, 36))
+			{
+				TriggerLaserBolt(item, SOPHIALEE_Right, false, ANGLE(1.5));
+				TriggerLaserBolt(item, SOPHIALEE_Staff, true, 0);
+				TriggerLaserBolt(item, SOPHIALEE_Left, false, -ANGLE(1.5));
+			}
+			
 			break;
 		case SOPHIALEE_STATE_SMALL_SHOOT:
 			creature->MaxTurn = 0;
+			RotateToTarget(item, &ai, SOPHIALEE_WALK_TURN_RATE_MAX);
 			if (ai.ahead)
 			{
 				data->torsoYAngle = ai.angle;
 				data->torsoXAngle = ai.xAngle;
+			}
+
+			if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
+			{
+				TriggerLaserBolt(item, SOPHIALEE_Right, false, ANGLE(1.5));
+				TriggerLaserBolt(item, SOPHIALEE_Left, false, -ANGLE(1.5));
 			}
 
 			break;

@@ -465,23 +465,12 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 	}
 }
 
+const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	static constexpr auto rotationMax = 30;
-	static constexpr auto lifeMax	  = 44;
-
-	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
-
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	constexpr auto rotationMax = 30;
+	constexpr auto lifeMax = 44;
 	int scalar = 1;
-
-	if (dx < -BLOCK(16) || dx > BLOCK(16) ||
-		dz < -BLOCK(16) || dz > BLOCK(16))
-	{
-		return;
-	}
-
 	if (roomNumber < 0)
 	{
 		roomNumber = -roomNumber;

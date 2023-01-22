@@ -1401,45 +1401,39 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 	}
 }
 
-void FindAITargetObject(CreatureInfo* creature, short objectNumber)
+void FindAITargetObject(CreatureInfo* creature, int objectNumber)
 {
 	auto* item = &g_Level.Items[creature->ItemNumber];
+	FindAITargetObject(creature, objectNumber, item->ItemFlags[3], true);
+}
 
+void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone)
+{
+	auto* item = &g_Level.Items[creature->ItemNumber];
 	if (g_Level.AIObjects.size() > 0)
 	{
 		AI_OBJECT* foundObject = nullptr;
-
-		for (int i = 0; i < g_Level.AIObjects.size(); i++)
+		for (auto& aiObj : g_Level.AIObjects)
 		{
-			auto* aiObject = &g_Level.AIObjects[i];
-
-			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->ItemFlags[3] && aiObject->roomNumber != NO_ROOM)
+			if (aiObj.objectNumber == objectNumber && aiObj.triggerFlags == ocb && aiObj.roomNumber != NO_ROOM)
 			{
 				int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
-
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
-
-				room = &g_Level.Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = GetSector(room, aiObject->pos.Position.x - room->x, aiObject->pos.Position.z - room->z)->Box;
-
-				if (item->BoxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
+				room = &g_Level.Rooms[aiObj.roomNumber];
+				aiObj.boxNumber = GetSector(room, aiObj.pos.Position.x - room->x, aiObj.pos.Position.z - room->z)->Box;
+				if (item->BoxNumber == NO_BOX || aiObj.boxNumber == NO_BOX)
 					return;
-
-				if (zone[item->BoxNumber] == zone[aiObject->boxNumber])
-				{
-					foundObject = aiObject;
-					break;
-				}
+				if (checkSameZone && (zone[item->BoxNumber] != zone[aiObj.boxNumber]))
+					return;
+				foundObject = &aiObj; // Don't check for same zone, we need it to be like this for sophia.
 			}
 		}
 
 		if (foundObject != nullptr)
 		{
 			auto* aiItem = creature->AITarget;
-
 			creature->Enemy = aiItem;
-
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
 			aiItem->Pose.Position = foundObject->pos.Position;
@@ -1447,11 +1441,10 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
 			aiItem->BoxNumber = foundObject->boxNumber;
-
-			if (!(creature->AITarget->Flags & 32))
+			if (!(creature->AITarget->Flags & ItemFlags::IFLAG_TRIGGERED))
 			{
-				creature->AITarget->Pose.Position.x += phd_sin(creature->AITarget->Pose.Orientation.y) * 256;
-				creature->AITarget->Pose.Position.z += phd_cos(creature->AITarget->Pose.Orientation.y) * 256;
+				creature->AITarget->Pose.Position.x += phd_sin(creature->AITarget->Pose.Orientation.y) * CLICK(1);
+				creature->AITarget->Pose.Position.z += phd_cos(creature->AITarget->Pose.Orientation.y) * CLICK(1);
 			}
 		}
 	}

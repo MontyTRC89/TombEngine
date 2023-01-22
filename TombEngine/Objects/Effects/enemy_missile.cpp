@@ -156,7 +156,11 @@ namespace TEN::Entities::Effects
 				fx->speed++;
 			else
 				fx->speed += 3;
+		}
 
+		if (fx->speed < maxVelocity && fx->flag1 != (int)MissileType::SophiaLee_Small &&
+			                           fx->flag1 != (int)MissileType::SophiaLee_Big)
+		{
 			short dy = orient.y - fx->pos.Orientation.y;
 			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
@@ -187,7 +191,6 @@ namespace TEN::Entities::Effects
 			}
 
 			fx->pos.Orientation.x += dx;
-
 			if (fx->flag1 != (int)MissileType::Demigod3Radial && (fx->flag1 != (int)MissileType::Mutant || !fx->counter))
 				fx->pos.Orientation.y += dy;
 		}
@@ -213,12 +216,24 @@ namespace TEN::Entities::Effects
 			fx->pos.Position.y = oldY;
 			fx->pos.Position.z = oldZ;
 
-			if (fx->flag1 != (int)MissileType::Mutant)
+			if (fx->flag1 != (int)MissileType::Mutant &&
+				fx->flag1 != (int)MissileType::SophiaLee_Small &&
+				fx->flag1 != (int)MissileType::SophiaLee_Big)
 				BubblesShatterFunction(fx, 0, -32);
 
 			if (fx->flag1 == (int)MissileType::SethLarge)
 			{
 				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+			}
+			else if (fx->flag1 == (int)MissileType::SophiaLee_Small)
+			{
+				TriggerShockwave(&fx->pos, 5, 32, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180), 0);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+			}
+			else if (fx->flag1 == (int)MissileType::SophiaLee_Big)
+			{
+				TriggerShockwave(&fx->pos, 10, 64, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180), 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			}
 			else
@@ -267,7 +282,9 @@ namespace TEN::Entities::Effects
 		if (ItemNearLara(fx->pos.Position, 200))
 		{
 			LaraItem->HitStatus = true;
-			if (fx->flag1 != (int)MissileType::Mutant)
+			if (fx->flag1 != (int)MissileType::Mutant &&
+				fx->flag1 != (int)MissileType::SophiaLee_Small &&
+				fx->flag1 != (int)MissileType::SophiaLee_Big)
 				BubblesShatterFunction(fx, 0, -32);
 
 			KillEffect(fxNum);
@@ -277,6 +294,16 @@ namespace TEN::Entities::Effects
 				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 128, 64, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 				ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f));
+			}
+			else if (fx->flag1 == (int)MissileType::SophiaLee_Small)
+			{
+				TriggerShockwave(&fx->pos, 5, 32, 128, 0, 128, 128, 24, fx->pos.Orientation.y, fx->flag2);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+			}
+			else if (fx->flag1 == (int)MissileType::SophiaLee_Big)
+			{
+				TriggerShockwave(&fx->pos, 10, 64, 128, 0, 128, 128, 24, fx->pos.Orientation.y, fx->flag2);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			}
 			else if (fx->flag1)
 			{
