@@ -197,60 +197,52 @@ namespace TEN::Effects::Boss
 	// NOTE: Can really die after deathCount 60.
 	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color)
 	{
-		auto pos = Vector3::Zero;
-
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 		item.HitPoints = NOT_TARGETABLE;
 
-		// Start doing the explosion (entity will do the count).
-		short counter = item.ItemFlags[(int)BossItemFlags::ExplodeCount];
+		// Start explosion (entity will keep duration count).
+		int counter = item.ItemFlags[(int)BossItemFlags::ExplodeCount];
 		if (counter == 1)
 		{
 			SpawnShockwaveExplosion(item, color);
+
+			auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(0.5f));
 			for (int i = 0; i < 3; i++)
 			{
-				pos = Vector3(
-					item.Pose.Position.x + Random::GenerateInt(-512, 512),
-					(item.Pose.Position.y - CLICK(3)) + Random::GenerateInt(-512, 512),
-					item.Pose.Position.z + Random::GenerateInt(-512, 512));
+				auto pos = Random::GeneratePointInSphere(sphere);
 				SpawnExplosionSmoke(pos);
 			}
 		}
 
 		if (counter > 0 && !(counter % 10))
 		{
+			auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(0.5f));
 			for (int i = 0; i < 3; i++)
 			{
-				pos = Vector3(
-					item.Pose.Position.x + Random::GenerateInt(-512, 512),
-					(item.Pose.Position.y - CLICK(3)) + Random::GenerateInt(-512, 512),
-					item.Pose.Position.z + Random::GenerateInt(-512, 512));
+				auto pos = Random::GeneratePointInSphere(sphere);
 				SpawnExplosionSmoke(pos);
 			}
 
-			auto shockwavePos = Pose(
-				item.Pose.Position.x + Random::GenerateInt(-64, 64),
-				(item.Pose.Position.y - CLICK(2)) + Random::GenerateInt(-64, 64),
-				item.Pose.Position.z + Random::GenerateInt(-64, 64), 
-				item.Pose.Orientation);
+			sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+			auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
-			float angle = Random::GenerateFloat(0.0f, 180.0f);
-			int random = Random::GenerateInt(264, 612);
+			int speed = Random::GenerateInt(BLOCK(0.5f), BLOCK(1.6f));
+			auto orient2D = Random::GenerateAngle(0, ANGLE(180.0f));
 
-			unsigned char r = color.x * UCHAR_MAX;
-			unsigned char g = color.y * UCHAR_MAX;
-			unsigned char b = color.z * UCHAR_MAX;
-
-			TriggerShockwave(&shockwavePos, 300, 512, random, r, g, b, 36, ANGLE(angle), 0);
+			TriggerShockwave(
+				&shockwavePos, 300, BLOCK(0.5f), speed,
+				color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX,
+				36, orient2D, 0);
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}
 
 		TriggerDynamicLight(
 			item.Pose.Position.x,
 			item.Pose.Position.y - CLICK(2),
-			item.Pose.Position.z, counter / 2,
-			color.x * 255, color.y * 255, color.z * 255);
+			item.Pose.Position.z,
+			counter / 2,
+			color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
 		if (counter >= deathCountToDie)
 			CreatureDie(itemNumber, true);

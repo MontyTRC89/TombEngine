@@ -1158,7 +1158,7 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 	switch (stepCount)
 	{
 	case -4:
-		return item->ObjectNumber != ID_SMALL_SPIDER;
+		return (item->ObjectNumber != ID_SMALL_SPIDER);
 
 	case -3:
 		return (item->ObjectNumber != ID_CIVVY &&

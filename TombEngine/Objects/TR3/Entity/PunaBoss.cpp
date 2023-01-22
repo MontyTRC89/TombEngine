@@ -148,52 +148,54 @@ namespace TEN::Entities::Creatures::TR3
 	static void SpawnSummonSmoke(const Vector3& pos)
 	{
 		auto& smoke = *GetFreeParticle();
+		
+		int scale = Random::GenerateInt(256, 384);
 
+		smoke.on = true;
+		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.x = pos.x + Random::GenerateInt(-64, 64);
+		smoke.y = pos.y - Random::GenerateInt(0, 32);
+		smoke.z = pos.z + Random::GenerateInt(-64, 64);
+		smoke.xVel = Random::GenerateInt(-128, 128);
+		smoke.yVel = Random::GenerateInt(-32, -16);
+		smoke.zVel = Random::GenerateInt(-128, 128);
 		smoke.sR = 16;
 		smoke.sG = 64;
 		smoke.sB = 0;
 		smoke.dR = 8;
 		smoke.dG = 32;
 		smoke.dB = 0;
-		smoke.colFadeSpeed = 16 + (GetRandomControl() & 7);
+		smoke.colFadeSpeed = Random::GenerateInt(16, 24);
 		smoke.fadeToBlack = 64;
-		smoke.sLife = smoke.life = (GetRandomControl() & 15) + 96;
+		smoke.sLife =
+		smoke.life = Random::GenerateInt(96, 112);
 
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		smoke.extras = 0;
 		smoke.dynamic = -1;
-
-		smoke.x = pos.x + ((GetRandomControl() & 127) - 64);
-		smoke.y = pos.y - (GetRandomControl() & 31);
-		smoke.z = pos.z + ((GetRandomControl() & 127) - 64);
-		smoke.xVel = ((GetRandomControl() & 255) - 128);
-		smoke.yVel = -(GetRandomControl() & 15) - 16;
-		smoke.zVel = ((GetRandomControl() & 255) - 128);
 		smoke.friction = 0;
 
 		if (Random::TestProbability(1 / 2.0f))
 		{
-			smoke.rotAng = GetRandomControl() & 4095;
+			smoke.rotAng = Random::GenerateAngle();
 			smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
 
-			if (GetRandomControl() & 1)
-				smoke.rotAdd = -(GetRandomControl() & 7) - 4;
+			if (Random::TestProbability(1 / 2.0f))
+				smoke.rotAdd = Random::GenerateInt(-12, -8);
 			else
-				smoke.rotAdd = (GetRandomControl() & 7) + 4;
+				smoke.rotAdd = Random::GenerateInt(8, 12);
 		}
 		else
 		{
 			smoke.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_WIND;
 		}
 
-		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		smoke.scalar = 3;
-		smoke.gravity = -(GetRandomControl() & 7) - 8;
-		smoke.maxYvel = -(GetRandomControl() & 7) - 4;
-		int size = (GetRandomControl() & 128) + 256;
-		smoke.size = smoke.sSize = size >> 1;
-		smoke.dSize = size;
-		smoke.on = true;
+		smoke.gravity = Random::GenerateInt(-16, -8);
+		smoke.maxYvel = Random::GenerateInt(-12, -8);
+		smoke.size =
+		smoke.sSize = scale / 2;
+		smoke.dSize = scale;
 	}
 
 	static void SpawnLizard(ItemInfo& item)
@@ -512,11 +514,11 @@ namespace TEN::Entities::Creatures::TR3
 			if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
 				target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
 			{
-				Vector4 shieldColor = Vector4(0.0f, Random::GenerateFloat(0.0f, 0.5f), 
-											Random::GenerateFloat(0.0f, 0.5f), 
-											Random::GenerateFloat(0.5f, 0.8f));
+				auto color = Vector4(
+					0.0f, Random::GenerateFloat(0.0f, 0.5f), Random::GenerateFloat(0.0f, 0.5f), 
+					Random::GenerateFloat(0.5f, 0.8f));
 
-				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), shieldColor);
+				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), color);
 			}
 			else
 			{

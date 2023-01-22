@@ -106,10 +106,10 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(&item, &AI);
-			GetCreatureMood(&item, &AI, true);
-			CreatureMood(&item, &AI, true);
+			AI_INFO ai;
+			CreatureAIInfo(&item, &ai);
+			GetCreatureMood(&item, &ai, true);
+			CreatureMood(&item, &ai, true);
 
 			if (IsLizardTargetBlocked(item))
 				creature.Mood = MoodType::Attack;
@@ -117,11 +117,11 @@ namespace TEN::Entities::Creatures::TR3
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
 			// Turn head. Avoid while climbing or falling.
-			if (AI.ahead &&
+			if (ai.ahead &&
 				item.Animation.ActiveState < LIZARD_STATE_DEATH)
 			{
-				headOrient.x = AI.xAngle;
-				headOrient.y = AI.angle;
+				headOrient.x = ai.xAngle;
+				headOrient.y = ai.angle;
 			}
 
 			bool isPlayerPoisonedOrTargetBlocked = 
@@ -153,12 +153,12 @@ namespace TEN::Entities::Creatures::TR3
 						item.Animation.TargetState = LIZARD_STATE_WAIT;
 					}
 				}
-				else if (AI.bite && AI.distance < LIZARD_ATTACK_1_RANGE)
+				else if (ai.bite && ai.distance < LIZARD_ATTACK_1_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_AIM_1;
 				}
-				else if (Targetable(&item, &AI) && AI.bite &&
-					AI.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
+				else if (Targetable(&item, &ai) && ai.bite &&
+					ai.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_AIM_0;
 				}
@@ -202,20 +202,20 @@ namespace TEN::Entities::Creatures::TR3
 						item.Animation.TargetState = LIZARD_STATE_IDLE;
 					}
 				}
-				else if (AI.bite && AI.distance < LIZARD_ATTACK_1_RANGE)
+				else if (ai.bite && ai.distance < LIZARD_ATTACK_1_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
-				else if (AI.bite && AI.distance < LIZARD_ATTACK_2_RANGE)
+				else if (ai.bite && ai.distance < LIZARD_ATTACK_2_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_AIM_2;
 				}
-				else if (Targetable(&item, &AI) && AI.distance < LIZARD_ATTACK_0_RANGE &&
+				else if (Targetable(&item, &ai) && ai.distance < LIZARD_ATTACK_0_RANGE &&
 					isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
-				else if (AI.distance > LIZARD_WALK_RANGE)
+				else if (ai.distance > LIZARD_WALK_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_RUN_FORWARD;
 				}
@@ -234,16 +234,16 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = LIZARD_STATE_WALK_FORWARD;
 				}
-				else if (AI.bite && AI.distance < LIZARD_ATTACK_1_RANGE)
+				else if (ai.bite && ai.distance < LIZARD_ATTACK_1_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
-				else if (Targetable(&item, &AI) && AI.distance < LIZARD_ATTACK_0_RANGE &&
+				else if (Targetable(&item, &ai) && ai.distance < LIZARD_ATTACK_0_RANGE &&
 					isPlayerPoisonedOrTargetBlocked)
 				{
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
 				}
-				else if (AI.ahead && AI.distance < LIZARD_WALK_RANGE)
+				else if (ai.ahead && ai.distance < LIZARD_WALK_RANGE)
 				{
 					item.Animation.TargetState = LIZARD_STATE_WALK_FORWARD;
 				}
@@ -254,11 +254,11 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 				creature.Flags = 0;
 
-				if (abs(AI.angle) < LIZARD_RUN_TURN_RATE_MAX)
+				if (abs(ai.angle) < LIZARD_RUN_TURN_RATE_MAX)
 				{
-					item.Pose.Orientation.y += AI.angle;
+					item.Pose.Orientation.y += ai.angle;
 				}
-				else if (AI.angle < 0)
+				else if (ai.angle < 0)
 				{
 					item.Pose.Orientation.y -= LIZARD_RUN_TURN_RATE_MAX;
 				}
@@ -268,7 +268,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// Maybe we should add targetable as well? -- TokyoSU
-				if (AI.bite && AI.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
+				if (ai.bite && ai.distance < LIZARD_ATTACK_0_RANGE && isPlayerPoisonedOrTargetBlocked)
 					item.Animation.TargetState = LIZARD_STATE_PUNCH_0;
 				else
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
@@ -279,7 +279,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = LIZARD_WALK_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (AI.ahead && AI.distance < LIZARD_ATTACK_1_RANGE)
+				if (ai.ahead && ai.distance < LIZARD_ATTACK_1_RANGE)
 					item.Animation.TargetState = LIZARD_STATE_PUNCH_1;
 				else
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
@@ -290,7 +290,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = LIZARD_WALK_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (AI.ahead && AI.distance < LIZARD_ATTACK_2_RANGE)
+				if (ai.ahead && ai.distance < LIZARD_ATTACK_2_RANGE)
 					item.Animation.TargetState = LIZARD_STATE_PUNCH_2;
 				else
 					item.Animation.TargetState = LIZARD_STATE_IDLE;
@@ -300,11 +300,11 @@ namespace TEN::Entities::Creatures::TR3
 			case LIZARD_STATE_PUNCH_0:
 				creature.MaxTurn = 0;
 
-				if (abs(AI.angle) < LIZARD_RUN_TURN_RATE_MAX)
+				if (abs(ai.angle) < LIZARD_RUN_TURN_RATE_MAX)
 				{
-					item.Pose.Orientation.y += AI.angle;
+					item.Pose.Orientation.y += ai.angle;
 				}
-				else if (AI.angle < 0)
+				else if (ai.angle < 0)
 				{
 					item.Pose.Orientation.y -= LIZARD_RUN_TURN_RATE_MAX;
 				}
@@ -340,7 +340,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature.Flags = 1;
 				}
 
-				if (AI.distance < LIZARD_ATTACK_2_RANGE)
+				if (ai.distance < LIZARD_ATTACK_2_RANGE)
 					item.Animation.TargetState = LIZARD_STATE_PUNCH_2;
 
 				break;

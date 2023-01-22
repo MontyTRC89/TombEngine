@@ -480,7 +480,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Do basic hit effect.
 		else if (object.hitEffect == HitEffect::Blood)
 		{
-			DoBloodSplat(pos->x, pos->y, pos->z, (GetRandomControl() & 3) + 3, source.Pose.Orientation.y, pos->RoomNumber);
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 			DoItemHit(&target, damage, isExplosive);
 		}
 	}
