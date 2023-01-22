@@ -1166,7 +1166,8 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 				item->ObjectNumber != ID_YETI &&
 				item->ObjectNumber != ID_LIZARD &&
 				item->ObjectNumber != ID_APE &&
-				item->ObjectNumber != ID_SMALL_SPIDER);
+				item->ObjectNumber != ID_SMALL_SPIDER &&
+			    item->ObjectNumber != ID_SOPHIA_LEE_BOSS);
 
 	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
@@ -1176,7 +1177,8 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 				item->ObjectNumber != ID_YETI &&
 				item->ObjectNumber != ID_LIZARD &&
 				item->ObjectNumber != ID_APE &&
-				item->ObjectNumber != ID_SMALL_SPIDER);
+				item->ObjectNumber != ID_SMALL_SPIDER &&
+				item->ObjectNumber != ID_SOPHIA_LEE_BOSS);
 	}
 
 	return true;
@@ -1547,7 +1549,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		{
 			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
 			AI->distance = SQUARE(vector.z) + SQUARE(vector.x); // 2D distance.
-			AI->verticalDistance = abs(vector.y);
+			AI->verticalDistance = vector.y;
 		}
 		else
 			AI->distance = AI->verticalDistance = INT_MAX;

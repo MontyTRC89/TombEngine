@@ -19,7 +19,7 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
-#include "Objects/TR3/Entity/tr3_sophia.h" // OK
+#include "Objects/TR3/Entity/SophiaLee.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
@@ -278,15 +278,14 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLondonBoss;
-		obj->collision = CreatureCollision;
 		obj->control = LondonBossControl;
-		obj->drawRoutine = S_DrawLondonBoss;
+		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::SophiaLee;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();

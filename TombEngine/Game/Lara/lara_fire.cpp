@@ -1059,7 +1059,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	{
 		hitPos->RoomNumber = targetEntity->RoomNumber;
 
-		int foundJointIndex = -1;
+		int foundJointIndex = NO_JOINT;
 		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 		{
 			const auto& mesh = g_Level.Meshes[object.meshIndex + jointIndex];

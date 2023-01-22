@@ -22,113 +22,86 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
-	enum class MissileType
-	{
-		SethNormal = 0,
-		SethLarge = 1,
-		Harpy = 2,
-		Demigod3Single = 3,
-		Demigod3Radial = 4,
-		Demigod2 = 5,
-		Mutant = 6
-	};
-
 	void TriggerSethMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
 		auto* fx = &EffectList[fxNumber];
+		auto* spark = GetFreeParticle();
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
-		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
+		spark->on = 1;
+		spark->sR = 0;
+		spark->dR = 0;
+		spark->sG = (GetRandomControl() & 0x7F) + 32;
+		spark->sB = spark->dG + 64;
+		spark->dB = (GetRandomControl() & 0x7F) + 32;
+		spark->dG = spark->dB + 64;
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
+		spark->y = 0;
+		spark->x = (GetRandomControl() & 0xF) - 8;
+		spark->xVel = xVel;
+		spark->yVel = yVel;
+		spark->z = (GetRandomControl() & 0xF) - 8;
+		spark->zVel = zVel;
+		spark->friction = 68;
+		spark->flags = 602;
+		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-			dz >= -BLOCK(16) && dz <= BLOCK(16))
-		{
-			auto* spark = GetFreeParticle();
+		if (GetRandomControl() & 1)
+			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+		else
+			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-			spark->on = 1;
-			spark->sR = 0;
-			spark->dR = 0;
-			spark->sG = (GetRandomControl() & 0x7F) + 32;
-			spark->sB = spark->dG + 64;
-			spark->dB = (GetRandomControl() & 0x7F) + 32;
-			spark->dG = spark->dB + 64;
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
-			spark->y = 0;
-			spark->x = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = xVel;
-			spark->yVel = yVel;
-			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->zVel = zVel;
-			spark->friction = 68;
-			spark->flags = 602;
-			spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->gravity = 0;
+		spark->maxYvel = 0;
+		spark->fxObj = fxNumber;
 
-			if (GetRandomControl() & 1)
-				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			else
-				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+		if (fx->flag1 == 1)
+			spark->scalar = 3;
+		else
+			spark->scalar = 2;
 
-			spark->gravity = 0;
-			spark->maxYvel = 0;
-			spark->fxObj = fxNumber;
-
-			if (fx->flag1 == 1)
-				spark->scalar = 3;
-			else
-				spark->scalar = 2;
-
-			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-			spark->dSize = spark->size / 32;
-		}
+		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
+		spark->dSize = spark->size / 32;
 	}
 
 	void TriggerHarpyFlameFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
 		auto* fx = &EffectList[fxNum];
+		auto* spark = GetFreeParticle();
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
-		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
+		spark->on = 1;
+		spark->sR = 0;
+		spark->sG = (GetRandomControl() & 0x7F) + 32;
+		spark->sB = spark->dG + 64;
+		spark->dB = 0;
+		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
+		spark->y = 0;
+		spark->x = (GetRandomControl() & 0xF) - 8;
+		spark->xVel = xVel;
+		spark->zVel = zVel;
+		spark->z = (GetRandomControl() & 0xF) - 8;
+		spark->yVel = yVel;
+		spark->friction = 68;
+		spark->flags = 602;
+		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-			dz >= -BLOCK(16) && dz <= BLOCK(16))
-		{
-			auto* spark = GetFreeParticle();
+		if (GetRandomControl() & 1)
+			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+		else
+			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-			spark->on = 1;
-			spark->sR = 0;
-			spark->sG = (GetRandomControl() & 0x7F) + 32;
-			spark->sB = spark->dG + 64;
-			spark->dB = 0;
-			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
-			spark->y = 0;
-			spark->x = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = xVel;
-			spark->zVel = zVel;
-			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->yVel = yVel;
-			spark->friction = 68;
-			spark->flags = 602;
-			spark->rotAng = GetRandomControl() & 0xFFF;
-
-			if (GetRandomControl() & 1)
-				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			else
-				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-
-			spark->gravity = 0;
-			spark->maxYvel = 0;
-			spark->fxObj = fxNum;
-			spark->scalar = 2;
-			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-			spark->dSize = spark->size / 32;
-		}
+		spark->gravity = 0;
+		spark->maxYvel = 0;
+		spark->fxObj = fxNum;
+		spark->scalar = 2;
+		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
+		spark->dSize = spark->size / 32;
 	}
 
 	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
