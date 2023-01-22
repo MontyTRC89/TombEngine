@@ -870,6 +870,9 @@ void DropPickups(ItemInfo* item)
 		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
 			continue;
 
+		// Remember floor position for a tested point.
+		int candidateYPos = collPoint.Position.Floor;
+
 		// Now repeat the same test for original extent point to make sure it's also valid.
 		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
 		candidatePos.y = yPos;
@@ -878,9 +881,14 @@ void DropPickups(ItemInfo* item)
 		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
 			continue;
 
-		// Finally, do a height difference test. If difference is more than one and a half click,
+		// Finally, do height difference tests. If difference is more than one and a half click,
 		// most likely it's hanging in the air or submerged, so bypass the corner.
 		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
+			continue;
+
+		// If height difference between extended and original extent points is more than one click,
+		// it means it landed on a step, so let's search for other position.
+		if (abs(collPoint.Position.Floor - candidateYPos) >= CLICK(1.0f))
 			continue;
 
 		origin = candidatePos;
