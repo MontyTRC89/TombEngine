@@ -29,6 +29,7 @@ Version 1.0.6
 * Antitriggering an enemy will now cause it to vanish and pause.
 * Re-triggering an enemy will cause it to reappear and unpause.
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
+* Improve level loading speed a lot.
 
 Lua API changes
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).

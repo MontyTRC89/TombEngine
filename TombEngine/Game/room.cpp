@@ -135,12 +135,9 @@ int IsRoomOutside(int x, int y, int z)
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
 		auto* room = &g_Level.Rooms[roomNumber];
 
-		if (y > room->maxceiling &&
-			y < room->minfloor &&
-			(z > (room->z + SECTOR(1)) &&
-				z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
-			(x > (room->x + SECTOR(1)) &&
-				x < (room->x + (room->xSize - 1) * SECTOR(1))))
+		if ((y > room->maxceiling && y < room->minfloor) &&
+			(z > (room->z + SECTOR(1)) && z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
+			(x > (room->x + SECTOR(1)) && x < (room->x + (room->xSize - 1) * SECTOR(1))))
 		{
 			auto probe = GetCollision(x, y, z, roomNumber);
 
