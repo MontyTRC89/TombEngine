@@ -852,7 +852,7 @@ void DropPickups(ItemInfo* item)
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
-	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90);
+	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
 
 	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
 	// and also does not significantly differ in height to an object centerpoint height.
