@@ -852,6 +852,8 @@ void DropPickups(ItemInfo* item)
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
+	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90);
+
 	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
 	// and also does not significantly differ in height to an object centerpoint height.
 	// If all corner tests will fail, a pickup will be spawned at bounding box centerpoint, as it does in tomb4.
@@ -859,7 +861,7 @@ void DropPickups(ItemInfo* item)
 	for (int corner = 0; corner < 4; corner++)
 	{
 		auto angle = item->Pose.Orientation;
-		angle.y += corner * ANGLE(90);
+		angle.y += startAngle + corner * ANGLE(90);
 
 		// At first, do an inside-wall test at an extended extent point to make sure player can correctly align.
 		auto candidatePos = Geometry::TranslatePoint(origin, angle, extents * 1.2f);
