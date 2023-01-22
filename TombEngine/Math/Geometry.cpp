@@ -14,6 +14,16 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+	}
+
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
 	{
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
@@ -26,11 +36,6 @@ namespace TEN::Math::Geometry
 			point.x + ((forward * sinHeading) + (right * cosHeading)),
 			point.y + down,
 			point.z + ((forward * cosHeading) - (right * sinHeading)));
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
@@ -47,11 +52,6 @@ namespace TEN::Math::Geometry
 			point.x + (distance * (sinY * cosX)),
 			point.y - (distance * sinX),
 			point.z + (distance * (cosX * cosY)));
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
@@ -102,11 +102,26 @@ namespace TEN::Math::Geometry
 		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
 
 		if (distanceAlpha < 0.0f)
+		{
 			return linePoint0;
+		}
 		else if (distanceAlpha > 1.0f)
+		{
+			return linePoint1;
+		}
+
+		return TranslatePoint(linePoint0, direction, distanceAlpha);
+	}
+
+	Vector3 GetTruncatedLineEndpoint(const Vector3& linePoint0, const Vector3& linePoint1, float maxDistance)
+	{
+		auto distance = Vector3::Distance(linePoint0, linePoint1);
+		if (distance <= maxDistance)
 			return linePoint1;
 
-		return (linePoint0 + (direction * distanceAlpha));
+		auto direction = linePoint1 - linePoint0;
+		direction.Normalize();
+		return TranslatePoint(linePoint0, direction, maxDistance);
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)

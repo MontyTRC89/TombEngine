@@ -26,7 +26,7 @@ constexpr auto REACHED_GOAL_RADIUS = 640;
 constexpr auto ATTACK_RANGE = SQUARE(SECTOR(3));
 constexpr auto ESCAPE_CHANCE = 0x800;
 constexpr auto RECOVER_CHANCE = 0x100;
-constexpr auto BIFF_AVOID_TURN = 1536;
+constexpr auto BIFF_AVOID_TURN = ANGLE(11.25f);
 constexpr auto FEELER_DISTANCE = CLICK(2);
 constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
@@ -40,34 +40,6 @@ constexpr int NONE_PRIO_RANGE = LOW_PRIO_RANGE + LOW_PRIO_RANGE * (LOW_PRIO_RANG
 constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
-
-// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
-bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
-{
-	switch (stepCount)
-	{
-	case -4:
-		return (item->ObjectNumber != ID_SMALL_SPIDER);
-
-	case -3:
-		return (item->ObjectNumber != ID_CIVVY &&
-				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI &&
-				item->ObjectNumber != ID_APE &&
-				item->ObjectNumber != ID_SMALL_SPIDER);
-
-	case -2:
-		return (item->ObjectNumber != ID_BADDY1 &&
-				item->ObjectNumber != ID_BADDY2 &&
-				item->ObjectNumber != ID_CIVVY &&
-				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI &&
-				item->ObjectNumber != ID_APE &&
-				item->ObjectNumber != ID_SMALL_SPIDER);
-	}
-
-	return true;
-}
 
 void DrawBox(int boxIndex, Vector3 color)
 {
@@ -719,7 +691,7 @@ void CreatureFloat(short itemNumber)
 	}
 }
 
-void CreatureJoint(ItemInfo* item, short joint, short required) 
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle)
 {
 	if (!item->IsCreature())
 		return;
@@ -733,10 +705,10 @@ void CreatureJoint(ItemInfo* item, short joint, short required)
 		change = ANGLE(-3.0f);
 
 	creature->JointRotation[joint] += change;
-	if (creature->JointRotation[joint] > ANGLE(70.0f))
-		creature->JointRotation[joint] = ANGLE(70.0f);
-	else if (creature->JointRotation[joint] < -ANGLE(70.0f))
-		creature->JointRotation[joint] = -ANGLE(70.0f);
+	if (creature->JointRotation[joint] > maxAngle)
+		creature->JointRotation[joint] = maxAngle;
+	else if (creature->JointRotation[joint] < -maxAngle)
+		creature->JointRotation[joint] = -maxAngle;
 }
 
 void CreatureTilt(ItemInfo* item, short angle) 
@@ -925,21 +897,20 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 	if (boxNumber == NO_BOX)
 		return false;
 
-	auto* object = &Objects[item->ObjectNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+	const auto& creature = *GetCreatureInfo(item);
+	const auto& zone = g_Level.Zones[(int)creature.LOT.Zone][FlipStatus].data();
 
-	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
+	if (creature.LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
-	auto* box = &g_Level.Boxes[boxNumber];
-	if (creature->LOT.BlockMask & box->flags)
+	const auto& box = g_Level.Boxes[boxNumber];
+	if (creature.LOT.BlockMask & box.flags)
 		return false;
 
-	if (item->Pose.Position.z > (box->left * SECTOR(1)) &&
-		item->Pose.Position.z < (box->right * SECTOR(1)) &&
-		item->Pose.Position.x > (box->top * SECTOR(1)) &&
-		item->Pose.Position.x < (box->bottom * SECTOR(1)))
+	if (item->Pose.Position.z > (box.left * BLOCK(1)) &&
+		item->Pose.Position.z < (box.right * BLOCK(1)) &&
+		item->Pose.Position.x > (box.top * BLOCK(1)) &&
+		item->Pose.Position.x < (box.bottom * BLOCK(1)))
 	{
 		return false;
 	}
@@ -951,9 +922,10 @@ bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
 	if (boxNumber == NO_BOX)
 		return false;
-	auto* box = &g_Level.Boxes[boxNumber];
-	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
-	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
+
+	const auto& box = g_Level.Boxes[boxNumber];
+	int x = ((box.top + box.bottom) * BLOCK(0.5f)) - enemy->Pose.Position.x;
+	int z = ((box.left + box.right) * BLOCK(0.5f)) - enemy->Pose.Position.z;
 
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST &&
 		z > -ESCAPE_DIST && z < ESCAPE_DIST)
@@ -1114,8 +1086,8 @@ bool CreatureActive(short itemNumber)
 	if (!Objects[item->ObjectNumber].intelligent)
 		return false;
 
-	// Object is already dead or body cleared.
-	if (item->Flags & IFLAG_KILLED || item->Flags & IFLAG_CLEAR_BODY)
+	// Object is already dead.
+	if (item->Flags & IFLAG_KILLED)
 		return false;
 
 	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
@@ -1180,6 +1152,36 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	return true;
 }
 
+// TODO: Do it via Lua instead. -- TokyoSU 22.12.21
+bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
+{
+	switch (stepCount)
+	{
+	case -4:
+		return (item->ObjectNumber != ID_SMALL_SPIDER);
+
+	case -3:
+		return (item->ObjectNumber != ID_CIVVY &&
+				item->ObjectNumber != ID_MP_WITH_STICK &&
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
+
+	case -2:
+		return (item->ObjectNumber != ID_BADDY1 &&
+				item->ObjectNumber != ID_BADDY2 &&
+				item->ObjectNumber != ID_CIVVY &&
+				item->ObjectNumber != ID_MP_WITH_STICK &&
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
+	}
+
+	return true;
+}
+
 int CreatureVault(short itemNumber, short angle, int vault, int shift)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -1192,8 +1194,7 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	// FIXME: Add climb down animations for Von Croy and baddies?
-	if (item->Floor > y + CLICK(4.5f))
+	if (item->Floor > (y + CLICK(4.5f)))
 	{
 		vault = 0;
 	}
@@ -1439,9 +1440,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position.x = foundObject->pos.Position.x;
-			aiItem->Pose.Position.y = foundObject->pos.Position.y;
-			aiItem->Pose.Position.z = foundObject->pos.Position.z;
+			aiItem->Pose.Position = foundObject->pos.Position;
 			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
@@ -1462,7 +1461,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	auto& room = g_Level.Rooms[enemy->RoomNumber];
 	auto* floor = GetSector(&room, enemy->Pose.Position.x - room.x, enemy->Pose.Position.z - room.z);
 
-	// NEW: Only update enemy box number if it is actually reachable by enemy.
+	// NEW: Only update enemy box number if it is actually reachable by the enemy.
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
@@ -1476,7 +1475,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	{
 		auto pointColl = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
 		auto bounds = GameBoundingBox(item);
-		isReachable = ((abs(enemy->Pose.Position.y - pointColl.Position.Floor)) < bounds.GetHeight());
+		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
 	}
 
 	return (isReachable ? floor->Box : item->BoxNumber);

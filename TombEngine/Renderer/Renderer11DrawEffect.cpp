@@ -1368,7 +1368,7 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
-			// TODO: Switch back to alpha blend mode once rendering for it is refactored. -- Sezz 21.01.2023
+			// TODO: Switch back to alpha blend mode once rendering for it is refactored. -- Sezz 2023.01.14
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
 				smoke.position,
