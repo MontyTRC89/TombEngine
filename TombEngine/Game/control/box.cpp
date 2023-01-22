@@ -1504,7 +1504,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->zoneNumber = zone[item->BoxNumber];
 
 	enemy->BoxNumber = TargetReachable(item, enemy);
-	AI->enemyZone = zone[enemy->BoxNumber];
+	AI->enemyZone = enemy->BoxNumber == NO_BOX ? NO_ZONE : zone[enemy->BoxNumber];
 
 	if (!object->nonLot)
 	{
