@@ -2,8 +2,8 @@
 
 class EulerAngles;
 
-namespace TEN::Math
-{
+//namespace TEN::Math
+//{
 	class AxisAngle
 	{
 	private:
@@ -13,7 +13,7 @@ namespace TEN::Math
 
 	public:
 		// Constants
-		static const AxisAngle Zero;
+		static const AxisAngle Identity;
 
 		// Constructors
 		AxisAngle();
@@ -34,7 +34,6 @@ namespace TEN::Math
 		// Utilities
 		void			 Slerp(const AxisAngle& axisAngleTo, float alpha = 1.0f);
 		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha = 1.0f);
-		Vector3			 RotatePoint(const Vector3& point);
 
 		// Converters
 		Vector3		ToDirection() const;
@@ -49,4 +48,4 @@ namespace TEN::Math
 		AxisAngle& operator *=(const AxisAngle& axisAngle);
 		AxisAngle  operator *(const AxisAngle& axisAngle) const;
 	};
-}
+//}

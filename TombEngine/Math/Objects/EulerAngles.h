@@ -1,8 +1,6 @@
 #pragma once
 #include "Math/Objects/AxisAngle.h"
 
-using namespace TEN::Math;
-
 //namespace TEN::Math
 //{
 	class EulerAngles

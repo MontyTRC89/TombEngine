@@ -419,15 +419,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//auto convertedOrient = AxisAngle(item->Pose.Orientation.ToQuaternion()).ToQuaternion();
 	//item->Pose.Orientation = EulerAngles(convertedOrient);
 
-	auto base = Vector3::Right * 256;
-	static short rot = 0;
+	static auto pos1 = Vector3::Right * 256;
+	static auto pos2 = Vector3::Left * 256;
+
+	auto rot = AxisAngle(Vector3::Down, ANGLE(5.0f));
+
+	pos1 = Geometry::RotatePoint(pos1, rot);
+	pos2 = Geometry::RotatePoint(pos2, rot);
 
 	auto offset = item->Pose.Position.ToVector3() + Vector3(0.0f, -coll->Setup.Height, 0.0f);
-	g_Renderer.AddSphere(offset + AxisAngle(Vector3::Down, rot).RotatePoint(base), 50, Vector4::One);
-	g_Renderer.AddSphere(offset + AxisAngle(Vector3::Down, ANGLE(120.0f) + rot).RotatePoint(base), 50, Vector4::One);
-	g_Renderer.AddSphere(offset + AxisAngle(Vector3::Down, ANGLE(240.0f) + rot).RotatePoint(base), 50, Vector4::One);
+	g_Renderer.AddSphere(offset + pos1, 50, Vector4::One);
+	g_Renderer.AddSphere(offset + pos2, 50, Vector4::One);
 
-	rot += ANGLE(5.0f);
 	//auto pos = GetJointPosition(item, LM_HEAD).ToVector3();
 	//g_Renderer.AddLine3D(pos, pos + (convertedOrient * 512), Vector4::One);
 

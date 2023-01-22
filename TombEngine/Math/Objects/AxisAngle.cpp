@@ -4,9 +4,9 @@
 #include "Math/Legacy.h"
 #include "Math/Objects/EulerAngles.h"
 
-namespace TEN::Math
-{
-	const AxisAngle AxisAngle::Zero = AxisAngle(Vector3::Zero, 0);
+//namespace TEN::Math
+//{
+	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Zero, 0);
 
 	AxisAngle::AxisAngle()
 	{
@@ -132,12 +132,6 @@ namespace TEN::Math
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
-	Vector3 AxisAngle::RotatePoint(const Vector3& point)
-	{
-		auto rotMatrix = this->ToRotationMatrix();
-		return Vector3::Transform(point, rotMatrix);
-	}
-
 	// Wrong? Direction seems to "lag behind" the required one.
 	Vector3 AxisAngle::ToDirection() const
 	{
@@ -200,4 +194,4 @@ namespace TEN::Math
 		short angle = Angle + axisAngle.GetAngle();
 		return AxisAngle(axis, angle);
 	}
-}
+//}

@@ -3,6 +3,7 @@
 
 #include "Math/Constants.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/AxisAngle.h"
 #include "Math/Objects/EulerAngles.h"
 #include "Math/Objects/Pose.h"
 #include "Math/Objects/Vector3i.h"
@@ -62,6 +63,18 @@ namespace TEN::Math::Geometry
 		auto directionNorm = direction;
 		directionNorm.Normalize();
 		return (point + (directionNorm * distance));
+	}
+
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
 	}
 
 	short GetShortestAngle(short fromAngle, short toAngle)
