@@ -194,8 +194,8 @@ namespace TEN::Effects::Boss
 		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 
-	// NOTE: Can really die after deathCount 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color)
+	// NOTE: Actual death occurs when countUntilDeath >= 60.
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -244,7 +244,7 @@ namespace TEN::Effects::Boss
 			counter / 2,
 			color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
-		if (counter >= deathCountToDie)
+		if (counter >= countUntilDeath)
 			CreatureDie(itemNumber, true);
 	}
 

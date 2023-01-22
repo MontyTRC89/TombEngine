@@ -333,8 +333,8 @@ namespace TEN::Entities::Creatures::TR3
 				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
-				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR); // Do explosion effect.
-
+				// Do explosion effect.
+				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR);
 				return;
 			}
 			else
