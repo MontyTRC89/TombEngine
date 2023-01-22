@@ -841,6 +841,73 @@ void RegeneratePickups()
 	}
 }
 
+void DropPickups(ItemInfo* item)
+{
+	ItemInfo* pickup = nullptr;
+
+	auto bounds = GameBoundingBox(item);
+	auto extents = bounds.GetExtents();
+	auto origin = Geometry::TranslatePoint(item->Pose.Position.ToVector3(), item->Pose.Orientation, bounds.GetCenter());
+	auto yPos = GetCollision(item).Position.Floor;
+
+	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
+
+	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
+	// and also does not significantly differ in height to an object centerpoint height.
+	// If all corner tests will fail, a pickup will be spawned at bounding box centerpoint, as it does in tomb4.
+
+	for (int corner = 0; corner < 4; corner++)
+	{
+		auto angle = item->Pose.Orientation;
+		angle.y += corner * ANGLE(90);
+
+		// At first, do an inside-wall test at an extended extent point to make sure player can correctly align.
+		auto candidatePos = Geometry::TranslatePoint(origin, angle, extents * 1.2f);
+		candidatePos.y = yPos;
+		auto collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+
+		// If position is inside a wall or on a slope, don't use it.
+		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// Now repeat the same test for original extent point to make sure it's also valid.
+		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
+		candidatePos.y = yPos;
+		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+
+		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// Finally, do a height difference test. If difference is more than one and a half click,
+		// most likely it's hanging in the air or submerged, so bypass the corner.
+		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
+			continue;
+
+		origin = candidatePos;
+		origin.y = collPoint.Position.Floor;
+		break;
+	}
+
+	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
+	{
+		pickup = &g_Level.Items[pickupNumber];
+		pickup->Pose.Position = origin;
+		pickup->Pose.Position.y -= GameBoundingBox(pickup).Y2;
+
+		pickup->Pose.Orientation.y = ANGLE(Random::GenerateInt(0, 359)); // Randomize pickup rotation.
+
+		// HACK: Pickup is not moved to a right room at this moment, it will only update next game loop.
+		// Therefore, we need to temporarily inject actual room number, so AlignEntityToSurface succeeds.
+
+		pickup->RoomNumber = item->RoomNumber;
+		AlignEntityToSurface(pickup, Vector2(Objects[item->ObjectNumber].radius));
+		pickup->RoomNumber = -1;
+		pickup->Flags |= 32;
+
+		ItemNewRoom(pickupNumber, item->RoomNumber);
+	}
+}
+
 void PickupControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

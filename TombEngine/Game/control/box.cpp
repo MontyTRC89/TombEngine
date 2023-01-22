@@ -13,6 +13,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Math/Math.h"
@@ -115,33 +116,6 @@ void DrawNearbyPathfinding(int boxIndex)
 			break;
 		else
 			index++;
-	}
-}
-
-void DropEntityPickups(ItemInfo* item)
-{
-	ItemInfo* pickup = nullptr;
-
-	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
-	{
-		pickup = &g_Level.Items[pickupNumber];
-		pickup->Pose.Position.x = item->Pose.Position.x;
-		pickup->Pose.Position.z = item->Pose.Position.z;
-
-		pickup->Pose.Position.y = GetCollision(item).Position.Floor;
-		auto bounds = GameBoundingBox(pickup);
-		pickup->Pose.Position.y -= bounds.Y2;
-
-		ItemNewRoom(pickupNumber, item->RoomNumber);
-
-		// HACK: Pickup is not moved to a right room at this moment, it will only update next game loop.
-		// Therefore, we need to temporarily inject actual room number, so AlignEntityToSurface succeeds.
-
-		pickup->RoomNumber = item->RoomNumber;
-		AlignEntityToSurface(pickup, Vector2(Objects[item->ObjectNumber].radius));
-		pickup->RoomNumber = -1;
-
-		pickup->Flags |= 32;
 	}
 }
 
@@ -862,7 +836,7 @@ void CreatureDie(short itemNumber, bool explode)
 
 	DisableEntityAI(itemNumber);
 	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
-	DropEntityPickups(item);
+	DropPickups(item);
 }
 
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT)
