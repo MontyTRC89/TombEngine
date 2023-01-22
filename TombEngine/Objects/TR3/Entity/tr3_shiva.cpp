@@ -82,17 +82,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	};
 
-	void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
-	}
-
-	void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
-	}
-
-	void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
+	static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
 		if (!creature->Flags && item->TouchBits.Test(ShivaAttackRightJoints))
 		{
@@ -111,7 +101,17 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
+	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
+	}
+
+	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
+	}
+
+	static bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
 	{
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
@@ -165,6 +165,89 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		return false;
+	}
+
+	static void SpawnShivaSmoke(const Vector3& pos, int roomNumber)
+	{
+		auto& smoke = *GetFreeParticle();
+
+		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, Vector3i(pos), roomNumber);
+		auto sphere = BoundingSphere(pos, 16);
+		auto effectPos = Random::GeneratePointInSphere(sphere);
+
+		smoke.on = true;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+		smoke.x = effectPos.x;
+		smoke.y = effectPos.y;
+		smoke.z = effectPos.z;
+		smoke.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+		smoke.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
+		smoke.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+
+		if (isUnderwater)
+		{
+			smoke.sR = 144;
+			smoke.sG = 144;
+			smoke.sB = 144;
+			smoke.dR = 64;
+			smoke.dG = 64;
+			smoke.dB = 64;
+		}
+		else
+		{
+			smoke.sR = 0;
+			smoke.sG = 0;
+			smoke.sB = 0;
+			smoke.dR = 192;
+			smoke.dG = 192;
+			smoke.dB = 208;
+		}
+
+		smoke.colFadeSpeed = 8;
+		smoke.fadeToBlack = 64;
+		smoke.sLife =
+		smoke.life = Random::GenerateInt(96, 128);
+		smoke.extras = 0;
+		smoke.dynamic = -1;
+
+		if (isUnderwater)
+		{
+			smoke.yVel /= 16;
+			smoke.y += 32;
+			smoke.friction = 4 | 16;
+		}
+		else
+		{
+			smoke.friction = 6;
+		}
+
+		smoke.rotAng = Random::GenerateAngle();
+		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+
+		smoke.scalar = 3;
+
+		if (isUnderwater)
+		{
+			smoke.gravity = 0;
+			smoke.maxYvel = 0;
+		}
+		else
+		{
+			smoke.gravity = Random::GenerateInt(-8, -4);
+			smoke.maxYvel = Random::GenerateInt(-8, -4);
+		}
+
+		int scale = Random::GenerateInt(128, 160);
+		smoke.size =
+		smoke.sSize = scale / 4;
+		smoke.dSize = scale;
+
+		scale += Random::GenerateInt(32, 64);
+		smoke.size =
+		smoke.sSize = scale / 8;
+		smoke.dSize = scale;
+		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 
 	void InitialiseShiva(short itemNumber)
@@ -483,91 +566,5 @@ namespace TEN::Entities::Creatures::TR3
 			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 			DoItemHit(&target, damage, isExplosive);
 		}
-	}
-
-	void SpawnShivaSmoke(const Vector3& pos, int roomNumber)
-	{
-		auto& smoke = *GetFreeParticle();
-
-		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, Vector3i(pos), roomNumber);
-		auto sphere = BoundingSphere(pos, 16);
-		auto randPos = Random::GeneratePointInSphere(sphere);
-
-		if (isUnderwater)
-		{
-			smoke.sR = 144;
-			smoke.sG = 144;
-			smoke.sB = 144;
-			smoke.dR = 64;
-			smoke.dG = 64;
-			smoke.dB = 64;
-		}
-		else
-		{
-			smoke.sR = 0;
-			smoke.sG = 0;
-			smoke.sB = 0;
-			smoke.dR = 192;
-			smoke.dG = 192;
-			smoke.dB = 208;
-		}
-
-		smoke.colFadeSpeed = 8;
-		smoke.fadeToBlack = 64;
-		smoke.sLife =
-		smoke.life = Random::GenerateInt(96, 128);
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		smoke.extras = 0;
-		smoke.dynamic = -1;
-
-		smoke.x = randPos.x;
-		smoke.y = randPos.y;
-		smoke.z = randPos.z;
-		smoke.xVel = ((GetRandomControl() & 4095) - 2048) / 4;
-		smoke.yVel = (GetRandomControl() & 255) - 128;
-		smoke.zVel = ((GetRandomControl() & 4095) - 2048) / 4;
-
-		if (isUnderwater)
-		{
-			smoke.yVel /= 16;
-			smoke.y += 32;
-			smoke.friction = 4 | (16);
-		}
-		else
-		{
-			smoke.friction = 6;
-		}
-
-		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		smoke.rotAng = GetRandomControl() & 4095;
-
-		if (Random::TestProbability(1 / 2.0f))
-			smoke.rotAdd = -(GetRandomControl() & 15) - 16;
-		else
-			smoke.rotAdd = (GetRandomControl() & 15) + 16;
-
-		smoke.scalar = 3;
-
-		if (isUnderwater)
-		{
-			smoke.gravity =
-			smoke.maxYvel = 0;
-		}
-		else
-		{
-			smoke.gravity = -(GetRandomControl() & 3) - 3;
-			smoke.maxYvel = -(GetRandomControl() & 3) - 4;
-		}
-
-		int size = (GetRandomControl() & 31) + 128;
-		smoke.size =
-		smoke.sSize = size / 4;
-		smoke.dSize = size;
-
-		size += (GetRandomControl() & 31) + 32;
-		smoke.size =
-		smoke.sSize = size / 8;
-		smoke.dSize = size;
-		smoke.on = true;
 	}
 }
