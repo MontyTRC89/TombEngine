@@ -86,15 +86,10 @@ namespace TEN::Renderer
 			auto* segment = &Segments[i];
 			
 
-				//for (int i = 0; i < 32; i++)
-				//{
-					//if (!wave.Segments[i].On)
-					//	continue;
-
 					if (!segment->On)
 						continue;
 
-					//if (wave.Segments[i].Life)
+
 					if (segment->Life)
 					{
 
@@ -107,72 +102,10 @@ namespace TEN::Renderer
 							segment->Vertices[3], Vector4(255, 255, 255, 0.1f),
 							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
 
-						/*AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							wave.Segments[i].Vertices[0],
-							wave.Segments[i].Vertices[1],
-							wave.Segments[i].Vertices[2],
-							wave.Segments[i].Vertices[3], Vector4(255, 255, 255, 1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);*/
 
-						/*LightningPos[0].x = wave->pos1.x;
-						LightningPos[0].y = wave->pos1.y;
-						LightningPos[0].z = wave->pos1.z;
-
-						memcpy(&LightningPos[1], wave, 48);
-
-						LightningPos[1].x = wave->pos2.x;
-						LightningPos[1].y = wave->pos2.y;
-						LightningPos[1].z = wave->pos2.z;
-
-						for (int j = 0; j < 1; j++)
-						{
-							LightningPos[j].x -= wave->pos2.x;
-							LightningPos[j].y -= wave->pos2.y;
-							LightningPos[j].z -= wave->pos2.z;
-						}
-
-						CalcSpline(&LightningPos[0], LightningBuffer, wave);
-
-						if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
-						{
-							short* interpolatedPos = &LightningBuffer[0];
-
-							for (int s = 0; s < 32; s++)
-							{
-								int ix = wave->pos2.x + interpolatedPos[0];
-								int iy = wave->pos2.y + interpolatedPos[1];
-								int iz = wave->pos2.z + interpolatedPos[2];
-
-								interpolatedPos += 4;
-
-								int ix2 = wave->pos2.x + interpolatedPos[0];
-								int iy2 = wave->pos2.y + interpolatedPos[1];
-								int iz2 = wave->pos2.z + interpolatedPos[2];
-
-								byte r, g, b;
-
-								r = g = b = 255;
-								Vector3 pos1 = Vector3(ix, iy, iz);
-								Vector3 pos2 = Vector3(ix2, iy2, iz2);
-
-								Vector3 d = pos2 - pos1;
-								d.Normalize();
-
-								Vector3 c = (pos1 + pos2) / 2.0f;
-
-								AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-									c,
-									Vector4(r , g , b , 1.0f),
-									(PI / 2),
-									1.0f,
-									{ wave->width * 8.0f,
-									Vector3::Distance(pos1, pos2) },
-									BLENDMODE_ADDITIVE,
-									d, true, view);
-							}*/
 					}
 				
-			//}
+			
 		}
 
 	}

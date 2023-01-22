@@ -31,6 +31,12 @@ namespace TEN::Effects::BOATFX
 	std::array<Wave, 1> Waves;
 
 
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
 	void KayakUpdateWakeFX()
 	{
 
@@ -50,105 +56,88 @@ namespace TEN::Effects::BOATFX
 				continue;
 
 			segment.Age++;
-			segment.Life--; // NOTE: Life tracked in frame time.
+			segment.Life--; // NOTE: Life.
 			if (segment.Life <= 0.0f)
 			{
 				segment.On = false;
 				continue;
 			}
 
-		
-
 			segment.ScaleRate += 1.0f;
 
-			//wave.Segments[i].Vertices[0] = wave.Segments[i - 1].Vertices[0];
-			//wave.Segments[i].Vertices[1] = wave.Segments[i - 1].Vertices[1];
-		//segment.Segments[i].ScaleRate
+			//auto lDirection = RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
+			//segment.Vertices[0] += lDirection * segment.ScaleRate; // Or maybe v1, also make sure ScaleRate was defined in the spawn function...
 
-		// Update opacity.
-		//segment.Opacity = Lerp(1.0f, 0.0f, 1.0f - (segment.Life / 16));
-		//segment.Color.w = segment.Opacity;
+			//auto rDirection = RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
+			//segment.Vertices[1] += rDirection * segment.ScaleRate;
+
+
+
+		//TODO: Update opacity.
+
 		}
 			
 	}
 
-	void SpawnWaveSegment(const Vector3& origin, const Vector3& target, int roomNumber, const Vector4& color)
+	void SpawnWaveSegment(const Vector3& origin, const Vector3& target, ItemInfo* kayakItem, const Vector4& color, const Vector3& width)
 	{
-		Vector3 startVector = origin;
-		Vector3 targetVector = target;
-		Vector3 lineVector = targetVector - startVector;
 
-		lineVector.Normalize();;// * 64;
-		//lineVector = lineVector * 64;
-		targetVector = startVector + lineVector;
-		//g_Renderer.AddLine3D(startVector, targetVector, Vector4(255, 255, 255, 1));
 
-		//g_Renderer.AddLine3D(basePos, targetPos, Vector4(color));
-		
 
+
+		int segmentLenght = 47;
+
+
+
+		//NOTE: Width
+		auto direction = (  origin - target);
+		direction.Normalize();
+
+
+		auto lRotMatrix = EulerAngles(0, ANGLE(-90.0f), 0).ToRotationMatrix();
+		auto rRotMatrix = EulerAngles(0, ANGLE(90.0f), 0).ToRotationMatrix();
+
+		auto lDirection = RotatePoint(direction,  EulerAngles(0, ANGLE(-90.0f), 0));
+		auto rDirection = RotatePoint(direction, EulerAngles(0, ANGLE(90.0f), 0));
+
+
+	
 
 			auto& segment = GetFreeWaveSegment();
 			auto& prevSegment = GetPreviousSegment();
 
-
 					if (segment.On)
 						return;
 
+					//NOTE: set the first two vertices
 
-					
+					segment.Direction = direction;
 					segment.On = true;
 					segment.Age = 0;
-					segment.Vertices[0] = startVector  ;
-					segment.Vertices[1] = startVector + Vector3(47.0f, 0.0f, 0.0f);
 
-						//(g_Renderer.AddDebugSphere(wave.Segments[i].Vertices[3], 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
+					segment.Vertices[0] = origin ;// startVector;
+					segment.Vertices[1] = origin +Vector3(47.0f, 0.0f, 0.0f);// 
 
-					
+					//g_Renderer.AddDebugSphere(lDirection, 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
+
+					// NOTE: move the other two vertices to the position of the previous segment
 
 					segment.Vertices[3] = prevSegment.Vertices[0];
-					segment.Vertices[2] = prevSegment.Vertices[1];// +Vector3(47.0f, 0.0f, 0.0f);
+					segment.Vertices[2] = prevSegment.Vertices[1];
 
 					segment.On = true;
 
-					segment.RoomNumber = roomNumber;
+					segment.RoomNumber = kayakItem->RoomNumber;
 
 					segment.Opacity = 0.2f;
 					segment.Life = 64;
-					//segment.Segments[i].ScaleRate =
 
-					/*for (int i = 0; i < 32; i++)
-					{
-
-						wave.Segments[i].On = true;
-						wave.Segments[i].Vertices[0] = startVector;
-						wave.Segments[i].Vertices[1] = startVector + Vector3(47.0f, 0.0f, 0.0f);
-
-						//(g_Renderer.AddDebugSphere(wave.Segments[i].Vertices[3], 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
-
-						wave.Segments[i].Vertices[3] = targetVector;
-						wave.Segments[i].Vertices[2] = targetVector + Vector3(47.0f, 0.0f, 0.0f);
-
-						wave.Segments[i].On = true;
-
-						wave.Segments[i].RoomNumber = roomNumber;
-
-						wave.Segments[i].Opacity = 1.0f;
-						wave.Segments[i].Life = 16;
-					}*/
-
-
-
-				
-			
-		
-	
 		
 	}
 
 	void ClearWaveSegment()
 	{
-		//for (auto& segment : Waves)
-		//	segment = {};
+//not needed TODO: delete later 
 	}
 
 	WaveSegment& GetFreeWaveSegment()
@@ -166,7 +155,7 @@ namespace TEN::Effects::BOATFX
 
 	WaveSegment& GetPreviousSegment()
 	{
-		int oldestLifeIndex = 0;
+		int youngestLifeIndex = 0;
 		int youngestAge = 0;
 
 		for (int i = 0; i < Segments.size(); i++)
@@ -176,7 +165,7 @@ namespace TEN::Effects::BOATFX
 			if (youngestAge < Segments[i].Life)
 			{
 				youngestAge = Segments[i].Life;
-				oldestLifeIndex = i;
+				youngestLifeIndex = i;
 			}
 
 
@@ -186,18 +175,12 @@ namespace TEN::Effects::BOATFX
 
 				if (i > 0)				
 					return Segments[i - 1];
-				//else
-				//	return Segments[oldestLifeIndex];
-					
-				
-
 
 			}
 
 		}
 
-
-		return Segments[oldestLifeIndex];
+		return Segments[youngestLifeIndex];
 	}
 
 

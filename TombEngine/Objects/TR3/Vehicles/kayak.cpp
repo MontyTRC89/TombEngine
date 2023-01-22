@@ -238,7 +238,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 
 		xOffset = 256;
-		zOffset = 256;
+		zOffset = 0;
 
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
 		float cosY = phd_cos(kayakItem->Pose.Orientation.y);
@@ -289,8 +289,15 @@ namespace TEN::Entities::Vehicles
 			int z1 = (kayakItem->Pose.Position.z +  ((offset2 * c - offset1 * s) >> W2V_SHIFT));
 
 			//Vector3 pos1 = Vector3(x1, y1, z1);
-			Vector3 pos1 = Vector3(kayakItem->Pose.Position.x , kayakItem->Pose.Position.y , kayakItem->Pose.Position.z );
-			Vector3 pos2 = Vector3(kayak->OldPose.Position.x , kayak->OldPose.Position.y , kayak->OldPose.Position.z );
+			// 
+			//Vector3 pos1 = Vector3(kayakItem->Pose.Position.x , kayakItem->Pose.Position.y , kayakItem->Pose.Position.z );
+			//Vector3 pos2 = Vector3(kayak->OldPose.Position.x , kayak->OldPose.Position.y , kayak->OldPose.Position.z );
+
+			Vector3 pos1 = Vector3(x, kayakItem->Pose.Position.y, z);
+			Vector3 pos2 = Vector3(x1, kayak->OldPose.Position.y, z1);
+
+
+			Vector3 pos3 = Vector3(x1,y1,z1);
 
 			int length = 64 + kayakItem->Animation.Velocity.z;
 
@@ -300,7 +307,7 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
 
-			SpawnWaveSegment(pos1, pos2, kayakItem->RoomNumber, color);
+			SpawnWaveSegment(pos1, pos2, kayakItem, color, pos3);
 
 			if (rotate == 1)
 			{
