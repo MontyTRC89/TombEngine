@@ -228,7 +228,7 @@ namespace TEN::Effects::Boss
 			auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
 			int speed = Random::GenerateInt(BLOCK(0.5f), BLOCK(1.6f));
-			auto orient2D = Random::GenerateAngle(0, ANGLE(180.0f));
+			auto orient2D = Random::GenerateAngle();
 
 			TriggerShockwave(
 				&shockwavePos, 300, BLOCK(0.5f), speed,

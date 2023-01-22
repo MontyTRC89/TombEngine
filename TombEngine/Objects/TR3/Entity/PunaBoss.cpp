@@ -178,12 +178,8 @@ namespace TEN::Entities::Creatures::TR3
 		if (Random::TestProbability(1 / 2.0f))
 		{
 			smoke.rotAng = Random::GenerateAngle();
+			smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.06f), ANGLE(0.06f));
 			smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_WIND;
-
-			if (Random::TestProbability(1 / 2.0f))
-				smoke.rotAdd = Random::GenerateInt(-12, -8);
-			else
-				smoke.rotAdd = Random::GenerateInt(8, 12);
 		}
 		else
 		{
