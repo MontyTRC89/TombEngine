@@ -23,7 +23,7 @@ namespace TEN::Effects::BOATFX
 {
 
 
-	constexpr auto NUM_WAKE_SPRITES = 32;
+	constexpr auto NUM_WAKE_SPRITES = 64;
 	constexpr auto NUM_WAKE_WITDH = 32;
 	
 
@@ -39,89 +39,93 @@ namespace TEN::Effects::BOATFX
 
 	void KayakUpdateWakeFX()
 	{
+		int youngestLifeIndex = 0;
+		int youngestAge = 0;
+		const auto& revSegment = Segments[0];
+		int testnumber = 0;
+	
 
 
 		for (int i = 0; i < Segments.size(); i++)
 		{
 			auto& segment = Segments[i];
 
-			auto& prevSegment = Segments[i];
-
-			
-				
-		
-			
-
 			if (!segment.On)
 				continue;
 
 			segment.Age++;
-			segment.Life--; // NOTE: Life.
+			segment.Life--; 
+
 			if (segment.Life <= 0.0f)
 			{
 				segment.On = false;
 				continue;
 			}
 
-			segment.ScaleRate += 1.0f;
+			int zOffset = 0;
 
-			//auto lDirection = RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
-			//segment.Vertices[0] += lDirection * segment.ScaleRate; // Or maybe v1, also make sure ScaleRate was defined in the spawn function...
-
-			//auto rDirection = RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
-			//segment.Vertices[1] += rDirection * segment.ScaleRate;
+			float sinY = phd_sin(segment.pos.Orientation.y);
+			float cosY = phd_cos(segment.pos.Orientation.y);
 
 
+			segment.Vertices[2]  -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY)) ;
+			segment.Vertices[1] -=  Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY)) ;
+			segment.Vertices[3] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
+			segment.Vertices[0] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
 
-		//TODO: Update opacity.
+			if (segment.Opacity > 0.0f)
+			segment.Opacity -= 0.1f /15 ;
 
 		}
 			
 	}
 
-	void SpawnWaveSegment(const Vector3& origin, const Vector3& target, ItemInfo* kayakItem, const Vector4& color, const Vector3& width)
+	void SpawnWaveSegment(const Vector3& origin, const Vector3& target, ItemInfo* kayakItem, const Vector4& color, int Velocity)
 	{
 
+		auto& segment = GetFreeWaveSegment();
+		auto& prevSegment = GetPreviousSegment();
+
+		if (segment.On)
+			return;
+
+
+		
+
+
+		segment.On = true;
+		segment.Age = 0;
+		segment.pos = kayakItem->Pose;
 
 
 
-		int segmentLenght = 47;
+		segment.Direction = origin;
+		segment.ScaleRate = 1.0f;
+		segment.width = 1.0f;
+		segment.PrevSegment = Velocity;
 
+		int zOffset = 0;
 
+		float sinY = phd_sin(segment.pos.Orientation.y);
+		float cosY = phd_cos(segment.pos.Orientation.y);
 
-		//NOTE: Width
-		auto direction = (  origin - target);
-		direction.Normalize();
+		int x = segment.Direction.x  + (zOffset * sinY) + (segment.width * cosY);
+		int z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
 
-
-		auto lRotMatrix = EulerAngles(0, ANGLE(-90.0f), 0).ToRotationMatrix();
-		auto rRotMatrix = EulerAngles(0, ANGLE(90.0f), 0).ToRotationMatrix();
-
-		auto lDirection = RotatePoint(direction,  EulerAngles(0, ANGLE(-90.0f), 0));
-		auto rDirection = RotatePoint(direction, EulerAngles(0, ANGLE(90.0f), 0));
-
-
+		Vector3 verticerPos = Vector3(x, origin.y, z);
 	
+		 x = segment.Direction.x - (zOffset * sinY) + (segment.width * cosY);
+		 z = segment.Direction.z - (zOffset * cosY) - (segment.width * sinY);
 
-			auto& segment = GetFreeWaveSegment();
-			auto& prevSegment = GetPreviousSegment();
+		Vector3 vertice1Pos = Vector3(x, origin.y, z);
+		
 
-					if (segment.On)
-						return;
 
-					//NOTE: set the first two vertices
+					segment.Vertices[0] = origin;// startVector;
+					segment.Vertices[1] = verticerPos;// 
 
-					segment.Direction = direction;
-					segment.On = true;
-					segment.Age = 0;
-
-					segment.Vertices[0] = origin ;// startVector;
-					segment.Vertices[1] = origin +Vector3(47.0f, 0.0f, 0.0f);// 
-
-					//g_Renderer.AddDebugSphere(lDirection, 32, Vector4(color), RENDERER_DEBUG_PAGE::NO_PAGE);
-
-					// NOTE: move the other two vertices to the position of the previous segment
-
+					//segment.Vertices[3] = origin;// startVector;
+					//segment.Vertices[2] = vertice1Pos;// 
 					segment.Vertices[3] = prevSegment.Vertices[0];
 					segment.Vertices[2] = prevSegment.Vertices[1];
 
@@ -129,8 +133,8 @@ namespace TEN::Effects::BOATFX
 
 					segment.RoomNumber = kayakItem->RoomNumber;
 
-					segment.Opacity = 0.2f;
-					segment.Life = 64;
+					segment.Opacity = 0.5f;
+					segment.Life = 84;
 
 		
 	}

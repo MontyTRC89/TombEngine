@@ -237,9 +237,6 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		xOffset = 256;
-		zOffset = 0;
-
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
 		float cosY = phd_cos(kayakItem->Pose.Orientation.y);
 
@@ -299,7 +296,7 @@ namespace TEN::Entities::Vehicles
 
 			Vector3 pos3 = Vector3(x1,y1,z1);
 
-			int length = 64 + kayakItem->Animation.Velocity.z;
+			
 
 			Vector4 color = Vector4(255, 255, 255, 1);
 
@@ -307,7 +304,7 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
 
-			SpawnWaveSegment(pos1, pos2, kayakItem, color, pos3);
+			SpawnWaveSegment(pos1, pos2, kayakItem, color, kayakItem->Animation.Velocity.z);
 
 			if (rotate == 1)
 			{
@@ -1270,7 +1267,7 @@ namespace TEN::Entities::Vehicles
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
 			KayakDoWake(kayakItem, -CLICK(0.5f), 0, 0);
-		//	KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
+			//KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
 		}
 
 		if (Wibble & 7)

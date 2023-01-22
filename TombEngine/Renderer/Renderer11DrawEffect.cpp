@@ -99,7 +99,7 @@ namespace TEN::Renderer
 							segment->Vertices[0],
 							segment->Vertices[1],
 							segment->Vertices[2],
-							segment->Vertices[3], Vector4(255, 255, 255, 0.1f),
+							segment->Vertices[3], Vector4(255, 255, 255, segment->Opacity),
 							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
 
 
