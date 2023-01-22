@@ -605,6 +605,14 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+
+		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
 		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return true;
 
@@ -722,6 +730,14 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBaddyGunflashes(RenderView& view)
 	{
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+
+		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
 		for (auto room : view.roomsToDraw)
 		{
 			for (auto item : room->ItemsToDraw)
@@ -1074,7 +1090,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
+	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{	
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1088,9 +1104,12 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stSprite.IsSoftParticle = info->IsSoftParticle ? 1 : 0;
-		m_cbSprite.updateData(m_stSprite, m_context.Get());
-		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+		if (resetPipeline)
+		{
+			m_stSprite.IsSoftParticle = info->IsSoftParticle ? 1 : 0;
+			m_cbSprite.updateData(m_stSprite, m_context.Get());
+			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+		}
 
 		SetBlendMode(info->blendMode);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -1107,12 +1126,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 
 	{
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		int firstBucket = (transparent ? 2 : 0);
-		int lastBucket = (transparent ? 4 : 2);
-
 		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
 		m_stStatic.World = effect->World;
@@ -1120,6 +1133,7 @@ namespace TEN::Renderer
 		m_stStatic.AmbientLight = effect->AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
+
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
@@ -1148,13 +1162,8 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-			if (lastBlendMode != bucket.BlendMode)
-			{
-				lastBlendMode = bucket.BlendMode;
-				SetBlendMode(lastBlendMode);
-			}
-
-			// Draw vertices
+			SetBlendMode(lastBlendMode);
+			
 			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 		}
 
@@ -1164,9 +1173,6 @@ namespace TEN::Renderer
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
-
-		int firstBucket = (transparent ? 2 : 0);
-		int lastBucket = (transparent ? 4 : 2);
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

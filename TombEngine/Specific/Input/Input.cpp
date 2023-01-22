@@ -600,9 +600,6 @@ namespace TEN::Input
 		}
 		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
 
-		if (!DebugMode)
-			return;
-
 		// Handle debug page switch.
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)

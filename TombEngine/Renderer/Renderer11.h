@@ -504,11 +504,11 @@ namespace TEN::Renderer
 		void DrawAllStrings();
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, bool transparent);
-		void DrawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
-		void DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view);
-		void DrawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
+		void DrawRoomsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawSpritesTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawStaticsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawItems(RenderView& view, bool transparent);
-		void DrawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
+		void DrawItemsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
