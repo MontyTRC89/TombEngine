@@ -62,8 +62,8 @@ void DoFlipMap(short group)
 
 	FlipStatus = FlipStats[group] = !FlipStats[group];
 
-	for (int i = 0; i < ActiveCreatures.size(); i++)
-		ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
+	for (auto& currentCreature : ActiveCreatures)
+		currentCreature->LOT.TargetBox = NO_BOX;
 }
 
 void AddRoomFlipItems(ROOM_INFO* room)

@@ -81,7 +81,10 @@ void AnimateLara(ItemInfo* item);
 void AnimateItem(ItemInfo* item);
 
 bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
+bool TestAnimNumber(const ItemInfo& item, int animNumber);
 bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
+bool TestAnimFrame(const ItemInfo& item, int frameStart);
+bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
