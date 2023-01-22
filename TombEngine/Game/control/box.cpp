@@ -1478,7 +1478,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
 	}
 
-	return (isReachable ? floor->Box : item->BoxNumber);
+	return (isReachable ? floor->Box : NO_BOX);
 }
 
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
