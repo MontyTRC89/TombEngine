@@ -19,6 +19,7 @@ Version 1.0.6
 * Fix TR3 Shiva and TR4 baddy 2 not blocking bullets.
 * Fix enemy projectile effect colours.
 * Fix enemy shadow position.
+* Fix sound positions not updated during flybys.
 * Make enemies drop pickups at their origin point, not bounding box centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
