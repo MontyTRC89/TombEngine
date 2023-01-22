@@ -873,13 +873,30 @@ void DropPickups(ItemInfo* item)
 			continue;
 
 		// Remember floor position for a tested point.
-		int candidateYPos = collPoint.Position.Floor;
+		int candidateYPos1 = collPoint.Position.Floor;
+
+		// Now do height test for narrow extent point to make sure it's also valid.
+		candidatePos = Geometry::TranslatePoint(origin, angle, extents * 0.8f);
+		candidatePos.y = yPos;
+		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+
+		// If position is inside a wall or on a slope, don't use it.
+		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// If height difference between extended and narrow extent points is more than one click,
+		// it means it landed on a step, so let's search for other position.
+		if (abs(collPoint.Position.Floor - candidateYPos1) >= CLICK(1.0f))
+			continue;
+
+		int candidateYPos2 = collPoint.Position.Floor;
 
 		// Now repeat the same test for original extent point to make sure it's also valid.
 		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
 		candidatePos.y = yPos;
 		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
 
+		// If position is inside a wall or on a slope, don't use it.
 		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
 			continue;
 
@@ -888,9 +905,9 @@ void DropPickups(ItemInfo* item)
 		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
 			continue;
 
-		// If height difference between extended and original extent points is more than one click,
+		// If height difference between any extent points is more than one click,
 		// it means it landed on a step, so let's search for other position.
-		if (abs(collPoint.Position.Floor - candidateYPos) >= CLICK(1.0f))
+		if (abs(collPoint.Position.Floor - candidateYPos2) >= CLICK(1.0f) || abs(candidateYPos1 - candidateYPos2) >= CLICK(1.0f))
 			continue;
 
 		origin = candidatePos;
