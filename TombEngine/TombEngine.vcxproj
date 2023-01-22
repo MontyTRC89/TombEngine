@@ -168,7 +168,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_willard.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
