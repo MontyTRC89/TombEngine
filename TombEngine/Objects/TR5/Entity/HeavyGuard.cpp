@@ -33,7 +33,6 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto HEAVY_GUARD_RAYGUN_DAMAGE = 250;
 
-	constexpr auto HEAVY_GUARD_HEAD_JOINT_RANGE = BLOCK(0.25f);
 	constexpr auto HEAVY_GUARD_ALERT_RANGE		= SQUARE(BLOCK(2));
 	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE	= SQUARE(BLOCK(3));
 	constexpr auto HEAVY_GUARD_CLOSE_RANGE		= SQUARE(BLOCK(1));
@@ -190,7 +189,6 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.ItemFlags[7] = HEAVY_GUARD_HEAD_JOINT_RANGE;
 		SetAnimation(&item, HEAVY_GUARD_ANIM_IDLE);
 	}
 
