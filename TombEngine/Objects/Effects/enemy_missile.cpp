@@ -22,9 +22,20 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
-	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
+	enum class MissileType
 	{
-		auto* fx = &EffectList[fxNum];
+		SethNormal = 0,
+		SethLarge = 1,
+		Harpy = 2,
+		Demigod3Single = 3,
+		Demigod3Radial = 4,
+		Demigod2 = 5,
+		Mutant = 6
+	};
+
+	void TriggerSethMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
+	{
+		auto* fx = &EffectList[fxNumber];
 
 		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
 		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
@@ -62,7 +73,7 @@ namespace TEN::Entities::Effects
 
 			spark->gravity = 0;
 			spark->maxYvel = 0;
-			spark->fxObj = fxNum;
+			spark->fxObj = fxNumber;
 
 			if (fx->flag1 == 1)
 				spark->scalar = 3;
@@ -144,14 +155,14 @@ namespace TEN::Entities::Effects
 		int maxRotation = 0;
 		int maxVelocity = 0;
 
-		if (fx->flag1 == 1)
+		if (fx->flag1 == (int)MissileType::SethLarge)
 		{
 			maxRotation = ANGLE(2.8f);
 			maxVelocity = CLICK(1);
 		}
 		else
 		{
-			if (fx->flag1 == 6)
+			if (fx->flag1 == (int)MissileType::Mutant)
 			{
 				if (fx->counter)
 					fx->counter--;
@@ -168,7 +179,7 @@ namespace TEN::Entities::Effects
 
 		if (fx->speed < maxVelocity)
 		{
-			if (fx->flag1 == 6)
+			if (fx->flag1 == (int)MissileType::Mutant)
 				fx->speed++;
 			else
 				fx->speed += 3;
@@ -204,12 +215,12 @@ namespace TEN::Entities::Effects
 
 			fx->pos.Orientation.x += dx;
 
-			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
+			if (fx->flag1 != (int)MissileType::Demigod3Radial && (fx->flag1 != (int)MissileType::Mutant || !fx->counter))
 				fx->pos.Orientation.y += dy;
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
-		if (fx->flag1 == 6)
+		if (fx->flag1 == (int)MissileType::Mutant)
 			fx->pos.Orientation.z += 16 * fx->speed;
 
 		int oldX = fx->pos.Position.x;
@@ -229,10 +240,10 @@ namespace TEN::Entities::Effects
 			fx->pos.Position.y = oldY;
 			fx->pos.Position.z = oldZ;
 
-			if (fx->flag1 != 6)
+			if (fx->flag1 != (int)MissileType::Mutant)
 				BubblesShatterFunction(fx, 0, -32);
 
-			if (fx->flag1 == 1)
+			if (fx->flag1 == (int)MissileType::SethLarge)
 			{
 				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
@@ -241,26 +252,26 @@ namespace TEN::Entities::Effects
 			{
 				if (fx->flag1)
 				{
-					if (fx->flag1 == 3 || fx->flag1 == 4)
+					if (fx->flag1 == (int)MissileType::Demigod3Single || fx->flag1 == (int)MissileType::Demigod3Radial)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
 					}
-					else if (fx->flag1 == 5)
+					else if (fx->flag1 == (int)MissileType::Demigod2)
 					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					}
 					else
 					{
-						if (fx->flag1 != 2)
+						if (fx->flag1 != (int)MissileType::Harpy)
 						{
-							if (fx->flag1 == 6)
+							if (fx->flag1 == (int)MissileType::Mutant)
 							{
 								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 15);
 								fx->pos.Position.y -= 128;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 15);
 								fx->pos.Position.y += 256;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 15);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 15);
 							}
 
 						}
@@ -283,12 +294,12 @@ namespace TEN::Entities::Effects
 		if (ItemNearLara(fx->pos.Position, 200))
 		{
 			LaraItem->HitStatus = true;
-			if (fx->flag1 != 6)
+			if (fx->flag1 != (int)MissileType::Mutant)
 				BubblesShatterFunction(fx, 0, -32);
 
 			KillEffect(fxNum);
 
-			if (fx->flag1 == 1)
+			if (fx->flag1 == (int)MissileType::SethLarge)
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 128, 64, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
@@ -298,26 +309,26 @@ namespace TEN::Entities::Effects
 			{
 				switch (fx->flag1)
 				{
-				case 3:
-				case 4:
+				case (int)MissileType::Demigod3Single:
+				case (int)MissileType::Demigod3Radial:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 10);
 					break;
 
-				case 5:
+				case (int)MissileType::Demigod2:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 5);
 					break;
 
-				case 2:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 3);//H
+				case (int)MissileType::Harpy:
+					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 128, 0, 16, 0, 3);
 					break;
 
-				case 6:
+				case (int)MissileType::Mutant:
 					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 0);
 					fx->pos.Position.y -= 128;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 0);
 					fx->pos.Position.y += 256;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 0);
 					ItemBurn(LaraItem);
 					break;
 				}
@@ -341,21 +352,21 @@ namespace TEN::Entities::Effects
 				switch (fx->flag1)
 				{
 				default:
-				case 1:
+				case (int)MissileType::SethLarge:
 					TriggerSethMissileFlame(fxNum, 32 * dx, 32 * dy, 32 * dz);
 					break;
 
-				case 2:
+				case (int)MissileType::Harpy:
 					TriggerHarpyFlameFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 
-				case 3:
-				case 4:
-				case 5:
+				case (int)MissileType::Demigod3Single:
+				case (int)MissileType::Demigod3Radial:
+				case (int)MissileType::Demigod2:
 					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 
-				case 6:
+				case (int)MissileType::Mutant:
 					TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
 				}
