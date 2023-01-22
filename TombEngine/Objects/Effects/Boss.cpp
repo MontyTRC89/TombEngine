@@ -161,10 +161,10 @@ namespace TEN::Effects::Boss
 
 		spark.on = true;
 		spark.sR = 75;
-		spark.sG = 75;
+		spark.sG = 125;
 		spark.sB = 175;
 		spark.dR = 25;
-		spark.dG = 25;
+		spark.dG = 80;
 		spark.dB = 100;
 		spark.colFadeSpeed = 8;
 		spark.fadeToBlack = 64;
@@ -220,7 +220,6 @@ namespace TEN::Effects::Boss
 
 		if (counter > 0 && !(counter % 10))
 		{
-			
 			for (int i = 0; i < 3; i++)
 			{
 				pos = Vector3(
@@ -245,7 +244,6 @@ namespace TEN::Effects::Boss
 
 			TriggerShockwave(&shockwavePos, 300, 512, random, r, g, b, 36, ANGLE(angle), 0);
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
-
 		}
 
 		TriggerDynamicLight(
@@ -254,7 +252,7 @@ namespace TEN::Effects::Boss
 			item.Pose.Position.z, counter / 2,
 			color.x * 255, color.y * 255, color.z * 255);
 
-		if (counter == deathCountToDie)
+		if (counter >= deathCountToDie)
 			CreatureDie(itemNumber, true);
 	}
 
