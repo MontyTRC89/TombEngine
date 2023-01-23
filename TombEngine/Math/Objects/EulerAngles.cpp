@@ -245,7 +245,7 @@ using namespace TEN::Math;
 
 	float EulerAngles::ClampAlpha(float alpha)
 	{
-		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
+		return std::clamp(alpha, 0.0f, 1.0f);
 	}
 
 	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)

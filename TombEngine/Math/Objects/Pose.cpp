@@ -80,6 +80,6 @@ using namespace TEN::Math;
 	}
 	bool Pose::operator !=(const Pose& pose) const
 	{
-		return ((Position != pose.Position) || (Orientation != pose.Orientation));
+		return !(*this == pose);
 	}
 //}
