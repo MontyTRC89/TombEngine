@@ -1267,7 +1267,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			KayakDoWake(kayakItem, -CLICK(0.5f), 0, 0);
+			DoWakeEffect(kayakItem, -CLICK(0.5f), 0, 1, true);//1 is left
+			//KayakDoWake(kayakItem, -CLICK(0.5f), 0, 0);
 			//KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
 		}
 
