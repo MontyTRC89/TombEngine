@@ -17,7 +17,8 @@ CreatureInfo* GetCreatureInfo(ItemInfo* item)
 
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 {
-	float bestDistance = FLT_MAX;
+	float nearestDistance = INFINITY;
+
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		auto* targetEntity = &g_Level.Items[i];
@@ -30,10 +31,10 @@ void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 			targetEntity->Status != ITEM_INVISIBLE)
 		{
 			float distance = Vector3i::Distance(item->Pose.Position, targetEntity->Pose.Position);
-			if (distance < bestDistance)
+			if (distance < nearestDistance)
 			{
 				creature->Enemy = targetEntity;
-				bestDistance = distance;
+				nearestDistance = distance;
 			}
 		}
 	}

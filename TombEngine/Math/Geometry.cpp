@@ -15,18 +15,14 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
 	{
-		if (forward == 0.0f && down == 0.0f && right == 0.0f)
-			return point;
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3()));
+	}
 
-		float sinHeading = phd_sin(headingAngle);
-		float cosHeading = phd_cos(headingAngle);
-
-		return Vector3(
-			point.x + ((forward * sinHeading) + (right * cosHeading)),
-			point.y + down,
-			point.z + ((forward * cosHeading) - (right * sinHeading)));
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, relOffset.ToVector3()));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
@@ -34,25 +30,41 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	{
+		if (forward == 0.0f && down == 0.0f && right == 0.0f)
+			return point;
+
+		auto orient = EulerAngles(0, headingAngle, 0);
+		auto relOffset = Vector3(right, down, forward);
+		return TranslatePoint(point, orient, relOffset);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
+	{
+		auto orient = EulerAngles(0, headingAngle, 0);
+		return TranslatePoint(point, orient, relOffset);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset)
+	{
+		auto rotMatrix = orient.ToRotationMatrix();
+		return (point + Vector3::Transform(relOffset, rotMatrix));
+	}
+
+	// NOTE: Roll (Z axis) of EulerAngles orientation is disregarded.
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
 
-		float sinX = phd_sin(orient.x);
-		float cosX = phd_cos(orient.x);
-		float sinY = phd_sin(orient.y);
-		float cosY = phd_cos(orient.y);
-
-		return Vector3(
-			point.x + (distance * (sinY * cosX)),
-			point.y - (distance * sinX),
-			point.z + (distance * (cosX * cosY)));
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+		auto direction = orient.ToDirection();
+		return TranslatePoint(point, direction, distance);
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
