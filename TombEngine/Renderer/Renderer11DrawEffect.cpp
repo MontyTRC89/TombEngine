@@ -1112,8 +1112,8 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(info->blendMode);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetAlphaTest(ALPHA_TEST_NONE, 0);
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
@@ -1122,6 +1122,8 @@ namespace TEN::Renderer
 
 		m_numTransparentDrawCalls++;
 		m_numSpritesTransparentDrawCalls++;
+
+		SetCullMode(CULL_MODE_CCW);
 	}
 
 	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 

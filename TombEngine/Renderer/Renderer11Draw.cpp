@@ -1314,6 +1314,8 @@ namespace TEN::Renderer
 
 		SetBlendMode(info->blendMode);
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_CCW);
 
 		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
 
@@ -1373,9 +1375,10 @@ namespace TEN::Renderer
 			BindLights(info->staticMesh->LightsToDraw);
 		}
 
-		SetBlendMode(info->blendMode);
-		
+		SetBlendMode(info->blendMode);	
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_CCW);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -1760,8 +1763,9 @@ namespace TEN::Renderer
 		            SAMPLER_NONE);
 
 		SetBlendMode(info->blendMode);
-
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+		SetCullMode(CULL_MODE_CCW);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -1970,7 +1974,7 @@ namespace TEN::Renderer
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
-
+			 
 			SetScissor(room->ClipBounds);
 
 			for (int animated = 0; animated < 2; animated++)
