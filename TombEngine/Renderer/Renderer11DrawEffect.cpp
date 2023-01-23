@@ -81,30 +81,33 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawWakeFX(RenderView& view)
 	{
-		for (int i = 0; i < Segments.size(); i++)
+		for (int i = 0; i < 64; i++)
 		{
-			auto* segment = &Segments[i];
-			
+			for (int j = 0; j < 3; j++)
+			{
+				auto& segment = Segments[i][j];
 
-					if (!segment->On)
-						continue;
+	
 
-
-					if (segment->Life)
-					{
-
+				if (!segment.On)
+					continue;
 
 
-						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BACKGROUND],
-							segment->Vertices[0],
-							segment->Vertices[1],
-							segment->Vertices[2],
-							segment->Vertices[3], Vector4(255, 255, 255, segment->Opacity),
-							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
+				if (segment.Life)
+				{
 
 
-					}
-				
+
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BACKGROUND],
+						segment.Vertices[0],
+						segment.Vertices[1],
+						segment.Vertices[2],
+						segment.Vertices[3], Vector4(255, 255, 255, segment.Opacity),
+						0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
+
+
+				}
+			}
 			
 		}
 

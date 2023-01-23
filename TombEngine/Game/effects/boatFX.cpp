@@ -32,8 +32,8 @@ namespace TEN::Effects::BOATFX
 	constexpr auto NUM_WAKE_SPRITES = 64;
 	constexpr auto NUM_WAKE_WITDH = 32;
 	
-	std::array<WaveSegment, NUM_WAKE_SPRITES> Segments;
-	Wave Waves;
+	WaveSegment Segments[64][3];
+	
 
 	void DoWakeEffect(ItemInfo* Item, int xOffset, int zOffset, int waveDirection, bool OnWater)
 	{
@@ -69,136 +69,174 @@ namespace TEN::Effects::BOATFX
 
 	void KayakUpdateWakeFX()
 	{
-		for (int i = 0; i < Segments.size(); i++)
+		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			auto& segment = Segments[i];
-
-			if (!segment.On)
-				continue;
-
-			segment.Age++;
-			segment.Life--; 
-
-			if (segment.Life <= 0.0f)
+			for (int j = 0; j < 3; j++)
 			{
-				segment.On = false;
-				continue;
+				auto* segment = &Segments[i][j];
+
+
+
+
+				if (!segment->On)
+					continue;
+
+
+				//segment.Age++;
+				segment->Life--;
+
+				if (segment->Life <= 0.0f)
+				{
+					segment->On = false;
+					continue;
+				}
+
+				int zOffset = 0;
+
+				float sinY = phd_sin(segment->Orientation.y);
+				float cosY = phd_cos(segment->Orientation.y);
+
+
+				if (segment->Opacity > 0.0f)
+					segment->Opacity -= 0.1f / 15;
+
+
+
+				switch (segment->ID)
+				{
+
+				case WAVE_DIRECTION_LEFT:
+
+					segment->Vertices[2] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[1] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[3] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
+					segment->Vertices[0] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
+					break;
+
+				case WAVE_DIRECTION_RIGHT:
+					segment->Vertices[2] += Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
+					segment->Vertices[1] += Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
+					segment->Vertices[3] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[0] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					break;
+
+				case WAVE_DIRECTION_CENTRAL:
+					segment->Vertices[2] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[3] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					segment->Vertices[0] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+					break;
+				}
 			}
-
-			int zOffset = 0;
-
-			float sinY = phd_sin(segment.Orientation.y);
-			float cosY = phd_cos(segment.Orientation.y);
-
-
-			if (segment.Opacity > 0.0f)
-				segment.Opacity -= 0.1f / 15;
-			
-
-			//Should be in WAVE struct
-			// 
-			//switch (segment.waveDirection)
-			//{
-
-			//case WAVE_DIRECTION_LEFT:
-
-				segment.Vertices[2] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[1] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[3] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
-				segment.Vertices[0] -= Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
-			//	break;
-
-			/*case WAVE_DIRECTION_RIGHT:
-				segment.Vertices[2] += Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
-				segment.Vertices[1] += Vector3((zOffset * sinY) + (0.2f * cosY), 0.0f, (zOffset * cosY) - (0.2f * sinY));
-				segment.Vertices[3] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[0] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				break;
-
-			case WAVE_DIRECTION_CENTRAL:
-				segment.Vertices[2] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[3] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-				segment.Vertices[0] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));*/
-				//break;
-			//}
 		}
 			
 	}
 
 	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection)
 	{
+		int youngestLifeIndex = 0;
+		int youngestAge = 0;
+		//WaveSegment& prevSegment = Segments[0][waveDirection];
 
-		auto& segment = GetFreeWaveSegment();
-		auto& prevSegment = GetPreviousSegment();
+		//for (int i = 0; i < NUM_WAKE_SPRITES; i++)
+		//{
+		//	WaveSegment& segment = Segments[i][waveDirection];
 
-		if (segment.On)
-			return;
 
-		segment.On = true;
-		segment.Age = 0;
+			auto& segment = GetFreeWaveSegment(waveDirection);
 
-				//segment.waveDirection = waveDirection; //should be in wave struct
 
-		segment.Direction = origin;
-		segment.Orientation = Item->Pose.Orientation;
-		segment.ScaleRate = 1.0f;
-		segment.width = 1.0f;
 
-		int zOffset = 0;
+			/*for (int k = 0; k < NUM_WAKE_SPRITES; k++)
+			{
+				if (youngestAge < segment.Life)
+				{
+					youngestAge = segment.Life;
+					youngestLifeIndex = k;
+				}
 
-		float sinY = phd_sin(Item->Pose.Orientation.y);
-		float cosY = phd_cos(Item->Pose.Orientation.y);
+				if (!segment.On)
+				{
 
-		int x = segment.Direction.x + (zOffset * sinY) + (segment.width * cosY);
-		int z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
-		Vector3 verticerPos = Vector3(x, origin.y, z);
 
-		segment.Vertices[0] = origin;
-		segment.Vertices[1] = verticerPos;
-		segment.Vertices[3] = prevSegment.Vertices[0];
-		segment.Vertices[2] = prevSegment.Vertices[1];
-		segment.RoomNumber = Item->RoomNumber;
+					if (k > 0)
+						WaveSegment& prevSegment = Segments[k - 1][waveDirection];
+
+				}
+			}*/
+
+
+			auto& prevSegment = GetPreviousSegment(waveDirection);
+
+			if (segment.On)
+				return;
+
+			segment.On = true;
+			//segment.Age = 0;
+
+					//segment.waveDirection = waveDirection; //should be in wave struct
+			segment.ID = waveDirection;
+			segment.Direction = origin;
+			segment.Orientation = Item->Pose.Orientation;
+			segment.ScaleRate = 1.0f;
+			segment.width = 1.0f;
+
+			int zOffset = 0;
+
+			float sinY = phd_sin(Item->Pose.Orientation.y);
+			float cosY = phd_cos(Item->Pose.Orientation.y);
+
+			int x = segment.Direction.x + (zOffset * sinY) + (segment.width * cosY);
+			int z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
+			Vector3 verticerPos = Vector3(x, origin.y, z);
+
+			segment.Vertices[0] = origin;
+			segment.Vertices[1] = verticerPos;
+			segment.Vertices[3] = prevSegment.Vertices[0]; //origin + Vector3(175,0,0);
+			segment.Vertices[2] = prevSegment.Vertices[1];
+			segment.RoomNumber = Item->RoomNumber;
+
+			segment.Opacity = 0.5f;
+			segment.Life = 84;
 		
-		segment.Opacity = 0.5f;
-		segment.Life = 84;		
+		
 	}
 
-	WaveSegment& GetFreeWaveSegment()
+	WaveSegment& GetFreeWaveSegment(int waveDirection)
 	{
-		for (int i = 0; i < Segments.size(); i++)
+		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			if (!Segments[i].On)
-				return Segments[i];
+			if (!Segments[i][waveDirection].On)
+				return Segments[i][waveDirection];
 		}
 		
-		return Segments[0];
+		return Segments[0][waveDirection];
 	}
 
-	WaveSegment& GetPreviousSegment()
+	WaveSegment& GetPreviousSegment(int waveDirection)
 	{
 		int youngestLifeIndex = 0;
 		int youngestAge = 0;
 
-		for (int i = 0; i < Segments.size(); i++)
+		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			if (youngestAge < Segments[i].Life)
+			if (youngestAge < Segments[i][waveDirection].Life)
 			{
-				youngestAge = Segments[i].Life;
+				youngestAge = Segments[i][waveDirection].Life;
 				youngestLifeIndex = i;
 			}
 
-			if (!Segments[i].On)
+			if (!Segments[i][waveDirection].On)
 			{
 
 
 				if (i > 0)				
-					return Segments[i - 1];
+					return Segments[i - 1][waveDirection];
 
 			}
 		}
 
-		return Segments[youngestLifeIndex];
+		return Segments[0][waveDirection];
 	}
 
 }

@@ -20,22 +20,16 @@ namespace TEN::Effects::BOATFX
 		bool On = false;
 		int Life = 0;
 		float ScaleRate = 0.0f; 
-		int RoomNumber;
-		float Opacity;
-		int Age;
-		float width;
+		int RoomNumber = 0;
+		float Opacity = 0.5f;
+		//int Age;
+		float width = 1.0f;
 		int PrevSegment;
+		int ID;
 	};
 
-	extern std::array<WaveSegment, 64> Segments;
+	extern WaveSegment Segments[64][3];
 
-	struct Wave
-	{
-		std::array<WaveSegment, 64> Segments;
-		short waveDirection;
-	};
-
-	extern Wave Waves;
 
 
 	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection);
@@ -43,6 +37,6 @@ namespace TEN::Effects::BOATFX
 	void KayakUpdateWakeFX();
 	void DoWakeEffect(ItemInfo* Item, int xOffset, int zOffset, int waveDirection, bool OnWater);
 
-	WaveSegment& GetFreeWaveSegment();
-	WaveSegment& GetPreviousSegment();
+	WaveSegment&  GetFreeWaveSegment(int waveDirection);
+	WaveSegment&  GetPreviousSegment(int waveDirection);
 }
