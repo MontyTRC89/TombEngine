@@ -10,6 +10,7 @@
 	constexpr inline auto PI_DIV_4 = PI / 4;
 	constexpr inline auto RADIAN   = PI / 180;
 	constexpr inline auto SQRT_2   = 1.41421356237309504880168872420969807856967187537694f;
+	constexpr inline auto EPSILON  = 0.00001f;
 
 	constexpr inline auto SQUARE = [](auto x) { return (x * x); };
 	constexpr inline auto CUBE	 = [](auto x) { return (x * x * x); };

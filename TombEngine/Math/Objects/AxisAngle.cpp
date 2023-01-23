@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Math/Objects/AxisAngle.h"
 
+#include "Math/Constants.h"
 #include "Math/Legacy.h"
 #include "Math/Objects/EulerAngles.h"
 
@@ -21,57 +22,45 @@
 		this->Angle = angle;
 	}
 
-	// Check. ToDirection() is probably wrong.
-	AxisAngle::AxisAngle(const Vector3& direction)
+	AxisAngle::AxisAngle(const EulerAngles& eulers)
 	{
-		auto directionNorm = direction;
-		directionNorm.Normalize();
+		*this = AxisAngle(eulers.ToQuaternion());
+	}
 
-		float angle = acos(Vector3::UnitZ.Dot(direction));
-		auto axis = Vector3::UnitZ.Cross(direction);
+	// NOTE: Some precision drift may occur.
+	AxisAngle::AxisAngle(const Quaternion& quat)
+	{
+		float angle = 2.0f * acos(quat.w);
+		float scale = sqrt(1.0f - quat.w * quat.w);
+		auto axis = Vector3(quat) / scale;
 		axis.Normalize();
 
 		this->Axis = axis;
 		this->Angle = FROM_RAD(angle);
 	}
 
-	// Check. Getting it from a quat is faster? 
-	AxisAngle::AxisAngle(const EulerAngles& eulers)
-	{
-		*this = AxisAngle(eulers.ToQuaternion());
-	}
-
-	// Check. Probably correct, but crashes if I use ToQuat on it again.
-	AxisAngle::AxisAngle(const Quaternion& quat)
-	{
-		auto axis = Quaternion::Identity;
-		float angle = 0.0f;
-		XMQuaternionToAxisAngle((XMVECTOR*)&axis, &angle, quat);
-
-		this->Axis = Vector3(axis);
-		this->Angle = FROM_RAD(angle);
-	}
-
-	// Wrong.
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
 	{
-		static constexpr auto epsilon = 0.00001f;
+		// Decompose matrix into quaternion.
+		auto rotMatrixCopy = rotMatrix;
+		auto scale = Vector3::Zero;
+		auto quat = Quaternion::Identity;
+		auto translation = Vector3::Zero;
+		rotMatrixCopy.Decompose(scale, quat, translation);
 
-		float trace = rotMatrix(1, 1) + rotMatrix(2, 2) + rotMatrix(3, 3);
-		float cosAngle = 0.5f * (trace - 1.0f);
-		this->Angle = FROM_RAD(acos(cosAngle));
+		// Convert quaternion to AxisAngle.
+		*this = AxisAngle(quat);
 
-		if (abs(TO_RAD(Angle)) <= epsilon)
+		// Extract rotation axis from matrix.
+		auto rotAxis = Vector3::TransformNormal(Vector3::Right, rotMatrix);
+		
+		// Check if rotation axis and unit axis are pointing in opposite directions.
+		float dot = rotAxis.Dot(Axis);
+		if (dot < 0.0f)
 		{
-			this->Axis = Vector3::UnitX;
-		}
-		else
-		{
-			float invSinAngle = 1.0f / sin(TO_RAD(Angle));
-			this->Axis = Vector3(
-				(rotMatrix(3, 2) - rotMatrix(2, 3)) * invSinAngle,
-				(rotMatrix(1, 3) - rotMatrix(3, 1)) * invSinAngle,
-				(rotMatrix(2, 1) - rotMatrix(1, 2)) * invSinAngle);
+			// Negate angle and unit axis to ensure the angle stays within [0, PI] range.
+			this->Angle = -Angle;
+			this->Axis = -Axis;
 		}
 	}
 
@@ -103,19 +92,16 @@
 		*this = Slerp(*this, axisAngleTo, alpha);
 	}
 
-	// Check.
 	AxisAngle AxisAngle::Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha)
 	{
-		static constexpr auto epsilon = 0.00001f;
-
 		auto axis = Vector3::Zero;
 		float angle = 0.0f;
 
-		// Find the angle between the two axes.
+		// Find angle between the two axes.
 		float angleBetweenAxes = acos(axisAngleFrom.GetAxis().Dot(axisAngleTo.GetAxis()));
 
-		// If the angle between the axes is close to 0, do simple interpolation of angle values.
-		if (abs(angleBetweenAxes) <= epsilon)
+		// If angle between the axes is close to 0, do simple interpolation of angle values.
+		if (abs(angleBetweenAxes) <= EPSILON)
 		{
 			axis = axisAngleFrom.GetAxis();
 			angle = TO_RAD(axisAngleFrom.GetAngle()) + (TO_RAD(axisAngleTo.GetAngle() - axisAngleFrom.GetAngle()) * alpha);
@@ -130,27 +116,6 @@
 		axis = (axisAngleFrom.GetAxis() * weight0) + (axisAngleTo.GetAxis() * weight1);
 		angle = (TO_RAD(axisAngleFrom.GetAngle()) * weight0) + (TO_RAD(axisAngleTo.GetAngle()) * weight1);
 		return AxisAngle(axis, FROM_RAD(angle));
-	}
-
-	// Wrong? Direction seems to "lag behind" the required one.
-	Vector3 AxisAngle::ToDirection() const
-	{
-		auto quat = this->ToQuaternion();
-
-		// Rotate the point (0, 0, 1) by the quaternion.
-		auto direction = Vector3(0.0f, 0.0f, 1.0f);
-		auto pointAsQuat = Quaternion(direction, 0.0f);
-		auto newPointAsQuat = pointAsQuat * quat;
-
-		// Extract and normalize the direction vector.
-		direction = Vector3(newPointAsQuat);
-		direction.Normalize();
-		return direction;
-	}
-
-	EulerAngles AxisAngle::ToEulerAngles() const
-	{
-		return EulerAngles(*this);
 	}
 
 	Quaternion AxisAngle::ToQuaternion() const
@@ -180,18 +145,16 @@
 		return *this;
 	}
 
-	// Check.
 	AxisAngle& AxisAngle::operator *=(const AxisAngle& axisAngle)
 	{
 		*this = *this * axisAngle;
 		return *this;
 	}
 
-	// Check.
 	AxisAngle AxisAngle::operator *(const AxisAngle& axisAngle) const
 	{
-		auto axis = Axis.Cross(axisAngle.GetAxis());
-		short angle = Angle + axisAngle.GetAngle();
-		return AxisAngle(axis, angle);
+		auto quat0 = this->ToQuaternion();
+		auto quat1 = axisAngle.ToQuaternion();
+		return AxisAngle(quat0 * quat1);
 	}
 //}

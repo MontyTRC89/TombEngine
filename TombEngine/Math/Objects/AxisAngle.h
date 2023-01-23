@@ -18,7 +18,6 @@ class EulerAngles;
 		// Constructors
 		AxisAngle();
 		AxisAngle(const Vector3& axis, short angle);
-		AxisAngle(const Vector3& direction);
 		AxisAngle(const EulerAngles& eulers);
 		AxisAngle(const Quaternion& quat);
 		AxisAngle(const Matrix& rotMatrix);
@@ -36,8 +35,6 @@ class EulerAngles;
 		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha = 1.0f);
 
 		// Converters
-		Vector3		ToDirection() const;
-		EulerAngles ToEulerAngles() const;
 		Quaternion	ToQuaternion() const;
 		Matrix		ToRotationMatrix() const;
 

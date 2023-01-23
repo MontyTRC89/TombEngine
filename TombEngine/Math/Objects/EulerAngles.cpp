@@ -33,24 +33,14 @@ using namespace TEN::Math;
 		this->z = 0;
 	}
 
-	// Very wrong. Maybe convention issue?
 	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
 	{
-		float sinAngle = sin(TO_RAD(axisAngle.GetAngle()));
-		float cosAngle = cos(TO_RAD(axisAngle.GetAngle()));
-
-		float pitch = asin(axisAngle.GetAxis().y * sinAngle);
-		float yaw = atan2(axisAngle.GetAxis().x * sinAngle, cosAngle);
-		float roll = atan2(axisAngle.GetAxis().z * sinAngle, cosAngle);
-
-		this->x = FROM_RAD(pitch);
-		this->y = FROM_RAD(yaw);
-		this->z = FROM_RAD(roll);
+		*this = EulerAngles(axisAngle.ToQuaternion());
 	}
 
 	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
-		static constexpr auto singularityThreshold = 0.9999995f;
+		static constexpr auto singularityThreshold = 1.0f - EPSILON;
 
 		// Handle singularity case.
 		float sinP = ((quat.w * quat.x) - (quat.y * quat.z)) * 2;
