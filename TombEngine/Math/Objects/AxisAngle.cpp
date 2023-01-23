@@ -30,10 +30,10 @@
 	// NOTE: Some precision drift may occur.
 	AxisAngle::AxisAngle(const Quaternion& quat)
 	{
-		float angle = 2.0f * acos(quat.w);
 		float scale = sqrt(1.0f - quat.w * quat.w);
 		auto axis = Vector3(quat) / scale;
 		axis.Normalize();
+		float angle = 2.0f * acos(quat.w);
 
 		this->Axis = axis;
 		this->Angle = FROM_RAD(angle);
@@ -42,10 +42,10 @@
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
 	{
 		// Decompose matrix into quaternion.
-		auto rotMatrixCopy = rotMatrix;
 		auto scale = Vector3::Zero;
 		auto quat = Quaternion::Identity;
 		auto translation = Vector3::Zero;
+		auto rotMatrixCopy = rotMatrix;
 		rotMatrixCopy.Decompose(scale, quat, translation);
 
 		// Convert quaternion to AxisAngle.
