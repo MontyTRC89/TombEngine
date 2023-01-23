@@ -237,6 +237,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
 
+
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
 		float cosY = phd_cos(kayakItem->Pose.Orientation.y);
 
@@ -304,7 +305,7 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
 
-			SpawnWaveSegment(pos1, pos2, kayakItem, color, kayakItem->Animation.Velocity.z);
+			SpawnWaveSegment(pos1, kayakItem, 1);
 
 			if (rotate == 1)
 			{
