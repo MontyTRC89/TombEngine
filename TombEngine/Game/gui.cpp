@@ -3146,9 +3146,8 @@ namespace TEN::Gui
 		if (GuiIsSelected())
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			g_GameScript->PreSave();
-			SaveGame::Save(SelectedSaveSlot);
 			g_GameScript->OnSave();
+			SaveGame::Save(SelectedSaveSlot);
 			return true;
 		}
 

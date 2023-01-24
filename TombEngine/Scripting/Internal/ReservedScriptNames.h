@@ -28,7 +28,6 @@ static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
 static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
-static constexpr char ScriptReserved_PreSave[]			= "PreSave";
 static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase";
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";

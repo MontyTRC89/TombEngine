@@ -100,7 +100,6 @@ public:
 	void								OnStart() override;
 	void								OnLoad() override;
 	void								OnControlPhase(float dt) override;
-	void 								PreSave() override;
 	void								OnSave() override;
 	void								OnEnd() override;
 };
