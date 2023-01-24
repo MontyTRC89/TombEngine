@@ -230,10 +230,9 @@ namespace TEN::Entities::TR4
 			int distance;
 			auto* targetCreature = ActiveCreatures[0];
 
-			for (int i = 0; i < ActiveCreatures.size(); i++)
+			for (auto& currentCreature : ActiveCreatures)
 			{
-				targetCreature = ActiveCreatures[i];
-
+				targetCreature = currentCreature;
 				if (targetCreature->ItemNumber == NO_ITEM ||
 					targetCreature->ItemNumber == itemNumber ||
 					g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_VON_CROY ||

@@ -191,18 +191,15 @@ namespace TEN::Entities::TR4
 		{
 			int minDistance = INT_MAX;
 
-			for (int i = 0; i < ActiveCreatures.size(); i++)
+			for (auto& currentCreature : ActiveCreatures)
 			{
-				auto* currentCreatureInfo = ActiveCreatures[i];
-
-				if (currentCreatureInfo->ItemNumber == NO_ITEM ||
-					currentCreatureInfo->ItemNumber == itemNumber)
+				if (currentCreature->ItemNumber == NO_ITEM ||
+					currentCreature->ItemNumber == itemNumber)
 				{
 					continue;
 				}
 
-				auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
-
+				auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 				if (currentItem->ObjectNumber != ID_GUIDE &&
 					abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
 				{
