@@ -1082,7 +1082,6 @@ void Moveable::SetVisible(bool visible)
 	}
 }
 
-
 void Moveable::Invalidate()
 {
 	// keep m_item as it is so that we can properly remove it from the moveables set when
