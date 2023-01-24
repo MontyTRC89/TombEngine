@@ -305,7 +305,7 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
 
-			SpawnWaveSegment(pos1, kayakItem, 1);
+			SpawnWaveSegment(pos1, kayakItem, 1,1,84,10.0f);
 
 			if (rotate == 1)
 			{
@@ -1267,9 +1267,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			DoWakeEffect(kayakItem, -CLICK(0.5f), 0, 1, true);//1 is left
-			DoWakeEffect(kayakItem, CLICK(0.5f), 0, 2, true);//2 is r
-			//KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
+			DoWakeEffect(kayakItem, -CLICK(0.5f), 0, 1, true, 2.0f, 84, 10.0f);//1 is left
+			DoWakeEffect(kayakItem, CLICK(0.5f), 0, 2, true, 2.0f, 84, 10.0f);//2 is r
 		}
 
 		if (Wibble & 7)

@@ -11,6 +11,8 @@ class Vector3i;
 
 namespace TEN::Effects::BOATFX
 {
+	constexpr auto NUM_WAKE_SPRITES = 64;
+
 	struct WaveSegment
 	{
 		//std::array<Vector3, 4> Vertices = {}; //NOTE: this cunfuses me, I will use that later when everything is set up and works
@@ -19,24 +21,23 @@ namespace TEN::Effects::BOATFX
 		EulerAngles Orientation;
 		bool On = false;
 		int Life = 0;
+		int Age = 0;
 		float ScaleRate = 0.0f; 
 		int RoomNumber = 0;
 		float Opacity = 0.5f;
-		//int Age;
 		float width = 1.0f;
-		int PrevSegment;
-		int ID;
+		int StreamerID;
+		int FadeOut;
+		int PreviousID;
 	};
 
-	extern WaveSegment Segments[64][3];
+	extern WaveSegment Segments[NUM_WAKE_SPRITES][3];
 
-
-
-	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection);
+	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection, float width, int life, float fade);
 
 	void KayakUpdateWakeFX();
-	void DoWakeEffect(ItemInfo* Item, int xOffset, int zOffset, int waveDirection, bool OnWater);
-
+	void DoWakeEffect(ItemInfo* Item, int xOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);
+	WaveSegment& Get2PreviousSegment(int waveDirection);
 	WaveSegment&  GetFreeWaveSegment(int waveDirection);
-	WaveSegment&  GetPreviousSegment(int waveDirection);
+	int GetPreviousSegment(int waveDirection);
 }

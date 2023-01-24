@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/boatFX.h"
 #include "Game/effects/bubble.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -19,6 +20,7 @@
 
 using std::vector;
 using namespace TEN::Input;
+using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -972,6 +974,13 @@ namespace TEN::Entities::Vehicles
 			height != NO_HEIGHT)
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
+
+			if (!(Wibble & 15) )
+			{
+			DoWakeEffect(rBoatItem, -344, 0, 1, true, 10.0f , 50, 4.0f);//1 is left
+			DoWakeEffect(rBoatItem, 344, 0, 2, true,  10.0f, 50, 4.0f);//2 is r
+			}
+
 			if ((GetRandomControl() & 1) == 0)
 			{
 				Pose pos;
@@ -982,6 +991,8 @@ namespace TEN::Entities::Vehicles
 				short roomNumber = rBoatItem->RoomNumber;
 				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
 				CreateBubble((Vector3i*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+
+
 			}
 		}
 		else
