@@ -98,15 +98,12 @@ namespace TEN::Entities::Creatures::TR3
 				ItemInfo* nearestItem = nullptr;
 				float minDistance = FLT_MAX;
 
-				for (auto* activeCreature : ActiveCreatures)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (activeCreature->ItemNumber == NO_ITEM || activeCreature->ItemNumber == itemNumber)
-					{
-						activeCreature++;
+					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
-					}
 
-					auto* targetItem = &g_Level.Items[activeCreature->ItemNumber];
+					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
 
 					int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
 					if (distance < minDistance && item->HitPoints > 0)
@@ -114,8 +111,6 @@ namespace TEN::Entities::Creatures::TR3
 						nearestItem = targetItem;
 						minDistance = distance;
 					}
-
-					activeCreature++;
 				}
 
 				if (nearestItem != nullptr &&
