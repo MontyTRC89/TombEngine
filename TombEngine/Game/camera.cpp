@@ -68,7 +68,6 @@ bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
 
-int PhdPerspective;
 short CurrentFOV;
 short LastFOV;
 
@@ -105,7 +104,6 @@ void AlterFOV(short value, bool store)
 		LastFOV = value;
 
 	CurrentFOV = value;
-	PhdPerspective = g_Configuration.Width / 2 * phd_cos(value / 2) / phd_sin(value / 2);
 }
 
 short GetCurrentFOV()
@@ -310,22 +308,8 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.mikePos.x = LaraItem->Pose.Position.x;
-		Camera.mikePos.y = LaraItem->Pose.Position.y;
-		Camera.mikePos.z = LaraItem->Pose.Position.z;
-		Camera.oldType = Camera.type;
-	}
-	else
-	{
-		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(angle);
-		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
-		Camera.oldType = Camera.type;
-	}
+	UpdateMikePos(LaraItem);
+	Camera.oldType = Camera.type;
 }
 
 void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
@@ -1136,22 +1120,7 @@ void LookCamera(ItemInfo* item)
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.mikePos.x = item->Pose.Position.x;
-		Camera.mikePos.y = item->Pose.Position.y;
-		Camera.mikePos.z = item->Pose.Position.z;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
-		Camera.mikePos.y = Camera.pos.y;
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 
 	lara->ExtraHeadRot.x = headXRot;
@@ -1271,20 +1240,7 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.target.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.mikePos = item->Pose.Position;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
-		Camera.mikePos.y = Camera.pos.y;
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
@@ -1906,6 +1862,30 @@ void ItemsCollideCamera()
 	}
 
 	staticList.clear(); // Done
+}
+
+void UpdateMikePos(ItemInfo* item)
+{
+	if (Camera.mikeAtLara)
+	{
+		Camera.mikePos = item->Pose.Position;
+		Camera.actualAngle = item->Pose.Orientation.y;
+
+		if (item->IsLara())
+		{
+			auto* lara = GetLaraInfo(item);
+			Camera.actualAngle += lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		}
+	}
+	else
+	{
+		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + phdPerspective * phd_cos(Camera.actualAngle);
+		Camera.mikePos.y = Camera.pos.y;
+	}
 }
 
 void RumbleScreen()

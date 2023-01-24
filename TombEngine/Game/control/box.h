@@ -158,7 +158,6 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber);
 void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
-void DropEntityPickups(ItemInfo* item);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
 void CreatureYRot2(Pose* fromPose, short angle, short angleAdd);
 bool SameZone(CreatureInfo* creature, ItemInfo* target);
