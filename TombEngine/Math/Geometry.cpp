@@ -200,4 +200,9 @@ namespace TEN::Math::Geometry
 
 		return false;
 	}
+
+	const int FastVectorsDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+	{
+		return sqrt(SQUARE(x2 - x1) + SQUARE(y2 - y1) + SQUARE(z2 - z1));
+	}
 }

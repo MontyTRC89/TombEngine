@@ -121,7 +121,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_currentCausticsFrame = 0;
 
 	// Preallocate lists
-	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
+	m_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
 	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);

@@ -29,7 +29,7 @@ namespace TEN::Renderer
 
 	void Renderer11::FreeRendererData()
 	{
-		shadowLight = nullptr;
+		m_shadowLight = nullptr;
 
 		ClearSceneItems();
 

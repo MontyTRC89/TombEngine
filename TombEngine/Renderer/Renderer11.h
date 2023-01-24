@@ -376,12 +376,12 @@ namespace TEN::Renderer
 		VertexBuffer m_staticsVertexBuffer;
 		IndexBuffer m_staticsIndexBuffer;
 
-		std::vector<RendererVertex> roomsVertices;
-		std::vector<int> roomsIndices;
-		std::vector<RendererVertex> moveablesVertices;
-		std::vector<int> moveablesIndices;
-		std::vector<RendererVertex> staticsVertices;
-		std::vector<int> staticsIndices;
+		std::vector<RendererVertex> m_roomsVertices;
+		std::vector<int> m_roomsIndices;
+		std::vector<RendererVertex> m_moveablesVertices;
+		std::vector<int> m_moveablesIndices;
+		std::vector<RendererVertex> m_staticsVertices;
+		std::vector<int> m_staticsIndices;
 
 		VertexBuffer m_transparentFacesVertexBuffer;
 		IndexBuffer m_transparentFacesIndexBuffer;
@@ -392,8 +392,8 @@ namespace TEN::Renderer
 		std::vector<RendererRoom> m_rooms;
 		bool m_invalidateCache;
 
-		std::vector<RendererLight> dynamicLights;
-		RendererLight* shadowLight;
+		std::vector<RendererLight> m_dynamicLights;
+		RendererLight* m_shadowLight;
 
 		std::vector<RendererLine3D> m_lines3DToDraw;
 		std::vector<RendererLine2D> m_lines2DToDraw;
@@ -504,11 +504,11 @@ namespace TEN::Renderer
 		void DrawAllStrings();
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, bool transparent);
-		void DrawRoomsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawSpritesTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawStaticsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawItems(RenderView& view, bool transparent);
-		void DrawItemsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
+		void DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
@@ -526,7 +526,7 @@ namespace TEN::Renderer
 		void DrawEffect(RenderView& view, RendererEffect* effect, bool transparent);
 		void DrawSplashes(RenderView& view);
 		void DrawSprites(RenderView& view);
-		void DrawTransparentFaces(RenderView& view);
+		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
 		void DrawLines2D();
 		void DrawOverlays(RenderView& view);

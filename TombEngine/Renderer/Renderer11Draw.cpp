@@ -136,18 +136,18 @@ namespace TEN::Renderer
 			return;
 		
 		// No shadow light found
-		if (shadowLight == nullptr)
+		if (m_shadowLight == nullptr)
 			return;
 
 		// Shadow light found but type is incorrect
-		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
+		if (m_shadowLight->Type != LIGHT_TYPE_POINT && m_shadowLight->Type != LIGHT_TYPE_SPOT)
 			return; 
 
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
 
-		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
+		int steps = m_shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
 		for (int step = 0; step < steps; step++) 
 		{
 			// Bind render target
@@ -157,7 +157,7 @@ namespace TEN::Renderer
 			m_context->RSSetViewports(1, &m_shadowMapViewport);
 			ResetScissor();
 
-			if (shadowLight->Position == item->Position)
+			if (m_shadowLight->Position == item->Position)
 				return;
 
 			UINT stride = sizeof(RendererVertex);
@@ -179,24 +179,24 @@ namespace TEN::Renderer
 			// Set camera matrices
 			Matrix view;
 			Matrix projection;
-			if (shadowLight->Type == LIGHT_TYPE_POINT) 
+			if (m_shadowLight->Type == LIGHT_TYPE_POINT)
 			{
-				view = Matrix::CreateLookAt(shadowLight->Position, shadowLight->Position +
+				view = Matrix::CreateLookAt(m_shadowLight->Position, m_shadowLight->Position +
 					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, m_shadowLight->Out);
 
 			}
-			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
+			else if (m_shadowLight->Type == LIGHT_TYPE_SPOT)
 			{
-				view = Matrix::CreateLookAt(shadowLight->Position,
-					shadowLight->Position - shadowLight->Direction * SECTOR(10),
+				view = Matrix::CreateLookAt(m_shadowLight->Position,
+					m_shadowLight->Position - m_shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
 				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
-				float projectionAngle = shadowLight->OutRange * 1.5f * (PI / 180.0f); 
-				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, shadowLight->Out);
+				float projectionAngle = m_shadowLight->OutRange * 1.5f * (PI / 180.0f);
+				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, m_shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
@@ -987,12 +987,12 @@ namespace TEN::Renderer
 		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 
-		dynamicLights.push_back(dynamicLight);
+		m_dynamicLights.push_back(dynamicLight);
 	}
 
 	void Renderer11::ClearDynamicLights()
 	{
-		dynamicLights.clear();
+		m_dynamicLights.clear();
 	}
 
 	void Renderer11::ClearScene()
@@ -1012,7 +1012,7 @@ namespace TEN::Renderer
 		CalculateFrameRate();
 	}
 
-	void Renderer11::DrawTransparentFaces(RenderView& view)
+	void Renderer11::DrawSortedFaces(RenderView& view)
 	{
 		std::for_each(std::execution::par_unseq,
 					  view.roomsToDraw.begin(),
@@ -1098,19 +1098,19 @@ namespace TEN::Renderer
 					{
 						if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
 						{
-							DrawRoomsTransparent(&oldFace->info, resetPipeline, view);
+							DrawRoomsSorted(&oldFace->info, resetPipeline, view);
 						}
 						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
 						{
-							DrawItemsTransparent(&oldFace->info, resetPipeline, view);
+							DrawItemsSorted(&oldFace->info, resetPipeline, view);
 						}
 						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
 						{
-							DrawStaticsTransparent(&oldFace->info, resetPipeline, view);
+							DrawStaticsSorted(&oldFace->info, resetPipeline, view);
 						}
 						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
 						{
-							DrawSpritesTransparent(&oldFace->info, resetPipeline, view);
+							DrawSpritesSorted(&oldFace->info, resetPipeline, view);
 						}
 
 						outputPolygons = false;
@@ -1128,19 +1128,19 @@ namespace TEN::Renderer
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(roomsIndices.data(), face->info.polygon->baseIndex, numIndices);
+					m_transparentFacesIndices.bulk_push_back(m_roomsIndices.data(), face->info.polygon->baseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(moveablesIndices.data(), face->info.polygon->baseIndex, numIndices);
+					m_transparentFacesIndices.bulk_push_back(m_moveablesIndices.data(), face->info.polygon->baseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(staticsIndices.data(), face->info.polygon->baseIndex, numIndices);
+					m_transparentFacesIndices.bulk_push_back(m_staticsIndices.data(), face->info.polygon->baseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
 				{
@@ -1219,19 +1219,19 @@ namespace TEN::Renderer
 				{
 					if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
 					{
-						DrawRoomsTransparent(&face->info, true, view);
+						DrawRoomsSorted(&face->info, true, view);
 					}
 					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
 					{
-						DrawItemsTransparent(&face->info, true, view);
+						DrawItemsSorted(&face->info, true, view);
 					}
 					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
 					{
-						DrawStaticsTransparent(&face->info, true, view);
+						DrawStaticsSorted(&face->info, true, view);
 					}
 					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
 					{
-						DrawSpritesTransparent(&face->info, true, view);
+						DrawSpritesSorted(&face->info, true, view);
 					}
 				}
 			}
@@ -1240,7 +1240,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::DrawRoomsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
+	void Renderer11::DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1342,7 +1342,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::DrawStaticsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
+	void Renderer11::DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1480,7 +1480,7 @@ namespace TEN::Renderer
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 
-		// Draw rooms and objects
+		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);
 		DrawStatics(view, false);
@@ -1521,7 +1521,7 @@ namespace TEN::Renderer
 		DrawSprites(view);
 		DrawLines3D(view);
 
-		// Here we sort transparent faces and draw them with a simplified shaders for alpha blending
+		// Draw immediately additive and unsorted blended faces, and collect all sorted blend modes faces for later
 		DrawRooms(view, true);
 		DrawItems(view, true);
 		DrawStatics(view, true);
@@ -1530,7 +1530,8 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		DrawTransparentFaces(view);
+		// Draw all sorted blend mode faces collected in the previous steps
+		DrawSortedFaces(view);
 
 		DrawPostprocess(target, depthTarget, view);
 
@@ -1660,9 +1661,9 @@ namespace TEN::Renderer
 			return;
 
 		// Get first three vertices of a waterfall object, meaning the very first triangle
-		const auto& v1 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 0];
-		const auto& v2 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 1];
-		const auto& v3 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 2];
+		const auto& v1 = m_moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 0];
+		const auto& v2 = m_moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 1];
+		const auto& v3 = m_moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 2];
 
 		// Calculate height of the texture by getting min/max UV.y coords of all three vertices
 		auto minY = std::min(std::min(v1.UV.y, v2.UV.y), v3.UV.y);
@@ -1722,7 +1723,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawItemsTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
+	void Renderer11::DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1934,9 +1935,9 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Set shadow map data
-		if (shadowLight != nullptr)
+		if (m_shadowLight != nullptr)
 		{
-			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
+			memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
 			m_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
 			m_stShadowMap.CastShadows = true;
 
@@ -2011,12 +2012,12 @@ namespace TEN::Renderer
 							m_numRoomsTransparentPolygons++;
 
 							// As polygon distance, for rooms, we use the farthest vertex distance                            
-							int d1 = (roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
-							int d2 = (roomsVertices[roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
-							int d3 = (roomsVertices[roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
+							int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
+							int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
+							int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
 							int d4 = 0;
 							if (p->shape == 0)
-								d4 = (roomsVertices[roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
+								d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
 
 							int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 

@@ -429,7 +429,7 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (auto& light : dynamicLights)
+		for (auto& light : m_dynamicLights)
 		{
 			float distanceSquared =
 				SQUARE(position.x - light.Position.x) +
@@ -625,11 +625,11 @@ namespace TEN::Renderer
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 		{
-			shadowLight = lightsToDraw.front();
+			m_shadowLight = lightsToDraw.front();
 		}
 		else
 		{
-			shadowLight = nullptr;
+			m_shadowLight = nullptr;
 		}
 	}	
 	
@@ -693,9 +693,9 @@ namespace TEN::Renderer
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		
 		// Collect dynamic lights for rooms
-		for (int i = 0; i < dynamicLights.size(); i++)
+		for (int i = 0; i < m_dynamicLights.size(); i++)
 		{
-			RendererLight* light = &dynamicLights[i];
+			RendererLight* light = &m_dynamicLights[i];
 
 			// If no radius, ignore
 			if (light->Out == 0.0f)

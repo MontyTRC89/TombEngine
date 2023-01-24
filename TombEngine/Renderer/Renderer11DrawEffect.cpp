@@ -1090,7 +1090,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
+	void Renderer11::DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{	
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
