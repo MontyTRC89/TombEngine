@@ -13,12 +13,12 @@ struct ColorData
 
 constexpr short ANGLE(float degrees)
 {
-	return (degrees * (65536.0f / 360.0f));
+	return short(degrees * (65536.0f / 360.0f));
 }
 
 constexpr short FROM_RAD(float radians)
 {
-	return ((radians / RADIAN) * (65536.0f / 360.0f));
+	return short((radians / RADIAN) * (65536.0f / 360.0f));
 }
 
 constexpr float TO_DEGREES(short shortAngle)
@@ -34,5 +34,3 @@ constexpr float TO_RAD(short shortAngle)
 float phd_sin(short x);
 float phd_cos(short x);
 int	  phd_atan(int y, int x);
-
-void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index);
