@@ -364,7 +364,7 @@ namespace TEN::Renderer
 					x2Outer += splash.x;
 					z2Outer = outerRadius * cos(alpha * j * PI / 180);
 					z2Outer += splash.z;
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 								Vector3(xOuter, yOuter, zOuter), 
 								Vector3(x2Outer, yOuter, z2Outer), 
 								Vector3(x2Inner, yInner, z2Inner), 
@@ -530,7 +530,7 @@ namespace TEN::Renderer
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 								pos + p1,
 								pos + p2,
 								pos + p3,
@@ -831,7 +831,7 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-				AddSprite3D(&m_sprites[spriteIndex],
+				AddQuad(&m_sprites[spriteIndex],
 					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
 					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
 		}
@@ -1053,7 +1053,10 @@ namespace TEN::Renderer
 				v0.Position.z = p0t.z;
 				v0.UV.x = spr.Sprite->UV[0].x;
 				v0.UV.y = spr.Sprite->UV[0].y;
-				v0.Color = spr.color;
+				v0.Color.x = spr.c1.x;
+				v0.Color.y = spr.c1.y;
+				v0.Color.z = spr.c1.z;
+				v0.Color.w = 1.0f;
 
 				RendererVertex v1;
 				v1.Position.x = p1t.x;
@@ -1061,7 +1064,10 @@ namespace TEN::Renderer
 				v1.Position.z = p1t.z;
 				v1.UV.x = spr.Sprite->UV[1].x;
 				v1.UV.y = spr.Sprite->UV[1].y;
-				v1.Color = spr.color;
+				v1.Color.x = spr.c2.x;
+				v1.Color.y = spr.c2.y;
+				v1.Color.z = spr.c2.z;
+				v1.Color.w = 1.0f;
 
 				RendererVertex v2;
 				v2.Position.x = p2t.x;
@@ -1069,7 +1075,10 @@ namespace TEN::Renderer
 				v2.Position.z = p2t.z;
 				v2.UV.x = spr.Sprite->UV[2].x;
 				v2.UV.y = spr.Sprite->UV[2].y;
-				v2.Color = spr.color;
+				v2.Color.x = spr.c3.x;
+				v2.Color.y = spr.c3.y;
+				v2.Color.z = spr.c3.z;
+				v2.Color.w = 1.0f;
 
 				RendererVertex v3;
 				v3.Position.x = p3t.x;
@@ -1077,7 +1086,10 @@ namespace TEN::Renderer
 				v3.Position.z = p3t.z;
 				v3.UV.x = spr.Sprite->UV[3].x;
 				v3.UV.y = spr.Sprite->UV[3].y;
-				v3.Color = spr.color;
+				v3.Color.x = spr.c4.x;
+				v3.Color.y = spr.c4.y;
+				v3.Color.z = spr.c4.z;
+				v3.Color.w = 1.0f;
 
 				m_primitiveBatch->DrawTriangle(v0, v1, v3);
 				m_primitiveBatch->DrawTriangle(v1, v2, v3);

@@ -589,8 +589,11 @@ namespace TEN::Renderer
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
 												 bool softParticles, RenderView& view);
-		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
+		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
+		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1,
+			Vector4 c2, Vector4 c3, Vector4 c4, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,
+			bool softParticles, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererMesh* GetMesh(int meshIndex);
