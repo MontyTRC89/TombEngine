@@ -37,6 +37,8 @@ Lua API changes
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
 * Moveable:MeshIsSwapped is now GetMeshSwapped
+* Primitive Classes (Color, Rotation, Vec3) can now be saved via Levelvars and Gamevars variables.
+* OnSave function now gets called just before data is saved, rather than just after.
 * Add new function CameraObject::PlayCamera()
 * Add new function Misc::GetCameraType()
 
