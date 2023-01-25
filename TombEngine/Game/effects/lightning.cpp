@@ -305,15 +305,10 @@ namespace TEN::Effects::ElectricArc
 	// More standard version. Adopt this in place of the above.
 	Vector3 CatmullRomSpline(float alpha, const std::array<Vector3, 4>& knots)
 	{
-		auto knot0 = knots[0];
-		auto knot1 = knots[1];
-		auto knot2 = knots[2];
-		auto knot3 = knots[3];
-
-		auto point1 = knot1 + ((knot2 - knot0) * (1 / 6.0f));
-		auto point2 = knot2;
-		auto point3 = knot2 + ((knot3 - knot1) * (-1 / 6.0f));
-		auto point4 = knot3;
+		auto point1 = knots[1] + ((knots[2] - knots[0]) * (1 / 6.0f));
+		auto point2 = knots[2];
+		auto point3 = knots[2] + ((knots[3] - knots[1]) * (-1 / 6.0f));
+		auto point4 = knots[3];
 
 		return (((point2 * 2) + (point3 - point1) * alpha) +
 			   (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
