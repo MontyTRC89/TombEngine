@@ -500,9 +500,9 @@ namespace TEN::Entities::Creatures::TR5
 						arc->pos4.z = pos2.z;
 
 						if (item->TriggerFlags)
-							TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color / 2);
+							SpawnElectricArcGlow(pos1.ToVector3(), 16, 0, color, color / 2);
 						else
-							TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color / 2, color);
+							SpawnElectricArcGlow(pos1.ToVector3(), 16, 0, color / 2, color);
 
 						continue;
 					}
@@ -524,7 +524,7 @@ namespace TEN::Entities::Creatures::TR5
 							48,
 							5);*/
 
-						TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
+						SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color, color / 2);
 						unknown = 1;
 						continue;
 					}
@@ -538,7 +538,7 @@ namespace TEN::Entities::Creatures::TR5
 						48,
 						5);*/
 
-					TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
+					SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color / 2, color);
 					unknown = true;
 				}
 

@@ -46,15 +46,8 @@ namespace Effects
 	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
 	static void EmitLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
-		Vector3i p1;
-		p1.x = src.x;
-		p1.y = src.y;
-		p1.z = src.z;
-
-		Vector3i p2;
-		p2.x = dest.x;
-		p2.y = dest.y;
-		p2.z = dest.z;
+		auto p1 = Vector3(src.x, src.y, src.z);
+		auto p2 = Vector3(dest.x, dest.y, dest.z);
 
 		int segs = USE_IF_HAVE(int, segments, 10);
 
@@ -95,7 +88,7 @@ namespace Effects
 
 		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
 
-		TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
+		SpawnElectricArc(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
 	/*** Emit a particle.

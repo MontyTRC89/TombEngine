@@ -220,10 +220,10 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			auto target = GameVector(pos, item.RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 0, 255, 180, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 180, 255, 0, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 200, 200, 30, LI_THININ | LI_THINOUT, 4, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 250, 255, 30, LI_THININ | LI_THINOUT, 2, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), 1, 0, 255, 180, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), 1, 180, 255, 0, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 200, 200, 30, LI_THININ | LI_THINOUT, 4, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 250, 255, 30, LI_THININ | LI_THINOUT, 2, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
@@ -238,20 +238,20 @@ namespace TEN::Entities::Creatures::TR3
 			auto target2 = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE / 6), creature.Enemy->RoomNumber);
 			auto target3 = GameVector(Geometry::TranslatePoint(origin1.ToVector3(), pos - origin1.ToVector3(), PUNA_ATTACK_RANGE / 10), creature.Enemy->RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricArc(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
+			SpawnElectricArc(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
 
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricArc(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
+			SpawnElectricArc(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
 
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 9);
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 10);
+			SpawnElectricArc(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 9);
+			SpawnElectricArc(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 10);
 
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 4, 7);
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 2, 8);
+			SpawnElectricArc(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 4, 7);
+			SpawnElectricArc(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 2, 8);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 20, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 12, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 80, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 5, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), 1, 20, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 12, 12);
+			SpawnElectricArc(origin.ToVector3(), target.ToVector3(), 1, 80, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 5, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 

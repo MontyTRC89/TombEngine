@@ -400,8 +400,8 @@ namespace TEN::Entities::Effects
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
-				auto origin = item->Pose.Position;
-				Vector3i target;
+				auto origin = item->Pose.Position.ToVector3();
+				auto target = Vector3::Zero;
 
 				if (!(GlobalCounter & 3))
 				{
@@ -412,9 +412,9 @@ namespace TEN::Entities::Effects
 						target.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 
 						if (GetRandomControl() & 3)
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
+							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
 						else
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
+							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
 					}
 				}
 
@@ -423,39 +423,39 @@ namespace TEN::Entities::Effects
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
 					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					target = GetJointPosition(targetItem, 0, Vector3i(0, -64, 20));
+					target = GetJointPosition(targetItem, 0, Vector3i(0, -64, 20)).ToVector3();
 
 					if (!(GlobalCounter & 3))
 					{
 						if (GetRandomControl() & 3)
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
+							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
 						else
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
+							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
-						TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
+						SpawnElectricArcGlow(target, 64, 0, g, b);
 				}
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					origin = item->Pose.Position;
-
-					target = Vector3i(
+					origin = item->Pose.Position.ToVector3();
+					target = Vector3(
 						(GetRandomControl() & 0x1FF) + origin.x - 256,
 						(GetRandomControl() & 0x1FF) + origin.y - 256,
-						(GetRandomControl() & 0x1FF) + origin.z - 256
-					);
+						(GetRandomControl() & 0x1FF) + origin.z - 256);
 
-					TriggerLightning(&origin, &target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
-					TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
+					SpawnElectricArc(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
+					SpawnElectricArcGlow(target, 64, 0, g, b);
 				}
 			}
 			else
 			{
 				// Small fires
 				if (item->ItemFlags[0] != 0)
+				{
 					item->ItemFlags[0]--;
+				}
 				else
 				{
 					item->ItemFlags[0] = (GetRandomControl() & 3) + 8;

@@ -16,18 +16,15 @@ namespace TEN::Effects::ElectricArc
 	std::array<Vector3, 6>	  ElectricArcKnots	= {};
 	std::array<Vector3, 1024> ElectricArcBuffer = {};
 	
-	// TODO: Pass const Vector3 references to postions and Vector3/Vector4 for color.
-	void TriggerLightning(Vector3i* origin, Vector3i* target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
+	// TODO: Pass const Vector4& for color.
+	void SpawnElectricArc(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
 		auto arc = ElectricArc();
 
-		auto fltOrigin = origin->ToVector3();
-		auto fltTarget = target->ToVector3();
-
-		arc.pos1 = fltOrigin;
-		arc.pos2 = ((fltOrigin * 3) + fltTarget) / 4;
-		arc.pos3 = ((fltTarget * 3) + fltOrigin) / 4;
-		arc.pos4 = fltTarget;
+		arc.pos1 = origin;
+		arc.pos2 = ((origin * 3) + target) / 4;
+		arc.pos3 = ((target * 3) + origin) / 4;
+		arc.pos4 = target;
 		arc.flags = flags;
 
 		for (int i = 0; i < arc.interpolation.size(); i++)
@@ -57,16 +54,16 @@ namespace TEN::Effects::ElectricArc
 		ElectricArcs.push_back(arc);
 	}
 
-	void TriggerLightningGlow(int x, int y, int z, float scale, byte r, byte g, byte b)
+	void SpawnElectricArcGlow(const Vector3& pos, float scale, byte r, byte g, byte b)
 	{
 		auto& spark = *GetFreeParticle();
 
 		spark.on = true;
 		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
 		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.x = x;
-		spark.y = y;
-		spark.z = z;
+		spark.x = pos.x;
+		spark.y = pos.y;
+		spark.z = pos.z;
 		spark.xVel = 0;
 		spark.yVel = 0;
 		spark.zVel = 0;
@@ -119,14 +116,9 @@ namespace TEN::Effects::ElectricArc
 
 		HelicalLasers.push_back(laser);
 
-		auto origin2 = Vector3i(origin);
-		auto target2 = Vector3i(target);
-
-		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, FLAGS, 19, 5);
-		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, FLAGS, 4, 5);
-		TriggerLightningGlow(
-			laser.LightPosition.x, laser.LightPosition.y, laser.LightPosition.z,
-			Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
+		SpawnElectricArc(origin, target, 1, 0, laser.g, laser.b, 20, FLAGS, 19, 5);
+		SpawnElectricArc(origin, target, 1, 110, 255, 250, 20, FLAGS, 4, 5);
+		SpawnElectricArcGlow(laser.LightPosition, Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
 	 }
 
 	void UpdateHelicalLasers()
