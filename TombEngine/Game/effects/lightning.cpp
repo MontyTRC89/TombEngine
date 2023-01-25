@@ -19,20 +19,17 @@ namespace TEN::Effects::ElectricArc
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
 	// 4-point Catmull-Rom spline interpolation.
-	// NOTE: Alpha is in range [0, 65536] rather than [0, 1].
 	// Function takes reference to array of knots and
-	// determines subset of 4 using passed alpha value.
-	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, int alpha)
+	// calculates using subset of 4 determined alpha value.
+	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, float alpha)
 	{
-		static const auto POW_2_TO_16 = pow(2, 16);
-
 		alpha *= ELECTRIC_ARC_KNOTS_SIZE - 3;
 
-		int span = alpha / POW_2_TO_16;
+		int span = alpha;
 		if (span >= (ELECTRIC_ARC_KNOTS_SIZE - 3))
 			span = ELECTRIC_ARC_KNOTS_SIZE - 4;
 
-		float alphaNorm = (alpha - (65536 * span)) / POW_2_TO_16;
+		float alphaNorm = alpha - span; // What?
 
 		// Determine subset of 4 knots.
 		const auto& knot0 = knots[span];
@@ -271,8 +268,8 @@ namespace TEN::Effects::ElectricArc
 		// Splined arc.
 		if (arc.flags & LI_SPLINE)
 		{
-			int interpStep = 65536 / ((arc.segments * 3) - 1);
-			int alpha = interpStep;
+			float interpStep = 1.0f / ((arc.segments * 3) - 1);
+			float alpha = interpStep;
 
 			if (((arc.segments * 3) - 2) > 0)
 			{
