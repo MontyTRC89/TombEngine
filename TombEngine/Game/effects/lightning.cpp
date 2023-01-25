@@ -22,7 +22,7 @@ namespace TEN::Effects::ElectricArc
 	// NOTE: Alpha is in range [0, 65536] rather than [0, 1].
 	// Function takes reference to array of knots and
 	// determines subset of 4 using passed alpha value.
-	static Vector3 ElectricArcSpline(int alpha, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots)
+	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, int alpha)
 	{
 		static const auto POW_2_TO_16 = pow(2, 16);
 
@@ -278,7 +278,7 @@ namespace TEN::Effects::ElectricArc
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					auto spline = ElectricArcSpline(alpha, posArray);
+					auto spline = ElectricArcSpline(posArray, alpha);
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
