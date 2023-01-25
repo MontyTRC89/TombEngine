@@ -276,8 +276,8 @@ namespace TEN::Effects::ElectricArc
 
 	// 4-point Catmull-Rom spline interpolation.
 	// NOTE: Alpha is in range [0, 65536] rather than [0, 1].
-	// Function takes pointer to array of 6 knots and determines subset of 4
-	// using passed alpha value. numKnots is always 6.
+	// Function takes pointer to array of 6 knots
+	// and determines subset of 4 using passed alpha value.
 	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots)
 	{
 		static const auto POW_2_TO_16 = pow(2, 16);
@@ -290,16 +290,20 @@ namespace TEN::Effects::ElectricArc
 
 		float alphaNorm = (alpha - (65536 * span)) / POW_2_TO_16;
 
-		auto* knotPtr = &knots[span];
+		// Determine subset of 4 knots.
+		const auto& knot0 = knots[span];
+		const auto& knot1 = knots[span + 1];
+		const auto& knot2 = knots[span + 2];
+		const auto& knot3 = knots[span + 3];
 
-		auto point1 = knotPtr[1] + (knotPtr[1] / 2) - (knotPtr[2] / 2) - knotPtr[2] + (knotPtr[3] / 2) + ((-knotPtr[0] - Vector3::One) / 2);
+		auto point1 = knot1 + (knot1 / 2) - (knot2 / 2) - knot2 + (knot3 / 2) + ((-knot0 - Vector3::One) / 2);
 		auto ret = point1 * alphaNorm;
-		auto point2 = ret + Vector3(2.0f) * knotPtr[2] - 2 * knotPtr[1] - (knotPtr[1] / 2) - (knotPtr[3] / 2) + knotPtr[0];
+		auto point2 = ret + Vector3(2.0f) * knot2 - 2 * knot1 - (knot1 / 2) - (knot3 / 2) + knot0;
 		ret = point2 * alphaNorm;
-		auto point3 = ret + (knotPtr[2] / 2) + ((-knotPtr[0] - Vector3::One) / 2);
+		auto point3 = ret + (knot2 / 2) + ((-knot0 - Vector3::One) / 2);
 		ret = point3 * alphaNorm;
 
-		return (ret + knotPtr[1]);
+		return (ret + knot1);
 	}
 
 	// More standard version. Adopt this in place of the above.
