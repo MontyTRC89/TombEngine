@@ -11,8 +11,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Math/Math.h"
@@ -26,15 +26,16 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER = 2.0f;
+	constexpr auto ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF	   = 2.0f;
+
 	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
-	constexpr auto ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER = 2;
-	constexpr auto ROMANSTATUE_EXPLOSIVE_DAMAGE_MULTIPLIER = 2;
 
 	struct RomanStatueInfo
 	{
-		Vector3i Position;
-		LIGHTNING_INFO* EnergyArcs[8];
-		unsigned int Count;
+		Vector3i Position = Vector3i::Zero;
+		LIGHTNING_INFO* EnergyArcs[8] = {};
+		unsigned int Count = 0;
 	};
 
 	RomanStatueInfo RomanStatueData;
@@ -79,8 +80,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!(GetRandomControl() & 0x1F))
 		{
-			short fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != -1)
+			int fxNumber = CreateNewEffect(item->RoomNumber);
+			if (fxNumber != NO_ITEM)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -203,7 +204,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
-		short fxNumber = CreateNewEffect(roomNumber);
+		int fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber == NO_ITEM)
 			return;
 
@@ -493,14 +494,17 @@ namespace TEN::Entities::Creatures::TR5
 					if (item->TriggerFlags)
 					{
 						RomanStatueData.EnergyArcs[i] = TriggerLightning(
-							&pos1,
-							&pos,
+							&pos1, &pos,
 							Random::GenerateInt(64, 80),
 							0, color, color / 2,
 							50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
 
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 84, 164, 10, 128);
-						TriggerLightningGlow(RomanStatueData.EnergyArcs[i]->pos4.x, RomanStatueData.EnergyArcs[i]->pos4.y, RomanStatueData.EnergyArcs[i]->pos4.z, 36, 0, color, color / 2);
+						TriggerLightningGlow(
+							RomanStatueData.EnergyArcs[i]->pos4.x,
+							RomanStatueData.EnergyArcs[i]->pos4.y,
+							RomanStatueData.EnergyArcs[i]->pos4.z,
+							36, 0, color, color / 2);
 
 						unknown = 1;
 						RomanStatueData.EnergyArcs[i] = nullptr;
@@ -508,14 +512,17 @@ namespace TEN::Entities::Creatures::TR5
 					}
 
 					RomanStatueData.EnergyArcs[i] = TriggerLightning(
-						&pos1,
-						&pos,
+						&pos1, &pos,
 						Random::GenerateInt(64, 80),
 						0, color / 2, color,
 						50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
 
 					TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 10, 124, 184, 128);
-					TriggerLightningGlow(RomanStatueData.EnergyArcs[i]->pos4.x, RomanStatueData.EnergyArcs[i]->pos4.y, RomanStatueData.EnergyArcs[i]->pos4.z, 36, 0, color / 2, color);
+					TriggerLightningGlow(
+						RomanStatueData.EnergyArcs[i]->pos4.x,
+						RomanStatueData.EnergyArcs[i]->pos4.y,
+						RomanStatueData.EnergyArcs[i]->pos4.z,
+						36, 0, color / 2, color);
 					RomanStatueData.EnergyArcs[i] = nullptr;
 					unknown = true;					
 				}
@@ -716,9 +723,7 @@ namespace TEN::Entities::Creatures::TR5
 						64);
 
 					RomanStatueData.Count = 16;
-					RomanStatueData.Position.x = attackPose.Position.x;
-					RomanStatueData.Position.y = attackPose.Position.y;
-					RomanStatueData.Position.z = attackPose.Position.z;
+					RomanStatueData.Position = attackPose.Position;
 
 					if (item->ItemFlags[0])
 						item->ItemFlags[0]--;
@@ -743,9 +748,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (i == 0)
 						{
 							TriggerDynamicLight(
-								pos2.x,
-								pos2.y,
-								pos2.z,
+								pos2.x, pos2.y, pos2.z,
 								8,
 								0,
 								(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32,
@@ -764,8 +767,7 @@ namespace TEN::Entities::Creatures::TR5
 						else if (deltaFrame <  16)
 						{
 							RomanStatueData.EnergyArcs[i] =	TriggerLightning(
-								&pos1,
-								&pos2,
+								&pos1, &pos2,
 								Random::GenerateInt(8, 16),
 								84, 164, 10,
 								50, LI_THININ | LI_SPLINE | LI_THINOUT, 6, 2);
@@ -776,10 +778,9 @@ namespace TEN::Entities::Creatures::TR5
 							color = (GetRandomControl() & 0x3F) + 128;
 
 							 TriggerLightning(
-								&pos1,
-								&pos2,
+								&pos1, &pos2,
 								Random::GenerateInt(18, 26),
-								0, color, color/2,
+								0, color, color / 2,
 								50, LI_THININ | LI_SPLINE | LI_THINOUT, 8, 2);
 						}
 					}
@@ -835,8 +836,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x1F) - 16,
 				86,
-				(GetRandomControl() & 0x1F) - 16
-			);
+				(GetRandomControl() & 0x1F) - 16);
 			RomanStatueHitEffect(item, &pos, 10);
 		}
 
@@ -845,8 +845,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				-40,
 				(GetRandomControl() & 0x7F) + 148,
-				(GetRandomControl() & 0x3F) - 32
-			);
+				(GetRandomControl() & 0x3F) - 32);
 			RomanStatueHitEffect(item, &pos, 4);
 		}
 
@@ -855,8 +854,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x3F) + 54,
 				-170,
-				(GetRandomControl() & 0x1F) + 27
-			);
+				(GetRandomControl() & 0x1F) + 27);
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 
@@ -884,11 +882,11 @@ namespace TEN::Entities::Creatures::TR5
 		}
 		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 		{
-			DoItemHit(&target, damage / ROMANSTATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
+			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
 		}
 		else
 		{
-			DoItemHit(&target, damage * ROMANSTATUE_EXPLOSIVE_DAMAGE_MULTIPLIER, isExplosive);
+			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive);
 		}
 	}
 }

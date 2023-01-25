@@ -1421,7 +1421,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	bool hasHitNotByEmitter = false;
 	bool isExplosive = type >= ProjectileType::Explosive;
 	bool isShatterable = type != ProjectileType::Harpoon;
-	
+
 	if (type < ProjectileType::Grenade)
 	{
 		// For non-grenade projectiles, check for room collision.
@@ -1430,7 +1430,8 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			pointColl.Position.Ceiling > item.Pose.Position.y)
 		{
 			item.Pose.Position = prevPos;
-			hasHit = hasHitNotByEmitter = true;
+			hasHit =
+			hasHitNotByEmitter = true;
 		}
 	}
 	else if (EmitFromProjectile(item, type))
@@ -1441,7 +1442,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
-		// Fire trail and water collision for grenade fragments
+		// Fire trail and water collision for grenade fragments.
 		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, FlameType::Medium);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
