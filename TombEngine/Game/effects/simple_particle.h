@@ -6,6 +6,7 @@
 #include "Objects\objectslist.h"
 
 struct ItemInfo;
+enum BLEND_MODES;
 
 namespace TEN::Effects
 {
@@ -20,6 +21,7 @@ namespace TEN::Effects
 		unsigned int sprite;
 		GAME_OBJECT_ID sequence;
 		bool active;
+		BLEND_MODES blendMode;
 	};
 	extern std::array<SimpleParticle, 15> simpleParticles;
 

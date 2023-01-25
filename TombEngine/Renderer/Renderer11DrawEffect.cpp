@@ -81,12 +81,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawWakeFX(RenderView& view)
 	{
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				//for (int k = 0; k < NUM_MAX_WAVES; k++)
-				//{
 				auto& segment = Segments[i][j];
 
 				if (!segment.On)
@@ -104,10 +102,8 @@ namespace TEN::Renderer
 						segment.Vertices[1],
 						segment.Vertices[2],
 						segment.Vertices[3], Vector4(255, 255, 255, segment.Opacity),
-						0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
-
+						0, 1, {0, 0}, BLENDMODE_ADDITIVE, true, view);
 				}
-				//}
 			}			
 		}
 	}
@@ -1368,7 +1364,7 @@ namespace TEN::Renderer
 		for(SimpleParticle& s : simpleParticles)
 		{
 			if(!s.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
+			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, s.blendMode, true, view);
 		}
 	}
 }

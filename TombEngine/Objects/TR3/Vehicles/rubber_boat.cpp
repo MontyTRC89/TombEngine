@@ -50,6 +50,10 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
+	constexpr auto RBOAT_WAKEFX_OFFSET = 344;
+	constexpr auto RBOAT_WAKEFX_SEGMENT_LIFE = 50;
+	constexpr auto RBOAT_WAKEFX_SEGMENT_FADEOUT = 4.0f;
+
 	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
 	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
@@ -975,11 +979,8 @@ namespace TEN::Entities::Vehicles
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 
-			if (!(Wibble & 15) )
-			{
-			DoWakeEffect(rBoatItem, -344, 0, 0, 1, true, 10.0f , 50, 4.0f);//1 is left
-			DoWakeEffect(rBoatItem, 344, 0, 0, 2, true,  10.0f, 50, 4.0f);//2 is r
-			}
+			DoWakeEffect(rBoatItem, -RBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(rBoatItem,  RBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
 
 			if ((GetRandomControl() & 1) == 0)
 			{

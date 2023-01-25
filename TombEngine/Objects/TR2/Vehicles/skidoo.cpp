@@ -54,6 +54,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_DAMAGE_START = 140;
 	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
 
+	constexpr auto SKIDOO_WAKEFX_OFFSET = Vector3(CLICK(1.1f), 0, CLICK(1.6f));
+
 	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
 	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
@@ -347,7 +349,7 @@ namespace TEN::Entities::Vehicles
 		skidoo->LeftVerticalVelocity = DoSkidooDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, (int*)&frontLeft.y);
 		skidoo->RightVerticalVelocity = DoSkidooDynamics(heightFrontRight, skidoo->RightVerticalVelocity, (int*)&frontRight.y);
 		skidooItem->Animation.Velocity.y = DoSkidooDynamics(height, skidooItem->Animation.Velocity.y, (int*)&skidooItem->Pose.Position.y);
-		skidooItem->Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity.z, SKIDOO_RADIUS, &skidoo->TurnRate);
+		skidooItem->Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity.z, SKIDOO_RADIUS, &skidoo->TurnRate, SKIDOO_WAKEFX_OFFSET);
 
 		height = (frontLeft.y + frontRight.y) / 2;
 		short xRot = phd_atan(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);

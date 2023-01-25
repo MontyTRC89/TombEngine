@@ -38,6 +38,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
+	constexpr auto KAYAK_WAKEFX_OFFSET = CLICK(0.5f);
+	constexpr auto KAYAK_WAKEFX_SEGMENT_LIFE = 84;
+	constexpr auto KAYAK_WAKEFX_SEGMENT_FADEOUT = 10.0f;
 
 	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
@@ -83,8 +86,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_IN_HOLD	   = IN_WALK;
 	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
-
-	//WAKE_PTS WakePts[NUM_WAKE_SPRITES];
 
 	enum KayakState
 	{
@@ -154,12 +155,6 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 
 		kayak->OldPose = kayakItem->Pose;
-
-		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
-		{
-			//WakePts[i].life = 0;
-			//WakePts[i].life = 0;
-		}
 	}
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -329,28 +324,6 @@ namespace TEN::Entities::Vehicles
 		//if (waterHeight != NO_HEIGHT)
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
 	}
-
-	/*void KayakUpdateWakeFX(ItemInfo* kayakItem)
-	{
-
-		auto* kayak = GetKayakInfo(kayakItem);
-
-
-			int current = (kayak->CurrentStartWake - 1);
-
-			for (int j = 0; j < NUM_WAKE_SPRITES; j++)
-			{
-				if (WakePts[j].life)
-				{
-					WakePts[j].life--;
-					WakePts[j].x[0] += WakePts[j].xvel[0];
-					WakePts[j].z[0] += WakePts[j].zvel[0];
-					WakePts[j].x[1] += WakePts[j].xvel[1];
-					WakePts[j].z[1] += WakePts[j].zvel[1];
-				}
-			}
-		
-	}*/
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
 	{
@@ -1267,8 +1240,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			DoWakeEffect(kayakItem, -CLICK(0.5f), 0, 0, 1, true, 2.0f, 84, 10.0f);//1 is left
-			DoWakeEffect(kayakItem, CLICK(0.5f), 0, 0, 2, true, 2.0f, 84, 10.0f);//2 is r
+			DoWakeEffect(kayakItem, -KAYAK_WAKEFX_OFFSET, 0, 0, 1, true, 2.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(kayakItem,  KAYAK_WAKEFX_OFFSET, 0, 0, 2, true, 2.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
 		}
 
 		if (Wibble & 7)
@@ -1307,7 +1280,6 @@ namespace TEN::Entities::Vehicles
 				kayak->WakeShade++;
 		}
 
-		KayakUpdateWakeFX();
 		KayakToItemCollision(kayakItem, laraItem);
 
 		return (lara->Vehicle != NO_ITEM) ? true : false;

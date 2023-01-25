@@ -68,6 +68,9 @@ namespace TEN::Entities::Vehicles
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
 	constexpr int UPV_SHIFT = 128;
 
+	constexpr auto UPV_WAKEFX_SEGMENT_LIFE = 40;
+	constexpr auto UPV_WAKEFX_SEGMENT_FADEOUT = 5.0f;
+
 	// TODO: These should probably be done in the wad. @Sezz 2022.06.24
 	constexpr auto UPV_DEATH_FRAME_1 = 16;
 	constexpr auto UPV_DEATH_FRAME_2 = 17;
@@ -949,8 +952,8 @@ namespace TEN::Entities::Vehicles
 		
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
-			DoWakeEffect(UPVItem, JointposL.x, JointposL.y, JointposL.z, 1, false, 5.0f, 40 , 5.0f );
-			DoWakeEffect(UPVItem, JointposR.x, JointposR.y, JointposR.z, 2, false, 5.0f, 40 , 5.0f );
+			DoWakeEffect(UPVItem, JointposL.x, JointposL.y, JointposL.z, 1, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(UPVItem, JointposR.x, JointposR.y, JointposR.z, 2, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&

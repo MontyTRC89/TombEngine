@@ -215,7 +215,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
-		KayakUpdateWakeFX();
+		UpdateWakeFX();
 
 		// Update screen UI and overlays.
 		UpdateBars(LaraItem);

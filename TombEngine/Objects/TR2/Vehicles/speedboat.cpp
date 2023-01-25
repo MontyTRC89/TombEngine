@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/boatFX.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -19,6 +20,7 @@
 
 using std::vector;
 using namespace TEN::Input;
+using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -38,6 +40,10 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2.25f);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
+
+	constexpr auto SPEEDBOAT_WAKEFX_OFFSET = 344;
+	constexpr auto SPEEDBOAT_WAKEFX_SEGMENT_LIFE = 50;
+	constexpr auto SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT = 4.0f;
 
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto SPEEDBOAT_VELOCITY_DECEL = 1;
@@ -903,6 +909,9 @@ namespace TEN::Entities::Vehicles
 			auto room = probe.Block->RoomBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
 			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
 				TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+
+				DoWakeEffect(speedboatItem, -SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
+				DoWakeEffect(speedboatItem,  SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
 		}
 
 		if (lara->Vehicle != itemNumber)

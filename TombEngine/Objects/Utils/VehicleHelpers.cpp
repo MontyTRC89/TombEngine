@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
+#include "Game/effects/boatFX.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
@@ -15,6 +16,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -197,7 +199,7 @@ namespace TEN::Entities::Vehicles
 		DoObjectCollision(vehicleItem, &coll);
 	}
 
-	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)
+	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate, Vector3 waveOffset)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -223,7 +225,13 @@ namespace TEN::Entities::Vehicles
 						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
-						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
+					{
+						Vector3i front;
+						int height = GetVehicleHeight(vehicleItem, 0, 0, true, &front);
+						
+							DoWakeEffect(vehicleItem, -waveOffset.x,   waterHeight/2, waveOffset.z, 1, true, 5.0f, 50, 9.0f);
+							DoWakeEffect(vehicleItem, waveOffset.x, waterHeight / 2, waveOffset.z, 2, true, 5.0f, 50, 9.0f);
+					}
 				}
 
 				if (*turnRate)

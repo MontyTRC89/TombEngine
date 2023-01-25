@@ -49,6 +49,7 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto JEEP_VELOCITY_MAX = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto JEEP_WAKEFX_OFFSET = Vector3(CLICK(0.9f), 0, CLICK(1.3f));
 
 	constexpr auto JEEP_CRASH_VELOCITY = 10922;
 
@@ -1416,7 +1417,7 @@ namespace TEN::Entities::Vehicles
 
 		int oldY = jeepItem->Pose.Position.y;
 		jeepItem->Animation.Velocity.y = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.Velocity.y, &jeepItem->Pose.Position.y, 0);
-		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
+		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate, JEEP_WAKEFX_OFFSET);
 
 		short xRot;
 		floorHeight = (fl.y + fr.y) / 2;
