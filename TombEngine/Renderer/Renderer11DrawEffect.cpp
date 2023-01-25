@@ -81,22 +81,23 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawWakeFX(RenderView& view)
 	{
-		for (int i = 0; i < 64; i++)
+		for (int i = 0; i < 256; i++)
 		{
 			for (int j = 0; j < 3; j++)
 			{
+				//for (int k = 0; k < NUM_MAX_WAVES; k++)
+				//{
 				auto& segment = Segments[i][j];
-
-	
 
 				if (!segment.On)
 					continue;
 
-
 				if (segment.Life)
 				{
-
-
+					Vector3 s1 = Vector3(segment.Vertices[0].x, segment.Vertices[0].y, segment.Vertices[0].z);
+					Vector3 s2 = Vector3(segment.Vertices[1].x, segment.Vertices[1].y, segment.Vertices[1].z);
+					Vector3 s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
+					Vector3 s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
 
 					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BACKGROUND],
 						segment.Vertices[0],
@@ -105,12 +106,10 @@ namespace TEN::Renderer
 						segment.Vertices[3], Vector4(255, 255, 255, segment.Opacity),
 						0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
 
-
 				}
-			}
-			
+				//}
+			}			
 		}
-
 	}
 
 	void Renderer11::DrawLightning(RenderView& view) 

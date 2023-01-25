@@ -11,7 +11,8 @@ class Vector3i;
 
 namespace TEN::Effects::BOATFX
 {
-	constexpr auto NUM_WAKE_SPRITES = 64;
+	constexpr auto NUM_WAKE_SPRITES = 256;
+	constexpr auto NUM_MAX_WAVES = 32;
 
 	struct WaveSegment
 	{
@@ -29,15 +30,22 @@ namespace TEN::Effects::BOATFX
 		int StreamerID;
 		int FadeOut;
 		int PreviousID;
+		int Velocity;
 	};
 
-	extern WaveSegment Segments[NUM_WAKE_SPRITES][3];
+	//struct Wave
+	//{
+	//	bool On = false;
+	//};
+
+	//extern Wave Waves[32];
+	extern WaveSegment Segments[NUM_WAKE_SPRITES][3];// [NUM_MAX_WAVES] ;
 
 	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection, float width, int life, float fade);
 
 	void KayakUpdateWakeFX();
-	void DoWakeEffect(ItemInfo* Item, int xOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);
-	WaveSegment& Get2PreviousSegment(int waveDirection);
+	void DoWakeEffect(ItemInfo* Item, int xOffset, int yOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);
+	int GetFreeSegmentNumber(int waveDirection);
 	WaveSegment&  GetFreeWaveSegment(int waveDirection);
-	int GetPreviousSegment(int waveDirection);
+	int GetPreviousSegment(int waveDirection, int segmentNr);
 }

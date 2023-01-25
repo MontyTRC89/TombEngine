@@ -8,6 +8,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
+#include "Game/effects/boatFX.h"
 #include "Game/effects/bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -26,6 +27,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Effects::BOATFX;
 using std::vector;
 
 // TODO:
@@ -40,9 +42,9 @@ namespace TEN::Entities::Vehicles
 	{
 		{ 0, 0, 0, 3 },
 		{ 0, 96, 256, 0 },
-		{ -128, 0, -64, 1 },
+		{ -128, 0, 64, 1 },
 		{ 0, 0, -64, 1 },
-		{ 128, 0, -64, 2 },
+		{ 128, 0, 64, 2 },
 		{ 0, 0, -64, 2 }
 	};
 	const vector<VehicleMountType> UPVMountTypes =
@@ -940,6 +942,16 @@ namespace TEN::Entities::Vehicles
 
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Vehicle);
+
+		Vector3i JointposL = GetJointPosition(UPVItem, UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].meshNum, Vector3i(UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].Position));
+		Vector3i JointposR = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
+
+		
+		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+		{
+			DoWakeEffect(UPVItem, JointposL.x, JointposL.y, JointposL.z, 1, false, 5.0f, 40 , 5.0f );
+			DoWakeEffect(UPVItem, JointposR.x, JointposR.y, JointposR.z, 2, false, 5.0f, 40 , 5.0f );
+		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
 			lara->Vehicle != NO_ITEM)

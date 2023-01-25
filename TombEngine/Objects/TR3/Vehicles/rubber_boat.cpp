@@ -977,8 +977,8 @@ namespace TEN::Entities::Vehicles
 
 			if (!(Wibble & 15) )
 			{
-			DoWakeEffect(rBoatItem, -344, 0, 1, true, 10.0f , 50, 4.0f);//1 is left
-			DoWakeEffect(rBoatItem, 344, 0, 2, true,  10.0f, 50, 4.0f);//2 is r
+			DoWakeEffect(rBoatItem, -344, 0, 0, 1, true, 10.0f , 50, 4.0f);//1 is left
+			DoWakeEffect(rBoatItem, 344, 0, 0, 2, true,  10.0f, 50, 4.0f);//2 is r
 			}
 
 			if ((GetRandomControl() & 1) == 0)
