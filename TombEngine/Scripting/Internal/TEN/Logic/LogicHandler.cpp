@@ -12,7 +12,7 @@
 #include "Vec3/Vec3.h"
 #include "LevelFunc.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::ElectricArc;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.

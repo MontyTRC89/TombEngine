@@ -8,7 +8,7 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Effects::Lightning
+namespace TEN::Effects::ElectricArc
 {
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
@@ -92,6 +92,10 @@ namespace TEN::Effects::Lightning
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
 		static constexpr auto SEGMENTS_NUM_MAX = 56;
+		static constexpr auto COLOR			   = Vector4(0.0f, 1.0f, 0.375f, 1.0f);
+		static constexpr auto LIFE_MAX		   = 17.0f;
+		static constexpr auto LENGTH_END	   = BLOCK(4);
+		static constexpr auto FADE_IN		   = 8.0f;
 		static constexpr auto FLAGS			   = LI_THININ | LI_THINOUT;
 
 		auto laser = HelicalLaser();
@@ -101,12 +105,12 @@ namespace TEN::Effects::Lightning
 		laser.Target = target;
 		laser.Orientation2D = Random::GenerateAngle();
 		laser.LightPosition = origin;
-		laser.Color = Vector4(0.0f, 1.0f, 0.375f, 1.0f); // TODO: Check start opacity.
-		laser.Life = 17.0f;
+		laser.Color = COLOR;
+		laser.Life = LIFE_MAX;
 		laser.Scale = 0.0f;
 		laser.Length = 0.0f;
-		laser.LengthEnd = BLOCK(4);
-		laser.FadeIn = 8.0f;
+		laser.LengthEnd = LENGTH_END;
+		laser.FadeIn = FADE_IN;
 		laser.Rotation = 0.0f;
 
 		laser.r = 0;
@@ -119,7 +123,7 @@ namespace TEN::Effects::Lightning
 		auto target2 = Vector3i(target);
 
 		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, FLAGS, 19, 5);
-		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, flags, 4, 5);
+		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, FLAGS, 4, 5);
 		TriggerLightningGlow(
 			laser.LightPosition.x, laser.LightPosition.y, laser.LightPosition.z,
 			Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
@@ -284,13 +288,15 @@ namespace TEN::Effects::Lightning
 	// using passed alpha value. numKnots is always 6.
 	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots)
 	{
+		static const auto POW_2_TO_16 = pow(2, 16);
+
 		alpha *= numKnots - 3;
 
-		int span = alpha / pow(2, 16);
+		int span = alpha / POW_2_TO_16;
 		if (span >= (numKnots - 3))
 			span = numKnots - 4;
 
-		float alphaNorm = (alpha - (65536 * span)) / pow(2, 16);
+		float alphaNorm = (alpha - (65536 * span)) / POW_2_TO_16;
 
 		auto* knotPtr = &knots[span];
 

@@ -51,8 +51,8 @@ class EulerAngles;
 struct CAMERA_INFO;
 struct RendererRectangle;
 
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Gui;
-using namespace TEN::Effects::Lightning;
 
 namespace TEN::Renderer
 {

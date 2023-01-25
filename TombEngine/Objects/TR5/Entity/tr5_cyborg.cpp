@@ -19,8 +19,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5

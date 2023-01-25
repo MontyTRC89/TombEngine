@@ -12,8 +12,8 @@
 #include "Game/effects/lightning.h"
 #include "Game/effects/debris.h"
 
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Input;
-using namespace TEN::Effects::Lightning;
 
 void InitialiseObelisk(short itemNumber)
 {

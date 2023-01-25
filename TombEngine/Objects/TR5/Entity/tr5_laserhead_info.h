@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/effects/lightning.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::ElectricArc;
 
 namespace TEN::Entities::Creatures::TR5
 {

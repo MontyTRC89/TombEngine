@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/control/control.h"
 
+#include <chrono>
 #include <process.h>
 
 #include "Game/camera.h"
@@ -51,14 +52,14 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
-#include <chrono>
 
+using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Generic;
@@ -68,11 +69,6 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace std::chrono;
-
-using std::string;
-using std::unordered_map;
-using std::vector;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;

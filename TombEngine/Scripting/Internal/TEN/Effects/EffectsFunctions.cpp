@@ -26,9 +26,9 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
@@ -95,7 +95,7 @@ namespace Effects
 
 		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
 
-		TEN::Effects::Lightning::TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
+		TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
 	/*** Emit a particle.

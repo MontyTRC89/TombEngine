@@ -18,9 +18,9 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-using namespace TEN::Effects::Lightning;
-using namespace TEN::Math;
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {

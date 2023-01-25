@@ -27,11 +27,11 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Math;
 using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];

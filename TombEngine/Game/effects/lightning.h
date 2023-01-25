@@ -4,7 +4,7 @@
 
 #include "Math/Math.h"
 
-namespace TEN::Effects::Lightning
+namespace TEN::Effects::ElectricArc
 {
 	enum ElectricArcFlags
 	{
