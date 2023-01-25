@@ -18,32 +18,18 @@ namespace TEN::Effects::ElectricArc
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
-	// More standard version. Adopt this in place of the one below.
-	static Vector3 CatmullRomSpline(const std::array<Vector3, 4>& knots, float alpha)
-	{
-		auto point0 = knots[1] + ((knots[2] - knots[0]) * (1 / 6.0f));
-		auto point1 = knots[2];
-		auto point2 = knots[2] + ((knots[3] - knots[1]) * (-1 / 6.0f));
-		auto point3 = knots[3];
-
-		auto spline = ((point1 * 2) + (point2 - point0) * alpha) +
-					  (((point0 * 2) - (point1 * 5) + (point2 * 4) - point3) * SQUARE(alpha)) +
-					  (((point0 * -1) + (point1 * 3) - (point2 * 3) + point3) * CUBE(alpha));
-		return spline;
-	}
-
 	// 4-point Catmull-Rom spline interpolation.
 	// Function takes reference to array of knots and
-	// calculates using subset of 4 determined by the alpha value.
+	// calculates using subset of 4 determined alpha value.
 	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, float alpha)
 	{
-		float alpha2 = alpha * (ELECTRIC_ARC_KNOTS_SIZE - 3);
+		alpha *= ELECTRIC_ARC_KNOTS_SIZE - 3;
 
 		int span = alpha;
 		if (span >= (ELECTRIC_ARC_KNOTS_SIZE - 3))
 			span = ELECTRIC_ARC_KNOTS_SIZE - 4;
 
-		float alphaNorm = alpha2 - span; // What?
+		float alphaNorm = alpha - span; // What?
 
 		// Determine subset of 4 knots.
 		const auto& knot0 = knots[span];
@@ -51,19 +37,28 @@ namespace TEN::Effects::ElectricArc
 		const auto& knot2 = knots[span + 2];
 		const auto& knot3 = knots[span + 3];
 
-		//auto knotSubset = std::array<Vector3, 4>{ knot0, knot1, knot2, knot3 };
-		//return CatmullRomSpline(knotSubset, alpha);
-
 		auto point1 = knot1 + (knot1 / 2) - (knot2 / 2) - knot2 + (knot3 / 2) + ((-knot0 - Vector3::One) / 2);
 		auto ret = point1 * alphaNorm;
-
 		auto point2 = ret + Vector3(2.0f) * knot2 - 2 * knot1 - (knot1 / 2) - (knot3 / 2) + knot0;
 		ret = point2 * alphaNorm;
-
 		auto point3 = ret + (knot2 / 2) + ((-knot0 - Vector3::One) / 2);
 		ret = point3 * alphaNorm;
 
 		return (ret + knot1);
+	}
+
+	// More standard version. Adopt this in place of the above.
+	static Vector3 CatmullRomSpline(float alpha, const std::array<Vector3, 4>& knots)
+	{
+		auto point1 = knots[1] + ((knots[2] - knots[0]) * (1 / 6.0f));
+		auto point2 = knots[2];
+		auto point3 = knots[2] + ((knots[3] - knots[1]) * (-1 / 6.0f));
+		auto point4 = knots[3];
+
+		auto spline = ((point2 * 2) + (point3 - point1) * alpha) +
+					  (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
+					  (((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
+		return spline;
 	}
 
 	// TODO: Pass const Vector4& for color.
