@@ -10,8 +10,6 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Lightning
 {
-	constexpr auto HELICAL_LASER_SEGMENTS_NUM_MAX = 56;
-	
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
@@ -93,11 +91,12 @@ namespace TEN::Effects::Lightning
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
-		static constexpr auto flags = LI_THININ | LI_THINOUT;
+		static constexpr auto SEGMENTS_NUM_MAX = 56;
+		static constexpr auto FLAGS			   = LI_THININ | LI_THINOUT;
 
 		auto laser = HelicalLaser();
 
-		laser.NumSegments = HELICAL_LASER_SEGMENTS_NUM_MAX;
+		laser.NumSegments = SEGMENTS_NUM_MAX;
 		laser.Origin = origin;
 		laser.Target = target;
 		laser.Orientation2D = Random::GenerateAngle();
@@ -119,7 +118,7 @@ namespace TEN::Effects::Lightning
 		auto origin2 = Vector3i(origin);
 		auto target2 = Vector3i(target);
 
-		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, flags, 19, 5);
+		TriggerLightning(&origin2, &target2, 1, 0, laser.g, laser.b, 20, FLAGS, 19, 5);
 		TriggerLightning(&origin2, &target2, 1, 110, 255, 250, 20, flags, 4, 5);
 		TriggerLightningGlow(
 			laser.LightPosition.x, laser.LightPosition.y, laser.LightPosition.z,
