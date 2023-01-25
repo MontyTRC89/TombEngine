@@ -14,6 +14,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/pickup/pickup.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -238,7 +239,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (TestEnvironment(ENV_FLAG_WATER, pointColl2.RoomNumber) && item.HitPoints > 0)
 					{
-						DropEntityPickups(&item);
+						DropPickups(&item);
 						DoDamage(&item, INT_MAX);
 						SetAnimation(&item, CYBORG_ANIM_ELECTROCUTION_DEATH);
 					}
