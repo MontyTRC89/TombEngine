@@ -152,11 +152,12 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								if (object->intelligent)
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
-									auto target = origin->ToVector3() + (directionNorm * weapon.TargetDist);
-									auto ray = Ray(origin->ToVector3(), directionNorm);
+
 									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-									int bestJointIndex = NO_JOINT;
+									auto ray = Ray(origin->ToVector3(), directionNorm);
 									float bestDistance = INFINITY;
+									int bestJointIndex = NO_JOINT;
+
 									for (int i = 0; i < num; i++)
 									{
 										auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);

@@ -33,9 +33,9 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto HEAVY_GUARD_RAYGUN_DAMAGE = 250;
 
-	constexpr auto HEAVY_GUARD_ALERT_RANGE		= SQUARE(BLOCK(2));
-	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE	= SQUARE(BLOCK(3));
-	constexpr auto HEAVY_GUARD_CLOSE_RANGE		= SQUARE(BLOCK(1));
+	constexpr auto HEAVY_GUARD_ALERT_RANGE	  = SQUARE(BLOCK(2));
+	constexpr auto HEAVY_GUARD_IDLE_AIM_RANGE = SQUARE(BLOCK(3));
+	constexpr auto HEAVY_GUARD_CLOSE_RANGE	  = SQUARE(BLOCK(1));
 
 	constexpr auto HEAVY_GUARD_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto HEAVY_GUARD_WALK_TURN_RATE_MAX = ANGLE(5.0f);

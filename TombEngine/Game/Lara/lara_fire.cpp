@@ -835,8 +835,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
 		
-		// NOTE: It seems that items hit by the player in the normal way must have GetTargetOnLOS return false.
-		// It's strange, but this will replicate original behaviour until we fully understand what is happening.
+		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
+		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
 			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false, bestJointIndex);
 
