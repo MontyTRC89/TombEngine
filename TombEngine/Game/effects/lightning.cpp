@@ -261,7 +261,7 @@ namespace TEN::Effects::ElectricArc
 				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalculateElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray, const ElectricArc& arc)
+	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray)
 	{
 		int bufferIndex = 0;
 

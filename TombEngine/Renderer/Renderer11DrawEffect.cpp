@@ -211,7 +211,7 @@ namespace TEN::Renderer
 			for (int j = 0; j < ElectricArcKnots.size(); j++)
 				ElectricArcKnots[j] -= LaraItem->Pose.Position.ToVector3();
 
-			CalculateElectricArcSpline(ElectricArcKnots, ElectricArcBuffer, arc);
+			CalculateElectricArcSpline(arc, ElectricArcKnots, ElectricArcBuffer);
 
 			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
