@@ -6,6 +6,9 @@
 
 namespace TEN::Effects::ElectricArc
 {
+	constexpr auto ELECTRIC_ARC_KNOTS_SIZE	= 6;
+	constexpr auto ELECTRIC_ARC_BUFFER_SIZE = 1024;
+
 	enum ElectricArcFlags
 	{
 		LI_SPLINE	= (1 << 0),
@@ -60,14 +63,14 @@ namespace TEN::Effects::ElectricArc
 		short Rotation	= 0;
 		short Coil		= 0;
 
-		int r, g, b; // TODO: Replace usage with Color.
+		int r, g, b; // TODO: Replace with Color.
 	};
 
 	extern std::vector<ElectricArc>	 ElectricArcs;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
-	extern std::array<Vector3, 6>	 ElectricArcKnots;
-	extern std::array<Vector3, 1024> ElectricArcBuffer;
+	extern std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>	 ElectricArcKnots;
+	extern std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE> ElectricArcBuffer;
 
 	void SpawnElectricArc(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
 	void SpawnElectricArcGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
@@ -76,6 +79,5 @@ namespace TEN::Effects::ElectricArc
 	void UpdateElectricArcs();
 	void UpdateHelicalLasers();
 
-	void CalculateElectricArcSpline(const std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const ElectricArc& arc);
-	Vector3 ElectricArcSpline(int alpha, const Vector3* knots, int numKnots);
+	void CalculateElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray, const ElectricArc& arc);
 }
