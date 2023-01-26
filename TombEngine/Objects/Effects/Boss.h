@@ -7,9 +7,11 @@ namespace TEN::Effects::Boss
 	{
 		Object = 0,			 // BossFlagValue enum.
 		Rotation = 1,		 // Store rotation for use (e.g. Puna when summoning).
+		ImmortalState = 1,   // Sophia "Tower mode"
 		ShieldIsEnabled = 2,
 		AttackType = 3,
 		AttackCount = 4,	 // Change behaviour after some attack.
+		ChargedState = 4,
 		DeathCount = 5,
 		ItemNumber = 6,		 // Check if summon is dead.
 		ExplodeCount = 7
@@ -26,7 +28,7 @@ namespace TEN::Effects::Boss
 	void ShockwaveRingControl(int itemNumber);
 	void ShockwaveExplosionControl(int itemNumber);
 
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color);
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color, bool allowExplosion = true);
 	void CheckForRequiredObjects(ItemInfo& item);
 
 	void SpawnShield(const ItemInfo& item, const Vector4& color);

@@ -19,7 +19,7 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
-#include "Objects/TR3/Entity/SophiaLee.h" // OK
+#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
@@ -274,7 +274,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_SOPHIA_LEE_BOSS];
+	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLondonBoss;
@@ -282,7 +282,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
-		obj->HitPoints = 300;
+		obj->HitPoints = 1;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;

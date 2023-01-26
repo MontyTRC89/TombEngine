@@ -11,8 +11,8 @@ namespace TEN::Entities::Effects
 		Demigod3Radial = 4,
 		Demigod2 = 5,
 		Mutant = 6,
-		SophiaLee_Small = 7,
-		SophiaLee_Big = 8
+		SophiaLeigh_Small = 7,
+		SophiaLeigh_Big = 8
 	};
 
 	void ControlEnemyMissile(short fxNum);

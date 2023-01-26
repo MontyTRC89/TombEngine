@@ -168,9 +168,9 @@ namespace TEN::Effects::Boss
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;
 		smoke.z = effectPos.z;
-		smoke.xVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.xVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.yVel = GetRandomControl() - 128;
-		smoke.zVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.zVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.sR = 75;
 		smoke.sG = 125;
 		smoke.sB = 175;
@@ -195,7 +195,7 @@ namespace TEN::Effects::Boss
 	}
 
 	// NOTE: Actual death occurs when countUntilDeath >= 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, bool allowExplosion)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -245,7 +245,11 @@ namespace TEN::Effects::Boss
 			color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
 		if (counter >= countUntilDeath)
-			CreatureDie(itemNumber, true);
+		{
+			CreatureDie(itemNumber, allowExplosion);
+			if (!allowExplosion)
+				KillItem(itemNumber);
+		}
 	}
 
 	void CheckForRequiredObjects(ItemInfo& item)
