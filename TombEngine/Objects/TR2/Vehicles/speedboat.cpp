@@ -904,19 +904,87 @@ namespace TEN::Entities::Vehicles
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 		}
 
+		auto pos1 = GetJointPosition(speedboatItem, 0, Vector3i(-100, 130, -500));
+		auto pos2 = GetJointPosition(speedboatItem, 0, Vector3i(100, 130, -500));
+
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
 			auto room = probe.Block->RoomBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
 			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-				TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+			{
+				if (speedboatItem->TriggerFlags == 1)
+				{
+					TriggerSpeedboatBoatMist(pos1.x, pos1.y,
+						pos1.z, abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+
+					TriggerSpeedboatBoatMist(pos2.x, pos2.y,
+						pos2.z, abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+				}
+				else
+				{
+					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+				}
 
 				DoWakeEffect(speedboatItem, -SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
-				DoWakeEffect(speedboatItem,  SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
+				DoWakeEffect(speedboatItem, SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
+			}
 		}
 
 		if (lara->Vehicle != itemNumber)
 			return;
 
 		DoSpeedboatDismount(speedboatItem, laraItem);
+	}
+
+	void TriggerSpeedboatBoatMist(long x, long y, long z, long velocity, short angle)
+	{
+		auto* sptr = GetFreeParticle();
+
+		sptr->on = 1;
+		sptr->sR = 0;
+		sptr->sG = 0;
+		sptr->sB = 0;
+
+		sptr->dR = 64;
+		sptr->dG = 64;
+		sptr->dB = 64;
+
+		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
+		sptr->fadeToBlack = 12;
+		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->extras = 0;
+		sptr->dynamic = -1;
+
+		sptr->x = x + ((GetRandomControl() & 15) - 8);
+		sptr->y = y + ((GetRandomControl() & 15) - 8);
+		sptr->z = z + ((GetRandomControl() & 15) - 8);
+		long zv = velocity * phd_cos(angle) / 4;
+		long xv = velocity * phd_sin(angle) / 4;
+		sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
+		sptr->yVel = 0;
+		sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
+		sptr->friction = 3;
+
+		if (GetRandomControl() & 1)
+		{
+			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			sptr->rotAng = GetRandomControl() & 4095;
+
+			if (GetRandomControl() & 1)
+				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+			else
+				sptr->rotAdd = (GetRandomControl() & 15) + 16;
+		}
+		else
+			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+		sptr->scalar = 3;
+		sptr->gravity = sptr->maxYvel = 0;
+		long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+		sptr->size = sptr->sSize = size / 4;
+		sptr->dSize = size;
 	}
 }

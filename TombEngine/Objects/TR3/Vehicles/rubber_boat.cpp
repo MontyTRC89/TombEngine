@@ -17,6 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Objects/TR3/Vehicles/upv.h"
 
 using std::vector;
 using namespace TEN::Input;
@@ -751,13 +752,13 @@ namespace TEN::Entities::Vehicles
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 
-		sptr->x = x * ((GetRandomControl() & 15) - 8);
-		sptr->y = y * ((GetRandomControl() & 15) - 8);
-		sptr->z = z * ((GetRandomControl() & 15) - 8);
+		sptr->x = x + ((GetRandomControl() & 15) - 8);
+		sptr->y = y + ((GetRandomControl() & 15) - 8);
+		sptr->z = z + ((GetRandomControl() & 15) - 8);
 		long zv = velocity * phd_cos(angle) / 4;
 		long xv = velocity * phd_sin(angle) / 4;
 		sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
-		sptr->yVel = (velocity * 8) + (velocity * 4);
+		sptr->yVel = 0;
 		sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
 		sptr->friction = 3;
 
@@ -774,14 +775,13 @@ namespace TEN::Entities::Vehicles
 		else
 			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
-		sptr->spriteIndex = Objects[ID_EXPLOSION_SPRITES].meshIndex;
-
 		if (!snow)
 		{
 			sptr->scalar = 4;
-			sptr->gravity = 0;
-			sptr->maxYvel = 0;
+			sptr->gravity = sptr->maxYvel = 0;
 			long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+			sptr->size = sptr->sSize = size / 4;
+			sptr->dSize = size;
 		}
 	}
 
@@ -977,8 +977,8 @@ namespace TEN::Entities::Vehicles
 			height < prop.y &&
 			height != NO_HEIGHT)
 		{
-			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
-
+			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
+			
 			DoWakeEffect(rBoatItem, -RBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
 			DoWakeEffect(rBoatItem,  RBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
 
@@ -992,8 +992,6 @@ namespace TEN::Entities::Vehicles
 				short roomNumber = rBoatItem->RoomNumber;
 				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
 				CreateBubble((Vector3i*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
-
-
 			}
 		}
 		else

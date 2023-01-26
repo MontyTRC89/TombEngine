@@ -23,4 +23,5 @@ namespace TEN::Entities::Vehicles
 	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, int collide);
 	void SpeedboatSplash(ItemInfo* speedboatItem, long verticalVelocity, long water);
 	void SpeedboatControl(short itemNumber);
+	void TriggerSpeedboatBoatMist(long x, long y, long z, long velocity, short angle);
 }
