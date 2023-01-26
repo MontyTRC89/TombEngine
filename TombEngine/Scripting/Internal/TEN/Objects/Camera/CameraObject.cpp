@@ -79,7 +79,7 @@ Vec3 CameraObject::GetPos() const
 void CameraObject::SetPos(Vec3 const& pos)
 {
 	m_camera.Position = Vector3i(pos.x, pos.y, pos.z);
-	FixedCameraRefresh(m_camera.Index);
+	RefreshFixedCamera(m_camera.Index);
 }
 
 std::string CameraObject::GetName() const

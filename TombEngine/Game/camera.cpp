@@ -405,7 +405,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	}
 }
 
-void FixedCameraRefresh(short camNumber)
+void RefreshFixedCamera(short camNumber)
 {
 	auto* camera = &g_Level.Cameras[camNumber];
 
