@@ -20,36 +20,7 @@ namespace TEN::Effects::ElectricArc
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
-	// 4-point Catmull-Rom spline interpolation.
-	// Function takes reference to array of knots and
-	// calculates using subset of 4 determined alpha value.
-	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, float alpha)
-	{
-		alpha *= ELECTRIC_ARC_KNOTS_SIZE - 3;
-
-		int span = alpha;
-		if (span >= (ELECTRIC_ARC_KNOTS_SIZE - 3))
-			span = ELECTRIC_ARC_KNOTS_SIZE - 4;
-
-		float alphaNorm = alpha - span; // What?
-
-		// Determine subset of 4 knots.
-		const auto& knot0 = knots[span];
-		const auto& knot1 = knots[span + 1];
-		const auto& knot2 = knots[span + 2];
-		const auto& knot3 = knots[span + 3];
-
-		auto point1 = knot1 + (knot1 / 2) - (knot2 / 2) - knot2 + (knot3 / 2) + ((-knot0 - Vector3::One) / 2);
-		auto ret = point1 * alphaNorm;
-		auto point2 = ret + Vector3(2.0f) * knot2 - 2 * knot1 - (knot1 / 2) - (knot3 / 2) + knot0;
-		ret = point2 * alphaNorm;
-		auto point3 = ret + (knot2 / 2) + ((-knot0 - Vector3::One) / 2);
-		ret = point3 * alphaNorm;
-
-		return (ret + knot1);
-	}
-
-	// More standard version. Adopt this in place of the above.
+	// More standard version. Adopt this in place of the one below.
 	static Vector3 CatmullRomSpline(float alpha, const std::array<Vector3, 4>& knots)
 	{
 		auto point1 = knots[1] + ((knots[2] - knots[0]) * (1 / 6.0f));
@@ -61,6 +32,35 @@ namespace TEN::Effects::ElectricArc
 					  (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
 					  (((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
 		return spline;
+	}
+
+	// 4-point Catmull-Rom spline interpolation.
+	// Function takes reference to array of knots and
+	// calculates using subset of 4 determined alpha value.
+	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, float alpha)
+	{
+		alpha *= ELECTRIC_ARC_KNOTS_SIZE - 3;
+
+		int span = alpha;
+		if (span >= (ELECTRIC_ARC_KNOTS_SIZE - 3))
+			span = ELECTRIC_ARC_KNOTS_SIZE - 4;
+
+		float something = alpha - span;
+
+		// Determine subset of 4 knots.
+		const auto& knot0 = knots[span];
+		const auto& knot1 = knots[span + 1];
+		const auto& knot2 = knots[span + 2];
+		const auto& knot3 = knots[span + 3];
+
+		auto point1 = knot1 + (knot1 / 2) - (knot2 / 2) - knot2 + (knot3 / 2) + ((-knot0 - Vector3::One) / 2);
+		auto ret = point1 * something;
+		auto point2 = ret + Vector3(2.0f) * knot2 - 2 * knot1 - (knot1 / 2) - (knot3 / 2) + knot0;
+		ret = point2 * something;
+		auto point3 = ret + (knot2 / 2) + ((-knot0 - Vector3::One) / 2);
+		ret = point3 * something;
+
+		return (ret + knot1);
 	}
 
 	// TODO: Pass const Vector4& for color.
@@ -167,6 +167,7 @@ namespace TEN::Effects::ElectricArc
 	void UpdateHelicalLasers()
 	{
 		static constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
+		static constexpr auto LENGTH_LERP_ALPHA = 0.25f;
 
 		// No active effects; return early.
 		if (HelicalLasers.empty())
@@ -180,7 +181,7 @@ namespace TEN::Effects::ElectricArc
 				continue;
 
 			// Update length.
-			laser.Length = Lerp(laser.Length, laser.LengthEnd, 0.25f);
+			laser.Length = Lerp(laser.Length, laser.LengthEnd, LENGTH_LERP_ALPHA);
 
 			// Update radius.
 			laser.Radius += 1 / 8.0f;
@@ -216,7 +217,7 @@ namespace TEN::Effects::ElectricArc
 			arc.life -= 2.0f;
 			if (arc.life > 0.0f)
 			{
-				// TODO: Find a better way for this.
+				// TODO: Find a better way to do this.
 				auto* posPtr = (Vector3*)&arc.pos2;
 				for (auto& interpPos : arc.interpolation)
 				{

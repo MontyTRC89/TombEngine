@@ -44,7 +44,7 @@ extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
+// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
 
 BiteInfo EnemyBites[12] =
 {
@@ -136,7 +136,7 @@ namespace TEN::Renderer
 				continue;
 
 			ElectricArcKnots[0] = arc.pos1;
-			memcpy(&ElectricArcKnots[1], &arc, 48); // TODO: This is wrong.
+			memcpy(&ElectricArcKnots[1], &arc, 48); // TODO: This should be wrong, but it still works??
 			ElectricArcKnots[5] = arc.pos4;
 
 			for (int j = 0; j < ElectricArcKnots.size(); j++)
