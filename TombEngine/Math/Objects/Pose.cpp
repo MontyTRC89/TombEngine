@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "Math/Containers/Pose.h"
+#include "Math/Objects/Pose.h"
 
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Vector3i.h"
 #include "Math/Geometry.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Vector3i.h"
 
 using namespace TEN::Math;
 
@@ -80,6 +80,6 @@ using namespace TEN::Math;
 	}
 	bool Pose::operator !=(const Pose& pose) const
 	{
-		return ((Position != pose.Position) || (Orientation != pose.Orientation));
+		return !(*this == pose);
 	}
 //}

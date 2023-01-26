@@ -162,16 +162,15 @@ Particle* GetFreeParticle()
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 {
-	float particleAge=  particle.sLife - particle.life;
-
-	if (!particle.life)
+	if (particle.life <= 0)
 	{
 		particle.on = false;
 		ParticleDynamics[particle.dynamic].On = false;
 	}
 
+	float particleAge = particle.sLife - particle.life;
 	if (particleAge > particle.life )
-	 return;	
+		return;	
 
 	int numSprites = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
@@ -245,18 +244,18 @@ void UpdateSparks()
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
 			{
-				int unk;
+				int explosionType;
 				if (spark->flags & SP_UNDERWEXP)
 				{
-					unk = 1;
+					explosionType = 1;
 				}
 				else if (spark->flags & SP_PLASMAEXP)
 				{
-					unk = 2;
+					explosionType = 2;
 				}
 				else
 				{
-					unk = 0;
+					explosionType = 0;
 				}
 
 				for (int j = 0; j < (spark->extras & 7); j++)
@@ -266,13 +265,13 @@ void UpdateSparks()
 						spark->z,
 						(spark->extras & 7) - 1,
 						spark->dynamic,
-						unk,
-						(spark->extras & 7));
+						explosionType,
+						spark->roomNumber);
 					
 					spark->dynamic = -1;
 				}
 
-				if (unk == 1)
+				if (explosionType == 1)
 				{
 					TriggerExplosionBubble(
 						spark->x,
@@ -468,8 +467,8 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	static const auto EXPLOSION_MAX_ROTATION_SPEED = 30;
-	static const auto EXPLOSION_PARTICLE_LIFE = 44;
+	static constexpr auto rotationMax = 30;
+	static constexpr auto lifeMax	  = 44;
 
 	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
@@ -515,7 +514,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.dB = 32;
 		spark.colFadeSpeed = 8;
 		spark.fadeToBlack = 16;
-		spark.life = (GetRandomControl() & 7) + EXPLOSION_PARTICLE_LIFE;
+		spark.life = (GetRandomControl() & 7) + lifeMax;
 		spark.sLife = spark.life;
 	}
 
@@ -580,7 +579,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
 
 			spark.rotAng = GetRandomControl() & 0xF;
-			spark.rotAdd = (GetRandomControl() & 0xF) + EXPLOSION_MAX_ROTATION_SPEED;
+			spark.rotAdd = (GetRandomControl() & 0xF) + rotationMax;
 		}
 		else if (uw == 1)
 		{

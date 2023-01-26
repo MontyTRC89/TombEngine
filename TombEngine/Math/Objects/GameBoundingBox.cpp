@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Math/Containers/GameBoundingBox.h"
+#include "Math/Objects/GameBoundingBox.h"
 
 #include "Game/animation.h"
 #include "Game/items.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
 
 //namespace TEN::Math
 //{
@@ -51,6 +51,16 @@
 		return abs(Z2 - Z1);
 	}
 
+	Vector3 GameBoundingBox::GetCenter() const
+	{
+		return ((Vector3(this->X1, this->Y1, this->Z1) + Vector3(this->X2, this->Y2, this->Z2)) / 2.0f);
+	}
+
+	Vector3 GameBoundingBox::GetExtents() const
+	{
+		return ((Vector3(this->X2, this->Y2, this->Z2) - Vector3(this->X1, this->Y1, this->Z1)) / 2.0f);
+	}
+
 	// NOTE: Previously phd_RotBoundingBoxNoPersp().
 	void GameBoundingBox::RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds)
 	{
@@ -76,11 +86,8 @@
 
 	BoundingOrientedBox GameBoundingBox::ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 	{
-		auto boxCenter = Vector3(X2 + X1, Y2 + Y1, Z2 + Z1) / 2.0f;
-		auto boxExtents = Vector3(X2 - X1, Y2 - Y1, Z2 - Z1) / 2.0f;
-
 		BoundingOrientedBox box;
-		BoundingOrientedBox(boxCenter, boxExtents, Vector4::UnitY).Transform(box, 1.0f, orient, pos);
+		BoundingOrientedBox(this->GetCenter(), this->GetExtents(), Vector4::UnitY).Transform(box, 1.0f, orient, pos);
 		return box;
 	}
 

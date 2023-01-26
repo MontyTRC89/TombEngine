@@ -51,6 +51,7 @@ private:
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
 	sol::protected_function										m_onControlPhase{};
+	sol::protected_function										m_preSave{};
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
