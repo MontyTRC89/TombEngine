@@ -1000,11 +1000,9 @@ namespace TEN::Renderer
 			BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
 			// Draw sprites with instancing
-			m_context->DrawInstanced(4, spriteBucket.SpritesToDraw.size(), 0, 0);
+			DrawInstancedTriangles(4, spriteBucket.SpritesToDraw.size(), 0);
 
 			m_numSpritesDrawCalls++;
-			m_numInstancedSpritesDrawCalls++;
-			m_numDrawCalls++;
 		}
 
 		// Draw 3D sprites

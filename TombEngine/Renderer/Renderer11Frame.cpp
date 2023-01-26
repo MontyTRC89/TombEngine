@@ -22,7 +22,7 @@ namespace TEN::Renderer
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 
-	void Renderer11::CollectRooms(RenderView &renderView, bool onlyRooms)
+	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
@@ -53,6 +53,12 @@ namespace TEN::Renderer
 			room->ClipBounds.right = (room->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		}
+
+		// Sort statics for better instancing later
+		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
+			{
+				return a->ObjectNumber < b->ObjectNumber;
+			});
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -408,6 +414,7 @@ namespace TEN::Renderer
 
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
+			renderView.StaticsToDraw.push_back(mesh);
 		}
 	}
 

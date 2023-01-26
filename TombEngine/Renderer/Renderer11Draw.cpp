@@ -1809,16 +1809,48 @@ namespace TEN::Renderer
 
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-		for (auto room : view.roomsToDraw)
+#define INSTANCING 1
+
+#ifdef INSTANCING 
+		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
+		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
+
+		// First create a list of buckets for instancing
+		std::vector<RendererInstancedStaticMeshData> instanceData;
+
+		int staticsCount = 0;
+
+		for (int s = 0; s < view.StaticsToDraw.size(); s++)
 		{
-			for (auto& msh : room->StaticsToDraw)
+			RendererStatic* staticToDraw = view.StaticsToDraw[s];
+			RendererObject& staticObj = *m_staticObjects[staticToDraw->ObjectNumber];
+			RendererRoom* room = &m_rooms[staticToDraw->RoomNumber];
+
+			if (staticObj.ObjectMeshes.size() > 0)
 			{
-				RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
+				RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
-				if (staticObj.ObjectMeshes.size() > 0)
+				m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].World = staticToDraw->World;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Color = staticToDraw->Color;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Ambient = staticToDraw->AmbientLight;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].LightMode = mesh->LightMode;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].NumLights = staticToDraw->LightsToDraw.size();
+				for (int l = 0; l < staticToDraw->LightsToDraw.size(); l++)
 				{
-					RendererMesh* mesh = staticObj.ObjectMeshes[0]; 
+					memcpy(
+						&m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Lights[l],
+						staticToDraw->LightsToDraw[l],
+						sizeof(ShaderLight)
+					);
+				}
 
+				staticsCount++;
+
+				// Draw
+				if (staticsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE
+					|| s == view.StaticsToDraw.size() - 1
+					|| (s < view.StaticsToDraw.size() - 1 && view.StaticsToDraw[s + 1]->ObjectNumber != staticToDraw->ObjectNumber))
+				{
 					for (auto& bucket : mesh->Buckets)
 					{
 						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
@@ -1831,45 +1863,11 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						if (DoesBlendModeRequireSorting(bucket.BlendMode))
+						if (!DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
-							// Collect transparent faces
-							for (int j = 0; j < bucket.Polygons.size(); j++)
-							{
-								RendererPolygon* p = &bucket.Polygons[j];
-
-								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, msh->World);
-								int distance = (centre - cameraPosition).Length();
-
-								RendererTransparentFace face;
-								face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
-								face.info.polygon = p;
-								face.distance = distance;
-								face.info.animated = bucket.Animated;
-								face.info.texture = bucket.Texture;
-								face.info.room = room;
-								face.info.staticMesh = msh;
-								face.info.world = msh->World;
-								face.info.position = msh->Pose.Position.ToVector3();
-								face.info.color = msh->Color;
-								face.info.blendMode = bucket.BlendMode;
-								face.info.bucket = &bucket;
-								room->TransparentFacesToDraw.push_back(face);
-							}
-						}
-						else
-						{
-							m_stStatic.World = msh->World;
-							m_stStatic.Color = msh->Color;
-							m_stStatic.AmbientLight = room->AmbientLight;
-							m_stStatic.LightMode = mesh->LightMode;
-
-							m_cbStatic.updateData(m_stStatic, m_context.Get());
-							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-							BindLights(msh->LightsToDraw);
+							m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+							BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedStaticMeshBuffer.get());
+							BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedStaticMeshBuffer.get());
 
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
@@ -1890,20 +1888,177 @@ namespace TEN::Renderer
 								}
 
 								BindTexture(TEXTURE_COLOR_MAP,
-								            &std::get<0>(m_staticsTextures[bucket.Texture]),
-								            SAMPLER_ANISOTROPIC_CLAMP);
+									&std::get<0>(m_staticsTextures[bucket.Texture]),
+									SAMPLER_ANISOTROPIC_CLAMP);
 								BindTexture(TEXTURE_NORMAL_MAP,
-								            &std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
+									&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
 
-								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+								DrawIndexedInstancedTriangles(bucket.NumIndices, staticsCount, bucket.StartIndex, 0);
 
 								m_numStaticsDrawCalls++;
+							}
+						}
+					}
+
+					staticsCount = 0;
+				}
+			}
+		}
+
+		// Collect sorted blend modes faces ordered by room, if transparent pass
+		if (transparent)
+		{
+			for (auto room : view.roomsToDraw)
+			{
+				for (auto& msh : view.StaticsToDraw)
+				{
+					RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
+
+					if (staticObj.ObjectMeshes.size() > 0)
+					{
+						RendererMesh* mesh = staticObj.ObjectMeshes[0];
+
+						for (auto& bucket : mesh->Buckets)
+						{
+							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+							{
+								continue;
+							}
+
+							if (bucket.NumVertices == 0)
+							{
+								continue;
+							}
+
+							if (DoesBlendModeRequireSorting(bucket.BlendMode))
+							{
+								// Collect transparent faces
+								for (int j = 0; j < bucket.Polygons.size(); j++)
+								{
+									RendererPolygon* p = &bucket.Polygons[j];
+
+									// As polygon distance, for moveables, we use the averaged distance
+									Vector3 centre = Vector3::Transform(p->centre, msh->World);
+									int distance = (centre - cameraPosition).Length();
+
+									RendererTransparentFace face;
+									face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
+									face.info.polygon = p;
+									face.distance = distance;
+									face.info.animated = bucket.Animated;
+									face.info.texture = bucket.Texture;
+									face.info.room = room;
+									face.info.staticMesh = msh;
+									face.info.world = msh->World;
+									face.info.position = msh->Pose.Position.ToVector3();
+									face.info.color = msh->Color;
+									face.info.blendMode = bucket.BlendMode;
+									face.info.bucket = &bucket;
+									room->TransparentFacesToDraw.push_back(face);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+
+#else
+
+		for (auto& msh : view.StaticsToDraw)
+		{
+			RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
+			RendererRoom* room = &m_rooms[msh->RoomNumber];
+
+			if (staticObj.ObjectMeshes.size() > 0)
+			{
+				RendererMesh* mesh = staticObj.ObjectMeshes[0];
+
+				for (auto& bucket : mesh->Buckets)
+				{
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					{
+						continue;
+					}
+
+					if (bucket.NumVertices == 0)
+					{
+						continue;
+					}
+
+					if (DoesBlendModeRequireSorting(bucket.BlendMode))
+					{
+						// Collect transparent faces
+						for (int j = 0; j < bucket.Polygons.size(); j++)
+						{
+							RendererPolygon* p = &bucket.Polygons[j];
+
+							// As polygon distance, for moveables, we use the averaged distance
+							Vector3 centre = Vector3::Transform(p->centre, msh->World);
+							int distance = (centre - cameraPosition).Length();
+
+							RendererTransparentFace face;
+							face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
+							face.info.polygon = p;
+							face.distance = distance;
+							face.info.animated = bucket.Animated;
+							face.info.texture = bucket.Texture;
+							face.info.room = room;
+							face.info.staticMesh = msh;
+							face.info.world = msh->World;
+							face.info.position = msh->Pose.Position.ToVector3();
+							face.info.color = msh->Color;
+							face.info.blendMode = bucket.BlendMode;
+							face.info.bucket = &bucket;
+							room->TransparentFacesToDraw.push_back(face);
+						}
+					}
+					else
+					{
+						m_stStatic.World = msh->World;
+						m_stStatic.Color = msh->Color;
+						m_stStatic.AmbientLight = room->AmbientLight;
+						m_stStatic.LightMode = mesh->LightMode;
+
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+						BindLights(msh->LightsToDraw);
+
+						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+
+						for (int pass = 0; pass < passes; pass++)
+						{
+							if (pass == 0)
+							{
+								SetBlendMode(bucket.BlendMode);
+								SetAlphaTest(
+									bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+									ALPHA_TEST_THRESHOLD
+								);
+							}
+							else
+							{
+								SetBlendMode(BLENDMODE_ALPHABLEND);
+								SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
+							}
+
+							BindTexture(TEXTURE_COLOR_MAP,
+								&std::get<0>(m_staticsTextures[bucket.Texture]),
+								SAMPLER_ANISOTROPIC_CLAMP);
+							BindTexture(TEXTURE_NORMAL_MAP,
+								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
+
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+							m_numStaticsDrawCalls++;
+						}
+					}
+				}
+			}
+		}
+#endif
 	}
 
 	void Renderer11::DrawRooms(RenderView& view, bool transparent)

@@ -81,11 +81,12 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
-
-	// Initialise input layout using the first vertex shader
+	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "VS", "vs_4_0", nullptr, blob);
+	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "PS", "ps_4_0", nullptr, blob);
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "PS", "ps_4_0", nullptr, blob);
 
+	// Initialise input layout using the first vertex
 	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -110,6 +111,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
 	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
+	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 
 	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();

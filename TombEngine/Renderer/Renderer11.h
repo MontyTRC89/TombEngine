@@ -24,6 +24,7 @@
 #include "Renderer/ConstantBuffers/BlendingBuffer.h"
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
+#include "Renderer/ConstantBuffers/InstancedStaticBuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
@@ -304,6 +305,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> m_psSprites;
 		ComPtr<ID3D11VertexShader> m_vsInstancedSprites;
 		ComPtr<ID3D11PixelShader> m_psInstancedSprites;
+		ComPtr<ID3D11VertexShader> m_vsInstancedStaticMeshes;
+		ComPtr<ID3D11PixelShader> m_psInstancedStaticMeshes;
 		ComPtr<ID3D11VertexShader> m_vsSolid;
 		ComPtr<ID3D11PixelShader> m_psSolid;
 		ComPtr<ID3D11VertexShader> m_vsInventory;
@@ -349,6 +352,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CInstancedSpriteBuffer> m_cbInstancedSpriteBuffer;
 		CBlendingBuffer m_stBlending;
 		ConstantBuffer<CBlendingBuffer> m_cbBlending;
+		CInstancedStaticMeshBuffer m_stInstancedStaticMeshBuffer;
+		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -606,6 +611,20 @@ namespace TEN::Renderer
 		{
 			m_context->DrawIndexed(count, baseIndex, baseVertex);
 			m_numPolygons += count / 3;
+			m_numDrawCalls++;
+		}
+
+		inline void DrawIndexedInstancedTriangles(int count, int instances, int baseIndex, int baseVertex)
+		{
+			m_context->DrawIndexedInstanced(count, instances, baseIndex, baseVertex, 0);
+			m_numPolygons += count / 3 * instances;
+			m_numDrawCalls++;
+		}
+
+		inline void DrawInstancedTriangles(int count, int instances, int baseVertex)
+		{
+			m_context->DrawInstanced(count, instances, baseVertex, 0);
+			m_numPolygons += count / 3 * instances;
 			m_numDrawCalls++;
 		}
 

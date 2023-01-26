@@ -57,7 +57,7 @@ namespace TEN::Renderer::Utils
 				auto error = std::string((char*)errorObj->GetBufferPointer());
 				TENLog(error, LogLevel::Error);
 				throw std::runtime_error(error);
-			}
+			} 
 			else
 				throwIfFailed(res);
 		}
