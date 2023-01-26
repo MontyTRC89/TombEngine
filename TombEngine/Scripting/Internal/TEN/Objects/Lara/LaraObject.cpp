@@ -129,7 +129,7 @@ int LaraObject::GetSprintEnergy() const
 
 /// Get the moveable's airborne status
 // @function Moveable:GetAirborne
-// @treturn (bool) true if entity animation is flying.
+// @treturn (bool) true if Lara state must react to aerial forces.
 bool LaraObject::GetAirborne() const
 {
 	return m_item->Animation.IsAirborne;
@@ -137,7 +137,7 @@ bool LaraObject::GetAirborne() const
 
 /// Set the moveable's airborne status
 // @function Moveable:SetAirborne
-// @tparam (bool) airborne status for the current animation.
+// @tparam (bool) New airborn status for Lara.
 void LaraObject::SetAirborne(bool newAirborne)
 {
 	m_item->Animation.IsAirborne = newAirborne;
