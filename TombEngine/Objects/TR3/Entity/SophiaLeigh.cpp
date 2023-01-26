@@ -448,7 +448,7 @@ namespace TEN::Entities::Creatures::TR3
 		SophiaData data{};
 
 		// She is immortal in tower mode !
-		if (item->TestFlagField((int)BossItemFlags::ImmortalState, TRUE) && item->TestOcb((int)SophiaOCB::OCB_Tower))
+		if (item->TestFlagField((int)BossItemFlags::ImmortalState, TRUE) && item->TriggerFlags & (int)SophiaOCB::OCB_Tower)
 			item->HitPoints = object.HitPoints;
 
 		if (item->HitPoints <= 0)
@@ -473,7 +473,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			if (item->TestOcb((int)SophiaOCB::OCB_Tower))
+			if (item->TriggerFlags & (int)SophiaOCB::OCB_Tower)
 				LondonBossTowerControl(item, creature, &data);
 			else
 				LondonBossNormalControl(item, creature, &data);
