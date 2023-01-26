@@ -18,6 +18,7 @@ int GetInventoryCount(GAME_OBJECT_ID objectID);
 void CollectCarriedItems(ItemInfo* item);
 void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void RegeneratePickups();
+void DropPickups(ItemInfo* item);
 void CollectMultiplePickups(int itemNumber);
 GameBoundingBox* FindPlinth(ItemInfo* item);
 
