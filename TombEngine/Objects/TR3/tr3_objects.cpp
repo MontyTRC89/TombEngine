@@ -282,7 +282,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
-		obj->HitPoints = 1;
+		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
