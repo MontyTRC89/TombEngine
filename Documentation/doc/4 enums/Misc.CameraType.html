@@ -48,7 +48,7 @@
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
-  <li>    <here>Flow.SkyLayer</here></li>
+  <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -71,7 +71,7 @@
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
+  <li>    <here>Misc.CameraType</here></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -86,29 +86,18 @@
 
 <div id="content">
 
-<h1>Class <code>Flow.SkyLayer</code></h1>
-<p>Describes a layer of moving clouds.</p>
-<p>As seen in TR4's City of the Dead.</p>
+<h1>Enum <code>Misc.CameraType</code></h1>
+<p>Constants for the type of the Camera.</p>
+<p>
+
+</p>
 
 
-<h2><a href="#Members">Members</a></h2>
+<h2><a href="#Misc_CameraType_constants">Misc.CameraType constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#color">color</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Color.html#">Color</a>) RGB sky color</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#speed">speed</a></td>
-	<td class="summary">(int) cloud speed.</td>
-	</tr>
-</table>
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#SkyLayer">SkyLayer(color, speed)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of camera type constants (for use with GetCameraType() function).</td>
 	</tr>
 </table>
 
@@ -116,80 +105,35 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
+    <h2 class="section-header has-description"><a name="Misc_CameraType_constants"></a>Misc.CameraType constants </h2>
 
+          <div class="section-description">
+
+
+
+<p>The following constants are inside CameraType.</p>
+
+<pre><code>CHASE
+FIXED
+LOOK
+COMBAT
+HEAVY
+OBJECT
+</code></pre>
+
+
+          </div>
     <dl class="function">
     <dt>
-    <a name = "color"></a>
-    <strong>color</strong>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    (<a href="../3 primitive classes/Color.html#">Color</a>) RGB sky color
+    Table of camera type constants (for use with GetCameraType() function).
 
 
 
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "speed"></a>
-    <strong>speed</strong>
-    </dt>
-    <dd>
-    (int) cloud speed. </p>
-
-<p>Values can be between [-32768, 32767], with positive numbers resulting in a sky that scrolls from
-west to east, and negative numbers resulting in one that travels east to west.</p>
-
-<p>Please note that speeds outside of the range of about [-1000, 1000] will cause the
-sky to scroll so fast that it will no longer appear as a coherent stream of clouds.
-Less is more. City of The Dead, for example, uses a speed value of 16.
-
-
-
-
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "SkyLayer"></a>
-    <strong>SkyLayer(color, speed)</strong>
-    </dt>
-    <dd>
-
-
-
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         RGB color
-        </li>
-        <li><span class="parameter">speed</span>
-            <span class="types"><span class="type">int</span></span>
-         cloud speed
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../2 classes/Flow.SkyLayer.html#SkyLayer">SkyLayer</a></span>
-        A SkyLayer object.
-    </ol>
 
 
 
