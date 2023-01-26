@@ -309,6 +309,10 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam index: (short) index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
+	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
+
+	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
+
 /// Get the moveable's color
 // @function Moveable:GetColor
 // @treturn Color a copy of the moveable's color
@@ -701,6 +705,23 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn (short) the value contained in the LocationAI of the creature.
+short Moveable::GetLocationAI() const
+{
+	auto creature = (CreatureInfo*)m_item->Data;
+	return creature->LocationAI;
+}
+
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam value: (short) value to store.
+void Moveable::SetLocationAI(short value)
+{
+	auto creature = (CreatureInfo*)m_item->Data;
+	creature->LocationAI = value;
+}
 
 ScriptColor Moveable::GetColor() const
 {
