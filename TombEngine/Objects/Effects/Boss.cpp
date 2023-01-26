@@ -214,9 +214,9 @@ namespace TEN::Effects::Boss
 				SpawnExplosionSmoke(pos);
 
 				TriggerExplosionSparks(
-					item.Pose.Position.x + (GetRandomControl() % 128 - 64 * 2),
-					(item.Pose.Position.y - CLICK(2)) + (GetRandomControl() % 128 - 64 * 2),
-					item.Pose.Position.z + (GetRandomControl() % 128 - 64 * 2),
+					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
 					2, -2, 2, item.RoomNumber);
 			}
 		}
@@ -230,9 +230,9 @@ namespace TEN::Effects::Boss
 				SpawnExplosionSmoke(pos);
 
 				TriggerExplosionSparks(
-					item.Pose.Position.x + (GetRandomControl() % 128 - 64 * 2),
-					(item.Pose.Position.y - CLICK(2)) + (GetRandomControl() % 128 - 64 * 2),
-					item.Pose.Position.z + (GetRandomControl() % 128 - 64 * 2),
+					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
 					2, -2, 2, item.RoomNumber);
 			}
 
@@ -248,9 +248,9 @@ namespace TEN::Effects::Boss
 				36, orient2D, 0);
 
 			TriggerExplosionSparks(
-				item.Pose.Position.x + (GetRandomControl() % 128 - 64 * 2),
-				(item.Pose.Position.y - CLICK(2)) + (GetRandomControl() % 128 - 64 * 2),
-				item.Pose.Position.z + (GetRandomControl() % 128 - 64 * 2),
+				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+				(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+				item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
 				2, -2, 2, item.RoomNumber);
 
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
