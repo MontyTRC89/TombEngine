@@ -625,7 +625,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->LotType = LotType::Human;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);

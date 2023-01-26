@@ -36,7 +36,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 constexpr auto TRIGGER_TIMEOUT		 = 5;
-constexpr auto GRENADE_FRAG_TIMEOUT	 = 16;
+constexpr auto GRENADE_FRAG_TIMEOUT  = 4;
 constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
 constexpr auto HARPOON_VELOCITY = CLICK(1);
@@ -1430,7 +1430,8 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			pointColl.Position.Ceiling > item.Pose.Position.y)
 		{
 			item.Pose.Position = prevPos;
-			hasHit = hasHitNotByEmitter = true;
+			hasHit =
+			hasHitNotByEmitter = true;
 		}
 	}
 	else if (EmitFromProjectile(item, type))
@@ -1441,7 +1442,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
-		// Fire trail and water collision for grenade fragments
+		// Fire trail and water collision for grenade fragments.
 		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, FlameType::Medium);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
