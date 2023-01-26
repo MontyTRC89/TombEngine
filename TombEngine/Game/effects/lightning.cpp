@@ -307,7 +307,7 @@ namespace TEN::Effects::ElectricArc
 		auto direction = target - origin;
 		direction.Normalize();
 
-		float stepLength = laser.Length / laser.NumSegments;
+		float lengthStep = laser.Length / laser.NumSegments;
 		float radiusStep = laser.Radius;
 
 		auto refPoint = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
@@ -316,9 +316,11 @@ namespace TEN::Effects::ElectricArc
 		for (int i = 0; i < laser.NumSegments; i++)
 		{
 			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
-			auto pos = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
 
-			buffer[bufferIndex] = origin + Geometry::TranslatePoint(pos, axisAngle.GetAxis(), stepLength * i);
+			auto offset = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
+			auto knot = Geometry::TranslatePoint(offset, axisAngle.GetAxis(), lengthStep * i);
+
+			buffer[bufferIndex] = origin + knot;
 			bufferIndex++;
 		}
 
