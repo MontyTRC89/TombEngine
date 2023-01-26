@@ -152,7 +152,7 @@ namespace TEN::Effects::ElectricArc
 		laser.Color = COLOR;
 		laser.Life = HELICAL_LASER_LIFE_MAX;
 		laser.Radius = 0.0f;
-		laser.Length = 0.0f;
+		laser.Length = LENGTH_MAX / 2;
 		laser.LengthEnd = LENGTH_MAX;
 		laser.Opacity = 1.0f;
 		laser.Rotation = ROTATION;
