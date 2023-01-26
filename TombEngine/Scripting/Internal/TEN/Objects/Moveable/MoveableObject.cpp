@@ -710,8 +710,12 @@ void Moveable::SetItemFlags(short value, int index)
 // @treturn (short) the value contained in the LocationAI of the creature.
 short Moveable::GetLocationAI() const
 {
-	auto creature = (CreatureInfo*)m_item->Data;
-	return creature->LocationAI;
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		return creature->LocationAI;
+	}
+	return 0;
 }
 
 /// Updates the location in the enemy AI with the given value.
@@ -719,8 +723,11 @@ short Moveable::GetLocationAI() const
 // @tparam value: (short) value to store.
 void Moveable::SetLocationAI(short value)
 {
-	auto creature = (CreatureInfo*)m_item->Data;
-	creature->LocationAI = value;
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		creature->LocationAI = value;
+	}
 }
 
 ScriptColor Moveable::GetColor() const
