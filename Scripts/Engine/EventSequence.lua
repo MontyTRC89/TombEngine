@@ -22,17 +22,20 @@
 --	LevelFuncs.TriggerSequence = function(obj) 
 --		local posSteve = TEN.Objects.GetMoveableByName("stevePosNullmesh"):GetPosition()
 --		local posChris = TEN.Objects.GetMoveableByName("chrisPosNullmesh"):GetPosition()
---		local mySeq = EventSequence.Create("my_seq",
---			false, -- does not loop
---			{seconds = true, deciseconds = true}, -- timer format, see Timer for details
---			6, -- seconds until call the function specified in next arg 
---			LevelFuncs.HealLara, -- first function to call. If we don't need to pass any arguments, we can just pass the function
---			2.1, -- seconds until the next function, after the previous one has been called
---			{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.BADDY1, "steve", posSteve}, -- if we DO want to pass arguments to the function to be called, we give a table with the function (LevelFuncs.SpawnBaddy in this case) followed by the args to pass to it
---			0.5,
---			{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.SAS_CAIRO, "chris", posChris},
---			1,
---			LevelFuncs.HealLara)
+--		local mySeq = EventSequence.Get("my_seq")
+--		if not mySeq then
+--			mySeq = EventSequence.Create("my_seq",
+--				false, -- does not loop
+--				{seconds = true, deciseconds = true}, -- timer format, see Timer for details
+--				6, -- seconds until call the function specified in next arg 
+--				LevelFuncs.HealLara, -- first function to call. If we don't need to pass any arguments, we can just pass the function
+--				2.1, -- seconds until the next function, after the previous one has been called
+--				{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.BADDY1, "steve", posSteve}, -- if we DO want to pass arguments to the function to be called, we give a table with the function (LevelFuncs.SpawnBaddy in this case) followed by the args to pass to it
+--				0.5,
+--				{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.SAS_CAIRO, "chris", posChris},
+--				1,
+--				LevelFuncs.HealLara)
+--		end
 --
 --		-- event sequences are inactive to begin with and so need to be started
 --		mySeq:Start()
