@@ -168,9 +168,9 @@ namespace TEN::Effects::Boss
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;
 		smoke.z = effectPos.z;
-		smoke.xVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.xVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.yVel = GetRandomControl() - 128;
-		smoke.zVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.zVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.sR = 75;
 		smoke.sG = 125;
 		smoke.sB = 175;
