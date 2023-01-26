@@ -81,6 +81,11 @@ EventSequence = {
 		setmetatable(obj, mt)
 
 		obj.name = name
+
+		if LevelVars.Engine.EventSequence.sequences[name] then
+			print("Warning: an EventSequence with name " .. name .. " already exists; overwriting it with a new one...")
+		end
+
 		LevelVars.Engine.EventSequence.sequences[name] = {} 
 		local thisES = LevelVars.Engine.EventSequence.sequences[name]
 		thisES.name = name
