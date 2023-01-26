@@ -405,6 +405,16 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	}
 }
 
+void FixedCameraRefresh(short camNumber)
+{
+	auto* camera = &g_Level.Cameras[camNumber];
+
+	GameVector from = GameVector(camera->Position, camera->RoomNumber);
+	int moveSpeed = camera->Speed * 8 + 1;
+
+	MoveCamera(&from, moveSpeed);
+}
+
 void ChaseCamera(ItemInfo* item)
 {
 	if (!Camera.targetElevation)
