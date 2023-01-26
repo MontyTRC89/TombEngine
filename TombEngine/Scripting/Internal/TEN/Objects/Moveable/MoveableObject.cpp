@@ -353,6 +353,12 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
+	ScriptReserved_GetRightVector, & Moveable::GetRightVector,
+
+	ScriptReserved_GetForwardVector, & Moveable::GetForwardVector,
+
+	ScriptReserved_GetUpVector, & Moveable::GetUpVector,
+
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @tparam int index of a joint to get position
@@ -540,6 +546,35 @@ bool Moveable::SetName(std::string const & id)
 Vec3 Moveable::GetPos() const
 {
 	return Vec3(m_item->Pose);
+}
+
+/// Get the object's RIGHT vector
+// @function Moveable:GetRightUpVector
+// @treturn Vec3 a copy of the moveable's RIGHT vector
+Vec3 Moveable::GetRightVector() const
+{
+	int yaw = TO_DEGREES(m_item->Pose.Orientation.y);
+	return Vec3(cos(yaw), 0, -sin(yaw));
+}
+
+/// Get the object's FORWARD vector
+// @function Moveable:GetForwardVector
+// @treturn Vec3 a copy of the moveable's FORWARD vector
+Vec3 Moveable::GetForwardVector() const
+{
+	int yaw = TO_DEGREES(m_item->Pose.Orientation.y);
+	int pitch = TO_DEGREES(m_item->Pose.Orientation.x);
+	return Vec3(cos(pitch) * sin(yaw), -sin(pitch), cos(pitch) * cos(yaw));
+}
+
+/// Get the object's UP vector
+// @function Moveable:GetUpVector
+// @treturn Vec3 a copy of the moveable's UP vector
+Vec3 Moveable::GetUpVector() const
+{
+	int yaw = TO_DEGREES(m_item->Pose.Orientation.y);
+	int pitch = TO_DEGREES(m_item->Pose.Orientation.x);
+	return Vec3(sin(pitch) * sin(yaw), cos(pitch), sin(pitch) * cos(yaw));
 }
 
 /// Set the moveable's position
