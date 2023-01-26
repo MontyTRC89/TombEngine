@@ -235,11 +235,11 @@ namespace TEN::Effects::ElectricArc
 				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
 	}
 
-	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray)
+	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer)
 	{
 		int bufferIndex = 0;
 
-		bufferArray[bufferIndex] = posArray[0];
+		buffer[bufferIndex] = knots[0];
 		bufferIndex++;
 
 		// Splined arc.
@@ -252,11 +252,11 @@ namespace TEN::Effects::ElectricArc
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					auto spline = ElectricArcSpline(posArray, alpha);
+					auto spline = ElectricArcSpline(knots, alpha);
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
-					bufferArray[bufferIndex] = spline + offset;
+					buffer[bufferIndex] = spline + offset;
 
 					alpha += interpStep;
 					bufferIndex++;
@@ -268,8 +268,8 @@ namespace TEN::Effects::ElectricArc
 		{
 			int numSegments = (arc.segments * 3) - 1;
 			
-			auto deltaPos = (posArray[posArray.size() - 1] - posArray[0]) / numSegments;
-			auto pos = posArray[0] + deltaPos + Vector3(
+			auto deltaPos = (knots[knots.size() - 1] - knots[0]) / numSegments;
+			auto pos = knots[0] + deltaPos + Vector3(
 				fmod(Random::GenerateInt(), arc.amplitude * 2),
 				fmod(Random::GenerateInt(), arc.amplitude * 2),
 				fmod(Random::GenerateInt(), arc.amplitude * 2)) -
@@ -279,7 +279,7 @@ namespace TEN::Effects::ElectricArc
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					bufferArray[bufferIndex] = pos;
+					buffer[bufferIndex] = pos;
 					bufferIndex++;
 
 					pos += deltaPos + Vector3(
@@ -291,18 +291,18 @@ namespace TEN::Effects::ElectricArc
 			}
 		}
 
-		bufferArray[bufferIndex] = posArray[5];
+		buffer[bufferIndex] = knots[5];
 	}
 
-	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray)
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer)
 	{
 		int bufferIndex = 0;
 
-		bufferArray[bufferIndex] = posArray[0];
+		buffer[bufferIndex] = knots[0];
 		bufferIndex++;
 
-		auto origin = posArray[0];
-		auto target = posArray[1];
+		auto origin = knots[0];
+		auto target = knots[1];
 		auto direction = target - origin;
 		direction.Normalize();
 
@@ -317,10 +317,10 @@ namespace TEN::Effects::ElectricArc
 			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
 			auto pos = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
 
-			bufferArray[bufferIndex] = origin + Geometry::TranslatePoint(pos, axisAngle.GetAxis(), stepLength * i);
+			buffer[bufferIndex] = origin + Geometry::TranslatePoint(pos, axisAngle.GetAxis(), stepLength * i);
 			bufferIndex++;
 		}
 
-		bufferArray[bufferIndex] = posArray[1];
+		buffer[bufferIndex] = knots[1];
 	}
 }

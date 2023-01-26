@@ -76,6 +76,6 @@ namespace TEN::Effects::ElectricArc
 	void UpdateElectricArcs();
 	void UpdateHelicalLasers();
 
-	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray);
-	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray);
+	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer);
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer);
 }
