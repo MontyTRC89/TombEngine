@@ -87,25 +87,8 @@ namespace TEN::Renderer
 			if (laser.Life <= 0.0f)
 				continue;
 
-			byte r, g, b;
-			if (laser.FadeIn < 8.0f)
-			{
-				r = (laser.r * laser.FadeIn) / 8;
-				g = (laser.g * laser.FadeIn) / 8;
-				b = (laser.b * laser.FadeIn) / 8;
-			}
-			else if (laser.Life < 16.0f)
-			{
-				r = (laser.r * laser.Life) / 16;
-				g = (laser.g * laser.Life) / 16;
-				b = (laser.b * laser.Life) / 16;
-			}
-			else
-			{
-				r = laser.r;
-				g = laser.g;
-				b = laser.b;
-			}
+			auto color = laser.Color;
+			color.w = laser.Opacity;
 
 			ElectricArcKnots[0] = laser.Target;
 			ElectricArcKnots[1] = laser.Origin;
@@ -113,7 +96,7 @@ namespace TEN::Renderer
 			for (int j = 0; j < 2; j++)
 				ElectricArcKnots[j] -= laser.Target;
 
-			HelixSpline(ElectricArcKnots, ElectricArcBuffer, laser);
+			CalculateHelixSpline(laser, ElectricArcKnots, ElectricArcBuffer);
 
 			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
 				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
@@ -135,62 +118,11 @@ namespace TEN::Renderer
 					AddSpriteBillboardConstrained(
 						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
-						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-						Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
+						color,
+						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
 				}
 			}				
 		}
-	}
-
-	void Renderer11::HelixSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const HelicalLaser& laser)
-	{
-		int bufferIndex = 0;
-
-		bufferArray[bufferIndex] = posArray[0];
-		bufferIndex++;
-
-		auto origin = posArray[0];
-		auto target = posArray[1];
-
-		int radiusMax = 48;
-		float length = Vector3::Distance(origin, target);
-		float stepLength = length / laser.NumSegments;
-		auto direction = target - origin;
-		direction.Normalize();
-
-		short radius = 0;
-		short angle = laser.Orientation2D;
-		auto currentPos = origin;
-
-		// TODO: Helix gets flattened at certain angles. Use axis-angle representation to fix.
-		if (laser.NumSegments > 0)
-		{
-			for (int i = laser.NumSegments; i > 0; i--)
-			{
-				int x1 = std::clamp(radius / 2, 0, radiusMax);
-
-				bufferArray[bufferIndex] = Vector3(
-					(currentPos.x + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1,
-					(currentPos.y + (laser.Length / laser.NumSegments) + (radius * phd_sin(angle)) / 2) - x1,
-					(currentPos.z + (laser.Length / laser.NumSegments) + (radius * phd_cos(angle)) / 2) - x1);
-				bufferIndex++;
-
-				// Increment the radius and angle.
-				angle += laser.Coil;
-				radius += laser.Scale;
-
-				if (i & 1)
-					radius -= laser.Scale;
-
-				// Increment the current position along the line.
-				currentPos += direction * stepLength;
-
-				if (radius < 4)
-					radius = 4;
-			}
-		}
-
-		bufferArray[bufferIndex] = posArray[1];
 	}
 
 	void Renderer11::DrawElectricArcs(RenderView& view)

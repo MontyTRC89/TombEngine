@@ -10,6 +10,8 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::ElectricArc
 {
+	static constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
+
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
@@ -134,11 +136,11 @@ namespace TEN::Effects::ElectricArc
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
 		static constexpr auto SEGMENTS_NUM_MAX = 56;
-		static constexpr auto COLOR			   = Vector4(0.0f, 1.0f, 0.375f, 1.0f);
-		static constexpr auto LIFE_MAX		   = 17.0f;
-		static constexpr auto LENGTH_END	   = BLOCK(4);
-		static constexpr auto FADE_IN		   = 8.0f;
-		static constexpr auto FLAGS			   = LI_THININ | LI_THINOUT;
+		static constexpr auto COLOR			   = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
+		static constexpr auto LENGTH_MAX	   = BLOCK(4);
+		static constexpr auto ROTATION		   = ANGLE(-10.0f);
+
+		static constexpr auto ELECTRIC_ARC_FLAGS = LI_THININ | LI_THINOUT;
 
 		auto laser = HelicalLaser();
 
@@ -148,26 +150,25 @@ namespace TEN::Effects::ElectricArc
 		laser.Orientation2D = Random::GenerateAngle();
 		laser.LightPosition = origin;
 		laser.Color = COLOR;
-		laser.Life = LIFE_MAX;
-		laser.Scale = 0.0f;
+		laser.Life = HELICAL_LASER_LIFE_MAX;
+		laser.Radius = 0.0f;
 		laser.Length = 0.0f;
-		laser.LengthEnd = LENGTH_END;
-		laser.FadeIn = FADE_IN;
-		laser.Rotation = 0.0f;
-
-		laser.r = 0;
-		laser.b = 255;
-		laser.g = 96;
+		laser.LengthEnd = LENGTH_MAX;
+		laser.Opacity = 1.0f;
+		laser.Rotation = ROTATION;
 
 		HelicalLasers.push_back(laser);
 
-		SpawnElectricArc(origin, target, 1, 0, laser.g, laser.b, 20, FLAGS, 19, 5);
-		SpawnElectricArc(origin, target, 1, 110, 255, 250, 20, FLAGS, 4, 5);
-		SpawnElectricArcGlow(laser.LightPosition, Random::GenerateInt(64, 68) << 24, 0, laser.g / 2, laser.b / 2); // TODO: What's up with red??
+		SpawnElectricArc(origin, target, 1, 0, laser.Color.x * UCHAR_MAX, laser.Color.z * UCHAR_MAX, 20, ELECTRIC_ARC_FLAGS, 19, 5);
+		SpawnElectricArc(origin, target, 1, 110, 255, 250, 20, ELECTRIC_ARC_FLAGS, 4, 5);
+		SpawnElectricArcGlow(laser.LightPosition, 0, 0, (laser.Color.x / 2) * UCHAR_MAX, (laser.Color.z / 2) * UCHAR_MAX);
 	 }
 
 	void UpdateHelicalLasers()
 	{
+		static constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
+		static constexpr auto NUM_TURNS = 12;
+
 		// No active effects; return early.
 		if (HelicalLasers.empty())
 			return;
@@ -175,45 +176,21 @@ namespace TEN::Effects::ElectricArc
 		for (auto& laser : HelicalLasers)
 		{
 			// Set to despawn.
+			laser.Life -= 1.0f;
 			if (laser.Life <= 0.0f)
 				continue;
 
-			laser.Life -= 1.0f;
+			// Update length. TODO
+			laser.Length = laser.LengthEnd;// Lerp(laser.Length, laser.LengthEnd, 0.25f);
 
-			if (laser.Life < 16.0f)
-			{
-				laser.Rotation -= laser.Rotation / 8;
-				laser.Scale += 1.0f;
-			}
-			else if ((int)round(laser.Life) == 16) // TODO: Cleaner way.
-			{
-				laser.Rotation = MAX_VISIBILITY_DISTANCE;
-				laser.Coil = MAX_VISIBILITY_DISTANCE;
-				laser.Length = laser.LengthEnd;
-				laser.Scale = 4.0f;
-			}
-			else
-			{
-				laser.Coil += (MAX_VISIBILITY_DISTANCE - laser.Coil) / 8;
+			// Update radius.
+			laser.Radius += 0.5f;
 
-				if ((laser.LengthEnd - laser.Length) <= (laser.LengthEnd / 4))
-				{
-					laser.Rotation += (MAX_VISIBILITY_DISTANCE - laser.Rotation) / 8;
-					laser.Length = laser.LengthEnd;
-				}
-				else
-				{
-					laser.Length += (laser.LengthEnd - laser.Length) / 4;
-				}
+			// Update opacity.
+			float alpha = laser.Life / LIFE_START_FADING;
+			laser.Opacity = Lerp(0.0f, 1.0f, alpha);
 
-				if (laser.Scale < 4.0f)
-					laser.Scale += 1.0f;
-			}
-
-			if (laser.FadeIn < 8.0f)
-				laser.FadeIn += 1.0f;
-
-			laser.Orientation2D -= laser.Rotation;
+			laser.Orientation2D += laser.Rotation;
 		}
 
 		// Despawn inactive effects.
@@ -315,5 +292,38 @@ namespace TEN::Effects::ElectricArc
 		}
 
 		bufferArray[bufferIndex] = posArray[5];
+	}
+
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray)
+	{
+		int bufferIndex = 0;
+
+		bufferArray[bufferIndex] = posArray[0];
+		bufferIndex++;
+
+		auto origin = posArray[0];
+		auto target = posArray[1];
+		auto direction = target - origin;
+		direction.Normalize();
+
+		float stepLength = laser.Length / laser.NumSegments;
+		float radiusStep = laser.Radius;
+
+		// TODO: Simplify this.
+		auto point = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
+		auto axisAngle = AxisAngle(direction, laser.Orientation2D);
+
+		for (int i = 0; i < laser.NumSegments; i++)
+		{
+			// Increment the radius and angle.
+			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(45.0f));
+
+			// Don't use right. Establish some other point.
+			auto pos = Geometry::RotatePoint(point * radiusStep * i, axisAngle);
+			bufferArray[bufferIndex] = origin + Geometry::TranslatePoint(pos, direction, stepLength * i);
+			bufferIndex++;
+		}
+
+		bufferArray[bufferIndex] = posArray[1];
 	}
 }

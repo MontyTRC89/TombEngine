@@ -52,18 +52,15 @@ namespace TEN::Effects::ElectricArc
 		Vector3 Origin		  = Vector3::Zero;
 		Vector3 Target		  = Vector3::Zero;
 		short	Orientation2D = 0;
-		Vector3 LightPosition = Vector3::Zero; // TODO: Use a light cone instead?
+		Vector3 LightPosition = Vector3::Zero; // TODO: Use light cone instead?
 		Vector4 Color		  = Vector4::Zero;
 
 		float Life		= 0.0f;
-		float Scale		= 0.0f;
+		float Radius	= 0.0f;
 		float Length	= 0.0f;
 		float LengthEnd = 0.0f;
-		float FadeIn	= 0.0f;
+		float Opacity	= 0.0f;
 		short Rotation	= 0;
-		short Coil		= 0;
-
-		int r, g, b; // TODO: Replace with Color.
 	};
 
 	extern std::vector<ElectricArc>	 ElectricArcs;
@@ -80,4 +77,5 @@ namespace TEN::Effects::ElectricArc
 	void UpdateHelicalLasers();
 
 	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray);
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& posArray, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& bufferArray);
 }

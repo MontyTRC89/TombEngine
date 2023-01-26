@@ -520,6 +520,7 @@ namespace TEN::Renderer
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
 		void DrawElectricArcs(RenderView& view);
+		void DrawHelicalLasers(RenderView& view);
 		void DrawBlood(RenderView& view);
 		void DrawWeatherParticles(RenderView& view);
 		void DrawDrips(RenderView& view);
@@ -681,8 +682,6 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
-		void DrawHelicalLasers(RenderView& view);
-		void HelixSpline(std::array<Vector3, 6>& posArray, std::array<Vector3, 1024>& bufferArray, const HelicalLaser& laser);
 		std::string GetDefaultAdapterName();
 	};
 
