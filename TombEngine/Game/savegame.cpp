@@ -149,6 +149,14 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+#define SaveVec(Type, Data, TableBuilder, UnionType) \
+				auto data = std::get<(int)Type>(Data); \
+				TableBuilder vtb{ fbb }; \
+				Save::Vector3 saveVec = FromVector3(data); \
+				vtb.add_vec(&saveVec); \
+				auto vecOffset = vtb.Finish(); \
+				putDataInVec(UnionType, vecOffset);
+
 bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
@@ -662,7 +670,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_color(&FromVector4(itemToSerialize.Model.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
-		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
@@ -1141,15 +1148,30 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
 		}
-		else if (std::holds_alternative<Vector3i>(s))
+		else
 		{
-			Save::vec3TableBuilder vtb{ fbb };
-			Vector3i data = std::get<Vector3i>(s);
-			Save::Vector3 saveVec = FromVector3(std::get<Vector3i>(s));
-			vtb.add_vec(&saveVec);
-			auto vec3Offset = vtb.Finish();
+			switch (SavedVarType(s.index()))
+			{
+			case SavedVarType::Vec3:
+			{
+				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
+			}
+			break;
+			case SavedVarType::Rotation:
+			{
+				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
+			}
+			break;
+			case SavedVarType::Color:
+			{
+				Save::colorTableBuilder ctb{ fbb };
+				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+				auto offset = ctb.Finish();
 
-			putDataInVec(Save::VarUnion::vec3, vec3Offset);
+				putDataInVec(Save::VarUnion::color, offset);
+			}
+			break;
+			}
 		}
 	}
 	auto unionVec = fbb.CreateVector(varsVec);
@@ -1397,7 +1419,7 @@ bool SaveGame::Load(int slot)
 		bool dynamicItem = i >= g_Level.NumItems;
 
 		ItemInfo* item = &g_Level.Items[i];
-		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+		item->ObjectNumber = GAME_OBJECT_ID(savedItem->object_id());
 
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
@@ -1495,7 +1517,7 @@ bool SaveGame::Load(int slot)
 			UpdateBridgeItem(i);
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
 
@@ -1531,7 +1553,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
-			SetBaddyTarget(i, savedCreature->ai_target_number());
+			SetEntityTarget(i, savedCreature->ai_target_number());
 		}
 		else if (item->Data.is<QuadBikeInfo>())
 		{
@@ -1999,7 +2021,21 @@ bool SaveGame::Load(int slot)
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
-				loadedVars.push_back(ToVector3i(var->u_as_vec3()->vec()));
+				auto stored = var->u_as_vec3()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::rotation)
+			{
+				auto stored = var->u_as_rotation()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::color)
+			{
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

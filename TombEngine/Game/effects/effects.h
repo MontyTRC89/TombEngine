@@ -2,6 +2,7 @@
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
+enum GAME_OBJECT_ID : short;
 enum class LaraWeaponType;
 struct CollisionInfo;
 struct ItemInfo;
@@ -172,7 +173,9 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 
 Particle* GetFreeParticle();
 
-void DetatchSpark(int num, SpriteEnumFlags type);
+void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
+
+void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);

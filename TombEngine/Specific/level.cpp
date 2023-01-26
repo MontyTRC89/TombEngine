@@ -415,6 +415,7 @@ void LoadCameras()
 	for (int i = 0; i < numCameras; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
+		camera.Index = i;
 		camera.Position.x = ReadInt32();
 		camera.Position.y = ReadInt32();
 		camera.Position.z = ReadInt32();
@@ -1391,22 +1392,24 @@ void BuildOutsideRoomsTable()
 			OutsideRoomTable[x][z].clear();
 	}
 
-	for (int x = 0; x < OUTSIDE_SIZE; x++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		for (int z = 0; z < OUTSIDE_SIZE; z++)
+		auto* room = &g_Level.Rooms[i];
+
+		int rx = (room->x / SECTOR(1));
+		int rz = (room->z / SECTOR(1));
+
+		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
-			for (int i = 0; i < g_Level.Rooms.size(); i++)
+			if (x < (rx + 1) || x > (rx + room->xSize - 2))
+				continue;
+
+			for (int z = 0; z < OUTSIDE_SIZE; z++)
 			{
-				auto* room = &g_Level.Rooms[i];
+				if (z < (rz + 1) || z > (rz + room->zSize - 2))
+					continue;
 
-				int rx = (room->x / SECTOR(1));
-				int rz = (room->z / SECTOR(1));
-
-				if (x >= (rx + 1) && z >= (rz + 1) &&
-					x <= (rx + room->xSize - 2) && z <= (rz + room->zSize - 2))
-				{
-					OutsideRoomTable[x][z].push_back(i);
-				}
+				OutsideRoomTable[x][z].push_back(i);
 			}
 		}
 	}

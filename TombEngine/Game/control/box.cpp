@@ -13,6 +13,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Math/Math.h"
@@ -26,7 +27,7 @@ constexpr auto REACHED_GOAL_RADIUS = 640;
 constexpr auto ATTACK_RANGE = SQUARE(SECTOR(3));
 constexpr auto ESCAPE_CHANCE = 0x800;
 constexpr auto RECOVER_CHANCE = 0x100;
-constexpr auto BIFF_AVOID_TURN = 1536;
+constexpr auto BIFF_AVOID_TURN = ANGLE(11.25f);
 constexpr auto FEELER_DISTANCE = CLICK(2);
 constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
@@ -87,25 +88,6 @@ void DrawNearbyPathfinding(int boxIndex)
 			break;
 		else
 			index++;
-	}
-}
-
-void DropEntityPickups(ItemInfo* item)
-{
-	ItemInfo* pickup = nullptr;
-
-	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
-	{
-		pickup = &g_Level.Items[pickupNumber];
-		pickup->Pose.Position.x = (item->Pose.Position.x & -CLICK(1)) | CLICK(1);
-		pickup->Pose.Position.z = (item->Pose.Position.z & -CLICK(1)) | CLICK(1);
-
-		pickup->Pose.Position.y = GetCollision(pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z, item->RoomNumber).Position.Floor;
-		auto bounds = GameBoundingBox(pickup);
-		pickup->Pose.Position.y -= bounds.Y2;
-
-		ItemNewRoom(pickupNumber, item->RoomNumber);
-		pickup->Flags |= 32;
 	}
 }
 
@@ -691,7 +673,7 @@ void CreatureFloat(short itemNumber)
 	}
 }
 
-void CreatureJoint(ItemInfo* item, short joint, short required) 
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle)
 {
 	if (!item->IsCreature())
 		return;
@@ -705,10 +687,10 @@ void CreatureJoint(ItemInfo* item, short joint, short required)
 		change = ANGLE(-3.0f);
 
 	creature->JointRotation[joint] += change;
-	if (creature->JointRotation[joint] > ANGLE(70.0f))
-		creature->JointRotation[joint] = ANGLE(70.0f);
-	else if (creature->JointRotation[joint] < -ANGLE(70.0f))
-		creature->JointRotation[joint] = -ANGLE(70.0f);
+	if (creature->JointRotation[joint] > maxAngle)
+		creature->JointRotation[joint] = maxAngle;
+	else if (creature->JointRotation[joint] < -maxAngle)
+		creature->JointRotation[joint] = -maxAngle;
 }
 
 void CreatureTilt(ItemInfo* item, short angle) 
@@ -826,7 +808,7 @@ void CreatureDie(short itemNumber, bool explode)
 
 	DisableEntityAI(itemNumber);
 	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
-	DropEntityPickups(item);
+	DropPickups(item);
 }
 
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT)
@@ -897,20 +879,20 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 	if (boxNumber == NO_BOX)
 		return false;
 
-	auto* creature = GetCreatureInfo(item);
-	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+	const auto& creature = *GetCreatureInfo(item);
+	const auto& zone = g_Level.Zones[(int)creature.LOT.Zone][FlipStatus].data();
 
-	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
+	if (creature.LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
-	auto* box = &g_Level.Boxes[boxNumber];
-	if (creature->LOT.BlockMask & box->flags)
+	const auto& box = g_Level.Boxes[boxNumber];
+	if (creature.LOT.BlockMask & box.flags)
 		return false;
 
-	if (item->Pose.Position.z > (box->left * SECTOR(1)) &&
-		item->Pose.Position.z < (box->right * SECTOR(1)) &&
-		item->Pose.Position.x > (box->top * SECTOR(1)) &&
-		item->Pose.Position.x < (box->bottom * SECTOR(1)))
+	if (item->Pose.Position.z > (box.left * BLOCK(1)) &&
+		item->Pose.Position.z < (box.right * BLOCK(1)) &&
+		item->Pose.Position.x > (box.top * BLOCK(1)) &&
+		item->Pose.Position.x < (box.bottom * BLOCK(1)))
 	{
 		return false;
 	}
@@ -922,9 +904,10 @@ bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
 	if (boxNumber == NO_BOX)
 		return false;
-	auto* box = &g_Level.Boxes[boxNumber];
-	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
-	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
+
+	const auto& box = g_Level.Boxes[boxNumber];
+	int x = ((box.top + box.bottom) * BLOCK(0.5f)) - enemy->Pose.Position.x;
+	int z = ((box.left + box.right) * BLOCK(0.5f)) - enemy->Pose.Position.z;
 
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST &&
 		z > -ESCAPE_DIST && z < ESCAPE_DIST)
@@ -1085,14 +1068,14 @@ bool CreatureActive(short itemNumber)
 	if (!Objects[item->ObjectNumber].intelligent)
 		return false;
 
-	// Object is already dead or body cleared.
-	if (item->Flags & IFLAG_KILLED || item->Flags & IFLAG_CLEAR_BODY)
+	// Object is already dead.
+	if (item->Flags & IFLAG_KILLED)
 		return false;
 
 	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
 	{
 		// AI couldn't be activated.
-		if (!EnableEntityAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, false))
 			return false;
 
 		item->Status = ITEM_ACTIVE;
@@ -1156,17 +1139,26 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)
 	{
+	case -4:
+		return (item->ObjectNumber != ID_SMALL_SPIDER);
+
 	case -3:
 		return (item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
 
 	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
 				item->ObjectNumber != ID_BADDY2 &&
 				item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
-				item->ObjectNumber != ID_YETI);
+				item->ObjectNumber != ID_YETI &&
+				item->ObjectNumber != ID_LIZARD &&
+				item->ObjectNumber != ID_APE &&
+				item->ObjectNumber != ID_SMALL_SPIDER);
 	}
 
 	return true;
@@ -1184,23 +1176,38 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	// FIXME: Add climb down animations for Von Croy and baddies?
-	if (item->Floor > y + CLICK(4.5f))
+	if (item->Floor > (y + CLICK(4.5f)))
+	{
 		vault = 0;
-	else if (item->Floor > y + CLICK(3.5f))
+	}
+	else if (item->Floor > (y + CLICK(3.5f)) && IsCreatureVaultAvailable(item, -4))
+	{
 		vault = -4;
-	else if (item->Floor > y + CLICK(2.5f) && IsCreatureVaultAvailable(item, -3))
+	}
+	else if (item->Floor > (y + CLICK(2.5f)) && IsCreatureVaultAvailable(item, -3))
+	{
 		vault = -3;
-	else if (item->Floor > y + CLICK(1.5f) && IsCreatureVaultAvailable(item, -2))
+	}
+	else if (item->Floor > (y + CLICK(1.5f)) && IsCreatureVaultAvailable(item, -2))
+	{
 		vault = -2;
-	else if (item->Pose.Position.y > y - CLICK(1.5f))
+	}
+	else if (item->Pose.Position.y > (y - CLICK(1.5f)))
+	{
 		return 0;
-	else if (item->Pose.Position.y > y - CLICK(2.5f))
+	}
+	else if (item->Pose.Position.y > (y - CLICK(2.5f)))
+	{
 		vault = 2;
-	else if (item->Pose.Position.y > y - CLICK(3.5f))
+	}
+	else if (item->Pose.Position.y > (y - CLICK(3.5f)))
+	{
 		vault = 3;
-	else
+	}
+	else if (item->Pose.Position.y > (y - CLICK(4.5f)))
+	{
 		vault = 4;
+	}
 
 	// Jump
 	int newXblock = item->Pose.Position.x / SECTOR(1);
@@ -1415,9 +1422,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position.x = foundObject->pos.Position.x;
-			aiItem->Pose.Position.y = foundObject->pos.Position.y;
-			aiItem->Pose.Position.z = foundObject->pos.Position.z;
+			aiItem->Pose.Position = foundObject->pos.Position;
 			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
@@ -1434,18 +1439,19 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 {
-	auto* object = &Objects[item->ObjectNumber];
-	auto* room = &g_Level.Rooms[enemy->RoomNumber];
-	auto* floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
+	const auto& creature = *GetCreatureInfo(item);
+	auto& room = g_Level.Rooms[enemy->RoomNumber];
+	auto* floor = GetSector(&room, enemy->Pose.Position.x - room.x, enemy->Pose.Position.z - room.z);
 
-	// NEW: Only update enemy box number if it is actually reachable by enemy.
+	// NEW: Only update enemy box number if it is actually reachable by the enemy.
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
-	if (object->ZoneType == ZoneType::Flyer ||
-	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (creature.LOT.Zone == ZoneType::Flyer ||
+	   (creature.LOT.Zone == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
-		isReachable = true; // If NPC is flying or swimming in water, player is always reachable.
+		// If NPC is flying or swimming in water, player is always reachable.
+		isReachable = true;
 	}
 	else
 	{
@@ -1454,7 +1460,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
 	}
 
-	return (isReachable ? floor->Box : item->BoxNumber);
+	return (isReachable ? floor->Box : NO_BOX);
 }
 
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
@@ -1480,7 +1486,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->zoneNumber = zone[item->BoxNumber];
 
 	enemy->BoxNumber = TargetReachable(item, enemy);
-	AI->enemyZone = zone[enemy->BoxNumber];
+	AI->enemyZone = enemy->BoxNumber == NO_BOX ? NO_ZONE : zone[enemy->BoxNumber];
 
 	if (!object->nonLot)
 	{

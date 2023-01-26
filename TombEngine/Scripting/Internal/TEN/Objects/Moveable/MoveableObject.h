@@ -127,6 +127,8 @@ public:
 	friend bool operator==(Moveable const&, Moveable const&);
 	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
 
+	short GetIndex() const;
+
 protected:
 	ItemInfo* m_item;
 

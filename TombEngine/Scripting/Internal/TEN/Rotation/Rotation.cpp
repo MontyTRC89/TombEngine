@@ -55,6 +55,13 @@ Rotation::Rotation(const EulerAngles& eulers)
 	z = TO_DEGREES(eulers.z);
 }
 
+Rotation::Rotation(const Vector3& vec)
+{
+	x = vec.x;
+	y = vec.y;
+	z = vec.z;
+}
+
 Rotation::Rotation(const Pose& pose)
 {
 	x = TO_DEGREES(pose.Orientation.x);
@@ -68,6 +75,11 @@ void Rotation::StoreInPHDPos(Pose& pose) const
 	pose.Orientation.y = ANGLE(y);
 	pose.Orientation.z = ANGLE(z);
 }
+
+Rotation::operator Vector3() const
+{
+	return Vector3{ x, y, z };
+};
 
 /***
 @tparam Rotation rotation this rotation

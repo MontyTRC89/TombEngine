@@ -2,6 +2,7 @@
 
 #include "Objects/NamedBase.h"
 #include "Objects/Room/RoomObject.h"
+#include "Objects/Moveable/MoveableObject.h"
 
 struct LevelCameraInfo;
 
@@ -31,6 +32,8 @@ public:
 
 	std::string GetName() const;
 	void SetName(std::string const &);
+
+	void PlayCamera(sol::optional<Moveable&> TargetObj);
 
 private:
 	LevelCameraInfo & m_camera;

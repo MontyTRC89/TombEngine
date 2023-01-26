@@ -44,6 +44,20 @@ void TriggerChaffEffects(ItemInfo& item, int age)
 
 void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& vel, int speed, bool isUnderwater, int age)
 {
+	auto pose = item.Pose;
+	if (item.IsLara())
+	{
+		auto handPos = GetJointPosition(&item, LM_RHAND);
+		pose.Position = handPos;
+		pose.Position.y -= 64;
+	}
+
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item.RoomNumber);
+	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
+
+	if (!age)
+		return;
+
 	int numSparks = Random::GenerateInt(1, 3);
 
 	for (int i = 0; i < numSparks; i++)
@@ -62,6 +76,7 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		color.b = 192 - color.g;
 
 		TriggerChaffSparkles(pos, vel, color, age, item);
+
 		if (isUnderwater)
 		{
 			TriggerChaffBubbles(pos, item.RoomNumber);
@@ -73,17 +88,6 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 			TEN::Effects::Smoke::TriggerFlareSmoke(pos.ToVector3() + direction * 20, direction, age, item.RoomNumber);
 		}
 	}
-
-	auto pose = item.Pose;
-	if (item.IsLara())
-	{
-		auto handPos = GetJointPosition(&item, LM_RHAND);
-		pose.Position = handPos;
-		pose.Position.y -= 64;
-	}
-
-	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item.RoomNumber);
-	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
 void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int age, const ItemInfo& item)

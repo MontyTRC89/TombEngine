@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "Math/Containers/GameVector.h"
+#include "Math/Objects/GameVector.h"
 
-#include "Math/Containers/Vector3i.h"
+#include "Math/Objects/Vector3i.h"
 
 //namespace TEN::Math
 //{
@@ -58,7 +58,7 @@
 
 	bool GameVector::operator !=(const GameVector& vector) const
 	{
-		return ((x != vector.x) || (y != vector.y) || (z != vector.z) || (RoomNumber != vector.RoomNumber));
+		return !(*this == vector);
 	}
 
 	GameVector& GameVector::operator =(const GameVector& vector)
@@ -66,6 +66,7 @@
 		this->x = vector.x;
 		this->y = vector.y;
 		this->z = vector.z;
+		this->RoomNumber = vector.RoomNumber;
 		return *this;
 	}
 

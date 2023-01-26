@@ -29,6 +29,26 @@ namespace TEN::Renderer
 
 		m_meshes.clear();
 
+		TENLog("Allocated renderer object memory.", LogLevel::Info);
+
+		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
+		for (int i = 0; i < g_Level.AnimatedTextures.size(); i++)
+		{
+			TEXTURE* texture = &g_Level.AnimatedTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			}
+			else {
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_animatedTextures[i] = tex;
+		}
+
+		if (m_animatedTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_animatedTextures.size()) + " animated textures.", LogLevel::Info);
+
 		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(m_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
 			RendererAnimatedTextureSet set{};
 			set.NumTextures = sequence.numFrames;
@@ -47,6 +67,9 @@ namespace TEN::Renderer
 			set.Fps = sequence.Fps;
 			return set;
 		});
+
+		if (m_animatedTextureSets.size() > 0)
+			TENLog("Generated " + std::to_string(m_animatedTextureSets.size()) + " animated texture sets.", LogLevel::Info);
 
 		m_roomTextures.resize(g_Level.RoomTextures.size());
 		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
@@ -70,20 +93,8 @@ namespace TEN::Renderer
 #endif
 		}
 
-		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
-		for (int i = 0; i < g_Level.AnimatedTextures.size(); i++)
-		{
-			TEXTURE *texture = &g_Level.AnimatedTextures[i];
-			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
-			}
-			else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
-			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
-			m_animatedTextures[i] = tex;
-		}
+		if (m_roomTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_roomTextures.size()) + " room texture atlases.", LogLevel::Info);
 
 		m_moveablesTextures.resize(g_Level.MoveablesTextures.size());
 		for (int i = 0; i < g_Level.MoveablesTextures.size(); i++)
@@ -107,6 +118,9 @@ namespace TEN::Renderer
 #endif
 		}
 
+		if (m_moveablesTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_moveablesTextures.size()) + " moveable texture atlases.", LogLevel::Info);
+
 		m_staticsTextures.resize(g_Level.StaticsTextures.size());
 		for (int i = 0; i < g_Level.StaticsTextures.size(); i++)
 		{
@@ -129,6 +143,9 @@ namespace TEN::Renderer
 #endif
 		}
 
+		if (m_staticsTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_staticsTextures.size()) + " static mesh texture atlases.", LogLevel::Info);
+
 		m_spritesTextures.resize(g_Level.SpritesTextures.size());
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
@@ -136,7 +153,12 @@ namespace TEN::Renderer
 			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size());
 		}
 
+		if (m_spritesTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_spritesTextures.size()) + " sprite atlases.", LogLevel::Info);
+
 		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), g_Level.SkyTexture.colorMapData.size());
+
+		TENLog("Loaded sky texture.", LogLevel::Info);
 
 		int totalVertices = 0;
 		int totalIndices = 0;
@@ -153,8 +175,12 @@ namespace TEN::Renderer
 		roomsVertices.resize(totalVertices);
 		roomsIndices.resize(totalIndices);
 
+		TENLog("Loaded total " + std::to_string(totalVertices) + " room vertices.", LogLevel::Info);
+
 		int lastVertex = 0;
 		int lastIndex = 0;
+
+		TENLog("Preparing room data...", LogLevel::Info);
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
@@ -403,6 +429,8 @@ namespace TEN::Renderer
 				);
 			}
 		);
+
+		TENLog("Preparing object data...", LogLevel::Info);
 
 		bool skinPresent = false;
 		bool hairsPresent = false;
@@ -707,6 +735,8 @@ namespace TEN::Renderer
 		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), moveablesVertices.size(), moveablesVertices.data());
 		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), moveablesIndices.size(), moveablesIndices.data());
 
+		TENLog("Preparing static mesh data...", LogLevel::Info);
+
 		totalVertices = 0;
 		totalIndices = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
@@ -752,6 +782,8 @@ namespace TEN::Renderer
 			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), 1);
 			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), 1);
 		}
+
+		TENLog("Preparing sprite data...", LogLevel::Info);
 		
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());

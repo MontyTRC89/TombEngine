@@ -1,5 +1,6 @@
 #pragma once
 
+class AxisAngle;
 class EulerAngles;
 class Pose;
 class Vector3i;
@@ -10,11 +11,18 @@ namespace TEN::Math::Geometry
 	// 2D vector operations can be done in the XZ plane. Maybe revise geometry functions to each take an "up" vector argument someday.
 
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset);
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance);
-	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance);
+	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset);
+	Vector3  TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset);
+	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3	 TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
+
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation);
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation);
 
 	Vector3 GetFloorNormal(const Vector2& tilt);
 	Vector3 GetCeilingNormal(const Vector2& tilt);

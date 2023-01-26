@@ -357,7 +357,7 @@ void InitialiseObjects()
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
-		obj->ZoneType = ZoneType::Basic;
+		obj->LotType = LotType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
