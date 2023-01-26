@@ -135,7 +135,7 @@ namespace TEN::Effects::ElectricArc
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
-		static constexpr auto SEGMENTS_NUM_MAX = 56;
+		static constexpr auto SEGMENTS_NUM_MAX = 128;
 		static constexpr auto COLOR			   = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
 		static constexpr auto LENGTH_MAX	   = BLOCK(4);
 		static constexpr auto ROTATION		   = ANGLE(-10.0f);
@@ -167,7 +167,6 @@ namespace TEN::Effects::ElectricArc
 	void UpdateHelicalLasers()
 	{
 		static constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
-		static constexpr auto NUM_TURNS = 12;
 
 		// No active effects; return early.
 		if (HelicalLasers.empty())
@@ -180,11 +179,11 @@ namespace TEN::Effects::ElectricArc
 			if (laser.Life <= 0.0f)
 				continue;
 
-			// Update length. TODO
-			laser.Length = laser.LengthEnd;// Lerp(laser.Length, laser.LengthEnd, 0.25f);
+			// Update length.
+			laser.Length = Lerp(laser.Length, laser.LengthEnd, 0.25f);
 
 			// Update radius.
-			laser.Radius += 0.5f;
+			laser.Radius += 1 / 8.0f;
 
 			// Update opacity.
 			float alpha = laser.Life / LIFE_START_FADING;
@@ -309,18 +308,15 @@ namespace TEN::Effects::ElectricArc
 		float stepLength = laser.Length / laser.NumSegments;
 		float radiusStep = laser.Radius;
 
-		// TODO: Simplify this.
-		auto point = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
+		auto refPoint = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
 		auto axisAngle = AxisAngle(direction, laser.Orientation2D);
 
 		for (int i = 0; i < laser.NumSegments; i++)
 		{
-			// Increment the radius and angle.
-			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(45.0f));
+			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
+			auto pos = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
 
-			// Don't use right. Establish some other point.
-			auto pos = Geometry::RotatePoint(point * radiusStep * i, axisAngle);
-			bufferArray[bufferIndex] = origin + Geometry::TranslatePoint(pos, direction, stepLength * i);
+			bufferArray[bufferIndex] = origin + Geometry::TranslatePoint(pos, axisAngle.GetAxis(), stepLength * i);
 			bufferIndex++;
 		}
 

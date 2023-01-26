@@ -7,7 +7,7 @@
 namespace TEN::Effects::ElectricArc
 {
 	constexpr auto ELECTRIC_ARC_KNOTS_SIZE	= 6;
-	constexpr auto ELECTRIC_ARC_BUFFER_SIZE = 1024;
+	constexpr auto ELECTRIC_ARC_BUFFER_SIZE = 2048;
 
 	enum ElectricArcFlags
 	{

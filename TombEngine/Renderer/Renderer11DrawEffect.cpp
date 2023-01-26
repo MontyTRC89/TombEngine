@@ -83,7 +83,6 @@ namespace TEN::Renderer
 
 		for (const auto& laser : HelicalLasers)
 		{
-			// Set to despawn.
 			if (laser.Life <= 0.0f)
 				continue;
 
