@@ -715,6 +715,7 @@ short Moveable::GetLocationAI() const
 		auto creature = (CreatureInfo*)m_item->Data;
 		return creature->LocationAI;
 	}
+	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
 	return 0;
 }
 
@@ -728,6 +729,8 @@ void Moveable::SetLocationAI(short value)
 		auto creature = (CreatureInfo*)m_item->Data;
 		creature->LocationAI = value;
 	}
+	else
+		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
 }
 
 ScriptColor Moveable::GetColor() const
