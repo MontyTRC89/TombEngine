@@ -55,9 +55,6 @@ public:
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 
-	[[nodiscard]] bool GetAirborne() const;
-	void SetAirborne(bool newAirborne);
-
 	[[nodiscard]] int GetStateNumber() const;
 	void SetStateNumber(int stateNumber);
 

@@ -127,6 +127,22 @@ int LaraObject::GetSprintEnergy() const
 	return lara->SprintEnergy;
 }
 
+/// Get the moveable's airborne status
+// @function Moveable:GetAirborne
+// @treturn (bool) true if entity animation is flying.
+bool LaraObject::GetAirborne() const
+{
+	return m_item->Animation.IsAirborne;
+}
+
+/// Set the moveable's airborne status
+// @function Moveable:SetAirborne
+// @tparam (bool) airborne status for the current animation.
+void LaraObject::SetAirborne(bool newAirborne)
+{
+	m_item->Animation.IsAirborne = newAirborne;
+}
+
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
 // @usage
@@ -289,6 +305,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetWet, &LaraObject::GetWet,
 			ScriptReserved_SetSprintEnergy, &LaraObject::SetSprintEnergy,
 			ScriptReserved_GetSprintEnergy, &LaraObject::GetSprintEnergy,
+			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
+			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,

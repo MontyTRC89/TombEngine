@@ -371,10 +371,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Rotation rotation The moveable's new rotation
 	ScriptReserved_SetRotation, &Moveable::SetRot,
 
-	ScriptReserved_GetAirborne, & Moveable::GetAirborne,
-
-	ScriptReserved_SetAirborne, & Moveable::SetAirborne,
-
 /// Get the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
@@ -603,22 +599,6 @@ void Moveable::SetRot(Rotation const& rot)
 	m_item->Pose.Orientation.x = ANGLE(rot.x);
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
-}
-
-/// Get the moveable's airborne status
-// @function Moveable:GetAirborne
-// @treturn (bool) true if entity animation is flying.
-bool Moveable::GetAirborne() const
-{
-	return m_item->Animation.IsAirborne;
-}
-
-/// Set the moveable's airborne status
-// @function Moveable:SetAirborne
-// @tparam (bool) airborne status for the current animation.
-void Moveable::SetAirborne(bool newAirborne)
-{
-	m_item->Animation.IsAirborne = newAirborne;
 }
 
 /// Get current HP (hit points/health points)
