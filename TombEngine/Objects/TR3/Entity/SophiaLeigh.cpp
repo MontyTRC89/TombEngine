@@ -385,10 +385,10 @@ namespace TEN::Entities::Creatures::TR3
 				else
 					item->Animation.TargetState = SOPHIALEIGH_STATE_SMALL_SHOOT;
 			}
-			else if (ai.distance > SOPHIALEIGH_NORMAL_WALK_RANGE)
-				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
-			else
+			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE && abs(ai.verticalDistance) <= STEPUP_HEIGHT)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
+			else
+				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
 			break;
 		case SOPHIALEIGH_STATE_WALK:
 			creature->MaxTurn = SOPHIALEIGH_WALK_TURN_RATE_MAX;
@@ -404,7 +404,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (Targetable(item, &ai) && ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND; 
-			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE)
+			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE && abs(ai.verticalDistance) <= STEPUP_HEIGHT)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
 			break;
 		case SOPHIALEIGH_STATE_SUMMON:
