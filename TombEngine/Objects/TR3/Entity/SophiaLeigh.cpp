@@ -14,12 +14,19 @@
 #include "setup.h"
 #include "lara_helpers.h"
 #include "tomb4fx.h"
+#include "people.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	const auto SOPHIALEIGH_Staff = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
+	const auto SOPHIALEIGH_Right = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
+	const auto SOPHIALEIGH_Left = BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
+
+	// Basic value.
+
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 	constexpr auto SOPHIALEIGH_WALK_TURN_RATE_MAX = ANGLE(4);
 	constexpr auto SOPHIALEIGH_RUN_TURN_RATE_MAX = ANGLE(7);
@@ -32,9 +39,10 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX = 60;
 	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
 
-	const auto SOPHIALEIGH_Staff = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
-	const auto SOPHIALEIGH_Right = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
-	const auto SOPHIALEIGH_Left = BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
+	// Additional normal value.
+	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE = SQUARE(BLOCK(5)); // < walk else run.
+
 
 	enum SophiaState
 	{
@@ -358,22 +366,46 @@ namespace TEN::Entities::Creatures::TR3
 		{
 		case SOPHIALEIGH_STATE_LAUGH:
 			creature->MaxTurn = 0;
-
+			RotateToTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 			break;
 		case SOPHIALEIGH_STATE_STAND:
 			creature->MaxTurn = 0;
 			creature->Flags = 0;
 
+			if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
+			{
+				item->Animation.TargetState = SOPHIALEIGH_STATE_LAUGH;
+			}
+			else if (ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE && Targetable(item, &ai))
+			{
+				if (item->TestFlagField((int)BossItemFlags::ChargedState, TRUE))
+					item->Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
+				else if (item->Timer <= 0)
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;
+				else
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SMALL_SHOOT;
+			}
+			else if (ai.distance > SOPHIALEIGH_NORMAL_WALK_RANGE)
+				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
+			else
+				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
 			break;
 		case SOPHIALEIGH_STATE_WALK:
 			creature->MaxTurn = SOPHIALEIGH_WALK_TURN_RATE_MAX;
 
+			if (ai.distance > SOPHIALEIGH_NORMAL_WALK_RANGE)
+				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
+			else if (Targetable(item, &ai) && ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE)
+				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND;
 			break;
 		case SOPHIALEIGH_STATE_RUN:
 			creature->MaxTurn = SOPHIALEIGH_RUN_TURN_RATE_MAX;
 			data->tilt = data->angle / 2;
 
-
+			if (Targetable(item, &ai) && ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE)
+				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND; 
+			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE)
+				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
 			break;
 		case SOPHIALEIGH_STATE_SUMMON:
 			creature->MaxTurn = 0;
