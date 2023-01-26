@@ -194,9 +194,6 @@ namespace TEN::Entities::Creatures::TR3
 		AI_INFO ai;
 		CreatureAIInfo(item, &ai);
 
-		bool isEnemyAhead = ai.verticalDistance >= SOPHIALEIGH_Y_DISTANCE_RANGE; // If enemy is up, then sophia need to get to next AI_X2
-		bool isSophiaAhead = ai.verticalDistance <= -SOPHIALEIGH_Y_DISTANCE_RANGE; // If enemy is down, then sophia need to get to previous AI_X1
-
 		// Check the old and next position of ai object
 		// This will allow sophia to go down or up based on enemy y pos.
 		FindAITargetObject(creature, ID_AI_X1, creature->LocationAI, false);
@@ -207,9 +204,11 @@ namespace TEN::Entities::Creatures::TR3
 			creature->Enemy = LaraItem; // TODO: deal with LaraItem global.
 			if (!(item->TriggerFlags & (short)SophiaOCB::OCB_LuaToMoveUpDown))
 			{
-				if (isEnemyAhead)
+				// If enemy is up, then sophia need to get to next AI_X2
+				if (ai.verticalDistance >= SOPHIALEIGH_Y_DISTANCE_RANGE)
 					creature->LocationAI++;
-				else if (isSophiaAhead)
+				// If enemy is down, then sophia need to get to previous AI_X1
+				else if (ai.verticalDistance <= -SOPHIALEIGH_Y_DISTANCE_RANGE)
 					creature->LocationAI--;
 			}
 		}
