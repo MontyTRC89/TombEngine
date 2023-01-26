@@ -358,6 +358,18 @@ namespace TEN::Entities::Creatures::TR3
 		AI_INFO ai;
 
 		CreatureAIInfo(item, &ai);
+		if (item->Timer > 0) // Used for charge count, if 0, sophia will be able to do a new charge animation.
+			item->Timer--;
+
+		if (ai.ahead)
+		{
+			data->headAngle = ai.angle;
+		}
+		else
+		{
+			data->torsoXAngle = 0;
+			data->torsoYAngle = 0;
+		}
 		GetCreatureMood(item, &ai, true);
 		CreatureMood(item, &ai, true);
 
