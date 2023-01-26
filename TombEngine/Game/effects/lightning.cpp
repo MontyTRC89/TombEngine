@@ -189,6 +189,7 @@ namespace TEN::Effects::ElectricArc
 			float alpha = laser.Life / LIFE_START_FADING;
 			laser.Opacity = Lerp(0.0f, 1.0f, alpha);
 
+			// Update orientation.
 			laser.Orientation2D += laser.Rotation;
 		}
 
