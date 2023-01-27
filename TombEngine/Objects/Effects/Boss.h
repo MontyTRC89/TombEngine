@@ -7,7 +7,7 @@ namespace TEN::Effects::Boss
 	{
 		Object = 0,			 // BossFlagValue enum.
 		Rotation = 1,		 // Store rotation for use (e.g. Puna when summoning).
-		ImmortalState = 1,   // Sophia "Tower mode"
+		ImmortalState = 1,   // Sophia Leigh "tower mode".
 		ShieldIsEnabled = 2,
 		AttackType = 3,
 		AttackCount = 4,	 // Change behaviour after some attack.

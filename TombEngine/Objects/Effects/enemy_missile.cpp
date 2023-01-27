@@ -24,84 +24,84 @@ namespace TEN::Entities::Effects
 {
 	void TriggerSethMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
-		auto* fx = &EffectList[fxNumber];
-		auto* spark = GetFreeParticle();
+		const auto& fx = EffectList[fxNumber];
+		auto& flame = *GetFreeParticle();
 
-		spark->on = 1;
-		spark->sR = 0;
-		spark->dR = 0;
-		spark->sG = (GetRandomControl() & 0x7F) + 32;
-		spark->sB = spark->dG + 64;
-		spark->dB = (GetRandomControl() & 0x7F) + 32;
-		spark->dG = spark->dB + 64;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
-		spark->y = 0;
-		spark->x = (GetRandomControl() & 0xF) - 8;
-		spark->xVel = xVel;
-		spark->yVel = yVel;
-		spark->z = (GetRandomControl() & 0xF) - 8;
-		spark->zVel = zVel;
-		spark->friction = 68;
-		spark->flags = 602;
-		spark->rotAng = GetRandomControl() & 0xFFF;
+		flame.on = true;
+		flame.sR = 0;
+		flame.dR = 0;
+		flame.sG = (GetRandomControl() & 0x7F) + 32;
+		flame.sB = flame.dG + 64;
+		flame.dB = (GetRandomControl() & 0x7F) + 32;
+		flame.dG = flame.dB + 64;
+		flame.fadeToBlack = 8;
+		flame.colFadeSpeed = (GetRandomControl() & 3) + 4;
+		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.life = flame.sLife = (GetRandomControl() & 3) + 16;
+		flame.y = 0;
+		flame.x = (GetRandomControl() & 0xF) - 8;
+		flame.xVel = xVel;
+		flame.yVel = yVel;
+		flame.z = (GetRandomControl() & 0xF) - 8;
+		flame.zVel = zVel;
+		flame.friction = 68;
+		flame.flags = 602;
+		flame.rotAng = GetRandomControl() & 0xFFF;
 
 		if (GetRandomControl() & 1)
-			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			flame.rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
-			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+			flame.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-		spark->gravity = 0;
-		spark->maxYvel = 0;
-		spark->fxObj = fxNumber;
+		flame.gravity = 0;
+		flame.maxYvel = 0;
+		flame.fxObj = fxNumber;
 
-		if (fx->flag1 == 1)
-			spark->scalar = 3;
+		if (fx.flag1 == 1)
+			flame.scalar = 3;
 		else
-			spark->scalar = 2;
+			flame.scalar = 2;
 
-		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-		spark->dSize = spark->size / 32;
+		flame.sSize = flame.size = (GetRandomControl() & 7) + 64;
+		flame.dSize = flame.size / 32;
 	}
 
-	void TriggerHarpyFlameFlame(short fxNum, short xVel, short yVel, short zVel)
+	void TriggerHarpyFlameFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
-		auto* fx = &EffectList[fxNum];
-		auto* spark = GetFreeParticle();
+		const auto& fx = EffectList[fxNumber];
+		auto& flame = *GetFreeParticle();
 
-		spark->on = 1;
-		spark->sR = 0;
-		spark->sG = (GetRandomControl() & 0x7F) + 32;
-		spark->sB = spark->dG + 64;
-		spark->dB = 0;
-		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
-		spark->y = 0;
-		spark->x = (GetRandomControl() & 0xF) - 8;
-		spark->xVel = xVel;
-		spark->zVel = zVel;
-		spark->z = (GetRandomControl() & 0xF) - 8;
-		spark->yVel = yVel;
-		spark->friction = 68;
-		spark->flags = 602;
-		spark->rotAng = GetRandomControl() & 0xFFF;
+		flame.on = true;
+		flame.sR = 0;
+		flame.sG = (GetRandomControl() & 0x7F) + 32;
+		flame.sB = flame.dG + 64;
+		flame.dB = 0;
+		flame.dG = flame.dR = (GetRandomControl() & 0x7F) + 32;
+		flame.fadeToBlack = 8;
+		flame.colFadeSpeed = (GetRandomControl() & 3) + 4;
+		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.life = flame.sLife = (GetRandomControl() & 3) + 16;
+		flame.y = 0;
+		flame.x = (GetRandomControl() & 0xF) - 8;
+		flame.xVel = xVel;
+		flame.zVel = zVel;
+		flame.z = (GetRandomControl() & 0xF) - 8;
+		flame.yVel = yVel;
+		flame.friction = 68;
+		flame.flags = 602;
+		flame.rotAng = GetRandomControl() & 0xFFF;
 
 		if (GetRandomControl() & 1)
-			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			flame.rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
-			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+			flame.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-		spark->gravity = 0;
-		spark->maxYvel = 0;
-		spark->fxObj = fxNum;
-		spark->scalar = 2;
-		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
-		spark->dSize = spark->size / 32;
+		flame.gravity = 0;
+		flame.maxYvel = 0;
+		flame.fxObj = fxNumber;
+		flame.scalar = 2;
+		flame.sSize = flame.size = (GetRandomControl() & 7) + 64;
+		flame.dSize = flame.size / 32;
 	}
 
 	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
@@ -158,8 +158,9 @@ namespace TEN::Entities::Effects
 				fx->speed += 3;
 		}
 
-		if (fx->speed < maxVelocity && fx->flag1 != (int)MissileType::SophiaLeigh_Small &&
-			                           fx->flag1 != (int)MissileType::SophiaLeigh_Big)
+		if (fx->speed < maxVelocity &&
+			fx->flag1 != (int)MissileType::SophiaLeigh_Small &&
+			fx->flag1 != (int)MissileType::SophiaLeigh_Big)
 		{
 			short dy = orient.y - fx->pos.Orientation.y;
 			if (abs(dy) > abs(ANGLE(180.0f)))
@@ -191,6 +192,7 @@ namespace TEN::Entities::Effects
 			}
 
 			fx->pos.Orientation.x += dx;
+
 			if (fx->flag1 != (int)MissileType::Demigod3Radial && (fx->flag1 != (int)MissileType::Mutant || !fx->counter))
 				fx->pos.Orientation.y += dy;
 		}
@@ -199,9 +201,7 @@ namespace TEN::Entities::Effects
 		if (fx->flag1 == (int)MissileType::Mutant)
 			fx->pos.Orientation.z += 16 * fx->speed;
 
-		int oldX = fx->pos.Position.x;
-		int oldY = fx->pos.Position.y;
-		int oldZ = fx->pos.Position.z;
+		auto prevPos = fx->pos.Position;
 
 		int speed = (fx->speed * phd_cos(fx->pos.Orientation.x));
 		fx->pos.Position.x += (speed * phd_sin(fx->pos.Orientation.y));
@@ -212,9 +212,7 @@ namespace TEN::Entities::Effects
 
 		if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
 		{
-			fx->pos.Position.x = oldX;
-			fx->pos.Position.y = oldY;
-			fx->pos.Position.z = oldZ;
+			fx->pos.Position = prevPos;
 
 			if (fx->flag1 != (int)MissileType::Mutant &&
 				fx->flag1 != (int)MissileType::SophiaLeigh_Small &&
@@ -224,17 +222,17 @@ namespace TEN::Entities::Effects
 			if (fx->flag1 == (int)MissileType::SethLarge)
 			{
 				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 			}
 			else if (fx->flag1 == (int)MissileType::SophiaLeigh_Small)
 			{
-				TriggerShockwave(&fx->pos, 5, 32, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180), 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerShockwave(&fx->pos, 5, 32, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180.0f), 0);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 			}
 			else if (fx->flag1 == (int)MissileType::SophiaLeigh_Big)
 			{
-				TriggerShockwave(&fx->pos, 10, 64, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180), 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerShockwave(&fx->pos, 10, 64, 128, 0, 128, 128, 24, fx->pos.Orientation.y + ANGLE(180.0f), 0);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 			}
 			else
 			{
@@ -254,7 +252,7 @@ namespace TEN::Entities::Effects
 						{
 							if (fx->flag1 == (int)MissileType::Mutant)
 							{
-								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
+								TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, fx->roomNumber);
 								TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 15);
 								fx->pos.Position.y -= 128;
 								TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 15);
@@ -292,18 +290,18 @@ namespace TEN::Entities::Effects
 			if (fx->flag1 == (int)MissileType::SethLarge)
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 128, 64, 24, 0, 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 				ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f));
 			}
 			else if (fx->flag1 == (int)MissileType::SophiaLeigh_Small)
 			{
 				TriggerShockwave(&fx->pos, 5, 32, 128, 0, 128, 128, 24, fx->pos.Orientation.y, fx->flag2);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 			}
 			else if (fx->flag1 == (int)MissileType::SophiaLeigh_Big)
 			{
 				TriggerShockwave(&fx->pos, 10, 64, 128, 0, 128, 128, 24, fx->pos.Orientation.y, fx->flag2);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx->roomNumber);
 			}
 			else if (fx->flag1)
 			{
@@ -323,7 +321,7 @@ namespace TEN::Entities::Effects
 					break;
 
 				case (int)MissileType::Mutant:
-					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
+					TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, fx->roomNumber);
 					TriggerShockwave(&fx->pos, 48, 240, 64, 128, 96, 0, 24, 0, 0);
 					fx->pos.Position.y -= 128;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 128, 112, 0, 16, 0, 0);
@@ -343,9 +341,7 @@ namespace TEN::Entities::Effects
 			if (probe.RoomNumber != fx->roomNumber)
 				EffectNewRoom(fxNum, probe.RoomNumber);
 
-			int dx = oldX - fx->pos.Position.x;
-			int dy = oldY - fx->pos.Position.y;
-			int dz = oldZ - fx->pos.Position.z;
+			auto deltaPos = prevPos - fx->pos.Position;
 
 			if (Wibble & 4)
 			{
@@ -353,21 +349,21 @@ namespace TEN::Entities::Effects
 				{
 				default:
 				case (int)MissileType::SethLarge:
-					TriggerSethMissileFlame(fxNum, 32 * dx, 32 * dy, 32 * dz);
+					TriggerSethMissileFlame(fxNum, 32 * deltaPos.x, 32 * deltaPos.y, 32 * deltaPos.z);
 					break;
 
 				case (int)MissileType::Harpy:
-					TriggerHarpyFlameFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					TriggerHarpyFlameFlame(fxNum, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
 					break;
 
 				case (int)MissileType::Demigod3Single:
 				case (int)MissileType::Demigod3Radial:
 				case (int)MissileType::Demigod2:
-					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					TriggerDemigodMissileFlame(fxNum, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
 					break;
 
 				case (int)MissileType::Mutant:
-					TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					TriggerCrocgodMissileFlame(fxNum, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
 					break;
 				}
 			}
