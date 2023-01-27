@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/control/control.h"
 
+#include <chrono>
 #include <process.h>
 
 #include "Game/camera.h"
@@ -10,6 +11,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
@@ -51,9 +53,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
-#include <chrono>
 
 using namespace TEN::Effects;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
@@ -404,9 +406,9 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear all kinds of particles.
+	ClearBubbles();
 	DisableSmokeParticles();
 	DisableDripParticles();
-	DisableBubbles();
 	DisableDebris();
 
 	// Clear swarm enemies.

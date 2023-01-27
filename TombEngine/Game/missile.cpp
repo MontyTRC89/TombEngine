@@ -7,7 +7,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Math/Math.h"
@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Math;
 
@@ -120,7 +121,7 @@ void ControlMissile(short fxNumber)
 	{
 	case ID_SCUBA_HARPOON:
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx.roomNumber))
-			CreateBubble(&fx.pos.Position, fx.roomNumber, 1, 0, 0, 0, 0, 0);
+			SpawnBubble(fx.pos.Position.ToVector3(), fx.roomNumber, 0);
 
 		break;
 

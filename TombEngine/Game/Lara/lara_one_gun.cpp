@@ -7,7 +7,7 @@
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
@@ -29,6 +29,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
@@ -634,9 +635,9 @@ void HarpoonBoltControl(short itemNumber)
 	}
 	else
 	{
-		// Create bubbles.
+		// Spawn bubbles.
 		if (Wibble & 4)
-			CreateBubble((Vector3i*)&item.Pose, item.RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
+			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, BubbleFlags::Clump | BubbleFlags::HighAmplitude);
 			
 		item.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item.Pose.Orientation.x) / 2;
 		item.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item.Pose.Orientation.x) / 2;
@@ -933,8 +934,8 @@ void RocketControl(short itemNumber)
 	// If underwater, generate bubbles.
 	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 	{
-		auto pos = item.Pose.Position + Vector3i(wx, wy, wz);
-		CreateBubble(&pos, item.RoomNumber, 4, 8, 0, 0, 0, 0);
+		auto pos = item.Pose.Position.ToVector3() + Vector3(wx, wy, wz);
+		SpawnBubble(pos, item.RoomNumber, 0);
 	}
 
 	// Update rocket's position.
@@ -1043,13 +1044,11 @@ void CrossbowBoltControl(short itemNumber)
 
 	if (TestEnvironment(ENV_FLAG_WATER, &item))
 	{
-		auto bubblePos = item.Pose.Position;
-
 		if (item.Animation.Velocity.z > 64.0f)
 			item.Animation.Velocity.z -= item.Animation.Velocity.z / 16;
 
 		if (GlobalCounter & 1)
-			CreateBubble(&bubblePos, item.RoomNumber, 4, 7, 0, 0, 0, 0);
+			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, 0);
 	}
 
 	auto prevPos = item.Pose.Position;

@@ -8,7 +8,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -25,6 +25,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 using std::vector;
 
@@ -310,14 +311,13 @@ namespace TEN::Entities::Vehicles
 
 				if ((GetRandomControl() & 1) == 0)
 				{
-					auto pos2 = Pose(
+					auto pos2 = Vector3(
 						pos.x + (GetRandomControl() & 63) - 32,
 						pos.y + UPV_SHIFT,
-						pos.z + (GetRandomControl() & 63) - 32
-					);
-					short probedRoomNumber = GetCollision(pos2.Position.x, pos2.Position.y, pos2.Position.z, UPVItem->RoomNumber).RoomNumber;
+						pos.z + (GetRandomControl() & 63) - 32);
+					short probedRoomNumber = GetCollision(pos2.x, pos2.y, pos2.z, UPVItem->RoomNumber).RoomNumber;
 				
-					CreateBubble((Vector3i*)&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
+					SpawnBubble(pos2, probedRoomNumber, BubbleFlags::Clump);
 				}
 			}
 		}

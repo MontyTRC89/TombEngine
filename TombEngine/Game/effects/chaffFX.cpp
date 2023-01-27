@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -16,6 +16,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
 
 #define	MAX_TRIGGER_RANGE 0x4000
@@ -164,25 +165,27 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 
 void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
 {
-	auto& bubble = Bubbles[GetFreeBubble()];
+	// Too many effects; return early.
+	if (Bubbles.size() > BUBBLE_NUM_MAX)
+		return;
 
-	bubble = {};
-	bubble.active = true;
-	bubble.size = 0;
-	bubble.age = 0;
-	bubble.speed = Random::GenerateFloat(4.0f, 16.0f);
-	bubble.sourceColor = Vector4(0, 0, 0, 0);
+	auto& bubble = Bubbles.emplace_back();
+
+	bubble.Life = 0.0f;
+	bubble.Velocity = Random::GenerateFloat(4.0f, 16.0f);
+	bubble.ColorStart = Vector4(0, 0, 0, 0);
 	float shade = Random::GenerateFloat(0.3f, 0.8f);
-	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
-	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = Random::GenerateFloat(32.0f, 96.0f);
-	bubble.spriteNum = SPR_BUBBLES;
-	bubble.rotation = 0;
-	bubble.worldPosition = pos.ToVector3();
+	bubble.ColorEnd = Vector4(shade, shade, shade, 0.8f);
+	bubble.Color = bubble.ColorStart;
+	bubble.Scale =
+	bubble.ScaleMax =
+	bubble.ScaleMin = Vector2(Random::GenerateFloat(32.0f, 96.0f));
+	bubble.SpriteIndex = SPR_BUBBLES;
+	bubble.Position = pos.ToVector3();
 	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
-	bubble.waveSpeed = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
-	bubble.roomNumber = roomNumber;
+	bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
+	bubble.PositionBase = bubble.Position;
+	bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
+	bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
+	bubble.RoomNumber = roomNumber;
 }
