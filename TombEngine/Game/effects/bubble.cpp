@@ -20,7 +20,7 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags)
 	{
-		static constexpr auto COLOR_START		  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+		static constexpr auto COLOR_END			  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 		static constexpr auto OPACTY_MAX		  = 0.8f;
 		static constexpr auto OPACTY_MIN		  = 0.3f;
 		static constexpr auto AMPLITUDE_HIGH	  = 256.0f;
@@ -55,8 +55,8 @@ namespace TEN::Effects::Bubble
 		bubble.RoomNumber = roomNumber;
 
 		bubble.Color =
-		bubble.ColorStart = COLOR_START;
-		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
+		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
+		bubble.ColorEnd = COLOR_END;
 
 		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
 		bubble.WavePeriod = Vector3::Zero;
@@ -116,7 +116,7 @@ namespace TEN::Effects::Bubble
 			}
 
 			// Update color.
-			float alpha = std::clamp(bubble.Life / LIFE_START_FADING, 0.0f, 1.0f);
+			float alpha = 1.0f - (bubble.Life / LIFE_START_FADING);
 			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
 
 			// Oscillate scale according to period.
