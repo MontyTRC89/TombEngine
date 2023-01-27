@@ -39,12 +39,6 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 
-// TEMP
-#include <ois/OISKeyboard.h>
-#include "Game/effects/Bubble.h"
-using namespace TEN::Effects::Bubble;
-//
-
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
