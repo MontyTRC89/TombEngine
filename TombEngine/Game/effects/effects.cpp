@@ -1287,31 +1287,33 @@ void Splash(ItemInfo* item)
 	constexpr auto BUBBLE_COUNT		   = 256;
 	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
 
-	short roomNumber = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	int probedRoomNumber = GetCollision(item).RoomNumber;
+	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
+		return;
 
-	auto* room = &g_Level.Rooms[roomNumber];
-	if (TestEnvironment(ENV_FLAG_WATER, room))
+	int waterHeight = GetWaterHeight(item);
+
+	SplashSetup.x = item->Pose.Position.x;
+	SplashSetup.y = waterHeight - 1;
+	SplashSetup.z = item->Pose.Position.z;
+	SplashSetup.splashPower = item->Animation.Velocity.y;
+	SplashSetup.innerRadius = 64;
+	SetupSplash(&SplashSetup, probedRoomNumber);
+
+	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
+	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
+
+	auto direction = item->Animation.Velocity;
+	direction.Normalize();
+	direction = Geometry::RotatePoint(direction, EulerAngles(0, item->Pose.Orientation.y, 0));
+
+	// Spawn bubbles.
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
-		SplashSetup.y = waterHeight - 1;
-		SplashSetup.x = item->Pose.Position.x;
-		SplashSetup.z = item->Pose.Position.z;
-		SplashSetup.splashPower = item->Animation.Velocity.y;
-		SplashSetup.innerRadius = 64;
-		SetupSplash(&SplashSetup, roomNumber);
-
-		auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
-		auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
-
-		// Spawn bubbles.
-		for (int i = 0; i < BUBBLE_COUNT; i++)
-		{
-			auto pos = Random::GeneratePointInSphere(sphere);
-			auto direction = Random::GenerateDirectionInCone(Vector3::Up, 10.0f);
-			auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.3f));
-			SpawnBubble(pos, item->RoomNumber, inertia, 0);
-		}
+		auto pos = Random::GeneratePointInSphere(sphere);
+		auto coneDirection = Random::GenerateDirectionInCone(direction, 15.0f);
+		auto inertia = coneDirection * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.3f));
+		SpawnBubble(pos, item->RoomNumber, inertia, 0);
 	}
 }
 
