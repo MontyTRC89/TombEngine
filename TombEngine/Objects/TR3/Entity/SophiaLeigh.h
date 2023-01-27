@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	void InitialiseLondonBoss(short itemNumber);
-	void LondonBossControl(short itemNumber);
+	void InitialiseSophiaLeigh(short itemNumber);
+	void SophiaLeighControl(short itemNumber);
 }

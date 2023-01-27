@@ -277,8 +277,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLondonBoss;
-		obj->control = LondonBossControl;
+		obj->initialise = InitialiseSophiaLeigh;
+		obj->control = SophiaLeighControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;

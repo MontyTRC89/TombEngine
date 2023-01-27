@@ -159,8 +159,8 @@ namespace TEN::Entities::Effects
 		}
 
 		if (fx.speed < maxVelocity &&
-			fx.flag1 != (int)MissileType::SophiaLeigh_Small &&
-			fx.flag1 != (int)MissileType::SophiaLeigh_Big)
+			fx.flag1 != (int)MissileType::SophiaLeighNormal &&
+			fx.flag1 != (int)MissileType::SophiaLeighLarge)
 		{
 			short dy = orient.y - fx.pos.Orientation.y;
 			if (abs(dy) > abs(ANGLE(180.0f)))
@@ -215,8 +215,8 @@ namespace TEN::Entities::Effects
 			fx.pos.Position = prevPos;
 
 			if (fx.flag1 != (int)MissileType::Mutant &&
-				fx.flag1 != (int)MissileType::SophiaLeigh_Small &&
-				fx.flag1 != (int)MissileType::SophiaLeigh_Big)
+				fx.flag1 != (int)MissileType::SophiaLeighNormal &&
+				fx.flag1 != (int)MissileType::SophiaLeighLarge)
 				BubblesShatterFunction(&fx, 0, -32);
 
 			if (fx.flag1 == (int)MissileType::SethLarge)
@@ -224,12 +224,12 @@ namespace TEN::Entities::Effects
 				TriggerShockwave(&fx.pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx.roomNumber].flags) / 16) & 2) * 65536, 0);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 			}
-			else if (fx.flag1 == (int)MissileType::SophiaLeigh_Small)
+			else if (fx.flag1 == (int)MissileType::SophiaLeighNormal)
 			{
 				TriggerShockwave(&fx.pos, 5, 32, 128, 0, 128, 128, 24, fx.pos.Orientation.y + ANGLE(180.0f), 0);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 			}
-			else if (fx.flag1 == (int)MissileType::SophiaLeigh_Big)
+			else if (fx.flag1 == (int)MissileType::SophiaLeighLarge)
 			{
 				TriggerShockwave(&fx.pos, 10, 64, 128, 0, 128, 128, 24, fx.pos.Orientation.y + ANGLE(180.0f), 0);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
@@ -281,8 +281,8 @@ namespace TEN::Entities::Effects
 		{
 			LaraItem->HitStatus = true;
 			if (fx.flag1 != (int)MissileType::Mutant &&
-				fx.flag1 != (int)MissileType::SophiaLeigh_Small &&
-				fx.flag1 != (int)MissileType::SophiaLeigh_Big)
+				fx.flag1 != (int)MissileType::SophiaLeighNormal &&
+				fx.flag1 != (int)MissileType::SophiaLeighLarge)
 				BubblesShatterFunction(&fx, 0, -32);
 
 			KillEffect(fxNumber);
@@ -293,12 +293,12 @@ namespace TEN::Entities::Effects
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f));
 			}
-			else if (fx.flag1 == (int)MissileType::SophiaLeigh_Small)
+			else if (fx.flag1 == (int)MissileType::SophiaLeighNormal)
 			{
 				TriggerShockwave(&fx.pos, 5, 32, 128, 0, 128, 128, 24, fx.pos.Orientation.y, fx.flag2);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 			}
-			else if (fx.flag1 == (int)MissileType::SophiaLeigh_Big)
+			else if (fx.flag1 == (int)MissileType::SophiaLeighLarge)
 			{
 				TriggerShockwave(&fx.pos, 10, 64, 128, 0, 128, 128, 24, fx.pos.Orientation.y, fx.flag2);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
