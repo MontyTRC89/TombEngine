@@ -1284,7 +1284,8 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 
 void Splash(ItemInfo* item)
 {
-	static constexpr auto NUM_BUBBLES = 128;
+	constexpr auto BUBBLE_COUNT		   = 256;
+	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -1300,11 +1301,17 @@ void Splash(ItemInfo* item)
 		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup, roomNumber);
 
+		auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
+		auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
+
 		// Spawn bubbles.
-		auto pos = Vector3(SplashSetup.x, SplashSetup.y + BLOCK(0.4f), SplashSetup.z);
-		auto sphere = BoundingSphere(pos, BLOCK(0.25f));
-		for (int i = 0; i < NUM_BUBBLES; i++)
-			SpawnBubble(Random::GeneratePointInSphere(sphere), item->RoomNumber, 0);
+		for (int i = 0; i < BUBBLE_COUNT; i++)
+		{
+			auto pos = Random::GeneratePointInSphere(sphere);
+			auto direction = Random::GenerateDirectionInCone(Vector3::Up, 10.0f);
+			auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.3f));
+			SpawnBubble(pos, item->RoomNumber, inertia, 0);
+		}
 	}
 }
 

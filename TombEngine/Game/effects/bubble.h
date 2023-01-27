@@ -19,6 +19,7 @@ namespace TEN::Effects::Bubble
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;
 		int		RoomNumber	 = 0;
+		Vector3 Inertia		 = Vector3::Zero;
 
 		Vector4 Color		 = Vector4::Zero;
 		Vector4 ColorStart	 = Vector4::Zero;
@@ -40,6 +41,7 @@ namespace TEN::Effects::Bubble
 
 	extern std::vector<Bubble> Bubbles;
 
+	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags);
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags);
 
 	void UpdateBubbles();

@@ -18,7 +18,7 @@ namespace TEN::Effects::Bubble
 	// TODO: Use deque instead? Depends how the compiler handles it. -- Sezz 2023.01.27
 	std::vector<Bubble> Bubbles = {};
 
-	void SpawnBubble(const Vector3& pos, int roomNumber, int flags)
+	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
 	{
 		static constexpr auto COLOR_END			  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 		static constexpr auto OPACTY_MAX		  = 0.8f;
@@ -53,6 +53,7 @@ namespace TEN::Effects::Bubble
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
+		bubble.Inertia = inertia;
 
 		bubble.Color =
 		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
@@ -66,7 +67,7 @@ namespace TEN::Effects::Bubble
 			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
 		
 		bubble.Scale =
-			bubble.ScaleMax = (flags & BubbleFlags::Large) ?
+		bubble.ScaleMax = (flags & BubbleFlags::Large) ?
 			Vector2(Random::GenerateFloat(SCALE_LARGE_MIN, SCALE_LARGE_MAX)) :
 			Vector2(Random::GenerateFloat(SCALE_SMALL_MIN, SCALE_SMALL_MAX));
 		bubble.ScaleMin = bubble.Scale * 0.7f;
@@ -76,6 +77,11 @@ namespace TEN::Effects::Bubble
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y / 2));
 		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ?
 			0.0f : Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y / 2)) / SCALE_LARGE_MAX);
+	}
+
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags)
+	{
+		SpawnBubble(pos, roomNumber, Vector3::Zero, flags);
 	}
 
 	void UpdateBubbles()
@@ -89,8 +95,6 @@ namespace TEN::Effects::Bubble
 		{
 			if (bubble.Life <= 0.0f)
 				continue;
-
-			bubble.Life -= 1.0f;
 
 			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y, bubble.Position.z, bubble.RoomNumber);
 
@@ -128,7 +132,14 @@ namespace TEN::Effects::Bubble
 			// Update position.
 			bubble.WavePeriod += bubble.WaveVelocity;
 			bubble.PositionBase.y -= bubble.Velocity;
+			bubble.PositionBase += bubble.Inertia;
 			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
+
+			// Update intertia.
+			bubble.Inertia *= 0.75f;
+
+			// Update life.
+			bubble.Life -= 1.0f;
 		}
 
 		// Clear inactive effects.
