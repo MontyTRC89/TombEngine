@@ -32,6 +32,10 @@ namespace TEN::Effects::Bubble
 		static constexpr auto VELOCITY_MIN		  = 8.0f;
 		static constexpr auto VELOCITY_SINGLE_MAX = 12.0f;
 		static constexpr auto VELOCITY_CLUMP_MAX  = 16.0f;
+		static constexpr auto WAVE_VELOCITY_MAX	  = 1 / 8.0f;
+		static constexpr auto WAVE_VELOCITY_MIN	  = 1 / 16.0f;
+		static constexpr auto OSC_VELOCITY_MAX	  = 0.5f;
+		static constexpr auto OSC_VELOCITY_MIN	  = 0.1f;
 
 		// Too many effects; return early.
 		if (Bubbles.size() > BUBBLE_NUM_MAX)
@@ -56,7 +60,10 @@ namespace TEN::Effects::Bubble
 
 		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
 		bubble.WavePeriod = Vector3::Zero;
-		bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f));
+		bubble.WaveVelocity = Vector3(
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
 		
 		bubble.Scale =
 			bubble.ScaleMax = (flags & BubbleFlags::Large) ?
@@ -67,7 +74,8 @@ namespace TEN::Effects::Bubble
 		bubble.Life = BUBBLE_LIFE_MAX;
 		bubble.Velocity = Random::GenerateFloat(VELOCITY_MIN, (flags & BubbleFlags::Clump) ? VELOCITY_CLUMP_MAX : VELOCITY_SINGLE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y / 2));
-		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ? 0.0f : Lerp(0.5f, 0.1f, ((bubble.ScaleMax.x + bubble.ScaleMax.y / 2)) / SCALE_LARGE_MAX);
+		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ?
+			0.0f : Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y / 2)) / SCALE_LARGE_MAX);
 	}
 
 	void UpdateBubbles()
