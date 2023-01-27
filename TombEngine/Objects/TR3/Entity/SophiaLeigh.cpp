@@ -1,50 +1,57 @@
 #include "framework.h"
-#include "SophiaLeigh.h"
+#include "Objects/TR3/Entity/SophiaLeigh.h"
 
-#include "Objects/Effects/Boss.h"
 #include "Game/animation.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
-#include "Objects/Effects/enemy_missile.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
-#include "Lara/lara.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Objects/Effects/Boss.h"
+#include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto SOPHIALEIGH_Staff = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
-	const auto SOPHIALEIGH_Right = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
-	const auto SOPHIALEIGH_Left = BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
+	constexpr auto SOPHIALEIGH_WALK_RANGE		   = SQUARE(BLOCK(1));
+	constexpr auto SOPHIALEIGH_Y_DISTANCE_RANGE	   = BLOCK(1.5f);
+	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = CLICK(2);
+	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE   = SQUARE(BLOCK(5));
 
-	// Basic value.
-
-	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
-	constexpr auto SOPHIALEIGH_WALK_TURN_RATE_MAX = ANGLE(4);
-	constexpr auto SOPHIALEIGH_RUN_TURN_RATE_MAX = ANGLE(7);
-	constexpr auto SOPHIALEIGH_LASER_DECREASE_XANGLE_IF_LARA_CROUCH = ANGLE(0.25f);
-	constexpr auto SOPHIALEIGH_LASER_DISPERSION_ANGLE = ANGLE(1.5f);
-	constexpr auto SOPHIALEIGH_WALK_RANGE = SQUARE(BLOCK(1));
-	constexpr auto SOPHIALEIGH_Y_DISTANCE_RANGE = BLOCK(1.5f);
-	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE = CLICK(2);
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX = 60;
 	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
 
-	// Additional normal value.
-	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
-	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE = SQUARE(BLOCK(5)); // < walk else run.
+	constexpr auto SOPHIALEIGH_WALK_TURN_RATE_MAX = ANGLE(4);
+	constexpr auto SOPHIALEIGH_RUN_TURN_RATE_MAX = ANGLE(7);
+	constexpr auto SOPHIALEIGH_LASER_DECREASE_XANGLE_IF_LARA_CROUCH = ANGLE(0.25f);
+	constexpr auto SOPHIALEIGH_LASER_DISPERSION_ANGLE = ANGLE(1.5f);
 
+	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	enum SophiaState
+	const auto SophiaLeighStaffBite = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
+	const auto SophiaLeighLeftBite	= BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
+	const auto SophiaLeighRightBite = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
+
+	struct SophiaData
+	{
+		short angle;
+		short tilt;
+		short headAngle;
+		short torsoXAngle;
+		short torsoYAngle;
+	};
+
+	enum SophiaLeighState
 	{
 		// No state 0.
 		SOPHIALEIGH_STATE_STAND = 1,
@@ -61,7 +68,7 @@ namespace TEN::Entities::Creatures::TR3
 		SOPHIALEIGH_STATE_FALL4CLICK = 12,
 	};
 
-	enum SophiaAnim
+	enum SophiaLeighAnim
 	{
 		SOPHIALEIGH_ANIM_WALK = 0,
 		SOPHIALEIGH_ANIM_SUMMON_START = 1,
@@ -91,30 +98,24 @@ namespace TEN::Entities::Creatures::TR3
 		SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT = 25
 	};
 
-	enum class SophiaOCB : int
+	enum class SophiaOCB
 	{
 		OCB_Normal = 1, // Like other entity, move/climb/attack and chase lara.
 		OCB_Tower = 2, // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
 		OCB_LuaToMoveUpDown = 4, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
 	};
 
-	struct SophiaData
-	{
-		short angle;
-		short tilt;
-		short headAngle;
-		short torsoXAngle;
-		short torsoYAngle;
-	};
-
 	void InitialiseLondonBoss(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
+
 		if (item->TriggerFlags == 0) // if no mode is set then set it to normal by default.
 			item->TriggerFlags = (short)SophiaOCB::OCB_Normal;
-		item->SetFlagField((int)BossItemFlags::ImmortalState, TRUE); // Immortal state.
-		item->SetFlagField((int)BossItemFlags::ChargedState, FALSE); // Charged state. 1 = full charged.
+
+		item->SetFlagField((int)BossItemFlags::ImmortalState, true); // Immortal state.
+		item->SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = full charged.
 		item->SetFlagField((int)BossItemFlags::DeathCount, 0);
 		item->SetFlagField((int)BossItemFlags::ExplodeCount, 0);
 		SetAnimation(item, SOPHIALEIGH_ANIM_SUMMON_START); // She always start with charging.
@@ -127,23 +128,30 @@ namespace TEN::Entities::Creatures::TR3
 			if (aiObj.objectNumber == objectNumber && aiObj.triggerFlags == currentFlagToSearch)
 				return aiObj.pos.Position;
 		}
+
 		return Vector3i::Zero;
 	}
 
 	static void RotateToTarget(ItemInfo* item, AI_INFO* ai, short angleRate)
 	{
 		if (abs(ai->angle) < angleRate)
+		{
 			item->Pose.Orientation.y += ai->angle;
+		}
 		else if (ai->angle < 0)
+		{
 			item->Pose.Orientation.y -= angleRate;
+		}
 		else
+		{
 			item->Pose.Orientation.y += angleRate;
+		}
 	}
 
 	static void TriggerLaserBolt(ItemInfo* item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBigLaser, short angleAdd)
 	{
-		short fxNumber = CreateNewEffect(item->RoomNumber);
-		if (fxNumber == -1)
+		int fxNumber = CreateNewEffect(item->RoomNumber);
+		if (fxNumber == NO_ITEM)
 			return;
 
 		auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
@@ -166,7 +174,7 @@ namespace TEN::Entities::Creatures::TR3
 		fx.roomNumber = item->RoomNumber;
 		fx.counter = 0;
 		fx.flag1 = laserType;
-		fx.flag2 = isBigLaser ? 10 : 2; // damage
+		fx.flag2 = isBigLaser ? 10 : 2; // Damage value.
 		fx.speed = Random::GenerateInt(120, 160);
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (laserType - 1);
@@ -174,24 +182,26 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerSophiaShockwave(ItemInfo* item, const BiteInfo& bite)
 	{
-		short shockwaveID = GetFreeShockwave();
-		if (shockwaveID != NO_ITEM)
-		{
-			auto* ringEffect = &ShockWaves[shockwaveID];
-			auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
-			ringEffect->x = pos.x;
-			ringEffect->y = pos.y;
-			ringEffect->z = pos.z;
-			ringEffect->innerRad = 620;
-			ringEffect->outerRad = 640;
-			ringEffect->xRot = Random::GenerateAngle(-45, 45);
-			ringEffect->damage = 0;
-			ringEffect->r = 0;
-			ringEffect->g = 255;
-			ringEffect->b = 255;
-			ringEffect->speed = -400;
-			ringEffect->life = 64;
-		}
+		int fxNumber = GetFreeShockwave();
+		if (fxNumber == NO_ITEM)
+			return;
+
+		auto* ringEffect = &ShockWaves[fxNumber];
+
+		auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
+
+		ringEffect->x = pos.x;
+		ringEffect->y = pos.y;
+		ringEffect->z = pos.z;
+		ringEffect->innerRad = 620;
+		ringEffect->outerRad = 640;
+		ringEffect->xRot = Random::GenerateAngle(-45, 45);
+		ringEffect->damage = 0;
+		ringEffect->r = 0;
+		ringEffect->g = 255;
+		ringEffect->b = 255;
+		ringEffect->speed = -400;
+		ringEffect->life = 64;
 	}
 
 	static void LondonBossTowerControl(ItemInfo* item, CreatureInfo* creature, SophiaData* data)
@@ -328,9 +338,9 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item->Animation.FrameNumber == GetFrameNumber(item, 36))
 			{
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Right, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Staff, data, true, 0);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Left, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 			}
 			
 			break;
@@ -345,8 +355,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
 			{
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Right, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Left, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 			}
 
 			break;
@@ -456,9 +466,9 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item->Animation.FrameNumber == GetFrameNumber(item, 36))
 			{
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Right, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Staff, data, true, 0);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Left, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 			}
 
 			break;
@@ -473,8 +483,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
 			{
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Right, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
-				TriggerLaserBolt(item, creature->Enemy, SOPHIALEIGH_Left, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
+				TriggerLaserBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 			}
 
 			break;
