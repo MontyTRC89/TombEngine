@@ -91,19 +91,6 @@ static void StartObject(ObjectInfo* object)
 		}
 	}
 
-	/*object = &Objects[ID_SCALING_TRAPDOOR];  //I don't know what this Object purpose.
-	if (object->loaded)
-	{
-		object->initialise = InitialiseTrapDoor;
-		object->collision = TrapDoorCollision;
-		object->control = TrapDoorControl;
-		object->floorBorder = TrapDoorFloorBorder;
-		object->ceilingBorder = TrapDoorCeilingBorder;
-		object->floor = TrapDoorFloor;
-		object->ceiling = TrapDoorCeiling;
-		object->SetupHitEffect(true);
-	}*/
-
 	object = &Objects[ID_BRIDGE_FLAT];
 	if (object->loaded)
 	{
