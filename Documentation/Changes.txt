@@ -23,6 +23,7 @@ Version 1.0.6
 * Fix sound positions not updated during flybys.
 * Fix Grenade launcher super ammo - will now explode 3 grenades like in TR4.
 * Fix Grenade and rocket launcher lighting.
+* Fix Ceiling_trapdoor and Floor_trapdoor not being initialized.
 * Make enemies drop pickups at their origin point, not bounding box centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
