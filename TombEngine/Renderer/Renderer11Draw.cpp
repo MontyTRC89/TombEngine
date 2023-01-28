@@ -1,32 +1,34 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
-#include "Specific/configuration.h"
+
+#include <algorithm>
+#include <chrono>
+#include <execution>
+#include <filesystem>
+
+#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/hair.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/savegame.h"
-#include "Game/health.h"
-#include "Game/camera.h"
-#include "Game/items.h"
-#include "Game/animation.h"
 #include "Game/Gui.h"
+#include "Game/health.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Specific/winmain.h"
+#include "Game/savegame.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "RenderView/RenderView.h"
-#include <chrono>
-#include <algorithm>
-#include <execution>
-#include <filesystem>
+#include "Renderer/Renderer11.h"
+#include "Specific/configuration.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Entities::Generic;
 
@@ -38,16 +40,15 @@ extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
 	using namespace std::chrono;
+	using namespace TEN::Renderer;
 
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
-		std::vector<Sphere> nearestSpheres;
+		auto nearestSpheres = std::vector<Sphere>{};
 		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
 
-		// Collect Lara spheres.
-
+		// Collect player spheres.
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
@@ -57,12 +58,11 @@ namespace TEN::Renderer
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
 
-				// Skip everything that's not "alive" or not a vehicle.
-
+				// Skip everything that isn't alive or a vehicle.
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
 
-				if (i->ObjectNumber == ID_LARA)
+				if (nativeItem.IsLara())
 				{
 					for (auto i = 0; i < sphereMeshes.size(); i++)
 					{
@@ -70,29 +70,27 @@ namespace TEN::Renderer
 							continue;
 
 						auto& mesh = g_Level.Meshes[nativeItem.Model.MeshIndex[sphereMeshes[i]]];
-						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 
 						// Push foot spheres a little lower.
+						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
 							offset.y += 8;
-						auto pos = GetJointPosition(LaraItem, sphereMeshes[i], offset);
 
 						auto& newSphere = nearestSpheres.emplace_back();
-						newSphere.position = Vector3(pos.x, pos.y, pos.z);
+						newSphere.position = GetJointPosition(LaraItem, sphereMeshes[i], offset).ToVector3();;
 						newSphere.radius = mesh.sphere.Radius * sphereScaleFactors[i];
 					}
 				}
 				else
 				{
-					auto bBox = GameBoundingBox(&nativeItem);
-					auto center = ((Vector3(bBox.X1, bBox.Y1, bBox.Z1) + Vector3(bBox.X2, bBox.Y2, bBox.Z2)) / 2) +
-						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+					auto bounds = GameBoundingBox(&nativeItem);
+					auto extents = bounds.GetExtents();
+					auto center = Geometry::TranslatePoint(nativeItem.Pose.Position.ToVector3(), nativeItem.Pose.Orientation, bounds.GetCenter());
 					center.y = nativeItem.Pose.Position.y;
-					float maxExtent = std::max(bBox.X2 - bBox.X1, bBox.Z2 - bBox.Z1);
 
 					auto& newSphere = nearestSpheres.emplace_back();
 					newSphere.position = center;
-					newSphere.radius = maxExtent;
+					newSphere.radius = std::max(abs(extents.x), abs(extents.z)) * 1.5f;
 				}
 			}
 		}
@@ -1524,7 +1522,8 @@ namespace TEN::Renderer
 		DrawRipples(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
-		DrawLightning(view);
+		DrawElectricity(view);
+		DrawHelicalLasers(view);
 		DrawRopes(view);
 
 		// Here is where we actually output sprites

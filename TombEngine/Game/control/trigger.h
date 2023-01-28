@@ -75,7 +75,6 @@ void RefreshCamera(short type, short* data);
 int TriggerActive(ItemInfo* item);
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z);
 short* GetTriggerIndex(ItemInfo* item);
-void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags = 0);
 void ProcessSectorFlags(ItemInfo* item);

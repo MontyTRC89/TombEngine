@@ -3,8 +3,9 @@
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
-struct ItemInfo;
+enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
+struct ItemInfo;
 
 enum RIPPLE_TYPE
 {
@@ -197,6 +198,8 @@ extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 extern FX_INFO EffectList[NUM_EFFECTS];
 
 Particle* GetFreeParticle();
+
+void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();

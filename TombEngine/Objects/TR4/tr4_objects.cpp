@@ -196,9 +196,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BADDY1];
 		if (obj->loaded)
 		{
-			if (!Objects[ID_MESHSWAP_BADDY1].loaded)
-				TENLog("ID_MESHSWAP_BADDY1 missing; ID_BADDY1 will not use its sword and uzi meshes.", LogLevel::Warning);
-
+			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY1, "ID_BADDY1", "ID_MESHSWAP_BADDY1");
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
@@ -218,9 +216,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BADDY2];
 		if (obj->loaded)
 		{
-			if (!Objects[ID_MESHSWAP_BADDY2].loaded)
-				TENLog("ID_MESHSWAP_BADDY2 missing; ID_BADDY1 will not use its sword and uzi meshes.", LogLevel::Warning);
-
+			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY2, "ID_BADDY2", "ID_MESHSWAP_BADDY2");
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
@@ -539,8 +535,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_INV];
 		if (obj->loaded)
 		{
-			if (Objects[ID_BABOON_NORMAL].loaded)
-				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_INV", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
@@ -555,8 +550,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_SILENT];
 		if (obj->loaded)
 		{
-			if (Objects[ID_BABOON_NORMAL].loaded)
-				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;

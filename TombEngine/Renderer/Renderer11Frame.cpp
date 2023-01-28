@@ -170,7 +170,7 @@ namespace TEN::Renderer
 		// FIXME: This is an urgent hack to fix stack overflow crashes.
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
 
-		static constexpr int MAX_SEARCH_DEPTH = 128;
+		static constexpr int MAX_SEARCH_DEPTH = 64;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
 			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
@@ -226,11 +226,12 @@ namespace TEN::Renderer
 					Camera.pos.x - (door->AbsoluteVertices[0].x),
 					Camera.pos.y - (door->AbsoluteVertices[0].y),
 					Camera.pos.z - (door->AbsoluteVertices[0].z));
+				door->CameraToDoor.Normalize();
 			}
 
 			if (door->Normal.x * door->CameraToDoor.x +
 				door->Normal.y * door->CameraToDoor.y +
-				door->Normal.z * door->CameraToDoor.z < 0)
+				door->Normal.z * door->CameraToDoor.z <= 0)
 			{
 				continue;
 			}

@@ -36,7 +36,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 constexpr auto TRIGGER_TIMEOUT		 = 5;
-constexpr auto GRENADE_FRAG_TIMEOUT	 = 16;
+constexpr auto GRENADE_FRAG_TIMEOUT  = 4;
 constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
 constexpr auto HARPOON_VELOCITY = CLICK(1);
@@ -1399,7 +1399,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	}
 	else
 	{
-		TriggerShockwave(&item.Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, 0, 0);
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
@@ -1430,7 +1430,8 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			pointColl.Position.Ceiling > item.Pose.Position.y)
 		{
 			item.Pose.Position = prevPos;
-			hasHit = hasHitNotByEmitter = true;
+			hasHit =
+			hasHitNotByEmitter = true;
 		}
 	}
 	else if (EmitFromProjectile(item, type))
@@ -1441,7 +1442,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
-		// Fire trail and water collision for grenade fragments
+		// Fire trail and water collision for grenade fragments.
 		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, FlameType::Medium);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
