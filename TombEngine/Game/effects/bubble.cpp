@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Objects/objectslist.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
@@ -34,7 +35,7 @@ namespace TEN::Effects::Bubble
 		constexpr auto VELOCITY_CLUMP_MAX  = 16.0f;
 		constexpr auto WAVE_VELOCITY_MAX   = 1 / 8.0f;
 		constexpr auto WAVE_VELOCITY_MIN   = 1 / 16.0f;
-		constexpr auto OSC_VELOCITY_MAX	   = 0.5f;
+		constexpr auto OSC_VELOCITY_MAX	   = 0.4f;
 		constexpr auto OSC_VELOCITY_MIN	   = 0.1f;
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
@@ -49,12 +50,12 @@ namespace TEN::Effects::Bubble
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
-		bubble.Inertia = inertia;
 
 		bubble.Color =
 		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
 		bubble.ColorEnd = COLOR_END;
 
+		bubble.Inertia = inertia;
 		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
 		bubble.WavePeriod = Vector3::Zero;
 		bubble.WaveVelocity = Vector3(
@@ -82,6 +83,7 @@ namespace TEN::Effects::Bubble
 
 	void UpdateBubbles()
 	{
+		constexpr auto LIFE_FULL_SCALE	 = std::max(BUBBLE_LIFE_MAX - (0.25f * FPS), 0.0f);
 		constexpr auto LIFE_START_FADING = std::min(1.0f * FPS, BUBBLE_LIFE_MAX);
 
 		if (Bubbles.empty())
@@ -124,11 +126,11 @@ namespace TEN::Effects::Bubble
 			bubble.Scale = Vector2(
 				(bubble.ScaleMin.x / 2) + ((bubble.ScaleMax.x - bubble.ScaleMin.x) * (0.5f + (0.5f * sin(bubble.OscillationPeriod)))),
 				(bubble.ScaleMin.y / 2) + ((bubble.ScaleMax.y - bubble.ScaleMin.y) * (0.5f + (0.5f * cos(bubble.OscillationPeriod + 1.0f)))));
+			bubble.Scale *= Lerp(0.0f, 1.0f, bubble.Life / LIFE_FULL_SCALE);
 
 			// Update position.
 			bubble.WavePeriod += bubble.WaveVelocity;
-			bubble.PositionBase.y -= bubble.Velocity;
-			bubble.PositionBase += bubble.Inertia;
+			bubble.PositionBase += Vector3(0.0f, -bubble.Velocity, 0.0f) + bubble.Inertia;
 			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
 
 			// Update intertia.
@@ -138,11 +140,7 @@ namespace TEN::Effects::Bubble
 			bubble.Life -= 1.0f;
 		}
 
-		// Clear inactive effects.
-		Bubbles.erase(
-			std::remove_if(
-				Bubbles.begin(), Bubbles.end(),
-				[](const Bubble& bubble) { return bubble.Life <= 0.0f; }), Bubbles.end());
+		ClearInactiveEffects(Bubbles);
 	}
 
 	void ClearBubbles()

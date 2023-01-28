@@ -1,5 +1,4 @@
 #pragma once
-#include "Game/effects/effects.h"
 
 namespace TEN::Effects::Bubble
 {
@@ -19,19 +18,19 @@ namespace TEN::Effects::Bubble
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;
 		int		RoomNumber	 = 0;
-		Vector3 Inertia		 = Vector3::Zero;
 
 		Vector4 Color		 = Vector4::Zero;
 		Vector4 ColorStart	 = Vector4::Zero;
 		Vector4 ColorEnd	 = Vector4::Zero;
 
+		Vector3 Inertia		 = Vector3::Zero;
 		Vector3 Amplitude	 = Vector3::Zero;
 		Vector3 WavePeriod	 = Vector3::Zero;
 		Vector3 WaveVelocity = Vector3::Zero;
 
-		Vector2 Scale	 = Vector2::Zero;
-		Vector2 ScaleMax = Vector2::Zero;
-		Vector2 ScaleMin = Vector2::Zero;
+		Vector2 Scale	   = Vector2::Zero;
+		Vector2 ScaleMax   = Vector2::Zero;
+		Vector2 ScaleMin   = Vector2::Zero;
 
 		float Life				  = 0.0f;
 		float Velocity			  = 0.0f;
