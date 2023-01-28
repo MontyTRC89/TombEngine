@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "tr5_roman_statue.h"
-#include "Game/items.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/spark.h"
+#include "Objects/TR5/Entity/tr5_roman_statue.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
-#include "Game/people.h"
 #include "Game/effects/debris.h"
-#include "Game/animation.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"
+#include "Game/effects/spark.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::ElectricArc;
 using namespace TEN::Effects::Spark;
@@ -24,13 +26,16 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER = 2.0f;
+	constexpr auto ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF	   = 2.0f;
+
 	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
 
 	struct RomanStatueInfo
 	{
-		Vector3i Position;
-		ElectricArc* EnergyArcs[8];
-		unsigned int Count;
+		Vector3i Position = Vector3i::Zero;
+		ElectricArc* EnergyArcs[8] = {};
+		unsigned int Count = 0;
 	};
 
 	RomanStatueInfo RomanStatueData;
@@ -56,9 +61,17 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO
 	enum RomanStatueAnim
 	{
-		STATUE_ANIM_HIT = 5,
+		STATUE_ANIM_RECOIL = 5,
 		STATUE_ANIM_DEATH = 14,
 		STATUE_ANIM_START_JUMP_DOWN = 16
+	};
+
+	enum RomanStatueHitMeshFlags
+	{
+		MS_LIGHT_DMG  = 0x10,
+		MS_MEDIUM_DMG = 0x410,
+		MS_HARD_DMG	  = 0x510,
+		MS_HEAVY_DMG  = 0x10510
 	};
 
 	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
@@ -67,8 +80,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!(GetRandomControl() & 0x1F))
 		{
-			short fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != -1)
+			int fxNumber = CreateNewEffect(item->RoomNumber);
+			if (fxNumber != NO_ITEM)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -147,49 +160,11 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
 
-	static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
-	{
-		auto* spark = GetFreeParticle();
-
-		spark->on = 1;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = 64;
-
-		if (flags)
-		{
-			spark->dG = (GetRandomControl() & 0x3F) - 64;
-			spark->dB = spark->dG / 2;
-		}
-		else
-		{
-			spark->dB = (GetRandomControl() & 0x3F) - 64;
-			spark->dG = spark->dB / 2;
-		}
-
-		spark->colFadeSpeed = 4;
-		spark->fadeToBlack = 4;
-		spark->life = 16;
-		spark->sLife = 16;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = xv;
-		spark->yVel = yv;
-		spark->zVel = zv;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->friction = 34;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-		spark->flags = SP_NONE;
-	}
-
 	static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->on = 1;
+		spark->on = true;
 		spark->sR = 0;
 		spark->sB = (GetRandomControl() & 0x3F) - 96;
 		spark->dB = (GetRandomControl() & 0x3F) - 96;
@@ -229,32 +204,31 @@ namespace TEN::Entities::Creatures::TR5
 
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
-		short fxNumber = CreateNewEffect(roomNumber);
+		int fxNumber = CreateNewEffect(roomNumber);
+		if (fxNumber == NO_ITEM)
+			return;
 
-		if (fxNumber != NO_ITEM)
-		{
-			auto* fx = &EffectList[fxNumber];
+		auto* fx = &EffectList[fxNumber];
 
-			fx->pos.Position.x = pos->Position.x;
-			fx->pos.Position.y = pos->Position.y;
-			fx->pos.Position.z = pos->Position.z;
-			fx->pos.Orientation.x = pos->Orientation.x;
-			fx->pos.Orientation.y = pos->Orientation.y;
-			fx->pos.Orientation.z = 0;
-			fx->roomNumber = roomNumber;
-			fx->counter = 16 * count + 15;
-			fx->flag1 = 1;
-			fx->objectNumber = ID_BUBBLES;
-			fx->speed = (GetRandomControl() & 0x1F) + 64;
-			fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
-		}
+		fx->pos.Position.x = pos->Position.x;
+		fx->pos.Position.y = pos->Position.y;
+		fx->pos.Position.z = pos->Position.z;
+		fx->pos.Orientation.x = pos->Orientation.x;
+		fx->pos.Orientation.y = pos->Orientation.y;
+		fx->pos.Orientation.z = 0;
+		fx->roomNumber = roomNumber;
+		fx->counter = 16 * count + 15;
+		fx->flag1 = 1;
+		fx->objectNumber = ID_BUBBLES;
+		fx->speed = (GetRandomControl() & 0x1F) + 64;
+		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
 	}
 
 	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->on = 1;
+		spark->on = true;
 		spark->sR = 0;
 		spark->sG = (GetRandomControl() & 0x3F) - 96;
 		spark->sB = spark->sG / 2;
@@ -312,59 +286,57 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto prevMeshSwapBits = item->Model.MeshIndex;
 
-		// At determined HP values, roman statues sheds material.
-		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(0x10000))
+		if (item->Effect.Type == EffectType::Fire)
+			item->Effect.Type = EffectType::None;
+
+		// At determined HP values, the statue sheds material.
+		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(MS_HEAVY_DMG))
 		{
 			ExplodeItemNode(item, 16, 0, 8);
-			item->MeshBits |= 0x10000;
-			item->SetMeshSwapFlags(0x10000);
+			item->MeshBits |= MS_HEAVY_DMG;
+			item->SetMeshSwapFlags(MS_HEAVY_DMG);
 		}
-		else if (item->HitPoints < 75 && !item->TestMeshSwapFlags(0x100))
+		else if (item->HitPoints < 75 && !item->TestMeshSwapFlags(MS_HARD_DMG))
 		{
 			ExplodeItemNode(item, 8, 0, 8);
-			item->MeshBits |= 0x100;
-			item->SetMeshSwapFlags(0x100);
+			item->MeshBits |= MS_HARD_DMG;
+			item->SetMeshSwapFlags(MS_HARD_DMG);
 		}
-		else if (item->HitPoints < 150 && !item->TestMeshSwapFlags(0x400))
+		else if (item->HitPoints < 150 && !item->TestMeshSwapFlags(MS_MEDIUM_DMG))
 		{
 			ExplodeItemNode(item, 10, 0, 32);
 			ExplodeItemNode(item, 11, 0, 32);
-			item->MeshBits |= 0x400u;
-			item->SetMeshSwapFlags(0x400);
+			item->MeshBits |= MS_MEDIUM_DMG;
+			item->SetMeshSwapFlags(MS_MEDIUM_DMG);
 		}
-		else if (item->HitPoints < 225 && !item->TestMeshSwapFlags(0x10))
+		else if (item->HitPoints < 225 && !item->TestMeshSwapFlags(MS_LIGHT_DMG))
 		{
 			ExplodeItemNode(item, 4, 0, 8);
-			item->MeshBits |= 0x10;
-			item->SetMeshSwapFlags(0x10);
+			item->MeshBits |= MS_LIGHT_DMG;
+			item->SetMeshSwapFlags(MS_LIGHT_DMG);
 		}
 
-		// Play hit animation.
+		// Set recoil animation.
 		if (prevMeshSwapBits != item->Model.MeshIndex)
-		{
-			item->Animation.TargetState = STATUE_STATE_HIT;
-			item->Animation.ActiveState = STATUE_STATE_HIT;
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_HIT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		}
+			SetAnimation(item, STATUE_ANIM_RECOIL);
 
 		if (item->HitPoints > 0)
 		{
 			creature->Enemy = LaraItem;
 
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (AI.ahead)
+			if (ai.ahead)
 			{
-				joint0 = AI.angle / 2;
-				joint2 = AI.angle / 2;
-				joint1 = AI.xAngle;
+				joint0 = ai.angle / 2;
+				joint2 = ai.angle / 2;
+				joint1 = ai.xAngle;
 			}
 
 			creature->MaxTurn = 0;
@@ -373,33 +345,39 @@ namespace TEN::Entities::Creatures::TR5
 			byte color;
 			int deltaFrame;
 			bool unknown;
+			
+			color = (GetRandomControl() & 0x3F) + 128;
 
 			switch (item->Animation.ActiveState)
 			{
 			case STATUE_STATE_IDLE:
 				creature->Flags = 0;
-				joint2 = AI.angle;
+				joint2 = ai.angle;
 
 				if (creature->Mood == MoodType::Attack)
+				{
 					creature->MaxTurn = ANGLE(2.0f);
+				}
 				else
 				{
-					creature->MaxTurn = 0;
 					item->Animation.TargetState = STATUE_STATE_WALK;
+					creature->MaxTurn = 0;
 				}
 
 				if (item->AIBits ||
 					!(GetRandomControl() & 0x1F) &&
-					(AI.distance > pow(SECTOR(1), 2) ||
+					(ai.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard((CreatureInfo*)creature);
 				}
-				else if (AI.angle > ANGLE(112.5f) || AI.angle < -ANGLE(112.5f))
-					item->Animation.TargetState = STATUE_STATE_TURN_180;
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				else if (ai.angle > ANGLE(112.5f) || ai.angle < -ANGLE(112.5f))
 				{
-					if (AI.bite & ((GetRandomControl() & 3) == 0))
+					item->Animation.TargetState = STATUE_STATE_TURN_180;
+				}
+				else if (ai.ahead && ai.distance < pow(SECTOR(1), 2))
+				{
+					if (ai.bite & ((GetRandomControl() & 3) == 0))
 						item->Animation.TargetState = STATUE_STATE_ATTACK_1;
 					else if (GetRandomControl() & 1)
 						item->Animation.TargetState = STATUE_STATE_ATTACK_2;
@@ -417,14 +395,14 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->TriggerFlags == 1)
 					{
-						if (Targetable(item, &AI) && GetRandomControl() & 1)
+						if (Targetable(item, &ai) && Random::TestProbability(1 / 2.0f))
 						{
 							item->Animation.TargetState = STATUE_STATE_ENERGY_ATTACK;
 							break;
 						}
 					}
 
-					if (item->TriggerFlags || AI.distance >= pow(SECTOR(2.5f), 2) || !AI.bite)
+					if (item->TriggerFlags || ai.distance >= pow(SECTOR(2.5f), 2) || !ai.bite)
 					{
 						item->Animation.TargetState = STATUE_STATE_WALK;
 						break;
@@ -454,24 +432,24 @@ namespace TEN::Entities::Creatures::TR5
 							deltaFrame2 = 16;
 					}
 					else
+					{
 						deltaFrame2 = 4 * (62 - deltaFrame);
+					}
 
 					color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 
 					if (item->TriggerFlags)
-						TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color, color / 2);
 					else
-						TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color / 2, color);
 
 					for (int i = 0; i < 2; i++)
 					{
-						int R = 64;
-						int B = (GetRandomControl() & 0x3F) - 64;
-						int G = B;
-						auto sparkColor = Vector3(R, G, B);
-
-						TriggerAttackSpark(pos.ToVector3(), sparkColor);
-					}
+						if (item->TriggerFlags)
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(0, color, color / 2));
+						else
+							TriggerAttackSpark(pos2.ToVector3(), Vector3(0, color / 2, color));
+					}				
 				}
 
 				if (deltaFrame <= 90 || deltaFrame >= 130)
@@ -483,7 +461,7 @@ namespace TEN::Entities::Creatures::TR5
 					pos = Vector3i(-40, 64, GetRandomControl() % 360);
 				pos = GetJointPosition(item, 14, pos);
 
-				color = (GetRandomControl() & 0x3F) + 128;
+				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
 				pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
 				pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - SECTOR(4);
@@ -500,9 +478,9 @@ namespace TEN::Entities::Creatures::TR5
 						arc->pos4.z = pos2.z;
 
 						if (item->TriggerFlags)
-							SpawnElectricArcGlow(pos1.ToVector3(), 16, 0, color, color / 2);
+							SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color, color / 2);
 						else
-							SpawnElectricArcGlow(pos1.ToVector3(), 16, 0, color / 2, color);
+							SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color / 2, color);
 
 						continue;
 					}
@@ -515,33 +493,32 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->TriggerFlags)
 					{
-						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-							(Vector3i*)& dest.Orientation.x,
-							(Vector3i*)& dest,
-							(GetRandomControl() & 0x3F) + 16,
-							(color >> 1) | ((color | 0x180000) << 8),
-							15,
-							48,
-							5);*/
+						RomanStatueData.EnergyArcs[i] = TriggerLightning(
+							&pos1, &pos,
+							Random::GenerateInt(64, 80),
+							0, color, color / 2,
+							50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
 
-						SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color, color / 2);
+						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 84, 164, 10, 128);
+						SpawnElectricArcGlow(RomanStatueData.EnergyArcs[i]->pos4.ToVector3(), 36, 0, color, color / 2);
+
+						RomanStatueData.EnergyArcs[i] = nullptr;
 						unknown = 1;
 						continue;
 					}
 
-					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-						&pos2,
-						&pos1,
-						(GetRandomControl() & 0x3F) + 16,
-						color | (((color >> 1) | 0x180000) << 8),
-						15,
-						48,
-						5);*/
+					RomanStatueData.EnergyArcs[i] = TriggerLightning(
+						&pos1, &pos,
+						Random::GenerateInt(64, 80),
+						0, color / 2, color,
+						50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
 
-					SpawnElectricArcGlow(pos.ToVector3(), 16, 0, color / 2, color);
+					SpawnElectricArcGlow(RomanStatueData.EnergyArcs[i]->pos4.ToVector3(), 36, 0, color / 2, color);
+
+					RomanStatueData.EnergyArcs[i] = nullptr;
 					unknown = true;
 				}
-
+				
 				break;
 
 			case STATUE_STATE_ATTACK_1:
@@ -550,15 +527,17 @@ namespace TEN::Entities::Creatures::TR5
 			case STATUE_STATE_ATTACK_4:
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(ai.angle) >= ANGLE(2.0f))
 				{
-					if (AI.angle >= 0)
+					if (ai.angle >= 0)
 						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+				{
+					item->Pose.Orientation.y += ai.angle;
+				}
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 				{
@@ -626,7 +605,9 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
 						}
 						else
+						{
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
+						}
 					}
 				}
 
@@ -634,31 +615,35 @@ namespace TEN::Entities::Creatures::TR5
 
 			case STATUE_STATE_WALK:
 				creature->Flags = 0;
-				joint2 = AI.angle;
+				joint2 = ai.angle;
 
 				if (creature->Mood == MoodType::Attack)
+				{
 					creature->MaxTurn = ANGLE(7.0f);
+				}
 				else
 				{
 					creature->MaxTurn = 0;
-					if (abs(AI.angle) >= ANGLE(2.0f))
+					if (abs(ai.angle) >= ANGLE(2.0f))
 					{
-						if (AI.angle > 0)
+						if (ai.angle > 0)
 							item->Pose.Orientation.y += ANGLE(2.0f);
 						else
 							item->Pose.Orientation.y -= ANGLE(2.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+					{
+						item->Pose.Orientation.y += ai.angle;
+					}
 				}
 
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (ai.distance < pow(SECTOR(1), 2))
 				{
 					item->Animation.TargetState = STATUE_STATE_IDLE;
 					break;
 				}
 
-				if (AI.bite && AI.distance < pow(SECTOR(1.75f), 2))
+				if (ai.bite && ai.distance < pow(SECTOR(1.75f), 2))
 				{
 					item->Animation.TargetState = 9;
 					break;
@@ -666,14 +651,14 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->TriggerFlags == 1)
 				{
-					if (Targetable(item, &AI) && !(GetRandomControl() & 3))
+					if (Targetable(item, &ai) && !(GetRandomControl() & 3))
 					{
 						item->Animation.TargetState = STATUE_STATE_IDLE;
 						break;
 					}
 				}
 
-				if (item->TriggerFlags || AI.distance >= pow(SECTOR(2.5f), 2))
+				if (item->TriggerFlags || ai.distance >= pow(SECTOR(2.5f), 2))
 					item->Animation.TargetState = STATUE_STATE_WALK;
 				else
 					item->Animation.TargetState = STATUE_STATE_IDLE;
@@ -684,7 +669,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.angle > 0)
+				if (ai.angle > 0)
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
@@ -713,32 +698,32 @@ namespace TEN::Entities::Creatures::TR5
 					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
 				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
-				auto attackPos = Pose(pos2, orient);
+				auto attackPose = Pose(pos2, orient);
 
 					short roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
-					RomanStatueAttack(&attackPos, roomNumber, 1);
+					RomanStatueAttack(&attackPose, roomNumber, 1);
 
 					TriggerRomanStatueShockwaveAttackSparks(
-						attackPos.Position.x,
-						attackPos.Position.y,
-						attackPos.Position.z,
+						attackPose.Position.x,
+						attackPose.Position.y,
+						attackPose.Position.z,
 						0,
 						(((GetRandomControl() & 0x3F) + 128) / 2),
 						(((GetRandomControl() & 0x3F) + 128)),
 						64);
 
 					RomanStatueData.Count = 16;
-					RomanStatueData.Position.x = attackPos.Position.x;
-					RomanStatueData.Position.y = attackPos.Position.y;
-					RomanStatueData.Position.z = attackPos.Position.z;
+					RomanStatueData.Position = attackPose.Position;
 
 					if (item->ItemFlags[0])
 						item->ItemFlags[0]--;
 				}
 				else if (deltaFrame < 10 || deltaFrame > 49)
+				{
 					break;
+				}
 
 				deltaFrame -= 10;
 				if (deltaFrame < 32)
@@ -755,9 +740,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (i == 0)
 						{
 							TriggerDynamicLight(
-								pos2.x,
-								pos2.y,
-								pos2.z,
+								pos2.x, pos2.y, pos2.z,
 								8,
 								0,
 								(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32,
@@ -769,38 +752,29 @@ namespace TEN::Entities::Creatures::TR5
 						if (arc && deltaFrame && deltaFrame != 24)
 						{
 							if (deltaFrame < 16)
-							{
 								arc->life = 56;
-								arc->r = 0;
-								arc->g = g;
-								arc->b = b;
-							}
 
 							arc->pos1 = pos1.ToVector3();
 							arc->pos4 = pos2.ToVector3();
 						}
-						else if (deltaFrame >= 16)
+						else if (deltaFrame <  16)
 						{
-							if (deltaFrame == 24)
-							{
-								/*TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
-									(((GetRandomControl() & 0x3F) + 128) / 2), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
-									ENERGY_ARC_STRAIGHT_LINE);*/
-							}
-						}
-						else
-						{
-							/*TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
-								ENERGY_ARC_STRAIGHT_LINE);*/
+							RomanStatueData.EnergyArcs[i] =	TriggerLightning(
+								&pos1, &pos2,
+								Random::GenerateInt(8, 16),
+								84, 164, 10,
+								50, LI_THININ | LI_SPLINE | LI_THINOUT, 6, 2);
 
-								/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-									&pos1,
-									&pos2,
-									(GetRandomControl() & 7) + 8,
-									cb | ((cg | 0x180000) << 8),
-									12,
-									64,
-									4);*/
+						}						
+						else if (deltaFrame == 24)
+						{
+							color = (GetRandomControl() & 0x3F) + 128;
+
+							 TriggerLightning(
+								&pos1, &pos2,
+								Random::GenerateInt(18, 26),
+								0, color, color / 2,
+								50, LI_THININ | LI_SPLINE | LI_THINOUT, 8, 2);
 						}
 					}
 				}
@@ -855,8 +829,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x1F) - 16,
 				86,
-				(GetRandomControl() & 0x1F) - 16
-			);
+				(GetRandomControl() & 0x1F) - 16);
 			RomanStatueHitEffect(item, &pos, 10);
 		}
 
@@ -865,8 +838,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				-40,
 				(GetRandomControl() & 0x7F) + 148,
-				(GetRandomControl() & 0x3F) - 32
-			);
+				(GetRandomControl() & 0x3F) - 32);
 			RomanStatueHitEffect(item, &pos, 4);
 		}
 
@@ -875,8 +847,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x3F) + 54,
 				-170,
-				(GetRandomControl() & 0x1F) + 27
-			);
+				(GetRandomControl() & 0x1F) + 27);
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 
@@ -885,6 +856,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
+		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
 		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
@@ -893,6 +865,21 @@ namespace TEN::Entities::Creatures::TR5
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 
-		DoItemHit(&target, damage, isExplosive);
+		if (pos.has_value() && (player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
+			player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+			player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+			player.Control.Weapon.GunType == LaraWeaponType::HK ||
+			player.Control.Weapon.GunType == LaraWeaponType::Revolver))
+		{
+			DoItemHit(&target, damage, isExplosive);
+		}
+		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+		{
+			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
+		}
+		else
+		{
+			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive);
+		}
 	}
 }
