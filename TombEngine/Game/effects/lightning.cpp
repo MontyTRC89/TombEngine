@@ -10,7 +10,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::ElectricArc
 {
-	static constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
+	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
 
 	std::vector<ElectricArc>  ElectricArcs	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
@@ -20,7 +20,8 @@ namespace TEN::Effects::ElectricArc
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
-	// More standard version. Adopt this in place of the one below.
+	// More standard version.
+	// TODO: Adopt this in place of the one below.
 	static Vector3 CatmullRomSpline(float alpha, const std::array<Vector3, 4>& knots)
 	{
 		auto point1 = knots[1] + ((knots[2] - knots[0]) * (1 / 6.0f));
@@ -135,10 +136,10 @@ namespace TEN::Effects::ElectricArc
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	 {
-		static constexpr auto SEGMENTS_NUM_MAX = 128;
-		static constexpr auto COLOR			   = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
-		static constexpr auto LENGTH_MAX	   = BLOCK(4);
-		static constexpr auto ROTATION		   = ANGLE(-10.0f);
+		constexpr auto SEGMENTS_NUM_MAX = 128;
+		constexpr auto COLOR			= Vector4(0.0f, 0.375f, 1.0f, 1.0f);
+		constexpr auto LENGTH_MAX		= BLOCK(4);
+		constexpr auto ROTATION			= ANGLE(-10.0f);
 
 		static constexpr auto ELECTRIC_ARC_FLAGS = LI_THININ | LI_THINOUT;
 
@@ -166,8 +167,8 @@ namespace TEN::Effects::ElectricArc
 
 	void UpdateHelicalLasers()
 	{
-		static constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
-		static constexpr auto LENGTH_LERP_ALPHA = 0.25f;
+		constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
+		constexpr auto LENGTH_LERP_ALPHA = 0.25f;
 
 		// No active effects; return early.
 		if (HelicalLasers.empty())

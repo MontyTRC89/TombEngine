@@ -136,7 +136,7 @@ namespace TEN::Renderer
 				continue;
 
 			ElectricArcKnots[0] = arc.pos1;
-			memcpy(&ElectricArcKnots[1], &arc, 48); // TODO: This should be wrong, but it still works??
+			memcpy(&ElectricArcKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
 			ElectricArcKnots[5] = arc.pos4;
 
 			for (int j = 0; j < ElectricArcKnots.size(); j++)
