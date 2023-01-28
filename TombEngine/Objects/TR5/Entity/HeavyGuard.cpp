@@ -9,8 +9,8 @@
 #include "Game/control/los.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
@@ -25,7 +25,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 

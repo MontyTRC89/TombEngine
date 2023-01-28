@@ -10,9 +10,9 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -27,7 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Entities::Creatures::TR5;
@@ -64,7 +64,7 @@ BiteInfo EnemyBites[12] =
 
 namespace TEN::Renderer 
 {
-	constexpr auto ELECTRIC_ARC_RANGE_MAX = BLOCK(24);
+	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -89,21 +89,21 @@ namespace TEN::Renderer
 			auto color = laser.Color;
 			color.w = laser.Opacity;
 
-			ElectricArcKnots[0] = laser.Target;
-			ElectricArcKnots[1] = laser.Origin;
+			ElectricityKnots[0] = laser.Target;
+			ElectricityKnots[1] = laser.Origin;
 			
 			for (int j = 0; j < 2; j++)
-				ElectricArcKnots[j] -= laser.Target;
+				ElectricityKnots[j] -= laser.Target;
 
-			CalculateHelixSpline(laser, ElectricArcKnots, ElectricArcBuffer);
+			CalculateHelixSpline(laser, ElectricityKnots, ElectricityBuffer);
 
-			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(ElectricArcKnots[0].z) <= ELECTRIC_ARC_RANGE_MAX)
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
 			{
 				int bufferIndex = 0;
 
-				auto& interpPosArray = ElectricArcBuffer;
+				auto& interpPosArray = ElectricityBuffer;
 				for (int s = 0; s < laser.NumSegments ; s++)
 				{
 					auto origin = laser.Target + interpPosArray[bufferIndex];
@@ -124,33 +124,33 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawElectricArcs(RenderView& view)
+	void Renderer11::DrawElectricity(RenderView& view)
 	{
 		// No active effects; return early.
-		if (ElectricArcs.empty())
+		if (Electricitys.empty())
 			return;
 
-		for (const auto& arc : ElectricArcs)
+		for (const auto& arc : Electricitys)
 		{
 			if (arc.life <= 0)
 				continue;
 
-			ElectricArcKnots[0] = arc.pos1;
-			memcpy(&ElectricArcKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
-			ElectricArcKnots[5] = arc.pos4;
+			ElectricityKnots[0] = arc.pos1;
+			memcpy(&ElectricityKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
+			ElectricityKnots[5] = arc.pos4;
 
-			for (int j = 0; j < ElectricArcKnots.size(); j++)
-				ElectricArcKnots[j] -= LaraItem->Pose.Position.ToVector3();
+			for (int j = 0; j < ElectricityKnots.size(); j++)
+				ElectricityKnots[j] -= LaraItem->Pose.Position.ToVector3();
 
-			CalculateElectricArcSpline(arc, ElectricArcKnots, ElectricArcBuffer);
+			CalculateElectricitySpline(arc, ElectricityKnots, ElectricityBuffer);
 
-			if (abs(ElectricArcKnots[0].x) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(ElectricArcKnots[0].y) <= ELECTRIC_ARC_RANGE_MAX &&
-				abs(ElectricArcKnots[0].z) <= ELECTRIC_ARC_RANGE_MAX)
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
 			{
 				int bufferIndex = 0;
 
-				auto& interpPosArray = ElectricArcBuffer;
+				auto& interpPosArray = ElectricityBuffer;
 				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
 					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();

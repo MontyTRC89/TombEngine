@@ -13,10 +13,10 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
 #include "Game/effects/hair.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -56,7 +56,7 @@
 using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Drip;
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
@@ -196,7 +196,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		UpdateElectricArcs();
+		UpdateElectricitys();
 		UpdateHelicalLasers();
 		UpdateDrips();
 		UpdateRats();

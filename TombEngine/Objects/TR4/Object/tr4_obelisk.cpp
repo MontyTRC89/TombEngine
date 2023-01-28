@@ -9,10 +9,10 @@
 #include "Game/effects/effects.h"
 #include "Specific/Input/Input.h"
 #include "Game/animation.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/debris.h"
 
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Input;
 
 void InitialiseObelisk(short itemNumber)
@@ -69,7 +69,7 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
+					SoundEffect(SFX_TR4_LIGHTNING_LOOP, &item->Pose);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
@@ -90,13 +90,13 @@ void ObeliskControl(short itemNumber)
 				{
 					if (!(GlobalCounter & 3))
 					{
-						SpawnElectricArc(
+						SpawnElectricity(
 							pos, pos2,
 							(GetRandomControl() & 0x1F) + 32,
 							r, g, b, 24, 1, 32, 5);
 					}
 
-					SpawnElectricArcGlow(pos, 48, r, g, b);
+					SpawnElectricityGlow(pos, 48, r, g, b);
 				}
 			}
 		}
@@ -107,7 +107,7 @@ void ObeliskControl(short itemNumber)
 			pos.y = item->Pose.Position.y;
 			pos.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
-			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &Pose(Vector3i(pos)));
+			SoundEffect(SFX_TR4_LIGHTNING_LOOP, &Pose(Vector3i(pos)));
 
 			if (GlobalCounter & 1)
 			{
@@ -139,7 +139,7 @@ void ObeliskControl(short itemNumber)
 						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Pose);
 					}
 
-					SpawnElectricArc(
+					SpawnElectricity(
 						pos, pos2,
 						(GetRandomControl() & 0xF) + 16,
 						r, g, b, 24, 3, 24, 3);

@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -20,7 +20,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Input;
@@ -395,7 +395,7 @@ namespace TEN::Entities::Effects
 		{
 			if (item->TriggerFlags)
 			{
-				SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
+				SoundEffect(SFX_TR4_LIGHTNING_LOOP, &item->Pose);
 
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
@@ -412,9 +412,9 @@ namespace TEN::Entities::Effects
 						target.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 
 						if (GetRandomControl() & 3)
-							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
 						else
-							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
 					}
 				}
 
@@ -428,13 +428,13 @@ namespace TEN::Entities::Effects
 					if (!(GlobalCounter & 3))
 					{
 						if (GetRandomControl() & 3)
-							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
 						else
-							SpawnElectricArc(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
-						SpawnElectricArcGlow(target, 64, 0, g, b);
+						SpawnElectricityGlow(target, 64, 0, g, b);
 				}
 
 				if ((GlobalCounter & 3) == 2)
@@ -445,8 +445,8 @@ namespace TEN::Entities::Effects
 						(GetRandomControl() & 0x1FF) + origin.y - 256,
 						(GetRandomControl() & 0x1FF) + origin.z - 256);
 
-					SpawnElectricArc(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
-					SpawnElectricArcGlow(target, 64, 0, g, b);
+					SpawnElectricity(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
+					SpawnElectricityGlow(target, 64, 0, g, b);
 				}
 			}
 			else

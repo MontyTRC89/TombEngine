@@ -4,12 +4,12 @@
 
 #include "Math/Math.h"
 
-namespace TEN::Effects::ElectricArc
+namespace TEN::Effects::Electricity
 {
-	constexpr auto ELECTRIC_ARC_KNOTS_SIZE	= 6;
-	constexpr auto ELECTRIC_ARC_BUFFER_SIZE = 2048;
+	constexpr auto ELECTRICITY_KNOTS_SIZE  = 6;
+	constexpr auto ELECTRICITY_BUFFER_SIZE = 2048;
 
-	enum ElectricArcFlags
+	enum ElectricityFlags
 	{
 		LI_SPLINE	= (1 << 0),
 		LI_MOVEEND	= (1 << 1),
@@ -19,7 +19,7 @@ namespace TEN::Effects::ElectricArc
 	};
 
 	// TODO: Make sense of this struct.
-	struct ElectricArc
+	struct Electricity
 	{
 		Vector3 pos1;
 		Vector3 pos2;
@@ -63,19 +63,19 @@ namespace TEN::Effects::ElectricArc
 		short Rotation	= 0;
 	};
 
-	extern std::vector<ElectricArc>	 ElectricArcs;
+	extern std::vector<Electricity>	 Electricitys;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
-	extern std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>	 ElectricArcKnots;
-	extern std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE> ElectricArcBuffer;
+	extern std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots;
+	extern std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer;
 
-	void SpawnElectricArc(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
-	void SpawnElectricArcGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
+	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
+	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
-	void UpdateElectricArcs();
+	void UpdateElectricitys();
 	void UpdateHelicalLasers();
 
-	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer);
-	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer);
+	void CalculateElectricitySpline(const Electricity& arc, const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer);
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer);
 }

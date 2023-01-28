@@ -5,8 +5,8 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
@@ -20,7 +20,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::ElectricArc;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
@@ -215,7 +215,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			auto pos = GetJointPosition(&item, CyborgJoints[randomIndex], Vector3i(0, 0, 50)).ToVector3();
 
-			SpawnElectricArcGlow(pos, 48, 32, 32, 64);
+			SpawnElectricityGlow(pos, 48, 32, 32, 64);
 	
 			SpawnCyborgSpark(pos);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, Random::GenerateInt(4, 20), 31, 63, 127);
@@ -251,7 +251,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				SpawnElectricArc(pos, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
+				SpawnElectricity(pos, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
 			}
 		}
 

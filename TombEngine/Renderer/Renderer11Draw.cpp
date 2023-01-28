@@ -1522,7 +1522,7 @@ namespace TEN::Renderer
 		DrawRipples(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
-		DrawElectricArcs(view);
+		DrawElectricity(view);
 		DrawHelicalLasers(view);
 		DrawRopes(view);
 

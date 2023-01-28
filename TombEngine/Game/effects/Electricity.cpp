@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 
 #include "Game/effects/effects.h"
 #include "Game/people.h"
@@ -8,15 +8,15 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Effects::ElectricArc
+namespace TEN::Effects::Electricity
 {
 	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
 
-	std::vector<ElectricArc>  ElectricArcs	= {};
+	std::vector<Electricity>  Electricitys	= {};
 	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>  ElectricArcKnots  = {};
-	std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE> ElectricArcBuffer = {};
+	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>  ElectricityKnots  = {};
+	std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer = {};
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
 
@@ -38,13 +38,13 @@ namespace TEN::Effects::ElectricArc
 	// 4-point Catmull-Rom spline interpolation.
 	// Function takes reference to array of knots and
 	// calculates using subset of 4 determined alpha value.
-	static Vector3 ElectricArcSpline(const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, float alpha)
+	static Vector3 ElectricitySpline(const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, float alpha)
 	{
-		alpha *= ELECTRIC_ARC_KNOTS_SIZE - 3;
+		alpha *= ELECTRICITY_KNOTS_SIZE - 3;
 
 		int span = alpha;
-		if (span >= (ELECTRIC_ARC_KNOTS_SIZE - 3))
-			span = ELECTRIC_ARC_KNOTS_SIZE - 4;
+		if (span >= (ELECTRICITY_KNOTS_SIZE - 3))
+			span = ELECTRICITY_KNOTS_SIZE - 4;
 
 		float something = alpha - span;
 
@@ -65,9 +65,9 @@ namespace TEN::Effects::ElectricArc
 	}
 
 	// TODO: Pass const Vector4& for color.
-	void SpawnElectricArc(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
+	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
-		auto arc = ElectricArc();
+		auto arc = Electricity();
 
 		arc.pos1 = origin;
 		arc.pos2 = ((origin * 3) + target) / 4;
@@ -99,10 +99,10 @@ namespace TEN::Effects::ElectricArc
 		arc.amplitude = amplitude;
 		arc.width = width;
 
-		ElectricArcs.push_back(arc);
+		Electricitys.push_back(arc);
 	}
 
-	void SpawnElectricArcGlow(const Vector3& pos, float scale, byte r, byte g, byte b)
+	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b)
 	{
 		auto& spark = *GetFreeParticle();
 
@@ -141,7 +141,7 @@ namespace TEN::Effects::ElectricArc
 		constexpr auto LENGTH_MAX		= BLOCK(4);
 		constexpr auto ROTATION			= ANGLE(-10.0f);
 
-		static constexpr auto ELECTRIC_ARC_FLAGS = LI_THININ | LI_THINOUT;
+		static constexpr auto ELECTRICITY_FLAGS = LI_THININ | LI_THINOUT;
 
 		auto laser = HelicalLaser();
 
@@ -160,9 +160,9 @@ namespace TEN::Effects::ElectricArc
 
 		HelicalLasers.push_back(laser);
 
-		SpawnElectricArc(origin, target, 1, 0, laser.Color.x * UCHAR_MAX, laser.Color.z * UCHAR_MAX, 20, ELECTRIC_ARC_FLAGS, 19, 5);
-		SpawnElectricArc(origin, target, 1, 110, 255, 250, 20, ELECTRIC_ARC_FLAGS, 4, 5);
-		SpawnElectricArcGlow(laser.LightPosition, 0, 0, (laser.Color.x / 2) * UCHAR_MAX, (laser.Color.z / 2) * UCHAR_MAX);
+		SpawnElectricity(origin, target, 1, 0, laser.Color.x * UCHAR_MAX, laser.Color.z * UCHAR_MAX, 20, ELECTRICITY_FLAGS, 19, 5);
+		SpawnElectricity(origin, target, 1, 110, 255, 250, 20, ELECTRICITY_FLAGS, 4, 5);
+		SpawnElectricityGlow(laser.LightPosition, 0, 0, (laser.Color.x / 2) * UCHAR_MAX, (laser.Color.z / 2) * UCHAR_MAX);
 	 }
 
 	void UpdateHelicalLasers()
@@ -202,13 +202,13 @@ namespace TEN::Effects::ElectricArc
 				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
-	void UpdateElectricArcs()
+	void UpdateElectricitys()
 	{
 		// No active effects; return early.
-		if (ElectricArcs.empty())
+		if (Electricitys.empty())
 			return;
 
-		for (auto& arc : ElectricArcs)
+		for (auto& arc : Electricitys)
 		{
 			// Set to despawn.
 			if (arc.life <= 0.0f)
@@ -231,13 +231,13 @@ namespace TEN::Effects::ElectricArc
 		}
 
 		// Despawn inactive effects.
-		ElectricArcs.erase(
+		Electricitys.erase(
 			std::remove_if(
-				ElectricArcs.begin(), ElectricArcs.end(),
-				[](const ElectricArc& arc) { return (arc.life <= 0.0f); }), ElectricArcs.end());
+				Electricitys.begin(), Electricitys.end(),
+				[](const Electricity& arc) { return (arc.life <= 0.0f); }), Electricitys.end());
 	}
 
-	void CalculateElectricArcSpline(const ElectricArc& arc, const std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer)
+	void CalculateElectricitySpline(const Electricity& arc, const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer)
 	{
 		int bufferIndex = 0;
 
@@ -254,7 +254,7 @@ namespace TEN::Effects::ElectricArc
 			{
 				for (int i = (arc.segments * 3) - 2; i > 0; i--)
 				{
-					auto spline = ElectricArcSpline(knots, alpha);
+					auto spline = ElectricitySpline(knots, alpha);
 					auto sphere = BoundingSphere(Vector3::Zero, 8.0f);
 					auto offset = Random::GeneratePointInSphere(sphere);
 
@@ -296,7 +296,7 @@ namespace TEN::Effects::ElectricArc
 		buffer[bufferIndex] = knots[5];
 	}
 
-	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRIC_ARC_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRIC_ARC_BUFFER_SIZE>& buffer)
+	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer)
 	{
 		int bufferIndex = 0;
 
