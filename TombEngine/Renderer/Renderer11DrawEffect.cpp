@@ -77,7 +77,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawHelicalLasers(RenderView& view)
 	{
-		// No active effects; return early.
 		if (HelicalLasers.empty())
 			return;
 
@@ -126,7 +125,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawElectricity(RenderView& view)
 	{
-		// No active effects; return early.
 		if (Electricitys.empty())
 			return;
 

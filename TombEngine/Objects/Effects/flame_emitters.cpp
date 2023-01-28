@@ -414,7 +414,7 @@ namespace TEN::Entities::Effects
 						if (GetRandomControl() & 3)
 							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
 						else
-							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, (int)ElectricityFlags::Spline, 32, 3);
 					}
 				}
 
@@ -430,7 +430,7 @@ namespace TEN::Entities::Effects
 						if (GetRandomControl() & 3)
 							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
 						else
-							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, (int)ElectricityFlags::Spline, 32, 5);
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
@@ -445,7 +445,7 @@ namespace TEN::Entities::Effects
 						(GetRandomControl() & 0x1FF) + origin.y - 256,
 						(GetRandomControl() & 0x1FF) + origin.z - 256);
 
-					SpawnElectricity(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
+					SpawnElectricity(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 32, 3);
 					SpawnElectricityGlow(target, 64, 0, g, b);
 				}
 			}

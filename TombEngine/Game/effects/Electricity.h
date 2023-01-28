@@ -9,13 +9,13 @@ namespace TEN::Effects::Electricity
 	constexpr auto ELECTRICITY_KNOTS_SIZE  = 6;
 	constexpr auto ELECTRICITY_BUFFER_SIZE = 2048;
 
-	enum ElectricityFlags
+	enum class ElectricityFlags
 	{
-		LI_SPLINE	= (1 << 0),
-		LI_MOVEEND	= (1 << 1),
-		LI_THINOUT	= (1 << 2),
-		LI_THININ	= (1 << 3),
-		LI_SPARKEND = (1 << 4)
+		Spline	 = (1 << 0),
+		MoveEnd	 = (1 << 1),
+		ThinOut	 = (1 << 2),
+		ThinIn	 = (1 << 3),
+		SparkEnd = (1 << 4)
 	};
 
 	// TODO: Make sense of this struct.

@@ -251,7 +251,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				SpawnElectricity(pos, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
+				SpawnElectricity(pos, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 3);
 			}
 		}
 

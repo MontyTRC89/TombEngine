@@ -77,7 +77,7 @@ namespace TEN::Effects::Electricity
 
 		for (int i = 0; i < arc.interpolation.size(); i++)
 		{
-			if (arc.flags & LI_MOVEEND || i < (arc.interpolation.size() - 1))
+			if (arc.flags & (int)ElectricityFlags::MoveEnd || i < (arc.interpolation.size() - 1))
 			{
 				arc.interpolation[i] = Vector3(
 					fmod(Random::GenerateInt(), amplitude),
@@ -141,7 +141,7 @@ namespace TEN::Effects::Electricity
 		constexpr auto LENGTH_MAX		= BLOCK(4);
 		constexpr auto ROTATION			= ANGLE(-10.0f);
 
-		static constexpr auto ELECTRICITY_FLAGS = LI_THININ | LI_THINOUT;
+		static constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
 
 		auto laser = HelicalLaser();
 
@@ -245,7 +245,7 @@ namespace TEN::Effects::Electricity
 		bufferIndex++;
 
 		// Splined arc.
-		if (arc.flags & LI_SPLINE)
+		if (arc.flags & (int)ElectricityFlags::Spline)
 		{
 			float interpStep = 1.0f / ((arc.segments * 3) - 1);
 			float alpha = interpStep;
