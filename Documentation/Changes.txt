@@ -26,7 +26,7 @@ Version 1.0.6
 * Fix grenade launcher super ammo emitting too many fragments.
 * Fix grenade and rocket launcher lighting.
 * Fix ceiling trapdoor and floor trapdoor that Lara couldn't open manually.
-* Make enemies drop pickups at their origin point, not bounding box centerpoint.
+* Make enemies drop pickups at first available bounding box corner point, not centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
 * Add TR3 boss effects in ID_BOSS_SHIELD and ID_BOSS_SHOCKWAVE_EXPLOSION slots.
