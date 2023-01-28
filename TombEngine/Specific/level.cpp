@@ -1249,11 +1249,13 @@ void LoadBoxes()
 				int excessiveZoneGroups = numZoneGroups - j + 1;
 				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
 					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
-				break;
+				LevelDataPtr += numBoxes * sizeof(int);
 			}
-
-			g_Level.Zones[j][i].resize(numBoxes);
-			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			else
+			{
+				g_Level.Zones[j][i].resize(numBoxes);
+				ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			}
 		}
 	}
 
