@@ -197,6 +197,9 @@ extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
+template <class T>
+T& GetFreeEffect(std::vector<T>& effects, unsigned int countMax);
+
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);

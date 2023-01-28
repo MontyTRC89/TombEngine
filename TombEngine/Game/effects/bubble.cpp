@@ -20,31 +20,27 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
 	{
-		static constexpr auto COLOR_END			  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
-		static constexpr auto OPACTY_MAX		  = 0.8f;
-		static constexpr auto OPACTY_MIN		  = 0.3f;
-		static constexpr auto AMPLITUDE_HIGH	  = BLOCK(0.25f);
-		static constexpr auto AMPLITUDE_LOW		  = BLOCK(1 / 32.0f);
-		static constexpr auto SCALE_LARGE_MAX	  = BLOCK(0.5f);
-		static constexpr auto SCALE_LARGE_MIN	  = BLOCK(0.25f);
-		static constexpr auto SCALE_SMALL_MAX	  = BLOCK(1 / 8.0f);
-		static constexpr auto SCALE_SMALL_MIN	  = BLOCK(1 / 32.0f);
-		static constexpr auto VELOCITY_MIN		  = 8.0f;
-		static constexpr auto VELOCITY_SINGLE_MAX = 12.0f;
-		static constexpr auto VELOCITY_CLUMP_MAX  = 16.0f;
-		static constexpr auto WAVE_VELOCITY_MAX	  = 1 / 8.0f;
-		static constexpr auto WAVE_VELOCITY_MIN	  = 1 / 16.0f;
-		static constexpr auto OSC_VELOCITY_MAX	  = 0.5f;
-		static constexpr auto OSC_VELOCITY_MIN	  = 0.1f;
-
-		// Too many effects; return early.
-		if (Bubbles.size() > BUBBLE_NUM_MAX)
-			return;
+		constexpr auto COLOR_END		   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+		constexpr auto OPACTY_MAX		   = 0.8f;
+		constexpr auto OPACTY_MIN		   = 0.3f;
+		constexpr auto AMPLITUDE_HIGH	   = BLOCK(0.25f);
+		constexpr auto AMPLITUDE_LOW	   = BLOCK(1 / 32.0f);
+		constexpr auto SCALE_LARGE_MAX	   = BLOCK(0.5f);
+		constexpr auto SCALE_LARGE_MIN	   = BLOCK(0.25f);
+		constexpr auto SCALE_SMALL_MAX	   = BLOCK(1 / 8.0f);
+		constexpr auto SCALE_SMALL_MIN	   = BLOCK(1 / 32.0f);
+		constexpr auto VELOCITY_MIN		   = 8.0f;
+		constexpr auto VELOCITY_SINGLE_MAX = 12.0f;
+		constexpr auto VELOCITY_CLUMP_MAX  = 16.0f;
+		constexpr auto WAVE_VELOCITY_MAX   = 1 / 8.0f;
+		constexpr auto WAVE_VELOCITY_MIN   = 1 / 16.0f;
+		constexpr auto OSC_VELOCITY_MAX	   = 0.5f;
+		constexpr auto OSC_VELOCITY_MIN	   = 0.1f;
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto& bubble = Bubbles.emplace_back();
+		auto& bubble = GetFreeEffect(Bubbles, BUBBLE_NUM_MAX);
 
 		float amplitudeMax = (flags & BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH : AMPLITUDE_LOW;
 		auto sphere = BoundingSphere(Vector3::Zero, amplitudeMax);
@@ -86,7 +82,7 @@ namespace TEN::Effects::Bubble
 
 	void UpdateBubbles()
 	{
-		static constexpr auto LIFE_START_FADING = std::min(1.0f * FPS, BUBBLE_LIFE_MAX);
+		constexpr auto LIFE_START_FADING = std::min(1.0f * FPS, BUBBLE_LIFE_MAX);
 
 		if (Bubbles.empty())
 			return;

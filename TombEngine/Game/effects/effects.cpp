@@ -73,6 +73,31 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 	{ 0, 0, 0, 0, false }, // Empty
 };
 
+template <class T>
+T& GetFreeEffect(std::vector<T>& effects, unsigned int countMax)
+{
+	// Add and return new effect.
+	if (effects.size() < countMax)
+		return effects.emplace_back();
+
+	T* effectPtr = nullptr;
+	float shortestLife = INFINITY;
+
+	// Find effect with shortest remaining life.
+	for (auto& effect : effects)
+	{
+		if (effect.Life < shortestLife)
+		{
+			effectPtr = &effect;
+			shortestLife = effect.Life;
+		}
+	}
+
+	// Clear and return existing effect.
+	*effectPtr = T();
+	return *effectPtr;
+}
+
 void DetatchSpark(int number, SpriteEnumFlag type)
 {
 	auto* sptr = &Particles[0];
