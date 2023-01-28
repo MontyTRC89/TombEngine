@@ -40,7 +40,7 @@ namespace TEN::Effects::Bubble
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto& bubble = GetNewEffect(Bubbles, BUBBLE_NUM_MAX);
+		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
 		float amplitudeMax = (flags & BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH : AMPLITUDE_LOW;
 		auto sphere = BoundingSphere(Vector3::Zero, amplitudeMax);

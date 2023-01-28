@@ -166,7 +166,7 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
 {
 	// Too many effects; return early.
-	if (Bubbles.size() > BUBBLE_NUM_MAX)
+	if (Bubbles.size() > BUBBLE_COUNT_MAX)
 		return;
 
 	auto& bubble = Bubbles.emplace_back();
