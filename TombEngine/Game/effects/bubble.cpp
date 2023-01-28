@@ -16,8 +16,7 @@ namespace TEN::Effects::Bubble
 {
 	constexpr auto BUBBLE_LIFE_MAX = 60.0f * FPS;
 
-	// TODO: Use deque instead? Depends how the compiler handles it. -- Sezz 2023.01.27
-	std::vector<Bubble> Bubbles = {};
+	std::deque<Bubble> Bubbles = {};
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
 	{
@@ -41,7 +40,7 @@ namespace TEN::Effects::Bubble
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto& bubble = GetFreeEffect(Bubbles, BUBBLE_NUM_MAX);
+		auto& bubble = GetNewEffect(Bubbles, BUBBLE_NUM_MAX);
 
 		float amplitudeMax = (flags & BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH : AMPLITUDE_LOW;
 		auto sphere = BoundingSphere(Vector3::Zero, amplitudeMax);

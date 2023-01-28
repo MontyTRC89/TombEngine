@@ -38,7 +38,7 @@ namespace TEN::Effects::Bubble
 		float OscillationVelocity = 0.0f;
 	};
 
-	extern std::vector<Bubble> Bubbles;
+	extern std::deque<Bubble> Bubbles;
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags);
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags);
