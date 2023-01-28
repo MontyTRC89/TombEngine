@@ -1,8 +1,4 @@
 #pragma once
-#include <cstddef>
-#include <vector>
-
-#include "Math/Math.h"
 
 namespace TEN::Effects::Electricity
 {
