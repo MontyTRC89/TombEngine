@@ -19,6 +19,7 @@ Version 1.0.6
 * Fix TR4 skeleton spawn when used with OCB 3.
 * Fix TR4 sphinx solving his bugged behaviour that happened if it received a lot of damage.
 * Fix TR5 Roman statue and its meshswap.
+* Fix TR5 twogun laser guard.
 * Fix enemy projectile effect colours.
 * Fix enemy shadow position.
 * Fix sound positions not updated during flybys.
