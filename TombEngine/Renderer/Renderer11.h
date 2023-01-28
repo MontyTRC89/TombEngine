@@ -474,8 +474,9 @@ namespace TEN::Renderer
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
-		void BindLights(std::vector<RendererLight*>& lights);
-		void BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
+		void BindRoomLights(std::vector<RendererLight*>& lights);
+		void BindStaticLights(std::vector<RendererLight*>& lights);
+		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
 		void BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType);
 		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);

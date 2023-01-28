@@ -12,14 +12,11 @@ struct InstancedStaticMesh
 	float4x4 World;
 	float4 Color;
 	float4 AmbientLight;
-	int LightMode;
-	int NumLights;
-	int Padding1;
-	int Padding2;
-	ShaderLight Lights[8];
+	ShaderLight InstancedStaticLights[MAX_LIGHTS_PER_ITEM];
+	uint4 LightInfo;
 };
 
-cbuffer InstancedStaticMeshBuffer : register(b13)
+cbuffer InstancedStaticMeshBuffer : register(b3)
 {
 	InstancedStaticMesh StaticMeshes[INSTANCED_STATIC_MESH_BUCKET_SIZE];
 };
@@ -82,8 +79,19 @@ PixelShaderOutput PS(PixelShaderInput input, uint InstanceID : SV_InstanceID)
 	float4 tex = Texture.Sample(Sampler, input.UV);
 	DoAlphaTest(tex);
 
-	float3 color = (StaticMeshes[InstanceID].LightMode == 0) ?
-		CombineLights(StaticMeshes[InstanceID].AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normalize(input.Normal), input.Sheen) :
+	int mode = StaticMeshes[InstanceID].LightInfo.y;
+	int numLights = StaticMeshes[InstanceID].LightInfo.x;
+
+	float3 color = (mode == 0) ?
+		CombineLights(
+			StaticMeshes[InstanceID].AmbientLight.xyz, 
+			input.Color.xyz,
+			tex.xyz, 
+			input.WorldPosition, 
+			normalize(input.Normal), 
+			input.Sheen,
+			StaticMeshes[InstanceID].InstancedStaticLights,
+			numLights) :
 		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = float4(color, tex.w);

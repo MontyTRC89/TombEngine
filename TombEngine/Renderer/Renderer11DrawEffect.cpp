@@ -605,6 +605,9 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -625,8 +628,7 @@ namespace TEN::Renderer
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-
-		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+		BindStaticLights(item->LightsToDraw);
 
 		short length = 0;
 		short zOffset = 0;
@@ -704,6 +706,7 @@ namespace TEN::Renderer
 					m_stStatic.World = world;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
@@ -717,6 +720,7 @@ namespace TEN::Renderer
 					m_stStatic.World = world;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
@@ -730,6 +734,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBaddyGunflashes(RenderView& view)
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -764,9 +771,8 @@ namespace TEN::Renderer
 				m_stStatic.Color = Vector4::One;
 				m_stStatic.AmbientLight = room.AmbientLight;
 				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-
-				BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
-
+				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+				 
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
@@ -1144,12 +1150,10 @@ namespace TEN::Renderer
 		m_stStatic.Color = effect->Color;
 		m_stStatic.AmbientLight = effect->AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		BindStaticLights(effect->LightsToDraw);
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
-
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-		BindLights(effect->LightsToDraw);
 
 		if (transparent)
 		{

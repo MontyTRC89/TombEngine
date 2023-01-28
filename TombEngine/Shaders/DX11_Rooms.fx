@@ -7,17 +7,16 @@
 #include "./AnimatedTextures.hlsli"
 #include "./Shadows.hlsli"
 
-cbuffer MiscBuffer : register(b3)
+cbuffer RoomBuffer : register(b5)
 {
 	float2 CausticsStartUV;
 	float2 CausticsScale;
-	int Caustics;
-};
-
-cbuffer RoomBuffer : register(b5)
-{
 	float4 AmbientColor;
-	unsigned int Water;
+	ShaderLight RoomLights[MAX_LIGHTS_PER_ROOM];
+	int NumRoomLights;
+	int Water;
+	int Caustics;
+	int Padding;
 };
 
 struct PixelShaderInput
@@ -133,11 +132,11 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	if (doLights)
 	{
-		for (int i = 0; i < NumLights; i++)
+		for (int i = 0; i < NumRoomLights; i++)
 		{
-			float3 lightPos = Lights[i].Position.xyz;
-			float3 color = Lights[i].Color.xyz;
-			float radius = Lights[i].Out;
+			float3 lightPos = RoomLights[i].Position.xyz;
+			float3 color = RoomLights[i].Color.xyz;
+			float radius = RoomLights[i].Out;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);

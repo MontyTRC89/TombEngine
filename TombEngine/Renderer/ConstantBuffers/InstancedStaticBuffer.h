@@ -31,11 +31,11 @@ namespace TEN::Renderer
 		Matrix World;
 		Vector4 Color;
 		Vector4 Ambient;
-		int LightMode;
+		ShaderLight Lights[8];
 		int NumLights;
+		int LightMode;
 		int Padding1;
 		int Padding2;
-		ShaderLight Lights[8];
 	};
 
 	struct alignas(16) CInstancedStaticMeshBuffer
