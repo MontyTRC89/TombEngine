@@ -141,7 +141,7 @@ namespace TEN::Effects::Electricity
 		constexpr auto LENGTH_MAX		= BLOCK(4);
 		constexpr auto ROTATION			= ANGLE(-10.0f);
 
-		static constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
+		constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
 
 		auto laser = HelicalLaser();
 
