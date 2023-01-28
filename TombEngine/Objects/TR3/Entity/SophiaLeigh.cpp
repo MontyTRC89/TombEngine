@@ -15,6 +15,7 @@
 #include "lara_helpers.h"
 #include "tomb4fx.h"
 #include "people.h"
+#include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
@@ -37,7 +38,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE = CLICK(2);
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX = 60;
-	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.6f, 0.4f, 0.5f);
+	constexpr auto SOPHIALEIGH_LIGHTNING_GLOW_SIZE = 32;
 
 	// Additional normal value.
 	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
@@ -105,7 +107,12 @@ namespace TEN::Entities::Creatures::TR3
 		short headAngle;
 		short torsoXAngle;
 		short torsoYAngle;
+		SHOCKWAVE_STRUCT* Shockwaves[3] = {};
+		short shockwaveCount;
+		short shockwaveTimer;
 	};
+
+	SophiaData Sophia;
 
 	void InitialiseLondonBoss(short itemNumber)
 	{
@@ -199,6 +206,12 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->AIBits)
 			GetAITarget(creature);
 
+		auto orient2D = Random::GenerateAngle();
+		auto sphere = BoundingSphere(item->Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item->Pose.Orientation);
+
+		int speed = Random::GenerateInt(-BLOCK(0.5f), -BLOCK(1.6f));
+
 		AI_INFO ai;
 		CreatureAIInfo(item, &ai);
 
@@ -258,32 +271,32 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
 			{
-				item->Animation.TargetState = SOPHIALEIGH_STATE_LAUGH;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_LAUGH;
 			}
 			else if (creature->ReachedGoal)
 			{
 				if (item->TestFlagField((int)BossItemFlags::ChargedState, TRUE))
-					item->Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_BIG_SHOOT;
 				else if (item->Timer <= 0)
 					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;
 				else
-					item->Animation.TargetState = SOPHIALEIGH_STATE_SMALL_SHOOT;
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_SMALL_SHOOT;
 			}
 			else
-				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_RUN;
 			break;
 		case SOPHIALEIGH_STATE_WALK:
 			creature->MaxTurn = SOPHIALEIGH_WALK_TURN_RATE_MAX;
 			if (creature->ReachedGoal)
-				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_STAND;
 			else if (ai.distance > SOPHIALEIGH_WALK_RANGE)
-				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_RUN;
 			break;
 		case SOPHIALEIGH_STATE_RUN:
 			creature->MaxTurn = SOPHIALEIGH_RUN_TURN_RATE_MAX;
 			if (creature->ReachedGoal)
 			{
-				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;//SOPHIALEIGH_STATE_STAND;
 				break;
 			}
 			data->tilt = data->angle / 2;
@@ -313,6 +326,23 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			//TriggerSophiaShockwave(item, SOPHIALEIGH_Staff); // SHITTY EFFECT
+
+						//TriggerSophiaShockwave(item, SOPHIALEIGH_Staff); // SHITTY EFFECT
+			if (item->Timer == 600)
+			{
+				sphere = BoundingSphere(item->Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item->Pose.Orientation);
+
+				speed = Random::GenerateInt(-BLOCK(0.5f), -BLOCK(1.6f));
+				orient2D = Random::GenerateAngle(ANGLE(-24.0f), ANGLE(24.0f));
+
+				TriggerShockwave(
+					&shockwavePos, BLOCK(1.0f), BLOCK(2.5f), speed,
+					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+					36, EulerAngles(orient2D, 0.0f, orient2D), 0, true);
+				SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
+				//TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
+			}
 
 			break;
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
@@ -357,6 +387,17 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		AI_INFO ai;
 
+		//auto& wave = Sophia.Shockwaves[Sophia.shockwaveCount];
+		
+		int  charginCounter = 0;
+		auto orientz = Random::GenerateAngle();
+		auto orientx = Random::GenerateAngle();
+		auto orienty = 0;
+		auto sphere = BoundingSphere(item->Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item->Pose.Orientation);
+
+		int speed = Random::GenerateInt(-BLOCK(0.5f), -BLOCK(1.6f));
+
 		CreatureAIInfo(item, &ai);
 		if (item->Timer > 0) // Used for charge count, if 0, sophia will be able to do a new charge animation.
 			item->Timer--;
@@ -391,11 +432,11 @@ namespace TEN::Entities::Creatures::TR3
 			else if (ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE && Targetable(item, &ai))
 			{
 				if (item->TestFlagField((int)BossItemFlags::ChargedState, TRUE))
-					item->Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON; // SOPHIALEIGH_STATE_BIG_SHOOT;
 				else if (item->Timer <= 0)
 					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON;
 				else
-					item->Animation.TargetState = SOPHIALEIGH_STATE_SMALL_SHOOT;
+					item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON; // SOPHIALEIGH_STATE_SMALL_SHOOT;
 			}
 			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE && abs(ai.verticalDistance) <= STEPUP_HEIGHT)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
@@ -406,7 +447,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->MaxTurn = SOPHIALEIGH_WALK_TURN_RATE_MAX;
 
 			if (ai.distance > SOPHIALEIGH_NORMAL_WALK_RANGE)
-				item->Animation.TargetState = SOPHIALEIGH_STATE_RUN;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON; //SOPHIALEIGH_STATE_RUN;
 			else if (Targetable(item, &ai) && ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND;
 			break;
@@ -417,7 +458,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (Targetable(item, &ai) && ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE)
 				item->Animation.TargetState = SOPHIALEIGH_STATE_STAND; 
 			else if (ai.distance < SOPHIALEIGH_NORMAL_WALK_RANGE && abs(ai.verticalDistance) <= STEPUP_HEIGHT)
-				item->Animation.TargetState = SOPHIALEIGH_STATE_WALK;
+				item->Animation.TargetState = SOPHIALEIGH_STATE_SUMMON; //SOPHIALEIGH_STATE_WALK;
 			break;
 		case SOPHIALEIGH_STATE_SUMMON:
 			creature->MaxTurn = 0;
@@ -427,6 +468,8 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->Animation.FrameNumber == GetFrameNumber(item, 0))
 				{
 					item->Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
+					Sophia.shockwaveTimer = 0;
+					Sophia.shockwaveCount = 0;
 				}
 				else if (item->HitStatus && item->Animation.TargetState != SOPHIALEIGH_STATE_STAND && Random::TestProbability(1.0f / 50.0f)) // Avoid her being canceled every time.
 				{
@@ -441,7 +484,80 @@ namespace TEN::Entities::Creatures::TR3
 				item->SetFlagField((int)BossItemFlags::ChargedState, TRUE);
 			}
 
-			//TriggerSophiaShockwave(item, SOPHIALEIGH_Staff); // SHITTY EFFECT
+
+			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
+				SOPHIALEIGH_LIGHTNING_GLOW_SIZE + (Random::GenerateInt(3, 8)),
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
+
+			
+		
+				//TriggerSophiaShockwave(item, SOPHIALEIGH_Staff); // SHITTY EFFECT
+			if (!Sophia.shockwaveTimer && Sophia.shockwaveCount < 4)
+			{
+
+
+				//int wave = GetFreeSegment();
+
+
+
+				int posi2 = -512;// Random::GenerateFloat(0, -BLOCK(1)); //TR3 effect
+				sphere = BoundingSphere(item->Pose.Position.ToVector3() + Vector3(0.0f, posi2, 0.0f), BLOCK(1 / 16.0f));
+				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item->Pose.Orientation);
+
+
+
+				auto pos = Pose(item->Pose.Position, 0, 0, 0);
+
+
+				
+				
+
+				SpawnSophiaSparks(shockwavePos.Position.ToVector3(), Vector3(SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX), 5, 2);
+
+				//TEN::Effects::Spark::TriggerAttackSpark(shockwavePos.Position.ToVector3(), Vector3(SOPHIALEIGH_EFFECT_COLOR.x* UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y* UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z* UCHAR_MAX));
+
+				speed = -104;//Random::GenerateInt(-54, -64);//TR3 effect
+				Vector2 circle = Vector2(2700, 2000);;// Vector2(Random::GenerateInt(BLOCK(2.4f), BLOCK(2.8f)), Random::GenerateInt(BLOCK(1.8f), BLOCK(2.4f)));//Vector2(BLOCK(2.4), BLOCK(2.8));
+
+				orientz = item->Pose.Position.x + Random::GenerateInt(-80, 80 ) * phd_sin(item->Pose.Orientation.y);
+				orientx = item->Pose.Position.z + Random::GenerateInt(-80, 80) * phd_cos(item->Pose.Orientation.y);;// Random::GenerateAngle(ANGLE(0.0f), ANGLE(5.0f));
+				//shockwavePos
+				orienty = (item->Pose.Position.y ) * phd_sin(item->Pose.Orientation.x);
+
+
+				/*TriggerLightningGlow(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
+					SOPHIALEIGH_LIGHTNING_GLOW_SIZE + (GetRandomControl() & 3), 
+					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);*/
+
+				 TriggerShockwave(
+					&shockwavePos, circle.x, circle.y, speed,
+					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+					36, EulerAngles(orientx, orienty,  orientz), 0, false);
+
+				orientx = Random::GenerateAngle(ANGLE(0.0f), ANGLE(5.0f));
+
+				
+
+				Sophia.shockwaveTimer = 5;
+				Sophia.shockwaveCount++;
+				//}
+				//else
+				//{
+
+				break;
+			}
+
+			if (Sophia.shockwaveCount == 4)
+			{
+				Sophia.shockwaveCount = 0;
+				Sophia.shockwaveTimer = 11;
+				break;
+			}
+
+			Sophia.shockwaveTimer--;
+			
+				
+				
 
 			break;
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
@@ -556,4 +672,44 @@ namespace TEN::Entities::Creatures::TR3
 			CreatureAnimation(itemNumber, data.angle, 0);
 		}
 	}
+
+
+	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int unk)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			auto* spark = GetFreeParticle();
+
+			auto sphere = BoundingSphere(Vector3::Zero, BLOCK(2));
+			auto vel = Random::GeneratePointInSphere(sphere) * pow(2, unk);
+
+			spark->on = true;
+			spark->sR = color.x;
+			spark->sG = color.y;
+			spark->sB = color.z;
+			spark->dB = 0;
+			spark->dG = 0;
+			spark->dR = 0;
+			spark->colFadeSpeed = 9 * pow(2, unk);
+			spark->fadeToBlack = 0;
+			spark->life = 9 * pow(2, unk);
+			spark->sLife = 9 * pow(2, unk);
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->x = pos.x;
+			spark->y = pos.y;
+			spark->z = pos.z;
+			spark->gravity = (GetRandomControl() / 128) & 0x1F;
+			spark->yVel = vel.x;
+			spark->xVel = vel.y;
+			spark->zVel = vel.z;
+			spark->flags = SP_NONE;
+			spark->maxYvel = 0;
+			spark->friction = 34 * pow(2, unk);
+			spark->scalar = 3;
+			spark->dSize =
+				spark->sSize =
+				spark->size = Random::GenerateInt(84, 98);
+		}
+	}
+
 }

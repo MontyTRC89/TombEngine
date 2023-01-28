@@ -63,13 +63,19 @@ struct SHOCKWAVE_STRUCT
 	short innerRad;
 	short outerRad;
 	short xRot;
+	short yRot;
+	short zRot;
 	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
+	unsigned char sr;
+	unsigned char sg;
+	unsigned char sb;
 	unsigned char life;
 	short speed;
 	short temp;
+	bool fadein = false;
 };
 
 struct GUNSHELL_STRUCT
@@ -247,7 +253,7 @@ void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

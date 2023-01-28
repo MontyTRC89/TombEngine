@@ -1392,7 +1392,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1406,7 +1406,9 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->z = pos->Position.z;
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
-		sptr->xRot = angle;
+		sptr->xRot = rotation.x;
+		sptr->yRot = rotation.y;
+		sptr->zRot = rotation.z;
 		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
@@ -1414,8 +1416,26 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
+
+		sptr->sr = 0;
+		sptr->sg = 0;
+		sptr->sb = 0;
+
+
+		if (sound)
+		{
+			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
+		}
+
+
+		sptr->fadein = false;
+
+
+
+		
 	}
+
+	
 }
 
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
@@ -1487,7 +1507,8 @@ void UpdateShockwaves()
 			if (sw->life)
 			{
 				sw->outerRad += sw->speed;
-				sw->speed -= (sw->speed >> 4);
+				sw->innerRad += (sw->speed);
+				sw->speed -= (sw->speed >> 4);//>> 4
 
 				if (LaraItem->HitPoints > 0)
 				{

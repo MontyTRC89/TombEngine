@@ -258,7 +258,7 @@ namespace Effects
 
 		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
 
-		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, ANGLE(ang), short(damage));
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, EulerAngles(ANGLE(ang), 0.0f, 0.0f), short(damage), true);
 	}
 
 /***Emit dynamic light that lasts for a single frame.

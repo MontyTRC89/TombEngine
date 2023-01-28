@@ -486,27 +486,50 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawShockwaves(RenderView& view) 
 	{
+		unsigned char r = 0;
+		unsigned char g = 0;
+		unsigned char b = 0;
+
 		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
+
+
 
 			if (shockwave->life) 
 			{
 				byte color = shockwave->life * 8;
 
 				int dl = shockwave->outerRad - shockwave->innerRad;
-				Matrix rotationMatrix = Matrix::CreateRotationX(TO_RAD(shockwave->xRot));
+
+
+				shockwave->yRot += shockwave->yRot/FPS;
+
+				//if (shockwave->yRot > 360)
+				//	shockwave->yRot = 0;
+
+				
+				Matrix rotationMatrix = Matrix::CreateRotationX(shockwave->xRot) * Matrix::CreateRotationY(ANGLE(shockwave->yRot/4)) * Matrix::CreateRotationZ(shockwave->zRot);
+
 				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
-				float angle = PI / 32.0f;
+				float angle = PI / 16.0f;//16 TR3
 				float c = cos(angle);
 				float s = sin(angle);
-				float x1 = (shockwave->innerRad * c);
-				float z1 = (shockwave->innerRad * s);
+
+				float x1 = (shockwave->innerRad * c); //TR3 Effect
+				float z1 = (shockwave->innerRad * s);//TR3 Effect
+
+				//float x1 = (shockwave->innerRad * c); //TR3 Effect
+				//float z1 = (shockwave->innerRad * s);//TR3 Effect
+
 				float x4 = (shockwave->outerRad * c);
 				float z4 = (shockwave->outerRad * s);
-				angle -= PI / 8.0f;
+
+				//float x4 = 0;
+				//float z4 = 0;
+				angle -= PI / 4.0f;//4= TR3
 
 				Vector3 p1 = Vector3(x1, 0, z1);
 				Vector3 p4 = Vector3(x4, 0, z4);
@@ -514,15 +537,72 @@ namespace TEN::Renderer
 				p1 = Vector3::Transform(p1, rotationMatrix);
 				p4 = Vector3::Transform(p4, rotationMatrix);
 
-				for (int j = 0; j < 16; j++) 
+
+
+				if (shockwave->fadein == false)
+				{
+
+
+
+					if (shockwave->sr < shockwave->r)
+					{
+						shockwave->sr += shockwave->r/18;
+						r = shockwave->sr * shockwave->life / 255.0f;
+					}
+					else
+						r = shockwave->r * shockwave->life / 255.0f;
+
+
+					if (shockwave->sg < shockwave->g)
+					{
+						shockwave->sg += shockwave->g /18;
+						g = shockwave->sg * shockwave->life / 255.0f;
+					}
+					else
+						g = shockwave->g * shockwave->life / 255.0f;
+
+
+					if (shockwave->sb < shockwave->b)
+					{
+						shockwave->sb += shockwave->b / 18;
+						b = shockwave->sb * shockwave->life / 255.0f;
+					}
+					else
+						b = shockwave->b * shockwave->life / 255.0f;
+
+					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+						shockwave->fadein = true;
+
+				}
+				else
+				{
+					r = shockwave->r * shockwave->life / 255.0f;
+					g = shockwave->g * shockwave->life / 255.0f;
+					b = shockwave->b * shockwave->life / 255.0f;
+
+
+				}
+
+				
+
+				for (int j = 0; j < 16; j++) //8 = TR3
 				{
 					c = cos(angle);
 					s = sin(angle);
-					float x2 = (shockwave->innerRad * c);
-					float z2 = (shockwave->innerRad * s);
+
+					//float x2 =  (shockwave->innerRad * c); 
+					//float z2 =  (shockwave->innerRad * s);
+
+					float x2 =  (shockwave->innerRad * c); // TR3 effect
+					float z2 = (shockwave->innerRad * s);//TR3 effect
+
+
+					//float x3 = 0;// (shockwave->outerRad * c);
+					//float z3 = 0;// (shockwave->outerRad * s);
+
 					float x3 = (shockwave->outerRad * c);
 					float z3 = (shockwave->outerRad * s);
-					angle -= PI / 8.0f;
+					angle -= PI / 4.0f;//4=TR3
 
 					Vector3 p2 = Vector3(x2, 0, z2);
 					Vector3 p3 = Vector3(x3, 0, z3);
@@ -530,17 +610,33 @@ namespace TEN::Renderer
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-								pos + p1,
-								pos + p2,
-								pos + p3,
+
+
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+
+
+					/*AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH1],// SPR_SPLASH],
 								pos + p4,
+								pos + p3,
+								pos + p2,
+								pos + p1,
 								Vector4(
-								shockwave->r * shockwave->life / 255.0f / 16.0f,
-								shockwave->g * shockwave->life / 255.0f / 16.0f,
-								shockwave->b * shockwave->life / 255.0f / 16.0f,
+									r / 16.0f,
+									g / 16.0f,
+									b / 16.0f,
 								1.0f),
-								0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+						0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);*/
 
 					p1 = p2;
 					p4 = p3;
