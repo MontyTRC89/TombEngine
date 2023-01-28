@@ -14,12 +14,16 @@ Version 1.0.6
 * Fix TR1 rat which crashed the game when it was killed.
 * Fix TR1 ape climbing.
 * Fix TR2 small spider climbing and pathfinding.
+* Fix TR3 Shiva and TR4 baddy 2 not blocking bullets.
 * Fix TR4 skeleton spawn when used with OCB 3.
 * Fix TR4 SAS teleporting over the blocks he walks by.
-* Fix TR3 Shiva and TR4 baddy 2 not blocking bullets.
+* Fix TR5 Roman statue and its meshswap.
 * Fix enemy projectile effect colours.
 * Fix enemy shadow position.
 * Fix sound positions not updated during flybys.
+* Fix grenade launcher super ammo emitting too many fragments.
+* Fix grenade and rocket launcher lighting.
+* Fix ceiling trapdoor not being initialized properly.
 * Make enemies drop pickups at their origin point, not bounding box centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
@@ -37,6 +41,8 @@ Lua API changes
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
 * Moveable:MeshIsSwapped is now GetMeshSwapped
+* Primitive Classes (Color, Rotation, Vec3) can now be saved via Levelvars and Gamevars variables.
+* OnSave function now gets called just before data is saved, rather than just after.
 * Add new function CameraObject::PlayCamera()
 * Add new function Misc::GetCameraType()
 

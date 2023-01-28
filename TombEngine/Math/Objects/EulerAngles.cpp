@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "Math/Containers/EulerAngles.h"
+#include "Math/Objects/EulerAngles.h"
 
 #include "Math/Constants.h"
 #include "Math/Geometry.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/AxisAngle.h"
 
 using namespace TEN::Math;
 
@@ -32,9 +33,14 @@ using namespace TEN::Math;
 		this->z = 0;
 	}
 
+	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
+	{
+		*this = EulerAngles(axisAngle.ToQuaternion());
+	}
+
 	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
-		static constexpr auto singularityThreshold = 0.9999995f;
+		static constexpr auto singularityThreshold = 1.0f - EPSILON;
 
 		// Handle singularity case.
 		float sinP = ((quat.w * quat.x) - (quat.y * quat.z)) * 2;
@@ -66,12 +72,11 @@ using namespace TEN::Math;
 		*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
 	}
 
-	// TODO: Check.
 	EulerAngles::EulerAngles(const Matrix& rotMatrix)
 	{
-		this->x = FROM_RAD(asin(rotMatrix._31));
-		this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
-		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
+		this->x = FROM_RAD(asin(-rotMatrix._32));
+		this->y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
+		this->z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
 	}
 
 	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
@@ -84,19 +89,6 @@ using namespace TEN::Math;
 		}
 
 		return false;
-	}
-
-	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
-	{
-		*this = InterpolateConstant(*this, eulersTo, angularVel);
-	}
-
-	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
-	{
-		return EulerAngles(
-			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
-			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
-			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel));
 	}
 
 	void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
@@ -112,6 +104,33 @@ using namespace TEN::Math;
 			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon));
 	}
 
+	void EulerAngles::Slerp(const EulerAngles& eulersTo, float alpha)
+	{
+		*this = Slerp(*this, eulersTo, alpha);
+	}
+
+	EulerAngles EulerAngles::Slerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha)
+	{
+		auto quatFrom = eulersFrom.ToQuaternion();
+		auto quatTo = eulersTo.ToQuaternion();
+
+		auto quat = Quaternion::Slerp(quatFrom, quatTo, alpha);
+		return EulerAngles(quat);
+	}
+
+	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
+	{
+		*this = InterpolateConstant(*this, eulersTo, angularVel);
+	}
+
+	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+	{
+		return EulerAngles(
+			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
+			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
+			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel));
+	}
+
 	Vector3 EulerAngles::ToDirection() const
 	{
 		float sinX = sin(TO_RAD(x));
@@ -124,6 +143,11 @@ using namespace TEN::Math;
 			sinY * cosX,
 			-sinX,
 			cosY * cosX);
+	}
+
+	AxisAngle EulerAngles::ToAxisAngle() const
+	{
+		return AxisAngle(*this);
 	}
 
 	Quaternion EulerAngles::ToQuaternion() const
@@ -143,7 +167,7 @@ using namespace TEN::Math;
 
 	bool EulerAngles::operator !=(const EulerAngles& eulers) const
 	{
-		return ((x != eulers.x) || (y != eulers.y) || (z != eulers.z));
+		return !(*this == eulers);
 	}
 
 	EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)
@@ -221,7 +245,7 @@ using namespace TEN::Math;
 
 	float EulerAngles::ClampAlpha(float alpha)
 	{
-		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
+		return std::clamp(alpha, 0.0f, 1.0f);
 	}
 
 	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)

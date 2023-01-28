@@ -852,6 +852,9 @@ void DropPickups(ItemInfo* item)
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
+	// Also collect objects which are around.
+	bool collidedWithObjects = GetCollidedObjects(item, extents.Length(), true, CollidedItems, CollidedMeshes, true);
+
 	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
 
 	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
@@ -882,6 +885,46 @@ void DropPickups(ItemInfo* item)
 
 		// If position is inside a wall or on a slope, don't use it.
 		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// If position is not in the same room, don't use it.
+		if (collPoint.RoomNumber != item->RoomNumber)
+			continue;
+
+		// Setup a dummy sphere with 1-click diameter for item and static mesh collision tests.
+		auto sphere = BoundingSphere(candidatePos, CLICK(0.5f));
+		bool collidedWithObject = false;
+
+		// Iterate through all found items and statics around, and determine if dummy sphere
+		// intersects any of those. If so, try other corner.
+
+		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		{
+			auto* currentItem = CollidedItems[i];
+			if (!currentItem)
+				break;
+
+			if (GameBoundingBox(currentItem).ToBoundingOrientedBox(currentItem->Pose).Intersects(sphere))
+			{
+				collidedWithObject = true;
+				break;
+			}
+		}
+
+		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		{
+			auto* currentMesh = CollidedMeshes[i];
+			if (!currentMesh)
+				break;
+
+			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			{
+				collidedWithObject = true;
+				break;
+			}
+		}
+
+		if (collidedWithObject)
 			continue;
 
 		// Finally, do height difference tests. If difference is more than one and a half click,

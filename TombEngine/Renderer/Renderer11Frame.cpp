@@ -177,7 +177,7 @@ namespace TEN::Renderer
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
 		// NOTE by MontyTRC: I'd keep this as a failsafe solution for 0.00000001% of cases we could have problems
 
-		static constexpr int MAX_SEARCH_DEPTH = 128;
+		static constexpr int MAX_SEARCH_DEPTH = 64;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
 			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
