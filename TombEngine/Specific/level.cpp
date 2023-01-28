@@ -1226,20 +1226,20 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
+	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
 	g_Level.Boxes.resize(numBoxes);
 	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
-	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-
 	// Read overlaps
 	int numOverlaps = ReadInt32();
+	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
-	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
-
 	// Read zones
 	int numZoneGroups = ReadInt32();
+	TENLog("Num zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < numZoneGroups; j++)
