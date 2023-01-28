@@ -6,7 +6,7 @@
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
@@ -20,7 +20,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 
@@ -34,7 +34,7 @@ namespace TEN::Entities::Creatures::TR5
 	struct RomanStatueInfo
 	{
 		Vector3i Position = Vector3i::Zero;
-		LIGHTNING_INFO* EnergyArcs[8] = {};
+		Electricity* EnergyArcs[8] = {};
 		unsigned int Count = 0;
 	};
 
@@ -478,9 +478,9 @@ namespace TEN::Entities::Creatures::TR5
 						arc->pos4.z = pos2.z;
 
 						if (item->TriggerFlags)
-							TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
+							SpawnElectricityGlow(pos.ToVector3(), 16, 0, color, color / 2);
 						else
-							TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
+							SpawnElectricityGlow(pos.ToVector3(), 16, 0, color / 2, color);
 
 						continue;
 					}
@@ -493,38 +493,32 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->TriggerFlags)
 					{
-						RomanStatueData.EnergyArcs[i] = TriggerLightning(
-							&pos1, &pos,
+						SpawnElectricity(
+							pos1.ToVector3(), pos.ToVector3(),
 							Random::GenerateInt(64, 80),
 							0, color, color / 2,
-							50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
+							50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 2, 10);
+						RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 84, 164, 10, 128);
-						TriggerLightningGlow(
-							RomanStatueData.EnergyArcs[i]->pos4.x,
-							RomanStatueData.EnergyArcs[i]->pos4.y,
-							RomanStatueData.EnergyArcs[i]->pos4.z,
-							36, 0, color, color / 2);
+						SpawnElectricityGlow(RomanStatueData.EnergyArcs[i]->pos4, 36, 0, color, color / 2);
 
-						unknown = 1;
 						RomanStatueData.EnergyArcs[i] = nullptr;
+						unknown = 1;
 						continue;
 					}
 
-					RomanStatueData.EnergyArcs[i] = TriggerLightning(
-						&pos1, &pos,
+					SpawnElectricity(
+						pos1.ToVector3(), pos.ToVector3(),
 						Random::GenerateInt(64, 80),
 						0, color / 2, color,
-						50, LI_THININ | LI_SPLINE | LI_THINOUT, 2, 10);
+						50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 2, 10);
+					RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
-					TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 10, 124, 184, 128);
-					TriggerLightningGlow(
-						RomanStatueData.EnergyArcs[i]->pos4.x,
-						RomanStatueData.EnergyArcs[i]->pos4.y,
-						RomanStatueData.EnergyArcs[i]->pos4.z,
-						36, 0, color / 2, color);
+					SpawnElectricityGlow(RomanStatueData.EnergyArcs[i]->pos4, 36, 0, color / 2, color);
+
 					RomanStatueData.EnergyArcs[i] = nullptr;
-					unknown = true;					
+					unknown = true;
 				}
 				
 				break;
@@ -761,27 +755,29 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (deltaFrame < 16)
 								arc->life = 56;
-								arc->pos1 = pos1;
-								arc->pos4 = pos2;
+
+							arc->pos1 = pos1.ToVector3();
+							arc->pos4 = pos2.ToVector3();
 						}
 						else if (deltaFrame <  16)
 						{
-							RomanStatueData.EnergyArcs[i] =	TriggerLightning(
-								&pos1, &pos2,
+							SpawnElectricity(
+								pos1.ToVector3(), pos2.ToVector3(),
 								Random::GenerateInt(8, 16),
 								84, 164, 10,
-								50, LI_THININ | LI_SPLINE | LI_THINOUT, 6, 2);
+								50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 6, 2);
+							RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
 						}						
 						else if (deltaFrame == 24)
 						{
 							color = (GetRandomControl() & 0x3F) + 128;
 
-							 TriggerLightning(
-								&pos1, &pos2,
+							SpawnElectricity(
+								pos1.ToVector3(), pos2.ToVector3(),
 								Random::GenerateInt(18, 26),
 								0, color, color / 2,
-								50, LI_THININ | LI_SPLINE | LI_THINOUT, 8, 2);
+								50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 8, 2);
 						}
 					}
 				}
