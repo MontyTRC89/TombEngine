@@ -359,7 +359,7 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye.
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
-									SpawnElectricArc(origin1.ToVector3(), eye.ToVector3(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, LI_THININ | LI_THINOUT, 6, 10);
+									SpawnElectricArc(origin1.ToVector3(), eye.ToVector3(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, LI_SPLINE | LI_THININ | LI_THINOUT, 6, 10);
 									guardian->fireArcs[i] = &ElectricArcs.back();
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
@@ -564,7 +564,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			origin = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianChargePositions[i]).ToVector3();
-			SpawnElectricArc(origin, target, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			SpawnElectricArc(origin, target, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, LI_SPLINE | LI_THINOUT | LI_THININ, 6, 5);
 		}
 
 		if (GlobalCounter & 1)
@@ -584,7 +584,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		if (!(GlobalCounter & 3))
-			SpawnElectricArc(target, item->Pose.Position.ToVector3(), Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			SpawnElectricArc(target, item->Pose.Position.ToVector3(), Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, LI_SPLINE | LI_THINOUT | LI_THININ, 6, 5);
 			
 		SpawnGuardianSparks(target, colorSparks, 3, 1);
 	}
