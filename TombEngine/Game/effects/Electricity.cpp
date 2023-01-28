@@ -12,10 +12,10 @@ namespace TEN::Effects::Electricity
 {
 	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
 
-	std::vector<Electricity>  Electricitys	= {};
-	std::vector<HelicalLaser> HelicalLasers = {};
+	std::vector<Electricity>  ElectricityArcs = {};
+	std::vector<HelicalLaser> HelicalLasers	  = {};
 
-	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>  ElectricityKnots  = {};
+	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots  = {};
 	std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer = {};
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
@@ -99,7 +99,7 @@ namespace TEN::Effects::Electricity
 		arc.amplitude = amplitude;
 		arc.width = width;
 
-		Electricitys.push_back(arc);
+		ElectricityArcs.push_back(arc);
 	}
 
 	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b)
@@ -205,10 +205,10 @@ namespace TEN::Effects::Electricity
 	void UpdateElectricitys()
 	{
 		// No active effects; return early.
-		if (Electricitys.empty())
+		if (ElectricityArcs.empty())
 			return;
 
-		for (auto& arc : Electricitys)
+		for (auto& arc : ElectricityArcs)
 		{
 			// Set to despawn.
 			if (arc.life <= 0.0f)
@@ -231,10 +231,10 @@ namespace TEN::Effects::Electricity
 		}
 
 		// Despawn inactive effects.
-		Electricitys.erase(
+		ElectricityArcs.erase(
 			std::remove_if(
-				Electricitys.begin(), Electricitys.end(),
-				[](const Electricity& arc) { return (arc.life <= 0.0f); }), Electricitys.end());
+				ElectricityArcs.begin(), ElectricityArcs.end(),
+				[](const Electricity& arc) { return (arc.life <= 0.0f); }), ElectricityArcs.end());
 	}
 
 	void CalculateElectricitySpline(const Electricity& arc, const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer)

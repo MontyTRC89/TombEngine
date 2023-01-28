@@ -360,7 +360,7 @@ namespace TEN::Entities::Creatures::TR5
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
 									SpawnElectricity(origin1.ToVector3(), eye.ToVector3(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut, 6, 10);
-									guardian->fireArcs[i] = &Electricitys.back();
+									guardian->fireArcs[i] = &ElectricityArcs.back();
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}

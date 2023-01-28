@@ -498,7 +498,7 @@ namespace TEN::Entities::Creatures::TR5
 							Random::GenerateInt(64, 80),
 							0, color, color / 2,
 							50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 2, 10);
-						RomanStatueData.EnergyArcs[i] = &Electricitys.back();
+						RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 84, 164, 10, 128);
 						SpawnElectricityGlow(RomanStatueData.EnergyArcs[i]->pos4, 36, 0, color, color / 2);
@@ -513,7 +513,7 @@ namespace TEN::Entities::Creatures::TR5
 						Random::GenerateInt(64, 80),
 						0, color / 2, color,
 						50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 2, 10);
-					RomanStatueData.EnergyArcs[i] = &Electricitys.back();
+					RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
 					SpawnElectricityGlow(RomanStatueData.EnergyArcs[i]->pos4, 36, 0, color / 2, color);
 
@@ -766,7 +766,7 @@ namespace TEN::Entities::Creatures::TR5
 								Random::GenerateInt(8, 16),
 								84, 164, 10,
 								50, (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut, 6, 2);
-							RomanStatueData.EnergyArcs[i] = &Electricitys.back();
+							RomanStatueData.EnergyArcs[i] = &ElectricityArcs.back();
 
 						}						
 						else if (deltaFrame == 24)

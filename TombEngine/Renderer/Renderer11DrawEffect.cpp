@@ -125,10 +125,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawElectricity(RenderView& view)
 	{
-		if (Electricitys.empty())
+		if (ElectricityArcs.empty())
 			return;
 
-		for (const auto& arc : Electricitys)
+		for (const auto& arc : ElectricityArcs)
 		{
 			if (arc.life <= 0)
 				continue;

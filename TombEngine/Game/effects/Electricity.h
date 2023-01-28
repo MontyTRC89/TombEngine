@@ -63,10 +63,10 @@ namespace TEN::Effects::Electricity
 		short Rotation	= 0;
 	};
 
-	extern std::vector<Electricity>	 Electricitys;
+	extern std::vector<Electricity>	 ElectricityArcs;
 	extern std::vector<HelicalLaser> HelicalLasers;
 
-	extern std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots;
+	extern std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	ElectricityKnots;
 	extern std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer;
 
 	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
