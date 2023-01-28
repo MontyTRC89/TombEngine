@@ -170,7 +170,6 @@ namespace TEN::Effects::Electricity
 		constexpr auto LIFE_START_FADING = HELICAL_LASER_LIFE_MAX / 2;
 		constexpr auto LENGTH_LERP_ALPHA = 0.25f;
 
-		// No active effects; return early.
 		if (HelicalLasers.empty())
 			return;
 
