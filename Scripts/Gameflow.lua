@@ -26,7 +26,7 @@ Flow.EnableLaraInTitle(false)
 
 -- Disable/enable level selection in title level
 
-Flow.EnableLevelSelect(false)
+Flow.EnableLevelSelect(true)
 
 -- Disable/enable mass pickup (collect all pickups at once)
 

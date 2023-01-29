@@ -55,9 +55,19 @@ namespace TEN::Renderer
 		{
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
-			if (!bone) return;//otherwise inventory crashes mm
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			if (!bone)
+			{
+				return; // Otherwise inventory crashes
+			}
 
+			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			{
+				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
+					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
+				return;
+			}
+
+			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
 				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);

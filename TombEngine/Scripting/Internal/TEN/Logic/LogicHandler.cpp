@@ -6,7 +6,7 @@
 #include "Game/savegame.h"
 #include "Sound/sound.h"
 #include "ReservedScriptNames.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
@@ -14,7 +14,7 @@
 #include "Color/Color.h"
 #include "LevelFunc.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.

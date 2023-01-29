@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Math/Containers/GameBoundingBox.h"
+#include "Math/Objects/GameBoundingBox.h"
 
 #include "Game/animation.h"
 #include "Game/items.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
 
 //namespace TEN::Math
 //{

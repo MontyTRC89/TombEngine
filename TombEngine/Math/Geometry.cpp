@@ -2,10 +2,11 @@
 #include "Math/Geometry.h"
 
 #include "Math/Constants.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
-#include "Math/Containers/Vector3i.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/AxisAngle.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
+#include "Math/Objects/Vector3i.h"
 
 namespace TEN::Math::Geometry
 {
@@ -76,6 +77,32 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
+	Vector3 GetFloorNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
+	Vector3 GetCeilingNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
@@ -84,19 +111,21 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSteepnessAngle(Vector2 tilt)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force)
 	{
-		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
-
-		return (short)sqrt(SQUARE(tilt.x * qtrBlockAngleIncrement) + SQUARE(tilt.y * qtrBlockAngleIncrement));
-	}
-
-	short GetSurfaceAspectAngle(Vector2 tilt)
-	{
-		if (tilt == Vector2::Zero)
+		if (normal == -force)
 			return 0;
 
-		return FROM_RAD(atan2(-tilt.x, -tilt.y));
+		return FROM_RAD(acos(normal.Dot(-force)));
+	}
+
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force)
+	{
+		if (normal == -force)
+			return 0;
+
+		// TODO: Consider normal of downward force.
+		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -129,11 +158,30 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
+	{
+		// TODO: Consider normal of downward force.
+
+		// Determine relative angle properties of normal.
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
+
+		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
+		float sinDeltaAngle = phd_sin(deltaAngle);
+		float cosDeltaAngle = phd_cos(deltaAngle);
+
+		// Calculate relative orientation adhering to normal.
+		return EulerAngles(
+			-slopeAngle * cosDeltaAngle,
+			orient2D,
+			slopeAngle * sinDeltaAngle);
+	}
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
-	
+
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)

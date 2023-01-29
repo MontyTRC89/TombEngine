@@ -5,8 +5,8 @@
 #include "Game/control/los.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -21,8 +21,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 
 // NOTES:
@@ -359,7 +359,8 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye.
 									origin1.RoomNumber = item->RoomNumber;														
 									guardian->LOS[i] = LOS(&origin1, &eye);
-									guardian->fireArcs[i] = TriggerLightning(&origin1.ToVector3i(), &eye.ToVector3i(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
+									SpawnElectricity(origin1.ToVector3(), eye.ToVector3(), (GetRandomControl() & 1) + 3, color.x, color.y, color.z, 46, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut, 6, 10);
+									guardian->fireArcs[i] = &ElectricityArcs.back();
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);																		
 								}
@@ -367,14 +368,14 @@ namespace TEN::Entities::Creatures::TR5
 								if (GlobalCounter & 1)
 								{
 									SpawnGuardianSparks(origin1.ToVector3(), colorSparks, 3);
-									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, color.x, color.y, color.z);
+									SpawnElectricityGlow(origin1.ToVector3(), (GetRandomControl() & 3) + 32, color.x, color.y, color.z);
 									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 
 									if (!guardian->LOS[i] && guardian->fireArcs[i] != nullptr)
 									{
-										TriggerLightningGlow(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
+										SpawnElectricityGlow(guardian->fireArcs[i]->pos4, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
-										SpawnGuardianSparks(guardian->fireArcs[i]->pos4.ToVector3(), colorSparks, 3);
+										SpawnGuardianSparks(guardian->fireArcs[i]->pos4, colorSparks, 3);
 									}
 								}
 
@@ -545,8 +546,8 @@ namespace TEN::Entities::Creatures::TR5
 			size = 32;
 		}
 
-		auto origin = Vector3i::Zero;
-		auto target = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianBasePosition);
+		auto origin = Vector3::Zero;
+		auto target = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianBasePosition).ToVector3();
 
 		for (int i = 0; i < GUARDIAN_CHARGE_ARC_COUNT; i++)
 		{
@@ -562,8 +563,8 @@ namespace TEN::Entities::Creatures::TR5
 				continue;
 			}
 
-			origin = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianChargePositions[i]);
-			TriggerLightning(&origin, &target, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			origin = GetJointPosition(&g_Level.Items[guardian->BaseItem], 0, GuardianChargePositions[i]).ToVector3();
+			SpawnElectricity(origin, target, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 5);
 		}
 
 		if (GlobalCounter & 1)
@@ -572,20 +573,20 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->MeshBits.Test(GuardianEyeJoints[i]))
 				{
-					origin = GetJointPosition(item, GuardianEyeJoints[i]);
-					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), color.x, color.y, color.z);
-					SpawnGuardianSparks(origin.ToVector3(), colorSparks, 3);
+					origin = GetJointPosition(item, GuardianEyeJoints[i]).ToVector3();
+					SpawnElectricityGlow(origin, size + (GetRandomControl() & 3), color.x, color.y, color.z);
+					SpawnGuardianSparks(origin, colorSparks, 3);
 				}
 			}
 
-			TriggerLightningGlow(target.x, target.y, target.z, (GetRandomControl() & 3) + size + 8, color.x, color.y, color.z);
+			SpawnElectricityGlow(target, (GetRandomControl() & 3) + size + 8, color.x, color.y, color.z);
 			TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 		}
 
 		if (!(GlobalCounter & 3))
-			TriggerLightning(&target, &item->Pose.Position, Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+			SpawnElectricity(target, item->Pose.Position.ToVector3(), Random::GenerateInt(8, 16), color.x, color.y, color.z, 16, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 5);
 			
-		SpawnGuardianSparks(target.ToVector3(), colorSparks, 3, 1);
+		SpawnGuardianSparks(target, colorSparks, 3, 1);
 	}
 
 	void DoGuardianDeath(int itemNumber, ItemInfo& item)
