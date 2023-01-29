@@ -337,7 +337,7 @@ void Trigger(short const value, short const flags)
 	}
 }
 
-void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags)
+void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activator, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -721,20 +721,18 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 											 (int)VolumeActivatorFlags::Moveable | 
 											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
 
-				VolumeActivator dummy = nullptr;
-
 				switch (trigger & TIMER_BITS)
 				{
 				case 0:
-					HandleEvent(set.OnEnter, dummy);
+					HandleEvent(set.OnEnter, activator);
 					break;
 
 				case 1:
-					HandleEvent(set.OnInside, dummy);
+					HandleEvent(set.OnInside, activator);
 					break;
 
 				case 2:
-					HandleEvent(set.OnLeave, dummy);
+					HandleEvent(set.OnLeave, activator);
 					break;
 				}
 			}
@@ -758,7 +756,10 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, heavy, heavyFlags);
+	auto roomNum = item->RoomNumber;
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNum);
+
+	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, heavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -770,7 +771,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(floor, x, y, z, heavy, heavyFlags);
+	TestTriggers(x, y, z, floor, nullptr, heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ItemInfo* item)

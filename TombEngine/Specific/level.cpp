@@ -1226,25 +1226,36 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
+	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
 	g_Level.Boxes.resize(numBoxes);
 	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
-	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-
 	// Read overlaps
 	int numOverlaps = ReadInt32();
+	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
-	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
-
 	// Read zones
+	int numZoneGroups = ReadInt32();
+	TENLog("Num zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
+		for (int j = 0; j < numZoneGroups; j++)
 		{
-			g_Level.Zones[j][i].resize(numBoxes);
-			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			if (j >= (int)ZoneType::MaxZone)
+			{
+				int excessiveZoneGroups = numZoneGroups - j + 1;
+				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
+					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
+				LevelDataPtr += numBoxes * sizeof(int);
+			}
+			else
+			{
+				g_Level.Zones[j][i].resize(numBoxes);
+				ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			}
 		}
 	}
 
@@ -1392,22 +1403,24 @@ void BuildOutsideRoomsTable()
 			OutsideRoomTable[x][z].clear();
 	}
 
-	for (int x = 0; x < OUTSIDE_SIZE; x++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		for (int z = 0; z < OUTSIDE_SIZE; z++)
+		auto* room = &g_Level.Rooms[i];
+
+		int rx = (room->x / SECTOR(1));
+		int rz = (room->z / SECTOR(1));
+
+		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
-			for (int i = 0; i < g_Level.Rooms.size(); i++)
+			if (x < (rx + 1) || x > (rx + room->xSize - 2))
+				continue;
+
+			for (int z = 0; z < OUTSIDE_SIZE; z++)
 			{
-				auto* room = &g_Level.Rooms[i];
+				if (z < (rz + 1) || z > (rz + room->zSize - 2))
+					continue;
 
-				int rx = (room->x / SECTOR(1));
-				int rz = (room->z / SECTOR(1));
-
-				if (x >= (rx + 1) && z >= (rz + 1) &&
-					x <= (rx + room->xSize - 2) && z <= (rz + room->zSize - 2))
-				{
-					OutsideRoomTable[x][z].push_back(i);
-				}
+				OutsideRoomTable[x][z].push_back(i);
 			}
 		}
 	}

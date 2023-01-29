@@ -44,13 +44,45 @@ using namespace TEN::Entities::Generic;
 
 static void StartObject(ObjectInfo* object)
 {
-	for (int objectNumber = ID_TRAPDOOR1; objectNumber <= ID_CEILING_TRAPDOOR2; objectNumber++)
+	for (int objectNumber = ID_TRAPDOOR1; objectNumber <= ID_TRAPDOOR3; objectNumber++)
 	{
 		object = &Objects[objectNumber];
 		if (object->loaded)
 		{
 			object->initialise = InitialiseTrapDoor;
 			object->collision = TrapDoorCollision;
+			object->control = TrapDoorControl;
+			object->floorBorder = TrapDoorFloorBorder;
+			object->ceilingBorder = TrapDoorCeilingBorder;
+			object->floor = TrapDoorFloor;
+			object->ceiling = TrapDoorCeiling;
+			object->SetupHitEffect(true);
+		}
+	}
+
+	for (int objectNumber = ID_FLOOR_TRAPDOOR1; objectNumber <= ID_FLOOR_TRAPDOOR2; objectNumber++)
+	{
+		object = &Objects[objectNumber];
+		if (object->loaded)
+		{
+			object->initialise = InitialiseTrapDoor;
+			object->collision = FloorTrapDoorCollision;
+			object->control = TrapDoorControl;
+			object->floorBorder = TrapDoorFloorBorder;
+			object->ceilingBorder = TrapDoorCeilingBorder;
+			object->floor = TrapDoorFloor;
+			object->ceiling = TrapDoorCeiling;
+			object->SetupHitEffect(true);
+		}
+	}
+
+	for (int objectNumber = ID_CEILING_TRAPDOOR1; objectNumber <= ID_CEILING_TRAPDOOR2; objectNumber++)
+	{
+		object = &Objects[objectNumber];
+		if (object->loaded)
+		{
+			object->initialise = InitialiseTrapDoor;
+			object->collision = CeilingTrapDoorCollision;
 			object->control = TrapDoorControl;
 			object->floorBorder = TrapDoorFloorBorder;
 			object->ceilingBorder = TrapDoorCeilingBorder;

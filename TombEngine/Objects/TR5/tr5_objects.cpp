@@ -15,6 +15,7 @@
 
 // Creatures
 #include "Objects/TR5/Entity/AutoGun.h"			 // OK
+#include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
 #include "Objects/TR5/Entity/tr5_cyborg.h"		 // OK
@@ -123,10 +124,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD1];
 	if (obj->loaded)
 	{
-		// Object required.
-		if (Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_SWAT].animIndex;
-
+		AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD1", "ID_SWAT");
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
@@ -146,10 +144,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SWAT_PLUS];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_GUARD1].animIndex;
-		else
-			obj->animIndex = Objects[ID_SWAT].animIndex;
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SWAT_PLUS", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SWAT_PLUS", "ID_GUARD1");
 
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
@@ -169,10 +165,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_MAFIA];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_GUARD1].animIndex;
-		else
-			obj->animIndex = Objects[ID_SWAT].animIndex;
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_MAFIA", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_MAFIA", "ID_GUARD1");
 
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
@@ -193,10 +187,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SCIENTIST];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_GUARD1].animIndex;
-		else
-			obj->animIndex = Objects[ID_SWAT].animIndex;
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SCIENTIST", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SCIENTIST", "ID_GUARD1");
 
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
@@ -215,10 +207,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD2];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_GUARD1].animIndex;
-		else
-			obj->animIndex = Objects[ID_SWAT].animIndex;
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD2", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD2", "ID_GUARD1");
 
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
@@ -239,10 +229,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD3];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_SWAT].loaded)
-			obj->animIndex = Objects[ID_GUARD1].animIndex;
-		else
-			obj->animIndex = Objects[ID_SWAT].animIndex;
+		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD3", "ID_SWAT"))
+			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD3", "ID_GUARD1");
 
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
@@ -455,15 +443,15 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD_LASER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGuardLaser;
+		obj->initialise = InitialiseHeavyGuard;
 		obj->collision = CreatureCollision;
-		//obj->control = GuardControlLaser;
+		obj->control = HeavyGuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->HitRoutine = HeavyGuardHit;
 		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
-		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -638,7 +626,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->LotType = LotType::Human;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -922,7 +909,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->control = AnimatingControl;
 	}
 
-	// TODO: Why commented? -- TokyoSU, 2022.12.24
+	// TODO: Seem not decompiled. -- TokyoSU, 2023.01.12
 	obj = &Objects[ID_GEN_SLOT4];
 	if (obj->loaded)
 	{
