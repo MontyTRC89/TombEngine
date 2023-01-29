@@ -1,3 +1,9 @@
+Version 1.0.7
+=============
+
+* Fix silent crash if skin joints or hair object is missing.
+* Fix holster meshes not displaying for Lara's shadow.
+
 Version 1.0.6
 =============
 
