@@ -4,8 +4,8 @@
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
@@ -14,8 +14,8 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Boss;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -220,10 +220,10 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			auto target = GameVector(pos, item.RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 0, 255, 180, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 180, 255, 0, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 200, 200, 30, LI_THININ | LI_THINOUT, 4, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 250, 255, 30, LI_THININ | LI_THINOUT, 2, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 0, 255, 180, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 8, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 180, 255, 0, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 3, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 200, 200, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 250, 255, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 2, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
@@ -238,20 +238,20 @@ namespace TEN::Entities::Creatures::TR3
 			auto target2 = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE / 6), creature.Enemy->RoomNumber);
 			auto target3 = GameVector(Geometry::TranslatePoint(origin1.ToVector3(), pos - origin1.ToVector3(), PUNA_ATTACK_RANGE / 10), creature.Enemy->RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricity(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 6);
+			SpawnElectricity(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 7);
 
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricity(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 6);
+			SpawnElectricity(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 7);
 
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 9);
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 10);
+			SpawnElectricity(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 9);
+			SpawnElectricity(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 10);
 
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 4, 7);
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 2, 8);
+			SpawnElectricity(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 16, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 7);
+			SpawnElectricity(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 16, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 8);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 20, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 12, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 80, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 5, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 20, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 12, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 80, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 5, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
