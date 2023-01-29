@@ -9,6 +9,9 @@
 #include "Specific/setup.h"
 
 // Creatures
+#include "Objects/TR3/Entity/Lizard.h" // OK
+#include "Objects/TR3/Entity/PunaBoss.h" // OK
+#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -19,13 +22,10 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
-#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-#include "Objects/TR3/Entity/Lizard.h" // OK
-#include "Objects/TR3/Entity/PunaBoss.h" // OK
 
 // Effects
 #include "Objects/Effects/Boss.h"
@@ -277,8 +277,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLondonBoss;
-		obj->control = LondonBossControl;
+		obj->initialise = InitialiseSophiaLeigh;
+		obj->control = SophiaLeighControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;

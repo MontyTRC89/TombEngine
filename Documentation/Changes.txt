@@ -6,26 +6,30 @@ Version 1.0.6
 * Fix savegame crash for disabled enemies with partially set activation mask.
 * Fix certain enemies not damaging Lara if binoculars or lasersight mode is active.
 * Fix invisible Lara after starting a new game from title flyby with hidden Lara.
-* Fix double activation of TR4 seth blades when used an OCB different than 0.
-* Fix sting attack of TR4 harpy which was neither hurting nor poisoning Lara.
 * Fix backholster weapons not updating their sound position together with player.
 * Fix black screen bug when there was an obstacle between the fixed camera and the target.
 * Fix underwater caustics not appearing without visiting options menu beforehand.
-* Fix TR1 rat which crashed the game when it was killed.
 * Fix TR1 ape climbing.
+* Fix TR1 rat which crashed the game when it was killed.
 * Fix TR2 small spider climbing and pathfinding.
 * Fix TR3 Shiva and TR4 baddy 2 not blocking bullets.
-* Fix TR4 skeleton spawn when used with OCB 3.
+* Fix TR4 harpy's sting attack which was neither hurting nor poisoning Lara.
 * Fix TR4 SAS teleporting over the blocks he walks by.
+* Fix TR4 seth blades that were doing a double activation when used an OCB different than 0.
+* Fix TR4 skeleton spawn when used with OCB 3.
+* Fix TR4 sphinx solving his bugged behaviour that happened if it received a lot of damage.
 * Fix TR5 Roman statue and its meshswap.
+* Fix TR5 twogun laser guard.
 * Fix enemy projectile effect colours.
 * Fix enemy shadow position.
 * Fix sound positions not updated during flybys.
-* Make enemies drop pickups at their origin point, not bounding box centerpoint.
+* Fix grenade launcher super ammo emitting too many fragments.
+* Fix grenade and rocket launcher lighting.
+* Fix ceiling trapdoor and floor trapdoor that Lara couldn't open manually.
+* Make enemies drop pickups at first available bounding box corner point, not centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
 * Add TR3 boss effects in ID_BOSS_SHIELD and ID_BOSS_SHOCKWAVE_EXPLOSION slots.
-* Add undead flag to TR4 sphinx to prevent it from becoming bugged after receiving a lot of damage.
 * Add an option to activate Lua or node events from legacy triggers.
 * Add more warnings in logs to enemies which animation or required slot is missing.
 * Antitriggering an enemy will now cause it to vanish and pause.

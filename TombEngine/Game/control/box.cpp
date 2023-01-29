@@ -1294,7 +1294,9 @@ void GetAITarget(CreatureInfo* creature)
 				FindAITargetObject(creature, ID_AI_PATROL1);
 		}
 		else if (enemyObjectNumber != ID_AI_PATROL2)
+		{
 			FindAITargetObject(creature, ID_AI_PATROL2);
+		}
 		else if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS ||
@@ -1337,9 +1339,13 @@ void GetAITarget(CreatureInfo* creature)
 			//item->aiBits &= ~FOLLOW;
 		}
 		else if (item->HitStatus)
+		{
 			item->AIBits &= ~FOLLOW;
+		}
 		else if (enemyObjectNumber != ID_AI_FOLLOW)
+		{
 			FindAITargetObject(creature, ID_AI_FOLLOW);
+		}
 		else if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
@@ -1363,72 +1369,92 @@ void GetAITarget(CreatureInfo* creature)
 	}*/
 }
 
-// TR3 old way..
+// Old TR3 way.
 void FindAITarget(CreatureInfo* creature, short objectNumber)
 {
-	auto* item = &g_Level.Items[creature->ItemNumber];
-	ItemInfo* targetItem;
+	const auto& item = g_Level.Items[creature->ItemNumber];
 
 	int i;
+	ItemInfo* targetItem;
 	for (i = 0, targetItem = &g_Level.Items[0]; i < g_Level.NumItems; i++, targetItem++)
 	{
-		if (targetItem->ObjectNumber == objectNumber && targetItem->RoomNumber != NO_ROOM)
+		if (targetItem->ObjectNumber != objectNumber)
+			continue;
+
+		if (targetItem->RoomNumber == NO_ROOM)
+			continue;
+
+		if (SameZone(creature, targetItem) &&
+			targetItem->Pose.Orientation.y == item.ItemFlags[3])
 		{
-			if (SameZone(creature, targetItem) && targetItem->Pose.Orientation.y == item->ItemFlags[3])
-			{
-				creature->Enemy = targetItem;
-				break;
-			}
+			creature->Enemy = targetItem;
+			break;
 		}
 	}
 }
 
 void FindAITargetObject(CreatureInfo* creature, int objectNumber)
 {
-	auto* item = &g_Level.Items[creature->ItemNumber];
-	FindAITargetObject(creature, objectNumber, item->ItemFlags[3], true);
+	const auto& item = g_Level.Items[creature->ItemNumber];
+
+	FindAITargetObject(creature, objectNumber, item.ItemFlags[3], true);
 }
 
 void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone)
 {
-	auto* item = &g_Level.Items[creature->ItemNumber];
-	if (g_Level.AIObjects.size() > 0)
-	{
-		AI_OBJECT* foundObject = nullptr;
-		for (auto& aiObj : g_Level.AIObjects)
-		{
-			if (aiObj.objectNumber == objectNumber && aiObj.triggerFlags == ocb && aiObj.roomNumber != NO_ROOM)
-			{
-				int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
-				auto* room = &g_Level.Rooms[item->RoomNumber];
-				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
-				room = &g_Level.Rooms[aiObj.roomNumber];
-				aiObj.boxNumber = GetSector(room, aiObj.pos.Position.x - room->x, aiObj.pos.Position.z - room->z)->Box;
-				if (item->BoxNumber == NO_BOX || aiObj.boxNumber == NO_BOX)
-					return;
-				if (checkSameZone && (zone[item->BoxNumber] != zone[aiObj.boxNumber]))
-					return;
-				foundObject = &aiObj; // Don't check for same zone, we need it to be like this for sophia.
-			}
-		}
+	auto& item = g_Level.Items[creature->ItemNumber];
 
-		if (foundObject != nullptr)
+	if (g_Level.AIObjects.empty())
+		return;
+
+	AI_OBJECT* foundObject = nullptr;
+
+	for (auto& aiObject : g_Level.AIObjects)
+	{
+		if (aiObject.objectNumber == objectNumber &&
+			aiObject.triggerFlags == ocb &&
+			aiObject.roomNumber != NO_ROOM)
 		{
-			auto* aiItem = creature->AITarget;
-			creature->Enemy = aiItem;
-			aiItem->ObjectNumber = foundObject->objectNumber;
-			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position = foundObject->pos.Position;
-			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
-			aiItem->Flags = foundObject->flags;
-			aiItem->TriggerFlags = foundObject->triggerFlags;
-			aiItem->BoxNumber = foundObject->boxNumber;
-			if (!(creature->AITarget->Flags & ItemFlags::IFLAG_TRIGGERED))
-			{
-				creature->AITarget->Pose.Position.x += phd_sin(creature->AITarget->Pose.Orientation.y) * CLICK(1);
-				creature->AITarget->Pose.Position.z += phd_cos(creature->AITarget->Pose.Orientation.y) * CLICK(1);
-			}
+			int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+			auto* room = &g_Level.Rooms[item.RoomNumber];
+
+			item.BoxNumber = GetSector(room, item.Pose.Position.x - room->x, item.Pose.Position.z - room->z)->Box;
+			room = &g_Level.Rooms[aiObject.roomNumber];
+			aiObject.boxNumber = GetSector(room, aiObject.pos.Position.x - room->x, aiObject.pos.Position.z - room->z)->Box;
+
+			if (item.BoxNumber == NO_BOX || aiObject.boxNumber == NO_BOX)
+				return;
+
+			if (checkSameZone && (zone[item.BoxNumber] != zone[aiObject.boxNumber]))
+				return;
+
+			// Don't check for same zone. Needed for Sophia Leigh.
+			foundObject = &aiObject;
 		}
+	}
+
+	if (foundObject == nullptr)
+		return;
+
+	auto& aiItem = *creature->AITarget;
+
+	creature->Enemy = &aiItem;
+
+	aiItem.ObjectNumber = foundObject->objectNumber;
+	aiItem.RoomNumber = foundObject->roomNumber;
+	aiItem.Pose.Position = foundObject->pos.Position;
+	aiItem.Pose.Orientation.y = foundObject->pos.Orientation.y;
+	aiItem.Flags = foundObject->flags;
+	aiItem.TriggerFlags = foundObject->triggerFlags;
+	aiItem.BoxNumber = foundObject->boxNumber;
+
+	if (!(creature->AITarget->Flags & ItemFlags::IFLAG_TRIGGERED))
+	{
+		float sinY = phd_sin(creature->AITarget->Pose.Orientation.y);
+		float cosY = phd_cos(creature->AITarget->Pose.Orientation.y);
+
+		creature->AITarget->Pose.Position.x += CLICK(1) * sinY;
+		creature->AITarget->Pose.Position.z += CLICK(1) * cosY;
 	}
 }
 
