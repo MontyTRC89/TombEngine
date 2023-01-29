@@ -505,25 +505,28 @@ namespace TEN::Entities::Creatures::TR3
 
 	void PunaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		if (pos.has_value())
+		if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
+			target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
 		{
-			if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
-				target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
-			{
-				auto color = Vector4(
-					0.0f, Random::GenerateFloat(0.0f, 0.5f), Random::GenerateFloat(0.0f, 0.5f), 
-					Random::GenerateFloat(0.5f, 0.8f));
+			auto color = Vector4(
+				0.0f,
+				Random::GenerateFloat(0.0f, 0.5f),
+				Random::GenerateFloat(0.0f, 0.5f),
+				Random::GenerateFloat(0.5f, 0.8f)
+			);
 
+			if (pos.has_value() && !isExplosive)
 				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), color);
-			}
-			else
-			{
-				if (target.HitStatus)
-					SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
-
+			else if (isExplosive)
+				SpawnShield(target, color);
+		}
+		else
+		{
+			if (target.HitStatus)
+				SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
+			if (pos.has_value())
 				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, damage, isExplosive, false);
-			}
+			DoItemHit(&target, damage, isExplosive, false);
 		}
 	}
 }

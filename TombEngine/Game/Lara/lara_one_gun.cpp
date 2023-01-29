@@ -1273,7 +1273,7 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			return;
 
 		target.HitStatus = true;
-		HitTarget(&emitter, &target, nullptr, damage, 1);
+		HitTarget(&emitter, &target, nullptr, damage, true);
 
 		if (&target != &emitter)
 		{

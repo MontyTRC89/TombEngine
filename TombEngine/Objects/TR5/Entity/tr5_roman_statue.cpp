@@ -283,11 +283,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		auto prevMeshSwapBits = item->Model.MeshIndex;
-
-		if (item->Effect.Type == EffectType::Fire)
-			item->Effect.Type = EffectType::None;
 
 		// At determined HP values, the statue sheds material.
 		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(MS_HEAVY_DMG))
@@ -874,15 +870,15 @@ namespace TEN::Entities::Creatures::TR5
 			player.Control.Weapon.GunType == LaraWeaponType::HK ||
 			player.Control.Weapon.GunType == LaraWeaponType::Revolver))
 		{
-			DoItemHit(&target, damage, isExplosive);
+			DoItemHit(&target, damage, isExplosive, false);
 		}
 		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 		{
-			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
+			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive, false);
 		}
 		else
 		{
-			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive);
+			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive, false);
 		}
 	}
 }
