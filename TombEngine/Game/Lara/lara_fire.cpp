@@ -799,9 +799,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestItemNumber = NO_ITEM;
+	int bestJointIndex = NO_JOINT;
 	float bestDistance = INFINITY;
-
 	for (int i = 0; i < num; i++)
 	{
 		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
@@ -811,7 +810,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			if (distance < bestDistance)
 			{
 				bestDistance = distance;
-				bestItemNumber = i;
+				bestJointIndex = i;
 			}
 		}
 	}
@@ -824,7 +823,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (bestItemNumber < 0)
+	if (bestJointIndex < 0)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -836,10 +835,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
 		
-		// NOTE: It seems that items hit by the player in the normal way must have GetTargetOnLOS return false.
-		// It's strange, but this will replicate original behaviour until we fully understand what is happening.
+		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
+		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
+			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false, bestJointIndex);
 
 		return FireWeaponType::PossibleHit;
 	}
@@ -1047,7 +1046,7 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	lara.TargetArmOrient = orient;
 }
 
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive)
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex)
 {
 	const auto& object = Objects[targetEntity->ObjectNumber];
 
@@ -1058,26 +1057,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	if (hitPos != nullptr)
 	{
 		hitPos->RoomNumber = targetEntity->RoomNumber;
-
-		int foundJointIndex = NO_JOINT;
-		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
-		{
-			const auto& mesh = g_Level.Meshes[object.meshIndex + jointIndex];
-			auto jointPos = GetJointPosition(targetEntity, jointIndex);
-
-			float distance = Vector3::Distance(hitPos->ToVector3(), jointPos.ToVector3());
-			if (distance < mesh.sphere.Radius)
-			{
-				foundJointIndex = jointIndex;
-				break;
-			}
-		}
-
-		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, foundJointIndex);
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, bestJointIndex);
 	}
 	else
 	{
-		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, isExplosive, NO_JOINT);
+		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, isExplosive, bestJointIndex);
 	}
 }
 
