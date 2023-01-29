@@ -163,10 +163,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
-    <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\effects\Electricity.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
@@ -643,6 +644,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
@@ -664,7 +666,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_overhang.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
-    <ClCompile Include="Game\effects\lightning.cpp" />
+    <ClCompile Include="Game\effects\Electricity.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />

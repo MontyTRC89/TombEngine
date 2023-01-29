@@ -10,9 +10,9 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -27,8 +27,10 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
+using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
@@ -42,7 +44,7 @@ extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
+// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
 
 BiteInfo EnemyBites[12] =
 {
@@ -55,15 +57,14 @@ BiteInfo EnemyBites[12] =
 	{ 0, -110, 480, 13 },
 	{ -20, -80, 190, -10 },
 	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 },   // Baddy 2
-	{ 20, -60, 400, 7 },    // SAS
-	{ 0, -64, 250, 7 }      // Troops
+	{ 10, -60, 200, 11 }, // Baddy 2
+	{ 20, -60, 400, 7 },  // SAS
+	{ 0, -64, 250, 7 }	  // Troops
 };
 
 namespace TEN::Renderer 
 {
-	using namespace TEN::Effects::Footprints;
-	using std::vector;
+	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -74,82 +75,109 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
-	void Renderer11::DrawLightning(RenderView& view) 
+	void Renderer11::DrawHelicalLasers(RenderView& view)
 	{
-		for (int i = 0; i < Lightning.size(); i++)
+		if (HelicalLasers.empty())
+			return;
+
+		for (const auto& laser : HelicalLasers)
 		{
-			LIGHTNING_INFO* arc = &Lightning[i];
+			if (laser.Life <= 0.0f)
+				continue;
 
-			if (arc->life)
+			auto color = laser.Color;
+			color.w = laser.Opacity;
+
+			ElectricityKnots[0] = laser.Target;
+			ElectricityKnots[1] = laser.Origin;
+			
+			for (int j = 0; j < 2; j++)
+				ElectricityKnots[j] -= laser.Target;
+
+			CalculateHelixSpline(laser, ElectricityKnots, ElectricityBuffer);
+
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
 			{
-				LightningPos[0].x = arc->pos1.x;
-				LightningPos[0].y = arc->pos1.y;
-				LightningPos[0].z = arc->pos1.z;
+				int bufferIndex = 0;
 
-				memcpy(&LightningPos[1], arc, 48);
-
-				LightningPos[5].x = arc->pos4.x;
-				LightningPos[5].y = arc->pos4.y;
-				LightningPos[5].z = arc->pos4.z;
-
-				for (int j = 0; j < 6; j++)
+				auto& interpPosArray = ElectricityBuffer;
+				for (int s = 0; s < laser.NumSegments ; s++)
 				{
-					LightningPos[j].x -= LaraItem->Pose.Position.x;
-					LightningPos[j].y -= LaraItem->Pose.Position.y;
-					LightningPos[j].z -= LaraItem->Pose.Position.z;
+					auto origin = laser.Target + interpPosArray[bufferIndex];
+					bufferIndex++;
+					auto target = laser.Target + interpPosArray[bufferIndex];
+
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						color,
+						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
 				}
+			}				
+		}
+	}
 
-				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
+	void Renderer11::DrawElectricity(RenderView& view)
+	{
+		if (ElectricityArcs.empty())
+			return;
 
-				if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
+		for (const auto& arc : ElectricityArcs)
+		{
+			if (arc.life <= 0)
+				continue;
+
+			ElectricityKnots[0] = arc.pos1;
+			memcpy(&ElectricityKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
+			ElectricityKnots[5] = arc.pos4;
+
+			for (int j = 0; j < ElectricityKnots.size(); j++)
+				ElectricityKnots[j] -= LaraItem->Pose.Position.ToVector3();
+
+			CalculateElectricitySpline(arc, ElectricityKnots, ElectricityBuffer);
+
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
+			{
+				int bufferIndex = 0;
+
+				auto& interpPosArray = ElectricityBuffer;
+				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
-					short* interpolatedPos = &LightningBuffer[0];
+					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
+					bufferIndex++;
+					auto target = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
 
-					for (int s = 0; s < 3 * arc->segments - 1; s++)
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					byte r, g, b;
+					if (arc.life >= 16)
 					{
-						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						interpolatedPos += 4;
-
-						int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						byte r, g, b;
-
-						if (arc->life >= 16)
-						{
-							r = arc->r;
-							g = arc->g;
-							b = arc->b;
-						}
-						else
-						{
-							r = arc->life * arc->r / 16;
-							g = arc->life * arc->g / 16;
-							b = arc->life * arc->b / 16;
-						}
-
-						Vector3 pos1 = Vector3(ix, iy, iz);
-						Vector3 pos2 = Vector3(ix2, iy2, iz2);
-
-						Vector3 d = pos2 - pos1;
-						d.Normalize();
-
-						Vector3 c = (pos1 + pos2) / 2.0f;
-
-						AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							c,
-							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							(PI / 2),
-							1.0f,
-							{ arc->width * 8.0f,
-							Vector3::Distance(pos1, pos2) },
-							BLENDMODE_ADDITIVE,
-							d, true, view);
+						r = arc.r;
+						g = arc.g;
+						b = arc.b;
 					}
+					else
+					{
+						r = (arc.life * arc.r) / 16;
+						g = (arc.life * arc.g) / 16;
+						b = (arc.life * arc.b) / 16;
+					}
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
 				}
 			}
 		}
@@ -825,7 +853,7 @@ namespace TEN::Renderer
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
-		vector<byte> data = { 128, 128, 255, 1 };
+		std::vector<byte> data = { 128, 128, 255, 1 };
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
@@ -1210,8 +1238,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
-		extern vector<DebrisFragment> DebrisFragments;
-		vector<RendererVertex> vertices;
+		extern std::vector<DebrisFragment> DebrisFragments;
+		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 

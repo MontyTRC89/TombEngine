@@ -9,6 +9,7 @@
 #include "Game/animation.h"
 #include "Game/gui.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
@@ -51,6 +52,7 @@ class EulerAngles;
 struct CAMERA_INFO;
 struct RendererRectangle;
 
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Gui;
 
 namespace TEN::Renderer
@@ -524,7 +526,8 @@ namespace TEN::Renderer
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
-		void DrawLightning(RenderView& view);
+		void DrawElectricity(RenderView& view);
+		void DrawHelicalLasers(RenderView& view);
 		void DrawBlood(RenderView& view);
 		void DrawWeatherParticles(RenderView& view);
 		void DrawDrips(RenderView& view);

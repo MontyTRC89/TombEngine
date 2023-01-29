@@ -1507,7 +1507,8 @@ namespace TEN::Renderer
 		DrawRipples(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
-		DrawLightning(view);
+		DrawElectricity(view);
+		DrawHelicalLasers(view);
 		DrawRopes(view);
 
 		// Here is where we actually output sprites
@@ -1966,8 +1967,10 @@ namespace TEN::Renderer
 		RendererSprite* causticsSprite = &m_sprites[causticsFrame];
 		m_stRoom.CausticsStartUV = causticsSprite->UV[0];
 		m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
-
-		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		if (m_sprites.size() > causticsFrame)
+		{
+			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		}
 
 		// Set shadow map data
 		if (m_shadowLight != nullptr)

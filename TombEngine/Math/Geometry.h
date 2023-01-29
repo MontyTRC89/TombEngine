@@ -7,8 +7,8 @@ class Vector3i;
 
 namespace TEN::Math::Geometry
 {
-	// Since Y is assumed as the vertical axis, only the Y Euler component needs to be considered and
-	// 2D vector operations can be done in the XZ plane. Maybe revise geometry functions to each take an "up" vector argument someday.
+	// Since Y is assumed as the vertical axis, 2D operations are simply done in the XZ plane.
+	// Revise geometry functions to each take a "force" direction argument someday. -- Sezz 2023.01.26
 
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset);
@@ -24,13 +24,17 @@ namespace TEN::Math::Geometry
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation);
 	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation);
 
+	Vector3 GetFloorNormal(const Vector2& tilt);
+	Vector3 GetCeilingNormal(const Vector2& tilt);
+
 	short GetShortestAngle(short fromAngle, short toAngle);
-	short GetSurfaceSteepnessAngle(Vector2 tilt);
-	short GetSurfaceAspectAngle(Vector2 tilt);
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force = Vector3::Up);	// Up = Down.
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
 
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
