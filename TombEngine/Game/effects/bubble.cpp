@@ -49,6 +49,7 @@ namespace TEN::Effects::Bubble
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
+		bubble.Orientation2D = 0;
 
 		bubble.Color =
 		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
@@ -70,9 +71,13 @@ namespace TEN::Effects::Bubble
 
 		bubble.Life = BUBBLE_LIFE_MAX;
 		bubble.Velocity = Random::GenerateFloat(VELOCITY_MIN, (flags & BubbleFlags::Clump) ? VELOCITY_CLUMP_MAX : VELOCITY_SINGLE_MAX);
-		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y / 2));
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
 		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ?
-			0.0f : Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y / 2)) / SCALE_LARGE_MAX);
+			0.0f :
+			Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
+		bubble.Rotation = (flags & BubbleFlags::Clump) ?
+			Random::GenerateAngle(-ANGLE(3.0f), ANGLE(3.0f)) :
+			0;
 	}
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags)
@@ -93,11 +98,11 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y, bubble.Position.z, bubble.RoomNumber);
+			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Velocity, bubble.Position.z, bubble.RoomNumber);
 
 			// Hit floor or ceiling; set to despawn.
-			if (bubble.Position.y >= pointColl.Position.Floor ||
-				bubble.Position.y <= pointColl.Position.Ceiling)
+			if ((bubble.Position.y - bubble.Velocity) >= pointColl.Position.Floor ||
+				(bubble.Position.y - bubble.Velocity) <= pointColl.Position.Ceiling)
 			{
 				bubble.Life = 0.0f;
 				continue;
@@ -120,20 +125,23 @@ namespace TEN::Effects::Bubble
 			float alpha = 1.0f - (bubble.Life / LIFE_START_FADING);
 			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
 
+			// Update position.
+			bubble.WavePeriod += bubble.WaveVelocity;
+			bubble.PositionBase += Vector3(0.0f, -bubble.Velocity, 0.0f) + bubble.Inertia;
+			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
+
+			// Update 2D orientation.
+			bubble.Orientation2D += bubble.Rotation;
+
+			// Update intertia.
+			bubble.Inertia *= 0.8f;
+
 			// Oscillate scale according to period.
 			bubble.OscillationPeriod += bubble.OscillationVelocity;
 			bubble.Scale = Vector2(
 				(bubble.ScaleMin.x / 2) + ((bubble.ScaleMax.x - bubble.ScaleMin.x) * (0.5f + (0.5f * sin(bubble.OscillationPeriod)))),
 				(bubble.ScaleMin.y / 2) + ((bubble.ScaleMax.y - bubble.ScaleMin.y) * (0.5f + (0.5f * cos(bubble.OscillationPeriod + 1.0f)))));
 			bubble.Scale *= Lerp(0.0f, 1.0f, bubble.Life / LIFE_FULL_SCALE);
-
-			// Update position.
-			bubble.WavePeriod += bubble.WaveVelocity;
-			bubble.PositionBase += Vector3(0.0f, -bubble.Velocity, 0.0f) + bubble.Inertia;
-			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
-
-			// Update intertia.
-			bubble.Inertia *= 0.75f;
 
 			// Update life.
 			bubble.Life -= 1.0f;

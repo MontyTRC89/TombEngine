@@ -8,16 +8,17 @@ namespace TEN::Effects::Bubble
 	{
 		Large		  = (1 << 0),
 		Clump		  = (1 << 1),
-		HighAmplitude = (1 << 2)
+		HighAmplitude = (1 << 2),
 	};
 
 	struct Bubble
 	{
 		unsigned int SpriteIndex = 0;
 
-		Vector3 Position	 = Vector3::Zero;
-		Vector3 PositionBase = Vector3::Zero;
-		int		RoomNumber	 = 0;
+		Vector3 Position	  = Vector3::Zero;
+		Vector3 PositionBase  = Vector3::Zero;
+		int		RoomNumber	  = 0;
+		short	Orientation2D = 0;
 
 		Vector4 Color		 = Vector4::Zero;
 		Vector4 ColorStart	 = Vector4::Zero;
@@ -36,6 +37,7 @@ namespace TEN::Effects::Bubble
 		float Velocity			  = 0.0f;
 		float OscillationPeriod	  = 0.0f;
 		float OscillationVelocity = 0.0f;
+		short Rotation			  = 0;
 	};
 
 	extern std::deque<Bubble> Bubbles;
