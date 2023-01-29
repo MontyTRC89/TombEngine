@@ -69,7 +69,7 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_LIGHTNING_LOOP, &item->Pose);
+					SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
@@ -107,7 +107,7 @@ void ObeliskControl(short itemNumber)
 			pos.y = item->Pose.Position.y;
 			pos.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
-			SoundEffect(SFX_TR4_LIGHTNING_LOOP, &Pose(Vector3i(pos)));
+			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &Pose(Vector3i(pos)));
 
 			if (GlobalCounter & 1)
 			{
