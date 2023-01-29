@@ -522,7 +522,7 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
 
 				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, damage, isExplosive);
+				DoItemHit(&target, damage, isExplosive, false);
 			}
 		}
 	}

@@ -6,6 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
@@ -23,6 +24,7 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Items;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -788,7 +790,7 @@ void DoDamage(ItemInfo* item, int damage)
 	}
 }
 
-void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
@@ -800,6 +802,9 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
 			DoDamage(target, damage);
 		}
 	}
+
+	if (isExplosive && allowBurn && Random::TestProbability(1 / 2.0f))
+		ItemBurn(target);
 
 	if (!target->Callbacks.OnHit.empty())
 	{

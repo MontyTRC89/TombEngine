@@ -192,5 +192,5 @@ std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
-void DoItemHit(ItemInfo* target, int damage, bool isExplosive);
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
