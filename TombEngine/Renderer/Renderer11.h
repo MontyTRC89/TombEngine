@@ -554,7 +554,9 @@ namespace TEN::Renderer
 		void DrawSparkParticles(RenderView& view);
 		void DrawDripParticles(RenderView& view);
 		void DrawExplosionParticles(RenderView& view);
-		void DrawLaraHolsters(bool transparent);
+		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
+		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
+		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
 		void DrawFootprints(RenderView& view);

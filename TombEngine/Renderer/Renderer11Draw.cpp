@@ -240,63 +240,11 @@ namespace TEN::Renderer
 				}
 			}
 
-			if (item->ObjectNumber != ID_LARA)
-				continue;
-
-			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
+			if (item->ObjectNumber == ID_LARA)
 			{
-				auto& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
-
-				for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
-				{
-					auto* mesh = laraSkinJoints.ObjectMeshes[k];
-
-					for (auto& bucket : mesh->Buckets)
-					{
-						if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
-							continue;
-
-						// Draw vertices
-						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-						m_numMoveablesDrawCalls++;
-					}
-				}
-			}
-
-			auto& hairsObj = *m_moveableObjects[ID_HAIR];
-
-			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-			m_stItem.World = Matrix::Identity;
-			m_stItem.BonesMatrices[0] = obj.AnimationTransforms[LM_HEAD] * item->World;
-
-			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
-			{
-				auto* hairs = &Hairs[0][i];
-				auto world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
-					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-				m_stItem.BonesMatrices[i + 1] = world;
-				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-			}
-
-			m_cbItem.updateData(m_stItem, m_context.Get());
-			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-			{
-				auto* mesh = hairsObj.ObjectMeshes[k];
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
-						continue;
-
-					// Draw vertices
-					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-					m_numMoveablesDrawCalls++;
-				}
+				DrawLaraHolsters(item, &room, false);
+				DrawLaraJoints(item, &room, false);
+				DrawLaraHair(item, &room, false);
 			}
 		}
 	}
