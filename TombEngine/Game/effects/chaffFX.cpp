@@ -19,7 +19,7 @@
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
 
-#define	MAX_TRIGGER_RANGE 0x4000
+constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 
 void TriggerChaffEffects(int flareLife)
 {
@@ -163,29 +163,45 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 	smoke->size = smoke->dSize = size;
 }
 
+// TODO: Move to Bubble.cpp
 void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
 {
-	// Too many effects; return early.
-	if (Bubbles.size() > BUBBLE_COUNT_MAX)
-		return;
+	constexpr auto COLOR_END		= Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+	constexpr auto OPACTY_MAX		= 0.8f;
+	constexpr auto OPACTY_MIN		= 0.3f;
+	constexpr auto AMPLITUDE_MAX	= BLOCK(1 / 16.0f);
+	constexpr auto SCALE_LARGE_MAX	= BLOCK(0.5f);
+	constexpr auto OSC_VELOCITY_MAX = 0.4f;
+	constexpr auto OSC_VELOCITY_MIN = 0.1f;
 
-	auto& bubble = Bubbles.emplace_back();
+	auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
+
+	auto sphere = BoundingSphere(Vector3::Zero, AMPLITUDE_MAX);
+
+	bubble.SpriteIndex = SPR_BUBBLES;
+	bubble.Position = pos.ToVector3();
+	bubble.PositionBase = bubble.Position;
+	bubble.RoomNumber = roomNumber;
+
+	bubble.Color =
+	bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
+	bubble.ColorEnd = COLOR_END;
+	bubble.Orientation2D = 0;
+
+	bubble.Inertia = Vector3::Zero;
+	bubble.Amplitude = Random::GeneratePointInSphere(sphere);
+	bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
+	bubble.WaveVelocity = Vector3(
+		1 / Random::GenerateFloat(8, 16),
+		1 / Random::GenerateFloat(8, 16),
+		1 / Random::GenerateFloat(8, 16));
 
 	bubble.Life = 0.0f;
 	bubble.Velocity = Random::GenerateFloat(4.0f, 16.0f);
-	bubble.ColorStart = Vector4(0, 0, 0, 0);
-	float shade = Random::GenerateFloat(0.3f, 0.8f);
-	bubble.ColorEnd = Vector4(shade, shade, shade, 0.8f);
-	bubble.Color = bubble.ColorStart;
+	bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
+	bubble.OscillationVelocity = Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
 	bubble.Scale =
 	bubble.ScaleMax =
 	bubble.ScaleMin = Vector2(Random::GenerateFloat(32.0f, 96.0f));
-	bubble.SpriteIndex = SPR_BUBBLES;
-	bubble.Position = pos.ToVector3();
-	float maxAmplitude = 64;
-	bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-	bubble.PositionBase = bubble.Position;
-	bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
-	bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
-	bubble.RoomNumber = roomNumber;
+	bubble.Rotation = 0;
 }

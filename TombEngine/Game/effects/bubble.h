@@ -8,7 +8,7 @@ namespace TEN::Effects::Bubble
 	{
 		Large		  = (1 << 0),
 		Clump		  = (1 << 1),
-		HighAmplitude = (1 << 2),
+		HighAmplitude = (1 << 2)
 	};
 
 	struct Bubble

@@ -23,8 +23,8 @@ namespace TEN::Effects::Bubble
 		constexpr auto COLOR_END		   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 		constexpr auto OPACTY_MAX		   = 0.8f;
 		constexpr auto OPACTY_MIN		   = 0.3f;
-		constexpr auto AMPLITUDE_HIGH	   = BLOCK(0.25f);
-		constexpr auto AMPLITUDE_LOW	   = BLOCK(1 / 32.0f);
+		constexpr auto AMPLITUDE_MAX_HIGH  = BLOCK(0.25f);
+		constexpr auto AMPLITUDE_MAX_LOW   = BLOCK(1 / 32.0f);
 		constexpr auto SCALE_LARGE_MAX	   = BLOCK(0.5f);
 		constexpr auto SCALE_LARGE_MIN	   = BLOCK(0.25f);
 		constexpr auto SCALE_SMALL_MAX	   = BLOCK(1 / 8.0f);
@@ -42,7 +42,7 @@ namespace TEN::Effects::Bubble
 
 		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
-		float amplitudeMax = (flags & BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH : AMPLITUDE_LOW;
+		float amplitudeMax = (flags & BubbleFlags::HighAmplitude) ? AMPLITUDE_MAX_HIGH : AMPLITUDE_MAX_LOW;
 		auto sphere = BoundingSphere(Vector3::Zero, amplitudeMax);
 
 		bubble.SpriteIndex = (flags & BubbleFlags::Clump) ? SPR_UNKNOWN1 : SPR_BUBBLES;
@@ -113,6 +113,7 @@ namespace TEN::Effects::Bubble
 			{
 				bubble.Life = 0.0f;
 
+				// TODO: Derive ripple scale from bubble scale.
 				SetupRipple(
 					bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z,
 					Random::GenerateFloat(48.0f, 64.0f),
@@ -125,7 +126,7 @@ namespace TEN::Effects::Bubble
 			float alpha = 1.0f - (bubble.Life / LIFE_START_FADING);
 			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
 
-			// Update position.
+			// Update position. TODO: Sinks.
 			bubble.WavePeriod += bubble.WaveVelocity;
 			bubble.PositionBase += Vector3(0.0f, -bubble.Velocity, 0.0f) + bubble.Inertia;
 			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
