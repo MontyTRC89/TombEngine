@@ -138,7 +138,7 @@ namespace TEN::Effects::Bubble
 			// Update life.
 			bubble.Life -= 1.0f;
 		}
-
+		
 		ClearInactiveEffects(Bubbles);
 	}
 

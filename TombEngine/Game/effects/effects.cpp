@@ -1303,16 +1303,12 @@ void Splash(ItemInfo* item)
 	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
 	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
 
-	auto direction = item->Animation.Velocity;
-	direction.Normalize();
-	direction = Geometry::RotatePoint(direction, EulerAngles(0, item->Pose.Orientation.y, 0));
-
 	// Spawn bubbles.
 	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
 		auto pos = Random::GeneratePointInSphere(sphere);
-		auto coneDirection = Random::GenerateDirectionInCone(direction, 15.0f);
-		auto inertia = coneDirection * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.3f));
+		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
+		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
 		SpawnBubble(pos, item->RoomNumber, inertia, 0);
 	}
 }

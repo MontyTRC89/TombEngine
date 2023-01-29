@@ -197,14 +197,14 @@ extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
-template <class T>
-T& GetNewEffect(std::deque<T>& effects, unsigned int countMax)
+template <typename TEffect>
+TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
 {
 	// Add and return new effect.
 	if (effects.size() < countMax)
 		return effects.emplace_back();
 
-	T* effectPtr = nullptr;
+	TEffect* effectPtr = nullptr;
 	float shortestLife = INFINITY;
 
 	// Find effect with shortest remaining life.
@@ -218,17 +218,17 @@ T& GetNewEffect(std::deque<T>& effects, unsigned int countMax)
 	}
 
 	// Clear and return existing effect.
-	*effectPtr = T();
+	*effectPtr = TEffect();
 	return *effectPtr;
 }
 
-template <class T>
-void ClearInactiveEffects(std::deque<T>& effects)
+template <typename TEffect>
+void ClearInactiveEffects(std::deque<TEffect>& effects)
 {
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const T& effect) { return (effect.Life <= 0.0f); }), effects.end());
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }), effects.end());
 }
 
 Particle* GetFreeParticle();
