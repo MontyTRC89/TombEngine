@@ -102,9 +102,9 @@ void ExplosionControl(short itemNumber)
 			if (item->ItemFlags[3])
 			{
 				if (flag == 2)
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 				else
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 			}
 
 			if (flag != 2)
@@ -140,7 +140,7 @@ void ExplosionControl(short itemNumber)
 					{
 						TriggerExplosionSparks(CollidedItems[i]->Pose.Position.x, CollidedItems[i]->Pose.Position.y, CollidedItems[i]->Pose.Position.z, 3, -2, 0, CollidedItems[i]->RoomNumber);
 						CollidedItems[i]->Pose.Position.y -= 128;
-						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true);
+						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 						CollidedItems[i]->Pose.Position.y += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
 						SmashObject(CollidedItems[i] - g_Level.Items.data());
@@ -166,7 +166,7 @@ void ExplosionControl(short itemNumber)
 					{
 						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
 						CollidedMeshes[i]->pos.Position.y -= 128;
-						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 128, 96, 0, 16, EulerAngles::Zero, 0, true);
+						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 128, 96, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 						CollidedMeshes[i]->pos.Position.y += 128;
 						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->RoomNumber, 0);
