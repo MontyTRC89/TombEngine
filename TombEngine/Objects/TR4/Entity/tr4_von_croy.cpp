@@ -673,12 +673,7 @@ namespace TEN::Entities::TR4
 				item->Pose = enemy->Pose;
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 			{
-				TestTriggers(
-					creature->AITarget->Pose.Position.x,
-					creature->AITarget->Pose.Position.y,
-					creature->AITarget->Pose.Position.z,
-					creature->AITarget->RoomNumber,
-					true);
+				TestTriggers(creature->AITarget, true);
 
 				creature->ReachedGoal = false;
 				creature->Enemy = nullptr;
@@ -789,12 +784,7 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			TestTriggers(
-				creature->AITarget->Pose.Position.x,
-				creature->AITarget->Pose.Position.y,
-				creature->AITarget->Pose.Position.z,
-				creature->AITarget->RoomNumber,
-				true);
+			TestTriggers(creature->AITarget, true);
 
 			item->AIBits = FOLLOW;
 			creature->ReachedGoal = false;
