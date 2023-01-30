@@ -637,7 +637,10 @@ void HarpoonBoltControl(short itemNumber)
 	{
 		// Spawn bubbles.
 		if (Wibble & 4)
-			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, BubbleFlags::Clump | BubbleFlags::HighAmplitude);
+		{
+			for (int i = 0; i < 3; i++)
+				SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, BubbleFlags::HighAmplitude);
+		}
 			
 		item.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item.Pose.Orientation.x) / 2;
 		item.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item.Pose.Orientation.x) / 2;

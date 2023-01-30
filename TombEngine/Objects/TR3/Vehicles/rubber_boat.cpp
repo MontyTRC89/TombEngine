@@ -983,7 +983,9 @@ namespace TEN::Entities::Vehicles
 
 				short roomNumber = rBoatItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-				SpawnBubble(pos, roomNumber);
+
+				for (int i = 0; i < 5; i++)
+					SpawnBubble(pos, roomNumber);
 			}
 		}
 		else
