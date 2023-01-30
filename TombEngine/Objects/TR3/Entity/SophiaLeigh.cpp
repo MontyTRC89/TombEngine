@@ -35,15 +35,16 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX = 60;
-	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.7f, 0.5f, 0.5f);
-	constexpr auto SOPHIALEIGH_EXPLOSION_COLOR = Vector4(0.0f, 0.3f, 0.7f, 0.5f);
+	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+	constexpr auto SOPHIALEIGH_EXPLOSION_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
 
 	constexpr auto SOPHIALEIGH_WALK_TURN_RATE_MAX = ANGLE(4);
 	constexpr auto SOPHIALEIGH_RUN_TURN_RATE_MAX = ANGLE(7);
 	constexpr auto SOPHIALEIGH_LASER_DECREASE_XANGLE_IF_LARA_CROUCH = ANGLE(0.25f);
 	constexpr auto SOPHIALEIGH_LASER_DISPERSION_ANGLE = ANGLE(1.5f);
 
-	constexpr auto SOPHIALEIGH_LIGHTNING_GLOW_SIZE = 16;
+	constexpr auto SOPHIALEIGH_LIGHTNING_GLOW_SIZE = 8;
+	constexpr auto SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE = 10;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_SPEED = -184;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_INNER_SIZE = 2700;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE = 2300;
@@ -132,6 +133,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = fully charged.
 		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
 		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
+		item.SetFlagField((int)BossItemFlags::Rotation, 0);
 		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START);			// Always start with projectile attack.
 	}
 
@@ -165,16 +167,31 @@ namespace TEN::Entities::Creatures::TR3
 	static void TriggerSophiaLeightLight(ItemInfo& item, Pose& shockwavePos)
 	{
 		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
-			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 16)) ||
+			item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
+			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
 		{
+
 			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				SOPHIALEIGH_LIGHTNING_GLOW_SIZE + (Random::GenerateInt(3, 8)),
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX
-			);
+				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
+
+			if (item.ItemFlags[(int)BossItemFlags::Rotation] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
+				item.ItemFlags[(int)BossItemFlags::Rotation]++;
 		}
+		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
+		{
+			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
+				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
+
+			item.ItemFlags[(int)BossItemFlags::Rotation]--;
+
+		}
+		else
+			item.ItemFlags[(int)BossItemFlags::AttackType] = 0;
+
 	}
 
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBigLaser, short angleAdd)
@@ -670,7 +687,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
 				// Do explosion effect.
-				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_EXPLOSION_COLOR, true, false);
+				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_EXPLOSION_COLOR, false);
 				return;
 			}
 		}
