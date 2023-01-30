@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TONY_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto TONY_EXPLOSION_NUM_MAX = 60;
 	constexpr auto TONY_DAMAGE = 100;
-	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.5f, 0.0f, 0.5f);
+	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
 	const BiteInfo TonyLeftHandBite = BiteInfo(Vector3::Zero, 10);
 	const BiteInfo TonyRightHandBite = BiteInfo(Vector3::Zero, 13);
