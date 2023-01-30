@@ -1,3 +1,9 @@
+Version 1.0.7
+=============
+
+* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt).
+* Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
+
 Version 1.0.6
 =============
 
