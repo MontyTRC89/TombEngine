@@ -348,7 +348,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < size; i++)
 		{
 			memcpy(&m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
-		}
+		} 
 		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = size;
 	}
 

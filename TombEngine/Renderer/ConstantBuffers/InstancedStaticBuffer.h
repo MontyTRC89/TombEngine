@@ -9,7 +9,7 @@ namespace TEN::Renderer
 	using DirectX::SimpleMath::Matrix;
 	using DirectX::SimpleMath::Vector4;
 
-	constexpr int INSTANCED_STATIC_MESH_BUCKET_SIZE = 32;
+	constexpr int INSTANCED_STATIC_MESH_BUCKET_SIZE = 100;
 	
 	struct RendererStatic;
 	struct RendererMesh;

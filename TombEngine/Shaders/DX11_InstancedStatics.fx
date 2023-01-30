@@ -5,7 +5,7 @@
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
 
-#define INSTANCED_STATIC_MESH_BUCKET_SIZE 32
+#define INSTANCED_STATIC_MESH_BUCKET_SIZE 100
 
 struct InstancedStaticMesh
 {

@@ -1784,7 +1784,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
-		if (m_staticsTextures.size() == 0 || view.StaticsToDraw.size() == 0)
+		if (m_staticsTextures.size() == 0 || view.SortedStatics.size() == 0)
 		{
 			return;
 		}
@@ -1801,35 +1801,43 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		int staticsCount = 0;
-
-		for (int s = 0; s < view.StaticsToDraw.size(); s++)
+		for (auto it = view.SortedStatics.begin(); it != view.SortedStatics.end(); it++)
 		{
-			RendererStatic* staticToDraw = view.StaticsToDraw[s];
-			RendererObject& staticObj = *m_staticObjects[staticToDraw->ObjectNumber];
-			RendererRoom* room = &m_rooms[staticToDraw->RoomNumber];
+			int staticObjectNumber = it->first;
+			std::vector<RendererStatic*> statics = it->second;
 
-			if (staticObj.ObjectMeshes.size() == 0)
-			{
+			RendererStatic* refStatic = statics[0];
+			RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
+			if (refStaticObj.ObjectMeshes.size() == 0)
 				continue;
-			}
 
-			RendererMesh* mesh = staticObj.ObjectMeshes[0];
+			RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
 
-			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].World = staticToDraw->World;
-			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Color = staticToDraw->Color;
-			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Ambient = room->AmbientLight;
-			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].LightMode = mesh->LightMode;
-			BindInstancedStaticLights(staticToDraw->LightsToDraw, staticsCount);
+			int staticsCount = (int)statics.size();
+			int bucketSize = 1;
+			int baseStaticIndex = 0;
 
-			staticsCount++;
+			while (baseStaticIndex < staticsCount)
+			{
+				int k = 0;
+				int currentBucketSize = std::min(bucketSize, staticsCount - baseStaticIndex);
+				int max = std::min(baseStaticIndex + bucketSize, staticsCount);
 
-			// Draw 
-			if (staticsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE
-				|| s == view.StaticsToDraw.size() - 1
-				|| (s < view.StaticsToDraw.size() - 1 && view.StaticsToDraw[s + 1]->ObjectNumber != staticToDraw->ObjectNumber))
-			{  
-				for (auto& bucket : mesh->Buckets)
+				for (int s = baseStaticIndex; s < max; s++)
+				{
+					RendererStatic* current = statics[s];
+						RendererRoom* room = &m_rooms[current->RoomNumber];
+
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
+						BindInstancedStaticLights(current->LightsToDraw, k);
+				}
+
+				baseStaticIndex += bucketSize;
+
+				for (auto& bucket : refMesh->Buckets)
 				{
 					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 					{
@@ -1871,14 +1879,12 @@ namespace TEN::Renderer
 							BindTexture(TEXTURE_NORMAL_MAP,
 								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
 
-							DrawIndexedInstancedTriangles(bucket.NumIndices, staticsCount, bucket.StartIndex, 0);
+							DrawIndexedInstancedTriangles(bucket.NumIndices, currentBucketSize, bucket.StartIndex, 0);
 
 							m_numStaticsDrawCalls++;
 						}
 					}
 				}
-
-				staticsCount = 0;
 			}
 		}
 

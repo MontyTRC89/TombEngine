@@ -414,7 +414,13 @@ namespace TEN::Renderer
 
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
-			renderView.StaticsToDraw.push_back(mesh);
+
+			if (renderView.SortedStatics.find(mesh->ObjectNumber) == renderView.SortedStatics.end())
+			{
+				std::vector<RendererStatic*> vec;
+				renderView.SortedStatics.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+			}
+			renderView.SortedStatics[mesh->ObjectNumber].push_back(mesh);
 		}
 	}
 
