@@ -391,9 +391,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_STAND;
 
-					StopSoundEffect(SFX_TR3_SOFIALEE_SUMMON);
-					SoundEffect(SFX_TR3_SOFIALEE_SUMMON_FAIL, &item.Pose);
-					SoundEffect(SFX_TR3_SOFIALEE_TAKE_HIT, &item.Pose);
+					StopSoundEffect(SFX_TR3_SOFIALEIGH_SUMMON);
+					SoundEffect(SFX_TR3_SOFIALEIGH_SUMMON_FAIL, &item.Pose);
+					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
@@ -582,9 +582,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_STAND;
 
-					StopSoundEffect(SFX_TR3_SOFIALEE_SUMMON);
-					SoundEffect(SFX_TR3_SOFIALEE_SUMMON_FAIL, &item.Pose);
-					SoundEffect(SFX_TR3_SOFIALEE_TAKE_HIT, &item.Pose);
+					StopSoundEffect(SFX_TR3_SOFIALEIGH_SUMMON);
+					SoundEffect(SFX_TR3_SOFIALEIGH_SUMMON_FAIL, &item.Pose);
+					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
