@@ -186,12 +186,6 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.Zone = ZoneType::Human;
 			break;
-
-		case LotType::SophiaLee:
-			creature->LOT.Step = BLOCK(1);
-			creature->LOT.Drop = -CLICK(3);
-			creature->LOT.Zone = ZoneType::Human;
-			break;
 	}
 
 	ClearLOT(&creature->LOT);
