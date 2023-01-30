@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		OCB_Normal = 1,			 // Move, climb, attack, and chase player.
 		OCB_Tower = 2,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
-		OCB_LuaToMoveUpDown = 4, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
+		OCB_LuaToMoveUpDown = 6, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
 	};
 
 	void InitialiseSophiaLeigh(short itemNumber)
