@@ -84,6 +84,7 @@ namespace TEN::Effects::Bubble
 	{
 		constexpr auto AMPLITUDE_MAX	= BLOCK(1 / 16.0f);
 		constexpr auto SCALE_MAX		= BLOCK(0.5f);
+		constexpr auto SCALE_MIN		= BLOCK(0.25f);
 		constexpr auto OSC_VELOCITY_MAX = 0.4f;
 		constexpr auto OSC_VELOCITY_MIN = 0.1f;
 
@@ -95,6 +96,7 @@ namespace TEN::Effects::Bubble
 		bubble.Position = pos;
 		bubble.PositionBase = bubble.Position;
 		bubble.RoomNumber = roomNumber;
+		bubble.Orientation2D = 0;
 
 		bubble.Color =
 		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
@@ -108,6 +110,10 @@ namespace TEN::Effects::Bubble
 			1 / Random::GenerateFloat(8, 16),
 			1 / Random::GenerateFloat(8, 16),
 			1 / Random::GenerateFloat(8, 16));
+		
+		bubble.Scale =
+		bubble.ScaleMax =Vector2(Random::GenerateFloat(SCALE_MIN, SCALE_MAX));
+		bubble.ScaleMin = bubble.Scale * 0.7f;
 
 		bubble.Life = 0.0f;
 		bubble.Gravity = Random::GenerateFloat(4.0f, 16.0f);
