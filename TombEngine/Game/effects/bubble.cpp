@@ -20,7 +20,6 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
 	{
-		constexpr auto COLOR_END		  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 		constexpr auto OPACTY_MAX		   = 0.8f;
 		constexpr auto OPACTY_MIN		  = 0.3f;
 		constexpr auto AMPLITUDE_MAX_HIGH = BLOCK(0.25f);
@@ -54,7 +53,7 @@ namespace TEN::Effects::Bubble
 
 		bubble.Color =
 		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
-		bubble.ColorEnd = COLOR_END;
+		bubble.ColorEnd = Vector4::Zero;
 
 		bubble.Inertia = inertia;
 		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
