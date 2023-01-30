@@ -147,10 +147,11 @@ namespace TEN::Effects::Bubble
 			{
 				bubble.Life = 0.0f;
 
-				// TODO: Derive ripple scale from bubble scale.
 				SetupRipple(
 					bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z,
-					Random::GenerateFloat(48.0f, 64.0f),
+					//pointColl.RoomNumber,
+					((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) * 0.5f,
+					//RippleFlags::ShortInit);
 					RIPPLE_FLAG_SHORT_INIT);
 
 				continue;
