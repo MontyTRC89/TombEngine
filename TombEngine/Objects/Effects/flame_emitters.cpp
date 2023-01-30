@@ -395,7 +395,7 @@ namespace TEN::Entities::Effects
 		{
 			if (item->TriggerFlags)
 			{
-				SoundEffect(SFX_TR4_LIGHTNING_LOOP, &item->Pose);
+				SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
 
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;

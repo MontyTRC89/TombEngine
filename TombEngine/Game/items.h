@@ -187,6 +187,7 @@ void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
+const std::string& GetObjectName(GAME_OBJECT_ID id);
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);

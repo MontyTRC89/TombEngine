@@ -977,7 +977,7 @@ void LoadEvent(VolumeEvent& event)
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < eventSetCount; i++)
 	{
@@ -1186,26 +1186,29 @@ void LoadSamples()
 {
 	TENLog("Loading samples... ", LogLevel::Info);
 
-	int SoundMapSize = ReadInt16();
-	g_Level.SoundMap.resize(SoundMapSize);
-	ReadBytes(g_Level.SoundMap.data(), SoundMapSize * sizeof(short));
+	int soundMapSize = ReadInt16();
+	TENLog("Sound map size: " + std::to_string(soundMapSize), LogLevel::Info);
 
-	TENLog("Sound map size: " + std::to_string(SoundMapSize), LogLevel::Info);
+	g_Level.SoundMap.resize(soundMapSize);
+	ReadBytes(g_Level.SoundMap.data(), soundMapSize * sizeof(short));
 
-	int numSamplesInfos = ReadInt32();
-
-	if (!numSamplesInfos)
+	int numSampleInfos = ReadInt32();
+	if (!numSampleInfos)
 	{
 		TENLog("No samples were found and loaded.", LogLevel::Warning);
 		return;
 	}
 
-	g_Level.SoundDetails.resize(numSamplesInfos);
-	ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
+	TENLog("Num sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
+
+	g_Level.SoundDetails.resize(numSampleInfos);
+	ReadBytes(g_Level.SoundDetails.data(), numSampleInfos * sizeof(SampleInfo));
 
 	int numSamples = ReadInt32();
 	if (numSamples <= 0)
 		return;
+
+	TENLog("Num samples: " + std::to_string(numSamples), LogLevel::Info);
 
 	int uncompressedSize;
 	int compressedSize;

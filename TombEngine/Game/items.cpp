@@ -17,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -636,6 +637,18 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	}
 
 	return changed;
+}
+
+const std::string& GetObjectName(GAME_OBJECT_ID id)
+{
+	for (auto it = kObjIDs.begin(); it != kObjIDs.end(); ++it)
+	{
+		if (it->second == id)
+			return it->first;
+	}
+
+	static const std::string unknownSlot = "UNKNOWN_SLOT";
+	return unknownSlot;
 }
 
 std::vector<int> FindAllItems(short objectNumber)
