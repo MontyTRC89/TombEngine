@@ -34,7 +34,7 @@ namespace TEN::Effects::Bubble
 		Vector2 ScaleMin   = Vector2::Zero;
 
 		float Life				  = 0.0f;
-		float Velocity			  = 0.0f;
+		float Gravity			  = 0.0f;
 		float OscillationPeriod	  = 0.0f;
 		float OscillationVelocity = 0.0f;
 		short Rotation			  = 0;

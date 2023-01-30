@@ -20,22 +20,23 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
 	{
-		constexpr auto COLOR_END		   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+		constexpr auto COLOR_END		  = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 		constexpr auto OPACTY_MAX		   = 0.8f;
-		constexpr auto OPACTY_MIN		   = 0.3f;
-		constexpr auto AMPLITUDE_MAX_HIGH  = BLOCK(0.25f);
-		constexpr auto AMPLITUDE_MAX_LOW   = BLOCK(1 / 32.0f);
-		constexpr auto SCALE_LARGE_MAX	   = BLOCK(0.5f);
-		constexpr auto SCALE_LARGE_MIN	   = BLOCK(0.25f);
-		constexpr auto SCALE_SMALL_MAX	   = BLOCK(1 / 8.0f);
-		constexpr auto SCALE_SMALL_MIN	   = BLOCK(1 / 32.0f);
-		constexpr auto VELOCITY_MIN		   = 8.0f;
-		constexpr auto VELOCITY_SINGLE_MAX = 12.0f;
-		constexpr auto VELOCITY_CLUMP_MAX  = 16.0f;
-		constexpr auto WAVE_VELOCITY_MAX   = 1 / 8.0f;
-		constexpr auto WAVE_VELOCITY_MIN   = 1 / 16.0f;
-		constexpr auto OSC_VELOCITY_MAX	   = 0.4f;
-		constexpr auto OSC_VELOCITY_MIN	   = 0.1f;
+		constexpr auto OPACTY_MIN		  = 0.3f;
+		constexpr auto AMPLITUDE_MAX_HIGH = BLOCK(0.25f);
+		constexpr auto AMPLITUDE_MAX_LOW  = BLOCK(1 / 32.0f);
+		constexpr auto SCALE_LARGE_MAX	  = BLOCK(0.5f);
+		constexpr auto SCALE_LARGE_MIN	  = BLOCK(0.25f);
+		constexpr auto SCALE_SMALL_MAX	  = BLOCK(1 / 8.0f);
+		constexpr auto SCALE_SMALL_MIN	  = BLOCK(1 / 32.0f);
+		constexpr auto WAVE_VELOCITY_MAX  = 1 / 8.0f;
+		constexpr auto WAVE_VELOCITY_MIN  = 1 / 16.0f;
+		constexpr auto GRAVITY_MIN		  = 8.0f;
+		constexpr auto GRAVITY_SINGLE_MAX = 12.0f;
+		constexpr auto GRAVITY_CLUMP_MAX  = 16.0f;
+		constexpr auto OSC_VELOCITY_MAX	  = 0.4f;
+		constexpr auto OSC_VELOCITY_MIN	  = 0.1f;
+		constexpr auto ROTATION_MAX		  = ANGLE(3.0f);
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
@@ -70,13 +71,13 @@ namespace TEN::Effects::Bubble
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
 		bubble.Life = BUBBLE_LIFE_MAX;
-		bubble.Velocity = Random::GenerateFloat(VELOCITY_MIN, (flags & BubbleFlags::Clump) ? VELOCITY_CLUMP_MAX : VELOCITY_SINGLE_MAX);
+		bubble.Gravity = Random::GenerateFloat(GRAVITY_MIN, (flags & BubbleFlags::Clump) ? GRAVITY_CLUMP_MAX : GRAVITY_SINGLE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
 		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ?
 			0.0f :
 			Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
 		bubble.Rotation = (flags & BubbleFlags::Clump) ?
-			Random::GenerateAngle(-ANGLE(3.0f), ANGLE(3.0f)) :
+			Random::GenerateAngle(-ROTATION_MAX, ROTATION_MAX) :
 			0;
 	}
 
@@ -98,11 +99,11 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Velocity, bubble.Position.z, bubble.RoomNumber);
+			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z, bubble.RoomNumber);
 
 			// Hit floor or ceiling; set to despawn.
-			if ((bubble.Position.y - bubble.Velocity) >= pointColl.Position.Floor ||
-				(bubble.Position.y - bubble.Velocity) <= pointColl.Position.Ceiling)
+			if ((bubble.Position.y - bubble.Gravity) >= pointColl.Position.Floor ||
+				(bubble.Position.y - bubble.Gravity) <= pointColl.Position.Ceiling)
 			{
 				bubble.Life = 0.0f;
 				continue;
@@ -128,7 +129,7 @@ namespace TEN::Effects::Bubble
 
 			// Update position. TODO: Sinks.
 			bubble.WavePeriod += bubble.WaveVelocity;
-			bubble.PositionBase += Vector3(0.0f, -bubble.Velocity, 0.0f) + bubble.Inertia;
+			bubble.PositionBase += Vector3(0.0f, -bubble.Gravity, 0.0f) + bubble.Inertia;
 			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
 
 			// Update 2D orientation.

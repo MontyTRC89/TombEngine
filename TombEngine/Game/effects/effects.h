@@ -184,7 +184,6 @@ struct ParticleDynamic
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class
-
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 

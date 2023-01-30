@@ -197,7 +197,7 @@ void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
 		1 / Random::GenerateFloat(8, 16));
 
 	bubble.Life = 0.0f;
-	bubble.Velocity = Random::GenerateFloat(4.0f, 16.0f);
+	bubble.Gravity = Random::GenerateFloat(4.0f, 16.0f);
 	bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
 	bubble.OscillationVelocity = Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
 	bubble.Scale =
