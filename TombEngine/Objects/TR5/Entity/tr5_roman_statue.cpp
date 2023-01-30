@@ -276,13 +276,13 @@ namespace TEN::Entities::Creatures::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
-		short angle = 0;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short headingAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
-
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 		auto prevMeshSwapBits = item->Model.MeshIndex;
 
 		// At determined HP values, the statue sheds material.
@@ -326,7 +326,7 @@ namespace TEN::Entities::Creatures::TR5
 			GetCreatureMood(item, &ai, true);
 			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			if (ai.ahead)
 			{
@@ -850,7 +850,7 @@ namespace TEN::Entities::Creatures::TR5
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 
 	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)

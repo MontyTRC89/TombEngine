@@ -512,20 +512,25 @@ namespace TEN::Entities::Creatures::TR3
 				0.0f,
 				Random::GenerateFloat(0.0f, 0.5f),
 				Random::GenerateFloat(0.0f, 0.5f),
-				Random::GenerateFloat(0.5f, 0.8f)
-			);
+				Random::GenerateFloat(0.5f, 0.8f));
 
 			if (pos.has_value() && !isExplosive)
+			{
 				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), color);
+			}
 			else if (isExplosive)
+			{
 				SpawnShield(target, color);
+			}
 		}
 		else
 		{
 			if (target.HitStatus)
 				SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
+
 			if (pos.has_value())
 				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
+
 			DoItemHit(&target, damage, isExplosive, false);
 		}
 	}

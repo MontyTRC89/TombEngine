@@ -20,11 +20,11 @@
 #include "Specific/setup.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
-using namespace TEN::Floordata;
-using namespace TEN::Input;
-using namespace TEN::Math::Random;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Floordata;
+using namespace TEN::Input;
+using namespace TEN::Math;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -778,11 +778,11 @@ void DoDamage(ItemInfo* item, int damage)
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
 			Rumble(power, 0.15f);
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
+		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;
