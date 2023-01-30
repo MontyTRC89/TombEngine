@@ -2,8 +2,6 @@
 
 namespace TEN::Effects::Bubble
 {
-	constexpr auto BUBBLE_COUNT_MAX = 1024;
-
 	enum BubbleFlags
 	{
 		Large		  = (1 << 0),
