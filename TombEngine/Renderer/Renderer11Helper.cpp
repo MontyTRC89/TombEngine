@@ -389,7 +389,7 @@ namespace TEN::Renderer
 
 	RendererObject& Renderer11::GetRendererObject(GAME_OBJECT_ID id)
 	{
-		if (id == GAME_OBJECT_ID::ID_LARA_SKIN)
+		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
 		{
 			if (m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
 				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
@@ -459,10 +459,7 @@ namespace TEN::Renderer
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
-		auto objNum = nativeItem->ObjectNumber;
-		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
-
-		auto& moveable = GetRendererObject(objNum);
+		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
 
 		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{
