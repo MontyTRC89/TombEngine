@@ -27,7 +27,7 @@ namespace TEN::Effects::Boss
 	void ShockwaveRingControl(int itemNumber);
 	void ShockwaveExplosionControl(int itemNumber);
 
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color, bool allowExplosion = true);
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color, bool greenExplosion, bool allowExplosion = true);
 	void CheckForRequiredObjects(ItemInfo& item);
 
 	void SpawnShield(const ItemInfo& item, const Vector4& color);

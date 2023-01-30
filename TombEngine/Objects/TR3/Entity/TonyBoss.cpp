@@ -483,7 +483,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->ItemFlags[7]++;
 
 				// Do explosion effect.
-				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_NUM_MAX, TONY_EFFECT_COLOR);
+				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_NUM_MAX, TONY_EFFECT_COLOR, false);
 				return;
 			}
 		}

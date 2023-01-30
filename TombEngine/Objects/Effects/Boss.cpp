@@ -195,7 +195,7 @@ namespace TEN::Effects::Boss
 	}
 
 	// NOTE: Actual death occurs when countUntilDeath >= 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, bool allowExplosion)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, bool greenExplosion, bool allowExplosion)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -217,7 +217,7 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					2, -2, 2, item.RoomNumber);
+					3 - greenExplosion, -2, greenExplosion * 2, item.RoomNumber);
 			}
 		}
 
@@ -233,7 +233,7 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					2, -2, 2, item.RoomNumber);
+					3 - greenExplosion, -2, greenExplosion * 2, item.RoomNumber);
 			}
 
 			sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
@@ -251,7 +251,7 @@ namespace TEN::Effects::Boss
 				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 				(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 				item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-				2, -2, 2, item.RoomNumber);
+				3 - greenExplosion, -2, greenExplosion * 2, item.RoomNumber);
 
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}
