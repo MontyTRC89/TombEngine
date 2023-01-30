@@ -1,3 +1,8 @@
+Version 1.0.7
+=============
+
+* Fix TR3 tony not using boss effect.
+
 Version 1.0.6
 =============
 
