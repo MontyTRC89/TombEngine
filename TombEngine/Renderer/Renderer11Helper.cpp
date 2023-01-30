@@ -459,7 +459,10 @@ namespace TEN::Renderer
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
-		auto& moveable = GetRendererObject((GAME_OBJECT_ID)nativeItem->ObjectNumber);
+		auto objNum = nativeItem->ObjectNumber;
+		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
+
+		auto& moveable = GetRendererObject(objNum);
 
 		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{
