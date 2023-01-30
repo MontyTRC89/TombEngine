@@ -276,18 +276,14 @@ namespace TEN::Entities::Creatures::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
-		short angle = 0;
-		short joint0 = 0;
-		short joint1 = 0;
-		short joint2 = 0;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
+		short headingAngle = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
 		auto prevMeshSwapBits = item->Model.MeshIndex;
-
-		if (item->Effect.Type == EffectType::Fire)
-			item->Effect.Type = EffectType::None;
 
 		// At determined HP values, the statue sheds material.
 		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(MS_HEAVY_DMG))
@@ -330,7 +326,7 @@ namespace TEN::Entities::Creatures::TR5
 			GetCreatureMood(item, &ai, true);
 			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			if (ai.ahead)
 			{
@@ -854,7 +850,7 @@ namespace TEN::Entities::Creatures::TR5
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 
 	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
@@ -874,15 +870,15 @@ namespace TEN::Entities::Creatures::TR5
 			player.Control.Weapon.GunType == LaraWeaponType::HK ||
 			player.Control.Weapon.GunType == LaraWeaponType::Revolver))
 		{
-			DoItemHit(&target, damage, isExplosive);
+			DoItemHit(&target, damage, isExplosive, false);
 		}
 		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 		{
-			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive);
+			DoItemHit(&target, damage / ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER, isExplosive, false);
 		}
 		else
 		{
-			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive);
+			DoItemHit(&target, damage * ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF, isExplosive, false);
 		}
 	}
 }

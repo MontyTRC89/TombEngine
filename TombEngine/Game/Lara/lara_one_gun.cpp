@@ -1273,12 +1273,8 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			return;
 
 		target.HitStatus = true;
+		HitTarget(&emitter, &target, nullptr, damage, true);
 
-		HitTarget(&emitter, &target, nullptr, damage, 1);
-
-		if (Random::TestProbability(1 / 2.0f))
-			ItemBurn(&target);
-					
 		if (&target != &emitter)
 		{
 			Statistics.Game.AmmoHits++;
