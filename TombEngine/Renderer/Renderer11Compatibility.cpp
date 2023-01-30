@@ -583,7 +583,7 @@ namespace TEN::Renderer
 						skinPresent = true;
 						int BonesToCheck[2] = {0, 0};
 
-						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA);
+						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
 						for (int j = 1; j < obj->nmeshes; j++)
 						{
@@ -669,7 +669,7 @@ namespace TEN::Renderer
 										// Mesh 0 must be linked with head
 										int parentVertices[] = { 37,39,40,38 };
 										
-										RendererObject& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA);
+										RendererObject& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 										RendererMesh* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										RendererBone* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
