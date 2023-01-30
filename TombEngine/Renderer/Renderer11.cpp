@@ -343,11 +343,13 @@ namespace TEN::Renderer
 
 	void Renderer11::BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID)
 	{
-		for (int i = 0; i < lights.size(); i++)
+		int size = std::min((int)lights.size(), 8);
+
+		for (int i = 0; i < size; i++)
 		{
 			memcpy(&m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
 		}
-		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = lights.size();
+		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = size;
 	}
 
 	void Renderer11::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)

@@ -20,8 +20,7 @@ struct ShaderLight
 	float Out;
 	float InRange;
 	float OutRange;
-
-	float padding;
+	float Padding;
 };
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)

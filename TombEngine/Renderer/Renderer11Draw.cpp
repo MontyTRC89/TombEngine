@@ -1788,6 +1788,9 @@ namespace TEN::Renderer
 		{
 			return;
 		}
+		 
+		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
+		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
 
 		// Bind vertex and index buffer
 		UINT stride = sizeof(RendererVertex);
@@ -1797,9 +1800,6 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		
-		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
 
 		int staticsCount = 0;
 
@@ -1820,7 +1820,6 @@ namespace TEN::Renderer
 			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Color = staticToDraw->Color;
 			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].Ambient = room->AmbientLight;
 			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].LightMode = mesh->LightMode;
-			m_stInstancedStaticMeshBuffer.StaticMeshes[staticsCount].NumLights = staticToDraw->LightsToDraw.size();
 			BindInstancedStaticLights(staticToDraw->LightsToDraw, staticsCount);
 
 			staticsCount++;
@@ -1829,7 +1828,7 @@ namespace TEN::Renderer
 			if (staticsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE
 				|| s == view.StaticsToDraw.size() - 1
 				|| (s < view.StaticsToDraw.size() - 1 && view.StaticsToDraw[s + 1]->ObjectNumber != staticToDraw->ObjectNumber))
-			{
+			{  
 				for (auto& bucket : mesh->Buckets)
 				{
 					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
@@ -1961,17 +1960,14 @@ namespace TEN::Renderer
 		// Bind caustics and shadow map textures
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
+		int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0, (int)m_sprites.size());
+		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Strange packing due to particular HLSL 16 bytes alignment requirements
 		RendererSprite* causticsSprite = &m_sprites[causticsFrame];
 		m_stRoom.CausticsStartUV = causticsSprite->UV[0];
 		m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
-		if (m_sprites.size() > causticsFrame)
-		{
-			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
-		}
-
+		
 		// Set shadow map data
 		if (m_shadowLight != nullptr)
 		{
