@@ -9,6 +9,9 @@
 #include "Specific/setup.h"
 
 // Creatures
+#include "Objects/TR3/Entity/Lizard.h" // OK
+#include "Objects/TR3/Entity/PunaBoss.h" // OK
+#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -19,13 +22,10 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
-#include "Objects/TR3/Entity/tr3_sophia.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-#include "Objects/TR3/Entity/Lizard.h" // OK
-#include "Objects/TR3/Entity/PunaBoss.h" // OK
 
 // Effects
 #include "Objects/Effects/Boss.h"
@@ -274,19 +274,18 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_SOPHIA_LEE_BOSS];
+	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLondonBoss;
+		obj->initialise = InitialiseSophiaLeigh;
+		obj->control = SophiaLeighControl;
 		obj->collision = CreatureCollision;
-		obj->control = LondonBossControl;
-		obj->drawRoutine = S_DrawLondonBoss;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::SophiaLee;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();

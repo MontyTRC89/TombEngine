@@ -764,7 +764,7 @@ namespace TEN::Entities::TR4
 					if (currentCreature->Enemy && 
 						currentCreature->Enemy->HitPoints > 0 && 
 						AI.distance < pow(SECTOR(0.5f), 2) &&
-						AI.verticalDistance < SECTOR(1))
+						abs(AI.verticalDistance) < SECTOR(1))
 					{
 						if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN))
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
