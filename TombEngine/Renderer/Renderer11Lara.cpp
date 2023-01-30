@@ -283,7 +283,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+	RendererObject& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
@@ -356,7 +356,6 @@ void Renderer11::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, bo
 		return;
 
 	RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
-	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 	for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 	{

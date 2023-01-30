@@ -206,9 +206,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = *m_moveableObjects[item->ObjectNumber];
-			RendererObject& skin = item->ObjectNumber == ID_LARA ? *m_moveableObjects[ID_LARA_SKIN] : obj;
-			RendererRoom& room = m_rooms[item->RoomNumber];
+			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectNumber);
 
 			m_stItem.World = item->World;
 			m_stItem.Color = item->Color;
@@ -221,7 +219,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-			for (int k = 0; k < skin.ObjectMeshes.size(); k++)
+			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
 				auto* mesh = GetMesh(item->MeshIndex[k]);
 
@@ -242,6 +240,8 @@ namespace TEN::Renderer
 
 			if (item->ObjectNumber == ID_LARA)
 			{
+				RendererRoom& room = m_rooms[item->RoomNumber];
+
 				DrawLaraHolsters(item, &room, false);
 				DrawLaraJoints(item, &room, false);
 				DrawLaraHair(item, &room, false);

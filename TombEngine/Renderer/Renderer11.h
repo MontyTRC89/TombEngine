@@ -597,6 +597,7 @@ namespace TEN::Renderer
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
+		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 
