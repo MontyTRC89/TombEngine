@@ -44,6 +44,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_LASER_DISPERSION_ANGLE = ANGLE(1.5f);
 
 	constexpr auto SOPHIALEIGH_LIGHTNING_GLOW_SIZE = 8;
+	constexpr auto SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE = 10;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_SPEED = -184;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_INNER_SIZE = 2700;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE = 2300;
@@ -132,7 +133,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = fully charged.
 		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
 		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
-		item.SetFlagField((int)BossItemFlags::AttackType, 0);
+		item.SetFlagField((int)BossItemFlags::Rotation, 0);
 		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START);			// Always start with projectile attack.
 	}
 
@@ -167,25 +168,25 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
 			item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 6)) ||
+			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
 		{
 
 			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::AttackType] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
 
-			if (item.ItemFlags[(int)BossItemFlags::AttackType] < SOPHIALEIGH_LIGHTNING_GLOW_SIZE)
-				item.ItemFlags[(int)BossItemFlags::AttackType]++;
+			if (item.ItemFlags[(int)BossItemFlags::Rotation] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
+				item.ItemFlags[(int)BossItemFlags::Rotation]++;
 		}
-		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 6) && item.ItemFlags[1] > 0)
+		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::AttackType] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
 
-			item.ItemFlags[(int)BossItemFlags::AttackType]--;
+			item.ItemFlags[(int)BossItemFlags::Rotation]--;
 
 		}
 		else
