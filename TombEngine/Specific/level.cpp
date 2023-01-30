@@ -977,7 +977,7 @@ void LoadEvent(VolumeEvent& event)
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < eventSetCount; i++)
 	{
