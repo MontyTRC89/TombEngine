@@ -333,7 +333,7 @@ namespace TEN::Entities::Effects
 			}
 			else
 			{
-				TriggerShockwave(&fx.pos, 24, 88, 48, 0, 128, 64, 16, EulerAngles((((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0.0f, 0.0f), 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.pos, 24, 88, 48, 0, 128, 64, 16, EulerAngles((((~g_Level.Rooms[fx.roomNumber].flags) / 16) & 2) * 65536, 0.0f, 0.0f), 1, true, false, (int)ShockwaveStyle::Normal);
 			}
 		}
 		else

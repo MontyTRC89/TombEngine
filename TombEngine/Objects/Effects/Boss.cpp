@@ -276,9 +276,9 @@ namespace TEN::Effects::Boss
 	{
 		short flags = 0;
 
-		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)
+		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)		
 			flags |= (short)BossFlagValue::Lizard;
-
+		
 		// The following are only for aesthetics.
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)
