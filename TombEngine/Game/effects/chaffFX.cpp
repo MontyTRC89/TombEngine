@@ -79,7 +79,7 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 
 		if (isUnderwater)
 		{
-			TriggerChaffBubbles(pos, item.RoomNumber);
+			SpawnChaffBubble(pos.ToVector3(), item.RoomNumber);
 		}
 		else
 		{
@@ -161,47 +161,4 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 	size = (GetRandomControl() & 7) + (speed >> 7) + 32;
 	smoke->sSize = size >> 2;
 	smoke->size = smoke->dSize = size;
-}
-
-// TODO: Move to Bubble.cpp
-void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
-{
-	constexpr auto COLOR_END		= Vector4(1.0f, 1.0f, 1.0f, 0.0f);
-	constexpr auto OPACTY_MAX		= 0.8f;
-	constexpr auto OPACTY_MIN		= 0.3f;
-	constexpr auto AMPLITUDE_MAX	= BLOCK(1 / 16.0f);
-	constexpr auto SCALE_LARGE_MAX	= BLOCK(0.5f);
-	constexpr auto OSC_VELOCITY_MAX = 0.4f;
-	constexpr auto OSC_VELOCITY_MIN = 0.1f;
-
-	auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
-
-	auto sphere = BoundingSphere(Vector3::Zero, AMPLITUDE_MAX);
-
-	bubble.SpriteIndex = SPR_BUBBLES;
-	bubble.Position = pos.ToVector3();
-	bubble.PositionBase = bubble.Position;
-	bubble.RoomNumber = roomNumber;
-
-	bubble.Color =
-	bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
-	bubble.ColorEnd = COLOR_END;
-	bubble.Orientation2D = 0;
-
-	bubble.Inertia = Vector3::Zero;
-	bubble.Amplitude = Random::GeneratePointInSphere(sphere);
-	bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
-	bubble.WaveVelocity = Vector3(
-		1 / Random::GenerateFloat(8, 16),
-		1 / Random::GenerateFloat(8, 16),
-		1 / Random::GenerateFloat(8, 16));
-
-	bubble.Life = 0.0f;
-	bubble.Gravity = Random::GenerateFloat(4.0f, 16.0f);
-	bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
-	bubble.OscillationVelocity = Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
-	bubble.Scale =
-	bubble.ScaleMax =
-	bubble.ScaleMin = Vector2(Random::GenerateFloat(32.0f, 96.0f));
-	bubble.Rotation = 0;
 }

@@ -14,14 +14,16 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Bubble
 {
-	constexpr auto BUBBLE_LIFE_MAX = 60.0f * FPS;
+	constexpr auto BUBBLE_LIFE_MAX		   = 60.0f;
+	constexpr auto BUBBLE_OPACTY_MAX	   = 0.8f;
+	constexpr auto BUBBLE_OPACTY_MIN	   = 0.3f;
+	constexpr auto BUBBLE_OSC_VELOCITY_MAX = 0.4f;
+	constexpr auto BUBBLE_OSC_VELOCITY_MIN = 0.1f;
 
 	std::deque<Bubble> Bubbles = {};
 
-	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags)
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags, const Vector3& inertia)
 	{
-		constexpr auto OPACTY_MAX		   = 0.8f;
-		constexpr auto OPACTY_MIN		  = 0.3f;
 		constexpr auto AMPLITUDE_MAX_HIGH = BLOCK(0.25f);
 		constexpr auto AMPLITUDE_MAX_LOW  = BLOCK(1 / 32.0f);
 		constexpr auto SCALE_LARGE_MAX	  = BLOCK(0.5f);
@@ -33,8 +35,6 @@ namespace TEN::Effects::Bubble
 		constexpr auto GRAVITY_MIN		  = 8.0f;
 		constexpr auto GRAVITY_SINGLE_MAX = 12.0f;
 		constexpr auto GRAVITY_CLUMP_MAX  = 16.0f;
-		constexpr auto OSC_VELOCITY_MAX	  = 0.4f;
-		constexpr auto OSC_VELOCITY_MIN	  = 0.1f;
 		constexpr auto ROTATION_MAX		  = ANGLE(3.0f);
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
@@ -52,8 +52,8 @@ namespace TEN::Effects::Bubble
 		bubble.Orientation2D = 0;
 
 		bubble.Color =
-		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(OPACTY_MIN, OPACTY_MAX));
-		bubble.ColorEnd = Vector4::Zero;
+		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
+		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		bubble.Inertia = inertia;
 		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
@@ -69,26 +69,60 @@ namespace TEN::Effects::Bubble
 			Vector2(Random::GenerateFloat(SCALE_SMALL_MIN, SCALE_SMALL_MAX));
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
-		bubble.Life = BUBBLE_LIFE_MAX;
+		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
 		bubble.Gravity = Random::GenerateFloat(GRAVITY_MIN, (flags & BubbleFlags::Clump) ? GRAVITY_CLUMP_MAX : GRAVITY_SINGLE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
 		bubble.OscillationVelocity = (flags & BubbleFlags::Clump) ?
 			0.0f :
-			Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
+			Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_LARGE_MAX);
 		bubble.Rotation = (flags & BubbleFlags::Clump) ?
 			Random::GenerateAngle(-ROTATION_MAX, ROTATION_MAX) :
 			0;
 	}
-
-	void SpawnBubble(const Vector3& pos, int roomNumber, int flags)
+	
+	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
 	{
-		SpawnBubble(pos, roomNumber, Vector3::Zero, flags);
+		constexpr auto AMPLITUDE_MAX	= BLOCK(1 / 16.0f);
+		constexpr auto SCALE_MAX		= BLOCK(0.5f);
+		constexpr auto OSC_VELOCITY_MAX = 0.4f;
+		constexpr auto OSC_VELOCITY_MIN = 0.1f;
+
+		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
+
+		auto sphere = BoundingSphere(Vector3::Zero, AMPLITUDE_MAX);
+
+		bubble.SpriteIndex = SPR_BUBBLES;
+		bubble.Position = pos;
+		bubble.PositionBase = bubble.Position;
+		bubble.RoomNumber = roomNumber;
+
+		bubble.Color =
+		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
+		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+		bubble.Orientation2D = 0;
+
+		bubble.Inertia = Vector3::Zero;
+		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
+		bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
+		bubble.WaveVelocity = Vector3(
+			1 / Random::GenerateFloat(8, 16),
+			1 / Random::GenerateFloat(8, 16),
+			1 / Random::GenerateFloat(8, 16));
+
+		bubble.Life = 0.0f;
+		bubble.Gravity = Random::GenerateFloat(4.0f, 16.0f);
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
+		bubble.OscillationVelocity = Lerp(OSC_VELOCITY_MAX, OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_MAX);
+		bubble.Scale =
+		bubble.ScaleMax =
+		bubble.ScaleMin = Vector2(Random::GenerateFloat(32.0f, 96.0f));
+		bubble.Rotation = 0;
 	}
 
 	void UpdateBubbles()
 	{
-		constexpr auto LIFE_FULL_SCALE	 = std::max(BUBBLE_LIFE_MAX - (0.25f * FPS), 0.0f);
-		constexpr auto LIFE_START_FADING = std::min(1.0f * FPS, BUBBLE_LIFE_MAX);
+		constexpr auto LIFE_FULL_SCALE	 = std::max(BUBBLE_LIFE_MAX - 0.25f, 0.0f);
+		constexpr auto LIFE_START_FADING = std::min(1.0f, BUBBLE_LIFE_MAX);
 
 		if (Bubbles.empty())
 			return;
@@ -123,7 +157,7 @@ namespace TEN::Effects::Bubble
 			}
 
 			// Update color.
-			float alpha = 1.0f - (bubble.Life / LIFE_START_FADING);
+			float alpha = 1.0f - (bubble.Life / std::round(LIFE_START_FADING * FPS));
 			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
 
 			// Update position. TODO: Sinks.
@@ -142,7 +176,7 @@ namespace TEN::Effects::Bubble
 			bubble.Scale = Vector2(
 				(bubble.ScaleMin.x / 2) + ((bubble.ScaleMax.x - bubble.ScaleMin.x) * (0.5f + (0.5f * sin(bubble.OscillationPeriod)))),
 				(bubble.ScaleMin.y / 2) + ((bubble.ScaleMax.y - bubble.ScaleMin.y) * (0.5f + (0.5f * cos(bubble.OscillationPeriod + 1.0f)))));
-			bubble.Scale *= Lerp(0.0f, 1.0f, bubble.Life / LIFE_FULL_SCALE);
+			bubble.Scale *= Lerp(0.0f, 1.0f, bubble.Life / std::round(LIFE_FULL_SCALE * FPS));
 
 			// Update life.
 			bubble.Life -= 1.0f;

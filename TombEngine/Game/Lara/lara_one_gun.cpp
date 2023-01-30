@@ -935,7 +935,7 @@ void RocketControl(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 	{
 		auto pos = item.Pose.Position.ToVector3() + Vector3(wx, wy, wz);
-		SpawnBubble(pos, item.RoomNumber, 0);
+		SpawnBubble(pos, item.RoomNumber);
 	}
 
 	// Update rocket's position.
@@ -1048,7 +1048,7 @@ void CrossbowBoltControl(short itemNumber)
 			item.Animation.Velocity.z -= item.Animation.Velocity.z / 16;
 
 		if (GlobalCounter & 1)
-			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, 0);
+			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber);
 	}
 
 	auto prevPos = item.Pose.Position;

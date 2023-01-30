@@ -42,8 +42,8 @@ namespace TEN::Effects::Bubble
 
 	extern std::deque<Bubble> Bubbles;
 
-	void SpawnBubble(const Vector3& pos, int roomNumber, const Vector3& inertia, int flags);
-	void SpawnBubble(const Vector3& pos, int roomNumber, int flags);
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags = 0, const Vector3& inertia = Vector3::Zero);
+	void SpawnChaffBubble(const Vector3& pos, int roomNumber);
 
 	void UpdateBubbles();
 	void ClearBubbles();

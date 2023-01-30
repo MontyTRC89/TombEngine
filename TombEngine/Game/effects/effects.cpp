@@ -674,7 +674,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 				(GetRandomControl() & 0x1FF) + x - 256,
 				(GetRandomControl() & 0x7F) + y - 64,
 				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber, 0);
+			SpawnBubble(pos, roomNumber);
 		}
 	}
 }
@@ -1309,7 +1309,7 @@ void Splash(ItemInfo* item)
 		auto pos = Random::GeneratePointInSphere(sphere);
 		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
 		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
-		SpawnBubble(pos, item->RoomNumber, inertia, 0);
+		SpawnBubble(pos, item->RoomNumber, 0, inertia);
 	}
 }
 

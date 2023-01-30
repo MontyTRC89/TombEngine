@@ -1074,7 +1074,7 @@ void LaraBubbles(ItemInfo* item)
 
 	int numBubbles = Random::GenerateInt(0, 3);
 	for (int i = 0; i < numBubbles; i++)
-		SpawnBubble(pos, item->RoomNumber, 0);
+		SpawnBubble(pos, item->RoomNumber);
 }
 
 int GetFreeDrip()

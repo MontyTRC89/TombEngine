@@ -121,7 +121,7 @@ void ControlMissile(short fxNumber)
 	{
 	case ID_SCUBA_HARPOON:
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx.roomNumber))
-			SpawnBubble(fx.pos.Position.ToVector3(), fx.roomNumber, 0);
+			SpawnBubble(fx.pos.Position.ToVector3(), fx.roomNumber);
 
 		break;
 
