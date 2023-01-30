@@ -25,19 +25,19 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum SophiaState
 	{
-		LONDONBOSS_EMPTY = 0,
-		LONDONBOSS_STAND = 1,
-		LONDONBOSS_WALK = 2,
-		LONDONBOSS_RUN = 3,
-		LONDONBOSS_SUMMON = 4,
-		LONDONBOSS_BIGZAP = 5,
-		LONDONBOSS_DEATH = 6,
-		LONDONBOSS_LAUGH = 7,
-		LONDONBOSS_LILZAP = 8,
-		LONDONBOSS_VAULT2 = 9,
-		LONDONBOSS_VAULT3 = 10,
-		LONDONBOSS_VAULT4 = 11,
-		LONDONBOSS_GODOWN = 12,
+		SOPHIALEIGH_EMPTY = 0,
+		SOPHIALEIGH_STAND = 1,
+		SOPHIALEIGH_WALK = 2,
+		SOPHIALEIGH_RUN = 3,
+		SOPHIALEIGH_SUMMON = 4,
+		SOPHIALEIGH_BIGZAP = 5,
+		SOPHIALEIGH_DEATH = 6,
+		SOPHIALEIGH_LAUGH = 7,
+		SOPHIALEIGH_LILZAP = 8,
+		SOPHIALEIGH_VAULT2 = 9,
+		SOPHIALEIGH_VAULT3 = 10,
+		SOPHIALEIGH_VAULT4 = 11,
+		SOPHIALEIGH_GODOWN = 12,
 	};
 
 	// TODO
@@ -46,24 +46,24 @@ namespace TEN::Entities::Creatures::TR3
 
 	};
 
-#define	LONDONBOSS_VAULT2_ANIM 9
-#define	LONDONBOSS_VAULT3_ANIM 18
-#define	LONDONBOSS_VAULT4_ANIM 15
-#define	LONDONBOSS_GODOWN_ANIM 21
-#define	LONDONBOSS_STND2SUM_ANIM 1
-#define LONDONBOSS_SUMMON_ANIM 2
-#define	LONDONBOSS_GODOWN_ANIM 21
+#define	SOPHIALEIGH_VAULT2_ANIM 9
+#define	SOPHIALEIGH_VAULT3_ANIM 18
+#define	SOPHIALEIGH_VAULT4_ANIM 15
+#define	SOPHIALEIGH_GODOWN_ANIM 21
+#define	SOPHIALEIGH_STND2SUM_ANIM 1
+#define SOPHIALEIGH_SUMMON_ANIM 2
+#define	SOPHIALEIGH_GODOWN_ANIM 21
 
-#define LONDONBOSS_VAULT_SHIFT 96
-#define LONDONBOSS_AWARE_DISTANCE pow(SECTOR(1), 2)
-#define LONDONBOSS_WALK_TURN ANGLE(4)
-#define LONDONBOSS_RUN_TURN ANGLE(7)
-#define LONDONBOSS_WALK_RANGE pow(SECTOR(1), 2)
-#define LONDONBOSS_WALK_CHANCE 0x100
-#define LONDONBOSS_LAUGH_CHANCE 0x100
-#define LONDONBOSS_TURN ANGLE(2.0f)
-#define LONDONBOSS_DIE_ANIM 17
-#define LONDONBOSS_FINAL_HEIGHT -11776
+#define SOPHIALEIGH_VAULT_SHIFT 96
+#define SOPHIALEIGH_AWARE_DISTANCE pow(SECTOR(1), 2)
+#define SOPHIALEIGH_WALK_TURN ANGLE(4)
+#define SOPHIALEIGH_RUN_TURN ANGLE(7)
+#define SOPHIALEIGH_WALK_RANGE pow(SECTOR(1), 2)
+#define SOPHIALEIGH_WALK_CHANCE 0x100
+#define SOPHIALEIGH_LAUGH_CHANCE 0x100
+#define SOPHIALEIGH_TURN ANGLE(2.0f)
+#define SOPHIALEIGH_DIE_ANIM 17
+#define SOPHIALEIGH_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
 	static void TriggerLaserBolt(Vector3i* pos, ItemInfo* item, long type, short yAngle)
@@ -86,12 +86,12 @@ namespace TEN::Entities::Creatures::TR3
 		return 0;
 	}
 
-	static void ExplodeLondonBoss(ItemInfo* item)
+	static void ExplodeSophiaLeigh(ItemInfo* item)
 	{
 
 	}
 
-	static void LondonBossDie(short itemNumber)
+	static void SophiaLeighDie(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -114,17 +114,17 @@ namespace TEN::Entities::Creatures::TR3
 
 	}
 
-	void InitialiseLondonBoss(short itemNumber)
+	void InitialiseSophiaLeigh(short itemNumber)
 	{
 
 	}
 
-	void LondonBossControl(short itemNumber)
+	void SophiaLeighControl(short itemNumber)
 	{
 
 	}
 
-	void S_DrawLondonBoss(ItemInfo* item)
+	void S_DrawSophiaLeigh(ItemInfo* item)
 	{
 		DrawAnimatingItem(item);
 

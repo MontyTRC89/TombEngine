@@ -5,7 +5,7 @@ namespace TEN::Entities::Creatures::TR3
 {
 	void ControlLaserBolts(short itemNumber);
 	void ControlLondBossPlasmaBall(short fxNumber);
-	void InitialiseLondonBoss(short itemNumber);
-	void LondonBossControl(short itemNumber);
-	void S_DrawLondonBoss(ItemInfo* item);
+	void InitialiseSophiaLeigh(short itemNumber);
+	void SophiaLeighControl(short itemNumber);
+	void S_DrawSophiaLeigh(ItemInfo* item);
 }

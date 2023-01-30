@@ -277,10 +277,10 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SOPHIA_LEE_BOSS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLondonBoss;
+		obj->initialise = InitialiseSophiaLeigh;
 		obj->collision = CreatureCollision;
-		obj->control = LondonBossControl;
-		obj->drawRoutine = S_DrawLondonBoss;
+		obj->control = SophiaLeighControl;
+		obj->drawRoutine = S_DrawSophiaLeigh;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
