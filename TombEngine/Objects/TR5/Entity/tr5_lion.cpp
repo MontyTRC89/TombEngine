@@ -20,7 +20,11 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto LION_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto LION_BITE_ATTACK_DAMAGE	 = 60;
 
-	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1.25f));
+	constexpr auto LION_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.7f));
+	constexpr auto LION_ATTACK_MIN_RANGE = SQUARE(SECTOR(0.4f));
+
+	constexpr auto LION_ROAR_CHANCE = 1.0f / 256;
 
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
@@ -101,102 +105,102 @@ namespace TEN::Entities::Creatures::TR5
 
 				switch (item->Animation.ActiveState)
 				{
-				case LION_STATE_IDLE:
-					creature->MaxTurn = 0;
+					case LION_STATE_IDLE:
+						creature->MaxTurn = 0;
+						creature->Flags = 0;
 
-					if (item->Animation.RequiredState)
-					{
-						item->Animation.TargetState = item->Animation.RequiredState;
-						break;
-					}
-
-					if (creature->Mood == MoodType::Bored)
-					{
-						if (!(GetRandomControl() & 0x3F))
-							item->Animation.TargetState = LION_STATE_WALK_FORWARD;
-
-						break;
-					}
-
-					if (AI.ahead)
-					{
-						if (item->TouchBits.Test(LionAttackJoints))
+						if (item->Animation.RequiredState)
 						{
-							item->Animation.TargetState = LION_STATE_BITE_ATTACK;
+							item->Animation.TargetState = item->Animation.RequiredState;
 							break;
 						}
 
-						if (AI.distance < LION_POUNCE_ATTACK_RANGE)
+						if (creature->Mood == MoodType::Bored)
 						{
-							item->Animation.TargetState = LION_STATE_POUNCE_ATTACK;
+							if (!(GetRandomControl() & 0x3F))
+								item->Animation.TargetState = LION_STATE_WALK_FORWARD;
+
 							break;
 						}
-					}
 
-					item->Animation.TargetState = LION_STATE_RUN_FORWARD;
-					break;
-
-				case LION_STATE_WALK_FORWARD:
-					creature->MaxTurn = ANGLE(2.0f);
-
-					if (creature->Mood == MoodType::Bored)
-					{
-						if (TestProbability(1.0f / 256))
+						if (AI.ahead && AI.bite)
 						{
-							item->Animation.TargetState = LION_STATE_IDLE;
-							item->Animation.RequiredState = LION_STATE_ROAR;
-						}
-					}
-					else
-						item->Animation.TargetState = LION_STATE_IDLE;
-
-					break;
-
-				case LION_STATE_RUN_FORWARD:
-					creature->MaxTurn = ANGLE(5.0f);
-					tilt = angle;
-
-					if (creature->Mood != MoodType::Bored)
-					{
-						if (AI.ahead && AI.distance < LION_POUNCE_ATTACK_RANGE)
-							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (item->TouchBits.Test(LionAttackJoints) && AI.ahead)
-							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (creature->Mood != MoodType::Escape)
-						{
-							if (TestProbability(1.0f / 256))
+							if (AI.distance >= LION_ATTACK_MIN_RANGE)
 							{
-								item->Animation.TargetState = LION_STATE_IDLE;
-								item->Animation.RequiredState = LION_STATE_ROAR;
+								if (AI.distance <= LION_BITE_ATTACK_RANGE)
+								{
+									item->Animation.TargetState = LION_STATE_BITE_ATTACK;
+									break;
+								}
+								if (AI.distance < LION_POUNCE_ATTACK_RANGE)
+								{
+									item->Animation.TargetState = LION_STATE_POUNCE_ATTACK;
+									break;
+								}
 							}
 						}
-					}
-					else
-						item->Animation.TargetState = LION_STATE_IDLE;
+
+						item->Animation.TargetState = LION_STATE_RUN_FORWARD;
+					break;
+
+					case LION_STATE_WALK_FORWARD:
+						creature->MaxTurn = ANGLE(2.0f);
+
+						if (creature->Mood == MoodType::Bored)
+						{
+							if (TestProbability(LION_ROAR_CHANCE))
+								item->Animation.TargetState = LION_STATE_ROAR;
+						}
+						else
+							item->Animation.TargetState = LION_STATE_IDLE;
 
 					break;
 
-				case LION_STATE_POUNCE_ATTACK:
-					if (!item->Animation.RequiredState &&
-						item->TouchBits.Test(LionAttackJoints))
-					{
-						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
-						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
-						item->Animation.RequiredState = LION_STATE_IDLE;
-					}
+					case LION_STATE_RUN_FORWARD:
+						creature->MaxTurn = ANGLE(5.0f);
+						tilt = angle;
+
+						if (creature->Mood != MoodType::Bored)
+						{
+							if (AI.ahead &&
+								AI.bite &&
+								AI.distance < LION_BITE_ATTACK_RANGE &&
+								AI.distance >= LION_ATTACK_MIN_RANGE)
+									item->Animation.TargetState = LION_STATE_IDLE;
+							else if (creature->Mood != MoodType::Escape)
+							{
+								if (TestProbability(LION_ROAR_CHANCE))
+									item->Animation.TargetState = LION_STATE_ROAR;
+							}
+						}
+						else
+							item->Animation.TargetState = LION_STATE_IDLE;
 
 					break;
 
-				case LION_STATE_BITE_ATTACK:
-					creature->MaxTurn = ANGLE(1.0f);
+					case LION_STATE_POUNCE_ATTACK:
+						if (!creature->Flags &&
+							item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_POUNCE_ATTACK_END &&
+							item->TouchBits.Test(LionAttackJoints))
+						{
+							DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
+							CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
+							creature->Flags = 1;
+						}
 
-					if (!item->Animation.RequiredState &&
-						item->TouchBits.Test(LionAttackJoints))
-					{
-						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
-						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
-						item->Animation.RequiredState = LION_STATE_IDLE;
-					}
+					break;
+
+					case LION_STATE_BITE_ATTACK:
+						creature->MaxTurn = ANGLE(1.0f);
+
+						if (!creature->Flags &&
+							item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_BITE_ATTACK &&
+							item->TouchBits.Test(LionAttackJoints))
+						{
+							DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
+							CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
+							creature->Flags = 1;
+						}
 
 					break;
 				}

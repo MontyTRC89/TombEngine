@@ -185,9 +185,9 @@ namespace TEN::Entities::Creatures::TR3
 				case TIGER_STATE_POUNCE_ATTACK:
 					if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
 					{
-						if	(item->Animation.ActiveState == TIGER_STATE_BITE_ATTACK &&
+						if	(item->Animation.AnimNumber == Objects[ID_TIGER].animIndex + TIGER_ANIM_BITE_ATTACK &&
 							 item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 4 ||
-							 item->Animation.ActiveState == TIGER_STATE_POUNCE_ATTACK &&
+							item->Animation.AnimNumber == Objects[ID_TIGER].animIndex + TIGER_ANIM_POUNCE_ATTACK_START &&
 							 item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 12 )
 						{
 							DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR3
 				case TIGER_STATE_RUN_SWIPE_ATTACK:
 					if (!creature->Flags && item->TouchBits.Test(TigerSwipeAttackJoints))
 					{
-						if (item->Animation.ActiveState == TIGER_STATE_RUN_SWIPE_ATTACK &&
+						if (item->Animation.AnimNumber == Objects[ID_TIGER].animIndex + TIGER_ANIM_RUN_SWIPE_ATTACK &&
 							item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 						{
