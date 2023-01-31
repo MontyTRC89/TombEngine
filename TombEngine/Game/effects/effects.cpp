@@ -683,8 +683,16 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	GetRandomControl();
 	spark.maxYvel = 0;
 
-	if (!(extraTrig) && mainColor != Vector3::Zero)
-		return;
+	if (mainColor != Vector3::Zero)
+	{
+		if (extraTrig)
+		{			
+			TriggerExplosionSmokeEnd(x, y, z, uw);
+			return;
+		}
+		else
+			return;
+	}
 
 	if (uw == 2)
 	{

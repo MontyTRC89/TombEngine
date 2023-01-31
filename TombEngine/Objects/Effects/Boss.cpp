@@ -217,7 +217,7 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					0, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z), 
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z), 
 					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 		}
@@ -234,7 +234,7 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					0, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
 					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 
@@ -253,7 +253,7 @@ namespace TEN::Effects::Boss
 				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 				(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 				item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-				0, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+				2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
 				Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
