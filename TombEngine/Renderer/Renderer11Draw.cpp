@@ -306,32 +306,19 @@ namespace TEN::Renderer
 		auto& room = m_rooms[LaraItem->RoomNumber];
 		auto* item = &m_items[Lara.ItemNumber];
 
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		m_stStatic.Color = room.AmbientLight;
-		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-		BindStaticLights(item->LightsToDraw);
-
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		int gunShellsCount = 0;
+		short objectNumber = 0;
 
 		for (int i = 0; i < MAX_GUNSHELL; i++)
 		{
 			auto* gunshell = &Gunshells[i];
 
 			if (gunshell->counter <= 0)
+			{
 				continue;
+			}
 
-			auto* object = &Objects[gunshell->objectNumber];
-			auto& moveableObject = *m_moveableObjects[gunshell->objectNumber];
+			objectNumber = gunshell->objectNumber;
 
 			Matrix translation = Matrix::CreateTranslation(
 				gunshell->pos.Position.x, 
@@ -340,26 +327,54 @@ namespace TEN::Renderer
 			);
 			Matrix rotation = gunshell->pos.Orientation.ToRotationMatrix();
 			Matrix world = rotation * translation;
-			m_stStatic.World = world;
-			m_cbStatic.updateData(m_stStatic, m_context.Get());
 
-			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+			m_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].World = world;
+			m_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Ambient = room.AmbientLight;
+			m_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Color = room.AmbientLight;
+			m_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			BindInstancedStaticLights(item->LightsToDraw, gunShellsCount);
+
+			gunShellsCount++;
+		}
+
+		if (gunShellsCount > 0)
+		{
+			auto* object = &Objects[objectNumber];
+			auto& moveableObject = *m_moveableObjects[objectNumber];
+
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
+
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
+
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+			m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
 			auto* mesh = moveableObject.ObjectMeshes[0];
 
 			for (auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+				{
 					continue;
+				}
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-				// Draw vertices.
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				DrawIndexedInstancedTriangles(bucket.NumIndices, gunShellsCount, bucket.StartIndex, 0);
 
-				m_numMoveablesDrawCalls++;
+				m_numStaticsDrawCalls++;
 			}
 		}
 	}

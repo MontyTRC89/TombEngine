@@ -82,8 +82,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);
 	DoAlphaTest(tex);
 
-	int mode = StaticMeshes[input.InstanceID].LightInfo.y;
-	int numLights = StaticMeshes[input.InstanceID].LightInfo.x;
+	uint mode = StaticMeshes[input.InstanceID].LightInfo.y;
+	uint numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
 	float3 color = (mode == 0) ?
 		CombineLights(
