@@ -26,9 +26,15 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto LION_ROAR_CHANCE = 1.0f / 256;
 
+	constexpr auto LION_HEAD_DISTANCE = BLOCK(0.4f);
+
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
 	const std::vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
+
+	#define LION_WALK_TURN_RATE_MAX				ANGLE(2.0f)
+	#define LION_RUN_TURN_RATE_MAX				ANGLE(5.0f)
+	#define LION_ATTACKS_TURN_RATE_MAX			ANGLE(1.0f)
 
 	enum LionState
 	{
@@ -77,7 +83,9 @@ namespace TEN::Entities::Creatures::TR5
 		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
-
+		short headingAngle = 0;
+		bool targetAhead = false;
+		
 		if (CreatureActive(itemNumber))
 		{
 			auto* creature = GetCreatureInfo(item);
@@ -94,8 +102,17 @@ namespace TEN::Entities::Creatures::TR5
 				AI_INFO AI;
 				CreatureAIInfo(item, &AI);
 
-				if (AI.ahead)
-					joint1 = AI.angle;
+				//Because the lion is quite big, AI.ahead don't get properly the angle from the lion's head. So I'm calculating its own one like tr1_giant_mutant.
+
+				Vector3 forwardVector = Vector3(cos(item->Pose.Orientation.x) * sin(item->Pose.Orientation.y), -sin(item->Pose.Orientation.x), cos(item->Pose.Orientation.x) * cos(item->Pose.Orientation.y));
+				forwardVector.Normalize();
+				forwardVector *= LION_HEAD_DISTANCE;
+				headingAngle = (short)phd_atan(	creature->Target.z - item->Pose.Position.z + forwardVector.z,
+												creature->Target.x - item->Pose.Position.x + forwardVector.x) - item->Pose.Orientation.y;
+				targetAhead = (headingAngle > -FRONT_ARC && headingAngle < FRONT_ARC);
+
+				if (targetAhead)
+					joint1 = headingAngle;
 
 				GetCreatureMood(item, &AI, true);
 				CreatureMood(item, &AI, true);
@@ -123,7 +140,7 @@ namespace TEN::Entities::Creatures::TR5
 							break;
 						}
 
-						if (AI.ahead && AI.bite)
+						if (targetAhead && AI.bite)
 						{
 							if (AI.distance >= LION_ATTACK_MIN_RANGE)
 							{
@@ -144,7 +161,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 					case LION_STATE_WALK_FORWARD:
-						creature->MaxTurn = ANGLE(2.0f);
+						creature->MaxTurn = LION_WALK_TURN_RATE_MAX;
 
 						if (creature->Mood == MoodType::Bored)
 						{
@@ -157,14 +174,14 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 					case LION_STATE_RUN_FORWARD:
-						creature->MaxTurn = ANGLE(5.0f);
+						creature->MaxTurn = LION_RUN_TURN_RATE_MAX;
 						tilt = angle;
 
 						if (creature->Mood != MoodType::Bored)
 						{
-							if (AI.ahead &&
+							if (targetAhead &&
 								AI.bite &&
-								AI.distance < LION_BITE_ATTACK_RANGE &&
+								AI.distance < LION_POUNCE_ATTACK_RANGE &&
 								AI.distance >= LION_ATTACK_MIN_RANGE)
 									item->Animation.TargetState = LION_STATE_IDLE;
 							else if (creature->Mood != MoodType::Escape)
@@ -179,6 +196,8 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 					case LION_STATE_POUNCE_ATTACK:
+						creature->MaxTurn = LION_ATTACKS_TURN_RATE_MAX;
+
 						if (!creature->Flags &&
 							item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_POUNCE_ATTACK_END &&
 							item->TouchBits.Test(LionAttackJoints))
@@ -191,7 +210,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 					case LION_STATE_BITE_ATTACK:
-						creature->MaxTurn = ANGLE(1.0f);
+						creature->MaxTurn = LION_ATTACKS_TURN_RATE_MAX;
 
 						if (!creature->Flags &&
 							item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_BITE_ATTACK &&
