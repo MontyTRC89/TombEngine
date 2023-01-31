@@ -418,6 +418,8 @@ void CleanUp()
 
 void InitialiseScripting(int levelIndex, bool loadGame)
 {
+	TENLog("Loading level script...", LogLevel::Info);
+
 	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(!levelIndex || loadGame);
 

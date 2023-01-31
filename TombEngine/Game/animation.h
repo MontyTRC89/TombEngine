@@ -93,6 +93,7 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0, int sourceIndex = -1);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);
+int GetAnimNumber(ItemInfo& item, int animID);
 int GetFrameNumber(ItemInfo* item, int frameToStart);
 int GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int GetFrameCount(int animNumber);

@@ -1,3 +1,16 @@
+Version 1.0.7
+=============
+
+* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt).
+* Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
+* Fix silent crash if hair object or skin joints are missing.
+* Fix holster meshes not displaying for Lara's shadow.
+* Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Add TR3 Sophia Leigh with following OCBs:	
+	- 1 – Normal mode. Sophia behaves like a regular enemy.
+	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
+	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
+
 Version 1.0.6
 =============
 

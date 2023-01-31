@@ -489,6 +489,11 @@ int GetCurrentRelativeFrameNumber(ItemInfo* item)
 	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
 }
 
+int GetAnimNumber(ItemInfo& item, int animID)
+{
+	return Objects[item.ObjectNumber].animIndex + animID;
+}
+
 int GetFrameNumber(ItemInfo* item, int frameToStart)
 {
 	int animNumber = item->Animation.AnimNumber - Objects[item->ObjectNumber].animIndex;
