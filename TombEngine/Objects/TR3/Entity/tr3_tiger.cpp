@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_tiger.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -73,6 +74,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
@@ -217,5 +219,8 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, extraHeadRot.y);
 		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
+
+		auto radius = Vector2(object->radius, object->radius * 1.33f);
+		AlignEntityToSurface(item, radius);
 	}
 }
