@@ -31,6 +31,7 @@ struct PixelShaderInput
 	float Sheen : SHEEN;
 	float Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
+	uint InstanceID : SV_InstanceID;
 };
 
 struct PixelShaderOutput
@@ -69,28 +70,30 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 
 	output.PositionCopy = output.Position;
 	output.Sheen = input.Effects.w;
+	output.InstanceID = InstanceID;
+
 	return output;
 }
 
-PixelShaderOutput PS(PixelShaderInput input, uint InstanceID : SV_InstanceID)
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 
 	float4 tex = Texture.Sample(Sampler, input.UV);
 	DoAlphaTest(tex);
 
-	int mode = StaticMeshes[InstanceID].LightInfo.y;
-	int numLights = StaticMeshes[InstanceID].LightInfo.x;
+	int mode = StaticMeshes[input.InstanceID].LightInfo.y;
+	int numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
 	float3 color = (mode == 0) ?
 		CombineLights(
-			StaticMeshes[InstanceID].AmbientLight.xyz, 
+			StaticMeshes[input.InstanceID].AmbientLight.xyz,
 			input.Color.xyz,
 			tex.xyz, 
 			input.WorldPosition, 
 			normalize(input.Normal), 
 			input.Sheen,
-			StaticMeshes[InstanceID].InstancedStaticLights,
+			StaticMeshes[input.InstanceID].InstancedStaticLights,
 			numLights) :
 		StaticLight(input.Color.xyz, tex.xyz);
 

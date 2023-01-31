@@ -11,21 +11,6 @@ namespace TEN::Renderer
 
 	constexpr int INSTANCED_STATIC_MESH_BUCKET_SIZE = 100;
 	
-	struct RendererStatic;
-	struct RendererMesh;
-
-	struct RendererInstancedStaticMeshData
-	{
-		RendererStatic* Static;
-		RendererMesh* Mesh;
-		Matrix World;
-		Vector4 Color;
-		Vector4 Ambient;
-		int LightMode;
-		int NumLights;
-		ShaderLight Lights[8];
-	};
-
 	struct alignas(16) InstancedStaticMesh
 	{
 		Matrix World;

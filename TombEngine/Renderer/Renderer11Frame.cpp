@@ -391,7 +391,7 @@ namespace TEN::Renderer
 			{
 				continue;
 			}
-
+			 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
 			std::vector<RendererLight*> cachedRoomLights;
