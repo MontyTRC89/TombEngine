@@ -115,9 +115,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum class SophiaOCB
 	{
-		OCB_Normal = 1,			 // Move, climb, attack, and chase player.
-		OCB_Tower = 2,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
-		OCB_LuaToMoveUpDown = 4, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
+		OCB_Normal = 0,			 // Move, climb, attack, and chase player.
+		OCB_Tower = 1,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
+		OCB_TowerWithVolume = 2, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
 	};
 
 	void InitialiseSophiaLeigh(short itemNumber)
@@ -128,12 +128,9 @@ namespace TEN::Entities::Creatures::TR3
 		CheckForRequiredObjects(item);
 
 		// Set to normal mode by default if none is set
-		if (item.TriggerFlags == 0)
-			item.TriggerFlags = (short)SophiaOCB::OCB_Normal;
 		item.SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = fully charged.
-		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
-		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
 		item.SetFlagField((int)BossItemFlags::Rotation, 0);
+
 		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START);			// Always start with projectile attack.
 	}
 
@@ -189,9 +186,6 @@ namespace TEN::Entities::Creatures::TR3
 			item.ItemFlags[(int)BossItemFlags::Rotation]--;
 
 		}
-		else
-			item.ItemFlags[(int)BossItemFlags::AttackType] = 0;
-
 	}
 
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBigLaser, short angleAdd)
@@ -279,7 +273,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem; // TODO: Deal with LaraItem global.
 
-			if (!(item.TriggerFlags & (short)SophiaOCB::OCB_LuaToMoveUpDown))
+			if (item.TriggerFlags != (int)SophiaOCB::OCB_TowerWithVolume)
 			{
 				// If enemy is above, get to next AI_X1.
 				if (ai.verticalDistance >= SOPHIALEIGH_Y_DISTANCE_RANGE)
@@ -694,7 +688,8 @@ namespace TEN::Entities::Creatures::TR3
 		else
 		{
 
-			if (item.TriggerFlags & (int)SophiaOCB::OCB_Tower)
+			if (item.TriggerFlags == (int)SophiaOCB::OCB_Tower ||
+				item.TriggerFlags == (int)SophiaOCB::OCB_TowerWithVolume)
 				SophiaLeighTowerControl(item, &creature, &data);
 			else
 				SophiaLeighNormalControl(item, &creature, &data);
