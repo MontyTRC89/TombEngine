@@ -36,7 +36,9 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX = 60;
 	constexpr auto SOPHIALEIGH_EFFECT_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
-	constexpr auto SOPHIALEIGH_EXPLOSION_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+	constexpr auto SOPHIALEIGH_SHOCKWAVE_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+	constexpr auto SOPHIALEIGH_EXPLOSION_MAIN_COLOR = Vector4(0.0f, 0.7f, 0.2f, 0.5f);
+	constexpr auto SOPHIALEIGH_EXPLOSION_SECOND_COLOR = Vector4(0.0f, 0.7f, 0.0f, 0.5f);
 
 	constexpr auto SOPHIALEIGH_WALK_TURN_RATE_MAX = ANGLE(4);
 	constexpr auto SOPHIALEIGH_RUN_TURN_RATE_MAX = ANGLE(7);
@@ -687,7 +689,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
 				// Do explosion effect.
-				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_EXPLOSION_COLOR, false);
+				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_SHOCKWAVE_COLOR, SOPHIALEIGH_EXPLOSION_MAIN_COLOR, SOPHIALEIGH_EXPLOSION_SECOND_COLOR, false);
 				return;
 			}
 		}

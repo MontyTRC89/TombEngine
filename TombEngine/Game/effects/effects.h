@@ -36,7 +36,8 @@ enum SpriteEnumFlag
 	SP_UNDERWEXP = 0x0800,
 	SP_NODEATTACH = 0x1000,
 	SP_PLASMAEXP = 0x2000,
-	SP_POISON = 0x4000
+	SP_POISON = 0x4000,
+	SP_COLOR = 0x8000
 };
 
 enum class FlameType
@@ -205,7 +206,7 @@ void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
-void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
+void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor = Vector3::Zero, const Vector3& secondColor = Vector3::Zero);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);

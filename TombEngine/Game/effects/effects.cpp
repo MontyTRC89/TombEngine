@@ -245,6 +245,8 @@ void UpdateSparks()
 				spark->extras & 7)
 			{
 				int explosionType;
+				Vector3 color1, color2;
+
 				if (spark->flags & SP_UNDERWEXP)
 				{
 					explosionType = 1;
@@ -256,17 +258,34 @@ void UpdateSparks()
 				else
 				{
 					explosionType = 0;
+					
+					color1 = Vector3(spark->dR, spark->dG, spark->dB);
+					color2 = Vector3(spark->sR, spark->sG, spark->sB);
+				
 				}
 
 				for (int j = 0; j < (spark->extras & 7); j++)
 				{
-					TriggerExplosionSparks(spark->x,
-						spark->y,
-						spark->z,
-						(spark->extras & 7) - 1,
-						spark->dynamic,
-						explosionType,
-						spark->roomNumber);
+					if (spark->flags & SP_COLOR)
+					{
+						TriggerExplosionSparks(spark->x,
+							spark->y,
+							spark->z,
+							(spark->extras & 7) - 1,
+							spark->dynamic,
+							explosionType,
+							spark->roomNumber, color1, color2);
+					}
+					else
+					{
+						TriggerExplosionSparks(spark->x,
+							spark->y,
+							spark->z,
+							(spark->extras & 7) - 1,
+							spark->dynamic,
+							explosionType,
+							spark->roomNumber);
+					}
 					
 					spark->dynamic = -1;
 				}
@@ -413,7 +432,12 @@ void UpdateSparks()
 					else
 						falloff = 31;
 
-					TriggerDynamicLight(x, y, z, falloff, g, b, r);
+					if (spark->flags & SP_COLOR)
+					{
+						TriggerDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
+					}
+					else
+						TriggerDynamicLight(x, y, z, falloff, g, b, r);
 				}
 			}
 		}
@@ -465,7 +489,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 	}
 }
 
-void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
+void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor, const Vector3& secondColor)
 {
 	static constexpr auto LIFE_MAX	   = 44.0f;
 	static constexpr auto ROTATION_MAX = ANGLE(0.15f);
@@ -499,15 +523,65 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 	else
 	{
-		spark.sG = (GetRandomControl() & 0xF) + 32;
-		spark.sB = 0;
-		spark.dR = (GetRandomControl() & 0x3F) + 192;
-		spark.dG = (GetRandomControl() & 0x3F) + 128;
-		spark.dB = 32;
-		spark.colFadeSpeed = 8;
-		spark.fadeToBlack = 16;
-		spark.life = (GetRandomControl() & 7) + LIFE_MAX;
-		spark.sLife = spark.life;
+		if (mainColor == Vector3::Zero)
+		{
+			spark.sG = (GetRandomControl() & 0xF) + 32;
+			spark.sB = 0;
+			spark.dR = (GetRandomControl() & 0x3F) + 192;
+			spark.dG = (GetRandomControl() & 0x3F) + 128;
+			spark.dB = 32;
+			spark.colFadeSpeed = 8;
+			spark.fadeToBlack = 16;
+			spark.life = (GetRandomControl() & 7) + LIFE_MAX;
+			spark.sLife = spark.life;
+		}
+		else
+		{
+			// New colored flame processing.
+
+			int colorS[3] = { int(mainColor.x * UCHAR_MAX), int(mainColor.y * UCHAR_MAX), int(mainColor.z * UCHAR_MAX) };
+			int colorD[3] = { int(secondColor.x * UCHAR_MAX), int(secondColor.y * UCHAR_MAX), int(secondColor.z * UCHAR_MAX) };
+
+			// Determine weakest RGB component.
+
+			int lowestS = UCHAR_MAX;
+			int lowestD = UCHAR_MAX;
+			for (int i = 0; i < 3; i++)
+			{
+				if (lowestS > colorS[i]) lowestS = colorS[i];
+				if (lowestD > colorD[i]) lowestD = colorD[i];
+			}
+
+			// Introduce random color shift for non-weakest RGB components.
+
+			static constexpr int CHROMA_SHIFT = 32;
+			static constexpr float LUMA_SHIFT = 0.5f;
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (colorS[i] != lowestS)
+					colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+				if (colorD[i] != lowestD)
+					colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+				colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+				colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+				colorS[i] = std::clamp(colorS[i], 0, UCHAR_MAX);
+				colorD[i] = std::clamp(colorD[i], 0, UCHAR_MAX);
+			}
+
+			spark.sR = colorS[0];
+			spark.sG = colorS[1];
+			spark.sB = colorS[2];
+			spark.dR = colorD[0];
+			spark.dG = colorD[1];
+			spark.dB = colorD[2];
+			spark.colFadeSpeed = 8;
+			spark.fadeToBlack = 16;
+			spark.life = (GetRandomControl() & 7) + LIFE_MAX;
+			spark.sLife = spark.life;
+		}
 	}
 
 	spark.extras = unsigned char(extraTrig | ((EXTRAS_TABLE[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
@@ -570,7 +644,16 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		if (uw == 1)
 			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
 		else
-			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
+		{
+			if (mainColor == Vector3::Zero)
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
+			}
+			else
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION | SP_COLOR;
+			}
+		}
 
 		spark.rotAng = GetRandomControl() & 0xF;
 		spark.rotAdd = (GetRandomControl() & 0xF) + ROTATION_MAX;
@@ -581,7 +664,14 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 	else
 	{
-		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
+		if (mainColor == Vector3::Zero)
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
+		}
+		else
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION | SP_COLOR;
+		}
 	}
 
 	spark.scalar = 3;
@@ -592,6 +682,9 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	spark.size *= scalar;
 	GetRandomControl();
 	spark.maxYvel = 0;
+
+	if (!(extraTrig) && mainColor != Vector3::Zero)
+		return;
 
 	if (uw == 2)
 	{
