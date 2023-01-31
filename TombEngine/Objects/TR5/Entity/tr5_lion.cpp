@@ -165,11 +165,8 @@ namespace TEN::Entities::Creatures::TR5
 				case LION_STATE_WALK_FORWARD:
 					creature->MaxTurn = LION_WALK_TURN_RATE_MAX;
 
-					if (creature->Mood == MoodType::Bored)
-					{
-						if (TestProbability(LION_ROAR_CHANCE))
-							item->Animation.TargetState = LION_STATE_ROAR;
-					}
+					if (creature->Mood == MoodType::Bored && TestProbability(LION_ROAR_CHANCE))
+						item->Animation.TargetState = LION_STATE_ROAR;
 					else
 						item->Animation.TargetState = LION_STATE_IDLE;
 
@@ -201,7 +198,7 @@ namespace TEN::Entities::Creatures::TR5
 					creature->MaxTurn = LION_ATTACKS_TURN_RATE_MAX;
 
 					if (!creature->Flags &&
-						item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_POUNCE_ATTACK_END &&
+						item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_POUNCE_ATTACK_END) &&
 						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
@@ -215,7 +212,7 @@ namespace TEN::Entities::Creatures::TR5
 					creature->MaxTurn = LION_ATTACKS_TURN_RATE_MAX;
 
 					if (!creature->Flags &&
-						item->Animation.AnimNumber == Objects[ID_LION].animIndex + LION_ANIM_BITE_ATTACK &&
+						item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_BITE_ATTACK) &&
 						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
