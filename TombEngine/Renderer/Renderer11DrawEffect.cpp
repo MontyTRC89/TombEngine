@@ -514,6 +514,13 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawShockwaves(RenderView& view) 
 	{
+		unsigned char r = 0;
+		unsigned char g = 0;
+		unsigned char b = 0;
+		float c = 0;
+		float s = 0;
+		float angle = 0;
+
 		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
@@ -522,53 +529,133 @@ namespace TEN::Renderer
 			{
 				byte color = shockwave->life * 8;
 
-				int dl = shockwave->outerRad - shockwave->innerRad;
-				Matrix rotationMatrix = Matrix::CreateRotationX(TO_RAD(shockwave->xRot));
+				//int dl = shockwave->outerRad - shockwave->innerRad;
+
+				shockwave->yRot +=  shockwave->yRot/FPS;
+				
+				Matrix rotationMatrix =
+					Matrix::CreateRotationY(shockwave->yRot / 4) *
+					Matrix::CreateRotationZ(shockwave->zRot) *
+					Matrix::CreateRotationX(shockwave->xRot);
+					
 				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
-				float angle = PI / 32.0f;
-				float c = cos(angle);
-				float s = sin(angle);
+				if (shockwave->style == (int)ShockwaveStyle::Normal)
+				{
+					angle = PI / 32.0f;
+					c = cos(angle);
+					s = sin(angle);
+					angle -= PI / 8.0f;
+				}
+				else
+				{
+					angle = PI / 16.0f;
+					c = cos(angle);
+					s = sin(angle);
+					angle -= PI / 4.0f;
+				}
+
 				float x1 = (shockwave->innerRad * c);
 				float z1 = (shockwave->innerRad * s);
 				float x4 = (shockwave->outerRad * c);
 				float z4 = (shockwave->outerRad * s);
-				angle -= PI / 8.0f;
-
+			
 				Vector3 p1 = Vector3(x1, 0, z1);
 				Vector3 p4 = Vector3(x4, 0, z4);
 
 				p1 = Vector3::Transform(p1, rotationMatrix);
 				p4 = Vector3::Transform(p4, rotationMatrix);
 
-				for (int j = 0; j < 16; j++) 
+				if (shockwave->fadeIn == true)
+				{
+					if (shockwave->sr < shockwave->r)
+					{
+						shockwave->sr += shockwave->r/18;
+						r = shockwave->sr * shockwave->life / 255.0f;
+					}
+					else
+						r = shockwave->r * shockwave->life / 255.0f;
+
+
+					if (shockwave->sg < shockwave->g)
+					{
+						shockwave->sg += shockwave->g /18;
+						g = shockwave->sg * shockwave->life / 255.0f;
+					}
+					else
+						g = shockwave->g * shockwave->life / 255.0f;
+
+
+					if (shockwave->sb < shockwave->b)
+					{
+						shockwave->sb += shockwave->b / 18;
+						b = shockwave->sb * shockwave->life / 255.0f;
+					}
+					else
+						b = shockwave->b * shockwave->life / 255.0f;
+
+					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+						shockwave->fadeIn = false;
+
+				}
+				else
+				{
+					r = shockwave->r * shockwave->life / 255.0f;
+					g = shockwave->g * shockwave->life / 255.0f;
+					b = shockwave->b * shockwave->life / 255.0f;
+				}
+				
+				for (int j = 0; j < 16; j++)
 				{
 					c = cos(angle);
 					s = sin(angle);
-					float x2 = (shockwave->innerRad * c);
+
+					float x2 =  (shockwave->innerRad * c);
 					float z2 = (shockwave->innerRad * s);
+
 					float x3 = (shockwave->outerRad * c);
 					float z3 = (shockwave->outerRad * s);
-					angle -= PI / 8.0f;
-
+				
 					Vector3 p2 = Vector3(x2, 0, z2);
 					Vector3 p3 = Vector3(x3, 0, z3);
 
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-								pos + p1,
-								pos + p2,
-								pos + p3,
-								pos + p4,
-								Vector4(
-								shockwave->r * shockwave->life / 255.0f / 16.0f,
-								shockwave->g * shockwave->life / 255.0f / 16.0f,
-								shockwave->b * shockwave->life / 255.0f / 16.0f,
+					if (shockwave->style == (int)ShockwaveStyle::Normal)
+					{
+						angle -= PI / 8.0f;
+
+						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+							pos + p1,
+							pos + p2,
+							pos + p3,
+							pos + p4,
+							Vector4(
+								r / 16.0f,
+								g / 16.0f,
+								b / 16.0f,
 								1.0f),
-								0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+							0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+					}
+					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
+					{
+						angle -= PI / 4.0f;
+
+						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+							pos + p1,
+							pos + p2,
+							pos + p3,
+							pos + p4,
+							Vector4(
+								r / 16.0f,
+								g / 16.0f,
+								b / 16.0f,
+								1.0f),
+							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+					}
 
 					p1 = p2;
 					p4 = p3;
