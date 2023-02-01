@@ -132,17 +132,14 @@ int SwitchTrigger(short itemNumber, short timer)
 				item->Timer = FPS * timer;
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
+		if (item->TriggerFlags >= 0 || item->Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
 			item->Status = ITEM_NOT_ACTIVE;
 			if (!item->ItemFlags[0] == 0)
 				item->Flags |= ONESHOT;
-			if (item->Animation.ActiveState != 1)
-				return 1;
-			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
-				return 1;
+			return 1;
 		}
 		else
 		{
@@ -340,7 +337,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 	int flipAvailable = 0;
 	int newEffect = -1;
 	int switchOff = 0;
-	int switchFlag = 0;
+	//int switchFlag = 0;
 	short objectNumber = 0;
 	int keyResult = 0;
 	short cameraFlags = 0;
@@ -405,8 +402,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 				return;
 
 			objectNumber = g_Level.Items[value].ObjectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				switchFlag = 1;
+			//This disables the antitrigger of the Valve switch (ocb 5). I don't know the purpose of this in TR4.
+			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
+				//switchFlag = 1;
 
 			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
 
@@ -537,10 +535,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			{
 				if (heavyFlags >= 0)
 				{
-					if (switchFlag)
-						item->Flags |= (flags & CODE_BITS);
-					else
-						item->Flags ^= (flags & CODE_BITS);
+					//if (switchFlag)
+						//item->Flags |= (flags & CODE_BITS);
+					//else
+
+					item->Flags ^= (flags & CODE_BITS);
 
 					if (flags & ONESHOT)
 						item->Flags |= SWONESHOT;
