@@ -9,34 +9,34 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto TIGER_BITE_ATTACK_DAMAGE	 = 90;
 	constexpr auto TIGER_SWIPE_ATTACK_DAMAGE = 150;
-	constexpr auto TIGER_BITE_ATTACK_DAMAGE = 90;
 
 	constexpr auto TIGER_BITE_ATTACK_RANGE	 = SQUARE(BLOCK(0.4f));
 	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(BLOCK(0.75f));
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(BLOCK(1.5f));
 
-	constexpr auto TIGER_WALK_CHANCE = 1.0f / 32;
-	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
-	constexpr auto TIGER_MELEE_CHANCE = 0.4f;
+	constexpr auto TIGER_WALK_CHANCE   = 1 / 32.0f;
+	constexpr auto TIGER_ROAR_CHANCE   = 1 / 340.0f;
+	constexpr auto TIGER_ATTACK_CHANCE = 4 / 10.0f;
 
+	constexpr auto TIGER_WALK_TURN_RATE_MAX			 = ANGLE(3.0f);
+	constexpr auto TIGER_RUN_TURN_RATE_MAX			 = ANGLE(6.0f);
+	constexpr auto TIGER_POUNCE_ATTACK_TURN_RATE_MAX = ANGLE(3.0f);
+
+	constexpr auto TIGER_PLAYER_ALERT_VELOCITY = 10.0f;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
-	const vector<unsigned int> TigerSwipeAttackJoints = { 14, 15, 16 };
-	const vector<unsigned int> TigerBiteAttackJoints = { 22, 25, 26 };
-
-	#define TIGER_WALK_TURN_RATE_MAX		  ANGLE(3.0f)
-	#define TIGER_RUN_TURN_RATE_MAX			  ANGLE(6.0f)
-	#define TIGER_POUNCE_ATTACK_TURN_RATE_MAX ANGLE(3.0f)
+	const auto TigerSwipeAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
+	const auto TigerBiteAttackJoints  = std::vector<unsigned int>{ 22, 25, 26 };
 
 	enum TigerState
 	{
@@ -88,18 +88,18 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			if (AI.ahead)
-				extraHeadRot.y = AI.angle;
+			if (ai.ahead)
+				extraHeadRot.y = ai.angle;
 
-			GetCreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
 
-			if (creature->Alerted && AI.zoneNumber != AI.enemyZone)
+			if (creature->Alerted && ai.zoneNumber != ai.enemyZone)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, true);
+			CreatureMood(item, &ai, true);
 
 			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
@@ -110,32 +110,45 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Flags = 0;
 
 					if (item->Animation.RequiredState)
+					{
 						item->Animation.TargetState = item->Animation.RequiredState;
+					}
 					else if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.TargetEntity != item && AI.ahead)
+						if (Lara.TargetEntity != item && ai.ahead)
 							item->Animation.TargetState = TIGER_STATE_IDLE;
 						else
 							item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
 					}
 					else if (creature->Mood == MoodType::Bored)
 					{
-						if (TestProbability(TIGER_ROAR_CHANCE))
+						if (Random::TestProbability(TIGER_ROAR_CHANCE))
+						{
 							item->Animation.TargetState = TIGER_STATE_ROAR;
-						else if (TestProbability(TIGER_WALK_CHANCE))
+						}
+						else if (Random::TestProbability(TIGER_WALK_CHANCE))
+						{
 							item->Animation.TargetState = TIGER_STATE_WALK_FORWARD;
+						}
 					}
-					else if (AI.bite && AI.distance < TIGER_BITE_ATTACK_RANGE)
+					else if (ai.bite && ai.distance < TIGER_BITE_ATTACK_RANGE)
+					{
 						item->Animation.TargetState = TIGER_STATE_BITE_ATTACK;
-					else if (AI.bite && AI.distance < TIGER_POUNCE_ATTACK_RANGE)
+					}
+					else if (ai.bite && ai.distance < TIGER_POUNCE_ATTACK_RANGE)
 					{
 						item->Animation.TargetState = TIGER_STATE_POUNCE_ATTACK;
 						creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
 					}
-					else if (creature->Mood != MoodType::Attack && TestProbability(TIGER_ROAR_CHANCE))
+					else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
+					{
 						item->Animation.TargetState = TIGER_STATE_ROAR;
+					}
 					else
+					{
 						item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+					}
+					
 					break;
 
 				case TIGER_STATE_WALK_FORWARD:
@@ -146,7 +159,7 @@ namespace TEN::Entities::Creatures::TR3
 					{
 						item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
 					}
-					else if (TestProbability(TIGER_ROAR_CHANCE))
+					else if (Random::TestProbability(TIGER_ROAR_CHANCE))
 					{
 						item->Animation.TargetState = TIGER_STATE_IDLE;
 						item->Animation.RequiredState = TIGER_STATE_ROAR;
@@ -158,24 +171,34 @@ namespace TEN::Entities::Creatures::TR3
 					creature->MaxTurn = TIGER_RUN_TURN_RATE_MAX;
 
 					if (creature->Mood == MoodType::Bored)
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-					else if (creature->Flags && AI.ahead)
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-					else if (AI.bite && AI.distance < TIGER_RUN_ATTACK_RANGE)
 					{
-						if (LaraItem->Animation.Velocity.z <= 10.0f && TestProbability(TIGER_MELEE_CHANCE))
-							item->Animation.TargetState = TIGER_STATE_IDLE;
-						else if (AI.ahead)
-							item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
-						else
-							item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+						item->Animation.TargetState = TIGER_STATE_IDLE;
 					}
-					else if (creature->Mood != MoodType::Attack && TestProbability(TIGER_ROAR_CHANCE))
+					else if (creature->Flags && ai.ahead)
+					{
+						item->Animation.TargetState = TIGER_STATE_IDLE;
+					}
+					else if (ai.bite && ai.distance < TIGER_RUN_ATTACK_RANGE)
+					{
+						if (LaraItem->Animation.Velocity.z <= TIGER_PLAYER_ALERT_VELOCITY &&
+							Random::TestProbability(TIGER_ATTACK_CHANCE))
+						{
+							item->Animation.TargetState = TIGER_STATE_IDLE;
+						}
+						else if (ai.ahead)
+						{
+							item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
+						}
+						else
+						{
+							item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+						}
+					}
+					else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
 					{
 						item->Animation.TargetState = TIGER_STATE_ROAR;
 					}
-					else if (creature->Mood == MoodType::Escape &&
-						Lara.TargetEntity != item && AI.ahead)
+					else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && ai.ahead)
 					{
 						item->Animation.TargetState = TIGER_STATE_IDLE;
 					}
@@ -194,7 +217,7 @@ namespace TEN::Entities::Creatures::TR3
 						{
 							DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
 							CreatureEffect(item, TigerBite, DoBloodSplat);
-							creature->Flags = 1; // 1 = is attacking.
+							creature->Flags = 1; // Flag 1 = is attacking.
 						}
 					}
 					break;
