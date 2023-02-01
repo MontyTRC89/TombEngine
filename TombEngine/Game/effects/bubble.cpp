@@ -18,18 +18,18 @@ namespace TEN::Effects::Bubble
 	constexpr auto BUBBLE_LIFE_MAX		   = 60.0f;
 	constexpr auto BUBBLE_SCALE_MAX		   = BLOCK(0.5f);
 	constexpr auto BUBBLE_OPACTY_MAX	   = 0.8f;
-	constexpr auto BUBBLE_OPACTY_MIN	   = 0.3f;
+	constexpr auto BUBBLE_OPACTY_MIN	   = BUBBLE_OPACTY_MAX / 2;
 	constexpr auto BUBBLE_OSC_VELOCITY_MAX = 0.4f;
-	constexpr auto BUBBLE_OSC_VELOCITY_MIN = 0.1f;
+	constexpr auto BUBBLE_OSC_VELOCITY_MIN = BUBBLE_OSC_VELOCITY_MAX / 4;
 
 	std::deque<Bubble> Bubbles = {};
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia)
 	{
 		constexpr auto GRAVITY_MAX		  = 12.0f;
-		constexpr auto GRAVITY_MIN		  = 8.0f;
+		constexpr auto GRAVITY_MIN		  = GRAVITY_MAX * (2 / 3.0f);
 		constexpr auto WAVE_VELOCITY_MAX  = 1 / 8.0f;
-		constexpr auto WAVE_VELOCITY_MIN  = 1 / 16.0f;
+		constexpr auto WAVE_VELOCITY_MIN  = WAVE_VELOCITY_MAX / 2;
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
