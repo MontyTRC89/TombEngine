@@ -26,18 +26,18 @@ namespace TEN::Entities::Switches
 
 	void AirlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
-		auto* switchItem = &g_Level.Items[itemNumber];
+		auto& player = *GetLaraInfo(laraItem);
+		auto& switchItem = g_Level.Items[itemNumber];
 
 		if (IsHeld(In::Action) &&
-			switchItem->Animation.ActiveState == 0 &&
+			switchItem.Animation.ActiveState == 0 &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraInfo->Control.HandStatus == HandStatus::Free &&
-			switchItem->Status == ITEM_NOT_ACTIVE ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			player.Control.HandStatus == HandStatus::Free &&
+			switchItem.Status == ITEM_NOT_ACTIVE ||
+			player.Control.IsMoving && player.InteractedItem == itemNumber)
 		{
-			auto bounds = GameBoundingBox(switchItem);
+			auto bounds = GameBoundingBox(&switchItem);
 
 			AirlockSwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25f);
 			AirlockSwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25f);
@@ -45,32 +45,32 @@ namespace TEN::Entities::Switches
 			AirlockSwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.5f);
 			AirlockSwitchPos.z = bounds.Z1 - 112;
 
-			if (TestLaraPosition(AirlockSwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(AirlockSwitchBounds, &switchItem, laraItem))
 			{
-				if (MoveLaraPosition(AirlockSwitchPos, switchItem, laraItem))
+				if (MoveLaraPosition(AirlockSwitchPos, &switchItem, laraItem))
 				{
-					if (switchItem->Animation.ActiveState == 0)
+					if (switchItem.Animation.ActiveState == 0)
 					{
 						SetAnimation(laraItem, LaraAnim::LA_VALVE_TURN);
-						switchItem->Animation.TargetState = 1;
+						switchItem.Animation.TargetState = 1;
 					}
 
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Busy;
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
 
 					AddActiveItem(itemNumber);
-					switchItem->Status = ITEM_ACTIVE;
-					AnimateItem(switchItem);
+					switchItem.Status = ITEM_ACTIVE;
+					AnimateItem(&switchItem);
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					player.InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			else if (player.Control.IsMoving && player.InteractedItem == itemNumber)
 			{
-				laraInfo->Control.IsMoving = false;
-				laraInfo->Control.HandStatus = HandStatus::Free;
+				player.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Free;
 			}
 
 			return;
