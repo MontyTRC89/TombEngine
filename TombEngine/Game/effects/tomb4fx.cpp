@@ -1526,50 +1526,43 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	constexpr auto BUBBLE_COUNT = 24;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	spark->sR = 128;
+	spark->dR = 128;
+	spark->dG = 128;
+	spark->dB = 128;
+	spark->on = 1;
+	spark->life = 24;
+	spark->sLife = 24;
+	spark->sG = 64;
+	spark->sB = 0;
+	spark->colFadeSpeed = 8;
+	spark->fadeToBlack = 12;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->x = x;
+	spark->y = y;
+	spark->z = z;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->friction = 0;
+	spark->flags = 2058;
+	spark->scalar = 3;
+	spark->gravity = 0;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->maxYvel = 0;
+	int size = (GetRandomControl() & 7) + 63;
+	spark->sSize = size >> 1;
+	spark->size = size >> 1;
+	spark->dSize = 2 * size;
+
+	auto sphere = BoundingSphere(Vector3(x, y, z), BLOCK(0.25f));
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
-		spark->on = 1;
-		spark->life = 24;
-		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 2058;
-		spark->scalar = 3;
-		spark->gravity = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
-		spark->maxYvel = 0;
-		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = 2 * size;
-
-		for (int i = 0; i < 8; i++)
-		{
-			auto pos = Vector3(
-				(GetRandomControl() & 0x1FF) + x - 256,
-				(GetRandomControl() & 0x7F) + y - 64,
-				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber, BubbleFlags::Clump | BubbleFlags::Large | BubbleFlags::HighAmplitude);
-		}
+		auto pos = Random::GeneratePointInSphere(sphere);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::Large | (int)BubbleFlags::HighAmplitude);
 	}
 }
 

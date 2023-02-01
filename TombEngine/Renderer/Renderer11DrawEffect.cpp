@@ -417,7 +417,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
 				bubble.Position,
-				bubble.Color, FROM_RAD(bubble.Orientation2D), 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
+				bubble.Color, 0.0f, 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
