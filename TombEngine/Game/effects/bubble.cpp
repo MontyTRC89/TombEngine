@@ -110,7 +110,7 @@ namespace TEN::Effects::Bubble
 			1 / Random::GenerateFloat(8, 16));
 		
 		bubble.Scale =
-		bubble.ScaleMax =Vector2(Random::GenerateFloat(SCALE_MIN, SCALE_MAX));
+		bubble.ScaleMax = Vector2(Random::GenerateFloat(SCALE_MIN, SCALE_MAX));
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
 		bubble.Life = 0.0f;
