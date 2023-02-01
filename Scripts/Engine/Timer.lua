@@ -78,7 +78,7 @@ Timer = {
 		obj.name = name
 
 		if LevelVars.Engine.Timer.timers[name] then
-			print("Warning: a timer with name " .. name .. " already exists.")
+			print("Warning: a timer with name " .. name .. " already exists; overwriting it with a new one...")
 		end
 
 		LevelVars.Engine.Timer.timers[name] ={} 

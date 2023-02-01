@@ -2475,11 +2475,11 @@ bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Broken on diagonal slides?
 	if (g_GameFlow->HasSlideExtended())
 	{
-		auto probe = GetCollision(item);
+		auto pointColl = GetCollision(item);
 
-		short direction = GetLaraSlideDirection(item, coll);
-		short steepness = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(probe.FloorTilt));
-		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
+		short directionAngle = GetLaraSlideDirection(item, coll);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		return (abs(short(coll->Setup.ForwardAngle - directionAngle)) <= abs(slopeAngle));
 	}
 
 	return true;

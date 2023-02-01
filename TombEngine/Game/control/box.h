@@ -154,14 +154,13 @@ constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
-void FindAITargetObject(CreatureInfo* creature, short objectNumber);
+void FindAITargetObject(CreatureInfo* creature, int objectNumber);
+void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
-void DropEntityPickups(ItemInfo* item);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
 void CreatureYRot2(Pose* fromPose, short angle, short angleAdd);
 bool SameZone(CreatureInfo* creature, ItemInfo* target);
-void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
@@ -170,7 +169,7 @@ short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
-void CreatureJoint(ItemInfo* item, short joint, short required);
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle = ANGLE(70.0f));
 void CreatureTilt(ItemInfo* item, short angle);
 short CreatureTurn(ItemInfo* item, short maxTurn);
 void CreatureDie(short itemNumber, bool explode);

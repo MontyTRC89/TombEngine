@@ -16,14 +16,18 @@ namespace TEN::Entities::Creatures::TR2
 	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
 	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);
 
-	// TODO
-	enum EagleState
+	enum EagleOrCrowState
 	{
-
+		// No state 0.
+		EAGLE_CROW_STATE_FLY = 1,
+		EAGLE_CROW_STATE_IDLE = 2,
+		EAGLE_CROW_STATE_PLANE = 3,
+		EAGLE_CROW_STATE_DEATH_START = 4,
+		EAGLE_CROW_STATE_DEATH_END = 5,
+		EAGLE_CROW_STATE_ATTACK = 6
 	};
 
-	// TODO
-	enum EagleAnim
+	enum EagleOrCrowAnim
 	{
 
 	};

@@ -681,14 +681,14 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(probe.FloorTilt));
-		short direction = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(probe.FloorTilt));
+		//short steepness = Geometry::GetSurfaceSlopeAngle(probe.FloorTilt);
+		//short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
-		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		//int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		g_Renderer.PrintDebugMessage("%d", slideVelocity);
+		//g_Renderer.PrintDebugMessage("%d", slideVelocity);
 
 		//lara->ExtraVelocity.x += slideVelocity;
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
@@ -699,7 +699,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Determine relative orientation to floor normal.
+	// Determine relative orientation adhering to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
