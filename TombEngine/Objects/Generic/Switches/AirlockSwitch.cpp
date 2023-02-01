@@ -1,19 +1,19 @@
 #include "framework.h"
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Specific/Input/Input.h"
-#include "Specific/level.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/animation.h"
-#include "Game/collision/collide_item.h"
-#include "Game/items.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	ObjectCollisionBounds LockSwitchBounds =
+	ObjectCollisionBounds AirlockSwitchBounds =
 	{
 		GameBoundingBox::Zero,
 		std::pair(
@@ -22,14 +22,14 @@ namespace TEN::Entities::Switches
 		)
 	};
 
-	auto AirLockSwitchPos = Vector3i::Zero;
+	auto AirlockSwitchPos = Vector3i::Zero;
 
-	void AirLockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void AirlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			switchItem->Animation.ActiveState == 0 &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -39,15 +39,15 @@ namespace TEN::Entities::Switches
 		{
 			auto bounds = GameBoundingBox(switchItem);
 
-			LockSwitchBounds.BoundingBox.X1 = bounds.X1 - 256;
-			LockSwitchBounds.BoundingBox.X2 = bounds.X2 + 256;
-			LockSwitchBounds.BoundingBox.Z1 = bounds.Z1 - 512;
-			LockSwitchBounds.BoundingBox.Z2 = bounds.Z2 + 512;
-			AirLockSwitchPos.z = bounds.Z1 - 112;
+			AirlockSwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25f);
+			AirlockSwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25f);
+			AirlockSwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5f);
+			AirlockSwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.5f);
+			AirlockSwitchPos.z = bounds.Z1 - 112;
 
-			if (TestLaraPosition(LockSwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(AirlockSwitchBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(AirLockSwitchPos, switchItem, laraItem))
+				if (MoveLaraPosition(AirlockSwitchPos, switchItem, laraItem))
 				{
 					if (switchItem->Animation.ActiveState == 0)
 					{

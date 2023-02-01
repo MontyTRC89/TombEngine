@@ -118,7 +118,7 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 	return 0;
 }
 
-int SwitchTrigger(short itemNumber, short timer)
+bool SwitchTrigger(short itemNumber, short timer)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -130,7 +130,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			item->Status = ITEM_ACTIVE;
 			if (timer != 1)
 				item->Timer = FPS * timer;
-			return 1;
+			return true;
 		}
 		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
 		{
@@ -140,14 +140,14 @@ int SwitchTrigger(short itemNumber, short timer)
 			if (!item->ItemFlags[0] == 0)
 				item->Flags |= ONESHOT;
 			if (item->Animation.ActiveState != 1)
-				return 1;
+				return true;
 			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
-				return 1;
+				return true;
 		}
 		else
 		{
 			item->Status = ITEM_ACTIVE;
-			return 1;
+			return true;
 		}
 	}
 	else if (item->Status)
@@ -155,15 +155,15 @@ int SwitchTrigger(short itemNumber, short timer)
 		if (item->ObjectNumber == ID_AIRLOCK_SWITCH &&
 			item->Animation.AnimNumber == GetAnimNumber (*item, 2) &&
 			item->Animation.FrameNumber == GetFrameNumber (item, 0))
-			return 1;
+			return true;
 		return (item->Flags & ONESHOT) >> 8;
 	}
 	else
 	{
-		return 0;
+		return false;
 	}
 
-	return 0;
+	return false;
 }
 
 int KeyTrigger(short itemNum)
