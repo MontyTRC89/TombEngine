@@ -686,12 +686,9 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	if (mainColor != Vector3::Zero)
 	{
 		if (extraTrig)
-		{			
 			TriggerExplosionSmokeEnd(x, y, z, uw);
-			return;
-		}
-		else
-			return;
+
+		return;
 	}
 
 	if (uw == 2)
