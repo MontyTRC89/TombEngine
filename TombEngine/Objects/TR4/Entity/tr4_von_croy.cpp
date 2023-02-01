@@ -30,6 +30,7 @@ namespace TEN::Entities::TR4
 
 	enum VonCroyState
 	{
+		// No state 0.
 		VON_CROY_STATE_IDLE = 1,
 		VON_CROY_STATE_WALK = 2,
 		VON_CROY_STATE_RUN = 3,
@@ -137,14 +138,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP);
 		item->SetMeshSwapFlags(VonCroyKnifeSwapJoints);
 
-		memset(VonCroyPassedWaypoints, 0, 128);
+		ZeroMemory(VonCroyPassedWaypoints, sizeof(VonCroyPassedWaypoints));
 	}
 
 	void VonCroyControl(short itemNumber)
@@ -232,10 +230,9 @@ namespace TEN::Entities::TR4
 			int distance;
 			auto* targetCreature = ActiveCreatures[0];
 
-			for (int i = 0; i < ActiveCreatures.size(); i++)
+			for (auto& currentCreature : ActiveCreatures)
 			{
-				targetCreature = ActiveCreatures[i];
-
+				targetCreature = currentCreature;
 				if (targetCreature->ItemNumber == NO_ITEM ||
 					targetCreature->ItemNumber == itemNumber ||
 					g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_VON_CROY ||
@@ -676,12 +673,7 @@ namespace TEN::Entities::TR4
 				item->Pose = enemy->Pose;
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 			{
-				TestTriggers(
-					creature->AITarget->Pose.Position.x,
-					creature->AITarget->Pose.Position.y,
-					creature->AITarget->Pose.Position.z,
-					creature->AITarget->RoomNumber,
-					true);
+				TestTriggers(creature->AITarget, true);
 
 				creature->ReachedGoal = false;
 				creature->Enemy = nullptr;
@@ -792,12 +784,7 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			TestTriggers(
-				creature->AITarget->Pose.Position.x,
-				creature->AITarget->Pose.Position.y,
-				creature->AITarget->Pose.Position.z,
-				creature->AITarget->RoomNumber,
-				true);
+			TestTriggers(creature->AITarget, true);
 
 			item->AIBits = FOLLOW;
 			creature->ReachedGoal = false;

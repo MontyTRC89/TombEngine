@@ -319,6 +319,11 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	return false;
 }
 
+bool TestAnimNumber(const ItemInfo& item, int animNumber)
+{
+	return (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + animNumber));
+}
+
 bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	if (animNumber == NO_ANIM)
@@ -328,8 +333,20 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 		return false;
 
 	const auto& anim = g_Level.Anims[animNumber];
-
 	return (item->Animation.FrameNumber >= anim.frameEnd);
+}
+
+bool TestAnimFrame(const ItemInfo& item, int frameStart)
+{
+	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
+	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
+}
+
+bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
+{
+	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
+	return (item.Animation.FrameNumber >= (anim.frameBase + frameStart) &&
+			item.Animation.FrameNumber <= (anim.frameBase + frameEnd));
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -360,9 +377,11 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 	}
 
 	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
-	item->Animation.TargetState = item->Animation.ActiveState;
+	const auto& anim = g_Level.Anims[index];
+
+	item->Animation.FrameNumber = anim.frameBase + frameToStart;
+	item->Animation.ActiveState = anim.ActiveState;
+	item->Animation.TargetState = anim.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
@@ -398,6 +417,57 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
+int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
+{
+	int frame = item->Animation.FrameNumber;
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+
+	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
+	int rate = outRate = anim.Interpolation & 0x00FF;
+	frame -= anim.frameBase;
+
+	int first = frame / rate;
+	int interpolation = frame % rate;
+	outFramePtr[0] += first;			 // Get frame pointers...
+	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
+
+	if (interpolation == 0)
+		return 0;
+
+	// Clamp key frame to end if need be.
+	int second = first * rate + rate;
+	if (second > anim.frameEnd)
+		outRate = anim.frameEnd - (second - rate);
+
+	return interpolation;
+}
+
+AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber)
+{
+	int animIndex = Objects[slot].animIndex + animNumber;
+	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
+
+	const auto& anim = g_Level.Anims[animIndex];
+
+	int frameCount = anim.frameEnd - anim.frameBase;
+	if (frameNumber > frameCount)
+		frameNumber = frameCount;
+
+	auto* result = &g_Level.Frames[anim.FramePtr];
+	result += frameNumber / anim.Interpolation;
+	return result;
+}
+
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, 0);
+}
+
+AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, INT_MAX);
+}
+
 AnimFrame* GetBestFrame(ItemInfo* item)
 {
 	int rate = 0;
@@ -410,34 +480,14 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 		return framePtr[1];
 }
 
-int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
-{
-	int frame = item->Animation.FrameNumber;
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
-
-	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate2 = outRate = anim.Interpolation & 0x00ff;
-	frame -= anim.frameBase; 
-
-	int first = frame / rate2;
-	int interpolation = frame % rate2;
-	outFramePtr[0] += first;			 // Get frame pointers...
-	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
-
-	if (interpolation == 0)
-		return 0;
-
-	// Clamp key frame to end if need be.
-	int second = first * rate2 + rate2;
-	if (second > anim.frameEnd)
-		outRate = anim.frameEnd - (second - rate2);
-
-	return interpolation;
-}
-
 int GetCurrentRelativeFrameNumber(ItemInfo* item)
 {
 	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
+}
+
+int GetAnimNumber(ItemInfo& item, int animID)
+{
+	return Objects[item.ObjectNumber].animIndex + animID;
 }
 
 int GetFrameNumber(ItemInfo* item, int frameToStart)
@@ -493,13 +543,10 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 	}
 }
 
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
 {
-	// Get real item number.
-	short itemNumber = item - g_Level.Items.data();
-
 	// Use matrices done in the renderer to transform the offset vector.
-	auto pos = offset.ToVector3();
-	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
+	auto pos = relOffset.ToVector3();
+	g_Renderer.GetItemAbsBonePosition(item->Index, pos, jointIndex);
 	return Vector3i(pos);
 }

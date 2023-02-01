@@ -55,9 +55,19 @@ namespace TEN::Renderer
 		{
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
-			if (!bone) return;//otherwise inventory crashes mm
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			if (!bone)
+			{
+				return; // Otherwise inventory crashes
+			}
 
+			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			{
+				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
+					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
+				return;
+			}
+
+			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
 				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
@@ -352,12 +362,8 @@ namespace TEN::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
-		Vector3 centre = (boxMin + boxMax) / 2.0f;
-		Vector3 extens = boxMax - centre;
-		BoundingBox box = BoundingBox(centre, extens);
-
 		if (sphereRadius == 0.0f)
 			return box.Contains(sphereCentre);
 		else
@@ -377,6 +383,23 @@ namespace TEN::Renderer
 
 		m_rooms[roomNumber1].RoomNumber = roomNumber1;
 		m_rooms[roomNumber2].RoomNumber = roomNumber2;
+
+		m_invalidateCache = true;
+	}
+
+	RendererObject& Renderer11::GetRendererObject(GAME_OBJECT_ID id)
+	{
+		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
+		{
+			if (m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			else
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+		}
+		else
+		{
+			return m_moveableObjects[id].value();
+		}
 	}
 
 	RendererMesh* Renderer11::GetMesh(int meshIndex)
@@ -436,10 +459,7 @@ namespace TEN::Renderer
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
-		short objNum = nativeItem->ObjectNumber;
-		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
-
-		auto& moveable = *m_moveableObjects[objNum];
+		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
 
 		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{

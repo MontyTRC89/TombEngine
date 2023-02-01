@@ -136,11 +136,11 @@ namespace TEN::Entities::TR4
 					creature->Enemy = nullptr;
 					float minDistance = FLT_MAX;
 
-					for (auto* activeCreature : ActiveCreatures)
+					for (auto& currentCreature : ActiveCreatures)
 					{
-						if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
+						if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 						{
-							auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
+							auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
@@ -260,7 +260,7 @@ namespace TEN::Entities::TR4
 
 					if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
 					{
-						CreatureKill(item, BSCORPION_ANIM_KILL, BSCORPION_STATE_KILL, LA_BIG_SCORPION_DEATH);
+						CreatureKill(item, BSCORPION_ANIM_KILL, 0, BSCORPION_STATE_KILL, LS_DEATH); // TODO: add big_scorpion lara extra state enum
 						creature->MaxTurn = 0;
 						return;
 					}

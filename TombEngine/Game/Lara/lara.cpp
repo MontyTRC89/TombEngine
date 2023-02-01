@@ -4,24 +4,24 @@
 #include <ois/OISKeyboard.h>
 
 #include "Game/Lara/lara_basic.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_jump.h"
-#include "Game/Lara/lara_tests.h"
-#include "Game/Lara/lara_monkey.h"
-#include "Game/Lara/lara_crawl.h"
-#include "Game/Lara/lara_objects.h"
-#include "Game/Lara/lara_hang.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_slide.h"
-#include "Game/Lara/lara_fire.h"
-#include "Game/Lara/lara_surface.h"
-#include "Game/Lara/lara_swim.h"
-#include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
-#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_crawl.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_hang.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_initialise.h"
+#include "Game/Lara/lara_jump.h"
+#include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/lara_objects.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_slide.h"
+#include "Game/Lara/lara_surface.h"
+#include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -36,18 +36,18 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Renderer/Renderer11.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Renderer/Renderer11.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
+using namespace TEN::Math;
 
-using std::function;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara = {};
@@ -55,7 +55,7 @@ ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
-function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
+std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 {
 	lara_as_walk_forward,
 	lara_as_run_forward,
@@ -260,7 +260,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crawl_vault,//194
 };
 
-function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
+std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 {
 	lara_col_walk_forward,
 	lara_col_run_forward,
@@ -731,6 +731,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
+	{
+		item->HitPoints--;
+	}
+
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = -1;
@@ -738,8 +743,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		if (lara.Control.Count.Death == 0)
 			StopSoundTracks();
 
-		lara.Control.Count.Death++;
-		if ((item->Flags & 0x100))
+		lara->Control.Count.Death++;
+		if item->Flags & IFLAG_INVISIBLE))
 		{
 			lara.Control.Count.Death++;
 			return;

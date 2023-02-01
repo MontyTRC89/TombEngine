@@ -44,8 +44,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
+		InitialiseCreature(itemNumber);
 		ImpState state;
 
 		if (item->TriggerFlags == 2 || item->TriggerFlags == 12)

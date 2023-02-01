@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -20,10 +20,10 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Input;
-using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Items;
+using namespace TEN::Input;
 
 namespace TEN::Entities::Effects
 {
@@ -282,7 +282,7 @@ namespace TEN::Entities::Effects
 			else if (item->ItemFlags[0] == 0)
 			{
 				DoFlipMap(-item->TriggerFlags);
-				FlipMap[-item->TriggerFlags] ^= 0x3E00u;
+				FlipMap[-item->TriggerFlags] ^= CODE_BITS;
 				item->ItemFlags[0] = 1;
 			}
 		}
@@ -400,8 +400,8 @@ namespace TEN::Entities::Effects
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
-				auto origin = item->Pose.Position;
-				Vector3i target;
+				auto origin = item->Pose.Position.ToVector3();
+				auto target = Vector3::Zero;
 
 				if (!(GlobalCounter & 3))
 				{
@@ -412,9 +412,9 @@ namespace TEN::Entities::Effects
 						target.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 
 						if (GetRandomControl() & 3)
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
 						else
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, (int)ElectricityFlags::Spline, 32, 3);
 					}
 				}
 
@@ -423,39 +423,39 @@ namespace TEN::Entities::Effects
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
 					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					target = GetJointPosition(targetItem, 0, Vector3i(0, -64, 20));
+					target = GetJointPosition(targetItem, 0, Vector3i(0, -64, 20)).ToVector3();
 
 					if (!(GlobalCounter & 3))
 					{
 						if (GetRandomControl() & 3)
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
 						else
-							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
+							SpawnElectricity(origin, target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, (int)ElectricityFlags::Spline, 32, 5);
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
-						TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
+						SpawnElectricityGlow(target, 64, 0, g, b);
 				}
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					origin = item->Pose.Position;
-
-					target = Vector3i(
+					origin = item->Pose.Position.ToVector3();
+					target = Vector3(
 						(GetRandomControl() & 0x1FF) + origin.x - 256,
 						(GetRandomControl() & 0x1FF) + origin.y - 256,
-						(GetRandomControl() & 0x1FF) + origin.z - 256
-					);
+						(GetRandomControl() & 0x1FF) + origin.z - 256);
 
-					TriggerLightning(&origin, &target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
-					TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
+					SpawnElectricity(origin, target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 32, 3);
+					SpawnElectricityGlow(target, 64, 0, g, b);
 				}
 			}
 			else
 			{
 				// Small fires
 				if (item->ItemFlags[0] != 0)
+				{
 					item->ItemFlags[0]--;
+				}
 				else
 				{
 					item->ItemFlags[0] = (GetRandomControl() & 3) + 8;
@@ -595,7 +595,7 @@ namespace TEN::Entities::Effects
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 
-					item->Flags |= 0x3E00;
+					item->Flags |= CODE_BITS;
 					item->ItemFlags[3] = 0;
 					item->Status = ITEM_ACTIVE;
 

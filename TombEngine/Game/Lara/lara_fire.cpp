@@ -349,6 +349,7 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 GameVector GetTargetPoint(ItemInfo* targetEntity)
 {
 	const auto& bounds = GetBestFrame(targetEntity)->boundingBox;
+
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,
 		bounds.Y1 + (bounds.GetHeight() / 3),
@@ -798,9 +799,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestItemNumber = NO_ITEM;
+	int bestJointIndex = NO_JOINT;
 	float bestDistance = INFINITY;
-
 	for (int i = 0; i < num; i++)
 	{
 		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
@@ -810,7 +810,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			if (distance < bestDistance)
 			{
 				bestDistance = distance;
-				bestItemNumber = i;
+				bestJointIndex = i;
 			}
 		}
 	}
@@ -823,7 +823,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (bestItemNumber < 0)
+	if (bestJointIndex < 0)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -832,56 +832,14 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	else
 	{
 		Statistics.Game.AmmoHits++;
-
 		target = origin + (directionNorm * bestDistance);
-
 		auto vTarget = GameVector(target);
-
-		// TODO: Enable when slot is created.
-		/*
-		if (target->ObjectNumber == ID_TRIBEBOSS)
-		{
-			long dx, dy, dz;
-
-			dx = (vDest.x - vSrc.x) >> 5;
-			dy = (vDest.y - vSrc.y) >> 5;
-			dz = (vDest.z - vSrc.z) >> 5;
-			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
-		}
-		else if (target->ObjectNumber == ID_ARMY_WINSTON || target->ObjectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
-		{
-			short ricochet_angle;
-			target->HitStatus = true; //need to do this to maintain defence state
-			target->HitPoints--;
-			ricochet_angle = (mGetAngle(lara.Pose.Position.z, lara.Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
-			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-			SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose);		// play RICOCHET Sample
-		}
-		else if (target->ObjectNumber == ID_SHIVA) //So must be Shiva
-		{
-			z = target->Pose.Position.z - lara_item->Pose.Position.z;
-			x = target->Pose.Position.x - lara_item->Pose.Position.x;
-			angle = 0x8000 + phd_atan(z, x) - target->Pose.Orientation.y;
-
-			if ((target->ActiveState > 1 && target->ActiveState < 5) && angle < 0x4000 && angle > -0x4000)
-			{
-				target->HitStatus = true; //need to do this to maintain defence state
-				ricochet_angle = (mGetAngle(lara.Pose.Position.z, lara.Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
-				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose); // play RICOCHET Sample
-			}
-			else //Shiva's not in defence mode or has its back to Lara
-				HitTarget(target, &vDest, weapon->damage, 0);
-		}
-		else
-		{*/
-			// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
-			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
-			// with weapons
-			if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-				HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
-		//}
 		
+		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
+		// It's strange, but this replicates original behaviour until we fully understand what is happening.
+		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
+			HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false, bestJointIndex);
+
 		return FireWeaponType::PossibleHit;
 	}
 }
@@ -1088,73 +1046,22 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	lara.TargetArmOrient = orient;
 }
 
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	targetEntity->HitStatus = true;
-
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	const auto& object = Objects[targetEntity->ObjectNumber];
-
 	if (hitPos != nullptr)
 	{
-		if (object.hitEffect != HIT_NONE)
-		{
-			switch (object.hitEffect)
-			{
-			case HIT_BLOOD:
-				if (targetEntity->ObjectNumber == ID_BADDY2 &&
-					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
-					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-						lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-						lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
-				{
-					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-					return;
-				}
-				else
-				{
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity->Pose.Orientation.y, targetEntity->RoomNumber);
-				}
-
-				break;
-
-			case HIT_RICOCHET:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-				break;
-
-			case HIT_SMOKE:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
-
-				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
-					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
-				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
-				}
-
-				break;
-			}
-		}
+		hitPos->RoomNumber = targetEntity->RoomNumber;
+		object.HitRoutine(*targetEntity, *laraItem, *hitPos, damage, isExplosive, bestJointIndex);
 	}
-
-	if (!object.undead || grenade)
+	else
 	{
-		if (targetEntity->HitPoints > 0)
-		{
-			Statistics.Level.AmmoHits++;
-			DoDamage(targetEntity, damage);
-		}
-	}
-
-	if (!targetEntity->Callbacks.OnHit.empty())
-	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->Name);
-		g_GameScript->ExecuteFunction(targetEntity->Callbacks.OnHit, index);
+		object.HitRoutine(*targetEntity, *laraItem, std::nullopt, damage, isExplosive, bestJointIndex);
 	}
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Containers/EulerAngles.h"
+#include "Math/Objects/EulerAngles.h"
 
 namespace sol
 {
@@ -19,6 +19,9 @@ public:
 	Rotation(float aX, float aY, float aZ);
 	Rotation(const EulerAngles& eulers);
 	Rotation(const Pose& pose);
+	Rotation(const Vector3& vec);
+
+	operator Vector3() const;
 
 	void StoreInPHDPos(Pose& pose) const;
 

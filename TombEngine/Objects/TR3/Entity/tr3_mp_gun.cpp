@@ -24,6 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum MPGunState
 	{
+		// No state 0.
 		MPGUN_STATE_WAIT = 1,
 		MPGUN_STATE_WALK = 2,
 		MPGUN_STATE_RUN = 3,
@@ -121,9 +122,8 @@ namespace TEN::Entities::Creatures::TR3
 
 				laraAI.distance = pow(dx, 2) + pow(dx, 2);
 
-				for (int slot = 0; slot < ActiveCreatures.size(); slot++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentCreature = ActiveCreatures[slot];
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
 

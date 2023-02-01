@@ -130,7 +130,7 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
-int   GetQuadrant(short angle);
+int	  GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);

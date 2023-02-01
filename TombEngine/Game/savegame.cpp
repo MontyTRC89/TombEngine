@@ -139,19 +139,33 @@ Vector3 ToVector3(const Save::Vector3* vec)
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
+Vector4 ToVector4(const Save::Vector3* vec)
+{
+	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
+}
+
 Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+#define SaveVec(Type, Data, TableBuilder, UnionType) \
+				auto data = std::get<(int)Type>(Data); \
+				TableBuilder vtb{ fbb }; \
+				Save::Vector3 saveVec = FromVector3(data); \
+				vtb.add_vec(&saveVec); \
+				auto vecOffset = vtb.Finish(); \
+				putDataInVec(UnionType, vecOffset);
+
 bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
+	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
-	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
+	std::vector<flatbuffers::Offset<Save::Item>> serializedItems{};
 
 	// Savegame header
 	auto levelNameOffset = fbb.CreateString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
@@ -453,6 +467,22 @@ bool SaveGame::Save(int slot)
 	lara.add_wet(wetOffset);
 	auto laraOffset = lara.Finish();
 
+	std::vector<flatbuffers::Offset<Save::Room>> rooms;
+	for (auto& room : g_Level.Rooms)
+	{
+		auto nameOffset = fbb.CreateString(room.name);
+
+		Save::RoomBuilder serializedInfo{ fbb };
+		serializedInfo.add_name(nameOffset);
+		serializedInfo.add_index(room.index);
+		serializedInfo.add_reverb_type((int)room.reverbType);
+		serializedInfo.add_flags(room.flags);
+		auto serializedInfoOffset = serializedInfo.Finish();
+
+		rooms.push_back(serializedInfoOffset);
+	}
+	auto roomOffset = fbb.CreateVector(rooms);
+
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
@@ -637,10 +667,9 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
-		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
+		serializedItem.add_color(&FromVector4(itemToSerialize.Model.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
-		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
@@ -702,7 +731,6 @@ bool SaveGame::Save(int slot)
 
 		currentItemIndex++;
 	}
-
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// TODO: In future, we should save only active FX, not whole array.
@@ -831,7 +859,7 @@ bool SaveGame::Save(int slot)
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(i);
+			staticMesh.add_room_number(room->index);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
@@ -862,7 +890,7 @@ bool SaveGame::Save(int slot)
 			auto nameOffset = fbb.CreateString(currVolume.Name);
 
 			Save::VolumeBuilder volume{ fbb };
-			volume.add_room_number(i);
+			volume.add_room_number(room->index);
 			volume.add_number(j);
 			volume.add_name(nameOffset);
 			volume.add_enabled(currVolume.Enabled);
@@ -1120,15 +1148,30 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
 		}
-		else if (std::holds_alternative<Vector3i>(s))
+		else
 		{
-			Save::vec3TableBuilder vtb{ fbb };
-			Vector3i data = std::get<Vector3i>(s);
-			Save::Vector3 saveVec = FromVector3(std::get<Vector3i>(s));
-			vtb.add_vec(&saveVec);
-			auto vec3Offset = vtb.Finish();
+			switch (SavedVarType(s.index()))
+			{
+			case SavedVarType::Vec3:
+			{
+				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
+			}
+			break;
+			case SavedVarType::Rotation:
+			{
+				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
+			}
+			break;
+			case SavedVarType::Color:
+			{
+				Save::colorTableBuilder ctb{ fbb };
+				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+				auto offset = ctb.Finish();
 
-			putDataInVec(Save::VarUnion::vec3, vec3Offset);
+				putDataInVec(Save::VarUnion::color, offset);
+			}
+			break;
+			}
 		}
 	}
 	auto unionVec = fbb.CreateVector(varsVec);
@@ -1149,6 +1192,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
@@ -1210,6 +1254,7 @@ bool SaveGame::Save(int slot)
 bool SaveGame::Load(int slot)
 {
 	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -1242,39 +1287,13 @@ bool SaveGame::Load(int slot)
 	Statistics.Level.Secrets = s->level()->secrets();
 	Statistics.Level.Timer = s->level()->timer();
 
-	// Flipmaps
-	for (int i = 0; i < s->flip_stats()->size(); i++)
+	// Rooms
+	for (int i = 0; i < s->rooms()->size(); i++)
 	{
-		if (s->flip_stats()->Get(i) != 0)
-			DoFlipMap(i);
-
-		FlipMap[i] = s->flip_maps()->Get(i) << 8;
-	}
-
-	// Effects
-	FlipEffect = s->flip_effect();
-	FlipStatus = s->flip_status();
-
-	// Restore camera FOV
-	AlterFOV(s->current_fov());
-
-	// Restore action queue
-	for (int i = 0; i < s->action_queue()->size(); i++)
-	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
-		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
-	}
-
-	// Restore soundtracks
-	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
-	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
-
-	// Legacy soundtrack map
-	for (int i = 0; i < s->cd_flags()->size(); i++)
-	{
-		int index = s->cd_flags()->Get(i);
-		int mask  = s->cd_flags()->Get(++i);
-		SoundTracks[index].Mask = mask;
+		auto room = s->rooms()->Get(i);
+		g_Level.Rooms[room->index()].name = room->name()->str();
+		g_Level.Rooms[room->index()].flags = room->flags();
+		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
 	}
 
 	// Static objects
@@ -1329,6 +1348,41 @@ bool SaveGame::Load(int slot)
 		}
 	}
 
+	// Flipmaps (should be applied after statics and volumes are loaded)
+	for (int i = 0; i < s->flip_stats()->size(); i++)
+	{
+		if (s->flip_stats()->Get(i) != 0)
+			DoFlipMap(i);
+
+		FlipMap[i] = s->flip_maps()->Get(i) << 8;
+	}
+
+	// Effects
+	FlipEffect = s->flip_effect();
+	FlipStatus = s->flip_status();
+
+	// Restore camera FOV
+	AlterFOV(s->current_fov());
+
+	// Restore action queue
+	for (int i = 0; i < s->action_queue()->size(); i++)
+	{
+		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+	}
+
+	// Restore soundtracks
+	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
+	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
+
+	// Legacy soundtrack map
+	for (int i = 0; i < s->cd_flags()->size(); i++)
+	{
+		int index = s->cd_flags()->Get(i);
+		int mask = s->cd_flags()->Get(++i);
+		SoundTracks[index].Mask = mask;
+	}
+
 	// Cameras 
 	for (int i = 0; i < s->fixed_cameras()->size(); i++)
 	{
@@ -1365,7 +1419,7 @@ bool SaveGame::Load(int slot)
 		bool dynamicItem = i >= g_Level.NumItems;
 
 		ItemInfo* item = &g_Level.Items[i];
-		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+		item->ObjectNumber = GAME_OBJECT_ID(savedItem->object_id());
 
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
@@ -1420,7 +1474,7 @@ bool SaveGame::Load(int slot)
 		item->Flags = savedItem->flags();
 
 		// Color
-		item->Color = ToVector4(savedItem->color());
+		item->Model.Color = ToVector4(savedItem->color());
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
@@ -1463,7 +1517,7 @@ bool SaveGame::Load(int slot)
 			UpdateBridgeItem(i);
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
 
@@ -1499,7 +1553,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
-			SetBaddyTarget(i, savedCreature->ai_target_number());
+			SetEntityTarget(i, savedCreature->ai_target_number());
 		}
 		else if (item->Data.is<QuadBikeInfo>())
 		{
@@ -1967,7 +2021,21 @@ bool SaveGame::Load(int slot)
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
-				loadedVars.push_back(ToVector3i(var->u_as_vec3()->vec()));
+				auto stored = var->u_as_vec3()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::rotation)
+			{
+				auto stored = var->u_as_rotation()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::color)
+			{
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

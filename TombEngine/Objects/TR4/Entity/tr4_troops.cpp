@@ -24,6 +24,7 @@ namespace TEN::Entities::TR4
 
 	enum TroopState
 	{
+		// No state 0.
 		TROOP_STATE_IDLE = 1,
 		TROOP_STATE_WALK = 2,
 		TROOP_STATE_RUN = 3,
@@ -50,7 +51,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{
@@ -147,12 +148,11 @@ namespace TEN::Entities::TR4
 
 				float minDistance = FLT_MAX;
 
-				for (auto* activeCreature : ActiveCreatures)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
+					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 					{
-						auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
-
+						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&

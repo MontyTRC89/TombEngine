@@ -7,6 +7,12 @@ struct CreatureInfo;
 struct ItemInfo;
 struct LOTInfo;
 
+enum class JumpDistance
+{
+	Block1,
+	Block2
+};
+
 enum TARGET_TYPE
 {
 	NO_TARGET,
@@ -148,42 +154,43 @@ constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
-void FindAITargetObject(CreatureInfo* creature, short objectNumber);
+void FindAITargetObject(CreatureInfo* creature, int objectNumber);
+void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
-void DropEntityPickups(ItemInfo* item);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
 void CreatureYRot2(Pose* fromPose, short angle, short angleAdd);
 bool SameZone(CreatureInfo* creature, ItemInfo* target);
-void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
-void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState);
+void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int entityKillState, int laraKillState);
 short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func);
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
-void CreatureJoint(ItemInfo* item, short joint, short required);
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle = ANGLE(70.0f));
 void CreatureTilt(ItemInfo* item, short angle);
 short CreatureTurn(ItemInfo* item, short maxTurn);
 void CreatureDie(short itemNumber, bool explode);
-int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
+bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);
-int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber);
-int EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
+bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber);
+bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void TargetBox(LOTInfo* LOT, int boxNumber);
-int UpdateLOT(LOTInfo* LOT, int expansion);
-int SearchLOT(LOTInfo* LOT, int expansion);
-int CreatureActive(short itemNumber);
+bool UpdateLOT(LOTInfo* LOT, int expansion);
+bool SearchLOT(LOTInfo* LOT, int expansion);
+bool CreatureActive(short itemNumber);
 void InitialiseCreature(short itemNumber);
-int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
+bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
-int CreatureAnimation(short itemNumber, short angle, short tilt);
+bool CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
+
+bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType);
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);
