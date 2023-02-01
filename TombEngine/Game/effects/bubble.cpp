@@ -36,6 +36,8 @@ namespace TEN::Effects::Bubble
 
 		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
+		scale = std::min(scale, BUBBLE_SCALE_MAX);
+
 		bubble.SpriteIndex = SPR_BUBBLES;
 		bubble.Position =
 		bubble.PositionBase = pos;
@@ -58,7 +60,7 @@ namespace TEN::Effects::Bubble
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
 		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
-		bubble.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
+		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, scale / BUBBLE_SCALE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
 		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / BUBBLE_SCALE_MAX);
 	}
