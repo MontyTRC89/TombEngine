@@ -59,11 +59,8 @@ namespace TEN::Effects::Bubble
 
 		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
 		bubble.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
-		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
-		bubble.OscillationVelocity = Lerp(
-			BUBBLE_OSC_VELOCITY_MAX,
-			BUBBLE_OSC_VELOCITY_MIN,
-			((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / BUBBLE_SCALE_MAX);
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
+		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / BUBBLE_SCALE_MAX);
 	}
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags, const Vector3& inertia)
