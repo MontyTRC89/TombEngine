@@ -147,10 +147,12 @@ namespace TEN::Effects::Bubble
 				continue;
 			}
 
-			// Reached water surface; spawn ripple.
+			// Hit water surface; spawn ripple.
 			if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 			{
 				bubble.Life = 0.0f;
+
+				// TODO: Also spawn small drip splash.
 
 				SetupRipple(
 					bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z,
