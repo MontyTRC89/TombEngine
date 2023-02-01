@@ -61,7 +61,6 @@ namespace TEN::Effects::Bubble
 		bubble.Scale =
 		bubble.ScaleMax = Vector2(scale);
 		bubble.ScaleMin = bubble.Scale * 0.7f;
-
 	}
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags, const Vector3& inertia)
