@@ -1,13 +1,13 @@
 #include "framework.h"
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Specific/Input/Input.h"
-#include "Specific/level.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/animation.h"
-#include "Game/collision/collide_item.h"
-#include "Game/items.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -65,7 +65,7 @@ namespace TEN::Entities::Switches
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -128,8 +128,8 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(SwitchPos, switchItem, laraItem))
 				{
-					short onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
-					short offAnim = LaraAnim::LA_WALLSWITCH_UP;
+					int onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
+					int offAnim = LaraAnim::LA_WALLSWITCH_UP;
 
 					switch (switchItem->TriggerFlags)
 					{
