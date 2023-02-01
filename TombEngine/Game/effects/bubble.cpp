@@ -82,15 +82,20 @@ namespace TEN::Effects::Bubble
 		SpawnBubble(pos, roomNumber, scale, amplitude, inertia);
 	}
 	
+	// TODO: Still not spawning!!
 	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
 	{
-		constexpr auto SCALE_MAX	 = BUBBLE_SCALE_MAX;
-		constexpr auto SCALE_MIN	 = SCALE_MAX / 2;
-		constexpr auto AMPLITUDE_MAX = BLOCK(1 / 16.0f);
+		constexpr auto SCALE_MAX		 = BUBBLE_SCALE_MAX;
+		constexpr auto SCALE_MIN		 = SCALE_MAX / 2;
+		constexpr auto GRAVITY_MAX		 = 16.0f;
+		constexpr auto GRAVITY_MIN		 = GRAVITY_MAX / 4;
+		constexpr auto AMPLITUDE_MAX	 = BLOCK(1 / 16.0f);
+		constexpr auto WAVE_VELOCITY_MAX = 1 / 16.0f;
+		constexpr auto WAVE_VELOCITY_MIN = WAVE_VELOCITY_MAX / 2;
 
 		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
-		auto sphere = BoundingSphere(Vector3::Zero, AMPLITUDE_MAX);
+		float scale = Random::GenerateFloat(SCALE_MIN, SCALE_MAX);
 
 		bubble.SpriteIndex = SPR_BUBBLES;
 		bubble.Position = pos;
@@ -102,24 +107,21 @@ namespace TEN::Effects::Bubble
 		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		bubble.Inertia = Vector3::Zero;
-		bubble.Amplitude = Random::GeneratePointInSphere(sphere);
+		bubble.Amplitude = Random::GenerateDirection() * AMPLITUDE_MAX;
 		bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
 		bubble.WaveVelocity = Vector3(
-			1 / Random::GenerateFloat(8, 16),
-			1 / Random::GenerateFloat(8, 16),
-			1 / Random::GenerateFloat(8, 16));
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
 		
 		bubble.Scale =
-		bubble.ScaleMax = Vector2(Random::GenerateFloat(SCALE_MIN, SCALE_MAX));
+		bubble.ScaleMax = Vector2(scale);
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
-		bubble.Life = 0.0f;
-		bubble.Gravity = Random::GenerateFloat(4.0f, 16.0f);
-		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, (bubble.ScaleMax.x + bubble.ScaleMax.y) / 2);
-		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, ((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) / SCALE_MAX);
-		bubble.Scale =
-		bubble.ScaleMax =
-		bubble.ScaleMin = Vector2(Random::GenerateFloat(32.0f, 96.0f));
+		bubble.Life = BUBBLE_LIFE_MAX;
+		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, scale / BUBBLE_SCALE_MAX);
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
+		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / SCALE_MAX);
 	}
 
 	void UpdateBubbles()
