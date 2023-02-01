@@ -79,48 +79,63 @@ namespace TEN::Entities::Switches
 			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_OFF)
 				return;
 
-			SwitchBounds.BoundingBox.X1 = bounds.X1 - 256;
-			SwitchBounds.BoundingBox.X2 = bounds.X2 + 256;
-
-			SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 512;
-			SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 512;
+			SwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25);
+			SwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25);
 
 			switch (switchItem->TriggerFlags)
 			{
 				default:
 					SwitchPos.z = bounds.Z1 - 128;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.2);
 					break;
 
 				case SWT_BIG_LEVER:
 					SwitchPos.z = bounds.Z1 - 64;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.2);
 					break;
 
 				case SWT_SMALL_LEVER:
 					SwitchPos.z = bounds.Z1 - 112;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25);
 					break;
 
 				case SWT_SMALL_BUTTON:
 					SwitchPos.z = bounds.Z1 - 156;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.2);
 					break;
 
 				case SWT_BIG_BUTTON:
 					SwitchPos.z = bounds.Z1 - 256;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.5);
 					break;
 
 				case SWT_GIANT_BUTTON:
 					SwitchPos.z = bounds.Z1 - 384;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.5);
 					break;
 
 				case SWT_VALVE:
 					SwitchPos.z = bounds.Z1 - 112;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25);
 					break;
 
 				case SWT_WALL_HOLE:
 					SwitchPos.z = bounds.Z1 - 196;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.2);
 					break;
 
 				case SWT_CUSTOM:
 					SwitchPos.z = bounds.Z1 - switchItem->ItemFlags[6];
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.5);
 					break;
 			}
 
