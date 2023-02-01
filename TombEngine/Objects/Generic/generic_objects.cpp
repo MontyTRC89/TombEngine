@@ -21,6 +21,7 @@
 #include "Objects/Generic/Switches/pulley_switch.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/turn_switch.h"
+#include "Objects/Generic/Switches/airlock_switch.h"
 
 // Doors
 #include "Objects/Generic/Doors/generic_doors.h"
@@ -177,6 +178,14 @@ void StartSwitches(ObjectInfo* object)
 			object->control = SwitchControl;
 			object->SetupHitEffect(true);
 		}
+	}
+
+	object = &Objects[ID_AIRLOCK_SWITCH];
+	if (object->loaded)
+	{
+		object->collision = AirLockSwitchCollision;
+		object->control = SwitchControl;
+		object->SetupHitEffect(true);
 	}
 
 	object = &Objects[ID_CROWBAR_SWITCH];
