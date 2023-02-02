@@ -190,19 +190,10 @@ namespace TEN::Renderer
 		RendererRoom* room = &m_rooms[to];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[to];
 
-		auto cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-		float xRad = nativeRoom->xSize * SECTOR(1) / 2.0f;
-		float yRad = (nativeRoom->minfloor - nativeRoom->maxceiling) / 2.0f;
-		float zRad = nativeRoom->zSize * SECTOR(1) / 2.0f;
-
-		auto roomCentre = Vector3(nativeRoom->x + xRad, nativeRoom->minfloor - yRad, nativeRoom->z + zRad);
-
-		float roomRad = std::max(std::max(xRad, yRad), zRad);
-		float distance = std::max((roomCentre - cameraPosition).Length() - (roomRad * 1.5f), 0.0f);
-
-		if (!m_rooms[to].Visited)
+		if (!room->Visited)
 		{
+			room->Visited = true;
+
 			renderView.roomsToDraw.push_back(room);
 
 			CollectLightsForRoom(to, renderView);
@@ -215,8 +206,6 @@ namespace TEN::Renderer
 			}
 		}
 
-		room->Distance = distance;
-		room->Visited = true;
 		room->ViewPort.x = std::min(room->ViewPort.x, viewPort.x);
 		room->ViewPort.y = std::min(room->ViewPort.y, viewPort.y);
 		room->ViewPort.z = std::max(room->ViewPort.z, viewPort.z);
