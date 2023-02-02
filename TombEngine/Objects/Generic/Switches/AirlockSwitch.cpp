@@ -1,4 +1,6 @@
 #include "framework.h"
+#include "Objects/Generic/Switches/AirlockSwitch.h"
+
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
@@ -18,24 +20,23 @@ namespace TEN::Entities::Switches
 		GameBoundingBox::Zero,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-		)
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 	};
 
 	auto AirlockSwitchPos = Vector3i::Zero;
 
 	void AirlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto& player = *GetLaraInfo(laraItem);
 		auto& switchItem = g_Level.Items[itemNumber];
+		auto& player = *GetLaraInfo(laraItem);
 
-		if (IsHeld(In::Action) &&
+		if ((IsHeld(In::Action) &&
 			switchItem.Animation.ActiveState == 0 &&
+			switchItem.Status == ITEM_NOT_ACTIVE &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			player.Control.HandStatus == HandStatus::Free &&
-			switchItem.Status == ITEM_NOT_ACTIVE ||
-			player.Control.IsMoving && player.InteractedItem == itemNumber)
+			player.Control.HandStatus == HandStatus::Free) ||
+			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			auto bounds = GameBoundingBox(&switchItem);
 
@@ -65,7 +66,9 @@ namespace TEN::Entities::Switches
 					AnimateItem(&switchItem);
 				}
 				else
+				{
 					player.InteractedItem = itemNumber;
+				}
 			}
 			else if (player.Control.IsMoving && player.InteractedItem == itemNumber)
 			{
