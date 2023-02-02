@@ -39,6 +39,7 @@ namespace TEN::Renderer
 			for (int j = 0; j < room->Doors.size(); j++)
 			{
 				room->Doors[j].Visited = false;
+				room->Doors[j].InvisibleFromCamera = false;
 			}
 		}
 
@@ -46,6 +47,7 @@ namespace TEN::Renderer
 
 		m_invalidateCache = false;
 
+		// Prepae the real DX scissor test rectangle
 		for (auto room : renderView.roomsToDraw)
 		{
 			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
@@ -54,7 +56,7 @@ namespace TEN::Renderer
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		}
 
-		// Sort statics for better instancing later
+		// Sort statics for doing instancing later
 		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
 			{
 				return a->ObjectNumber < b->ObjectNumber;
@@ -216,6 +218,11 @@ namespace TEN::Renderer
 		{
 			RendererDoor* door = &room->Doors[i];
 
+			if (door->InvisibleFromCamera)
+			{
+				continue;
+			}
+
 			if (!door->Visited)
 			{
 				door->CameraToDoor = Vector3(
@@ -232,6 +239,7 @@ namespace TEN::Renderer
 				door->Normal.y * door->CameraToDoor.y +
 				door->Normal.z * door->CameraToDoor.z <= 0)
 			{
+				door->InvisibleFromCamera = true;
 				continue;
 			}
 

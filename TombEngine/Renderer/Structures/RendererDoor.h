@@ -7,6 +7,7 @@ namespace TEN::Renderer
 	struct RendererDoor
 	{
 		bool Visited;
+		bool InvisibleFromCamera;
 		short RoomNumber;
 		Vector3 Normal;
 		Vector3 CameraToDoor;
