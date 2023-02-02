@@ -245,7 +245,6 @@ void UpdateSparks()
 				spark->extras & 7)
 			{
 				int explosionType;
-				Vector3 color1, color2;
 
 				if (spark->flags & SP_UNDERWEXP)
 				{
@@ -257,11 +256,7 @@ void UpdateSparks()
 				}
 				else
 				{
-					explosionType = 0;
-					
-					color1 = Vector3(spark->dR, spark->dG, spark->dB);
-					color2 = Vector3(spark->sR, spark->sG, spark->sB);
-				
+					explosionType = 0;			
 				}
 
 				for (int j = 0; j < (spark->extras & 7); j++)
@@ -274,7 +269,9 @@ void UpdateSparks()
 							(spark->extras & 7) - 1,
 							spark->dynamic,
 							explosionType,
-							spark->roomNumber, color1, color2);
+							spark->roomNumber, 
+							Vector3(spark->dR, spark->dG, spark->dB), 
+							Vector3(spark->sR, spark->sG, spark->sB));
 					}
 					else
 					{
