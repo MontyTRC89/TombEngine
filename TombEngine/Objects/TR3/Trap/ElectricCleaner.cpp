@@ -44,7 +44,7 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 		item.ItemFlags[1] = 0;
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
-		item.Collidable = 1;
+		item.Collidable = true;
 	}
 
 	void ElectricCleanerControl(short itemNumber)
@@ -73,9 +73,9 @@ namespace TEN::Entities::Traps
 		else
 		{
 			// Do we need a new target?
-			if (NeedNewTarget(item))
+			if (NeedBlockAlignment(item))
 			{
-				long x, y, z;
+				int x, y, z;
 				FloorInfo* floor;
 				ROOM_INFO* r;
 				short roomNumber;
@@ -88,7 +88,7 @@ namespace TEN::Entities::Traps
 					roomNumber = item.RoomNumber;
 					floor = GetFloor(x, y, z, &roomNumber);
 					r = &g_Level.Rooms[roomNumber];
-					r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = 0;
+					r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = false;
 					item.ItemFlags[1] = 0;
 				}
 
@@ -138,7 +138,7 @@ namespace TEN::Entities::Traps
 						roomNumber = item.RoomNumber;
 						floor = GetFloor(x, y, z, &roomNumber);
 						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = 1;
+						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
 					}
 
 					break;
@@ -180,7 +180,7 @@ namespace TEN::Entities::Traps
 						roomNumber = item.RoomNumber;
 						floor = GetFloor(x, y, z, &roomNumber);
 						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = 1;
+						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
 					}
 
 					break;
@@ -221,7 +221,7 @@ namespace TEN::Entities::Traps
 						roomNumber = item.RoomNumber;
 						floor = GetFloor(x, y, z, &roomNumber);
 						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = 1;
+						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
 					}
 
 					break;
@@ -262,7 +262,7 @@ namespace TEN::Entities::Traps
 						roomNumber = item.RoomNumber;
 						floor = GetFloor(x, y, z, &roomNumber);
 						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = 1;
+						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
 					}
 
 					break;
@@ -323,7 +323,7 @@ namespace TEN::Entities::Traps
 	}
 
 	// Checks if the cleaner is in the centre of a block and facing the proper direction.
-	bool NeedNewTarget(const ItemInfo& item)
+	bool NeedBlockAlignment(const ItemInfo& item)
 	{
 		if ((item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f) &&
 			(item.Pose.Orientation.y == ANGLE(0.0f) || item.Pose.Orientation.y == ANGLE(180.0f)))
@@ -360,17 +360,17 @@ namespace TEN::Entities::Traps
 		return false;
 	}
 
-	void CheckCleanerHeading(ItemInfo& item, long x, long y, long z, short roomNumber, bool& heading)
+	void CheckCleanerHeading(ItemInfo& item, int x, int y, int z, short roomNumber, bool& heading)
 	{
 		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
-		long h = GetFloorHeight(floor, x, y, z);
+		int h = GetFloorHeight(floor, x, y, z);
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		floor = &r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))];
 		bool collide;
 
 		/*
-		long ox = item.Pose.Position.x;
-		long oz = item.Pose.Position.z;
+		int ox = item.Pose.Position.x;
+		int oz = item.Pose.Position.z;
 		item.Pose.Position.x = x;
 		item.Pose.Position.z = z;
 		collide = CheckObjectAhead(item);
@@ -409,7 +409,7 @@ namespace TEN::Entities::Traps
 
 		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
 		{
-			long lp = 0;
+			int lp = 0;
 			while (CollidedItems[lp] != nullptr)
 			{
 				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
@@ -445,7 +445,7 @@ namespace TEN::Entities::Traps
 				else
 					item.ItemFlags[3 + i]--;
 
-				long joint = wireEndJoints[i];
+				int joint = wireEndJoints[i];
 				auto pos = GetJointPosition(&item, joint, Vector3i(-160, -8, 16));
 
 				byte c = Random::GenerateInt(0, 64) + 128;
@@ -454,7 +454,7 @@ namespace TEN::Entities::Traps
 				auto& spark = GetFreeSparkParticle();
 
 				spark = {};
-				spark.active = 1;
+				spark.active = true;
 				spark.age = 0;
 				float color = (192.0F + Random::GenerateFloat(0, 63.0F)) / 255.0F;
 				spark.sourceColor = Vector4(color / 4, color / 2, color, 1.0F);
