@@ -1928,10 +1928,13 @@ namespace TEN::Renderer
 		// Bind pixel shaders
 		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
+		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
+		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
+
 		// Bind caustics and shadow map textures
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-		int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0, (int)m_sprites.size());
+		int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
 		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Strange packing due to particular HLSL 16 bytes alignment requirements
@@ -1973,8 +1976,6 @@ namespace TEN::Renderer
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 			BindRoomLights(view.lightsToDraw);
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
-			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
-			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 			 
 			SetScissor(room->ClipBounds);
 
