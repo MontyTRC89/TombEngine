@@ -118,7 +118,7 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 	return 0;
 }
 
-bool SwitchTrigger(short itemNumber, short timer)
+int SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 
@@ -133,7 +133,7 @@ bool SwitchTrigger(short itemNumber, short timer)
 			if (timer != 1)
 				item.Timer = FPS * timer;
 
-			return true;
+			return 1;
 		}
 		if (item.TriggerFlags != 6 || item.Animation.ActiveState)
 		{
@@ -144,15 +144,15 @@ bool SwitchTrigger(short itemNumber, short timer)
 				item.Flags |= ONESHOT;
 
 			if (item.Animation.ActiveState != 1)
-				return true;
+				return 1;
 
 			if (item.TriggerFlags != 5 && item.TriggerFlags != 6)
-				return true;
+				return 1;
 		}
 		else
 		{
 			item.Status = ITEM_ACTIVE;
-			return true;
+			return 1;
 		}
 	}
 	else if (item.Status)
@@ -161,17 +161,17 @@ bool SwitchTrigger(short itemNumber, short timer)
 			item.Animation.AnimNumber == GetAnimNumber(item, 2) &&
 			item.Animation.FrameNumber == GetFrameNumber(&item, 0))
 		{
-			return true;
+			return 1;
 		}
 
 		return ((item.Flags & ONESHOT) >> 8);
 	}
 	else
 	{
-		return false;
+		return 0;
 	}
 
-	return false;
+	return 0;
 }
 
 int KeyTrigger(short itemNum)
