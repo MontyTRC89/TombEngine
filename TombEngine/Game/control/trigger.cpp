@@ -164,7 +164,7 @@ bool SwitchTrigger(short itemNumber, short timer)
 			return true;
 		}
 
-		return (item.Flags & ONESHOT) >> 8;
+		return ((item.Flags & ONESHOT) >> 8);
 	}
 	else
 	{
