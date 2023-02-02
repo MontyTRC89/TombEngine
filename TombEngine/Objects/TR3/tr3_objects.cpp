@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
 
+#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
@@ -8,6 +9,9 @@
 #include "Specific/setup.h"
 
 // Creatures
+#include "Objects/TR3/Entity/Lizard.h" // OK
+#include "Objects/TR3/Entity/PunaBoss.h" // OK
+#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -18,11 +22,13 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
-#include "Objects/TR3/Entity/tr3_sophia.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
+
+// Effects
+#include "Objects/Effects/Boss.h"
 
 // Traps
 #include "Objects/TR3/Trap/ElectricCleaner.h"
@@ -35,9 +41,11 @@
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Traps;
+using namespace TEN::Effects::Boss;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -52,6 +60,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->nonLot = true; // NOTE: Doesn't move to reach the player, only throws projectiles.
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -149,7 +158,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Blockable;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_Y);
 		obj->SetupHitEffect();
@@ -167,7 +176,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->pivotLength = 50;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -199,6 +208,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_KEY, "ID_MONKEY", "ID_MESHSWAP_MONKEY_KEY");
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_MEDIPACK, "ID_MONKEY", "ID_MESHSWAP_MONKEY_MEDIPACK");
 		obj->initialise = InitialiseMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
@@ -240,7 +251,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -249,6 +260,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SHIVA_STATUE, "ID_SHIVA", "ID_SHIVA_STATUE");
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
@@ -258,23 +270,24 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(25, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_SOPHIA_LEE_BOSS];
+	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLondonBoss;
+		obj->initialise = InitialiseSophiaLeigh;
+		obj->control = SophiaLeighControl;
 		obj->collision = CreatureCollision;
-		obj->control = LondonBossControl;
-		obj->drawRoutine = S_DrawLondonBoss;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -291,16 +304,75 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_LIZARD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = LizardControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 36;
+		obj->intelligent = true;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->LotType = LotType::Human;
+		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_PUNA_BOSS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePuna;
+		obj->control = PunaControl;
+		obj->collision = CreatureCollision;
+		obj->HitRoutine = PunaHit;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 200;
+		obj->intelligent = true;
+		obj->nonLot = true;
+		obj->radius = 102;
+		obj->pivotLength = 50;
+		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
+		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetupHitEffect();
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
+	obj = &Objects[ID_BOSS_SHIELD];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = ObjectCollision;
+		obj->control = ShieldControl;
+		obj->shadowType = ShadowMode::None;
+	}
 
+	obj = &Objects[ID_BOSS_EXPLOSION_RING];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = nullptr;
+		obj->control = ShockwaveRingControl;
+		obj->shadowType = ShadowMode::None;
+	}
+
+	obj = &Objects[ID_BOSS_EXPLOSION_SHOCKWAVE];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = nullptr;
+		obj->control = ShockwaveExplosionControl;
+		obj->shadowType = ShadowMode::None;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)

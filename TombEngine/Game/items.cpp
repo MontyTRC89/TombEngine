@@ -6,6 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
@@ -17,15 +18,17 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
+using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
-using namespace TEN::Control::Volumes;
+using namespace TEN::Math;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
-bool ItemInfo::TestOcb(short ocbFlags)
+bool ItemInfo::TestOcb(short ocbFlags) const
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
 }
@@ -40,29 +43,53 @@ void ItemInfo::ClearAllOcb()
 	TriggerFlags = 0;
 }
 
-bool ItemInfo::TestFlags(short id, short value)
+bool ItemInfo::TestFlags(int id, short flags) const
 {
 	if (id < 0 || id > 7)
 		return false;
 
-	return (ItemFlags[id] == value);
+	return (ItemFlags[id] & flags) != 0;
 }
 
-void ItemInfo::SetFlags(short id, short value)
+bool ItemInfo::TestFlagField(int id, short flags) const
+{
+	if (id < 0 || id > 7)
+		return false;
+
+	return (ItemFlags[id] == flags);
+}
+
+short ItemInfo::GetFlagField(int id) const
+{
+	if (id < 0 || id > 7)
+		return 0;
+
+	return ItemFlags[id];
+}
+
+void ItemInfo::SetFlagField(int id, short flags)
 {
 	if (id < 0 || id > 7)
 		return;
 
-	ItemFlags[id] = value;
+	this->ItemFlags[id] = flags;
+}
+
+void ItemInfo::ClearFlags(int id, short flags)
+{
+	if (id < 0 || id > 7)
+		return;
+
+	this->ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 {
-	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
 	{
 		if (flags & (1 << i))
 		{
-			if (Model.MeshIndex[i] == Model.BaseMesh + i)
+			if (Model.MeshIndex[i] == (Model.BaseMesh + i))
 				return false;
 		}
 	}
@@ -242,8 +269,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 void AddActiveItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
-	item->Flags |= 0x20;
+	item->Flags |= IFLAG_TRIGGERED;
 
 	if (Objects[item->ObjectNumber].control == NULL)
 	{
@@ -470,10 +496,8 @@ void InitialiseItem(short itemNumber)
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;
 
-	item->ItemFlags[3] = 0;
-	item->ItemFlags[2] = 0;
-	item->ItemFlags[1] = 0;
-	item->ItemFlags[0] = 0;
+	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
+		item->ItemFlags[i] = 0;
 
 	item->Active = false;
 	item->Status = ITEM_NOT_ACTIVE;
@@ -481,9 +505,7 @@ void InitialiseItem(short itemNumber)
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
-
 	item->Timer = 0;
-
 	item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
 	if (item->ObjectNumber == ID_HK_ITEM ||
@@ -516,7 +538,6 @@ void InitialiseItem(short itemNumber)
 	}
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
@@ -545,11 +566,10 @@ void InitialiseItem(short itemNumber)
 
 short CreateItem()
 {
-	short itemNumber = 0;
+	if (NextItemFree == NO_ITEM)
+		return NO_ITEM;
 
-	if (NextItemFree == -1) return NO_ITEM;
-
-	itemNumber = NextItemFree;
+	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
@@ -619,6 +639,18 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	}
 
 	return changed;
+}
+
+const std::string& GetObjectName(GAME_OBJECT_ID id)
+{
+	for (auto it = kObjIDs.begin(); it != kObjIDs.end(); ++it)
+	{
+		if (it->second == id)
+			return it->first;
+	}
+
+	static const std::string unknownSlot = "UNKNOWN_SLOT";
+	return unknownSlot;
 }
 
 std::vector<int> FindAllItems(short objectNumber)
@@ -746,11 +778,11 @@ void DoDamage(ItemInfo* item, int damage)
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
 			Rumble(power, 0.15f);
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
+		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;
@@ -758,7 +790,7 @@ void DoDamage(ItemInfo* item, int damage)
 	}
 }
 
-void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
@@ -770,6 +802,9 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive)
 			DoDamage(target, damage);
 		}
 	}
+
+	if (isExplosive && allowBurn && Random::TestProbability(1 / 2.0f))
+		ItemBurn(target);
 
 	if (!target->Callbacks.OnHit.empty())
 	{

@@ -82,17 +82,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	};
 
-	void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
-	}
-
-	void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
-	{
-		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
-	}
-
-	void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
+	static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
 		if (!creature->Flags && item->TouchBits.Test(ShivaAttackRightJoints))
 		{
@@ -111,22 +101,115 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
+	static void SpawnShivaSmoke(const Vector3& pos, int roomNumber)
+	{
+		auto& smoke = *GetFreeParticle();
+
+		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, Vector3i(pos), roomNumber);
+		auto sphere = BoundingSphere(pos, 16);
+		auto effectPos = Random::GeneratePointInSphere(sphere);
+
+		smoke.on = true;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+		smoke.x = effectPos.x;
+		smoke.y = effectPos.y;
+		smoke.z = effectPos.z;
+		smoke.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+		smoke.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
+		smoke.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+
+		if (isUnderwater)
+		{
+			smoke.sR = 144;
+			smoke.sG = 144;
+			smoke.sB = 144;
+			smoke.dR = 64;
+			smoke.dG = 64;
+			smoke.dB = 64;
+		}
+		else
+		{
+			smoke.sR = 0;
+			smoke.sG = 0;
+			smoke.sB = 0;
+			smoke.dR = 192;
+			smoke.dG = 192;
+			smoke.dB = 208;
+		}
+
+		smoke.colFadeSpeed = 8;
+		smoke.fadeToBlack = 64;
+		smoke.sLife =
+		smoke.life = Random::GenerateInt(96, 128);
+		smoke.extras = 0;
+		smoke.dynamic = -1;
+
+		if (isUnderwater)
+		{
+			smoke.yVel /= 16;
+			smoke.y += 32;
+			smoke.friction = 4 | 16;
+		}
+		else
+		{
+			smoke.friction = 6;
+		}
+
+		smoke.rotAng = Random::GenerateAngle();
+		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+
+		smoke.scalar = 3;
+
+		if (isUnderwater)
+		{
+			smoke.gravity = 0;
+			smoke.maxYvel = 0;
+		}
+		else
+		{
+			smoke.gravity = Random::GenerateInt(-8, -4);
+			smoke.maxYvel = Random::GenerateInt(-8, -4);
+		}
+
+		int scale = Random::GenerateInt(128, 160);
+		smoke.size =
+		smoke.sSize = scale / 4;
+		smoke.dSize = scale;
+
+		scale += Random::GenerateInt(32, 64);
+		smoke.size =
+		smoke.sSize = scale / 8;
+		smoke.dSize = scale;
+		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	}
+
+	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
+	}
+
+	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
+	{
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
+	}
+
+	static bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
 	{
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (creature.Flags == 0 && (item.TestFlags(2, 1) || item.TestFlags(2, 2)))
+		if (creature.Flags == 0 && (item.TestFlagField(2, 1) || item.TestFlagField(2, 2)))
 		{
 			creature.Flags = 1;
 
 			if (isDead && item.ItemFlags[0] < 0)
 			{
-				item.SetFlags(2, 0);
+				item.SetFlagField(2, 0);
 			}
 			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
 			{
-				item.SetFlags(2, 0);
+				item.SetFlagField(2, 0);
 			}
 			else
 			{
@@ -150,17 +233,17 @@ namespace TEN::Entities::Creatures::TR3
 			creature.Flags--;
 		}
 
-		if (item.TestFlags(2, 0) && !isDead)
+		if (item.TestFlagField(2, 0) && !isDead)
 		{
 			item.Animation.TargetState = SHIVA_STATE_IDLE;
 			creature.Flags = -45;
-			item.SetFlags(1, 0);
-			item.SetFlags(1, 1); // Is alive (for savegame).
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 1); // Is alive (for savegame).
 		}
-		else if (item.TestFlags(2, 0) && isDead)
+		else if (item.TestFlagField(2, 0) && isDead)
 		{
-			item.SetFlags(1, 0);
-			item.SetFlags(1, 2); // Is dead.
+			item.SetFlagField(1, 0);
+			item.SetFlagField(1, 2); // Is dead.
 			return true;
 		}
 
@@ -177,15 +260,15 @@ namespace TEN::Entities::Creatures::TR3
 		item.Status &= ~ITEM_INVISIBLE;
 
 		// Joint index used for swapping mesh.
-		item.SetFlags(0, 0);
+		item.SetFlagField(0, 0);
 
-		if (item.TestFlags(1, 0))
+		if (item.TestFlagField(1, 0))
 		{
 			for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 				SwapShivaMeshToStone(item, jointIndex);
 
 			// Continue transition until finished.
-			item.SetFlags(2, 1);
+			item.SetFlagField(2, 1);
 		}
 	}
 
@@ -208,10 +291,10 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != SHIVA_STATE_DEATH)
 			{
 				SetAnimation(item, SHIVA_ANIM_DEATH);
-				item->ItemFlags[0] = object.nmeshes - 1;
+				item->SetFlagField(0, object.nmeshes - 1);
 
 				// Redo mesh swap to stone.
-				item->SetFlags(2, 2);
+				item->SetFlagField(2, 2);
 			}
 
 			int frameEnd = g_Level.Anims[object.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
@@ -232,6 +315,7 @@ namespace TEN::Entities::Creatures::TR3
 			GetCreatureMood(item, &ai, true);
 			CreatureMood(item, &ai, true);
 
+			// Shiva don't resent fear.
 			if (creature->Mood == MoodType::Escape)
 			{
 				creature->Target.x = creature->Enemy->Pose.Position.x;
@@ -463,107 +547,24 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
+		if (!pos.has_value())
+			return;
+
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
 		// If guarded, ricochet without damage.
 		if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
-			target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE) && pos.has_value())
+			 target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE))
 		{
 			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 		}
 		// Do basic hit effect.
-		else if (object.hitEffect == HitEffect::Blood && pos.has_value())
+		else if (object.hitEffect == HitEffect::Blood)
 		{
-			DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 			DoItemHit(&target, damage, isExplosive);
 		}
-	}
-
-	void SpawnShivaSmoke(const Vector3& pos, int roomNumber)
-	{
-		auto& smoke = *GetFreeParticle();
-
-		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, Vector3i(pos), roomNumber);
-		auto sphere = BoundingSphere(pos, 16);
-		auto randPos = Random::GeneratePointInSphere(sphere);
-
-		if (isUnderwater)
-		{
-			smoke.sR = 144;
-			smoke.sG = 144;
-			smoke.sB = 144;
-			smoke.dR = 64;
-			smoke.dG = 64;
-			smoke.dB = 64;
-		}
-		else
-		{
-			smoke.sR = 0;
-			smoke.sG = 0;
-			smoke.sB = 0;
-			smoke.dR = 192;
-			smoke.dG = 192;
-			smoke.dB = 208;
-		}
-
-		smoke.colFadeSpeed = 8;
-		smoke.fadeToBlack = 64;
-		smoke.sLife =
-		smoke.life = Random::GenerateInt(96, 128);
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		smoke.extras = 0;
-		smoke.dynamic = -1;
-
-		smoke.x = randPos.x;
-		smoke.y = randPos.y;
-		smoke.z = randPos.z;
-		smoke.xVel = ((GetRandomControl() & 4095) - 2048) / 4;
-		smoke.yVel = (GetRandomControl() & 255) - 128;
-		smoke.zVel = ((GetRandomControl() & 4095) - 2048) / 4;
-
-		if (isUnderwater)
-		{
-			smoke.yVel /= 16;
-			smoke.y += 32;
-			smoke.friction = 4 | (16);
-		}
-		else
-		{
-			smoke.friction = 6;
-		}
-
-		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		smoke.rotAng = GetRandomControl() & 4095;
-
-		if (Random::TestProbability(1 / 2.0f))
-			smoke.rotAdd = -(GetRandomControl() & 15) - 16;
-		else
-			smoke.rotAdd = (GetRandomControl() & 15) + 16;
-
-		smoke.scalar = 3;
-
-		if (isUnderwater)
-		{
-			smoke.gravity =
-			smoke.maxYvel = 0;
-		}
-		else
-		{
-			smoke.gravity = -(GetRandomControl() & 3) - 3;
-			smoke.maxYvel = -(GetRandomControl() & 3) - 4;
-		}
-
-		int size = (GetRandomControl() & 31) + 128;
-		smoke.size =
-		smoke.sSize = size / 4;
-		smoke.dSize = size;
-
-		size += (GetRandomControl() & 31) + 32;
-		smoke.size =
-		smoke.sSize = size / 8;
-		smoke.dSize = size;
-		smoke.on = true;
 	}
 }
