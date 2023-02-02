@@ -210,10 +210,11 @@ namespace TEN::Entities::Creatures::TR3
 				case TIGER_STATE_POUNCE_ATTACK:
 					if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
 					{
-						if	(item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_BITE_ATTACK) &&
-							 item->Animation.FrameNumber > GetFrameNumber(item, 4) ||
-							 item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_POUNCE_ATTACK_START) &&
-							 item->Animation.FrameNumber > GetFrameNumber(item, 12))
+						if	( (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_BITE_ATTACK) &&
+							   item->Animation.FrameNumber > GetFrameNumber(item,  4) ) ||
+							  (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_POUNCE_ATTACK_START) &&
+							   item->Animation.FrameNumber > GetFrameNumber(item, 12) )
+							)
 						{
 							DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
 							CreatureEffect(item, TigerBite, DoBloodSplat);
