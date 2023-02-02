@@ -40,6 +40,7 @@ namespace TEN::Renderer
 			{
 				room->Doors[j].Visited = false;
 				room->Doors[j].InvisibleFromCamera = false;
+				room->Doors[j].DotProduct = FLT_MAX;
 			}
 		}
 
@@ -235,9 +236,16 @@ namespace TEN::Renderer
 			// IMPORTANT: dot = 0 would generate ambiguity becase door could be traversed in both directions, potentially 
 			// generating endless loops. We need to exclude this.
 
-			if (door->Normal.x * door->CameraToDoor.x +
-				door->Normal.y * door->CameraToDoor.y +
-				door->Normal.z * door->CameraToDoor.z <= 0)
+			if (door->DotProduct == FLT_MAX)
+			{
+				door->DotProduct = 
+					door->Normal.x * door->CameraToDoor.x +
+					door->Normal.y * door->CameraToDoor.y +
+					door->Normal.z * door->CameraToDoor.z;
+				m_dotProducts++;
+			}
+
+			if (door->DotProduct <= 0)
 			{
 				door->InvisibleFromCamera = true;
 				continue;

@@ -432,7 +432,6 @@ namespace TEN::Renderer
 		int m_numMoveablesDrawCalls = 0;
 		int m_numStaticsDrawCalls = 0;
 		int m_numSpritesDrawCalls = 0;
-		int m_numInstancedSpritesDrawCalls = 0;
 		int m_numTransparentDrawCalls = 0;
 		int m_numRoomsTransparentDrawCalls = 0;
 		int m_numMoveablesTransparentDrawCalls = 0;
@@ -442,6 +441,7 @@ namespace TEN::Renderer
 		int m_numRoomsTransparentPolygons;
 		int m_numPolygons = 0;
 		int m_currentY;
+		int m_dotProducts = 0;
 
 		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
 
