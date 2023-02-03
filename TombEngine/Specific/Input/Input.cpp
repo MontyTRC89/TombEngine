@@ -217,17 +217,13 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			if (ActionQueue[i] != QueueState::None)
-			{
-				if (ActionQueue[i] == QueueState::Push)
-				{
-					ActionMap[i].Update(true);
-				}
-				else
-				{
-					ActionMap[i].Clear();
-				}
-			}
+			if (ActionQueue[i] == QueueState::None)
+				continue;
+
+			if (ActionQueue[i] == QueueState::Push)
+				ActionMap[i].Update(true);
+			else
+				ActionMap[i].Clear();
 		}
 	}
 

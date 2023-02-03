@@ -365,16 +365,14 @@ namespace TEN::Renderer
 	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
 		if (sphereRadius == 0.0f)
+		{
 			return box.Contains(sphereCentre);
+		}
 		else
 		{
 			BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
 			return box.Intersects(sphere);
 		}
-	}
-
-	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone)
-	{
 	}
 
 	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
@@ -405,31 +403,6 @@ namespace TEN::Renderer
 	RendererMesh* Renderer11::GetMesh(int meshIndex)
 	{
 		return m_meshes[meshIndex];
-	}
-
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex)
-	{
-		auto* rendererItem = &m_items[itemNumber];
-		auto* nativeItem = &g_Level.Items[itemNumber];
-
-		rendererItem->ItemNumber = itemNumber;
-
-		if (!rendererItem)
-			return;
-
-		if (!rendererItem->DoneAnimations)
-		{
-			if (itemNumber == Lara.ItemNumber)
-				UpdateLaraAnimations(false);
-			else
-				UpdateItemAnimations(itemNumber, false);
-		}
-
-		if (jointIndex >= MAX_BONES)
-			jointIndex = 0;
-
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
-		pos = Vector3::Transform(pos, world);
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
@@ -531,5 +504,49 @@ namespace TEN::Renderer
 			return vp;
 
 		return s;
+	}
+
+	Vector2 Renderer11::GetScreenResolution() const
+	{
+		return Vector2(m_screenWidth, m_screenHeight);
+	}
+
+	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
+	{
+		auto* rendererItem = &m_items[itemNumber];
+
+		rendererItem->ItemNumber = itemNumber;
+
+		if (!rendererItem)
+			return Vector3::Zero;
+
+		if (!rendererItem->DoneAnimations)
+		{
+			if (itemNumber == Lara.ItemNumber)
+				UpdateLaraAnimations(false);
+			else
+				UpdateItemAnimations(itemNumber, false);
+		}
+
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
+
+		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		return Vector3::Transform(relOffset, world);
+	}
+
+	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	{
+		// Calculate clip space coords.
+		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
+		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+
+		// Calculate normalized device coords.
+		point /= point.w;
+
+		// Return 2D screen space coords.
+		return Vector2(
+			((point.x + 1.0f) * m_screenWidth) / 2,
+			((1.0f - point.y) * m_screenHeight) / 2);
 	}
 }

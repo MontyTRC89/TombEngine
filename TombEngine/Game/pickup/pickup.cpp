@@ -7,8 +7,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/effects/debris.h"
 #include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
-#include "Game/health.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_flare.h"
@@ -31,6 +31,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 
 static auto PickUpPosition = Vector3i(0, 0, -100);
@@ -215,7 +216,7 @@ void CollectCarriedItems(ItemInfo* item)
 	{
 		auto* pickupItem = &g_Level.Items[pickupNumber];
 
-		AddDisplayPickup(pickupItem->ObjectNumber);
+		g_Hud.PickupSummaryControl.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 		KillItem(pickupNumber);
 
 		pickupNumber = pickupItem->CarriedItem;
@@ -239,7 +240,7 @@ void CollectMultiplePickups(int itemNumber)
 		if (!Objects[currentItem->ObjectNumber].isPickup)
 			continue;
 
-		AddDisplayPickup(currentItem->ObjectNumber);
+		g_Hud.PickupSummaryControl.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
 		if (currentItem->TriggerFlags & 0x100)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
@@ -281,7 +282,7 @@ void DoPickup(ItemInfo* laraItem)
 
 	if (pickupItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
 	{
-		AddDisplayPickup(ID_BURNING_TORCH_ITEM);
+		g_Hud.PickupSummaryControl.AddDisplayPickup(ID_BURNING_TORCH_ITEM, pickupItem->Pose.Position.ToVector3());
 		GetFlameTorch();
 		lara->Torch.IsLit = (pickupItem->ItemFlags[3] & 1);
 
@@ -322,7 +323,7 @@ void DoPickup(ItemInfo* laraItem)
 	{
 		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
 		{
-			AddDisplayPickup(pickupItem->ObjectNumber);
+			g_Hud.PickupSummaryControl.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 			if (!(pickupItem->TriggerFlags & 0xC0))
 				KillItem(pickupItemNumber);
 			else
@@ -340,7 +341,7 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			if (laraItem->Animation.AnimNumber == LA_CROWBAR_PRY_WALL_SLOW)
 			{
-				AddDisplayPickup(ID_CROWBAR_ITEM);
+				g_Hud.PickupSummaryControl.AddDisplayPickup(ID_CROWBAR_ITEM, pickupItem->Pose.Position.ToVector3());
 				lara->Inventory.HasCrowbar = true;
 				KillItem(pickupItemNumber);
 			}
@@ -355,7 +356,7 @@ void DoPickup(ItemInfo* laraItem)
 					return;
 				}
 
-				AddDisplayPickup(pickupItem->ObjectNumber);
+				g_Hud.PickupSummaryControl.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 				if (pickupItem->TriggerFlags & 0x100)
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
@@ -1249,9 +1250,13 @@ void SearchObjectControl(short itemNumber)
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
 	{
 		if (frameNumber == 18)
+		{
 			item->MeshBits = 1;
+		}
 		else if (frameNumber == 172)
+		{
 			item->MeshBits = 2;
+		}
 	}
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT4)
 	{
@@ -1284,7 +1289,7 @@ void SearchObjectControl(short itemNumber)
 
 				if (Objects[item2->ObjectNumber].isPickup)
 				{
-					AddDisplayPickup(item2->ObjectNumber);
+					g_Hud.PickupSummaryControl.AddDisplayPickup(item2->ObjectNumber, item2->Pose.Position.ToVector3());
 					KillItem(item->ItemFlags[1]);
 				}
 				else
@@ -1299,7 +1304,9 @@ void SearchObjectControl(short itemNumber)
 			}
 		}
 		else
+		{
 			CollectCarriedItems(item);
+		}
 	}
 
 	

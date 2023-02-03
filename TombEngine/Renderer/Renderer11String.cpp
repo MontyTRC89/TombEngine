@@ -9,7 +9,7 @@ namespace TEN::Renderer
 		if (m_Locked)
 			return;
 
-		if (string == NULL)
+		if (string == nullptr)
 			return;
 
 		try

@@ -3,6 +3,10 @@
 
 #include <codecvt>
 
+#include "Renderer/Renderer11.h"
+
+using TEN::Renderer::g_Renderer;
+
 namespace TEN::Utils
 {
 	std::string ToUpper(std::string source)
@@ -111,5 +115,10 @@ namespace TEN::Utils
                 HIWORD(info->dwFileVersionLS),
                 LOWORD(info->dwFileVersionLS)
             };
+    }
+
+    Vector2 Get2DScreenPosition(const Vector3& pos)
+    {
+        return g_Renderer.GetScreenSpacePosition(pos);
     }
 }

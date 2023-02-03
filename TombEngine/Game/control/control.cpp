@@ -23,11 +23,11 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/health.h"
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
@@ -66,6 +66,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -211,9 +212,10 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 
-		// Update screen UI and overlays.
+		// Update HUD.
 		UpdateBars(LaraItem);
 		UpdateFadeScreenAndCinematicBars();
+		g_Hud.Update();
 
 		// Rumble screen (like in submarine level of TRC).
 		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
@@ -283,7 +285,6 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	InitialiseFXArray(true);
-	InitialisePickupDisplay();
 	InitialiseCamera();
 	InitialiseSpotCamSequences(isTitle);
 	InitialiseHair();
@@ -408,6 +409,9 @@ void CleanUp()
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
+
+	// Clear HUD.
+	g_Hud.Clear();
 
 	// Clear soundtrack masks.
 	ClearSoundTrackMasks();
