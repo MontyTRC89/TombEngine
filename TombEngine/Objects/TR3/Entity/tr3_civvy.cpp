@@ -45,7 +45,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
 	{
-		ID_CIVVIE,
+		ID_CIVVY,
 		ID_VON_CROY,
 		ID_GUIDE,
 		ID_MONK1,
