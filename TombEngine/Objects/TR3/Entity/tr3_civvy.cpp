@@ -116,6 +116,8 @@ namespace TEN::Entities::Creatures::TR3
 		SetAnimation(item, CIVVY_ANIM_IDLE);
 	}
 
+
+	//In the future, if this function works, it could be taken to a more neutral place to be reused by other ally entities.
 	ItemInfo* CivvyFindNearTarget(short itemNumber, std::vector<GAME_OBJECT_ID>& excludedTargetList, int rangeDetection)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -135,10 +137,6 @@ namespace TEN::Entities::Creatures::TR3
 
 			//Ignore if it's itself, or a non valid Item.
 			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == itemNumber)
-				continue;
-
-			//Ignore if it's Lara, but was not hurt by her.
-			if (g_Level.Items[targetCreature->ItemNumber].IsLara() && !creature.HurtByLara)
 				continue;
 
 			//Ignore if it's an entity from the Excluded Targets lists.
