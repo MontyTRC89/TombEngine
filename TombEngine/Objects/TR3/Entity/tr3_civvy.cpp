@@ -36,7 +36,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	#define CIVVY_WALK_TURN_RATE_MAX ANGLE(5.0f)
 	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
-	#define CIVVY_AIM_TURN_RATE_MAX	 ANGLE(10.0f)
+	#define CIVVY_AIM_TURN_RATE_MAX	 ANGLE(8.0f)
 
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR3
 		SetAnimation(item, CIVVY_ANIM_IDLE);
 	}
 
-	ItemInfo* CivvyFindNearTarget(short itemNumber, int RangeDetection)
+	ItemInfo* CivvyFindNearTarget(short itemNumber, std::vector<GAME_OBJECT_ID>& excludedTargetList, int rangeDetection)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR3
 		Vector3 distanceVector;
 		float distanceValue;
 		auto* targetCreature = ActiveCreatures[0];
-		float MaxRange = RangeDetection <= 0 ? FLT_MAX : RangeDetection;
+		float MaxRange = rangeDetection <= 0 ? FLT_MAX : rangeDetection;
 
 		for (int i = 0; i < ActiveCreatures.size(); i++)
 		{
@@ -144,7 +144,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			//Ignore if it's an entity from the Excluded Targets lists.
 			bool forbiddenTarget = false;
-			for (std::vector<GAME_OBJECT_ID>::iterator it = CivvyExcludedTargets.begin(); it != CivvyExcludedTargets.end(); ++it)
+			for (std::vector<GAME_OBJECT_ID>::iterator it = excludedTargetList.begin(); it != excludedTargetList.end(); ++it)
 			{
 				if (g_Level.Items[targetCreature->ItemNumber].ObjectNumber == *it)
 					forbiddenTarget = true;
@@ -194,14 +194,13 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (item.Animation.ActiveState != CIVVY_STATE_DEATH)
 				SetAnimation(&item, CIVVY_ANIM_DEATH);
-				//creature.LOT.Step = CLICK(1); //I don't know what is this for.
 		}
 		else
 		{
 			if (item.AIBits)
 				GetAITarget(&creature);
 			else
-				creature.Enemy = CivvyFindNearTarget(itemNumber, 0);
+				creature.Enemy = CivvyFindNearTarget(itemNumber, CivvyExcludedTargets, 0);
 
 			AI_INFO AI;
 			CreatureAIInfo(&item, &AI);
@@ -294,7 +293,7 @@ namespace TEN::Entities::Creatures::TR3
 						else
 							item.Animation.TargetState = CIVVY_STATE_WAIT;
 					}
-					else if (AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE)
+					else if (creature.Enemy->HitPoints > 0 && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_CLOSE_PUNCH;
 					else if (AI.bite && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_FAR_PUNCH;
@@ -321,7 +320,7 @@ namespace TEN::Entities::Creatures::TR3
 						if (TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_WAIT;
 					}
-					else if (AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY)
+					else if (creature.Enemy->HitPoints > 0 && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY)
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if (AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_WALKING_PUNCH;
