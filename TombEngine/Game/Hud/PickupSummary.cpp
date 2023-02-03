@@ -2,15 +2,12 @@
 #include "Game/Hud/PickupSummary.h"
 
 #include "Game/effects/effects.h"
-#include "Game/Gui.h"
 #include "Math/Math.h"
-#include "Objects/game_object_ids.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
 #include "Specific/trutils.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Gui;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
