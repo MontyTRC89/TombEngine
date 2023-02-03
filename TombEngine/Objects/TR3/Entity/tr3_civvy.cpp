@@ -30,7 +30,6 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(1));
 
 	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
-	constexpr auto CIVVY_STATE_WALK_CHANCE = 0.008f; // Unused.
 
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
@@ -439,7 +438,6 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
-							TENLog("CLOSE PUNCH", LogLevel::Info, LogConfig::All, true);
 						}
 					}
 
@@ -477,7 +475,6 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
-							TENLog("FAR PUNCH", LogLevel::Info, LogConfig::All, true);
 						}
 					}
 
@@ -518,7 +515,6 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
-							TENLog("WALKING PUNCH", LogLevel::Info, LogConfig::All, true);
 						}
 					}
 
@@ -548,16 +544,6 @@ namespace TEN::Entities::Creatures::TR3
 			case 4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, CIVVY_ANIM_CLIMB_4CLICKS);
-				break;
-
-			case -2:
-				creature.MaxTurn = 0;
-				SetAnimation(&item, CIVVY_ANIM_FALL_4CLICKS);
-				break;
-
-			case -3:
-				creature.MaxTurn = 0;
-				SetAnimation(&item, CIVVY_ANIM_FALL_4CLICKS);
 				break;
 
 			case -4:
