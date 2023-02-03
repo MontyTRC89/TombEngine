@@ -1302,6 +1302,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawEffects(RenderView& view, bool transparent) 
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -1325,6 +1328,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 

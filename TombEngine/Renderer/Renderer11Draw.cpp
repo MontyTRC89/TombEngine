@@ -498,6 +498,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRats(RenderView& view)
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -550,6 +553,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBats(RenderView& view)
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -602,6 +608,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawScarabs(RenderView& view)
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -654,6 +663,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLocusts(RenderView& view)
 	{
+		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
+		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
