@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_civvy.h"
 
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
@@ -21,13 +22,13 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE  = 50;
 
-	constexpr auto CIVVY_ATTACK_PUNCH1_RANGE = SQUARE(BLOCK(1));
-	constexpr auto CIVVY_ATTACK_PUNCH2_RANGE = SQUARE(BLOCK(0.5));
-	constexpr auto CIVVY_ATTACK_PUNCH3_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto CIVVY_ATTACK_PUNCH1_RANGE = SQUARE(BLOCK(0.75f));
+	constexpr auto CIVVY_ATTACK_PUNCH2_RANGE = SQUARE(BLOCK(0.45f));
+	constexpr auto CIVVY_ATTACK_PUNCH3_RANGE = SQUARE(BLOCK(0.70f));
 	
-	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(SECTOR(1));
-	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(SECTOR(3));
-	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(SECTOR(1));
+	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(2));
+	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(5));
+	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(1));
 
 	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
 	constexpr auto CIVVY_STATE_WALK_CHANCE = 0.008f; // Unused.
@@ -37,8 +38,19 @@ namespace TEN::Entities::Creatures::TR3
 	#define CIVVY_WALK_TURN_RATE_MAX ANGLE(5.0f)
 	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
 
+	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
+
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
 	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
+
+	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
+	{
+		ID_CIVVIE,
+		ID_VON_CROY,
+		ID_GUIDE,
+		ID_MONK1,
+		ID_MONK2
+	};
 
 	enum CivvyState
 	{
@@ -48,8 +60,8 @@ namespace TEN::Entities::Creatures::TR3
 		CIVVY_STATE_ATTACK_PUNCH1 = 3, //Punch while walking
 		CIVVY_STATE_AIM_PUNCH1 = 4,
 		CIVVY_STATE_WAIT = 5,
-		CIVVY_STATE_AIM_PUNCH3 = 6, //Punch while Idle
-		CIVVY_STATE_AIM_PUNCH2 = 7, //Punch from Idle to walk
+		CIVVY_STATE_AIM_PUNCH3 = 6, //Punch from Idle to walk
+		CIVVY_STATE_AIM_PUNCH2 = 7, //Punch while Idle
 		CIVVY_STATE_ATTACK_PUNCH3 = 8,
 		CIVVY_STATE_ATTACK_PUNCH2 = 9,
 		CIVVY_STATE_RUN = 10,
@@ -104,6 +116,55 @@ namespace TEN::Entities::Creatures::TR3
 		SetAnimation(item, CIVVY_ANIM_IDLE);
 	}
 
+	ItemInfo* CivvyFindNearTarget(short itemNumber, int RangeDetection)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
+
+		ItemInfo* result = nullptr;
+
+		auto closetsDistance = FLT_MAX;
+		Vector3 distanceVector;
+		float distanceValue;
+		auto* targetCreature = ActiveCreatures[0];
+		float MaxRange = RangeDetection <= 0 ? FLT_MAX : RangeDetection;
+
+		for (int i = 0; i < ActiveCreatures.size(); i++)
+		{
+			targetCreature = ActiveCreatures[i];
+
+			//If it's itself, or a non valid Item.
+			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == itemNumber)
+				continue;
+
+			//If it's Lara, but was not hurt by her, ignore her.
+			if (g_Level.Items[targetCreature->ItemNumber].IsLara() && !creature.HurtByLara)
+				continue;
+
+			//If it's an entity from the Excluded Targets lists, don't count them.
+			bool forbiddenTarget = false;
+			for (std::vector<GAME_OBJECT_ID>::iterator it = CivvyExcludedTargets.begin(); it != CivvyExcludedTargets.end(); ++it)
+			{
+				if (g_Level.Items[targetCreature->ItemNumber].ObjectNumber == *it)
+					forbiddenTarget = true;
+			}
+			if (forbiddenTarget)
+				continue;
+
+			//If it's closer than other entity, choose this one.
+			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
+
+			distanceValue = Vector3i::Distance(item.Pose.Position, currentItem.Pose.Position);
+
+			if (distanceValue < closetsDistance && distanceValue < MaxRange)
+			{
+				closetsDistance = distanceValue;
+				result = &currentItem;
+			}
+		}
+		return result;
+	}
+
 	void CivvyControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -127,17 +188,15 @@ namespace TEN::Entities::Creatures::TR3
 		if (item.HitPoints <= 0)
 		{
 			if (item.Animation.ActiveState != CIVVY_STATE_DEATH)
-			{
 				SetAnimation(&item, CIVVY_ANIM_DEATH);
-				//creature.LOT.Step = CLICK(1);
-			}
+				//creature.LOT.Step = CLICK(1); //I don't know what is this for.
 		}
 		else
 		{
 			if (item.AIBits)
 				GetAITarget(&creature);
 			else
-				creature.Enemy = LaraItem;
+				creature.Enemy = CivvyFindNearTarget(itemNumber, 0);
 
 			AI_INFO AI;
 			CreatureAIInfo(&item, &AI);
@@ -153,13 +212,17 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				int laraDx = LaraItem->Pose.Position.x - item.Pose.Position.x;
-				int laraDz = LaraItem->Pose.Position.z - item.Pose.Position.z;
-				targetAI.angle = phd_atan(laraDz, laraDx) - item.Pose.Orientation.y;
-				targetAI.distance = SQUARE(laraDx) + SQUARE(laraDz);
+				int targetDx = creature.Enemy->Pose.Position.x - item.Pose.Position.x;
+				int targetDz = creature.Enemy->Pose.Position.z - item.Pose.Position.z;
+				targetAI.angle = phd_atan(targetDz, targetDx) - item.Pose.Orientation.y;
+				targetAI.distance = SQUARE(targetDx) + SQUARE(targetDz);
 			}
 
-			GetCreatureMood(&item, &AI, true);
+			//If Lara was placed by system, not because she were a real target. Then delete the target.
+			if (!creature.HurtByLara && creature.Enemy->IsLara())
+				creature.Enemy = nullptr;
+
+			GetCreatureMood(&item, &AI, false);
 
 			if (creature.Enemy == LaraItem &&
 				AI.distance > CIVVY_ESCAPE_RANGE &&
@@ -169,7 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.Mood = MoodType::Escape;
 			}
 
-			CreatureMood(&item, &AI, true);
+			CreatureMood(&item, &AI, false);
 
 			angle = CreatureTurn(&item, creature.MaxTurn);
 
@@ -255,12 +318,14 @@ namespace TEN::Entities::Creatures::TR3
 						if (TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_WAIT;
 					}
-					else if (AI.bite && AI.distance < CIVVY_ATTACK_PUNCH2_RANGE)
+					else if (AI.bite && AI.distance < CIVVY_ATTACK_PUNCH2_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY)
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if (AI.bite && AI.distance < CIVVY_ATTACK_PUNCH1_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_PUNCH1;
-					else
+					else if (AI.distance > CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_RUN;
+					else
+						item.Animation.TargetState = CIVVY_STATE_WALK;
 
 					break;
 
@@ -277,18 +342,14 @@ namespace TEN::Entities::Creatures::TR3
 						jointHeadRot.y = AI.angle;
 
 					if (item.AIBits & GUARD)
-						item.Animation.TargetState = CIVVY_STATE_WAIT; //This State change is not in the vanilla object.
-					else if (creature.Mood == MoodType::Escape)
-					{
-						if (Lara.TargetEntity != &item && AI.ahead)
-							item.Animation.TargetState = CIVVY_STATE_IDLE;
-						break;
-					}
+						item.Animation.TargetState = CIVVY_STATE_WAIT;
+					//else if (creature.Mood == MoodType::Escape && Lara.TargetEntity != &item && AI.ahead)
+						//item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if ((item.AIBits & FOLLOW) && (creature.ReachedGoal || targetAI.distance > SQUARE(SECTOR(2))))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if (creature.Mood == MoodType::Bored)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
-					else if (AI.ahead && AI.distance < CIVVY_WALK_RANGE)
+					else if (AI.ahead && AI.distance <= CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
 
 					break;
@@ -380,8 +441,8 @@ namespace TEN::Entities::Creatures::TR3
 						creature.Flags = 1;
 					}
 
-					if (AI.ahead && AI.distance > CIVVY_ATTACK_PUNCH3_RANGE && AI.distance < CIVVY_ATTACK_PUNCH1_RANGE)
-						item.Animation.TargetState = CIVVY_STATE_ATTACK_PUNCH1;
+					if (AI.ahead && AI.distance > CIVVY_ATTACK_PUNCH3_RANGE)
+						item.Animation.TargetState = CIVVY_STATE_WALK;
 
 					break;
 
@@ -428,6 +489,16 @@ namespace TEN::Entities::Creatures::TR3
 			case 4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, CIVVY_ANIM_CLIMB_4CLICKS);
+				break;
+
+			case -2:
+				creature.MaxTurn = 0;
+				SetAnimation(&item, CIVVY_ANIM_FALL_4CLICKS);
+				break;
+
+			case -3:
+				creature.MaxTurn = 0;
+				SetAnimation(&item, CIVVY_ANIM_FALL_4CLICKS);
 				break;
 
 			case -4:
