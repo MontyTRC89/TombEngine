@@ -100,6 +100,15 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+float3 UnpackNormalMap(float3 compressedNormalMap)
+{
+	float2 normalXY = compressedNormalMap.rg;
+
+	normalXY = normalXY * float2(2.0f, 2.0f) - float2(1.0f, 1.0f);
+	float normalZ = sqrt(saturate(1.0f - dot(normalXY, normalXY)));
+	return float3(normalXY.xy, normalZ);
+}
+
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
@@ -108,9 +117,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 	DoAlphaTest(output.Color);
 
-	float3 Normal = NormalTexture.Sample(Sampler, input.UV).rgb;
-	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal, input.TBN));
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(Sampler, input.UV).rgb);
+	normal = normalize(mul(normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -144,7 +152,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 				continue;
 
 			lightVec = normalize(lightVec);
-			float d = saturate(dot(Normal, -lightVec ));
+			float d = saturate(dot(normal, -lightVec ));
 			if (d < 0)
 				continue;
 			
@@ -157,8 +165,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	if (Caustics)
 	{
 		float3 position = input.WorldPosition.xyz;
-		float3 normal = Normal;
-
+		
 		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
 		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
