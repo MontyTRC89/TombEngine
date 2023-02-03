@@ -42,7 +42,7 @@ namespace TEN::Hud
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		const	  auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
 
-		if (this->IsOffscreen())
+		if (this->IsOffscreen(false))
 			return;
 
 		// Update position, scale, and opacity.
