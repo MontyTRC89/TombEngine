@@ -686,9 +686,9 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 
-		Vector2 GetScreenResolution() const;
-		Vector3 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
-		Vector2 GetScreenSpacePosition(const Vector3& pos) const;
+		Vector2i GetScreenResolution() const;
+		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
+		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 	};
 
 	extern Renderer11 g_Renderer;

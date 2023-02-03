@@ -506,11 +506,6 @@ namespace TEN::Renderer
 		return s;
 	}
 
-	Vector2 Renderer11::GetScreenResolution() const
-	{
-		return Vector2(m_screenWidth, m_screenHeight);
-	}
-
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
 		auto* rendererItem = &m_items[itemNumber];
@@ -533,6 +528,11 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	Vector2i Renderer11::GetScreenResolution() const
+	{
+		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
 	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const

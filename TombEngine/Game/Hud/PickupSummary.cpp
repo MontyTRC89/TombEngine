@@ -18,7 +18,7 @@ namespace TEN::Hud
 
 	bool DisplayPickup::IsOffscreen(bool checkAbove) const
 	{
-		auto screenRes = g_Renderer.GetScreenResolution();
+		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		auto threshold = screenRes * 0.1f;
 
 		// NOTE: Positions above screen can be ignored to account for high stacks.
@@ -68,7 +68,7 @@ namespace TEN::Hud
 		else if (isHead)
 		{
 			// TODO: Use easing function.
-			auto screenRes = g_Renderer.GetScreenResolution();
+			auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 			auto hideVelocity = Vector2(screenRes.x * HIDE_VELOCITY_COEFF, 0.0f);
 			this->Position += hideVelocity;
 		}
@@ -177,7 +177,7 @@ namespace TEN::Hud
 		constexpr auto OFFSET_COEFF		= 1 / 7.0f;
 
 		// Determine screen values.
-		auto screenRes = g_Renderer.GetScreenResolution();
+		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		auto scale = screenRes * SCALE_COEFF;
 		auto offset = -(screenRes * OFFSET_COEFF);
 
