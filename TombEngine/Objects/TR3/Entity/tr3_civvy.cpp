@@ -19,7 +19,6 @@ using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE  = 50;
 
 	constexpr auto CIVVY_ATTACK_PUNCH1_RANGE = SQUARE(BLOCK(0.75f));
@@ -40,7 +39,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 
-	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
+	const auto CivvyBiteRight = BiteInfo(Vector3::Zero, 13);
+	const auto CivvyBiteLeft = BiteInfo(Vector3::Zero, 10);
 	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
 
 	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
@@ -176,6 +176,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
+		bool doDamageFlag = false;
 		auto jointHeadRot = EulerAngles::Zero;
 		auto jointTorsoRot = EulerAngles::Zero;
 
@@ -414,12 +415,30 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (!creature.Flags && item.TouchBits.Test(CivvyAttackJoints))
+					doDamageFlag = false;
+
+					if (creature.Flags == 0 &&
+						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_PUNCH2_ATTACK))
 					{
-						CreatureEffect(&item, CivvyBite, DoBloodSplat);
-						DoDamage(creature.Enemy, CIVVY_ATTACK_DAMAGE);
-						SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
-						creature.Flags = 1;
+						if (creature.Enemy->IsLara())
+						{
+							if (item.TouchBits.Test(CivvyAttackJoints))
+								doDamageFlag = true;
+						}
+						else
+						{
+							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
+							if (distance <= CLICK(2))
+								doDamageFlag = true;
+						}
+
+						if (doDamageFlag)
+						{
+							DoDamage(creature.Enemy, CIVVY_SWIPE_DAMAGE);
+							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
+							creature.Flags = 1;
+						}
 					}
 
 					break;
@@ -433,12 +452,30 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (!creature.Flags && item.TouchBits.Test(CivvyAttackJoints))
+					doDamageFlag = false;
+
+					if (creature.Flags == 0 &&
+						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_PUNCH3_ATTACK))
 					{
-						CreatureEffect(&item, CivvyBite, DoBloodSplat);
-						DoDamage(creature.Enemy, CIVVY_ATTACK_DAMAGE);
-						SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
-						creature.Flags = 1;
+						if (creature.Enemy->IsLara())
+						{
+							if (item.TouchBits.Test(CivvyAttackJoints))
+								doDamageFlag = true;
+						}
+						else
+						{
+							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
+							if (distance <= CLICK(2))
+								doDamageFlag = true;
+						}
+
+						if (doDamageFlag)
+						{
+							DoDamage(creature.Enemy, CIVVY_SWIPE_DAMAGE);
+							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
+							creature.Flags = 1;
+						}
 					}
 
 					if (AI.ahead && AI.distance > CIVVY_ATTACK_PUNCH3_RANGE)
@@ -455,12 +492,30 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (creature.Flags != 2 && item.TouchBits.Test(CivvyAttackJoints))
+					doDamageFlag = false;
+
+					if (creature.Flags == 0 &&
+						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_PUNCH1_ATTACK))
 					{
-						DoDamage(creature.Enemy, CIVVY_SWIPE_DAMAGE);
-						CreatureEffect(&item, CivvyBite, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
-						creature.Flags = 2;
+						if (creature.Enemy->IsLara())
+						{
+							if (item.TouchBits.Test(CivvyAttackJoints))
+								doDamageFlag = true;
+						}
+						else
+						{
+							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
+							if (distance <= CLICK(2))
+								doDamageFlag = true;
+						}
+
+						if (doDamageFlag)
+						{
+							DoDamage(creature.Enemy, CIVVY_SWIPE_DAMAGE);
+							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
+							creature.Flags = 1;
+						}
 					}
 
 					break;
