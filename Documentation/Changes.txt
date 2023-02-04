@@ -10,6 +10,7 @@ Version 1.0.7
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
+* Improve behaviour of Tiger and Lion enemies. 
 
 
 * Fix Valve switch unable to untrigger objects.
