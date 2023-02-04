@@ -43,26 +43,26 @@ namespace TEN::Utils
         return std::wstring(buffer);
     }
 
-	std::vector<std::string> SplitString(const std::string& source)
+	std::vector<std::string> SplitString(const std::string& string)
 	{
         auto strings = std::vector<std::string>{};
 
 		// String is single line; exit early.
-		if (source.find('\n') == std::string::npos)
+		if (string.find('\n') == std::string::npos)
 		{
-			strings.push_back(source);
+			strings.push_back(string);
 			return strings;
 		}
 
 		std::string::size_type pos = 0;
 		std::string::size_type prev = 0;
-		while ((pos = source.find('\n', prev)) != std::string::npos)
+		while ((pos = string.find('\n', prev)) != std::string::npos)
 		{
-			strings.push_back(source.substr(prev, pos - prev));
+			strings.push_back(string.substr(prev, pos - prev));
 			prev = pos + 1;
 		}
 
-		strings.push_back(source.substr(prev));
+		strings.push_back(string.substr(prev));
 		return strings;
 	}
 
