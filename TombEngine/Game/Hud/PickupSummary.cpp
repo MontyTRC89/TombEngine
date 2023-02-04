@@ -5,11 +5,9 @@
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
-#include "Specific/trutils.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
@@ -111,7 +109,7 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = GetNewDisplayPickup();
 
-		auto screenPos = Get2DScreenPosition(pos);
+		auto screenPos = g_Renderer.GetScreenSpacePosition(pos);
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;

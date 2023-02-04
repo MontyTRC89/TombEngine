@@ -11,6 +11,4 @@ namespace TEN::Utils
 	std::vector<std::string> SplitString(const std::string& string);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
-
-	Vector2 Get2DScreenPosition(const Vector3& pos);
 }

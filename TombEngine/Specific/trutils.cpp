@@ -128,9 +128,4 @@ namespace TEN::Utils
             };
         }
     }
-
-    Vector2 Get2DScreenPosition(const Vector3& pos)
-    {
-        return g_Renderer.GetScreenSpacePosition(pos);
-    }
 }
