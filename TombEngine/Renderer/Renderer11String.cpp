@@ -46,7 +46,7 @@ namespace TEN::Renderer
 				rString.X = 0;
 				rString.Y = 0;
 				rString.Color = color.ToVector3() * UCHAR_MAX;
-				rString.Scale = UIScale * fontScale * scale;
+				rString.Scale = (UIScale * fontScale) * scale;
 
 				// Measure string.
 				auto size = Vector2(m_gameFont->MeasureString(wString.c_str()));
