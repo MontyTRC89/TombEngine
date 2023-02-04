@@ -10,7 +10,7 @@ Version 1.0.7
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
-* Add Airlock_Switch object. (Valves to open doors from TR5 submarine levels).
+* Add Airlock_Switch object. Achieved by putting valve switch trigger and door trigger on the same sector (Valves to open doors from TR5 submarine levels).
 
 Version 1.0.6
 =============
