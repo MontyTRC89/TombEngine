@@ -23,8 +23,8 @@ namespace TEN::Renderer
 			auto screenRes = GetScreenResolution();
 			auto factor = Vector2(screenRes.x / REFERENCE_RES_WIDTH, screenRes.y / REFERENCE_RES_HEIGHT);
 			float UIScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
-			float fontLeading = m_gameFont->GetLineSpacing();
-			float fontScale   = REFERENCE_FONT_SIZE / fontLeading;
+			float fontSpacing = m_gameFont->GetLineSpacing();
+			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
 
 			auto stringLines = SplitString(string);
 			float yOffset = 0.0f;
@@ -71,7 +71,7 @@ namespace TEN::Renderer
 
 				m_strings.push_back(rString);
 
-				yOffset += fontLeading * 1.1f;
+				yOffset += fontSpacing * 1.1f;
 			}
 
 		}

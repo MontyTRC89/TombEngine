@@ -6,6 +6,8 @@ using namespace TEN::Math;
 
 namespace TEN::Hud
 {
+	// BIG TODO: Object transparency in renderer.
+
 	struct DisplayPickup
 	{
 		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
@@ -41,13 +43,12 @@ namespace TEN::Hud
 		void Draw() const;
 		void Clear();
 
-		void DrawDebug() const;
-
 	private:
 		// Helpers
 		std::vector<Vector2> GetStackPositions() const;
+		DisplayPickup&		 GetNewDisplayPickup();
+		void				 ClearInactiveDisplayPickups();
 
-		DisplayPickup& GetNewDisplayPickup();
-		void		   ClearInactiveDisplayPickups();
+		void DrawDebug() const;
 	};
 }

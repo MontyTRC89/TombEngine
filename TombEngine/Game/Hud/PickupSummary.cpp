@@ -2,6 +2,7 @@
 #include "Game/Hud/PickupSummary.h"
 
 #include "Game/effects/effects.h"
+#include "Game/pickup/pickup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
@@ -64,8 +65,9 @@ namespace TEN::Hud
 			this->Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
 			this->Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
 		}
+
 		// Move offscreen.
-		else if (isHead)
+		if (isHead && Life <= 0.0f)
 		{
 			auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 			auto vel = Vector2(screenRes.x * HIDE_VELOCITY_COEFF, 0.0f);
@@ -91,6 +93,9 @@ namespace TEN::Hud
 		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALE_MAX	 = 2.0f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
+
+		// TODO: Call this elsewhere. Maybe add PickUpObject() function to pickup.cpp.
+		PickedUpObject(objectID);
 
 		// Display pickup of same type exists; increment its count.
 		for (auto& pickup : this->DisplayPickups)
@@ -149,7 +154,7 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Draw() const
 	{
-		this->DrawDebug();
+		//this->DrawDebug();
 
 		if (DisplayPickups.empty())
 			return;
@@ -167,11 +172,6 @@ namespace TEN::Hud
 	void PickupSummaryController::Clear()
 	{
 		this->DisplayPickups.clear();
-	}
-
-	void PickupSummaryController::DrawDebug() const
-	{
-		g_Renderer.PrintDebugMessage("Num. display pickups: %d", DisplayPickups.size());
 	}
 
 	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
@@ -216,5 +216,10 @@ namespace TEN::Hud
 				DisplayPickups.begin(), DisplayPickups.end(),
 				[](const DisplayPickup& pickup) { return pickup.IsOffscreen(false); }),
 			DisplayPickups.end());
+	}
+
+	void PickupSummaryController::DrawDebug() const
+	{
+		g_Renderer.PrintDebugMessage("Num. display pickups: %d", DisplayPickups.size());
 	}
 }
