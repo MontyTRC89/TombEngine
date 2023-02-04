@@ -117,12 +117,10 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = GetNewDisplayPickup();
 
-		auto screenPos = g_Renderer.GetScreenSpacePosition(pos);
-
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position =
-		pickup.Origin = screenPos;
+		pickup.Origin = g_Renderer.GetScreenSpacePosition(pos);
 		pickup.Target = Vector2::Zero;
 		pickup.Life = round(LIFE_MAX * FPS);
 		pickup.Scale = 0.0f;
@@ -214,7 +212,7 @@ namespace TEN::Hud
 		DisplayPickups.erase(
 			std::remove_if(
 				DisplayPickups.begin(), DisplayPickups.end(),
-				[](const DisplayPickup& pickup) { return pickup.IsOffscreen(false); }),
+				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen(false)); }),
 			DisplayPickups.end());
 	}
 
