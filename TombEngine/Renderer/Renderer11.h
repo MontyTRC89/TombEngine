@@ -659,6 +659,7 @@ namespace TEN::Renderer
 		void DrawPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
+		void AddString(const Vector2& pos, const std::string& string, const Color& color, float scale, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
