@@ -11,6 +11,11 @@ Version 1.0.7
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
 
+Lua API Changes
+* Fix Camera:SetPosition not updating camera position when it is played simultaneously.
+* Add Moveable:GetAirborne and Moveable:SetAirborne.
+* Add Moveable:GetLocationAI and Moveable:SetLocationAI.
+
 Version 1.0.6
 =============
 
