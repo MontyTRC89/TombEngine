@@ -136,13 +136,13 @@ int SwitchTrigger(short itemNumber, short timer)
 			return 1;
 		}
     
-    if (item->TriggerFlags >= 0 || item->Animation.ActiveState)
+		if (item.TriggerFlags >= 0 || item.Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
-			item->Status = ITEM_NOT_ACTIVE;
-			if (!item->ItemFlags[0] == 0)
-				item->Flags |= ONESHOT;
+			item.Status = ITEM_NOT_ACTIVE;
+			if (!item.ItemFlags[0] == 0)
+				item.Flags |= ONESHOT;
 			return 1;
 		}
 		else
