@@ -1,8 +1,6 @@
 #include "framework.h"
 #include "Math/Legacy.h"
 
-#include "Math/Constants.h"
-
 float phd_sin(short x)
 {
 	return sin(TO_RAD(x));
