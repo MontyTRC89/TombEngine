@@ -11,6 +11,14 @@ Version 1.0.7
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
 
+* Fix Valve switch unable to untrigger objects.
+* Fix Valve and Wall Hole (OCB 5 nad 6) not work as a timed switch.
+* Polish the distance position between Lara and switch.
+* Add OCB 7 - Custom Lua switch (Usage of ItemFlags in lua required).
+	- ItemFlags[4] = on Anination
+	- ItemFlags[5] = off Animation
+	- ItemFlags[6] = Distance to use the switch.
+
 Version 1.0.6
 =============
 
