@@ -91,7 +91,6 @@ namespace TEN::Hud
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
 		constexpr auto LIFE_MAX			 = 2.5f;
-		constexpr auto STRING_SCALE_MAX	 = 2.0f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
 		// TODO: Call this elsewhere. Maybe add PickUpObject() function to pickup.cpp.
@@ -108,7 +107,6 @@ namespace TEN::Hud
 			{
 				pickup.Count++;
 				pickup.Life = round(LIFE_MAX * FPS);
-				pickup.StringScale = STRING_SCALE_MAX;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
 			}
@@ -127,6 +125,7 @@ namespace TEN::Hud
 		pickup.Opacity = 0.0f;
 		pickup.HideVelocity = 0.0f;
 		pickup.StringScale = 0.0f;
+		pickup.StringScalar = 0.0f;
 	}
 
 	void PickupSummaryController::Update()
