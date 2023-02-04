@@ -76,7 +76,10 @@ namespace TEN::Hud
 		// Update orientation.
 		this->Orientation += ROTATION;
 
-		// TODO: Update string scale.
+		// TODO: String scaling works, now design how this works.
+		// Update string scale.
+		float alpha = Scale / SCALE_MAX;
+		this->StringScale = Lerp(0.0f, 1.0f, alpha) * 1.0f;
 
 		// Update life.
 		this->Life -= 1.0f;
@@ -127,7 +130,7 @@ namespace TEN::Hud
 		if (DisplayPickups.empty())
 			return;
 
-		// Get and apply stack screen positions.
+		// Get and apply screen stack positions as targets.
 		auto stackPositions = this->GetStackPositions();
 		for (int i = 0; i < stackPositions.size(); i++)
 			this->DisplayPickups[i].Target = stackPositions[i];

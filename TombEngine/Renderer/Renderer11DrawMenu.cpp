@@ -515,10 +515,16 @@ namespace TEN::Renderer
 		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+		// Draw display pickup.
 		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
+		// Draw count string.
 		if (pickup.Count > 1)
-			AddString(pickup.Position.x, pickup.Position.y, (COUNT_STRING_PREFIX + std::to_string(pickup.Count)).c_str(), PRINTSTRING_COLOR_WHITE, SF());
+		{
+			AddString(
+				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
+				pickup.Position, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+		}
 	}
 
 	// TODO: Handle opacity

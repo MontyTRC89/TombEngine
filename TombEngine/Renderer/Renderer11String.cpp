@@ -9,10 +9,10 @@ namespace TEN::Renderer
 {
 	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
-		AddString(Vector2(x, y), std::string(string), Color(color), 1.0f, flags);
+		AddString(std::string(string), Vector2(x, y), Color(color), 1.0f, flags);
 	}
 
-	void Renderer11::AddString(const Vector2& pos, const std::string& string, const Color& color, float scale, int flags)
+	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
 		if (m_Locked)
 			return;
@@ -29,7 +29,7 @@ namespace TEN::Renderer
 			float fontScale   = REFERENCE_FONT_SIZE / fontLeading;
 
 			auto stringLines = SplitString(string);
-			float currentY = 0.0f;
+			float yOffset = 0.0f;
 			for (const auto& line : stringLines)
 			{
 				auto cLine = line.c_str();
@@ -53,7 +53,7 @@ namespace TEN::Renderer
 				float width = size.x * rString.Scale;
 
 				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (width / 2.0f)) : (pos.x * factor.x);
-				rString.Y = (pos.y * UIScale) + currentY;
+				rString.Y = (pos.y * UIScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
 				{
@@ -80,7 +80,7 @@ namespace TEN::Renderer
 
 				m_strings.push_back(rString);
 
-				currentY += fontLeading * 1.1f;
+				yOffset += fontLeading * 1.1f;
 			}
 
 		}
