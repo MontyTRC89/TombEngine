@@ -18,8 +18,8 @@ namespace TEN::Hud
 
 	bool DisplayPickup::IsOffscreen(bool checkAbove) const
 	{
-		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
-		auto threshold = screenRes * 0.1f;
+		auto screenRes = g_Renderer.GetScreenResolution();
+		auto threshold = screenRes.ToVector2() * 0.1f;
 
 		// NOTE: Positions above screen can be ignored to account for high stacks.
 		if (checkAbove)
