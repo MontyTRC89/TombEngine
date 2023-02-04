@@ -553,110 +553,148 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBats(RenderView& view)
 	{
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		if (Objects[ID_BATS_EMITTER].loaded)
+		if (!Objects[ID_LITTLE_BEETLE].loaded)
 		{
-			ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
-			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
-			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex - (GlobalCounter & 3));
+			return;
+		}
 
-			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
+		ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
+		RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
+		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
-			for (int b = 0; b < mesh->Buckets.size(); b++)
+		int batsCount = 0;
+
+		for (int i = 0; i < NUM_BATS; i++)
+		{
+			auto* bat = &Bats[i];
+
+			if (bat->On)
 			{
-				RendererBucket* bucket = &mesh->Buckets[b];
+				RendererRoom& room = m_rooms[bat->RoomNumber];
 
-				if (bucket->Polygons.size() == 0)
-					continue;
+				Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
+				Matrix rotation = bat->Pose.Orientation.ToRotationMatrix();
+				Matrix world = rotation * translation;
 
-				for (int i = 0; i < NUM_BATS; i++)
+				m_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = world;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = mesh->LightMode;
+				BindInstancedStaticLights(room.LightsToDraw, batsCount);
+
+				batsCount++;
+			}
+		}
+
+		if (batsCount > 0)
+		{
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
+
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
+
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+			m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+
+			for (auto& bucket : mesh->Buckets)
+			{
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 				{
-					auto* bat = &Bats[i];
-
-					if (bat->On)
-					{
-						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
-						Matrix rotation = bat->Pose.Orientation.ToRotationMatrix();
-						Matrix world = rotation * translation;
-
-						m_stStatic.World = world;
-						m_stStatic.Color = Vector4::One;
-						m_stStatic.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
-						BindStaticLights(m_rooms[bat->RoomNumber].LightsToDraw);
-						m_cbStatic.updateData(m_stStatic, m_context.Get());
-						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
-
-						m_numMoveablesDrawCalls++;
-					}
+					continue;
 				}
+
+				SetBlendMode(bucket.BlendMode);
+
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+
+				DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+
+				m_numStaticsDrawCalls++;
 			}
 		}
 	}
 
 	void Renderer11::DrawScarabs(RenderView& view)
 	{
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		if (Objects[ID_LITTLE_BEETLE].loaded)
+		if (!Objects[ID_LITTLE_BEETLE].loaded)
 		{
-			ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
-			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
+			return;
+		}
 
-			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
+		ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
+		RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
+		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
-			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
+		int littleBeetlesCount = 0;
+
+		for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
+		{
+			auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+
+			if (beetle->On)
 			{
-				auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+				RendererRoom& room = m_rooms[beetle->RoomNumber];
 
-				if (beetle->On)
+				Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+				Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
+				Matrix world = rotation * translation;
+
+				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].World = world;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Ambient = room.AmbientLight;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Color = Vector4::One;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].LightMode = mesh->LightMode;
+				BindInstancedStaticLights(room.LightsToDraw, littleBeetlesCount);
+
+				littleBeetlesCount++;
+			}
+		}
+
+		if (littleBeetlesCount > 0)
+		{
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
+
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
+
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+			m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+
+			for (auto& bucket : mesh->Buckets)
+			{
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
-					Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-					Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
-					Matrix world = rotation * translation;
-
-					m_stStatic.World = world;
-					m_stStatic.Color = Vector4::One;
-					m_stStatic.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
-					BindStaticLights(m_rooms[beetle->RoomNumber].LightsToDraw);
-					m_cbStatic.updateData(m_stStatic, m_context.Get());
-					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-					for (int b = 0; b < mesh->Buckets.size(); b++)
-					{
-						RendererBucket* bucket = &mesh->Buckets[b];
-
-						if (bucket->Polygons.size() == 0)
-							continue;
-
-						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
-
-						m_numMoveablesDrawCalls++;
-					}
+					continue;
 				}
+
+				SetBlendMode(bucket.BlendMode);
+
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+
+				DrawIndexedInstancedTriangles(bucket.NumIndices, littleBeetlesCount, bucket.StartIndex, 0);
+
+				m_numStaticsDrawCalls++;
 			}
 		}
 	}
