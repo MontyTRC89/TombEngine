@@ -299,14 +299,14 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @tparam index: (short) index the ItemFlags, can be between 0 and 7.
-// @treturn (short) the value contained in the ItemFlags[index]
+// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @treturn int the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
 /// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam value: (short) value to store in the moveable's ItemFlags[index]
-// @tparam index: (short) index of the ItemFlags where store the value.
+// @tparam short value to store in the moveable's ItemFlags[index]
+// @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
 	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
