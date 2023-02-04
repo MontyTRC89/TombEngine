@@ -67,6 +67,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Adngel
 - Caesum
 - Dustie
+- GeckoKid
 - JoeyQuint
 - Kamillos
 - Kubsy
@@ -78,6 +79,8 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 
 ## Assets and Miscellaneous
 
+- Geckokid (Sprites and test level creator).
+
 ### Animations
 - SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)
 - Krystian (Flexibility crawlspace, slope climbing animations)
@@ -85,7 +88,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)
 - JoeyQuint (Standing 180° turn, monkey swing 180° turn)
 
-### TombEngine Wiki tutorials 
-- Kubsy (Lua Basics tutorial)
-- Stranger1992 (Sound Setups)
-- Wolfcheese (Lua puzzles setups)
+### TombEngine Marketing 
+- Kubsy (Twitter and forum posts)
+- Stranger1992 (This website, Facebook, Instagram, Youtube and Twitch.
+

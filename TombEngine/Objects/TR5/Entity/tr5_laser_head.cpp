@@ -602,9 +602,9 @@ namespace TEN::Entities::Creatures::TR5
 		TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 3, -2, 2, item.RoomNumber);
 		TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 2, 0, 2, item.RoomNumber);
 
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, 0, 0);
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, 0x3000, 0);
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, 0x6000, 0);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x3000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 
 		g_Level.Items[guardian.PuzzleItem].Pose.Position.y = item.Pose.Position.y;
 		TestTriggers(&item, true);

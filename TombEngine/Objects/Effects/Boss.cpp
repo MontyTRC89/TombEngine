@@ -195,7 +195,7 @@ namespace TEN::Effects::Boss
 	}
 
 	// NOTE: Actual death occurs when countUntilDeath >= 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, bool allowExplosion)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -245,7 +245,7 @@ namespace TEN::Effects::Boss
 			TriggerShockwave(
 				&shockwavePos, 300, BLOCK(0.5f), speed,
 				color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX,
-				36, orient2D, 0);
+				36, EulerAngles(orient2D, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 
 			TriggerExplosionSparks(
 				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
@@ -264,16 +264,21 @@ namespace TEN::Effects::Boss
 			color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
 		if (counter >= countUntilDeath)
-			CreatureDie(itemNumber, true);
+		{
+			CreatureDie(itemNumber, allowExplosion);
+
+			if (!allowExplosion)
+				KillItem(itemNumber);
+		}
 	}
 
 	void CheckForRequiredObjects(ItemInfo& item)
 	{
 		short flags = 0;
 
-		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)
+		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)		
 			flags |= (short)BossFlagValue::Lizard;
-
+		
 		// The following are only for aesthetics.
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)
