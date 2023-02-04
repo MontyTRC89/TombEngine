@@ -9,23 +9,32 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Utils
 {
-	std::string ToUpper(std::string source)
+	std::string ToUpper(std::string string)
 	{
-		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::toupper(c); });
-		return source;
+		std::transform(string.begin(), string.end(), string.begin(), [](unsigned char c) { return std::toupper(c); });
+		return string;
 	}
     
-	std::string ToLower(std::string source)
+	std::string ToLower(std::string string)
 	{
-		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::tolower(c); });
-		return source;
+		std::transform(string.begin(), string.end(), string.begin(), [](unsigned char c) { return std::tolower(c); });
+		return string;
 	}
 
 	std::string FromWchar(const wchar_t* source)
 	{
-		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+        auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
 		return converter.to_bytes(std::wstring(source));
 	}
+
+    std::wstring ToWString(const std::string& string)
+    {
+        auto cString = string.c_str();
+        int size = MultiByteToWideChar(CP_UTF8, 0, cString, string.size(), nullptr, 0);
+        auto wString = std::wstring(size, 0);
+        MultiByteToWideChar(CP_UTF8, 0, cString, strlen(cString), &wString[0], size);
+        return wString;
+    }
 
     std::wstring FromChar(const char* source)
     {
@@ -36,7 +45,7 @@ namespace TEN::Utils
 
 	std::vector<std::string> SplitString(const std::string& source)
 	{
-		std::vector<std::string> strings;
+        auto strings = std::vector<std::string>{};
 
 		// String is single line; exit early.
 		if (source.find('\n') == std::string::npos)
@@ -54,7 +63,6 @@ namespace TEN::Utils
 		}
 
 		strings.push_back(source.substr(prev));
-
 		return strings;
 	}
 
@@ -77,7 +85,7 @@ namespace TEN::Utils
         }
         std::unique_ptr<unsigned char> buffer(new unsigned char[size]);
 
-        // Load the version info.
+        // Load version info.
         if (!GetFileVersionInfoA(fileName, 0, size, buffer.get()))
         {
             TENLog("GetFileVersionInfoA failed", LogLevel::Error);
@@ -100,6 +108,7 @@ namespace TEN::Utils
         }
 
         if (productVersion)
+        {
             return
             {
                 HIWORD(info->dwProductVersionMS),
@@ -107,7 +116,9 @@ namespace TEN::Utils
                 HIWORD(info->dwProductVersionLS),
                 LOWORD(info->dwProductVersionLS)
             };
+        }
         else
+        {
             return
             {
                 HIWORD(info->dwFileVersionMS),
@@ -115,6 +126,7 @@ namespace TEN::Utils
                 HIWORD(info->dwFileVersionLS),
                 LOWORD(info->dwFileVersionLS)
             };
+        }
     }
 
     Vector2 Get2DScreenPosition(const Vector3& pos)

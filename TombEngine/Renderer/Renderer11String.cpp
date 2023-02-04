@@ -5,7 +5,7 @@
 
 using namespace TEN::Utils;
 
-namespace TEN::Renderer 
+namespace TEN::Renderer
 {
 	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
@@ -32,16 +32,9 @@ namespace TEN::Renderer
 			float yOffset = 0.0f;
 			for (const auto& line : stringLines)
 			{
-				auto cLine = line.c_str();
-
-				// Convert string to wstring.
-				int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, cLine, line.size(), nullptr, 0);
-				auto wString = std::wstring(sizeNeeded, 0);
-				MultiByteToWideChar(CP_UTF8, 0, cLine, strlen(cLine), &wString[0], sizeNeeded);
-				
 				// Prepare structure for renderer.
 				RendererStringToDraw rString;
-				rString.String = wString;
+				rString.String = ToWString(line);
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
@@ -49,7 +42,7 @@ namespace TEN::Renderer
 				rString.Scale = (UIScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(m_gameFont->MeasureString(wString.c_str()));
+				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str()));
 				float width = size.x * rString.Scale;
 
 				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (width / 2.0f)) : (pos.x * factor.x);

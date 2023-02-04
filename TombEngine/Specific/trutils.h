@@ -1,13 +1,14 @@
 #pragma once
-#include <string>
 
 namespace TEN::Utils
 {
-	std::string ToUpper(std::string source);
-	std::string ToLower(std::string source);
-	std::string FromWchar(const wchar_t* source);
-	std::wstring FromChar(const char* source);
-	std::vector<std::string> SplitString(const std::string& source);
+	// String utilities
+	std::string ToUpper(std::string string);
+	std::string ToLower(std::string string);
+	std::string FromWchar(const wchar_t* string);
+	std::wstring ToWString(const std::string& string);
+	std::wstring FromChar(const char* string);
+	std::vector<std::string> SplitString(const std::string& string);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
 
