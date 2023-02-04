@@ -38,6 +38,7 @@ namespace TEN::Hud
 		constexpr auto SCALE_MIN		   = 0.2f;
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
+		constexpr auto STRING_SCALAR_COEFF = 0.8f;
 		const	  auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
 
 		if (this->IsOffscreen(false))
@@ -74,10 +75,10 @@ namespace TEN::Hud
 		// Update orientation.
 		this->Orientation += ROTATION;
 
-		// TODO: String scaling works, now design how this works.
 		// Update string scale.
 		float alpha = Scale / SCALE_MAX;
-		this->StringScale = Lerp(0.0f, 1.0f, alpha) * 1.0f;
+		this->StringScale = Lerp(0.0f, 1.0f, alpha) * (1.0f + StringScalar);
+		this->StringScalar *= STRING_SCALAR_COEFF;
 
 		// Update life.
 		this->Life -= 1.0f;
@@ -87,8 +88,9 @@ namespace TEN::Hud
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
-		constexpr auto LIFE_MAX		   = 2.5f;
-		constexpr auto COUNT_SCALE_MAX = 2.0f;
+		constexpr auto LIFE_MAX			 = 2.5f;
+		constexpr auto STRING_SCALE_MAX	 = 2.0f;
+		constexpr auto STRING_SCALAR_MAX = 0.5f;
 
 		// Display pickup of same type exists; increment its count.
 		for (auto& pickup : this->DisplayPickups)
@@ -101,7 +103,8 @@ namespace TEN::Hud
 			{
 				pickup.Count++;
 				pickup.Life = round(LIFE_MAX * FPS);
-				pickup.StringScale = COUNT_SCALE_MAX;
+				pickup.StringScale = STRING_SCALE_MAX;
+				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
 			}
 		}
@@ -128,7 +131,7 @@ namespace TEN::Hud
 		if (DisplayPickups.empty())
 			return;
 
-		// Get and apply screen stack positions as targets.
+		// Get and apply stack screen positions as targets.
 		auto stackPositions = this->GetStackPositions();
 		for (int i = 0; i < stackPositions.size(); i++)
 			this->DisplayPickups[i].Target = stackPositions[i];

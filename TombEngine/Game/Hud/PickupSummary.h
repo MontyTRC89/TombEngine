@@ -21,6 +21,7 @@ namespace TEN::Hud
 		float Opacity	   = 0.0f;
 		float HideVelocity = 0.0f;
 		float StringScale  = 0.0f;
+		float StringScalar = 0.0f;
 
 		bool IsOffscreen(bool checkAbove = true) const;
 		void Update(bool isHead);
