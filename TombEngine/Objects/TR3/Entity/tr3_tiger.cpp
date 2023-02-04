@@ -105,138 +105,138 @@ namespace TEN::Entities::Creatures::TR3
 
 			switch (item->Animation.ActiveState)
 			{
-				case TIGER_STATE_IDLE:
-					creature->MaxTurn = 0;
-					creature->Flags = 0;
+			case TIGER_STATE_IDLE:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
-					if (item->Animation.RequiredState)
-					{
-						item->Animation.TargetState = item->Animation.RequiredState;
-					}
-					else if (creature->Mood == MoodType::Escape)
-					{
-						if (Lara.TargetEntity != item && ai.ahead)
-							item->Animation.TargetState = TIGER_STATE_IDLE;
-						else
-							item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
-					}
-					else if (creature->Mood == MoodType::Bored)
-					{
-						if (Random::TestProbability(TIGER_ROAR_CHANCE))
-						{
-							item->Animation.TargetState = TIGER_STATE_ROAR;
-						}
-						else if (Random::TestProbability(TIGER_WALK_CHANCE))
-						{
-							item->Animation.TargetState = TIGER_STATE_WALK_FORWARD;
-						}
-					}
-					else if (ai.bite && ai.distance < TIGER_BITE_ATTACK_RANGE)
-					{
-						item->Animation.TargetState = TIGER_STATE_BITE_ATTACK;
-					}
-					else if (ai.bite && ai.distance < TIGER_POUNCE_ATTACK_RANGE)
-					{
-						item->Animation.TargetState = TIGER_STATE_POUNCE_ATTACK;
-						creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
-					}
-					else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
+				if (item->Animation.RequiredState)
+				{
+					item->Animation.TargetState = item->Animation.RequiredState;
+				}
+				else if (creature->Mood == MoodType::Escape)
+				{
+					if (Lara.TargetEntity != item && ai.ahead)
+						item->Animation.TargetState = TIGER_STATE_IDLE;
+					else
+						item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+				}
+				else if (creature->Mood == MoodType::Bored)
+				{
+					if (Random::TestProbability(TIGER_ROAR_CHANCE))
 					{
 						item->Animation.TargetState = TIGER_STATE_ROAR;
+					}
+					else if (Random::TestProbability(TIGER_WALK_CHANCE))
+					{
+						item->Animation.TargetState = TIGER_STATE_WALK_FORWARD;
+					}
+				}
+				else if (ai.bite && ai.distance < TIGER_BITE_ATTACK_RANGE)
+				{
+					item->Animation.TargetState = TIGER_STATE_BITE_ATTACK;
+				}
+				else if (ai.bite && ai.distance < TIGER_POUNCE_ATTACK_RANGE)
+				{
+					item->Animation.TargetState = TIGER_STATE_POUNCE_ATTACK;
+					creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
+				}
+				else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
+				{
+					item->Animation.TargetState = TIGER_STATE_ROAR;
+				}
+				else
+				{
+					item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+				}
+					
+				break;
+
+			case TIGER_STATE_WALK_FORWARD:
+				creature->MaxTurn = TIGER_WALK_TURN_RATE_MAX;
+
+				if (creature->Mood == MoodType::Escape ||
+					creature->Mood == MoodType::Attack)
+				{
+					item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+				}
+				else if (Random::TestProbability(TIGER_ROAR_CHANCE))
+				{
+					item->Animation.TargetState = TIGER_STATE_IDLE;
+					item->Animation.RequiredState = TIGER_STATE_ROAR;
+				}
+
+				break;
+
+			case TIGER_STATE_RUN_FORWARD:
+				creature->MaxTurn = TIGER_RUN_TURN_RATE_MAX;
+
+				if (creature->Mood == MoodType::Bored)
+				{
+					item->Animation.TargetState = TIGER_STATE_IDLE;
+				}
+				else if (creature->Flags && ai.ahead)
+				{
+					item->Animation.TargetState = TIGER_STATE_IDLE;
+				}
+				else if (ai.bite && ai.distance < TIGER_RUN_ATTACK_RANGE)
+				{
+					if (LaraItem->Animation.Velocity.z <= TIGER_PLAYER_ALERT_VELOCITY &&
+						Random::TestProbability(TIGER_ATTACK_CHANCE))
+					{
+						item->Animation.TargetState = TIGER_STATE_IDLE;
+					}
+					else if (ai.ahead)
+					{
+						item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
 					}
 					else
 					{
 						item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
 					}
-					
-					break;
+				}
+				else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
+				{
+					item->Animation.TargetState = TIGER_STATE_ROAR;
+				}
+				else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && ai.ahead)
+				{
+					item->Animation.TargetState = TIGER_STATE_IDLE;
+				}
 
-				case TIGER_STATE_WALK_FORWARD:
-					creature->MaxTurn = TIGER_WALK_TURN_RATE_MAX;
+				creature->Flags = 0;
+				break;
 
-					if (creature->Mood == MoodType::Escape ||
-						creature->Mood == MoodType::Attack)
+			case TIGER_STATE_BITE_ATTACK:
+			case TIGER_STATE_POUNCE_ATTACK:
+				if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
+				{
+					if ((item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_BITE_ATTACK) &&
+							item->Animation.FrameNumber > GetFrameNumber(item,  4)) ||
+						(item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_POUNCE_ATTACK_START) &&
+							item->Animation.FrameNumber > GetFrameNumber(item, 12)))
 					{
-						item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
+						DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
+						CreatureEffect(item, TigerBite, DoBloodSplat);
+						creature->Flags = 1; // Flag 1 = is attacking.
 					}
-					else if (Random::TestProbability(TIGER_ROAR_CHANCE))
-					{
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-						item->Animation.RequiredState = TIGER_STATE_ROAR;
-					}
+				}
 
-					break;
+				break;
 
-				case TIGER_STATE_RUN_FORWARD:
-					creature->MaxTurn = TIGER_RUN_TURN_RATE_MAX;
+			case TIGER_STATE_RUN_SWIPE_ATTACK:
+				if (!creature->Flags && item->TouchBits.Test(TigerSwipeAttackJoints))
+				{
+					if (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_RUN_SWIPE_ATTACK) &&
+						item->Animation.FrameNumber >= GetFrameNumber(item, 6) &&
+						item->Animation.FrameNumber < GetFrameNumber(item, 16))
+					{
+						DoDamage(creature->Enemy, TIGER_SWIPE_ATTACK_DAMAGE);
+						CreatureEffect(item, TigerBite, DoBloodSplat);
+						creature->Flags = 1; // 1 = is attacking.
+					}
+				}
 
-					if (creature->Mood == MoodType::Bored)
-					{
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-					}
-					else if (creature->Flags && ai.ahead)
-					{
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-					}
-					else if (ai.bite && ai.distance < TIGER_RUN_ATTACK_RANGE)
-					{
-						if (LaraItem->Animation.Velocity.z <= TIGER_PLAYER_ALERT_VELOCITY &&
-							Random::TestProbability(TIGER_ATTACK_CHANCE))
-						{
-							item->Animation.TargetState = TIGER_STATE_IDLE;
-						}
-						else if (ai.ahead)
-						{
-							item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
-						}
-						else
-						{
-							item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
-						}
-					}
-					else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
-					{
-						item->Animation.TargetState = TIGER_STATE_ROAR;
-					}
-					else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && ai.ahead)
-					{
-						item->Animation.TargetState = TIGER_STATE_IDLE;
-					}
-
-					creature->Flags = 0;
-					break;
-
-				case TIGER_STATE_BITE_ATTACK:
-				case TIGER_STATE_POUNCE_ATTACK:
-					if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
-					{
-						if	( (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_BITE_ATTACK) &&
-							   item->Animation.FrameNumber > GetFrameNumber(item,  4) ) ||
-							  (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_POUNCE_ATTACK_START) &&
-							   item->Animation.FrameNumber > GetFrameNumber(item, 12) )
-							)
-						{
-							DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
-							CreatureEffect(item, TigerBite, DoBloodSplat);
-							creature->Flags = 1; // Flag 1 = is attacking.
-						}
-					}
-					break;
-
-				case TIGER_STATE_RUN_SWIPE_ATTACK:
-					if (!creature->Flags && item->TouchBits.Test(TigerSwipeAttackJoints))
-					{
-						if (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_RUN_SWIPE_ATTACK) &&
-							item->Animation.FrameNumber >= GetFrameNumber(item, 6) &&
-							item->Animation.FrameNumber < GetFrameNumber(item, 16))
-						{
-							DoDamage(creature->Enemy, TIGER_SWIPE_ATTACK_DAMAGE);
-							CreatureEffect(item, TigerBite, DoBloodSplat);
-							creature->Flags = 1; // 1 = is attacking.
-						}
-					}
-
-					break;
+				break;
 			}
 		}
 
