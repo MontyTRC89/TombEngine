@@ -10,9 +10,8 @@ Version 1.0.7
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
-* Improve behaviour of Tiger and Lion enemies. 
-
-
+* Add Airlock_Switch object. Achieved by putting valve switch trigger and door trigger on the same sector (Valves to open doors from TR5 submarine levels).  
+* Improved behaviour of Tiger and Lion enemies. 
 * Fix Valve switch unable to untrigger objects.
 * Fix Valve and Wall Hole (OCB 5 nad 6) not work as a timed switch.
 * Polish the distance position between Lara and switch.
@@ -25,7 +24,6 @@ Lua API Changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
 * Add Moveable:GetAirborne and Moveable:SetAirborne.
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
-
 
 Version 1.0.6
 =============

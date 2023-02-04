@@ -8,17 +8,17 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/items.h"
 #include "Game/room.h"
-#include "Game/spotcam.h"
 #include "Game/savegame.h"
+#include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/setup.h"
@@ -120,19 +120,23 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 
 int SwitchTrigger(short itemNumber, short timer)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_DEACTIVATED)
+	if (item.Status == ITEM_DEACTIVATED)
 	{
-		if ((!item->Animation.ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->Animation.ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&
+			timer > 0)
 		{
-			item->Timer = timer;
-			item->Status = ITEM_ACTIVE;
+			item.Timer = timer;
+			item.Status = ITEM_ACTIVE;
+
 			if (timer != 1)
-				item->Timer = FPS * timer;
+				item.Timer = FPS * timer;
+
 			return 1;
 		}
-		if (item->TriggerFlags >= 0 || item->Animation.ActiveState)
+    
+    if (item->TriggerFlags >= 0 || item->Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
@@ -143,13 +147,20 @@ int SwitchTrigger(short itemNumber, short timer)
 		}
 		else
 		{
-			item->Status = ITEM_ACTIVE;
+			item.Status = ITEM_ACTIVE;
 			return 1;
 		}
 	}
-	else if (item->Status)
+	else if (item.Status)
 	{
-		return (item->Flags & ONESHOT) >> 8;
+		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
+			item.Animation.AnimNumber == GetAnimNumber(item, 2) &&
+			item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+		{
+			return 1;
+		}
+
+		return ((item.Flags & ONESHOT) >> 8);
 	}
 	else
 	{
