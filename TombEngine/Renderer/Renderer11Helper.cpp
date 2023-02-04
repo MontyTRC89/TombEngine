@@ -506,6 +506,27 @@ namespace TEN::Renderer
 		return s;
 	}
 
+	Vector2i Renderer11::GetScreenResolution() const
+	{
+		return Vector2i(m_screenWidth, m_screenHeight);
+	}
+
+	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	{
+		// Calculate clip space coords.
+		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
+		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+
+		// Calculate normalized device coords.
+		point /= point.w;
+
+		// Return 2D screen space coords.
+		auto screenRes = GetScreenResolution();
+		return Vector2(
+			((point.x + 1.0f) * screenRes.x) / 2,
+			((1.0f - point.y) * screenRes.y) / 2);
+	}
+
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
 		auto* rendererItem = &m_items[itemNumber];
@@ -528,25 +549,5 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
-	}
-
-	Vector2i Renderer11::GetScreenResolution() const
-	{
-		return Vector2i(m_screenWidth, m_screenHeight);
-	}
-
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
-	{
-		// Calculate clip space coords.
-		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
-		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
-
-		// Calculate normalized device coords.
-		point /= point.w;
-
-		// Return 2D screen space coords.
-		return Vector2(
-			((point.x + 1.0f) * m_screenWidth) / 2,
-			((1.0f - point.y) * m_screenHeight) / 2);
 	}
 }

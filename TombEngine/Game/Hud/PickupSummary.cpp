@@ -51,7 +51,7 @@ namespace TEN::Hud
 			float totalDist = Vector2::Distance(Origin, Target);
 			float coveredDist = Vector2::Distance(Origin, Position);
 
-			// Handle edge case when tiling grid shifts.
+			// Handle edge case when stack shifts.
 			if (coveredDist > totalDist)
 			{
 				this->Origin = Position;
@@ -65,12 +65,12 @@ namespace TEN::Hud
 			this->Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
 			this->Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
 		}
+		// Move offscreen.
 		else if (isHead)
 		{
-			// TODO: Use easing function.
 			auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
-			auto hideVelocity = Vector2(screenRes.x * HIDE_VELOCITY_COEFF, 0.0f);
-			this->Position += hideVelocity;
+			auto vel = Vector2(screenRes.x * HIDE_VELOCITY_COEFF, 0.0f);
+			this->Position += vel;
 		}
 
 		// Update orientation.
