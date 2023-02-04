@@ -38,7 +38,7 @@ namespace TEN::Hud
 		constexpr auto SCALE_MIN		   = 0.2f;
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
-		constexpr auto STRING_SCALAR_COEFF = 0.8f;
+		constexpr auto STRING_SCALAR_COEFF = 0.75f;
 		const	  auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
 
 		if (this->IsOffscreen(false))
@@ -90,7 +90,7 @@ namespace TEN::Hud
 	{
 		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALE_MAX	 = 2.0f;
-		constexpr auto STRING_SCALAR_MAX = 0.5f;
+		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
 		// Display pickup of same type exists; increment its count.
 		for (auto& pickup : this->DisplayPickups)
