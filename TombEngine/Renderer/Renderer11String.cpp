@@ -3,8 +3,6 @@
 
 #include "Specific/trutils.h"
 
-using namespace TEN::Utils;
-
 namespace TEN::Renderer
 {
 	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
@@ -34,7 +32,7 @@ namespace TEN::Renderer
 			{
 				// Prepare structure for renderer.
 				RendererStringToDraw rString;
-				rString.String = ToWString(line);
+				rString.String = TEN::Utils::ToWString(line);
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;

@@ -21,7 +21,7 @@ namespace TEN::Utils
 		return string;
 	}
 
-	std::string FromWchar(const wchar_t* source)
+	std::string ToString(const wchar_t* source)
 	{
         auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
 		return converter.to_bytes(std::wstring(source));
@@ -36,7 +36,7 @@ namespace TEN::Utils
         return wString;
     }
 
-    std::wstring FromChar(const char* source)
+    std::wstring ToWString(const char* source)
     {
         wchar_t buffer[UCHAR_MAX];
         std::mbstowcs(buffer, source, UCHAR_MAX);
