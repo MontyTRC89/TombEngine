@@ -79,7 +79,8 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 
 		if (isUnderwater)
 		{
-			SpawnChaffBubble(pos.ToVector3(), item.RoomNumber);
+			if (Random::TestProbability(1 / 4.0f))
+				SpawnChaffBubble(pos.ToVector3(), item.RoomNumber);
 		}
 		else
 		{

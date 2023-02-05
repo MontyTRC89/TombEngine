@@ -84,7 +84,7 @@ namespace TEN::Effects::Bubble
 	
 	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
 	{
-		constexpr auto SCALE_MAX		 = BUBBLE_SCALE_MAX;
+		constexpr auto SCALE_MAX		 = BUBBLE_SCALE_MAX / 8;
 		constexpr auto SCALE_MIN		 = SCALE_MAX / 2;
 		constexpr auto GRAVITY_MAX		 = 16.0f;
 		constexpr auto GRAVITY_MIN		 = GRAVITY_MAX / 4;
