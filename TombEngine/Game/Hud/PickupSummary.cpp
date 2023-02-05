@@ -67,7 +67,7 @@ namespace TEN::Hud
 		}
 
 		// Move offscreen.
-		if (isHead && Life <= 0.0f)
+		if (Life <= 0.0f && isHead)
 		{
 			auto vel = Vector2(SCREEN_COORDS.x * HIDE_VELOCITY_COEFF, 0.0f);
 			this->Position += vel;
@@ -95,7 +95,7 @@ namespace TEN::Hud
 		// TODO: Call this elsewhere. Maybe add PickUpObject() function to pickup.cpp.
 		PickedUpObject(objectID);
 
-		// Display pickup of same type exists; increment its count.
+		// Increment count of existing display pickup if it exists.
 		for (auto& pickup : this->DisplayPickups)
 		{
 			// Ignore already disappearing display pickups.
