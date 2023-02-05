@@ -19,6 +19,16 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_MIST_COUNT_MAX  = 256;
 	constexpr auto UW_BLOOD_COUNT_MAX	 = 256;
 
+	constexpr auto BLOOD_DRIP_LIFE_START_FADING = 0.5f;
+
+	constexpr auto BLOOD_STAIN_LIFE_MAX			  = 5.0f * 60.0f;
+	constexpr auto BLOOD_STAIN_LIFE_START_FADING  = 30.0f;
+	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
+	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
+	constexpr auto BLOOD_STAIN_POOLING_DELAY_TIME = 5.0f;
+	constexpr auto BLOOD_STAIN_SURFACE_OFFSET	  = 4;
+	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 7; // TODO: Dehardcode this index range.
+
 	constexpr auto UW_BLOOD_LIFE_MAX	  = 8.5f;
 	constexpr auto UW_BLOOD_LIFE_MIN	  = 8.0f;
 	constexpr auto UW_BLOOD_SCALE_MAX	  = BLOCK(0.25f);
@@ -36,22 +46,6 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_MIST_ROTATION_MAX	= ANGLE(10.0f);
 	constexpr auto BLOOD_MIST_SPHERE_RADIUS = BLOCK(1 / 8.0f);
 	constexpr auto BLOOD_MIST_SEMIANGLE		= 20.0f;
-
-	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f;
-	constexpr auto BLOOD_DRIP_LIFE_START_FADING	 = 0.5f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MAX		 = 15.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN		 = 5.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MAX = 45.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MIN = 15.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE	 = 50.0f;
-
-	constexpr auto BLOOD_STAIN_LIFE_MAX			  = 5.0f * 60.0f;
-	constexpr auto BLOOD_STAIN_LIFE_START_FADING  = 30.0f;
-	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
-	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
-	constexpr auto BLOOD_STAIN_POOLING_DELAY_TIME = 5.0f;
-	constexpr auto BLOOD_STAIN_SURFACE_OFFSET	  = 4;
-	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 7; // TODO: Dehardcode this index range.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
@@ -106,63 +100,11 @@ namespace TEN::Effects::Blood
 		return true;
 	}
 
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
-	{
-		auto& uwBlood = GetNewEffect(UnderwaterBloodParticles, UW_BLOOD_COUNT_MAX);
-
-		auto sphere = BoundingSphere(pos, UW_BLOOD_SPHERE_RADIUS);
-
-		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		uwBlood.Position = Random::GeneratePointInSphere(sphere);
-		uwBlood.Life = std::round(Random::GenerateFloat(UW_BLOOD_LIFE_MIN, UW_BLOOD_LIFE_MAX) * FPS);
-		uwBlood.Init = 1.0f;
-		uwBlood.Scale = scale;
-	}
-
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
-	{
-		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-
-		for (int i = 0; i < count; i++)
-			SpawnUnderwaterBlood(pos, roomNumber, scaleMax);
-	}
-
-	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
-	{
-		auto& mist = GetNewEffect(BloodMists, BLOOD_MIST_COUNT_MAX);
-
-		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
-
-		mist.SpriteIndex = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
-		mist.Position = Random::GeneratePointInSphere(sphere);
-		mist.RoomNumber = roomNumber;
-		mist.Orientation2D = Random::GenerateAngle();
-		mist.Velocity = Random::GenerateDirectionInCone(direction, BLOOD_MIST_SEMIANGLE) * Random::GenerateFloat(0.0f, BLOOD_MIST_VELOCITY_MAX);
-		mist.Color = BLOOD_COLOR_RED;
-		mist.Life = std::round(Random::GenerateFloat(BLOOD_MIST_LIFE_MIN, BLOOD_MIST_LIFE_MAX) * FPS);
-		mist.LifeMax = mist.Life;
-		mist.Scale = Random::GenerateFloat(BLOOD_MIST_SCALE_MIN, BLOOD_MIST_SCALE_MAX);
-		mist.ScaleMax = mist.Scale * 4;
-		mist.ScaleMin = mist.Scale;
-		mist.Opacity =
-		mist.OpacityMax = BLOOD_MIST_OPACITY_MAX;
-		mist.Gravity = Random::GenerateFloat(BLOOD_MIST_GRAVITY_MIN, BLOOD_MIST_GRAVITY_MAX);
-		mist.Friction = BLOOD_MIST_FRICTION;
-		mist.Rotation = Random::GenerateAngle(-BLOOD_MIST_ROTATION_MAX, BLOOD_MIST_ROTATION_MAX);
-	}
-
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
-	{
-		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-
-		for (int i = 0; i < count; i++)
-			SpawnBloodMist(pos, roomNumber, direction);
-	}
-
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
 	{
+		constexpr auto GRAVITY_MAX = 15.0f;
+		constexpr auto GRAVITY_MIN = 5.0f;
+
 		auto& drip = GetNewEffect(BloodDrips, BLOOD_DRIP_COUNT_MAX);
 
 		drip.SpriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
@@ -175,11 +117,16 @@ namespace TEN::Effects::Blood
 		drip.LifeStartFading = std::round(BLOOD_DRIP_LIFE_START_FADING * FPS);
 		drip.Opacity = 1.0f;
 		drip.Scale = scale;
-		drip.Gravity = Random::GenerateFloat(BLOOD_DRIP_GRAVITY_MIN, BLOOD_DRIP_GRAVITY_MAX);
+		drip.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
 	}
 
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
+		constexpr auto LIFE_MAX			  = 5.0f;
+		constexpr auto SPRAY_VELOCITY_MAX = 45.0f;
+		constexpr auto SPRAY_VELOCITY_MIN = 15.0f;
+		constexpr auto SPRAY_SEMIANGLE	  = 50.0f;
+
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
@@ -189,8 +136,8 @@ namespace TEN::Effects::Blood
 		// Spawn decorative drips.
 		for (int i = 0; i < count * 12; i++)
 		{
-			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
-			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
+			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
+			auto velocity = Random::GenerateDirectionInCone(-direction, SPRAY_SEMIANGLE) * length;
 			float scale = length * 0.25f;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_START_FADING, scale, false);
@@ -199,11 +146,11 @@ namespace TEN::Effects::Blood
 		// Spawn special drips capable of creating stains.
 		for (int i = 0; i < count; i++)
 		{
-			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
-			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
+			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
+			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, SPRAY_SEMIANGLE) * length;
 			float scale = length * 0.5f;
 
-			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_MAX, scale, true);
+			SpawnBloodDrip(pos, roomNumber, velocity, LIFE_MAX, scale, true);
 		}
 	}
 
@@ -257,62 +204,60 @@ namespace TEN::Effects::Blood
 
 		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_DELAY_TIME);
 	}
-
-	void UpdateUnderwaterBloodParticles()
+	
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
 	{
-		for (auto& uwBlood : UnderwaterBloodParticles)
-		{
-			if (uwBlood.Life <= 0.0f)
-				continue;
+		auto& mist = GetNewEffect(BloodMists, BLOOD_MIST_COUNT_MAX);
 
-			// Update scale.
-			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
-				uwBlood.Scale += 4.0f;
+		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
 
-			// Update life.
-			if (uwBlood.Init == 0.0f)
-			{
-				uwBlood.Life -= 3.0f;
-			}
-			else if (uwBlood.Init < uwBlood.Life)
-			{
-				uwBlood.Init += 4.0f;
-
-				if (uwBlood.Init >= uwBlood.Life)
-					uwBlood.Init = 0.0f;
-			}
-		}
-
-		ClearInactiveEffects(UnderwaterBloodParticles);
+		mist.SpriteIndex = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
+		mist.Position = Random::GeneratePointInSphere(sphere);
+		mist.RoomNumber = roomNumber;
+		mist.Orientation2D = Random::GenerateAngle();
+		mist.Velocity = Random::GenerateDirectionInCone(direction, BLOOD_MIST_SEMIANGLE) * Random::GenerateFloat(0.0f, BLOOD_MIST_VELOCITY_MAX);
+		mist.Color = BLOOD_COLOR_RED;
+		mist.Life = std::round(Random::GenerateFloat(BLOOD_MIST_LIFE_MIN, BLOOD_MIST_LIFE_MAX) * FPS);
+		mist.LifeMax = mist.Life;
+		mist.Scale = Random::GenerateFloat(BLOOD_MIST_SCALE_MIN, BLOOD_MIST_SCALE_MAX);
+		mist.ScaleMax = mist.Scale * 4;
+		mist.ScaleMin = mist.Scale;
+		mist.Opacity =
+		mist.OpacityMax = BLOOD_MIST_OPACITY_MAX;
+		mist.Gravity = Random::GenerateFloat(BLOOD_MIST_GRAVITY_MIN, BLOOD_MIST_GRAVITY_MAX);
+		mist.Friction = BLOOD_MIST_FRICTION;
+		mist.Rotation = Random::GenerateAngle(-BLOOD_MIST_ROTATION_MAX, BLOOD_MIST_ROTATION_MAX);
 	}
 
-	void UpdateBloodMists()
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
 	{
-		for (auto& mist : BloodMists)
-		{
-			if (mist.Life <= 0.0f)
-				continue;
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
 
-			// Update velocity.
-			mist.Velocity.y += mist.Gravity;
-			mist.Velocity -= mist.Velocity / mist.Friction;
+		for (int i = 0; i < count; i++)
+			SpawnBloodMist(pos, roomNumber, direction);
+	}
+	
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
+	{
+		auto& uwBlood = GetNewEffect(UnderwaterBloodParticles, UW_BLOOD_COUNT_MAX);
 
-			// Update position.
-			mist.Position += mist.Velocity;
-			mist.Orientation2D += mist.Rotation;
+		auto sphere = BoundingSphere(pos, UW_BLOOD_SPHERE_RADIUS);
 
-			// Update scale.
-			mist.Scale = Lerp(mist.ScaleMin, mist.ScaleMax, 1.0f - (mist.Life / mist.LifeMax));
+		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		uwBlood.Position = Random::GeneratePointInSphere(sphere);
+		uwBlood.Life = std::round(Random::GenerateFloat(UW_BLOOD_LIFE_MIN, UW_BLOOD_LIFE_MAX) * FPS);
+		uwBlood.Init = 1.0f;
+		uwBlood.Scale = scale;
+	}
 
-			// Update opacity.
-			mist.Opacity = Lerp(mist.OpacityMax, 0.0f, 1.0f - (mist.Life / mist.LifeMax));
-			mist.Color.w = mist.Opacity;
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
+	{
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
 
-			// Update life.
-			mist.Life -= 1.0f;
-		}
-
-		ClearInactiveEffects(BloodMists);
+		for (int i = 0; i < count; i++)
+			SpawnUnderwaterBlood(pos, roomNumber, scaleMax);
 	}
 
 	void UpdateBloodDrips()
@@ -422,6 +367,63 @@ namespace TEN::Effects::Blood
 		}
 
 		ClearInactiveEffects(BloodStains);
+	}
+
+	void UpdateBloodMists()
+	{
+		for (auto& mist : BloodMists)
+		{
+			if (mist.Life <= 0.0f)
+				continue;
+
+			// Update velocity.
+			mist.Velocity.y += mist.Gravity;
+			mist.Velocity -= mist.Velocity / mist.Friction;
+
+			// Update position.
+			mist.Position += mist.Velocity;
+			mist.Orientation2D += mist.Rotation;
+
+			// Update scale.
+			mist.Scale = Lerp(mist.ScaleMin, mist.ScaleMax, 1.0f - (mist.Life / mist.LifeMax));
+
+			// Update opacity.
+			mist.Opacity = Lerp(mist.OpacityMax, 0.0f, 1.0f - (mist.Life / mist.LifeMax));
+			mist.Color.w = mist.Opacity;
+
+			// Update life.
+			mist.Life -= 1.0f;
+		}
+
+		ClearInactiveEffects(BloodMists);
+	}
+
+	void UpdateUnderwaterBloodParticles()
+	{
+		for (auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (uwBlood.Life <= 0.0f)
+				continue;
+
+			// Update scale.
+			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
+				uwBlood.Scale += 4.0f;
+
+			// Update life.
+			if (uwBlood.Init == 0.0f)
+			{
+				uwBlood.Life -= 3.0f;
+			}
+			else if (uwBlood.Init < uwBlood.Life)
+			{
+				uwBlood.Init += 4.0f;
+
+				if (uwBlood.Init >= uwBlood.Life)
+					uwBlood.Init = 0.0f;
+			}
+		}
+
+		ClearInactiveEffects(UnderwaterBloodParticles);
 	}
 
 	void ClearUnderwaterBloodParticles()
