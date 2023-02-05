@@ -177,14 +177,14 @@ namespace TEN::Hud
 		constexpr auto SCREEN_SCALE_COEFF  = 1 / 7.0f;
 		constexpr auto SCREEN_OFFSET_COEFF = 1 / 7.0f;
 		constexpr auto SCREEN_SCALE		   = Vector2(SCREEN_COORDS.x * SCREEN_SCALE_COEFF, SCREEN_COORDS.y * SCREEN_SCALE_COEFF);
-		constexpr auto SCREEN_OFFSET	   = Vector2(-(SCREEN_COORDS.x * SCREEN_OFFSET_COEFF), -(SCREEN_COORDS.y * SCREEN_OFFSET_COEFF));
+		constexpr auto SCREEN_OFFSET	   = Vector2(SCREEN_COORDS.x * SCREEN_OFFSET_COEFF, SCREEN_COORDS.y * SCREEN_OFFSET_COEFF);
 
 		// Calculate screen positions. 
 		auto stackPositions = std::vector<Vector2>{};
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_COORDS.y);
-			auto pos = (SCREEN_COORDS - relPos) + SCREEN_OFFSET;
+			auto pos = (SCREEN_COORDS - relPos) - SCREEN_OFFSET;
 			stackPositions.push_back(pos);
 		}
 
