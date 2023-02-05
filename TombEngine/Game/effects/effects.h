@@ -170,12 +170,46 @@ extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
+template <typename TEffect>
+
+TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+{
+	// Add and return new effect.
+	if (effects.size() < countMax)
+		return effects.emplace_back();
+
+	TEffect* effectPtr = nullptr;
+	float shortestLife = INFINITY;
+
+	// Find effect with shortest remaining life.
+	for (auto& effect : effects)
+	{
+		if (effect.Life < shortestLife)
+		{
+			effectPtr = &effect;
+			shortestLife = effect.Life;
+		}
+	}
+
+	// Clear and return existing effect.
+	*effectPtr = TEffect();
+	return *effectPtr;
+}
+
+template <typename TEffect>
+void ClearInactiveEffects(std::deque<TEffect>& effects)
+{
+	effects.erase(
+		std::remove_if(
+			effects.begin(), effects.end(),
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }), effects.end());
+}
 
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
 
-void DetatchSpark(int num, SpriteEnumFlag type);
+void DetatchSpark(int num, SpriteEnumFlags type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);

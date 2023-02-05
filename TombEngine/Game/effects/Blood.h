@@ -1,16 +1,10 @@
 #pragma once
-#include <deque>
 
 struct CollisionResult;
 struct ItemInfo;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto UW_BLOOD_NUM_MAX	   = 256;
-	constexpr auto BLOOD_MIST_NUM_MAX  = 256;
-	constexpr auto BLOOD_DRIP_NUM_MAX  = 256;
-	constexpr auto BLOOD_STAIN_NUM_MAX = 192;
-
 	struct UnderwaterBlood
 	{
 		unsigned int SpriteIndex = 0;
@@ -91,14 +85,11 @@ namespace TEN::Effects::Blood
 		float DelayTime		  = 0.0f;
 	};
 
-	extern std::array<UnderwaterBlood, UW_BLOOD_NUM_MAX> UnderwaterBloodParticles;
-	extern std::array<BloodMist, BLOOD_MIST_NUM_MAX>	 BloodMists;
-	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX>	 BloodDrips;
-	extern std::deque<BloodStain>						 BloodStains;
+	extern std::deque<UnderwaterBlood> UnderwaterBloodParticles;
+	extern std::deque<BloodMist>	   BloodMists;
+	extern std::deque<BloodDrip>	   BloodDrips;
+	extern std::deque<BloodStain>	   BloodStains;
 
-	UnderwaterBlood&	   GetFreeUnderwaterBlood();
-	BloodMist&			   GetFreeBloodMist();
-	BloodDrip&			   GetFreeBloodDrip();
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
 	bool				   TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints);
 

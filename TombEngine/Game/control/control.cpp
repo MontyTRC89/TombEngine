@@ -65,7 +65,6 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprint;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
@@ -209,7 +208,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSplashes();
 		UpdateElectricitys();
 		UpdateHelicalLasers();
-		UpdateDrips();
+		//UpdateDrips(); // TODO: Check what this was.
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();

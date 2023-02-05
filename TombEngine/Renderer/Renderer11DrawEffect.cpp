@@ -29,6 +29,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -46,7 +47,6 @@ extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
 // TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
-
 BiteInfo EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },

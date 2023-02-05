@@ -14,6 +14,11 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
+	constexpr auto BLOOD_DRIP_COUNT_MAX  = 256;
+	constexpr auto BLOOD_STAIN_COUNT_MAX = 192;
+	constexpr auto BLOOD_MIST_COUNT_MAX  = 256;
+	constexpr auto UW_BLOOD_COUNT_MAX	 = 256;
+
 	constexpr auto UW_BLOOD_LIFE_MAX	  = 8.5f;
 	constexpr auto UW_BLOOD_LIFE_MIN	  = 8.0f;
 	constexpr auto UW_BLOOD_SCALE_MAX	  = BLOCK(0.25f);
@@ -51,82 +56,10 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
-	std::array<UnderwaterBlood, UW_BLOOD_NUM_MAX> UnderwaterBloodParticles = {};
-	std::array<BloodMist, BLOOD_MIST_NUM_MAX>	  BloodMists			   = {};
-	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX>	  BloodDrips			   = {};
-	std::deque<BloodStain>						  BloodStains			   = {};
-
-	UnderwaterBlood& GetFreeUnderwaterBlood()
-	{
-		float shortestLife = INFINITY;
-		auto* oldestUWBlood = &UnderwaterBloodParticles[0];
-
-		for (auto& uwBlood : UnderwaterBloodParticles)
-		{
-			if (!uwBlood.IsActive)
-			{
-				uwBlood = {};
-				return uwBlood;
-			}
-
-			if (uwBlood.Life < shortestLife)
-			{
-				shortestLife = uwBlood.Life;
-				oldestUWBlood = &uwBlood;
-			}
-		}
-
-		*oldestUWBlood = {};
-		return *oldestUWBlood;
-	}
-	
-	BloodMist& GetFreeBloodMist()
-	{
-		float shortestLife = INFINITY;
-		auto* oldestMistPtr = &BloodMists[0];
-
-		for (auto& mist : BloodMists)
-		{
-			if (!mist.IsActive)
-			{
-				mist = {};
-				return mist;
-			}
-
-			if (mist.Life < shortestLife)
-			{
-				shortestLife = mist.Life;
-				oldestMistPtr = &mist;
-			}
-		}
-
-		*oldestMistPtr = {};
-		return *oldestMistPtr;
-	}
-
-	BloodDrip& GetFreeBloodDrip()
-	{
-		float shortestLife = INFINITY;
-		auto* oldestDripPtr = &BloodDrips[0];
-
-		for (auto& drip : BloodDrips)
-		{
-			if (!drip.IsActive)
-			{
-				drip = {};
-				return drip;
-			}
-
-			if (drip.Life < shortestLife)
-			{
-				shortestLife = drip.Life;
-				oldestDripPtr = &drip;
-			}
-		}
-
-		*oldestDripPtr = {};
-		return *oldestDripPtr;
-	}
+	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
+	std::deque<BloodMist>		BloodMists				 = {};
+	std::deque<BloodDrip>		BloodDrips				 = {};
+	std::deque<BloodStain>		BloodStains				 = {};
 
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
@@ -175,7 +108,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
 	{
-		auto& uwBlood = GetFreeUnderwaterBlood();
+		auto& uwBlood = GetNewEffect(UnderwaterBloodParticles, UW_BLOOD_COUNT_MAX);
 
 		auto sphere = BoundingSphere(pos, UW_BLOOD_SPHERE_RADIUS);
 
@@ -198,7 +131,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
 	{
-		auto& mist = GetFreeBloodMist();
+		auto& mist = GetNewEffect(BloodMists, BLOOD_MIST_COUNT_MAX);
 
 		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
 
@@ -232,7 +165,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
 	{
-		auto& drip = GetFreeBloodDrip();
+		auto& drip = GetNewEffect(BloodDrips, BLOOD_DRIP_COUNT_MAX);
 
 		drip.SpriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
 		drip.IsActive = true;
@@ -279,7 +212,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec)
 	{
-		auto stain = BloodStain();
+		auto& stain = GetNewEffect(BloodStains, BLOOD_STAIN_COUNT_MAX);
 
 		stain.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_SPRITE_INDEX_MAX);
 		stain.Position = pos;
@@ -298,11 +231,6 @@ namespace TEN::Effects::Blood
 		stain.Opacity =
 		stain.OpacityMax = BLOOD_STAIN_OPACITY_MAX;
 		stain.DelayTime = std::round(delayTimeInSec * FPS);
-
-		if (BloodStains.size() >= BLOOD_STAIN_NUM_MAX)
-			BloodStains.pop_back();
-
-		BloodStains.push_front(stain);
 	}
 
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl)
@@ -357,6 +285,8 @@ namespace TEN::Effects::Blood
 			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
 				uwBlood.Scale += 4.0f;
 		}
+
+		ClearInactiveEffects(UnderwaterBloodParticles);
 	}
 
 	void UpdateBloodMists()
@@ -389,6 +319,8 @@ namespace TEN::Effects::Blood
 			mist.Opacity = Lerp(mist.OpacityMax, 0.0f, 1.0f - (mist.Life / mist.LifeMax));
 			mist.Color.w = mist.Opacity;
 		}
+
+		ClearInactiveEffects(BloodMists);
 	}
 
 	void UpdateBloodDrips()
@@ -445,6 +377,8 @@ namespace TEN::Effects::Blood
 				SpawnBloodStainFromDrip(drip, pointColl);
 			}
 		}
+
+		ClearInactiveEffects(BloodDrips);
 	}
 
 	void UpdateBloodStains()
@@ -501,21 +435,23 @@ namespace TEN::Effects::Blood
 			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_MAX * FPS)));
 			stain.Color.w = stain.Opacity;
 		}
+
+		ClearInactiveEffects(BloodStains);
 	}
 
 	void ClearUnderwaterBloodParticles()
 	{
-		UnderwaterBloodParticles.fill({});
+		UnderwaterBloodParticles.clear();
 	}
 	
 	void ClearBloodMists()
 	{
-		BloodMists.fill({});
+		BloodMists.clear();
 	}
 
 	void ClearBloodDrips()
 	{
-		BloodDrips.fill({});
+		BloodDrips.clear();
 	}
 
 	void ClearBloodStains()
