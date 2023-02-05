@@ -5,48 +5,9 @@ struct ItemInfo;
 
 namespace TEN::Effects::Blood
 {
-	struct UnderwaterBlood
-	{
-		unsigned int SpriteIndex = 0;
-		bool		 IsActive = false;
-
-		Vector3 Position   = Vector3::Zero;
-		int		RoomNumber = 0;
-		Vector4 Color	   = Vector4::Zero;
-
-		float Life	   = 0.0f;
-		float Init	   = 0.0f;
-		float Scale	   = 0.0f;
-		float Opacity  = 0.0f;
-	};
-
-	struct BloodMist
-	{
-		unsigned int SpriteIndex   = 0;
-		bool		 IsActive	   = false;
-
-		Vector3 Position	  = Vector3::Zero;
-		int		RoomNumber	  = 0;
-		short	Orientation2D = 0;
-		Vector3 Velocity	  = Vector3::Zero;
-		Vector4 Color		  = Vector4::Zero;
-		
-		float Life		 = 0.0f;
-		float LifeMax	 = 0.0f;
-		float Scale		 = 0.0f;
-		float ScaleMax	 = 0.0f;
-		float ScaleMin	 = 0.0f;
-		float Opacity	 = 0.0f;
-		float OpacityMax = 0.0f;
-		float Gravity	 = 0.0f;
-		float Friction	 = 0.0f;
-		short Rotation	 = 0;
-	};
-
 	struct BloodDrip
 	{
 		unsigned int SpriteIndex   = 0;
-		bool		 IsActive	   = false;
 		bool		 CanSpawnStain = false;
 
 		Vector3 Position   = Vector3::Zero;
@@ -84,20 +45,50 @@ namespace TEN::Effects::Blood
 		float OpacityMax	  = 0.0f;
 		float DelayTime		  = 0.0f;
 	};
+	
+	struct BloodMist
+	{
+		unsigned int SpriteIndex   = 0;
 
-	extern std::deque<UnderwaterBlood> UnderwaterBloodParticles;
-	extern std::deque<BloodMist>	   BloodMists;
+		Vector3 Position	  = Vector3::Zero;
+		int		RoomNumber	  = 0;
+		short	Orientation2D = 0;
+		Vector3 Velocity	  = Vector3::Zero;
+		Vector4 Color		  = Vector4::Zero;
+		
+		float Life		 = 0.0f;
+		float LifeMax	 = 0.0f;
+		float Scale		 = 0.0f;
+		float ScaleMax	 = 0.0f;
+		float ScaleMin	 = 0.0f;
+		float Opacity	 = 0.0f;
+		float OpacityMax = 0.0f;
+		float Gravity	 = 0.0f;
+		float Friction	 = 0.0f;
+		short Rotation	 = 0;
+	};
+
+	struct UnderwaterBlood
+	{
+		unsigned int SpriteIndex = 0;
+
+		Vector3 Position   = Vector3::Zero;
+		int		RoomNumber = 0;
+		Vector4 Color	   = Vector4::Zero;
+
+		float Life	  = 0.0f;
+		float Init	  = 0.0f;
+		float Scale	  = 0.0f;
+		float Opacity = 0.0f;
+	};
+
 	extern std::deque<BloodDrip>	   BloodDrips;
 	extern std::deque<BloodStain>	   BloodStains;
+	extern std::deque<BloodMist>	   BloodMists;
+	extern std::deque<UnderwaterBlood> UnderwaterBloodParticles;
 
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
 	bool				   TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints);
-
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale);
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count);
-
-	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count);
@@ -106,15 +97,21 @@ namespace TEN::Effects::Blood
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl);
 	void SpawnBloodStainPool(ItemInfo& item);
 
-	void UpdateUnderwaterBloodParticles();
-	void UpdateBloodMists();
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
+
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale);
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count);
+
 	void UpdateBloodDrips();
 	void UpdateBloodStains();
+	void UpdateBloodMists();
+	void UpdateUnderwaterBloodParticles();
 
-	void ClearUnderwaterBloodParticles();
-	void ClearBloodMists();
 	void ClearBloodDrips();
 	void ClearBloodStains();
+	void ClearBloodMists();
+	void ClearUnderwaterBloodParticles();
 
 	void DrawBloodDebug();
 }

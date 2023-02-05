@@ -851,10 +851,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& drip : BloodDrips)
 		{
-			if (!drip.IsActive)
-				continue;
-
-			if (drip.SpriteIndex >= g_Level.Sprites.size())
+			if (drip.Life <= 0.0f)
 				continue;
 
 			auto axis = -drip.Velocity;
@@ -874,10 +871,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& mist : BloodMists)
 		{
-			if (!mist.IsActive)
-				continue;
-
-			if (mist.SpriteIndex >= g_Level.Sprites.size())
+			if (mist.Life <= 0.0f)
 				continue;
 
 			AddSpriteBillboard(
@@ -891,7 +885,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& stain : BloodStains)
 		{
-			if (stain.SpriteIndex >= g_Level.Sprites.size())
+			if (stain.Life <= 0.0f)
 				continue;
 
 			// TODO: Try setting soft particle to true.
@@ -906,7 +900,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& uwBlood : UnderwaterBloodParticles)
 		{
-			if (!uwBlood.IsActive)
+			if (uwBlood.Life <= 0.0f)
 				continue;
 
 			auto color = Vector4::Zero;
