@@ -556,7 +556,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Determine relative orientation to floor normal.
+	// Determine relative orientation adhering to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 

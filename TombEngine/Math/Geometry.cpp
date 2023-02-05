@@ -126,7 +126,6 @@ namespace TEN::Math::Geometry
 
 		// TODO: Consider normal of downward force.
 		return FROM_RAD(atan2(normal.x, normal.z));
-		//return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
 	}
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -162,7 +161,7 @@ namespace TEN::Math::Geometry
 	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
 	{
 		// TODO: Consider normal of downward force.
-		
+
 		// Determine relative angle properties of normal.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
@@ -171,7 +170,7 @@ namespace TEN::Math::Geometry
 		float sinDeltaAngle = phd_sin(deltaAngle);
 		float cosDeltaAngle = phd_cos(deltaAngle);
 
-		// Calculate relative orientation to normal.
+		// Calculate relative orientation adhering to normal.
 		return EulerAngles(
 			-slopeAngle * cosDeltaAngle,
 			orient2D,
@@ -182,7 +181,7 @@ namespace TEN::Math::Geometry
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
-	
+
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)

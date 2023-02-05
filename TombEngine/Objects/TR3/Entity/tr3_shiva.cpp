@@ -199,7 +199,7 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (creature.Flags == 0 && (item.TestFlags(2, 1) || item.TestFlags(2, 2)))
+		if (creature.Flags == 0 && (item.TestFlagField(2, 1) || item.TestFlagField(2, 2)))
 		{
 			creature.Flags = 1;
 
@@ -233,14 +233,14 @@ namespace TEN::Entities::Creatures::TR3
 			creature.Flags--;
 		}
 
-		if (item.TestFlags(2, 0) && !isDead)
+		if (item.TestFlagField(2, 0) && !isDead)
 		{
 			item.Animation.TargetState = SHIVA_STATE_IDLE;
 			creature.Flags = -45;
 			item.SetFlagField(1, 0);
 			item.SetFlagField(1, 1); // Is alive (for savegame).
 		}
-		else if (item.TestFlags(2, 0) && isDead)
+		else if (item.TestFlagField(2, 0) && isDead)
 		{
 			item.SetFlagField(1, 0);
 			item.SetFlagField(1, 2); // Is dead.
@@ -262,7 +262,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Joint index used for swapping mesh.
 		item.SetFlagField(0, 0);
 
-		if (item.TestFlags(1, 0))
+		if (item.TestFlagField(1, 0))
 		{
 			for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
 				SwapShivaMeshToStone(item, jointIndex);

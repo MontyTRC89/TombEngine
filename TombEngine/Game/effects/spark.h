@@ -6,7 +6,7 @@
 namespace TEN::Effects::Spark
 {
 	constexpr auto SPARK_NUM_MAX = 128;
-	constexpr auto SPARK_RICOCHET_COLOR_DEFAULT = Vector4(1.0f, 0.8f, 0.2f, 1.0f);
+	constexpr auto SPARK_RICOCHET_COLOR_DEFAULT = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 
 	struct SparkParticle
 	{

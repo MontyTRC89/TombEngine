@@ -977,7 +977,7 @@ void LoadEvent(VolumeEvent& event)
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < eventSetCount; i++)
 	{
@@ -1186,26 +1186,29 @@ void LoadSamples()
 {
 	TENLog("Loading samples... ", LogLevel::Info);
 
-	int SoundMapSize = ReadInt16();
-	g_Level.SoundMap.resize(SoundMapSize);
-	ReadBytes(g_Level.SoundMap.data(), SoundMapSize * sizeof(short));
+	int soundMapSize = ReadInt16();
+	TENLog("Sound map size: " + std::to_string(soundMapSize), LogLevel::Info);
 
-	TENLog("Sound map size: " + std::to_string(SoundMapSize), LogLevel::Info);
+	g_Level.SoundMap.resize(soundMapSize);
+	ReadBytes(g_Level.SoundMap.data(), soundMapSize * sizeof(short));
 
-	int numSamplesInfos = ReadInt32();
-
-	if (!numSamplesInfos)
+	int numSampleInfos = ReadInt32();
+	if (!numSampleInfos)
 	{
 		TENLog("No samples were found and loaded.", LogLevel::Warning);
 		return;
 	}
 
-	g_Level.SoundDetails.resize(numSamplesInfos);
-	ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
+	TENLog("Num sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
+
+	g_Level.SoundDetails.resize(numSampleInfos);
+	ReadBytes(g_Level.SoundDetails.data(), numSampleInfos * sizeof(SampleInfo));
 
 	int numSamples = ReadInt32();
 	if (numSamples <= 0)
 		return;
+
+	TENLog("Num samples: " + std::to_string(numSamples), LogLevel::Info);
 
 	int uncompressedSize;
 	int compressedSize;
@@ -1226,25 +1229,36 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
+	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
 	g_Level.Boxes.resize(numBoxes);
 	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
-	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-
 	// Read overlaps
 	int numOverlaps = ReadInt32();
+	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
-	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
-
 	// Read zones
+	int numZoneGroups = ReadInt32();
+	TENLog("Num zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
+		for (int j = 0; j < numZoneGroups; j++)
 		{
-			g_Level.Zones[j][i].resize(numBoxes);
-			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			if (j >= (int)ZoneType::MaxZone)
+			{
+				int excessiveZoneGroups = numZoneGroups - j + 1;
+				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
+					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
+				LevelDataPtr += numBoxes * sizeof(int);
+			}
+			else
+			{
+				g_Level.Zones[j][i].resize(numBoxes);
+				ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			}
 		}
 	}
 

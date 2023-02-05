@@ -63,13 +63,20 @@ struct SHOCKWAVE_STRUCT
 	short innerRad;
 	short outerRad;
 	short xRot;
+	short yRot;
+	short zRot;
 	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
+	unsigned char sr;
+	unsigned char sg;
+	unsigned char sb;
 	unsigned char life;
 	short speed;
 	short temp;
+	bool fadeIn = false;
+	int style;
 };
 
 struct GUNSHELL_STRUCT
@@ -126,6 +133,12 @@ struct FIRE_SPARKS
 	unsigned char fadeToBlack;
 	unsigned char sLife;
 	unsigned char life;
+};
+
+enum class ShockwaveStyle
+{
+	Normal = 0,
+	Sophia = 1
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0
@@ -192,7 +205,7 @@ void LaraBubbles(ItemInfo* item);
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

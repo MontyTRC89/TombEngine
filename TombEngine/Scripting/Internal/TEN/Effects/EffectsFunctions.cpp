@@ -14,7 +14,7 @@
 #include "Game/effects/weather.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Effects/BlendIDs.h"
 #include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
@@ -26,9 +26,9 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
@@ -46,15 +46,8 @@ namespace Effects
 	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
 	static void EmitLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
-		Vector3i p1;
-		p1.x = src.x;
-		p1.y = src.y;
-		p1.z = src.z;
-
-		Vector3i p2;
-		p2.x = dest.x;
-		p2.y = dest.y;
-		p2.z = dest.z;
+		auto p1 = Vector3(src.x, src.y, src.z);
+		auto p2 = Vector3(dest.x, dest.y, dest.z);
 
 		int segs = USE_IF_HAVE(int, segments, 10);
 
@@ -95,7 +88,7 @@ namespace Effects
 
 		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
 
-		TEN::Effects::Lightning::TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
+		SpawnElectricity(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
 	/*** Emit a particle.
@@ -258,7 +251,7 @@ namespace Effects
 
 		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
 
-		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, ANGLE(ang), short(damage));
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, EulerAngles(ANGLE(ang), 0.0f, 0.0f), short(damage), true, false, (int)ShockwaveStyle::Normal);
 	}
 
 /***Emit dynamic light that lasts for a single frame.
