@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 					item->Animation.TargetState = GUARD_STATE_SURRENDER;
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & GUARD)
 				{
@@ -895,7 +895,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			case GUARD_STATE_SURRENDER:
 				creature->MaxTurn = 0;
-				if (item != Lara.TargetEntity && Random::TestProbability(1.0f / 64))
+
+				if (item != Lara.TargetEntity && Random::TestProbability(1 / 64.0f))
 				{
 					if (item->TriggerFlags == (int)GuardOcb::UseComputer || item->TriggerFlags == (int)GuardOcb::UseComputerScientist)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
