@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
@@ -16,13 +17,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Footprint
 {
-	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f;
-	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f;
-	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
-
-	constexpr auto FOOTPRINT_SCALE			= 64.0f;
-	constexpr auto FOOTPRINT_SURFACE_OFFSET = 4;
-	constexpr auto FOOT_HEIGHT_OFFSET		= CLICK(0.25f);
+	constexpr auto FOOTPRINT_COUNT_MAX = 32;
 
 	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
 	{
@@ -38,7 +33,7 @@ namespace TEN::Effects::Footprint
 
 	std::deque<Footprint> Footprints = {};
 
-	SOUND_EFFECTS GetFootprintSfx(FLOOR_MATERIAL material)
+	static SOUND_EFFECTS GetFootprintSfx(FLOOR_MATERIAL material)
 	{
 		switch (material)
 		{
@@ -113,26 +108,27 @@ namespace TEN::Effects::Footprint
 		}
 	}
 
-	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
+	static std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		static constexpr auto point0 = Vector3( FOOTPRINT_SCALE, 0.0f,  FOOTPRINT_SCALE);
-		static constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f,  FOOTPRINT_SCALE);
-		static constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
-		static constexpr auto point3 = Vector3( FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
+		constexpr auto SCALE   = BLOCK(1 / 16.0f);
+		constexpr auto POINT_0 = Vector3( SCALE, 0.0f,  SCALE);
+		constexpr auto POINT_1 = Vector3(-SCALE, 0.0f,  SCALE);
+		constexpr auto POINT_2 = Vector3(-SCALE, 0.0f, -SCALE);
+		constexpr auto POINT_3 = Vector3( SCALE, 0.0f, -SCALE);
 
 		// Determine rotation matrix.
 		auto rotMatrix = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, normal).ToRotationMatrix();
 
 		return std::array<Vector3, 4>
 		{
-			pos + Vector3::Transform(point0, rotMatrix),
-			pos + Vector3::Transform(point1, rotMatrix),
-			pos + Vector3::Transform(point2, rotMatrix),
-			pos + Vector3::Transform(point3, rotMatrix)
+			pos + Vector3::Transform(POINT_0, rotMatrix),
+			pos + Vector3::Transform(POINT_1, rotMatrix),
+			pos + Vector3::Transform(POINT_2, rotMatrix),
+			pos + Vector3::Transform(POINT_3, rotMatrix)
 		};
 	}
 
-	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList)
+	static bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList)
 	{
 		for (const auto& material : materialList)
 		{
@@ -143,21 +139,24 @@ namespace TEN::Effects::Footprint
 		return false;
 	}
 
-	bool TestFootHeight(const ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
+	static bool TestFootHeight(const ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
 	{
-		static constexpr auto heightRange = CLICK(0.25f);
-		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
+		constexpr auto SURFACE_OFFSET = 4;
+		constexpr auto HEIGHT_OFFSET  = CLICK(0.25f);
+		constexpr auto HEIGHT_RANGE	  = CLICK(0.25f);
 
-		auto footPos = GetJointPosition(LaraItem, meshIndex, footOffset);
+		static const auto FOOT_OFFSET = Vector3i(0, HEIGHT_OFFSET, 0);
+
+		auto footPos = GetJointPosition(LaraItem, meshIndex, FOOT_OFFSET);
 		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
 
-		outFootprintPos = Vector3(footPos.x, floorHeight - FOOTPRINT_SURFACE_OFFSET, footPos.z);
-		return (abs(footPos.y - floorHeight) < heightRange);
+		outFootprintPos = Vector3(footPos.x, floorHeight - SURFACE_OFFSET, footPos.z);
+		return (abs(footPos.y - floorHeight) < HEIGHT_RANGE);
 	}
 
-	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints)
+	static bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints)
 	{
-		static constexpr auto heightRange = CLICK(0.5f);
+		constexpr auto HEIGHT_RANGE = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
@@ -166,10 +165,10 @@ namespace TEN::Effects::Footprint
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
 		// Don't spawn footprint if floor heights at vertex points are outside relative range.
-		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
-			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
-			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
-			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > heightRange))
+		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > HEIGHT_RANGE) ||
+			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > HEIGHT_RANGE) ||
+			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > HEIGHT_RANGE) ||
+			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > HEIGHT_RANGE))
 		{
 			return false;
 		}
@@ -179,20 +178,19 @@ namespace TEN::Effects::Footprint
 
 	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints)
 	{
-		auto footprint = Footprint();
+		constexpr auto LIFE_MAX			 = 20.0f;
+		constexpr auto LIFE_START_FADING = 10.0f;
+		constexpr auto OPACITY_MAX		 = 0.5f;
+
+		auto footprint = GetNewEffect(Footprints, FOOTPRINT_COUNT_MAX);
 
 		footprint.SpriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
 		footprint.IsRightFoot = isRightFoot;
 		footprint.VertexPoints = vertexPoints;
-		footprint.Life = std::round(FOOTPRINT_LIFE_MAX * FPS);
-		footprint.LifeStartFading = std::round(FOOTPRINT_LIFE_START_FADING * FPS);
+		footprint.Life = std::round(LIFE_MAX * FPS);
+		footprint.LifeStartFading = std::round(LIFE_START_FADING * FPS);
 		footprint.Opacity =
-		footprint.OpacityStart = FOOTPRINT_OPACITY_MAX;
-
-		if (Footprints.size() >= FOOTPRINT_NUM_MAX)
-			Footprints.pop_back();
-
-		Footprints.push_front(footprint);
+		footprint.OpacityStart = OPACITY_MAX;
 	}
 
 	void SpawnFootprint(const ItemInfo& item, bool isRightFoot)
@@ -216,11 +214,9 @@ namespace TEN::Effects::Footprint
 		if (pointColl.Position.Bridge >= 0)
 			return;
 
-		// Get footstep sound for floor material.
+		// Get and emit footstep sound for floor material.
 		auto sfx = GetFootprintSfx(pointColl.BottomBlock->Material);
-
-		// HACK: Must be here until reference WAD2 is revised.
-		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
+		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS) // HACK: Must be here until reference WAD2 is revised.
 		{
 			auto poseCopy = item.Pose;
 			SoundEffect(sfx, &poseCopy);
@@ -244,17 +240,11 @@ namespace TEN::Effects::Footprint
 		if (Footprints.empty())
 			return;
 
-		unsigned int numInvalidFootprints = 0;
-
 		for (auto& footprint: Footprints)
 		{
 			// Despawn.
-			footprint.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (footprint.Life <= 0.0f)
-			{
-				numInvalidFootprints++;
 				continue;
-			}
 
 			// Update opacity.
 			if (footprint.Life <= footprint.LifeStartFading)
@@ -262,11 +252,12 @@ namespace TEN::Effects::Footprint
 				float opacity = Lerp(footprint.OpacityStart, 0.0f, 1.0f - (footprint.Life / footprint.LifeStartFading));
 				footprint.Opacity = opacity;
 			}
+
+			// Update life.
+			footprint.Life -= 1.0f;
 		}
 
-		// Despawn.
-		for (int i = 0; i < numInvalidFootprints; i++)
-			Footprints.pop_back();
+		ClearInactiveEffects(Footprints);
 	}
 
 	void ClearFootprints()

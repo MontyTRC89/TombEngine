@@ -2,6 +2,7 @@
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -28,17 +29,17 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
-	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
-	std::deque<BloodMist>		BloodMists				 = {};
 	std::deque<BloodDrip>		BloodDrips				 = {};
 	std::deque<BloodStain>		BloodStains				 = {};
+	std::deque<BloodMist>		BloodMists				 = {};
+	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
 
 	static std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
-		constexpr auto point0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
-		constexpr auto point1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
-		constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
-		constexpr auto point3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
+		constexpr auto POINT_0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
+		constexpr auto POINT_1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
+		constexpr auto POINT_2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
+		constexpr auto POINT_3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
 
 		// No scale; return early.
 		if (scale == 0.0f)
@@ -49,10 +50,10 @@ namespace TEN::Effects::Blood
 
 		return std::array<Vector3, 4>
 		{
-			pos + Vector3::Transform(point0 * (scale / 2), rotMatrix),
-			pos + Vector3::Transform(point1 * (scale / 2), rotMatrix),
-			pos + Vector3::Transform(point2 * (scale / 2), rotMatrix),
-			pos + Vector3::Transform(point3 * (scale / 2), rotMatrix)
+			pos + Vector3::Transform(POINT_0 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(POINT_1 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(POINT_2 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(POINT_3 * (scale / 2), rotMatrix)
 		};
 	}
 
