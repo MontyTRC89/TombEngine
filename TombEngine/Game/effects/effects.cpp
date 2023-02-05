@@ -468,20 +468,12 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	static constexpr auto rotationMax = 30;
-	static constexpr auto lifeMax	  = 44;
+	static constexpr auto LIFE_MAX	   = 44.0f;
+	static constexpr auto ROTATION_MAX = ANGLE(0.15f);
 
-	static const auto extrasTable = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
+	static const auto EXTRAS_TABLE = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
 	int scalar = 1;
-
-	if (dx < -BLOCK(16) || dx > BLOCK(16) ||
-		dz < -BLOCK(16) || dz > BLOCK(16))
-	{
-		return;
-	}
 
 	if (roomNumber < 0)
 	{
@@ -515,11 +507,11 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.dB = 32;
 		spark.colFadeSpeed = 8;
 		spark.fadeToBlack = 16;
-		spark.life = (GetRandomControl() & 7) + lifeMax;
+		spark.life = (GetRandomControl() & 7) + LIFE_MAX;
 		spark.sLife = spark.life;
 	}
 
-	spark.extras = unsigned char(extraTrig | ((extrasTable[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
+	spark.extras = unsigned char(extraTrig | ((EXTRAS_TABLE[extraTrig] + (GetRandomControl() & 7) + 28) << 3));
 	spark.dynamic = (char)dynamic;
 
 	if (dynamic == -2)
@@ -570,26 +562,28 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark.friction = 17;
 	}
 	else
+	{
 		spark.friction = 51;
+	}
 
-		if (GetRandomControl() & 1)
-		{
-			if (uw == 1)
-				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
-			else
-				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
-
-			spark.rotAng = GetRandomControl() & 0xF;
-			spark.rotAdd = (GetRandomControl() & 0xF) + rotationMax;
-		}
-		else if (uw == 1)
-		{
-			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
-		}
+	if (GetRandomControl() & 1)
+	{
+		if (uw == 1)
+			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
 		else
-		{
-			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
-		}
+			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_EXPLOSION;
+
+		spark.rotAng = GetRandomControl() & 0xF;
+		spark.rotAdd = (GetRandomControl() & 0xF) + ROTATION_MAX;
+	}
+	else if (uw == 1)
+	{
+		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+	}
+	else
+	{
+		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_EXPLOSION;
+	}
 
 	spark.scalar = 3;
 	spark.gravity = 0;

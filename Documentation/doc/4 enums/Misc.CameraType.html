@@ -70,8 +70,8 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <here>Misc.ActionID</here></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
+  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
+  <li>    <here>Misc.CameraType</here></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -86,18 +86,18 @@
 
 <div id="content">
 
-<h1>Enum <code>Misc.ActionID</code></h1>
-<p>Constants for action key IDs.</p>
+<h1>Enum <code>Misc.CameraType</code></h1>
+<p>Constants for the type of the Camera.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Misc_ActionID_constants">Misc.ActionID constants </a></h2>
+<h2><a href="#Misc_CameraType_constants">Misc.CameraType constants </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
-	<td class="summary">Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).</td>
+	<td class="summary">Table of camera type constants (for use with GetCameraType() function).</td>
 	</tr>
 </table>
 
@@ -105,31 +105,20 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Misc_ActionID_constants"></a>Misc.ActionID constants </h2>
+    <h2 class="section-header has-description"><a name="Misc_CameraType_constants"></a>Misc.CameraType constants </h2>
 
           <div class="section-description">
 
 
 
-<p>The following constants are inside ActionID.</p>
+<p>The following constants are inside CameraType.</p>
 
-<pre><code>FORWARD
-BACK
-LEFT
-RIGHT
-CROUCH
-SPRINT
-WALK
-JUMP
-ACTION
-DRAW
-FLARE
+<pre><code>CHASE
+FIXED
 LOOK
-ROLL
-INVENTORY
-PAUSE
-STEPLEFT
-STEPRIGHT
+COMBAT
+HEAVY
+OBJECT
 </code></pre>
 
 
@@ -140,7 +129,7 @@ STEPRIGHT
     <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).
+    Table of camera type constants (for use with GetCameraType() function).
 
 
 

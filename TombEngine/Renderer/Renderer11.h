@@ -554,7 +554,9 @@ namespace TEN::Renderer
 		void DrawSparkParticles(RenderView& view);
 		void DrawDripParticles(RenderView& view);
 		void DrawExplosionParticles(RenderView& view);
-		void DrawLaraHolsters(bool transparent);
+		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
+		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
+		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
 		void DrawFootprints(RenderView& view);
@@ -595,6 +597,7 @@ namespace TEN::Renderer
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
+		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 

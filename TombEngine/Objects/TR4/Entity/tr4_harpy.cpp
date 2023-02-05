@@ -446,8 +446,8 @@ namespace TEN::Entities::TR4
 						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
 						AI.distance < SQUARE(BLOCK(2)) &&
-						item->Animation.ActiveState == HARPY_STATE_STINGER_ATTACK &&
-						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 17)
+						item->Animation.AnimNumber == GetAnimNumber(*item, HARPY_ANIM_STINGER_ATTACK) &&
+						item->Animation.FrameNumber > GetFrameNumber(item, 17))
 					)
 				{
 					if (creature->Enemy->IsLara())

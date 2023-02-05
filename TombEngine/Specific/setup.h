@@ -23,7 +23,6 @@ enum class LotType
 	Flyer,
 	Blockable, // For large creatures such as trex and shiva.
 	Spider,    // Only 2 block vault allowed.
-	SophiaLee, // Prevents Sophia from going to lower levels again.
 	Ape		   // Only 2 block vault allowed.
 };
 
