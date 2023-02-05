@@ -17,7 +17,8 @@ namespace TEN::Hud
 
 	bool DisplayPickup::IsOffscreen(bool checkAbove) const
 	{
-		const auto SCREEN_THRESHOLD = SCREEN_COORDS * 0.1f;
+		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
+		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_COORDS.x * SCREEN_THRESHOLD_COEFF, SCREEN_COORDS.y * SCREEN_THRESHOLD_COEFF);
 
 		// NOTE: Positions above screen can be ignored to account for high stacks.
 		if (checkAbove)
@@ -172,9 +173,11 @@ namespace TEN::Hud
 	// TODO: Make positions hug the edge.
 	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
 	{
-		constexpr auto STACK_HEIGHT_MAX = 6;
-		const	  auto SCREEN_SCALE		= SCREEN_COORDS * (1 / 7.0f);
-		const	  auto SCREEN_OFFSET	= -(SCREEN_COORDS * (1 / 7.0f));
+		constexpr auto STACK_HEIGHT_MAX	   = 6;
+		constexpr auto SCREEN_SCALE_COEFF  = 1 / 7.0f;
+		constexpr auto SCREEN_OFFSET_COEFF = 1 / 7.0f;
+		constexpr auto SCREEN_SCALE		   = Vector2(SCREEN_COORDS.x * SCREEN_SCALE_COEFF, SCREEN_COORDS.y * SCREEN_SCALE_COEFF);
+		constexpr auto SCREEN_OFFSET	   = Vector2(-(SCREEN_COORDS.x * SCREEN_OFFSET_COEFF), -(SCREEN_COORDS.y * SCREEN_OFFSET_COEFF));
 
 		// Calculate screen positions. 
 		auto stackPositions = std::vector<Vector2>{};
