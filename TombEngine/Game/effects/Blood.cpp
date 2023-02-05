@@ -33,7 +33,7 @@ namespace TEN::Effects::Blood
 	std::deque<BloodDrip>		BloodDrips				 = {};
 	std::deque<BloodStain>		BloodStains				 = {};
 
-	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
+	static std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
 		constexpr auto point0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
 		constexpr auto point1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
@@ -56,7 +56,7 @@ namespace TEN::Effects::Blood
 		};
 	}
 
-	bool TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints)
+	static bool TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints)
 	{
 		static constexpr auto heightRange = CLICK(0.5f);
 
