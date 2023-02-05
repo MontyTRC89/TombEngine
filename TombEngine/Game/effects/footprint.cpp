@@ -198,14 +198,14 @@ namespace TEN::Effects::Footprint
 		if (!item.IsLara())
 			return;
 
-		auto footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
+		int footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
 
 		// Don't process actual footprint placement if foot isn't on floor.
 		auto footPos = Vector3::Zero;
 		if (!TestFootHeight(item, footJoint, footPos))
 			return;
 
-		// Slightly randomize 2D footprint position to avoid patterns.
+		// Slightly randomize 2D position.
 		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
 		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber);
@@ -242,7 +242,6 @@ namespace TEN::Effects::Footprint
 
 		for (auto& footprint: Footprints)
 		{
-			// Despawn.
 			if (footprint.Life <= 0.0f)
 				continue;
 
