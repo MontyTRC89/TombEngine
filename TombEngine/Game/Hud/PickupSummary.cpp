@@ -40,7 +40,8 @@ namespace TEN::Hud
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.75f;
-		const	  auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
+
+		static const auto ROTATION = EulerAngles(0, ANGLE(3.0f), 0);
 
 		if (this->IsOffscreen(false))
 			return;
