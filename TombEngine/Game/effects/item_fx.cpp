@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -80,7 +81,7 @@ namespace TEN::Effects::Items
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (item->IsLara())
+		if (!item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);

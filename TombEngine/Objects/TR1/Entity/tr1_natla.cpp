@@ -9,7 +9,9 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -19,17 +21,17 @@ namespace TEN::Entities::Creatures::TR1
 	// TODO: Organise.
 	constexpr auto NATLA_SHOT_DAMAGE = 100;
 	constexpr auto NATLA_NEAR_DEATH = 200;
-	constexpr auto NATLA_DEATH_TIME = (FPS * 16); // 16 seconds.
+	constexpr auto NATLA_DEATH_TIME = FPS * 16; // 16 seconds.
 	constexpr auto NATLA_FLYMODE = 0x8000;
 	constexpr auto NATLA_TIMER = 0x7FFF;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
 
-	constexpr auto NATLA_LAND_CHANCE = 1.0f / 128;
+	constexpr auto NATLA_LAND_CHANCE = 1 / 128.0f;
 
-	const auto NATLA_TURN_NEAR_DEATH_SPEED = ANGLE(6.0f);
-	const auto NATLA_TURN_SPEED = ANGLE(5.0f);
-	const auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
-	const auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
+	constexpr auto NATLA_TURN_NEAR_DEATH_SPEED = ANGLE(6.0f);
+	constexpr auto NATLA_TURN_SPEED = ANGLE(5.0f);
+	constexpr auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
+	constexpr auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
 
 	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
@@ -259,7 +261,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case NATLA_STATE_AIM:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (shoot)
 					item->Animation.TargetState = NATLA_STATE_SHOOT;
@@ -269,7 +271,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case NATLA_STATE_SHOOT:
-				if (!item->Animation.RequiredState)
+				if (item->Animation.RequiredState == NO_STATE)
 				{
 					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)

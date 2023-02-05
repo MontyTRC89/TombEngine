@@ -25,7 +25,7 @@ enum class GameStatus
 	LevelComplete
 };
 
-enum HEADINGS
+enum CardinalDirection
 {
 	NORTH,
 	EAST,
@@ -33,7 +33,7 @@ enum HEADINGS
 	WEST
 };
 
-enum FADE_STATUS
+enum FadeStatus
 {
 	FADE_STATUS_NONE,
 	FADE_STATUS_FADEIN,
@@ -67,6 +67,8 @@ extern short NextItemActive;
 extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
+
+extern int ControlPhaseTime;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 

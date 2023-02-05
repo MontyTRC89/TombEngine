@@ -9,7 +9,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -28,12 +28,12 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "ScriptInterfaceLevel.h"
 #include "ScriptInterfaceGame.h"
-#include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;
@@ -139,29 +139,46 @@ Vector3 ToVector3(const Save::Vector3* vec)
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
+Vector4 ToVector4(const Save::Vector3* vec)
+{
+	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
+}
+
 Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+#define SaveVec(Type, Data, TableBuilder, UnionType) \
+				auto data = std::get<(int)Type>(Data); \
+				TableBuilder vtb{ fbb }; \
+				Save::Vector3 saveVec = FromVector3(data); \
+				vtb.add_vec(&saveVec); \
+				auto vecOffset = vtb.Finish(); \
+				putDataInVec(UnionType, vecOffset);
+
 bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
+	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
-	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
+	std::vector<flatbuffers::Offset<Save::Item>> serializedItems{};
 
 	// Savegame header
 	auto levelNameOffset = fbb.CreateString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
-	sghb.add_days((GameTimer / FPS) / 8640);
-	sghb.add_hours(((GameTimer / FPS) % 86400) / 3600);
-	sghb.add_minutes(((GameTimer / FPS) / 60) % 6);
-	sghb.add_seconds((GameTimer / FPS) % 60);
+
+	auto gameTime = GetGameTime(GameTimer);
+	sghb.add_days(gameTime.Days);
+	sghb.add_hours(gameTime.Hours);
+	sghb.add_minutes(gameTime.Minutes);
+	sghb.add_seconds(gameTime.Seconds);
+
 	sghb.add_level(CurrentLevel);
 	sghb.add_timer(GameTimer);
 	sghb.add_count(++LastSaveGame);
@@ -450,6 +467,22 @@ bool SaveGame::Save(int slot)
 	lara.add_wet(wetOffset);
 	auto laraOffset = lara.Finish();
 
+	std::vector<flatbuffers::Offset<Save::Room>> rooms;
+	for (auto& room : g_Level.Rooms)
+	{
+		auto nameOffset = fbb.CreateString(room.name);
+
+		Save::RoomBuilder serializedInfo{ fbb };
+		serializedInfo.add_name(nameOffset);
+		serializedInfo.add_index(room.index);
+		serializedInfo.add_reverb_type((int)room.reverbType);
+		serializedInfo.add_flags(room.flags);
+		auto serializedInfoOffset = serializedInfo.Finish();
+
+		rooms.push_back(serializedInfoOffset);
+	}
+	auto roomOffset = fbb.CreateVector(rooms);
+
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
@@ -634,10 +667,9 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
-		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
+		serializedItem.add_color(&FromVector4(itemToSerialize.Model.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
-		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
@@ -699,7 +731,6 @@ bool SaveGame::Save(int slot)
 
 		currentItemIndex++;
 	}
-
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// TODO: In future, we should save only active FX, not whole array.
@@ -811,9 +842,9 @@ bool SaveGame::Save(int slot)
 	}
 	auto flybyCamerasOffset = fbb.CreateVector(flybyCameras);
 
-	// Static meshes and volume states
+	// Static meshes and volumes
 	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
-	std::vector<flatbuffers::Offset<Save::VolumeState>> volumeStates;
+	std::vector<flatbuffers::Offset<Save::Volume>> volumes;
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
@@ -828,36 +859,50 @@ bool SaveGame::Save(int slot)
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(room->mesh[j].roomNumber);
+			staticMesh.add_room_number(room->index);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
 
 		for (int j = 0; j < room->triggerVolumes.size(); j++)
 		{
-			Save::VolumeStateBuilder volumeState{ fbb };
+			auto& currVolume = room->triggerVolumes[j];
 
-			auto& volume = room->triggerVolumes[j];
+			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
+			for (int k = 0; k < currVolume.StateQueue.size(); k++)
+			{
+				auto& entry = currVolume.StateQueue[k];
 
-			volumeState.add_room_number(i);
-			volumeState.add_number(j);
+				int activator = NO_ITEM;
+				if (std::holds_alternative<short>(entry.Activator))
+					activator = std::get<short>(entry.Activator);
+				else
+					continue;
 
-			volumeState.add_position(&FromVector3(volume.Position));
-			volumeState.add_rotation(&FromVector4(volume.Rotation));
-			volumeState.add_scale(&FromVector3(volume.Scale));
+				Save::VolumeStateBuilder volstate{ fbb };
+				volstate.add_status((int)entry.Status);
+				volstate.add_activator(activator);
+				volstate.add_timestamp(entry.Timestamp);
+				queue.push_back(volstate.Finish());
+			}
 
-			int triggerer = -1;
-			if (std::holds_alternative<short>(volume.Triggerer))
-				triggerer = std::get<short>(volume.Triggerer);
+			auto queueOffset = fbb.CreateVector(queue);
+			auto nameOffset = fbb.CreateString(currVolume.Name);
 
-			volumeState.add_triggerer(triggerer);
-			volumeState.add_state((int)volume.Status);
-			volumeState.add_timeout((int)volume.Timeout);
-			volumeStates.push_back(volumeState.Finish());
+			Save::VolumeBuilder volume{ fbb };
+			volume.add_room_number(room->index);
+			volume.add_number(j);
+			volume.add_name(nameOffset);
+			volume.add_enabled(currVolume.Enabled);
+			volume.add_position(&FromVector3(currVolume.Box.Center));
+			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
+			volume.add_scale(&FromVector3(currVolume.Box.Extents));
+			volume.add_queue(queueOffset);
+			volumes.push_back(volume.Finish());
 		}
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
-	auto volumeStatesOffset = fbb.CreateVector(volumeStates);
+	auto volumesOffset = fbb.CreateVector(volumes);
 
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
@@ -1103,15 +1148,30 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
 		}
-		else if (std::holds_alternative<Vector3i>(s))
+		else
 		{
-			Save::vec3TableBuilder vtb{ fbb };
-			Vector3i data = std::get<Vector3i>(s);
-			Save::Vector3 saveVec = FromVector3(std::get<Vector3i>(s));
-			vtb.add_vec(&saveVec);
-			auto vec3Offset = vtb.Finish();
+			switch (SavedVarType(s.index()))
+			{
+			case SavedVarType::Vec3:
+			{
+				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
+			}
+			break;
+			case SavedVarType::Rotation:
+			{
+				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
+			}
+			break;
+			case SavedVarType::Color:
+			{
+				Save::colorTableBuilder ctb{ fbb };
+				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+				auto offset = ctb.Finish();
 
-			putDataInVec(Save::VarUnion::vec3, vec3Offset);
+				putDataInVec(Save::VarUnion::color, offset);
+			}
+			break;
+			}
 		}
 	}
 	auto unionVec = fbb.CreateVector(varsVec);
@@ -1132,6 +1192,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
@@ -1151,7 +1212,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_current_fov(LastFOV);
 	sgb.add_static_meshes(staticMeshesOffset);
-	sgb.add_volume_states(volumeStatesOffset);
+	sgb.add_volumes(volumesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
 	sgb.add_particles(particleOffset);
 	sgb.add_bats(batsOffset);
@@ -1193,6 +1254,7 @@ bool SaveGame::Save(int slot)
 bool SaveGame::Load(int slot)
 {
 	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -1225,7 +1287,68 @@ bool SaveGame::Load(int slot)
 	Statistics.Level.Secrets = s->level()->secrets();
 	Statistics.Level.Timer = s->level()->timer();
 
-	// Flipmaps
+	// Rooms
+	for (int i = 0; i < s->rooms()->size(); i++)
+	{
+		auto room = s->rooms()->Get(i);
+		g_Level.Rooms[room->index()].name = room->name()->str();
+		g_Level.Rooms[room->index()].flags = room->flags();
+		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
+	}
+
+	// Static objects
+	for (int i = 0; i < s->static_meshes()->size(); i++)
+	{
+		auto staticMesh = s->static_meshes()->Get(i);
+		auto room = &g_Level.Rooms[staticMesh->room_number()];
+		int number = staticMesh->number();
+
+		room->mesh[number].pos = ToPHD(staticMesh->pose());
+		room->mesh[number].roomNumber = staticMesh->room_number();
+		room->mesh[number].scale = staticMesh->scale();
+		room->mesh[number].color = ToVector4(staticMesh->color());
+
+		room->mesh[number].flags = staticMesh->flags();
+		room->mesh[number].HitPoints = staticMesh->hit_points();
+		
+		if (!room->mesh[number].flags)
+		{
+			short roomNumber = staticMesh->room_number();
+			FloorInfo* floor = GetFloor(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, &roomNumber);
+			TestTriggers(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, staticMesh->room_number(), true, 0);
+			floor->Stopper = false;
+		}
+	}
+
+	// Volumes
+	for (int i = 0; i < s->volumes()->size(); i++)
+	{
+		auto volume = s->volumes()->Get(i);
+		auto room = &g_Level.Rooms[volume->room_number()];
+		int number = volume->number();
+
+		room->triggerVolumes[number].Enabled = volume->enabled();
+		room->triggerVolumes[number].Name = volume->name()->str();
+		room->triggerVolumes[number].Box.Center =
+		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
+		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
+		room->triggerVolumes[number].Box.Extents = ToVector3(volume->scale());
+		room->triggerVolumes[number].Sphere.Radius = room->triggerVolumes[number].Box.Extents.x;
+
+		for (int j = 0; j < volume->queue()->size(); j++)
+		{
+			auto state = volume->queue()->Get(j);
+			room->triggerVolumes[number].StateQueue.push_back(
+				VolumeState
+				{
+					(VolumeStateStatus)state->status(),
+					(short)state->activator(),
+					state->timestamp()
+				});
+		}
+	}
+
+	// Flipmaps (should be applied after statics and volumes are loaded)
 	for (int i = 0; i < s->flip_stats()->size(); i++)
 	{
 		if (s->flip_stats()->Get(i) != 0)
@@ -1256,53 +1379,8 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
 		int index = s->cd_flags()->Get(i);
-		int mask  = s->cd_flags()->Get(++i);
+		int mask = s->cd_flags()->Get(++i);
 		SoundTracks[index].Mask = mask;
-	}
-
-	// Static objects
-	for (int i = 0; i < s->static_meshes()->size(); i++)
-	{
-		auto staticMesh = s->static_meshes()->Get(i);
-		auto room = &g_Level.Rooms[staticMesh->room_number()];
-		int number = staticMesh->number();
-
-		room->mesh[number].pos = ToPHD(staticMesh->pose());
-		room->mesh[number].roomNumber = staticMesh->room_number();
-		room->mesh[number].scale = staticMesh->scale();
-		room->mesh[number].color = ToVector4(staticMesh->color());
-
-		room->mesh[number].flags = staticMesh->flags();
-		room->mesh[number].HitPoints = staticMesh->hit_points();
-		
-		if (!room->mesh[number].flags)
-		{
-			short roomNumber = staticMesh->room_number();
-			FloorInfo* floor = GetFloor(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, &roomNumber);
-			TestTriggers(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, staticMesh->room_number(), true, 0);
-			floor->Stopper = false;
-		}
-	}
-
-	// Volumes
-	for (int i = 0; i < s->volume_states()->size(); i++)
-	{
-		auto volume = s->volume_states()->Get(i);
-		auto room = &g_Level.Rooms[volume->room_number()];
-		int number = volume->number();
-
-		room->triggerVolumes[number].Position = ToVector3(volume->position());
-		room->triggerVolumes[number].Rotation = ToVector4(volume->rotation());
-		room->triggerVolumes[number].Scale = ToVector3(volume->scale());
-
-		int triggerer = volume->triggerer();
-		if (triggerer >= 0)
-			room->triggerVolumes[number].Triggerer = short(triggerer);
-		else
-			room->triggerVolumes[number].Triggerer = nullptr;
-
-		room->triggerVolumes[number].Status = TriggerStatus(volume->state());
-		room->triggerVolumes[number].Timeout = volume->timeout();
 	}
 
 	// Cameras 
@@ -1341,7 +1419,7 @@ bool SaveGame::Load(int slot)
 		bool dynamicItem = i >= g_Level.NumItems;
 
 		ItemInfo* item = &g_Level.Items[i];
-		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+		item->ObjectNumber = GAME_OBJECT_ID(savedItem->object_id());
 
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
@@ -1396,7 +1474,7 @@ bool SaveGame::Load(int slot)
 		item->Flags = savedItem->flags();
 
 		// Color
-		item->Color = ToVector4(savedItem->color());
+		item->Model.Color = ToVector4(savedItem->color());
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
@@ -1439,7 +1517,7 @@ bool SaveGame::Load(int slot)
 			UpdateBridgeItem(i);
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
 
@@ -1475,7 +1553,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
-			SetBaddyTarget(i, savedCreature->ai_target_number());
+			SetEntityTarget(i, savedCreature->ai_target_number());
 		}
 		else if (item->Data.is<QuadBikeInfo>())
 		{
@@ -1720,7 +1798,7 @@ bool SaveGame::Load(int slot)
 	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
 	{
-		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups_combo()->Get(i);
+		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
 	}
 
 	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));
@@ -1943,7 +2021,21 @@ bool SaveGame::Load(int slot)
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
-				loadedVars.push_back(ToVector3i(var->u_as_vec3()->vec()));
+				auto stored = var->u_as_vec3()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::rotation)
+			{
+				auto stored = var->u_as_rotation()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::color)
+			{
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

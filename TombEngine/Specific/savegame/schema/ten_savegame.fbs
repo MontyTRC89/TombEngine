@@ -6,6 +6,13 @@ struct RoomVector {
 	y_location: uint32;
 }
 
+table Room {
+	index: int32;
+	name: string;
+	flags: int32;
+	reverb_type: int32;
+}
+
 table Item {
 	active_state: int32;
 	anim_number: int32;
@@ -32,7 +39,6 @@ table Item {
 	pose: Position;
 	next_item: int32;
 	next_item_active: int32;
-	triggered: bool;
 	active: bool;
 	status: int32;
 	hit_stauts: bool;
@@ -367,14 +373,20 @@ table EventSetCallCounters {
 }
 
 table VolumeState {
+	status: int32;
+	activator: int32;
+	timestamp: int32;
+}
+
+table Volume {
+	name: string;
 	number: int32;
 	room_number: int32;
+	enabled: bool;
 	position: Vector3;
 	rotation: Vector4;
 	scale: Vector3;
-	state: int32;
-	triggerer: int32;
-	timeout: int32;
+	queue: [VolumeState];
 }
 
 struct KeyValPair {
@@ -402,6 +414,14 @@ table vec3Table {
 	vec: Vector3;
 }
 
+table rotationTable {
+	vec: Vector3;
+}
+
+table colorTable {
+	color: uint32;
+}
+
 table funcNameTable {
 	str: string;
 }
@@ -412,6 +432,8 @@ union VarUnion {
 	num: doubleTable,
 	boolean: boolTable,
 	vec3: vec3Table,
+	rotation: rotationTable,
+	color: colorTable,
 	funcName: funcNameTable
 }
 
@@ -449,6 +471,7 @@ table SaveGame {
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
 	lara: Lara;
+	rooms: [Room];
 	items: [Item];
 	next_item_free: int32;
 	next_item_active: int32;
@@ -480,7 +503,7 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
-	volume_states: [VolumeState];
+	volumes: [Volume];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
 	callbacks_pre_control: [string];

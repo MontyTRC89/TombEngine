@@ -126,15 +126,6 @@ void ObjectObjects()
 		obj->control = FallingBlockControl;
 	}
 
-	/*obj = &Objects[ID_AIRLOCK_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = TEN::Entities::Switches::SwitchCollision;
-		obj->control = SwitchControl;
-		
-		
-	}*/
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -350,23 +341,23 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
+		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowType = ShadowMode::None;
 		obj->HitPoints = NOT_TARGETABLE;
-		obj->hitEffect = HIT_NONE;
+		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
 		obj->waterCreature = false;
-		obj->nonLot = true;
+		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
-		obj->ZoneType = ZoneType::None;
+		obj->LotType = LotType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseEffectsObjects();

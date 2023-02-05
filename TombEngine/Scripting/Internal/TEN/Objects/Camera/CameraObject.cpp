@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/Camera/CameraObject.h"
+#include "Game/camera.h"
 
 #include "ReservedScriptNames.h"
 #include "ScriptAssert.h"
@@ -15,15 +16,15 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Camera, ScriptReserved_Camera);
-static auto newindex_error = newindex_error_maker(Camera, ScriptReserved_Camera);
+static auto index_error = index_error_maker(CameraObject, ScriptReserved_Camera);
+static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_Camera);
 
-Camera::Camera(LevelCameraInfo & ref) : m_camera{ref}
+CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
-void Camera::Register(sol::table & parent)
+void CameraObject::Register(sol::table & parent)
 {
-	parent.new_usertype<Camera>(ScriptReserved_Camera,
+	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
 		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
@@ -31,52 +32,63 @@ void Camera::Register(sol::table & parent)
 		/// Get the camera's position
 		// @function Camera:GetPosition
 		// @treturn Vec3 a copy of the camera's position
-		ScriptReserved_GetPosition, &Camera::GetPos,
+		ScriptReserved_GetPosition, &CameraObject::GetPos,
 
 		/// Set the camera's position
 		// @function Camera:SetPosition
 		// @tparam Vec3 position the new position of the camera 
-		ScriptReserved_SetPosition, &Camera::SetPos,
+		ScriptReserved_SetPosition, &CameraObject::SetPos,
 
 		/// Get the camera's unique string identifier
 		// @function Camera:GetName
 		// @treturn string the camera's name
-		ScriptReserved_GetName, &Camera::GetName,
+		ScriptReserved_GetName, &CameraObject::GetName,
 
 		/// Set the camera's name (its unique string identifier)
 		// @function Camera:SetName
 		// @tparam string name The camera's new name
-		ScriptReserved_SetName, &Camera::SetName,
+		ScriptReserved_SetName, &CameraObject::SetName,
 
 		/// Get the current room of the camera
-		// @function Camera:GetRoom
+		// @function CameraObject:GetRoom
+		// @treturn Room current room of the camera
+		ScriptReserved_GetRoom, &CameraObject::GetRoom,
+
+		/// Get the current room number of the camera
+		// @function Camera:GetRoomNumber
 		// @treturn int number representing the current room of the camera
-		ScriptReserved_GetRoom, &Camera::GetRoom,
+		ScriptReserved_GetRoomNumber, &CameraObject::GetRoomNumber,
 
 		/// Set room of camera 
 		// This is used in conjunction with SetPosition to teleport the camera to a new room.
-		// @function Camera:SetRoom
+		// @function Camera:SetRoomNumber
 		// @tparam int ID the ID of the new room 
-		ScriptReserved_SetRoom, &Camera::SetRoom
+		ScriptReserved_SetRoomNumber, &CameraObject::SetRoomNumber,
+
+		/// Active the camera during that frame.
+		// @function Camera:PlayCamera
+		// @tparam[opt] Moveable target If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
+		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
 		);
 }
 
-Vec3 Camera::GetPos() const
+Vec3 CameraObject::GetPos() const
 {
 	return Vec3{ m_camera.Position };
 }
 
-void Camera::SetPos(Vec3 const& pos)
+void CameraObject::SetPos(Vec3 const& pos)
 {
 	m_camera.Position = Vector3i(pos.x, pos.y, pos.z);
+	RefreshFixedCamera(m_camera.Index);
 }
 
-std::string Camera::GetName() const
+std::string CameraObject::GetName() const
 {
 	return m_camera.Name;
 }
 
-void Camera::SetName(std::string const & id) 
+void CameraObject::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
 	{
@@ -96,12 +108,17 @@ void Camera::SetName(std::string const & id)
 	}
 }
 
-short Camera::GetRoom() const
+std::unique_ptr<Room> CameraObject::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_camera.RoomNumber]);
+}
+
+int CameraObject::GetRoomNumber() const
 {
 	return m_camera.RoomNumber;
 }
 
-void Camera::SetRoom(short room)
+void CameraObject::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)
@@ -113,3 +130,13 @@ void Camera::SetRoom(short room)
 
 	m_camera.RoomNumber = room;
 }
+
+void CameraObject::PlayCamera(sol::optional<Moveable&> TargetObj)
+{
+	Camera.number = m_camera.Index;
+	Camera.type = CameraType::Fixed;
+
+	if (TargetObj.has_value()) //Otherwise, it will point to Lara by default.
+		Camera.item = &g_Level.Items[TargetObj.value().GetIndex()];
+}
+

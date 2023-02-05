@@ -456,6 +456,12 @@ namespace TEN::Renderer
 
 	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
+		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+		{
+			m_context->RSSetState(m_states->Wireframe());
+			return;
+		}
+
 		if (cullMode != lastCullMode || force)
 		{
 			switch (cullMode)
@@ -471,7 +477,6 @@ namespace TEN::Renderer
 			case CULL_MODE_CW:
 				m_context->RSSetState(m_cullClockwiseRasterizerState.Get());
 				break;
-
 			}
 
 			lastCullMode = cullMode;
@@ -495,9 +500,9 @@ namespace TEN::Renderer
 	{
 		D3D11_RECT rects;
 		rects.left = s.left;
-		rects.top = m_screenHeight - s.top;
+		rects.top = s.top;
 		rects.right = s.right;
-		rects.bottom = m_screenHeight - s.bottom;
+		rects.bottom = s.bottom;
 
 		m_context->RSSetScissorRects(1, &rects);
 	}

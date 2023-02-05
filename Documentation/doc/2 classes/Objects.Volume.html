@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine 1.0.6 Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li>    <a href="../1 modules/Effects.html">Effects</a></li>
+  <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li>    <a href="../1 modules/Logic.html">Logic</a></li>
+  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
+  <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
+  <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
+  <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li>    <here>Objects.Volume</here></li>
+  <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
+  <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
+  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
+  <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
+  <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>Objects.Volume</code></h1>
+<p>Volumes</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#Volume:Enable">Volume:Enable()</a></td>
+	<td class="summary">Enable the volume.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:Disable">Volume:Disable()</a></td>
+	<td class="summary">Disable the volume.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:GetActive">Volume:GetActive()</a></td>
+	<td class="summary">Determine whether the volume is active or not</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:GetPosition">Volume:GetPosition()</a></td>
+	<td class="summary">Get the volume's position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:SetPosition">Volume:SetPosition(position)</a></td>
+	<td class="summary">Set the volume's position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:GetRotation">Volume:GetRotation()</a></td>
+	<td class="summary">Get the volume's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:SetRotation">Volume:SetRotation(rotation)</a></td>
+	<td class="summary">Set the volume's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:GetScale">Volume:GetScale()</a></td>
+	<td class="summary">Get the volume's scale (separately on all 3 axes).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:SetScale">Volume:SetScale(scale)</a></td>
+	<td class="summary">Set the volume's scale (separately on all 3 axes).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:GetName">Volume:GetName()</a></td>
+	<td class="summary">Get the volume's unique string identifier.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:SetName">Volume:SetName(name)</a></td>
+	<td class="summary">Set the volume's name (its unique string identifier).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:ClearActivators">Volume:ClearActivators()</a></td>
+	<td class="summary">Clear activator list for volumes (makes volume trigger everything again)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Volume:IsMoveableInside">Volume:IsMoveableInside(Moveable)</a></td>
+	<td class="summary">Check if specified moveable is inside the volume</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Volume:Enable"></a>
+    <strong>Volume:Enable()</strong>
+    </dt>
+    <dd>
+    Enable the volume.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:Disable"></a>
+    <strong>Volume:Disable()</strong>
+    </dt>
+    <dd>
+    Disable the volume.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:GetActive"></a>
+    <strong>Volume:GetActive()</strong>
+    </dt>
+    <dd>
+    Determine whether the volume is active or not
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if the volume is active
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:GetPosition"></a>
+    <strong>Volume:GetPosition()</strong>
+    </dt>
+    <dd>
+    Get the volume's position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        a copy of the volume's position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:SetPosition"></a>
+    <strong>Volume:SetPosition(position)</strong>
+    </dt>
+    <dd>
+    Set the volume's position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         the new position of the volume
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:GetRotation"></a>
+    <strong>Volume:GetRotation()</strong>
+    </dt>
+    <dd>
+    Get the volume's rotation.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        a copy of the volume's rotation
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:SetRotation"></a>
+    <strong>Volume:SetRotation(rotation)</strong>
+    </dt>
+    <dd>
+    Set the volume's rotation.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rotation</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         the volume's new rotation
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:GetScale"></a>
+    <strong>Volume:GetScale()</strong>
+    </dt>
+    <dd>
+    Get the volume's scale (separately on all 3 axes).
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        current volume scale
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:SetScale"></a>
+    <strong>Volume:SetScale(scale)</strong>
+    </dt>
+    <dd>
+    Set the volume's scale (separately on all 3 axes).
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scale</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         the volume's new scale
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:GetName"></a>
+    <strong>Volume:GetName()</strong>
+    </dt>
+    <dd>
+    Get the volume's unique string identifier.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the volume's name
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:SetName"></a>
+    <strong>Volume:SetName(name)</strong>
+    </dt>
+    <dd>
+    Set the volume's name (its unique string identifier).
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         The volume's new name
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:ClearActivators"></a>
+    <strong>Volume:ClearActivators()</strong>
+    </dt>
+    <dd>
+    Clear activator list for volumes (makes volume trigger everything again)
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Volume:IsMoveableInside"></a>
+    <strong>Volume:IsMoveableInside(Moveable)</strong>
+    </dt>
+    <dd>
+    Check if specified moveable is inside the volume
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Moveable</span>
+            <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
+         which should be checked for containment
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        state of the moveable, true if contained, false if not
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2023-01-29 18:57:43 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

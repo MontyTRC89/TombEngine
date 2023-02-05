@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -14,8 +15,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
@@ -39,18 +41,18 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 	constexpr auto SETH_JUMP_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 
-	const auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
-	const auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
-
-	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
-	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
+	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
+	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
 	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
 	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
 
-	constexpr auto LARA_STATE_SETH_DEATH = 13;
+	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
+	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
+
+	constexpr auto LARA_STATE_SETH_DEATH = 14;
 	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
 
 	enum SethState
@@ -111,7 +113,6 @@ namespace TEN::Entities::TR4
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
@@ -183,7 +184,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -658,7 +659,7 @@ namespace TEN::Entities::TR4
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
-		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
 	}
 
 	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
@@ -672,7 +673,7 @@ namespace TEN::Entities::TR4
 		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
 		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
 		laraItem->Animation.IsAirborne = false;
-		laraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
 		if (item->RoomNumber != laraItem->RoomNumber)
 			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
@@ -686,9 +687,12 @@ namespace TEN::Entities::TR4
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 
 		Camera.pos.RoomNumber = laraItem->RoomNumber;
-		Camera.type = CameraType::Chase;
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(170.0f);
-		Camera.targetElevation = ANGLE(-25.0f);
+		Camera.type = CameraType::Fixed;
+		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
+		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);
+		ForcedFixedCamera.z = item->Pose.Position.z + ((BLOCK(2) * phd_cos(item->Pose.Orientation.y)));
+		ForcedFixedCamera.RoomNumber = item->RoomNumber;
+		UseForcedFixedCamera = true;
+
 	}
 }

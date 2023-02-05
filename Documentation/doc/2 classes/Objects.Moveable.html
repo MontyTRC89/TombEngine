@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.4 Lua API</title>
+    <title>TombEngine 1.0.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -53,9 +53,11 @@
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
   <li>    <here>Objects.Moveable</here></li>
+  <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
 </ul>
 <h2>3 Primitive Classes</h2>
@@ -69,7 +71,10 @@
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
+  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
+  <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -93,18 +98,6 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation][, room][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</a></td>
 	<td class="summary">For more information on each parameter, see the
 associated getters and setters.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
-	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:Disable">Moveable:Disable()</a></td>
-	<td class="summary">Disable the item</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:MakeInvisible">Moveable:MakeInvisible()</a></td>
-	<td class="summary">Make the item invisible.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:Explode">Moveable:Explode()</a></td>
@@ -132,16 +125,7 @@ associated getters and setters.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
- Note that this will be triggered twice when shot with both pistols at once.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
-	<td class="summary">Set the function to be called called when this moveable collides with another moveable</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
-	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
@@ -202,12 +186,12 @@ associated getters and setters.</td>
 	<td class="summary">Set OCB (object code bit) of the moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetItemFlags">Moveable:GetItemFlags()</a></td>
-	<td class="summary">Get the value stored in ItemFlags[x] (x is the value of the parameter)</td>
+	<td class="name" ><a href="#Moveable:GetItemFlags">Moveable:GetItemFlags(short)</a></td>
+	<td class="summary">Get the value stored in ItemFlags[index]</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetItemFlags">Moveable:SetItemFlags(value)</a></td>
-	<td class="summary">Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)</td>
+	<td class="name" ><a href="#Moveable:SetItemFlags">Moveable:SetItemFlags(short, short)</a></td>
+	<td class="summary">Stores a value in ItemFlags[index]</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetColor">Moveable:GetColor()</a></td>
@@ -218,55 +202,6 @@ associated getters and setters.</td>
 	<td class="summary">Set the moveable's color</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetAIBits">Moveable:GetAIBits()</a></td>
-	<td class="summary">Get AIBits of object
- This will return a table with six values, each corresponding to
- an active behaviour.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetAIBits">Moveable:SetAIBits(bits)</a></td>
-	<td class="summary">Set AIBits of object
- Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
- (or more than one) had suddenly spawned beneath their feet.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:MeshIsVisible">Moveable:MeshIsVisible(index)</a></td>
-	<td class="summary">Get state of specified mesh visibility of object
- Returns true if specified mesh is visible on an object, and false
- if it is not visible.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:ShowMesh">Moveable:ShowMesh(index)</a></td>
-	<td class="summary">Makes specified mesh visible
- Use this to show specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:HideMesh">Moveable:HideMesh(index)</a></td>
-	<td class="summary">Makes specified mesh invisible
- Use this to hide specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:ShatterMesh">Moveable:ShatterMesh(index)</a></td>
-	<td class="summary">Shatters specified mesh and makes it invisible
- Note that you can re-enable mesh later by using ShowMesh().</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:MeshIsSwapped">Moveable:MeshIsSwapped(index)</a></td>
-	<td class="summary">Get state of specified mesh swap of object
- Returns true if specified mesh is swapped on an object, and false
- if it is not swapped.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, index, optional)</a></td>
-	<td class="summary">Set state of specified mesh swap of object
- Use this to swap specified mesh of an object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:UnswapMesh">Moveable:UnswapMesh(index)</a></td>
-	<td class="summary">Set state of specified mesh swap of object
- Use this to bring back original unswapped mesh</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Moveable:GetHitStatus">Moveable:GetHitStatus()</a></td>
 	<td class="summary">Get the hit status of the object</td>
 	</tr>
@@ -275,7 +210,7 @@ associated getters and setters.</td>
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition()</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index)</a></td>
 	<td class="summary">Get the object's joint position</td>
 	</tr>
 	<tr>
@@ -305,12 +240,20 @@ associated getters and setters.</td>
 	<td class="summary">Destroy the moveable.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:AttachObjCamera">Moveable:AttachObjCamera(mesh)</a></td>
+	<td class="name" ><a href="#Moveable:AttachObjCamera">Moveable:AttachObjCamera(mesh, target, mesh)</a></td>
 	<td class="summary">Attach camera to an object.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:AnimFromObject">Moveable:AnimFromObject(ObjectID, animNumber, stateID)</a></td>
 	<td class="summary">Borrow animation from an object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
+	<td class="summary">Set the function to be called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
+	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
@@ -332,13 +275,77 @@ associated getters and setters.</td>
  Clamped to [0, 32767] for "intelligent" entities (i.e.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetAIBits">Moveable:GetAIBits()</a></td>
+	<td class="summary">Get AIBits of object
+ This will return a table with six values, each corresponding to
+ an active behaviour.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetAIBits">Moveable:SetAIBits(bits)</a></td>
+	<td class="summary">Set AIBits of object
+ Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+ (or more than one) had suddenly spawned beneath their feet.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
 	<td class="summary">Get the current room of the object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetRoom">Moveable:SetRoom(ID)</a></td>
-	<td class="summary">Set room of object
+	<td class="name" ><a href="#Moveable:GetRoomNumber">Moveable:GetRoomNumber()</a></td>
+	<td class="summary">Get the current room number of the object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetRoomNumber">Moveable:SetRoomNumber(ID)</a></td>
+	<td class="summary">Set room number of object
  Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetMeshVisible">Moveable:GetMeshVisible(index)</a></td>
+	<td class="summary">Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetMeshVisible">Moveable:SetMeshVisible(index, visible)</a></td>
+	<td class="summary">Makes specified mesh visible or invisible
+ Use this to show or hide a specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:ShatterMesh">Moveable:ShatterMesh(index)</a></td>
+	<td class="summary">Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using SetMeshVisible().</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetMeshSwapped">Moveable:GetMeshSwapped(index)</a></td>
+	<td class="summary">Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, slotIndex[, swapIndex])</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:UnswapMesh">Moveable:UnswapMesh(index)</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
+	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:Disable">Moveable:Disable()</a></td>
+	<td class="summary">Disable the item, as if an antitrigger for it had been stepped on (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:MakeInvisible">Moveable:MakeInvisible()</a></td>
+	<td class="summary">Make the item invisible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetVisible">Moveable:SetVisible(visible)</a></td>
+	<td class="summary">Set the item's visibility.</td>
 	</tr>
 </table>
 
@@ -428,51 +435,6 @@ most can just be ignored (see usage).
 </span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>)
 	)</pre>
     </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:Enable"></a>
-    <strong>Moveable:Enable()</strong>
-    </dt>
-    <dd>
-    Enable the item, as if a trigger for it had been stepped on.
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:Disable"></a>
-    <strong>Moveable:Disable()</strong>
-    </dt>
-    <dd>
-    Disable the item
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:MakeInvisible"></a>
-    <strong>Moveable:MakeInvisible()</strong>
-    </dt>
-    <dd>
-    Make the item invisible.  Use EnableItem to make it visible again.
-
-
-
-
-
-
-
 
 </dd>
     <dt>
@@ -613,7 +575,7 @@ most can just be ignored (see usage).
     <strong>Moveable:SetOnHit(callback)</strong>
     </dt>
     <dd>
-    Set the name of the function to be called when the moveable is shot by Lara
+    Set the name of the function to be called when the moveable is shot by Lara.
  Note that this will be triggered twice when shot with both pistols at once.
 
 
@@ -623,50 +585,6 @@ most can just be ignored (see usage).
         <li><span class="parameter">callback</span>
             <span class="types"><span class="type">function</span></span>
          function in LevelFuncs hierarchy to call when moveable is shot
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithObject"></a>
-    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
-    </dt>
-    <dd>
-    Set the function to be called called when this moveable collides with another moveable
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithRoom"></a>
-    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
-    </dt>
-    <dd>
-    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor)
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy)
         </li>
     </ul>
 
@@ -1006,19 +924,26 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetItemFlags"></a>
-    <strong>Moveable:GetItemFlags()</strong>
+    <strong>Moveable:GetItemFlags(short)</strong>
     </dt>
     <dd>
-    Get the value stored in ItemFlags[x] (x is the value of the parameter)
+    Get the value stored in ItemFlags[index]
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">short</span>
+            <span class="types"><span class="type">index:</span></span>
+        ) index the ItemFlags, can be between 0 and 7.
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">short</span></span>
-        id of the ItemFlags array
+           <span class="types"><span class="type">(short)</span></span>
+        the value contained in the ItemFlags[index]
     </ol>
 
 
@@ -1027,18 +952,22 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetItemFlags"></a>
-    <strong>Moveable:SetItemFlags(value)</strong>
+    <strong>Moveable:SetItemFlags(short, short)</strong>
     </dt>
     <dd>
-    Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+    Stores a value in ItemFlags[index]
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">value</span>
-            <span class="types"><span class="type">short</span></span>
-         to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+        <li><span class="parameter">short</span>
+            <span class="types"><span class="type">index:</span></span>
+        ) index of the ItemFlags where store the value.
+        </li>
+        <li><span class="parameter">short</span>
+            <span class="types"><span class="type">index:</span></span>
+        ) index of the ItemFlags where store the value.
         </li>
     </ul>
 
@@ -1091,249 +1020,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
-    <a name = "Moveable:GetAIBits"></a>
-    <strong>Moveable:GetAIBits()</strong>
-    </dt>
-    <dd>
-    Get AIBits of object
- This will return a table with six values, each corresponding to
- an active behaviour.  If the object is in a certain AI mode, the table will
- have a <em>1</em> in the corresponding cell. Otherwise, the cell will hold
- a <em>0</em>.
- 1 - guard
- 2 - ambush
- 3 - patrol 1
- 4 - modify
- 5 - follow
- 6 - patrol 2
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-        a table of AI bits
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetAIBits"></a>
-    <strong>Moveable:SetAIBits(bits)</strong>
-    </dt>
-    <dd>
-    Set AIBits of object
- Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
- (or more than one) had suddenly spawned beneath their feet.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">bits</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         the table of AI bits
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
-sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>})</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:MeshIsVisible"></a>
-    <strong>Moveable:MeshIsVisible(index)</strong>
-    </dt>
-    <dd>
-    Get state of specified mesh visibility of object
- Returns true if specified mesh is visible on an object, and false
- if it is not visible.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        visibility status
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:ShowMesh"></a>
-    <strong>Moveable:ShowMesh(index)</strong>
-    </dt>
-    <dd>
-    Makes specified mesh visible
- Use this to show specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:HideMesh"></a>
-    <strong>Moveable:HideMesh(index)</strong>
-    </dt>
-    <dd>
-    Makes specified mesh invisible
- Use this to hide specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:ShatterMesh"></a>
-    <strong>Moveable:ShatterMesh(index)</strong>
-    </dt>
-    <dd>
-    Shatters specified mesh and makes it invisible
- Note that you can re-enable mesh later by using ShowMesh().
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:MeshIsSwapped"></a>
-    <strong>Moveable:MeshIsSwapped(index)</strong>
-    </dt>
-    <dd>
-    Get state of specified mesh swap of object
- Returns true if specified mesh is swapped on an object, and false
- if it is not swapped.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        mesh swap status
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SwapMesh"></a>
-    <strong>Moveable:SwapMesh(index, index, optional)</strong>
-    </dt>
-    <dd>
-    Set state of specified mesh swap of object
- Use this to swap specified mesh of an object.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a slot to get meshswap from
-        </li>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a slot to get meshswap from
-        </li>
-        <li><span class="parameter">optional</span>
-            <span class="types"><span class="type">int</span></span>
-        ) index of a mesh from meshswap slot to use
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:UnswapMesh"></a>
-    <strong>Moveable:UnswapMesh(index)</strong>
-    </dt>
-    <dd>
-    Set state of specified mesh swap of object
- Use this to bring back original unswapped mesh
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         of a mesh to unswap
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "Moveable:GetHitStatus"></a>
     <strong>Moveable:GetHitStatus()</strong>
     </dt>
@@ -1377,13 +1063,20 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition()</strong>
+    <strong>Moveable:GetJointPosition(index)</strong>
     </dt>
     <dd>
     Get the object's joint position
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a joint to get position
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
@@ -1505,8 +1198,8 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">valid</span></span>
-        bool true if the object is still not destroyed
+           <span class="types"><span class="type">bool</span></span>
+        valid true if the object is still not destroyed
     </ol>
 
 
@@ -1530,7 +1223,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:AttachObjCamera"></a>
-    <strong>Moveable:AttachObjCamera(mesh)</strong>
+    <strong>Moveable:AttachObjCamera(mesh, target, mesh)</strong>
     </dt>
     <dd>
     Attach camera to an object.
@@ -1541,7 +1234,15 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <ul>
         <li><span class="parameter">mesh</span>
             <span class="types"><span class="type">int</span></span>
-         1 for camera, mesh 2 for target
+         of a target moveable to use as a camera target
+        </li>
+        <li><span class="parameter">target</span>
+            <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a></span>
+         moveable to attach camera to
+        </li>
+        <li><span class="parameter">mesh</span>
+            <span class="types"><span class="type">int</span></span>
+         of a target moveable to use as a camera target
         </li>
     </ul>
 
@@ -1578,6 +1279,64 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 
 
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
+    </dt>
+    <dd>
+    Set the function to be called when this moveable collides with another moveable
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> taking part in the collision.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
+    <span class="global">print</span>(obj1:GetName() .. <span class="string">" collided with "</span> .. obj2:GetName())
+<span class="keyword">end</span>
+baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
+    </dt>
+    <dd>
+    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor). This function can take an argument that holds the <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> that collided with geometry.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.roomCollided = <span class="keyword">function</span>(obj)
+    <span class="global">print</span>(obj:GetName() .. <span class="string">" collided with room geometry"</span>)
+<span class="keyword">end</span>
+baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
+    </ul>
 
 </dd>
     <dt>
@@ -1676,11 +1435,93 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
+    <a name = "Moveable:GetAIBits"></a>
+    <strong>Moveable:GetAIBits()</strong>
+    </dt>
+    <dd>
+    Get AIBits of object
+ This will return a table with six values, each corresponding to
+ an active behaviour.  If the object is in a certain AI mode, the table will
+ have a <em>1</em> in the corresponding cell. Otherwise, the cell will hold
+ a <em>0</em>.</p>
+
+<p> <br />1 - guard
+ <br />2 - ambush
+ <br />3 - patrol 1
+ <br />4 - modify
+ <br />5 - follow
+ <br />6 - patrol 2
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+        a table of AI bits
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetAIBits"></a>
+    <strong>Moveable:SetAIBits(bits)</strong>
+    </dt>
+    <dd>
+    Set AIBits of object
+ Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+ (or more than one) had suddenly spawned beneath their feet.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bits</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         the table of AI bits
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
+sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>})</pre>
+    </ul>
+
+</dd>
+    <dt>
     <a name = "Moveable:GetRoom"></a>
     <strong>Moveable:GetRoom()</strong>
     </dt>
     <dd>
     Get the current room of the object
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Room</span></span>
+        current room of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetRoomNumber"></a>
+    <strong>Moveable:GetRoomNumber()</strong>
+    </dt>
+    <dd>
+    Get the current room number of the object
 
 
 
@@ -1697,11 +1538,11 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
-    <a name = "Moveable:SetRoom"></a>
-    <strong>Moveable:SetRoom(ID)</strong>
+    <a name = "Moveable:SetRoomNumber"></a>
+    <strong>Moveable:SetRoomNumber(ID)</strong>
     </dt>
     <dd>
-    Set room of object
+    Set room number of object
  Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 
 
@@ -1720,9 +1561,242 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
-sas:SetRoom(destinationRoom)
+sas:SetRoomNumber(destinationRoom)
 sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetMeshVisible"></a>
+    <strong>Moveable:GetMeshVisible(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        visibility status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetMeshVisible"></a>
+    <strong>Moveable:SetMeshVisible(index, visible)</strong>
+    </dt>
+    <dd>
+    Makes specified mesh visible or invisible
+ Use this to show or hide a specified mesh of an object.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+        <li><span class="parameter">visible</span>
+            <span class="types"><span class="type">bool</span></span>
+         true if you want the mesh to be visible, false otherwise
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:ShatterMesh"></a>
+    <strong>Moveable:ShatterMesh(index)</strong>
+    </dt>
+    <dd>
+    Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using SetMeshVisible().
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetMeshSwapped"></a>
+    <strong>Moveable:GetMeshSwapped(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        mesh swap status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SwapMesh"></a>
+    <strong>Moveable:SwapMesh(index, slotIndex[, swapIndex])</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh
+        </li>
+        <li><span class="parameter">slotIndex</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a slot to get meshswap from
+        </li>
+        <li><span class="parameter">swapIndex</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh from meshswap slot to use
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:UnswapMesh"></a>
+    <strong>Moveable:UnswapMesh(index)</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a mesh to unswap
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:Enable"></a>
+    <strong>Moveable:Enable()</strong>
+    </dt>
+    <dd>
+    Enable the item, as if a trigger for it had been stepped on.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:Disable"></a>
+    <strong>Moveable:Disable()</strong>
+    </dt>
+    <dd>
+    Disable the item, as if an antitrigger for it had been stepped on (i.e.  it will close an open door or extinguish a flame emitter).
+ Note that this will not trigger an OnKilled callback.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:MakeInvisible"></a>
+    <strong>Moveable:MakeInvisible()</strong>
+    </dt>
+    <dd>
+    Make the item invisible.  Alias for <code>Moveable:SetVisible(false)</code>.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetVisible"></a>
+    <strong>Moveable:SetVisible(visible)</strong>
+    </dt>
+    <dd>
+    Set the item's visibility.  <strong>An invisible item will have collision turned off, as if it no longer exists in the game world</strong>.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">visible</span>
+            <span class="types"><span class="type">bool</span></span>
+         true if the caller should become visible, false if it should become invisible
+        </li>
+    </ul>
+
+
+
+
 
 </dd>
 </dl>
@@ -1732,7 +1806,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-11 18:38:45 </i>
+<i style="float:right;">Last updated 2023-01-29 18:57:43 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

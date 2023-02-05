@@ -21,6 +21,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Smoke;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 using std::vector;
@@ -620,96 +621,7 @@ byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
 
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
 {
-	/*
-	SMOKE_SPARKS* spark;
-	
-	spark = &SmokeSparks[GetFreeSmokeSpark()];
-	spark->on = true;
-	spark->sShade = 0;
-	spark->dShade = (count << 2);
-	spark->colFadeSpeed = 4;
-	spark->fadeToBlack = 32 - (initial << 4);
-	spark->life = (GetRandomControl() & 3) + 40;
-	spark->sLife = spark->life;
-
-	if (weaponType == LaraWeaponType::Pistol || weaponType == LaraWeaponType::Revolver || weaponType == LaraWeaponType::Uzi)
-	{
-		if (spark->dShade > 64)
-			spark->dShade = 64;
-	}
-
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark->x = x + (GetRandomControl() & 31) - 16;
-	spark->y = y + (GetRandomControl() & 31) - 16;
-	spark->z = z + (GetRandomControl() & 31) - 16;
-
-	if (initial)
-	{
-		spark->xVel = ((GetRandomControl() & 1023) - 512) + xv;
-		spark->yVel = ((GetRandomControl() & 1023) - 512) + yv;
-		spark->zVel = ((GetRandomControl() & 1023) - 512) + zv;
-	}
-	else
-	{
-		float f = (frand() * 6) - 3;
-		spark->xVel = (frand() * 6) - 3;
-		spark->yVel = (frand() * 6) - 3;
-		spark->zVel = (frand() * 6) - 3;
-	}
-
-	spark->friction = 4;
-
-	if (GetRandomControl() & 1)
-	{
-		if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-			spark->flags = SP_ROTATE | SP_WIND;
-		else
-			spark->flags = SP_ROTATE;
-
-		spark->rotAng = GetRandomControl() & 0xFFF;
-
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 0x0F) - 16;
-		else
-			spark->rotAdd = (GetRandomControl() & 0x0F) + 16;
-	}
-	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-	{
-		spark->flags = SP_WIND;
-	}
-	else
-	{
-		spark->flags = SP_NONE;
-	}
-	float gravity = frand() * 1.25f;
-	spark->gravity = gravity;
-	spark->maxYvel = frand() * 16;
-
-	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
-
-	if (initial)
-	{
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = (size << 1) + 8;
-	}
-	else
-	{
-		spark->sSize = size >> 2;
-		spark->size = size >> 2;
-		spark->dSize = size;
-	}
-
-	/*if (gfLevelFlags & 0x20 && LaraItem->roomNumber == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
-	{
-		spark->mirror = 1;
-	}
-	else
-	{
-		spark->mirror = 0;
-	}*/
-	TEN::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
-	
+	TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
 }
 
 void TriggerShatterSmoke(int x, int y, int z)
@@ -1457,7 +1369,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				}
 
 				fx->objectNumber = ID_BODY_PART;
-				fx->color = item->Color;
+				fx->color = item->Model.Color;
 				fx->flag2 = flags;
 				fx->frameNumber = item->Model.MeshIndex[i];
 			}
@@ -1480,7 +1392,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1494,16 +1406,28 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->z = pos->Position.z;
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
-		sptr->xRot = angle;
+		sptr->xRot = rotation.x;
+		sptr->yRot = rotation.y;
+		sptr->zRot = rotation.z;
 		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
+		sptr->fadeIn = fadein;
 		
-		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
-	}
+		sptr->sr = 0;
+		sptr->sg = 0;
+		sptr->sb = 0;
+		sptr->style = style;
+
+		if (sound)
+		{
+			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
+		}	
+
+	}	
 }
 
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
@@ -1575,6 +1499,12 @@ void UpdateShockwaves()
 			if (sw->life)
 			{
 				sw->outerRad += sw->speed;
+
+				if (sw->style == (int)ShockwaveStyle::Sophia)
+				{
+					sw->innerRad += sw->speed;
+				}
+
 				sw->speed -= (sw->speed >> 4);
 
 				if (LaraItem->HitPoints > 0)
