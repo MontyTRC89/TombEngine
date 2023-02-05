@@ -35,7 +35,7 @@ namespace TEN::Hud
 	void DisplayPickup::Update(bool isHead)
 	{
 		constexpr auto LIFE_BUFFER		   = 0.2f;
-		constexpr auto SCALE_MAX		   = 0.3f;
+		constexpr auto SCALE_MAX		   = 0.4f;
 		constexpr auto SCALE_MIN		   = 0.2f;
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
