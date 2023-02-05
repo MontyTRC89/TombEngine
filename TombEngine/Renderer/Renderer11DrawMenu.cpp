@@ -775,7 +775,7 @@ namespace TEN::Renderer
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
 				int logoLeft   = (SCREEN_COORDS.x / 2) - (LogoWidth / 2);
-				int logoRight  = (SCREEN_COORDS.y / 2) + (LogoWidth / 2);
+				int logoRight  = (SCREEN_COORDS.x / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;
