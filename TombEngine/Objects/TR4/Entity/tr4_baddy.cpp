@@ -52,7 +52,7 @@ ID_BADDY2
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto BADDY_USE_UZI = 24;
+	constexpr auto BADDY_UZI_AMMO = 24;
 
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
@@ -497,7 +497,7 @@ namespace TEN::Entities::TR4
 							(item->TriggerFlags / 1000) == (possibleEnemy->TriggerFlags / 1000) - 1 &&
 							!(possibleEnemy->Flags & IFLAG_KILLED))
 						{
-							if (EnableEntityAI(i, 0))
+							if (EnableEntityAI(i, false))
 								possibleEnemy->Status = ITEM_ACTIVE;
 							else
 								possibleEnemy->Status = ITEM_INVISIBLE;
@@ -764,7 +764,7 @@ namespace TEN::Entities::TR4
 					if (currentCreature->Enemy && 
 						currentCreature->Enemy->HitPoints > 0 && 
 						AI.distance < pow(SECTOR(0.5f), 2) &&
-						AI.verticalDistance < SECTOR(1))
+						abs(AI.verticalDistance) < SECTOR(1))
 					{
 						if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN))
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
@@ -1267,37 +1267,27 @@ namespace TEN::Entities::TR4
 			switch (vault)
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_2_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDY_STATE_CLIMB_2_STEPS;
+				SetAnimation(item, BADDY_ANIM_CLIMB_2_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDY_STATE_CLIMB_3_STEPS;
+				SetAnimation(item, BADDY_ANIM_CLIMB_3_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
-				item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				SetAnimation(item, BADDY_ANIM_CLIMB_4_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_3_STEPS;
+				SetAnimation(item, BADDY_ANIM_JUMP_OFF_3_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_4_STEPS;
+				SetAnimation(item, BADDY_ANIM_JUMP_OFF_4_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
@@ -1307,38 +1297,36 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_BLIND;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
-			item->Animation.ActiveState = BADDY_STATE_BLIND;
+			SetAnimation(item, BADDY_ANIM_BLIND, Random::GenerateInt(0, 8));
 			creature->MaxTurn = 0;
 		}
 	}
 
-	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)
+	void Baddy2Hit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
 
 		if (pos.has_value())
 		{
-			if ((target.Animation.ActiveState == BADDY_STATE_DODGE || Random::TestProbability(1 / 2.0f)) &&
+			if (target.Animation.ActiveState == BADDY_STATE_DODGE &&
 				(player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Uzi ||
 				 player.Control.Weapon.GunType == LaraWeaponType::HK ||
 				 player.Control.Weapon.GunType == LaraWeaponType::Revolver))
 			{
-				// Baddy2 sword deflecting bullet.
+				// Baddy2 bullet deflection with sword.
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
 				return;
 			}
 			else if (object.hitEffect == HitEffect::Blood)
 			{
-				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+				DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 			}
 		}
 
-		DoItemHit(&target, damage, explosive);
+		DoItemHit(&target, damage, isExplosive);
 	}
 }

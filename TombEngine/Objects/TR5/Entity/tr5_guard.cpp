@@ -938,7 +938,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else
 					{
-						TestTriggers(creature->Enemy->Pose.Position.x, creature->Enemy->Pose.Position.y, creature->Enemy->Pose.Position.z, enemy->RoomNumber, true);
+						TestTriggers(enemy, true);
 						item->Animation.RequiredState = GUARD_STATE_WALK_FORWARD;
 
 						if (creature->Enemy->Flags & 2)

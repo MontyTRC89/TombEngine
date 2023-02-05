@@ -412,7 +412,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-		TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNum, true);
+		TestTriggers(item, true);
 		DoVehicleCollision(item, CLICK(1.5f));
 
 		if (item->Pose.Position.y >= item->Floor - CLICK(1))

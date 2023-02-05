@@ -69,7 +69,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Ape;
+		obj->LotType = LotType::Ape;
 		obj->SetupHitEffect();
 	}
 
@@ -85,7 +85,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -114,7 +114,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 500;
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Blockable;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -143,7 +143,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 400;
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Blockable;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -160,7 +160,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->HitPoints = 50;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(2, ROT_Y);
 		obj->SetupHitEffect();

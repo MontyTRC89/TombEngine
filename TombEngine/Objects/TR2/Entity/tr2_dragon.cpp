@@ -544,7 +544,7 @@ namespace TEN::Entities::Creatures::TR2
 				front = &g_Level.Items[frontItem];
 
 				front->TouchBits = back->TouchBits = NO_JOINT_BITS;
-				EnableEntityAI(frontItem, 1);
+				EnableEntityAI(frontItem, true);
 				AddActiveItem(frontItem);
 				AddActiveItem(backItem);
 				back->Status = ITEM_ACTIVE;

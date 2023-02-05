@@ -297,15 +297,21 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// Get the value stored in ItemFlags[x] (x is the value of the parameter)
+/// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @treturn short id of the ItemFlags array
+// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @treturn int the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
-/// Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+/// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam short value to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+// @tparam short value to store in the moveable's ItemFlags[index]
+// @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
+
+	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
+
+	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -453,6 +459,11 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 			+ callerName);
 	}
 
+}
+
+short Moveable::GetIndex() const
+{
+	return m_num;
 }
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
@@ -694,6 +705,33 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn (short) the value contained in the LocationAI of the creature.
+short Moveable::GetLocationAI() const
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		return creature->LocationAI;
+	}
+	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	return 0;
+}
+
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam value: (short) value to store.
+void Moveable::SetLocationAI(short value)
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		creature->LocationAI = value;
+	}
+	else
+		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+}
 
 ScriptColor Moveable::GetColor() const
 {
@@ -1074,7 +1112,6 @@ void Moveable::SetVisible(bool visible)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
-
 
 void Moveable::Invalidate()
 {

@@ -68,7 +68,6 @@ bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
 
-int PhdPerspective;
 short CurrentFOV;
 short LastFOV;
 
@@ -105,7 +104,6 @@ void AlterFOV(short value, bool store)
 		LastFOV = value;
 
 	CurrentFOV = value;
-	PhdPerspective = g_Configuration.Width / 2 * phd_cos(value / 2) / phd_sin(value / 2);
 }
 
 short GetCurrentFOV()
@@ -310,22 +308,8 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.mikePos.x = LaraItem->Pose.Position.x;
-		Camera.mikePos.y = LaraItem->Pose.Position.y;
-		Camera.mikePos.z = LaraItem->Pose.Position.z;
-		Camera.oldType = Camera.type;
-	}
-	else
-	{
-		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(angle);
-		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
-		Camera.oldType = Camera.type;
-	}
+	UpdateMikePos(LaraItem);
+	Camera.oldType = Camera.type;
 }
 
 void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
@@ -419,6 +403,16 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 										ItemCamera.LastAngle.y = angle.y, 
 										ItemCamera.LastAngle.z = angle.z);
 	}
+}
+
+void RefreshFixedCamera(short camNumber)
+{
+	auto& camera = g_Level.Cameras[camNumber];
+
+	auto origin = GameVector(camera.Position, camera.RoomNumber);
+	int moveSpeed = camera.Speed * 8 + 1;
+
+	MoveCamera(&origin, moveSpeed);
 }
 
 void ChaseCamera(ItemInfo* item)
@@ -1136,22 +1130,7 @@ void LookCamera(ItemInfo* item)
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.mikePos.x = item->Pose.Position.x;
-		Camera.mikePos.y = item->Pose.Position.y;
-		Camera.mikePos.z = item->Pose.Position.z;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
-		Camera.mikePos.y = Camera.pos.y;
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 
 	lara->ExtraHeadRot.x = headXRot;
@@ -1189,7 +1168,6 @@ void BinocularCamera(ItemInfo* item)
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
-			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;
 			lara->ExtraTorsoRot = EulerAngles::Zero;
@@ -1201,7 +1179,6 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits = NO_JOINT_BITS;
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
@@ -1273,20 +1250,7 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.target.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.mikePos = item->Pose.Position;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
-		Camera.mikePos.y = Camera.pos.y;
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
@@ -1910,6 +1874,30 @@ void ItemsCollideCamera()
 	staticList.clear(); // Done
 }
 
+void UpdateMikePos(ItemInfo* item)
+{
+	if (Camera.mikeAtLara)
+	{
+		Camera.mikePos = item->Pose.Position;
+		Camera.actualAngle = item->Pose.Orientation.y;
+
+		if (item->IsLara())
+		{
+			auto* lara = GetLaraInfo(item);
+			Camera.actualAngle += lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		}
+	}
+	else
+	{
+		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + phdPerspective * phd_cos(Camera.actualAngle);
+		Camera.mikePos.y = Camera.pos.y;
+	}
+}
+
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
@@ -2032,13 +2020,15 @@ void HandleOptics(ItemInfo* item)
 		DbInput = 0;
 	}
 
+	auto lara = GetLaraInfo(item);
+
 	// We are standing, can use optics.
-	if (LaraItem->Animation.ActiveState == LS_IDLE || LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
 		breakOptics = false;
 
 	// We are crouching, can use optics.
-	if ((Lara.Control.IsLow || TrInput & IN_CROUCH) &&
-		(LaraItem->Animation.TargetState == LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber == LA_CROUCH_IDLE))
+	if ((lara->Control.IsLow || TrInput & IN_CROUCH) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
 
 	// If lasersight, and no look is pressed, exit optics.
@@ -2051,10 +2041,10 @@ void HandleOptics(ItemInfo* item)
 
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
 	{
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-			((Lara.Control.Weapon.GunType == LaraWeaponType::HK && Lara.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-			 (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-			 (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
+			((lara->Control.Weapon.GunType == LaraWeaponType::HK && lara->Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
+			 (lara->Control.Weapon.GunType == LaraWeaponType::Revolver && lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+			 (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow && lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
 			BinocularRange = 128;
 			BinocularOldCamera = Camera.oldType;
@@ -2079,7 +2069,6 @@ void HandleOptics(ItemInfo* item)
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);
 
-	LaraItem->MeshBits = ALL_JOINT_BITS;
 	Lara.Inventory.IsBusy = false;
 	ResetLaraFlex(LaraItem);
 

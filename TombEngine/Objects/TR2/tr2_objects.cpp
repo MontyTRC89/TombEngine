@@ -4,6 +4,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -53,7 +54,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(9, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -70,7 +71,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -86,7 +87,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -101,7 +102,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->LotType = LotType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -130,7 +131,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -156,16 +157,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER2];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -183,16 +175,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER3];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
@@ -251,6 +234,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->LotType = LotType::Spider;
 		obj->SetupHitEffect();
 	}
 
@@ -370,16 +354,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
 	if (obj->loaded)
 	{
-		if (Objects[ID_MERCENARY_AUTOPISTOLS1].loaded)
-		{
-			obj->animIndex = Objects[ID_MERCENARY_AUTOPISTOLS1].animIndex;
-			obj->frameBase = Objects[ID_MERCENARY_AUTOPISTOLS1].frameBase;
-		}
-		else
-		{
-			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found.", LogLevel::Warning);
-		}
-
+		AssignObjectAnimations(*obj, ID_MERCENARY_AUTOPISTOLS1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
@@ -426,6 +401,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
@@ -442,6 +418,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
@@ -458,9 +435,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_DRAGON_BACK].loaded)
-			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK.", LogLevel::Warning);
-
+		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -475,19 +450,18 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI.", LogLevel::Warning);
-
+		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
 	}

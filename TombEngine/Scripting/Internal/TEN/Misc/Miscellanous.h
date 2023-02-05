@@ -7,5 +7,5 @@ namespace sol
 
 namespace Misc
 {
-	void Register(sol::state* lua, sol::table &);
+	void Register(sol::state* lua, sol::table&);
 };

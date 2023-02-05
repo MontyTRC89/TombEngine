@@ -126,15 +126,6 @@ void ObjectObjects()
 		obj->control = FallingBlockControl;
 	}
 
-	/*obj = &Objects[ID_AIRLOCK_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = TEN::Entities::Switches::SwitchCollision;
-		obj->control = SwitchControl;
-		
-		
-	}*/
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -362,7 +353,7 @@ void InitialiseObjects()
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
-		obj->ZoneType = ZoneType::Basic;
+		obj->LotType = LotType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;

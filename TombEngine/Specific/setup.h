@@ -10,6 +10,22 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
+// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+enum class LotType
+{
+	Skeleton,
+	Basic,
+	Water,
+	WaterAndLand,
+	Human,
+	HumanPlusJump,
+	HumanPlusJumpAndMonkey,
+	Flyer,
+	Blockable, // For large creatures such as trex and shiva.
+	Spider,    // Only 2 block vault allowed.
+	Ape		   // Only 2 block vault allowed.
+};
+
 enum JointRotationFlags
 {
 	ROT_X = (1 << 2),
@@ -40,7 +56,7 @@ struct ObjectInfo
 	int meshIndex;
 	int boneIndex;
 	int frameBase;
-	ZoneType ZoneType;
+	LotType LotType;
 	int animIndex;
 	short HitPoints;
 	short pivotLength;
@@ -67,7 +83,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool explosive, int jointIndex)> HitRoutine;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
 
 	/// <summary>
 	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
@@ -80,7 +96,7 @@ struct ObjectInfo
 	}
 
 	/// <summary>
-	/// Use this to set up a hit rffect for the slot based on its value.
+	/// Use this to set up a hit effect for the slot based on its value.
 	/// </summary>
 	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)

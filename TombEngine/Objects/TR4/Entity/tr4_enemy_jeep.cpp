@@ -248,7 +248,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->ReachedGoal)
 			{
-				TestTriggers(target->Pose.Position.x, target->Pose.Position.y, target->Pose.Position.z, target->RoomNumber, true);
+				TestTriggers(target, true);
 
 				if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
 				{

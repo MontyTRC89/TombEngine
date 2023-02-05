@@ -847,19 +847,19 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2f(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
 		0,
-		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
-	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))) -
+		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
-	// Rotate X axis if forward height difference is not too significant.
+	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.x) <= ANGLE(constraintAngle))
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
-	// Rotate Z axis if lateral height difference is not too significant.
+	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.z) <= ANGLE(constraintAngle))
@@ -869,7 +869,7 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 
 int GetQuadrant(short angle)
 {
-	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
+	return (unsigned short(angle + ANGLE(45.0f)) / ANGLE(90.0f));
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
