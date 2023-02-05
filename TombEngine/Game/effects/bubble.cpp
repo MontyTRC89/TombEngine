@@ -82,7 +82,6 @@ namespace TEN::Effects::Bubble
 		SpawnBubble(pos, roomNumber, scale, amplitude, inertia);
 	}
 	
-	// TODO: Still not spawning!!
 	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
 	{
 		constexpr auto SCALE_MAX		 = BUBBLE_SCALE_MAX;
@@ -98,8 +97,8 @@ namespace TEN::Effects::Bubble
 		float scale = Random::GenerateFloat(SCALE_MIN, SCALE_MAX);
 
 		bubble.SpriteIndex = SPR_BUBBLES;
-		bubble.Position = pos;
-		bubble.PositionBase = bubble.Position;
+		bubble.Position =
+		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
 
 		bubble.Color =
@@ -118,7 +117,7 @@ namespace TEN::Effects::Bubble
 		bubble.ScaleMax = Vector2(scale);
 		bubble.ScaleMin = bubble.Scale * 0.7f;
 
-		bubble.Life = BUBBLE_LIFE_MAX;
+		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
 		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, scale / BUBBLE_SCALE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
 		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / SCALE_MAX);
