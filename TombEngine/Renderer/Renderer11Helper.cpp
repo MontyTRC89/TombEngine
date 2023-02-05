@@ -520,11 +520,10 @@ namespace TEN::Renderer
 		// Calculate normalized device coords.
 		point /= point.w;
 
-		// Return 2D screen space coords.
-		auto screenRes = GetScreenResolution();
+		// Calculate and return screen space position.
 		return Vector2(
-			((point.x + 1.0f) * screenRes.x) / 2,
-			((1.0f - point.y) * screenRes.y) / 2);
+			((point.x + 1.0f) * SCREEN_COORDS.x) / 2,
+			((1.0f - point.y) * SCREEN_COORDS.y) / 2);
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)

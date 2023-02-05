@@ -436,9 +436,10 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.AddString(float(x) / float(g_Configuration.Width) * REFERENCE_RES_WIDTH,
-								 float(y) / float(g_Configuration.Height) * REFERENCE_RES_HEIGHT,
-								 key.c_str(), col, flags);
+			g_Renderer.AddString(
+				float(x) / float(g_Configuration.Width) * SCREEN_COORDS.x,
+				float(y) / float(g_Configuration.Height) * SCREEN_COORDS.y,
+				key.c_str(), col, flags);
 		});
 	}
 

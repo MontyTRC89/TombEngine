@@ -535,9 +535,10 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
+		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
-			m_screenWidth / REFERENCE_RES_WIDTH,
-			m_screenHeight / REFERENCE_RES_HEIGHT);
+			screenRes.x / SCREEN_COORDS.x,
+			screenRes.y / SCREEN_COORDS.y);
 
 		screenPos *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
@@ -769,12 +770,12 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)m_screenWidth / REFERENCE_RES_WIDTH;
-				float factorY = (float)m_screenHeight / REFERENCE_RES_HEIGHT;
+				float factorX = (float)m_screenWidth / SCREEN_COORDS.x;
+				float factorY = (float)m_screenHeight / SCREEN_COORDS.y;
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
-				int logoLeft   = (REFERENCE_RES_WIDTH / 2) - (LogoWidth / 2);
-				int logoRight  = (REFERENCE_RES_WIDTH / 2) + (LogoWidth / 2);
+				int logoLeft   = (SCREEN_COORDS.x / 2) - (LogoWidth / 2);
+				int logoRight  = (SCREEN_COORDS.y / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;

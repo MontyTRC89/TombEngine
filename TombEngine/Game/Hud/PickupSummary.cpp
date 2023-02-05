@@ -17,19 +17,18 @@ namespace TEN::Hud
 
 	bool DisplayPickup::IsOffscreen(bool checkAbove) const
 	{
-		auto screenRes = g_Renderer.GetScreenResolution();
-		auto threshold = screenRes.ToVector2() * 0.1f;
+		const auto SCREEN_THRESHOLD = SCREEN_COORDS * 0.1f;
 
 		// NOTE: Positions above screen can be ignored to account for high stacks.
 		if (checkAbove)
 		{
-			if (Position.y <= -threshold.y)
+			if (Position.y <= -SCREEN_THRESHOLD.y)
 				return true;
 		}
 
-		return (Position.x <= -threshold.x ||
-				Position.x >= (screenRes.x + threshold.x) ||
-				Position.y >= (screenRes.y + threshold.y));
+		return (Position.x <= -SCREEN_THRESHOLD.x ||
+				Position.x >= (SCREEN_COORDS.x + SCREEN_THRESHOLD.x) ||
+				Position.y >= (SCREEN_COORDS.y + SCREEN_THRESHOLD.y));
 	}
 
 	void DisplayPickup::Update(bool isHead)
@@ -69,8 +68,7 @@ namespace TEN::Hud
 		// Move offscreen.
 		if (isHead && Life <= 0.0f)
 		{
-			auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
-			auto vel = Vector2(screenRes.x * HIDE_VELOCITY_COEFF, 0.0f);
+			auto vel = Vector2(SCREEN_COORDS.x * HIDE_VELOCITY_COEFF, 0.0f);
 			this->Position += vel;
 		}
 
@@ -171,23 +169,19 @@ namespace TEN::Hud
 		this->DisplayPickups.clear();
 	}
 
+	// TODO: Make positions hug the edge.
 	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
 	{
 		constexpr auto STACK_HEIGHT_MAX = 6;
-		constexpr auto SCALE_COEFF		= 1 / 7.0f;
-		constexpr auto OFFSET_COEFF		= 1 / 7.0f;
-
-		// Determine screen values.
-		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
-		auto scale = screenRes * SCALE_COEFF;
-		auto offset = -(screenRes * OFFSET_COEFF);
+		const	  auto SCREEN_SCALE		= SCREEN_COORDS * (1 / 7.0f);
+		const	  auto SCREEN_OFFSET	= -(SCREEN_COORDS * (1 / 7.0f));
 
 		// Calculate screen positions. 
 		auto stackPositions = std::vector<Vector2>{};
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
-			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * scale) : Vector2(0.0f, screenRes.y);
-			auto pos = (screenRes - relPos) + offset;
+			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_COORDS.y);
+			auto pos = (SCREEN_COORDS - relPos) + SCREEN_OFFSET;
 			stackPositions.push_back(pos);
 		}
 

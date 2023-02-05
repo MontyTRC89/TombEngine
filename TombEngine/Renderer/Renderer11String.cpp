@@ -21,7 +21,7 @@ namespace TEN::Renderer
 		try
 		{
 			auto screenRes = GetScreenResolution();
-			auto factor = Vector2(screenRes.x / REFERENCE_RES_WIDTH, screenRes.y / REFERENCE_RES_HEIGHT);
+			auto factor = Vector2(screenRes.x / SCREEN_COORDS.x, screenRes.y / SCREEN_COORDS.y);
 			float UIScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
 			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;

@@ -3,10 +3,6 @@
 
 #include <codecvt>
 
-#include "Renderer/Renderer11.h"
-
-using TEN::Renderer::g_Renderer;
-
 namespace TEN::Utils
 {
 	std::string ToUpper(std::string string)
@@ -21,10 +17,10 @@ namespace TEN::Utils
 		return string;
 	}
 
-	std::string ToString(const wchar_t* source)
+	std::string ToString(const wchar_t* string)
 	{
         auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
-		return converter.to_bytes(std::wstring(source));
+		return converter.to_bytes(std::wstring(string));
 	}
 
     std::wstring ToWString(const std::string& string)
@@ -78,7 +74,7 @@ namespace TEN::Utils
 
         int size = GetFileVersionInfoSizeA(fileName, NULL);
 
-        if (!size)
+        if (size == 0)
         {
             TENLog("GetFileVersionInfoSizeA failed", LogLevel::Error);
             return {};

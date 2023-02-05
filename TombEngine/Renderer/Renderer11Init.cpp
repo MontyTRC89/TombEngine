@@ -116,7 +116,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_COORDS.x, 0, SCREEN_COORDS.y, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 

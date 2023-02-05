@@ -240,12 +240,11 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 
 constexpr auto MAX_BONES = 32;
 
+constexpr auto SCREEN_COORDS	   = Vector2(800.0f, 600.0f);
 constexpr auto REFERENCE_FONT_SIZE = 35.0f;
-constexpr auto REFERENCE_RES_WIDTH = 800.0f;
-constexpr auto REFERENCE_RES_HEIGHT = 600.0f;
-constexpr auto HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
-constexpr auto HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
-constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
+constexpr auto HUD_UNIT_X		   = 1.0f / SCREEN_COORDS.x;
+constexpr auto HUD_UNIT_Y		   = 1.0f / SCREEN_COORDS.y;
+constexpr auto HUD_ZERO_Y		   = -SCREEN_COORDS.y;
 
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
