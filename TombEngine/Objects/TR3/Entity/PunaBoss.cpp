@@ -31,8 +31,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 60;
 	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
-	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.4f, 0.5f, 0.5f);
-	constexpr auto PUNA_EXPLOSION_MAIN_COLOR = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+
+	constexpr auto PUNA_EFFECT_COLOR		   = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+	constexpr auto PUNA_EXPLOSION_MAIN_COLOR   = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
 	constexpr auto PUNA_EXPLOSION_SECOND_COLOR = Vector4(0.1f, 0.3f, 0.7f, 0.5f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);

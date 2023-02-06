@@ -256,16 +256,15 @@ void UpdateSparks()
 				}
 				else
 				{
-					explosionType = 0;			
+					explosionType = 0;
 				}
 
 				for (int j = 0; j < (spark->extras & 7); j++)
 				{
 					if (spark->flags & SP_COLOR)
 					{
-						TriggerExplosionSparks(spark->x,
-							spark->y,
-							spark->z,
+						TriggerExplosionSparks(
+							spark->x, spark->y, spark->z,
 							(spark->extras & 7) - 1,
 							spark->dynamic,
 							explosionType,
@@ -275,9 +274,8 @@ void UpdateSparks()
 					}
 					else
 					{
-						TriggerExplosionSparks(spark->x,
-							spark->y,
-							spark->z,
+						TriggerExplosionSparks(
+							spark->x, spark->y, spark->z,
 							(spark->extras & 7) - 1,
 							spark->dynamic,
 							explosionType,
@@ -423,18 +421,16 @@ void UpdateSparks()
 				}
 				else
 				{
-					int falloff;
-					if (dynsp->Falloff <= 28)
-						falloff = dynsp->Falloff;
-					else
-						falloff = 31;
+					int falloff = (dynsp->Falloff <= 28) ? dynsp->Falloff : 31;
 
 					if (spark->flags & SP_COLOR)
 					{
 						TriggerDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
 					}
 					else
+					{
 						TriggerDynamicLight(x, y, z, falloff, g, b, r);
+					}
 				}
 			}
 		}
@@ -488,8 +484,8 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor, const Vector3& secondColor)
 {
-	static constexpr auto LIFE_MAX	   = 44.0f;
-	static constexpr auto ROTATION_MAX = ANGLE(0.15f);
+	constexpr auto LIFE_MAX		= 44.0f;
+	constexpr auto ROTATION_MAX = ANGLE(0.15f);
 
 	static const auto EXTRAS_TABLE = std::array<unsigned char, 4>{ 0, 4, 7, 10 };
 
@@ -535,12 +531,10 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		else
 		{
 			// New colored flame processing.
-
 			int colorS[3] = { int(mainColor.x * UCHAR_MAX), int(mainColor.y * UCHAR_MAX), int(mainColor.z * UCHAR_MAX) };
 			int colorD[3] = { int(secondColor.x * UCHAR_MAX), int(secondColor.y * UCHAR_MAX), int(secondColor.z * UCHAR_MAX) };
 
 			// Determine weakest RGB component.
-
 			int lowestS = UCHAR_MAX;
 			int lowestD = UCHAR_MAX;
 			for (int i = 0; i < 3; i++)
@@ -550,14 +544,14 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			}
 
 			// Introduce random color shift for non-weakest RGB components.
-
-			static constexpr int CHROMA_SHIFT = 32;
-			static constexpr float LUMA_SHIFT = 0.5f;
+			constexpr auto CHROMA_SHIFT = 32;
+			constexpr auto LUMA_SHIFT	= 0.5f;
 
 			for (int i = 0; i < 3; i++)
 			{
 				if (colorS[i] != lowestS)
 					colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
 				if (colorD[i] != lowestD)
 					colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
 
