@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature.Mood == MoodType::Bored)
 				{
-					if (item.Animation.RequiredState)
+					if (item.Animation.RequiredState != NO_STATE)
 					{
 						item.Animation.TargetState = item.Animation.RequiredState;
 					}

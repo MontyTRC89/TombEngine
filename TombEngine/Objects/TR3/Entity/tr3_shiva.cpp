@@ -17,6 +17,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math;
+
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
