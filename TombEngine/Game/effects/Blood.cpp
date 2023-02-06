@@ -215,8 +215,8 @@ namespace TEN::Effects::Blood
 		mist.Orientation2D = Random::GenerateAngle();
 		mist.Velocity = Random::GenerateDirectionInCone(direction, SEMIANGLE) * Random::GenerateFloat(0.0f, VELOCITY_MAX);
 		mist.Color = BLOOD_COLOR_RED;
-		mist.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
-		mist.LifeMax = mist.Life;
+		mist.Life =
+		mist.LifeMax = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 		mist.Scale = Random::GenerateFloat(SCALE_MIN, SCALE_MAX);
 		mist.ScaleMax = mist.Scale * 4;
 		mist.ScaleMin = mist.Scale;
@@ -402,7 +402,8 @@ namespace TEN::Effects::Blood
 
 	void UpdateUnderwaterBloodParticles()
 	{
-		constexpr auto SCALE_MAX = BLOCK(0.25f);
+		constexpr auto SCALE_MAX  = BLOCK(0.25f);
+		constexpr auto SCALE_RATE = 4.0f;
 
 		for (auto& uwBlood : UnderwaterBloodParticles)
 		{
@@ -411,7 +412,7 @@ namespace TEN::Effects::Blood
 
 			// Update scale.
 			if (uwBlood.Scale < SCALE_MAX)
-				uwBlood.Scale += 4.0f;
+				uwBlood.Scale += SCALE_RATE;
 
 			// Update life.
 			if (uwBlood.Init == 0.0f)
