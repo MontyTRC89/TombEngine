@@ -40,8 +40,7 @@ namespace TEN::Hud
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.75f;
-
-		static const auto ROTATION = EulerAngles(0, ANGLE(3.0f), 0);
+		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
 
 		if (this->IsOffscreen(false))
 			return;
@@ -80,7 +79,7 @@ namespace TEN::Hud
 		// Update string scale.
 		float alpha = Scale / SCALE_MAX;
 		this->StringScale = Lerp(0.0f, 1.0f, alpha) * (1.0f + StringScalar);
-		this->StringScalar *= STRING_SCALAR_ALPHA;
+		this->StringScalar = Lerp(StringScalar, 0.0f, STRING_SCALAR_ALPHA);
 
 		// Update life.
 		this->Life -= 1.0f;
