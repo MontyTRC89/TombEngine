@@ -1055,8 +1055,15 @@ namespace TEN::Renderer
 				face.info.blendMode = spr.BlendMode;
 				face.info.IsSoftParticle = spr.SoftParticle;
 
-				RendererRoom& room = m_rooms[FindRoomNumber(Vector3i(spr.pos))];
-				room.TransparentFacesToDraw.push_back(face);
+				for (int j = 0; j < view.roomsToDraw.size(); j++)
+				{
+					short roomNumber = view.roomsToDraw[j]->RoomNumber;
+					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(spr.pos), roomNumber))
+					{
+						view.roomsToDraw[j]->TransparentFacesToDraw.push_back(face);
+						break;
+					}
+				}
 			}
 			else
 			{
