@@ -34,7 +34,6 @@ e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`
 Must be one of:
 	EQUIP
 	USE
-	COMBINE
 	EXAMINE
 e.g. `myItem.action = ItemAction.EXAMINE`
 	@treturn InventoryItem an InventoryItem
