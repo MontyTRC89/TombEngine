@@ -472,10 +472,10 @@ namespace TEN::Effects::Environment
 
 				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GenerateInt() & (WALL_SIZE * 4 - 1));
+				auto yPos = Camera.pos.y - (BLOCK(4) + GenerateInt() & (BLOCK(4) - 1));
 				
 				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);
-
+				
 				if (outsideRoom == NO_ROOM)
 					continue;
 

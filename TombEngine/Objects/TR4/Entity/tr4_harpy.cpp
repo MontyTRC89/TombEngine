@@ -35,12 +35,12 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
 	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
 	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
-	const vector<unsigned int> HarpySwoopAttackJoints   = { 2, 4, 15 };
-	const vector<unsigned int> HarpyStingerAttackJoints = { 2, 4 };
+	const auto HarpySwoopAttackJoints   = std::vector<unsigned int>{ 2, 4, 15 };
+	const auto HarpyStingerAttackJoints = std::vector<unsigned int>{ 2, 4 };
 
 	enum HarpyState
 	{
-		HARPY_STATE_NONE = 0,
+		// No state 0.
 		HARPY_STATE_IDLE = 1,
 		HARPY_STATE_FLY_FORWARD = 2,
 		HARPY_STATE_FLY_DOWN = 3,
@@ -322,7 +322,7 @@ namespace TEN::Entities::TR4
 				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
 					AI.distance <= SQUARE(BLOCK(3.5f)) ||
-					TestProbability(0.5f))
+					Random::TestProbability(1 / 2.0f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					break;
@@ -336,7 +336,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					if (item->Animation.RequiredState == HARPY_STATE_FLAME_ATTACK)
@@ -355,7 +355,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance >= SQUARE(341))
 					{
-						if (AI.ahead && TestProbability(0.5f) &&
+						if (AI.ahead && Random::TestProbability(1 / 2.0f) &&
 							AI.distance >= SQUARE(BLOCK(2)) &&
 							AI.distance > SQUARE(BLOCK(3.5f)))
 						{
@@ -371,7 +371,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (TestProbability(0.5f))
+				if (Random::TestProbability(1 / 2.0f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
 					break;
@@ -387,7 +387,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.ahead && AI.distance >= SQUARE(BLOCK(2)) &&
 						AI.distance > SQUARE(BLOCK(3.5f)) &&
-						TestProbability(0.5f))
+						Random::TestProbability(1 / 2.0f))
 					{
 						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
@@ -470,7 +470,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
 				}
-				else if (TestProbability(0.5f))
+				else if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = HARPY_STATE_IDLE;
 
 				break;

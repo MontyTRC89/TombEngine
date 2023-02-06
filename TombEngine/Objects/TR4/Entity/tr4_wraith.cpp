@@ -10,14 +10,15 @@
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
 #include "Game/room.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR4/Entity/tr4_wraith_info.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Effects::Items;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -53,10 +54,10 @@ namespace TEN::Entities::TR4
 
 		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Pose);
 
-		// HitPoints stores the target of wraith
+		// HACK: HitPoints stores the wraith's target.
 		auto* target = item->ItemFlags[6] ? &g_Level.Items[item->ItemFlags[6]] : LaraItem;
 
-		auto oldPos = item->Pose.Position;
+		auto prevPos = item->Pose.Position;
 
 		int x, y, z;
 		int dy;
@@ -290,7 +291,7 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldPos, item->Pose.Orientation.y - ANGLE(180.0f), item->ObjectNumber);
+				WraithWallsEffect(prevPos, item->Pose.Orientation.y - ANGLE(180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
 			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.y, item->ObjectNumber);
@@ -330,7 +331,7 @@ namespace TEN::Entities::TR4
 		}
 
 		wraith[0].Position = item->Pose.Position;
-		wraith[0].Velocity = (item->Pose.Position - oldPos) * 4;
+		wraith[0].Velocity = (item->Pose.Position - prevPos) * 4;
 
 		// Standard WRAITH drawing code
 		DrawWraith(
@@ -339,7 +340,7 @@ namespace TEN::Entities::TR4
 			item->ObjectNumber);
 
 		DrawWraith(
-			(oldPos + item->Pose.Position) / 2,
+			(prevPos + item->Pose.Position) / 2,
 			wraith[0].Velocity,
 			item->ObjectNumber);
 
