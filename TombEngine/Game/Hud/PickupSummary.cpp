@@ -91,7 +91,7 @@ namespace TEN::Hud
 		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
-		// TODO: Call this elsewhere. Maybe add PickUpObject() function to pickup.cpp.
+		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
 		PickedUpObject(objectID);
 
 		// Increment count of existing display pickup if it exists.
