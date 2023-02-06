@@ -45,8 +45,14 @@ namespace TEN::Hud
 		if (this->IsOffscreen(false))
 			return;
 
+		// Move offscreen.
+		if (Life <= 0.0f && isHead)
+		{
+			auto vel = Vector2(SCREEN_COORDS.x * HIDE_VELOCITY_COEFF, 0.0f);
+			this->Position += vel;
+		}
 		// Update position, scale, and opacity.
-		if (Life > 0.0f)
+		else if (Life > 0.0f)
 		{
 			float totalDist = Vector2::Distance(Origin, Target);
 			float coveredDist = Vector2::Distance(Origin, Position);
@@ -64,13 +70,6 @@ namespace TEN::Hud
 			this->Position = Vector2::Lerp(Position, Target, POSITION_LERP_ALPHA);
 			this->Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
 			this->Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
-		}
-
-		// Move offscreen.
-		if (Life <= 0.0f && isHead)
-		{
-			auto vel = Vector2(SCREEN_COORDS.x * HIDE_VELOCITY_COEFF, 0.0f);
-			this->Position += vel;
 		}
 
 		// Update orientation.
