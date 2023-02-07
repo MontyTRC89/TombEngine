@@ -11,6 +11,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -55,6 +56,7 @@
 
 using namespace std::chrono;
 using namespace TEN::Effects;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -401,9 +403,9 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear all kinds of particles.
+	ClearBubbles();
 	DisableSmokeParticles();
 	DisableDripParticles();
-	DisableBubbles();
 	DisableDebris();
 
 	// Clear swarm enemies.

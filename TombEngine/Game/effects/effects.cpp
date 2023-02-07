@@ -4,7 +4,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/item_fx.h"
@@ -23,6 +23,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
@@ -752,11 +753,11 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
-			pos.y = (GetRandomControl() & 0x7F) + y - 64;
-			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNumber, 6, 15, 0, 0, 0, 0);
+			auto pos = Vector3(
+				(GetRandomControl() & 0x1FF) + x - 256,
+				(GetRandomControl() & 0x7F) + y - 64,
+				(GetRandomControl() & 0x1FF) + z - 256);
+			SpawnBubble(pos, roomNumber);
 		}
 	}
 }
@@ -1366,19 +1367,32 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 
 void Splash(ItemInfo* item)
 {
-	short roomNumber = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	constexpr auto BUBBLE_COUNT		   = 256;
+	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
 
-	auto* room = &g_Level.Rooms[roomNumber];
-	if (TestEnvironment(ENV_FLAG_WATER, room))
+	int probedRoomNumber = GetCollision(item).RoomNumber;
+	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
+		return;
+
+	int waterHeight = GetWaterHeight(item);
+
+	SplashSetup.x = item->Pose.Position.x;
+	SplashSetup.y = waterHeight - 1;
+	SplashSetup.z = item->Pose.Position.z;
+	SplashSetup.splashPower = item->Animation.Velocity.y;
+	SplashSetup.innerRadius = 64;
+	SetupSplash(&SplashSetup, probedRoomNumber);
+
+	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
+	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
+
+	// Spawn bubbles.
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
-		SplashSetup.y = waterHeight - 1;
-		SplashSetup.x = item->Pose.Position.x;
-		SplashSetup.z = item->Pose.Position.z;
-		SplashSetup.splashPower = item->Animation.Velocity.y;
-		SplashSetup.innerRadius = 64;
-		SetupSplash(&SplashSetup, roomNumber);
+		auto pos = Random::GeneratePointInSphere(sphere);
+		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
+		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
+		SpawnBubble(pos, item->RoomNumber, 0, inertia);
 	}
 }
 
