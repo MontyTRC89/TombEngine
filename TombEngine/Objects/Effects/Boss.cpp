@@ -247,7 +247,7 @@ namespace TEN::Effects::Boss
 			TriggerShockwave(
 				&shockwavePos, 300, BLOCK(0.5f), speed,
 				color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX,
-				36, EulerAngles(orient2D, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Knockback);
+				36, EulerAngles(orient2D, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 
 			TriggerExplosionSparks(
 				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
