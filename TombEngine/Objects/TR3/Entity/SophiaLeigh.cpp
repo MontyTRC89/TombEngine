@@ -32,6 +32,10 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = CLICK(2);
 	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE   = SQUARE(BLOCK(5));
+	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = SQUARE(SECTOR(2));
+
+	constexpr auto SOPHIALEIGH_DAMAGE_SMALL_BOLT = 4;
+	constexpr auto SOPHIALEIGH_DAMAGE_LARGE_BOLT = 10;
 
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX	 = 60;
@@ -118,9 +122,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum class SophiaOCB
 	{
-		OCB_Normal = 1,			 // Move, climb, attack, and chase player.
-		OCB_Tower = 2,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
-		OCB_LuaToMoveUpDown = 6, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
+		Normal = 0,			 // Move, climb, attack, and chase player.
+		Tower = 1,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
+		TowerWithVolume = 2, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
 	};
 
 	void InitialiseSophiaLeigh(short itemNumber)
@@ -128,15 +132,11 @@ namespace TEN::Entities::Creatures::TR3
 		auto& item = g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-		CheckForRequiredObjects(item);
-
-		// Set to normal mode by default if none is set
-		if (item.TriggerFlags == 0)
-			item.TriggerFlags = (short)SophiaOCB::OCB_Normal;
-		item.SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = fully charged.
-		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
-		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
-		item.SetFlagField((int)BossItemFlags::Rotation, 0);
+		CheckForRequiredObjects(item); // ItemFlags[0] is used there !
+		item.ItemFlags[1] = 0; // Light timer. (To smooth it)
+		item.ItemFlags[4] = 0; // Charged state. (TRUE or FALSE)
+		item.ItemFlags[5] = 0; // Death count.
+		item.ItemFlags[7] = 0; // Explode count.
 		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START);			// Always start with projectile attack.
 	}
 
@@ -177,27 +177,26 @@ namespace TEN::Entities::Creatures::TR3
 		{
 
 			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
+				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX
+			);
 
-			if (item.ItemFlags[(int)BossItemFlags::Rotation] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
-				item.ItemFlags[(int)BossItemFlags::Rotation]++;
+			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
+				item.ItemFlags[1]++;
 		}
 		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
+				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX
+			);
 
-			item.ItemFlags[(int)BossItemFlags::Rotation]--;
+			item.ItemFlags[1]--;
 
 		}
-		else
-			item.ItemFlags[(int)BossItemFlags::AttackType] = 0;
-
 	}
 
-	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBigLaser, short angleAdd)
+	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
 		if (fxNumber == NO_ITEM)
@@ -205,7 +204,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& fx = EffectList[fxNumber];
 
-		auto laserType = isBigLaser ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
+		auto boltType = isBoltLarge ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
 
 		fx.pos.Position = GetJointPosition(&item, bite.meshNum, bite.Position);
 		fx.pos.Orientation.x = item.Pose.Orientation.x + data->torsoXAngle;
@@ -221,11 +220,11 @@ namespace TEN::Entities::Creatures::TR3
 		fx.pos.Orientation.z = 0;
 		fx.roomNumber = item.RoomNumber;
 		fx.counter = 0;
-		fx.flag1 = laserType;
-		fx.flag2 = isBigLaser ? 10 : 2; // Damage value.
+		fx.flag1 = boltType;
+		fx.flag2 = isBoltLarge ? SOPHIALEIGH_DAMAGE_LARGE_BOLT : SOPHIALEIGH_DAMAGE_SMALL_BOLT; // Damage value.
 		fx.speed = Random::GenerateInt(120, 160);
 		fx.objectNumber = ID_ENERGY_BUBBLES;
-		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (laserType - 1);
+		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (boltType - 1);
 	}
 
 	static void TriggerSophiaShockwave(ItemInfo* item, const BiteInfo& bite)
@@ -256,15 +255,11 @@ namespace TEN::Entities::Creatures::TR3
 		ringEffect->life = LIFE_MAX;
 	}
 
-	// TODO: Rename. What even is "tower"?
+	// TR3 Behaviour, which let sophia go to AI_X1 object to move up/down a "tower"
 	static void SophiaLeighTowerControl(ItemInfo& item, CreatureInfo* creature, SophiaData* data)
 	{
 		if (item.AIBits)
 			GetAITarget(creature);
-
-		// Immortal in tower mode.
-		auto& object = Objects[item.ObjectNumber];
-		item.HitPoints = object.HitPoints;
 
 		auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
@@ -282,7 +277,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem; // TODO: Deal with LaraItem global.
 
-			if (!(item.TriggerFlags & (short)SophiaOCB::OCB_LuaToMoveUpDown))
+			if (item.TriggerFlags == (int)SophiaOCB::Tower)
 			{
 				// If enemy is above, get to next AI_X1.
 				if (ai.verticalDistance >= SOPHIALEIGH_Y_DISTANCE_RANGE)
@@ -333,7 +328,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else if (creature->ReachedGoal)
 			{
-				if (item.TestFlagField((int)BossItemFlags::ChargedState, true))
+				if (item.ItemFlags[4] == 1)
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
 				}
@@ -402,7 +397,7 @@ namespace TEN::Entities::Creatures::TR3
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
-				item.SetFlagField((int)BossItemFlags::ChargedState, true);
+				item.ItemFlags[4] = 1; // Charged state
 			}
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
@@ -432,7 +427,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
-			item.SetFlagField((int)BossItemFlags::ChargedState, false);
+			item.ItemFlags[4] = 0; // Bolt have been shoot, reset the flag.
 			creature->MaxTurn = 0;
 			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
@@ -471,6 +466,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	// TR3 Gold Behaviour, which let sophia attack and chase lara normally.
 	static void SophiaLeighNormalControl(ItemInfo& item, CreatureInfo* creature, SophiaData* data)
 	{
 		AI_INFO ai;
@@ -515,7 +511,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else if (ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE && Targetable(&item, &ai))
 			{
-				if (item.TestFlagField((int)BossItemFlags::ChargedState, true))
+				if (item.ItemFlags[4] == 1)
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
 				}
@@ -593,7 +589,7 @@ namespace TEN::Entities::Creatures::TR3
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
-				item.SetFlagField((int)BossItemFlags::ChargedState, true);
+				item.ItemFlags[4] = 1; // Charged state.
 			}
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
@@ -625,7 +621,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
-			item.SetFlagField((int)BossItemFlags::ChargedState, false);
+			item.ItemFlags[4] = 0; // Bolt have been shoot, reset the flag.
 			creature->MaxTurn = 0;
 
 			if (ai.ahead)
@@ -686,8 +682,8 @@ namespace TEN::Entities::Creatures::TR3
 				item.Animation.FrameNumber = frameEnd;
 				item.MeshBits.ClearAll();
 
-				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < SOPHIALEIGH_EXPLOSION_NUM_MAX)
-					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
+				if (item.ItemFlags[7] < SOPHIALEIGH_EXPLOSION_NUM_MAX)
+					item.ItemFlags[7]++;
 
 				// Do explosion effect.
 				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_SHOCKWAVE_COLOR, SOPHIALEIGH_EXPLOSION_MAIN_COLOR, SOPHIALEIGH_EXPLOSION_SECOND_COLOR, false);
@@ -696,8 +692,8 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-
-			if (item.TriggerFlags & (int)SophiaOCB::OCB_Tower)
+			if (item.TriggerFlags == (int)SophiaOCB::Tower ||
+				item.TriggerFlags == (int)SophiaOCB::TowerWithVolume)
 				SophiaLeighTowerControl(item, &creature, &data);
 			else
 				SophiaLeighNormalControl(item, &creature, &data);
@@ -738,14 +734,14 @@ namespace TEN::Entities::Creatures::TR3
 	}
 
 
-	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int unk)
+	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int multiplicatorSquared)
 	{
 		for (int i = 0; i < count; i++)
 		{
 			auto* spark = GetFreeParticle();
-
 			auto sphere = BoundingSphere(Vector3::Zero, BLOCK(2));
-			auto vel = Random::GeneratePointInSphere(sphere) * SQUARE(unk);
+			auto mulSqr = SQUARE(multiplicatorSquared);
+			auto vel = Random::GeneratePointInSphere(sphere) * mulSqr;
 
 			spark->on = true;
 			spark->sR = color.x;
@@ -754,10 +750,10 @@ namespace TEN::Entities::Creatures::TR3
 			spark->dB = 0;
 			spark->dG = 0;
 			spark->dR = 0;
-			spark->colFadeSpeed = 9 * SQUARE(unk);
+			spark->colFadeSpeed = 9 * mulSqr;
 			spark->fadeToBlack = 0;
-			spark->life = 9 * SQUARE(unk);
-			spark->sLife = 9 * SQUARE(unk);
+			spark->life = 9 * mulSqr;
+			spark->sLife = 9 * mulSqr;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos.x;
 			spark->y = pos.y;
@@ -768,7 +764,7 @@ namespace TEN::Entities::Creatures::TR3
 			spark->zVel = vel.z;
 			spark->flags = SP_NONE;
 			spark->maxYvel = 0;
-			spark->friction = 34 * SQUARE(unk);
+			spark->friction = 34 * mulSqr;
 			spark->scalar = 3;
 			spark->dSize = spark->sSize = spark->size = Random::GenerateInt(84, 98);
 		}
