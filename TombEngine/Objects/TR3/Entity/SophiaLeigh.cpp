@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = CLICK(2);
 	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE   = SQUARE(BLOCK(5));
-	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = SQUARE(SECTOR(2));
+	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = SQUARE(SECTOR(1));
 
 	constexpr auto SOPHIALEIGH_DAMAGE_SMALL_BOLT = 4;
 	constexpr auto SOPHIALEIGH_DAMAGE_LARGE_BOLT = 10;
@@ -179,9 +179,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		short diff = item->Pose.Orientation.y - currentAngle;
 		if (abs(diff) < 0x4000) // Facing away from ring.
-			item->Animation.Velocity.z = -75;
-		else // Facing toward ring.
 			item->Animation.Velocity.z = 75;
+		else // Facing toward ring.
+			item->Animation.Velocity.z = -75;
 
 		item->Animation.IsAirborne = true;
 		item->Animation.Velocity.y = -50;
@@ -192,9 +192,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerKnockback(ItemInfo& item, CreatureInfo& creature, int life = 32)
 	{
-		int dx = creature.Enemy->Pose.Position.x - item.Pose.Position.x;
-		int dz = creature.Enemy->Pose.Position.z - item.Pose.Position.z;
-		int distance = sqrt(SQUARE(dx) + SQUARE(dz));
+		auto* enemy = creature.Enemy;
+		auto angle = Geometry::GetOrientToPoint(enemy->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
+		int distance = Vector3::Distance(item.Pose.Position.ToVector3(), enemy->Pose.Position.ToVector3());
 		if (distance < SOPHIALEIGH_KNOCKBACK_RANGE)
 		{
 			byte red = SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX;
@@ -219,22 +219,25 @@ namespace TEN::Entities::Creatures::TR3
 			// Up position
 			TriggerShockwave(
 				&upperPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				red, green, blue,
 				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
 			// Middle position
 			TriggerShockwave(
 				&middlePos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				red, green, blue,
 				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
 			// Down position
 			TriggerShockwave(
 				&lowerPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				red, green, blue,
 				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
-			KnockbackCollision(creature.Enemy, phd_atan(dz, dx));
+			TriggerExplosionSparks(enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z, 3, -2, 2, enemy->RoomNumber);
+			// NOTE: There is TriggerPlasmaBall but it's not coded (it use EXTRAFX5 in OG).
+
+			KnockbackCollision(creature.Enemy, angle.y);
 		}
 	}
 
