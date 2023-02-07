@@ -138,8 +138,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		InitialiseCreature(itemNumber);
 		CheckForRequiredObjects(item); // ItemFlags[0] is used there !
-		item.ItemFlags[1] = 0; // Light timer. (To smooth it)
-		item.ItemFlags[2] = 0; // Knockback ring timer. (To smooth it)
+		item.ItemFlags[1] = 0; // Light timer. (To smooth it)		
 		item.ItemFlags[4] = 0; // Charged state. (TRUE or FALSE)
 		item.ItemFlags[5] = 0; // Death count.
 		item.ItemFlags[7] = 0; // Explode count.
@@ -189,8 +188,6 @@ namespace TEN::Entities::Creatures::TR3
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
 		SetAnimation(item, LA_FALL_BACK);
-
-		// TODO: add effect here.
 	}
 
 	static void TriggerKnockback(ItemInfo& item, CreatureInfo& creature, int life = 32)
@@ -204,20 +201,38 @@ namespace TEN::Entities::Creatures::TR3
 			byte green = SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX;
 			byte blue = SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX;
 
+			auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+			auto middlePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
+
+			auto sphere1 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(1 / 16.0f));
+			auto upperPos = Pose(Random::GeneratePointInSphere(sphere1), item.Pose.Orientation);
+
+			auto sphere2 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f), BLOCK(1 / 16.0f));
+			auto lowerPos = Pose(Random::GeneratePointInSphere(sphere2), item.Pose.Orientation);
+
 			// There is 3 shockwave:
 			// - Up
 			// - Middle
 			// - Down
 			Pose pos(item.Pose);
 
-			pos.Position.y -= 768; // Up position
-			TriggerShockwave(&pos, CLICK(2), BLOCK(1), 140, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+			// Up position
+			TriggerShockwave(
+				&upperPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
-			pos.Position.y += 256; // Middle position
-			TriggerShockwave(&pos, BLOCK(1), BLOCK(2), 160, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+			// Middle position
+			TriggerShockwave(
+				&middlePos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
-			pos.Position.y += 256; // Down position
-			TriggerShockwave(&pos, CLICK(2), BLOCK(1), 140, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+			// Down position
+			TriggerShockwave(
+				&lowerPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
 
 			KnockbackCollision(creature.Enemy, phd_atan(dz, dx));
 		}
@@ -250,34 +265,6 @@ namespace TEN::Entities::Creatures::TR3
 			item.ItemFlags[1]--;
 
 		}
-	}
-
-	static void TriggerKnockbackRings(ItemInfo& item)
-	{
-		auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
-		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
-
-		auto sphere1 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(1 / 16.0f));
-		auto knockbackPos1 = Pose(Random::GeneratePointInSphere(sphere1), item.Pose.Orientation);
-
-		auto sphere2 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f), BLOCK(1 / 16.0f));
-		auto knockbackPos2 = Pose(Random::GeneratePointInSphere(sphere2), item.Pose.Orientation);
-
-		TriggerShockwave(
-			&knockbackPos1, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
-		TriggerShockwave(
-			&shockwavePos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
-			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
-		TriggerShockwave(
-			&knockbackPos2, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
 	}
 
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
@@ -561,38 +548,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		GetCreatureMood(&item, &ai, true);
 		CreatureMood(&item, &ai, true);
-
-		if (ai.distance < SOPHIALEIGH_KNOCKBACK_RANGE)
-		{
-			if (item.ItemFlags[2] == 0)
-			{
-				auto sphere1 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(1 / 16.0f));
-				auto knockbackPos1 = Pose(Random::GeneratePointInSphere(sphere1), item.Pose.Orientation);
-
-				auto sphere2 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f), BLOCK(1 / 16.0f));
-				auto knockbackPos2 = Pose(Random::GeneratePointInSphere(sphere2), item.Pose.Orientation);
-
-				TriggerShockwave(
-					&knockbackPos1, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-					36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
-				TriggerShockwave(
-					&shockwavePos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
-					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-					36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
-				TriggerShockwave(
-					&knockbackPos2, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
-					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-					36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
-
-				item.ItemFlags[2] = 36;
-			}
-		}
-
-		if (item.ItemFlags[2] > 0)
-			item.ItemFlags[2]--;
 
 		data->angle = CreatureTurn(&item, creature->MaxTurn);
 		switch (item.Animation.ActiveState)
