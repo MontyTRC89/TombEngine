@@ -182,7 +182,7 @@ namespace TEN::Hud
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_COORDS.y);
-			auto pos = (SCREEN_COORDS - relPos) - Vector2(SCREEN_OFFSET.y, SCREEN_OFFSET.y);
+			auto pos = (SCREEN_COORDS - relPos) - SCREEN_OFFSET;
 			stackPositions.push_back(pos);
 		}
 
