@@ -486,7 +486,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				// Do explosion effect.
 				// TODO: change the explosion color to tony one, which is red, orange.
-				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_NUM_MAX, TONY_EFFECT_COLOR, TONY_EFFECT_COLOR, TONY_EFFECT_COLOR, false);
+				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_NUM_MAX, TONY_EFFECT_COLOR, Vector4::Zero, Vector4::Zero, false);
 				return;
 			}
 		}
