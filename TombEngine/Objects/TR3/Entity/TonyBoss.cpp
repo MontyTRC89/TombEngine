@@ -492,7 +492,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			if (item->ItemFlags[3] != 2) // Shield tony to avoid him to take damage before him is flying.
+			if (item->ItemFlags[3] != 2) // Tony is immune to damage until he is flying and idle.
 				item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
 			AI_INFO ai;
@@ -502,7 +502,6 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				if (ai.distance < TONY_TRIGGER_RANGE)
 					item->ItemFlags[3] = 1;
-				item->HitPoints = object->HitPoints; // Tony is immune to damage when lara is not around.
 				angle = 0;
 			}
 			else
