@@ -181,7 +181,8 @@ struct BLOOD_STRUCT
 enum class ShockwaveStyle
 {
 	Normal = 0,
-	Sophia = 1
+	Sophia = 1,
+	Knockback = 2,
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0
