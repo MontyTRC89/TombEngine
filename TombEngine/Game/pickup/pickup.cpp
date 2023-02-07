@@ -40,12 +40,10 @@ const ObjectCollisionBounds PickUpBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-200, 200,
-		-CLICK(1), CLICK(1)
-	),
+		-CLICK(1), CLICK(1)),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), 0, ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), 0, ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), 0, ANGLE(45.0f)))
 };
 
 static auto HiddenPickUpPosition = Vector3i(0, 0, -690);
@@ -54,12 +52,10 @@ const ObjectCollisionBounds HiddenPickUpBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
-		-800, -CLICK(1)
-	),
+		-800, -CLICK(1)),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f)))
 };
 
 static auto CrowbarPickUpPosition = Vector3i(0, 0, 215);
@@ -68,12 +64,10 @@ const ObjectCollisionBounds CrowbarPickUpBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
-		200, CLICK(2)
-	),
+		200, CLICK(2)	),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f)))
 };
 
 static auto JobyCrowPickUpPosition = Vector3i(-224, 0, 240);
@@ -82,12 +76,10 @@ const ObjectCollisionBounds JobyCrowPickUpBounds =
 	GameBoundingBox(
 		-CLICK(2), 0,
 		-100, 100,
-		0, CLICK(2)
-	),
+		0, CLICK(2)),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f)))
 };
 
 static auto PlinthPickUpPosition = Vector3i(0, 0, -460);
@@ -96,12 +88,10 @@ ObjectCollisionBounds PlinthPickUpBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-640, 640,
-		-511, 0
-	),
+		-511, 0),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f)))
 };
 
 static auto PickUpPositionUW = Vector3i(0, -200, -350);
@@ -110,12 +100,10 @@ const ObjectCollisionBounds PickUpBoundsUW =
 	GameBoundingBox(
 		-CLICK(2), CLICK(2),
 		-CLICK(2), CLICK(2),
-		-CLICK(2), CLICK(2)
-	),
+		-CLICK(2), CLICK(2)),
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-45.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(45.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(45.0f), ANGLE(45.0f)))
 };
 
 static auto SOPos = Vector3i::Zero;
@@ -124,8 +112,7 @@ ObjectCollisionBounds SOBounds =
 	GameBoundingBox::Zero,
 	std::pair(
 		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
-		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
-	)
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f)))
 };
 
 short SearchCollectFrames[4] = { 180, 100, 153, 83 };
@@ -137,8 +124,7 @@ const ObjectCollisionBounds MSBounds =
 	GameBoundingBox::Zero,
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
 
 int NumRPickups;
@@ -155,6 +141,7 @@ bool SetInventoryCount(GAME_OBJECT_ID objectID, int count)
 	{
 		return false;
 	}
+
 	return true;
 }
 
