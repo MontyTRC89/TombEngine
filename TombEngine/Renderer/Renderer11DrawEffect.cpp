@@ -639,7 +639,7 @@ namespace TEN::Renderer
 								1.0f),
 							0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
 					}
-					else if (shockwave->style == (int)ShockwaveStyle::Sophia || shockwave->style == (int)ShockwaveStyle::Knockback)
+					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
 					{
 						angle -= PI / 4.0f;
 
@@ -655,6 +655,22 @@ namespace TEN::Renderer
 								1.0f),
 							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
 
+					}
+					else if (shockwave->style == (int)ShockwaveStyle::Knockback)
+					{
+						angle -= PI / 4.0f;
+
+						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+							pos + p4,
+							pos + p3,
+							pos + p2,
+							pos + p1,
+							Vector4(
+								r / 16.0f,
+								g / 16.0f,
+								b / 16.0f,
+								1.0f),
+							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
 					}
 
 					p1 = p2;

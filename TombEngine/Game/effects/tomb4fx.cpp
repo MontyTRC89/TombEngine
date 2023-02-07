@@ -1415,6 +1415,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
+		sptr->sLife = life;
 		sptr->fadeIn = fadein;
 		
 		sptr->sr = 0;
@@ -1522,9 +1523,28 @@ void UpdateShockwaves()
 		if (sw->life <= 0)
 			continue;
 		sw->life--;
-		sw->outerRad += sw->speed;
-		if (sw->style == (int)ShockwaveStyle::Sophia)
-			sw->innerRad += sw->speed;
+
+
+		if (sw->style != (int)ShockwaveStyle::Knockback)
+		{
+			sw->outerRad += sw->speed;
+			if (sw->style == (int)ShockwaveStyle::Sophia)
+				sw->innerRad += sw->speed;
+		}
+		else
+		{
+			if (sw->life > (sw->sLife / 2))
+			{
+				sw->outerRad += sw->speed;
+				sw->innerRad += sw->speed;
+			}
+			else
+			{
+				sw->outerRad -= sw->speed;
+				sw->innerRad -= sw->speed;
+			}
+		}
+
 		sw->speed -= (sw->speed >> 4);
 
 		if (LaraItem->HitPoints > 0)

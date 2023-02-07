@@ -74,7 +74,7 @@ struct SHOCKWAVE_STRUCT
 	unsigned char sb;
 	unsigned char life;
 	short speed;
-	short temp;
+	short sLife;
 	bool fadeIn = false;
 	int style;
 };
