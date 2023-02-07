@@ -203,11 +203,11 @@ namespace TEN::Hud
 
 	void PickupSummaryController::ClearInactiveDisplayPickups()
 	{
-		DisplayPickups.erase(
+		this->DisplayPickups.erase(
 			std::remove_if(
-				DisplayPickups.begin(), DisplayPickups.end(),
+				this->DisplayPickups.begin(), this->DisplayPickups.end(),
 				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen(false)); }),
-			DisplayPickups.end());
+			this->DisplayPickups.end());
 	}
 
 	void PickupSummaryController::DrawDebug() const
