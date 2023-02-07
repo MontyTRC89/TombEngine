@@ -26,10 +26,10 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia)
 	{
-		constexpr auto GRAVITY_MAX		  = 12.0f;
-		constexpr auto GRAVITY_MIN		  = GRAVITY_MAX * (2 / 3.0f);
-		constexpr auto WAVE_VELOCITY_MAX  = 1 / 8.0f;
-		constexpr auto WAVE_VELOCITY_MIN  = WAVE_VELOCITY_MAX / 2;
+		constexpr auto GRAVITY_MAX		 = 12.0f;
+		constexpr auto GRAVITY_MIN		 = GRAVITY_MAX * (2 / 3.0f);
+		constexpr auto WAVE_VELOCITY_MAX = 1 / 8.0f;
+		constexpr auto WAVE_VELOCITY_MIN = WAVE_VELOCITY_MAX / 2;
 
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
@@ -167,11 +167,13 @@ namespace TEN::Effects::Bubble
 			float alpha = 1.0f - (bubble.Life / std::round(LIFE_START_FADING * FPS));
 			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
 
-			// Update position. TODO: Sinks.
+			// Update position.
 			bubble.WavePeriod += bubble.WaveVelocity;
 			bubble.PositionBase += Vector3(0.0f, -bubble.Gravity, 0.0f) + bubble.Inertia;
 			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
 
+			//  TODO: Let bubbles be affected by sinks.
+			
 			// Update intertia.
 			bubble.Inertia *= 0.8f;
 
