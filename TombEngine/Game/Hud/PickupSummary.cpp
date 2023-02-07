@@ -39,7 +39,7 @@ namespace TEN::Hud
 		constexpr auto SCALE_MIN		   = 0.2f;
 		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
-		constexpr auto STRING_SCALAR_ALPHA = 0.75f;
+		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
 		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
 
 		if (this->IsOffscreen(false))
