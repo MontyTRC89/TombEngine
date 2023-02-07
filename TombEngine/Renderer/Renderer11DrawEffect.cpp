@@ -639,7 +639,7 @@ namespace TEN::Renderer
 								1.0f),
 							0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
 					}
-					else if (shockwave->style == (int)ShockwaveStyle::Sophia || shockwave->style == (int)ShockwaveStyle::Knockback)
+					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
 					{
 						angle -= PI / 4.0f;
 
