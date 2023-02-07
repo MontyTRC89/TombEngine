@@ -6,8 +6,6 @@ using namespace TEN::Math;
 
 namespace TEN::Hud
 {
-	// BIG TODO: Object transparency in renderer.
-
 	struct DisplayPickup
 	{
 		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
@@ -20,7 +18,7 @@ namespace TEN::Hud
 
 		float Life		   = 0.0f;
 		float Scale		   = 0.0f;
-		float Opacity	   = 0.0f;
+		float Opacity	   = 0.0f; // BIG TODO: Object transparency in renderer.
 		float HideVelocity = 0.0f;
 		float StringScale  = 0.0f;
 		float StringScalar = 0.0f;
