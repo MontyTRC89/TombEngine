@@ -21,17 +21,17 @@ namespace TEN::Hud
 
 	void HudController::Update()
 	{
-		this->PickupSummaryControl.Update();
+		this->PickupSummary.Update();
 	}
 
 	void HudController::Draw() const
 	{
-		this->PickupSummaryControl.Draw();
+		this->PickupSummary.Draw();
 	}
 
 	void HudController::Clear()
 	{
-		this->PickupSummaryControl.Clear();
+		this->PickupSummary.Clear();
 	}
 
 	constexpr auto HEALTH_BAR_TIMER_MAX = 40.0f;

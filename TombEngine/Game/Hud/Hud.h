@@ -11,7 +11,7 @@ namespace TEN::Hud
 	{
 	public:
 		// Components
-		PickupSummaryController PickupSummaryControl = {};
+		PickupSummaryController PickupSummary = {};
 
 		// Utilities
 		void Update();
