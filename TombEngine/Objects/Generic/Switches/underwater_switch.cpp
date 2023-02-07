@@ -21,7 +21,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			0, BLOCK(3.0f / 4)
+			0, BLOCK(3 / 4.0f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -34,8 +34,8 @@ namespace TEN::Entities::Switches
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
-			-BLOCK(1.0f / 2), 0
+			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			-BLOCK(1 / 2.0f), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -48,8 +48,8 @@ namespace TEN::Entities::Switches
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
-			0, BLOCK(1.0f / 2)
+			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			0, BLOCK(1 / 2.0f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),

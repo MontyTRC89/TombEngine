@@ -13,17 +13,17 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Gui;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
 	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
-	const vector<unsigned int> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
+	const auto LagoonWitchAttackJoints = std::vector<unsigned int>{ 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
 	{
+		// No state 0.
 		WITCH_STATE_SWIM = 1,
 		WITCH_STATE_IDLE = 2,
 		WITCH_STATE_ATTACK = 3,

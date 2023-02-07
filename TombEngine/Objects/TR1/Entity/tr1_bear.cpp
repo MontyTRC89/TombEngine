@@ -21,17 +21,17 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BEAR_SLAM_DAMAGE	  = 200;
 	constexpr auto BEAR_PAT_DAMAGE	  = 400;
 
-	constexpr auto BEAR_ATTACK_RANGE			= SECTOR(1);
-	constexpr auto BEAR_REAR_RANGE				= SECTOR(2);
-	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = SECTOR(0.6f);
-	constexpr auto BEAR_EAT_RANGE				= CLICK(3);
+	constexpr auto BEAR_ATTACK_RANGE			= BLOCK(1);
+	constexpr auto BEAR_REAR_RANGE				= BLOCK(2);
+	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3 / 5.0f);
+	constexpr auto BEAR_EAT_RANGE				= BLOCK(3 / 4.0f);
 	
-	constexpr auto BEAR_ROAR_CHANCE = 1.0f / 400;
-	constexpr auto BEAR_REAR_CHANCE = 1.0f / 40;
-	constexpr auto BEAR_DROP_CHANCE = 1.0f / 22;
+	constexpr auto BEAR_ROAR_CHANCE = 1 / 400.0f;
+	constexpr auto BEAR_REAR_CHANCE = 1 / 40.0f;
+	constexpr auto BEAR_DROP_CHANCE = 1 / 22.0f;
 
-	const auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
-	const auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
+	constexpr auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
 	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
 	const auto BearAttackJoints = std::vector<unsigned int>{ 2, 3, 5, 6, 14, 17 };
@@ -154,7 +154,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 						item->Animation.TargetState = BEAR_STATE_STROLL;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BEAR_STATE_STROLL;
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR1
 
 				if (creature->Mood == MoodType::Bored || isLaraDead)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
-				else if (AI.ahead && !item->Animation.RequiredState)
+				else if (AI.ahead && item->Animation.RequiredState == NO_STATE)
 				{
 					if (AI.distance < pow(BEAR_REAR_RANGE, 2) &&
 						Random::TestProbability(BEAR_REAR_CHANCE) &&
@@ -212,7 +212,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.RequiredState = BEAR_STATE_STROLL;
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
@@ -250,7 +250,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_REAR_SWIPE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_PAT_DAMAGE);
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_RUN_SWIPE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);
