@@ -1487,34 +1487,6 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 	}
 }
 
-static void KnockbackCollision(ItemInfo* item, short currentAngle)
-{
-	// It's continuous damage.
-	item->HitPoints -= 2;
-	item->HitStatus = 1;
-
-	// Facing away from ring.
-	if (abs(currentAngle) < 45)
-	{
-		item->Pose.Orientation.y = currentAngle;
-		item->Animation.Velocity.z = 75;
-	}
-	// Facing toward ring.
-	else
-	{
-		item->Pose.Orientation.y = currentAngle - 180;
-		item->Animation.Velocity.z = -75;
-	}
-
-	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = -50;
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	SetAnimation(item, LA_FALL_BACK);
-
-	// TODO: add effect here.
-}
-
 void UpdateShockwaves()
 {
 	for (int i = 0; i < MAX_SHOCKWAVE; i++)
@@ -1547,13 +1519,13 @@ void UpdateShockwaves()
 
 		sw->speed -= (sw->speed >> 4);
 
-		if (LaraItem->HitPoints > 0)
+		if (LaraItem->HitPoints > 0 && sw->damage)
 		{
 			auto* frame = GetBestFrame(LaraItem);
 			auto dx = LaraItem->Pose.Position.x - sw->x;
 			auto dz = LaraItem->Pose.Position.z - sw->z;
 			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));
-			auto angle = Geometry::GetOrientToPoint(LaraItem->Pose.Position.ToVector3(), Vector3(dx, sw->y, dz));
+			auto angle = phd_atan(dz, dx);
 
 			// Lara is inside the shockwave ?
 			if (sw->y > LaraItem->Pose.Position.y + frame->boundingBox.Y1
@@ -1561,22 +1533,13 @@ void UpdateShockwaves()
 			&&  distance > sw->innerRad
 			&&  distance < sw->outerRad)
 			{
-				if (sw->style == (int)ShockwaveStyle::Knockback)
-				{
-					KnockbackCollision(LaraItem, angle.y);
-					continue;
-				}
-
-				if (sw->damage)
-				{
-					TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
-						sw->y,
-						LaraItem->Pose.Position.z,
-						sw->r, sw->g, sw->b,
-						angle.y,
-						sw->speed);
-					DoDamage(LaraItem, sw->damage);
-				}
+				TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
+					sw->y,
+					LaraItem->Pose.Position.z,
+					sw->r, sw->g, sw->b,
+					angle,
+					sw->speed);
+				DoDamage(LaraItem, sw->damage);
 			}
 		}
 	}

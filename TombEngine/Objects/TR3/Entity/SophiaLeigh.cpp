@@ -173,10 +173,60 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	static void KnockbackCollision(ItemInfo* item, short currentAngle)
+	{
+		item->HitPoints -= 200;
+		item->HitStatus = 1;
+
+		short diff = item->Pose.Orientation.y - currentAngle;
+		if (abs(diff) < 0x4000) // Facing away from ring.
+			item->Animation.Velocity.z = -75;
+		else // Facing toward ring.
+			item->Animation.Velocity.z = 75;
+
+		item->Animation.IsAirborne = true;
+		item->Animation.Velocity.y = -50;
+		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.z = 0;
+		SetAnimation(item, LA_FALL_BACK);
+
+		// TODO: add effect here.
+	}
+
+	static void TriggerKnockback(ItemInfo& item, CreatureInfo& creature, int life = 32)
+	{
+		int dx = creature.Enemy->Pose.Position.x - item.Pose.Position.x;
+		int dz = creature.Enemy->Pose.Position.z - item.Pose.Position.z;
+		int distance = sqrt(SQUARE(dx) + SQUARE(dz));
+		if (distance < SOPHIALEIGH_KNOCKBACK_RANGE)
+		{
+			byte red = SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX;
+			byte green = SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX;
+			byte blue = SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX;
+
+			// There is 3 shockwave:
+			// - Up
+			// - Middle
+			// - Down
+			Pose pos(item.Pose);
+
+			pos.Position.y -= 768; // Up position
+			TriggerShockwave(&pos, CLICK(2), BLOCK(1), 140, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+
+			pos.Position.y += 256; // Middle position
+			TriggerShockwave(&pos, BLOCK(1), BLOCK(2), 160, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+
+			pos.Position.y += 256; // Down position
+			TriggerShockwave(&pos, CLICK(2), BLOCK(1), 140, red, green, blue, life, EulerAngles::Zero, 0, false, true, (int)ShockwaveStyle::Sophia);
+
+			KnockbackCollision(creature.Enemy, phd_atan(dz, dx));
+		}
+	}
+
 	static void TriggerSophiaLeightLight(ItemInfo& item, Pose& shockwavePos)
 	{
 		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
-			item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
+			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
@@ -261,34 +311,6 @@ namespace TEN::Entities::Creatures::TR3
 		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (boltType - 1);
 	}
 
-	static void TriggerSophiaShockwave(ItemInfo* item, const BiteInfo& bite)
-	{
-		static constexpr auto LIFE_MAX = 64.0f;
-		static constexpr auto VELOCITY = -400.0f;
-		static constexpr auto COLOR	   = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
-
-		int fxNumber = GetFreeShockwave();
-		if (fxNumber == NO_ITEM)
-			return;
-
-		auto* ringEffect = &ShockWaves[fxNumber];
-
-		auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
-
-		ringEffect->x = pos.x;
-		ringEffect->y = pos.y;
-		ringEffect->z = pos.z;
-		ringEffect->innerRad = 620;
-		ringEffect->outerRad = 640;
-		ringEffect->xRot = Random::GenerateAngle(-ANGLE(0.25f), ANGLE(0.25f));
-		ringEffect->damage = 0;
-		ringEffect->r = COLOR.x;
-		ringEffect->g = COLOR.y * UCHAR_MAX;
-		ringEffect->b = COLOR.z * UCHAR_MAX;
-		ringEffect->speed = VELOCITY;
-		ringEffect->life = LIFE_MAX;
-	}
-
 	// TR3 Behaviour, which let sophia go to AI_X1 object to move up/down a "tower"
 	static void SophiaLeighTowerControl(ItemInfo& item, CreatureInfo* creature, SophiaData* data)
 	{
@@ -343,6 +365,17 @@ namespace TEN::Entities::Creatures::TR3
 
 		GetCreatureMood(&item, &ai, true);
 		CreatureMood(&item, &ai, true);
+
+		// Knockback the target if near sophia in tower mode !
+		if (ai.distance < SOPHIALEIGH_KNOCKBACK_RANGE && creature->Flags <= 0 && creature->Enemy->HitPoints > 0) // Avoid spawning the rings if target is dead !
+		{
+			TriggerKnockback(item, *creature);
+			creature->Flags = 50;
+		}
+		else
+		{
+			creature->Flags--;
+		}
 
 		data->angle = CreatureTurn(&item, creature->MaxTurn);
 		switch (item.Animation.ActiveState)
