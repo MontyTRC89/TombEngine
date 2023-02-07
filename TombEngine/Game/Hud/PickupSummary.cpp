@@ -111,7 +111,7 @@ namespace TEN::Hud
 		}
 
 		// Create new display pickup.
-		auto& pickup = GetNewDisplayPickup();
+		auto& pickup = this->GetNewDisplayPickup();
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
