@@ -228,7 +228,8 @@ void ClearInactiveEffects(std::deque<TEffect>& effects)
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const TEffect& effect) { return (effect.Life <= 0.0f); }), effects.end());
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+		effects.end());
 }
 
 Particle* GetFreeParticle();
