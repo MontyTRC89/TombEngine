@@ -129,10 +129,10 @@ namespace TEN::Input
 
 	extern const char* g_KeyNames[];
 
-	extern vector<InputAction>	ActionMap;
-	extern vector<QueueState>	ActionQueue;
-	extern vector<bool>			KeyMap;
-	extern vector<float>		AxisMap;
+	extern std::vector<InputAction> ActionMap;
+	extern vector<QueueState>		ActionQueue;
+	extern std::vector<bool>		KeyMap;
+	extern std::vector<float>		AxisMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?

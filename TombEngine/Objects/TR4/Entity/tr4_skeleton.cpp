@@ -16,8 +16,11 @@
 #include "Game/people.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -178,10 +181,10 @@ namespace TEN::Entities::TR4
 		spark->flags = 26;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (Random::TestProbability(1 / 2.0f))
-			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-		else
-			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+			if (Random::TestProbability(1 / 2.0f))
+				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+			else
+				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 3;
@@ -447,7 +450,7 @@ namespace TEN::Entities::TR4
 							item->AIBits & FOLLOW &&
 							(creature->ReachedGoal || laraAI.distance > SQUARE(BLOCK(2))))
 						{
-							if (item->Animation.RequiredState)
+							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = 15;
@@ -455,7 +458,7 @@ namespace TEN::Entities::TR4
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle && laraAI.distance < SQUARE(BLOCK(2)) &&
 							Random::TestProbability(1 / 2.0f) &&
-							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(3 / 50.0f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
@@ -472,7 +475,7 @@ namespace TEN::Entities::TR4
 							else
 								item->Animation.TargetState = SKELETON_STATE_ATTACK_3;
 						}
-						else if (item->HitStatus || item->Animation.RequiredState)
+						else if (item->HitStatus || item->Animation.RequiredState != NO_STATE)
 						{
 							if (Random::TestProbability(1 / 2.0f))
 							{

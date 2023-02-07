@@ -136,7 +136,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;

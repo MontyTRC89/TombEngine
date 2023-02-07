@@ -195,7 +195,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 		sampleFlags |= BASS_SAMPLE_3D;
 
 	// Set & randomize volume (if needed)
-	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);;
+	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
 	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
 		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
 

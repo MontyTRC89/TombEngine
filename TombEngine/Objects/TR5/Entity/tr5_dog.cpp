@@ -1,15 +1,16 @@
 #include "framework.h"
-#include "tr5_dog.h"
+#include "Objects/TR5/Entity/tr5_dog.h"
+
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/control/control.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {

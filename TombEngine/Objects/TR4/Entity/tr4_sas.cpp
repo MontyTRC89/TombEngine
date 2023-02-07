@@ -680,7 +680,7 @@ namespace TEN::Entities::TR4
 		grenadeItem->Animation.Velocity.z = 128;
 		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-		grenadeItem->Animation.RequiredState = 0;
+		grenadeItem->Animation.RequiredState = NO_STATE;
 
 		if (Random::TestProbability(3 / 4.0f))
 			grenadeItem->ItemFlags[0] = (int)ProjectileType::Grenade;
