@@ -202,6 +202,34 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	static void TriggerKnockbackRings(ItemInfo& item)
+	{
+		auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
+
+		auto sphere1 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(1 / 16.0f));
+		auto knockbackPos1 = Pose(Random::GeneratePointInSphere(sphere1), item.Pose.Orientation);
+
+		auto sphere2 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f), BLOCK(1 / 16.0f));
+		auto knockbackPos2 = Pose(Random::GeneratePointInSphere(sphere2), item.Pose.Orientation);
+
+		TriggerShockwave(
+			&knockbackPos1, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+		TriggerShockwave(
+			&shockwavePos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
+			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+		TriggerShockwave(
+			&knockbackPos2, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+			SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
+			36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+	}
+
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
