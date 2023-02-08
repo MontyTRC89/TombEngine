@@ -1259,8 +1259,8 @@ struct LaraControlData
 
 struct PlayerEffectData
 {
-	unsigned char WetNodes[NUM_LARA_MESHES];
-	unsigned char BubbleNodes[NUM_LARA_MESHES]; // TODO: Savegame
+	std::array<unsigned char, NUM_LARA_MESHES> WetNodes	   = {};
+	std::array<unsigned char, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
 };
 
 struct LaraInfo
@@ -1291,7 +1291,7 @@ struct LaraInfo
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
-	FX_INFO* SpasmEffect;	// Not saved.
+	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
 
 	short InteractedItem;
 	int ProjectedFloorHeight;

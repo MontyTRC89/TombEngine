@@ -50,7 +50,6 @@ using TEN::Renderer::g_Renderer;
 LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
-byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 {

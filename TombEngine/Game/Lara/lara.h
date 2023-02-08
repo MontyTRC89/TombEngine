@@ -87,7 +87,6 @@ constexpr auto SLOPE_DIFFERENCE	   = 60;
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
-extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)

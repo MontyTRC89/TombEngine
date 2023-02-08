@@ -165,9 +165,11 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 			continue;
 		}
 
-		if (player.Effect.WetNodes[i] > 0 && !LaraNodeUnderwater[i] &&
-			//Random::TestProbability(1 / ((player.Effect.WetNodes[i] / UCHAR_MAX) * 2.0f))) // Check.
-			Random::GenerateInt(0, 512) < player.Effect.WetNodes[i])
+		if (player.Effect.WetNodes[i] <= 0)
+			continue;
+
+		float chance = player.Effect.WetNodes[i] / (UCHAR_MAX * 2.0f);
+		if (Random::TestProbability(chance))
 		{
 			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
 
@@ -185,7 +187,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		auto pos = GetJointPosition(&item, i);
+		auto pos = GetJointPosition(&item, i).ToVector3();
 		auto roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
 
 		// Node above water; set max bubble value.
@@ -195,10 +197,15 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 			continue;
 		}
 
-		if (Random::TestProbability(player.Effect.BubbleNodes[i] / (float)UCHAR_MAX))
+		if (player.Effect.BubbleNodes[i] <= 0)
+			continue;
+
+		float chance = player.Effect.BubbleNodes[i] / (float)UCHAR_MAX;
+		if (Random::TestProbability(chance))
 		{
-			for (int i = 0; i < (player.Effect.BubbleNodes[i] / 4); i++)
-				SpawnBubble(pos.ToVector3(), item.RoomNumber, (int)BubbleFlags::HighAmplitude);
+			unsigned int count = (int)round(player.Effect.BubbleNodes[i] / 4.0f);
+			for (int i = 0; i < count; i++)
+				SpawnBubble(pos, item.RoomNumber, (int)BubbleFlags::HighAmplitude);
 
 			if (player.Effect.BubbleNodes[i] >= 24)
 				player.Effect.BubbleNodes[i] -= 24;
