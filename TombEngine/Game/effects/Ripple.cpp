@@ -27,10 +27,10 @@ namespace TEN::Effects::Ripple
 
 		auto& ripple = GetNewEffect(Ripples, RIPPLE_COUNT_MAX);
 
-		float life = (flags & RippleFlags::OnGround) ?
+		float lifeInSec = (flags & RippleFlags::OnGround) ?
 			Random::GenerateFloat(LIFE_GROUND_MIN, LIFE_GROUND_MAX) :
 			Random::GenerateFloat(LIFE_WATER_SURFACE_MIN, LIFE_WATER_SURFACE_MAX);
-		float fadeTime = life / 3;
+		float fadeTimeInSec = lifeInSec / 3;
 
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
@@ -38,9 +38,9 @@ namespace TEN::Effects::Ripple
 		ripple.Normal = normal;
 		ripple.Color = COLOR_WHITE;
 		ripple.Life =
-		ripple.LifeMax = round(life * FPS);
-		ripple.LifeFullOpacity = round((life - fadeTime) * FPS);
-		ripple.LifeStartFading = round(fadeTime * FPS);
+		ripple.LifeMax = round(lifeInSec * FPS);
+		ripple.LifeFullOpacity = round((lifeInSec - fadeTimeInSec) * FPS);
+		ripple.LifeStartFading = round(fadeTimeInSec * FPS);
 		ripple.Scale = scale;
 		ripple.Flags = flags;
 

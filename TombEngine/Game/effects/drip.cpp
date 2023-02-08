@@ -26,7 +26,7 @@ namespace TEN::Effects::Drip
 
 	void SpawnDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity)
 	{
-		constexpr auto WIDTH	   = 4.0f;
+		constexpr auto WIDTH = 4.0f;
 
 		auto& drip = GetNewEffect(Drips, DRIP_COUNT_MAX);
 
