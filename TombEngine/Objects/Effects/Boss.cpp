@@ -168,9 +168,9 @@ namespace TEN::Effects::Boss
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;
 		smoke.z = effectPos.z;
-		smoke.xVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.xVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.yVel = GetRandomControl() - 128;
-		smoke.zVel = Random::GenerateInt(BLOCK(0.5f), BLOCK(0.5f));
+		smoke.zVel = Random::GenerateFloat(BLOCK(0.5f), BLOCK(0.5f));
 		smoke.sR = 75;
 		smoke.sG = 125;
 		smoke.sB = 175;
@@ -195,7 +195,7 @@ namespace TEN::Effects::Boss
 	}
 
 	// NOTE: Actual death occurs when countUntilDeath >= 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, const Vector4& explosionColor1, const Vector4& explosionColor2, bool allowExplosion)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -212,6 +212,13 @@ namespace TEN::Effects::Boss
 			{
 				auto pos = Random::GeneratePointInSphere(sphere);
 				SpawnExplosionSmoke(pos);
+
+				TriggerExplosionSparks(
+					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z), 
+					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 		}
 
@@ -222,18 +229,33 @@ namespace TEN::Effects::Boss
 			{
 				auto pos = Random::GeneratePointInSphere(sphere);
 				SpawnExplosionSmoke(pos);
+
+				TriggerExplosionSparks(
+					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 
 			sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 			auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
 			int speed = Random::GenerateInt(BLOCK(0.5f), BLOCK(1.6f));
-			auto orient2D = Random::GenerateAngle();
+			auto orient2D = Random::GenerateAngle(ANGLE(-24.0f), ANGLE(24.0f));
 
 			TriggerShockwave(
 				&shockwavePos, 300, BLOCK(0.5f), speed,
 				color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX,
-				36, orient2D, 0);
+				36, EulerAngles(orient2D, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+
+			TriggerExplosionSparks(
+				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
+				(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
+				item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
+				2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+				Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
+
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}
 
@@ -245,16 +267,21 @@ namespace TEN::Effects::Boss
 			color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
 		if (counter >= countUntilDeath)
-			CreatureDie(itemNumber, true);
+		{
+			CreatureDie(itemNumber, allowExplosion);
+
+			if (!allowExplosion)
+				KillItem(itemNumber);
+		}
 	}
 
 	void CheckForRequiredObjects(ItemInfo& item)
 	{
 		short flags = 0;
 
-		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)
+		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)		
 			flags |= (short)BossFlagValue::Lizard;
-
+		
 		// The following are only for aesthetics.
 
 		if (Objects[ID_BOSS_EXPLOSION_SHOCKWAVE].loaded)

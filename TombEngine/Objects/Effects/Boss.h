@@ -10,6 +10,7 @@ namespace TEN::Effects::Boss
 		ShieldIsEnabled = 2,
 		AttackType = 3,
 		AttackCount = 4,	 // Change behaviour after some attack.
+		ChargedState = 4,
 		DeathCount = 5,
 		ItemNumber = 6,		 // Check if summon is dead.
 		ExplodeCount = 7
@@ -26,7 +27,7 @@ namespace TEN::Effects::Boss
 	void ShockwaveRingControl(int itemNumber);
 	void ShockwaveExplosionControl(int itemNumber);
 
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color);
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int deathCountToDie, const Vector4& color, const Vector4& explosionColor1, const Vector4& explosionColor2, bool allowExplosion = true);
 	void CheckForRequiredObjects(ItemInfo& item);
 
 	void SpawnShield(const ItemInfo& item, const Vector4& color);

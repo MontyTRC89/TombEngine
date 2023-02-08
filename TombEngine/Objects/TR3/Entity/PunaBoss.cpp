@@ -4,8 +4,8 @@
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
@@ -14,8 +14,8 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Boss;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -31,7 +31,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 60;
 	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
-	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+
+	constexpr auto PUNA_EFFECT_COLOR		   = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+	constexpr auto PUNA_EXPLOSION_MAIN_COLOR   = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+	constexpr auto PUNA_EXPLOSION_SECOND_COLOR = Vector4(0.1f, 0.3f, 0.7f, 0.5f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
 	const auto PunaBossHandBite = BiteInfo(Vector3::Zero, 14);
@@ -220,10 +223,10 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			auto target = GameVector(pos, item.RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 0, 255, 180, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 8, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 180, 255, 0, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 3, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 200, 200, 30, LI_THININ | LI_THINOUT, 4, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), Random::GenerateInt(25, 50), 100, 250, 255, 30, LI_THININ | LI_THINOUT, 2, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 0, 255, 180, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 8, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 180, 255, 0, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 3, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 200, 200, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 250, 255, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 2, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
@@ -238,20 +241,20 @@ namespace TEN::Entities::Creatures::TR3
 			auto target2 = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), PUNA_ATTACK_RANGE / 6), creature.Enemy->RoomNumber);
 			auto target3 = GameVector(Geometry::TranslatePoint(origin1.ToVector3(), pos - origin1.ToVector3(), PUNA_ATTACK_RANGE / 10), creature.Enemy->RoomNumber);
 
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&origin.ToVector3i(), &target2.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricity(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 6);
+			SpawnElectricity(origin.ToVector3(), target2.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 7);
 
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 6);
-			TriggerLightning(&target2.ToVector3i(), &origin1.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 7);
+			SpawnElectricity(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 6);
+			SpawnElectricity(target2.ToVector3(), origin1.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 7);
 
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 4, 9);
-			TriggerLightning(&origin1.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 20, LI_THINOUT | LI_THININ, 2, 10);
+			SpawnElectricity(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 9);
+			SpawnElectricity(origin1.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 20, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 10);
 
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(15, 40), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 4, 7);
-			TriggerLightning(&origin2.ToVector3i(), &target3.ToVector3i(), Random::GenerateInt(25, 35), 20, 160, 160, 16, LI_THINOUT | LI_THININ, 2, 8);
+			SpawnElectricity(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(15, 40), 20, 160, 160, 16, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 4, 7);
+			SpawnElectricity(origin2.ToVector3(), target3.ToVector3(), Random::GenerateInt(25, 35), 20, 160, 160, 16, (int)(int)ElectricityFlags::ThinOut | (int)(int)(int)ElectricityFlags::ThinIn, 2, 8);
 
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 20, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 12, 12);
-			TriggerLightning(&origin.ToVector3i(), &target.ToVector3i(), 1, 80, 160, 160, 30, LI_THININ | LI_SPLINE | LI_MOVEEND, 5, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 20, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 12, 12);
+			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 80, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 5, 12);
 
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
@@ -334,7 +337,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
 				// Do explosion effect.
-				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR);
+				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR, PUNA_EXPLOSION_MAIN_COLOR, PUNA_EXPLOSION_SECOND_COLOR);
 				return;
 			}
 			else
@@ -505,25 +508,33 @@ namespace TEN::Entities::Creatures::TR3
 
 	void PunaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		if (pos.has_value())
+		if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
+			target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
 		{
-			if (target.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Shield) &&
-				target.TestFlagField((int)BossItemFlags::ShieldIsEnabled, 1))
-			{
-				auto color = Vector4(
-					0.0f, Random::GenerateFloat(0.0f, 0.5f), Random::GenerateFloat(0.0f, 0.5f), 
-					Random::GenerateFloat(0.5f, 0.8f));
+			auto color = Vector4(
+				0.0f,
+				Random::GenerateFloat(0.0f, 0.5f),
+				Random::GenerateFloat(0.0f, 0.5f),
+				Random::GenerateFloat(0.5f, 0.8f));
 
+			if (pos.has_value() && !isExplosive)
+			{
 				SpawnShieldAndRichochetSparks(target, pos->ToVector3(), color);
 			}
-			else
+			else if (isExplosive)
 			{
-				if (target.HitStatus)
-					SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
-
-				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, damage, isExplosive);
+				SpawnShield(target, color);
 			}
+		}
+		else
+		{
+			if (target.HitStatus)
+				SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &target.Pose);
+
+			if (pos.has_value())
+				DoBloodSplat(pos->x, pos->y, pos->z, 5, source.Pose.Orientation.y, pos->RoomNumber);
+
+			DoItemHit(&target, damage, isExplosive, false);
 		}
 	}
 }

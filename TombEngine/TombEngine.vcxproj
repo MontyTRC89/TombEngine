@@ -152,25 +152,28 @@ CALL gen.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\control\volumeactivator.h" />
-    <ClInclude Include="Game\effects\boatFX.h" />
-    <ClInclude Include="Game\effects\bubble.h" />
+     <ClInclude Include="Game\effects\boatFX.h" />
+    <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
-    <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\effects\Electricity.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
+    <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
@@ -434,7 +437,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_sophia.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
@@ -623,6 +625,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
     <ClCompile Include="framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -630,7 +633,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\boatFX.cpp" />
-    <ClCompile Include="Game\effects\bubble.cpp" />
+    <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
@@ -644,9 +647,11 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Room\RoomObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
@@ -665,7 +670,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_overhang.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
-    <ClCompile Include="Game\effects\lightning.cpp" />
+    <ClCompile Include="Game\effects\Electricity.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
@@ -804,7 +809,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Trap\tr2_killerstatue.cpp" />
     <ClCompile Include="Objects\TR2\Trap\tr2_springboard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_sophia.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\rubber_boat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_ahmet.cpp" />

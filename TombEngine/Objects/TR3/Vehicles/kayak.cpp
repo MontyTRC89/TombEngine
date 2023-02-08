@@ -429,7 +429,7 @@ namespace TEN::Entities::Vehicles
 			int sinkval = lara->WaterCurrentActive - 1;
 		
 			auto target = g_Level.Sinks[sinkval].Position;
-			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target.ToVector3()).y) / 16) & 4095;
+			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target).y) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;

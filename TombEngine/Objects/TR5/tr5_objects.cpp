@@ -15,6 +15,7 @@
 
 // Creatures
 #include "Objects/TR5/Entity/AutoGun.h"			 // OK
+#include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
 #include "Objects/TR5/Entity/tr5_cyborg.h"		 // OK
@@ -442,15 +443,15 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD_LASER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGuardLaser;
+		obj->initialise = InitialiseHeavyGuard;
 		obj->collision = CreatureCollision;
-		//obj->control = GuardControlLaser;
+		obj->control = HeavyGuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->HitRoutine = HeavyGuardHit;
 		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
-		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -625,7 +626,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->LotType = LotType::Human;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);

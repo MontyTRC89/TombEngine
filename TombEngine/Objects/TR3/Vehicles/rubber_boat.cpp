@@ -6,7 +6,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/boatFX.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/Bubble.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -20,6 +21,7 @@
 #include "Objects/TR3/Vehicles/upv.h"
 
 using std::vector;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 using namespace TEN::Effects::BOATFX;
 
@@ -984,14 +986,16 @@ namespace TEN::Entities::Vehicles
 
 			if ((GetRandomControl() & 1) == 0)
 			{
-				Pose pos;
-				pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
-				pos.Position.y = prop.y + (GetRandomControl() & 15);
-				pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;
+				auto pos = Vector3(
+					prop.x + (GetRandomControl() & 63) - 32,
+					prop.y + (GetRandomControl() & 15),
+					prop.z + (GetRandomControl() & 63) - 32);
 
 				short roomNumber = rBoatItem->RoomNumber;
-				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
-				CreateBubble((Vector3i*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+
+				for (int i = 0; i < 5; i++)
+					SpawnBubble(pos, roomNumber);
 			}
 		}
 		else

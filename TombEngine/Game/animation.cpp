@@ -247,7 +247,7 @@ void AnimateItem(ItemInfo* item)
 
 		item->Animation.ActiveState = animPtr->ActiveState;
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
@@ -265,7 +265,7 @@ void AnimateItem(ItemInfo* item)
 		}
 
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	int frameCount = animPtr->frameEnd - animPtr->frameBase;
@@ -483,6 +483,11 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 int GetCurrentRelativeFrameNumber(ItemInfo* item)
 {
 	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
+}
+
+int GetAnimNumber(ItemInfo& item, int animID)
+{
+	return Objects[item.ObjectNumber].animIndex + animID;
 }
 
 int GetFrameNumber(ItemInfo* item, int frameToStart)

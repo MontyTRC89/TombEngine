@@ -18,7 +18,6 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -26,8 +25,8 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
 	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-	const vector<unsigned int> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
-	const vector<unsigned int> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
+	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
+	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)

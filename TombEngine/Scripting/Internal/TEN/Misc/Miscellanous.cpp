@@ -14,6 +14,7 @@
 #include "LuaHandler.h"
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"

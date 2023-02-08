@@ -5,8 +5,8 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
@@ -20,8 +20,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5
@@ -213,27 +213,28 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (randomIndex < item.ItemFlags[0])
 		{
-			auto pos = GetJointPosition(&item, CyborgJoints[randomIndex], Vector3i(0, 0, 50));
+			auto pos = GetJointPosition(&item, CyborgJoints[randomIndex], Vector3i(0, 0, 50)).ToVector3();
 
-			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
+			SpawnElectricityGlow(pos, 48, 32, 32, 64);
 	
-			SpawnCyborgSpark(pos.ToVector3());
+			SpawnCyborgSpark(pos);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, Random::GenerateInt(4, 20), 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item.Pose);
 
 			if (randomIndex == 5 || randomIndex == 7 || randomIndex == 10)
 			{
-				auto pos2 = Vector3i::Zero;
+				auto pos2 = Vector3::Zero;
 				auto pointColl2 = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber);
+				
 				switch (randomIndex)
 				{
 				case 5:
-					pos2 = GetJointPosition(&item, 15, Vector3i(0, 0, 50));
+					pos2 = GetJointPosition(&item, 15, Vector3i(0, 0, 50)).ToVector3();
 					break;
 
 				case 7:
-					pos2 = GetJointPosition(&item, 6, Vector3i(0, 0, 50));
+					pos2 = GetJointPosition(&item, 6, Vector3i(0, 0, 50)).ToVector3();
 					pointColl2 = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber);
 
 					if (TestEnvironment(ENV_FLAG_WATER, pointColl2.RoomNumber) && item.HitPoints > 0)
@@ -246,11 +247,11 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				case 10:
-					pos2 = GetJointPosition(&item, 12, Vector3i(0, 0, 50));
+					pos2 = GetJointPosition(&item, 12, Vector3i(0, 0, 50)).ToVector3();
 					break;
 				}
 
-				TriggerLightning(&pos, &pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
+				SpawnElectricity(pos, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 3);
 			}
 		}
 
@@ -321,7 +322,7 @@ namespace TEN::Entities::Creatures::TR5
 					joint1 = AI.xAngle;
 				}
 
-				if (item.Animation.RequiredState)
+				if (item.Animation.RequiredState != NO_STATE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

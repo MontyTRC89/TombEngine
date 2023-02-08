@@ -13,13 +13,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -167,7 +166,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(0.5f))
+			if (Random::TestProbability(1 / 2.0f))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -299,12 +298,12 @@ namespace TEN::Entities::TR4
 				spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
 				spark->friction = 9;
 
-				if (TestProbability(0.5f))
+				if (Random::TestProbability(1 / 2.0f))
 				{
 					spark->flags = 16;
 					spark->rotAng = GetRandomControl() & 0xFFF;
 
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
 						spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
 					else
 						spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
@@ -486,7 +485,7 @@ namespace TEN::Entities::TR4
 							break;
 						}
 
-						if (TestProbability(0.25f))
+						if (Random::TestProbability(1 / 4.0f))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
 							break;
@@ -707,7 +706,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 8);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, (int)ShockwaveStyle::Normal);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;
