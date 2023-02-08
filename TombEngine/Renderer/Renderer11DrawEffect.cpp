@@ -80,6 +80,7 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
+	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
 	void Renderer11::DrawWakeFX(RenderView& view)
 	{
