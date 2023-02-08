@@ -454,26 +454,9 @@ namespace TEN::Renderer
 			if (ripple.Life <= 0.0f)
 				continue;
 
-			auto color = Vector4::Zero;
-			if (ripple.Flags & RippleFlags::LowOpacity)
-			{
-				if (ripple.Init)
-					color = Vector4(ripple.Init, ripple.Init, ripple.Init, UCHAR_MAX);
-				else
-					color = Vector4(ripple.Life, ripple.Life, ripple.Life, UCHAR_MAX);
-			}
-			else
-			{
-				if (ripple.Init)
-					color = Vector4(ripple.Init * 2, ripple.Init * 2, ripple.Init * 2, UCHAR_MAX);
-				else
-					color = Vector4(ripple.Life * 2, ripple.Life * 2, ripple.Life * 2, UCHAR_MAX);
-			}
-
-			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
-			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
-			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
-			color /= UCHAR_MAX;
+			float opacity = ripple.Color.w * ((ripple.Flags & RippleFlags::LowOpacity) ? 0.5f : 1.0f);
+			auto color = ripple.Color;
+			color.w = opacity;
 
 			AddSpriteBillboardConstrainedLookAt(
 				&m_sprites[ripple.SpriteIndex],
