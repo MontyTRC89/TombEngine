@@ -77,6 +77,9 @@ constexpr auto LARA_AIR_CRITICAL	   = LARA_AIR_MAX / 4;
 constexpr auto LARA_SPRINT_ENERGY_MAX  = 120.0f;
 constexpr auto LARA_POISON_POTENCY_MAX = 64.0f;
 
+constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
+constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
+
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);
 constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);

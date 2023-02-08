@@ -161,28 +161,31 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 		// Node underwater; set max wetness value.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
-			player.Effect.WetNodes[i] = UCHAR_MAX;
+			player.Effect.DripNodes[i] = PLAYER_DRIP_NODE_MAX;
 			continue;
 		}
 
-		if (player.Effect.WetNodes[i] <= 0)
+		// Node inactive; continue.
+		if (player.Effect.DripNodes[i] <= 0.0f)
 			continue;
 
-		float chance = player.Effect.WetNodes[i] / (UCHAR_MAX * 2.0f);
+		// Spawn drip.
+		float chance = (player.Effect.DripNodes[i] / PLAYER_DRIP_NODE_MAX) / 2;
 		if (Random::TestProbability(chance))
 		{
 			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
 
-			if (player.Effect.WetNodes[i] >= 4)
-				player.Effect.WetNodes[i] -= 4;
-			else
-				player.Effect.WetNodes[i] = 0;
+			player.Effect.DripNodes[i] -= 1.0f;
+			if (player.Effect.DripNodes[i] <= 0.0f)
+				player.Effect.DripNodes[i] = 0.0f;
 		}
 	}
 }
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
+	constexpr auto BUBBLE_COUNT_MULT = 6.0f;
+
 	auto& player = *GetLaraInfo(&item);
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
@@ -193,24 +196,25 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 		// Node above water; set max bubble value.
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
-			player.Effect.BubbleNodes[i] = UCHAR_MAX;
+			player.Effect.BubbleNodes[i] = PLAYER_BUBBLE_NODE_MAX;
 			continue;
 		}
 
-		if (player.Effect.BubbleNodes[i] <= 0)
+		// Node inactive; continue.
+		if (player.Effect.BubbleNodes[i] <= 0.0f)
 			continue;
 
-		float chance = player.Effect.BubbleNodes[i] / (float)UCHAR_MAX;
+		// Spawn bubbles.
+		float chance = player.Effect.BubbleNodes[i] / PLAYER_BUBBLE_NODE_MAX;
 		if (Random::TestProbability(chance))
 		{
-			unsigned int count = (int)round(player.Effect.BubbleNodes[i] / 4.0f);
+			unsigned int count = (int)round(player.Effect.BubbleNodes[i] * BUBBLE_COUNT_MULT);
 			for (int i = 0; i < count; i++)
 				SpawnBubble(pos, item.RoomNumber, (int)BubbleFlags::HighAmplitude);
 
-			if (player.Effect.BubbleNodes[i] >= 24)
-				player.Effect.BubbleNodes[i] -= 24;
-			else
-				player.Effect.BubbleNodes[i] = 0;
+			player.Effect.BubbleNodes[i] -= 1.0f;
+			if (player.Effect.BubbleNodes[i] <= 0.0f)
+				player.Effect.BubbleNodes[i] = 0.0f;
 		}
 	}
 }

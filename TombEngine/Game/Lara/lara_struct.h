@@ -1259,8 +1259,8 @@ struct LaraControlData
 
 struct PlayerEffectData
 {
-	std::array<unsigned char, NUM_LARA_MESHES> WetNodes	   = {};
-	std::array<unsigned char, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
 };
 
 struct LaraInfo
