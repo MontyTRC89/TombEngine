@@ -19,6 +19,7 @@ Version 1.0.7
 	- ItemFlags[4] = on Animation (example: MySwitch:SetItemFlags(number ID of On Animation, 4)
 	- ItemFlags[5] = off Animation (example: MySwitch:SetItemFlags(number ID of Off Animation, 5)
 	- ItemFlags[6] = Distance to use the switch. (example: MySwitch:SetItemFlags(Distance Position, 6)
+* Implement squash and stretch water bubbles.
 
 Lua API Changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.

@@ -66,11 +66,11 @@ enum class EffectType
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = -1;
-	int FrameNumber	  = -1;
-	int ActiveState	  = -1;
-	int TargetState	  = -1;
-	int RequiredState = -1; // TODO: Phase out this weird feature.
+	int AnimNumber	  = 0;
+	int FrameNumber	  = 0;
+	int ActiveState	  = 0;
+	int TargetState	  = 0;
+	int RequiredState = NO_STATE;
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward

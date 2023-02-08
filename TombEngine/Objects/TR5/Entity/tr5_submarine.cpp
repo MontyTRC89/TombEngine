@@ -429,7 +429,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				pos.x = 4 * item->Animation.ActiveState;
 				pos.y = 4 * item->Animation.TargetState;
-				pos.z = 4 * item->Animation.RequiredState;
+				pos.z = 4 * (item->Animation.RequiredState == NO_STATE) ? 0 : item->Animation.RequiredState;
 			}
 		}
 

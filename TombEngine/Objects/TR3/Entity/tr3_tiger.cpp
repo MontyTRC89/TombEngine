@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 				}

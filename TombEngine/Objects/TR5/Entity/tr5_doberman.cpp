@@ -8,10 +8,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -19,7 +20,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum DobermanState
 	{
-		DOBERMAN_STATE_NONE = 0,
+		// No state 0.
 		DOBERMAN_STATE_WALK_FORWARD = 1,
 		DOBERMAN_STATE_RUN_FORWARD = 2,
 		DOBERMAN_STATE_STOP = 3,
@@ -110,21 +111,21 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
 				else
 				{
-					if (TestProbability(0.025f))
+					if (Random::TestProbability(0.025f))
 					{
 						item->Animation.RequiredState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 						break;
 					}
 
-					if (TestProbability(0.045f))
+					if (Random::TestProbability(0.045f))
 					{
 						item->Animation.RequiredState = DOBERMAN_STATE_SIT_IDLE;
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 						break;
 					}
 
-					if (TestProbability(0.085f))
+					if (Random::TestProbability(0.085f))
 					{
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 						break;
@@ -165,15 +166,15 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else
 					{
-						if (TestProbability(0.975f))
+						if (Random::TestProbability(0.975f))
 						{
-							if (TestProbability(0.95f))
+							if (Random::TestProbability(0.95f))
 							{
-								if (TestProbability(0.3f))
+								if (Random::TestProbability(0.3f))
 									item->Animation.TargetState = DOBERMAN_STATE_WALK_FORWARD;
 							}
 							else
@@ -187,19 +188,19 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case DOBERMAN_STATE_STAND_LOW_BITE_ATTACK:
-				if (creature->Mood != MoodType::Bored || TestProbability(0.04f))
+				if (creature->Mood != MoodType::Bored || Random::TestProbability(0.04f))
 					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 				break;
 
 			case DOBERMAN_STATE_SIT_IDLE:
-				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 128))
+				if (creature->Mood != MoodType::Bored || Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 				break;
 
 			case DOBERMAN_STATE_STAND_IDLE:
-				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 64))
+				if (creature->Mood != MoodType::Bored || Random::TestProbability(1 / 64.0f))
 					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 				break;

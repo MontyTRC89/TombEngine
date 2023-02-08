@@ -9,35 +9,34 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE  = 50;
 
-	constexpr auto CIVVY_ATTACK0_RANGE = SQUARE(SECTOR(3));
-	constexpr auto CIVVY_ATTACK1_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto CIVVY_ATTACK2_RANGE = SQUARE(SECTOR(1));
-	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(SECTOR(1));
-	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(SECTOR(3));
-	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(SECTOR(1));
+	constexpr auto CIVVY_ATTACK0_RANGE = SQUARE(BLOCK(3));
+	constexpr auto CIVVY_ATTACK1_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto CIVVY_ATTACK2_RANGE = SQUARE(BLOCK(1));
+	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(3));
+	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(1));
 
-	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
-	constexpr auto CIVVY_STATE_WALK_CHANCE = 0.008f; // Unused.
+	constexpr auto CIVVY_WAIT_CHANCE	   = 1.0f / 128;
+	constexpr auto CIVVY_STATE_WALK_CHANCE = 1.0f / 128; // Unused.
 
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	#define CIVVY_WALK_TURN_RATE_MAX ANGLE(5.0f)
-	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
+	constexpr auto CIVVY_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto CIVVY_RUN_TURN_RATE_MAX	= ANGLE(6.0f);
 
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
-	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
+	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };
 
 	// TODO
 	enum CivvyState
@@ -199,7 +198,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Mood == MoodType::Bored ||
 					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > SQUARE(SECTOR(2)))))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = CIVVY_STATE_IDLE;
@@ -230,7 +229,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = CIVVY_STATE_RUN_FORWARD;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(CIVVY_WAIT_CHANCE))
+					if (Random::TestProbability(CIVVY_WAIT_CHANCE))
 					{
 						item->Animation.TargetState = CIVVY_STATE_IDLE;
 						item->Animation.RequiredState = CIVVY_WAIT;
