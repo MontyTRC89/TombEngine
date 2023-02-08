@@ -73,13 +73,13 @@ namespace TEN::Effects::Bubble
 		constexpr auto SCALE_LARGE_MIN	  = SCALE_LARGE_MAX / 2;
 		constexpr auto SCALE_SMALL_MAX	  = SCALE_LARGE_MIN / 2;
 		constexpr auto SCALE_SMALL_MIN	  = SCALE_SMALL_MAX / 4;
-		constexpr auto AMPLITUDE_MAX_HIGH = BLOCK(0.25f);
-		constexpr auto AMPLITUDE_MAX_LOW  = AMPLITUDE_MAX_HIGH / 8;
+		constexpr auto AMPLITUDE_HIGH_MAX = BLOCK(0.25f);
+		constexpr auto AMPLITUDE_LOW_MAX  = AMPLITUDE_HIGH_MAX / 8;
 
 		float scale = (flags & (int)BubbleFlags::Large) ?
 			Random::GenerateFloat(SCALE_LARGE_MIN, SCALE_LARGE_MAX) :
 			Random::GenerateFloat(SCALE_SMALL_MIN, SCALE_SMALL_MAX);
-		float amplitude = (flags & (int)BubbleFlags::HighAmplitude) ? AMPLITUDE_MAX_HIGH : AMPLITUDE_MAX_LOW;
+		float amplitude = (flags & (int)BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH_MAX : AMPLITUDE_LOW_MAX;
 
 		SpawnBubble(pos, roomNumber, scale, amplitude, inertia);
 	}

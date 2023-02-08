@@ -441,12 +441,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		++lara->Control.Count.PositionAdjust;
 	}
 	else
+	{
 		lara->Control.Count.PositionAdjust = 0;
+	}
 
 	if (!lara->Control.Locked)
 		lara->LocationPad = -1;
 
-	auto oldPos = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -499,6 +501,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.IsAirborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
+
+					for (int i = 0; i < NUM_LARA_MESHES; i++)
+						lara->Effect.BubbleNodes[i] = PLAYER_BUBBLE_NODE_MAX;
 
 					UpdateLaraRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
@@ -752,7 +757,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
