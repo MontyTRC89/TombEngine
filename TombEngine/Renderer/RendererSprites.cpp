@@ -86,7 +86,12 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
+	void Renderer11::AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
+	{
+		AddQuad(sprite, vtx1, vtx2, vtx3, vtx4, color, color, color, color, rotation, scale, size, blendMode, softParticles, view);
+	}
+
+	void Renderer11::AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1, Vector4 c2, Vector4 c3, Vector4 c4, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
 			return;
@@ -95,7 +100,7 @@ namespace TEN::Renderer
 			scale = 1.0f;
 
 		size.x *= scale;
-		size.y *= scale; 
+		size.y *= scale;
 
 		RendererSpriteToDraw spr = {};
 
@@ -105,7 +110,10 @@ namespace TEN::Renderer
 		spr.vtx2 = vtx2;
 		spr.vtx3 = vtx3;
 		spr.vtx4 = vtx4;
-		spr.color = color;
+		spr.c1 = c1;
+		spr.c2 = c2;
+		spr.c3 = c3;
+		spr.c4 = c4;
 		spr.Rotation = rotation;
 		spr.Scale = scale;
 		spr.Width = size.x;

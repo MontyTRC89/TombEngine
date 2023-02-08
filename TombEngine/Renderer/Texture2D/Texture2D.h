@@ -11,6 +11,9 @@ namespace TEN::Renderer
 	class Texture2D : public TextureBase
 	{
 	public:
+		int Width;
+		int Height;
+
 		ComPtr<ID3D11Texture2D> Texture;
 		Texture2D() = default;
 		Texture2D(ID3D11Device* device, int w, int h, byte* data);
