@@ -487,10 +487,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		switch (lara->Control.WaterStatus)
 		{
 		case WaterStatus::Dry:
+			for (int i = 0; i < NUM_LARA_MESHES; i++)
+				lara->Effect.BubbleNodes[i] = 0.0f;
+
 			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_DEPTH)
 				break;
 
-			Camera.targetElevation = -ANGLE(22.0f);
+			Camera.targetElevation = ANGLE(-22.0f);
 
 			// Water is deep enough to swim; dispatch dive.
 			if (waterDepth >= SWIM_DEPTH && !isSwamp)

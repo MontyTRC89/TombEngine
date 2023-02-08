@@ -11,27 +11,26 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Ripple
 {
-	constexpr auto RIPPLE_COUNT_MAX = 1024;
+	constexpr auto RIPPLE_COUNT_MAX	  = 1024;
+	constexpr auto RIPPLE_OPACITY_MAX = 0.5f;
 
 	extern std::deque<Ripple> Ripples = {};
 
 	void SpawnRipple(const Vector3& pos, int roomNumber, float scale, int flags, const Vector3& normal)
 	{
-		constexpr auto LIFE_WATER_SURFACE_MAX = 0.75f;
-		constexpr auto LIFE_WATER_SURFACE_MIN = 0.5f;
+		constexpr auto LIFE_WATER_SURFACE_MAX = 1.0f;
+		constexpr auto LIFE_WATER_SURFACE_MIN = LIFE_WATER_SURFACE_MAX / 2;
 		constexpr auto LIFE_GROUND_MAX		  = 0.4f;
-		constexpr auto LIFE_GROUND_MIN		  = 0.25f;
-		constexpr auto FADE_TIME_LONG		  = 0.2f;
-		constexpr auto FADE_TIME_SHORT		  = 0.1f;
-		constexpr auto COLOR_WHITE			  = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+		constexpr auto LIFE_GROUND_MIN		  = LIFE_GROUND_MAX / 2;
+		constexpr auto COLOR_WHITE			  = Vector4(1.0f, 1.0f, 1.0f, RIPPLE_OPACITY_MAX);
 		constexpr auto SPAWN_RADIUS_2D		  = BLOCK(1 / 16.0f);
 
 		auto& ripple = GetNewEffect(Ripples, RIPPLE_COUNT_MAX);
 
-		float lifeMax = (flags & RippleFlags::OnGround) ? LIFE_GROUND_MAX : LIFE_WATER_SURFACE_MAX;
-		float lifeMin = (flags & RippleFlags::OnGround) ? LIFE_GROUND_MIN : LIFE_WATER_SURFACE_MIN;
-		float life = Random::GenerateFloat(lifeMin, lifeMax);
-		float fadeTime = (flags & (RippleFlags::ShortInit | RippleFlags::OnGround)) ? FADE_TIME_SHORT : FADE_TIME_LONG;
+		float life = (flags & RippleFlags::OnGround) ?
+			Random::GenerateFloat(LIFE_GROUND_MIN, LIFE_GROUND_MAX) :
+			Random::GenerateFloat(LIFE_WATER_SURFACE_MIN, LIFE_WATER_SURFACE_MAX);
+		float fadeTime = life / 3;
 
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
@@ -76,12 +75,12 @@ namespace TEN::Effects::Ripple
 			if (ripple.Life >= ripple.LifeFullOpacity)
 			{
 				float alpha = 1.0f - (ripple.Life - ripple.LifeFullOpacity) / (ripple.LifeMax - ripple.LifeFullOpacity);
-				ripple.Color.w = Lerp(0.0f, 1.0f, alpha);
+				ripple.Color.w = Lerp(0.0f, RIPPLE_OPACITY_MAX, alpha);
 			}
 			else if (ripple.Life <= ripple.LifeStartFading)
 			{
 				float alpha = 1.0f - (ripple.Life / ripple.LifeStartFading);
-				ripple.Color.w = Lerp(1.0f, 0.0f, alpha);
+				ripple.Color.w = Lerp(RIPPLE_OPACITY_MAX, 0.0f, alpha);
 			}
 
 			//opacity *= (ripple.Flags & RippleFlags::LowOpacity) ? 0.5f : 1.0f;
