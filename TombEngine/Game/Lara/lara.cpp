@@ -1057,6 +1057,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Update player effects.
 	HandlePlayerWetnessDrips(*item);
+	HandlePlayerDiveBubbles(*item);
 	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);
 }

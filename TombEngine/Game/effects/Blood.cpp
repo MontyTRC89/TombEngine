@@ -12,7 +12,6 @@ using namespace TEN::Math;
 namespace TEN::Effects::Blood
 {
 	constexpr auto UW_BLOOD_COUNT_MAX = 512;
-	constexpr auto UW_BLOOD_SCALE_MAX = BLOCK(0.25f);
 
 	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
 
@@ -28,6 +27,7 @@ namespace TEN::Effects::Blood
 
 		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		uwBlood.Position = Random::GeneratePointInSphere(sphere);
+		uwBlood.RoomNumber = roomNumber;
 		uwBlood.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 		uwBlood.Init = 1.0f;
 		uwBlood.Scale = scale;
@@ -44,6 +44,8 @@ namespace TEN::Effects::Blood
 
 	void UpdateUnderwaterBloodParticles()
 	{
+		constexpr auto SCALE_MAX = BLOCK(0.25f);
+
 		if (UnderwaterBloodParticles.empty())
 			return;
 
@@ -53,7 +55,7 @@ namespace TEN::Effects::Blood
 				continue;
 
 			// Update scale.
-			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
+			if (uwBlood.Scale < SCALE_MAX)
 				uwBlood.Scale += 4.0f;
 
 			// Update life.

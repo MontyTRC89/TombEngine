@@ -1289,9 +1289,6 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 
 void Splash(ItemInfo* item)
 {
-	constexpr auto BUBBLE_COUNT		   = 256;
-	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
-
 	int probedRoomNumber = GetCollision(item).RoomNumber;
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
@@ -1304,18 +1301,6 @@ void Splash(ItemInfo* item)
 	SplashSetup.splashPower = item->Animation.Velocity.y;
 	SplashSetup.innerRadius = 64;
 	SetupSplash(&SplashSetup, probedRoomNumber);
-
-	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
-	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
-
-	// Spawn bubbles.
-	for (int i = 0; i < BUBBLE_COUNT; i++)
-	{
-		auto pos = Random::GeneratePointInSphere(sphere);
-		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
-		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
-		SpawnBubble(pos, item->RoomNumber, 0, inertia);
-	}
 }
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)

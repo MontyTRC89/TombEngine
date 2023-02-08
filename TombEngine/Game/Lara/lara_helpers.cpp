@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
@@ -29,6 +30,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -159,20 +161,49 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 		// Node underwater; set max wetness value.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
-			player.WetNodes[i] = UCHAR_MAX;
+			player.Effect.WetNodes[i] = UCHAR_MAX;
 			continue;
 		}
 
-		if (player.WetNodes[i] > 0 && !LaraNodeUnderwater[i] &&
-			//Random::TestProbability(1 / ((player.WetNodes[i] / UCHAR_MAX) * 2.0f))) // Check.
-			Random::GenerateInt(0, 512) < player.WetNodes[i])
+		if (player.Effect.WetNodes[i] > 0 && !LaraNodeUnderwater[i] &&
+			//Random::TestProbability(1 / ((player.Effect.WetNodes[i] / UCHAR_MAX) * 2.0f))) // Check.
+			Random::GenerateInt(0, 512) < player.Effect.WetNodes[i])
 		{
 			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
 
-			if (player.WetNodes[i] >= 4)
-				player.WetNodes[i] -= 4;
+			if (player.Effect.WetNodes[i] >= 4)
+				player.Effect.WetNodes[i] -= 4;
 			else
-				player.WetNodes[i] = 0;
+				player.Effect.WetNodes[i] = 0;
+		}
+	}
+}
+
+void HandlePlayerDiveBubbles(ItemInfo& item)
+{
+	auto& player = *GetLaraInfo(&item);
+
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
+	{
+		auto pos = GetJointPosition(&item, i);
+		auto roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+
+		// Node above water; set max bubble value.
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+		{
+			player.Effect.BubbleNodes[i] = UCHAR_MAX;
+			continue;
+		}
+
+		if (Random::TestProbability(player.Effect.BubbleNodes[i] / (float)UCHAR_MAX))
+		{
+			for (int i = 0; i < (player.Effect.BubbleNodes[i] / 4); i++)
+				SpawnBubble(pos.ToVector3(), item.RoomNumber, (int)BubbleFlags::HighAmplitude);
+
+			if (player.Effect.BubbleNodes[i] >= 24)
+				player.Effect.BubbleNodes[i] -= 24;
+			else
+				player.Effect.BubbleNodes[i] = 0;
 		}
 	}
 }
@@ -183,9 +214,9 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr int   rate				 = 50;
-	static constexpr float easingAlpha		 = 0.35f;
-	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+	constexpr auto RATE				  = 50;
+	constexpr auto EASING_ALPHA		  = 0.35f;
+	constexpr auto CONSTANT_THRESHOLD = STEPUP_HEIGHT / 2;
 
 	// Check for walls.
 	if (height == NO_HEIGHT)
@@ -201,15 +232,15 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
 
 	// Regular case.
-	if (abs(height) > constantThreshold)
+	if (abs(height) > CONSTANT_THRESHOLD)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += rate * sign;
+		item->Pose.Position.y += RATE * sign;
 	}
 	else if (abs(height) > easingThreshold)
 	{
 		int vPos = item->Pose.Position.y;
-		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
+		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
 	}
 	else
 		item->Pose.Position.y += height;

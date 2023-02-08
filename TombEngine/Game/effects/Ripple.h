@@ -4,10 +4,10 @@ namespace TEN::Effects::Ripple
 {
 	enum RippleFlags
 	{
-		ShortInit		  = (0 << 0),
-		LowOpacity		  = (1 << 0),
-		RandomizePosition = (1 << 1),
-		OnGround		  = (1 << 2)
+		ShortInit		  = (1 << 0),
+		LowOpacity		  = (1 << 1),
+		RandomizePosition = (1 << 2),
+		OnGround		  = (1 << 3)
 	};
 
 	struct Ripple

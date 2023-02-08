@@ -1257,6 +1257,12 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct PlayerEffectData
+{
+	unsigned char WetNodes[NUM_LARA_MESHES];
+	unsigned char BubbleNodes[NUM_LARA_MESHES]; // TODO: Savegame
+};
+
 struct LaraInfo
 {
 	short ItemNumber;
@@ -1293,7 +1299,8 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte WetNodes[NUM_LARA_MESHES];
+	PlayerEffectData Effect = {};
+
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;
