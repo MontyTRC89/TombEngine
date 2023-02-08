@@ -14,7 +14,7 @@ namespace TEN::Effects::Ripple
 	constexpr auto RIPPLE_COUNT_MAX	  = 1024;
 	constexpr auto RIPPLE_OPACITY_MAX = 0.5f;
 
-	extern std::deque<Ripple> Ripples = {};
+	std::deque<Ripple> Ripples = {};
 
 	void SpawnRipple(const Vector3& pos, int roomNumber, float scale, int flags, const Vector3& normal)
 	{
