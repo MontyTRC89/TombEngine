@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
 #include "Math/Random.h"
@@ -12,6 +13,7 @@
 #include "Specific/level.h"
 #include "ScriptInterfaceLevel.h"
 
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;
 
 namespace TEN::Effects::Environment 
@@ -295,7 +297,9 @@ namespace TEN::Effects::Environment
 				collisionCalculated = true;
 			}
 			else
+			{
 				p.CollisionCheckDelay--;
+			}
 
 			auto& r = g_Level.Rooms[p.Room];
 
@@ -335,14 +339,10 @@ namespace TEN::Effects::Environment
 					p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 
 					// Produce ripples if particle got into substance (water or swamp).
-
 					if (inSubstance)
-					{
-						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
-					}
+						SpawnRipple(p.Position, p.Room, Random::GenerateFloat(16.0f, 24.0f), RippleFlags::ShortInit | RippleFlags::LowOpacity);
 
 					// Immediately disable rain particle because it doesn't need fading out.
-
 					if (p.Type == WeatherType::Rain)
 					{
 						p.Enabled = false;

@@ -86,7 +86,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 	auto* lara = GetLaraInfo(m_item);
 
 	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
-	for (unsigned char& i : lara->Wet)
+	for (unsigned char& i : lara->WetNodes)
 		i = value;
 }
 
@@ -98,7 +98,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 int LaraObject::GetWet() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->Wet[0];
+	return lara->WetNodes[0];
 }
 
 /// Set sprint energy value of Lara

@@ -6,13 +6,15 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -27,23 +29,24 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 // TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
 
@@ -421,96 +424,89 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDrips(RenderView& view) 
+	void Renderer11::DrawDrips(RenderView& view)
 	{
-		for (int i = 0; i < MAX_DRIPS; i++) 
-		{
-			DRIP_STRUCT* drip = &Drips[i];
+		if (Drips.empty())
+			return;
 
-			if (drip->on) 
-			{
-				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
-					Vector3(drip->x, drip->y, drip->z),
-					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
-					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, false, view);
-			}
+		for (const auto& drip : Drips)
+		{
+			if (drip.Life <= 0.0f)
+				continue;
+
+			auto axis = drip.Velocity;
+			drip.Velocity.Normalize(axis);
+
+			AddSpriteBillboardConstrained(
+				&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+				drip.Position,
+				drip.Color, 0.0f, 1.0f, drip.Scale, BLENDMODE_ADDITIVE, -axis, false, view);
 		}
 	}
 
 	void Renderer11::DrawRipples(RenderView& view) 
 	{
-		for (int i = 0; i < MAX_RIPPLES; i++) 
+		if (Ripples.empty())
+			return;
+
+		for (const auto& ripple : Ripples)
 		{
-			RIPPLE_STRUCT* ripple = &Ripples[i];
+			if (ripple.Life <= 0.0f)
+				continue;
 
-			if (ripple->flags & RIPPLE_FLAG_ACTIVE) 
+			auto color = Vector4::Zero;
+			if (ripple.Flags & RippleFlags::LowOpacity)
 			{
-				int spriteId;
-				if (ripple->flags & RIPPLE_FLAG_BLOOD)
-					spriteId = 0;
+				if (ripple.Init)
+					color = Vector4(ripple.Init, ripple.Init, ripple.Init, UCHAR_MAX);
 				else
-					spriteId = SPR_RIPPLES;
-
-				Vector4 color;
-				if (ripple->flags & RIPPLE_FLAG_LOW_OPACITY)
-				{
-					if (ripple->flags & RIPPLE_FLAG_BLOOD)
-					{
-						if (ripple->init)
-							color = Vector4(ripple->init >> 1, 0, ripple->init >> 4, 255);
-						else
-							color = Vector4(ripple->life >> 1, 0, ripple->life >> 4, 255);
-					}
-					else
-					{
-						if (ripple->init)
-							color = Vector4(ripple->init, ripple->init, ripple->init, 255);
-						else
-							color = Vector4(ripple->life, ripple->life, ripple->life, 255);
-					}
-				}
-				else
-				{
-					if (ripple->init)
-						color = Vector4(ripple->init << 1, ripple->init << 1, ripple->init << 1, 255);
-					else
-						color = Vector4(ripple->life << 1, ripple->life << 1, ripple->life << 1, 255);
-				}
-
-				color.x = (int)std::clamp((int)color.x, 0, 255);
-				color.y = (int)std::clamp((int)color.y, 0, 255);
-				color.z = (int)std::clamp((int)color.z, 0, 255);
-
-				color /= 255.0f;
-
-				if (ripple->flags & RIPPLE_FLAG_BLOOD)
-				{
-					AddSpriteBillboard(
-						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex],
-						Vector3(ripple->x, ripple->y, ripple->z), 
-						color,
-						0, 
-						1,
-						{ ripple->size * 2.0f, ripple->size * 2.0f },
-						BLENDMODE_ADDITIVE, 
-						true,
-						view);
-				}
-				else
-				{
-					AddSpriteBillboardConstrainedLookAt(
-						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES],
-						Vector3(ripple->x, ripple->y, ripple->z),
-						color,
-						0,
-						1,
-						{ ripple->size * 2.0f, ripple->size * 2.0f },
-						BLENDMODE_ADDITIVE,
-						Vector3(0, -1, 0),
-						true,
-						view);
-				}
+					color = Vector4(ripple.Life, ripple.Life, ripple.Life, UCHAR_MAX);
 			}
+			else
+			{
+				if (ripple.Init)
+					color = Vector4(ripple.Init * 2, ripple.Init * 2, ripple.Init * 2, UCHAR_MAX);
+				else
+					color = Vector4(ripple.Life * 2, ripple.Life * 2, ripple.Life * 2, UCHAR_MAX);
+			}
+
+			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
+			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
+			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
+			color /= UCHAR_MAX;
+
+			AddSpriteBillboardConstrainedLookAt(
+				&m_sprites[ripple.SpriteIndex],
+				ripple.Position,
+				color, 0.0f, 1.0f, Vector2(ripple.Scale * 2), BLENDMODE_ADDITIVE, ripple.Normal, true, view);
+		}
+	}
+
+	void Renderer11::DrawUnderwaterBloodParticles(RenderView& view)
+	{
+		if (UnderwaterBloodParticles.empty())
+			return;
+
+		for (const auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (uwBlood.Life <= 0.0f)
+				continue;
+
+			auto color = Vector4::Zero;
+			if (uwBlood.Init)
+				color = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, UCHAR_MAX);
+			else
+				color = Vector4(uwBlood.Life / 2, 0, uwBlood.Life / 16, UCHAR_MAX);
+
+			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
+			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
+			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
+			color /= UCHAR_MAX;
+
+			AddSpriteBillboard(
+				&m_sprites[uwBlood.SpriteIndex],
+				uwBlood.Position,
+				color, 0.0f, 1.0f, Vector2(uwBlood.Scale, uwBlood.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -684,7 +680,9 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawWeatherParticles(RenderView& view) 
-	{		
+	{
+		constexpr auto RAIN_WIDTH = 4.0f;
+
 		for (auto& p : Weather.GetParticles())
 		{
 			if (!p.Enabled)
@@ -693,28 +691,35 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
 					BLENDMODE_ADDITIVE, true, view);
+
 				break;
 
 			case WeatherType::Snow:
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
 					BLENDMODE_ADDITIVE, true, view);
+
 				break;
 
 			case WeatherType::Rain:
 				Vector3 v;
 				p.Velocity.Normalize(v);
-				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
+
+				AddSpriteBillboardConstrained(
+					&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, true, view);
+					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, true, view);
+
 				break;
 			}
 		}
@@ -1413,22 +1418,6 @@ namespace TEN::Renderer
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
 			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, false, view);
-		}
-	}
-
-	void Renderer11::DrawDripParticles(RenderView& view)
-	{
-		using TEN::Effects::Drip::DripParticle;
-		using TEN::Effects::Drip::dripParticles;
-		using TEN::Effects::Drip::DRIP_WIDTH;
-
-		for (int i = 0; i < dripParticles.size(); i++) 
-		{
-			DripParticle& d = dripParticles[i];
-			if (!d.active) continue;
-			Vector3 v;
-			d.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, false, view);
 		}
 	}
 

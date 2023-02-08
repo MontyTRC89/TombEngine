@@ -1052,11 +1052,11 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 		SayNo();
 	}
 
-	// Update Lara's animations.
+	// Update player animations.
 	g_Renderer.UpdateLaraAnimations(true);
 
-	// Update Lara's effects.
-	TriggerLaraDrips(item);
+	// Update player effects.
+	HandlePlayerWetnessDrips(*item);
 	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);
 }

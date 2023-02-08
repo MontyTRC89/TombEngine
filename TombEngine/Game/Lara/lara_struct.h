@@ -1293,7 +1293,7 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte Wet[NUM_LARA_MESHES];
+	byte WetNodes[NUM_LARA_MESHES];
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

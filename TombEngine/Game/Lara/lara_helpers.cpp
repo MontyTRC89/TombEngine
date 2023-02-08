@@ -3,9 +3,11 @@
 
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Game/effects/Drip.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
@@ -27,6 +29,8 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Drip;
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -138,6 +142,39 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return true;
+}
+
+void HandlePlayerWetnessDrips(ItemInfo& item)
+{
+	auto& player = *GetLaraInfo(&item);
+
+	if (Wibble & 0xF)
+		return;
+
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
+	{
+		auto pos = GetJointPosition(&item, i);
+		auto roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+
+		// Node underwater; set max wetness value.
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+		{
+			player.WetNodes[i] = UCHAR_MAX;
+			continue;
+		}
+
+		if (player.WetNodes[i] > 0 && !LaraNodeUnderwater[i] &&
+			//Random::TestProbability(1 / ((player.WetNodes[i] / UCHAR_MAX) * 2.0f))) // Check.
+			Random::GenerateInt(0, 512) < player.WetNodes[i])
+		{
+			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
+
+			if (player.WetNodes[i] >= 4)
+				player.WetNodes[i] -= 4;
+			else
+				player.WetNodes[i] = 0;
+		}
+	}
 }
 
 // TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.

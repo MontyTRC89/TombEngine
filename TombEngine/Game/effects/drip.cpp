@@ -1,130 +1,174 @@
 #include "framework.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
 #include "Game/room.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Ripple;
+using namespace TEN::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
 {
-	using namespace DirectX::SimpleMath;
+	constexpr auto DRIP_COUNT_MAX	= 1024;
+	constexpr auto DRIP_COLOR_WHITE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	std::array<DripParticle, NUM_DRIPS> dripParticles;
-	constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
+	std::deque<Drip> Drips = {};
 
-	void DisableDripParticles()
+	void SpawnDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity)
 	{
-		for (int i = 0; i < dripParticles.size(); i++)
-			dripParticles[i].active = false;
+		constexpr auto WIDTH	   = 4.0f;
+
+		auto& drip = GetNewEffect(Drips, DRIP_COUNT_MAX);
+
+		drip.Position = pos;
+		drip.RoomNumber = roomNumber;
+		drip.Velocity = velocity;
+		drip.Scale = Vector2(WIDTH, 0.0f);
+		drip.Color = DRIP_COLOR_WHITE;
+		drip.Life =
+		drip.LifeMax = std::round(lifeInSec * FPS);
+		drip.Gravity = gravity;
 	}
 
-	void UpdateDripParticles()
+	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count, bool isSmallSplash)
 	{
-		for (int i = 0; i < dripParticles.size(); i++) 
+		constexpr auto LIFE_MAX					  = 4.0f;
+		constexpr auto VELOCITY_BASE			  = 16.0f;
+		constexpr auto VERTICAL_VELOCITY_HIGH_MAX = 64.0f;
+		constexpr auto VERTICAL_VELOCITY_HIGH_MIN = 32.0f;
+		constexpr auto VERTICAL_VELOCITY_LOW_MAX  = 24.0f;
+		constexpr auto VERTICAL_VELOCITY_LOW_MIN  = 16.0f;
+		constexpr auto GRAVITY_HIGH_MAX			  = 6.0f;
+		constexpr auto GRAVITY_HIGH_MIN			  = 3.0f;
+		constexpr auto GRAVITY_LOW_MAX			  = 3.0f;
+		constexpr auto GRAVITY_LOW_MIN			  = 2.0f;
+		constexpr auto SPAWN_RADIUS_LARGE		  = BLOCK(1 / 8.0f);
+		constexpr auto SPAWN_RADIUS_SMALL		  = BLOCK(1 / 64.0f);
+
+		// TODO: Can spawn beneath water surface.
+		auto sphere = BoundingSphere(pos, isSmallSplash ? SPAWN_RADIUS_SMALL : SPAWN_RADIUS_LARGE);
+
+		for (int i = 0; i < count; i++)
 		{
-			auto& drip = dripParticles[i];
-
-			if (!drip.active)
-				continue;
-
-			drip.age++;
-			if (drip.age > drip.life)
-				drip.active = false;
-
-			drip.velocity.y += drip.gravity;
-
-			if (TestEnvironment(ENV_FLAG_WIND, drip.room))
-			{
-				drip.velocity.x = Weather.Wind().x;
-				drip.velocity.z = Weather.Wind().z;
-			}
-
-			drip.pos += drip.velocity;
-			float normalizedAge = drip.age / drip.life;
-			drip.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
-			drip.height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
-			short room = drip.room;
-			FloorInfo* floor = GetFloor(drip.pos.x, drip.pos.y, drip.pos.z, &room);
-			int floorheight = floor->FloorHeight(drip.pos.x, drip.pos.z);
-			int waterHeight = GetWaterHeight(drip.pos.x, drip.pos.y, drip.pos.z, drip.room);
-
-			if (drip.pos.y > floorheight) 
-				drip.active = false;
-
-			if (drip.pos.y > waterHeight) 
-			{
-				drip.active = false;
-				SetupRipple(drip.pos.x, waterHeight, drip.pos.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
-			}
-		}
-	}
-
-	DripParticle& getFreeDrip()
-	{
-		for (int i = 0; i < dripParticles.size(); i++)
-		{
-			if (!dripParticles[i].active)
-				return dripParticles[i];
-		}
-
-		return dripParticles[0];
-	}
-
-	void SpawnWetnessDrip(const Vector3& pos, int room)
-	{
-		auto& drip = getFreeDrip();
-		drip = {};
-		drip.active = true;
-		drip.pos = pos;
-		drip.room = room;
-		drip.life = DRIP_LIFE;
-		drip.gravity = Random::GenerateFloat(3, 6);
-	}
-
-	void SpawnSplashDrips(const Vector3& pos, int number, int room)
-	{
-		for (int i = 0; i < number; i++) 
-		{
-			auto dripPos = pos + Vector3(Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128));
-			auto direction = (dripPos - pos);
-			direction.Normalize();
-
-			auto& drip = getFreeDrip();
-			drip = {};
-			drip.pos = dripPos;
-			drip.velocity = direction*16;
-			drip.velocity -= Vector3(0, Random::GenerateFloat(32, 64), 0);
-			drip.gravity = Random::GenerateFloat(3, 6);
-			drip.room = room;
-			drip.life = DRIP_LIFE_LONG;
-			drip.active = true;
-		}
-	}
-
-	void SpawnGunshellDrips(const Vector3& pos, int room)
-	{
-		for (int i = 0; i < 4; i++) 
-		{
-			auto dripPos = pos + Vector3(Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16));
+			auto dripPos = Random::GeneratePointInSphere(sphere);
 			auto direction = dripPos - pos;
 			direction.Normalize();
 
-			auto& drip = getFreeDrip();
-			drip = {};
-			drip.pos = dripPos;
-			drip.velocity = direction * 16;
-			drip.velocity -= Vector3(0, Random::GenerateFloat(16, 24), 0);
-			drip.gravity = Random::GenerateFloat(2, 3);
-			drip.room = room;
-			drip.life = DRIP_LIFE_LONG;
-			drip.active = true;
+			float verticalVel = isSmallSplash ?
+				Random::GenerateFloat(VERTICAL_VELOCITY_LOW_MIN, VERTICAL_VELOCITY_LOW_MAX) :
+				Random::GenerateFloat(VERTICAL_VELOCITY_HIGH_MIN, VERTICAL_VELOCITY_HIGH_MAX);
+			auto vel = (direction * VELOCITY_BASE) + Vector3(0.0f, -verticalVel, 0.0f);
+
+			float gravity = isSmallSplash ?
+				Random::GenerateFloat(GRAVITY_LOW_MIN, GRAVITY_LOW_MAX) :
+				Random::GenerateFloat(GRAVITY_HIGH_MIN, GRAVITY_HIGH_MAX);
+
+			SpawnDrip(dripPos, roomNumber, vel, LIFE_MAX, gravity);
 		}
+	}
+
+	void SpawnWetnessDrip(const Vector3& pos, int roomNumber)
+	{
+		constexpr auto LIFE_MAX		= 1.0f;
+		constexpr auto GRAVITY_MAX	= 6.0f;
+		constexpr auto GRAVITY_MIN	= 3.0f;
+		constexpr auto SPAWN_RADIUS = BLOCK(1 / 32.0f);
+
+		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
+		auto dripPos = Random::GeneratePointInSphere(sphere);
+		SpawnDrip(dripPos, roomNumber, Vector3::Zero, LIFE_MAX, Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX));
+	}
+
+	void UpdateDrips()
+	{
+		constexpr auto RIPPLE_SCALE_WATER_MAX  = 24.0f;
+		constexpr auto RIPPLE_SCALE_WATER_MIN  = 16.0f;
+		constexpr auto RIPPLE_SCALE_GROUND_MAX = 16.0f;
+		constexpr auto RIPPLE_SCALE_GROUND_MIN = 8.0f;
+		constexpr auto RIPPLE_HEIGHT_OFFSET	   = 4;
+
+		if (Drips.empty())
+			return;
+
+		for (auto& drip : Drips)
+		{
+			if (drip.Life <= 0.0f)
+				continue;
+
+			// Update velocity.
+			drip.Velocity.y += drip.Gravity;
+			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
+				drip.Velocity += Weather.Wind();
+
+			int prevRoomNumber = drip.RoomNumber;
+			auto pointColl = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
+
+			// Update position.
+			drip.Position += drip.Velocity;
+			drip.RoomNumber = pointColl.RoomNumber;
+
+			// Update size and color.
+			float alpha = 1.0f - (drip.Life / drip.LifeMax);
+			drip.Scale.y = Lerp(drip.Scale.x / (1 / 6.4f), 0.0f, alpha);
+			drip.Color = Vector4::Lerp(DRIP_COLOR_WHITE, Vector4::Zero, alpha);
+
+			// Hit water.
+			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
+			{
+				drip.Life = 0.0f;
+
+				// Spawn ripple on surface only.
+				if (!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
+				{
+					float waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
+					SpawnRipple(
+						Vector3(drip.Position.x, waterHeight - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
+						pointColl.RoomNumber,
+						Random::GenerateFloat(RIPPLE_SCALE_WATER_MIN, RIPPLE_SCALE_WATER_MAX),
+						RippleFlags::ShortInit | RippleFlags::LowOpacity);
+				}
+
+				continue;
+			}
+			// Hit floor; spawn ripple.
+			else if (drip.Position.y >= pointColl.Position.Floor)
+			{
+				SpawnRipple(
+					Vector3(drip.Position.x, pointColl.Position.Floor - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
+					pointColl.RoomNumber,
+					Random::GenerateFloat(RIPPLE_SCALE_GROUND_MIN, RIPPLE_SCALE_GROUND_MAX),
+					RippleFlags::ShortInit | RippleFlags::OnGround,
+					Geometry::GetFloorNormal(pointColl.FloorTilt));
+
+				drip.Life = 0.0f;
+				continue;
+			}
+			// Hit ceiling; deactivate.
+			else if (drip.Position.y <= pointColl.Position.Ceiling)
+			{
+				drip.Life = 0.0f;
+				continue;
+			}
+
+			// Update life.
+			drip.Life -= 1.0f;
+		}
+
+		ClearInactiveEffects(Drips);
+	}
+
+	void ClearDrips()
+	{
+		Drips.clear();
 	}
 }

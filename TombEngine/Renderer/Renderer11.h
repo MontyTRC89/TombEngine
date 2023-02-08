@@ -549,10 +549,10 @@ namespace TEN::Renderer
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
+		void DrawUnderwaterBloodParticles(RenderView& view);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
-		void DrawDripParticles(RenderView& view);
 		void DrawExplosionParticles(RenderView& view);
 		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
 		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, bool transparent);

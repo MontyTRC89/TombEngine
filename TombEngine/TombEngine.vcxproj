@@ -158,6 +158,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\control\volumeactivator.h" />
+    <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
@@ -165,6 +166,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
+    <ClInclude Include="Game\effects\Ripple.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
@@ -183,7 +185,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
-    <ClInclude Include="Game\effects\drip.h" />
+    <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
     <ClInclude Include="Game\collision\floordata.h" />
@@ -631,14 +633,16 @@ CALL gen.bat</Command>
     </ClCompile>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
+    <ClCompile Include="Game\effects\Blood.cpp" />
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
-    <ClCompile Include="Game\effects\drip.cpp" />
+    <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
+    <ClCompile Include="Game\effects\Ripple.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />

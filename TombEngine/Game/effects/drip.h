@@ -1,33 +1,28 @@
 #pragma once
-#include <array>
-#include <d3d11.h>
-#include <SimpleMath.h>
+
+struct ItemInfo;
 
 namespace TEN::Effects::Drip
 {
-	constexpr float DRIP_LIFE = 25.0f;
-	constexpr float DRIP_LIFE_LONG = 120.0f;
-	constexpr float DRIP_WIDTH = 4.0f;
-	constexpr int NUM_DRIPS = 512;
-
-	struct DripParticle
+	struct Drip
 	{
-		Vector3 pos;
-		Vector3 velocity;
-		Vector4 color;
-		int room;
-		float gravity;
-		float life;
-		float age;
-		float height;
-		bool active;
-	};
-	extern std::array<DripParticle, NUM_DRIPS> dripParticles;
+		Vector3 Position   = Vector3::Zero;
+		int		RoomNumber = 0;
+		Vector3 Velocity   = Vector3::Zero;
+		Vector2 Scale	   = Vector2::Zero;
+		Vector4 Color	   = Vector4::Zero;
 
-	void UpdateDripParticles();
-	void DisableDripParticles();
-	DripParticle& getFreeDrip();
-	void SpawnWetnessDrip(const Vector3& pos, int room);
-	void SpawnSplashDrips(const Vector3& pos, int number, int room);
-	void SpawnGunshellDrips(const Vector3& pos, int room);
+		float Life	  = 0.0f;
+		float LifeMax = 0.0f;
+		float Gravity = 0.0f;
+	};
+
+	extern std::deque<Drip> Drips;
+
+	void SpawnDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity);
+	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count, bool isSmallSplash = false);
+	void SpawnWetnessDrip(const Vector3& pos, int roomNumber);
+
+	void UpdateDrips();
+	void ClearDrips();
 }
