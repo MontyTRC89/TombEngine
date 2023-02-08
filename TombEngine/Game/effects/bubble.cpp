@@ -83,6 +83,18 @@ namespace TEN::Effects::Bubble
 
 		SpawnBubble(pos, roomNumber, scale, amplitude, inertia);
 	}
+
+	void SpawnDiveBubbles(const Vector3& pos, int roomNumber, unsigned int count)
+	{
+		constexpr auto SPAWN_RADIUS = BLOCK(1 / 32.0f);
+
+		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
+		for (int i = 0; i < count; i++)
+		{
+			auto bubblePos = Random::GeneratePointInSphere(sphere);
+			SpawnBubble(bubblePos, roomNumber, (int)BubbleFlags::HighAmplitude);
+		}
+	}
 	
 	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
 	{

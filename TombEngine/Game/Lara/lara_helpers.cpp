@@ -184,7 +184,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
-	constexpr auto BUBBLE_COUNT_MULT = 6.0f;
+	constexpr auto BUBBLE_COUNT_MULT = 6;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -209,8 +209,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 		if (Random::TestProbability(chance))
 		{
 			unsigned int count = (int)round(player.Effect.BubbleNodes[i] * BUBBLE_COUNT_MULT);
-			for (int i = 0; i < count; i++)
-				SpawnBubble(pos, item.RoomNumber, (int)BubbleFlags::HighAmplitude);
+			SpawnDiveBubbles(pos, item.RoomNumber, count);
 
 			player.Effect.BubbleNodes[i] -= 1.0f;
 			if (player.Effect.BubbleNodes[i] <= 0.0f)

@@ -39,6 +39,7 @@ namespace TEN::Effects::Bubble
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia = Vector3::Zero);
 	void SpawnBubble(const Vector3& pos, int roomNumber, int flags = 0, const Vector3& inertia = Vector3::Zero);
+	void SpawnDiveBubbles(const Vector3& pos, int roomNumber, unsigned int count);
 	void SpawnChaffBubble(const Vector3& pos, int roomNumber);
 
 	void UpdateBubbles();

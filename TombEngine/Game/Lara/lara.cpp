@@ -533,16 +533,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				lara->Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while is_airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
 					item->Animation.IsAirborne && !isSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
 				}
-				// Lara is grounded; don't splash again.
+				// Player is grounded; don't splash again.
 				else if (!item->Animation.IsAirborne)
+				{
 					item->Animation.TargetState = LS_IDLE;
+				}
 				else if (isSwamp)
 				{
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
