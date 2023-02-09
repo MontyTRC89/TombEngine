@@ -1,9 +1,9 @@
 #pragma once
-#include "Game/control/control.h"
-#include "Math/Math.h"
-#include "Specific/clock.h"
 
 enum class LaraWeaponType;
+class GameVector;
+class Pose;
+class Vector3i;
 struct ItemInfo;
 
 enum class GrenadeType

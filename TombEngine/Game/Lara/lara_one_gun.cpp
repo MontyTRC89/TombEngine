@@ -40,14 +40,14 @@ constexpr auto TRIGGER_TIMEOUT		 = 5;
 constexpr auto GRENADE_FRAG_TIMEOUT  = 4;
 constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
-constexpr auto HARPOON_VELOCITY = CLICK(1);
+constexpr auto HARPOON_VELOCITY = BLOCK(0.25f);
 constexpr auto HARPOON_TIME		= 10 * FPS;
 constexpr auto ROCKET_VELOCITY	= CLICK(2);
 constexpr auto ROCKET_TIME		= 4.5f * FPS;
-constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
+constexpr auto GRENADE_VELOCITY = BLOCK(1 / 8.0f);
 constexpr auto GRENADE_TIME		= 4 * FPS;
 
-constexpr auto PROJECTILE_HIT_RADIUS	 = CLICK(0.5f);
+constexpr auto PROJECTILE_HIT_RADIUS	 = BLOCK(1 / 8.0f);
 constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 
 constexpr auto HK_BURST_MODE_SHOT_COUNT				  = 5;
@@ -58,6 +58,27 @@ constexpr auto SHOTGUN_PELLET_COUNT			   = 6;
 constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER   = 10.0f;
 constexpr auto SHOTGUN_WIDESHOT_PELLET_SCATTER = 30.0f;
 
+static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType)
+{
+	switch (weaponType)
+	{
+	case LaraWeaponType::HK:
+		return Vector3i(0, 228, 96);
+
+	case LaraWeaponType::Shotgun:
+		return Vector3i(0, 228, 0);
+
+	case LaraWeaponType::GrenadeLauncher:
+		return Vector3i(0, 180, 80);
+
+	case LaraWeaponType::RocketLauncher:
+		return Vector3i(0, 84, 72);;
+
+	default:
+		return Vector3i::Zero;
+	}
+}
+
 void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
 	auto& lara = *GetLaraInfo(&laraItem);
@@ -65,25 +86,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (lara.LeftArm.GunSmoke > 0)
 	{
-		auto pos = Vector3i::Zero;
-		if (weaponType == LaraWeaponType::HK)
-		{
-			pos = Vector3i(0, 228, 96);
-		}
-		else if (weaponType == LaraWeaponType::Shotgun)
-		{
-			pos = Vector3i(0, 228, 0);
-		}
-		else if (weaponType == LaraWeaponType::GrenadeLauncher)
-		{
-			pos = Vector3i(0, 180, 80);
-		}
-		else if (weaponType == LaraWeaponType::RocketLauncher)
-		{
-			pos = Vector3i(0, 84, 72);
-		}
-
-		pos = GetJointPosition(&laraItem, LM_RHAND, pos);
+		auto relOffset = GetWeaponSmokeRelOffset(weaponType);
+		auto pos = GetJointPosition(&laraItem, LM_RHAND, relOffset);
 
 		if (laraItem.MeshBits.TestAny())
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara.LeftArm.GunSmoke);
@@ -265,8 +269,13 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			{
 				if (IsHeld(In::Action) && (!lara.TargetEntity || lara.LeftArm.Locked))
 				{
-					if (weaponType == LaraWeaponType::HarpoonGun)
+					switch (weaponType)
 					{
+					default:
+						item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+						break;
+
+					case LaraWeaponType::HarpoonGun:
 						FireHarpoon(laraItem);
 
 						if (!(lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
@@ -274,11 +283,12 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						{
 							reloadHarpoonGun = true;
 						}
-					}
-					else if (weaponType == LaraWeaponType::HK)
-					{
+
+						break;
+
+					case LaraWeaponType::HK:
 						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 ||
-							 weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
+							weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
 							lara.Control.Weapon.Interval != 0.0f)
 						{
 							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
@@ -291,12 +301,9 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
-
 						}
-					}
-					else
-					{
-						item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+
+						break;
 					}
 
 					if (weaponType != LaraWeaponType::HK)
@@ -451,14 +458,14 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		}
 
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState =
 		item->Animation.TargetState = WEAPON_STATE_DRAW;
-		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
 		item->Pose = laraItem.Pose;
 
+		lara.LeftArm.FrameBase =
 		lara.RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
-		lara.LeftArm.FrameBase = lara.RightArm.FrameBase;
 	}
 	else
 	{
@@ -572,8 +579,8 @@ ItemInfo* FireHarpoon(ItemInfo& laraItem)
 	item.RoomNumber = laraItem.RoomNumber;
 
 	auto jointPos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(-2, 373, 77));
-
 	int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item.RoomNumber).Position.Floor;
+
 	if (floorHeight >= jointPos.y)
 	{
 		item.Pose.Position = jointPos;
@@ -710,8 +717,8 @@ void FireGrenade(ItemInfo& laraItem)
 	if (!lara.LeftArm.Locked)
 		item.Pose.Orientation += lara.ExtraTorsoRot;
 
-	item.Animation.Velocity.z = GRENADE_VELOCITY;
 	item.Animation.Velocity.y = CLICK(2) * phd_sin(item.Pose.Orientation.x);
+	item.Animation.Velocity.z = GRENADE_VELOCITY;
 	item.Animation.ActiveState = item.Pose.Orientation.x;
 	item.Animation.TargetState = item.Pose.Orientation.y;
 	item.Animation.RequiredState = NO_STATE;
@@ -738,6 +745,7 @@ void FireGrenade(ItemInfo& laraItem)
 	case WeaponAmmoType::Ammo3:
 		item.ItemFlags[0] = (int)ProjectileType::FlashGrenade;
 		break;
+
 	default:
 		break;
 	}
@@ -801,14 +809,14 @@ void GrenadeControl(short itemNumber)
 		TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	}
 
-	auto velocity = Vector3i(
+	auto vel = Vector3i(
 		item.Animation.Velocity.z * phd_sin(item.Animation.TargetState),
 		item.Animation.Velocity.y,
 		item.Animation.Velocity.z * phd_cos(item.Animation.TargetState));
 
 	// Update grenade position.
 	auto prevPos = item.Pose.Position;
-	item.Pose.Position += velocity;
+	item.Pose.Position += vel;
 
 	// Do dynamics only for first-order grenades (not fragments, which have ProjectileType set to Explosive).
 	if (item.ItemFlags[0] != (int)ProjectileType::Explosive)
@@ -817,7 +825,7 @@ void GrenadeControl(short itemNumber)
 		short sYOrient = item.Pose.Orientation.y;
 		item.Pose.Orientation.y = item.Animation.TargetState;
 
-		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, velocity.x, velocity.y, velocity.z);
+		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, vel.x, vel.y, vel.z);
 
 		item.Animation.TargetState = item.Pose.Orientation.y;
 		item.Pose.Orientation.y = sYOrient;

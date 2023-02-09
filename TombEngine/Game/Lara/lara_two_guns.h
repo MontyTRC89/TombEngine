@@ -10,4 +10,4 @@ void DrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType);
 void DrawPistolMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 
 void UndrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType);
-void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRightHand);
+void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRightWeapon);

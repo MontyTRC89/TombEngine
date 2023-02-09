@@ -304,7 +304,7 @@ void SetFlareArm(ItemInfo& laraItem, int armFrame)
 	player.LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
-void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
+void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 {
 	const auto& lara = *GetLaraInfo(&laraItem);
 
@@ -314,7 +314,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 
 	auto& flareItem = g_Level.Items[itemNumber];
 
-	flareItem.ObjectNumber = objectNumber;
+	flareItem.ObjectNumber = objectID;
 	flareItem.RoomNumber = laraItem.RoomNumber;
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(-16, 32, 42));
@@ -363,7 +363,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 	if (hasLanded)
 		flareItem.Animation.Velocity.z /= 2;
 
-	if (objectNumber == ID_FLARE_ITEM)
+	if (objectID == ID_FLARE_ITEM)
 	{
 		flareItem.Data = (int)0;
 		int& life = flareItem.Data;
@@ -380,11 +380,6 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 
 	AddActiveItem(itemNumber);
 	flareItem.Status = ITEM_ACTIVE;
-}
-
-void DrawFlareInAir(ItemInfo& flareItem)
-{
-	TENLog("DrawFlareInAir() not implemented!", LogLevel::Warning);
 }
 
 void DoFlareInHand(ItemInfo& laraItem, int flareLife)
