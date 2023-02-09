@@ -63,7 +63,7 @@ namespace TEN::Effects::Ripple
 			if (ripple.Size < RIPPLE_SIZE_MAX)
 				ripple.Size += (ripple.Flags & ((int)RippleFlags::SlowFade | (int)RippleFlags::OnGround)) ? SIZE_STEP_SMALL : SIZE_STEP_LARGE;
 
-			float lifeFullOpacity = ripple.LifeMax - (ripple.FadeDuration * 0.5f);
+			float lifeFullOpacity = ripple.LifeMax - (ripple.FadeDuration * 0.75f);
 			float lifeStartFading = ripple.FadeDuration;
 
 			// Update opacity.
