@@ -954,9 +954,11 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
+			{
 				AddQuad(&m_sprites[spriteIndex],
 					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3],
 					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
+			}
 		}
 	}
 
