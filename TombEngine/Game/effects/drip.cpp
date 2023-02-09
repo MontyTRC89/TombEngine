@@ -125,8 +125,6 @@ namespace TEN::Effects::Drip
 			// Hit water.
 			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			{
-				drip.Life = 0.0f;
-
 				// Spawn ripple on surface only.
 				if (!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 				{
@@ -138,6 +136,7 @@ namespace TEN::Effects::Drip
 						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				}
 
+				drip.Life = 0.0f;
 				continue;
 			}
 			// Hit floor; spawn ripple.

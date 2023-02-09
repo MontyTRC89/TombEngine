@@ -76,7 +76,7 @@ namespace TEN::Effects::Bubble
 		constexpr auto AMPLITUDE_HIGH_MAX = BLOCK(0.25f);
 		constexpr auto AMPLITUDE_LOW_MAX  = AMPLITUDE_HIGH_MAX / 8;
 
-		float scale = (flags & (int)BubbleFlags::Large) ?
+		float scale = (flags & (int)BubbleFlags::LargeScale) ?
 			Random::GenerateFloat(SCALE_LARGE_MIN, SCALE_LARGE_MAX) :
 			Random::GenerateFloat(SCALE_SMALL_MIN, SCALE_SMALL_MAX);
 		float amplitude = (flags & (int)BubbleFlags::HighAmplitude) ? AMPLITUDE_HIGH_MAX : AMPLITUDE_LOW_MAX;

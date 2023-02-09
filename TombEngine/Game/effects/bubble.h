@@ -4,7 +4,7 @@ namespace TEN::Effects::Bubble
 {
 	enum class BubbleFlags
 	{
-		Large		  = (1 << 0),
+		LargeScale	  = (1 << 0),
 		HighAmplitude = (1 << 1)
 	};
 

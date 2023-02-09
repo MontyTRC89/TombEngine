@@ -1454,7 +1454,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
 		auto pos = Random::GeneratePointInSphere(sphere);
-		SpawnBubble(pos, roomNumber, (int)BubbleFlags::Large | (int)BubbleFlags::HighAmplitude);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::LargeScale | (int)BubbleFlags::HighAmplitude);
 	}
 }
 
