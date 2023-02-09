@@ -22,6 +22,8 @@ namespace TEN::Effects::Ripple
 		constexpr auto LIFE_WATER_SURFACE_MIN = LIFE_WATER_SURFACE_MAX / 2;
 		constexpr auto LIFE_GROUND_MAX		  = 0.4f;
 		constexpr auto LIFE_GROUND_MIN		  = LIFE_GROUND_MAX / 2;
+		constexpr auto FADE_FAST_COEFF		  = 1 / 3.0f;
+		constexpr auto FADE_SLOW_COEFF		  = 0.5f;
 		constexpr auto COLOR_WHITE			  = Vector4(1.0f, 1.0f, 1.0f, RIPPLE_OPACITY_MAX);
 
 		auto& ripple = GetNewEffect(Ripples, RIPPLE_COUNT_MAX);
@@ -29,7 +31,7 @@ namespace TEN::Effects::Ripple
 		float lifeInSec = (flags & (int)RippleFlags::OnGround) ?
 			Random::GenerateFloat(LIFE_GROUND_MIN, LIFE_GROUND_MAX) :
 			Random::GenerateFloat(LIFE_WATER_SURFACE_MIN, LIFE_WATER_SURFACE_MAX);
-		float fadeTimeInSec = lifeInSec / ((ripple.Flags & ((int)RippleFlags::SlowFade)) ? 3 : 2);
+		float fadeDurationInSec = lifeInSec * ((ripple.Flags & ((int)RippleFlags::SlowFade)) ? FADE_SLOW_COEFF : FADE_FAST_COEFF);
 
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
@@ -38,9 +40,8 @@ namespace TEN::Effects::Ripple
 		ripple.Color = COLOR_WHITE;
 		ripple.Life =
 		ripple.LifeMax = round(lifeInSec * FPS);
-		ripple.LifeFullOpacity = round((lifeInSec - fadeTimeInSec) * FPS);
-		ripple.LifeStartFading = round(fadeTimeInSec * FPS);
 		ripple.Scale = scale;
+		ripple.FadeDuration = round(fadeDurationInSec * FPS);
 		ripple.Flags = flags;
 	}
 
@@ -62,15 +63,18 @@ namespace TEN::Effects::Ripple
 			if (ripple.Scale < SCALE_MAX)
 				ripple.Scale += (ripple.Flags & ((int)RippleFlags::SlowFade | (int)RippleFlags::OnGround)) ? SCALE_RATE_SLOW : SCALE_RATE_FAST;
 
+			float lifeFullOpacity = ripple.LifeMax - ripple.FadeDuration;
+			float lifeStartFading = ripple.FadeDuration;
+
 			// Update opacity.
-			if (ripple.Life >= ripple.LifeFullOpacity)
+			if (ripple.Life >= lifeFullOpacity)
 			{
-				float alpha = 1.0f - (ripple.Life - ripple.LifeFullOpacity) / (ripple.LifeMax - ripple.LifeFullOpacity);
+				float alpha = 1.0f - ((ripple.Life - lifeFullOpacity) / (ripple.LifeMax - lifeFullOpacity));
 				ripple.Color.w = Lerp(0.0f, RIPPLE_OPACITY_MAX, alpha);
 			}
-			else if (ripple.Life <= ripple.LifeStartFading)
+			else if (ripple.Life <= lifeStartFading)
 			{
-				float alpha = 1.0f - (ripple.Life / ripple.LifeStartFading);
+				float alpha = 1.0f - (ripple.Life / lifeStartFading);
 				ripple.Color.w = Lerp(RIPPLE_OPACITY_MAX, 0.0f, alpha);
 			}
 

@@ -18,12 +18,11 @@ namespace TEN::Effects::Ripple
 		Vector3 Normal	   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
-		float Life			  = 0.0f;
-		float LifeMax		  = 0.0f;
-		float LifeFullOpacity = 0.0f;
-		float LifeStartFading = 0.0f;
-		float Scale			  = 0.0f;
-		int	  Flags			  = 0;
+		float Life		   = 0.0f;
+		float LifeMax	   = 0.0f;
+		float Scale		   = 0.0f;
+		float FadeDuration = 0.0f;
+		int	  Flags		   = 0;
 	};
 
 	extern std::deque<Ripple> Ripples;
