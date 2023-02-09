@@ -66,9 +66,9 @@ Vec3 Sink::GetPos() const
 	return Vec3{ m_sink.Position };
 }
 
-void Sink::SetPos(Vec3 const& pos)
+void Sink::SetPos(const Vec3& pos)
 {
-	m_sink.Position = Vector3i(pos.x, pos.y, pos.z);
+	m_sink.Position = Vector3(pos.x, pos.y, pos.z);
 }
 
 std::string Sink::GetName() const
@@ -76,7 +76,7 @@ std::string Sink::GetName() const
 	return m_sink.Name;
 }
 
-void Sink::SetName(std::string const & id) 
+void Sink::SetName(const std::string& id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
 	{
@@ -101,8 +101,7 @@ int Sink::GetStrength() const
 	return m_sink.Strength;
 }
 
-void Sink::SetStrength(int str)
+void Sink::SetStrength(int strength)
 {
-	m_sink.Strength = std::clamp(str, 1, 32);
+	m_sink.Strength = std::clamp(strength, 1, 32);
 }
-

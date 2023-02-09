@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
@@ -27,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprints;
@@ -405,17 +406,18 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBubbles(RenderView& view) 
 	{
-		for (int i = 0; i < MAX_BUBBLES; i++) 
+		if (Bubbles.empty())
+			return;
+
+		for (const auto& bubble : Bubbles)
 		{
-			BUBBLE_STRUCT* bubble = &Bubbles[i];
-			if (bubble->active)
-			{
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
-					Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z),
-					bubble->color,
-					bubble->rotation,
-					1.0f, { bubble->size * 0.5f, bubble->size * 0.5f }, BLENDMODE_ADDITIVE, true, view);
-			}
+			if (bubble.Life <= 0.0f)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
+				bubble.Position,
+				bubble.Color, 0.0f, 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
