@@ -2,12 +2,11 @@
 
 namespace TEN::Effects::Ripple
 {
-	enum RippleFlags
+	enum class RippleFlags
 	{
-		ShortInit		  = (1 << 0),
+		SlowFade		  = (1 << 0),
 		LowOpacity		  = (1 << 1),
-		RandomizePosition = (1 << 2),
-		OnGround		  = (1 << 3)
+		OnGround		  = (1 << 2)
 	};
 
 	struct Ripple

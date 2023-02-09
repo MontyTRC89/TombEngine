@@ -167,7 +167,7 @@ namespace TEN::Effects::Bubble
 					Vector3(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z),
 					pointColl.RoomNumber,
 					((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) * 0.5f,
-					RippleFlags::ShortInit);
+					(int)RippleFlags::SlowFade);
 
 				bubble.Life = 0.0f;
 				continue;

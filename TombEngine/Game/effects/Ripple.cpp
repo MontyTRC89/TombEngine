@@ -23,14 +23,13 @@ namespace TEN::Effects::Ripple
 		constexpr auto LIFE_GROUND_MAX		  = 0.4f;
 		constexpr auto LIFE_GROUND_MIN		  = LIFE_GROUND_MAX / 2;
 		constexpr auto COLOR_WHITE			  = Vector4(1.0f, 1.0f, 1.0f, RIPPLE_OPACITY_MAX);
-		constexpr auto SPAWN_RADIUS_2D		  = BLOCK(1 / 16.0f);
 
 		auto& ripple = GetNewEffect(Ripples, RIPPLE_COUNT_MAX);
 
-		float lifeInSec = (flags & RippleFlags::OnGround) ?
+		float lifeInSec = (flags & (int)RippleFlags::OnGround) ?
 			Random::GenerateFloat(LIFE_GROUND_MIN, LIFE_GROUND_MAX) :
 			Random::GenerateFloat(LIFE_WATER_SURFACE_MIN, LIFE_WATER_SURFACE_MAX);
-		float fadeTimeInSec = lifeInSec / 3;
+		float fadeTimeInSec = lifeInSec / ((ripple.Flags & ((int)RippleFlags::SlowFade)) ? 3 : 2);
 
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
@@ -43,21 +42,13 @@ namespace TEN::Effects::Ripple
 		ripple.LifeStartFading = round(fadeTimeInSec * FPS);
 		ripple.Scale = scale;
 		ripple.Flags = flags;
-
-		// Slightly randomize 2D ripple position.
-		if (ripple.Flags & RippleFlags::RandomizePosition)
-		{
-			auto direction2D = Random::GenerateDirection2D();
-			auto offset = direction2D * Random::GenerateFloat(0.0f, SPAWN_RADIUS_2D);
-			ripple.Position += Vector3(offset.x, 0.0f, offset.y);
-		}
 	}
 
 	void UpdateRipples()
 	{
-		constexpr auto SCALE_MAX		= BLOCK(0.5f);
-		constexpr auto SCALE_RATE_LARGE = 4.0f;
-		constexpr auto SCALE_RATE_SMALL = 2.0f;
+		constexpr auto SCALE_MAX	   = BLOCK(0.5f);
+		constexpr auto SCALE_RATE_FAST = 4.0f;
+		constexpr auto SCALE_RATE_SLOW = 2.0f;
 
 		if (Ripples.empty())
 			return;
@@ -69,7 +60,7 @@ namespace TEN::Effects::Ripple
 
 			// Update scale.
 			if (ripple.Scale < SCALE_MAX)
-				ripple.Scale += (ripple.Flags & (RippleFlags::ShortInit | RippleFlags::OnGround)) ? SCALE_RATE_SMALL : SCALE_RATE_LARGE;
+				ripple.Scale += (ripple.Flags & ((int)RippleFlags::SlowFade | (int)RippleFlags::OnGround)) ? SCALE_RATE_SLOW : SCALE_RATE_FAST;
 
 			// Update opacity.
 			if (ripple.Life >= ripple.LifeFullOpacity)
@@ -82,9 +73,6 @@ namespace TEN::Effects::Ripple
 				float alpha = 1.0f - (ripple.Life / ripple.LifeStartFading);
 				ripple.Color.w = Lerp(RIPPLE_OPACITY_MAX, 0.0f, alpha);
 			}
-
-			//opacity *= (ripple.Flags & RippleFlags::LowOpacity) ? 0.5f : 1.0f;
-			//ripple.Color.w = opacity;
 
 			// Update life.
 			ripple.Life -= 1.0f;

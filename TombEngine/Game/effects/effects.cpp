@@ -1269,9 +1269,9 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
 				if (item->Animation.ActiveState != LS_IDLE)
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), RippleFlags::ShortInit | RippleFlags::LowOpacity);
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				else
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), RippleFlags::LowOpacity);
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::LowOpacity);
 			}
 		}
 	}

@@ -454,7 +454,7 @@ namespace TEN::Renderer
 			if (ripple.Life <= 0.0f)
 				continue;
 
-			float opacity = ripple.Color.w * ((ripple.Flags & RippleFlags::LowOpacity) ? 0.5f : 1.0f);
+			float opacity = ripple.Color.w * ((ripple.Flags & (int)RippleFlags::LowOpacity) ? 0.5f : 1.0f);
 			auto color = ripple.Color;
 			color.w = opacity;
 

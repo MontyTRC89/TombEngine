@@ -276,7 +276,7 @@ void UpdateRats()
 								Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
 								rat->RoomNumber,
 								Random::GenerateFloat(48.0f, 52.0f),
-								RippleFlags::ShortInit);
+								(int)RippleFlags::SlowFade);
 					}
 					else
 					{
@@ -285,7 +285,7 @@ void UpdateRats()
 							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
 							rat->RoomNumber,
 							Random::GenerateFloat(48.0f, 52.0f),
-							RippleFlags::ShortInit);
+							(int)RippleFlags::SlowFade);
 						
 						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose);
 					}

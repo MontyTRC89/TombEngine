@@ -211,7 +211,7 @@ void ElectricityWiresControl(short itemNumber)
 						Vector3(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z),
 						roomNumber,
 						Random::GenerateFloat(32.0f, 40.0f),
-						RippleFlags::LowOpacity);
+						(int)RippleFlags::LowOpacity);
 				}
 			}
 

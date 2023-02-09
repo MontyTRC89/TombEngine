@@ -985,7 +985,7 @@ void UpdateGunShells()
 					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z),
 					gunshell->roomNumber,
 					Random::GenerateFloat(8.0f, 12.0f),
-					RippleFlags::ShortInit);
+					(int)RippleFlags::SlowFade);
 				
 				gunshell->fallspeed >>= 5;
 				continue;

@@ -340,7 +340,7 @@ namespace TEN::Effects::Environment
 
 					// Produce ripples if particle got into substance (water or swamp).
 					if (inSubstance)
-						SpawnRipple(p.Position, p.Room, Random::GenerateFloat(16.0f, 24.0f), RippleFlags::ShortInit | RippleFlags::LowOpacity);
+						SpawnRipple(p.Position, p.Room, Random::GenerateFloat(16.0f, 24.0f), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 
 					// Immediately disable rain particle because it doesn't need fading out.
 					if (p.Type == WeatherType::Rain)

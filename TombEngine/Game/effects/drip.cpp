@@ -135,7 +135,7 @@ namespace TEN::Effects::Drip
 						Vector3(drip.Position.x, waterHeight - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
 						pointColl.RoomNumber,
 						Random::GenerateFloat(RIPPLE_SCALE_WATER_MIN, RIPPLE_SCALE_WATER_MAX),
-						RippleFlags::ShortInit | RippleFlags::LowOpacity);
+						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				}
 
 				continue;
@@ -147,7 +147,7 @@ namespace TEN::Effects::Drip
 					Vector3(drip.Position.x, pointColl.Position.Floor - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
 					pointColl.RoomNumber,
 					Random::GenerateFloat(RIPPLE_SCALE_GROUND_MIN, RIPPLE_SCALE_GROUND_MAX),
-					RippleFlags::ShortInit | RippleFlags::OnGround,
+					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity | (int)RippleFlags::OnGround,
 					Geometry::GetFloorNormal(pointColl.FloorTilt));
 
 				drip.Life = 0.0f;
