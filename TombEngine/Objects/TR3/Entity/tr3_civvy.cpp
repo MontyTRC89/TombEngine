@@ -257,7 +257,9 @@ namespace TEN::Entities::Creatures::TR3
 
 					creature.MaxTurn = 0;
 					creature.Flags = 0;
-					jointHeadRot.y = targetAngle;
+
+					if (AI.ahead)
+						jointHeadRot.y = targetAngle;
 
 					if (item.AIBits & GUARD)
 					{
@@ -348,7 +350,11 @@ namespace TEN::Entities::Creatures::TR3
 				case CIVVY_STATE_WAIT:
 
 					creature.MaxTurn = 0;
-					jointHeadRot.y = item.AIBits & GUARD ? AIGuard(&creature) : targetAngle;
+					
+					if (AI.ahead)
+						jointHeadRot.y = targetAngle;
+					else if (item.AIBits & GUARD)
+						jointHeadRot.y = AIGuard(&creature);
 
 					if (creature.Alerted || Random::TestProbability(CIVVY_WAIT_CHANCE))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
