@@ -94,24 +94,21 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (lara.LeftArm.Locked && !lara.RightArm.Locked)
 	{
-		lara.ExtraTorsoRot.x = lara.LeftArm.Orientation.x / 2;
-		lara.ExtraTorsoRot.y = lara.LeftArm.Orientation.y / 2;
+		lara.ExtraTorsoRot = lara.LeftArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara.ExtraHeadRot = lara.ExtraTorsoRot;
 	}
 	else if (!lara.LeftArm.Locked && lara.RightArm.Locked)
 	{
-		lara.ExtraTorsoRot.x = lara.RightArm.Orientation.x / 2;
-		lara.ExtraTorsoRot.y = lara.RightArm.Orientation.y / 2;
+		lara.ExtraTorsoRot = lara.RightArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara.ExtraHeadRot = lara.ExtraTorsoRot;
 	}
 	else if (lara.LeftArm.Locked && lara.RightArm.Locked)
 	{
-		lara.ExtraTorsoRot.x = (lara.LeftArm.Orientation.x + lara.RightArm.Orientation.x) / 4;
-		lara.ExtraTorsoRot.y = (lara.LeftArm.Orientation.y + lara.RightArm.Orientation.y) / 4;
+		lara.ExtraTorsoRot = (lara.LeftArm.Orientation + lara.RightArm.Orientation) / 4;
 
 		if (Camera.oldType != CameraType::Look)
 			lara.ExtraHeadRot = lara.ExtraTorsoRot;
@@ -262,10 +259,14 @@ void AnimateWeaponArm(ItemInfo& laraItem, LaraWeaponType weaponType, bool& hasFi
 
 		// At SHOOT_CONTINUE (3) end frame; go to START_SHOOT (0) end frame.
 		if (frame == (weaponDef.RecoilAnim + weapon.RecoilFrame))
+		{
 			frame = weaponDef.Draw1Anim2;
+		}
 		// Go back to "ready" stance.
 		else if ((frame > 0) && (frame <= weaponDef.Draw1Anim2))
+		{
 			frame--;
+		}
 
 		if (isRightArm)
 		{
@@ -294,7 +295,7 @@ void AnimatePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 	AnimateWeaponArm(laraItem, weaponType, hasFired, true);
 	AnimateWeaponArm(laraItem, weaponType, hasFired, false);
 
-	// If either weapon has fired, rumble gamepad once.
+	// If either weapon has fired, rumble gamepad.
 	if (hasFired)
 	{
 		float power = (weaponType == LaraWeaponType::Uzi) ? Random::GenerateFloat(0.1f, 0.3f) : 1.0f;
@@ -341,7 +342,9 @@ void UndrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 		frameLeft++;
 
 	if (frameLeft == (weaponDef->RecoilAnim + weapon->RecoilFrame))
+	{
 		frameLeft = weaponDef->Draw1Anim2;
+	}
 	else if (frameLeft > 0 && frameLeft < weaponDef->Draw1Anim)
 	{
 		lara.LeftArm.Orientation.x -= lara.LeftArm.Orientation.x / frameLeft;

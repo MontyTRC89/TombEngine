@@ -700,7 +700,7 @@ void FireGrenade(ItemInfo& laraItem)
 
 	InitialiseItem(itemNumber);
 
-	item.Pose.Orientation.x = laraItem.Pose.Orientation.x + lara.LeftArm.Orientation.x + ANGLE(180);
+	item.Pose.Orientation.x = laraItem.Pose.Orientation.x + lara.LeftArm.Orientation.x + ANGLE(180.0f);
 	item.Pose.Orientation.y = laraItem.Pose.Orientation.y + lara.LeftArm.Orientation.y;
 	item.Pose.Orientation.z = 0;
 
@@ -1229,7 +1229,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	FindNewTarget(laraItem, weapon);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 		LaraTargetInfo(laraItem, weapon);
 
 	AimWeapon(laraItem, lara.LeftArm, weapon);
