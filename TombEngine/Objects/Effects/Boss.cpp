@@ -195,7 +195,7 @@ namespace TEN::Effects::Boss
 	}
 
 	// NOTE: Actual death occurs when countUntilDeath >= 60.
-	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, bool allowExplosion)
+	void ExplodeBoss(int itemNumber, ItemInfo& item, int countUntilDeath, const Vector4& color, const Vector4& explosionColor1, const Vector4& explosionColor2, bool allowExplosion)
 	{
 		// Disable shield.
 		item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
@@ -217,7 +217,8 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					2, -2, 2, item.RoomNumber);
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z), 
+					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 		}
 
@@ -233,7 +234,8 @@ namespace TEN::Effects::Boss
 					item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 					(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 					item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-					2, -2, 2, item.RoomNumber);
+					2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+					Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 			}
 
 			sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
@@ -251,7 +253,8 @@ namespace TEN::Effects::Boss
 				item.Pose.Position.x + (Random::GenerateInt(0, 127) - 64 * 2),
 				(item.Pose.Position.y - CLICK(2)) + (Random::GenerateInt(0, 127) - 64 * 2),
 				item.Pose.Position.z + (Random::GenerateInt(0, 127) - 64 * 2),
-				2, -2, 2, item.RoomNumber);
+				2, -3, 0, item.RoomNumber, Vector3(explosionColor1.x, explosionColor1.y, explosionColor1.z),
+				Vector3(explosionColor2.x, explosionColor2.y, explosionColor2.z));
 
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}

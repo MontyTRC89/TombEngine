@@ -1,33 +1,46 @@
 #pragma once
-#include "Game/effects/effects.h"
 
-constexpr float MAX_BUBBLES = 256;
-constexpr int BUBBLE_FLAG_BIG_SIZE = 0x1;
-constexpr int BUBBLE_FLAG_CLUMP = 0x2;
-constexpr int BUBBLE_FLAG_HIGH_AMPLITUDE = 0x4;
-
-struct BUBBLE_STRUCT
+namespace TEN::Effects::Bubble
 {
-	Vector4 color;
-	Vector4 sourceColor;
-	Vector4 destinationColor;
-	Vector3 worldPositionCenter; // goes straight up
-	Vector3 worldPosition; // actual position with wave motion
-	Vector3 amplitude;
-	Vector3 wavePeriod;
-	Vector3 waveSpeed;
-	float speed;
-	float size;
-	float destinationSize;
-	float rotation;
-	int roomNumber;
-	int spriteNum;
-	int age;
-	bool active;
-};
-extern std::vector<BUBBLE_STRUCT> Bubbles;
+	enum class BubbleFlags
+	{
+		Large		  = (1 << 0),
+		HighAmplitude = (1 << 1)
+	};
 
-void DisableBubbles();
-void UpdateBubbles();
-int GetFreeBubble();//8BEAC(<), 8DEF0(<) (F)
-void CreateBubble(Vector3i* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv);//8BF14(<), 8DF58(<) (F)
+	struct Bubble
+	{
+		unsigned int SpriteIndex = 0;
+
+		Vector3 Position	 = Vector3::Zero;
+		Vector3 PositionBase = Vector3::Zero;
+		int		RoomNumber	 = 0;
+
+		Vector4 Color	   = Vector4::Zero;
+		Vector4 ColorStart = Vector4::Zero;
+		Vector4 ColorEnd   = Vector4::Zero;
+
+		Vector3 Inertia		 = Vector3::Zero;
+		Vector3 Amplitude	 = Vector3::Zero;
+		Vector3 WavePeriod	 = Vector3::Zero;
+		Vector3 WaveVelocity = Vector3::Zero;
+
+		Vector2 Scale	 = Vector2::Zero;
+		Vector2 ScaleMax = Vector2::Zero;
+		Vector2 ScaleMin = Vector2::Zero;
+
+		float Life				  = 0.0f;
+		float Gravity			  = 0.0f;
+		float OscillationPeriod	  = 0.0f;
+		float OscillationVelocity = 0.0f;
+	};
+
+	extern std::deque<Bubble> Bubbles;
+
+	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia = Vector3::Zero);
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags = 0, const Vector3& inertia = Vector3::Zero);
+	void SpawnChaffBubble(const Vector3& pos, int roomNumber);
+
+	void UpdateBubbles();
+	void ClearBubbles();
+}

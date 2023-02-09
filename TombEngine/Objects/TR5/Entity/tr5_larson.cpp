@@ -10,10 +10,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -154,7 +155,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (AI.ahead)
 					joint1 = AI.xAngle;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & AMBUSH)
 					item->Animation.TargetState = STATE_TR5_LARSON_RUN;
@@ -187,7 +188,7 @@ namespace TEN::Entities::Creatures::TR5
 								item->Animation.TargetState = STATE_TR5_LARSON_WALK;
 						}
 						else
-							item->Animation.TargetState = TestProbability(0.997f) ? 2 : 6;
+							item->Animation.TargetState = Random::TestProbability(0.997f) ? 2 : 6;
 					}
 				}
 
@@ -199,7 +200,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (AI.ahead)
 					joint2 = AI.angle;
 
-				if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 340))
+				if (creature->Mood == MoodType::Bored && Random::TestProbability(1.0f / 340))
 				{
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
@@ -235,7 +236,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				else if (item->AIBits & AMBUSH)
 					item->Animation.TargetState = STATE_TR5_LARSON_RUN;
-				else if (creature->Mood != MoodType::Bored || TestProbability(0.997f))
+				else if (creature->Mood != MoodType::Bored || Random::TestProbability(0.997f))
 				{
 					if (Targetable(item, &AI))
 					{
@@ -295,7 +296,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				else
 				{
-					if (TestProbability(1.0f / 340))
+					if (Random::TestProbability(1.0f / 340))
 					{
 						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 						item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
@@ -335,7 +336,7 @@ namespace TEN::Entities::Creatures::TR5
 					creature->FiredWeapon = 2;
 				}
 
-				if (creature->Mood == MoodType::Escape && TestProbability(0.75f))
+				if (creature->Mood == MoodType::Escape && Random::TestProbability(0.75f))
 					item->Animation.RequiredState = STATE_TR5_LARSON_STOP;
 
 				break;

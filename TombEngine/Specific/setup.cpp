@@ -126,15 +126,6 @@ void ObjectObjects()
 		obj->control = FallingBlockControl;
 	}
 
-	/*obj = &Objects[ID_AIRLOCK_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = TEN::Entities::Switches::SwitchCollision;
-		obj->control = SwitchControl;
-		
-		
-	}*/
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -322,7 +313,6 @@ void InitialiseSpecialEffects()
 	NextFireSpark = 1;
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
-	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
 

@@ -11,11 +11,11 @@
 #include "Game/people.h"
 #include "Math/Random.h"
 #include "Sound/sound.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(5));
 	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(15));
 
-	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
+	constexpr auto CIVVY_WAIT_CHANCE	   = 1.0f / 128;
 
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
@@ -42,7 +42,7 @@ namespace TEN::Entities::Creatures::TR3
 	const auto CivvyBiteRight = BiteInfo(Vector3::Zero, 13);
 	const auto CivvyBiteLeft = BiteInfo(Vector3::Zero, 10);
 	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
-
+  
 	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
 	{
 		ID_CIVVY,
