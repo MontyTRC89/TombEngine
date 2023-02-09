@@ -235,6 +235,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			angle = CreatureTurn(&item, creature.MaxTurn);
 
+
+			//TODO: Make a way to detect entities if it has an AI Object (A current issue for other entities too).
 			if ( item.HitStatus ||
 				 (targetDistance <= CIVVY_AWARE_RANGE && 
 				  creature.Enemy != nullptr && TargetVisible(&item, &AI) &&
