@@ -1,5 +1,4 @@
 #pragma once
-#include "Game/control/control.h"
 
 enum GAME_OBJECT_ID : short;
 class Vector3i;
