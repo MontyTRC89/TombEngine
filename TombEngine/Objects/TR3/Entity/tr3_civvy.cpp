@@ -12,10 +12,12 @@
 #include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Math/Math.h"
+
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
+using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -283,7 +285,7 @@ namespace TEN::Entities::Creatures::TR3
 					else if (creature.Mood == MoodType::Bored ||
 						(item.AIBits & FOLLOW && (creature.ReachedGoal || targetDistance > SQUARE(BLOCK(2)))))
 					{
-						if (!creature.Alerted && TestProbability(CIVVY_WAIT_CHANCE))
+						if (!creature.Alerted && Random::TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_WAIT;
 						else
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
@@ -324,7 +326,7 @@ namespace TEN::Entities::Creatures::TR3
 						item.Animation.TargetState = CIVVY_STATE_RUN;
 					else if (creature.Mood == MoodType::Bored)
 					{
-						if (TestProbability(CIVVY_WAIT_CHANCE))
+						if (Random::TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
 					else if ((creature.Enemy->HitPoints > 0 && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY) &&
@@ -348,7 +350,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature.MaxTurn = 0;
 					jointHeadRot.y = item.AIBits & GUARD ? AIGuard(&creature) : targetAngle;
 
-					if (creature.Alerted || TestProbability(CIVVY_WAIT_CHANCE))
+					if (creature.Alerted || Random::TestProbability(CIVVY_WAIT_CHANCE))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 
 					break;
