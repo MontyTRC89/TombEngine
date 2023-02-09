@@ -37,6 +37,24 @@ const WeaponDef WeaponDefs[4] =
 	{ ID_UZI_ANIM, 4, 5, 13, 24 }
 };
 
+static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType, bool isRightWeapon)
+{
+	switch (weaponType)
+	{
+	case LaraWeaponType::Pistol:
+		return Vector3i(isRightWeapon ? -16 : 4, 128, 40);
+
+	case LaraWeaponType::Revolver:
+		return Vector3i(isRightWeapon ? -32 : 16, 160, 56);
+
+	case LaraWeaponType::Uzi:
+		return Vector3i(isRightWeapon ? -16 : 8, 140, 48);
+
+	default:
+		return Vector3i::Zero;
+	}
+}
+
 static void SetArmInfo(ItemInfo& laraItem, ArmInfo& arm, int frame)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -91,26 +109,8 @@ static void AnimateWeaponArm(ItemInfo& laraItem, LaraWeaponType weaponType, bool
 	// Spawn weapon smoke.
 	if (laraItem.MeshBits.TestAny() && arm.GunSmoke)
 	{
-		auto offset = Vector3i::Zero;
-		switch (weaponType)
-		{
-		case LaraWeaponType::Pistol:
-			offset = Vector3i(isRightArm ? -16 : 4, 128, 40);
-			break;
-
-		case LaraWeaponType::Revolver:
-			offset = Vector3i(isRightArm ? -32 : 16, 160, 56);
-			break;
-
-		case LaraWeaponType::Uzi:
-			offset = Vector3i(isRightArm ? -16 : 8, 140, 48);
-			break;
-
-		default:
-			break;
-		}
-
-		auto pos = GetJointPosition(&laraItem, isRightArm ? LM_RHAND : LM_LHAND, offset);
+		auto relOffset = GetWeaponSmokeRelOffset(weaponType, isRightArm);
+		auto pos = GetJointPosition(&laraItem, isRightArm ? LM_RHAND : LM_LHAND, relOffset);
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, arm.GunSmoke);
 	}
 
