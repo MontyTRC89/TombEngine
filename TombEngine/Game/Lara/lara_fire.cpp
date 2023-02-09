@@ -865,7 +865,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		laraItem.Pose.Position.z,
 		laraItem.RoomNumber);
 
-	ItemInfo* nearestEntity = nullptr;
+	ItemInfo* nearestEntityPtr = nullptr;
 	float nearestDistance = INFINITY;
 	short nearestYOrient = MAXSHORT;
 	unsigned int numTargets = 0;
@@ -906,7 +906,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			if (distance < nearestDistance &&
 				abs(orient.y) < (nearestYOrient + ANGLE(15.0f)))
 			{
-				nearestEntity = &item;
+				nearestEntityPtr = &item;
 				nearestDistance = distance;
 				nearestYOrient = abs(orient.y);
 			}
@@ -914,26 +914,26 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	}
 
 	TargetList[numTargets] = nullptr;
-	if (!TargetList[0])
+	if (TargetList[0] == nullptr)
 	{
 		lara.TargetEntity = nullptr;
 	}
 	else
 	{
-		for (int slot = 0; slot < TARGET_COUNT_MAX; ++slot)
+		for (const auto* targetPtr : TargetList)
 		{
-			if (!TargetList[slot])
+			if (targetPtr == nullptr)
 				lara.TargetEntity = nullptr;
 
-			if (TargetList[slot] == lara.TargetEntity)
+			if (targetPtr == lara.TargetEntity)
 				break;
 		}
 
-		if (lara.Control.HandStatus != HandStatus::Free || IsClicked(In::SwitchTarget))
+		if (IsClicked(In::SwitchTarget) || lara.Control.HandStatus != HandStatus::Free)
 		{
 			if (lara.TargetEntity == nullptr)
 			{
-				lara.TargetEntity = nearestEntity;
+				lara.TargetEntity = nearestEntityPtr;
 				LastTargets[0] = nullptr;
 			}
 			else if (IsClicked(In::SwitchTarget))
@@ -941,12 +941,12 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				lara.TargetEntity = nullptr;
 				bool flag = true;
 
-				for (int match = 0; match < TARGET_COUNT_MAX && TargetList[match]; ++match)
+				for (const auto& targetPtr : TargetList)
 				{
 					bool doLoop = false;
-					for (int slot = 0; slot < TARGET_COUNT_MAX && LastTargets[slot]; ++slot)
+					for (const auto* lastTargetPtr : LastTargets)
 					{
-						if (LastTargets[slot] == TargetList[match])
+						if (lastTargetPtr == targetPtr)
 						{
 							doLoop = true;
 							break;
@@ -955,7 +955,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 					if (!doLoop)
 					{
-						lara.TargetEntity = TargetList[match];
+						lara.TargetEntity = targetPtr;
 						if (lara.TargetEntity)
 							flag = false;
 
@@ -965,7 +965,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 				if (flag)
 				{
-					lara.TargetEntity = nearestEntity;
+					lara.TargetEntity = nearestEntityPtr;
 					LastTargets[0] = nullptr;
 				}
 			}
@@ -974,7 +974,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 	if (lara.TargetEntity != LastTargets[0])
 	{
-		for (int slot = 7; slot > 0; --slot)
+		for (int slot = TARGET_COUNT_MAX - 1; slot > 0; --slot)
 			LastTargets[slot] = LastTargets[slot - 1];
 		
 		LastTargets[0] = lara.TargetEntity;
