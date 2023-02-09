@@ -23,22 +23,25 @@ using namespace TEN::Effects::Boss;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto TONY_TRIGGER_RANGE = SQUARE(SECTOR(4));
+	constexpr auto TONY_TRIGGER_RANGE = SQUARE(BLOCK(4));
 	constexpr auto TONY_TURN_RATE_MAX = ANGLE(2.0f);
-	constexpr auto TONY_EXPLOSION_NUM_MAX = 60;
-	constexpr auto TONY_DAMAGE = 100;
-	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.4f, 0.0f, 0.5f);
+
+	constexpr auto TONY_EXPLOSION_COUNT_MAX = 60;
+	constexpr auto TONY_EFFECT_COLOR		= Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
 	const BiteInfo TonyLeftHandBite = BiteInfo(Vector3::Zero, 10);
 	const BiteInfo TonyRightHandBite = BiteInfo(Vector3::Zero, 13);
-	// I can't set it to the TonyFlame struct since the control of the flame use fxNumber as argument or that FX_INFO have no void* to hold custom data !
-	const short LightIntensityTable[7] = { 16, 0, 14, 9, 7, 7, 7 }; // So i let it there to avoid initialising it everytime in the control of the flame.
+
+	// I can't set it to the TonyFlame struct since the control of the
+	// flame use fxNumber as argument or that FX_INFO have no void* to hold custom data.
+	// So i let it there to avoid initialising it everytime in the control of the flame.
+	const short LightIntensityTable[7] = { 16, 0, 14, 9, 7, 7, 7 }; 
 
 	enum class TonyFlameType
 	{
-		NoFlame = 0, // There will be no flame throwed, it will not happen normally.
-		CeilingLeftHand, // Go to ceiling from left hand.
-		CeilingRightHand, // Same as above but right hand.
+		NoFlame = 0,
+		CeilingLeftHand,
+		CeilingRightHand,
 		CeilingDebris, // It's the fire debris which is called when any of the fire from CeilingLeftHand/CeilingRightHand hit the ceiling, it will create small debris.
 		InFront, // Go from it's right hand to lara.
 		InFrontDebris, // Will create debris when it hit the wall.
@@ -53,21 +56,20 @@ namespace TEN::Entities::Creatures::TR3
 		TONY_STATE_FLY,
 		TONY_STATE_SHOOT_RIGHT_HAND,
 		TONY_STATE_SHOOT_CEILING,
-		TONY_STATE_FLIPMAP, // Causes an shockwave explosion.
+		TONY_STATE_FLIPMAP, // Shockwave explosion.
 		TONY_STATE_DEATH
 	};
 
 	enum TonyAnim
 	{
-		TONY_ANIM_WAIT, // Wait lara.
+		TONY_ANIM_WAIT,			 // Await player.
 		TONY_ANIM_RISE,
-		TONY_ANIM_FLY, // Real idle state.
+		TONY_ANIM_FLY,			 // Real idle state.
 		TONY_ANIM_SHOOT_FIRE_RIGHT_HAND,
-		TONY_ANIM_SHOOT_CEILING, // with two hand.
-		TONY_ANIM_FLIPMAP, // Causes an shockwave explosion.
+		TONY_ANIM_SHOOT_CEILING, // Two-handed.
+		TONY_ANIM_FLIPMAP,		 // Shockwave explosion.
 		TONY_ANIM_DEATH
 	};
-
 
 	struct TonyFlame
 	{
@@ -80,53 +82,46 @@ namespace TEN::Entities::Creatures::TR3
 		TonyFlameType type;
 	};
 
-	void InitialiseTony(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
-		CheckForRequiredObjects(item);
-		item.ItemFlags[1] = 0; // Attack type.
-		item.ItemFlags[3] = 0; // Was triggered ?
-		item.ItemFlags[5] = 0; // Death count.
-		item.ItemFlags[7] = 0; // Explode count.
-	}
-
 	static void TriggerTonyEffect(const TonyFlame flame)
 	{
-		short fxNumber = CreateNewEffect(flame.room_number);
-		if (fxNumber != -1)
-		{
-			auto* fx = &EffectList[fxNumber];
+		int fxNumber = CreateNewEffect(flame.room_number);
+		if (fxNumber == NO_ITEM)
+			return;
 
-			fx->pos.Position.x = flame.pos.x;
-			fx->pos.Position.y = flame.pos.y;
-			fx->pos.Position.z = flame.pos.z;
-			fx->fallspeed = flame.fallspeed;
-			fx->pos.Orientation.x = 0;
-			fx->pos.Orientation.y = flame.yRot;
-			fx->pos.Orientation.z = 0;
-			fx->objectNumber = ID_TONY_BOSS_FLAME;
-			fx->flag1 = (short)flame.type;
-			fx->speed = flame.speed;
-			fx->color = Vector4::Zero;
-			switch (flame.type)
-			{
-			case TonyFlameType::InFrontDebris:
-				fx->flag2 *= 2;
-				break;
-			case TonyFlameType::InFront:
-				fx->flag2 = 0;
-				break;
-			default:
-				fx->flag2 = (GetRandomControl() & 3) + 1;
-				break;
-			}
+		auto* fx = &EffectList[fxNumber];
+
+		fx->pos.Position.x = flame.pos.x;
+		fx->pos.Position.y = flame.pos.y;
+		fx->pos.Position.z = flame.pos.z;
+		fx->fallspeed = flame.fallspeed;
+		fx->pos.Orientation.x = 0;
+		fx->pos.Orientation.y = flame.yRot;
+		fx->pos.Orientation.z = 0;
+		fx->objectNumber = ID_TONY_BOSS_FLAME;
+		fx->flag1 = (short)flame.type;
+		fx->speed = flame.speed;
+		fx->color = Vector4::Zero;
+
+		switch (flame.type)
+		{
+		case TonyFlameType::InFrontDebris:
+			fx->flag2 *= 2;
+			break;
+
+		case TonyFlameType::InFront:
+			fx->flag2 = 0;
+			break;
+
+		default:
+			fx->flag2 = (GetRandomControl() & 3) + 1;
+			break;
 		}
 	}
 
 	static void TriggerTonyFlame(short itemNumber, int hand)
 	{
 		auto* sptr = GetFreeParticle();
+
 		sptr->on = true;
 		sptr->sR = 255;
 		sptr->sG = 48 + (GetRandomControl() & 31);
@@ -138,7 +133,7 @@ namespace TEN::Entities::Creatures::TR3
 		sptr->fadeToBlack = 8;
 		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
 		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->extras = NULL;
+		sptr->extras = 0;
 		sptr->dynamic = -1;
 		sptr->x = ((GetRandomControl() & 15) - 8);
 		sptr->y = 0;
@@ -152,13 +147,16 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 			sptr->rotAng = GetRandomControl() & 4095;
-			if (GetRandomControl() & 1)
+
+			if (Random::TestProbability(1 / 2.0f))
 				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
 			else
 				sptr->rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
+		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+		}
 
 		sptr->gravity = -(GetRandomControl() & 31) - 16;
 		sptr->maxYvel = -(GetRandomControl() & 7) - 16;
@@ -166,6 +164,7 @@ namespace TEN::Entities::Creatures::TR3
 		sptr->nodeNumber = hand;
 		sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		sptr->scalar = 1;
+
 		unsigned char size = (GetRandomControl() & 31) + 64;
 		sptr->size = sptr->sSize = sptr->dSize = size;
 	}
@@ -173,6 +172,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void TriggerFireBallFlame(short fxNumber, TonyFlameType type, int xv, int yv, int zv)
 	{
 		auto* sptr = GetFreeParticle();
+
 		sptr->on = true;
 		sptr->sR = 255;
 		sptr->sG = 48 + (GetRandomControl() & 31);
@@ -198,13 +198,16 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
 			sptr->rotAng = GetRandomControl() & 4095;
+
 			if (GetRandomControl() & 1)
 				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
 			else
 				sptr->rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
+		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
+		}
 
 		sptr->fxObj = (unsigned char)fxNumber;
 		sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
@@ -222,22 +225,26 @@ namespace TEN::Entities::Creatures::TR3
 			sptr->yVel = -sptr->yVel * 16;
 			sptr->scalar = 2;
 			break;
+
 		case TonyFlameType::CeilingDebris:
 		case TonyFlameType::InFrontDebris:
 		case TonyFlameType::ShowerFromCeilingDebris:
 			sptr->gravity = 0;
 			sptr->maxYvel = 0;
 			break;
+
 		case TonyFlameType::ShowerFromCeiling:
 			sptr->gravity = -(GetRandomControl() & 31) - 16;
 			sptr->maxYvel = -(GetRandomControl() & 31) - 64;
 			sptr->yVel = sptr->yVel * 16;
 			sptr->scalar = 2;
 			break;
+
 		case TonyFlameType::InFront:
 			sptr->gravity = sptr->maxYvel = 0;
 			sptr->scalar = 2;
 			break;
+
 		default:
 			sptr->scalar = 1;
 			break;
@@ -248,6 +255,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		TonyFlame flame{};
 		flame.type = type;
+
 		switch (type)
 		{
 		case TonyFlameType::CeilingLeftHand:
@@ -333,11 +341,26 @@ namespace TEN::Entities::Creatures::TR3
 		{
 		case TonyFlameType::InFront:
 			return TonyFlameType::InFrontDebris;
+
 		case TonyFlameType::ShowerFromCeiling:
 			return TonyFlameType::ShowerFromCeilingDebris;
+
 		default:
 			return TonyFlameType::CeilingDebris;
 		}
+	}
+
+	void InitialiseTony(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		CheckForRequiredObjects(item);
+
+		item.ItemFlags[1] = 0; // Attack type.
+		item.ItemFlags[3] = 0; // Was triggered?
+		item.ItemFlags[5] = 0; // Death count.
+		item.ItemFlags[7] = 0; // Explode count.
 	}
 
 	void ControlTonyFireBall(short fxNumber)
@@ -347,25 +370,31 @@ namespace TEN::Entities::Creatures::TR3
 		auto oldY = fx->pos.Position.y;
 		auto oldZ = fx->pos.Position.z;
 		auto type = (TonyFlameType)fx->flag1;
+
 		switch (type)
 		{
 		case TonyFlameType::CeilingLeftHand:
 		case TonyFlameType::CeilingRightHand:
 			fx->fallspeed += (fx->fallspeed / 8) + 1;
-			if (fx->fallspeed < -SECTOR(4))
-				fx->fallspeed = -SECTOR(4);
+			if (fx->fallspeed < -BLOCK(4))
+				fx->fallspeed = -BLOCK(4);
+
 			fx->pos.Position.y += fx->fallspeed;
 
 			if (Wibble & 4)
 				TriggerFireBallFlame(fxNumber, type, 0, 0, 0);
+
 			break;
+
 		case TonyFlameType::ShowerFromCeiling:
 			fx->fallspeed += 2;
 			fx->pos.Position.y += fx->fallspeed;
 
 			if (Wibble & 4)
 				TriggerFireBallFlame(fxNumber, type, 0, 0, 0);
+
 			break;
+
 		default:
 			if (type != TonyFlameType::InFront)
 			{
@@ -376,12 +405,18 @@ namespace TEN::Entities::Creatures::TR3
 			fx->fallspeed += fx->flag2;
 			if (fx->fallspeed > CLICK(2))
 				fx->fallspeed = CLICK(2);
+
 			fx->pos.Position.y += fx->fallspeed / 2;
 			fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
 			fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
 
 			if (Wibble & 4)
-				TriggerFireBallFlame(fxNumber, type, (short)((oldX - fx->pos.Position.x) * 8), (short)((oldY - fx->pos.Position.y) * 8), (short)((oldZ - fx->pos.Position.z) * 4));
+			{
+				TriggerFireBallFlame(
+					fxNumber, type,
+					short((oldX - fx->pos.Position.x) * 8), short((oldY - fx->pos.Position.y) * 8), short((oldZ - fx->pos.Position.z) * 4));
+			}
+			
 			break;
 		}
 
@@ -399,27 +434,31 @@ namespace TEN::Entities::Creatures::TR3
 			case TonyFlameType::CeilingRightHand:
 				for (int x = 0; x < 2; x++)
 					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, fx->roomNumber);
-				probe = GetCollision(LaraItem); // Deal with LaraItem global.
+
+				probe = GetCollision(LaraItem); // TODO: Deal with LaraItem global.
 				pos.y = probe.Position.Ceiling + CLICK(1);
 				pos.x = LaraItem->Pose.Position.x + (GetRandomControl() & 1023) - CLICK(2);
 				pos.z = LaraItem->Pose.Position.z + (GetRandomControl() & 1023) - CLICK(2);
+
 				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, probe.RoomNumber);
-				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, probe.RoomNumber, 0, 0); // Falltrough is intended !
+				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, probe.RoomNumber, 0, 0); // Fallthrough is intended.
+
 			case TonyFlameType::InFront:
 			case TonyFlameType::ShowerFromCeiling:
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 				pos.x = oldX;
 				pos.y = oldY;
 				pos.z = oldZ;
+
 				for (int x = 0; x < debrisCount; x++)
 					TriggerFireBall(nullptr, GetDebrisType(type), &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
+
 				break;
 			}
 
 			KillEffect(fxNumber);
 			return;
 		}
-
 
 		if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
@@ -449,8 +488,7 @@ namespace TEN::Entities::Creatures::TR3
 				LightIntensityTable[fx->flag1],
 				31 - ((GetRandomControl() / 16) & 3),
 				24 - ((GetRandomControl() / 64) & 3),
-				GetRandomControl() & 7
-			);
+				GetRandomControl() & 7);
 		}
 	}
 
@@ -463,9 +501,9 @@ namespace TEN::Entities::Creatures::TR3
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
-		short head = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		short headAngle = 0;
 		short torsoX = 0;
 		short torsoY = 0;
 
@@ -481,18 +519,19 @@ namespace TEN::Entities::Creatures::TR3
 				item->Animation.FrameNumber = frameEnd;
 				item->MeshBits.ClearAll();
 
-				if (item->ItemFlags[7] < TONY_EXPLOSION_NUM_MAX)
+				if (item->ItemFlags[7] < TONY_EXPLOSION_COUNT_MAX)
 					item->ItemFlags[7]++;
 
 				// Do explosion effect.
 				// TODO: change the explosion color to tony one, which is red, orange.
-				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_NUM_MAX, TONY_EFFECT_COLOR, Vector4::Zero, Vector4::Zero, false);
+				ExplodeBoss(itemNumber, *item, TONY_EXPLOSION_COUNT_MAX, TONY_EFFECT_COLOR, Vector4::Zero, Vector4::Zero, false);
 				return;
 			}
 		}
 		else
 		{
-			if (item->ItemFlags[3] != 2) // Tony is immune to damage until he is flying and idle.
+			// Immune to damage until flying and idle.
+			if (item->ItemFlags[3] != 2)
 				item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
 			AI_INFO ai;
@@ -502,17 +541,18 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				if (ai.distance < TONY_TRIGGER_RANGE)
 					item->ItemFlags[3] = 1;
-				angle = 0;
+
+				headingAngle = 0;
 			}
 			else
 			{
 				creature->Target.x = LaraItem->Pose.Position.x; // TODO: deal with LaraItem global.
 				creature->Target.z = LaraItem->Pose.Position.z;
-				angle = CreatureTurn(item, creature->MaxTurn);
+				headingAngle = CreatureTurn(item, creature->MaxTurn);
 			}
 
 			if (ai.ahead)
-				head = ai.angle;
+				headAngle = ai.angle;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -530,6 +570,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case TONY_STATE_FLY:
 				creature->MaxTurn = TONY_TURN_RATE_MAX;
+
 				if (ai.ahead)
 				{
 					torsoX = ai.xAngle;
@@ -550,7 +591,8 @@ namespace TEN::Entities::Creatures::TR3
 						}
 					}
 
-					if (item->Animation.TargetState != TONY_STATE_SHOOT_RIGHT_HAND && item->Animation.TargetState != TONY_STATE_SHOOT_CEILING &&
+					if (item->Animation.TargetState != TONY_STATE_SHOOT_RIGHT_HAND &&
+						item->Animation.TargetState != TONY_STATE_SHOOT_CEILING &&
 						item->ItemFlags[3] == 2)
 					{
 						if (!(Wibble & 255) && item->ItemFlags[1] == 1)
@@ -565,6 +607,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case TONY_STATE_SHOOT_CEILING:
 				creature->MaxTurn = 0;
+
 				if (ai.ahead)
 				{
 					torsoX = ai.xAngle;
@@ -581,6 +624,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case TONY_STATE_SHOOT_RIGHT_HAND:
 				creature->MaxTurn = TONY_TURN_RATE_MAX / 2;
+
 				if (ai.ahead)
 				{
 					torsoX = ai.xAngle;
@@ -612,6 +656,7 @@ namespace TEN::Entities::Creatures::TR3
 			int bright = GetCurrentRelativeFrameNumber(item);
 			if (bright > 16)
 				bright = 16;
+
 			byte r = 31 - ((GetRandomControl() / 16) & 3);
 			byte g = 24 - ((GetRandomControl() / 64) & 3);
 			byte b = GetRandomControl() & 7;
@@ -623,7 +668,8 @@ namespace TEN::Entities::Creatures::TR3
 			TriggerTonyFlame(itemNumber, 13);
 			TriggerDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
 
-			if (item->Animation.ActiveState == TONY_STATE_SHOOT_CEILING || item->Animation.ActiveState == TONY_STATE_FLIPMAP)
+			if (item->Animation.ActiveState == TONY_STATE_SHOOT_CEILING ||
+				item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 			{
 				handPos = GetJointPosition(item, TonyRightHandBite.meshNum);
 				TriggerTonyFlame(itemNumber, 14);
@@ -634,6 +680,6 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 0, torsoY >> 1);
 		CreatureJoint(item, 1, torsoX);
 		CreatureJoint(item, 2, torsoY >> 1);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }
