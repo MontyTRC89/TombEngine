@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/box.h"
@@ -16,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include <tomb4fx.h>
 
 using namespace TEN::Input;
 
@@ -27,6 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
+	const auto DragonBackSpineJoints = std::vector<unsigned int>{ 21, 22, 23 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
@@ -85,13 +88,6 @@ namespace TEN::Entities::Creatures::TR2
 			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
 	}
 
-	static short DragonFire(int x, int y, int z, short speed, short yRot, short roomNumber)
-	{
-		short fxNumber = NO_ITEM;
-		// TODO:: set correct fx parameters
-		return fxNumber;
-	}
-
 	static void createExplosion(ItemInfo* item)
 	{
 		short ExplosionIndex = CreateItem();
@@ -100,12 +96,18 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			auto* explosionItem = &g_Level.Items[ExplosionIndex];
 
-			if (item->Timer == BOOM_TIME)
+			switch (item->Timer)
+			{
+			case BOOM_TIME:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM;
-			else if (item->Timer == BOOM_TIME + 10)
+				break;
+			case BOOM_TIME + 10:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM2;
-			else if (item->Timer == BOOM_TIME + 20)
+				break;
+			case BOOM_TIME + 20:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM3;
+				break;
+			}
 
 			explosionItem->Pose.Position.x = item->Pose.Position.x;
 			explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
@@ -233,6 +235,54 @@ namespace TEN::Entities::Creatures::TR2
 
 		ItemPushItem(item, laraItem, coll, 1, 0);
 	}
+
+
+	static void TriggerFireBreath(ItemInfo* item, const BiteInfo& bite, const Vector3i& speed, ItemInfo* enemy)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			auto* spark = GetFreeParticle();
+
+			spark->sR = (GetRandomControl() & 0x1F) + 48;
+			spark->sG = 38;
+			spark->sB = 255;
+			spark->dR = (GetRandomControl() & 0x3F) - 64;
+			spark->dG = (GetRandomControl() & 0x3F) + -128;
+			spark->dB = 32;
+			spark->colFadeSpeed = 12;
+			spark->fadeToBlack = 8;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+			auto pos1 = GetJointPosition(item, bite.meshNum, Vector3i(-4, -30, -4) + bite.Position);
+
+			spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
+			spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
+			spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
+
+			auto pos2 = GetJointPosition(item, bite.meshNum, Vector3i(-4, -30, -4) + bite.Position + speed);
+
+			int v = (GetRandomControl() & 0x3F) + 192;
+
+			spark->life = spark->sLife = v / 6;
+
+			spark->xVel = v * (pos2.x - pos1.x) / 10;
+			spark->yVel = v * (pos2.y - pos1.y) / 10;
+			spark->zVel = v * (pos2.z - pos1.z) / 10;
+
+			spark->friction = 85;
+			spark->gravity = -16 - (GetRandomControl() & 0x1F);
+			spark->maxYvel = 0;
+			spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+			spark->scalar = 3;
+			spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+			spark->sSize = spark->dSize / 4;
+			spark->size = spark->dSize / 2;
+
+			spark->on = 1;
+		}
+	}
+
 
 	void DragonControl(short backItemNumber)
 	{
@@ -423,11 +473,12 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead)
 					head = -AI.angle;
-
 				if (creature->Flags)
 				{
 					if (AI.ahead)
-						CreatureEffect(item, DragonMouthBite, DragonFire);
+					{
+						TriggerFireBreath(item, DragonMouthBite, Vector3i(0, 0, 300), creature->Enemy);
+					}
 					creature->Flags--;
 				}
 				else
@@ -449,59 +500,60 @@ namespace TEN::Entities::Creatures::TR2
 			ItemNewRoom(backItemNumber, item->RoomNumber);
 	}
 
-	void InitialiseBartoli(short itemNumber)
+	static void CreateDragonFront(ItemInfo* bartoliItem, ItemInfo* dragonBackItem)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		item->Pose.Position.x -= CLICK(2);
-		item->Pose.Position.z -= CLICK(2);
-
-		short backItem = CreateItem();
-		short frontItem = CreateItem();
-
-		if (backItem != NO_ITEM && frontItem != NO_ITEM)
+		short frontItemNumber = CreateItem();
+		if (frontItemNumber != NO_ITEM && dragonBackItem != nullptr)
 		{
-			auto* back = &g_Level.Items[backItem];
-			back->ObjectNumber = ID_DRAGON_BACK;
-			back->Pose.Position = item->Pose.Position;
-			back->Pose.Orientation.y = item->Pose.Orientation.y;
-			back->RoomNumber = item->RoomNumber;
-			back->Status = ITEM_INVISIBLE;
-			back->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			auto* dragonFrontItem = &g_Level.Items[frontItemNumber];
+			dragonFrontItem->Pose.Position = bartoliItem->Pose.Position;
+			dragonFrontItem->Pose.Orientation.y = bartoliItem->Pose.Orientation.y;
+			dragonFrontItem->RoomNumber = bartoliItem->RoomNumber;
+			dragonFrontItem->ObjectNumber = ID_DRAGON_FRONT;
+			dragonFrontItem->Model.Color = bartoliItem->Model.Color;
+			InitialiseItem(frontItemNumber);
+			g_Level.NumItems++;
+			dragonBackItem->Data = frontItemNumber;
+		}
+		else
+		{
+			TENLog("Failed to create the dragon front item from marco bartoli item !", LogLevel::Warning);
+		}
+	}
 
-			InitialiseItem(backItem);
-			back->MeshBits = 0x1FFFFF;
+	static void CreateDragon(ItemInfo* bartoliItem)
+	{
+		short backItemNumber = CreateItem();
+		if (backItemNumber != NO_ITEM)
+		{
+			auto* dragonBackItem = &g_Level.Items[backItemNumber];
+			dragonBackItem->Pose.Position = bartoliItem->Pose.Position;
+			dragonBackItem->Pose.Orientation.y = bartoliItem->Pose.Orientation.y;
+			dragonBackItem->RoomNumber = bartoliItem->RoomNumber;
+			dragonBackItem->ObjectNumber = ID_DRAGON_BACK;
+			dragonBackItem->Model.Color = bartoliItem->Model.Color;
+			InitialiseItem(backItemNumber);
+			dragonBackItem->MeshBits.Clear(DragonBackSpineJoints); // No need to draw it if it's alive.
+			bartoliItem->Data = backItemNumber;
+			g_Level.NumItems++;
 
-			item->Data = backItem;
-
-			auto* front = &g_Level.Items[frontItem];
-
-			front->ObjectNumber = ID_DRAGON_FRONT;
-			front->Pose.Position = item->Pose.Position;
-			front->Pose.Orientation.y = item->Pose.Orientation.y;
-			front->RoomNumber = item->RoomNumber;
-			front->Status = ITEM_INVISIBLE;
-			front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-
-			InitialiseItem(frontItem);
-
-			back->Data = frontItem;
-
-			g_Level.NumItems += 2;
+			CreateDragonFront(bartoliItem, dragonBackItem);
+		}
+		else
+		{
+			TENLog("Failed to create the dragon back item from marco bartoli item !", LogLevel::Warning);
 		}
 	}
 
 	void BartoliControl(short itemNumber)
 	{
-		ItemInfo* back, * front;
+		ItemInfo* back, *front;
 		short frontItem, backItem;
-
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->Timer)
 		{
 			item->Timer++;
-
 			if (!(item->Timer & 7))
 				Camera.bounce = item->Timer;
 
@@ -528,15 +580,19 @@ namespace TEN::Entities::Creatures::TR2
 					front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 					front->Pose.Position.z = item->Pose.Position.z;
 					front->RoomNumber = item->RoomNumber;
-					front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+					front->Model.Color = item->Model.Color;
 
 					InitialiseItem(frontItem);
 					AddActiveItem(frontItem);
+
+					front->Timer = 100; // Time before it fade away.
 					front->Status = ITEM_ACTIVE;
 				}
 			}
-			else if (item->Timer >= 30 * 5)
+			else if (item->Timer >= BOOM_TIME + 30)
 			{
+				CreateDragon(item);
+
 				backItem = (short)item->Data;
 				back = &g_Level.Items[backItem];
 
@@ -553,9 +609,27 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 		else if (abs(LaraItem->Pose.Position.x - item->Pose.Position.x) < BARTOLI_RANGE &&
-			abs(LaraItem->Pose.Position.z - item->Pose.Position.z) < BARTOLI_RANGE)
+			     abs(LaraItem->Pose.Position.z - item->Pose.Position.z) < BARTOLI_RANGE)
 		{
 			item->Timer = 1;
+		}
+	}
+
+	void SphereOfDoomControl(short itemNumber)
+	{
+		// Expend over time.
+		auto* item = &g_Level.Items[itemNumber];
+		if (item->Timer > 0)
+		{
+			item->Timer--;
+			if (item->Model.Mutator.size() >= 1)
+				item->Model.Mutator[0].Scale += Vector3(0.5f);
+		}
+		else
+		{
+			item->Model.Color.w -= 0.05f;
+			if (item->Model.Color.w <= 0.0f)
+				KillItem(itemNumber);
 		}
 	}
 }

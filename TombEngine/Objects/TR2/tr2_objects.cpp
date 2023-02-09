@@ -436,6 +436,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_FRONT", "ID_MARCO_BARTOLI");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -450,6 +451,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_BACK", "ID_DRAGON_FRONT");
 		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
 		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
@@ -462,7 +464,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
-		obj->initialise = InitialiseBartoli;
+		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_MARCO_BARTOLI", "ID_DRAGON_FRONT");
 		obj->control = BartoliControl;
 	}
 
@@ -491,7 +493,17 @@ static void StartEntity(ObjectInfo* obj)
 
 static void StartObject(ObjectInfo* obj)
 {
-	
+	obj = &Objects[ID_SPHERE_OF_DOOM];
+	if (obj->loaded)
+		obj->control = SphereOfDoomControl;
+
+	obj = &Objects[ID_SPHERE_OF_DOOM2];
+	if (obj->loaded)
+		obj->control = SphereOfDoomControl;
+
+	obj = &Objects[ID_SPHERE_OF_DOOM3];
+	if (obj->loaded)
+		obj->control = SphereOfDoomControl;
 }
 
 static void StartTrap(ObjectInfo* obj)
