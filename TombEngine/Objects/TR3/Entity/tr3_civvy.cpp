@@ -174,7 +174,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		bool doDamageFlag = false;
 
 		int targetAngle = 0;
 		int targetDistance = 0;
@@ -413,24 +412,22 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					doDamageFlag = false;
-
 					if (creature.Flags == 0 &&
 						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_CLOSE_PUNCH_ATTACK))
 					{
 						if (creature.Enemy->IsLara())
 						{
 							if (item.TouchBits.Test(CivvyAttackJoints))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 						else
 						{
 							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
 							if (distance <= CLICK(2))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 
-						if (doDamageFlag)
+						if (creature.Flags == 2)
 						{
 							DoDamage(creature.Enemy, CIVVY_ATTACK_DAMAGE);
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
@@ -450,24 +447,22 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					doDamageFlag = false;
-
 					if (creature.Flags == 0 &&
 						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_FAR_PUNCH_ATTACK))
 					{
 						if (creature.Enemy->IsLara())
 						{
 							if (item.TouchBits.Test(CivvyAttackJoints))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 						else
 						{
 							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
 							if (distance <= CLICK(2))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 
-						if (doDamageFlag)
+						if (creature.Flags == 2)
 						{
 							DoDamage(creature.Enemy, CIVVY_ATTACK_DAMAGE);
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
@@ -490,24 +485,22 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					doDamageFlag = false;
-
 					if (creature.Flags == 0 &&
 						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_WALKING_PUNCH_ATTACK))
 					{
 						if (creature.Enemy->IsLara())
 						{
 							if (item.TouchBits.Test(CivvyAttackJoints))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 						else
 						{
 							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
 							if (distance <= CLICK(2))
-								doDamageFlag = true;
+								creature.Flags = 2;
 						}
 
-						if (doDamageFlag)
+						if (creature.Flags == 2)
 						{
 							DoDamage(creature.Enemy, CIVVY_ATTACK_DAMAGE);
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
