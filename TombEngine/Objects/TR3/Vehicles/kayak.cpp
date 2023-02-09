@@ -1240,8 +1240,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			DoWakeEffect(kayakItem, -KAYAK_WAKEFX_OFFSET, 0, 0, 1, true, 2.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
-			DoWakeEffect(kayakItem,  KAYAK_WAKEFX_OFFSET, 0, 0, 2, true, 2.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(kayakItem, -KAYAK_WAKEFX_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(kayakItem,  KAYAK_WAKEFX_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
 		}
 
 		if (Wibble & 7)

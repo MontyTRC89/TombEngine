@@ -100,7 +100,7 @@ namespace TEN::Renderer
 					Vector3 s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
 					Vector3 s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
 
-					AddQuad(&m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 3],
+					AddColoredQuad(
 						segment.Vertices[0],
 						segment.Vertices[1],
 						segment.Vertices[2],
@@ -109,7 +109,7 @@ namespace TEN::Renderer
 						Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
 						Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
 						Vector4(0, 0, 0, 1),
-						0, 1, {0, 0}, BLENDMODE_WIREFRAME, false, view);
+						 BLENDMODE_WIREFRAME, view);
 				}
 			}			
 		}
