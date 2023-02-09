@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	
 	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(2));
 	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(5));
-	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(1));
+	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(3));
 
 	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
 
@@ -49,7 +49,8 @@ namespace TEN::Entities::Creatures::TR3
 		ID_VON_CROY,
 		ID_GUIDE,
 		ID_MONK1,
-		ID_MONK2
+		ID_MONK2,
+		ID_TROOPS
 	};
 
 	enum CivvyState
@@ -196,7 +197,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.AIBits)
 				GetAITarget(&creature);
 			else
-				creature.Enemy = CivvyFindNearTarget(itemNumber, CivvyExcludedTargets, 0);
+				creature.Enemy = CivvyFindNearTarget(itemNumber, CivvyExcludedTargets, CIVVY_AWARE_RANGE);
 
 			AI_INFO AI;
 			CreatureAIInfo(&item, &AI);
@@ -216,11 +217,11 @@ namespace TEN::Entities::Creatures::TR3
 				targetDistance = SQUARE(targetDx) + SQUARE(targetDz);
 			}
 
-			//If Lara was placed by system, not because she were a real target. Then delete the target.
+			//If Lara was placed by system (CreatureAIInfo), not because she were a real target. Then delete the target.
 			if (creature.Enemy->IsLara() && !creature.HurtByLara)
 				creature.Enemy = nullptr;
 
-			GetCreatureMood(&item, &AI, false);
+			GetCreatureMood(&item, &AI, true);
 
 			if (creature.Enemy == LaraItem &&
 				AI.distance > CIVVY_ESCAPE_RANGE &&
@@ -230,24 +231,21 @@ namespace TEN::Entities::Creatures::TR3
 				creature.Mood = MoodType::Escape;
 			}
 
-			CreatureMood(&item, &AI, false);
+			CreatureMood(&item, &AI, true);
 
 			angle = CreatureTurn(&item, creature.MaxTurn);
 
-			auto* realEnemy = creature.Enemy;
-			creature.Enemy = LaraItem;
-
-			if ((targetDistance < CIVVY_AWARE_RANGE || 
-				 item.HitStatus || 
-				 TargetVisible(&item, &AI)) &&
-				 !(item.AIBits & FOLLOW))
+			if ( item.HitStatus ||
+				 (targetDistance <= CIVVY_AWARE_RANGE && 
+				  creature.Enemy != nullptr && TargetVisible(&item, &AI) &&
+				  !(item.AIBits & FOLLOW))
+				)
 			{
 				if (!creature.Alerted)
 					SoundEffect(SFX_TR3_AMERCAN_HOY, &item.Pose);
 
 				AlertAllGuards(itemNumber);
 			}
-			creature.Enemy = realEnemy;
 
 			switch (item.Animation.ActiveState)
 			{
@@ -284,10 +282,10 @@ namespace TEN::Entities::Creatures::TR3
 					else if (creature.Mood == MoodType::Bored ||
 						(item.AIBits & FOLLOW && (creature.ReachedGoal || targetDistance > SQUARE(BLOCK(2)))))
 					{
-						if (AI.ahead)
-							item.Animation.TargetState = CIVVY_STATE_IDLE;
-						else
+						if (!creature.Alerted && TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_WAIT;
+						else
+							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
 					else if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) ||
 							 (creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(0.5f))) )
@@ -311,14 +309,27 @@ namespace TEN::Entities::Creatures::TR3
 						jointHeadRot.y = 0;
 						item.Animation.TargetState = CIVVY_STATE_WALK;
 					}
+					else if (item.AIBits & FOLLOW)
+					{
+						if (creature.ReachedGoal)
+							item.Animation.TargetState = CIVVY_STATE_IDLE;
+						else if (targetDistance > CIVVY_WALK_RANGE)
+							item.Animation.TargetState = CIVVY_STATE_RUN;
+						else
+							item.Animation.TargetState = CIVVY_STATE_WALK;
+					}
 					else if (creature.Mood == MoodType::Escape)
 						item.Animation.TargetState = CIVVY_STATE_RUN;
 					else if (creature.Mood == MoodType::Bored)
 					{
 						if (TestProbability(CIVVY_WAIT_CHANCE))
-							item.Animation.TargetState = CIVVY_STATE_WAIT;
+							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
-					else if (creature.Enemy->HitPoints > 0 && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY)
+					else if ((creature.Enemy->HitPoints > 0 && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY) &&
+							 (
+							  (creature.Enemy->IsLara() && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE ) ||
+							  (creature.Enemy->IsCreature() && AI.distance < SQUARE(BLOCK(0.5f)) )
+							 ))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) ||
 							 (creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(1))) )
@@ -331,7 +342,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_WAIT:
-					if (creature.Alerted)
+					if (creature.Alerted || TestProbability(CIVVY_WAIT_CHANCE))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					break;
 
@@ -344,6 +355,8 @@ namespace TEN::Entities::Creatures::TR3
 
 					if (item.AIBits & GUARD)
 						item.Animation.TargetState = CIVVY_STATE_WAIT;
+					else if (creature.Mood == MoodType::Escape)
+						item.Animation.TargetState = CIVVY_STATE_RUN;
 					//else if (creature.Mood == MoodType::Escape && Lara.TargetEntity != &item && AI.ahead)
 						//item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if ((item.AIBits & FOLLOW) && (creature.ReachedGoal || targetDistance > SQUARE(SECTOR(2))))
@@ -440,6 +453,9 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
+
+							if (creature.Enemy->HitPoints <= 0 && !creature.Enemy->IsLara() && !item.HitStatus)
+								creature.Alerted = false;
 						}
 					}
 
@@ -475,6 +491,9 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
+
+							if (creature.Enemy->HitPoints <= 0 && !creature.Enemy->IsLara() && !item.HitStatus)
+								creature.Alerted = false;
 						}
 					}
 
@@ -513,6 +532,9 @@ namespace TEN::Entities::Creatures::TR3
 							CreatureEffect(&item, CivvyBiteLeft, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item.Pose);
 							creature.Flags = 1;
+
+							if (creature.Enemy->HitPoints <= 0 && !creature.Enemy->IsLara() && !item.HitStatus)
+								creature.Alerted = false;
 						}
 					}
 
