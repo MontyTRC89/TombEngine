@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	
 	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(2));
 	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(5));
-	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(3));
+	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(15));
 
 	constexpr auto CIVVY_WAIT_CHANCE	   = 0.008f;
 
@@ -250,6 +250,7 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item.Animation.ActiveState)
 			{
 				case CIVVY_STATE_IDLE:
+
 					creature.MaxTurn = 0;
 					creature.Flags = 0;
 					jointHeadRot.y = targetAngle;
@@ -268,10 +269,8 @@ namespace TEN::Entities::Creatures::TR3
 
 						break;
 					}
-
 					else if (item.AIBits & PATROL1)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
-
 					else if (creature.Mood == MoodType::Escape)
 					{
 						if (Lara.TargetEntity != &item && AI.ahead)
@@ -301,6 +300,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_WALK:
+
 					creature.MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
 					jointHeadRot.y = targetAngle;
 
@@ -342,11 +342,17 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_WAIT:
+
+					creature.MaxTurn = 0;
+					jointHeadRot.y = item.AIBits & GUARD ? AIGuard(&creature) : targetAngle;
+
 					if (creature.Alerted || TestProbability(CIVVY_WAIT_CHANCE))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
+
 					break;
 
 				case CIVVY_STATE_RUN:
+
 					creature.MaxTurn = CIVVY_RUN_TURN_RATE_MAX;
 					tilt = angle / 2;
 
@@ -354,7 +360,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointHeadRot.y = AI.angle;
 
 					if (item.AIBits & GUARD)
-						item.Animation.TargetState = CIVVY_STATE_WAIT;
+						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if (creature.Mood == MoodType::Escape)
 						item.Animation.TargetState = CIVVY_STATE_RUN;
 					//else if (creature.Mood == MoodType::Escape && Lara.TargetEntity != &item && AI.ahead)
@@ -369,6 +375,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_AIM_CLOSE_PUNCH:
+
 					creature.MaxTurn = CIVVY_AIM_TURN_RATE_MAX;
 					creature.Flags = 0;
 
@@ -387,6 +394,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_AIM_FAR_PUNCH:
+
 					creature.MaxTurn = CIVVY_AIM_TURN_RATE_MAX;
 					creature.Flags = 0;
 
@@ -405,6 +413,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_AIM_WALKING_PUNCH:
+
 					creature.MaxTurn = CIVVY_AIM_TURN_RATE_MAX;
 					creature.Flags = 0;
 
@@ -424,6 +433,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_ATTACK_CLOSE_PUNCH:
+
 					creature.MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
 
 					if (AI.ahead)
@@ -462,6 +472,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_ATTACK_FAR_PUNCH:
+
 					creature.MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
 
 					if (AI.ahead)
@@ -503,6 +514,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 
 				case CIVVY_STATE_ATTACK_WALKING_PUNCH:
+
 					creature.MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
 
 					if (AI.ahead)
