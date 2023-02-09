@@ -1,10 +1,10 @@
 #pragma once
 #include "Game/control/control.h"
 
+enum GAME_OBJECT_ID : short;
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
-class Vector3i;
-enum GAME_OBJECT_ID : short;
 
 void FlareControl(short itemNumber);
 void ReadyFlare(ItemInfo& laraItem);
