@@ -190,33 +190,9 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 									if (object->HitRoutine != nullptr)
-									{
 										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
-									}
-									else // If hitRoutine was not setup for this object, then do the default one.
-									{
-										switch (object->hitEffect)
-										{
-										case HitEffect::Blood:
-											DoBloodSplat(target2.x, target2.y, target2.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
-											break;
-
-										case HitEffect::Smoke:
-											TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
-											break;
-
-										case HitEffect::Richochet:
-											TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-											break;
-										}
-										if (!object->undead)
-											DoDamage(item, weapon.Damage);
-										if (!item->Callbacks.OnHit.empty())
-										{
-											short index = g_GameScriptEntities->GetIndexByName(item->Name);
-											g_GameScript->ExecuteFunction(item->Callbacks.OnHit, index);
-										}
-									}
+									else
+										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
 								}
 							}
 						}
