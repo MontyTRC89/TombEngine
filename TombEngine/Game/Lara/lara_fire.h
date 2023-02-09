@@ -5,8 +5,6 @@ class EulerAngles;
 struct CollisionInfo;
 struct ItemInfo;
 
-constexpr auto MAX_TARGETS = 8;
-
 enum class FireWeaponType
 {
 	Miss = -1,

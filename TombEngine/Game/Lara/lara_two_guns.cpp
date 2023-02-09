@@ -289,7 +289,10 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 		auto sphere = BoundingSphere(basePos, BLOCK(1 / 8.0f));
 		auto lightPos = Random::GeneratePointInSphere(sphere);
 
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, Random::GenerateFloat(8.0f, 11.0f), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+		TriggerDynamicLight(
+			lightPos.x, lightPos.y, lightPos.z,
+			Random::GenerateFloat(8.0f, 11.0f),
+			(GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
 

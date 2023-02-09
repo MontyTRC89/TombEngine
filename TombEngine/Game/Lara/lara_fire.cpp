@@ -34,8 +34,10 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-ItemInfo* LastTargets[MAX_TARGETS];
-ItemInfo* TargetList[MAX_TARGETS];
+constexpr auto TARGET_COUNT_MAX = 8;
+
+std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
+std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -88,7 +90,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		650,
-		SECTOR(8),
+		BLOCK(8),
 		1,
 		9,
 		3,
@@ -105,7 +107,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		650,
-		SECTOR(8),
+		BLOCK(8),
 		21,
 		16,
 		3,
@@ -122,7 +124,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		650,
-		SECTOR(8),
+		BLOCK(8),
 		1,
 		3,
 		3,
@@ -139,7 +141,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		0,
 		500,
-		SECTOR(8),
+		BLOCK(8),
 		3,
 		9,
 		3,
@@ -156,7 +158,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		500,
-		SECTOR(12),
+		BLOCK(12),
 		4,
 		0,
 		3,
@@ -173,7 +175,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
-		SECTOR(8),
+		BLOCK(8),
 		5,
 		0,
 		2,
@@ -207,7 +209,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		400,
-		SECTOR(8),
+		BLOCK(8),
 		3,
 		0,
 		2,
@@ -224,7 +226,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
-		SECTOR(8),
+		BLOCK(8),
 		20,
 		0,
 		2,
@@ -241,7 +243,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
-		SECTOR(8),
+		BLOCK(8),
 		6,
 		0,
 		2,
@@ -258,7 +260,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
-		SECTOR(8),
+		BLOCK(8),
 		30,
 		0,
 		2,
@@ -275,7 +277,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		400,
-		SECTOR(8),
+		BLOCK(8),
 		3,
 		0,
 		0,
@@ -863,9 +865,9 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		laraItem.Pose.Position.z,
 		laraItem.RoomNumber);
 
-	ItemInfo* bestEntity = nullptr;
-	float bestDistance = INFINITY;
-	short bestYOrient = MAXSHORT;
+	ItemInfo* nearestEntity = nullptr;
+	float nearestDistance = INFINITY;
+	short nearestYOrient = MAXSHORT;
 	unsigned int numTargets = 0;
 	float maxDistance = weaponInfo.TargetDist;
 
@@ -877,7 +879,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 		auto& item = g_Level.Items[creaturePtr->ItemNumber];
 
-		// Check whether creature is alive.
+		// Check if creature is alive.
 		if (item.HitPoints <= 0)
 			continue;
 
@@ -901,12 +903,12 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			TargetList[numTargets] = &item;
 			++numTargets;
 
-			if (distance < bestDistance &&
-				abs(orient.y) < (bestYOrient + ANGLE(15.0f)))
+			if (distance < nearestDistance &&
+				abs(orient.y) < (nearestYOrient + ANGLE(15.0f)))
 			{
-				bestEntity = &item;
-				bestDistance = distance;
-				bestYOrient = abs(orient.y);
+				nearestEntity = &item;
+				nearestDistance = distance;
+				nearestYOrient = abs(orient.y);
 			}
 		}
 	}
@@ -918,7 +920,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	}
 	else
 	{
-		for (int slot = 0; slot < MAX_TARGETS; ++slot)
+		for (int slot = 0; slot < TARGET_COUNT_MAX; ++slot)
 		{
 			if (!TargetList[slot])
 				lara.TargetEntity = nullptr;
@@ -931,7 +933,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		{
 			if (lara.TargetEntity == nullptr)
 			{
-				lara.TargetEntity = bestEntity;
+				lara.TargetEntity = nearestEntity;
 				LastTargets[0] = nullptr;
 			}
 			else if (IsClicked(In::SwitchTarget))
@@ -939,10 +941,10 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				lara.TargetEntity = nullptr;
 				bool flag = true;
 
-				for (int match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
+				for (int match = 0; match < TARGET_COUNT_MAX && TargetList[match]; ++match)
 				{
 					bool doLoop = false;
-					for (int slot = 0; slot < MAX_TARGETS && LastTargets[slot]; ++slot)
+					for (int slot = 0; slot < TARGET_COUNT_MAX && LastTargets[slot]; ++slot)
 					{
 						if (LastTargets[slot] == TargetList[match])
 						{
@@ -963,7 +965,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 				if (flag)
 				{
-					lara.TargetEntity = bestEntity;
+					lara.TargetEntity = nearestEntity;
 					LastTargets[0] = nullptr;
 				}
 			}
