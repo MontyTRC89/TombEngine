@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/items.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/control/control.h"
 #include "Game/control/trigger.h"
@@ -12,6 +12,8 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
+
+using namespace TEN::Effects::Bubble;
 
 void InitialiseSmokeEmitter(short itemNumber)
 {
@@ -70,8 +72,6 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 void SmokeEmitterControl(short itemNumber)
 {
-	Vector3i pos = {};
-
 	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
@@ -83,14 +83,15 @@ void SmokeEmitterControl(short itemNumber)
 		{
 			if (!(GetRandomControl() & 3) || item->ItemFlags[1])
 			{
-				pos.x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
-				pos.y = item->Pose.Position.y - (GetRandomControl() & 0x1F) - 16;
-				pos.z = (GetRandomControl() & 0x3F) + item->Pose.Position.z - 32;
+				auto pos = Vector3(
+					(GetRandomControl() & 0x3F) + item->Pose.Position.x - 32,
+					item->Pose.Position.y - (GetRandomControl() & 0x1F) - 16,
+					(GetRandomControl() & 0x3F) + item->Pose.Position.z - 32);
 
 				if (item->TriggerFlags == 1)
-					CreateBubble(&pos, item->RoomNumber, 15, 15, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber);
 				else
-					CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber);
 
 				if (item->ItemFlags[0])
 				{
@@ -102,7 +103,9 @@ void SmokeEmitterControl(short itemNumber)
 			}
 		}
 		else if (!(GetRandomControl() & 0x1F))
+		{
 			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
+		}
 
 		return;
 	}

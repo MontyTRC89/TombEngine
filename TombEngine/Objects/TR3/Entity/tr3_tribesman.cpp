@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const auto TribesmanAxeAttackJoints  = std::vector<unsigned int>{ 13 };
+	const auto TribesmanAxeAttackJoints	 = std::vector<unsigned int>{ 13 };
 	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
@@ -382,7 +382,7 @@ namespace TEN::Entities::Creatures::TR3
 		dartItem->Pose.Orientation = orient;
 		dartItem->Animation.Velocity.z = CLICK(1);
 		dartItem->TriggerFlags = TRIBESMAN_DART_DAMAGE;
-		dartItem->Color = item->Color;
+		dartItem->Model.Color = item->Model.Color;
 
 		AddActiveItem(dartItemNumber);
 		dartItem->Status = ITEM_ACTIVE;
@@ -497,7 +497,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (Random::TestProbability(1.0f / 64))
+					if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						break;
@@ -544,7 +544,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored && Random::TestProbability(1.0f / 64))
+				else if (creature->Mood == MoodType::Bored && Random::TestProbability(1 / 64.0f))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}

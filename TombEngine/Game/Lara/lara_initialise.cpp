@@ -58,9 +58,9 @@ void InitialiseLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Override base mesh and mesh indices to Lara skin.
+	// Override base mesh and mesh indices to Lara skin, if it exists.
+	item->Model.BaseMesh = Objects[(Objects[ID_LARA_SKIN].loaded ? ID_LARA_SKIN : ID_LARA)].meshIndex;
 
-	item->Model.BaseMesh = Objects[ID_LARA_SKIN].meshIndex;
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
 

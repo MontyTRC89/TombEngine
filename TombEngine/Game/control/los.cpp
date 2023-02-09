@@ -136,43 +136,47 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
 							LaserSight)
 						{
-							//if (!Objects[item->objectNumber].intelligent)
-							//{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = directionNorm;
 								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-							/*}
-							else
-							{
-								if (item->objectNumber != ID_GUARD_LASER)
-								{
-									DoDamage(item, 30);
-									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
-								}
-								else
-								{
-									angle = phd_atan(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
-									if (angle > -ANGLE(90) && angle < ANGLE(90))
-									{
-										DoDamage(item, INT_MAX);
-										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
-									}
-								}
-							}*/
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
 						}
 						else
 						{
+							auto* object = &Objects[item->ObjectNumber];
+
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
-								if (Objects[item->ObjectNumber].intelligent)
-									HitTarget(*LaraItem, *item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
+								if (object->intelligent)
+								{
+									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
+
+									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+									auto ray = Ray(origin->ToVector3(), directionNorm);
+									float bestDistance = INFINITY;
+									int bestJointIndex = NO_JOINT;
+
+									for (int i = 0; i < num; i++)
+									{
+										auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+										float distance = 0.0f;
+										if (ray.Intersects(sphere, distance))
+										{
+											if (distance < bestDistance)
+											{
+												bestDistance = distance;
+												bestJointIndex = i;
+											}
+										}
+									}
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+								}
 								else
 								{
 									// TR5
-									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
+									if (object->hitEffect == HitEffect::Richochet)
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 								}
 							}
@@ -182,14 +186,23 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									SmashObject(itemNumber);
 								else
 								{
-									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
+									switch (object->hitEffect)
+									{
+									case HitEffect::Blood:
 										DoBloodSplat(target2.x, target2.y, target2.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										break;
 
-									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
+									case HitEffect::Smoke:
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
+										break;
+
+									case HitEffect::Richochet:
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										break;
+									}
+
+									if (!Objects[item->ObjectNumber].undead)
+										DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
 									if (!item->Callbacks.OnHit.empty())
 									{
@@ -471,9 +484,9 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
 					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
 
-					int dx = p[0].x - p[3].x;
-					int dy = p[0].y - p[3].y;
-					int dz = p[0].z - p[3].z;
+					int dx = SQUARE(p[0].x - p[3].x);
+					int dy = SQUARE(p[0].y - p[3].y);
+					int dz = SQUARE(p[0].z - p[3].z);
 
 					int distance = dx + dy + dz;
 
@@ -520,7 +533,7 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
-		ShatterItem.color = item->Color;
+		ShatterItem.color = item->Model.Color;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;
 		ShatterItem.sphere.z = CreatureSpheres[sp].z;

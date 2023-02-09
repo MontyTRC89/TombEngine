@@ -5,6 +5,7 @@
 #include "Math/Math.h"
 
 struct TriggerVolume;
+enum class ReverbType;
 
 struct ROOM_VERTEX
 {
@@ -47,6 +48,7 @@ struct MESH_INFO
 	Vector4 color;
 	short HitPoints;
 	std::string Name;
+	bool Dirty;
 };
 
 struct LIGHTINFO
@@ -81,6 +83,7 @@ enum RoomEnvFlags
 	ENV_FLAG_MIST			  = (1 << 8),
 	ENV_FLAG_CAUSTICS		  = (1 << 9),
 	ENV_FLAG_UNKNOWN3		  = (1 << 10),
+	ENV_FLAG_DAMAGE			  = (1 << 11),
 	ENV_FLAG_COLD			  = (1 << 12)
 };
 
@@ -92,6 +95,7 @@ enum StaticMeshFlags : short
 
 struct ROOM_INFO
 {
+	int index;
 	int x;
 	int y;
 	int z;
@@ -103,7 +107,7 @@ struct ROOM_INFO
 	int flippedRoom;
 	int flags;
 	int meshEffect;
-	int reverbType;
+	ReverbType reverbType;
 	int flipNumber;
 	short itemNumber;
 	short fxNumber;
