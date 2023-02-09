@@ -28,6 +28,13 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
+	m_whiteSprite.Height = m_whiteTexture.Height;
+	m_whiteSprite.Width = m_whiteTexture.Width;
+	m_whiteSprite.UV[0] = Vector2(0.0f, 0.0f);
+	m_whiteSprite.UV[1] = Vector2(1.0f, 0.0f);
+	m_whiteSprite.UV[2] = Vector2(1.0f, 1.0f);
+	m_whiteSprite.UV[3] = Vector2(0.0f, 1.0f);
+	m_whiteSprite.Texture = &m_whiteTexture;
 
 	auto logoName = L"Textures/Logo.png";
 	SetTextureOrDefault(m_logo, logoName);

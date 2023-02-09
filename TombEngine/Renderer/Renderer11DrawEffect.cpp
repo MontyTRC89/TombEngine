@@ -993,9 +993,11 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
+			{
 				AddQuad(&m_sprites[spriteIndex],
-					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
+					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3],
 					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
+			}
 		}
 	}
 
@@ -1093,8 +1095,6 @@ namespace TEN::Renderer
 				face.info.sprite = &spr;
 				face.distance = distance;
 				face.info.world = GetWorldMatrixForSprite(&spr, view);
-				face.info.blendMode = spr.BlendMode;
-				face.info.IsSoftParticle = spr.SoftParticle;
 
 				for (int j = 0; j < view.roomsToDraw.size(); j++)
 				{
@@ -1285,12 +1285,13 @@ namespace TEN::Renderer
 
 		if (resetPipeline)
 		{
-			m_stSprite.IsSoftParticle = info->IsSoftParticle ? 1 : 0;
+			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
 		}
 
-		SetBlendMode(info->blendMode);
+		SetBlendMode(info->sprite->BlendMode);
 		SetCullMode(CULL_MODE_NONE);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetAlphaTest(ALPHA_TEST_NONE, 0);
