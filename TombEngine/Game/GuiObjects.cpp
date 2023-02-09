@@ -347,7 +347,7 @@ namespace TEN::Gui
 		if (lara->Control.HandStatus != HandStatus::Free &&
 			lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
-			UndrawPistolMeshRight(*item, LaraWeaponType::Revolver);
+			UndrawPistolMesh(*item, LaraWeaponType::Revolver, true);
 			DrawPistolMeshes(*item, LaraWeaponType::Revolver);
 		}
 	}
