@@ -1098,7 +1098,8 @@ namespace TEN::Renderer
 							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
 						}
 						else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
-							(oldFace->info.blendMode != face->info.blendMode
+							(oldFace->info.sprite->BlendMode != face->info.sprite->BlendMode 
+								|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
 								|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
 								|| m_transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
 						{
@@ -1203,22 +1204,22 @@ namespace TEN::Renderer
 					RendererVertex v0;
 					v0.Position = Vector3::Transform(p0t, face->info.world);
 					v0.UV = uv0;
-					v0.Color = spr->color;
+					v0.Color = spr->c1;
 
 					RendererVertex v1;
 					v1.Position = Vector3::Transform(p1t, face->info.world);
 					v1.UV = uv1;
-					v1.Color = spr->color;
+					v1.Color = spr->c2;
 
 					RendererVertex v2;
 					v2.Position = Vector3::Transform(p2t, face->info.world);
 					v2.UV = uv2;
-					v2.Color = spr->color;
+					v2.Color = spr->c3;
 
 					RendererVertex v3;
 					v3.Position = Vector3::Transform(p3t, face->info.world);
 					v3.UV = uv3;
-					v3.Color = spr->color;
+					v3.Color = spr->c4;
 
 					m_transparentFacesVertices.push_back(v0);
 					m_transparentFacesVertices.push_back(v1);
