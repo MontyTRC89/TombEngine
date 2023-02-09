@@ -97,8 +97,8 @@ namespace TEN::Effects::BOATFX
 
 					case WAVE_DIRECTION_RIGHT:
 
-						segment->Vertices[0] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
-						segment->Vertices[1] += Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
+						segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
+						segment->Vertices[0] += Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
 						segment->Vertices[2] = prevSegment->Vertices[1];
 						segment->Vertices[3] = prevSegment->Vertices[0];
 
@@ -152,10 +152,21 @@ namespace TEN::Effects::BOATFX
 		z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
 		Vector3 verticerPos = Vector3(x, origin.y, z);
 
-		segment.Vertices[0] = verticelPos;
-		segment.Vertices[1] = verticerPos;
-		segment.Vertices[3] = prevSegment->Vertices[0];
-		segment.Vertices[2] = prevSegment->Vertices[1];
+		if (waveDirection == WAVE_DIRECTION_LEFT)
+		{
+			segment.Vertices[0] = verticelPos;
+			segment.Vertices[1] = verticerPos;
+			segment.Vertices[3] = prevSegment->Vertices[0];
+			segment.Vertices[2] = prevSegment->Vertices[1];
+		}
+		else
+		{
+			segment.Vertices[1] = verticelPos;
+			segment.Vertices[0] = verticerPos;
+			segment.Vertices[3] = prevSegment->Vertices[0];
+			segment.Vertices[2] = prevSegment->Vertices[1];
+
+		}
 
 		segment.Opacity = 0.5f;
 
