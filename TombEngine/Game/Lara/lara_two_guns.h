@@ -1,5 +1,7 @@
 #pragma once
-#include "Game/Lara/lara_struct.h"
+
+enum class LaraWeaponType;
+struct ItemInfo;
 
 void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType);
 void AnimatePistols(ItemInfo& laraItem, LaraWeaponType weaponType);
