@@ -29,13 +29,13 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TONY_EXPLOSION_COUNT_MAX = 60;
 	constexpr auto TONY_EFFECT_COLOR		= Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
-	const BiteInfo TonyLeftHandBite = BiteInfo(Vector3::Zero, 10);
-	const BiteInfo TonyRightHandBite = BiteInfo(Vector3::Zero, 13);
+	const auto TonyLeftHandBite	 = BiteInfo(Vector3::Zero, 10);
+	const auto TonyRightHandBite = BiteInfo(Vector3::Zero, 13);
 
 	// I can't set it to the TonyFlame struct since the control of the
 	// flame use fxNumber as argument or that FX_INFO have no void* to hold custom data.
-	// So i let it there to avoid initialising it everytime in the control of the flame.
-	const short LightIntensityTable[7] = { 16, 0, 14, 9, 7, 7, 7 }; 
+	// So i let it there to avoid initialising it every time in the control of the flame.
+	const int LightIntensityTable[7] = { 16, 0, 14, 9, 7, 7, 7 }; 
 
 	enum class TonyFlameType
 	{
@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum TonyAnim
 	{
-		TONY_ANIM_WAIT,			 // Await player.
+		TONY_ANIM_WAIT,
 		TONY_ANIM_RISE,
 		TONY_ANIM_FLY,			 // Real idle state.
 		TONY_ANIM_SHOOT_FIRE_RIGHT_HAND,
@@ -74,260 +74,258 @@ namespace TEN::Entities::Creatures::TR3
 	struct TonyFlame
 	{
 		bool on;
-		Vector3i pos;
-		int fallspeed;
+		Vector3i Position;
+		int VerticalVelocity;
 		int speed;
 		short yRot;
-		short room_number;
-		TonyFlameType type;
+		short RoomNumber;
+		TonyFlameType Type;
 	};
 
-	static void TriggerTonyEffect(const TonyFlame flame)
+	static void TriggerTonyEffect(const TonyFlame& flame)
 	{
-		int fxNumber = CreateNewEffect(flame.room_number);
+		int fxNumber = CreateNewEffect(flame.RoomNumber);
 		if (fxNumber == NO_ITEM)
 			return;
 
-		auto* fx = &EffectList[fxNumber];
+		auto& fx = EffectList[fxNumber];
 
-		fx->pos.Position.x = flame.pos.x;
-		fx->pos.Position.y = flame.pos.y;
-		fx->pos.Position.z = flame.pos.z;
-		fx->fallspeed = flame.fallspeed;
-		fx->pos.Orientation.x = 0;
-		fx->pos.Orientation.y = flame.yRot;
-		fx->pos.Orientation.z = 0;
-		fx->objectNumber = ID_TONY_BOSS_FLAME;
-		fx->flag1 = (short)flame.type;
-		fx->speed = flame.speed;
-		fx->color = Vector4::Zero;
+		fx.pos.Position = flame.Position;
+		fx.fallspeed = flame.VerticalVelocity;
+		fx.pos.Orientation = EulerAngles(0, flame.yRot, 0);
+		fx.objectNumber = ID_TONY_BOSS_FLAME;
+		fx.flag1 = (short)flame.Type;
+		fx.speed = flame.speed;
+		fx.color = Vector4::Zero;
 
-		switch (flame.type)
+		switch (flame.Type)
 		{
 		case TonyFlameType::InFrontDebris:
-			fx->flag2 *= 2;
+			fx.flag2 *= 2;
 			break;
 
 		case TonyFlameType::InFront:
-			fx->flag2 = 0;
+			fx.flag2 = 0;
 			break;
 
 		default:
-			fx->flag2 = (GetRandomControl() & 3) + 1;
+			fx.flag2 = (GetRandomControl() & 3) + 1;
 			break;
 		}
 	}
 
 	static void TriggerTonyFlame(short itemNumber, int hand)
 	{
-		auto* sptr = GetFreeParticle();
+		auto& flame = *GetFreeParticle();
 
-		sptr->on = true;
-		sptr->sR = 255;
-		sptr->sG = 48 + (GetRandomControl() & 31);
-		sptr->sB = 48;
-		sptr->dR = 192 + (GetRandomControl() & 63);
-		sptr->dG = 128 + (GetRandomControl() & 63);
-		sptr->dB = 32;
-		sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->extras = 0;
-		sptr->dynamic = -1;
-		sptr->x = ((GetRandomControl() & 15) - 8);
-		sptr->y = 0;
-		sptr->z = ((GetRandomControl() & 15) - 8);
-		sptr->xVel = ((GetRandomControl() & 255) - 128);
-		sptr->yVel = -(GetRandomControl() & 15) - 16;
-		sptr->zVel = ((GetRandomControl() & 255) - 128);
-		sptr->friction = 5;
+		flame.on = true;
+		flame.sR = 255;
+		flame.sG = 48 + (GetRandomControl() & 31);
+		flame.sB = 48;
+		flame.dR = 192 + (GetRandomControl() & 63);
+		flame.dG = 128 + (GetRandomControl() & 63);
+		flame.dB = 32;
+		flame.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		flame.fadeToBlack = 8;
+		flame.sLife = flame.life = (GetRandomControl() & 7) + 24;
+		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.extras = 0;
+		flame.dynamic = -1;
+		flame.x = ((GetRandomControl() & 15) - 8);
+		flame.y = 0;
+		flame.z = ((GetRandomControl() & 15) - 8);
+		flame.xVel = ((GetRandomControl() & 255) - 128);
+		flame.yVel = -(GetRandomControl() & 15) - 16;
+		flame.zVel = ((GetRandomControl() & 255) - 128);
+		flame.friction = 5;
 
 		if (GetRandomControl() & 1)
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-			sptr->rotAng = GetRandomControl() & 4095;
+			flame.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+			flame.rotAng = GetRandomControl() & 4095;
 
 			if (Random::TestProbability(1 / 2.0f))
-				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+				flame.rotAdd = -(GetRandomControl() & 15) - 16;
 			else
-				sptr->rotAdd = (GetRandomControl() & 15) + 16;
+				flame.rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+			flame.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 		}
 
-		sptr->gravity = -(GetRandomControl() & 31) - 16;
-		sptr->maxYvel = -(GetRandomControl() & 7) - 16;
-		sptr->fxObj = itemNumber;
-		sptr->nodeNumber = hand;
-		sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		sptr->scalar = 1;
+		flame.gravity = -(GetRandomControl() & 31) - 16;
+		flame.maxYvel = -(GetRandomControl() & 7) - 16;
+		flame.fxObj = itemNumber;
+		flame.nodeNumber = hand;
+		flame.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		flame.scalar = 1;
 
-		unsigned char size = (GetRandomControl() & 31) + 64;
-		sptr->size = sptr->sSize = sptr->dSize = size;
+		float size = (GetRandomControl() & 31) + 64;
+		flame.size =
+		flame.sSize =
+		flame.dSize = size;
 	}
 
-	static void TriggerFireBallFlame(short fxNumber, TonyFlameType type, int xv, int yv, int zv)
+	static void TriggerFireBallFlame(int fxNumber, TonyFlameType type, int xv, int yv, int zv)
 	{
-		auto* sptr = GetFreeParticle();
+		auto& flame = *GetFreeParticle();
 
-		sptr->on = true;
-		sptr->sR = 255;
-		sptr->sG = 48 + (GetRandomControl() & 31);
-		sptr->sB = 48;
-		sptr->dR = 192 + (GetRandomControl() & 63);
-		sptr->dG = 128 + (GetRandomControl() & 63);
-		sptr->dB = 32;
-		sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->extras = 0;
-		sptr->dynamic = -1;
-		sptr->x = ((GetRandomControl() & 15) - 8);
-		sptr->y = 0;
-		sptr->z = ((GetRandomControl() & 15) - 8);
-		sptr->xVel = xv + ((GetRandomControl() & 255) - 128);
-		sptr->yVel = yv;
-		sptr->zVel = zv + ((GetRandomControl() & 255) - 128);
-		sptr->friction = 5;
+		flame.on = true;
+		flame.sR = 255;
+		flame.sG = 48 + (GetRandomControl() & 31);
+		flame.sB = 48;
+		flame.dR = 192 + (GetRandomControl() & 63);
+		flame.dG = 128 + (GetRandomControl() & 63);
+		flame.dB = 32;
+		flame.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		flame.fadeToBlack = 8;
+		flame.sLife = flame.life = (GetRandomControl() & 7) + 24;
+		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.extras = 0;
+		flame.dynamic = -1;
+		flame.x = ((GetRandomControl() & 15) - 8);
+		flame.y = 0;
+		flame.z = ((GetRandomControl() & 15) - 8);
+		flame.xVel = xv + ((GetRandomControl() & 255) - 128);
+		flame.yVel = yv;
+		flame.zVel = zv + ((GetRandomControl() & 255) - 128);
+		flame.friction = 5;
 
 		if (GetRandomControl() & 1)
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
-			sptr->rotAng = GetRandomControl() & 4095;
+			flame.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
+			flame.rotAng = GetRandomControl() & 4095;
 
 			if (GetRandomControl() & 1)
-				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+				flame.rotAdd = -(GetRandomControl() & 15) - 16;
 			else
-				sptr->rotAdd = (GetRandomControl() & 15) + 16;
+				flame.rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
+			flame.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
 		}
 
-		sptr->fxObj = (unsigned char)fxNumber;
-		sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
+		flame.fxObj = (unsigned char)fxNumber;
+		flame.spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
 		unsigned char size = (GetRandomControl() & 31) + 64;
-		sptr->size = size;
-		sptr->sSize = size;
-		sptr->dSize = size / 4;
+		flame.size = size;
+		flame.sSize = size;
+		flame.dSize = size / 4;
 
 		switch (type)
 		{
 		case TonyFlameType::CeilingLeftHand:
 		case TonyFlameType::CeilingRightHand:
-			sptr->gravity = (GetRandomControl() & 31) + 16;
-			sptr->maxYvel = (GetRandomControl() & 15) + 48;
-			sptr->yVel = -sptr->yVel * 16;
-			sptr->scalar = 2;
+			flame.gravity = (GetRandomControl() & 31) + 16;
+			flame.maxYvel = (GetRandomControl() & 15) + 48;
+			flame.yVel = -flame.yVel * 16;
+			flame.scalar = 2;
 			break;
 
 		case TonyFlameType::CeilingDebris:
 		case TonyFlameType::InFrontDebris:
 		case TonyFlameType::ShowerFromCeilingDebris:
-			sptr->gravity = 0;
-			sptr->maxYvel = 0;
+			flame.gravity = 0;
+			flame.maxYvel = 0;
 			break;
 
 		case TonyFlameType::ShowerFromCeiling:
-			sptr->gravity = -(GetRandomControl() & 31) - 16;
-			sptr->maxYvel = -(GetRandomControl() & 31) - 64;
-			sptr->yVel = sptr->yVel * 16;
-			sptr->scalar = 2;
+			flame.gravity = -(GetRandomControl() & 31) - 16;
+			flame.maxYvel = -(GetRandomControl() & 31) - 64;
+			flame.yVel = flame.yVel * 16;
+			flame.scalar = 2;
 			break;
 
 		case TonyFlameType::InFront:
-			sptr->gravity = sptr->maxYvel = 0;
-			sptr->scalar = 2;
+			flame.gravity = flame.maxYvel = 0;
+			flame.scalar = 2;
 			break;
 
 		default:
-			sptr->scalar = 1;
+			flame.scalar = 1;
 			break;
 		}
 	}
 
 	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3i* laraPos, short roomNumber, short angle, int zdVelocity)
 	{
-		TonyFlame flame{};
-		flame.type = type;
+		auto flame = TonyFlame();
 
-		switch (type)
+		flame.Type = type;
+		switch (flame.Type)
 		{
 		case TonyFlameType::CeilingLeftHand:
 			flame.on = true;
-			flame.pos = GetJointPosition(item, 10);
-			flame.fallspeed = -16;
+			flame.Position = GetJointPosition(item, 10);
+			flame.VerticalVelocity = -16;
 			flame.speed = 0;
 			flame.yRot = item->Pose.Orientation.y;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::CeilingRightHand:
 			flame.on = true;
-			flame.pos = GetJointPosition(item, 13);
-			flame.fallspeed = -16;
+			flame.Position = GetJointPosition(item, 13);
+			flame.VerticalVelocity = -16;
 			flame.speed = 0;
 			flame.yRot = item->Pose.Orientation.y;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::InFront:
 			flame.on = true;
-			flame.pos = GetJointPosition(item, 13);
-			flame.fallspeed = (GetRandomControl() & 7) + 10;
+			flame.Position = GetJointPosition(item, 13);
+			flame.VerticalVelocity = (GetRandomControl() & 7) + 10;
 			flame.speed = 160;
 			flame.yRot = item->Pose.Orientation.y;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::ShowerFromCeiling:
 			flame.on = true;
-			flame.pos.x = laraPos->x;
-			flame.pos.y = laraPos->y + 64;
-			flame.pos.z = laraPos->z;
-			flame.fallspeed = (GetRandomControl() & 3) + 4;
+			flame.Position.x = laraPos->x;
+			flame.Position.y = laraPos->y + 64;
+			flame.Position.z = laraPos->z;
+			flame.VerticalVelocity = (GetRandomControl() & 3) + 4;
 			flame.speed = 0;
 			flame.yRot = angle;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::CeilingDebris:
 			flame.on = true;
-			flame.pos.x = laraPos->x;
-			flame.pos.y = laraPos->y;
-			flame.pos.z = laraPos->z;
-			flame.fallspeed = (GetRandomControl() & 3) - 2;
+			flame.Position.x = laraPos->x;
+			flame.Position.y = laraPos->y;
+			flame.Position.z = laraPos->z;
+			flame.VerticalVelocity = (GetRandomControl() & 3) - 2;
 			flame.speed = zdVelocity + (GetRandomControl() & 3);
 			flame.yRot = GetRandomControl() * 2;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::InFrontDebris:
 			flame.on = true;
-			flame.pos.x = laraPos->x;
-			flame.pos.y = laraPos->y;
-			flame.pos.z = laraPos->z;
-			flame.fallspeed = -(GetRandomControl() & 15) - 16;
+			flame.Position.x = laraPos->x;
+			flame.Position.y = laraPos->y;
+			flame.Position.z = laraPos->z;
+			flame.VerticalVelocity = -(GetRandomControl() & 15) - 16;
 			flame.speed = (GetRandomControl() & 7) + 48;
 			angle += (GetRandomControl() & 0x1fff) - 0x9000;
 			flame.yRot = angle;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 
 		case TonyFlameType::ShowerFromCeilingDebris:
 			flame.on = true;
-			flame.pos.x = laraPos->x;
-			flame.pos.y = laraPos->y;
-			flame.pos.z = laraPos->z;
-			flame.fallspeed = -(GetRandomControl() & 31) - 32;
+			flame.Position.x = laraPos->x;
+			flame.Position.y = laraPos->y;
+			flame.Position.z = laraPos->z;
+			flame.VerticalVelocity = -(GetRandomControl() & 31) - 32;
 			flame.speed = (GetRandomControl() & 31) + 32;
 			flame.yRot = GetRandomControl() * 2;
-			flame.room_number = roomNumber;
+			flame.RoomNumber = roomNumber;
 			break;
 		}
 
@@ -365,21 +363,20 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ControlTonyFireBall(short fxNumber)
 	{
-		auto* fx = &EffectList[fxNumber];
-		auto oldX = fx->pos.Position.x;
-		auto oldY = fx->pos.Position.y;
-		auto oldZ = fx->pos.Position.z;
-		auto type = (TonyFlameType)fx->flag1;
+		auto& fx = EffectList[fxNumber];
+
+		auto prevPos = fx.pos.Position;
+		auto type = (TonyFlameType)fx.flag1;
 
 		switch (type)
 		{
 		case TonyFlameType::CeilingLeftHand:
 		case TonyFlameType::CeilingRightHand:
-			fx->fallspeed += (fx->fallspeed / 8) + 1;
-			if (fx->fallspeed < -BLOCK(4))
-				fx->fallspeed = -BLOCK(4);
+			fx.fallspeed += (fx.fallspeed / 8) + 1;
+			if (fx.fallspeed < -BLOCK(4))
+				fx.fallspeed = -BLOCK(4);
 
-			fx->pos.Position.y += fx->fallspeed;
+			fx.pos.Position.y += fx.fallspeed;
 
 			if (Wibble & 4)
 				TriggerFireBallFlame(fxNumber, type, 0, 0, 0);
@@ -387,8 +384,8 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case TonyFlameType::ShowerFromCeiling:
-			fx->fallspeed += 2;
-			fx->pos.Position.y += fx->fallspeed;
+			fx.fallspeed += 2;
+			fx.pos.Position.y += fx.fallspeed;
 
 			if (Wibble & 4)
 				TriggerFireBallFlame(fxNumber, type, 0, 0, 0);
@@ -398,32 +395,32 @@ namespace TEN::Entities::Creatures::TR3
 		default:
 			if (type != TonyFlameType::InFront)
 			{
-				if (fx->speed > 48)
-					fx->speed--;
+				if (fx.speed > 48)
+					fx.speed--;
 			}
 
-			fx->fallspeed += fx->flag2;
-			if (fx->fallspeed > CLICK(2))
-				fx->fallspeed = CLICK(2);
+			fx.fallspeed += fx.flag2;
+			if (fx.fallspeed > CLICK(2))
+				fx.fallspeed = CLICK(2);
 
-			fx->pos.Position.y += fx->fallspeed / 2;
-			fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
-			fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
+			fx.pos.Position.y += fx.fallspeed / 2;
+			fx.pos.Position.z += fx.speed * phd_cos(fx.pos.Orientation.y);
+			fx.pos.Position.x += fx.speed * phd_sin(fx.pos.Orientation.y);
 
 			if (Wibble & 4)
 			{
 				TriggerFireBallFlame(
 					fxNumber, type,
-					short((oldX - fx->pos.Position.x) * 8), short((oldY - fx->pos.Position.y) * 8), short((oldZ - fx->pos.Position.z) * 4));
+					short((prevPos.x - fx.pos.Position.x) * 8), short((prevPos.y - fx.pos.Position.y) * 8), short((prevPos.z - fx.pos.Position.z) * 4));
 			}
 			
 			break;
 		}
 
-		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+		auto probe = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
 
-		if (fx->pos.Position.y >= probe.Position.Floor ||
-			fx->pos.Position.y < probe.Position.Ceiling)
+		if (fx.pos.Position.y >= probe.Position.Floor ||
+			fx.pos.Position.y < probe.Position.Ceiling)
 		{
 			Vector3i pos;
 			int debrisCount = type == TonyFlameType::InFront ? 7 : 3;
@@ -433,7 +430,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TonyFlameType::CeilingLeftHand:
 			case TonyFlameType::CeilingRightHand:
 				for (int x = 0; x < 2; x++)
-					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, fx->roomNumber);
+					TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, fx.roomNumber);
 
 				probe = GetCollision(LaraItem); // TODO: Deal with LaraItem global.
 				pos.y = probe.Position.Ceiling + CLICK(1);
@@ -445,13 +442,11 @@ namespace TEN::Entities::Creatures::TR3
 
 			case TonyFlameType::InFront:
 			case TonyFlameType::ShowerFromCeiling:
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-				pos.x = oldX;
-				pos.y = oldY;
-				pos.z = oldZ;
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, fx.roomNumber);
+				pos = prevPos;
 
 				for (int x = 0; x < debrisCount; x++)
-					TriggerFireBall(nullptr, GetDebrisType(type), &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
+					TriggerFireBall(nullptr, GetDebrisType(type), &pos, fx.roomNumber, fx.pos.Orientation.y, 32 + (x * 4));
 
 				break;
 			}
@@ -468,7 +463,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (LaraItem->Effect.Type == EffectType::None)
 		{
-			if (ItemNearLara(fx->pos.Position, 200))
+			if (ItemNearLara(fx.pos.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);
@@ -478,14 +473,14 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		if (probe.RoomNumber != fx->roomNumber)
+		if (probe.RoomNumber != fx.roomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
-		if (LightIntensityTable[fx->flag1])
+		if (LightIntensityTable[fx.flag1])
 		{
 			TriggerDynamicLight(
-				fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,
-				LightIntensityTable[fx->flag1],
+				fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z,
+				LightIntensityTable[fx.flag1],
 				31 - ((GetRandomControl() / 16) & 3),
 				24 - ((GetRandomControl() / 64) & 3),
 				GetRandomControl() & 7);
