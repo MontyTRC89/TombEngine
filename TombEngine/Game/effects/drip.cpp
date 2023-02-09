@@ -33,7 +33,7 @@ namespace TEN::Effects::Drip
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
-		drip.Scale = Vector2(WIDTH, 0.0f);
+		drip.Size = Vector2(WIDTH, 0.0f);
 		drip.Color = DRIP_COLOR_WHITE;
 		drip.Life =
 		drip.LifeMax = std::round(lifeInSec * FPS);
@@ -91,11 +91,11 @@ namespace TEN::Effects::Drip
 
 	void UpdateDrips()
 	{
-		constexpr auto RIPPLE_SCALE_WATER_MAX  = 24.0f;
-		constexpr auto RIPPLE_SCALE_WATER_MIN  = 16.0f;
-		constexpr auto RIPPLE_SCALE_GROUND_MAX = 16.0f;
-		constexpr auto RIPPLE_SCALE_GROUND_MIN = 8.0f;
-		constexpr auto RIPPLE_HEIGHT_OFFSET	   = 4;
+		constexpr auto RIPPLE_SIZE_WATER_MAX  = 24.0f;
+		constexpr auto RIPPLE_SIZE_WATER_MIN  = 16.0f;
+		constexpr auto RIPPLE_SIZE_GROUND_MAX = 16.0f;
+		constexpr auto RIPPLE_SIZE_GROUND_MIN = 8.0f;
+		constexpr auto RIPPLE_HEIGHT_OFFSET	  = 4;
 
 		if (Drips.empty())
 			return;
@@ -119,7 +119,7 @@ namespace TEN::Effects::Drip
 
 			// Update size and color.
 			float alpha = 1.0f - (drip.Life / drip.LifeMax);
-			drip.Scale.y = Lerp(drip.Scale.x / (1 / 6.4f), 0.0f, alpha);
+			drip.Size.y = Lerp(drip.Size.x / (1 / 6.4f), 0.0f, alpha);
 			drip.Color = Vector4::Lerp(DRIP_COLOR_WHITE, Vector4::Zero, alpha);
 
 			// Hit water.
@@ -132,7 +132,7 @@ namespace TEN::Effects::Drip
 					SpawnRipple(
 						Vector3(drip.Position.x, waterHeight - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
 						pointColl.RoomNumber,
-						Random::GenerateFloat(RIPPLE_SCALE_WATER_MIN, RIPPLE_SCALE_WATER_MAX),
+						Random::GenerateFloat(RIPPLE_SIZE_WATER_MIN, RIPPLE_SIZE_WATER_MAX),
 						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				}
 
@@ -145,7 +145,7 @@ namespace TEN::Effects::Drip
 				SpawnRipple(
 					Vector3(drip.Position.x, pointColl.Position.Floor - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
 					pointColl.RoomNumber,
-					Random::GenerateFloat(RIPPLE_SCALE_GROUND_MIN, RIPPLE_SCALE_GROUND_MAX),
+					Random::GenerateFloat(RIPPLE_SIZE_GROUND_MIN, RIPPLE_SIZE_GROUND_MAX),
 					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity | (int)RippleFlags::OnGround,
 					Geometry::GetFloorNormal(pointColl.FloorTilt));
 

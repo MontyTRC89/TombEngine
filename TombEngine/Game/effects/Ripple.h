@@ -20,14 +20,14 @@ namespace TEN::Effects::Ripple
 
 		float Life		   = 0.0f;
 		float LifeMax	   = 0.0f;
-		float Scale		   = 0.0f;
+		float Size		   = 0.0f;
 		float FadeDuration = 0.0f;
 		int	  Flags		   = 0;
 	};
 
 	extern std::deque<Ripple> Ripples;
 
-	void SpawnRipple(const Vector3& pos, int roomNumber, float scale, int flags = 0, const Vector3& normal = Vector3::Down);
+	void SpawnRipple(const Vector3& pos, int roomNumber, float size, int flags = 0, const Vector3& normal = Vector3::Down);
 
 	void UpdateRipples();
 	void ClearRipples();

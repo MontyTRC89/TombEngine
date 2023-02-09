@@ -15,7 +15,7 @@ namespace TEN::Effects::Blood
 
 	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
 
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
 	{
 		constexpr auto LIFE_MAX		= 8.5f;
 		constexpr auto LIFE_MIN		= 8.0f;
@@ -30,21 +30,21 @@ namespace TEN::Effects::Blood
 		uwBlood.RoomNumber = roomNumber;
 		uwBlood.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 		uwBlood.Init = 1.0f;
-		uwBlood.Scale = scale;
+		uwBlood.Size = size;
 	}
 
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count)
 	{
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
 		for (int i = 0; i < count; i++)
-			SpawnUnderwaterBlood(pos, roomNumber, scaleMax);
+			SpawnUnderwaterBlood(pos, roomNumber, sizeMax);
 	}
 
 	void UpdateUnderwaterBloodParticles()
 	{
-		constexpr auto SCALE_MAX = BLOCK(0.25f);
+		constexpr auto UW_BLOOD_SIZE_MAX = BLOCK(0.25f);
 
 		if (UnderwaterBloodParticles.empty())
 			return;
@@ -54,9 +54,9 @@ namespace TEN::Effects::Blood
 			if (uwBlood.Life <= 0.0f)
 				continue;
 
-			// Update scale.
-			if (uwBlood.Scale < SCALE_MAX)
-				uwBlood.Scale += 4.0f;
+			// Update size.
+			if (uwBlood.Size < UW_BLOOD_SIZE_MAX)
+				uwBlood.Size += 4.0f;
 
 			// Update life.
 			if (uwBlood.Init == 0.0f)

@@ -9,7 +9,7 @@ namespace TEN::Effects::Drip
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
-		Vector2 Scale	   = Vector2::Zero;
+		Vector2 Size	   = Vector2::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
 		float Life	  = 0.0f;

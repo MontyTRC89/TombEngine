@@ -420,7 +420,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
 				bubble.Position,
-				bubble.Color, 0.0f, 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
+				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -440,7 +440,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrained(
 				&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 				drip.Position,
-				drip.Color, 0.0f, 1.0f, drip.Scale, BLENDMODE_ADDITIVE, -axis, false, view);
+				drip.Color, 0.0f, 1.0f, drip.Size, BLENDMODE_ADDITIVE, -axis, false, view);
 		}
 	}
 
@@ -461,7 +461,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrainedLookAt(
 				&m_sprites[ripple.SpriteIndex],
 				ripple.Position,
-				color, 0.0f, 1.0f, Vector2(ripple.Scale * 2), BLENDMODE_ADDITIVE, ripple.Normal, true, view);
+				color, 0.0f, 1.0f, Vector2(ripple.Size * 2), BLENDMODE_ADDITIVE, ripple.Normal, true, view);
 		}
 	}
 
@@ -489,7 +489,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&m_sprites[uwBlood.SpriteIndex],
 				uwBlood.Position,
-				color, 0.0f, 1.0f, Vector2(uwBlood.Scale, uwBlood.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
+				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
