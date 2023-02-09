@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_shiva.h"
+#include "Objects/TR3/Entity/Shiva.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -21,16 +21,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto SHIVA_WALK_TURN_RATE_MAX     = ANGLE(4.0f);
+	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX   = ANGLE(4.0f);
+
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
-	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE		= 150;
+	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE     = 150;
 
-	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE = SQUARE(BLOCK(4) / 3);
-	constexpr auto SHIVA_GRAB_ATTACK_RANGE	   = SQUARE(BLOCK(1.25f));
+	constexpr auto SHIVA_DOWNWARD_ATTACK_RANGE  = SQUARE(BLOCK(4) / 3);
+	constexpr auto SHIVA_GRAB_ATTACK_RANGE      = SQUARE(BLOCK(1.25f));
+	constexpr auto SHIVA_SWAPMESH_TIME		    = 3;
 
-	constexpr auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
-	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
-
-	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
+	constexpr auto PLAYER_ANIM_SHIVA_DEATH      = 7; // TODO: Move to LaraExtraAnims enum.
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
@@ -76,12 +77,6 @@ namespace TEN::Entities::Creatures::TR3
 		SHIVA_ANIM_WALK_BACK_LEFT = 20,
 		SHIVA_ANIM_WALK_BACK_RIGHT = 21,
 		SHIVA_ANIM_DEATH = 22
-	};
-
-	// TODO: Figure these out.
-	enum ShivaFlags
-	{
-
 	};
 
 	static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
@@ -186,13 +181,17 @@ namespace TEN::Entities::Creatures::TR3
 		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 
-	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
+	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
+		if (useEffect)
+			SpawnShivaSmoke(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
 	}
 
-	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
+	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
+		if (useEffect)
+			SpawnShivaSmoke(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
 	}
 
@@ -201,52 +200,39 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (creature.Flags == 0 && (item.TestFlagField(2, 1) || item.TestFlagField(2, 2)))
+		// Do the swap meshes
+		if (creature.Flags == 0)
 		{
-			creature.Flags = 1;
-
-			if (isDead && item.ItemFlags[0] < 0)
+			switch (item.ItemFlags[3])
 			{
-				item.SetFlagField(2, 0);
-			}
-			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
-			{
-				item.SetFlagField(2, 0);
-			}
-			else
-			{
-				auto pos = GetJointPosition(&item, item.ItemFlags[0]).ToVector3();
-				SpawnShivaSmoke(pos, item.RoomNumber);
-
-				if (isDead)
+			case 0: // From stone to normal.
+				SwapShivaMeshToNormal(item, item.ItemFlags[0]);
+				item.ItemFlags[0]++;
+				if (item.ItemFlags[0] >= object.nmeshes)
 				{
-					SwapShivaMeshToStone(item, item.ItemFlags[0]);
-					item.ItemFlags[0]--;
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 0;
+					item.ItemFlags[3] = 0;
+					return true;
 				}
-				else
+				break;
+			case 1: // From normal to stone.
+				SwapShivaMeshToStone(item, item.ItemFlags[0]);
+				item.ItemFlags[0]--;
+				if (item.ItemFlags[0] < 0)
 				{
-					SwapShivaMeshToNormal(item, item.ItemFlags[0]);
-					item.ItemFlags[0]++;
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 1;
+					item.ItemFlags[3] = 1;
+					return true;
 				}
+				break;
 			}
+			creature.Flags = SHIVA_SWAPMESH_TIME;
 		}
 		else
 		{
 			creature.Flags--;
-		}
-
-		if (item.TestFlagField(2, 0) && !isDead)
-		{
-			item.Animation.TargetState = SHIVA_STATE_IDLE;
-			creature.Flags = -45;
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 1); // Is alive (for savegame).
-		}
-		else if (item.TestFlagField(2, 0) && isDead)
-		{
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 2); // Is dead.
-			return true;
 		}
 
 		return false;
@@ -255,23 +241,18 @@ namespace TEN::Entities::Creatures::TR3
 	void InitialiseShiva(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
+		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
 
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SHIVA_ANIM_INACTIVE);
-		item.Status &= ~ITEM_INVISIBLE;
+		item.ItemFlags[0] = 0; // Joint index when swapping mesh.
+		item.ItemFlags[1] = 1; // Immune state. TRUE = immune to damage.
+		item.ItemFlags[2] = 1; // If 1 then swap to stone, else if 2, swap to normal.
+		item.ItemFlags[3] = 0; // If the mesh is swapped to stone, then it's TRUE, else FALSE.
 
-		// Joint index used for swapping mesh.
-		item.SetFlagField(0, 0);
-
-		if (item.TestFlagField(1, 0))
-		{
-			for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
-				SwapShivaMeshToStone(item, jointIndex);
-
-			// Continue transition until finished.
-			item.SetFlagField(2, 1);
-		}
+		auto& object = Objects[item.ObjectNumber];
+		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
+			SwapShivaMeshToStone(item, jointIndex, false);
 	}
 
 	void ShivaControl(short itemNumber)
@@ -293,10 +274,9 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != SHIVA_STATE_DEATH)
 			{
 				SetAnimation(item, SHIVA_ANIM_DEATH);
-				item->SetFlagField(0, object.nmeshes - 1);
-
-				// Redo mesh swap to stone.
-				item->SetFlagField(2, 2);
+				item->ItemFlags[0] = object.nmeshes - 1;
+				item->ItemFlags[2] = 1; // Redo mesh swap to stone.
+				item->ItemFlags[3] = 1;
 			}
 
 			int frameEnd = g_Level.Anims[object.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
@@ -331,25 +311,12 @@ namespace TEN::Entities::Creatures::TR3
 			{
 			case SHIVA_STATE_INACTIVE:
 				creature->MaxTurn = 0;
-				DoShivaSwapMesh(*item, false);
+				if (DoShivaSwapMesh(*item, false))
+					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				break;
 
 			case SHIVA_STATE_IDLE:
 				creature->MaxTurn = 0;
-
-				if (creature->Flags < 0)
-				{
-					creature->Flags++;
-
-					auto extents = Vector3(BLOCK(0.75f));
-					auto box = BoundingOrientedBox(item->Pose.Position.ToVector3(), extents, item->Pose.Orientation.ToQuaternion());
-					auto pos = Random::GeneratePointInBox(box);
-					pos.y -= CLICK(1);
-					SpawnShivaSmoke(pos, item->RoomNumber);
-
-					return;
-				}
-
 				creature->Flags = 0;
 
 				if (ai.ahead)
@@ -552,21 +519,23 @@ namespace TEN::Entities::Creatures::TR3
 		if (!pos.has_value())
 			return;
 
-		const auto& player = *GetLaraInfo(&source);
-		const auto& object = Objects[target.ObjectNumber];
+		// If immune, ricochet without damage.
+		if (target.ItemFlags[1] != 0)
+		{
+			SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			return;
+		}
 
 		// If guarded, ricochet without damage.
-		if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
-			 target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE))
+		if (target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
+		    target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
 		{
 			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
 			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			return;
 		}
-		// Do basic hit effect.
-		else if (object.hitEffect == HitEffect::Blood)
-		{
-			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
-			DoItemHit(&target, damage, isExplosive);
-		}
+		
+		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }

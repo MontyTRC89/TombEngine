@@ -9,6 +9,7 @@
 #include "Specific/setup.h"
 
 // Creatures
+#include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
@@ -21,7 +22,6 @@
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
-#include "Objects/TR3/Entity/tr3_shiva.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
