@@ -116,7 +116,7 @@ namespace TEN::Hud
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position =
-		pickup.Origin = g_Renderer.GetScreenSpacePosition(pos);
+		pickup.Origin = g_Renderer.GetScreenSpacePosition(pos); // TODO: Handle case when offscreen.
 		pickup.Target = Vector2::Zero;
 		pickup.Life = round(LIFE_MAX * FPS);
 		pickup.Scale = 0.0f;
