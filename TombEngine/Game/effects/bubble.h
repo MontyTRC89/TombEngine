@@ -1,45 +1,45 @@
 #pragma once
-#include "Game/effects/effects.h"
 
 namespace TEN::Effects::Bubble
 {
-	constexpr auto BUBBLE_NUM_MAX = 256;
-	
-	enum BubbleFlags
+	enum class BubbleFlags
 	{
-		BigSize		  = (1 << 0),
-		Clump		  = (1 << 1),
-		HighAmplitude = (1 << 2)
+		Large		  = (1 << 0),
+		HighAmplitude = (1 << 1)
 	};
 
 	struct Bubble
 	{
-		bool		 IsActive	 = false;
 		unsigned int SpriteIndex = 0;
 
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;
 		int		RoomNumber	 = 0;
-		Vector4 Color		 = Vector4::Zero;
-		Vector4 ColorStart	 = Vector4::Zero;
-		Vector4 ColorEnd	 = Vector4::Zero;
 
+		Vector4 Color	   = Vector4::Zero;
+		Vector4 ColorStart = Vector4::Zero;
+		Vector4 ColorEnd   = Vector4::Zero;
+
+		Vector3 Inertia		 = Vector3::Zero;
 		Vector3 Amplitude	 = Vector3::Zero;
 		Vector3 WavePeriod	 = Vector3::Zero;
 		Vector3 WaveVelocity = Vector3::Zero;
 
-		float Life	   = 0.0f;
-		float Scale	   = 0.0f;
-		float ScaleMax = 0.0f;
-		float Velocity = 0.0f;
-		float Rotation = 0.0f;
+		Vector2 Scale	 = Vector2::Zero;
+		Vector2 ScaleMax = Vector2::Zero;
+		Vector2 ScaleMin = Vector2::Zero;
+
+		float Life				  = 0.0f;
+		float Gravity			  = 0.0f;
+		float OscillationPeriod	  = 0.0f;
+		float OscillationVelocity = 0.0f;
 	};
 
-	extern std::array<Bubble, BUBBLE_NUM_MAX> Bubbles;
+	extern std::deque<Bubble> Bubbles;
 
-	Bubble& GetFreeBubble();
-
-	void SpawnBubble(const Vector3& pos, int roomNumber, int unk1, int unk2, int flags, int xv, int yv, int zv);
+	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia = Vector3::Zero);
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags = 0, const Vector3& inertia = Vector3::Zero);
+	void SpawnChaffBubble(const Vector3& pos, int roomNumber);
 
 	void UpdateBubbles();
 	void ClearBubbles();

@@ -637,9 +637,8 @@ void HarpoonBoltControl(short itemNumber)
 	}
 	else
 	{
-		// Create bubbles.
 		if (Wibble & 4)
-			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, 0, 0, BubbleFlags::Clump | BubbleFlags::HighAmplitude, 0, 0, 0);
+			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, (int)BubbleFlags::HighAmplitude);
 			
 		item.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item.Pose.Orientation.x) / 2;
 		item.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item.Pose.Orientation.x) / 2;
@@ -937,7 +936,7 @@ void RocketControl(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 	{
 		auto pos = item.Pose.Position.ToVector3() + Vector3(wx, wy, wz);
-		SpawnBubble(pos, item.RoomNumber, 4, 8, 0, 0, 0, 0);
+		SpawnBubble(pos, item.RoomNumber);
 	}
 
 	// Update rocket's position.
@@ -1050,7 +1049,7 @@ void CrossbowBoltControl(short itemNumber)
 			item.Animation.Velocity.z -= item.Animation.Velocity.z / 16;
 
 		if (GlobalCounter & 1)
-			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber, 4, 7, 0, 0, 0, 0);
+			SpawnBubble(item.Pose.Position.ToVector3(), item.RoomNumber);
 	}
 
 	auto prevPos = item.Pose.Position;

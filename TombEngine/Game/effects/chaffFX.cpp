@@ -19,7 +19,7 @@
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
 
-#define	MAX_TRIGGER_RANGE 0x4000
+constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 
 void TriggerChaffEffects(int flareLife)
 {
@@ -79,7 +79,8 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 
 		if (isUnderwater)
 		{
-			TriggerChaffBubbles(pos, item.RoomNumber);
+			if (Random::TestProbability(1 / 4.0f))
+				SpawnChaffBubble(pos.ToVector3(), item.RoomNumber);
 		}
 		else
 		{
@@ -161,29 +162,4 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 	size = (GetRandomControl() & 7) + (speed >> 7) + 32;
 	smoke->sSize = size >> 2;
 	smoke->size = smoke->dSize = size;
-}
-
-void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
-{
-	auto& bubble = TEN::Effects::Bubble::GetFreeBubble();
-
-	bubble = {};
-	bubble.IsActive = true;
-	bubble.Scale = 0.0f;
-	bubble.Life = 0.0f;
-	bubble.Velocity = Random::GenerateFloat(4.0f, 16.0f);
-	bubble.ColorStart = Vector4(0, 0, 0, 0);
-	float shade = Random::GenerateFloat(0.3f, 0.8f);
-	bubble.ColorEnd = Vector4(shade, shade, shade, 0.8f);
-	bubble.Color = bubble.ColorStart;
-	bubble.ScaleMax = Random::GenerateFloat(32.0f, 96.0f);
-	bubble.SpriteIndex = SPR_BUBBLES;
-	bubble.Rotation = 0;
-	bubble.Position = pos.ToVector3();
-	float maxAmplitude = 64;
-	bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-	bubble.PositionBase = bubble.Position;
-	bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
-	bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
-	bubble.RoomNumber = roomNumber;
 }

@@ -89,9 +89,9 @@ void SmokeEmitterControl(short itemNumber)
 					item->Pose.Position.z + (GetRandomControl() & 0x3F) - 32);
 
 				if (item->TriggerFlags == 1)
-					SpawnBubble(pos, item->RoomNumber, 15, 15, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber);
 				else
-					SpawnBubble(pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber);
 
 				if (item->ItemFlags[0])
 				{
@@ -103,7 +103,9 @@ void SmokeEmitterControl(short itemNumber)
 			}
 		}
 		else if (!(GetRandomControl() & 0x1F))
+		{
 			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
+		}
 
 		return;
 	}

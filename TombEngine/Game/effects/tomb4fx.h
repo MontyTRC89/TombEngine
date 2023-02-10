@@ -7,6 +7,15 @@
 enum class LaraWeaponType;
 struct ItemInfo;
 
+enum BodyPartFlags
+{
+	BODY_NO_BOUNCE	   = (1 << 0),
+	BODY_GIBS		   = (1 << 1),
+	BODY_EXPLODE	   = (1 << 8),
+	BODY_NO_BOUNCE_ALT = (1 << 9),
+	BODY_STONE_SOUND   = (1 << 11)
+};
+
 struct Matrix3D
 {
 	short m00, m01, m02;
@@ -153,7 +162,7 @@ extern char LaserSightCol;
 
 extern int NextFireSpark;
 extern int NextSmokeSpark;
-extern int NextBubble;
+extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
@@ -163,12 +172,6 @@ constexpr auto MAX_SPARKS_SMOKE = 32;
 constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
-
-constexpr auto BODY_NO_BOUNCE     = 0x0001;
-constexpr auto BODY_GIBS		  = 0x0002;
-constexpr auto BODY_EXPLODE		  = 0x0100;
-constexpr auto BODY_NO_BOUNCE_ALT = 0x0200;
-constexpr auto BODY_STONE_SOUND   = 0x0800;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -202,6 +205,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 void LaraBubbles(ItemInfo* item);
+void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();

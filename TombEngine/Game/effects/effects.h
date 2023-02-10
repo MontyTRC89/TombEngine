@@ -24,7 +24,8 @@ enum SpriteEnumFlags
 	SP_UNDERWEXP  = (1 << 11),
 	SP_NODEATTACH = (1 << 12),
 	SP_PLASMAEXP  = (1 << 13),
-	SP_POISON	  = (1 << 14)
+	SP_POISON	  = (1 << 14),
+	SP_COLOR	  = (1 << 15)
 };
 
 enum class FlameType
@@ -157,7 +158,6 @@ constexpr auto SD_UWEXPLOSION = 2;
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class
-
 constexpr auto MAX_PARTICLES = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 extern Particle Particles[MAX_PARTICLES];
@@ -202,7 +202,8 @@ void ClearInactiveEffects(std::deque<TEffect>& effects)
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const TEffect& effect) { return (effect.Life <= 0.0f); }), effects.end());
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+		effects.end());
 }
 
 Particle* GetFreeParticle();
@@ -213,7 +214,7 @@ void DetatchSpark(int num, SpriteEnumFlags type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
-void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
+void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor = Vector3::Zero, const Vector3& secondColor = Vector3::Zero);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);

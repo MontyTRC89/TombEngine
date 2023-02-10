@@ -306,15 +306,17 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position));
+				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position)).ToVector3();
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
+				auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
 				if (Random::TestProbability(1 / 2.0f))
 				{
-					auto pos2 = pos.ToVector3() + Vector3(Random::GenerateInt(-32, 32), UPV_SHIFT, Random::GenerateInt(-32, 32));
-					int probedRoomNumber = GetCollision(pos2.x, pos2.y, pos2.z, UPVItem->RoomNumber).RoomNumber;
+					auto bubblePos = Random::GeneratePointInSphere(sphere);
+					int probedRoomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, UPVItem->RoomNumber).RoomNumber;
 				
-					SpawnBubble(pos2, probedRoomNumber, 4, 8, BubbleFlags::Clump, 0, 0, 0);
+					for (int i = 0; i < 3; i++)
+						SpawnBubble(bubblePos, probedRoomNumber);
 				}
 			}
 		}

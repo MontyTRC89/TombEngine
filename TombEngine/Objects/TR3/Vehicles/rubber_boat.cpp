@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -982,7 +983,9 @@ namespace TEN::Entities::Vehicles
 
 				short roomNumber = rBoatItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-				SpawnBubble(pos, roomNumber, 16, 8, 0, 0, 0, 0);
+
+				for (int i = 0; i < 5; i++)
+					SpawnBubble(pos, roomNumber);
 			}
 		}
 		else

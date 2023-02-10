@@ -30,7 +30,6 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
-using std::vector;
 using TEN::Renderer::g_Renderer;
 
 char LaserSightActive = 0;
@@ -43,7 +42,6 @@ int LaserSightZ;
 
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
-int NextBubble = 0;
 int NextGunShell = 0;
 
 GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
@@ -950,17 +948,17 @@ void LaraBubbles(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
-	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
-
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
 	auto pos = Vector3::Zero;
-	if (level.GetLaraType() == LaraType::Divesuit)
+
+	if (level->GetLaraType() == LaraType::Divesuit)
 		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3();
 	else
 		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
 
-	int numBubbles = (GetRandomControl() & 1) + 2;
+	int numBubbles = Random::GenerateInt(0, 3);
 	for (int i = 0; i < numBubbles; i++)
-		SpawnBubble(pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+		SpawnBubble(pos, item->RoomNumber);
 }
 
 void TriggerLaraDrips(ItemInfo* item)
@@ -1324,50 +1322,43 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	constexpr auto BUBBLE_COUNT = 24;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	spark->sR = 128;
+	spark->dR = 128;
+	spark->dG = 128;
+	spark->dB = 128;
+	spark->on = 1;
+	spark->life = 24;
+	spark->sLife = 24;
+	spark->sG = 64;
+	spark->sB = 0;
+	spark->colFadeSpeed = 8;
+	spark->fadeToBlack = 12;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->x = x;
+	spark->y = y;
+	spark->z = z;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->friction = 0;
+	spark->flags = 2058;
+	spark->scalar = 3;
+	spark->gravity = 0;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->maxYvel = 0;
+	int size = (GetRandomControl() & 7) + 63;
+	spark->sSize = size >> 1;
+	spark->size = size >> 1;
+	spark->dSize = 2 * size;
+
+	auto sphere = BoundingSphere(Vector3(x, y, z), BLOCK(0.25f));
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
-		spark->on = 1;
-		spark->life = 24;
-		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 2058;
-		spark->scalar = 3;
-		spark->gravity = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
-		spark->maxYvel = 0;
-		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = 2 * size;
-
-		for (int i = 0; i < 8; i++)
-		{
-			auto pos = Vector3(
-				(GetRandomControl() & 0x1FF) + x - 256,
-				(GetRandomControl() & 0x7F) + y - 64,
-				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber, 6, 15, BubbleFlags::Clump | BubbleFlags::BigSize | BubbleFlags::HighAmplitude, 0, 0, 0);
-		}
+		auto pos = Random::GeneratePointInSphere(sphere);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::Large | (int)BubbleFlags::HighAmplitude);
 	}
 }
 

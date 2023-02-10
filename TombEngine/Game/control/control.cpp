@@ -13,6 +13,7 @@
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -411,6 +412,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear all kinds of particles.
+	ClearBubbles();
 	DisableSmokeParticles();
 	ClearDripParticles();
 	ClearBloodDrips();

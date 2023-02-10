@@ -310,7 +310,6 @@ void InitialiseSpecialEffects()
 	NextFireSpark = 1;
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
-	NextBubble = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
 }

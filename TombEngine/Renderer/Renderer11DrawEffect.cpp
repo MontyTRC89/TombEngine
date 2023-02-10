@@ -401,15 +401,18 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBubbles(RenderView& view)
 	{
+		if (Bubbles.empty())
+			return;
+
 		for (const auto& bubble : Bubbles)
 		{
-			if (!bubble.IsActive)
+			if (bubble.Life <= 0.0f)
 				continue;
 
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
 				bubble.Position,
-				bubble.Color, bubble.Rotation, 1.0f, Vector2(bubble.Scale, bubble.Scale) / 2, BLENDMODE_ADDITIVE, true, view);
+				bubble.Color, 0.0f, 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
