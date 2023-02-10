@@ -1,6 +1,7 @@
 Version 1.0.7
 =============
 
+* Fix entity taking damage when it's drawed by default (not invisible like shiva or sword/spear guardian) but still not triggered.
 * Fix blockable lot type (big entities like t-rex and shiva) which was not able to step up 1 click and drop 2 click.
 * Fix TR3 shiva not taking explosive damage (should still block with the sword).
 * Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
