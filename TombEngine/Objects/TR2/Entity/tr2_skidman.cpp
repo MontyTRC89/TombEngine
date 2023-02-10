@@ -19,12 +19,13 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	#define SMAN_MIN_TURN (ANGLE(2.0f))
-	#define SMAN_TARGET_ANGLE ANGLE(15.0f)
-	#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
+	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
 	const auto SkidooBiteLeft  = BiteInfo(Vector3(240.0f, -190.0f, 540.0f), 0);
 	const auto SkidooBiteRight = BiteInfo(Vector3(-240.0f, -190.0f, 540.0f), 0);
+
+	constexpr auto SMAN_MIN_TURN = ANGLE(2.0f);
+	constexpr auto SMAN_TARGET_ANGLE = ANGLE(15.0f);
 
 	enum SnowmobileManState
 	{
@@ -57,7 +58,7 @@ namespace TEN::Entities::Creatures::TR2
 			skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
 			skidooItem->RoomNumber = riderItem->RoomNumber;
 			skidooItem->Flags = ITEM_INVISIBLE;
-			skidooItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(skidooItemNumber);
 

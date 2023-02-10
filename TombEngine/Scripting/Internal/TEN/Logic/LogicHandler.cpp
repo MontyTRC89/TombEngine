@@ -6,13 +6,15 @@
 #include "Game/savegame.h"
 #include "Sound/sound.h"
 #include "ReservedScriptNames.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Rotation/Rotation.h"
+#include "Color/Color.h"
 #include "LevelFunc.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.
@@ -36,13 +38,8 @@ static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
-	switch (value.get_type())
+	auto PutVar = [](sol::table tab, sol::object key, sol::object value)
 	{
-	case sol::type::lua_nil:
-	case sol::type::boolean:
-	case sol::type::number:
-	case sol::type::string:
-	case sol::type::table:
 		switch (key.get_type())
 		{
 		case sol::type::number:
@@ -53,8 +50,10 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
 		}
-		break;
-	default:
+	};
+
+	auto UnsupportedValue = [](sol::table tab, sol::object key)
+	{
 		key.push();
 		size_t strLen;
 		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
@@ -68,7 +67,33 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
 		}
 		key.pop();
+	};
+
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+	case sol::type::boolean:
+	case sol::type::number:
+	case sol::type::string:
+	case sol::type::table:
+		PutVar(tab, key, value);
 		break;
+	case sol::type::userdata:
+	{
+		if (value.is<Vec3>() ||
+			value.is<Rotation>() ||
+			value.is<ScriptColor>())
+		{
+			PutVar(tab, key, value);
+		}
+		else
+		{
+			UnsupportedValue(tab, key);
+		}
+	}
+	break;
+	default:
+		UnsupportedValue(tab, key);
 	}
 }
 
@@ -104,6 +129,7 @@ void LogicHandler::ResetGameTables()
 }
 
 /*** Register a function as a callback.
+@advancedDesc
 Possible values for CallbackPoint:
 	PRECONTROLPHASE -- will be called immediately before OnControlPhase
 	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
@@ -165,12 +191,12 @@ void LogicHandler::ResetLevelTables()
 	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
-sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
 	auto & theMap = m_levelFuncs_tablesOfNames[partName];
 
-	auto fullNameIt = theMap.find(luaName);
+	auto fullNameIt = theMap.find(name);
 	if (fullNameIt != std::cend(theMap))
 	{
 		std::string_view key = fullNameIt->second;
@@ -207,21 +233,21 @@ sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & n
 	return r;
 }
 
-bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value)
 {
 	if (sol::type::lua_nil == value.get_type())
 	{
 		std::string error{ "Tried to set " + std::string{ScriptReserved_LevelFuncs} + " member " };
-		error += luaName + " to nil; this not permitted at this time.";
+		error += name + " to nil; this not permitted at this time.";
 		return ScriptAssert(false, error);
 	}
 	else if (sol::type::function == value.get_type())
 	{
 		// Add the name to the table of names
 		auto partName = tab.raw_get<std::string>(strKey);
-		auto fullName = partName + "." + luaName;
+		auto fullName = partName + "." + name;
 		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
-		parentNameTab.insert_or_assign(luaName, fullName);
+		parentNameTab.insert_or_assign(name, fullName);
 
 		// Create a LevelFunc userdata and add that too
 		LevelFunc levelFuncObject;
@@ -236,13 +262,13 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	{
 		// Create and add a new name map
 		std::unordered_map<std::string, std::string> newNameMap;
-		auto fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		auto fullName = tab.raw_get<std::string>(strKey) + "." + name;
 		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
 
 		// Create a new table to put in the LevelFuncs hierarchy
-		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
+		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), name, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 		newLevelFuncsTab.raw_set(strKey, fullName);
-		tab.raw_set(luaName, newLevelFuncsTab);
+		tab.raw_set(name, newLevelFuncsTab);
 
 		// "populate" the new table. This will trigger the __newindex metafunction and will
 		// thus call this function recursively, handling all subtables and functions.
@@ -253,7 +279,7 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	}
 	else{
 		std::string error{ "Failed to add " };
-		error += luaName + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
+		error += name + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;
@@ -312,11 +338,13 @@ void LogicHandler::FreeLevelScripts()
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
+	m_preSave = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
+//Used when loading
 void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 	ResetGameTables();
@@ -349,17 +377,27 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 					// outside of these bounds? - squidshire 30/04/2022
 					if (std::trunc(theNum) == theNum && theNum <= INT64_MAX && theNum >= INT64_MIN)
 					{
-						solTables[i][vars[first]] = static_cast<int64_t>(theNum);
+						solTables[i][vars[first]] = (int64_t)theNum;
 					}
 					else
 					{
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (std::holds_alternative<Vector3i>(vars[second]))
+				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto theVec = Vec3{ std::get<Vector3i>(vars[second]) };
+					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
 					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Rotation))
+				{
+					auto theVec = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Color))
+				{
+					auto theCol = D3DCOLOR{std::get<int(SavedVarType::Color)>(vars[second]) };
+					solTables[i][vars[first]] = ScriptColor{theCol};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
@@ -391,6 +429,24 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	}
 }
 
+
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom & var, MapType & varsMap, size_t & nVars, std::vector<SavedVar> & vars)
+{
+	auto [first, second] = varsMap.insert(std::make_pair(&var, nVars));
+
+	if (second)
+	{
+		SavedVar savedVar;
+		TypeTo varTo = (TypeTo)var;
+		savedVar.emplace<(int)TypeEnum>(varTo);
+		vars.push_back(varTo);
+		++nVars;
+	}
+
+	return first->second;
+}
+
+//Used when saving
 void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 	sol::table tab{ *m_handler.GetState(), sol::create };
@@ -410,22 +466,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	// The purpose of this is to only store each value once, and to fill our tables with
 	// indices to the values rather than copies of the values.
-	auto handleNum = [&](double num)
+
+	auto handleNum = [&](auto num, auto map)
 	{
-		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
-
-		if (second)
-		{
-			vars.push_back(num);
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleBool = [&](bool num)
-	{
-		auto [first, second] = boolMap.insert(std::make_pair(num, nVars));
+		auto [first, second] = map.insert(std::make_pair(num, nVars));
 
 		if (second)
 		{
@@ -444,19 +488,6 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleVec3 = [&](Vec3 const & vec)
-	{
-		auto [first, second] = varsMap.insert(std::make_pair(&vec, nVars));
-
-		if (second)
-		{
-			vars.push_back(vec);
 			++nVars;
 		}
 
@@ -497,7 +528,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					keyIndex = handleStr(first);
 					break;
 				case sol::type::number:
-					keyIndex = handleNum(first.as<double>());
+					keyIndex = handleNum(first.as<double>(), numMap);
 					break;
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a key");
@@ -518,15 +549,19 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					putInVars(handleStr(second));
 					break;
 				case sol::type::number:
-					putInVars(handleNum(second.as<double>()));
+					putInVars(handleNum(second.as<double>(), numMap));
 					break;
 				case sol::type::boolean:
-					putInVars(handleBool(second.as<bool>()));
+					putInVars(handleNum(second.as<bool>(), boolMap));
 					break;
 				case sol::type::userdata:
 				{
 					if(second.is<Vec3>())
-						putInVars(handleVec3(second.as<Vec3>()));
+						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
+					else if(second.is<Rotation>())
+						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, nVars, vars));
+					else if(second.is<ScriptColor>())
+						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, nVars, vars));
 					else if(second.is<LevelFunc>())
 						putInVars(handleFuncName(second.as<LevelFunc>()));
 					else
@@ -628,12 +663,12 @@ void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short i
 
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator activator, std::string const& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(triggerer))
+	if (std::holds_alternative<short>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
+		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
 	}
 	else
 	{
@@ -709,6 +744,7 @@ TombEngine uses the following tables for specific things.
 /*** A table with level-specific data which will be saved and loaded.
 This is for level-specific information that you want to store in saved games.
 
+@advancedDesc
 For example, you may have a level with a custom puzzle where Lara has
 to kill exactly seven enemies to open a door to a secret. You could use
 the following line each time an enemy is killed:
@@ -731,6 +767,7 @@ __LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do 
 This is for information not specific to any level, but which concerns your whole
 levelset or game, that you want to store in saved games.
 
+@advancedDesc
 For example, you may wish to have a final boss say a specific voice line based on
 a choice the player made in a previous level. In the level with the choice, you could
 write:
@@ -752,6 +789,7 @@ __GameVars.Engine is a reserved table used internally by TombEngine's libs. Do n
 
 /*** A table nested table system for level-specific functions.
 
+@advancedDesc
 This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
@@ -792,10 +830,10 @@ __The order of loading is as follows:__
 5. The control loop, in which `OnControlPhase` will be called once per frame, begins.
 
 @tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
-@tfield function OnLoad Will be called when a saved game is loaded
+@tfield function OnLoad Will be called when a saved game is loaded, just *after* data is loaded
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
-@tfield function OnSave Will be called when the player saves the game
+@tfield function OnSave Will be called when the player saves the game, just *before* data is saved
 @tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
 @table LevelFuncs
 */
@@ -826,9 +864,9 @@ void LogicHandler::InitCallbacks()
 		}
 	};
 
-	assignCB(m_onStart, "OnStart");
-	assignCB(m_onLoad, "OnLoad");
-	assignCB(m_onControlPhase, "OnControlPhase");
-	assignCB(m_onSave, "OnSave");
-	assignCB(m_onEnd, "OnEnd");
+	assignCB(m_onStart, ScriptReserved_OnStart);
+	assignCB(m_onLoad, ScriptReserved_OnLoad);
+	assignCB(m_onControlPhase, ScriptReserved_OnControlPhase);
+	assignCB(m_onSave, ScriptReserved_OnSave);
+	assignCB(m_onEnd, ScriptReserved_OnEnd);
 }

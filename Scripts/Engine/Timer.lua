@@ -13,6 +13,7 @@
 --	end
 --	
 --	-- This function triggers the timer
+--
 --	LevelFuncs.TriggerTimer = function(obj) 
 --		local myTimer = Timer.Create("my_timer",
 --			5.0,
@@ -41,6 +42,7 @@ Timer = {
 	--
 	-- You have the option of displaying the remaining time on the clock. Timer format details:
 	--
+	--@advancedDesc
 	--	-- deciseconds are 1/10th of a second
 	--	
 	--	-- mins:secs
@@ -55,13 +57,11 @@ Timer = {
 	--	-- secs; also what is printed if you pass true instead of a table
 	--	local myTimeFormat4 = {seconds = true}
 	--
-	--__At any given time, only one timer can show its countdown__.
-	--
-	--__Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
-	--
 	--Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 	--
-	-- @string name A label to give this timer; used to retrieve the timer later
+	--At any given time, only one timer can show its countdown.
+	--
+	-- @string name A label to give this timer; used to retrieve the timer later. __Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
 	-- @tparam ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. 
@@ -78,7 +78,7 @@ Timer = {
 		obj.name = name
 
 		if LevelVars.Engine.Timer.timers[name] then
-			print("Warning: a timer with name " .. name .. " already exists.")
+			print("Warning: a timer with name " .. name .. " already exists; overwriting it with a new one...")
 		end
 
 		LevelVars.Engine.Timer.timers[name] ={} 
@@ -120,12 +120,12 @@ Timer = {
 				t.remainingTime = t.remainingTime - dt
 
 				if t.remainingTime <= 0 then
-					t.func(table.unpack(t.funcArgs))
 					if not t.loop then
 						t.active = false
 					else
 						t.remainingTime = t.remainingTime + t.totalTime
 					end
+					t.func(table.unpack(t.funcArgs))
 				end
 			end
 

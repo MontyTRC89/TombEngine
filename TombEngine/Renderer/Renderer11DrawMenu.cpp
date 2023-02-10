@@ -434,12 +434,6 @@ namespace TEN::Renderer
 	{
 		char buffer[40];
 
-		auto seconds = GameTimer / FPS;
-		auto days    = (seconds / (24 * 60 * 60));
-		auto hours   = (seconds % (24 * 60 * 60)) / (60 * 60);
-		auto min     = (seconds / 60) % 60;
-		auto sec     = (seconds % 60);
-
 		ScriptInterfaceLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 		auto y = MenuVerticalStatisticsTitle;
 
@@ -452,7 +446,8 @@ namespace TEN::Renderer
 		GetNextBlockPosition(&y);
 
 		// Time taken
-		sprintf(buffer, "%02d:%02d:%02d", (days * 24) + hours, min, sec);
+		auto gameTime = GetGameTime(GameTimer);
+		sprintf(buffer, "%02d:%02d:%02d", (gameTime.Days * DAY_UNIT) + gameTime.Hours, gameTime.Minutes, gameTime.Seconds);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
@@ -876,12 +871,8 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
-#if _DEBUG
-		AddString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 		DrawAllStrings();
-#else
-		DrawAllStrings();
-#endif
+
 		m_swapChain->Present(0, 0);
 	}
 
@@ -902,6 +893,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
 				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
+				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
+				PrintDebugMessage("Rooms collector time: %d", m_timeRoomsCollector);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
@@ -919,6 +912,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
+				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
@@ -952,11 +947,13 @@ namespace TEN::Renderer
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
-				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
 				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
+				break;
+
+			default:
 				break;
 			}
 		}
@@ -972,8 +969,8 @@ namespace TEN::Renderer
 			++index;
 
 		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
-			index = 4;
-		else if (index > RENDERER_DEBUG_PAGE::LOGIC_STATS)
+			index = RENDERER_DEBUG_PAGE::WIREFRAME_MODE;
+		else if (index > RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
 			index = 0;
 
 		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;

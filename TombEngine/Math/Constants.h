@@ -10,6 +10,7 @@
 	constexpr inline auto PI_DIV_4 = PI / 4;
 	constexpr inline auto RADIAN   = PI / 180;
 	constexpr inline auto SQRT_2   = 1.41421356237309504880168872420969807856967187537694f;
+	constexpr inline auto EPSILON  = 0.00001f;
 
 	constexpr inline auto SQUARE = [](auto x) { return (x * x); };
 	constexpr inline auto CUBE	 = [](auto x) { return (x * x * x); };
@@ -26,12 +27,6 @@
 
 	constexpr inline auto STEP_SIZE		 = CLICK(1);
 	constexpr inline auto STOP_SIZE		 = CLICK(2);
-	constexpr inline auto WALL_SIZE		 = BLOCK(1);
-	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1;
-	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1.0f / 8);
-
-	constexpr inline auto FPS = 30; // TODO: Move this to clock.h.
-
-	// Legacy constants
-	constexpr inline auto PREDICTIVE_SCALE_FACTOR = 14;
+	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1; // TODO: Rename to BLOCK_MASK?
+	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1 / 8.0f);
 //}

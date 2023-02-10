@@ -33,8 +33,8 @@ int FloorInfo::SectorPlaneCeiling(int x, int z) const
 Vector2 FloorInfo::TiltXZ(int x, int z, bool floor) const
 {
 	auto plane = floor ? FloorCollision.Planes[SectorPlane(x, z)] : CeilingCollision.Planes[SectorPlane(x, z)];
-	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
-	auto tiltZ = (int)-(plane.y * WALL_SIZE / STEP_SIZE);
+	auto tiltX = (int)-(plane.x * BLOCK(1) / CLICK(1));
+	auto tiltZ = (int)-(plane.y * BLOCK(1) / CLICK(1));
 
 	return Vector2(tiltX, tiltZ);
 }
@@ -816,8 +816,8 @@ namespace TEN::Floordata
 		for (int x = 0; x < room->xSize; x++)
 			for (int z = 0; z < room->zSize; z++)
 			{
-				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
-				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
+				auto pX = room->x + (x * BLOCK(1)) + BLOCK(1 / 2.0f);
+				auto pZ = room->z + (z * BLOCK(1)) + BLOCK(1 / 2.0f);
 				auto offX = pX - item->Pose.Position.x;
 				auto offZ = pZ - item->Pose.Position.z;
 
@@ -834,7 +834,7 @@ namespace TEN::Floordata
 
 				// Block is in enclosed AABB space, do more precise test.
 				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
-				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(WALL_SIZE / 2), Vector4::UnitY);
+				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(BLOCK(1 / 2.0f)), Vector4::UnitY);
 				if (dxBounds.Intersects(blockBox))
 					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
 			}

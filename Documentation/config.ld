@@ -12,7 +12,7 @@ new_type("luautil", "5 Lua utility modules", true)
 
 not_luadoc = true
 
-local version = "1.0.3"
+local version = "1.0.6"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
@@ -37,11 +37,13 @@ Enjoy.
 \- _squidshire_
 ]]
 
+convert_opt=true 
 style = true
 wrap = true
 template = true
-format='markdown'
+format = 'markdown'
 no_space_before_args = true
+keep_menu_order = true
 
 custom_display_name_handler = function(item, default_handler)
   if item.type == 'files' then

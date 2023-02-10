@@ -78,7 +78,6 @@ bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
 
-int PhdPerspective;
 short CurrentFOV;
 short LastFOV;
 
@@ -246,23 +245,7 @@ void LookCamera(ItemInfo* item)
 	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * cameraAlpha, item->RoomNumber);
 
 	LookAt(&Camera, 0);
-
-	// Set mike position.
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = orient.y;
-		Camera.mikePos = item->Pose.Position;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos = Vector3i(
-			Camera.pos.x + (PhdPerspective * phd_sin(Camera.actualAngle)),
-			Camera.pos.y,
-			Camera.pos.z + (PhdPerspective * phd_cos(Camera.actualAngle))
-		);
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 }
 
@@ -285,7 +268,6 @@ void AlterFOV(short value, bool store)
 		LastFOV = value;
 
 	CurrentFOV = value;
-	PhdPerspective = g_Configuration.Width / 2 * phd_cos(value / 2) / phd_sin(value / 2);
 }
 
 short GetCurrentFOV()
@@ -479,22 +461,8 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.mikePos.x = LaraItem->Pose.Position.x;
-		Camera.mikePos.y = LaraItem->Pose.Position.y;
-		Camera.mikePos.z = LaraItem->Pose.Position.z;
-		Camera.oldType = Camera.type;
-	}
-	else
-	{
-		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * phd_sin(angle));
-		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle));
-		Camera.oldType = Camera.type;
-	}
+	UpdateMikePos(LaraItem);
+	Camera.oldType = Camera.type;
 }
 
 void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
@@ -588,6 +556,16 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 										ItemCamera.LastAngle.y = angle.y, 
 										ItemCamera.LastAngle.z = angle.z);
 	}
+}
+
+void RefreshFixedCamera(short camNumber)
+{
+	auto& camera = g_Level.Cameras[camNumber];
+
+	auto origin = GameVector(camera.Position, camera.RoomNumber);
+	int moveSpeed = camera.Speed * 8 + 1;
+
+	MoveCamera(&origin, moveSpeed);
 }
 
 void ChaseCamera(ItemInfo* item)
@@ -1023,7 +1001,6 @@ void BinocularCamera(ItemInfo* item)
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
-			item->MeshBits.SetAll();
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;
 			lara->ExtraTorsoRot = EulerAngles::Zero;
@@ -1035,7 +1012,6 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits.ClearAll();
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
@@ -1107,20 +1083,7 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.target.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-
-	if (Camera.mikeAtLara)
-	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.mikePos = item->Pose.Position;
-	}
-	else
-	{
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle);
-		Camera.mikePos.y = Camera.pos.y;
-	}
-
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
@@ -1618,12 +1581,8 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, radius);
 
-#ifdef _DEBUG
-		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-			RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-#endif
+		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(item->Pose),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 	}
 
 	// Done.
@@ -1644,14 +1603,36 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, radius);
 
-#ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-#endif
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 	}
 
 	// Done.
 	staticList.clear();
+}
+
+void UpdateMikePos(ItemInfo* item)
+{
+	if (Camera.mikeAtLara)
+	{
+		Camera.mikePos = item->Pose.Position;
+		Camera.actualAngle = item->Pose.Orientation.y;
+
+		if (item->IsLara())
+		{
+			auto* lara = GetLaraInfo(item);
+			Camera.actualAngle += lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		}
+	}
+	else
+	{
+		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);
+		Camera.mikePos.z = Camera.pos.z + phdPerspective * phd_cos(Camera.actualAngle);
+		Camera.mikePos.y = Camera.pos.y;
+	}
 }
 
 void RumbleScreen()
@@ -1794,6 +1775,10 @@ void HandleOptics(ItemInfo* item)
 	if (LaserSight && !IsHeld(In::Look))
 		breakOptics = true;
 
+	// If lasersight, and weapon is holstered, exit optics.
+	if (LaserSight && IsHeld(In::Draw))
+		breakOptics = true;
+
 	// Engage lasersight if available.
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK))
 	{
@@ -1825,7 +1810,6 @@ void HandleOptics(ItemInfo* item)
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);
 
-	item->MeshBits.SetAll();
 	lara->Inventory.IsBusy = false;
 	ResetLaraFlex(item);
 

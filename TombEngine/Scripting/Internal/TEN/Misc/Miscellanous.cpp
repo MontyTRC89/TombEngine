@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Miscellanous.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -13,12 +14,14 @@
 #include "LuaHandler.h"
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
 #include "ScriptAssert.h"
 #include "ActionIDs.h"
+#include "CameraTypes.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -26,8 +29,8 @@ Functions that don't fit in the other modules.
 @pragma nostrip
 */
 
-using namespace TEN::Input;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Input;
 
 namespace Misc 
 {
@@ -49,7 +52,7 @@ namespace Misc
 	//@treturn bool is there a direct line of sight between the two positions?
 	//@usage
 	//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
-	//print(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))
+	//print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
 		GameVector vec1, vec2;
@@ -112,7 +115,7 @@ namespace Misc
 	//@tparam float angle in degrees (clamped to [10, 170])
 	static void SetFOV(float angle)
 	{
-		AlterFOV(FROM_DEGREES(std::clamp(abs(angle), 10.0f, 170.0f)));
+		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	//Get field of view.
@@ -121,6 +124,20 @@ namespace Misc
 	static float GetFOV()
 	{
 		return TO_DEGREES(GetCurrentFOV());
+	}
+
+	///Shows the mode of the game camera.
+	//@function GetCameraType
+	//@treturn Misc.CameraType value used by the Main Camera.
+	//@usage
+	//LevelFuncs.OnControlPhase = function() 
+	//	if (Misc.GetCameraType() == CameraType.Combat) then
+	//		--Do your Actions here.
+	//	end
+	//end
+	static CameraType GetCameraType()
+	{
+		return Camera.oldType;
 	}
 	
 	/// Play an audio track
@@ -174,7 +191,9 @@ namespace Misc
 			return false;
 		}
 		else
+		{
 			return true;
+		}
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -237,10 +256,11 @@ namespace Misc
 	//@tparam Vec3 posA first position
 	//@tparam Vec3 posB second position
 	//@treturn int the direct distance from one position to the other
-	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
+	static int CalculateDistance(const Vec3& pos1, const Vec3& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector3(pos1.x, pos1.y, pos1.z);
+		auto p2 = Vector3(pos2.x, pos2.y, pos2.z);
+		return (int)round(Vector3::Distance(p1, p2));
 	}
 
 	///Calculate the horizontal distance between two positions.
@@ -248,10 +268,11 @@ namespace Misc
 	//@tparam Vec3 posA first position
 	//@tparam Vec3 posB second position
 	//@treturn int the direct distance on the XZ plane from one position to the other
-	static int CalculateHorizontalDistance(Vec3 const& pos1, Vec3 const& pos2)
+	static int CalculateHorizontalDistance(const Vec3& pos1, const Vec3& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector2(pos1.x, pos1.z);
+		auto p2 = Vector2(pos2.x, pos2.z);
+		return (int)round(Vector2::Distance(p1, p2));
 	}
 
 	///Translate a pair of percentages to screen-space pixel coordinates.
@@ -303,66 +324,67 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-
-	void Register(sol::state * state, sol::table & parent) {
-		sol::table table_misc{ state->lua_state(), sol::create };
-		parent.set(ScriptReserved_Misc, table_misc);
+	void Register(sol::state * state, sol::table & parent)
+	{
+		sol::table tableMisc{ state->lua_state(), sol::create };
+		parent.set(ScriptReserved_Misc, tableMisc);
 
 		///Vibrate gamepad, if possible.
 		//@function Vibrate
 		//@tparam float strength
 		//@tparam float time (in seconds, default: 0.3)
-		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
+		tableMisc.set_function(ScriptReserved_Vibrate, &Vibrate);
 
-		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
-		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
-		table_misc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
+		tableMisc.set_function(ScriptReserved_FadeIn, &FadeIn);
+		tableMisc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		tableMisc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
-		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
+		tableMisc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
-		table_misc.set_function(ScriptReserved_SetFOV, &SetFOV);
-		table_misc.set_function(ScriptReserved_GetFOV, &GetFOV);
-		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
+		tableMisc.set_function(ScriptReserved_SetFOV, &SetFOV);
+		tableMisc.set_function(ScriptReserved_GetFOV, &GetFOV);
+		tableMisc.set_function(ScriptReserved_GetCameraType, &GetCameraType);
+		tableMisc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
-		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
-		table_misc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
-		table_misc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
+		tableMisc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		tableMisc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
+		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
-		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
-		//@tparam ActionID action action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
+		//@tparam Misc.ActionID action action mapping index to check
+		tableMisc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
 		//@function KeyIsHit
-		//@tparam ActionID action action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
+		//@tparam Misc.ActionID action action mapping index to check
+		tableMisc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
-		//@tparam ActionID action action mapping index to push
-		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
+		//@tparam Misc.ActionID action action mapping index to push
+		tableMisc.set_function(ScriptReserved_KeyPush, &KeyPush);
 
 		/// Clears particular input from action key
 		//@function KeyClear
-		//@tparam ActionID action action mapping index to clear
-		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
+		//@tparam Misc.ActionID action action mapping index to clear
+		tableMisc.set_function(ScriptReserved_KeyClear, &KeyClear);
 
-		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
-		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
+		tableMisc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
+		tableMisc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
+		tableMisc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
-		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
-		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+		tableMisc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+		tableMisc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
-		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
-		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
-		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
-
+		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
+		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
 		LuaHandler handler{ state };
-		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
 	}
 }

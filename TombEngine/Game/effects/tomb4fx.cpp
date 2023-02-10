@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/smoke.h"
@@ -20,10 +20,11 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Smoke;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
-using std::vector;
 using TEN::Renderer::g_Renderer;
 
 char LaserSightActive = 0;
@@ -36,7 +37,6 @@ int LaserSightZ;
 
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
-int NextBubble = 0;
 int NextDrip = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
@@ -620,96 +620,7 @@ byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
 
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
 {
-	/*
-	SMOKE_SPARKS* spark;
-	
-	spark = &SmokeSparks[GetFreeSmokeSpark()];
-	spark->on = true;
-	spark->sShade = 0;
-	spark->dShade = (count << 2);
-	spark->colFadeSpeed = 4;
-	spark->fadeToBlack = 32 - (initial << 4);
-	spark->life = (GetRandomControl() & 3) + 40;
-	spark->sLife = spark->life;
-
-	if (weaponType == LaraWeaponType::Pistol || weaponType == LaraWeaponType::Revolver || weaponType == LaraWeaponType::Uzi)
-	{
-		if (spark->dShade > 64)
-			spark->dShade = 64;
-	}
-
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark->x = x + (GetRandomControl() & 31) - 16;
-	spark->y = y + (GetRandomControl() & 31) - 16;
-	spark->z = z + (GetRandomControl() & 31) - 16;
-
-	if (initial)
-	{
-		spark->xVel = ((GetRandomControl() & 1023) - 512) + xv;
-		spark->yVel = ((GetRandomControl() & 1023) - 512) + yv;
-		spark->zVel = ((GetRandomControl() & 1023) - 512) + zv;
-	}
-	else
-	{
-		float f = (frand() * 6) - 3;
-		spark->xVel = (frand() * 6) - 3;
-		spark->yVel = (frand() * 6) - 3;
-		spark->zVel = (frand() * 6) - 3;
-	}
-
-	spark->friction = 4;
-
-	if (GetRandomControl() & 1)
-	{
-		if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-			spark->flags = SP_ROTATE | SP_WIND;
-		else
-			spark->flags = SP_ROTATE;
-
-		spark->rotAng = GetRandomControl() & 0xFFF;
-
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 0x0F) - 16;
-		else
-			spark->rotAdd = (GetRandomControl() & 0x0F) + 16;
-	}
-	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-	{
-		spark->flags = SP_WIND;
-	}
-	else
-	{
-		spark->flags = SP_NONE;
-	}
-	float gravity = frand() * 1.25f;
-	spark->gravity = gravity;
-	spark->maxYvel = frand() * 16;
-
-	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
-
-	if (initial)
-	{
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = (size << 1) + 8;
-	}
-	else
-	{
-		spark->sSize = size >> 2;
-		spark->size = size >> 2;
-		spark->dSize = size;
-	}
-
-	/*if (gfLevelFlags & 0x20 && LaraItem->roomNumber == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
-	{
-		spark->mirror = 1;
-	}
-	else
-	{
-		spark->mirror = 0;
-	}*/
-	TEN::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
-	
+	TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
 }
 
 void TriggerShatterSmoke(int x, int y, int z)
@@ -1154,16 +1065,16 @@ void LaraBubbles(ItemInfo* item)
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	auto pos = Vector3i::Zero;
+	auto pos = Vector3::Zero;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160));
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3();
 	else
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
 
-	int numBubbles = (GetRandomControl() & 1) + 2;
+	int numBubbles = Random::GenerateInt(0, 3);
 	for (int i = 0; i < numBubbles; i++)
-		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+		SpawnBubble(pos, item->RoomNumber);
 }
 
 int GetFreeDrip()
@@ -1457,7 +1368,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				}
 
 				fx->objectNumber = ID_BODY_PART;
-				fx->color = item->Color;
+				fx->color = item->Model.Color;
 				fx->flag2 = flags;
 				fx->frameNumber = item->Model.MeshIndex[i];
 			}
@@ -1480,7 +1391,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1494,16 +1405,28 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->z = pos->Position.z;
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
-		sptr->xRot = angle;
+		sptr->xRot = rotation.x;
+		sptr->yRot = rotation.y;
+		sptr->zRot = rotation.z;
 		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
+		sptr->fadeIn = fadein;
 		
-		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
-	}
+		sptr->sr = 0;
+		sptr->sg = 0;
+		sptr->sb = 0;
+		sptr->style = style;
+
+		if (sound)
+		{
+			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
+		}	
+
+	}	
 }
 
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
@@ -1575,6 +1498,12 @@ void UpdateShockwaves()
 			if (sw->life)
 			{
 				sw->outerRad += sw->speed;
+
+				if (sw->style == (int)ShockwaveStyle::Sophia)
+				{
+					sw->innerRad += sw->speed;
+				}
+
 				sw->speed -= (sw->speed >> 4);
 
 				if (LaraItem->HitPoints > 0)
@@ -1615,50 +1544,43 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	constexpr auto BUBBLE_COUNT = 24;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	spark->sR = 128;
+	spark->dR = 128;
+	spark->dG = 128;
+	spark->dB = 128;
+	spark->on = 1;
+	spark->life = 24;
+	spark->sLife = 24;
+	spark->sG = 64;
+	spark->sB = 0;
+	spark->colFadeSpeed = 8;
+	spark->fadeToBlack = 12;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->x = x;
+	spark->y = y;
+	spark->z = z;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->friction = 0;
+	spark->flags = 2058;
+	spark->scalar = 3;
+	spark->gravity = 0;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->maxYvel = 0;
+	int size = (GetRandomControl() & 7) + 63;
+	spark->sSize = size >> 1;
+	spark->size = size >> 1;
+	spark->dSize = 2 * size;
+
+	auto sphere = BoundingSphere(Vector3(x, y, z), BLOCK(0.25f));
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
-		spark->on = 1;
-		spark->life = 24;
-		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 2058;
-		spark->scalar = 3;
-		spark->gravity = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
-		spark->maxYvel = 0;
-		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = 2 * size;
-
-		for (int i = 0; i < 8; i++)
-		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
-			pos.y = (GetRandomControl() & 0x7F) + y - 64;
-			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNumber, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
-		}
+		auto pos = Random::GeneratePointInSphere(sphere);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::Large | (int)BubbleFlags::HighAmplitude);
 	}
 }
 

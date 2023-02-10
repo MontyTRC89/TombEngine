@@ -19,7 +19,7 @@ namespace InventoryHandler
 	//10 instead.
 	//Has no effect if the player has an infinite number of that item.
 	//@function GiveItem
-	//@tparam ObjID item the item to be added
+	//@tparam Objects.ObjID item the item to be added
 	//@int[opt] count the number of items to add (default: the amount you would get from a pickup)
 	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
 	{
@@ -38,7 +38,7 @@ namespace InventoryHandler
 	//As in @{GiveItem}, omitting the count will remove the "default" amount of that item.
 	//Has no effect if the player has an infinite number of the item.
 	//@function TakeItem
-	//@tparam ObjID item the item to be removed
+	//@tparam Objects.ObjID item the item to be removed
 	//@int[opt] count the number of items to remove (default: the amount you would get from a pickup)
 	static void InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
 	{
@@ -51,7 +51,7 @@ namespace InventoryHandler
 
 	///Get the amount the player holds of an item.
 	//@function GetItemCount
-	//@tparam InvID item the ID item to check
+	//@tparam Objects.ObjID item the ID item to check
 	//@treturn int the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
 	static int InventoryGetCount(GAME_OBJECT_ID slot)
 	{
@@ -61,7 +61,7 @@ namespace InventoryHandler
 	///Set the amount of a certain item the player has in the inventory.
 	//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
 	//@function SetItemCount
-	//@tparam InvID item the ID of the item to be set.
+	//@tparam Objects.ObjID item the ID of the item to be set.
 	//@tparam int count the number of items the player will have. A value of -1 will give an infinite amount of that item.
 	static void InventorySetCount(GAME_OBJECT_ID slot, int count)
 	{

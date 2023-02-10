@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Math/Containers/GameBoundingBox.h"
+#include "Math/Objects/GameBoundingBox.h"
 
 #include "Game/animation.h"
 #include "Game/items.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
 
 //namespace TEN::Math
 //{
@@ -24,16 +24,16 @@
 		this->Z2 = (int)round(z2);
 	}
 
-	GameBoundingBox::GameBoundingBox(ItemInfo* item, bool isAccurate)
+	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
 		int rate = 0;
 		AnimFrame* framePtr[2];
 
 		int frac = GetFrame(item, framePtr, rate);
-		if (frac == 0 || !isAccurate)
+		if (frac == 0)
 			*this = framePtr[0]->boundingBox;
 		else
-			*this = framePtr[0]->boundingBox + ((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * (frac / rate));
+			*this = framePtr[0]->boundingBox + (((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * frac) / rate);
 	}
 
 	int GameBoundingBox::GetWidth() const
@@ -49,6 +49,16 @@
 	int GameBoundingBox::GetDepth() const
 	{
 		return abs(Z2 - Z1);
+	}
+
+	Vector3 GameBoundingBox::GetCenter() const
+	{
+		return ((Vector3(this->X1, this->Y1, this->Z1) + Vector3(this->X2, this->Y2, this->Z2)) / 2.0f);
+	}
+
+	Vector3 GameBoundingBox::GetExtents() const
+	{
+		return ((Vector3(this->X2, this->Y2, this->Z2) - Vector3(this->X1, this->Y1, this->Z1)) / 2.0f);
 	}
 
 	// NOTE: Previously phd_RotBoundingBoxNoPersp().
@@ -76,11 +86,8 @@
 
 	BoundingOrientedBox GameBoundingBox::ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 	{
-		auto boxCenter = Vector3(X2 + X1, Y2 + Y1, Z2 + Z1) / 2.0f;
-		auto boxExtents = Vector3(X2 - X1, Y2 - Y1, Z2 - Z1) / 2.0f;
-
 		BoundingOrientedBox box;
-		BoundingOrientedBox(boxCenter, boxExtents, Vector4::UnitY).Transform(box, 1.0f, orient, pos);
+		BoundingOrientedBox(this->GetCenter(), this->GetExtents(), Vector4::UnitY).Transform(box, 1.0f, orient, pos);
 		return box;
 	}
 
@@ -89,8 +96,7 @@
 		return GameBoundingBox(
 			X1 + bounds.X1, X2 + bounds.X2,
 			Y1 + bounds.Y1, Y2 + bounds.Y2,
-			Z1 + bounds.Z1, Z2 + bounds.Z2
-		);
+			Z1 + bounds.Z1, Z2 + bounds.Z2);
 	}
 
 	GameBoundingBox GameBoundingBox::operator +(const Pose& pose) const
@@ -98,8 +104,7 @@
 		return GameBoundingBox(
 			X1 + pose.Position.x, X2 + pose.Position.x,
 			Y1 + pose.Position.y, Y2 + pose.Position.y,
-			Z1 + pose.Position.z, Z2 + pose.Position.z
-		);
+			Z1 + pose.Position.z, Z2 + pose.Position.z);
 	}
 
 	GameBoundingBox GameBoundingBox::operator -(const GameBoundingBox& bounds) const
@@ -107,8 +112,7 @@
 		return GameBoundingBox(
 			X1 - bounds.X1, X2 - bounds.X2,
 			Y1 - bounds.Y1, Y2 - bounds.Y2,
-			Z1 - bounds.Z1, Z2 - bounds.Z2
-		);
+			Z1 - bounds.Z1, Z2 - bounds.Z2);
 	}
 
 	GameBoundingBox GameBoundingBox::operator -(const Pose& pose) const
@@ -116,8 +120,7 @@
 		return GameBoundingBox(
 			X1 - pose.Position.x, X2 - pose.Position.x,
 			Y1 - pose.Position.y, Y2 - pose.Position.y,
-			Z1 - pose.Position.z, Z2 - pose.Position.z
-		);
+			Z1 - pose.Position.z, Z2 - pose.Position.z);
 	}
 
 	GameBoundingBox GameBoundingBox::operator *(float scale) const
@@ -125,7 +128,14 @@
 		return GameBoundingBox(
 			X1 * scale, X2 * scale,
 			Y1 * scale, Y2 * scale,
-			Z1 * scale, Z2 * scale
-		);
+			Z1 * scale, Z2 * scale);
+	}
+
+	GameBoundingBox GameBoundingBox::operator /(float scale) const
+	{
+		return GameBoundingBox(
+			X1 / scale, X2 / scale,
+			Y1 / scale, Y2 / scale,
+			Z1 / scale, Z2 / scale);
 	}
 //}

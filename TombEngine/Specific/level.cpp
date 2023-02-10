@@ -6,7 +6,6 @@
 
 #include "Game/animation.h"
 #include "Game/animation.h"
-#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -181,7 +180,7 @@ void LoadItems()
 			item->Pose.Orientation.y = ReadInt16();
 			item->Pose.Orientation.x = ReadInt16();
 			item->Pose.Orientation.z = ReadInt16();
-			item->Color = ReadVector4();
+			item->Model.Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
@@ -351,7 +350,6 @@ void LoadObjects()
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
@@ -417,6 +415,7 @@ void LoadCameras()
 	for (int i = 0; i < numCameras; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
+		camera.Index = i;
 		camera.Position.x = ReadInt32();
 		camera.Position.y = ReadInt32();
 		camera.Position.z = ReadInt32();
@@ -591,6 +590,7 @@ void ReadRooms()
 	int numRooms = ReadInt32();
 	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
 
+	g_Level.Rooms.reserve(numRooms);
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
@@ -757,7 +757,9 @@ void ReadRooms()
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			auto & mesh = room.mesh.emplace_back();
+			auto& mesh = room.mesh.emplace_back();
+
+			mesh.roomNumber = i;
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -769,50 +771,48 @@ void ReadRooms()
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
 			mesh.HitPoints = ReadInt16();
-			mesh.luaName = ReadString();
+			mesh.Name = ReadString();
 
-			mesh.roomNumber = i;
-			g_GameScriptEntities->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
+
+		// Reserve in advance so the vector doesn't resize itself and leave anything
+		// in the script name-to-reference map obsolete.
+		room.triggerVolumes.reserve(numTriggerVolumes);
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
-			TriggerVolume volume;
+			auto& volume = room.triggerVolumes.emplace_back();
 
-			volume.Type = (TriggerVolumeType)ReadInt32();
+			volume.Type = (VolumeType)ReadInt32();
 
-			volume.Position.x = ReadFloat();
-			volume.Position.y = ReadFloat();
-			volume.Position.z = ReadFloat();
-
-			volume.Rotation.x = ReadFloat();
-			volume.Rotation.y = ReadFloat();
-			volume.Rotation.z = ReadFloat();
-			volume.Rotation.w = ReadFloat();
-
-			volume.Scale.x = ReadFloat();
-			volume.Scale.y = ReadFloat();
-			volume.Scale.z = ReadFloat();
+			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Status = TriggerStatus::Outside;
-			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
-			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
+			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Sphere = BoundingSphere(pos, scale.x);
 
-			room.triggerVolumes.push_back(volume);
+			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
+
+			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
 		room.meshEffect = ReadInt32();
-		room.reverbType = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
+		room.index = i;
+
+		g_GameScriptEntities->AddName(room.name, room);
 	}
 }
 
@@ -869,7 +869,7 @@ void FreeLevel()
 
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 			g_Level.Zones[j][i].clear();
 	}
 
@@ -960,38 +960,35 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.boxNumber = ReadInt32();
-		obj.luaName = ReadString();
+		obj.Name = ReadString();
 
-		g_GameScriptEntities->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.Name, obj);
 	}
+}
+
+void LoadEvent(VolumeEvent& event)
+{
+	event.Mode = (VolumeEventMode)ReadInt32();
+	event.Function = ReadString();
+	event.Data = ReadString();
+	event.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < eventSetCount; i++)
 	{
 		auto eventSet = VolumeEventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = ReadInt32();
+		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnEnter.Function = ReadString();
-		eventSet.OnEnter.Data = ReadString();
-		eventSet.OnEnter.CallCounter = ReadInt32();
-
-		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnInside.Function = ReadString();
-		eventSet.OnInside.Data = ReadString();
-		eventSet.OnInside.CallCounter = ReadInt32();
-
-		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnLeave.Function = ReadString();
-		eventSet.OnLeave.Data = ReadString();
-		eventSet.OnLeave.CallCounter = ReadInt32();
+		LoadEvent(eventSet.OnEnter);
+		LoadEvent(eventSet.OnInside);
+		LoadEvent(eventSet.OnLeave);
 
 		g_Level.EventSets.push_back(eventSet);
 	}
@@ -1189,26 +1186,29 @@ void LoadSamples()
 {
 	TENLog("Loading samples... ", LogLevel::Info);
 
-	int SoundMapSize = ReadInt16();
-	g_Level.SoundMap.resize(SoundMapSize);
-	ReadBytes(g_Level.SoundMap.data(), SoundMapSize * sizeof(short));
+	int soundMapSize = ReadInt16();
+	TENLog("Sound map size: " + std::to_string(soundMapSize), LogLevel::Info);
 
-	TENLog("Sound map size: " + std::to_string(SoundMapSize), LogLevel::Info);
+	g_Level.SoundMap.resize(soundMapSize);
+	ReadBytes(g_Level.SoundMap.data(), soundMapSize * sizeof(short));
 
-	int numSamplesInfos = ReadInt32();
-
-	if (!numSamplesInfos)
+	int numSampleInfos = ReadInt32();
+	if (!numSampleInfos)
 	{
 		TENLog("No samples were found and loaded.", LogLevel::Warning);
 		return;
 	}
 
-	g_Level.SoundDetails.resize(numSamplesInfos);
-	ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
+	TENLog("Num sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
+
+	g_Level.SoundDetails.resize(numSampleInfos);
+	ReadBytes(g_Level.SoundDetails.data(), numSampleInfos * sizeof(SampleInfo));
 
 	int numSamples = ReadInt32();
 	if (numSamples <= 0)
 		return;
+
+	TENLog("Num samples: " + std::to_string(numSamples), LogLevel::Info);
 
 	int uncompressedSize;
 	int compressedSize;
@@ -1229,31 +1229,37 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
+	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
 	g_Level.Boxes.resize(numBoxes);
 	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
-	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-
 	// Read overlaps
 	int numOverlaps = ReadInt32();
+	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
-	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
-
 	// Read zones
+	int numZoneGroups = ReadInt32();
+	TENLog("Num zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+
 	for (int i = 0; i < 2; i++)
 	{
-		// Ground zones
-		for (int j = 0; j < MAX_ZONES - 1; j++)
+		for (int j = 0; j < numZoneGroups; j++)
 		{
-			g_Level.Zones[j][i].resize(numBoxes * sizeof(int));
-			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			if (j >= (int)ZoneType::MaxZone)
+			{
+				int excessiveZoneGroups = numZoneGroups - j + 1;
+				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
+					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
+				LevelDataPtr += numBoxes * sizeof(int);
+			}
+			else
+			{
+				g_Level.Zones[j][i].resize(numBoxes);
+				ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+			}
 		}
-
-		// Fly zone
-		g_Level.Zones[MAX_ZONES - 1][i].resize(numBoxes * sizeof(int));
-		ReadBytes(g_Level.Zones[MAX_ZONES - 1][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked
@@ -1289,8 +1295,6 @@ int LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	ReadInt32(); // SPR\0
-
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
 
@@ -1402,22 +1406,24 @@ void BuildOutsideRoomsTable()
 			OutsideRoomTable[x][z].clear();
 	}
 
-	for (int x = 0; x < OUTSIDE_SIZE; x++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		for (int z = 0; z < OUTSIDE_SIZE; z++)
+		auto* room = &g_Level.Rooms[i];
+
+		int rx = (room->x / SECTOR(1));
+		int rz = (room->z / SECTOR(1));
+
+		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
-			for (int i = 0; i < g_Level.Rooms.size(); i++)
+			if (x < (rx + 1) || x > (rx + room->xSize - 2))
+				continue;
+
+			for (int z = 0; z < OUTSIDE_SIZE; z++)
 			{
-				auto* room = &g_Level.Rooms[i];
+				if (z < (rz + 1) || z > (rz + room->zSize - 2))
+					continue;
 
-				int rx = (room->x / SECTOR(1));
-				int rz = (room->z / SECTOR(1));
-
-				if (x >= (rx + 1) && z >= (rz + 1) &&
-					x <= (rx + room->xSize - 2) && z <= (rz + room->zSize - 2))
-				{
-					OutsideRoomTable[x][z].push_back(i);
-				}
+				OutsideRoomTable[x][z].push_back(i);
 			}
 		}
 	}

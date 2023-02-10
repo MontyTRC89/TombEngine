@@ -9,30 +9,29 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
 
 	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
-	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(SECTOR(1.5f));
+	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(BLOCK(1.5f));
 
 	constexpr auto RAPTOR_ROAR_CHANCE		   = 1.0f / 256;
 	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 1.0f / 128;
 
-	#define RAPTOR_WALK_TURN_RATE_MAX	ANGLE(2.0f)
-	#define RAPTOR_RUN_TURN_RATE_MAX	ANGLE(2.0f)
-	#define RAPTOR_ATTACK_TURN_RATE_MAX ANGLE(2.0f)
+	constexpr auto RAPTOR_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
+	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
+	constexpr auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
-	const vector<unsigned int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
+	const auto RaptorAttackJoints = std::vector<unsigned int>{ 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
 	{
@@ -89,24 +88,21 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
-				SetAnimation(item, RaptorDeathAnims[GenerateInt(0, RaptorDeathAnims.size() - 1)]);
+				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, RaptorDeathAnims.size() - 1)]);
 		}
 		else
 		{
-			if (creature->Enemy == nullptr || TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
+			if (creature->Enemy == nullptr || Random::TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
 			{
 				ItemInfo* nearestItem = nullptr;
-				float minDistance = FLT_MAX;
+				float minDistance = INFINITY;
 
-				for (auto* activeCreature : ActiveCreatures)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (activeCreature->ItemNumber == NO_ITEM || activeCreature->ItemNumber == itemNumber)
-					{
-						activeCreature++;
+					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
-					}
 
-					auto* targetItem = &g_Level.Items[activeCreature->ItemNumber];
+					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
 
 					int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
 					if (distance < minDistance && item->HitPoints > 0)
@@ -114,13 +110,11 @@ namespace TEN::Entities::Creatures::TR3
 						nearestItem = targetItem;
 						minDistance = distance;
 					}
-
-					activeCreature++;
 				}
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(TestProbability(1.0f / 30) && minDistance < SQUARE(SECTOR(2)))))
+						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(SECTOR(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}
@@ -154,7 +148,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = 0;
 				creature->Flags &= ~1;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Flags & 2)
 				{
@@ -186,7 +180,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-				else if (AI.ahead && TestProbability(RAPTOR_ROAR_CHANCE))
+				else if (AI.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
@@ -212,14 +206,14 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (item->Animation.TargetState == RAPTOR_STATE_RUN_FORWARD)
 					{
-						if (TestProbability(0.25f))
+						if (Random::TestProbability(0.25f))
 							item->Animation.TargetState = RAPTOR_STATE_IDLE;
 						else
 							item->Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
 					}
 				}
 				else if (AI.ahead && creature->Mood != MoodType::Escape &&
-					TestProbability(RAPTOR_ROAR_CHANCE))
+					Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;

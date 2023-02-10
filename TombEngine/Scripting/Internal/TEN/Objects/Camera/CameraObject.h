@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
+#include "Objects/Room/RoomObject.h"
+#include "Objects/Moveable/MoveableObject.h"
 
 struct LevelCameraInfo;
 
@@ -10,25 +12,28 @@ namespace sol
 }
 class Vec3;
 
-class Camera : public NamedBase<Camera, LevelCameraInfo &>
+class CameraObject : public NamedBase<CameraObject, LevelCameraInfo &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<LevelCameraInfo>;
-	Camera(LevelCameraInfo& ref);
-	~Camera() = default;
+	CameraObject(LevelCameraInfo& ref);
+	~CameraObject() = default;
 
-	Camera& operator=(Camera const& other) = delete;
-	Camera(Camera const& other) = delete;
+	CameraObject& operator=(CameraObject const& other) = delete;
+	CameraObject(CameraObject const& other) = delete;
 
 	static void Register(sol::table &);
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
 
-	short GetRoom() const;
-	void SetRoom(short room);
+	std::unique_ptr<Room> GetRoom() const;
+	int GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);
+
+	void PlayCamera(sol::optional<Moveable&> TargetObj);
 
 private:
 	LevelCameraInfo & m_camera;

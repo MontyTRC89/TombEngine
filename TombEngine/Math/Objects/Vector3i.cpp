@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Math/Containers/Vector3i.h"
+#include "Math/Objects/Vector3i.h"
 
 //namespace TEN::Math
 //{
@@ -45,7 +45,7 @@
 
 	bool Vector3i::operator !=(const Vector3i& vector) const
 	{
-		return ((x != vector.x) || (y != vector.y) || (z != vector.z));
+		return !(*this == vector);
 	}
 
 	Vector3i& Vector3i::operator =(const Vector3i& vector)
