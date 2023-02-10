@@ -53,7 +53,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass</LibraryPath>
@@ -152,24 +152,36 @@ CALL gen.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\collision\Interaction.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
-    <ClInclude Include="Game\control\volumetriggerer.h" />
-    <ClInclude Include="Game\effects\bubble.h" />
+    <ClInclude Include="Game\control\volumeactivator.h" />
+    <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
-    <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\effects\Electricity.h" />
     <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
+    <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
+    <ClInclude Include="Objects\Effects\Boss.h" />
+    <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomFlags.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Room\RoomReverbTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
@@ -181,19 +193,19 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
-    <ClInclude Include="Math\Containers\GameBoundingBox.h" />
+    <ClInclude Include="Math\Objects\GameBoundingBox.h" />
     <ClInclude Include="Math\Solvers.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
-    <ClInclude Include="Math\Containers\GameVector.h" />
-    <ClInclude Include="Math\Containers\EulerAngles.h" />
+    <ClInclude Include="Math\Objects\GameVector.h" />
+    <ClInclude Include="Math\Objects\EulerAngles.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
-    <ClInclude Include="Math\Containers\Pose.h" />
+    <ClInclude Include="Math\Objects\Pose.h" />
     <ClInclude Include="Math\Random.h" />
-    <ClInclude Include="Math\Containers\Vector2i.h" />
-    <ClInclude Include="Math\Containers\Vector3i.h" />
+    <ClInclude Include="Math\Objects\Vector2i.h" />
+    <ClInclude Include="Math\Objects\Vector3i.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\Ladder.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
@@ -231,6 +243,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererDoor.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
     <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
@@ -425,7 +438,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_sophia.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
@@ -614,6 +626,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
     <ClCompile Include="framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -621,7 +634,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\Interaction.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
-    <ClCompile Include="Game\effects\bubble.cpp" />
+    <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
@@ -633,8 +646,16 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
+    <ClCompile Include="Objects\Effects\Boss.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Room\RoomObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
@@ -650,7 +671,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_overhang.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
-    <ClCompile Include="Game\effects\lightning.cpp" />
+    <ClCompile Include="Game\effects\Electricity.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
@@ -660,16 +681,16 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
-    <ClCompile Include="Math\Containers\GameBoundingBox.cpp" />
-    <ClCompile Include="Math\Containers\GameVector.cpp" />
-    <ClCompile Include="Math\Containers\EulerAngles.cpp" />
+    <ClCompile Include="Math\Objects\GameBoundingBox.cpp" />
+    <ClCompile Include="Math\Objects\GameVector.cpp" />
+    <ClCompile Include="Math\Objects\EulerAngles.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
-    <ClCompile Include="Math\Containers\Pose.cpp" />
+    <ClCompile Include="Math\Objects\Pose.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
     <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Random.cpp" />
-    <ClCompile Include="Math\Containers\Vector2i.cpp" />
-    <ClCompile Include="Math\Containers\Vector3i.cpp" />
+    <ClCompile Include="Math\Objects\Vector2i.cpp" />
+    <ClCompile Include="Math\Objects\Vector3i.cpp" />
     <ClCompile Include="Math\Solvers.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
     <ClCompile Include="Objects\Generic\Object\Ladder.cpp" />
@@ -790,7 +811,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Trap\tr2_killerstatue.cpp" />
     <ClCompile Include="Objects\TR2\Trap\tr2_springboard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_sophia.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\rubber_boat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_ahmet.cpp" />
@@ -1167,13 +1187,13 @@ CALL gen.bat</Command>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" />
-    <Import Project="..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets" Condition="Exists('..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets" Condition="Exists('..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets'))" />
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets'))" />
   </Target>
 </Project>

@@ -11,21 +11,25 @@
 
 namespace TEN::Entities::Traps
 {
+	constexpr auto DART_DEFAULT_DAMAGE = 25;
+
 	void DartControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TouchBits.TestAny())
 		{
-			DoDamage(LaraItem, 25);
+			if (item->TriggerFlags < 0)
+				Lara.PoisonPotency += 1;
+
+			DoDamage(LaraItem, item->TriggerFlags ? abs(item->TriggerFlags) : DART_DEFAULT_DAMAGE);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
 			KillItem(itemNumber);
 		}
 		else
 		{
 			int oldX = item->Pose.Position.x;
-			int oldZ = item->Pose.Position.z - 1000;
+			int oldZ = item->Pose.Position.z;
 
 			int velocity = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
 
@@ -64,83 +68,40 @@ namespace TEN::Entities::Traps
 				return;
 			}
 			else
+			{
 				item->Timer = 24;
+			}
 		}
 
-		short dartItemNumber = CreateItem();
+		int dartItemNumber = CreateItem();
+		if (dartItemNumber == NO_ITEM)
+			return;
 
-		if (dartItemNumber != NO_ITEM)
-		{
-			ItemInfo* dartItem = &g_Level.Items[dartItemNumber];
+		ItemInfo* dartItem = &g_Level.Items[dartItemNumber];
 
-			dartItem->ObjectNumber = ID_DARTS;
-			dartItem->RoomNumber = item->RoomNumber;
+		dartItem->ObjectNumber = ID_DARTS;
+		dartItem->RoomNumber = item->RoomNumber;
 
-			int x = 0;
-			int z = 0;
+		dartItem->Pose.Position.x = item->Pose.Position.x;
+		dartItem->Pose.Position.y = item->Pose.Position.y - CLICK(0.9);
+		dartItem->Pose.Position.z = item->Pose.Position.z;
 
-			switch (item->Pose.Orientation.y)
-			{
-			case 0:
-				z = WALL_SIZE / 2;
-				break;
+		InitialiseItem(dartItemNumber);
 
-			case 0x4000:
-				x = WALL_SIZE / 2;
-				break;
+		dartItem->Pose.Orientation.x = item->Pose.Orientation.x - ANGLE(180.0f);
+		dartItem->Pose.Orientation.y = item->Pose.Orientation.y;
+		dartItem->Pose.Orientation.z = item->Pose.Orientation.z;
+		dartItem->Animation.Velocity.z = BLOCK(0.25f);
+		dartItem->TriggerFlags = item->TriggerFlags;
+		dartItem->Model.Color = item->Model.Color;
 
-			case -0x8000:
-				z = -WALL_SIZE / 2;
-				break;
+		for (int i = 0; i < 4; i++)
+			TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, 0, 0, false);
 
-			case -0x4000:
-				x = -WALL_SIZE / 2;
-				break;
-			}
+		AddActiveItem(dartItemNumber);
+		dartItem->Status = ITEM_ACTIVE;
 
-			dartItem->Pose.Position.x = x + item->Pose.Position.x;
-			dartItem->Pose.Position.y = item->Pose.Position.y - WALL_SIZE / 2;
-			dartItem->Pose.Position.z = z + item->Pose.Position.z;
-
-			InitialiseItem(dartItemNumber);
-
-			dartItem->Pose.Orientation.x = 0;
-			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
-			dartItem->Animation.Velocity.z = 256;
-
-			int xf = 0;
-			int zf = 0;
-
-			if (x)
-				xf = abs(2 * x) - 1;
-			else
-				zf = abs(2 * z) - 1;
-
-			for (int i = 0; i < 5; i++)
-			{
-				int random = -GetRandomControl();
-
-				int xv = 0;
-				int zv = 0;
-
-				if (z >= 0)
-					zv = zf & random;
-				else
-					zv = -(zf & random);
-
-				if (x >= 0)
-					xv = xf & random;
-				else
-					xv = -(xf & random);
-
-				TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, xv, zv, false);
-			}
-
-			AddActiveItem(dartItemNumber);
-			dartItem->Status = ITEM_ACTIVE;
-
-			SoundEffect(SFX_TR4_DART_SPIT, &dartItem->Pose);
-		}
+		SoundEffect(SFX_TR4_DART_SPIT, &dartItem->Pose);
 	}
 
 	void TriggerDartSmoke(int x, int y, int z, int xv, int zv, bool hit)
@@ -187,11 +148,13 @@ namespace TEN::Entities::Traps
 				spark->xVel = -xv;
 			else
 				spark->xVel = ((GetRandomControl() & 255) - 128);
+
 			spark->yVel = -(GetRandomControl() & 3) - 4;
 			if (zv)
 				spark->zVel = -zv;
 			else
 				spark->zVel = ((GetRandomControl() & 255) - 128);
+
 			spark->friction = 3;
 		}
 
@@ -200,6 +163,7 @@ namespace TEN::Entities::Traps
 		if (GetRandomControl() & 1)
 		{
 			spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
+
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			if (GetRandomControl() & 1)
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);

@@ -23,12 +23,14 @@ class Pose;
 		// Constructors
 		GameBoundingBox();
 		GameBoundingBox(float x1, float x2, float y1, float y2, float z1, float z2);
-		GameBoundingBox(ItemInfo* item, bool isAccurate = true);
+		GameBoundingBox(ItemInfo* item);
 
 		// Getters
-		int GetWidth() const;
-		int GetHeight() const;
-		int GetDepth() const;
+		int		GetWidth() const;
+		int		GetHeight() const;
+		int		GetDepth() const;
+		Vector3 GetCenter() const;
+		Vector3 GetExtents() const;
 
 		// Utilities
 		void Rotate(const EulerAngles& orient);
@@ -43,5 +45,6 @@ class Pose;
 		GameBoundingBox operator -(const GameBoundingBox& bounds) const;
 		GameBoundingBox operator -(const Pose& pose) const;
 		GameBoundingBox operator *(float scale) const;
+		GameBoundingBox operator /(float scale) const;
 	};
 //}

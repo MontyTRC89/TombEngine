@@ -8,30 +8,29 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto MUMMY_SWIPE_ATTACK_DAMAGE = 100;
 
-	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
-	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(SECTOR(1));
-	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
+	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(1 / 2.0f));
+	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(2 / 3.0f));
+	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(BLOCK(1));
+	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(BLOCK(7));
 
-	#define MUMMY_WALK_TURN_RATE_MAX ANGLE(7.0f)
-	#define MUMMY_ATTACK_TURN_RATE_MAX ANGLE(7.0f)
+	constexpr auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
+	constexpr auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
-	const vector<unsigned int> MummySwipeAttackJoints { 11, 14 };
+	const auto MummySwipeAttackJoints = std::vector<unsigned int>{ 11, 14 };
 
 	enum MummyState
 	{
@@ -77,7 +76,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 2)
 		{
@@ -85,7 +84,9 @@ namespace TEN::Entities::TR4
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
+		{
 			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
+		}
 	}
 
 	void MummyControl(short itemNumber)
@@ -96,8 +97,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -118,12 +119,12 @@ namespace TEN::Entities::TR4
 					item->Animation.ActiveState != MUMMY_ANIM_WALK_FORWARD_ARMS_UP_TO_WALK_FORWARD_LEFT &&
 					item->Animation.ActiveState != MUMMY_ANIM_IDLE_TO_WALK_FORWARD)
 				{
-					if (TestProbability(0.75f) ||
+					if (Random::TestProbability(0.75f) ||
 						Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 					{
-						if (TestProbability(0.125f) ||
+						if (Random::TestProbability(1 / 8.0f) ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -158,7 +159,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			if (AI.ahead)
 			{
@@ -255,7 +256,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(1.0f / 128))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
@@ -307,6 +308,6 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

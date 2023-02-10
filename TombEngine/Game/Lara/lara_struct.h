@@ -4,6 +4,11 @@
 
 using namespace TEN::Math;
 
+namespace TEN::Renderer
+{
+	struct RendererMesh;
+}
+
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
@@ -17,11 +22,6 @@ constexpr int NUM_PICKUPS		  = ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1;
 constexpr int NUM_PICKUPS_PIECES  = ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1;
 constexpr int NUM_EXAMINES		  = ID_EXAMINE8 - ID_EXAMINE1 + 1;
 constexpr int NUM_EXAMINES_PIECES = ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1;
-
-namespace TEN::Renderer
-{
-	struct RendererMesh;
-}
 
 #pragma region state_and_animation
 enum LaraState
@@ -1300,15 +1300,17 @@ struct LaraControlData
 	TightropeControlData Tightrope;
 	SubsuitControlData Subsuit;
 
-	bool CanLook;
-	bool IsMoving;
-	bool KeepLow;
-	bool IsLow;
-	bool CanClimbLadder;
-	bool IsClimbingLadder;
-	bool CanMonkeySwing;
-	bool RunJumpQueued;
-	bool Locked;
+	bool IsClimbingLadder = false;
+	bool Locked			  = false;
+	bool IsLow			  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool RunJumpQueued	  = false;
+	bool KeepLow		  = false;
+
+	bool CanClimbLadder = false;
+	bool CanLook		= false;
+	bool CanMonkeySwing = false;
 };
 
 struct LaraInfo

@@ -23,11 +23,11 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
+	constexpr auto CENTAUR_REAR_RANGE = BLOCK(3 / 2.0f);
+	constexpr auto CENTAUR_REAR_CHANCE = 1 / 340.0f;
 	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
-	const auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	enum CentaurState
 	{
-		CENTAUR_STATE_NONE = 0,
+		// No state 0.
 		CENTAUR_STATE_IDLE = 1,
 		CENTAUR_PROJECTILE_ATTACK = 2,
 		CENTAUR_STATE_RUN_FORWARD = 3,
@@ -82,7 +82,7 @@ namespace TEN::Entities::Creatures::TR1
 			{
 			case CENTAUR_STATE_IDLE:
 				CreatureJoint(item, 17, 0);
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < pow(CENTAUR_REAR_RANGE, 2))
 					item->Animation.TargetState = CENTAUR_STATE_RUN_FORWARD;
@@ -113,7 +113,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case CENTAUR_STATE_AIM:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (Targetable(item, &AI))
 					item->Animation.TargetState = CENTAUR_PROJECTILE_ATTACK;
@@ -123,7 +123,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case CENTAUR_PROJECTILE_ATTACK:
-				if (!item->Animation.RequiredState)
+				if (item->Animation.RequiredState == NO_STATE)
 				{
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
 					CreatureEffect2(item, CentaurRocketBite, CENTAUR_BOMB_VELOCITY, head, BombGun);
@@ -132,7 +132,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case CENTAUR_STATE_WARNING:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(CentaurAttackJoints))
 				{
 					DoDamage(creature->Enemy, CENTAUR_REAR_DAMAGE);

@@ -8,19 +8,18 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
 	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
-	const vector<unsigned int> YetiAttackJoints1 = { 10, 12 }; // TODO: Rename.
-	const vector<unsigned int> YetiAttackJoints2 = { 8, 9, 10 };
+	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
+	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 
 	// TODO
 	enum YetiState
@@ -38,7 +37,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 19);
 	}
 
@@ -87,18 +86,18 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (info->Mood == MoodType::Escape)
 					item->Animation.TargetState = 1;
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128) || !isLaraAlive)
+					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
-					else if (TestProbability(1.0f / 64))
+					else if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 9;
-					else if (TestProbability(0.025f))
+					else if (Random::TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && TestProbability(0.5f))
+				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = 4;
 				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 5;
@@ -119,18 +118,18 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (isLaraAlive)
 					{
-						if (TestProbability(1.0f / 128))
+						if (Random::TestProbability(1 / 128.0f))
 							item->Animation.TargetState = 2;
-						else if (TestProbability(1.0f / 64))
+						else if (Random::TestProbability(1 / 64.0f))
 							item->Animation.TargetState = 9;
-						else if (TestProbability(0.025f))
+						else if (Random::TestProbability(0.025f))
 						{
 							item->Animation.TargetState = 2;
 							item->Animation.RequiredState = 3;
 						}
 					}
 				}
-				else if (TestProbability(1.0f / 64))
+				else if (Random::TestProbability(1 / 64.0f))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -143,17 +142,17 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 2;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128) || !isLaraAlive)
+					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
-					else if (TestProbability(1.0f / 64))
+					else if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 2;
-					else if (TestProbability(0.025f))
+					else if (Random::TestProbability(0.025f))
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 3;
 					}
 				}
-				else if (TestProbability(1.0f / 64))
+				else if (Random::TestProbability(1 / 64.0f))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -168,17 +167,17 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 1;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128) || !isLaraAlive)
+					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 7;
 					}
-					else if (TestProbability(1.0f / 64))
+					else if (Random::TestProbability(1 / 64.0f))
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 9;
 					}
-					else if (TestProbability(0.025f))
+					else if (Random::TestProbability(0.025f))
 						item->Animation.TargetState = 2;
 				}
 				else if (info->Mood == MoodType::Attack)
@@ -277,7 +276,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!isLaraAlive)
 		{
 			info->MaxTurn = 0;
-			CreatureKill(item, 31, 14, 103);
+			CreatureKill(item, 31, 0, 14, 103); // TODO: add yeti state enum and lara extra state enum
 			return;
 		}
 

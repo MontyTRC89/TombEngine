@@ -7,6 +7,15 @@
 enum class LaraWeaponType;
 struct ItemInfo;
 
+enum BodyPartFlags
+{
+	BODY_NO_BOUNCE	   = (1 << 0),
+	BODY_GIBS		   = (1 << 1),
+	BODY_EXPLODE	   = (1 << 8),
+	BODY_NO_BOUNCE_ALT = (1 << 9),
+	BODY_STONE_SOUND   = (1 << 11)
+};
+
 struct Matrix3D
 {
 	short m00, m01, m02;
@@ -63,13 +72,20 @@ struct SHOCKWAVE_STRUCT
 	short innerRad;
 	short outerRad;
 	short xRot;
+	short yRot;
+	short zRot;
 	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
+	unsigned char sr;
+	unsigned char sg;
+	unsigned char sb;
 	unsigned char life;
 	short speed;
 	short temp;
+	bool fadeIn = false;
+	int style;
 };
 
 struct GUNSHELL_STRUCT
@@ -171,6 +187,12 @@ struct BLOOD_STRUCT
 	byte pad;
 };
 
+enum class ShockwaveStyle
+{
+	Normal = 0,
+	Sophia = 1
+};
+
 #define ENERGY_ARC_STRAIGHT_LINE	0
 #define ENERGY_ARC_CIRCLE			1
 #define ENERGY_ARC_NO_RANDOMIZE		1
@@ -183,7 +205,6 @@ extern char LaserSightCol;
 
 extern int NextFireSpark;
 extern int NextSmokeSpark;
-extern int NextBubble;
 extern int NextDrip;
 extern int NextBlood;
 extern int NextSpider;
@@ -197,12 +218,6 @@ constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_DRIPS = 32;
 constexpr auto MAX_SHOCKWAVE = 16;
-
-constexpr auto BODY_NO_BOUNCE     = 0x0001;
-constexpr auto BODY_GIBS		  = 0x0002;
-constexpr auto BODY_EXPLODE		  = 0x0100;
-constexpr auto BODY_NO_BOUNCE_ALT = 0x0200;
-constexpr auto BODY_STONE_SOUND   = 0x0800;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -238,16 +253,13 @@ int GetFreeGunshell();
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
-int GetFreeBubble();
 void LaraBubbles(ItemInfo* item);
-void DisableBubbles();
-void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

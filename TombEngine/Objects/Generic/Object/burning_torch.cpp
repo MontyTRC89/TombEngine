@@ -374,7 +374,7 @@ namespace TEN::Entities::Generic
 				if ((laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase) == 40)
 				{
 					TestTriggers(torchItem, true, torchItem->Flags & IFLAG_ACTIVATION_MASK);
-					torchItem->Flags |= 0x3E00;
+					torchItem->Flags |= CODE_BITS;
 					torchItem->ItemFlags[3] = 0;
 					torchItem->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNumber);

@@ -10,11 +10,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseLaraDouble(short itemNumber)
-	{
-		ClearItem(itemNumber);
-	}
-
 	void LaraDoubleControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];

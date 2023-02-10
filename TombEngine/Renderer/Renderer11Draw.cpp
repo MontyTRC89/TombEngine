@@ -1,32 +1,34 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
-#include "Specific/configuration.h"
+
+#include <algorithm>
+#include <chrono>
+#include <execution>
+#include <filesystem>
+
+#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/hair.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/savegame.h"
-#include "Game/health.h"
-#include "Game/camera.h"
-#include "Game/items.h"
-#include "Game/animation.h"
 #include "Game/Gui.h"
+#include "Game/health.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Specific/winmain.h"
+#include "Game/savegame.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "RenderView/RenderView.h"
-#include <chrono>
-#include <algorithm>
-#include <execution>
-#include <filesystem>
+#include "Renderer/Renderer11.h"
+#include "Specific/configuration.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Entities::Generic;
 
@@ -38,16 +40,15 @@ extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
 	using namespace std::chrono;
+	using namespace TEN::Renderer;
 
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
-		std::vector<Sphere> nearestSpheres;
+		auto nearestSpheres = std::vector<Sphere>{};
 		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
 
-		// Collect Lara spheres.
-
+		// Collect player spheres.
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
@@ -57,12 +58,11 @@ namespace TEN::Renderer
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
 
-				// Skip everything that's not "alive" or not a vehicle.
-
+				// Skip everything that isn't alive or a vehicle.
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
 
-				if (i->ObjectNumber == ID_LARA)
+				if (nativeItem.IsLara())
 				{
 					for (auto i = 0; i < sphereMeshes.size(); i++)
 					{
@@ -70,29 +70,27 @@ namespace TEN::Renderer
 							continue;
 
 						auto& mesh = g_Level.Meshes[nativeItem.Model.MeshIndex[sphereMeshes[i]]];
-						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 
 						// Push foot spheres a little lower.
+						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
 							offset.y += 8;
-						auto pos = GetJointPosition(LaraItem, sphereMeshes[i], offset);
 
 						auto& newSphere = nearestSpheres.emplace_back();
-						newSphere.position = Vector3(pos.x, pos.y, pos.z);
+						newSphere.position = GetJointPosition(LaraItem, sphereMeshes[i], offset).ToVector3();;
 						newSphere.radius = mesh.sphere.Radius * sphereScaleFactors[i];
 					}
 				}
 				else
 				{
-					auto bBox = GameBoundingBox(&nativeItem);
-					auto center = ((Vector3(bBox.X1, bBox.Y1, bBox.Z1) + Vector3(bBox.X2, bBox.Y2, bBox.Z2)) / 2) +
-						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+					auto bounds = GameBoundingBox(&nativeItem);
+					auto extents = bounds.GetExtents();
+					auto center = Geometry::TranslatePoint(nativeItem.Pose.Position.ToVector3(), nativeItem.Pose.Orientation, bounds.GetCenter());
 					center.y = nativeItem.Pose.Position.y;
-					float maxExtent = std::max(bBox.X2 - bBox.X1, bBox.Z2 - bBox.Z1);
 
 					auto& newSphere = nearestSpheres.emplace_back();
 					newSphere.position = center;
-					newSphere.radius = maxExtent;
+					newSphere.radius = std::max(abs(extents.x), abs(extents.z)) * 1.5f;
 				}
 			}
 		}
@@ -208,9 +206,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = *m_moveableObjects[item->ObjectNumber];
-			RendererObject& skin = item->ObjectNumber == ID_LARA ? *m_moveableObjects[ID_LARA_SKIN] : obj;
-			RendererRoom& room = m_rooms[item->RoomNumber];
+			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectNumber);
 
 			m_stItem.World = item->World;
 			m_stItem.Color = item->Color;
@@ -223,7 +219,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-			for (int k = 0; k < skin.ObjectMeshes.size(); k++)
+			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
 				auto* mesh = GetMesh(item->MeshIndex[k]);
 
@@ -242,63 +238,13 @@ namespace TEN::Renderer
 				}
 			}
 
-			if (item->ObjectNumber != ID_LARA)
-				continue;
-
-			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
+			if (item->ObjectNumber == ID_LARA)
 			{
-				auto& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
+				RendererRoom& room = m_rooms[item->RoomNumber];
 
-				for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
-				{
-					auto* mesh = laraSkinJoints.ObjectMeshes[k];
-
-					for (auto& bucket : mesh->Buckets)
-					{
-						if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
-							continue;
-
-						// Draw vertices
-						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-						m_numMoveablesDrawCalls++;
-					}
-				}
-			}
-
-			auto& hairsObj = *m_moveableObjects[ID_HAIR];
-
-			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-			m_stItem.World = Matrix::Identity;
-			m_stItem.BonesMatrices[0] = obj.AnimationTransforms[LM_HEAD] * item->World;
-
-			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
-			{
-				auto* hairs = &Hairs[0][i];
-				auto world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
-					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-				m_stItem.BonesMatrices[i + 1] = world;
-				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-			}
-
-			m_cbItem.updateData(m_stItem, m_context.Get());
-			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-			{
-				auto* mesh = hairsObj.ObjectMeshes[k];
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
-						continue;
-
-					// Draw vertices
-					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-					m_numMoveablesDrawCalls++;
-				}
+				DrawLaraHolsters(item, &room, false);
+				DrawLaraJoints(item, &room, false);
+				DrawLaraHair(item, &room, false);
 			}
 		}
 	}
@@ -811,12 +757,10 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddBox(Vector3* corners, Vector4 color)
@@ -933,7 +877,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
@@ -973,6 +917,8 @@ namespace TEN::Renderer
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
+		dynamicLight.Luma = Luma(dynamicLight.Color);
 
 		dynamicLights.push_back(dynamicLight);
 	}
@@ -1424,6 +1370,10 @@ namespace TEN::Renderer
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
+		auto timeRoomsCollector = std::chrono::high_resolution_clock::now();
+		m_timeRoomsCollector = (std::chrono::duration_cast<ns>(timeRoomsCollector - time1)).count() / 1000000;
+		time1 = timeRoomsCollector;
+
 		UpdateLaraAnimations(false);
 		UpdateItemAnimations(view);
 
@@ -1520,7 +1470,8 @@ namespace TEN::Renderer
 		DrawRipples(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
-		DrawLightning(view);
+		DrawElectricity(view);
+		DrawHelicalLasers(view);
 		DrawRopes(view);
 
 		// Here is where we actually output sprites
@@ -1621,10 +1572,6 @@ namespace TEN::Renderer
 				{
 				case ID_LARA:
 					DrawLara(view, transparent);
-					break;
-
-				case ID_DARTS:
-					DrawDarts(itemToDraw, view);
 					break;
 
 				case ID_WATERFALL1:
@@ -1797,25 +1744,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDarts(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-
-		Vector3 start = Vector3(
-			nativeItem->Pose.Position.x,
-			nativeItem->Pose.Position.y,
-			nativeItem->Pose.Position.z);
-
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
-
-		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
-			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
-			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
-
-		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
-	}
-
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
 		// Static mesh shader is used for all forthcoming renderer routines, so we
@@ -1842,7 +1770,7 @@ namespace TEN::Renderer
 		{
 			for (auto& msh : room->StaticsToDraw)
 			{
-				RendererObject& staticObj = *m_staticObjects[msh.ObjectNumber];
+				RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
@@ -1868,7 +1796,7 @@ namespace TEN::Renderer
 								RendererPolygon* p = &bucket.Polygons[j];
 
 								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, msh.World);
+								Vector3 centre = Vector3::Transform(p->centre, msh->World);
 								int distance = (centre - cameraPosition).Length();
 
 								RendererTransparentFace face;
@@ -1878,10 +1806,10 @@ namespace TEN::Renderer
 								face.info.animated = bucket.Animated;
 								face.info.texture = bucket.Texture;
 								face.info.room = room;
-								face.info.staticMesh = &msh;
+								face.info.staticMesh = msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = msh.Position;
-								face.info.color = msh.Color;
+								face.info.position = msh->Pose.Position.ToVector3();
+								face.info.color = msh->Color;
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
 								room->TransparentFacesToDraw.push_back(face);
@@ -1889,8 +1817,8 @@ namespace TEN::Renderer
 						}
 						else
 						{
-							m_stStatic.World = msh.World;
-							m_stStatic.Color = msh.Color;
+							m_stStatic.World = msh->World;
+							m_stStatic.Color = msh->Color;
 							m_stStatic.AmbientLight = room->AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
 
@@ -1898,7 +1826,7 @@ namespace TEN::Renderer
 							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-							BindLights(msh.LightsToDraw);
+							BindLights(msh->LightsToDraw);
 
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
@@ -1954,7 +1882,10 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
-		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		if (m_sprites.size() > causticsFrame)
+		{
+			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		}
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
@@ -1987,7 +1918,7 @@ namespace TEN::Renderer
 
 			BindLights(view.lightsToDraw);
 
-			m_stMisc.Caustics = (int)(g_Gui.GetCurrentSettings().Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+			m_stMisc.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_cbMisc.updateData(m_stMisc, m_context.Get());
 			BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 			BindConstantBufferVS(CB_MISC, m_cbMisc.get());
@@ -1998,7 +1929,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
-			SetScissor(room->Clip);
+			SetScissor(room->ClipBounds);
 
 			for (int animated = 0; animated < 2; animated++)
 			{

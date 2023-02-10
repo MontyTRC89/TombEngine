@@ -36,3 +36,17 @@ int Sync()
 	LdSync = dCounter;
 	return nFrames;
 }
+
+GameTime GetGameTime(int frameCount)
+{
+	GameTime result = {};
+
+	auto seconds = GameTimer / FPS;
+
+	result.Days    = (seconds / (DAY_UNIT * TIME_UNIT * TIME_UNIT));
+	result.Hours   = (seconds % (DAY_UNIT * TIME_UNIT * TIME_UNIT)) / (TIME_UNIT * TIME_UNIT);
+	result.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
+	result.Seconds = (seconds % TIME_UNIT);
+
+	return result;
+}

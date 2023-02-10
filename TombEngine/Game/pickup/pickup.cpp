@@ -601,6 +601,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		if (abs(laraItem->Pose.Position.y - item->Pose.Position.y) > CLICK(4))
 			break;
 
+		// Also prevent picking up from plinth if item is below Lara
+		if (laraItem->Pose.Position.y < item->Pose.Position.y)
+			break;
+
 		if (TestPlayerEntityInteract(item, laraItem, PlinthPickUpBounds) && !lara->Control.IsLow)
 		{
 			if (item->Pose.Position.y == laraItem->Pose.Position.y)
@@ -832,6 +836,127 @@ void RegeneratePickups()
 			if (ammo == 0)
 				item.Status = ITEM_NOT_ACTIVE;
 		}
+	}
+}
+
+void DropPickups(ItemInfo* item)
+{
+	ItemInfo* pickup = nullptr;
+
+	auto bounds = GameBoundingBox(item);
+	auto extents = bounds.GetExtents();
+	auto origin = Geometry::TranslatePoint(item->Pose.Position.ToVector3(), item->Pose.Orientation, bounds.GetCenter());
+	auto yPos = GetCollision(item).Position.Floor;
+
+	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
+
+	// Also collect objects which are around.
+	bool collidedWithObjects = GetCollidedObjects(item, extents.Length(), true, CollidedItems, CollidedMeshes, true);
+
+	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
+
+	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
+	// and also does not significantly differ in height to an object centerpoint height.
+	// If all corner tests will fail, a pickup will be spawned at bounding box centerpoint, as it does in tomb4.
+
+	for (int corner = 0; corner < 4; corner++)
+	{
+		auto angle = item->Pose.Orientation;
+		angle.y += startAngle + corner * ANGLE(90);
+
+		// At first, do an inside-wall test at an extended extent point to make sure player can correctly align.
+		auto candidatePos = Geometry::TranslatePoint(origin, angle, extents * 1.2f);
+		candidatePos.y = yPos;
+		auto collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+
+		// If position is inside a wall or on a slope, don't use it.
+		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// Remember floor position for a tested point.
+		int candidateYPos = collPoint.Position.Floor;
+
+		// Now repeat the same test for original extent point to make sure it's also valid.
+		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
+		candidatePos.y = yPos;
+		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+
+		// If position is inside a wall or on a slope, don't use it.
+		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+			continue;
+
+		// If position is not in the same room, don't use it.
+		if (collPoint.RoomNumber != item->RoomNumber)
+			continue;
+
+		// Setup a dummy sphere with 1-click diameter for item and static mesh collision tests.
+		auto sphere = BoundingSphere(candidatePos, CLICK(0.5f));
+		bool collidedWithObject = false;
+
+		// Iterate through all found items and statics around, and determine if dummy sphere
+		// intersects any of those. If so, try other corner.
+
+		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		{
+			auto* currentItem = CollidedItems[i];
+			if (!currentItem)
+				break;
+
+			if (GameBoundingBox(currentItem).ToBoundingOrientedBox(currentItem->Pose).Intersects(sphere))
+			{
+				collidedWithObject = true;
+				break;
+			}
+		}
+
+		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		{
+			auto* currentMesh = CollidedMeshes[i];
+			if (!currentMesh)
+				break;
+
+			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			{
+				collidedWithObject = true;
+				break;
+			}
+		}
+
+		if (collidedWithObject)
+			continue;
+
+		// Finally, do height difference tests. If difference is more than one and a half click,
+		// most likely it's hanging in the air or submerged, so bypass the corner.
+		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
+			continue;
+
+		// If height difference between extent points is more than one click, it means it landed
+		// on a step, so let's search for other position.
+		if (abs(collPoint.Position.Floor - candidateYPos) >= CLICK(1.0f))
+			continue;
+
+		origin = candidatePos;
+		origin.y = collPoint.Position.Floor;
+		break;
+	}
+
+	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
+	{
+		pickup = &g_Level.Items[pickupNumber];
+		pickup->Pose.Position = origin;
+		pickup->Pose.Position.y -= GameBoundingBox(pickup).Y2;
+
+		pickup->Pose.Orientation.y = ANGLE(Random::GenerateInt(0, 359)); // Randomize pickup rotation.
+
+		// HACK: Pickup is not moved to a right room at this moment, it will only update next game loop.
+		// Therefore, we need to temporarily inject actual room number, so AlignEntityToSurface succeeds.
+
+		pickup->RoomNumber = item->RoomNumber;
+		AlignEntityToSurface(pickup, Vector2(Objects[pickup->ObjectNumber].radius));
+		pickup->RoomNumber = -1;
+		pickup->Flags |= 32;
+
+		ItemNewRoom(pickupNumber, item->RoomNumber);
 	}
 }
 

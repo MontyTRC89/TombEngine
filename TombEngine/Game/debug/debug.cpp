@@ -18,7 +18,7 @@ void InitTENLog()
 	
 	spdlog::initialize_logger(logger);
     logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);   
+	logger->flush_on(spdlog::level::info);
 	logger->set_pattern("[%Y-%b-%d %T] [%^%l%$] %v");
 }
 

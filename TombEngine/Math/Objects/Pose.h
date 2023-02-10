@@ -1,6 +1,6 @@
 #pragma once
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Vector3i.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Vector3i.h"
 
 //namespace TEN::Math
 //{

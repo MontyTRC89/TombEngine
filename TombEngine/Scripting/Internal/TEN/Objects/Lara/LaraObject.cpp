@@ -127,6 +127,22 @@ int LaraObject::GetSprintEnergy() const
 	return lara->SprintEnergy;
 }
 
+/// Get the moveable's airborne status
+// @function Moveable:GetAirborne
+// @treturn (bool) true if Lara state must react to aerial forces.
+bool LaraObject::GetAirborne() const
+{
+	return m_item->Animation.IsAirborne;
+}
+
+/// Set the moveable's airborne status
+// @function Moveable:SetAirborne
+// @tparam (bool) New airborn status for Lara.
+void LaraObject::SetAirborne(bool newAirborne)
+{
+	m_item->Animation.IsAirborne = newAirborne;
+}
+
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
 // @usage
@@ -239,7 +255,7 @@ int LaraObject::GetAmmoCount() const
 
 /// Get current vehicle, if it exists
 // @function LaraObject:GetVehicle
-// @treturn Moveable current vehicle (nil if no vehicle present)
+// @treturn Objects.Moveable current vehicle (nil if no vehicle present)
 // @usage
 // local vehicle = Lara:GetVehicle()
 std::unique_ptr<Moveable> LaraObject::GetVehicle() const
@@ -254,7 +270,7 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 
 /// Get current target enemy, if it exists
 // @function LaraObject:GetTarget
-// @treturn Moveable current target enemy (nil if no target present)
+// @treturn Objects.Moveable current target enemy (nil if no target present)
 // @usage
 // local target = Lara:GetTarget()
 std::unique_ptr<Moveable> LaraObject::GetTarget() const
@@ -289,6 +305,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetWet, &LaraObject::GetWet,
 			ScriptReserved_SetSprintEnergy, &LaraObject::SetSprintEnergy,
 			ScriptReserved_GetSprintEnergy, &LaraObject::GetSprintEnergy,
+			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
+			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,

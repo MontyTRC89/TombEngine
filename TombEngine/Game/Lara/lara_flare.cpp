@@ -2,6 +2,7 @@
 #include "Game/Lara/lara_flare.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/chaffFX.h"
@@ -343,7 +344,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 
 	flareItem.Pose.Orientation.x = 0;
 	flareItem.Pose.Orientation.z = 0;
-	flareItem.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	flareItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	if (isThrown)
 	{
@@ -390,7 +391,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(pos, flareLife))
-		TriggerChaffEffects(flareLife);
+		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
 	/* Hardcoded code */
 
