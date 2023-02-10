@@ -17,15 +17,18 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto CIVVY_ATTACK_DAMAGE  = 50;
 
-	constexpr auto CIVVY_ATTACK_WALKING_PUNCH_RANGE = SQUARE(BLOCK(0.75f));
-	constexpr auto CIVVY_ATTACK_CLOSE_PUNCH_RANGE = SQUARE(BLOCK(0.45f));
-	constexpr auto CIVVY_ATTACK_FAR_PUNCH_RANGE = SQUARE(BLOCK(0.70f));
+	constexpr auto CIVVY_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto CIVVY_RUN_TURN_RATE_MAX = ANGLE(6.0f);
+	constexpr auto CIVVY_AIM_TURN_RATE_MAX = ANGLE(8.0f);
+
+	constexpr auto CIVVY_ATTACK_WALKING_PUNCH_RANGE = SQUARE(BLOCK(0.8f));
+	constexpr auto CIVVY_ATTACK_CLOSE_PUNCH_RANGE = SQUARE(BLOCK(0.5f));
+	constexpr auto CIVVY_ATTACK_FAR_PUNCH_RANGE = SQUARE(BLOCK(0.7f));
 	
 	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(2));
 	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(5));
@@ -35,15 +38,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	#define CIVVY_WALK_TURN_RATE_MAX ANGLE(5.0f)
-	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
-	#define CIVVY_AIM_TURN_RATE_MAX	 ANGLE(8.0f)
-
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 
 	const auto CivvyBiteRight = BiteInfo(Vector3::Zero, 13);
 	const auto CivvyBiteLeft = BiteInfo(Vector3::Zero, 10);
-	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
+	const std::vector<unsigned int> CivvyAttackJoints = { 10, 13 };
   
 	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
 	{
@@ -113,10 +112,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	void InitialiseCivvy(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-		SetAnimation(item, CIVVY_ANIM_IDLE);
+		SetAnimation(&item, CIVVY_ANIM_IDLE);
 	}
 
 
@@ -129,32 +128,35 @@ namespace TEN::Entities::Creatures::TR3
 		ItemInfo* result = nullptr;
 
 		auto closetsDistance = FLT_MAX;
-		Vector3 distanceVector;
 		float distanceValue;
-		auto* targetCreature = ActiveCreatures[0];
 		float MaxRange = rangeDetection <= 0 ? FLT_MAX : rangeDetection;
 
-		for (int i = 0; i < ActiveCreatures.size(); i++)
+		for (auto& targetCreature : ActiveCreatures)
 		{
-			targetCreature = ActiveCreatures[i];
-
 			//Ignore if it's itself, or a non valid Item.
 			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == itemNumber)
 				continue;
 
+			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
+
+			//Ignore if it's dead.
+			if (currentItem.HitPoints <= 0)
+				continue;
+
 			//Ignore if it's an entity from the Excluded Targets lists.
 			bool forbiddenTarget = false;
-			for (std::vector<GAME_OBJECT_ID>::iterator it = excludedTargetList.begin(); it != excludedTargetList.end(); ++it)
+			for (auto& excludedTargetID : excludedTargetList)
 			{
-				if (g_Level.Items[targetCreature->ItemNumber].ObjectNumber == *it)
+				if (currentItem.ObjectNumber == excludedTargetID)
+				{
 					forbiddenTarget = true;
+					break;
+				}
 			}
 			if (forbiddenTarget)
 				continue;
 
 			//If it's closer than other entity, choose this one.
-			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
-
 			distanceValue = Vector3i::Distance(item.Pose.Position, currentItem.Pose.Position);
 
 			if (distanceValue < closetsDistance && distanceValue < MaxRange)
@@ -178,14 +180,15 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 
+		bool validTarget = false;
 		int targetAngle = 0;
 		int targetDistance = 0;
 		auto jointHeadRot = EulerAngles::Zero;
 		auto jointTorsoRot = EulerAngles::Zero;
 
-		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED))
+		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{
-			DoDamage(&item, 20);
+			DoDamage(&item, INT_MAX);
 			DoLotsOfBlood(item.Pose.Position.x, item.Pose.Position.y - (GetRandomControl() & 255) - 32, item.Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item.RoomNumber, 3);
 		}
 
@@ -251,6 +254,8 @@ namespace TEN::Entities::Creatures::TR3
 				AlertAllGuards(itemNumber);
 			}
 
+			validTarget = (creature.Enemy != nullptr && creature.Enemy->HitPoints > 0) ? true : false;
+
 			switch (item.Animation.ActiveState)
 			{
 				case CIVVY_STATE_IDLE:
@@ -292,11 +297,13 @@ namespace TEN::Entities::Creatures::TR3
 						else
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
-					else if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) ||
-							 (creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(0.5f))) )
+					else if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) &&
+							 ((creature.Enemy->IsLara() && AI.bite) ||
+							  (creature.Enemy->IsCreature() && AI.ahead)) )
 						item.Animation.TargetState = CIVVY_STATE_AIM_CLOSE_PUNCH;
-					else if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) ||
-							 (creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(1))) )
+					else if ((validTarget && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) &&
+							 ((creature.Enemy->IsLara() && AI.bite) ||
+							  (creature.Enemy->IsCreature() && AI.ahead)) )
 						item.Animation.TargetState = CIVVY_STATE_AIM_FAR_PUNCH;
 					else if (AI.bite && AI.distance < CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
@@ -308,7 +315,9 @@ namespace TEN::Entities::Creatures::TR3
 				case CIVVY_STATE_WALK:
 
 					creature.MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
-					jointHeadRot.y = targetAngle;
+
+					if (AI.ahead)
+						jointHeadRot.y = targetAngle;
 
 					if (item.AIBits & PATROL1)
 					{
@@ -331,14 +340,12 @@ namespace TEN::Entities::Creatures::TR3
 						if (Random::TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
-					else if ((creature.Enemy->HitPoints > 0 && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY) &&
-							 (
-							  (creature.Enemy->IsLara() && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE ) ||
-							  (creature.Enemy->IsCreature() && AI.distance < SQUARE(BLOCK(0.5f)) )
-							 ))
+					else if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY ) &&
+							 (creature.Enemy->IsLara() || creature.Enemy->IsCreature()) )
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
-					else if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) ||
-							 (creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(1))) )
+					else if ((validTarget && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) &&
+							 ((creature.Enemy->IsLara() && AI.bite) ||
+							  (creature.Enemy->IsCreature() && AI.ahead)) )
 						item.Animation.TargetState = CIVVY_STATE_AIM_WALKING_PUNCH;
 					else if (AI.distance > CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_RUN;
@@ -364,7 +371,9 @@ namespace TEN::Entities::Creatures::TR3
 				case CIVVY_STATE_RUN:
 
 					creature.MaxTurn = CIVVY_RUN_TURN_RATE_MAX;
-					tilt = angle / 2;
+
+					if (AI.ahead)
+						tilt = angle / 2;
 
 					if (AI.ahead)
 						jointHeadRot.y = AI.angle;
@@ -375,7 +384,7 @@ namespace TEN::Entities::Creatures::TR3
 						item.Animation.TargetState = CIVVY_STATE_RUN;
 					//else if (creature.Mood == MoodType::Escape && Lara.TargetEntity != &item && AI.ahead)
 						//item.Animation.TargetState = CIVVY_STATE_IDLE;
-					else if ((item.AIBits & FOLLOW) && (creature.ReachedGoal || targetDistance > SQUARE(SECTOR(2))))
+					else if ((item.AIBits & FOLLOW) && (creature.ReachedGoal || targetDistance > CIVVY_WALK_RANGE))
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
 					else if (creature.Mood == MoodType::Bored)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
@@ -395,8 +404,9 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) ||
-						(creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(0.5f))))
+					if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) &&
+						((creature.Enemy->IsLara() && AI.bite) ||
+						 (creature.Enemy->IsCreature() && AI.ahead)) )
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_CLOSE_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
@@ -414,8 +424,9 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if ((creature.Enemy->IsLara() && AI.ahead && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) ||
-						(creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(0.5f))) )
+					if ((validTarget && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) &&
+						((creature.Enemy->IsLara() && AI.bite) ||
+						 (creature.Enemy->IsCreature() && AI.ahead)))
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_FAR_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
@@ -434,8 +445,9 @@ namespace TEN::Entities::Creatures::TR3
 					}
 
 					
-					if ((creature.Enemy->IsLara() && AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) ||
-						(creature.Enemy->IsCreature() && creature.Enemy->HitPoints > 0 && AI.ahead && AI.distance < SQUARE(BLOCK(0.5f))) )
+					if ((validTarget && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) &&
+						((creature.Enemy->IsLara() && AI.bite) ||
+						 (creature.Enemy->IsCreature() && AI.ahead)))
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_WALKING_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_WALK;
@@ -452,8 +464,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (creature.Flags == 0 &&
-						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_CLOSE_PUNCH_ATTACK))
+					if (creature.Flags == 0)
 					{
 						if (creature.Enemy->IsLara())
 						{
@@ -491,8 +502,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (creature.Flags == 0 &&
-						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_FAR_PUNCH_ATTACK))
+					if (creature.Flags == 0)
 					{
 						if (creature.Enemy->IsLara())
 						{
@@ -533,8 +543,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if (creature.Flags == 0 &&
-						item.Animation.AnimNumber == GetAnimNumber(item, CIVVY_ANIM_WALKING_PUNCH_ATTACK))
+					if (creature.Flags == 0)
 					{
 						if (creature.Enemy->IsLara())
 						{
@@ -596,7 +605,6 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			creature.MaxTurn = 0;
 			CreatureAnimation(itemNumber, angle, 0);
 		}
 	}
