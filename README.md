@@ -46,7 +46,6 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 
 - MontyTRC (Project Leader)
 
-- ChocolateFan (general coding)
 - Gancian (general coding)
 - Krystian (general coding)
 - Kubsy (Some cleanups and fixes)
