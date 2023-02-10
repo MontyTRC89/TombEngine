@@ -6,13 +6,13 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -27,8 +27,11 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
+using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
@@ -42,7 +45,7 @@ extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
+// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
 
 BiteInfo EnemyBites[12] =
 {
@@ -55,15 +58,14 @@ BiteInfo EnemyBites[12] =
 	{ 0, -110, 480, 13 },
 	{ -20, -80, 190, -10 },
 	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 },   // Baddy 2
-	{ 20, -60, 400, 7 },    // SAS
-	{ 0, -64, 250, 7 }      // Troops
+	{ 10, -60, 200, 11 }, // Baddy 2
+	{ 20, -60, 400, 7 },  // SAS
+	{ 0, -64, 250, 7 }	  // Troops
 };
 
 namespace TEN::Renderer 
 {
-	using namespace TEN::Effects::Footprints;
-	using std::vector;
+	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -74,82 +76,109 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
-	void Renderer11::DrawLightning(RenderView& view) 
+	void Renderer11::DrawHelicalLasers(RenderView& view)
 	{
-		for (int i = 0; i < Lightning.size(); i++)
+		if (HelicalLasers.empty())
+			return;
+
+		for (const auto& laser : HelicalLasers)
 		{
-			LIGHTNING_INFO* arc = &Lightning[i];
+			if (laser.Life <= 0.0f)
+				continue;
 
-			if (arc->life)
+			auto color = laser.Color;
+			color.w = laser.Opacity;
+
+			ElectricityKnots[0] = laser.Target;
+			ElectricityKnots[1] = laser.Origin;
+			
+			for (int j = 0; j < 2; j++)
+				ElectricityKnots[j] -= laser.Target;
+
+			CalculateHelixSpline(laser, ElectricityKnots, ElectricityBuffer);
+
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
 			{
-				LightningPos[0].x = arc->pos1.x;
-				LightningPos[0].y = arc->pos1.y;
-				LightningPos[0].z = arc->pos1.z;
+				int bufferIndex = 0;
 
-				memcpy(&LightningPos[1], arc, 48);
-
-				LightningPos[5].x = arc->pos4.x;
-				LightningPos[5].y = arc->pos4.y;
-				LightningPos[5].z = arc->pos4.z;
-
-				for (int j = 0; j < 6; j++)
+				auto& interpPosArray = ElectricityBuffer;
+				for (int s = 0; s < laser.NumSegments ; s++)
 				{
-					LightningPos[j].x -= LaraItem->Pose.Position.x;
-					LightningPos[j].y -= LaraItem->Pose.Position.y;
-					LightningPos[j].z -= LaraItem->Pose.Position.z;
+					auto origin = laser.Target + interpPosArray[bufferIndex];
+					bufferIndex++;
+					auto target = laser.Target + interpPosArray[bufferIndex];
+
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						color,
+						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
 				}
+			}				
+		}
+	}
 
-				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
+	void Renderer11::DrawElectricity(RenderView& view)
+	{
+		if (ElectricityArcs.empty())
+			return;
 
-				if (abs(LightningPos[0].x) <= 24576 && abs(LightningPos[0].y) <= 24576 && abs(LightningPos[0].z) <= 24576)
+		for (const auto& arc : ElectricityArcs)
+		{
+			if (arc.life <= 0)
+				continue;
+
+			ElectricityKnots[0] = arc.pos1;
+			memcpy(&ElectricityKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
+			ElectricityKnots[5] = arc.pos4;
+
+			for (int j = 0; j < ElectricityKnots.size(); j++)
+				ElectricityKnots[j] -= LaraItem->Pose.Position.ToVector3();
+
+			CalculateElectricitySpline(arc, ElectricityKnots, ElectricityBuffer);
+
+			if (abs(ElectricityKnots[0].x) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].y) <= ELECTRICITY_RANGE_MAX &&
+				abs(ElectricityKnots[0].z) <= ELECTRICITY_RANGE_MAX)
+			{
+				int bufferIndex = 0;
+
+				auto& interpPosArray = ElectricityBuffer;
+				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
-					short* interpolatedPos = &LightningBuffer[0];
+					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
+					bufferIndex++;
+					auto target = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
 
-					for (int s = 0; s < 3 * arc->segments - 1; s++)
+					auto center = (origin + target) / 2;
+					auto direction = target - origin;
+					direction.Normalize();
+
+					byte r, g, b;
+					if (arc.life >= 16)
 					{
-						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						interpolatedPos += 4;
-
-						int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
-
-						byte r, g, b;
-
-						if (arc->life >= 16)
-						{
-							r = arc->r;
-							g = arc->g;
-							b = arc->b;
-						}
-						else
-						{
-							r = arc->life * arc->r / 16;
-							g = arc->life * arc->g / 16;
-							b = arc->life * arc->b / 16;
-						}
-
-						Vector3 pos1 = Vector3(ix, iy, iz);
-						Vector3 pos2 = Vector3(ix2, iy2, iz2);
-
-						Vector3 d = pos2 - pos1;
-						d.Normalize();
-
-						Vector3 c = (pos1 + pos2) / 2.0f;
-
-						AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-							c,
-							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-							(PI / 2),
-							1.0f,
-							{ arc->width * 8.0f,
-							Vector3::Distance(pos1, pos2) },
-							BLENDMODE_ADDITIVE,
-							d, true, view);
+						r = arc.r;
+						g = arc.g;
+						b = arc.b;
 					}
+					else
+					{
+						r = (arc.life * arc.r) / 16;
+						g = (arc.life * arc.g) / 16;
+						b = (arc.life * arc.b) / 16;
+					}
+
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
 				}
 			}
 		}
@@ -377,17 +406,18 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBubbles(RenderView& view) 
 	{
-		for (int i = 0; i < MAX_BUBBLES; i++) 
+		if (Bubbles.empty())
+			return;
+
+		for (const auto& bubble : Bubbles)
 		{
-			BUBBLE_STRUCT* bubble = &Bubbles[i];
-			if (bubble->active)
-			{
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
-					Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z),
-					bubble->color,
-					bubble->rotation,
-					1.0f, { bubble->size * 0.5f, bubble->size * 0.5f }, BLENDMODE_ADDITIVE, true, view);
-			}
+			if (bubble.Life <= 0.0f)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
+				bubble.Position,
+				bubble.Color, 0.0f, 1.0f, bubble.Scale / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -486,6 +516,13 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawShockwaves(RenderView& view) 
 	{
+		unsigned char r = 0;
+		unsigned char g = 0;
+		unsigned char b = 0;
+		float c = 0;
+		float s = 0;
+		float angle = 0;
+
 		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
@@ -494,53 +531,133 @@ namespace TEN::Renderer
 			{
 				byte color = shockwave->life * 8;
 
-				int dl = shockwave->outerRad - shockwave->innerRad;
-				Matrix rotationMatrix = Matrix::CreateRotationX(TO_RAD(shockwave->xRot));
+				//int dl = shockwave->outerRad - shockwave->innerRad;
+
+				shockwave->yRot +=  shockwave->yRot/FPS;
+				
+				Matrix rotationMatrix =
+					Matrix::CreateRotationY(shockwave->yRot / 4) *
+					Matrix::CreateRotationZ(shockwave->zRot) *
+					Matrix::CreateRotationX(shockwave->xRot);
+					
 				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
-				float angle = PI / 32.0f;
-				float c = cos(angle);
-				float s = sin(angle);
+				if (shockwave->style == (int)ShockwaveStyle::Normal)
+				{
+					angle = PI / 32.0f;
+					c = cos(angle);
+					s = sin(angle);
+					angle -= PI / 8.0f;
+				}
+				else
+				{
+					angle = PI / 16.0f;
+					c = cos(angle);
+					s = sin(angle);
+					angle -= PI / 4.0f;
+				}
+
 				float x1 = (shockwave->innerRad * c);
 				float z1 = (shockwave->innerRad * s);
 				float x4 = (shockwave->outerRad * c);
 				float z4 = (shockwave->outerRad * s);
-				angle -= PI / 8.0f;
-
+			
 				Vector3 p1 = Vector3(x1, 0, z1);
 				Vector3 p4 = Vector3(x4, 0, z4);
 
 				p1 = Vector3::Transform(p1, rotationMatrix);
 				p4 = Vector3::Transform(p4, rotationMatrix);
 
-				for (int j = 0; j < 16; j++) 
+				if (shockwave->fadeIn == true)
+				{
+					if (shockwave->sr < shockwave->r)
+					{
+						shockwave->sr += shockwave->r/18;
+						r = shockwave->sr * shockwave->life / 255.0f;
+					}
+					else
+						r = shockwave->r * shockwave->life / 255.0f;
+
+
+					if (shockwave->sg < shockwave->g)
+					{
+						shockwave->sg += shockwave->g /18;
+						g = shockwave->sg * shockwave->life / 255.0f;
+					}
+					else
+						g = shockwave->g * shockwave->life / 255.0f;
+
+
+					if (shockwave->sb < shockwave->b)
+					{
+						shockwave->sb += shockwave->b / 18;
+						b = shockwave->sb * shockwave->life / 255.0f;
+					}
+					else
+						b = shockwave->b * shockwave->life / 255.0f;
+
+					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+						shockwave->fadeIn = false;
+
+				}
+				else
+				{
+					r = shockwave->r * shockwave->life / 255.0f;
+					g = shockwave->g * shockwave->life / 255.0f;
+					b = shockwave->b * shockwave->life / 255.0f;
+				}
+				
+				for (int j = 0; j < 16; j++)
 				{
 					c = cos(angle);
 					s = sin(angle);
-					float x2 = (shockwave->innerRad * c);
+
+					float x2 =  (shockwave->innerRad * c);
 					float z2 = (shockwave->innerRad * s);
+
 					float x3 = (shockwave->outerRad * c);
 					float z3 = (shockwave->outerRad * s);
-					angle -= PI / 8.0f;
-
+				
 					Vector3 p2 = Vector3(x2, 0, z2);
 					Vector3 p3 = Vector3(x3, 0, z3);
 
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-								pos + p1,
-								pos + p2,
-								pos + p3,
-								pos + p4,
-								Vector4(
-								shockwave->r * shockwave->life / 255.0f / 16.0f,
-								shockwave->g * shockwave->life / 255.0f / 16.0f,
-								shockwave->b * shockwave->life / 255.0f / 16.0f,
+					if (shockwave->style == (int)ShockwaveStyle::Normal)
+					{
+						angle -= PI / 8.0f;
+
+						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+							pos + p1,
+							pos + p2,
+							pos + p3,
+							pos + p4,
+							Vector4(
+								r / 16.0f,
+								g / 16.0f,
+								b / 16.0f,
 								1.0f),
-								0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+							0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+					}
+					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
+					{
+						angle -= PI / 4.0f;
+
+						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+							pos + p1,
+							pos + p2,
+							pos + p3,
+							pos + p4,
+							Vector4(
+								r / 16.0f,
+								g / 16.0f,
+								b / 16.0f,
+								1.0f),
+							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+					}
 
 					p1 = p2;
 					p4 = p3;
@@ -803,7 +920,7 @@ namespace TEN::Renderer
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
-		vector<byte> data = { 128, 128, 255, 1 };
+		std::vector<byte> data = { 128, 128, 255, 1 };
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
@@ -1183,8 +1300,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
-		extern vector<DebrisFragment> DebrisFragments;
-		vector<RendererVertex> vertices;
+		extern std::vector<DebrisFragment> DebrisFragments;
+		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
@@ -1264,11 +1381,16 @@ namespace TEN::Renderer
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
 
-		for (int i = 0; i < SmokeParticles.size(); i++) 
+		for (const auto& smoke : SmokeParticles) 
 		{
-			SmokeParticle& s = SmokeParticles[i];
-			if (!s.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, true, view);
+			if (!smoke.active)
+				continue;
+
+			// TODO: Switch back to alpha blend mode once rendering for it is refactored. -- Sezz 2023.01.14
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
+				smoke.position,
+				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 

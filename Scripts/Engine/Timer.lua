@@ -78,7 +78,7 @@ Timer = {
 		obj.name = name
 
 		if LevelVars.Engine.Timer.timers[name] then
-			print("Warning: a timer with name " .. name .. " already exists.")
+			print("Warning: a timer with name " .. name .. " already exists; overwriting it with a new one...")
 		end
 
 		LevelVars.Engine.Timer.timers[name] ={} 
@@ -120,12 +120,12 @@ Timer = {
 				t.remainingTime = t.remainingTime - dt
 
 				if t.remainingTime <= 0 then
-					t.func(table.unpack(t.funcArgs))
 					if not t.loop then
 						t.active = false
 					else
 						t.remainingTime = t.remainingTime + t.totalTime
 					end
+					t.func(table.unpack(t.funcArgs))
 				end
 			end
 

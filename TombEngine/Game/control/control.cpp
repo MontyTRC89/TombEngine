@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/control/control.h"
 
+#include <chrono>
 #include <process.h>
 
 #include "Game/camera.h"
@@ -10,12 +11,13 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
 #include "Game/effects/hair.h"
-#include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -32,7 +34,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -52,12 +54,14 @@
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
 
+using namespace std::chrono;
 using namespace TEN::Effects;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Generic;
@@ -65,7 +69,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 int GameTimer       = 0;
@@ -91,6 +95,8 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
+int ControlPhaseTime;
+
 int DrawPhase(bool isTitle)
 {
 	if (isTitle)
@@ -108,6 +114,9 @@ int DrawPhase(bool isTitle)
 
 GameStatus ControlPhase(int numFrames)
 {
+	auto time1 = std::chrono::high_resolution_clock::now();
+
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 	bool isTitle = (CurrentLevel == 0);
 
 	RegeneratePickups();
@@ -189,7 +198,8 @@ GameStatus ControlPhase(int numFrames)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		UpdateLightning();
+		UpdateElectricitys();
+		UpdateHelicalLasers();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
@@ -228,6 +238,12 @@ GameStatus ControlPhase(int numFrames)
 			isFirstTime = false;
 		}
 	}
+
+	using ns = std::chrono::nanoseconds;
+	using get_time = std::chrono::steady_clock;
+
+	auto time2 = std::chrono::high_resolution_clock::now();
+	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 
 	return GameStatus::None;
 }
@@ -357,12 +373,12 @@ void KillMoveEffects()
 
 int GetRandomControl()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 int GetRandomDraw()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 void CleanUp()
@@ -387,9 +403,9 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear all kinds of particles.
+	ClearBubbles();
 	DisableSmokeParticles();
 	DisableDripParticles();
-	DisableBubbles();
 	DisableDebris();
 
 	// Clear swarm enemies.
@@ -404,6 +420,8 @@ void CleanUp()
 
 void InitialiseScripting(int levelIndex, bool loadGame)
 {
+	TENLog("Loading level script...", LogLevel::Info);
+
 	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(!levelIndex || loadGame);
 
@@ -472,6 +490,12 @@ void InitialiseOrLoadGame(bool loadGame)
 			Statistics.Game = {};
 			GameTimer = 0;
 			InitialiseGame = false;
+
+			TENLog("Starting new game.", LogLevel::Info);
+		}
+		else
+		{
+			TENLog("Starting new level.", LogLevel::Info);
 		}
 
 		g_GameScript->OnStart();

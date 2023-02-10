@@ -135,8 +135,8 @@ namespace TEN::Input
 
 	extern std::vector<InputAction> ActionMap;
 	extern vector<QueueState>		ActionQueue;
-	extern std::vector<Vector2>		AxisMap;
 	extern std::vector<bool>		KeyMap;
+	extern std::vector<Vector2>		AxisMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?

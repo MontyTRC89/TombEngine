@@ -8,6 +8,7 @@ using std::string;
 
 struct LevelCameraInfo
 {
+	short Index = -1;
 	Vector3i Position	= Vector3i::Zero;
 	int		 RoomNumber = 0;
 	int		 Flags		= 0;

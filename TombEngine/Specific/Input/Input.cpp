@@ -93,16 +93,16 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData				 RumbleInfo	 = {};
+	RumbleData				 RumbleInfo  = {};
 	std::vector<InputAction> ActionMap	 = {};
-	std::vector<QueueState>	 ActionQueue = {};
-	std::vector<Vector2>	 AxisMap	 = {};
+	vector<QueueState>		 ActionQueue = {};
 	std::vector<bool>		 KeyMap		 = {};
+	std::vector<Vector2>	 AxisMap	 = {};
 
 	int DbInput = 0;
 	int TrInput = 0;
 
-	std::vector<int> DefaultBindings =
+	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/

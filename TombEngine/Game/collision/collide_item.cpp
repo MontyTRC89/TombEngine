@@ -1628,7 +1628,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					// Need to know which direction the wall is.
 
 					// X crossed boundary?
-					if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))))
+					if ((x & ~WALL_MASK) != (item->Pose.Position.x & ~WALL_MASK))
 					{
 						if (xv <= 0)	// Hit angle = ANGLE(270.0f).
 							item->Pose.Orientation.y = ANGLE(90.0f) + (ANGLE(270.0f) - item->Pose.Orientation.y);
@@ -1796,7 +1796,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
 				StaticObjects[mesh.staticNumber].shatterType != SHT_NONE)
 			{
-				SoundEffect(GetShatterSound(mesh.staticNumber), (Pose*&)mesh);
+				SoundEffect(GetShatterSound(mesh.staticNumber), &mesh.pos);
 				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)

@@ -8,11 +8,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -54,15 +55,10 @@ namespace TEN::Entities::Creatures::TR2
 
 	void InitialiseSpearGuardian(short itemNumber)
 	{
-		ClearItem(itemNumber);
-
 		auto* item = &g_Level.Items[itemNumber];
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
 
-		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-
-		item->Animation.FrameNumber = anim->frameBase;
-		item->Animation.ActiveState = anim->ActiveState;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 48);
 	}
 
 	void SpearGuardianControl(short itemNumber)
@@ -127,9 +123,9 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
+					if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 2;
-					else if (TestProbability(1.0f / 30))
+					else if (Random::TestProbability(1 / 30.0f))
 						item->Animation.TargetState = 3;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
@@ -149,9 +145,9 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 3;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
+					if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 1;
-					else if (TestProbability(1.0f / 30))
+					else if (Random::TestProbability(1 / 30.0f))
 						item->Animation.TargetState = 3;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
@@ -171,16 +167,16 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 4;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
+					if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 1;
-					else if (TestProbability(1.0f / 30))
+					else if (Random::TestProbability(1 / 30.0f))
 						item->Animation.TargetState = 2;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				{
 					if (AI.distance < pow(SECTOR(1.5f), 2))
 						item->Animation.TargetState = 7;
-					else if (TestProbability(0.5f))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = 9;
 					else
 						item->Animation.TargetState = 11;
@@ -200,7 +196,7 @@ namespace TEN::Entities::Creatures::TR2
 					break;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;
@@ -300,7 +296,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;
@@ -331,7 +327,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;
@@ -347,7 +343,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (isLaraAlive && LaraItem->HitPoints <= 0)
 		{
-			CreatureKill(item, 49, 19, 2);
+			CreatureKill(item, 49, 0, 19, LS_DEATH); // TODO: add spear_guardian state enum and lara extra state enum
 			return;
 		}
 

@@ -51,6 +51,7 @@ private:
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
 	sol::protected_function										m_onControlPhase{};
+	sol::protected_function										m_preSave{};
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
@@ -72,7 +73,7 @@ public:
 	void								FreeLevelScripts() override;
 
 	void								LogPrint(sol::variadic_args va);
-	bool								SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value);
+	bool								SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value);
 
 	void								AddCallback(CallbackPoint point, LevelFunc const & lf);
 	void								RemoveCallback(CallbackPoint point, LevelFunc const & lf);
@@ -80,11 +81,11 @@ public:
 	void								ResetScripts(bool clearGameVars) override;
 	void								ShortenTENCalls() override;
 
-	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& luaName);
+	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& name);
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteString(const std::string& command) override;
-	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) override;
+	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator, std::string const& arguments) override;
 
 	void								ExecuteFunction(std::string const& name, short idOne, short idTwo) override;
 

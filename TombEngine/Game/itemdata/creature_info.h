@@ -1,68 +1,26 @@
 #pragma once
 #include "Math/Math.h"
 
-using std::vector;
-
 struct ItemInfo;
 
-struct BOX_NODE 
-{
-	int exitBox;
-	int searchNumber;
-	int nextExpansion;
-	int boxNumber;
-};
-
+// Default zone loaded by TEN. They are added by TE at compile time.
 enum class ZoneType
 {
-	None = -1,
-	Skeleton,
-	Basic,
-	Flyer,
-	HumanClassic,
-	VonCroy,
-	Water,
-	Max,
+	Skeleton, // Enables jump, also 1 block vault and fall.
+	Basic,	  // Enables 1 step vault, 2 step fall (default).
 
-	// Custom zones (above zones are used for LOT.zone):
-	HumanJumpAndMonkey,
-	HumanJump,
-	Spider,
-	Blockable, // For large creatures such as trex and shiva.
-	SophiaLee, // Prevents Sophia from going to lower levels again.
-	Ape,	   // Only 0.5 block climb.
-	HumanLongJumpAndMonkey,
+	// TODO: Underwater creatures can go on land like the crocodile, which is wrong since the flag IsAmphibious is not set for them.
+	Water, // Enables movement exclusively underwater (exception: crocodile can go on land)
+	// Amphibious, // TODO: For later since it's not on level file now.
+
+	Human, // Enables 1 block vault and fall.
+	Flyer, // Enables flying anywhere except water rooms.
+
+	MaxZone // Used when loading level.
 };
 
-struct LOTInfo 
+enum class MoodType
 {
-	bool Initialised;
-
-	vector<BOX_NODE> Node = {};
-	int Head;
-	int Tail;
-
-	ZoneType Zone = ZoneType::None;
-	Vector3i Target = Vector3i::Zero;
-	int SearchNumber;
-	int BlockMask;
-	short Step;
-	short Drop;
-	short ZoneCount;
-	int TargetBox;
-	int RequiredBox;
-	short Fly;
-
-	bool CanJump	  = false;
-	bool CanMonkey	  = false;
-	bool IsJumping	  = false;
-	bool IsMonkeying  = false;
-	bool IsAmphibious = false;
-};
-
-enum class MoodType 
-{
-	None,
 	Bored,
 	Attack,
 	Escape,
@@ -77,21 +35,57 @@ enum class CreatureAIPriority
 	High
 };
 
+struct BoxNode
+{
+	int exitBox		  = 0;
+	int searchNumber  = 0;
+	int nextExpansion = 0;
+	int boxNumber	  = 0;
+};
+
+struct LOTInfo 
+{
+	bool Initialised = false;
+
+	std::vector<BoxNode> Node = {};
+	int Head = 0;
+	int Tail = 0;
+
+	ZoneType Zone	= ZoneType::Basic;
+	Vector3i Target = Vector3i::Zero;
+
+	int	  TargetBox	   = 0;
+	int	  RequiredBox  = 0;
+	int	  SearchNumber = 0;
+	int	  BlockMask	   = 0;
+	short ZoneCount	   = 0;
+	short Step		   = 0;
+	short Drop		   = 0;
+	short Fly		   = 0;
+
+	bool IsAmphibious = false;
+	bool IsJumping	  = false;
+	bool IsMonkeying  = false;
+
+	bool CanJump	  = false;
+	bool CanMonkey	  = false;
+};
+
 struct CreatureInfo 
 {
-	short ItemNumber = -1;
+	int ItemNumber = -1;
 
 	LOTInfo	  LOT			 = {};
-	MoodType  Mood			 = MoodType::None;
+	MoodType  Mood			 = MoodType::Bored;
 	ItemInfo* Enemy			 = nullptr;
 	ItemInfo* AITarget		 = nullptr;
-	short	  AITargetNumber = -1;
+	int		  AITargetNumber = -1;
 	Vector3i  Target		 = Vector3i::Zero;
 
-	short MaxTurn = 0;
+	short MaxTurn		   = 0;
 	short JointRotation[4] = {};
-	bool HeadLeft = false;
-	bool HeadRight = false;
+	bool  HeadLeft		   = false;
+	bool  HeadRight		   = false;
 
 	bool Patrol			  = false; // Unused?
 	bool Alerted		  = false;
@@ -102,10 +96,10 @@ struct CreatureInfo
 	bool MonkeySwingAhead = false;
 	bool ReachedGoal	  = false;
 
-	short FiredWeapon;
-	short Tosspad;
-	short LocationAI;
-	short Flags = 0;
+	short FiredWeapon = 0;
+	short Tosspad	  = 0;
+	short LocationAI  = 0;
+	short Flags		  = 0;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority = CreatureAIPriority::None;
