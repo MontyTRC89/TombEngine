@@ -513,8 +513,25 @@ namespace TEN::Renderer
 
 	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
 	{
-		// Calculate clip space coords.
+		constexpr auto INVALID_SCREEN_SPACE_POSITION = Vector2(INT_MAX, INT_MAX);
+
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
+		auto cameraPos = Vector4(
+			gameCamera.camera.WorldPosition.x,
+			gameCamera.camera.WorldPosition.y,
+			gameCamera.camera.WorldPosition.z,
+			1.0f);
+		auto cameraDirection = Vector4(
+			gameCamera.camera.WorldDirection.x,
+			gameCamera.camera.WorldDirection.y,
+			gameCamera.camera.WorldDirection.z,
+			1.0f);
+		
+		// If point is behind camera, return invalid screen space position.
+		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
+			return INVALID_SCREEN_SPACE_POSITION;
+
+		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
 
 		// Calculate normalized device coords.
