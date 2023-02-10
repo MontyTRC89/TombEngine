@@ -533,8 +533,6 @@ namespace TEN::Entities::Creatures::TR3
 		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 		TriggerSophiaLeightLight(item, shockwavePos);
 
-
-
 		// Charge count. Sophia can start the charge animation again when at 0.
 		if (item.Timer > 0)
 			item.Timer--;
