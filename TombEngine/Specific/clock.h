@@ -6,7 +6,19 @@
 // which assumes 30 iterations per second.
 constexpr auto FPS		  = 30;
 constexpr auto DELTA_TIME = 1.0f / FPS;
+constexpr auto TIME_UNIT  = 60;
+constexpr auto DAY_UNIT   = 24;
+
+struct GameTime
+{
+	int Days;
+	int Hours;
+	int Minutes;
+	int Seconds;
+};
 
 int Sync();
 bool TimeInit();
 bool TimeReset();
+
+GameTime GetGameTime(int frameCount);

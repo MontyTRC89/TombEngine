@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -16,9 +16,10 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
 
-#define	MAX_TRIGGER_RANGE 0x4000
+constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 
 void TriggerChaffEffects(int flareLife)
 {
@@ -43,6 +44,20 @@ void TriggerChaffEffects(ItemInfo& item, int age)
 
 void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& vel, int speed, bool isUnderwater, int age)
 {
+	auto pose = item.Pose;
+	if (item.IsLara())
+	{
+		auto handPos = GetJointPosition(&item, LM_RHAND);
+		pose.Position = handPos;
+		pose.Position.y -= 64;
+	}
+
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item.RoomNumber);
+	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
+
+	if (!age)
+		return;
+
 	int numSparks = Random::GenerateInt(1, 3);
 
 	for (int i = 0; i < numSparks; i++)
@@ -61,9 +76,11 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		color.b = 192 - color.g;
 
 		TriggerChaffSparkles(pos, vel, color, age, item);
+
 		if (isUnderwater)
 		{
-			TriggerChaffBubbles(pos, item.RoomNumber);
+			if (Random::TestProbability(1 / 4.0f))
+				SpawnChaffBubble(pos.ToVector3(), item.RoomNumber);
 		}
 		else
 		{
@@ -72,17 +89,6 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 			TEN::Effects::Smoke::TriggerFlareSmoke(pos.ToVector3() + direction * 20, direction, age, item.RoomNumber);
 		}
 	}
-
-	auto pose = item.Pose;
-	if (item.IsLara())
-	{
-		auto handPos = GetJointPosition(&item, LM_RHAND);
-		pose.Position = handPos;
-		pose.Position.y -= 64;
-	}
-
-	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item.RoomNumber);
-	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
 void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int age, const ItemInfo& item)
@@ -156,29 +162,4 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 	size = (GetRandomControl() & 7) + (speed >> 7) + 32;
 	smoke->sSize = size >> 2;
 	smoke->size = smoke->dSize = size;
-}
-
-void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
-{
-	auto& bubble = Bubbles[GetFreeBubble()];
-
-	bubble = {};
-	bubble.active = true;
-	bubble.size = 0;
-	bubble.age = 0;
-	bubble.speed = Random::GenerateFloat(4.0f, 16.0f);
-	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = Random::GenerateFloat(0.3f, 0.8f);
-	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
-	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = Random::GenerateFloat(32.0f, 96.0f);
-	bubble.spriteNum = SPR_BUBBLES;
-	bubble.rotation = 0;
-	bubble.worldPosition = pos.ToVector3();
-	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
-	bubble.waveSpeed = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
-	bubble.roomNumber = roomNumber;
 }

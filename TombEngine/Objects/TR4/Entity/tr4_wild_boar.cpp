@@ -9,11 +9,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, BOAR_ANIM_IDLE);
 	}
 
@@ -84,10 +84,9 @@ namespace TEN::Entities::TR4
 
 				int minDistance = INT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentItem = ActiveCreatures[i];
-
+					auto* currentItem = currentCreature;
 					if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
 						continue;
 
@@ -133,7 +132,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance || item->Flags)
 					item->Animation.TargetState = BOAR_STATE_RUN_FORWARD;
-				else if (TestProbability(0.992f))
+				else if (Random::TestProbability(0.992f))
 				{
 					joint1 = AIGuard(creature) / 2;
 					joint3 = joint1;
@@ -148,7 +147,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance)
 					item->Animation.TargetState = BOAR_STATE_IDLE;
-				else if (TestProbability(1.0f / 128))
+				else if (Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;
