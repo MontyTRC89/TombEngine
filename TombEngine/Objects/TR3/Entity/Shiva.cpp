@@ -529,26 +529,26 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		if (!pos.has_value())
-			return;
-
-		// If immune, ricochet without damage.
-		if (target.ItemFlags[1] != 0)
+		if (pos.has_value())
 		{
-			SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
-			return;
+			// If immune, ricochet without damage.
+			if (target.ItemFlags[1] != 0)
+			{
+				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
+
+			// If guarded, ricochet without damage.
+			if (target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
+				target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
+			{
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
 		}
 
-		// If guarded, ricochet without damage.
-		if (target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
-		    target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
-		{
-			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
-			return;
-		}
-		
 		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }
