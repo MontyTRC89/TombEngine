@@ -3,7 +3,7 @@ Version 1.0.7
 
 * Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt).
 * Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
-* Added boss effect for TR3 tony boss.
+* Added boss effect for TR3 tony boss and improved tony explosion color.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
