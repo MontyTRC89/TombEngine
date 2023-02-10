@@ -180,7 +180,6 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 
-		bool validTarget = false;
 		int targetAngle = 0;
 		int targetDistance = 0;
 		auto jointHeadRot = EulerAngles::Zero;
@@ -254,7 +253,6 @@ namespace TEN::Entities::Creatures::TR3
 				AlertAllGuards(itemNumber);
 			}
 
-			validTarget = (creature.Enemy != nullptr && creature.Enemy->HitPoints > 0) ? true : false;
 
 			switch (item.Animation.ActiveState)
 			{
@@ -297,13 +295,9 @@ namespace TEN::Entities::Creatures::TR3
 						else
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
-					else if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) &&
-							 ((creature.Enemy->IsLara() && AI.bite) ||
-							  (creature.Enemy->IsCreature() && AI.ahead)) )
+					else if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_CLOSE_PUNCH;
-					else if ((validTarget && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) &&
-							 ((creature.Enemy->IsLara() && AI.bite) ||
-							  (creature.Enemy->IsCreature() && AI.ahead)) )
+					else if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_FAR_PUNCH;
 					else if (AI.bite && AI.distance < CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_WALK;
@@ -340,12 +334,9 @@ namespace TEN::Entities::Creatures::TR3
 						if (Random::TestProbability(CIVVY_WAIT_CHANCE))
 							item.Animation.TargetState = CIVVY_STATE_IDLE;
 					}
-					else if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY ) &&
-							 (creature.Enemy->IsLara() || creature.Enemy->IsCreature()) )
+					else if (creature.Enemy != nullptr && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE && creature.Enemy->Animation.Velocity.z < CIVVY_TARGET_ALERT_VELOCITY )
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
-					else if ((validTarget && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) &&
-							 ((creature.Enemy->IsLara() && AI.bite) ||
-							  (creature.Enemy->IsCreature() && AI.ahead)) )
+					else if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_AIM_WALKING_PUNCH;
 					else if (AI.distance > CIVVY_WALK_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_RUN;
@@ -404,9 +395,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if ((validTarget && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE) &&
-						((creature.Enemy->IsLara() && AI.bite) ||
-						 (creature.Enemy->IsCreature() && AI.ahead)) )
+					if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_CLOSE_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_CLOSE_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
@@ -424,9 +413,7 @@ namespace TEN::Entities::Creatures::TR3
 						jointTorsoRot.y = AI.angle;
 					}
 
-					if ((validTarget && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE) &&
-						((creature.Enemy->IsLara() && AI.bite) ||
-						 (creature.Enemy->IsCreature() && AI.ahead)))
+					if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_FAR_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_FAR_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_IDLE;
@@ -445,9 +432,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 
 					
-					if ((validTarget && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE) &&
-						((creature.Enemy->IsLara() && AI.bite) ||
-						 (creature.Enemy->IsCreature() && AI.ahead)))
+					if (creature.Enemy != nullptr && AI.bite && AI.distance < CIVVY_ATTACK_WALKING_PUNCH_RANGE)
 						item.Animation.TargetState = CIVVY_STATE_ATTACK_WALKING_PUNCH;
 					else
 						item.Animation.TargetState = CIVVY_STATE_WALK;
