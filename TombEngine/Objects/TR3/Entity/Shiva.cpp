@@ -479,7 +479,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot = EulerAngles(ai.xAngle, ai.angle, 0);
 				}
 
-				ShivaDamage(&item, SHIVA_GRAB_ATTACK_DAMAGE);
+				ShivaDamage(*item, SHIVA_GRAB_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_DOWNWARD_ATTACK:
@@ -490,7 +490,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (ai.xAngle > 0)
 					extraTorsoRot.x = ai.xAngle;
 
-				ShivaDamage(&item, SHIVA_DOWNWARD_ATTACK_DAMAGE);
+				ShivaDamage(*item, SHIVA_DOWNWARD_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_KILL:
