@@ -172,13 +172,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color)
 	{
-		auto line = RendererLine2D
-		{
-			origin,
-			target,
-			color
-		};
-
+		auto line = RendererLine2D{ origin, target, color };
 		m_lines2DToDraw.push_back(line);
 	}
 
