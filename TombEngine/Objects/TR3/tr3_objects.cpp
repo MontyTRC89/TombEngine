@@ -28,7 +28,6 @@
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/tr3_wasp.h" 
-#include "Objects/TR3/Entity/tr3_wasp_spawn.h"
 
 // Effects
 #include "Objects/Effects/Boss.h"
