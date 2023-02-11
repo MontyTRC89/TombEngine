@@ -168,6 +168,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_monster_mutant.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_wasp.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
@@ -645,6 +646,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_monster_mutant.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_wasp.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
