@@ -23,7 +23,7 @@ namespace TEN::Hud
 		float StringScale  = 0.0f;
 		float StringScalar = 0.0f;
 
-		bool IsOffscreen(bool checkAbove = true) const;
+		bool IsOffscreen() const;
 		void Update(bool isHead);
 	};
 

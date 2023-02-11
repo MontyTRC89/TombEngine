@@ -15,19 +15,13 @@ namespace TEN::Hud
 {
 	constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
 
-	bool DisplayPickup::IsOffscreen(bool checkAbove) const
+	bool DisplayPickup::IsOffscreen() const
 	{
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
 		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, SCREEN_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
 
-		// NOTE: Positions above screen can be ignored to account for high stacks.
-		if (checkAbove)
-		{
-			if (Position.y <= -SCREEN_THRESHOLD.y)
-				return true;
-		}
-
 		return (Position.x <= -SCREEN_THRESHOLD.x ||
+				Position.y <= -SCREEN_THRESHOLD.y ||
 				Position.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
 				Position.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y));
 	}
@@ -41,9 +35,6 @@ namespace TEN::Hud
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
 		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
-
-		if (this->IsOffscreen(false))
-			return;
 
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
@@ -88,6 +79,7 @@ namespace TEN::Hud
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
+		constexpr auto DEFAULT_POSITION	 = Vector2(0.0f, 0.0f);
 		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
@@ -113,10 +105,14 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = this->GetNewDisplayPickup();
 
+		auto screenPos = g_Renderer.GetScreenSpacePosition(pos);
+		if (screenPos == INVALID_SCREEN_SPACE_POSITION)
+			screenPos = DEFAULT_POSITION;
+
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position =
-		pickup.Origin = g_Renderer.GetScreenSpacePosition(pos); // TODO: Handle case when offscreen.
+		pickup.Origin = screenPos;
 		pickup.Target = Vector2::Zero;
 		pickup.Life = round(LIFE_MAX * FPS);
 		pickup.Scale = 0.0f;
@@ -206,7 +202,7 @@ namespace TEN::Hud
 		this->DisplayPickups.erase(
 			std::remove_if(
 				this->DisplayPickups.begin(), this->DisplayPickups.end(),
-				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen(false)); }),
+				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
 			this->DisplayPickups.end());
 	}
 
