@@ -513,8 +513,6 @@ namespace TEN::Renderer
 
 	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
 	{
-		constexpr auto INVALID_SCREEN_SPACE_POSITION = Vector2(INT_MAX, INT_MAX);
-
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
 			gameCamera.camera.WorldPosition.x,
@@ -539,8 +537,8 @@ namespace TEN::Renderer
 
 		// Calculate and return screen space position.
 		return Vector2(
-			((point.x + 1.0f) * SCREEN_COORDS.x) / 2,
-			((1.0f - point.y) * SCREEN_COORDS.y) / 2);
+			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)

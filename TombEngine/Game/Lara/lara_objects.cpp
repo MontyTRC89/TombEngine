@@ -35,6 +35,9 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = -ANGLE(130.0f);
+	Camera.targetElevation = -ANGLE(15.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item))
 		item->Animation.TargetState = GetNextAnimState(item);
@@ -49,6 +52,9 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = ANGLE(130.0f);
+	Camera.targetElevation = -ANGLE(15.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 		lara->Control.HandStatus = HandStatus::Free;

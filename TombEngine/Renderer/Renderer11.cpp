@@ -117,7 +117,7 @@ namespace TEN::Renderer
 			Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
 
 		};
-		const float HUD_BORDER_WIDTH = borderSize * (SCREEN_COORDS.x / SCREEN_COORDS.y);
+		const float HUD_BORDER_WIDTH = borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
 		const float HUD_BORDER_HEIGT = borderSize;
 		array<Vector3, 16> barBorderVertices = {
 			//top left
