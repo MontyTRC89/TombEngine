@@ -555,7 +555,10 @@ namespace TEN::Entities::TR4
 		else
 		{
 			if (item.Animation.ActiveState != SAS_STATE_DEATH)
+			{
 				SetAnimation(&item, SAS_ANIM_DEATH);
+				item.Effect.Type = EffectType::Cadaver;
+			}
 		}
 
 		CreatureTilt(&item, tilt);
