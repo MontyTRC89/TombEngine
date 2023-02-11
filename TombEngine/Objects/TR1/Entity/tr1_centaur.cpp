@@ -13,24 +13,25 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
-	constexpr auto CENTAUR_REAR_DAMAGE	 = 200;
-	constexpr auto CENTAUR_REAR_RANGE	 = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE	 = 0x60;
-	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
+	constexpr auto CENTAUR_REAR_DAMAGE = 200;
+	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
+	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
+	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
-	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
+	const auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
-	const auto CentaurRearBite = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
-	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
+	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
+	const auto CentaurAttackJoints = std::vector<unsigned int>{ 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
 	{
@@ -56,17 +57,14 @@ namespace TEN::Entities::TR1
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		short head = 0;
+
 		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != CENTAUR_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CENTAUR_STATE_DEATH;
-			}
+				SetAnimation(item, CENTAUR_ANIM_DEATH);
 		}
 		else
 		{
@@ -98,18 +96,18 @@ namespace TEN::Entities::TR1
 			case CENTAUR_STATE_RUN_FORWARD:
 				if (AI.bite && AI.distance < pow(CENTAUR_REAR_RANGE, 2))
 				{
-					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
+					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 				}
 				else if (Targetable(item, &AI))
 				{
+					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
-					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 				}
-				else if (GetRandomControl() < CENTAUR_REAR_CHANCE)
+				else if (Random::TestProbability(CENTAUR_REAR_CHANCE))
 				{
-					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
+					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 				}
 
 				break;
@@ -135,10 +133,10 @@ namespace TEN::Entities::TR1
 
 			case CENTAUR_STATE_WARNING:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, CentaurAttackJoints))
+					item->TouchBits.Test(CentaurAttackJoints))
 				{
-					CreatureEffect(item, CentaurRearBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CENTAUR_REAR_DAMAGE);
+					CreatureEffect(item, CentaurRearBite, DoBloodSplat);
 					item->Animation.RequiredState = CENTAUR_STATE_IDLE;
 				}
 

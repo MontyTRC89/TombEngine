@@ -6,6 +6,13 @@ struct RoomVector {
 	y_location: uint32;
 }
 
+table Room {
+	index: int32;
+	name: string;
+	flags: int32;
+	reverb_type: int32;
+}
+
 table Item {
 	active_state: int32;
 	anim_number: int32;
@@ -32,15 +39,23 @@ table Item {
 	pose: Position;
 	next_item: int32;
 	next_item_active: int32;
-	triggered: bool;
 	active: bool;
 	status: int32;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
-	swap_mesh_flags: int32;
 	data: TEN.Save.ItemData;
+	
+	base_mesh: int32;
+	mesh_pointers: [int32];
+
+	effect_type: int32;
+	effect_light_colour: Vector3;
+	effect_primary_colour: Vector3;
+	effect_secondary_colour: Vector3;
+	effect_count: int32;
+
 	lua_name: string;
 	lua_on_killed_name: string;
 	lua_on_hit_name: string;
@@ -76,10 +91,11 @@ table HolsterInfo {
 
 table CarriedWeaponInfo {
 	present: bool;
-	ammo: [AmmoInfo];
-	selected_ammo: int32;
 	has_lasersight: bool;
 	has_silencer: bool;
+	ammo: [AmmoInfo];
+	selected_ammo: int32;
+	weapon_mode: int32;
 }
 
 table WeaponInfo {
@@ -162,6 +178,9 @@ table WeaponControlData {
 	request_gun_type: int32;
 	last_gun_type: int32;
 	holster_info: HolsterInfo;
+	num_shots_fired: uint;
+	interval: float;
+	timer: float;
 }
 
 table RopeControlData {
@@ -255,7 +274,6 @@ table Lara {
 	burn_blue: int32;
 	burn_smoke: bool;
 	wet: [bool];
-	mesh_ptrs: [int32];
 	location: int32;
 	highest_location: int32;
 	location_pad: int32;
@@ -355,14 +373,20 @@ table EventSetCallCounters {
 }
 
 table VolumeState {
+	status: int32;
+	activator: int32;
+	timestamp: int32;
+}
+
+table Volume {
+	name: string;
 	number: int32;
 	room_number: int32;
+	enabled: bool;
 	position: Vector3;
 	rotation: Vector4;
 	scale: Vector3;
-	state: int32;
-	triggerer: int32;
-	timeout: int32;
+	queue: [VolumeState];
 }
 
 struct KeyValPair {
@@ -386,11 +410,31 @@ table boolTable {
 	scalar: bool;
 }
 
+table vec3Table {
+	vec: Vector3;
+}
+
+table rotationTable {
+	vec: Vector3;
+}
+
+table colorTable {
+	color: uint32;
+}
+
+table funcNameTable {
+	str: string;
+}
+
 union VarUnion {
 	str: stringTable,
 	tab: ScriptTable,
 	num: doubleTable,
-	boolean: boolTable
+	boolean: boolTable,
+	vec3: vec3Table,
+	rotation: rotationTable,
+	color: colorTable,
+	funcName: funcNameTable
 }
 
 table UnionTable{
@@ -427,6 +471,7 @@ table SaveGame {
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
 	lara: Lara;
+	rooms: [Room];
 	items: [Item];
 	next_item_free: int32;
 	next_item_active: int32;
@@ -448,6 +493,8 @@ table SaveGame {
 	flip_effect: int32;
 	flip_timer: int32;
 	flip_status: int32;
+	current_fov: int16;
+	action_queue: [int32];
 	ambient_track: string;
 	ambient_position: uint64;
 	oneshot_track: string;
@@ -456,9 +503,11 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
-	volume_states: [VolumeState];
+	volumes: [Volume];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
+	callbacks_pre_control: [string];
+	callbacks_post_control: [string];
 	}
 
 root_type TEN.Save.SaveGame;

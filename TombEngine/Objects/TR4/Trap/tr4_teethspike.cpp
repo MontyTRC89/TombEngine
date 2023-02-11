@@ -9,12 +9,12 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto TEETH_SPIKE_HARM_CONSTANT = 8;
-	constexpr auto TEETH_SPIKE_HARM_EMERGING = 30;
+	constexpr auto TEETH_SPIKE_HARM_DAMAGE_CONSTANT = 8;
+	constexpr auto TEETH_SPIKE_HARM_DAMAGE_EMERGING = 30;
 	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
 	constexpr auto TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO = 0.95f;
 
@@ -23,8 +23,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		// Set mutators to 0 by default.
-		for (size_t i = 0; i < item->Animation.Mutator.size(); i++)
-			item->Animation.Mutator[i].Scale.y = 0.0f;
+		for (size_t i = 0; i < item->Model.Mutator.size(); i++)
+			item->Model.Mutator[i].Scale.y = 0.0f;
 
 		item->Status = ITEM_INVISIBLE;
 		item->ItemFlags[0] = 1024;
@@ -34,10 +34,10 @@ namespace TEN::Entities::TR4
 	ContainmentType TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
 	{
 		// Get both teeth spikes and colliding item bounds.
-		auto spikeBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
-		auto itemBox = TO_DX_BBOX(collidingItem->Pose, GetBoundsAccurate(collidingItem));
+		auto spikeBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+		auto itemBox = GameBoundingBox(collidingItem).ToBoundingOrientedBox(collidingItem->Pose);
 
-		// Make intersection a bit more forgiving by reducing spike bounds a bit.
+		// Make intersection more forgiving by slightly reducing spike bounds.
 		spikeBox.Extents = spikeBox.Extents * TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO;
 		return spikeBox.Contains(itemBox);
 	}
@@ -59,7 +59,7 @@ namespace TEN::Entities::TR4
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
 			// Get current item bounds and radius.
-			auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+			auto* bounds = (GameBoundingBox*)GetBestFrame(item);
 			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1)) / 2;
 
 			// Play sound only if spikes are just emerging.
@@ -81,14 +81,11 @@ namespace TEN::Entities::TR4
 			if (LaraItem->Animation.ActiveState != LS_DEATH && intersection != ContainmentType::DISJOINT)
 			{
 				// Calculate spike angle to the horizon. If angle is upward, impale Lara.
-				auto normal = Vector3::Transform(Vector3::UnitY, Matrix::CreateFromYawPitchRoll(
-					TO_RAD(item->Pose.Orientation.y), 
-					TO_RAD(item->Pose.Orientation.x), 
-					TO_RAD(item->Pose.Orientation.z)));
+				auto normal = Vector3::Transform(Vector3::UnitY, item->Pose.Orientation.ToRotationMatrix());
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
+				auto* laraBounds = (GameBoundingBox*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
 
@@ -96,16 +93,16 @@ namespace TEN::Entities::TR4
 				if ((item->ItemFlags[0] >= 1024 || LaraItem->Animation.IsAirborne) &&
 					(angle > PI * 0.25f && angle < PI * 0.75f))
 				{
-					if (LaraItem->Animation.Velocity.y > 6 || item->ItemFlags[0] > 1024)
+					if (LaraItem->Animation.Velocity.y > 6.0f || item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
 						bloodCount = 20;
 					}
 				}
 				// Spikes are emerging or already fully protruded (in latter case, only damage Lara if she runs).
-				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30)
+				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30.0f)
 				{
-					int damage = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_EMERGING : TEETH_SPIKE_HARM_CONSTANT;
+					int damage = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_DAMAGE_EMERGING : TEETH_SPIKE_HARM_DAMAGE_CONSTANT;
 					DoDamage(LaraItem, damage);
 					bloodCount = (GetRandomControl() & 3) + 2;
 				}
@@ -117,15 +114,15 @@ namespace TEN::Entities::TR4
 				int yTop = laraBounds->Y1 + LaraItem->Pose.Position.y;
 				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
 				
+				// Spikes are downward; move blood origin to top.
 				if (angle < PI * 0.125f || angle > PI * 0.825f)
 				{
-					// Spikes are downward; move blood origin to top.
 					y1 = -bounds->Y2;
 					y2 = -bounds->Y1;
 				}
+				// Spikes are upward; leave origin as is.
 				else
 				{
-					// Spikes are upward; leave origin as is.
 					y1 = bounds->Y1;
 					y2 = bounds->Y2;
 				}
@@ -213,13 +210,13 @@ namespace TEN::Entities::TR4
 		}
 
 		// Update bone mutators.
-		for (size_t i = 0; i < item->Animation.Mutator.size(); i++)
+		for (size_t i = 0; i < item->Model.Mutator.size(); i++)
 		{
 			float scale = (float)item->ItemFlags[1] / 4096.0f;
 			if (scale > 0.0f)
-				item->Animation.Mutator[i].Scale = Vector3(1.0f, scale, 1.0f);
+				item->Model.Mutator[i].Scale = Vector3(1.0f, scale, 1.0f);
 			else
-				item->Animation.Mutator[i].Scale = Vector3::Zero;
+				item->Model.Mutator[i].Scale = Vector3::Zero;
 		}
 	}
 }

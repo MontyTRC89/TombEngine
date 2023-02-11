@@ -7,9 +7,9 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/debris.h"
 #include "Game/room.h"
+#include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Floordata;
@@ -32,8 +32,8 @@ void InitialiseFallingBlock(short itemNumber)
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
 
 	// Set mutators to 0 by default
-	for (int i = 0; i < item->Animation.Mutator.size(); i++)
-		item->Animation.Mutator[i].Rotation = Vector3::Zero;
+	for (int i = 0; i < item->Model.Mutator.size(); i++)
+		item->Model.Mutator[i].Rotation = Vector3::Zero;
 }
 
 void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -50,7 +50,7 @@ void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 			item->ItemFlags[0] = 0;
 			item->Status = ITEM_ACTIVE;
-			item->Flags |= 0x3E00;
+			item->Flags |= CODE_BITS;
 		}
 	}
 }
@@ -70,23 +70,23 @@ void FallingBlockControl(short itemNumber)
 			if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
 			{
 				// Subtly shake all meshes separately.
-				for (int i = 0; i < item->Animation.Mutator.size(); i++)
+				for (int i = 0; i < item->Model.Mutator.size(); i++)
 				{
-					item->Animation.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Animation.Mutator[i].Rotation.y = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Animation.Mutator[i].Rotation.z = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.y = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.z = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
 				}
 			}
 			else
 			{
 				// Make rotational falling movement with some random seed.
-				for (int i = 0; i < item->Animation.Mutator.size(); i++)
+				for (int i = 0; i < item->Model.Mutator.size(); i++)
 				{
 					auto rotSpeed = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
 					rotSpeed += i % 3 ? rotSpeed / 2 : rotSpeed;
-					item->Animation.Mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Animation.Mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Animation.Mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
 				}
 
 				if (item->ItemFlags[0] == FALLINGBLOCK_DELAY)
@@ -111,9 +111,9 @@ void FallingBlockControl(short itemNumber)
 					// Convert object to shatter item
 					ShatterItem.yRot = item->Pose.Orientation.y;
 					ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
-					ShatterItem.color = item->Color;
+					ShatterItem.color = item->Model.Color;
 					ShatterItem.sphere.x = item->Pose.Position.x;
-					ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor
+					ShatterItem.sphere.y = item->Pose.Position.y - CLICK(1); // So debris won't spawn below floor
 					ShatterItem.sphere.z = item->Pose.Position.z;
 					ShatterItem.bit = 0;
 					ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
@@ -139,7 +139,7 @@ void FallingBlockControl(short itemNumber)
 std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -149,7 +149,7 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 
-	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

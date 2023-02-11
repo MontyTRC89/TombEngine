@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -22,20 +22,20 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE		   = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE	   = 15;
-	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
+	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 16;
 
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(1.35));
 	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(SECTOR(2));
 
 	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
 	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
+	const vector<unsigned int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	int CutSeqNum;
 
 	enum BigScorpionState
 	{
-		BSCORPION_STATE_NONE = 0,
+		// No state 0.
 		BSCORPION_STATE_IDLE = 1,
 		BSCORPION_STATE_WALK_FORWARD = 2,
 		BSCORPION_STATE_RUN_FORWARD = 3,
@@ -129,32 +129,24 @@ namespace TEN::Entities::TR4
 				GetAITarget(creature);
 			else
 			{
-				if (creature->HurtByLara &&
-					item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
-				{
+				if (creature->HurtByLara && item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
 					creature->Enemy = LaraItem;
-				}
 				else
 				{
 					creature->Enemy = nullptr;
-					int minDistance = INT_MAX;
+					float minDistance = FLT_MAX;
 
-					for (int i = 0; i < ActiveCreatures.size(); i++)
+					for (auto& currentCreature : ActiveCreatures)
 					{
-						auto* currentCreatureInfo = ActiveCreatures[i];
-						if (currentCreatureInfo->ItemNumber != NO_ITEM && currentCreatureInfo->ItemNumber != itemNumber)
+						if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 						{
-							auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+							auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
 									(!currentItem->IsLara() || creature->HurtByLara))
 								{
-									int dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-									int dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-									int dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-									int distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+									int distance = Vector3i::Distance(item->Pose.Position, currentItem->Pose.Position);
 									if (distance < minDistance)
 									{
 										minDistance = distance;
@@ -250,7 +242,7 @@ namespace TEN::Entities::TR4
 						creature->MaxTurn = 0;
 					}
 				}
-				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
+				else if (item->TouchBits.Test(BigScorpionAttackJoints))
 				{
 					DoDamage(creature->Enemy, BIG_SCORPION_ATTACK_DAMAGE);
 
@@ -268,7 +260,7 @@ namespace TEN::Entities::TR4
 
 					if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
 					{
-						CreatureKill(item, BSCORPION_ANIM_KILL, BSCORPION_STATE_KILL, LA_BIG_SCORPION_DEATH);
+						CreatureKill(item, BSCORPION_ANIM_KILL, 0, BSCORPION_STATE_KILL, LS_DEATH); // TODO: add big_scorpion lara extra state enum
 						creature->MaxTurn = 0;
 						return;
 					}

@@ -9,9 +9,9 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
@@ -24,11 +24,11 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
 	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
-	const vector<int> BigBeetleAttackJoints = { 5, 6 };
+	const vector<unsigned int> BigBeetleAttackJoints = { 5, 6 };
 
 	enum BigBeetleState
 	{
-		BBEETLE_STATE_NONE = 0,
+		// No state 0.
 		BBEETLE_STATE_IDLE = 1,
 		BBEETLE_STATE_TAKE_OFF = 2,
 		BBEETLE_STATE_FLY_FORWARD = 3,
@@ -122,7 +122,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
-				TestProbability(0.008f))
+				TestProbability(1.0f / 128))
 			{
 				creature->Flags = 0;
 			}
@@ -175,7 +175,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (!creature->Flags &&
-					item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
+					item->TouchBits.Test(BigBeetleAttackJoints))
 				{
 					DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
 					CreatureEffect2(item, BigBeetleBite, 5, -1, DoBloodSplat);

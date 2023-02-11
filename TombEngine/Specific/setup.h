@@ -1,26 +1,46 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Specific/phd_global.h"
-#include "Specific/level.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/level.h"
 
-struct ItemInfo;
+enum class ZoneType;
 struct CollisionInfo;
-enum ZoneType : char;
+struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
-constexpr auto ROT_X = 0x0004;
-constexpr auto ROT_Y = 0x0008;
-constexpr auto ROT_Z = 0x0010;
 
-enum HitEffectEnum
+// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+enum class LotType
 {
-    HIT_NONE,
-    HIT_BLOOD,
-    HIT_SMOKE,
-    HIT_RICOCHET,
-	HIT_SPECIAL,
-    MAX_HIT_EFFECT
+	Skeleton,
+	Basic,
+	Water,
+	WaterAndLand,
+	Human,
+	HumanPlusJump,
+	HumanPlusJumpAndMonkey,
+	Flyer,
+	Blockable, // For large creatures such as trex and shiva.
+	Spider,    // Only 2 block vault allowed.
+	Ape		   // Only 2 block vault allowed.
+};
+
+enum JointRotationFlags
+{
+	ROT_X = (1 << 2),
+	ROT_Y = (1 << 3),
+	ROT_Z = (1 << 4)
+};
+
+enum class HitEffect
+{
+    None,
+    Blood,
+    Smoke,
+    Richochet,
+	Special,
+    Max
 };
 
 enum ShatterType
@@ -32,10 +52,29 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	int nmeshes; 
+	int nmeshes;
 	int meshIndex;
-	int boneIndex; 
+	int boneIndex;
 	int frameBase;
+	LotType LotType;
+	int animIndex;
+	short HitPoints;
+	short pivotLength;
+	short radius;
+	ShadowMode shadowType;
+	short biteOffset;
+	bool loaded;
+	bool intelligent;
+	bool nonLot;
+	bool waterCreature;
+	bool usingDrawAnimatingItem;
+	HitEffect hitEffect;
+	bool undead;
+	bool isPickup;
+	bool isPuzzleHole;
+	int meshSwapSlot;
+	DWORD explodableMeshbits;
+
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
 	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> floor;
@@ -44,36 +83,54 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType zoneType;
-	int animIndex; 
-	short HitPoints; 
-	short pivotLength; 
-	short radius; 
-	ShadowMode shadowType;
-	short biteOffset; 
-	bool loaded;
-	bool intelligent;
-	bool nonLot;
-	bool savePosition;
-	bool saveHitpoints;
-	bool saveFlags;
-	bool saveAnim;
-	bool semiTransparent;
-	bool waterCreature;
-	bool usingDrawAnimatingItem;
-	HitEffectEnum hitEffect;
-	bool undead;
-	bool saveMesh;
-	bool friendly;
-	bool isPickup;
-	bool isPuzzleHole;
-	int meshSwapSlot;
-	DWORD explodableMeshbits;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
 
-	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint()
-	void SetBoneRotation(int boneID, int flags)
+	/// <summary>
+	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
+	/// </summary>
+	/// <param name="boneID">the mesh id - 1</param>
+	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
+	void SetBoneRotationFlags(int boneID, int flags)
 	{
 		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+	}
+
+	/// <summary>
+	/// Use this to set up a hit effect for the slot based on its value.
+	/// </summary>
+	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
+	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
+	{
+		// Avoid some objects such as ID_SAS_DYING having None.
+		if (isAlive)
+		{
+			hitEffect = HitEffect::Blood;
+			return;
+		}
+
+		if (intelligent)
+		{
+			if (isSolid && HitPoints > 0)
+			{
+				hitEffect = HitEffect::Richochet;
+			}
+			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			{
+				hitEffect = HitEffect::Smoke;
+			}
+			else if (!undead && HitPoints > 0)
+			{
+				hitEffect = HitEffect::Blood;
+			}
+		}
+		else if (isSolid && HitPoints <= 0)
+		{
+			hitEffect = HitEffect::Richochet;
+		}
+		else
+		{
+			hitEffect = HitEffect::None;
+		}
 	}
 };
 
@@ -81,13 +138,13 @@ struct STATIC_INFO
 {
 	int meshNumber;
 	int flags;
-	BOUNDING_BOX visibilityBox;
-	BOUNDING_BOX collisionBox;
+	GameBoundingBox visibilityBox;
+	GameBoundingBox collisionBox;
 	int shatterType;
 	int shatterSound;
 };
 
-#define MAX_STATICS 1000
+constexpr auto MAX_STATICS = 1000;
 constexpr auto SF_NO_COLLISION = 0x01;
 constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6.0f;

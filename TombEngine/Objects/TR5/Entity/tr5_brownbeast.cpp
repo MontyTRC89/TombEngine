@@ -10,17 +10,19 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto BROWN_BEAST_ATTACK_DAMAGE = 150;
 
 	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
 	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
+	const std::vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
+	const std::vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
 
 	// TODO
 	enum BrownBeastState
@@ -38,12 +40,8 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 	}
 
 	void ControlBrowsBeast(short itemNumber)
@@ -99,6 +97,7 @@ namespace TEN::Entities::TR5
 			{
 			case 1:
 				creature->Flags = 0;
+
 				if (creature->Mood == MoodType::Attack)
 				{
 					if (distance <= pow(SECTOR(1), 2))
@@ -143,7 +142,7 @@ namespace TEN::Entities::TR5
 				if (creature->Flags)
 					break;
 
-				if (item->TouchBits & 0x3C000)
+				if (item->TouchBits.Test(BrownBeastAttackJoints1))
 				{
 					if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 					{
@@ -157,7 +156,7 @@ namespace TEN::Entities::TR5
 						}
 					}
 
-					if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+					if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 2))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
@@ -170,13 +169,13 @@ namespace TEN::Entities::TR5
 					}
 				}
 
-				if (!(item->TouchBits & 0xF00000))
+				if (!item->TouchBits.Test(BrownBeastAttackJoints2))
 					break;
 
-				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+				if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 8))
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+					if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 13) &&
+						item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
 					{
 						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -185,10 +184,10 @@ namespace TEN::Entities::TR5
 					}
 				}
 
-				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+				if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 2))
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
+					if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 33) &&
+						item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 43))
 					{
 						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);

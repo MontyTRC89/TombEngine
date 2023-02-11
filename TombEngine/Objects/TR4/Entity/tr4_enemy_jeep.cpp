@@ -14,9 +14,9 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 
@@ -30,7 +30,7 @@ namespace TEN::Entities::TR4
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
-			grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			grenadeItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
@@ -149,8 +149,7 @@ namespace TEN::Entities::TR4
 			else
 				distance = pow(dx, 2) + pow(dz, 2);
 
-			Vector3Int pos;
-
+			auto pos = Vector3i::Zero;
 			switch (item->Animation.ActiveState)
 			{
 			case 0:
@@ -158,9 +157,7 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[0] -= 128;
 				item->MeshBits = -98305;
 
-				pos = Vector3Int(0, -144, -1024);
-				GetJointAbsPosition(item, &pos, 11);
-
+				pos = GetJointPosition(item, 11, Vector3i(0, -144, -1024));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
 				if (item->ItemFlags[0] < 0)
@@ -252,7 +249,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->ReachedGoal)
 			{
-				TestTriggers(target->Pose.Position.x, target->Pose.Position.y, target->Pose.Position.z, target->RoomNumber, true);
+				TestTriggers(target, true);
 
 				if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
 				{
@@ -310,9 +307,7 @@ namespace TEN::Entities::TR4
 						creature->Enemy = nullptr;
 						target->ObjectNumber = aiObject->objectNumber;
 						target->RoomNumber = aiObject->roomNumber;
-						target->Pose.Position.x = aiObject->pos.Position.x;
-						target->Pose.Position.y = aiObject->pos.Position.y;
-						target->Pose.Position.z = aiObject->pos.Position.z;
+						target->Pose.Position = aiObject->pos.Position;
 						target->Pose.Orientation.y = aiObject->pos.Orientation.y;
 						target->Flags = aiObject->flags;
 						target->TriggerFlags = aiObject->triggerFlags;
@@ -359,7 +354,7 @@ namespace TEN::Entities::TR4
 				creature->JointRotation[i] -= item->ItemFlags[0];
 
 			if (!creature->ReachedGoal)
-				ClampRotation(&item->Pose, AI.angle, item->ItemFlags[0] / 16);
+				ClampRotation(item->Pose, AI.angle, item->ItemFlags[0] / 16);
 
 			creature->MaxTurn = 0;
 			AnimateItem(item);

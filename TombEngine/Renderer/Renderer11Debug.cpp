@@ -8,6 +8,7 @@ namespace TEN::Renderer
 		m_timeUpdate = 0;
 		m_timeDraw = 0;
 		m_timeFrame = 0;
+		m_timeRoomsCollector = 0;
 		m_numDrawCalls = 0;
 		m_numRoomsDrawCalls = 0;
 		m_numMoveablesDrawCalls = 0;
@@ -20,6 +21,9 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls = 0;
 		m_biggestRoomIndexBuffer = 0;
 		m_numPolygons = 0;
+		m_numInstancedSpritesDrawCalls = 0; 
+		m_numCheckPortalCalls = 0;
+		m_numGetVisibleRoomsCalls = 0;
 	}
 
 	bool Renderer11::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)

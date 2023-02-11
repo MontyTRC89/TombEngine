@@ -1,12 +1,15 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Game/camera.h"
-#include "Game/spotcam.h"
-#include "Specific/setup.h"
 #include "Game/control/control.h"
+#include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Math/Math.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math;
 
 TEN::Renderer::RendererHUDBar* g_HealthBar;
 TEN::Renderer::RendererHUDBar* g_AirBar;
@@ -254,8 +257,8 @@ namespace TEN::Renderer
 	void Renderer11::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
-		SetCullMode(CULL_MODE_CCW);
 
+		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);

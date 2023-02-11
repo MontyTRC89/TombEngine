@@ -1,16 +1,19 @@
 #include "framework.h"
-#include "tr5_doberman.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
-#include "Game/items.h"
-#include "Game/misc.h"
+#include "Objects/TR5/Entity/tr5_doberman.h"
 
-namespace TEN::Entities::TR5
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
 
@@ -75,196 +78,198 @@ namespace TEN::Entities::TR5
 
 	void DobermanControl(short itemNumber)
 	{
-		if (CreatureActive(itemNumber))
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		if (!CreatureActive(itemNumber))
+			return;
+
+		short angle = 0;
+		short tilt = 0;
+		short joint = 0;
+
+		if (item->HitPoints > 0)
 		{
-			short angle = 0;
-			short tilt = 0;
-			short joint = 0;
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			auto* item = &g_Level.Items[itemNumber];
-			auto* creature = GetCreatureInfo(item);
+			if (AI.ahead)
+				joint = AI.angle;
 
-			if (item->HitPoints > 0)
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
+
+			angle = CreatureTurn(item, creature->MaxTurn);
+
+			switch (item->Animation.ActiveState)
 			{
-				AI_INFO AI;
-				CreatureAIInfo(item, &AI);
+			case DOBERMAN_STATE_WALK_FORWARD:
+				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.ahead)
-					joint = AI.angle;
-
-				GetCreatureMood(item, &AI, false);
-				CreatureMood(item, &AI, false);
-
-				angle = CreatureTurn(item, creature->MaxTurn);
-
-				switch (item->Animation.ActiveState)
+				if (creature->Mood != MoodType::Bored)
+					item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
+				else
 				{
-				case DOBERMAN_STATE_WALK_FORWARD:
-					creature->MaxTurn = ANGLE(3.0f);
-
-					if (creature->Mood != MoodType::Bored)
-						item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
-					else
+					if (TestProbability(0.025f))
 					{
-						int random = GetRandomControl();
-						if (random < 768)
-						{
-							item->Animation.RequiredState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
-							item->Animation.TargetState = DOBERMAN_STATE_STOP;
-							break;
-						}
-						if (random < 1536)
-						{
-							item->Animation.RequiredState = DOBERMAN_STATE_SIT_IDLE;
-							item->Animation.TargetState = DOBERMAN_STATE_STOP;
-							break;
-						}
-						if (random < 2816)
-						{
-							item->Animation.TargetState = DOBERMAN_STATE_STOP;
-							break;
-						}
-					}
-
-					break;
-
-				case DOBERMAN_STATE_RUN_FORWARD:
-					tilt = angle;
-					creature->MaxTurn = ANGLE(6.0f);
-
-					if (creature->Mood == MoodType::Bored)
-					{
+						item->Animation.RequiredState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 						break;
 					}
 
-					if (AI.distance < pow(768, 2))
-						item->Animation.TargetState = DOBERMAN_STATE_JUMP_BITE_ATTACK;
-
-					break;
-
-				case DOBERMAN_STATE_STOP:
-					creature->MaxTurn = 0;
-					creature->Flags = 0;
-					if (creature->Mood != MoodType::Bored)
+					if (TestProbability(0.045f))
 					{
-						if (creature->Mood != MoodType::Escape &&
-							AI.distance < pow(341, 2) &&
-							AI.ahead)
-						{
-							item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
-						}
-						else
-							item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
-					}
-					else
-					{
-						if (item->Animation.RequiredState)
-							item->Animation.TargetState = item->Animation.RequiredState;
-						else
-						{
-							int random = GetRandomControl();
-							if (random >= 768)
-							{
-								if (random >= 1536)
-								{
-									if (random < 9728)
-										item->Animation.TargetState = DOBERMAN_STATE_WALK_FORWARD;
-								}
-								else
-									item->Animation.TargetState = DOBERMAN_STATE_SIT_IDLE;
-							}
-							else
-								item->Animation.TargetState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
-						}
-					}
-					break;
-
-				case DOBERMAN_STATE_STAND_LOW_BITE_ATTACK:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 1280)
+						item->Animation.RequiredState = DOBERMAN_STATE_SIT_IDLE;
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
+						break;
+					}
 
-					break;
-
-				case DOBERMAN_STATE_SIT_IDLE:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 256)
+					if (TestProbability(0.085f))
+					{
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
-
-					break;
-
-				case DOBERMAN_STATE_STAND_IDLE:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 512)
-						item->Animation.TargetState = DOBERMAN_STATE_STOP;
-
-					break;
-
-				case DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK:
-					creature->MaxTurn = ANGLE(0.5f);
-
-					if (creature->Flags != 1 &&
-						AI.ahead &&
-						item->TouchBits & 0x122000)
-					{
-						DoDamage(creature->Enemy, 30);
-						CreatureEffect(item, DobermanBite, DoBloodSplat);
-						creature->Flags = 1;
+						break;
 					}
+				}
 
-					if (AI.distance <= pow(341, 2) || AI.distance >= pow(682, 2))
-						item->Animation.TargetState = DOBERMAN_STATE_STOP;
-					else
-						item->Animation.TargetState = DOBERMAN_STATE_LEAP_BITE_ATTACK;
+				break;
 
-					break;
+			case DOBERMAN_STATE_RUN_FORWARD:
+				creature->MaxTurn = ANGLE(6.0f);
+				tilt = angle;
 
-				case DOBERMAN_STATE_JUMP_BITE_ATTACK:
-					if (creature->Flags != 2 && item->TouchBits & 0x122000)
-					{
-						DoDamage(creature->Enemy, 80);
-						CreatureEffect(item, DobermanBite, DoBloodSplat);
-						creature->Flags = 2;
-					}
-
-					if (AI.distance >= pow(341, 2))
-					{
-						if (AI.distance < pow(682, 2))
-							item->Animation.TargetState = DOBERMAN_STATE_LEAP_BITE_ATTACK;
-					}
-					else
-						item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
-
-					break;
-
-				case DOBERMAN_STATE_LEAP_BITE_ATTACK:
-					creature->MaxTurn = ANGLE(6.0f);
-
-					if (creature->Flags != 3 && item->TouchBits & 0x122000)
-					{
-						DoDamage(creature->Enemy, 50);
-						CreatureEffect(item, DobermanBite, DoBloodSplat);
-						creature->Flags = 3;
-					}
-					if (AI.distance < pow(341, 2))
-						item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
-
-					break;
-
-				default:
+				if (creature->Mood == MoodType::Bored)
+				{
+					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 					break;
 				}
-			}
-			else if (item->Animation.ActiveState != DOBERMAN_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_DOBERMAN].animIndex + DOBERMAN_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = DOBERMAN_STATE_DEATH;
-			}
 
-			CreatureTilt(item, tilt);
-			CreatureJoint(item, 0, 0);
-			CreatureJoint(item, 1, joint);
-			CreatureJoint(item, 2, 0);
-			CreatureAnimation(itemNumber, angle, tilt);
+				if (AI.distance < pow(768, 2))
+					item->Animation.TargetState = DOBERMAN_STATE_JUMP_BITE_ATTACK;
+
+				break;
+
+			case DOBERMAN_STATE_STOP:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
+
+				if (creature->Mood != MoodType::Bored)
+				{
+					if (creature->Mood != MoodType::Escape &&
+						AI.distance < pow(341, 2) &&
+						AI.ahead)
+					{
+						item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
+					}
+					else
+						item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
+				}
+				else
+				{
+					if (item->Animation.RequiredState)
+						item->Animation.TargetState = item->Animation.RequiredState;
+					else
+					{
+						if (TestProbability(0.975f))
+						{
+							if (TestProbability(0.95f))
+							{
+								if (TestProbability(0.3f))
+									item->Animation.TargetState = DOBERMAN_STATE_WALK_FORWARD;
+							}
+							else
+								item->Animation.TargetState = DOBERMAN_STATE_SIT_IDLE;
+						}
+						else
+							item->Animation.TargetState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
+					}
+				}
+
+				break;
+
+			case DOBERMAN_STATE_STAND_LOW_BITE_ATTACK:
+				if (creature->Mood != MoodType::Bored || TestProbability(0.04f))
+					item->Animation.TargetState = DOBERMAN_STATE_STOP;
+
+				break;
+
+			case DOBERMAN_STATE_SIT_IDLE:
+				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 128))
+					item->Animation.TargetState = DOBERMAN_STATE_STOP;
+
+				break;
+
+			case DOBERMAN_STATE_STAND_IDLE:
+				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 64))
+					item->Animation.TargetState = DOBERMAN_STATE_STOP;
+
+				break;
+
+			case DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK:
+				creature->MaxTurn = ANGLE(0.5f);
+
+				if (creature->Flags != 1 && AI.ahead &&
+					item->TouchBits & 0x122000)
+				{
+					DoDamage(creature->Enemy, 30);
+					CreatureEffect(item, DobermanBite, DoBloodSplat);
+					creature->Flags = 1;
+				}
+
+				if (AI.distance <= pow(341, 2) || AI.distance >= pow(682, 2))
+					item->Animation.TargetState = DOBERMAN_STATE_STOP;
+				else
+					item->Animation.TargetState = DOBERMAN_STATE_LEAP_BITE_ATTACK;
+
+				break;
+
+			case DOBERMAN_STATE_JUMP_BITE_ATTACK:
+				if (creature->Flags != 2 && item->TouchBits & 0x122000)
+				{
+					DoDamage(creature->Enemy, 80);
+					CreatureEffect(item, DobermanBite, DoBloodSplat);
+					creature->Flags = 2;
+				}
+
+				if (AI.distance >= pow(341, 2))
+				{
+					if (AI.distance < pow(682, 2))
+						item->Animation.TargetState = DOBERMAN_STATE_LEAP_BITE_ATTACK;
+				}
+				else
+					item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
+
+				break;
+
+			case DOBERMAN_STATE_LEAP_BITE_ATTACK:
+				creature->MaxTurn = ANGLE(6.0f);
+
+				if (creature->Flags != 3 && item->TouchBits & 0x122000)
+				{
+					DoDamage(creature->Enemy, 50);
+					CreatureEffect(item, DobermanBite, DoBloodSplat);
+					creature->Flags = 3;
+				}
+
+				if (AI.distance < pow(341, 2))
+					item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
+
+				break;
+
+			default:
+				break;
+			}
 		}
+		else if (item->Animation.ActiveState != DOBERMAN_STATE_DEATH)
+		{
+			item->Animation.AnimNumber = Objects[ID_DOBERMAN].animIndex + DOBERMAN_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = DOBERMAN_STATE_DEATH;
+		}
+
+		CreatureTilt(item, tilt);
+		CreatureJoint(item, 0, 0);
+		CreatureJoint(item, 1, joint);
+		CreatureJoint(item, 2, 0);
+		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

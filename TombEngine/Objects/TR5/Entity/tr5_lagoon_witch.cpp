@@ -1,19 +1,26 @@
 #include "framework.h"
-#include "tr5_lagoon_witch.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_lagoon_witch.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
+#include "Game/Gui.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Gui;
+using std::vector;
+
+namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
+
 	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
+	const vector<unsigned int> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
 	{
@@ -32,13 +39,8 @@ namespace TEN::Entities::TR5
 	void InitialiseLagoonWitch(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.TargetState = WITCH_STATE_IDLE;
-		item->Animation.ActiveState = WITCH_STATE_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 1);
 		item->Pose.Position.y += CLICK(2);
 	}
 
@@ -53,17 +55,17 @@ namespace TEN::Entities::TR5
 		short joint2 = 0;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != WITCH_STATE_DEATH)
 			{
-				item->HitPoints = 0;
 				item->Animation.ActiveState = WITCH_STATE_DEATH;
 				item->Animation.AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->HitPoints = 0;
 			}
 		}
 		else
@@ -126,10 +128,10 @@ namespace TEN::Entities::TR5
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (!creature->Flags &&
-					item->TouchBits & 0x3C3C0 &&
+					item->TouchBits.Test(LagoonWitchAttackJoints) &&
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 				{
-					DoDamage(creature->Enemy, 100);
+					DoDamage(creature->Enemy, LAGOON_WITCH_ATTACK_DAMAGE);
 					CreatureEffect2(item, LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = WITCH_STATE_SWIM;
 				}
@@ -141,14 +143,14 @@ namespace TEN::Entities::TR5
 			{
 				auto* enemy = creature->Enemy;
 
-				if (enemy)
+				if (enemy != nullptr)
 				{
 					if (enemy->Flags & 2)
 						item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
 					item->ItemFlags[3]++;
 					creature->ReachedGoal = false;
-					creature->Enemy = 0;
+					creature->Enemy = nullptr;
 				}
 			}
 		}

@@ -3,6 +3,7 @@
 
 namespace TEN::Utils
 {
+	std::string ToUpper(std::string source);
 	std::string ToLower(std::string source);
 	std::string FromWchar(const wchar_t* source);
 	std::wstring FromChar(const char* source);

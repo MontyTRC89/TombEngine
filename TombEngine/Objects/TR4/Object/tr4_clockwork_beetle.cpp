@@ -26,8 +26,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber < fb + 104)
 		{
-			auto pos = Vector3Int(0, 0, -32);
-			GetLaraJointPosition(&pos, LM_RHAND);
+			auto pos = GetJointPosition(LaraItem, LM_RHAND, Vector3i(0, 0, -32));
 
 			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
@@ -315,12 +314,10 @@ void UseClockworkBeetle(short flag)
 			auto* item = &g_Level.Items[itemNumber];
 
 			Lara.Inventory.BeetleComponents &= 0xFE;
-			item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			item->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
 			item->RoomNumber = LaraItem->RoomNumber;
-			item->Pose.Position.x = LaraItem->Pose.Position.x;
-			item->Pose.Position.y = LaraItem->Pose.Position.y;
-			item->Pose.Position.z = LaraItem->Pose.Position.z;
+			item->Pose.Position = LaraItem->Pose.Position;
 
 			InitialiseItem(itemNumber);
 			item->Pose.Orientation.x = 0;

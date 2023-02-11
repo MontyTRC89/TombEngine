@@ -1,23 +1,31 @@
 #pragma once
+#include "Math/Objects/EulerAngles.h"
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
-struct PHD_3DPOS;
 
-class Rotation {
+class Pose;
+
+class Rotation
+{
 public:
-	short								x{ 0 };
-	short								y{ 0 };
-	short								z{ 0 };
+	float x { 0 };
+	float y { 0 };
+	float z { 0 };
 
 	Rotation() = default;
-	Rotation(int x, int y, int z);
-	Rotation(PHD_3DPOS const& pos);
+	Rotation(float aX, float aY, float aZ);
+	Rotation(const EulerAngles& eulers);
+	Rotation(const Pose& pose);
+	Rotation(const Vector3& vec);
+
+	operator Vector3() const;
+
+	void StoreInPHDPos(Pose& pose) const;
 
 	std::string ToString() const;
 
-	void StoreInPHDPos(PHD_3DPOS& pos) const;
-
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 };

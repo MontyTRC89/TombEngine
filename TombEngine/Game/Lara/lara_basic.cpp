@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
@@ -50,11 +50,12 @@ void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
+// Boulder death.
 void lara_as_special(ItemInfo* item, CollisionInfo* coll)
 {
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 }
 
 void lara_as_null(ItemInfo* item, CollisionInfo* coll)
@@ -70,6 +71,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 	{
@@ -102,7 +104,8 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
+
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -115,8 +118,8 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
 }
 
 // ---------------
@@ -146,17 +149,17 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && vaultResult.Success)
+		if (IsHeld(In::Action) && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -164,7 +167,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->Animation.TargetState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK) USE_FEATURE_IF_CPP20([[likely]])
+		else if (IsHeld(In::Walk)) USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		else
 			item->Animation.TargetState = LS_RUN_FORWARD;
@@ -217,7 +220,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -271,7 +274,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		!lara->Control.RunJumpQueued && // Jump queue blocks roll.
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -352,7 +355,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.4f, 0.15f);
 
@@ -362,7 +365,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -394,27 +397,34 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
+		return;
+	}
+
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
 	if (UseSpecialItem(item))
 		return;
 
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
+	if (IsHeld(In::Look) && lara->Control.CanLook)
 		LookUpDown(item);
 
 	// HACK.
 	if (BinocularOn)
 		return;
 
-	if (!(TrInput & IN_JUMP) || isSwamp) // JUMP locks orientation outside swamps.
+	if (!IsHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
 	{
-		if ((TrInput & IN_LEFT &&
-				!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))) || // Sidestep locks orientation.
-			(TrInput & IN_RIGHT &&
-				!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))))
+		// Sidestep locks orientation.
+		if ((IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
+			(IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, 0, 0, 0);
 		}
+		else if (IsHeld(In::Left) || IsHeld(In::Right))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
@@ -427,7 +437,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 	{
 		SetLaraJumpDirection(item, coll);
 		if (lara->Control.JumpDirection != JumpDirection::None)
@@ -436,29 +446,33 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		if (TrInput & IN_WALK || TestLaraTurn180(item, coll))
+			item->Animation.TargetState = LS_TURN_180;
+		else
+			item->Animation.TargetState = LS_ROLL_180_FORWARD;
+		
 		return;
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (IsHeld(In::Crouch) && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && vaultResult.Success)
+		if (IsHeld(In::Action) && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TrInput & IN_WALK)
+		else if (IsHeld(In::Walk))
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -466,7 +480,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
+		else if (IsHeld(In::Sprint) && TestLaraRunForward(item, coll))
 		{
 			item->Animation.TargetState = LS_SPRINT;
 			return;
@@ -477,9 +491,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
-		if (TrInput & IN_WALK)
+		if (IsHeld(In::Walk))
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
@@ -494,7 +508,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
 		if (TestLaraStepLeft(item, coll))
 			item->Animation.TargetState = LS_STEP_LEFT;
@@ -503,7 +517,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
 		if (TestLaraStepRight(item, coll))
 			item->Animation.TargetState = LS_STEP_RIGHT;
@@ -513,9 +527,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 	{
-		if (TrInput & IN_SPRINT ||
+		if (IsHeld(In::Sprint) ||
 			lara->Control.TurnRate <= -LARA_SLOW_TURN_RATE_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
@@ -525,9 +539,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (IsHeld(In::Right))
 	{
-		if (TrInput & IN_SPRINT ||
+		if (IsHeld(In::Sprint) ||
 			lara->Control.TurnRate >= LARA_SLOW_TURN_RATE_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
@@ -551,8 +565,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// TODO: Future-proof for rising water.
-// TODO: Make these into true states someday? It may take a bit of work. @Sezz 2021.10.13
+// NOTE: Pseudo-states already removed on states_tier_3.
 // Pseudo-state for idling in wade-height water.
 void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 {
@@ -562,6 +575,12 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.TargetState = LS_JUMP_PREPARE;
 		lara->Control.JumpDirection = JumpDirection::Up;
+		return;
+	}
+
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	{
+		item->Animation.TargetState = LS_TURN_180;
 		return;
 	}
 
@@ -621,10 +640,17 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
+// NOTE: Pseudo-states already removed on states_tier_3.
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	{
+		item->Animation.TargetState = LS_TURN_180;
+		return;
+	}
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -749,11 +775,11 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_ROLL)
 		{
-			item->Animation.TargetState = LS_ROLL_FORWARD;
+			item->Animation.TargetState = LS_ROLL_180_FORWARD;
 			return;
 		}
 
-		if (TrInput & IN_WAKE)
+		if (IsWakeActionHeld())
 		{
 			item->Animation.TargetState = LS_IDLE;
 			return;
@@ -780,7 +806,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -871,7 +897,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1117,7 +1143,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1328,7 +1354,6 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* bounds = GetBoundsAccurate(item);
 
 	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
@@ -1339,12 +1364,13 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	{
 		BinocularRange = 0;
 		LaserSight = false;
-		AlterFOV(ANGLE(80.0f));
+		AlterFOV(LastFOV);
 		item->MeshBits = ALL_JOINT_BITS;
 		lara->Inventory.IsBusy = false;
 	}
 
-	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+	auto bounds = GameBoundingBox(item);
+	if (bounds.GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1551,7 +1577,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ROLL &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1678,7 +1704,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ROLL &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1855,7 +1881,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1949,7 +1975,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1965,26 +1991,40 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_ROLL_BACK (23)
-// Collision:	lara_col_roll_back()
-void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_TURN_180 (173)
+// Collision: lara_col_turn_180()
+void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_BACK;
-		return;
-	}
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_ROLL_BACK (23)
+// State:	LS_TURN_180 (173)
+// Control: lara_as_turn_180()
+void lara_col_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	lara_col_idle(item, coll);
+}
+
+// State:		LS_ROLL_180_BACK (23)
+// Collision:	lara_col_roll_back()
+void lara_as_roll_180_back(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
+	item->Animation.TargetState = LS_IDLE;
+}
+
+// State:		LS_ROLL_180_BACK (23)
 // Control:		lara_as_roll_back()
-void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
+void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1996,7 +2036,7 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	Camera.laraNode = 0;
+	Camera.laraNode = LM_HIPS;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2026,35 +2066,21 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_ROLL_FORWARD (45)
-// Collision:	lara_col_roll_forward()
-void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_ROLL_180_FORWARD (45)
+// Collision:	lara_col_roll_180_forward()
+void lara_as_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
-	// TODO: Change swandive roll anim's state to something sensible.
-	if (TrInput & IN_FORWARD &&
-		item->Animation.AnimNumber == LA_SWANDIVE_ROLL) // Hack.
-	{
-		item->Animation.TargetState = LS_RUN_FORWARD;
-		return;
-	}
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}
-
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_ROLL_FORWARD (45)
-// Control:		lara_as_roll_forward()
-void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_ROLL_180_FORWARD (45)
+// Control:		lara_as_roll_180_forward()
+void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2205,7 +2231,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraLean(item);
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2336,7 +2362,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.5f, 0.15f);
 
@@ -2346,7 +2372,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;

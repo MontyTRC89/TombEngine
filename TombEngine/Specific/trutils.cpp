@@ -5,6 +5,12 @@
 
 namespace TEN::Utils
 {
+	std::string ToUpper(std::string source)
+	{
+		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::toupper(c); });
+		return source;
+	}
+    
 	std::string ToLower(std::string source)
 	{
 		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::tolower(c); });
@@ -28,7 +34,7 @@ namespace TEN::Utils
 	{
 		std::vector<std::string> strings;
 
-		// String is single-line, early exit
+		// String is single line; exit early.
 		if (source.find('\n') == std::string::npos)
 		{
 			strings.push_back(source);
@@ -67,7 +73,7 @@ namespace TEN::Utils
         }
         std::unique_ptr<unsigned char> buffer(new unsigned char[size]);
 
-        // Load the version info
+        // Load the version info.
         if (!GetFileVersionInfoA(fileName, 0, size, buffer.get()))
         {
             TENLog("GetFileVersionInfoA failed", LogLevel::Error);
@@ -75,15 +81,15 @@ namespace TEN::Utils
         }
 
         VS_FIXEDFILEINFO* info;
-        unsigned int info_size;
+        unsigned int infoSize;
 
-        if (!VerQueryValueA(buffer.get(), "\\", (void**)&info, &info_size))
+        if (!VerQueryValueA(buffer.get(), "\\", (void**)&info, &infoSize))
         {
             TENLog("VerQueryValueA failed", LogLevel::Error);
             return {};
         }
 
-        if (info_size != sizeof(VS_FIXEDFILEINFO))
+        if (infoSize != sizeof(VS_FIXEDFILEINFO))
         {
             TENLog("VerQueryValueA returned wrong size for VS_FIXEDFILEINFO", LogLevel::Error);
             return {};

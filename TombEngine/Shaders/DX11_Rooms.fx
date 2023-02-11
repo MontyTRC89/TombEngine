@@ -1,9 +1,9 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./VertexEffects.hlsli"
+#include "./Blending.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
-#include "./AlphaTestBuffer.hlsli"
 #include "./AnimatedTextures.hlsli"
 #include "./Shadows.hlsli"
 
@@ -15,7 +15,7 @@ cbuffer MiscBuffer : register(b3)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
-	uint Water;
+	unsigned int Water;
 };
 
 struct PixelShaderInput
@@ -183,8 +183,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (FogMaxDistance != 0)
-		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
+	output.Color = DoFog(output.Color, FogColor, input.Fog);
 
 	return output;
 }

@@ -13,23 +13,18 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN::Entities::TR2
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
-	void InitialiseSwordGuardian(short itemNumber)
+	void SwordGuardianFly(ItemInfo* item)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-	}
-
-	static void SwordGuardianFly(ItemInfo* item)
-	{
-		Vector3Int pos;
-		pos.x = (GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128;
-		pos.y = (GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256;
-		pos.z = (GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128;
+		auto pos = Vector3i(
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128,
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256,
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128);
 
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
@@ -47,7 +42,7 @@ namespace TEN::Entities::TR2
 		short head = 0;
 		short torso = 0;
 
-		bool laraAlive = LaraItem->HitPoints > 0;
+		bool isLaraAlive = LaraItem->HitPoints > 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -65,10 +60,10 @@ namespace TEN::Entities::TR2
 		}
 		else
 		{
-			creature->LOT.Step = STEP_SIZE;
-			creature->LOT.Drop = -STEP_SIZE;
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
-			creature->LOT.Zone = ZONE_BASIC;
+			creature->LOT.Zone = ZoneType::Basic;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
@@ -77,10 +72,10 @@ namespace TEN::Entities::TR2
 			{
 				if (AI.zoneNumber != AI.enemyZone)
 				{
-					creature->LOT.Step = WALL_SIZE * 20;
-					creature->LOT.Drop = -WALL_SIZE * 20;
-					creature->LOT.Fly = STEP_SIZE / 4;
-					creature->LOT.Zone = ZONE_FLYER;
+					creature->LOT.Step = SECTOR(20);
+					creature->LOT.Drop = -SECTOR(20);
+					creature->LOT.Fly = CLICK(0.25f);
+					creature->LOT.Zone = ZoneType::Flyer;
 					CreatureAIInfo(item, &AI);
 				}
 			}
@@ -91,7 +86,7 @@ namespace TEN::Entities::TR2
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->Animation.ActiveState != 9)
-				item->MeshBits = 0xFFFFFFFF;
+				item->MeshBits = ALL_JOINT_BITS;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -100,7 +95,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					item->MeshBits = (item->MeshBits << 1) + 1;
+					item->MeshBits = (item->MeshBits.ToPackedBits() << 1) + 1;
 					creature->Flags = 3;
 				}
 				else
@@ -114,15 +109,10 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (laraAlive)
+				if (isLaraAlive)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-					{
-						if (GetRandomControl() >= 0x4000)
-							item->Animation.TargetState = 5;
-						else
-							item->Animation.TargetState = 3;
-					}
+						item->Animation.TargetState = TestProbability(0.5f) ? 3 : 5;
 					else
 					{
 						if (AI.zoneNumber == AI.enemyZone)
@@ -142,7 +132,7 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (laraAlive)
+				if (isLaraAlive)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(2), 2))
 						item->Animation.TargetState = 10;

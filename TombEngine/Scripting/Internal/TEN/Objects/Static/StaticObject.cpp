@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 
+#include "Game/effects/debris.h"
 #include "ScriptAssert.h"
 #include "StaticObject.h"
 #include "Vec3/Vec3.h"
@@ -27,6 +28,29 @@ void Static::Register(sol::table & parent)
 		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
+
+		/// Enable the static, for cases when it was shattered or manually disabled before.
+		// @function Static:Enable
+		ScriptReserved_Enable, &Static::Enable,
+
+		/// Disable the static
+		// @function Static:Disable
+		ScriptReserved_Disable, &Static::Disable,
+
+		/// Get static mesh visibility
+		// @function Static:GetActive
+		// @treturn bool visibility state
+		ScriptReserved_GetActive, & Static::GetActive,
+
+		/// Get static mesh solid collision state
+		// @function Static:GetSolid
+		// @treturn bool solid collision state (true if solid, false if soft)
+		ScriptReserved_GetSolid, & Static::GetSolid,
+
+		/// Set static mesh solid collision state
+		// @function Static:SetSolid
+		// @tparam bool solidState if set, collision will be solid, if not, will be soft
+		ScriptReserved_SetSolid, & Static::SetSolid,
 
 		/// Get the static's position
 		// @function Static:GetPosition
@@ -87,7 +111,39 @@ void Static::Register(sol::table & parent)
 		/// Set the static's color
 		// @function Static:SetColor
 		// @tparam Color color the new color of the static 
-		ScriptReserved_SetColor, &Static::SetColor);
+		ScriptReserved_SetColor, &Static::SetColor,
+
+		/// Shatter static mesh
+		// @function Static:Shatter
+		ScriptReserved_Shatter, &Static::Shatter);
+}
+
+void Static::Enable()
+{
+	m_mesh.flags |= StaticMeshFlags::SM_VISIBLE;
+}
+
+void Static::Disable()
+{
+	m_mesh.flags &= ~StaticMeshFlags::SM_VISIBLE;
+}
+
+bool Static::GetActive()
+{
+	return (m_mesh.flags & StaticMeshFlags::SM_VISIBLE) != 0;
+}
+
+bool Static::GetSolid()
+{
+	return (m_mesh.flags & StaticMeshFlags::SM_SOLID) != 0;
+}
+
+void Static::SetSolid(bool yes)
+{
+	if (yes)
+		m_mesh.flags |= StaticMeshFlags::SM_SOLID;
+	else
+		m_mesh.flags &= ~StaticMeshFlags::SM_SOLID;
 }
 
 Vec3 Static::GetPos() const
@@ -100,6 +156,7 @@ void Static::SetPos(Vec3 const& pos)
 	m_mesh.pos.Position.x = pos.x;
 	m_mesh.pos.Position.y = pos.y;
 	m_mesh.pos.Position.z = pos.z;
+	m_mesh.Dirty = true;
 }
 
 float Static::GetScale() const
@@ -110,6 +167,7 @@ float Static::GetScale() const
 void Static::SetScale(float const& scale)
 {
 	m_mesh.scale = scale;
+	m_mesh.Dirty = true;
 }
 
 // This does not guarantee that the returned value will be identical
@@ -118,23 +176,24 @@ void Static::SetScale(float const& scale)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Static::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_mesh.pos.Orientation.x),
+		TO_DEGREES(m_mesh.pos.Orientation.y),
+		TO_DEGREES(m_mesh.pos.Orientation.z)
 	};
 }
 
 void Static::SetRot(Rotation const& rot)
 {
-	m_mesh.pos.Orientation.x = FROM_DEGREES(rot.x);
-	m_mesh.pos.Orientation.y = FROM_DEGREES(rot.y);
-	m_mesh.pos.Orientation.z = FROM_DEGREES(rot.z);
+	m_mesh.pos.Orientation.x = ANGLE(rot.x);
+	m_mesh.pos.Orientation.y = ANGLE(rot.y);
+	m_mesh.pos.Orientation.z = ANGLE(rot.z);
 }
 
 std::string Static::GetName() const
 {
-	return m_mesh.luaName;
+	return m_mesh.Name;
 }
 
 void Static::SetName(std::string const & name) 
@@ -147,8 +206,8 @@ void Static::SetName(std::string const & name)
 	if (s_callbackSetName(name, m_mesh))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_mesh.luaName);
-		m_mesh.luaName = name;
+		s_callbackRemoveName(m_mesh.Name);
+		m_mesh.Name = name;
 	}
 	else
 	{
@@ -165,6 +224,7 @@ int Static::GetSlot() const
 void Static::SetSlot(int slot)
 {
 	m_mesh.staticNumber = slot;
+	m_mesh.Dirty = true;
 }
 
 ScriptColor Static::GetColor() const
@@ -175,4 +235,10 @@ ScriptColor Static::GetColor() const
 void Static::SetColor(ScriptColor const& col)
 {
 	m_mesh.color = col;
+	m_mesh.Dirty = true;
+}
+
+void Static::Shatter()
+{
+	ShatterObject(nullptr, &m_mesh, -128, m_mesh.roomNumber, 0);
 }

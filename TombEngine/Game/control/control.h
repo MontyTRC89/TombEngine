@@ -3,13 +3,13 @@
 #include "Game/control/trigger.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
-struct BOUNDING_BOX;
-struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
-struct ANIM_STRUCT;
+class GameBoundingBox;
+struct AnimData;
+struct CollisionInfo;
+struct ItemInfo;
 struct MESH_INFO;
 struct ROOM_INFO;
 
@@ -25,7 +25,7 @@ enum class GameStatus
 	LevelComplete
 };
 
-enum HEADINGS
+enum CardinalDirection
 {
 	NORTH,
 	EAST,
@@ -33,7 +33,7 @@ enum HEADINGS
 	WEST
 };
 
-enum FADE_STATUS
+enum FadeStatus
 {
 	FADE_STATUS_NONE,
 	FADE_STATUS_FADEIN,
@@ -68,13 +68,20 @@ extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
+extern int ControlPhaseTime;
+
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase();
+int DrawPhase(bool isTitle);
 
-GameStatus DoTitle(int index, std::string const & ambient);
-GameStatus DoLevel(int index, std::string const & ambient, bool loadFromSavegame);
-GameStatus ControlPhase(int numFrames, int demoMode);
+GameStatus ControlPhase(int numFrames);
+GameStatus DoLevel(int levelIndex, bool loadGame = false);
+GameStatus DoGameLoop(int levelIndex);
+void EndGameLoop(int levelIndex);
+
+GameStatus HandleMenuCalls(bool isTitle);
+GameStatus HandleGlobalInputEvents(bool isTitle);
+void HandleControls(bool isTitle);
 
 int GetRandomControl();
 int GetRandomDraw();
@@ -84,5 +91,9 @@ void KillMoveEffects();
 void UpdateShatters();
 
 void CleanUp();
+
+void InitialiseOrLoadGame(bool loadGame);
+void InitialiseScripting(int levelIndex, bool loadGame);
+void DeInitialiseScripting(int levelIndex);
 
 unsigned CALLBACK GameMain(void*);

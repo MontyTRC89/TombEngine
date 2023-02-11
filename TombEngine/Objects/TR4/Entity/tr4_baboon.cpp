@@ -12,7 +12,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
@@ -41,16 +41,15 @@ namespace TEN::Entities::TR4
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
 
 	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
-	const vector<int> BaboonAttackJoints	  = { 11, 12 };
-	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const vector<unsigned int> BaboonAttackJoints	  = { 11, 12 };
+	const vector<unsigned int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<unsigned int> BaboonJumpAttackJoints  = { 3, 4, 8 };
 
 	BaboonRespawner BaboonRespawn;
 
 	enum BaboonState
 	{
-		BABOON_STATE_NULL = 0,
-		BABOON_STATE_NONE = 1,
+		// No states 0-1.
 		BABOON_STATE_WALK_FORWARD = 2,
 		BABOON_STATE_IDLE = 3,
 		BABOON_STATE_RUN_FORWARD = 4,
@@ -109,7 +108,7 @@ namespace TEN::Entities::TR4
 		BABOON_ANIM_ACTIVATE_SWITCH = 31
 	};
 
-	static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
+	static void TriggerBaboonShockwave(Pose pos, short xRot)
 	{
 		short shockwaveID = GetFreeShockwave();
 		if (shockwaveID != NO_ITEM)
@@ -132,7 +131,7 @@ namespace TEN::Entities::TR4
 
 	void BaboonDieEffect(ItemInfo* item)
 	{
-		auto pose = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
+		auto pose = Pose(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
 
 		// Trigger shockwave effect.
 		TriggerBaboonShockwave(pose, ANGLE(0.0f));
@@ -237,6 +236,8 @@ namespace TEN::Entities::TR4
 	void InitialiseBaboon(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		if (!Objects[ID_BABOON_NORMAL].loaded)
+			TENLog("Failed to assign ID_BABOON_INV|ID_BABOON_SILENT animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, BABOON_ANIM_SIT_IDLE);
@@ -437,7 +438,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->AIBits & FOLLOW)
 						item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
-					else if (TestProbability(0.008f))
+					else if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -447,7 +448,7 @@ namespace TEN::Entities::TR4
 					if (AI.bite && AI.distance < BABOON_ATTACK_READY_RANGE)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
-				else if (TestProbability(0.008f))
+				else if (TestProbability(1.0f / 128))
 					item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 
 				break;
@@ -488,7 +489,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
 				{
-					auto pos = Vector3Int();
+					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
 						pos.x = item->Pose.Position.x - SECTOR(1);
@@ -539,9 +540,9 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 
 				if (creature->Flags == 0 &&
-					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
-					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
-					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
+					(item->TouchBits.Test(BaboonAttackJoints) ||
+					 item->TouchBits.Test(BaboonAttackRightJoints) ||
+					 item->TouchBits.Test(BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, BaboonBite, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, BABOON_ATTACK_DAMAGE);

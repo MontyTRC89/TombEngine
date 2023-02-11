@@ -10,22 +10,21 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
-using std::vector;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LION_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto LION_BITE_ATTACK_DAMAGE	 = 60;
 
 	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 
-	const vector<int> LionAttackJoints = { 3, 6, 21 };
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
+	const std::vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
 
 	enum LionState
 	{
@@ -62,7 +61,7 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, LION_ANIM_IDLE);
 	}
 
@@ -121,7 +120,7 @@ namespace TEN::Entities::TR5
 
 					if (AI.ahead)
 					{
-						if (item->TestBits(JointBitType::Touch, LionAttackJoints))
+						if (item->TouchBits.Test(LionAttackJoints))
 						{
 							item->Animation.TargetState = LION_STATE_BITE_ATTACK;
 							break;
@@ -142,7 +141,7 @@ namespace TEN::Entities::TR5
 
 					if (creature->Mood == MoodType::Bored)
 					{
-						if (TestProbability(0.004f))
+						if (TestProbability(1.0f / 256))
 						{
 							item->Animation.TargetState = LION_STATE_IDLE;
 							item->Animation.RequiredState = LION_STATE_ROAR;
@@ -161,11 +160,11 @@ namespace TEN::Entities::TR5
 					{
 						if (AI.ahead && AI.distance < LION_POUNCE_ATTACK_RANGE)
 							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (item->TestBits(JointBitType::Touch, LionAttackJoints) && AI.ahead)
+						else if (item->TouchBits.Test(LionAttackJoints) && AI.ahead)
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (creature->Mood != MoodType::Escape)
 						{
-							if (TestProbability(0.004f))
+							if (TestProbability(1.0f / 256))
 							{
 								item->Animation.TargetState = LION_STATE_IDLE;
 								item->Animation.RequiredState = LION_STATE_ROAR;
@@ -179,11 +178,11 @@ namespace TEN::Entities::TR5
 
 				case LION_STATE_POUNCE_ATTACK:
 					if (!item->Animation.RequiredState &&
-						item->TestBits(JointBitType::Touch, LionAttackJoints))
+						item->TouchBits.Test(LionAttackJoints))
 					{
-						item->Animation.RequiredState = LION_STATE_IDLE;
 						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
+						item->Animation.RequiredState = LION_STATE_IDLE;
 					}
 
 					break;
@@ -192,11 +191,11 @@ namespace TEN::Entities::TR5
 					creature->MaxTurn = ANGLE(1.0f);
 
 					if (!item->Animation.RequiredState &&
-						item->TestBits(JointBitType::Touch, LionAttackJoints))
+						item->TouchBits.Test(LionAttackJoints))
 					{
-						item->Animation.RequiredState = LION_STATE_IDLE;
 						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
+						item->Animation.RequiredState = LION_STATE_IDLE;
 					}
 
 					break;

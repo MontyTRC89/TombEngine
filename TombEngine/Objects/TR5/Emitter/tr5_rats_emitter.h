@@ -6,7 +6,7 @@ constexpr auto NUM_RATS = 32;
 struct RatData
 {
 	byte On;
-	PHD_3DPOS Pose;
+	Pose Pose;
 	short RoomNumber;
 
 	short Velocity;

@@ -11,9 +11,14 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+using std::vector;
+
+namespace TEN::Entities::Creatures::TR2
 {
+	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
+
 	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
+	const vector<unsigned int> SharkBiteAttackJoints = { 10, 12, 13 };
 
 	void SharkControl(short itemNumber)
 	{
@@ -21,7 +26,7 @@ namespace TEN::Entities::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 		short head = 0;
@@ -29,11 +34,7 @@ namespace TEN::Entities::TR2
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 5)
-			{
-				item->Animation.AnimNumber = Objects[ID_SHARK].animIndex + 4;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 5;
-			}
+				SetAnimation(item, 4);
 
 			CreatureFloat(itemNumber);
 			return;
@@ -42,43 +43,43 @@ namespace TEN::Entities::TR2
 		{
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, info->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case 0:
-				info->Flags = 0;
-				info->MaxTurn = 0;
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2) && AI.zoneNumber == AI.enemyZone)
 					item->Animation.TargetState = 3;
 				else
 					item->Animation.TargetState = 1;
+
 				break;
 
 			case 1:
-				info->MaxTurn = ANGLE(0.5f);
+				creature->MaxTurn = ANGLE(0.5f);
 
-				if (info->Mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Bored)
 					break;
 				else if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2))
 					item->Animation.TargetState = 0;
-				else if (info->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !AI.ahead)
+				else if (creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !AI.ahead)
 					item->Animation.TargetState = 2;
 
 				break;
 
 			case 2:
-				info->MaxTurn = ANGLE(2.0f);
-				info->Flags = 0;
+				creature->MaxTurn = ANGLE(2.0f);
+				creature->Flags = 0;
 
-				if (info->Mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 1;
-				else if (info->Mood == MoodType::Escape)
+				else if (creature->Mood == MoodType::Escape)
 					break;
 				else if (AI.ahead && AI.distance < pow(1365, 2) && AI.zoneNumber == AI.enemyZone)
 				{
@@ -95,11 +96,11 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (!info->Flags && item->TouchBits & 0x3400)
+				if (!creature->Flags && item->TouchBits.Test(SharkBiteAttackJoints))
 				{
+					DoDamage(creature->Enemy, SHARK_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, SharkBite, DoBloodSplat);
-					DoDamage(info->Enemy, 400);
-					info->Flags = 1;
+					creature->Flags = 1;
 				}
 
 				break;

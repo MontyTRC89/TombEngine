@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <unordered_set>
+
 #include "LuaHandler.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/MoveableObject.h"
@@ -9,7 +10,6 @@
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {
-
 public:
 	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
 
@@ -20,8 +20,8 @@ public:
 	bool TryAddColliding(short id) override
 	{
 		ItemInfo* item = &g_Level.Items[id];
-		bool hasName = !(item->LuaCallbackOnCollidedWithObjectName.empty() && item->LuaCallbackOnCollidedWithRoomName.empty());
-		if(hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
+		bool hasName = !(item->Callbacks.OnObjectCollided.empty() && item->Callbacks.OnRoomCollided.empty());
+		if (hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return m_collidingItems.insert(id).second;
 
 		return false;
@@ -30,7 +30,7 @@ public:
 	bool TryRemoveColliding(short id, bool force = false) override
 	{
 		ItemInfo* item = &g_Level.Items[id];
-		bool hasName = !(item->LuaCallbackOnCollidedWithObjectName.empty() && item->LuaCallbackOnCollidedWithRoomName.empty());
+		bool hasName = !(item->Callbacks.OnObjectCollided.empty() && item->Callbacks.OnRoomCollided.empty());
 		if(!force && hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return false;
 
@@ -56,7 +56,7 @@ private:
 	void AssignLara() override;
 
 	template <typename R, char const* S>
-	std::unique_ptr<R> GetByName(std::string const& name)
+	std::unique_ptr<R> GetByName(const std::string& name)
 	{
 		if (!ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name))
 			return nullptr;
@@ -64,18 +64,78 @@ private:
 			return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
 	}
 
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetMoveablesBySlot(GAME_OBJECT_ID objID)
+	{
+		std::vector<std::unique_ptr<R>> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<short>(val))
+				continue;
+
+			auto& item = g_Level.Items[GetIndexByName(key)];
+
+			if (objID == item.ObjectNumber)
+				items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
+		}
+
+		return items;
+	}
+
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetStaticsBySlot(int slot)
+	{
+		std::vector<std::unique_ptr<R>> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
+				continue;
+			
+			auto meshInfo = std::get<std::reference_wrapper<MESH_INFO>>(val).get();
+
+			if (meshInfo.staticNumber == slot)
+				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
+		}
+
+		return items;
+	}
+
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetRoomsByTag(std::string tag)
+	{
+		std::vector<std::unique_ptr<R>> rooms = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<std::reference_wrapper<ROOM_INFO>>(val))
+				continue;
+
+			auto room = std::get<std::reference_wrapper<ROOM_INFO>>(val).get();
+			
+			if (std::any_of(room.tags.begin(), room.tags.end(),
+				[&tag](const std::string& value) { return value == tag; }))
+			{
+				rooms.push_back(GetByName<Room, ScriptReserved_Room>(key));
+			}
+		}
+
+		return rooms;
+	}
+
 	[[nodiscard]] short GetIndexByName(std::string const& name) const override
 	{
 		return std::get<short>(m_nameMap.at(name));
 	}
 
-	bool AddName(std::string const& key, VarMapVal val) override
+	bool AddName(const std::string& key, VarMapVal val) override
 	{
-		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
+		if (key.empty())
+			return false;
+
+		auto p = std::pair< const std::string&, VarMapVal>{ key, val };
 		return m_nameMap.insert(p).second;
 	}
 
-	bool RemoveName(std::string const& key)
+	bool RemoveName(const std::string& key)
 	{
 		return m_nameMap.erase(key);
 	}
@@ -85,5 +145,3 @@ private:
 		m_nameMap.clear();
 	}
 };
-	
-

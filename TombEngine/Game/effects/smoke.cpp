@@ -8,13 +8,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Effects::Smoke
 {
@@ -94,20 +93,20 @@ namespace TEN::Effects::Smoke
 		s.age = 0;
 		constexpr float d = 0.2f;
 
-		Vector3 randomDir = Vector3(GenerateFloat(-d, d), GenerateFloat(-d, d), GenerateFloat(-d, d));
+		Vector3 randomDir = Vector3(Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d));
 		Vector3 direction2;
 		(direction + randomDir).Normalize(direction2);
 
-		s.velocity = direction2 * GenerateFloat(7, 9);
+		s.velocity = direction2 * Random::GenerateFloat(7, 9);
 		s.gravity = -0.2f;
-		s.friction = GenerateFloat(0.7f, 0.85f);
+		s.friction = Random::GenerateFloat(0.7f, 0.85f);
 		s.sourceColor = Vector4(1, 131 / 255.0f, 100 / 255.0f, 1);
 		s.destinationColor = Vector4(1, 1, 1, 0);
-		s.life = GenerateFloat(25, 35);
-		s.angularVelocity = GenerateFloat(-0.3f, 0.3f);
+		s.life = Random::GenerateFloat(25, 35);
+		s.angularVelocity = Random::GenerateFloat(-0.3f, 0.3f);
 		s.angularDrag = 0.97f;
-		s.sourceSize = life > 4 ? GenerateFloat(16, 24) : GenerateFloat(100, 128);
-		s.destinationSize = life > 4 ? GenerateFloat(160, 200) : GenerateFloat(256, 300);
+		s.sourceSize = life > 4 ? Random::GenerateFloat(16, 24) : Random::GenerateFloat(100, 128);
+		s.destinationSize = life > 4 ? Random::GenerateFloat(160, 200) : Random::GenerateFloat(256, 300);
 		s.affectedByWind = true;
 		s.active = true;
 		s.room = room;
@@ -135,41 +134,41 @@ namespace TEN::Effects::Smoke
 		{
 			if (weaponType == LaraWeaponType::RocketLauncher)
 			{
-				float size = GenerateFloat(48, 80);
+				float size = Random::GenerateFloat(48, 80);
 				s.sourceSize = size * 2;
 				s.destinationSize = size * 8;
 				s.sourceColor = {0.75,0.75,1,1};
 				s.terminalVelocity = 0;
 				s.friction = 0.82f;
-				s.life = GenerateFloat(60, 90);
+				s.life = Random::GenerateFloat(60, 90);
 
 				if (initial == 1)
 				{
-					float size = GenerateFloat(48, 80);
+					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size * 2;
 					s.destinationSize = size * 16;
-					s.velocity = GetRandomVectorInCone(direction,25);
-					s.velocity *= GenerateFloat(0, 32);
+					s.velocity = Random::GenerateDirectionInCone(direction, 25);
+					s.velocity *= Random::GenerateFloat(0, 32);
 				}
 				else
 				{
-					float size = GenerateFloat(48, 80);
+					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size;
 					s.destinationSize = size * 8;
-					s.velocity = GetRandomVectorInCone(direction,3);
-					s.velocity *= GenerateFloat(0, 16);
+					s.velocity = Random::GenerateDirectionInCone(direction, 3);
+					s.velocity *= Random::GenerateFloat(0, 16);
 				}
 			}
 			else
 			{
-				float size = GenerateFloat(48, 73);
+				float size = Random::GenerateFloat(48, 73);
 				s.sourceSize = size * 2;
 				s.destinationSize = size * 8;
 				s.terminalVelocity = 0;
 				s.friction = 0.88f;
-				s.life = GenerateFloat(60, 90);
-				s.velocity = GetRandomVectorInCone(direction, 10);
-				s.velocity *= GenerateFloat(16, 30);
+				s.life = Random::GenerateFloat(60, 90);
+				s.velocity = Random::GenerateDirectionInCone(direction, 10);
+				s.velocity *= Random::GenerateFloat(16, 30);
 			}
 		}
 		else
@@ -177,19 +176,19 @@ namespace TEN::Effects::Smoke
 			float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
 
 			if (weaponType == LaraWeaponType::RocketLauncher)
-				s.sourceColor = {0.75,0.75,1,1};
+				s.sourceColor = { 0.75, 0.75, 1, 1 };
 
 			s.sourceSize = size / 2;
 			s.destinationSize = size * 4;
 			s.terminalVelocity = 0;
 			s.friction = 0.97f;
-			s.life = GenerateFloat(42, 62);
-			s.velocity *= GenerateFloat(16, 40);
+			s.life = Random::GenerateFloat(42, 62);
+			s.velocity *= Random::GenerateFloat(16, 40);
 		}
 
 		s.position = Vector3(x, y, z);
-		s.position += Vector3(GenerateFloat(-8, 8), GenerateFloat(-8, 8), GenerateFloat(-8, 8));
-		s.angularVelocity = GenerateFloat(-PI / 4, PI / 4);
+		s.position += Vector3(Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8));
+		s.angularVelocity = Random::GenerateFloat(-PI_DIV_4, PI_DIV_4);
 		s.angularDrag = 0.95f;
 		s.room = LaraItem->RoomNumber;
 	}
@@ -198,64 +197,64 @@ namespace TEN::Effects::Smoke
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
-		s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
+		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16));
 
 		float xVel = std::sin(TO_RAD(angle)) * velocity;
 		float zVel = std::cos(TO_RAD(angle)) * velocity;
 
-		s.velocity = Vector3(xVel, GenerateFloat(-1, 4), zVel);
+		s.velocity = Vector3(xVel, Random::GenerateFloat(-1, 4), zVel);
 		s.sourceColor = Vector4(1, 1, 1, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
-		s.sourceSize = GenerateFloat(8,24);
+		s.sourceSize = Random::GenerateFloat(8,24);
 		s.active = true;
 		s.affectedByWind = true;
 		s.friction = 0.999f;
 		s.gravity = -0.1f;
-		s.life = GenerateFloat(16, 24);
-		s.destinationSize = GenerateFloat(128, 160);
-		s.angularVelocity = GenerateFloat(-1, 1);
-		s.angularDrag = GenerateFloat(0.97f, 0.999f);
+		s.life = Random::GenerateFloat(16, 24);
+		s.destinationSize = Random::GenerateFloat(128, 160);
+		s.angularVelocity = Random::GenerateFloat(-1, 1);
+		s.angularDrag = Random::GenerateFloat(0.97f, 0.999f);
 	}
 
 	void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
-		s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
+		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f));
 		s.sourceColor = Vector4(0.8f, 0.8f, 1, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
-		s.sourceSize = GenerateFloat(32, 64);
+		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
 		s.active = true;
-		s.velocity = GetRandomVector() * GenerateFloat(1, 3);
+		s.velocity = Random::GenerateDirection() * Random::GenerateFloat(1.0f, 3.0f);
 		s.affectedByWind = true;
 		s.friction = 0.979f;
 		s.gravity = -0.1f;
-		s.life = GenerateFloat(80, 120);
-		s.destinationSize = GenerateFloat(1024, 1152);
-		s.angularVelocity = GenerateFloat(-0.6f, 0.6f);
-		s.angularDrag = GenerateFloat(0.87f, 0.99f);
+		s.life = Random::GenerateFloat(80, 120);
+		s.destinationSize = Random::GenerateFloat(1024, 1152);
+		s.angularVelocity = Random::GenerateFloat(-0.6f, 0.6f);
+		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
 	}
 
 	void TriggerBreathSmoke(long x, long y, long z, short angle)
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
-		s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
+		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16));
 
-		float xVel = std::sin(TO_RAD(angle)) * GenerateFloat(8, 12);
-		float zVel = std::cos(TO_RAD(angle)) * GenerateFloat(8, 12);
+		float xVel = std::sin(TO_RAD(angle)) * Random::GenerateFloat(8, 12);
+		float zVel = std::cos(TO_RAD(angle)) * Random::GenerateFloat(8, 12);
 				
 		s.velocity = Vector3(xVel, 0, zVel);
 		s.sourceColor = Vector4(1, 1, 1, 0.7f);
 		s.destinationColor = Vector4(1, 1, 1, 0);
-		s.sourceSize = GenerateFloat(8, 24);
+		s.sourceSize = Random::GenerateFloat(8, 24);
 		s.active = true;
 		s.affectedByWind = true;
 		s.friction = 0.999f;
 		s.gravity = -0.1f;
-		s.life = GenerateFloat(12, 20);
-		s.destinationSize = GenerateFloat(128, 160);
-		s.angularVelocity = GenerateFloat(-0.5f, 0.5f);
-		s.angularDrag = GenerateFloat(0.95f, 0.95f);
+		s.life = Random::GenerateFloat(12, 20);
+		s.destinationSize = Random::GenerateFloat(128, 160);
+		s.angularVelocity = Random::GenerateFloat(-0.5f, 0.5f);
+		s.angularDrag = Random::GenerateFloat(0.95f, 0.95f);
 	}
 }

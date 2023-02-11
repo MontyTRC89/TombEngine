@@ -23,10 +23,11 @@ namespace TEN::Entities::TR4
 	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
 
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
-	const vector<int> SphinxAttackJoints = { 6 };
+	const vector<unsigned int> SphinxAttackJoints = { 6 };
 
 	enum SphinxState
 	{
+		// No state 0.
 		SPHINX_STATE_NONE = 0,
 		SPHINX_STATE_REST = 1,
 		SPHINX_STATE_REST_ALERTED = 2,
@@ -63,12 +64,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SPHINX_ANIM_REST;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SPHINX_STATE_REST;
-		item->Animation.ActiveState = SPHINX_STATE_REST;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, SPHINX_ANIM_REST);
 	}
 
 	void SphinxControl(short itemNumber)
@@ -103,7 +100,6 @@ namespace TEN::Entities::TR4
 					ShatterObject(nullptr, mesh, -64, item->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
-					mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					probe.Block = false;
 
 					TestTriggers(x, y, z, item->RoomNumber, true);
@@ -189,7 +185,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->Flags == 0)
 			{
-				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
+				if (item->TouchBits.Test(SphinxAttackJoints))
 				{
 					DoDamage(creature->Enemy, SPHINX_ATTACK_DAMAGE);
 					CreatureEffect2(item, SphinxBite, 20, -1, DoBloodSplat);
@@ -230,7 +226,7 @@ namespace TEN::Entities::TR4
 			{
 				TestTriggers(item, true);
 
-				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
+				if (item->TouchBits.Test(SphinxAttackJoints))
 				{
 					DoDamage(creature->Enemy, INT_MAX);
 					CreatureEffect2(item, SphinxBite, 50, -1, DoBloodSplat);

@@ -7,16 +7,17 @@
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 
 void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
@@ -86,11 +87,9 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 {
-	Vector3Int pos = { 0, 0, 0 };
-	GetJointAbsPosition(item, &pos, joint);
-
 	auto* spark = GetFreeParticle();
 
+	auto pos = GetJointPosition(item, joint);
 	spark->on = 1;
 	spark->dR = 0;
 	spark->colFadeSpeed = 8;
@@ -116,14 +115,14 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->flags = SP_NONE;
 
 	if (flame)
-		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
+		TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::SmallFast, Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
 }
 
-static bool ElectricityWireCheckDeadlyBounds(Vector3Int* pos, short delta)
+bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
 {
-	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
-		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
-		pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
+	if ((pos->x + delta) >= DeadlyBounds.X1 && (pos->x - delta) <= DeadlyBounds.X2 &&
+		(pos->y + delta) >= DeadlyBounds.Y1 && (pos->y - delta) <= DeadlyBounds.Y2 &&
+		(pos->z + delta) >= DeadlyBounds.Z1 && (pos->z - delta) <= DeadlyBounds.Z2)
 	{
 		return true;
 	}
@@ -146,7 +145,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	auto* object = &Objects[item->ObjectNumber];
 
-	auto cableBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+	auto cableBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
@@ -154,8 +153,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	for (int i = 0; i < object->nmeshes; i++)
 	{
-		auto pos = Vector3Int(0, 0, CLICK(1));
-		GetJointAbsPosition(item, &pos, i);
+		auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 
 		if (pos.y < cableBottomPlane)
 			continue;
@@ -192,13 +190,11 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = TO_DX_BBOX(collItem->Pose, GetBoundsAccurate(collItem));
+		auto npcBox = GameBoundingBox(collItem).ToBoundingOrientedBox(collItem->Pose);
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{
-			auto pos = Vector3Int(0, 0, CLICK(1));
-			GetJointAbsPosition(item, &pos, i);
-
+			auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 			short roomNumber = item->RoomNumber;
 			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
@@ -215,8 +211,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
-				Vector3Int collPos = {};
-				GetJointAbsPosition(collItem, &collPos, j);
+				auto collPos = GetJointPosition(collItem, j);
 
 				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
 
@@ -228,14 +223,14 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->IsLara())
+				if (!isWaterNearby)
 				{
-					auto* lara = (LaraInfo*&)collItem->Data;
-					lara->BurnBlue = 1;
-					lara->BurnCount = 48;
-
-					if (!isWaterNearby)
-						LaraBurn(collItem);
+					if (collItem->Effect.Type != EffectType::Smoke)
+					{
+						ItemBlueElectricBurn(collItem, 2 *FPS);
+					}
+					else
+						ItemSmoke(collItem, -1);
 				}
 
 				if (instantKill)

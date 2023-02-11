@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
 
@@ -18,12 +18,8 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 		item->Pose.Position.y += CLICK(2);
 	}
 

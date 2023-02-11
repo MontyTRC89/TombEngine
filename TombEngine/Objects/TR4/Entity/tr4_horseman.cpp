@@ -13,9 +13,9 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 
@@ -24,14 +24,18 @@ namespace TEN::Entities::TR4
 	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
 	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
 	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
-
+	const std::vector<unsigned int> HorsemanAxeAttackJoints		= { 5, 6 };
+	const std::vector<unsigned int> HorsemanKickAttackJoints	= { 14 };
+	const std::vector<unsigned int> HorsemanMountedAttackJoints = { 5, 6, 10 };
+	const std::vector<unsigned int> HorsemanShieldAttackJoints	= { 10 };
+	
 	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
 	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
 	const auto HorseBite3 = BiteInfo(Vector3::Zero, 19);
 
 	enum HorsemanState
 	{
-		HORSEMAN_STATE_NONE = 0,
+		// No state 0.
 		HORSEMAN_STATE_MOUNTED_RUN_FORWARD = 1,
 		HORSEMAN_STATE_MOUNTED_WALK_FORWARD = 2,
 		HORSEMAN_STATE_MOUNTED_IDLE = 3,
@@ -90,7 +94,7 @@ namespace TEN::Entities::TR4
 
 	enum HorseState
 	{
-		HORSE_STATE_NONE = 0,
+		// No state 0.
 		HORSE_STATE_IDLE = 1,
 		HORSE_STATE_RUN_FORWARD = 2,
 		HORSE_STATE_WALK_FORWARD = 3,
@@ -116,7 +120,25 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	static void HorsemanSparks(Vector3Int* pos, int param1, int maxSparks)
+	void InitialiseHorse(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		SetAnimation(item, HORSE_ANIM_IDLE);
+		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
+		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
+	}
+
+	void InitialiseHorseman(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, HORSEMAN_ANIM_IDLE);
+		item->ItemFlags[0] = NO_ITEM; // No horse yet.
+	}
+
+	void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
@@ -187,26 +209,6 @@ namespace TEN::Entities::TR4
 			spark->xVel = -phd_sin((random & 0x7FF) + param1 - 1024) * 4096;
 			spark->zVel = phd_cos((random & 0x7FF) + param1 - 1024) * 4096;
 		}
-	}
-
-	void InitialiseHorse(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSE];
-
-		SetAnimation(item, HORSE_ANIM_IDLE);
-		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
-		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
-	}
-
-	void InitialiseHorseman(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSEMAN];
-
-		ClearItem(itemNumber);
-		SetAnimation(item, HORSEMAN_ANIM_IDLE);
-		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}
 
 	void HorsemanControl(short itemNumber)
@@ -353,8 +355,7 @@ namespace TEN::Entities::TR4
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
 								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
-								auto pos = Vector3Int(0, -128, 80);
-								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
+								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
 							else if (TestProbability(0.125f))
@@ -550,7 +551,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_ATTACK_RIGHT:
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x60)
+					if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 					{
 						DoDamage(creature->Enemy, 250);
 						CreatureEffect2(item, HorsemanBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -566,7 +567,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_ATTACK_LEFT:
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x4000)
+					if (item->TouchBits.Test(HorsemanKickAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect2(item, HorsemanBite2, 3, item->Pose.Orientation.y, DoBloodSplat);
@@ -655,7 +656,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x4000)
+					if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect2(item, HorsemanBite2, 3, item->Pose.Orientation.y, DoBloodSplat);
@@ -696,16 +697,16 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x460)
+					if (item->TouchBits.Test(HorsemanMountedAttackJoints))
 					{
 						LaraItem->HitStatus = true;
 
-						if (item->TouchBits & 0x60)
+						if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 						{
 							DoDamage(creature->Enemy, 250);
 							CreatureEffect2(horseItem, HorsemanBite1, 20, -1, DoBloodSplat);
 						}
-						else if (item->TouchBits & 0x400)
+						else if (item->TouchBits.Test(HorsemanShieldAttackJoints))
 						{
 							DoDamage(creature->Enemy, 150);
 							CreatureEffect2(horseItem, HorsemanBite3, 10, -1, DoBloodSplat);

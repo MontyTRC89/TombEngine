@@ -11,10 +11,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using std::vector;
@@ -32,8 +33,8 @@ namespace TEN::Entities::Vehicles
 		byte life;
 		byte pad[3];
 	};
-	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	static vector<VehicleMountType> KayakMountTypes =
+	const vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -185,7 +186,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, kayakItem);
 			DoKayakMount(kayakItem, laraItem, mountType);
 		}
 	}
@@ -223,7 +224,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, kayakItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, kayakItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -446,13 +447,13 @@ namespace TEN::Entities::Vehicles
 		{
 			int sinkval = lara->WaterCurrentActive - 1;
 		
-			auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
-			int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f))) / 16) & 4095;
+			auto target = g_Level.Sinks[sinkval].Position;
+			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target.ToVector3()).y) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;
 
-			int velocity = g_Level.Sinks[sinkval].strength;
+			int velocity = g_Level.Sinks[sinkval].Strength;
 			dx = phd_sin(angle * 16) * velocity * 1024;
 			dz = phd_cos(angle * 16) * velocity * 1024;
 
@@ -468,7 +469,7 @@ namespace TEN::Entities::Vehicles
 
 	bool KayakCanGetOut(ItemInfo* kayakItem, int direction)
 	{
-		Vector3Int pos;
+		Vector3i pos;
 		int height = GetVehicleWaterHeight(kayakItem, 0, (direction < 0) ? -KAYAK_DISMOUNT_DISTANCE : KAYAK_DISMOUNT_DISTANCE, false, &pos);
 
 		if ((kayakItem->Pose.Position.y - height) > 0)
@@ -477,7 +478,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	int KayakDoShift(ItemInfo* kayakItem, Vector3Int* pos, Vector3Int* old)
+	int KayakDoShift(ItemInfo* kayakItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -485,8 +486,8 @@ namespace TEN::Entities::Vehicles
 		int xOld = old->x / SECTOR(1);
 		int zOld = old->z / SECTOR(1);
 
-		int xShift = pos->x & (SECTOR(1) - 1);
-		int zShift = pos->z & (SECTOR(1) - 1);
+		int xShift = pos->x & WALL_MASK;
+		int zShift = pos->z & WALL_MASK;
 
 		if (x == xOld)
 		{
@@ -586,7 +587,7 @@ namespace TEN::Entities::Vehicles
 
 		kayak->OldPose = kayakItem->Pose;
 
-		Vector3Int oldPos[9];
+		Vector3i oldPos[9];
 		int height[8];
 		height[0] = GetVehicleWaterHeight(kayakItem, 1024, 0, true, &oldPos[0]);
 		height[1] = GetVehicleWaterHeight(kayakItem, 512, -96, true, &oldPos[1]);
@@ -601,7 +602,7 @@ namespace TEN::Entities::Vehicles
 		oldPos[8].y = kayakItem->Pose.Position.y;
 		oldPos[8].z = kayakItem->Pose.Position.z;
  
-		Vector3Int frontPos, leftPos, rightPos;
+		Vector3i frontPos, leftPos, rightPos;
 		int frontHeight = GetVehicleWaterHeight(kayakItem, 1024, 0, false, &frontPos);
 		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
@@ -629,7 +630,7 @@ namespace TEN::Entities::Vehicles
 		int zOld = kayakItem->Pose.Position.z;
 
 		int rot = 0;
-		Vector3Int pos;
+		Vector3i pos;
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(2.5f), 0, false, &pos)) < (oldPos[7].y - KAYAK_COLLIDE))
 			rot = KayakDoShift(kayakItem, &pos, &oldPos[7]);
@@ -665,7 +666,7 @@ namespace TEN::Entities::Vehicles
 			height2 = probe.Position.Floor;
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
-			KayakDoShift(kayakItem, (Vector3Int*)&kayakItem->Pose, &oldPos[8]);
+			KayakDoShift(kayakItem, (Vector3i*)&kayakItem->Pose, &oldPos[8]);
 
 		probe = GetCollision(kayakItem);
 		probedRoomNum = probe.RoomNumber;
@@ -680,14 +681,14 @@ namespace TEN::Entities::Vehicles
 			kayakPos.x = kayak->OldPose.Position.x;
 			kayakPos.y = kayak->OldPose.Position.y;
 			kayakPos.z = kayak->OldPose.Position.z;
-			kayakPos.roomNumber = kayakItem->RoomNumber;
+			kayakPos.RoomNumber = kayakItem->RoomNumber;
 
 			CameraCollisionBounds(&kayakPos, 256, 0);
 			{
 				kayakItem->Pose.Position.x = kayakPos.x;
 				kayakItem->Pose.Position.y = kayakPos.y;
 				kayakItem->Pose.Position.z = kayakPos.z;
-				kayakItem->RoomNumber = kayakPos.roomNumber;
+				kayakItem->RoomNumber = kayakPos.RoomNumber;
 			}
 		}
 
@@ -1026,8 +1027,8 @@ namespace TEN::Entities::Vehicles
 				!(kayak->Flags & 0x80))
 			{
 				kayak->Flags |= 0x80;
-				lara->MeshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->ClearBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
+				laraItem->MeshBits.Clear(KayakLaraLegJoints);
 			}
 
 			break;
@@ -1038,8 +1039,8 @@ namespace TEN::Entities::Vehicles
 				kayak->Flags & 0x80)
 			{
 				kayak->Flags &= ~0x80;
-				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-				laraItem->SetBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
+				laraItem->MeshBits.Set(KayakLaraLegJoints);
 			}
 
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
@@ -1049,8 +1050,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
 				frame == 83)
 			{
-				Vector3Int vec = { 0, 350, 500 };
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
@@ -1061,7 +1061,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.y = -50;
 				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak->LeftRightPaddleCount = 0;
 			}
 
@@ -1071,8 +1071,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
 				frame == 83)
 			{
-				Vector3Int vec = { 0, 350, 500 };
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
@@ -1083,7 +1082,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.z = 40;
 				laraItem->Animation.Velocity.y = -50;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak->LeftRightPaddleCount = 0;
 			}
 		}
@@ -1126,6 +1125,9 @@ namespace TEN::Entities::Vehicles
 	{
 		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNum = g_Level.Rooms[i].itemNumber;
 
 			while (itemNum != NO_ITEM)
@@ -1265,7 +1267,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (!kayak->TrueWater && kayakItem->Animation.Velocity.y < 20)
 			{
-				Vector3Int dest;
+				Vector3i dest;
 				char cnt = 0;
 				short MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
 				short MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };

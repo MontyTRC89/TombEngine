@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
@@ -22,11 +22,10 @@ int SpotcamTimer;
 bool SpotcamPaused;
 int SpotcamLoopCnt;
 int CameraFade;
-Vector3Int LaraFixedPosition;
+Vector3i LaraFixedPosition;
 int InitialCameraRoom;
-int LastFOV;
-Vector3Int InitialCameraPosition;
-Vector3Int InitialCameraTarget;
+Vector3i InitialCameraPosition;
+Vector3i InitialCameraTarget;
 int CurrentSplinePosition;
 int SplineToCamera;
 int FirstCamera;
@@ -61,34 +60,36 @@ bool SpotcamOverlay = false;
 void ClearSpotCamSequences()
 {
 	UseSpotCam = false;
+	SpotcamDontDrawLara = false;
+	SpotcamOverlay = false;
+
 
 	for (int i = 0; i < MAX_SPOTCAMS; i++)
 		SpotCam[i] = {};
 }
 
-void InitSpotCamSequences() 
+void InitialiseSpotCamSequences(bool startFirstSequence)
 {
-	int s, cc, n, ce;
+	TrackCameraInit = false;
 
-	n = NumberSpotcams;
-	TrackCameraInit = 0;
-	cc = 1;
+	int n = NumberSpotcams;
+	int cc = 1;
 
 	if (n != 0)
 	{
-		ce = 0;
-		s = SpotCam[0].sequence;
+		int ce = 0;
+		int s = SpotCam[0].sequence;
 
 		if (cc < n)
 		{
 			for (n = 1; n < NumberSpotcams; n++)
 			{
-				//Same sequence
+				// Same sequence.
 				if (SpotCam[n].sequence == s)
 					cc++;
+				// New sequence.
 				else
 				{
-					//New sequence
 					CameraCnt[ce] = cc;
 					cc = 1;
 					SpotCamRemap[s] = ce;
@@ -102,21 +103,25 @@ void InitSpotCamSequences()
 		SpotCamRemap[s] = ce;
 	}
 
-	return;
+	if (startFirstSequence)
+	{
+		InitialiseSpotCam(0);
+		UseSpotCam = true;
+	}
 }
 
 void InitialiseSpotCam(short Sequence)
 {
 	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
-		TrackCameraInit = 0;
+		TrackCameraInit = false;
 		return;
 	}
 
 	BinocularRange = 0;
 	LaserSight = false;
 
-	AlterFOV(16380);
+	AlterFOV(ANGLE(DEFAULT_FOV), false);
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
@@ -128,13 +133,12 @@ void InitialiseSpotCam(short Sequence)
 
 	CameraFade = -1;
 	LastSpotCamSequence = Sequence;
-	TrackCameraInit = 0;
+	TrackCameraInit = false;
 	SpotcamTimer = 0;
-	SpotcamPaused = 0;
+	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
 	Lara.Control.Locked = false;
 
-	LastFOV = CurrentFOV;
 	LaraAir = Lara.Air;
 
 	InitialCameraPosition.x = Camera.pos.x;
@@ -146,7 +150,7 @@ void InitialiseSpotCam(short Sequence)
 	InitialCameraTarget.z = Camera.target.z;
 
 	LaraHealth = LaraItem->HitPoints;
-	InitialCameraRoom = Camera.pos.roomNumber;
+	InitialCameraRoom = Camera.pos.RoomNumber;
 
 	LaraFixedPosition.x = LaraItem->Pose.Position.x;
 	LaraFixedPosition.y = LaraItem->Pose.Position.y;
@@ -353,7 +357,7 @@ void CalculateSpotCameras()
 	int cn; // $s0
 
 
-	CAMERA_INFO Backup;
+	CAMERA_INFO backup;
 
 	if (Lara.Control.Locked)
 	{
@@ -482,15 +486,16 @@ void CalculateSpotCameras()
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_ROOM)
 		{
-			Camera.pos.roomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
+			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 		}
 		else
-			Camera.pos.roomNumber = outsideRoom;
+			Camera.pos.RoomNumber = outsideRoom;
 
-		AlterFOV(cfov);
+		AlterFOV(cfov, false);
 
 		LookAt(&Camera, croll);
+		UpdateMikePos(LaraItem);
 
 		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
 			SpotcamOverlay = true;
@@ -507,13 +512,13 @@ void CalculateSpotCameras()
 			Camera.type = CameraType::Heavy;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 
@@ -643,13 +648,13 @@ void CalculateSpotCameras()
 						Camera.type = CameraType::Heavy;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 
@@ -674,7 +679,7 @@ void CalculateSpotCameras()
 						Camera.target.x = InitialCameraTarget.x;
 						Camera.target.y = InitialCameraTarget.y;
 						Camera.target.z = InitialCameraTarget.z;
-						Camera.pos.roomNumber = InitialCameraRoom;
+						Camera.pos.RoomNumber = InitialCameraRoom;
 					}
 
 					SpotcamOverlay = false;
@@ -703,7 +708,7 @@ void CalculateSpotCameras()
 					CameraFOV[2] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
-					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
+					memcpy((char*)& backup, (char*)& Camera, sizeof(CAMERA_INFO));
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
@@ -744,11 +749,12 @@ void CalculateSpotCameras()
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
-					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));
+					memcpy((char*)& Camera, (char*)& backup, sizeof(CAMERA_INFO));
 
 					Camera.targetElevation = elevation;
 
 					LookAt(&Camera, croll);
+					UpdateMikePos(LaraItem);
 
 					SplineToCamera = 1;
 				}
@@ -788,7 +794,8 @@ void CalculateSpotCameras()
 }
 
 #if 0
-int Spline(int x, int* knots, int nk)//Monty's version?
+// Monty's version.
+int Spline(int x, int* knots, int nk)
 {
 	/*int num = nk - 1;
 
@@ -878,20 +885,19 @@ int Spline(int x, int* knots, int nk)//Monty's version?
 	*/
 }
 #else
-int Spline(int x, int* knots, int nk)//Core's version, *proper* decompilation by ChocolateFan
+// Core's version. Proper decompilation by ChocolateFan
+int Spline(int x, int* knots, int nk)
 {
-	int* k;
-	int span, c1, c2;
-
-	span = x * (nk - 3) >> 16;
-
+	int span = x * (nk - 3) >> 16;
 	if (span >= nk - 3)
 		span = nk - 4;
 
-	k = &knots[span];
+	int* k = &knots[span];
 	x = x * (nk - 3) - span * 65536;
-	c1 = (k[1] >> 1) - (k[2] >> 1) - k[2] + k[1] + (k[3] >> 1) + ((-k[0] - 1) >> 1);
-	c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
+
+	int c1 = (k[1] >> 1) - (k[2] >> 1) - k[2] + k[1] + (k[3] >> 1) + ((-k[0] - 1) >> 1);
+	int c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
+
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
 }
 #endif

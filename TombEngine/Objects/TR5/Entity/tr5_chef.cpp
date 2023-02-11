@@ -1,24 +1,26 @@
 #include "framework.h"
-#include "tr5_chef.h"
+#include "Objects/TR5/Entity/tr5_chef.h"
+
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/people.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
 
 	// TODO
 	enum ChefState
 	{
+		// No state 0.
 		CHEF_STATE_COOKING = 1,
 		CHEF_STATE_TURN_180 = 2,
 		CHEF_STATE_ATTACK = 3,
@@ -31,6 +33,7 @@ namespace TEN::Entities::TR5
 	// TODO
 	enum ChefAnim
 	{
+		CHEF_ANIM_IDLE = 0,
 		CHEF_ANIM_DEATH = 16
 	};
 
@@ -38,12 +41,8 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = CHEF_STATE_COOKING;
-		item->Animation.ActiveState = CHEF_STATE_COOKING;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
 	}
@@ -53,13 +52,13 @@ namespace TEN::Entities::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short angle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
-		short angle = 0;
-
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 
 		if (item->HitPoints <= 0)
 		{
@@ -120,7 +119,7 @@ namespace TEN::Entities::TR5
 			case CHEF_STATE_COOKING:
 				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
 					AI.distance < pow(SECTOR(1.5f), 2) &&
-					(item->TouchBits ||
+					(item->TouchBits.TestAny() ||
 						item->HitStatus ||
 						LaraItem->Animation.Velocity.z > 15 ||
 						TargetVisible(item, &aiLaraInfo)))

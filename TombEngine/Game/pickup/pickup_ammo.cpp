@@ -2,6 +2,7 @@
 #include "Game/pickup/pickup_ammo.h"
 
 #include <array>
+
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
 #include "Objects/objectslist.h"
@@ -19,8 +20,8 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 	{
 		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 0 },
 		{ ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, WeaponAmmoType::Ammo1, 30 },
-		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 36 },
-		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 36 },
+		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 6 },
+		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 6 },
 		{ ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo1, 10 },
 		{ ID_CROSSBOW_AMMO2_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo2, 10 },
 		{ ID_CROSSBOW_AMMO3_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo3, 10 },
@@ -34,34 +35,49 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 	}
 };
 
-static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount, bool add)
+bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	int arrayPos = GetArraySlot(kAmmo, objectID);
 	if (-1 == arrayPos)
 		return false;
 
-	AmmoPickupInfo info = kAmmo[arrayPos];
+	auto ammoPickup = kAmmo[arrayPos];
 
-	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType];
-	if (!currentAmmo.hasInfinite())
+	auto& currentWeapon = lara.Weapons[(int)ammoPickup.LaraWeaponType];
+	auto& currentAmmo = currentWeapon.Ammo[(int)ammoPickup.AmmoType];
+
+	switch(modType)
 	{
-		int defaultModify = add ? info.Amount : -info.Amount;
-		int newVal = int{ currentAmmo.getCount() } + (amount ? amount : defaultModify);
-		lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType] = std::max(0, newVal);
-	}
+	case ModificationType::Set:
+		currentAmmo = amount.value();
+		currentAmmo.SetInfinite(amount == -1);
+		break;
+
+	default:
+		if (!currentAmmo.HasInfinite())
+		{
+			int defaultModify = modType == ModificationType::Add ? ammoPickup.Amount : -ammoPickup.Amount;
+			int newVal = (int)currentAmmo.GetCount() + (amount.has_value() ? amount.value() : defaultModify);
+			currentAmmo = std::max(0, newVal);
+		}
+
+		break;
+	};
 
 	return true;
 }
 
-// We need the extra bool because amount might be zero to signify the default amount.
-bool TryAddingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+bool TryAddingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {
-	return TryModifyingAmmo(lara, objectID, amount, true);
+	return TryModifyingAmmo(lara, objectID, amount, ModificationType::Add);
 }
 
-bool TryRemovingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+bool TryRemovingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {	
-	return TryModifyingAmmo(lara, objectID, -amount, false);
+	if (amount.has_value())
+		return TryModifyingAmmo(lara, objectID, -amount.value(), ModificationType::Remove);
+	else
+		return TryModifyingAmmo(lara, objectID, amount, ModificationType::Remove);
 }
 
 std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
@@ -72,8 +88,8 @@ std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
-	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].hasInfinite())
-		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].getCount();
+	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].HasInfinite())
+		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].GetCount();
 
 	// -1 signifies infinite ammo.
 	return -1;

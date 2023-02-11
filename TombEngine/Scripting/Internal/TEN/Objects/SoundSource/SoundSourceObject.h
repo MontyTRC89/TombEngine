@@ -1,18 +1,21 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
-namespace sol {
+struct SoundSourceInfo;
+
+namespace sol
+{
 	class state;
 }
 class Vec3;
 
-class SoundSource : public NamedBase<SoundSource, SOUND_SOURCE_INFO &>
+class SoundSource : public NamedBase<SoundSource, SoundSourceInfo &>
 {
 public:
-	using IdentifierType = std::reference_wrapper<SOUND_SOURCE_INFO>;
-	SoundSource(SOUND_SOURCE_INFO& ref);
+	using IdentifierType = std::reference_wrapper<SoundSourceInfo>;
+	SoundSource(SoundSourceInfo& ref);
 	~SoundSource() = default;
 
 	SoundSource& operator=(SoundSource const& other) = delete;
@@ -29,6 +32,6 @@ public:
 	void SetName(std::string const &);
 
 private:
-	SOUND_SOURCE_INFO & m_soundSource;
+	SoundSourceInfo & m_soundSource;
 };
 

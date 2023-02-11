@@ -1,16 +1,26 @@
 #include "framework.h"
-#include "ReservedScriptNames.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
+#include "Miscellanous.h"
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/Lara/lara.h"
+#include "Game/room.h"
+#include "Game/spotcam.h"
+#include "ReservedScriptNames.h"
+#include "LuaHandler.h"
+#include "ScriptUtil.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
-#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/Input/Input.h"
+#include "Vec3/Vec3.h"
+#include "ScriptAssert.h"
+#include "ActionIDs.h"
+#include "CameraTypes.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -18,8 +28,8 @@ Functions that don't fit in the other modules.
 @pragma nostrip
 */
 
-using namespace TEN::Input;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Input;
 
 namespace Misc 
 {
@@ -41,17 +51,23 @@ namespace Misc
 	//@treturn bool is there a direct line of sight between the two positions?
 	//@usage
 	//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
-	//print(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))
+	//print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
 		GameVector vec1, vec2;
 		pos1.StoreInGameVector(vec1);
-		vec1.roomNumber = roomNumber1;
+		vec1.RoomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
-		return LOS(&vec1, &vec2);
+
+		MESH_INFO* mesh;
+		Vector3i vector;
+		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
-
+	///Vibrate game controller, if function is available and setting is on.
+	//@function Vibrate
+	//@tparam float strength Strength of the vibration
+	//@tparam float time __(default 0.3)__ Time of the vibration, in seconds
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
@@ -73,6 +89,13 @@ namespace Misc
 		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
 	}
 
+	///Check if fade out is complete and screen is completely black.
+	//@treturn bool state of the fade out
+	static bool FadeOutComplete()
+	{
+		return ScreenFadeCurrent == 0.0f;
+	}
+
 	///Move black cinematic bars in from the top and bottom of the game window.
 	//@function SetCineBars
 	//@tparam float height  __(default 30)__ Percentage of the screen to be covered
@@ -91,7 +114,7 @@ namespace Misc
 	//@tparam float angle in degrees (clamped to [10, 170])
 	static void SetFOV(float angle)
 	{
-		AlterFOV(FROM_DEGREES(std::clamp(abs(angle), 10.0f, 170.0f)));
+		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	//Get field of view.
@@ -100,6 +123,20 @@ namespace Misc
 	static float GetFOV()
 	{
 		return TO_DEGREES(GetCurrentFOV());
+	}
+
+	///Shows the mode of the game camera.
+	//@function GetCameraType
+	//@treturn Misc.CameraType value used by the Main Camera.
+	//@usage
+	//LevelFuncs.OnControlPhase = function() 
+	//	if (Misc.GetCameraType() == CameraType.Combat) then
+	//		--Do your Actions here.
+	//	end
+	//end
+	static CameraType GetCameraType()
+	{
+		return Camera.oldType;
 	}
 	
 	/// Play an audio track
@@ -120,29 +157,97 @@ namespace Misc
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
+	///Stop any audio tracks currently playing
+	//@function StopAudioTracks
+	static void StopAudioTracks()
+	{
+		StopSoundTracks();
+	}
+
+	///Stop audio track that is currently playing
+	//@function StopAudioTrack
+	//@tparam bool looped if set, stop looped audio track, if not, stop one-shot audio track
+	static void StopAudioTrack(TypeOrNil<bool> looped)
+	{
+		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
+		StopSoundTrack(mode, SOUND_XFADETIME_ONESHOT);
+	}
+
+	/// Play sound effect
+	//@function PlaySound
+	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
-		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+	}
+
+	static bool CheckInput(int actionIndex)
+	{
+		if (actionIndex > ActionMap.size())
+		{
+			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	static bool KeyIsHeld(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return false;
+
+		if (IsHeld((ActionID)actionIndex))
+			return true;
+
 		return (TrInput & (1 << actionIndex)) != 0;
 	}
 
 	static bool KeyIsHit(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return false;
+
+		if (IsClicked((ActionID)actionIndex))
+			return true;
+
 		return (DbInput & (1 << actionIndex)) != 0;
 	}
 
 	static void KeyPush(int actionIndex)
 	{
-		TrInput |= (1 << actionIndex);
+		if (!CheckInput(actionIndex))
+			return;
+
+		ActionQueue[actionIndex] = QueueState::Push;
 	}
 
 	static void KeyClear(int actionIndex)
 	{
-		TrInput &= ~(1 << actionIndex);
+		if (!CheckInput(actionIndex))
+			return;
+
+		ActionQueue[actionIndex] = QueueState::Clear;
+	}
+
+	///Do FlipMap with specific ID
+	//@function FlipMap
+	//@tparam int flipmap (ID of flipmap)
+	static void FlipMap(int flipmap)
+	{
+		DoFlipMap(flipmap);
+	}
+
+	///Enable FlyBy with specific ID
+	//@function PlayFlyBy
+	//@tparam short flyby (ID of flyby)
+	static void PlayFlyBy(short flyby)
+	{
+		UseSpotCam = true;
+		InitialiseSpotCam(flyby);
 	}
 
 	///Calculate the distance between two positions.
@@ -150,10 +255,11 @@ namespace Misc
 	//@tparam Vec3 posA first position
 	//@tparam Vec3 posB second position
 	//@treturn int the direct distance from one position to the other
-	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
+	static int CalculateDistance(const Vec3& pos1, const Vec3& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector3(pos1.x, pos1.y, pos1.z);
+		auto p2 = Vector3(pos2.x, pos2.y, pos2.z);
+		return (int)round(Vector3::Distance(p1, p2));
 	}
 
 	///Calculate the horizontal distance between two positions.
@@ -161,10 +267,11 @@ namespace Misc
 	//@tparam Vec3 posA first position
 	//@tparam Vec3 posB second position
 	//@treturn int the direct distance on the XZ plane from one position to the other
-	static int CalculateHorizontalDistance(Vec3 const& pos1, Vec3 const& pos2)
+	static int CalculateHorizontalDistance(const Vec3& pos1, const Vec3& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector2(pos1.x, pos1.z);
+		auto p2 = Vector2(pos2.x, pos2.z);
+		return (int)round(Vector2::Distance(p1, p2));
 	}
 
 	///Translate a pair of percentages to screen-space pixel coordinates.
@@ -174,6 +281,15 @@ namespace Misc
 	//@tparam float y percent value to translate to y-coordinate
 	//@treturn int x coordinate in pixels
 	//@treturn int y coordinate in pixels
+	//@usage	
+	//local halfwayX, halfwayY = PercentToScreen(50, 50)
+	//local baddy
+	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
+	//local str1 = DisplayString("You spawned a baddy!", halfwayX, halfwayY, Color(255, 100, 100), false, {DisplayStringOption.SHADOW, DisplayStringOption.CENTER})
+	//
+	//LevelFuncs.triggerOne = function(obj) 
+	//	ShowString(str1, 4)
+	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
 		auto fWidth = static_cast<double>(g_Configuration.Width);
@@ -200,60 +316,74 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
+	/// Reset object camera back to Lara and deactivate object camera.
+	//@function ResetObjCamera
+	static void ResetObjCamera()
+	{
+		ObjCamera(LaraItem, 0, LaraItem, 0, false);
+	}
 
-	void Register(sol::state * state, sol::table & parent) {
-		sol::table table_misc{ state->lua_state(), sol::create };
-		parent.set(ScriptReserved_Misc, table_misc);
+	void Register(sol::state * state, sol::table & parent)
+	{
+		sol::table tableMisc{ state->lua_state(), sol::create };
+		parent.set(ScriptReserved_Misc, tableMisc);
 
 		///Vibrate gamepad, if possible.
 		//@function Vibrate
 		//@tparam float strength
 		//@tparam float time (in seconds, default: 0.3)
-		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
+		tableMisc.set_function(ScriptReserved_Vibrate, &Vibrate);
 
-		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
-		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		tableMisc.set_function(ScriptReserved_FadeIn, &FadeIn);
+		tableMisc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		tableMisc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
-		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
+		tableMisc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
-		table_misc.set_function(ScriptReserved_SetFOV, &SetFOV);
-		table_misc.set_function(ScriptReserved_GetFOV, &GetFOV);
-		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
+		tableMisc.set_function(ScriptReserved_SetFOV, &SetFOV);
+		tableMisc.set_function(ScriptReserved_GetFOV, &GetFOV);
+		tableMisc.set_function(ScriptReserved_GetCameraType, &GetCameraType);
+		tableMisc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
-		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		tableMisc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		tableMisc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
+		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
-		/// Play sound effect
-		//@function PlaySound
-		//@tparam int sound ID to play
-		//@tparam Vec3 position
-		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
-		//@tparam int action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
+		//@tparam Misc.ActionID action action mapping index to check
+		tableMisc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
 		//@function KeyIsHit
-		//@tparam int action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
+		//@tparam Misc.ActionID action action mapping index to check
+		tableMisc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
-		//@tparam int action mapping index to push
-		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
+		//@tparam Misc.ActionID action action mapping index to push
+		tableMisc.set_function(ScriptReserved_KeyPush, &KeyPush);
 
 		/// Clears particular input from action key
 		//@function KeyClear
-		//@tparam int action mapping index to clear
-		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
-		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
+		//@tparam Misc.ActionID action action mapping index to clear
+		tableMisc.set_function(ScriptReserved_KeyClear, &KeyClear);
 
-		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
+		tableMisc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
+		tableMisc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
+		tableMisc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
-		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
-		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
+		tableMisc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+		tableMisc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
-		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
+		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+
+		LuaHandler handler{ state };
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
 	}
 }

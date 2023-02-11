@@ -1,20 +1,23 @@
 #include "framework.h"
-#include "tr5_hydra.h"
+#include "Objects/TR5/Entity/tr5_hydra.h"
 
-#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Game/animation.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/misc.h"
-#include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/misc.h"
+#include "Math/Math.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
 
@@ -52,7 +55,7 @@ namespace TEN::Entities::TR5
 		item->Pose.Position.x -= CLICK(1);
 	}
 
-	static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
+	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != NO_ITEM)
@@ -74,7 +77,7 @@ namespace TEN::Entities::TR5
 		}
 	}
 
-	void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
+	void TriggerHydraMissileSparks(Vector3i* pos, short xv, short yv, short zv)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -103,7 +106,7 @@ namespace TEN::Entities::TR5
 		spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (TestProbability(0.5f))
 			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
 			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -227,11 +230,11 @@ namespace TEN::Entities::TR5
 				else if (item->TriggerFlags == 2)
 					tilt = ANGLE(2.8f);
 
-				if (AI.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
+				if (AI.distance >= pow(CLICK(7), 2) && TestProbability(0.97f))
 				{
-					if (AI.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
+					if (AI.distance >= pow(SECTOR(2), 2) && TestProbability(0.97f))
 					{
-						if (!(GetRandomControl() & 0xF))
+						if (TestProbability(0.06f))
 							item->Animation.TargetState = HYDRA_STATE_AIM;
 					}
 					else
@@ -290,7 +293,8 @@ namespace TEN::Entities::TR5
 					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 						damage *= 3;
 
-					if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
+					if ((GetRandomControl() & 0xF) < damage &&
+						AI.distance < SQUARE(SECTOR(10)) && damage > 0)
 					{
 						item->Animation.TargetState = 4;
 						DoDamage(item, damage);
@@ -317,19 +321,16 @@ namespace TEN::Entities::TR5
 			case 3:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					auto pos1 = Vector3Int(0, 1024, 40);
-					GetJointAbsPosition(item, &pos1, 10);
+					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));
+					auto pos2 = GetJointPosition(item, 10, Vector3i(0, 144, 40));
 
-					auto pos2 = Vector3Int(0, 144, 40);
-					GetJointAbsPosition(item, &pos2, 10);
-
-					auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
-					auto pos = PHD_3DPOS(pos1, angles);
+					auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
+					auto pose = Pose(pos1, orient);
 					roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
 					// TEST: uncomment this for making HYDRA not firing bubbles
-					HydraBubblesAttack(&pos, roomNumber, 1);
+					HydraBubblesAttack(&pose, roomNumber, 1);
 				}
 
 				break;

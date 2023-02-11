@@ -1,8 +1,11 @@
 #pragma once
 #include <bass.h>
 #include <bass_fx.h>
+
 #include "Game/control/control.h"
 #include "Sound/sound_effects.h"
+
+using std::string;
 
 constexpr auto SOUND_BASS_UNITS              = 1.0f / 1024.0f;	// TR->BASS distance unit coefficient
 constexpr auto SOUND_MAXVOL_RADIUS           = 1024.0f;		// Max. volume hearing distance
@@ -107,11 +110,41 @@ struct SoundTrackInfo
 	int Mask{ 0 };
 };
 
+struct SoundSourceInfo
+{
+	Vector3i Position = Vector3i::Zero;
+	int		 SoundID = 0;
+	int		 Flags = 0;
+	string	 Name = "";
+
+	SoundSourceInfo()
+	{
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
+		this->Flags = newflags;
+	}
+};
+
 extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 extern int SecretSoundIndex;
 
-bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
@@ -122,6 +155,7 @@ void ResumeAllSounds();
 void PlaySoundTrack(std::string trackName, SoundTrackType mode, QWORD position = 0);
 void PlaySoundTrack(std::string trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
+void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
 void StopSoundTracks();
 void ClearSoundTrackMasks();
 void PlaySecretTrack();
@@ -144,9 +178,9 @@ void  Sound_UpdateScene();
 void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
-int   Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position);
-float Sound_DistanceToListener(PHD_3DPOS *position);
+int   Sound_EffectIsPlaying(int effectID, Pose *position);
+float Sound_DistanceToListener(Pose *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
-bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force = false);
+bool  Sound_UpdateEffectPosition(int index, Pose *position, bool force = false);
 bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain);

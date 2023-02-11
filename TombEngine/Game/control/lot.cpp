@@ -21,81 +21,24 @@ void InitialiseLOTarray(int itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	if(!creature->LOT.Initialised)
+	if (!creature->LOT.Initialised)
 	{
-		creature->LOT.Node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
+		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
 		creature->LOT.Initialised = true;
 	}
 }
 
-int EnableEntityAI(short itemNum, int always, bool makeTarget)
+bool EnableEntityAI(short itemNum, bool always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
 	if (item->IsCreature())
 		return true;
-	   	
-	/*
-	if (SlotsUsed >= NUM_SLOTS)
-	{
-		int cameraDistance = 0;
-		if (!always)
-		{
-			int deltaX = (item->pos.Position.x - Camera.pos.x) >> 8;
-			int deltaY = (item->pos.Position.y - Camera.pos.y) >> 8;
-			int deltaZ = (item->pos.Position.z - Camera.pos.z) >> 8;
-			cameraDistance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
-		}
 
-		int slotToDisable = -1;
+	InitialiseSlot(itemNum, makeTarget);
+	ActiveCreatures.push_back(item->Data);
 
-
-		for (int slot = 0; slot < ActiveCreatures.size(); slot++)
-		{
-			CREATURE_INFO* creature = ActiveCreatures[slot];
-			item = &g_Level.Items[creature->itemNum];
-
-			int deltaX = (item->pos.Position.x - Camera.pos.x) >> 8;
-			int deltaY = (item->pos.Position.y - Camera.pos.y) >> 8;
-			int deltaZ = (item->pos.Position.z - Camera.pos.z) >> 8;
-			int distance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
-
-			if (distance > cameraDistance)
-			{
-				cameraDistance = distance;
-				slotToDisable = slot;
-			}
-		}
-
-		if (slotToDisable < 0 || slotToDisable > NUM_SLOTS)
-			return false;
-
-		ItemInfo* itemToDisable = &g_Level.Items[ActiveCreatures[slotToDisable].itemNum];
-		CREATURE_INFO* creatureToDisable = &ActiveCreatures[slotToDisable];
-
-		itemToDisable->status = ITEM_INVISIBLE;
-		DisableBaddyAI(creatureToDisable->itemNum);
-		InitialiseSlot(itemNum, slotToDisable);
-		return true;
-	}
-	else*/
-	{
-		/*
-		CREATURE_INFO* creature = ActiveCreatures.data();
-		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
-		{
-			if (creature->itemNum == NO_ITEM)
-			{
-				InitialiseSlot(itemNum, slot);
-				return true;
-			}
-		}
-		*/
-		InitialiseSlot(itemNum, 0, makeTarget);
-		ActiveCreatures.push_back(item->Data);
-	}
-
-	return true;
+	return item->IsCreature();
 }
 
 void DisableEntityAI(short itemNumber)
@@ -112,15 +55,15 @@ void DisableEntityAI(short itemNumber)
 	item->Data = nullptr;
 }
 
-void InitialiseSlot(short itemNum, short slot, bool makeTarget)
+void InitialiseSlot(short itemNumber, bool makeTarget)
 {
-	auto* item = &g_Level.Items[itemNum];
-	auto* obj = &Objects[item->ObjectNumber];
-
+	auto* item = &g_Level.Items[itemNumber];
+	auto* object = &Objects[item->ObjectNumber];
 	item->Data = CreatureInfo();
 	auto* creature = GetCreatureInfo(item);
-	InitialiseLOTarray(itemNum);
-	creature->ItemNumber = itemNum;
+
+	InitialiseLOTarray(itemNumber);
+	creature->ItemNumber = itemNumber;
 	creature->Mood = MoodType::Bored;
 	creature->JointRotation[0] = 0;
 	creature->JointRotation[1] = 0;
@@ -134,144 +77,125 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 	creature->Patrol = false;
 	creature->JumpAhead = false;
 	creature->MonkeySwingAhead = false;
-	creature->LOT.CanJump = false;
-	creature->LOT.CanMonkey = false;
-	creature->LOT.IsAmphibious = false; // only the crocodile can go water and land. (default: true)
-	creature->LOT.IsJumping = false;
-	creature->LOT.IsMonkeying = false;
 	creature->MaxTurn = ANGLE(1);
 	creature->Flags = 0;
-	creature->Enemy = NULL;
+	creature->Enemy = nullptr;
+
+	creature->LOT.CanJump = false;
+	creature->LOT.CanMonkey = false;
+	creature->LOT.IsAmphibious = false; // True for crocodile by default as only the crocodile can move in water and on land.
+	creature->LOT.IsJumping = false;
+	creature->LOT.IsMonkeying = false;
 	creature->LOT.Fly = NO_FLYING;
 	creature->LOT.BlockMask = BLOCKED;
+	creature->AITargetNumber = NO_ITEM;
+	creature->AITarget = nullptr;
 
 	if (makeTarget)
+	{
 		creature->AITargetNumber = CreateItem();
-	else
-		creature->AITargetNumber = NO_ITEM;
+		if (creature->AITargetNumber != NO_ITEM)
+			creature->AITarget = &g_Level.Items[creature->AITargetNumber];
+	}
 
-	if (creature->AITargetNumber != NO_ITEM)
-		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
-	else
-		creature->AITarget = nullptr;
-
-	switch (obj->zoneType)
+	switch (object->LotType)
 	{
 		default:
-		case ZONE_NULL:
-		    creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-			obj->zoneType = ZONE_BASIC; // only entity that use CreatureActive() will reach InitialiseSlot() !
+		case LotType::Basic:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
+			creature->LOT.Zone = ZoneType::Basic;
 			break;
 
-		case ZONE_SKELLY:
-			// Can jump
+		// Can jump.
+		case LotType::Skeleton:
 			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
 			creature->LOT.CanJump = true;
-			creature->LOT.Zone = ZONE_SKELLY;
+			creature->LOT.Zone = ZoneType::Skeleton;
 			break;
 
-		case ZONE_BASIC:
-			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-			creature->LOT.Zone = ZONE_BASIC;
-			break;
-
-		case ZONE_FLYER:
-			// Can fly
+		// Can fly.
+		case LotType::Flyer:
 			creature->LOT.Step = SECTOR(20);
 			creature->LOT.Drop = -SECTOR(20);
 			creature->LOT.Fly = DEFAULT_FLY_UPDOWN_SPEED;
-			creature->LOT.Zone = ZONE_FLYER;
+			creature->LOT.Zone = ZoneType::Flyer;
 			break;
 
-		case ZONE_WATER:
-			// Can swim
+		// Can swim.
+		case LotType::Water:
 			creature->LOT.Step = SECTOR(20);
 			creature->LOT.Drop = -SECTOR(20);
-			creature->LOT.Zone = ZONE_WATER;
+			creature->LOT.Zone = ZoneType::Water;
 
 			if (item->ObjectNumber == ID_CROCODILE)
 			{
-				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // is more slow than the other underwater entity
-				creature->LOT.IsAmphibious = true; // crocodile can walk and swim.
+				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // Slower than the other underwater creatures.
+				creature->LOT.IsAmphibious = true;				   // Can walk and swim.
 			}
 			else if (item->ObjectNumber == ID_BIG_RAT)
 			{
-				creature->LOT.Fly = NO_FLYING; // dont want the bigrat to be able to go in water (just the surface !)
-				creature->LOT.IsAmphibious = true; // bigrat can walk and swim.
+				creature->LOT.Fly = NO_FLYING;	   // Can't swim underwater, only on the surface.
+				creature->LOT.IsAmphibious = true; // Can walk and swim.
 			}
 			else
 			{
 				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
+
 			break;
 
-		case ZONE_HUMAN_CLASSIC:
-			// Can climb
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
-			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
+		// Can climb.
+		case LotType::Human:
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
-		case ZONE_HUMAN_JUMP:
-			// Can climb and jump
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
+		// Can climb and jump.
+		case LotType::HumanPlusJump:
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.CanJump = true;
-			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
-		case ZONE_HUMAN_JUMP_AND_MONKEY:
-			// Can climb, jump, monkey
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
-			creature->LOT.CanJump = true;
-			creature->LOT.CanMonkey = true;
-			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
-			break;
-
-		case ZONE_HUMAN_LONGJUMP_AND_MONKEY:
-			// Can climb, jump, monkey, long jump
-			creature->LOT.Step = SECTOR(1) + CLICK(3);
-			creature->LOT.Drop = -(SECTOR(1) + CLICK(3));
+		// Can climb, jump, monkeyswing.
+		case LotType::HumanPlusJumpAndMonkey:
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.CanJump = true;
 			creature->LOT.CanMonkey = true;
-			creature->LOT.Zone = ZONE_VON_CROY;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
-		case ZONE_SPIDER:
-			creature->LOT.Step = SECTOR(1) - CLICK(2);
-			creature->LOT.Drop = -(SECTOR(1) - CLICK(2));
-			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
-			break;
-
-		case ZONE_BLOCKABLE:
-			creature->LOT.BlockMask = BLOCKABLE;
-			creature->LOT.Zone = ZONE_BASIC;
-			break;
-
-		case ZONE_APE:
+		case LotType::Spider:
 			creature->LOT.Step = CLICK(2);
-			creature->LOT.Drop = -SECTOR(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
-		case ZONE_SOPHIALEE:
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -CLICK(3);
-			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
+		case LotType::Blockable:
+			creature->LOT.BlockMask = BLOCKABLE;
+			creature->LOT.Zone = ZoneType::Basic;
+			break;
+
+		case LotType::Ape:
+			creature->LOT.Step = CLICK(2);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 	}
 
 	ClearLOT(&creature->LOT);
-	if (itemNum != Lara.ItemNumber)
+	if (itemNumber != Lara.ItemNumber)
 		CreateZone(item);
 
 	SlotsUsed++;
 }
 
-void SetBaddyTarget(short itemNum, short target)
+void SetEntityTarget(short itemNum, short target)
 {
 	auto* item = &g_Level.Items[itemNum];
 	auto* creature = GetCreatureInfo(item);
@@ -304,16 +228,16 @@ void ClearLOT(LOTInfo* LOT)
 void CreateZone(ItemInfo* item)
 {
 	auto* creature = GetCreatureInfo(item);
-	auto* r = &g_Level.Rooms[item->RoomNumber];
+	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(r, item->Pose.Position.x - r->x, item->Pose.Position.z - r->z)->Box;
+	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
 
 	if (creature->LOT.Fly)
 	{
-		BOX_NODE* node = creature->LOT.Node.data();
+		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -322,8 +246,8 @@ void CreateZone(ItemInfo* item)
 	}
 	else
 	{
-		int* zone = g_Level.Zones[creature->LOT.Zone][0].data();
-		int* flippedZone = g_Level.Zones[creature->LOT.Zone][1].data();
+		int* zone = g_Level.Zones[(int)creature->LOT.Zone][0].data();
+		int* flippedZone = g_Level.Zones[(int)creature->LOT.Zone][1].data();
 
 		int zoneNumber = zone[item->BoxNumber];
 		int flippedZoneNumber = flippedZone[item->BoxNumber];
@@ -331,7 +255,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

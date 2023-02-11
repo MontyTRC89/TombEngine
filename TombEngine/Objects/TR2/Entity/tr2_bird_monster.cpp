@@ -8,13 +8,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;
 	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(SECTOR(1));
@@ -24,12 +24,12 @@ namespace TEN::Entities::TR2
 
 	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
-	const vector<int> BirdMonsterAttackLeftJoints  = { 18, 19 };
-	const vector<int> BirdMonsterAttackRightJoints = { 21, 22 };
+	const vector<unsigned int> BirdMonsterAttackLeftJoints  = { 18, 19 };
+	const vector<unsigned int> BirdMonsterAttackRightJoints = { 21, 22 };
 
 	enum BirdMonsterState
 	{
-		BMONSTER_STATE_NONE = 0,
+		// No state 0.
 		BMONSTER_STATE_IDLE = 1,
 		BMONSTER_STATE_WALK_FORWARD = 2,
 		BMONSTER_STATE_SLAM_ATTACK_START = 3,
@@ -181,7 +181,7 @@ namespace TEN::Entities::TR2
 			case BMONSTER_STATE_CRUSH_ATTACK_CONTINUE:
 			case BMONSTER_STATE_PUNCH_ATTACK_LEFT_CONTINUE:
 				if (!(creature->Flags & 1) &&
-					item->TestBits(JointBitType::Touch, BirdMonsterAttackRightJoints))
+					item->TouchBits.Test(BirdMonsterAttackRightJoints))
 				{
 					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteRight, DoBloodSplat);
@@ -189,7 +189,7 @@ namespace TEN::Entities::TR2
 				}
 
 				if (!(creature->Flags & 2) &&
-					item->TestBits(JointBitType::Touch, BirdMonsterAttackLeftJoints))
+					item->TouchBits.Test(BirdMonsterAttackLeftJoints))
 				{
 					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteLeft, DoBloodSplat);

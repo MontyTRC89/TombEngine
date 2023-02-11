@@ -4,7 +4,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -15,9 +15,9 @@
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 
 namespace TEN::Entities::TR4
 {
@@ -37,7 +37,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
-			wraith->Position = Vector3Int(0, 0, item->Pose.Position.z);
+			wraith->Position = Vector3i(0, 0, item->Pose.Position.z);
 			wraith->Velocity.z = 0;
 			wraith->r = 0;
 			wraith->g = 0;
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
 				{
 					item->ItemFlags[1] += 400;
 					if (item->ItemFlags[1] > 8000)
-						LaraBurn(LaraItem);
+						ItemBurn(LaraItem);
 				}
 			}
 			else if (target->ObjectNumber == ID_ANIMATING10)
@@ -373,15 +373,15 @@ namespace TEN::Entities::TR4
 
 		item->Pose.Position.y -= 384;
 
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, 0, 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(45.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(90.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(135.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 
 		item->Pose.Position.y += 384;
 	}
 
-	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
+	void DrawWraith(Vector3i pos, Vector3i velocity, int objectNumber)
 	{
 		auto* spark = GetFreeParticle();
 		spark->on = 1;
@@ -440,7 +440,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(Vector3Int pos, short yRot, short objectNumber)
+	void WraithWallsEffect(Vector3i pos, short yRot, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;

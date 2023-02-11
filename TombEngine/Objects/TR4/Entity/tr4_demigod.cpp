@@ -13,15 +13,22 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Random.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto DEMIGOD_IDLE_RANGE					   = SQUARE(BLOCK(2));
+	constexpr auto DEMIGOD_WALK_RANGE					   = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD1_WALK_RANGE					   = SQUARE(BLOCK(3));
+	constexpr auto DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
+	constexpr auto DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
+
 	enum DemigodState
 	{
 		DEMIGOD_STATE_IDLE = 0,
@@ -90,6 +97,30 @@ namespace TEN::Entities::TR4
 		DEMIGOD_ANIM_RUN_OVER_DEATH = 27
 	};
 
+	void InitialiseDemigod(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
+
+		/*if (g_Level.NumItems > 0)
+		{
+			ItemInfo* currentItem = &g_Level.Items[0];
+			int k = 0;
+
+			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
+			{
+				k++;
+				currentItem++;
+				if (k >= g_Level.NumItems)
+					return;
+			}
+
+			item->itemFlags[0] = k;
+		}*/
+	}
+
 	void TriggerDemigodMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
 		auto* fx = &EffectList[fxNumber];
@@ -97,8 +128,8 @@ namespace TEN::Entities::TR4
 		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
 		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
+		if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
+			dz >= -BLOCK(16) && dz <= BLOCK(16))
 		{
 			auto* spark = GetFreeParticle();
 
@@ -150,7 +181,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerDemigodMissile(PHD_3DPOS* pose, short roomNumber, int flags)
+	void TriggerDemigodMissile(Pose* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -175,7 +206,7 @@ namespace TEN::Entities::TR4
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
-			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + (flags >= 4, flags - 1, flags);
+			fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + ((flags >= 4) ? flags - 1 : flags);
 		}
 	}
 
@@ -189,14 +220,11 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3Int(-544, 96, 0);
-				GetJointAbsPosition(item, &pos1, 16);
+				auto origin = GetJointPosition(item, 16, Vector3i(-544, 96, 0));
+				auto target = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
+				auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-				auto pos2 = Vector3Int (-900, 96, 0);
-				GetJointAbsPosition(item, &pos2, 16);
-
-				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto pose = Pose(origin, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -207,14 +235,11 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3Int(-544, 96, 0 );
-				GetJointAbsPosition(item, &pos1, 16);
+				auto pos1 = GetJointPosition(item,  16, Vector3i(-544, 96, 0));
+				auto pos2 = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
-				auto pos2 = Vector3Int(-900, 96, 0);
-				GetJointAbsPosition(item, &pos2, 16);
-
-				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto pose = Pose(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -227,22 +252,22 @@ namespace TEN::Entities::TR4
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				auto pos1 = Vector3Int(0, 0, 192);
-				auto pos2 = Vector3Int(0, 0, 384);
+				auto pos1 = Vector3i(0, 0, 192);
+				auto pos2 = Vector3i(0, 0, 384);
 
 				if (GlobalCounter & 1)
 				{
-					GetJointAbsPosition(item, &pos1, 18);
-					GetJointAbsPosition(item, &pos2, 18);
+					pos1 = GetJointPosition(item, 18, pos1);
+					pos2 = GetJointPosition(item, 18, pos2);
 				}
 				else
 				{
-					GetJointAbsPosition(item, &pos1, 17);
-					GetJointAbsPosition(item, &pos2, 17);
+					pos1 = GetJointPosition(item, 17, pos1);
+					pos2 = GetJointPosition(item, 17, pos2);
 				}
 
-				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto pose = Pose(pos1, orient);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
@@ -300,34 +325,6 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseDemigod(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = DEMIGOD_STATE_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = DEMIGOD_STATE_IDLE;
-
-		/*if (g_Level.NumItems > 0)
-		{
-			ItemInfo* currentItem = &g_Level.Items[0];
-			int k = 0;
-
-			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
-			{
-				k++;
-				currentItem++;
-				if (k >= g_Level.NumItems)
-					return;
-			}
-
-			item->itemFlags[0] = k;
-		}*/
-	}
-
 	void DemigodControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -346,8 +343,8 @@ namespace TEN::Entities::TR4
 
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -445,7 +442,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance >= pow(SECTOR(3), 2))
+					if (AI.distance >= DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
@@ -460,7 +457,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (AI.distance <= pow(SECTOR(3), 2))
+					if (AI.distance <= DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
@@ -480,15 +477,15 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (AI.distance <= pow(SECTOR(2), 2) ||
-						AI.distance >= pow(SECTOR(5), 2))
-					{
-						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
-						break;
-					}
-
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
+						if (AI.distance <= DEMIGOD_IDLE_RANGE ||
+							AI.distance >= DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE)
+						{
+							item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
+							break;
+						}
+
 						if (TestProbability(0.25f))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
@@ -497,13 +494,17 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
+				if (AI.distance > DEMIGOD_WALK_RANGE && item->ObjectNumber == ID_DEMIGOD2)
+					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_AIM;
+				else
+					item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
+
 				break;
 
 			case DEMIGOD_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance < pow(SECTOR(2), 2))
+				if (AI.distance < DEMIGOD_IDLE_RANGE)
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -511,7 +512,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance < pow(SECTOR(3), 2))
+					if (AI.distance < DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
@@ -526,7 +527,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.distance > pow(SECTOR(3), 2))
+				if (AI.distance > DEMIGOD_WALK_RANGE)
 				{
 					if (item->ObjectNumber == ID_DEMIGOD2)
 						item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
@@ -539,7 +540,7 @@ namespace TEN::Entities::TR4
 			case DEMIGOD_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance < pow(SECTOR(2), 2))
+				if (AI.distance < DEMIGOD_IDLE_RANGE)
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -547,7 +548,7 @@ namespace TEN::Entities::TR4
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (AI.distance < pow(SECTOR(3), 2))
+					if (AI.distance < DEMIGOD1_WALK_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
@@ -555,13 +556,13 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > pow(SECTOR(2), 2))
+					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > DEMIGOD_IDLE_RANGE)
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 						break;
 					}
 
-					if (AI.distance < pow(SECTOR(3), 2))
+					if (AI.distance < DEMIGOD_WALK_RANGE)
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 				}
 
@@ -603,7 +604,7 @@ namespace TEN::Entities::TR4
 
 			case DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK:
 				creature->MaxTurn = ANGLE(7.0f);
-
+			
 				if (Targetable(item, &AI))
 					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_UNAIM;
 
@@ -611,8 +612,16 @@ namespace TEN::Entities::TR4
 
 			case DEMIGOD3_STATE_RADIAL_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
-				if (!Targetable(item, &AI) && AI.distance < pow(SECTOR(5), 2))
+
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_PROJECTILE_ATTACK;
+
+				break;
+
+			case DEMIGOD2_STATE_RADIAL_AIM:
+				creature->MaxTurn = ANGLE(7.0f);
+				if (!Targetable(item, &AI) && AI.distance < DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE)
+					item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;
 
 				break;
 
@@ -621,7 +630,7 @@ namespace TEN::Entities::TR4
 
 				DoDemigodEffects(itemNumber);
 
-				if (!Targetable(item, &AI) || AI.distance < pow(SECTOR(5), 2) || !GetRandomControl())
+				if (!Targetable(item, &AI) || AI.distance < DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE || !GetRandomControl())
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
 					break;
@@ -672,7 +681,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (AI.distance >= pow(SECTOR(3), 2) ||
+				if (AI.distance >= DEMIGOD1_WALK_RANGE ||
 					!AI.bite &&
 					(LaraItem->Animation.ActiveState < LS_LADDER_IDLE ||
 						LaraItem->Animation.ActiveState > LS_LADDER_DOWN ||
@@ -686,20 +695,19 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DEMIGOD1_STATE_HAMMER_ATTACK:
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == DEMIGOD_ANIM_RUN_TO_IDLE)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
-					auto pos = Vector3Int(80, -8, -40);
-					GetJointAbsPosition(item, &pos, 17);
+					auto pos = GetJointPosition(item, 17, Vector3i(80, -8, -40));
 
 					short roomNumber = item->RoomNumber;
 					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 					int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 					if (height == NO_HEIGHT)
-						pos.y = pos.y - 128;
+						pos.y = pos.y - CLICK(0.5f);
 					else
-						pos.y = height - 128;
+						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((PHD_3DPOS*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, (int)ShockwaveStyle::Normal);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

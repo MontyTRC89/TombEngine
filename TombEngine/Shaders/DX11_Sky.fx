@@ -1,5 +1,5 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b8)

@@ -1,10 +1,11 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
-struct ItemInfo;
+enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
+struct ItemInfo;
 
 enum RIPPLE_TYPE
 {
@@ -38,9 +39,20 @@ enum SpriteEnumFlag
 	SP_POISON = 0x4000
 };
 
+enum class FlameType
+{
+	Big,
+	Medium,
+	Small,
+	Static,
+	Pulse,
+	SmallFast,
+	Trail
+};
+
 struct FX_INFO
 {
-	PHD_3DPOS pos;
+	Pose pos;
 	short roomNumber;
 	short objectNumber;
 	short nextFx;
@@ -166,7 +178,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 #define MAX_SPLASHES 8
 #define NUM_EFFECTS 256
 
-extern int DeadlyBounds[6];
+extern GameBoundingBox DeadlyBounds;
 
 
 // New particle class
@@ -180,21 +192,23 @@ extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-extern Vector3Int NodeVectors[MAX_NODE];
+extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
 Particle* GetFreeParticle();
 
+void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
+
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
-void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk);
+void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
+void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
@@ -204,16 +218,17 @@ short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumbe
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
 void ControlWaterfallMist(short itemNumber);
-void TriggerWaterfallMist(int x, int y, int z, int angle);
+void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
-void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
-void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
-void Richochet(PHD_3DPOS* pos);
+void Ricochet(Pose& pos);
+void ProcessEffects(ItemInfo* item);

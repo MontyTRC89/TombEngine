@@ -3,8 +3,8 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_test_structs.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -46,14 +46,14 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList);
-bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
-bool IsVaultState(LaraState state);
-bool IsJumpState(LaraState state);
-bool IsRunJumpQueueableState(LaraState state);
-bool IsRunJumpCountableState(LaraState state);
+bool IsVaultState(int state);
+bool IsJumpState(int state);
+bool IsRunJumpQueueableState(int state);
+bool IsRunJumpCountableState(int state);
 
+bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
@@ -121,6 +121,7 @@ bool TestLaraJumpRight(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraJumpUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 

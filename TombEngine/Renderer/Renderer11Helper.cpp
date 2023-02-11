@@ -1,30 +1,32 @@
 #include "framework.h"
+
+#include <algorithm>
+
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
+#include "Objects/TR3/Vehicles/big_gun_info.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
+#include "Objects/TR3/Vehicles/quad_bike_info.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/TR3/Vehicles/rubber_boat_info.h"
+#include "Objects/TR3/Vehicles/upv.h"
+#include "Objects/TR3/Vehicles/upv_info.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR4/Vehicles/jeep_info.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
+#include "Renderer/RenderView/RenderView.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
-#include "Game/camera.h"
-#include "Game/animation.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Game/Lara/lara.h"
-#include "Game/collision/sphere.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Renderer/RenderView/RenderView.h"
-#include "Objects/TR3/Vehicles/quad_bike.h"
-#include "Objects/TR3/Vehicles/rubber_boat.h"
-#include "Objects/TR3/Vehicles/upv.h"
-#include "Objects/TR3/Vehicles/big_gun.h"
-#include "Objects/TR4/Vehicles/jeep.h"
-#include "Objects/TR4/Vehicles/motorbike.h"
-#include "Game/itemdata/creature_info.h"
-#include "Objects/TR3/Vehicles/quad_bike_info.h"
-#include "Objects/TR4/Vehicles/jeep_info.h"
-#include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Objects/TR3/Vehicles/rubber_boat_info.h"
-#include "Objects/TR3/Vehicles/upv_info.h"
-#include "Objects/TR3/Vehicles/big_gun_info.h"
-#include "Game/items.h"
-#include <algorithm>
+#include "Specific/setup.h"
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
@@ -34,7 +36,7 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
@@ -43,8 +45,8 @@ namespace TEN::Renderer
 		int nextBone = 0;
 
 		Matrix rotation;
-
-		Matrix *transforms = (item == NULL ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
+		
+		auto* transforms = ((item == nullptr) ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
 		// Push
 		Bones[nextBone++] = obj.Skeleton;
@@ -53,18 +55,28 @@ namespace TEN::Renderer
 		{
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
-			if (!bone) return;//otherwise inventory crashes mm
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			if (!bone)
+			{
+				return; // Otherwise inventory crashes
+			}
 
+			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			{
+				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
+					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
+				return;
+			}
+
+			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
-				Vector3 p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
+				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
 
 				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
 				
 				if (frac)
 				{
-					Vector3 p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
+					auto p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
 					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
@@ -82,9 +94,7 @@ namespace TEN::Renderer
 				if (bone == obj.Skeleton)
 					translation = Matrix::CreateTranslation(p.x, p.y, p.z);
 
-				Matrix extraRotation;
-				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-					
+				Matrix extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
 
 				if (useObjectWorldRotation)
 				{
@@ -95,9 +105,7 @@ namespace TEN::Renderer
 					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
 				}
 				else
-				{
 					rotation = extraRotation * rotation;
-				}
 
 				if (bone != obj.Skeleton)
 					transforms[bone->Index] = rotation * bone->Transform;
@@ -105,7 +113,6 @@ namespace TEN::Renderer
 					transforms[bone->Index] = rotation * translation;
 
 				if (bone != obj.Skeleton)
-
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
@@ -121,13 +128,13 @@ namespace TEN::Renderer
 		// Apply mutations on top
 		if (item) 
 		{
-			ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+			auto* nativeItem = &g_Level.Items[item->ItemNumber];
 
-			if (nativeItem->Animation.Mutator.size() == boneIndexList.size())
+			if (nativeItem->Model.Mutator.size() == boneIndexList.size())
 			{
 				for (int i : boneIndexList)
 				{
-					auto mutator = nativeItem->Animation.Mutator[i];
+					auto mutator = nativeItem->Model.Mutator[i];
 					if (mutator.IsEmpty())
 						continue;
 
@@ -143,8 +150,8 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 	{
-		RendererItem* itemToDraw = &m_items[itemNumber];
-		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
+		auto* itemToDraw = &m_items[itemNumber];
+		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		// TODO: hack for fixing a bug, check again if needed
 		itemToDraw->ItemNumber = itemNumber;
@@ -157,145 +164,147 @@ namespace TEN::Renderer
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		itemToDraw->DoneAnimations = true;
 
-		// Update animation matrices
-		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
+		auto* obj = &Objects[nativeItem->ObjectNumber];
+		auto& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+
+		// Copy meshswaps
+		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
+
+		if (obj->animIndex == -1)
+			return;
+
+		// Apply extra rotations
+		int lastJoint = 0;
+		for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
 		{
-			// Apply extra rotations
-			int lastJoint = 0;
-			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
-			{
-				RendererBone *currentBone = moveableObj.LinearizedBones[j];
+			auto* currentBone = moveableObj.LinearizedBones[j];
 
-				auto oldRotation = currentBone->ExtraRotation;
-				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+			auto prevRotation = currentBone->ExtraRotation;
+			currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
-				nativeItem->Data.apply(
-					[&j, &currentBone](QuadBikeInfo& quadBike)
+			nativeItem->Data.apply(
+				[&j, &currentBone](QuadBikeInfo& quadBike)
+				{
+					if (j == 3 || j == 4)
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+					else if (j == 6 || j == 7)
 					{
-						if (j == 3 || j == 4)
-							currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
-						else if (j == 6 || j == 7)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
-							currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
-						}
-					},
-					[&j, &currentBone](JeepInfo& jeep)
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
+						currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+					}
+				},
+				[&j, &currentBone](JeepInfo& jeep)
+				{
+					switch(j)
 					{
-						switch(j)
-						{
-						case 9:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
-							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
-							break;
+					case 9:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						break;
 
-						case 10:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
-							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
-							break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						break;
 
-						case 12:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
-							break;
+					case 12:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+						break;
 
-						case 13:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
-							break;
-						}
-					},
-					[&j, &currentBone](MotorbikeInfo& bike)
+					case 13:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+						break;
+					}
+				},
+				[&j, &currentBone](MotorbikeInfo& bike)
+				{
+					switch (j)
 					{
-						switch (j)
-						{
-						case 2:
-							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-							currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
-							break;
+					case 2:
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+						break;
 
-						case 4:
-							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-							break;
+					case 4:
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						break;
 
-						case 8:
-							currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
-							break;
-						}
-					},
-					[&j, &currentBone, &oldRotation](MinecartInfo& cart)
+					case 8:
+						currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
+						break;
+					}
+				},
+				[&j, &currentBone, &prevRotation](MinecartInfo& cart)
+				{
+					switch (j)
 					{
-						switch (j)
-						{
-						case 1:
-						case 2:
-						case 3:
-						case 4:
-							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
-							break;
-						}
-					},
-					[&j, &currentBone](RubberBoatInfo& boat)
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(prevRotation.z));
+						break;
+					}
+				},
+				[&j, &currentBone](RubberBoatInfo& boat)
+				{
+					if (j == 2)
+						currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
+				},
+				[&j, &currentBone](UPVInfo& upv)
+				{
+					switch (j)
 					{
-						if (j == 2)
-							currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
-					},
-					[&j, &currentBone](UPVInfo& upv)
+					case 1:
+						currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
+						break;
+
+					case 2:
+						currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
+						break;
+
+					case 3:
+						currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+						break;
+					}
+				},
+				[&j, &currentBone](BigGunInfo& big_gun)
+				{
+					if (j == 2)
+						currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+				},
+				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+				{
+					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						switch (j)
-						{
-						case 1:
-							currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
-							break;
+						currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
 
-						case 2:
-							currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
-							break;
-
-						case 3:
-							currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
-							break;
-						}
-					},
-					[&j, &currentBone](BigGunInfo& big_gun)
+					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						if (j == 2)
-							currentBone->ExtraRotation.z = big_gun.BarrelRotation;
-					},
-					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+						currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_Z)
 					{
-						if (currentBone->ExtraRotationFlags & ROT_Y)
-						{
-							currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_X)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_Z)
-						{
-							currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
-					});
-			}
-
-			ANIM_FRAME* framePtr[2];
-			int rate;
-			int frac = GetFrame(nativeItem, framePtr, &rate);
-
-			UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
-
-			for (int m = 0; m < obj->nmeshes; m++)
-				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+						currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
+				});
 		}
 
-		itemToDraw->DoneAnimations = true;
+		AnimFrame* framePtr[2];
+		int rate;
+		int frac = GetFrame(nativeItem, framePtr, rate);
+
+		UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
+
+		for (int m = 0; m < obj->nmeshes; m++)
+			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 	}
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
@@ -303,11 +312,11 @@ namespace TEN::Renderer
 		Matrix translation;
 		Matrix rotation;
 
-		for (auto room : view.roomsToDraw)
+		for (auto* room : view.roomsToDraw)
 		{
-			for (auto itemToDraw : room->ItemsToDraw)
+			for (auto* itemToDraw : room->ItemsToDraw)
 			{
-				ItemInfo* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				auto* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
 
 				// Lara has her own routine
 				if (nativeItem->ObjectNumber == ID_LARA)
@@ -318,27 +327,25 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode) {
+	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
+	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
 		for (int j = 0; j < node->Children.size(); j++)
-		{
 			BuildHierarchyRecursive(obj, node->Children[j], node);
-		}
 	}
 
-	void Renderer11::BuildHierarchy(RendererObject *obj) {
+	void Renderer11::BuildHierarchy(RendererObject *obj)
+	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 
 		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-		{
 			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
-		}
 	}
 
 	bool Renderer11::IsFullsScreen() 
@@ -355,16 +362,10 @@ namespace TEN::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
-		Vector3 centre = (boxMin + boxMax) / 2.0f;
-		Vector3 extens = boxMax - centre;
-		BoundingBox box = BoundingBox(centre, extens);
-
 		if (sphereRadius == 0.0f)
-		{
 			return box.Contains(sphereCentre);
-		}
 		else
 		{
 			BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
@@ -372,7 +373,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}
+	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone)
+	{
+	}
 
 	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
 	{
@@ -380,6 +383,23 @@ namespace TEN::Renderer
 
 		m_rooms[roomNumber1].RoomNumber = roomNumber1;
 		m_rooms[roomNumber2].RoomNumber = roomNumber2;
+
+		m_invalidateCache = true;
+	}
+
+	RendererObject& Renderer11::GetRendererObject(GAME_OBJECT_ID id)
+	{
+		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
+		{
+			if (m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			else
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+		}
+		else
+		{
+			return m_moveableObjects[id].value();
+		}
 	}
 
 	RendererMesh* Renderer11::GetMesh(int meshIndex)
@@ -387,20 +407,10 @@ namespace TEN::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex)
 	{
-		if (joint >= MAX_BONES)
-			joint = 0;
-
-		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
-		world = world * m_LaraWorldMatrix;
-		*pos = Vector3::Transform(*pos, world);
-	}
-
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
-	{
-		RendererItem *rendererItem = &m_items[itemNumber];
-		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
+		auto* rendererItem = &m_items[itemNumber];
+		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		rendererItem->ItemNumber = itemNumber;
 
@@ -415,17 +425,17 @@ namespace TEN::Renderer
 				UpdateItemAnimations(itemNumber, false);
 		}
 
-		if (joint >= MAX_BONES)
-			joint = 0;
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
 
-		Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
-		*pos = Vector3::Transform(*pos, world);
+		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		pos = Vector3::Transform(pos, world);
 	}
 
-	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
+	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
 	{
-		RendererItem* itemToDraw = &m_items[itemNumber];
-		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
+		auto* itemToDraw = &m_items[itemNumber];
+		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		itemToDraw->ItemNumber = itemNumber;
 
@@ -447,18 +457,15 @@ namespace TEN::Renderer
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->Pose.Orientation.y), TO_RAD(nativeItem->Pose.Orientation.x), TO_RAD(nativeItem->Pose.Orientation.z)) * world;
+		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
-		short objNum = nativeItem->ObjectNumber;
-		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
-
-		RendererObject& moveable = *m_moveableObjects[objNum];
+		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
 
 		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{
 			auto mesh = moveable.ObjectMeshes[i];
 
-			Vector3 pos = mesh->Sphere.Center;
+			auto pos = (Vector3)mesh->Sphere.Center;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
 				pos += moveable.LinearizedBones[i]->Translation;
 
@@ -474,28 +481,28 @@ namespace TEN::Renderer
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
 		if (itemNumber == Lara.ItemNumber)
 		{
-			RendererObject& obj = *m_moveableObjects[ID_LARA];
-			*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
+			auto& object = *m_moveableObjects[ID_LARA];
+			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
 		}
 		else
 		{
 			UpdateItemAnimations(itemNumber, true);
 			
-			RendererItem* rendererItem = &m_items[itemNumber];
-			ItemInfo* nativeItem = &g_Level.Items[itemNumber];
+			auto* rendererItem = &m_items[itemNumber];
+			auto* nativeItem = &g_Level.Items[itemNumber];
 
-			RendererObject& obj = *m_moveableObjects[nativeItem->ObjectNumber];
-			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;
+			auto& obj = *m_moveableObjects[nativeItem->ObjectNumber];
+			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
 		}
 	}
 
 	Vector4 Renderer11::GetPortalRect(Vector4 v, Vector4 vp) 
 	{
-		Vector4 sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f) 
+		auto sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f)
 			+ Vector4(0.5f, 0.5f, 0.5f, 0.5f)) 
 			* Vector4(vp.z, vp.w, vp.z, vp.w);
 
@@ -521,9 +528,7 @@ namespace TEN::Renderer
 		// as the viewport. This may fix clipping bugs while still allowing
 		// impossible geometry tricks.
 		if (s.z - s.x >= vp.z - vp.x || s.w - s.y >= vp.w - vp.y) 
-		{
 			return vp;
-		}
 
 		return s;
 	}

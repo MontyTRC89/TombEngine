@@ -8,12 +8,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;
@@ -21,18 +22,18 @@ namespace TEN::Entities::TR1
 	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
 	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
 
-	constexpr auto WOLF_WAKE_CHANCE	 = 0x20;
-	constexpr auto WOLF_SLEEP_CHANCE = 0x20;
-	constexpr auto WOLF_HOWL_CHANCE  = 0x180;
+	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
+	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
+	constexpr auto WOLF_HOWL_CHANCE  = 1.0f / 85;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
-	#define WOLF_WALK_TURN_RATE_MAX	 ANGLE(2.0f)
-	#define WOLF_RUN_TURN_RATE_MAX	 ANGLE(5.0f)
-	#define WOLF_STALK_TURN_RATE_MAX ANGLE(2.0f)
+	const auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
+	const auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
+	const auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
-	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
+	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState
 	{
@@ -61,7 +62,7 @@ namespace TEN::Entities::TR1
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		item->Animation.FrameNumber = WOLF_SLEEP_FRAME;
 	}
 
@@ -73,9 +74,9 @@ namespace TEN::Entities::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -110,7 +111,7 @@ namespace TEN::Entities::TR1
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
 				}
-				else if (GetRandomControl() < WOLF_WAKE_CHANCE)
+				else if (Random::TestProbability(WOLF_WAKE_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_WALK;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -133,7 +134,7 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = WOLF_STATE_STALK;
 					item->Animation.RequiredState = WOLF_STATE_NONE;
 				}
-				else if (GetRandomControl() < WOLF_SLEEP_CHANCE)
+				else if (Random::TestProbability(WOLF_SLEEP_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_SLEEP;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -174,7 +175,7 @@ namespace TEN::Entities::TR1
 						item->Animation.TargetState = WOLF_STATE_RUN;
 					}
 				}
-				else if (GetRandomControl() < WOLF_HOWL_CHANCE)
+				else if (Random::TestProbability(WOLF_HOWL_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_HOWL;
 					item->Animation.TargetState = WOLF_STATE_CROUCH;
@@ -217,7 +218,7 @@ namespace TEN::Entities::TR1
 				tilt = angle;
 
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, WolfAttackJoints))
+					item->TouchBits.Test(WolfAttackJoints))
 				{
 					item->Animation.RequiredState = WOLF_STATE_RUN;
 					DoDamage(creature->Enemy, WOLF_LUNGE_DAMAGE);
@@ -229,7 +230,7 @@ namespace TEN::Entities::TR1
 
 			case WOLF_STATE_BITE:
 				if (AI.ahead && !item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, WolfAttackJoints))
+					item->TouchBits.Test(WolfAttackJoints))
 				{
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
 					DoDamage(creature->Enemy, WOLF_BITE_DAMAGE);

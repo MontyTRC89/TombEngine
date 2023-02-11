@@ -1,12 +1,14 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 
 cbuffer SpriteBuffer: register(b9)
 {
-	float4x4 billboardMatrix;
-	float4 color;
-	bool isBillboard;
+	float4x4 BillboardMatrix;
+	float4 Color;
+	float IsBillboard;
+	float IsSoftParticle;
+	float2 SpritesPadding;
 }
 
 struct PixelShaderInput
@@ -15,7 +17,7 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float Fog : FOG;
+	float  Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
 };
 
@@ -31,11 +33,12 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4 worldPosition;
 
-	if (isBillboard) 
+	if (IsBillboard) 
 	{
-		worldPosition = mul(float4(input.Position, 1.0f), billboardMatrix);
-		output.Position = mul(mul(float4(input.Position, 1.0f), billboardMatrix), ViewProjection);
-	} else 
+		worldPosition = mul(float4(input.Position, 1.0f), BillboardMatrix);
+		output.Position = mul(mul(float4(input.Position, 1.0f), BillboardMatrix), ViewProjection);
+	}
+	else 
 	{
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
@@ -44,7 +47,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = output.Position;
 	
 	output.Normal = input.Normal;
-	output.Color = input.Color * color;
+	output.Color = input.Color * Color;
 	output.UV = input.UV;
 
 	float4 d = length(CamPositionWS - worldPosition);
@@ -56,25 +59,35 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+float LinearizeDepth(float depth)
+{
+	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
+}
+
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
 	DoAlphaTest(output);
 
-	float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
-	input.PositionCopy.xy /= input.PositionCopy.w;
-	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
-	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
+	if (IsSoftParticle == 1)
+	{
+		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
+		input.PositionCopy.xy /= input.PositionCopy.w;
+		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+		float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-	if (particleDepth > sceneDepth)
-		discard;
+		sceneDepth = LinearizeDepth(sceneDepth);
+		particleDepth = LinearizeDepth(particleDepth);
 
-	float fade = (sceneDepth - particleDepth) * 300.0F;
-	output.w = min(output.w, fade);
+		if (particleDepth - sceneDepth > 0.01f)
+			discard;
 
-	if (FogMaxDistance != 0)
-		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+		float fade = (sceneDepth - particleDepth) * 1024.0f;
+		output.w = min(output.w, fade);
+	}
+
+	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;
 }

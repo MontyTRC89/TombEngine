@@ -1,64 +1,71 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 
-struct PHD_3DPOS;
-struct Vector3Int;
+using namespace TEN::Math;
+
+class EulerAngles;
+class Pose;
+class Vector3i;
 struct ItemInfo;
 
-struct ANIM_FRAME
+constexpr auto NO_STATE = -1;
+constexpr auto NO_ANIM	= -1;
+
+enum class AnimCommandType
 {
-	BOUNDING_BOX boundingBox;
-	short offsetX;
-	short offsetY;
-	short offsetZ;
-	std::vector<Quaternion> angles;
+	None,
+	MoveOrigin,
+	JumpVelocity,
+	AttackReady,
+	Deactivate,
+	SoundEffect,
+	Flipeffect
 };
 
-struct CHANGE_STRUCT
+struct AnimFrame
 {
-	int TargetState;
-	int numberRanges;
-	int rangeIndex;
+	GameBoundingBox boundingBox = GameBoundingBox::Zero;
+	short offsetX = 0;
+	short offsetY = 0;
+	short offsetZ = 0;
+	std::vector<Quaternion> angles = {};
 };
 
-struct RANGE_STRUCT
+struct StateDispatchData
 {
-	int startFrame;
-	int endFrame;
-	int linkAnimNum;
-	int linkFrameNum;
+	int TargetState	 = NO_STATE;
+	int NumberRanges = 0;
+	int RangeIndex	 = 0;
 };
 
-struct ANIM_STRUCT
+struct StateDispatchRangeData
 {
-	int framePtr;
-	int Interpolation;
-	int ActiveState;
+	int StartFrame	 = 0;
+	int EndFrame	 = 0;
+	int LinkAnimNum	 = NO_ANIM;
+	int LinkFrameNum = NO_ANIM;
+};
 
-	// CONVENTION: +X is right, +Y is down, +Z is forward.
+struct AnimData
+{
+	int FramePtr	  = 0;
+	int Interpolation = 0;
+	int ActiveState	  = 0;
+
+	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
 
-	int frameBase;
-	int frameEnd;
+	int frameBase = 0;
+	int frameEnd  = 0;
 
-	int jumpAnimNum;
-	int jumpFrameNum;
-	int numberChanges;
-	int changeIndex;
-	int numberCommands;
-	int commandIndex;
-};
-
-enum ANIMCOMMAND_TYPES
-{
-	COMMAND_NULL = 0,
-	COMMAND_MOVE_ORIGIN,
-	COMMAND_JUMP_VELOCITY,
-	COMMAND_ATTACK_READY,
-	COMMAND_DEACTIVATE,
-	COMMAND_SOUND_FX,
-	COMMAND_EFFECT
+	int JumpAnimNum		   = NO_ANIM;
+	int JumpFrameNum	   = 0;
+	int NumStateDispatches = 0;
+	int StateDispatchIndex = 0;
+	int NumCommands		   = 0;
+	int CommandIndex	   = 0;
 };
 
 struct BoneMutator
@@ -67,34 +74,42 @@ struct BoneMutator
 	Vector3 Rotation = Vector3::Zero;
 	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return  (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
+	bool IsEmpty() { return ((Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One)); };
 };
 
 void AnimateLara(ItemInfo* item);
 void AnimateItem(ItemInfo* item);
 
-bool HasStateDispatch(ItemInfo* item, int targetState = -1);
-bool TestLastFrame(ItemInfo* item, int animNumber = -1);
+bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
+bool TestAnimNumber(const ItemInfo& item, int animNumber);
+bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
+bool TestAnimFrame(const ItemInfo& item, int frameStart);
+bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float down = 0.0f, float right = 0.0f);
-void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance);
-void TranslateItem(ItemInfo* item, Vector3 direction, float distance);
+void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
+void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
+
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);
+int GetAnimNumber(ItemInfo& item, int animID);
 int GetFrameNumber(ItemInfo* item, int frameToStart);
 int GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
-bool GetChange(ItemInfo* item, ANIM_STRUCT* anim);
-int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate);
-ANIM_FRAME* GetBestFrame(ItemInfo* item);
+bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
-BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
-void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
-void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint);
+int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
+AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber);
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber);
+AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber);
+AnimFrame* GetBestFrame(ItemInfo* item);
 
-void ClampRotation(PHD_3DPOS* pos, short angle, short rotation); 
-
+void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
+
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+
+void PerformAnimCommands(ItemInfo* item, bool isFrameBased);

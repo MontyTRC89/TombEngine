@@ -1,11 +1,12 @@
 #pragma once
 #include "framework.h"
-
-#include "ScriptAssert.h"
 #include "SinkObject.h"
-#include "Vec3/Vec3.h"
-#include "ScriptUtil.h"
+
 #include "ReservedScriptNames.h"
+#include "ScriptAssert.h"
+#include "ScriptUtil.h"
+#include "Vec3/Vec3.h"
+
 /***
 Sink
 
@@ -16,7 +17,7 @@ Sink
 static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
 static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
 
-Sink::Sink(SINK_INFO & ref) : m_sink{ref}
+Sink::Sink(SinkInfo & ref) : m_sink{ref}
 {};
 
 void Sink::Register(sol::table& parent)
@@ -62,19 +63,17 @@ void Sink::Register(sol::table& parent)
 
 Vec3 Sink::GetPos() const
 {
-	return Vec3{ m_sink.x, m_sink.y, m_sink.z };
+	return Vec3{ m_sink.Position };
 }
 
 void Sink::SetPos(Vec3 const& pos)
 {
-	m_sink.x = pos.x;
-	m_sink.y = pos.y;
-	m_sink.z = pos.z;
+	m_sink.Position = Vector3i(pos.x, pos.y, pos.z);
 }
 
 std::string Sink::GetName() const
 {
-	return m_sink.luaName;
+	return m_sink.Name;
 }
 
 void Sink::SetName(std::string const & id) 
@@ -87,8 +86,8 @@ void Sink::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_sink))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_sink.luaName);
-		m_sink.luaName = id;
+		s_callbackRemoveName(m_sink.Name);
+		m_sink.Name = id;
 	}
 	else
 	{
@@ -99,11 +98,11 @@ void Sink::SetName(std::string const & id)
 
 int Sink::GetStrength() const
 {
-	return m_sink.strength;
+	return m_sink.Strength;
 }
 
 void Sink::SetStrength(int str)
 {
-	m_sink.strength = std::clamp(str, 1, 32);
+	m_sink.Strength = std::clamp(str, 1, 32);
 }
 

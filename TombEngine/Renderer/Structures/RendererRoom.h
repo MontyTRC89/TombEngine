@@ -2,6 +2,8 @@
 #include <vector>
 #include <SimpleMath.h>
 
+#include "Renderer/RendererRectangle.h"
+
 struct MESH_INFO;
 
 namespace TEN::Renderer
@@ -11,6 +13,7 @@ namespace TEN::Renderer
 	struct RendererLight;
 	struct RendererEffect;
 	struct RendererTransparentFace;
+	struct RendererDoor;
 
 	struct RendererRoom
 	{
@@ -18,16 +21,18 @@ namespace TEN::Renderer
 		int Distance;
 		short RoomNumber;
 		Vector4 AmbientLight;
-		RendererRectangle Clip;
-		RendererRectangle ClipTest;
-		byte BoundActive;
+		Vector4 ViewPort;
 		std::vector<RendererBucket> Buckets;
 		std::vector<RendererLight> Lights;
+		std::vector<RendererStatic> Statics;
 		std::vector<RendererItem*> ItemsToDraw;
 		std::vector<RendererEffect*> EffectsToDraw;
-		std::vector<RendererStatic> StaticsToDraw;
+		std::vector<RendererStatic*> StaticsToDraw;
 		std::vector<RendererTransparentFace> TransparentFacesToDraw;
-
+		std::vector<RendererLight*> LightsToDraw;
+		std::vector<RendererDoor> Doors;
+		BoundingBox BoundingBox;
+		RendererRectangle ClipBounds;
 		std::vector<int> Neighbors;
 	};
 }

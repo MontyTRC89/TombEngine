@@ -29,7 +29,6 @@ struct Level : public ScriptInterfaceLevel
 	std::string AmbientTrack;
 	SkyLayer Layer1;
 	SkyLayer Layer2;
-	bool ColAddHorizon{ false };
 	Fog Fog;
 	bool Storm{ false };
 	WeatherType Weather{ WeatherType::None };
@@ -39,6 +38,7 @@ struct Level : public ScriptInterfaceLevel
 	int LevelFarView{ 0 };
 	bool UnlimitedAir{ false };
 	std::vector<InventoryItem> InventoryObjects;
+	int LevelSecrets{ 0 };
 
 	RGBAColor8Byte GetFogColor() const override;
 	bool GetFogEnabled() const override;
@@ -56,4 +56,7 @@ struct Level : public ScriptInterfaceLevel
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
 	short GetFarView() const override;
+	void SetSecrets(int secrets);
+	int GetSecrets() const override;
+	std::string GetAmbientTrack() const override;
 };

@@ -7,9 +7,11 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4 
 {
@@ -29,9 +31,9 @@ namespace TEN::Entities::TR4
 
 	void SpawnLocust(ItemInfo* item)
 	{
-		Vector3Int start, end;
+		Vector3i origin, target;
 	   short locustNumber = CreateLocust();
-	   Vector3Shrt angles;
+	   EulerAngles orient;
 		if (locustNumber != NO_ITEM)
 		{
 			auto* locust = &Locusts[locustNumber];
@@ -39,25 +41,15 @@ namespace TEN::Entities::TR4
 			// Emitter.
 			if (item->ObjectNumber == ID_LOCUSTS_EMITTER)
 			{
-				end = item->Pose.Position;
-				angles = Vector3Shrt(
-					0,
-					item->Pose.Orientation.y - ANGLE(180.0f),
-					0
-				);
+				target = item->Pose.Position;
+				orient = EulerAngles(0, item->Pose.Orientation.y + ANGLE(180.0f), 0);
 			}
 			// Mutant.
 			else
 			{
-				start.x = 0;
-				start.y = -96;
-				start.z = 144;
-				GetJointAbsPosition(item, &start, 9);
-				end.x = 0;
-				end.y = -128;
-				end.z = 288;
-				GetJointAbsPosition(item, &end, 9);
-				angles = GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z);
+				origin = GetJointPosition(item, 9, Vector3i(0, -96, 144));
+				target = GetJointPosition(item, 9, Vector3i(0, -128, 288));
+				orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 			}
 
 			// NOTE: this is not present in original TR4 code
@@ -65,9 +57,9 @@ namespace TEN::Entities::TR4
 
 			locust->on = true;
 			//locust->target = target != nullptr ? target : nullptr;
-			locust->pos.Position = end;
-			locust->pos.Orientation.x = (GetRandomControl() & 0x3FF) + angles.x - ANGLE(2.8f);
-			locust->pos.Orientation.y = (GetRandomControl() & 0x7FF) + angles.y - ANGLE(5.6f);
+			locust->pos.Position = target;
+			locust->pos.Orientation.x = (GetRandomControl() & 0x3FF) + orient.x - ANGLE(2.8f);
+			locust->pos.Orientation.y = (GetRandomControl() & 0x7FF) + orient.y - ANGLE(5.6f);
 			locust->roomNumber = item->RoomNumber;
 			locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
 			locust->escapeYrot = GetRandomControl() & 0x1FF;
@@ -122,7 +114,7 @@ namespace TEN::Entities::TR4
 				// NOTE: not present in original TR4 code
 				//if (locust->target == nullptr)
 				//    locust->target = LaraItem;
-				if ((Lara.Burn || LaraItem->HitPoints <= 0) && locust->counter >= 90 && !(GetRandomControl() & 7))
+				if ((LaraItem->Effect.Type != EffectType::None || LaraItem->HitPoints <= 0) && locust->counter >= 90 && !(GetRandomControl() & 7))
 					locust->counter = 90;
 
 				locust->counter--;
@@ -139,10 +131,13 @@ namespace TEN::Entities::TR4
 					locust->escapeZrot = (GetRandomControl() & 0x7F) - 64;
 				}
 
-				auto angles = GetVectorAngles(
-					LaraItem->Pose.Position.x + 8 * locust->escapeXrot - locust->pos.Position.x,
-					LaraItem->Pose.Position.y - locust->escapeYrot - locust->pos.Position.y,
-					LaraItem->Pose.Position.z + 8 * locust->escapeZrot - locust->pos.Position.z);
+				auto orient = Geometry::GetOrientToPoint(
+					locust->pos.Position.ToVector3(),
+					Vector3(
+						LaraItem->Pose.Position.x + locust->escapeXrot * 8,
+						LaraItem->Pose.Position.y - locust->escapeYrot,
+						LaraItem->Pose.Position.z + locust->escapeZrot * 8
+					));
 
 				int distance = SQUARE(LaraItem->Pose.Position.z - locust->pos.Position.z) + SQUARE(LaraItem->Pose.Position.x - locust->pos.Position.x);
 				int square = int(sqrt(distance)) / 8;
@@ -164,15 +159,15 @@ namespace TEN::Entities::TR4
 					short resultYrot, resultXrot;
 					int shiftYrot, shiftXrot;
 					int random = locust->randomRotation * 128;
-					resultYrot = angles.y - locust->pos.Orientation.y;
+					resultYrot = orient.y - locust->pos.Orientation.y;
 
 					if (abs(resultYrot) > ANGLE(180.0f))
-						resultYrot = locust->pos.Orientation.y - angles.y;
+						resultYrot = locust->pos.Orientation.y - orient.y;
 
-					resultXrot = angles.x - locust->pos.Orientation.x;
+					resultXrot = orient.x - locust->pos.Orientation.x;
 
 					if (abs(resultXrot) > ANGLE(180.0f))
-						resultXrot = locust->pos.Orientation.x - angles.y;
+						resultXrot = locust->pos.Orientation.x - orient.y;
 
 					shiftXrot = resultXrot / 8;
 					shiftYrot = resultYrot / 8;
@@ -191,7 +186,7 @@ namespace TEN::Entities::TR4
 				locust->pos.Position.y += locust->randomRotation * phd_sin(-locust->pos.Orientation.x);
 				locust->pos.Position.z += locust->randomRotation * phd_cos(locust->pos.Orientation.x) * phd_cos(locust->pos.Orientation.y);
 				
-				if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
+				if (ItemNearTarget(locust->pos.Position, LaraItem, CLICK(1) / 2))
 				{
 					TriggerBlood(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 2 * GetRandomControl(), 2);
 					DoDamage(LaraItem, LOCUST_LARA_DAMAGE);

@@ -3,11 +3,13 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/item_fx.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
@@ -15,13 +17,16 @@
 #include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 #include "Color/Color.h"
+#include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+
+using namespace TEN::Effects::Items;
 
 /***
 Represents any object inside the game world.
 Examples include traps, enemies, doors,
-pickups, and Lara herself.
+pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific features).
 
 @tenclass Objects.Moveable
 @pragma nostrip
@@ -69,34 +74,30 @@ bool operator==(Moveable const& first, Moveable const& second)
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
 	@function Moveable
-	@tparam ObjID object ID
+	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@tparam int room room ID item is in
-	@tparam int animNumber anim number (default 0)
-	@tparam int frameNumber frame number (default 0)
-	@tparam int hp HP of item (default 10)
-	@tparam int OCB ocb of item (default 0)
-	@tparam table AIBits table with AI bits (default {0,0,0,0,0,0})
-	@return reference to new Moveable object
+	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
+	@int[opt] room room ID item is in (default: calculated automatically)
+	@int[opt=0] animNumber anim number
+	@int[opt=0] frameNumber frame number
+	@int[opt=10] hp HP of item
+	@int[opt=0] OCB ocb of item (default 0)
+	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
+	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
-		TEN.ObjID.PISTOLS_ITEM, -- object id
+		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201),
-		Rotation(0,0,0),
-		0, -- room
+		Vec3(18907, 0, 21201)
 		)
 	*/
-
-
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,
 	Vec3 const & pos,
 	TypeOrNil<Rotation> const & rot,
-	short room,
+	TypeOrNil<short> room,
 	TypeOrNil<int> animNumber,
 	TypeOrNil<int> frameNumber,
 	TypeOrNil<short> hp,
@@ -110,9 +111,15 @@ static std::unique_ptr<Moveable> Create(
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
 		ItemInfo* item = &g_Level.Items[num];
-		ptr->SetPos(pos);
+		if (std::holds_alternative<short>(room))
+		{
+			ptr->SetPos(pos, false);
+			ptr->SetRoomNumber(std::get<short>(room));
+		}
+		else
+			ptr->SetPos(pos, true);
+
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
-		ptr->SetRoom(room);
 		ptr->SetObjectID(objID);
 		ptr->Init();
 
@@ -134,23 +141,18 @@ static std::unique_ptr<Moveable> Create(
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_New, Create,
 		sol::call_constructor, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
-/// Enable the item, as if a trigger for it had been stepped on.
-// @function Moveable:Enable
 	ScriptReserved_Enable, &Moveable::EnableItem,
 
-/// Disable the item
-// @function Moveable:Disable
 	ScriptReserved_Disable, &Moveable::DisableItem,
 
-/// Make the item invisible. Use EnableItem to make it visible again.
-// @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
+
+	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
@@ -159,6 +161,24 @@ void Moveable::Register(sol::table & parent)
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
+
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam Effects.EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetEffect, &Moveable::SetEffect,
+
+/// Set custom colored burn effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn Effects.EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -169,50 +189,26 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
-		
-/// Set the name of the function to be called when the moveable is shot by Lara
+
+/// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
-// @tparam string name of callback function to be called
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-/// Get the name of the function called when this moveable is shot
-// @function Moveable:GetOnHit
-// @treturn string name of the function
-	ScriptReserved_GetOnHit, &Moveable::GetOnHit,
-
-/// Set the name of the function called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam string name of callback function to be called
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
-/// Get the name of the function called when this moveable collides with another moveable
-// @function Moveable:GetOnCollidedWithObject
-// @treturn string name of the function
-	ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
-
-/// Set the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam string name of callback function to be called
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
-/// Get the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:GetOnCollidedWithRoom
-// @treturn string name of the function
-	ScriptReserved_GetOnCollidedWithRoom, &Moveable::GetOnCollidedWithRoom,
-
 /// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
 // @function Moveable:SetOnKilled
-// @tparam string callback name of function to be called
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
 // @usage
 // LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled("baddyKilled")
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
-
-/// Get the name of the function called when this moveable is killed
-// @function Moveable:GetOnKilled
-// @treturn string name of the function
-	ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -259,6 +255,20 @@ void Moveable::Register(sol::table & parent)
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
+/// Set the object's velocity to specified value.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:SetVelocity
+// @tparam Vec3 velocity velocity represented as vector 
+	ScriptReserved_SetVelocity, &Moveable::SetVelocity,
+		
+/// Get the object's velocity.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:GetVelocity
+// @treturn Vec3 current object velocity
+	ScriptReserved_GetVelocity, &Moveable::GetVelocity,
+
 /// Set frame number.
 // This will move the animation to the given frame.
 // The number of frames in an animation can be seen under the heading "End frame" in
@@ -268,14 +278,8 @@ void Moveable::Register(sol::table & parent)
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 		
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
-/// Set current HP (hit points/health points)
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
@@ -293,14 +297,16 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// Get the value stored in ItemFlags[x] (x is the value of the parameter)
+/// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @treturn short id of the ItemFlags array
+// @tparam index: (short) index the ItemFlags, can be between 0 and 7.
+// @treturn (short) the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
-/// Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+/// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam short value to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+// @tparam value: (short) value to store in the moveable's ItemFlags[index]
+// @tparam index: (short) index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
 /// Get the moveable's color
@@ -313,77 +319,20 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Color color the new color of the moveable 
 	ScriptReserved_SetColor, &Moveable::SetColor,
 
-/// Get AIBits of object
-// This will return a table with six values, each corresponding to
-// an active behaviour. If the object is in a certain AI mode, the table will
-// have a *1* in the corresponding cell. Otherwise, the cell will hold
-// a *0*.
-// 1 - guard
-// 2 - ambush
-// 3 - patrol 1
-// 4 - modify
-// 5 - follow
-// 6 - patrol 2
-// @function Moveable:GetAIBits
-// @treturn table a table of AI bits
 	ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
 			
-/// Set AIBits of object
-// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
-// (or more than one) had suddenly spawned beneath their feet.
-// @function Moveable:SetAIBits
-// @tparam table bits the table of AI bits
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-/// Get state of specified mesh visibility of object
-// Returns true if specified mesh is visible on an object, and false
-// if it is not visible.
-// @function Moveable:MeshIsVisible
-// @tparam int index of a mesh
-// @treturn bool visibility status
-	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
+	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
 			
-/// Makes specified mesh visible
-// Use this to show specified mesh of an object.
-// @function Moveable:ShowMesh
-// @tparam int index of a mesh
-	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
+	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
-/// Makes specified mesh invisible
-// Use this to hide specified mesh of an object.
-// @function Moveable:HideMesh
-// @tparam int index of a mesh
-	ScriptReserved_HideMesh, &Moveable::HideMesh,
-			
-/// Shatters specified mesh and makes it invisible
-// Note that you can re-enable mesh later by using ShowMesh().
-// @function Moveable:ShatterMesh
-// @tparam int index of a mesh
 	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
 
-/// Get state of specified mesh swap of object
-// Returns true if specified mesh is swapped on an object, and false
-// if it is not swapped.
-// @function Moveable:MeshIsSwapped
-// @tparam int index of a mesh
-// @treturn bool mesh swap status
-	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
+	ScriptReserved_GetMeshSwapped, &Moveable::GetMeshSwapped,
 			
-/// Set state of specified mesh swap of object
-// Use this to swap specified mesh of an object.
-// @function Moveable:SwapMesh
-// @tparam int index of a mesh
-// @tparam int index of a slot to get meshswap from
-// @tparam int (optional) index of a mesh from meshswap slot to use
 	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
 			
-/// Set state of specified mesh swap of object
-// Use this to bring back original unswapped mesh
-// @function Moveable:UnswapMesh
-// @tparam int index of a mesh to unswap
 	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 
 /// Get the hit status of the object
@@ -396,37 +345,20 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @treturn bool true if the moveable is active
 	ScriptReserved_GetActive, &Moveable::GetActive,
 
-/// Get the current room of the object
-// @function Moveable:GetRoom
-// @treturn int number representing the current room of the object
 	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-/// Set room of object 
-// This is used in conjunction with SetPosition to teleport an item to a new room.
-// @function Moveable:SetRoom
-// @tparam int ID the ID of the new room 
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
-// sas:SetPosition(destinationPosition)
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 
-/// Get the object's position
-// @function Moveable:GetPosition
-// @treturn Vec3 a copy of the moveable's position
+	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
+
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
+// @tparam int index of a joint to get position
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
-/// Set the moveable's position
-// If you are moving a moveable whose behaviour involves knowledge of room geometry,
-// (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
-// with @{Moveable:SetRoom}. Otherwise, said moveable will not behave correctly.
-// @function Moveable:SetPosition
-// @tparam Vec3 position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
@@ -456,20 +388,33 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
-// @treturn valid bool true if the object is still not destroyed
+// @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
-}
+	ScriptReserved_Destroy, &Moveable::Destroy,
 
+/// Attach camera to an object.
+// @function Moveable:AttachObjCamera
+// @tparam int mesh of a moveable to use as a camera position
+// @tparam Moveable target moveable to attach camera to
+// @tparam int mesh of a target moveable to use as a camera target
+	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
+
+/// Borrow animation from an object
+// @function Moveable:AnimFromObject
+// @tparam Objects.ObjID ObjectID to take animation and stateID from,
+// @tparam int animNumber animation from object
+// @tparam int stateID state from object
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+}
 
 void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->LuaName))
+	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
 		ScriptWarn("Resetting to the center of the room.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
@@ -488,61 +433,74 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
 	m_item->ObjectNumber = id;
+	m_item->ResetModelToDefault();
 }
 
-void Moveable::SetOnHit(std::string const & cbName)
+void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
 {
-	m_item->LuaCallbackOnHitName = cbName;
-}
-
-void Moveable::SetOnKilled(std::string const & cbName)
-{
-	m_item->LuaCallbackOnKilledName = cbName;
-}
-
-void Moveable::SetOnCollidedWithObject(std::string const & cbName)
-{
-	m_item->LuaCallbackOnCollidedWithObjectName = cbName;
-
-	if(cbName.empty())
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	if (std::holds_alternative<LevelFunc>(cb))
+	{
+		toModify = std::get<LevelFunc>(cb).m_funcName;
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(mov.m_num);
+	}
+	else if (std::holds_alternative<sol::nil_t>(cb))
+	{
+		toModify = std::string{};
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(mov.m_num);
+	}
 	else
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	{
+		ScriptAssert(false, "Tried giving " + mov.m_item->Name
+			+ " a non-LevelFunc object as an arg to "
+			+ callerName);
+	}
+
 }
 
-void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
+short Moveable::GetIndex() const
 {
-	m_item->LuaCallbackOnCollidedWithRoomName = cbName;
-
-	if(cbName.empty())
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
-	else
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	return m_num;
 }
 
-std::string Moveable::GetOnHit() const
+void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnHitName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
-std::string Moveable::GetOnKilled() const
+void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnKilledName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
-std::string Moveable::GetOnCollidedWithObject() const
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
+void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnCollidedWithObjectName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
-std::string Moveable::GetOnCollidedWithRoom() const
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
+void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnCollidedWithRoomName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
 
 std::string Moveable::GetName() const
 {
-	return m_item->LuaName;
+	return m_item->Name;
 }
 
 bool Moveable::SetName(std::string const & id) 
@@ -555,11 +513,11 @@ bool Moveable::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		if (id != m_item->LuaName)
+		if (id != m_item->Name)
 		{
-			if(!m_item->LuaName.empty())
-				s_callbackRemoveName(m_item->LuaName);
-			m_item->LuaName = id;
+			if(!m_item->Name.empty())
+				s_callbackRemoveName(m_item->Name);
+			m_item->Name = id;
 		}
 	}
 	else
@@ -572,21 +530,53 @@ bool Moveable::SetName(std::string const & id)
 	return true;
 }
 
+/// Get the object's position
+// @function Moveable:GetPosition
+// @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
 	return Vec3(m_item->Pose);
 }
 
-void Moveable::SetPos(Vec3 const& pos)
+/// Set the moveable's position
+// If you are moving a moveable whose behaviour involves knowledge of room geometry,
+// (e.g. a BADDY1, which uses it for pathfinding), then the second argument should
+// be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.
+// @function Moveable:SetPosition
+// @tparam Vec3 position the new position of the moveable 
+// @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
+void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 {
+	auto oldPos = m_item->Pose.Position.ToVector3();
 	pos.StoreInPHDPos(m_item->Pose);
+
+	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
+
+	if (m_initialised && willUpdate)
+	{
+		bool roomUpdated = false;
+
+		if (m_item->IsLara())
+			roomUpdated = UpdateLaraRoom(m_item, pos.y);
+		else
+			roomUpdated = UpdateItemRoom(m_item->Index);
+
+		// In case direct portal room update didn't happen, and distance between old and new
+		// points is significant, do a predictive room update.
+
+		if (!roomUpdated && 
+			(willUpdate || Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
+		{
+			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
+			if (potentialNewRoom != m_item->RoomNumber)
+				SetRoomNumber(potentialNewRoom);
+		}
+	}
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
 {
-	Vector3Int result = {};
-	GetJointAbsPosition(m_item, &result, jointIndex);
-
+	auto result = GetJointPosition(m_item, jointIndex);
 	return Vec3(result.x, result.y, result.z);
 }
 
@@ -596,43 +586,42 @@ Vec3 Moveable::GetJointPos(int jointIndex) const
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_item->Pose.Orientation.x),
+		TO_DEGREES(m_item->Pose.Orientation.y),
+		TO_DEGREES(m_item->Pose.Orientation.z)
 	};
 }
 
 void Moveable::SetRot(Rotation const& rot)
 {
-	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
+	m_item->Pose.Orientation.x = ANGLE(rot.x);
+	m_item->Pose.Orientation.y = ANGLE(rot.y);
+	m_item->Pose.Orientation.z = ANGLE(rot.z);
 }
 
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
-	return(m_item->HitPoints);
+	return m_item->HitPoints;
 }
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
+	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
-		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
-		if (hp < 0)
+		if (hp != NOT_TARGETABLE)
 		{
-			if (hp != NOT_TARGETABLE)
-			{
-				hp = 0;
-				ScriptWarn("Setting HP to 0.");
-			}
-		}
-		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
-		{
-			hp = Objects[m_item->ObjectNumber].HitPoints;
-			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
+			ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
+			ScriptWarn("Setting HP to 0.");
+			hp = 0;
 		}
 	}
 
@@ -641,7 +630,7 @@ void Moveable::SetHP(short hp)
 
 short Moveable::GetSlotHP() const
 {
-	return (Objects[m_item->ObjectNumber].HitPoints);
+	return Objects[m_item->ObjectNumber].HitPoints;
 }
 
 short Moveable::GetOCB() const
@@ -652,6 +641,54 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+
+	switch (effectType)
+	{
+	case EffectType::None:
+		m_item->Effect.Type = EffectType::None;
+		break;
+
+	case EffectType::Smoke:
+		ItemSmoke(m_item, realTimeout);
+		break;
+
+	case EffectType::Fire:
+		ItemBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Sparks:
+		ItemElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::ElectricIgnite:
+		ItemBlueElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::RedIgnite:
+		ItemRedLaserBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Custom:
+		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
+	}
+}
+
+void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
+	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
+	ItemCustomBurn(m_item, color1, color2, realTimeout);
+}
+
+EffectType Moveable::GetEffect() const
+{
+	return m_item->Effect.Type;
 }
 
 short Moveable::GetItemFlags(int index) const
@@ -667,14 +704,28 @@ void Moveable::SetItemFlags(short value, int index)
 
 ScriptColor Moveable::GetColor() const
 {
-	return ScriptColor{ m_item->Color };
+	return ScriptColor{ m_item->Model.Color };
 }
 
-void Moveable::SetColor(ScriptColor const& col)
+void Moveable::SetColor(const ScriptColor& color)
 {
-	m_item->Color = col;
+	m_item->Model.Color = color;
 }
 
+/// Get AIBits of object
+// This will return a table with six values, each corresponding to
+// an active behaviour. If the object is in a certain AI mode, the table will
+// have a *1* in the corresponding cell. Otherwise, the cell will hold
+// a *0*.
+//
+// <br />1 - guard
+// <br />2 - ambush
+// <br />3 - patrol 1
+// <br />4 - modify
+// <br />5 - follow
+// <br />6 - patrol 2
+// @function Moveable:GetAIBits
+// @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
 {
 	static_assert(63 == ALL_AIOBJ);
@@ -688,6 +739,14 @@ aiBitsType Moveable::GetAIBits() const
 	return ret;
 }
 
+/// Set AIBits of object
+// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+// (or more than one) had suddenly spawned beneath their feet.
+// @function Moveable:SetAIBits
+// @tparam table bits the table of AI bits
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 void Moveable::SetAIBits(aiBitsType const & bits)
 {
 	for (size_t i = 0; i < bits.value().size(); ++i)
@@ -723,6 +782,21 @@ int Moveable::GetFrameNumber() const
 	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
+Vec3 Moveable::GetVelocity() const
+{
+	return Vec3(int(round(m_item->Animation.Velocity.x)),
+				int(round(m_item->Animation.Velocity.y)),
+				int(round(m_item->Animation.Velocity.z)));
+}
+
+void Moveable::SetVelocity(Vec3 velocity)
+{
+	if (m_item->IsCreature())
+		ScriptWarn("Attempt to set velocity to a creature. In may not work, as velocity is overridden by AI.");
+
+	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
+}
+
 void Moveable::SetFrameNumber(int frameNumber)
 {
 	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
@@ -755,12 +829,31 @@ bool Moveable::GetHitStatus() const
 	return m_item->HitStatus;
 }
 
-short Moveable::GetRoom() const
+/// Get the current room of the object
+// @function Moveable:GetRoom
+// @treturn Room current room of the object
+std::unique_ptr<Room> Moveable::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);
+}
+
+/// Get the current room number of the object
+// @function Moveable:GetRoomNumber
+// @treturn int number representing the current room of the object
+int Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }
 
-void Moveable::SetRoom(short room)
+/// Set room number of object 
+// Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+// @function Moveable:SetRoomNumber
+// @tparam int ID the ID of the new room 
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetRoomNumber(destinationRoom)
+// sas:SetPosition(destinationPosition, false)
+void Moveable::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)
@@ -773,7 +866,15 @@ void Moveable::SetRoom(short room)
 	if (!m_initialised)
 		m_item->RoomNumber = room;
 	else
+	{
 		ItemNewRoom(m_num, room);
+
+		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
+		// or else camera won't be updated properly.
+
+		if (m_item->IsLara())
+			m_item->Location.roomNumber = room;
+	}
 }
 
 short Moveable::GetStatus() const
@@ -781,30 +882,40 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
-bool Moveable::MeshIsVisible(int meshId) const
+/// Get state of specified mesh visibility of object
+// Returns true if specified mesh is visible on an object, and false
+// if it is not visible.
+// @function Moveable:GetMeshVisible
+// @int index index of a mesh
+// @treturn bool visibility status
+bool Moveable::GetMeshVisible(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::Mesh, meshId);
+	return m_item->MeshBits.Test(meshId);
 }
 
-void Moveable::ShowMesh(int meshId)
+/// Makes specified mesh visible or invisible
+// Use this to show or hide a specified mesh of an object.
+// @function Moveable:SetMeshVisible
+// @int index index of a mesh
+// @bool visible true if you want the mesh to be visible, false otherwise
+void Moveable::SetMeshVisible(int meshId, bool visible)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->SetBits(JointBitType::Mesh, meshId);
+	if (visible)
+		m_item->MeshBits.Set(meshId);
+	else
+		m_item->MeshBits.Clear(meshId);
 }
 
-void Moveable::HideMesh(int meshId)
-{
-	if (!MeshExists(meshId))
-		return;
-
-	m_item->ClearBits(JointBitType::Mesh, meshId); 
-}
-
+/// Shatters specified mesh and makes it invisible
+// Note that you can re-enable mesh later by using SetMeshVisible().
+// @function Moveable:ShatterMesh
+// @int index index of a mesh
 void Moveable::ShatterMesh(int meshId)
 {
 	if (!MeshExists(meshId))
@@ -813,14 +924,26 @@ void Moveable::ShatterMesh(int meshId)
 	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
-bool Moveable::MeshIsSwapped(int meshId) const
+/// Get state of specified mesh swap of object
+// Returns true if specified mesh is swapped on an object, and false
+// if it is not swapped.
+// @function Moveable:GetMeshSwapped
+// @int index index of a mesh
+// @treturn bool mesh swap status
+bool Moveable::GetMeshSwapped(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::MeshSwap, meshId);
+	return m_item->Model.MeshIndex[meshId] == m_item->Model.BaseMesh + meshId;
 }
 
+/// Set state of specified mesh swap of object
+// Use this to swap specified mesh of an object.
+// @function Moveable:SwapMesh
+// @int index index of a mesh
+// @int slotIndex index of a slot to get meshswap from
+// @int[opt] swapIndex index of a mesh from meshswap slot to use
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
 {
 	if (!MeshExists(meshId))
@@ -829,117 +952,71 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 	if (!swapMeshIndex.has_value())
 		 swapMeshIndex = meshId;
 
-	// TODO: After beta, we should refactor whole meshswap workflow,
-	// because currently Lara and other objects use different convention -- Lwmte, 09.07.22
 
-	if (m_item->IsLara())
+	if (swapSlotId <= -1 || swapSlotId >= ID_NUMBER_OBJECTS)
 	{
-		if (swapSlotId <= -1)
-			return;
-
-		auto* lara = GetLaraInfo(m_item);
-
-		if (swapSlotId >= ID_NUMBER_OBJECTS || !Objects[swapSlotId].loaded)
-		{
-			TENLog("Specified slot does not exist in level!", LogLevel::Error);
-			return;
-		}
-
-		if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
-		{
-			TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
+		TENLog("Specified meshswap slot ID is incorrect!", LogLevel::Error);
+		return;
 	}
-	else
-		m_item->SetBits(JointBitType::MeshSwap, meshId);
+
+	if (!Objects[swapSlotId].loaded)
+	{
+		TENLog("Object in specified meshswap slot doesn't exist in level!", LogLevel::Error);
+		return;
+	}
+
+	if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
+	{
+		TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+		return;
+	}
+
+	m_item->Model.MeshIndex[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 }
 
+/// Set state of specified mesh swap of object
+// Use this to bring back original unswapped mesh
+// @function Moveable:UnswapMesh
+// @int index index of a mesh to unswap
 void Moveable::UnswapMesh(int meshId)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
-
-		if (meshId >= NUM_LARA_MESHES)
-		{
-			TENLog("Specified mesh index does not exist!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
-	}
-	else
-		m_item->ClearBits(JointBitType::MeshSwap, meshId);
+	m_item->Model.MeshIndex[meshId] = m_item->Model.BaseMesh + meshId;
 }
 
+/// Enable the item, as if a trigger for it had been stepped on.
+// @function Moveable:Enable
 void Moveable::EnableItem()
 {
-	if (!m_item->Active)
-	{
-		m_item->Flags |= IFLAG_ACTIVATION_MASK;
-		if (Objects[m_item->ObjectNumber].intelligent)
-		{
-			if (m_item->Status == ITEM_DEACTIVATED)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				m_item->Status = ITEM_ACTIVE;
-				AddActiveItem(m_num);
-				EnableEntityAI(m_num, 1);
-			}
-			else if (m_item->Status == ITEM_INVISIBLE)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				if (EnableEntityAI(m_num, 0))
-					m_item->Status = ITEM_ACTIVE;
-				else
-					m_item->Status = ITEM_INVISIBLE;
-				AddActiveItem(m_num);
-			}
-		}
-		else
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			AddActiveItem(m_num);
-			m_item->Status = ITEM_ACTIVE;
-		}
-
-		// Try add colliding in case the item went from invisible -> activated
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
-	}
-}
-
-void Moveable::DisableItem()
-{
-	if (!m_item->Active)
+	if (m_num == NO_ITEM)
 		return;
 
-	m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
-	if (Objects[m_item->ObjectNumber].intelligent)
-	{
-		if (m_item->Status == ITEM_ACTIVE)
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			m_item->Status = ITEM_DEACTIVATED;
-			RemoveActiveItem(m_num);
-			DisableEntityAI(m_num);
-		}
-	}
-	else
-	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
-		m_item->Status = ITEM_DEACTIVATED;
-	}
+	bool wasInvisible = false;
+	if (m_item->Status == ITEM_INVISIBLE)
+		wasInvisible = true;
 
-	// Try add colliding in case the item went from invisible -> deactivated
-	if (m_num > NO_ITEM)
+	m_item->Flags |= CODE_BITS;
+	Trigger(m_num);
+
+	// Try add colliding in case the item went from invisible -> activated
+	if (wasInvisible)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+}
+
+/// Disable the item, as if an antitrigger for it had been stepped on (i.e. it will close an open door or extinguish a flame emitter).
+// Note that this will not trigger an OnKilled callback.
+// @function Moveable:Disable
+void Moveable::DisableItem()
+{
+	if (m_num == NO_ITEM)
+		return;
+
+	Antitrigger(m_num);
+
+	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Explode()
@@ -962,19 +1039,47 @@ void Moveable::Shatter()
 	CreatureDie(m_num, false);
 }
 
+/// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
+// @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
 {
-	m_item->Status = ITEM_INVISIBLE;
-	if (m_item->Active)
+	SetVisible(false);
+}
+/// Set the item's visibility. __An invisible item will have collision turned off, as if it no longer exists in the game world__.
+// @bool visible true if the caller should become visible, false if it should become invisible
+// @function Moveable:SetVisible
+void Moveable::SetVisible(bool visible)
+{
+	if (!visible)
 	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
+		if (Objects[m_item->ObjectNumber].intelligent)
+			DisableItem();
+		else
+			RemoveActiveItem(m_num, false);
+
+		m_item->Status = ITEM_INVISIBLE;
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	}
+	else
+	{
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			DisableEntityAI(m_num);
+			if(!(m_item->Flags & IFLAG_KILLED))
+				EnableItem();
+			else
+				m_item->Status = ITEM_ACTIVE;
 		}
+		else
+		{
+			AddActiveItem(m_num);
+			m_item->Status = ITEM_ACTIVE;
+		}
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
-	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Invalidate()
@@ -995,7 +1100,7 @@ void Moveable::Destroy()
 	if (m_num > NO_ITEM) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		s_callbackRemoveName(m_item->LuaName);
+		s_callbackRemoveName(m_item->Name);
 		KillItem(m_num);
 	}
 
@@ -1006,9 +1111,27 @@ bool Moveable::MeshExists(int index) const
 {
 	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
 	{
-		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->LuaName);
+		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->Name);
 		return false;
 	}
 
 	return true;
+}
+
+//Attach camera and camera target to a mesh of an object.
+void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
+{
+	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
+	{
+		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
+	}
+}
+
+//Borrow an animtaion and state id from an object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+{
+	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.ActiveState = stateID;
+	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	AnimateItem(m_item);
 }

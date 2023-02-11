@@ -5,13 +5,16 @@ class FloorInfo;
 
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
-constexpr auto ONESHOT     = 0x0100;
-constexpr auto SWONESHOT   = 0x0040;
-constexpr auto ATONESHOT   = 0x0080;
-constexpr auto VALUE_BITS  = 0x03FF;
-constexpr auto CODE_BITS   = 0x3E00;
-constexpr auto END_BIT     = 0x8000;
-constexpr auto TRIGGERED   = 0x20;
+constexpr auto ONESHOT		 = 0x0100;
+constexpr auto SWONESHOT	 = 0x0040;
+constexpr auto ATONESHOT	 = 0x0080;
+constexpr auto VALUE_BITS	 = 0x03FF;
+constexpr auto TIMER_BITS	 = 0x00FF;
+constexpr auto FUNCTION_BITS = 0x001F;
+constexpr auto CODE_BITS	 = 0x3E00;
+constexpr auto END_BIT		 = 0x8000;
+constexpr auto TRIGGERED	 = 0x20;
+
 enum FLOORDATA_MASKS
 {
 	FD_MASK_FUNCTION = 0x001F,
@@ -54,7 +57,10 @@ enum TRIGOBJECTS_TYPES
 	TO_SECRET,
 	TO_BODYBAG,
 	TO_FLYBY,
-	TO_CUTSCENE
+	TO_CUTSCENE,
+	TO_UNUSED1, // TRNG FmvNg
+	TO_UNUSED2, // TRNG TimerfieldNg
+	TO_LUAEVENT
 };
 
 extern int TriggerTimer;
@@ -64,12 +70,14 @@ bool GetKeyTrigger(ItemInfo* item);
 int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNumber, short timer);
 int KeyTrigger(short itemNum);
-int PickupTrigger(short itemNum);
+bool PickupTrigger(short itemNum);
 void RefreshCamera(short type, short* data);
 int TriggerActive(ItemInfo* item);
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z);
 short* GetTriggerIndex(ItemInfo* item);
-void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags = 0);
 void ProcessSectorFlags(ItemInfo* item);
+
+void Antitrigger(short const value, short const flags = 0);
+void Trigger(short const value, short const flags = 0);

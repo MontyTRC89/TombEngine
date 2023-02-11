@@ -50,8 +50,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	DrawLeftPistol,				//15
 	ShootRightGun,				//16
 	ShootLeftGun,				//17
-	PushLoop,					//18
-	PushEnd,					//19
+	VoidEffect,					//18
+	VoidEffect,					//19
 	FlashOrange,				//20
 	InvisibilityOn,				//21
 	InvisibilityOff,			//22
@@ -99,14 +99,14 @@ void MeshSwapToPour(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->MeshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
+	item->Model.MeshIndex[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
 }
 
 void Pickup(ItemInfo* item)
@@ -153,15 +153,15 @@ void DrawLeftPistol(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
+	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
-		lara->MeshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
+		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
 	{
-		lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(LaraWeaponType::Pistol);
+		item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
+		lara->Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
@@ -169,15 +169,15 @@ void DrawRightPistol(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
-		lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
 		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
 	{
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(LaraWeaponType::Pistol);
+		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
+		lara->Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
@@ -263,10 +263,10 @@ void SwapCrowbar(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
+	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
+		item->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
 	else 
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
 }
 
 void ActivateKey(ItemInfo* item)

@@ -24,8 +24,8 @@ void InitialiseRaisingBlock(short itemNumber)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 	// Set mutators to 0 by default
-	for (int i = 0; i < item->Animation.Mutator.size(); i++)
-		item->Animation.Mutator[i].Scale.y = 0;
+	for (int i = 0; i < item->Model.Mutator.size(); i++)
+		item->Model.Mutator[i].Scale.y = 0;
 
 	if (item->TriggerFlags < 0)
 	{
@@ -144,8 +144,8 @@ void ControlRaisingBlock(short itemNumber)
 	// Update bone mutators
 	if (item->TriggerFlags > -1)
 	{
-		for (int i = 0; i < item->Animation.Mutator.size(); i++)
-			item->Animation.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+		for (int i = 0; i < item->Model.Mutator.size(); i++)
+			item->Model.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 
@@ -157,8 +157,8 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		auto* bounds = GetBoundsAccurate(item);
-		int height = bounds->Height();
+		auto bounds = GameBoundingBox(item);
+		int height = bounds.GetHeight();
 
 		int currentHeight = item->Pose.Position.y - height * item->ItemFlags[1] / 4096;
 		return std::optional{ currentHeight };

@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -26,10 +26,11 @@ namespace TEN::Entities::TR4
 
 	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
 	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
+	const vector<unsigned int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
 	{
+		// No state 0.
 		SSCORPION_STATE_IDLE = 1,
 		SSCORPION_STATE_WALK = 2,
 		SSCORPION_STATE_RUN = 3,
@@ -56,12 +57,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		
-		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SSCORPION_STATE_IDLE;
-		item->Animation.ActiveState = SSCORPION_STATE_IDLE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 
 	void SmallScorpionControl(short itemNumber)
@@ -73,9 +70,9 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
+		short tilt = 0;
 		short head = 0;
 		short neck = 0;
-		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -87,9 +84,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState != SSCORPION_STATE_DEATH_1 &&
 				item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 			{
-				item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
+				SetAnimation(item, SSCORPION_ANIM_DEATH);
 			}
 		}
 		else
@@ -118,6 +113,7 @@ namespace TEN::Entities::TR4
 				else if (AI.bite)
 				{
 					creature->MaxTurn = ANGLE(6.0f);
+
 					if (TestProbability(0.5f))
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 					else
@@ -162,7 +158,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, SmallScorpionAttackJoints))
+					if (item->TouchBits.Test(SmallScorpionAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)

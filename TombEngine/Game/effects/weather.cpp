@@ -6,8 +6,8 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
+#include "Math/Random.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "ScriptInterfaceLevel.h"
@@ -301,9 +301,7 @@ namespace TEN::Effects::Environment
 
 			// Check if particle got out of room bounds
 
-			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
-				p.Position.z <= (r.z + WALL_SIZE - STEP_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + STEP_SIZE) ||
-				p.Position.x <= (r.x + WALL_SIZE - STEP_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + STEP_SIZE))
+			if (!IsPointInRoom(p.Position, p.Room))
 			{
 				if (!collisionCalculated)
 				{
@@ -413,19 +411,19 @@ namespace TEN::Effects::Environment
 			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
 
 			// Use fast GetFloor instead of GetCollision as we spawn a lot of dust.
-			short roomNumber = Camera.pos.roomNumber;
+			short roomNumber = Camera.pos.RoomNumber;
 			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
 
 			// Check if water room.
 			if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber))
 				continue;
 
-			if (!IsPointInRoom(Vector3Int(xPos, yPos, zPos), roomNumber))
+			if (!IsPointInRoom(Vector3i(xPos, yPos, zPos), roomNumber))
 				continue;
 
 			auto part = WeatherParticle();
 
-			part.Velocity = GetRandomVector() * MAX_DUST_SPEED;
+			part.Velocity = Random::GenerateDirection() * MAX_DUST_SPEED;
 
 			part.Size = GenerateFloat(MAX_DUST_SIZE / 2, MAX_DUST_SIZE);
 

@@ -1,33 +1,17 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-struct ItemInfo;
+class EulerAngles;
 struct CollisionInfo;
+struct ItemInfo;
 
 constexpr auto MAX_TARGETS = 8;
 
 enum class FireWeaponType
 {
 	Miss = -1,
-	NoAmmo = 0,
-	PossibleHit = 1
-};
-
-struct WeaponInfo
-{
-	short LockAngles[4];
-	short LeftAngles[4];
-	short RightAngles[4];
-	int AimSpeed;
-	short ShotAccuracy;
-	int GunHeight;
-	short TargetDist;
-	int Damage;
-	int RecoilFrame;
-	int FlashTime;
-	int DrawFrame;
-	short SampleNum;
-	int ExplosiveDamage;
+	NoAmmo,
+	PossibleHit
 };
 
 enum WeaponState
@@ -43,19 +27,41 @@ enum WeaponState
 	WEAPON_STATE_UNDERWATER_RECOIL = 8
 };
 
-extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
-extern int FlashGrenadeAftershockTimer;
+struct WeaponInfo
+{
+	std::pair<EulerAngles, EulerAngles> LockOrientConstraint  = {};
+	std::pair<EulerAngles, EulerAngles> LeftOrientConstraint  = {};
+	std::pair<EulerAngles, EulerAngles> RightOrientConstraint = {};
 
-void SmashItem(short itemNum);
-GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
-void LaraGun(ItemInfo* laraItem);
-Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType);
+	short AimSpeed		  = 0;
+	short ShotAccuracy	  = 0;
+	int	  GunHeight		  = 0;
+	float TargetDist	  = 0.0f;
+	int	  Damage		  = 0;
+	int	  RecoilFrame	  = 0;
+	int	  FlashTime		  = 0;
+	int	  DrawFrame		  = 0;
+	int	  SampleNum		  = 0;
+	int	  ExplosiveDamage = 0;
+};
+
+extern int FlashGrenadeAftershockTimer;
+extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
+
 void InitialiseNewWeapon(ItemInfo* laraItem);
-GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType);
-void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
-void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int damage, int flag);
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, Vector3Shrt armOrient);
-void FindTargetPoint(ItemInfo* laraItem, GameVector* target);
-void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo);
-void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo);
-HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType);
+
+Ammo&		   GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
+GameVector	   GetTargetPoint(ItemInfo* targetEntity);
+HolsterSlot	   GetWeaponHolsterSlot(LaraWeaponType weaponType);
+GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType);
+GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo* laraItem, LaraWeaponType weaponType);
+
+void HandleWeapon(ItemInfo* laraItem);
+void AimWeapon(ItemInfo* laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, const EulerAngles& armOrient);
+
+void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo);
+void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo);
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex = NO_JOINT);
+
+void SmashItem(short itemNumber);
