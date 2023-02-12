@@ -52,11 +52,11 @@ namespace TEN::Entities::Traps
 	void ElectricCleanerControl(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
-		float rotationVel = item.ItemFlags[0];
-		float moveVel = item.ItemFlags[2];
-		float goalAngle = TO_RAD(item.ItemFlags[6]);
-		float angleDifference = abs(goalAngle - TO_RAD(item.Pose.Orientation.y));
+		auto& object = Objects[item.ObjectNumber];
+		
+		auto& rotationVel = item.ItemFlags[0];
+		auto& moveVel = item.ItemFlags[2];
+		auto& goalAngle = item.ItemFlags[6];
 
 		if (!TriggerActive(&item))
 		{
@@ -72,15 +72,18 @@ namespace TEN::Entities::Traps
 		if (moveVel <= 0)
 			return;
 
+		float angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+
 		bool flagDoDetection		= ((item.ItemFlags[1] & (1 << 0)) != 0);
-		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 1)) != 0);
-		bool flagAntiClockWiseOrder		= ((item.ItemFlags[1] & (1 << 2)) != 0);
-		//bool flagNoStopAfterKill	= ((item.ItemFlags[1] & (1 << 3)) != 0); //used in collision function.
-		//bool flagSmoothTurns		= ((item.ItemFlags[1] & (1 << 4)) != 0); //unused
+		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
+		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
+		//bool flagNoStopAfterKill	= ((item.ItemFlags[1] & (1 << 4)) != 0); //used in collision function.
+		//bool flagSmoothTurns		= ((item.ItemFlags[1] & (1 << 5)) != 0); //unused
 
 		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-		float pitch = TO_RAD(item.Pose.Orientation.x);
+		float pitch = TO_RAD(0);
 		float yaw = TO_RAD(item.Pose.Orientation.y);
 
 		Vector3 ForwardDirection = Vector3(cos(pitch) * sin(yaw), -sin(pitch), cos(pitch) * cos(yaw));
@@ -89,29 +92,17 @@ namespace TEN::Entities::Traps
 		Vector3 RightDirection = Vector3(cos(yaw), 0, -sin(yaw));
 		RightDirection.Normalize();
 		
-		//States
-		// o ROTATE
-		// o MOVE
-		//    > If it's on the center of the sector:
-		//	      - Test Heavy triggers
-		//        - Check and decide new direction
-		//    > else:
-		//        - Keep moving forward
-
-		//TENLog("yaw: " + std::to_string(yaw) + ", GoalAngle: " + std::to_string(item.ItemFlags[6]) + ", AngleDifference: " + std::to_string(angleDifference), LogLevel::Warning, LogConfig::All, true);
-
-		// ROTATE while it's not aligned to the goal direction.
 		if (angleDifference > TO_RAD(rotationVel))
 		{
-			TENLog("ROTATING//", LogLevel::Warning, LogConfig::All, true);
-			//TODO: check if rotate right or left
-			//if ()
-			item.Pose.Orientation.y += rotationVel;
+			if (flagTurnRight)
+				item.Pose.Orientation.y -= rotationVel;
+			else
+				item.Pose.Orientation.y += rotationVel;
 
-			angleDifference = abs (goalAngle - TO_RAD(item.Pose.Orientation.y));
-			//TENLog("ROTATING// new orientation y: " + std::to_string(TO_RAD(item.Pose.Orientation.y)) + ", AngleDifference: " + std::to_string(angleDifference) + ", Velocity: " + std::to_string(TO_RAD(rotationVel)), LogLevel::Warning, LogConfig::All, true);
+			// Recalculate new difference to check if we should force align with axis for safety check.
+			angleDifference = abs (TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
 			if (angleDifference <= TO_RAD(rotationVel))
-				item.Pose.Orientation.y = FROM_RAD(goalAngle);
+				item.Pose.Orientation.y = goalAngle;
 		}
 		else
 		{
@@ -119,47 +110,46 @@ namespace TEN::Entities::Traps
 				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
 				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 			{
+				//Do triggers
 				TestTriggers(&item, true);
 
+				//Search for next direction
 				Vector3 NewDirection;
 
 				if (flagPriorityForward)			
 				{
 					if (flagAntiClockWiseOrder)			//Forward Right Left
-						NewDirection = SearchDirections(item, ForwardDirection, RightDirection, -RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, ForwardDirection, RightDirection, -RightDirection);
 					else								//Forward Left Right
-						NewDirection = SearchDirections(item, ForwardDirection, -RightDirection, RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, ForwardDirection, -RightDirection, RightDirection);
 				}
 				else
 				{
 					if (flagAntiClockWiseOrder)			//Right Forward Left
-						NewDirection = SearchDirections(item, RightDirection, ForwardDirection, -RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, RightDirection, ForwardDirection, -RightDirection);
 					else								//Left Forward Right
-						NewDirection = SearchDirections(item, -RightDirection, ForwardDirection, RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, -RightDirection, ForwardDirection, RightDirection);
 				}
 
 				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
 					NewDirection = -ForwardDirection;
-
-				item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
-
-				//item.ItemFlags[6] = FROM_RAD (atan2(NewDirection.z, NewDirection.x)); //Why this doesn't work?
+								
+				//Will turn left or right?
+				auto crossProductResult = NewDirection.Cross(ForwardDirection);
+				if (crossProductResult.y > 0)
+					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
+				else if (crossProductResult.y < 0)
+					item.ItemFlags[1] &= ~(1 << 1); // Turn off 1st bit for flagTurnRight. (So it'll turn to the left)
+				
+				//Store goal angle to control the rotation.
 				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
 
-				if (abs(TO_RAD(item.ItemFlags[6]) - TO_RAD(item.Pose.Orientation.y)) < 2000)
-				{
-					item.Pose.Position.y = col.Position.Floor; 
+				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
+					//If it doesn't have to rotate, do forward movement to keep smooth movement.
 					item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
-				}
-
-				if (item.ItemFlags[6] == -32768)
-					TENLog("Go SOUTH", LogLevel::Warning, LogConfig::All, true);
-				if (item.ItemFlags[6] == -16384)
-					TENLog("Go WEST", LogLevel::Warning, LogConfig::All, true);
-				if (item.ItemFlags[6] == 16384)
-					TENLog("Go EAST", LogLevel::Warning, LogConfig::All, true);
-				if (item.ItemFlags[6] == 32768)
-					TENLog("Go NORTH", LogLevel::Warning, LogConfig::All, true);
+				else
+					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
+					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
 			}
 			else
 			{
@@ -169,7 +159,7 @@ namespace TEN::Entities::Traps
 				item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
 
 				auto slope = col.Block->FloorSlope(0);
-				//TENLog("Slope: " + std::to_string(slope.LengthSquared()), LogLevel::Warning, LogConfig::All, true);
+
 				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
 					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
 				else
@@ -183,8 +173,11 @@ namespace TEN::Entities::Traps
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 
+		auto radius = Vector2(object.radius * 0.5f, object.radius * 0.5f);
+		AlignEntityToSurface(&item, radius);
+
 		SpawnElectricCleanerSparks(item);
-		CleanerToItemCollision(item);
+		ElectricCleanerToItemCollision(item);
 	}
 
 	bool IsNextSectorValid(ItemInfo& item, const Vector3& Dir)
@@ -194,58 +187,75 @@ namespace TEN::Entities::Traps
 
 		auto col = GetCollision(detectionPoint);
 
-		//TENLog("I'm here! Fwd: " + std::to_string(Dir.x) + "," + std::to_string(Dir.y) + "," + std::to_string(Dir.z), LogLevel::Warning, LogConfig::All, true);
-
 		//Is a wall
-		if (col.Position.Floor == NO_HEIGHT && col.Position.Ceiling == NO_HEIGHT)
+		if (col.Block->IsWall(detectionPoint.x, detectionPoint.z))
 			return false;
-
-		//TENLog("Is not a wall", LogLevel::Warning, LogConfig::All, true);
-
-		//Is a 1 click step (higher or lower).
-		int distanceToFloor = abs (col.Position.Floor - item.Pose.Position.y);
-		if (distanceToFloor >= CLICK(1))
-			return false;
-
-		//TENLog("Is not a step", LogLevel::Warning, LogConfig::All, true);
 
 		//Is it a sliding slope?
 		if (col.Position.FloorSlope)
 			return false;
 
-		//TENLog("Is not a slope", LogLevel::Warning, LogConfig::All, true);
+		if (abs(col.FloorTilt.x) == 0 && abs(col.FloorTilt.y) == 0) //Is a flat tile
+		{
+			//Is a 1 click step (higher or lower).
+			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
+			if (distanceToFloor >= CLICK(1))
+				return false;
+		}
+		else //Is a slope tile
+		{
+			//Is a 2 click step (higher or lower).
+			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
+			if (distanceToFloor > CLICK(2))
+				return false;
+
+			short slopeAngle = ANGLE(0.0f);
+
+			if (col.FloorTilt.x > 0)
+				slopeAngle = -ANGLE(90.0f);
+			else if (col.FloorTilt.x < 0)
+				slopeAngle = ANGLE(90.0f);
+
+			if (col.FloorTilt.y > 0 && col.FloorTilt.y > abs(col.FloorTilt.x))
+				slopeAngle = ANGLE(180.0f);
+			else if (col.FloorTilt.y < 0 && -col.FloorTilt.y > abs(col.FloorTilt.x))
+				slopeAngle = ANGLE(0.0f);
+
+			auto angleDir = FROM_RAD(atan2(Dir.x, Dir.z));
+			auto alignment = slopeAngle - angleDir;
+
+			//Is slope not aligned with the direction?
+			if ((alignment != 32768) && (alignment != 0) && (alignment != -32768))
+				return false;
+		}
 
 		//Is diagonal floor?
 		if (col.Position.DiagonalStep)
 			return false;
 
-		//TENLog("Is not a diagonal floor", LogLevel::Warning, LogConfig::All, true);
-
 		//Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
 		int cleanerHeight = 1024; //TODO change it for the collision bounding box height.
-		if (distanceToCeiling <= cleanerHeight)
+		if (distanceToCeiling < cleanerHeight)
 			return false;
 
-		//TENLog("Is not the ceiling", LogLevel::Warning, LogConfig::All, true);
+		//Is a non walkable tile? (So there is not any box)
+		if (col.Block->Box == NO_BOX)
+			return false;
 
-		//Is a non walkable tile or box?
-		//if (col.Block->Box)
-			//return false;
-
-		//TENLog("Is not a BOX", LogLevel::Warning, LogConfig::All, true);
-
-		//Is a stopper tile?
-		if (col.Block->Stopper)
+		//Is a blocked grey box (So it's an Isolated box)
+		if (g_Level.Boxes[col.Block->Box].flags & BLOCKABLE)
 			return false;
 		
-		//TENLog("Is not a stopper so is a valid one!!!", LogLevel::Warning, LogConfig::All, true);
+		//Is a stopper tile? (There is still a shatter object).
+		if (col.Block->Stopper)
+			return false;
 
 		//If nothing of that happened, then it must be a valid sector.
 		return true;
 	}
 
-	Vector3 SearchDirections(ItemInfo& item, const Vector3& Dir1, const Vector3& Dir2, const Vector3& Dir3)
+	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& Dir1, const Vector3& Dir2, const Vector3& Dir3)
 	{
 		if (IsNextSectorValid(item, Dir1))
 			return Dir1;
@@ -274,52 +284,8 @@ namespace TEN::Entities::Traps
 			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
 		}
 	}
-
-	bool CheckObjectAhead(ItemInfo& item)
-	{
-		if (!GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
-			return false;
-
-		int lp = 0;
-		while (CollidedItems[lp])
-		{
-			if (CollidedItems[lp] == &item || Objects[CollidedItems[lp]->ObjectNumber].intelligent)
-			{
-				lp++;
-				continue;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	void CheckCleanerHeading(ItemInfo& item, int x, int y, int z, short roomNumber, bool& heading)
-	{
-		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
-		int h = GetFloorHeight(floor, x, y, z);
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-		floor = &r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))];
-		bool collide;
-
-		/*
-		int ox = item.Pose.Position.x;
-		int oz = item.Pose.Position.z;
-		item.Pose.Position.x = x;
-		item.Pose.Position.z = z;
-		collide = CheckObjectAhead(item);
-		item.Pose.Position.x = ox;
-		item.Pose.Position.z = oz;
-
-		* CheckObjectAhead causes issues when item collision boxes are too big, keeping it just in case it is salvageable.
-		*/
-
-		collide = false;
-		heading = ((h == y) && !collide && !floor->Stopper);
-	}
-
-	void CleanerToItemCollision(ItemInfo& item)
+		
+	void ElectricCleanerToItemCollision(ItemInfo& item)
 	{
 		auto backupPos = item.Pose.Position;
 
