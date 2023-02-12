@@ -83,13 +83,12 @@ namespace TEN::Entities::Traps
 		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
 		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
 		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
-		
+
 		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-		float pitch = TO_RAD(0);
 		float yaw = TO_RAD(item.Pose.Orientation.y);
 
-		Vector3 ForwardDirection = Vector3(cos(pitch) * sin(yaw), -sin(pitch), cos(pitch) * cos(yaw));
+		Vector3 ForwardDirection = Vector3(sin(yaw), 0, cos(yaw));
 		ForwardDirection.Normalize();
 
 		Vector3 RightDirection = Vector3(cos(yaw), 0, -sin(yaw));
