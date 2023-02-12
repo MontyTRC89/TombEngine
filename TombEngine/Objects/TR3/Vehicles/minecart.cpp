@@ -313,7 +313,7 @@ namespace TEN::Entities::Vehicles
 						{
 							if (TestBoundsCollide(item, laraItem, MINECART_ENTITY_RADIUS))
 							{
-								if (item->ObjectNumber == ID_ANIMATING2)
+								if (item->ObjectNumber == ID_MINECART_SWITCH)
 								{
 									if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 										(laraItem->Animation.ActiveState == MINECART_STATE_SWIPE &&
