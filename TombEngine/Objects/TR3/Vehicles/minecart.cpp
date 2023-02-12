@@ -304,7 +304,7 @@ namespace TEN::Entities::Vehicles
 				{
 					auto* object = &Objects[item->ObjectNumber];
 					if (object->collision &&
-						(object->intelligent || item->ObjectNumber == ID_ROLLINGBALL || item->ObjectNumber == ID_ANIMATING2))
+						(object->intelligent || item->ObjectNumber == ID_ROLLINGBALL || item->ObjectNumber == ID_MINECART_SWITCH))
 					{
 						auto direction = minecartItem->Pose.Position - item->Pose.Position;
 						if (direction.x > -BLOCK(2) && direction.x < BLOCK(2) &&
