@@ -20,37 +20,23 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
-
-	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.31));
-	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
-	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(BLOCK(1.5f));
-
 	constexpr auto COMPSOGNATHUS_ATTACK_DAMAGE = 90;
 	constexpr auto COMPSOGNATHUS_RUN_TURN = ANGLE(10);
 	constexpr auto COMPSOGNATHUS_STOP_TURN = ANGLE(3);
 
 	constexpr auto COMPSOGNATHUS_UPSET_SPEED = 15;
 
-	constexpr auto COMPSOGNATHUS_ATTACK_RANGE = SQUARE(BLOCK(0.31));
-	constexpr auto COMPSOGNATHUS_JUMP_ATTACK_RANGE = SQUARE(CLICK(1.0f));
-	constexpr auto COMPSOGNATHUS_RUN_RANGE = SQUARE(CLICK(1.2f));
+	constexpr auto COMPSOGNATHUS_ATTACK_RANGE = SQUARE(BLOCK(0.4f));
 	constexpr auto COMPSOGNATHUS_SCARED_RANGE = SQUARE(BLOCK(5));
 
-	constexpr auto COMPSOGNATHUS_HIT_RANGE = SQUARE(BLOCK(0.31));
 	constexpr auto COMPSOGNATHUS_ATTACK_ANGLE = 0x3000;
 	constexpr auto COMPSOGNATHUS_JUMP_ATTACK_CHANCE = 0x1000;
 	constexpr auto COMPSOGNATHUS_ATTACK_CHANCE = 31;
 
-	constexpr auto COMPSOGNATHUS_TOUCH = 0x0004;
-
-	constexpr auto COMPSOGNATHUS_DIE_ANIM = 6;
 	constexpr auto COMPSOGNATHUS_HIT_FLAG = 1;
 
 	const auto CompyBite = BiteInfo(Vector3(0.0f, 0.0f, 0.0f), 2);
 	const auto CompyAttackJoints = std::vector<unsigned int>{ 1, 2 };
-
-	int CarcasItem = NO_ITEM;
 	
 	enum CompyState
 	{
@@ -74,11 +60,10 @@ namespace TEN::Entities::Creatures::TR3
 	};
 
 	enum CompyTarget
-	{
-		ATTACK_LARA = 0,
-		ATTACK_CADAVER = 1
+	{	
+		ATTACK_CADAVER = 0,
+		ATTACK_LARA = 1
 	};
-
 
 	void InitialiseCompsognathus(short itemNumber)
 	{	
@@ -97,9 +82,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		int angle, head, neck, tilt, random, RoomNumber;
+		int angle, head, neck, tilt, random, RoomNumber, target;
 		Vector3 cadaverCoordinates;
-
+		
 		head = neck = angle = tilt = 0;
 
 		ItemInfo* nearestItem;
@@ -154,6 +139,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			creature->Enemy = LaraItem;
+
+			target = item->ItemFlags[1];
 
 			if (creature->HurtByLara)
 				AlertAllGuards(itemNumber);
@@ -237,8 +224,6 @@ namespace TEN::Entities::Creatures::TR3
 				{
 				creature->Target.x = cadaverCoordinates.x;
 				creature->Target.z = cadaverCoordinates.z;
-
-
 				}
 				else
 				{
@@ -273,7 +258,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~COMPSOGNATHUS_HIT_FLAG;
 				if (creature->Mood == MoodType::Attack)
 				{					
-					if (AI.ahead && AI.distance < COMPSOGNATHUS_HIT_RANGE * 4)
+					if (AI.ahead && AI.distance < COMPSOGNATHUS_ATTACK_RANGE * 4)
 					{
 						if (item->ItemFlags[1] == ATTACK_LARA)
 						{
@@ -285,19 +270,19 @@ namespace TEN::Entities::Creatures::TR3
 						else
 							item->Animation.TargetState = COMPSOGNATHUS_STATE_IDLE;
 					}
-					else if (AI.distance > COMPSOGNATHUS_HIT_RANGE * (9 - 4 * (item->ItemFlags[1] == ATTACK_LARA)))
+					else if (AI.distance > COMPSOGNATHUS_ATTACK_RANGE * (9 - 4 * target))
 						item->Animation.TargetState = COMPSOGNATHUS_STATE_RUN;
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{					
-					if (AI.ahead && AI.distance < (COMPSOGNATHUS_HIT_RANGE * 3 ) && item->ItemFlags[1] == ATTACK_CADAVER)
+					if (AI.ahead && AI.distance < (COMPSOGNATHUS_ATTACK_RANGE * 3 ) && item->ItemFlags[1] == ATTACK_CADAVER)
 					{
 						if (GetRandomControl() < 0x4000)
 							item->Animation.TargetState = COMPSOGNATHUS_STATE_ATTACK;
 						else
 							item->Animation.TargetState = COMPSOGNATHUS_STATE_JUMP_ATTACK;	
 					}
-					else if (AI.distance > COMPSOGNATHUS_HIT_RANGE * 3)
+					else if (AI.distance > COMPSOGNATHUS_ATTACK_RANGE * 3)
 					{
 						item->Animation.TargetState = COMPSOGNATHUS_STATE_RUN;
 					}
@@ -317,7 +302,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~COMPSOGNATHUS_HIT_FLAG;
 				creature->MaxTurn = COMPSOGNATHUS_RUN_TURN;
 
-				if (AI.angle < COMPSOGNATHUS_ATTACK_ANGLE && AI.angle > -COMPSOGNATHUS_ATTACK_ANGLE && AI.distance < COMPSOGNATHUS_HIT_RANGE * (9 - 4 ))
+				if (AI.angle < COMPSOGNATHUS_ATTACK_ANGLE && AI.angle > -COMPSOGNATHUS_ATTACK_ANGLE && AI.distance < COMPSOGNATHUS_ATTACK_RANGE * (9 - 4 * target))
 				{
 					item->Animation.TargetState = COMPSOGNATHUS_STATE_IDLE;
 
@@ -338,7 +323,7 @@ namespace TEN::Entities::Creatures::TR3
 					LaraItem->HitStatus = 1;
 					CreatureEffect(item, CompyBite, DoBloodSplat);
 				}
-				else if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG) && AI.distance < COMPSOGNATHUS_HIT_RANGE && AI.ahead && item->ItemFlags[1] == ATTACK_CADAVER)
+				else if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG) && AI.distance < COMPSOGNATHUS_ATTACK_RANGE && AI.ahead && item->ItemFlags[1] == ATTACK_CADAVER)
 				{
 					creature->Flags |= COMPSOGNATHUS_HIT_FLAG;				
 					CreatureEffect(item, CompyBite, DoBloodSplat);
