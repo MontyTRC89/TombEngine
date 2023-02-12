@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SPEAR_GUARDIAN_BASIC_DAMAGE = 75;
 	constexpr auto SPEAR_GUARDIAN_POWERFUL_DAMAGE = 120;
-	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 4;
+	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
 
 	enum SpearGuardianState
 	{
@@ -60,6 +60,7 @@ namespace TEN::Entities::Creatures::TR2
 		SPEAR_GUARDIAN_STATE_KILL_LARA = 19 // Killer move. Need lara extra anims enum !
 	};
 
+	// TODO: Found all name, also found some which is more appropriate.
 	enum SpearGuardianAnim
 	{
 		SPEAR_GUARDIAN_ANIM_DOUBLE_ATTACK_FRONT_CANCEL = 0,
@@ -76,23 +77,34 @@ namespace TEN::Entities::Creatures::TR2
 		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT = 11, // Deal damage.
 		SPEAR_GUARDIAN_ANIM_UNKNOWN = 12,
 
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT_TO_SLASH_PREPARE = 15,
+
 		SPEAR_GUARDIAN_ANIM_SLASH = 24,
 
 		SPEAR_GUARDIAN_ANIM_RUN_TO_WALK = 27,
-
+		SPEAR_GUARDIAN_ANIM_RUN = 28,
+		SPEAR_GUARDIAN_ANIM_STAND_TO_SLASH_PREPARE = 29,
+		SPEAR_GUARDIAN_ANIM_STAND_TO_WALK = 30,
+		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_STAND = 31,
+		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_WALK = 32,
+		SPEAR_GUARDIAN_ANIM_STAND = 33,
+		SPEAR_GUARDIAN_ANIM_SLASH_IDLE = 34,
+		SPEAR_GUARDIAN_ANIM_WALK = 35,
+		SPEAR_GUARDIAN_ANIM_WALK_TO_RUN = 36,
+		SPEAR_GUARDIAN_ANIM_RUN_TO_STAND = 37,
+		SPEAR_GUARDIAN_ANIM_WALK_TO_STAND = 38,
 		SPEAR_GUARDIAN_ANIM_RUN_TO_IDLE = 39,
 		SPEAR_GUARDIAN_ANIM_RUN_TO_SLASH_IDLE = 40,
 		SPEAR_GUARDIAN_ANIM_RUN_TO_DOUBLE_ATTACK_FRONT = 41,
+		SPEAR_GUARDIAN_ANIM_RUN_DOUBLE_ATTACK_FRONT = 42,
 
 		SPEAR_GUARDIAN_ANIM_WALK_TO_SLASH_IDLE = 47,
 		SPEAR_GUARDIAN_ANIM_AWAKE = 48,
 		SPEAR_GUARDIAN_ANIM_KILL_LARA = 49,
 	};
 
-	static void XianDamage(ItemInfo* item, int damage)
+	static void XianDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
-		auto* creature = GetCreatureInfo(item);
-
 		if (!(creature->Flags & 1) && item->TouchBits.Test(SpearBiteRight.meshNum))
 		{
 			DoDamage(creature->Enemy, damage);
@@ -480,13 +492,13 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT:
-				XianDamage(item, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
+				XianDamage(item, creature, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
 				break;
 
 			case SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT:
 			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR:
 			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR:
-				XianDamage(item, item->Animation.ActiveState == SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT ?
+				XianDamage(item, creature, item->Animation.ActiveState == SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT ?
 					SPEAR_GUARDIAN_POWERFUL_DAMAGE : SPEAR_GUARDIAN_BASIC_DAMAGE);
 
 				if (AI.ahead)
@@ -505,7 +517,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPEAR_GUARDIAN_STATE_SLASH:
-				XianDamage(item, SPEAR_GUARDIAN_BASIC_DAMAGE);
+				XianDamage(item, creature, SPEAR_GUARDIAN_BASIC_DAMAGE);
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -518,7 +530,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT:
-				XianDamage(item, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
+				XianDamage(item, creature, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -542,7 +554,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (isLaraAlive && creature->Enemy->HitPoints <= 0)
 		{
 			creature->MaxTurn = 0;
-			CreatureKill(item, 49, 0, 19, LS_DEATH); // TODO: add spear_guardian state enum and lara extra state enum
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL_LARA, LEA_XianSpearDeath, SPEAR_GUARDIAN_STATE_KILL_LARA, LS_DEATH);
 			return;
 		}
 

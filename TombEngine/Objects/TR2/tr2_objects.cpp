@@ -402,7 +402,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
-		obj->initialise = InitialiseCreature;
+		obj->initialise = InitialiseSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
 		obj->shadowType = ShadowMode::All;

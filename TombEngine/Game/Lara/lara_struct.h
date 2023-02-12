@@ -825,6 +825,25 @@ enum LaraAnim
 };
 #pragma endregion
 
+enum LaraExtraAnim
+{
+	LEA_Unsure1,
+	LEA_WakingUp,
+	LEA_XianSpearDeath,
+	LEA_SubwayTrainDeath,
+	LEA_TyrannosaurDeath,
+	LEA_Unsure2,
+	LEA_GiantMutantDeath,
+	LEA_ShivaDeath,
+	LEA_TntActivate,
+	LEA_MidasGold,
+	LEA_MidasDeath,
+	LEA_GongStrike,
+	LEA_WillardDeath,
+	LEA_SubwayTrainDeathEnd,
+	LEA_SethDeath
+};
+
 enum LARA_MESHES
 {
 	LM_HIPS,
