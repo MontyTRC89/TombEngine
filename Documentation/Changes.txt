@@ -21,7 +21,6 @@ Version 1.0.7
 	- ItemFlags[6] = Distance to use the switch. (example: MySwitch:SetItemFlags(Distance Position, 6)
 * Implement squash and stretch water bubbles.
 * Prevent Lara from drawing weapons during parallel bar swinging.
-* Implement squash and stretch water bubbles.
 * Implement a new pickup display inspired by OpenLara.
 
 Lua API Changes
