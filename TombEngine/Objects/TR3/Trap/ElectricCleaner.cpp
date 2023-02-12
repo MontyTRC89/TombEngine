@@ -175,7 +175,7 @@ namespace TEN::Entities::Traps
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 
-		auto radius = Vector2(object.radius * 0.5f, object.radius * 0.5f);
+		auto radius = Vector2(object.radius, object.radius);
 		AlignEntityToSurface(&item, radius);
 
 		SpawnElectricCleanerSparks(item);
