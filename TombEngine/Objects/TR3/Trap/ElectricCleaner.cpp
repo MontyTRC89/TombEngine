@@ -47,6 +47,11 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
 		item.ItemFlags[6] = item.Pose.Orientation.y;
 		item.Collidable = true;
+
+		if (item.TriggerFlags)
+			item.ItemFlags[1] &= ~(1 << 4);	// Turn off 1st bit for flagStopAfterKill.
+		else
+			item.ItemFlags[1] |= (1 << 4);	// Turn on 1st bit for flagStopAfterKill.
 	}
 
 	void ElectricCleanerControl(short itemNumber)
@@ -78,9 +83,7 @@ namespace TEN::Entities::Traps
 		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
 		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
 		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
-		//bool flagNoStopAfterKill	= ((item.ItemFlags[1] & (1 << 4)) != 0); //used in collision function.
-		//bool flagSmoothTurns		= ((item.ItemFlags[1] & (1 << 5)) != 0); //unused
-
+		
 		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 		float pitch = TO_RAD(0);
@@ -278,7 +281,8 @@ namespace TEN::Entities::Traps
 			ItemElectricBurn(laraItem, -1);
 			laraItem->HitPoints = 0;
 
-			if (!item.TriggerFlags)
+			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
+			if (flagStopAfterKill)
 				item.ItemFlags[2] = 0;
 
 			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
