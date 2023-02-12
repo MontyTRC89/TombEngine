@@ -13,8 +13,6 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
-
 
 using namespace TEN::Math;
 
@@ -73,7 +71,6 @@ namespace TEN::Entities::Creatures::TR3
 		//set friendly
 		item.ItemFlags[1] = ATTACK_CADAVER;		
 	}
-
 
 	void CompsognathusControl(short itemNumber)
 	{
@@ -155,7 +152,6 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			random = ((itemNumber & 0x7) * 0x200) - 0x700;
-
 		
 			if (!item->ItemFlags[3] 
 				&& !item->ItemFlags[1] == ATTACK_LARA
@@ -249,7 +245,6 @@ namespace TEN::Entities::Creatures::TR3
 			{
 					item->ItemFlags[1] = ATTACK_LARA;					
 			}
-
 
 			switch (item->Animation.ActiveState)
 			{
