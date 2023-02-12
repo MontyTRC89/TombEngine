@@ -84,8 +84,6 @@ namespace TEN::Entities::Creatures::TR3
 		
 		head = neck = angle = tilt = 0;
 
-		ItemInfo* nearestItem;
-
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != COMPSOGNATHUS_STATE_IDLE)
@@ -106,17 +104,13 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (cadaverCoordinates == Vector3::Zero)
 			{
-				nearestItem = nullptr;
 				float minDistance = INFINITY;
 
 				int i;
 				ItemInfo* targetItem;
 				for (i = 0, targetItem = &g_Level.Items[0]; i < g_Level.NumItems; i++, targetItem++)
 				{
-					if (targetItem->ObjectNumber == NO_ITEM || targetItem->Index == itemNumber)
-						continue;
-
-					if (targetItem->RoomNumber == NO_ROOM)
+					if (targetItem->ObjectNumber == NO_ITEM || targetItem->Index == itemNumber || targetItem->RoomNumber == NO_ROOM)
 						continue;
 
 					if (SameZone(creature, targetItem) )
@@ -125,8 +119,6 @@ namespace TEN::Entities::Creatures::TR3
 
 						if (distance < minDistance && targetItem->Effect.Type == EffectType::Cadaver)
 						{
-							nearestItem = targetItem;
-
 							cadaverCoordinates = Vector3(targetItem->Pose.Position.x, targetItem->Pose.Position.y, targetItem->Pose.Position.z);
 							minDistance = distance;
 							item->ItemFlags[1] = ATTACK_CADAVER;							
