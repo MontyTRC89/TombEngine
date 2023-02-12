@@ -7,7 +7,7 @@
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Input;
