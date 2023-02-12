@@ -16,10 +16,11 @@ Version 1.0.7
 * Fix Valve and Wall Hole (OCB 5 nad 6) not work as a timed switch.
 * Polish the distance position between Lara and switch.
 * Add OCB 7 - Custom Lua switch (Usage of ItemFlags in lua required).
-	- ItemFlags[4] = on Anination
+	- ItemFlags[4] = on Animation
 	- ItemFlags[5] = off Animation
 	- ItemFlags[6] = Distance to use the switch.
 * Implement squash and stretch water bubbles.
+* Implement a new pickup display inspired by OpenLara.
 
 Lua API Changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
