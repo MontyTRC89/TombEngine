@@ -231,6 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			neck = -(AI.angle / 4);
 
+			if (item->Timer < 250)
 			item->Timer++;
 
 			if (item->HitStatus && item->Timer > 200 && GetRandomControl() < COMPSOGNATHUS_ATTACK_CHANCE * 100 || (creature->Alerted && AI.zoneNumber == AI.enemyZone))
