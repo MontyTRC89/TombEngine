@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Hud/PickupSummary.h"
 
-#include "Game/effects/effects.h"
 #include "Game/pickup/pickup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"

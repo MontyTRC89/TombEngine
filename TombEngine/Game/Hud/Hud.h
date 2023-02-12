@@ -5,8 +5,6 @@ struct ItemInfo;
 
 namespace TEN::Hud
 {
-	class PickupSummaryController;
-
 	class HudController
 	{
 	public:
