@@ -16,10 +16,11 @@
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
-// ItemFlags[0]:	   Rotation speed and heading angle.
-// ItemFlags[1]:	   Has reached a new sector and can unblock the one behind it. Unused but reserved just in case.
-// ItemFlags[2]:	   Movement velocity.
-// ItemFlags[3, 4, 5]: Counters for dynamic lights and sparks.
+// ItemFlags[0]:		Rotation speed and heading angle.
+// ItemFlags[1]:		Has reached a new sector and can unblock the one behind it. Unused but reserved just in case.
+// ItemFlags[2]:		Movement velocity.
+// ItemFlags[3, 4, 5]:	Counters for dynamic lights and sparks.
+// ItemFlags[6]:		Goal direction angle.
 
 // OCB:
 // 0:			  Stop after killing the player.
@@ -44,6 +45,7 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 		item.ItemFlags[1] = 0;
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
+		item.ItemFlags[6] = item.Pose.Orientation.y;
 		item.Collidable = true;
 	}
 
@@ -51,246 +53,127 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		float rotationVel = item.ItemFlags[0];
+		float moveVel = item.ItemFlags[2];
+		float goalAngle = TO_RAD(item.ItemFlags[6]);
+		float angleDifference = abs(goalAngle - TO_RAD(item.Pose.Orientation.y));
+
 		if (!TriggerActive(&item))
 		{
-			if (item.ItemFlags[2])
+			if (moveVel > 0)
 			{
-				item.ItemFlags[2] = 0;
+				moveVel = 0;
 				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
 			}
 
 			return;
 		}
 
-		if (!item.ItemFlags[2])
+		if (moveVel <= 0)
 			return;
 
-		// Not facing a quadrant; keep turning.
-		if (item.Pose.Orientation.y & 0x3FFF)
+		bool flagDoDetection		= ((item.ItemFlags[1] & (1 << 0)) != 0);
+		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagAntiClockWiseOrder		= ((item.ItemFlags[1] & (1 << 2)) != 0);
+		//bool flagNoStopAfterKill	= ((item.ItemFlags[1] & (1 << 3)) != 0); //used in collision function.
+		//bool flagSmoothTurns		= ((item.ItemFlags[1] & (1 << 4)) != 0); //unused
+
+		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+		float pitch = TO_RAD(item.Pose.Orientation.x);
+		float yaw = TO_RAD(item.Pose.Orientation.y);
+
+		Vector3 ForwardDirection = Vector3(cos(pitch) * sin(yaw), -sin(pitch), cos(pitch) * cos(yaw));
+		ForwardDirection.Normalize();
+
+		Vector3 RightDirection = Vector3(cos(yaw), 0, -sin(yaw));
+		RightDirection.Normalize();
+		
+		//States
+		// o ROTATE
+		// o MOVE
+		//    > If it's on the center of the sector:
+		//	      - Test Heavy triggers
+		//        - Check and decide new direction
+		//    > else:
+		//        - Keep moving forward
+
+		//TENLog("yaw: " + std::to_string(yaw) + ", GoalAngle: " + std::to_string(item.ItemFlags[6]) + ", AngleDifference: " + std::to_string(angleDifference), LogLevel::Warning, LogConfig::All, true);
+
+		// ROTATE while it's not aligned to the goal direction.
+		if (angleDifference > TO_RAD(rotationVel))
 		{
-			item.Pose.Orientation.y += item.ItemFlags[0];
+			TENLog("ROTATING//", LogLevel::Warning, LogConfig::All, true);
+			//TODO: check if rotate right or left
+			//if ()
+			item.Pose.Orientation.y += rotationVel;
+
+			angleDifference = abs (goalAngle - TO_RAD(item.Pose.Orientation.y));
+			//TENLog("ROTATING// new orientation y: " + std::to_string(TO_RAD(item.Pose.Orientation.y)) + ", AngleDifference: " + std::to_string(angleDifference) + ", Velocity: " + std::to_string(TO_RAD(rotationVel)), LogLevel::Warning, LogConfig::All, true);
+			if (angleDifference <= TO_RAD(rotationVel))
+				item.Pose.Orientation.y = FROM_RAD(goalAngle);
 		}
 		else
 		{
-			// Do we need a new target?
-			if (NeedBlockAlignment(item))
+			if (flagDoDetection && 
+				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
+				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 			{
-				int x, y, z;
-				FloorInfo* floor;
-				ROOM_INFO* r;
-				short roomNumber;
-
-				if (item.ItemFlags[1])
-				{
-					x = item.Pose.Position.x + (BLOCK(1) * phd_sin(item.Pose.Orientation.y + ANGLE(180.0f)));
-					y = item.Pose.Position.y;
-					z = item.Pose.Position.z + (BLOCK(1) * phd_cos(item.Pose.Orientation.y + ANGLE(180.0f)));
-					roomNumber = item.RoomNumber;
-					floor = GetFloor(x, y, z, &roomNumber);
-					r = &g_Level.Rooms[roomNumber];
-					r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = false;
-					item.ItemFlags[1] = 0;
-				}
-
-				// Check where cleaner is heading and determine where to go next.
-				bool left, ahead;
-				y = item.Pose.Position.y;
-
-				switch (item.Pose.Orientation.y)
-				{
-				// Facing Z+
-				case ANGLE(0.0f):
-
-					// Check if cleaner can go left.
-					x = item.Pose.Position.x - BLOCK(1);
-					z = item.Pose.Position.z;
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, left);
-
-					// Check ahead.
-					x = item.Pose.Position.x;
-					z = item.Pose.Position.z + BLOCK(1);
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, ahead);
-
-					if (!ahead && !left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (!ahead && !left && item.ItemFlags[0] < 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
-					}
-					// Prioritize left.
-					else if (left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else
-					{
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[1] = 1;
-						item.Pose.Position.z += item.ItemFlags[2];
-						x = item.Pose.Position.x;
-						y = item.Pose.Position.y;
-						z = item.Pose.Position.z + BLOCK(1);
-						roomNumber = item.RoomNumber;
-						floor = GetFloor(x, y, z, &roomNumber);
-						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
-					}
-
-					break;
-
-				// Facing X+
-				case ANGLE(90.0f):
-					x = item.Pose.Position.x;
-					z = item.Pose.Position.z + BLOCK(1);
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, left);
-
-					x = item.Pose.Position.x + BLOCK(1);
-					z = item.Pose.Position.z;
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, ahead);
-
-					if (!ahead && !left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (!ahead && !left && item.ItemFlags[0] < 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
-					}
-					// Prioritize left.
-					else if (left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else
-					{
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[1] = 1;
-						item.Pose.Position.x += item.ItemFlags[2];
-						x = item.Pose.Position.x + BLOCK(1);
-						y = item.Pose.Position.y;
-						z = item.Pose.Position.z;
-						roomNumber = item.RoomNumber;
-						floor = GetFloor(x, y, z, &roomNumber);
-						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
-					}
-
-					break;
-
-				// Facing X-
-				case ANGLE(-90.0f):
-					x = item.Pose.Position.x;
-					z = item.Pose.Position.z - BLOCK(1);
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, left);
-
-					x = item.Pose.Position.x - BLOCK(1);
-					z = item.Pose.Position.z;
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, ahead);
-
-					if (!ahead && !left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (!ahead && !left && item.ItemFlags[0] < 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else
-					{
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[1] = 1;
-						item.Pose.Position.x -= item.ItemFlags[2];
-						x = item.Pose.Position.x - BLOCK(1);
-						y = item.Pose.Position.y;
-						z = item.Pose.Position.z;
-						roomNumber = item.RoomNumber;
-						floor = GetFloor(x, y, z, &roomNumber);
-						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
-					}
-
-					break;
-
-				// Facing Z-
-				case ANGLE(-180.0f):
-					x = item.Pose.Position.x + BLOCK(1);
-					z = item.Pose.Position.z;
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, left);
-
-					x = item.Pose.Position.x;
-					z = item.Pose.Position.z - BLOCK(1);
-					CheckCleanerHeading(item, x, y, z, item.RoomNumber, ahead);
-
-					if (!ahead && !left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y += ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (!ahead && !left && item.ItemFlags[0] < 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] -= ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else if (left && item.ItemFlags[0] > 0)
-					{
-						item.Pose.Orientation.y -= ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[0] = -ELECTRIC_CLEANER_TURN_RATE;
-					}
-					else
-					{
-						item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
-						item.ItemFlags[1] = 1;
-						item.Pose.Position.z -= item.ItemFlags[2];
-						x = item.Pose.Position.x;
-						y = item.Pose.Position.y;
-						z = item.Pose.Position.z - BLOCK(1);
-						roomNumber = item.RoomNumber;
-						floor = GetFloor(x, y, z, &roomNumber);
-						r = &g_Level.Rooms[roomNumber];
-						r->floor[((z - r->z) / BLOCK(1)) + r->xSize * ((x - r->x) / BLOCK(1))].Stopper = true;
-					}
-
-					break;
-				}
-
 				TestTriggers(&item, true);
+
+				Vector3 NewDirection;
+
+				if (flagPriorityForward)			
+				{
+					if (flagAntiClockWiseOrder)			//Forward Right Left
+						NewDirection = SearchDirections(item, ForwardDirection, RightDirection, -RightDirection);
+					else								//Forward Left Right
+						NewDirection = SearchDirections(item, ForwardDirection, -RightDirection, RightDirection);
+				}
+				else
+				{
+					if (flagAntiClockWiseOrder)			//Right Forward Left
+						NewDirection = SearchDirections(item, RightDirection, ForwardDirection, -RightDirection);
+					else								//Left Forward Right
+						NewDirection = SearchDirections(item, -RightDirection, ForwardDirection, RightDirection);
+				}
+
+				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
+					NewDirection = -ForwardDirection;
+
+				item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
+
+				//item.ItemFlags[6] = FROM_RAD (atan2(NewDirection.z, NewDirection.x)); //Why this doesn't work?
+				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
+
+				if (abs(TO_RAD(item.ItemFlags[6]) - TO_RAD(item.Pose.Orientation.y)) < 2000)
+				{
+					item.Pose.Position.y = col.Position.Floor; 
+					item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
+				}
+
+				if (item.ItemFlags[6] == -32768)
+					TENLog("Go SOUTH", LogLevel::Warning, LogConfig::All, true);
+				if (item.ItemFlags[6] == -16384)
+					TENLog("Go WEST", LogLevel::Warning, LogConfig::All, true);
+				if (item.ItemFlags[6] == 16384)
+					TENLog("Go EAST", LogLevel::Warning, LogConfig::All, true);
+				if (item.ItemFlags[6] == 32768)
+					TENLog("Go NORTH", LogLevel::Warning, LogConfig::All, true);
 			}
 			else
 			{
-				// No new target, keep updating position.
-				switch (item.Pose.Orientation.y)
-				{
-				case ANGLE(0.0f):
-					item.Pose.Position.z += item.ItemFlags[2];
-					break;
+				item.Pose.Position.y = col.Position.Floor;
 
-				case ANGLE(90.0f):
-					item.Pose.Position.x += item.ItemFlags[2];
-					break;
+				//Is not in the center of a tile, keep moving forward. 
+				item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
 
-				case ANGLE(-180.0f):
-					item.Pose.Position.z -= item.ItemFlags[2];
-					break;
-
-				case ANGLE(-90.0f):
-					item.Pose.Position.x -= item.ItemFlags[2];
-					break;
-				}
+				auto slope = col.Block->FloorSlope(0);
+				//TENLog("Slope: " + std::to_string(slope.LengthSquared()), LogLevel::Warning, LogConfig::All, true);
+				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
+					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
+				else
+					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
 			}
 		}
 
@@ -302,6 +185,76 @@ namespace TEN::Entities::Traps
 
 		SpawnElectricCleanerSparks(item);
 		CleanerToItemCollision(item);
+	}
+
+	bool IsNextSectorValid(ItemInfo& item, const Vector3& Dir)
+	{
+		GameVector detectionPoint = item.Pose.Position + Dir * BLOCK(1);
+		detectionPoint.RoomNumber = item.RoomNumber;
+
+		auto col = GetCollision(detectionPoint);
+
+		//TENLog("I'm here! Fwd: " + std::to_string(Dir.x) + "," + std::to_string(Dir.y) + "," + std::to_string(Dir.z), LogLevel::Warning, LogConfig::All, true);
+
+		//Is a wall
+		if (col.Position.Floor == NO_HEIGHT && col.Position.Ceiling == NO_HEIGHT)
+			return false;
+
+		//TENLog("Is not a wall", LogLevel::Warning, LogConfig::All, true);
+
+		//Is a 1 click step (higher or lower).
+		int distanceToFloor = abs (col.Position.Floor - item.Pose.Position.y);
+		if (distanceToFloor >= CLICK(1))
+			return false;
+
+		//TENLog("Is not a step", LogLevel::Warning, LogConfig::All, true);
+
+		//Is it a sliding slope?
+		if (col.Position.FloorSlope)
+			return false;
+
+		//TENLog("Is not a slope", LogLevel::Warning, LogConfig::All, true);
+
+		//Is diagonal floor?
+		if (col.Position.DiagonalStep)
+			return false;
+
+		//TENLog("Is not a diagonal floor", LogLevel::Warning, LogConfig::All, true);
+
+		//Is ceiling (square or diagonal) high enough?
+		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
+		int cleanerHeight = 1024; //TODO change it for the collision bounding box height.
+		if (distanceToCeiling <= cleanerHeight)
+			return false;
+
+		//TENLog("Is not the ceiling", LogLevel::Warning, LogConfig::All, true);
+
+		//Is a non walkable tile or box?
+		//if (col.Block->Box)
+			//return false;
+
+		//TENLog("Is not a BOX", LogLevel::Warning, LogConfig::All, true);
+
+		//Is a stopper tile?
+		if (col.Block->Stopper)
+			return false;
+		
+		//TENLog("Is not a stopper so is a valid one!!!", LogLevel::Warning, LogConfig::All, true);
+
+		//If nothing of that happened, then it must be a valid sector.
+		return true;
+	}
+
+	Vector3 SearchDirections(ItemInfo& item, const Vector3& Dir1, const Vector3& Dir2, const Vector3& Dir3)
+	{
+		if (IsNextSectorValid(item, Dir1))
+			return Dir1;
+		if (IsNextSectorValid(item, Dir2))
+			return Dir2;
+		if (IsNextSectorValid(item, Dir3))
+			return Dir3;
+
+		return Vector3::Zero;
 	}
 
 	void ElectricCleanerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -320,24 +273,6 @@ namespace TEN::Entities::Traps
 
 			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
 		}
-	}
-
-	// Checks if the cleaner is in the centre of a block and facing the proper direction.
-	bool NeedBlockAlignment(const ItemInfo& item)
-	{
-		if ((item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f) &&
-			(item.Pose.Orientation.y == ANGLE(0.0f) || item.Pose.Orientation.y == ANGLE(180.0f)))
-		{
-			return true;
-		}
-
-		if ((item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
-			(item.Pose.Orientation.y == ANGLE(90.0f) || item.Pose.Orientation.y == ANGLE(-90.0f)))
-		{
-			return true;
-		}
-
-		return false;
 	}
 
 	bool CheckObjectAhead(ItemInfo& item)

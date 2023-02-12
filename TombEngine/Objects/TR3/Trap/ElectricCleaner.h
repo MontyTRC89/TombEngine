@@ -9,7 +9,9 @@ namespace TEN::Entities::Traps
 	void ElectricCleanerControl(short itemNumber);
 	void ElectricCleanerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
-	bool NeedBlockAlignment(const ItemInfo& item);
+	bool IsNextSectorValid(ItemInfo& item, const Vector3& Dir);
+	Vector3 SearchDirections(ItemInfo& item, const Vector3& Dir1, const Vector3& Dir2, const Vector3& Dir3);
+
 	bool CheckObjectAhead(ItemInfo& item);
 	void CheckCleanerHeading(ItemInfo& item, int x, int y, int z, short roomNumber, bool& heading);
 	void CleanerToItemCollision(ItemInfo& item);
