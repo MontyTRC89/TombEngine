@@ -16,7 +16,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Bubble
 {
-	constexpr auto BUBBLE_COUNT_MAX		   = 1024;
+	constexpr auto BUBBLE_COUNT_MAX		   = 512;
 	constexpr auto BUBBLE_LIFE_MAX		   = 30.0f;
 	constexpr auto BUBBLE_SIZE_MAX		   = BLOCK(0.5f);
 	constexpr auto BUBBLE_OPACTY_MAX	   = 0.8f;
