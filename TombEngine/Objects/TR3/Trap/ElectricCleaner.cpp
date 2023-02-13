@@ -3,14 +3,14 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
-#include "Game/effects/debris.h"
-#include "Game/effects/effects.h"
+//#include "Game/effects/debris.h"
+//#include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
-#include "Specific/level.h"
+//#include "Math/Math.h"
+//#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
@@ -38,6 +38,8 @@ namespace TEN::Entities::Traps
 
 	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
+	std::vector <ItemInfo*> MyPushablesList = {};
+
 	void InitialiseElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -57,6 +59,8 @@ namespace TEN::Entities::Traps
 			item.ItemFlags[1] &= ~(1 << 4);	// Turn off 1st bit for flagStopAfterKill.
 		else
 			item.ItemFlags[1] |= (1 << 4);	// Turn on 1st bit for flagStopAfterKill.
+
+		CollectLevelPushables(MyPushablesList);
 	}
 
 	void ElectricCleanerControl(short itemNumber)
@@ -258,6 +262,10 @@ namespace TEN::Entities::Traps
 		if (col.Block->Stopper)
 			return false;
 
+		//Is there a pushable block?
+		if (CheckPushableList(MyPushablesList, detectionPoint.ToVector3()))
+			return false;
+
 		//If nothing of that happened, then it must be a valid sector.
 		return true;
 	}
@@ -382,4 +390,37 @@ namespace TEN::Entities::Traps
 			}
 		}
 	}
+
+	//TODO method to detect pushables while Pushable_Object get refactored.
+
+	void CollectLevelPushables(std::vector <ItemInfo* >& PushablesList)
+	{
+		for (int index = 0; index < g_Level.Items.size(); index++)
+		{
+			ItemInfo* currentItem = &g_Level.Items[index];
+			if (currentItem->ObjectNumber >= (ID_PUSHABLE_OBJECT1) &&
+				currentItem->ObjectNumber <= (ID_PUSHABLE_OBJECT10))
+				PushablesList.push_back(currentItem);
+		}
+	}
+
+	bool CheckPushableList(std::vector <ItemInfo* >& PushablesList, Vector3& refPoint)
+	{
+		auto pushableDistance = INFINITE;
+		for (int index = 0; index < PushablesList.size(); index++)
+		{
+			ItemInfo* currentObj = PushablesList[index];
+			
+			if (currentObj == nullptr)
+				continue;
+
+			Vector3 PushablePos = currentObj->Pose.Position.ToVector3();
+			auto currentDistance = Vector3::Distance(PushablePos, refPoint);
+
+			if (currentDistance < 1024)
+				return true;
+		}
+		return false;
+	}
+
 }
