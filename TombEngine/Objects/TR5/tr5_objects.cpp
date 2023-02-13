@@ -114,11 +114,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -133,12 +133,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SWAT_PLUS];
@@ -176,12 +176,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SCIENTIST];
@@ -218,12 +218,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUARD3];
@@ -240,12 +240,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -357,13 +357,13 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 26;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -433,11 +433,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUARD_LASER];
