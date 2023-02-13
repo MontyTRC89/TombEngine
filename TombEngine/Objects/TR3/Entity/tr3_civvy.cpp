@@ -39,9 +39,17 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 
-	const auto CivvyBiteRight = BiteInfo(Vector3::Zero, 13);
-	const auto CivvyBiteLeft = BiteInfo(Vector3::Zero, 10);
-	const std::vector<unsigned int> CivvyAttackJoints = { 10, 13 };
+	struct CivvyBiteStruct
+	{
+		unsigned int RightPunch = 13;
+		unsigned int LeftPunch = 10;
+	};
+	
+	CivvyBiteStruct CivvyBitesMeshes;
+
+	const auto CivvyBiteRight = BiteInfo(Vector3::Zero, CivvyBitesMeshes.RightPunch);
+	const auto CivvyBiteLeft = BiteInfo(Vector3::Zero, CivvyBitesMeshes.LeftPunch);
+	const auto CivvyAttackJoints = std::vector<unsigned int>{ CivvyBitesMeshes.LeftPunch, CivvyBitesMeshes.RightPunch };
   
 	std::vector<GAME_OBJECT_ID> CivvyExcludedTargets =
 	{
