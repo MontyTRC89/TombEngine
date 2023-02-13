@@ -1543,13 +1543,13 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
 				DoDamage(&target, INT_MAX);
+
+				return;
 			}
 			else
-			{
 				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
-				DoItemHit(&target, damage, isExplosive);
-			}
 		}
-	}
 
+		DoItemHit(&target, damage, isExplosive);
+	}
 }
