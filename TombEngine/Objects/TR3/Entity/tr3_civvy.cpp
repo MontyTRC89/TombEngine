@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 
 #include "Specific/level.h"
