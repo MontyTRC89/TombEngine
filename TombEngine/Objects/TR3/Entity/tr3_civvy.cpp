@@ -11,7 +11,6 @@
 #include "Game/people.h"
 #include "Math/Random.h"
 #include "Sound/sound.h"
-#include "Math/Math.h"
 
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -127,9 +126,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		ItemInfo* result = nullptr;
 
-		auto closetsDistance = FLT_MAX;
+		auto closestDistance = FLT_MAX;
 		float distanceValue;
-		float MaxRange = rangeDetection <= 0 ? FLT_MAX : rangeDetection;
+		float maxRange = rangeDetection <= 0 ? FLT_MAX : rangeDetection;
 
 		for (auto& targetCreature : ActiveCreatures)
 		{
@@ -159,9 +158,9 @@ namespace TEN::Entities::Creatures::TR3
 			//If it's closer than other entity, choose this one.
 			distanceValue = Vector3i::Distance(item.Pose.Position, currentItem.Pose.Position);
 
-			if (distanceValue < closetsDistance && distanceValue < MaxRange)
+			if (distanceValue < closestDistance && distanceValue < maxRange)
 			{
-				closetsDistance = distanceValue;
+				closestDistance = distanceValue;
 				result = &currentItem;
 			}
 		}
@@ -459,7 +458,7 @@ namespace TEN::Entities::Creatures::TR3
 						else
 						{
 							float distance = Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position);
-							if (distance <= CLICK(2))
+							if (distance <= BLOCK(0.5))
 								creature.Flags = 2;
 						}
 
