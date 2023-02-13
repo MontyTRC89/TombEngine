@@ -242,7 +242,7 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 1, joint1);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 
-		auto radius = Vector2(object->radius, object->radius * 1.33f);
+		auto radius = Vector2(object->radius, object->radius);
 		AlignEntityToSurface(item, radius);
 	}
 }
