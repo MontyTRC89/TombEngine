@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/Ripple.h"
@@ -27,6 +27,7 @@
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
@@ -1020,7 +1021,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; // Splash texture.
 				splash.spriteSequenceEnd = 7; // Splash texture.
-				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
+				splash.animationSpeed = fmin(0.6f, (1 / splash.outerRadVel) * 2);
 
 				numSplashesSetup++;
 			}
@@ -1032,15 +1033,9 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
-	Pose soundPosition;
-	soundPosition.Position.x = setup->x;
-	soundPosition.Position.y = setup->y;
-	soundPosition.Position.z = setup->z;
-	soundPosition.Orientation.y = 0;
-	soundPosition.Orientation.x = 0;
-	soundPosition.Orientation.z = 0;
+	SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
 
+	auto soundPosition = Pose(Vector3i(setup->x, setup->y, setup->z));
 	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
 }
 

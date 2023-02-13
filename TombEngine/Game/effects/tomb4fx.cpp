@@ -8,7 +8,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/weather.h"
