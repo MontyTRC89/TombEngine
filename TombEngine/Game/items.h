@@ -61,8 +61,8 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
-	Custom,
-	Cadaver
+	Cadaver,
+	Custom
 };
 
 struct EntityAnimationData

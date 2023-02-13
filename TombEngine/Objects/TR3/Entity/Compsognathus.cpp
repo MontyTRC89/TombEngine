@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_compies.h"
+#include "Objects/TR3/Entity/Compsognathus.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -106,20 +106,20 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				float minDistance = INFINITY;
 
-				int i;
-				ItemInfo* targetItem;
-				for (i = 0, targetItem = &g_Level.Items[0]; i < g_Level.NumItems; i++, targetItem++)
+				//int i;
+				//ItemInfo* targetItem;
+				for (auto& targetItem : g_Level.Items)
 				{
-					if (targetItem->ObjectNumber == NO_ITEM || targetItem->Index == itemNumber || targetItem->RoomNumber == NO_ROOM)
+					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
 
-					if (SameZone(creature, targetItem) )
+					if (SameZone(creature, &targetItem) )
 					{
-						int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
+						int distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
 
-						if (distance < minDistance && targetItem->Effect.Type == EffectType::Cadaver)
+						if (distance < minDistance && targetItem.Effect.Type == EffectType::Cadaver)
 						{
-							cadaverCoordinates = Vector3(targetItem->Pose.Position.x, targetItem->Pose.Position.y, targetItem->Pose.Position.z);
+							cadaverCoordinates = Vector3(targetItem.Pose.Position.x, targetItem.Pose.Position.y, targetItem.Pose.Position.z);
 							minDistance = distance;
 							item->ItemFlags[1] = ATTACK_CADAVER;							
 						}
@@ -138,7 +138,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				int dx = cadaverCoordinates.x - item->Pose.Position.x;
 				int dz = cadaverCoordinates.z - item->Pose.Position.z;
-				AI.distance = (dx * dx) + (dz * dz);
+				AI.distance = SQUARE(dx) + SQUARE(dz);
 				AI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 				AI.ahead = (AI.angle > -FRONT_ARC && AI.angle < FRONT_ARC);
 			}
@@ -303,25 +303,39 @@ namespace TEN::Entities::Creatures::TR3
 
 				creature->MaxTurn = COMPSOGNATHUS_RUN_TURN;
 
-				if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG) && (item->TouchBits.Test(CompyAttackJoints) && item->ItemFlags[1] == ATTACK_LARA))
+				if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG))
 				{
-					creature->Flags |= COMPSOGNATHUS_HIT_FLAG;
+					switch (item->ItemFlags[1])
+					{
+					case ATTACK_LARA:
 
-					DoDamage(creature->Enemy, COMPSOGNATHUS_ATTACK_DAMAGE);
-					LaraItem->HitStatus = 1;
-					CreatureEffect(item, CompyBite, DoBloodSplat);
-				}
-				else if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG) && AI.distance < COMPSOGNATHUS_ATTACK_RANGE && AI.ahead && item->ItemFlags[1] == ATTACK_CADAVER)
-				{
-					creature->Flags |= COMPSOGNATHUS_HIT_FLAG;				
-					CreatureEffect(item, CompyBite, DoBloodSplat);
+						if (item->TouchBits.Test(CompyAttackJoints))
+						{
+							creature->Flags |= COMPSOGNATHUS_HIT_FLAG;
+
+							DoDamage(creature->Enemy, COMPSOGNATHUS_ATTACK_DAMAGE);
+							CreatureEffect(item, CompyBite, DoBloodSplat);
+						}
+
+						break;
+
+					case ATTACK_CADAVER:
+
+						if (AI.distance < COMPSOGNATHUS_ATTACK_RANGE && AI.ahead)
+						{
+							creature->Flags |= COMPSOGNATHUS_HIT_FLAG;
+							CreatureEffect(item, CompyBite, DoBloodSplat);
+						}
+
+						break;
+					}
 				}
 
 				break;
 			}
 		}
-		tilt = angle >> 1;
-		CreatureTilt(item, tilt);
+
+		CreatureTilt(item, angle >> 1);
 		CreatureJoint(item, 0, head);
 		CreatureJoint(item, 1, neck);
 
