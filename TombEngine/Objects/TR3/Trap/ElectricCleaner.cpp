@@ -17,7 +17,12 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
 // ItemFlags[0]:		Rotation speed and heading angle.
-// ItemFlags[1]:		Has reached a new sector and can unblock the one behind it. Unused but reserved just in case.
+// ItemFlags[1]:		Flags, each bit is used to check the status of a flag
+//						b0: flagDoDetection
+//						b1: flagTurnRight
+//						b2: flagPriorityForward
+//						b3: flagAntiClockWiseOrder
+//						b4: flagStopAfterKill - If true the cleaner will stop when kills Lara.
 // ItemFlags[2]:		Movement velocity.
 // ItemFlags[3, 4, 5]:	Counters for dynamic lights and sparks.
 // ItemFlags[6]:		Goal direction angle.
