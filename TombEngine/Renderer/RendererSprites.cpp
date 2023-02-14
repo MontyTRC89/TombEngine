@@ -20,13 +20,17 @@ namespace TEN::Renderer
 		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD;
 		spr.Sprite = sprite;
 		spr.pos = pos;
-		spr.color = color;
 		spr.Rotation = rotation;
 		spr.Scale = scale;
 		spr.Width = size.x;
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.SoftParticle = softParticles;
+		spr.c1 = color;
+		spr.c2 = color;
+		spr.c3 = color;
+		spr.c4 = color;
+		spr.color = color;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -47,7 +51,6 @@ namespace TEN::Renderer
 		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM;
 		spr.Sprite = sprite;
 		spr.pos = pos;
-		spr.color = color;
 		spr.Rotation = rotation;
 		spr.Scale = scale;
 		spr.Width = size.x;
@@ -55,6 +58,11 @@ namespace TEN::Renderer
 		spr.BlendMode = blendMode;
 		spr.ConstrainAxis = constrainAxis;
 		spr.SoftParticle = softParticles;
+		spr.c1 = color;
+		spr.c2 = color;
+		spr.c3 = color;
+		spr.c4 = color;
+		spr.color = color;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -73,7 +81,6 @@ namespace TEN::Renderer
 		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT;
 		spr.Sprite = sprite;
 		spr.pos = pos;
-		spr.color = color;
 		spr.Rotation = rotation;
 		spr.Scale = scale;
 		spr.Width = size.x;
@@ -81,6 +88,11 @@ namespace TEN::Renderer
 		spr.BlendMode = blendMode;
 		spr.LookAtAxis = lookAtAxis;
 		spr.SoftParticle = softParticles;
+		spr.c1 = color;
+		spr.c2 = color;
+		spr.c3 = color;
+		spr.c4 = color;
+		spr.color = color;
 
 		view.spritesToDraw.push_back(spr);
 

@@ -1095,6 +1095,7 @@ namespace TEN::Renderer
 				face.info.sprite = &spr;
 				face.distance = distance;
 				face.info.world = GetWorldMatrixForSprite(&spr, view);
+				face.info.blendMode = spr.BlendMode;
 
 				for (int j = 0; j < view.roomsToDraw.size(); j++)
 				{

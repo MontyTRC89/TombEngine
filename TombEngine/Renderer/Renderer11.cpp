@@ -117,7 +117,7 @@ namespace TEN::Renderer
 			Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
 
 		};
-		const float HUD_BORDER_WIDTH = borderSize * (REFERENCE_RES_WIDTH / REFERENCE_RES_HEIGHT);
+		const float HUD_BORDER_WIDTH = borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
 		const float HUD_BORDER_HEIGT = borderSize;
 		array<Vector3, 16> barBorderVertices = {
 			//top left
@@ -396,35 +396,35 @@ namespace TEN::Renderer
 			switch (blendMode)
 			{
 			case BLENDMODE_ALPHABLEND:
-				m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_ALPHATEST:
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_OPAQUE:
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_SUBTRACTIVE:
-				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_ADDITIVE:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Additive(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_SCREEN:
-				m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_screenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_LIGHTEN:
-				m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_lightenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_EXCLUDE:
-				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_excludeBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 			}
 
@@ -445,7 +445,6 @@ namespace TEN::Renderer
 		default:
 			SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 			break;
-
 		}
 	}
 

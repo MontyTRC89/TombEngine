@@ -7,7 +7,9 @@
 
 #include "Game/items.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
+#include "Game/Hud/PickupSummary.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Specific/level.h"
@@ -54,6 +56,7 @@ struct RendererRectangle;
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Gui;
+using namespace TEN::Hud;
 
 namespace TEN::Renderer
 {
@@ -245,8 +248,9 @@ namespace TEN::Renderer
 
 	struct RendererLine2D
 	{
-		Vector2 Vertices[2];
-		Vector4 Color;
+		Vector2 Origin = Vector2::Zero;
+		Vector2 Target = Vector2::Zero;
+		Vector4 Color  = Vector4::Zero;
 	};
 
 	struct RendererRect2D
@@ -460,9 +464,6 @@ namespace TEN::Renderer
 
 		// A flag to prevent extra renderer object addition
 		bool m_Locked = false;
-		
-		// Misc
-		int m_pickupRotation = 0;
 
 		// Caching state changes
 		TextureBase* lastTexture;
@@ -683,19 +684,19 @@ namespace TEN::Renderer
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
-		void DrawPickup(short objectNum);
+		void DrawPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
+		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
-		void GetLaraBonePosition(Vector3* pos, int bone);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
-		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
+		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color);
 		void AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 		void AddBox(Vector3 min, Vector3 max, Vector4 color);
 		void AddBox(Vector3* corners, Vector4 color);
@@ -707,14 +708,17 @@ namespace TEN::Renderer
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits = NO_JOINT_BITS);
+		void DrawObjectOn2DPosition(int objectNumber, Vector2 pos, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		void DrawWakeFX(RenderView& view);
 		std::string GetDefaultAdapterName();
+
+		Vector2i GetScreenResolution() const;
+		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
+		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 	};
 
 	extern Renderer11 g_Renderer;

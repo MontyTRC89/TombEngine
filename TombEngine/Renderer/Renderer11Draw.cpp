@@ -14,7 +14,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
@@ -31,6 +31,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Hud;
 
 extern TEN::Renderer::RendererHUDBar* g_HealthBar;
 extern TEN::Renderer::RendererHUDBar* g_AirBar;
@@ -385,38 +386,29 @@ namespace TEN::Renderer
 
 		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
-		Matrix world = Matrix::CreateOrthographicOffCenter(0, m_screenWidth, m_screenHeight, 0, m_viewport.MinDepth,
-														   m_viewport.MaxDepth);
+		auto worldMatrix = Matrix::CreateOrthographicOffCenter(0, m_screenWidth, m_screenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		m_primitiveBatch->Begin();
 
-		for (int i = 0; i < m_lines2DToDraw.size(); i++)
+		for (const auto& line : m_lines2DToDraw)
 		{
-			RendererLine2D* line = &m_lines2DToDraw[i];
-
-			RendererVertex v1;
-			v1.Position.x = line->Vertices[0].x;
-			v1.Position.y = line->Vertices[0].y;
+			auto v1 = RendererVertex();
+			v1.Position.x = line.Origin.x;
+			v1.Position.y = line.Origin.y;
 			v1.Position.z = 1.0f;
-			v1.Color.x = line->Color.x / 255.0f;
-			v1.Color.y = line->Color.y / 255.0f;
-			v1.Color.z = line->Color.z / 255.0f;
-			v1.Color.w = line->Color.w / 255.0f;
+			v1.Color = line.Color;
 
-			RendererVertex v2;
-			v2.Position.x = line->Vertices[1].x;
-			v2.Position.y = line->Vertices[1].y;
+			auto v2 = RendererVertex();
+			v2.Position.x = line.Target.x;
+			v2.Position.y = line.Target.y;
 			v2.Position.z = 1.0f;
-			v2.Color.x = line->Color.x / 255.0f;
-			v2.Color.y = line->Color.y / 255.0f;
-			v2.Color.z = line->Color.z / 255.0f;
-			v2.Color.w = line->Color.w / 255.0f;
+			v2.Color = line.Color;
 
-			v1.Position = Vector3::Transform(v1.Position, world);
-			v2.Position = Vector3::Transform(v2.Position, world);
+			v1.Position = Vector3::Transform(v1.Position, worldMatrix);
+			v2.Position = Vector3::Transform(v2.Position, worldMatrix);
 
 			v1.Position.z = 0.5f;
 			v2.Position.z = 0.5f;
@@ -1098,7 +1090,7 @@ namespace TEN::Renderer
 							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
 						}
 						else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
-							(oldFace->info.sprite->BlendMode != face->info.sprite->BlendMode 
+							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
 								|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
 								|| m_transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
@@ -1547,8 +1539,9 @@ namespace TEN::Renderer
 		// Draw GUI stuff at the end
 		DrawLines2D();
 
-		// Bars
-		DrawHUD(LaraItem);
+		// Draw HUD.
+		g_Hud.Draw();
+		DrawHud(LaraItem);
 
 		// Draw binoculars or lasersight
 		DrawOverlays(view); 

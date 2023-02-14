@@ -13,7 +13,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/effects/simple_particle.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/camera.h"
 #include "Game/animation.h"
 #include "Math/Random.h"

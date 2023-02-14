@@ -33,8 +33,8 @@ using namespace TEN::Utils;
 namespace TEN::Gui
 {
 	constexpr int LINE_HEIGHT = 25;
-	constexpr int PHD_CENTER_X = REFERENCE_RES_WIDTH / 2;
-	constexpr int PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
+	constexpr int PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
+	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
 
 	constexpr int VOLUME_MAX = 100;
 
@@ -2486,12 +2486,14 @@ namespace TEN::Gui
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 					else
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 				}
 				else
-					g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+				{
+					g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+				}
 
 				xPos += OBJLIST_SPACING;
 			}
@@ -2775,9 +2777,9 @@ namespace TEN::Gui
 
 					int objectNumber;
 					if (ringIndex == (int)RingTypes::Inventory)
-						objectNumber = int(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
+						objectNumber = int(PHD_CENTER_Y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
 					else
-						objectNumber = int(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
+						objectNumber = int(PHD_CENTER_Y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
 
 					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
@@ -2830,7 +2832,7 @@ namespace TEN::Gui
 				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
 				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
 
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, orientation, scaler, bits);
+				g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
@@ -3043,7 +3045,7 @@ namespace TEN::Gui
 		// TODO
 		return;
 
-		g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
+		g_Renderer.DrawObjectOn2DPosition(ID_COMPASS_ITEM, Vector2(130, 480), EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
 		short compassSpeed = phd_sin(CompassNeedleAngle - item->Pose.Orientation.y);
 		short compassAngle = (item->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
 		Matrix::CreateRotationY(compassAngle);
