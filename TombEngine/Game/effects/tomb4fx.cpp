@@ -1066,23 +1066,6 @@ void AddWaterSparks(int x, int y, int z, int num)
 	}
 }
 
-void LaraBubbles(ItemInfo* item)
-{
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
-
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	auto pos = Vector3::Zero;
-
-	if (level->GetLaraType() == LaraType::Divesuit)
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3();
-	else
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
-
-	int numBubbles = Random::GenerateInt(0, 3);
-	for (int i = 0; i < numBubbles; i++)
-		SpawnBubble(pos, item->RoomNumber);
-}
-
 void SomeSparkEffect(int x, int y, int z, int count)
 {
 	for (int i = 0; i < count; i++)

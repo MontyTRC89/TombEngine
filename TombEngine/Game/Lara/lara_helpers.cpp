@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -219,6 +220,23 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	}
 }
 
+void HandlePlayerAirBubbles(ItemInfo* item)
+{
+	constexpr auto BUBBLE_COUNT_MAX = 3;
+
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
+
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+	
+	auto pos = (level.GetLaraType() == LaraType::Divesuit) ?
+		GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3() :
+		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
+
+	unsigned int bubbleCount = Random::GenerateInt(0, BUBBLE_COUNT_MAX);
+	for (int i = 0; i < bubbleCount; i++)
+		SpawnBubble(pos, item->RoomNumber);
+}
+
 // TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
@@ -229,7 +247,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	constexpr auto EASING_ALPHA		  = 0.35f;
 	constexpr auto CONSTANT_THRESHOLD = STEPUP_HEIGHT / 2;
 
-	// Check for walls.
+	// Check for wall.
 	if (height == NO_HEIGHT)
 		return;
 
@@ -254,7 +272,9 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
 	}
 	else
+	{
 		item->Pose.Position.y += height;
+	}
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.

@@ -15,6 +15,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
+void HandlePlayerAirBubbles(ItemInfo* item);
 
 void EaseOutLaraHeight(ItemInfo* item, int height);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);

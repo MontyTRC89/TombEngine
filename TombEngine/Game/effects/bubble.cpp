@@ -2,6 +2,7 @@
 #include "Game/effects/Bubble.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
@@ -12,6 +13,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Bubble
@@ -148,22 +150,28 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z, bubble.RoomNumber);
+			// Update room number. TODO: Should use GetCollision(), but calling the function for each bubble may be inefficient.
+			auto roomVector = ROOM_VECTOR{ bubble.RoomNumber, int(bubble.Position.y - bubble.Gravity) };
+			int roomNumber = GetRoom(roomVector, bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z).roomNumber;
+			int prevRoomNumber = bubble.RoomNumber;
+			bubble.RoomNumber = roomNumber;
 
-			// Hit floor or ceiling; set to despawn.
-			if ((bubble.Position.y - bubble.Gravity) >= pointColl.Position.Floor ||
-				(bubble.Position.y - bubble.Gravity) <= pointColl.Position.Ceiling)
+			// Out of water.
+			if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			{
-				bubble.Life = 0.0f;
-				continue;
-			}
+				auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z, bubble.RoomNumber);
 
-			// Hit water surface; spawn ripple.
-			if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
-			{
+				// Hit floor or ceiling; set to despawn.
+				if ((bubble.Position.y - bubble.Gravity) >= pointColl.Position.Floor ||
+					(bubble.Position.y - bubble.Gravity) <= pointColl.Position.Ceiling)
+				{
+					continue;
+				}
+
+				// Hit water surface; spawn ripple.
 				SpawnRipple(
-					Vector3(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z),
-					pointColl.RoomNumber,
+					Vector3(bubble.Position.x, g_Level.Rooms[prevRoomNumber].maxceiling, bubble.Position.z),
+					roomNumber,
 					((bubble.SizeMax.x + bubble.SizeMax.y) / 2) * 0.5f,
 					(int)RippleFlags::SlowFade);
 

@@ -761,7 +761,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 				(GetRandomControl() & 0x1FF) + x - 256,
 				(GetRandomControl() & 0x7F) + y - 64,
 				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber);
+			SpawnBubble(pos, roomNumber, (int)BubbleFlags::HighAmplitude);
 		}
 	}
 }
