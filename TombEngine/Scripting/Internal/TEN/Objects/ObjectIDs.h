@@ -89,7 +89,7 @@ The following constants are inside ObjID.
 	COBRA
 	MONKEY
 	WHALE
-	SMALL_DINOSAUR
+	COMPSOGNATHUS
 	FISH_EMITTER
 	RAT
 	BIG_RAT
@@ -217,7 +217,6 @@ The following constants are inside ObjID.
 	WRAITH3
 	WRAITH4
 	LARA_DOUBLE
-	COMPY
 	HYDRA
 	LASERHEAD
 	SCIENTIST
@@ -1255,7 +1254,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "COBRA", ID_COBRA },
 	{ "MONKEY", ID_MONKEY },
 	{ "WHALE", ID_WHALE },
-	{ "SMALL_DINOSAUR", ID_SMALL_DINOSAUR },
+	{ "COMPSOGNATHUS", ID_COMPSOGNATHUS },
 	{ "FISH_EMITTER", ID_FISH_EMITTER },
 	{ "RAT", ID_RAT },
 	{ "BIG_RAT", ID_BIG_RAT },
@@ -1383,7 +1382,6 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "WRAITH3", ID_WRAITH3 },
 	{ "WRAITH4", ID_WRAITH4 },
 	{ "LARA_DOUBLE", ID_LARA_DOUBLE },
-	{ "COMPY", ID_COMPY },
 	{ "HYDRA", ID_HYDRA },
 	{ "LASERHEAD", ID_LASERHEAD },
 	{ "SCIENTIST", ID_SCIENTIST },
