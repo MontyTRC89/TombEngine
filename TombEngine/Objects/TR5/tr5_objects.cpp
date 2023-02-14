@@ -198,10 +198,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUARD2];
