@@ -184,7 +184,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
-	constexpr auto BUBBLE_COUNT_MULT = 3;
+	constexpr auto BUBBLE_COUNT_MULT = 6;
 
 	auto& player = *GetLaraInfo(&item);
 
