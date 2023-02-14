@@ -153,31 +153,33 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	if (Wibble & 0xF)
 		return;
 
-	for (int i = 0; i < NUM_LARA_MESHES; i++)
+	int jointIndex = 0;
+	for (auto& node : player.Effect.DripNodes)
 	{
-		auto pos = GetJointPosition(&item, i).ToVector3();
+		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
 		auto roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		jointIndex++;
 
 		// Node underwater; set max wetness value.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
-			player.Effect.DripNodes[i] = PLAYER_DRIP_NODE_MAX;
+			node = PLAYER_DRIP_NODE_MAX;
 			continue;
 		}
 
 		// Node inactive; continue.
-		if (player.Effect.DripNodes[i] <= 0.0f)
+		if (node <= 0.0f)
 			continue;
 
 		// Spawn drip.
-		float chance = (player.Effect.DripNodes[i] / PLAYER_DRIP_NODE_MAX) / 2;
+		float chance = (node / PLAYER_DRIP_NODE_MAX) / 2;
 		if (Random::TestProbability(chance))
 		{
 			SpawnWetnessDrip(pos, item.RoomNumber);
 
-			player.Effect.DripNodes[i] -= 1.0f;
-			if (player.Effect.DripNodes[i] <= 0.0f)
-				player.Effect.DripNodes[i] = 0.0f;
+			node -= 1.0f;
+			if (node <= 0.0f)
+				node = 0.0f;
 		}
 	}
 }
@@ -188,29 +190,31 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 
 	auto& player = *GetLaraInfo(&item);
 
-	for (int i = 0; i < NUM_LARA_MESHES; i++)
+	int jointIndex = 0;
+	for (auto& node : player.Effect.BubbleNodes)
 	{
-		auto pos = GetJointPosition(&item, i).ToVector3();
+		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
 		auto roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		jointIndex++;
+
+		// Node inactive; continue.
+		if (node <= 0.0f)
+			continue;
 
 		// Node above water; continue.
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			continue;
 
-		// Node inactive; continue.
-		if (player.Effect.BubbleNodes[i] <= 0.0f)
-			continue;
-
 		// Spawn bubbles.
-		float chance = player.Effect.BubbleNodes[i] / PLAYER_BUBBLE_NODE_MAX;
+		float chance = node / PLAYER_BUBBLE_NODE_MAX;
 		if (Random::TestProbability(chance))
 		{
-			unsigned int count = (int)round(player.Effect.BubbleNodes[i] * BUBBLE_COUNT_MULT);
+			unsigned int count = (int)round(node * BUBBLE_COUNT_MULT);
 			SpawnDiveBubbles(pos, roomNumber, count);
 
-			player.Effect.BubbleNodes[i] -= 1.0f;
-			if (player.Effect.BubbleNodes[i] <= 0.0f)
-				player.Effect.BubbleNodes[i] = 0.0f;
+			node -= 1.0f;
+			if (node <= 0.0f)
+				node = 0.0f;
 		}
 	}
 }
