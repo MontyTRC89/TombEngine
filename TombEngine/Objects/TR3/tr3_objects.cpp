@@ -343,7 +343,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_SMALL_DINOSAUR];
+	obj = &Objects[ID_COMPSOGNATHUS];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCompsognathus;
