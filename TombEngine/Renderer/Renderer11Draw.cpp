@@ -1098,7 +1098,7 @@ namespace TEN::Renderer
 							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
 						}
 						else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
-							(oldFace->info.sprite->BlendMode != face->info.sprite->BlendMode 
+							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
 								|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
 								|| m_transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
