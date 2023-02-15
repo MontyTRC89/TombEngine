@@ -31,7 +31,7 @@ namespace TEN::Hud
 	{
 	private:
 		// Components
-		std::vector<DisplayPickup> DisplayPickups = {};
+		std::deque<DisplayPickup> DisplayPickups = {};
 
 	public:
 		// Utilities
