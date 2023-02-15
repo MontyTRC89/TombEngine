@@ -19,6 +19,7 @@ using namespace TEN::Math;
 namespace TEN::Effects::Bubble
 {
 	constexpr auto BUBBLE_COUNT_MAX		   = 1024;
+	constexpr auto BUBBLE_COLOR_WHITE	   = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	constexpr auto BUBBLE_LIFE_MAX		   = 30.0f;
 	constexpr auto BUBBLE_SIZE_MAX		   = BLOCK(0.5f);
 	constexpr auto BUBBLE_OPACTY_MAX	   = 0.8f;
@@ -46,14 +47,11 @@ namespace TEN::Effects::Bubble
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
+		bubble.Color = BUBBLE_COLOR_WHITE;
 
 		bubble.Size =
 		bubble.SizeMax = Vector2(size);
 		bubble.SizeMin = bubble.Size * 0.7f;
-
-		bubble.Color =
-		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
-		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		bubble.Amplitude = Random::GenerateDirection() * amplitude;
 		bubble.WavePeriod = Vector3::Zero;
@@ -63,6 +61,7 @@ namespace TEN::Effects::Bubble
 			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
 		
 		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
+		bubble.OpacityStart = Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX);
 		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, size / BUBBLE_SIZE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, size);
 		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, size / BUBBLE_SIZE_MAX);
@@ -115,14 +114,11 @@ namespace TEN::Effects::Bubble
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
+		bubble.Color = BUBBLE_COLOR_WHITE;
 
 		bubble.Size =
 		bubble.SizeMax = Vector2(size);
 		bubble.SizeMin = bubble.Size * 0.7f;
-
-		bubble.Color =
-		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
-		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		bubble.Amplitude = Random::GenerateDirection() * AMPLITUDE_MAX;
 		bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
@@ -132,6 +128,7 @@ namespace TEN::Effects::Bubble
 			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
 		
 		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
+		bubble.OpacityStart = Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX);
 		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, size / BUBBLE_SIZE_MAX);
 		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, size);
 		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, size / CHAFF_BUBBLE_SIZE_MAX);
@@ -186,9 +183,10 @@ namespace TEN::Effects::Bubble
 				(bubble.SizeMin.y / 2) + ((bubble.SizeMax.y - bubble.SizeMin.y) * (0.5f + (0.5f * cos(bubble.OscillationPeriod + 1.0f)))));
 			bubble.Size *= Lerp(0.0f, 1.0f, bubble.Life / std::round(LIFE_FULL_SCALE * FPS));
 
-			// Update color.
+			// Update opacity.
 			float alpha = 1.0f - (bubble.Life / std::round(LIFE_START_FADING * FPS));
-			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
+			float opacity = Lerp(bubble.OpacityStart, 0.0f, alpha);
+			bubble.Color.w = opacity;
 
 			//  TODO: Let bubbles be affected by sinks.
 			// Update position.
