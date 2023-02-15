@@ -22,7 +22,7 @@ namespace TEN::Effects::Drip
 	constexpr auto DRIP_COUNT_MAX	= 1024;
 	constexpr auto DRIP_COLOR_WHITE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	std::deque<Drip> Drips = {};
+	std::vector<Drip> Drips = {};
 
 	void SpawnDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity)
 	{

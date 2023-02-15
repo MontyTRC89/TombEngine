@@ -184,7 +184,7 @@ extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 extern FX_INFO EffectList[NUM_EFFECTS];
 
 template <typename TEffect>
-TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
 	// Add and return new effect.
 	if (effects.size() < countMax)
@@ -209,7 +209,7 @@ TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
 }
 
 template <typename TEffect>
-void ClearInactiveEffects(std::deque<TEffect>& effects)
+void ClearInactiveEffects(std::vector<TEffect>& effects)
 {
 	effects.erase(
 		std::remove_if(

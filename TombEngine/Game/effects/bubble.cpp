@@ -27,7 +27,7 @@ namespace TEN::Effects::Bubble
 	constexpr auto BUBBLE_OSC_VELOCITY_MAX = 0.4f;
 	constexpr auto BUBBLE_OSC_VELOCITY_MIN = BUBBLE_OSC_VELOCITY_MAX / 4;
 
-	std::deque<Bubble> Bubbles = {};
+	std::vector<Bubble> Bubbles = {};
 
 	void SpawnBubble(const Vector3& pos, int roomNumber, float size, float amplitude)
 	{

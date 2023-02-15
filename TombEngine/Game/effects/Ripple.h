@@ -25,7 +25,7 @@ namespace TEN::Effects::Ripple
 		int	  Flags		   = 0;
 	};
 
-	extern std::deque<Ripple> Ripples;
+	extern std::vector<Ripple> Ripples;
 
 	void SpawnRipple(const Vector3& pos, int roomNumber, float size, int flags = 0, const Vector3& normal = Vector3::Down);
 

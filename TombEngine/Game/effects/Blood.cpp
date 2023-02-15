@@ -13,7 +13,7 @@ namespace TEN::Effects::Blood
 {
 	constexpr auto UW_BLOOD_COUNT_MAX = 512;
 
-	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
+	std::vector<UnderwaterBlood> UnderwaterBloodParticles = {};
 
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
 	{

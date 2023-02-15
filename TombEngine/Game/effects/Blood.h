@@ -16,7 +16,7 @@ namespace TEN::Effects::Blood
 		float Opacity = 0.0f;
 	};
 
-	extern std::deque<UnderwaterBlood> UnderwaterBloodParticles;
+	extern std::vector<UnderwaterBlood> UnderwaterBloodParticles;
 
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size);
 	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);

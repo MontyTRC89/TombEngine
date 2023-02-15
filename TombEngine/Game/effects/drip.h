@@ -17,7 +17,7 @@ namespace TEN::Effects::Drip
 		float Gravity = 0.0f;
 	};
 
-	extern std::deque<Drip> Drips;
+	extern std::vector<Drip> Drips;
 
 	void SpawnDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity);
 	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count, bool isSmallSplash = false);
