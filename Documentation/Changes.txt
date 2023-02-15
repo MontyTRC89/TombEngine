@@ -11,6 +11,7 @@ Version 1.0.7
 * Fix TR3 shiva not taking explosive damage (should still block with the sword).
 * Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
 * Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
+* Fix flares and torches disappearing when collecting pickups in a batch.
 * Add TR3 Sophia Leigh with following OCBs:	
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
