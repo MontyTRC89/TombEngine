@@ -45,7 +45,7 @@ extern "C"
 
 bool ArgEquals(wchar_t* incomingArg, std::string name)
 {
-	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::FromWchar(incomingArg));
+	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::ToString(incomingArg));
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
@@ -259,7 +259,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "level") && argc > (i + 1))
 		{
-			levelFile = TEN::Utils::FromWchar(argv[i + 1]);
+			levelFile = TEN::Utils::ToString(argv[i + 1]);
 		}
 		else if (ArgEquals(argv[i], "hash") && argc > (i + 1))
 		{

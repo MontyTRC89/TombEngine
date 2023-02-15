@@ -1850,10 +1850,14 @@ void ProcessEffects(ItemInfo* item)
 			if (TestProbability(1 / 32.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
+
+		case EffectType::Cadaver:
+			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
+			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke)
+	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
