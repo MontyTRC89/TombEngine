@@ -170,6 +170,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
+    <ClInclude Include="Objects\TR3\Entity\TonyBoss.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
@@ -439,7 +440,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
     <ClInclude Include="Objects\TR3\fish.h" />
@@ -649,6 +649,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\TonyBoss.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
@@ -882,7 +883,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
