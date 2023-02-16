@@ -48,12 +48,12 @@ private:
 	// "LevelFuncs.MyLevel.CoolFuncs"
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};
 
-	sol::protected_function										m_onStart{};
-	sol::protected_function										m_onLoad{};
-	sol::protected_function										m_onControlPhase{};
-	sol::protected_function										m_preSave{};
-	sol::protected_function										m_onSave{};
-	sol::protected_function										m_onEnd{};
+	sol::protected_function m_onStart{};
+	sol::protected_function m_onLoad{};
+	sol::protected_function m_onControlPhase{};
+	sol::protected_function m_preSave{};
+	sol::protected_function m_onSave{};
+	sol::protected_function m_onEnd{};
 
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
@@ -69,41 +69,41 @@ private:
 	LuaHandler m_handler;
 
 public:	
-	LogicHandler(sol::state* lua, sol::table & parent);
+	LogicHandler(sol::state* lua, sol::table& parent);
 
-	sol::protected_function_result		CallLevelFunc(std::string const &, sol::variadic_args);
-	sol::protected_function_result		CallLevelFunc(std::string const &, float dt);
+	sol::protected_function_result CallLevelFunc(const std::string&, sol::variadic_args);
+	sol::protected_function_result CallLevelFunc(const std::string&, float deltaTime);
 
-	void								FreeLevelScripts() override;
+	void FreeLevelScripts() override;
 
-	void								LogPrint(sol::variadic_args va);
-	bool								SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value);
+	void LogPrint(sol::variadic_args va);
+	bool SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value);
 
-	void								AddCallback(CallbackPoint point, LevelFunc const & lf);
-	void								RemoveCallback(CallbackPoint point, LevelFunc const & lf);
+	void AddCallback(CallbackPoint point, const LevelFunc& lf);
+	void RemoveCallback(CallbackPoint point, const LevelFunc& lf);
 
-	void								ResetScripts(bool clearGameVars) override;
-	void								ShortenTENCalls() override;
+	void ResetScripts(bool clearGameVars) override;
+	void ShortenTENCalls() override;
 
-	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& name);
+	sol::object GetLevelFuncsMember(sol::table tab, const std::string& name);
 
-	void								ExecuteScriptFile(const std::string& luaFilename) override;
-	void								ExecuteString(const std::string& command) override;
-	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator, std::string const& arguments) override;
+	void ExecuteScriptFile(const std::string& luaFilename) override;
+	void ExecuteString(const std::string& command) override;
+	void ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) override;
 
-	void								ExecuteFunction(std::string const& name, short idOne, short idTwo) override;
+	void ExecuteFunction(const std::string& name, short idOne, short idTwo) override;
 
-	void								GetVariables(std::vector<SavedVar>& vars) override;
-	void								SetVariables(std::vector<SavedVar> const& vars) override;
-	void								ResetVariables();
+	void GetVariables(std::vector<SavedVar>& vars) override;
+	void SetVariables(const std::vector<SavedVar>& vars) override;
+	void ResetVariables();
 
-	void								SetCallbackStrings(std::vector<std::string> const& preControl, std::vector<std::string> const& postControl) override;
-	void								GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const override;
+	void SetCallbackStrings(const std::vector<std::string>& preControl, const std::vector<std::string>& postControl) override;
+	void GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const override;
 
-	void								InitCallbacks() override;
-	void								OnStart() override;
-	void								OnLoad() override;
-	void								OnControlPhase(float dt) override;
-	void								OnSave() override;
-	void								OnEnd() override;
+	void InitCallbacks() override;
+	void OnStart() override;
+	void OnLoad() override;
+	void OnControlPhase(float deltaTime) override;
+	void OnSave() override;
+	void OnEnd() override;
 };

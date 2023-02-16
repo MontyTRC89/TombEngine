@@ -7,9 +7,9 @@ namespace TEN::Renderer
 	RenderTargetCubeArray::RenderTargetCubeArray(ID3D11Device* device, size_t resolution, size_t numCubes, DXGI_FORMAT colorFormat,DXGI_FORMAT depthFormat) : numCubes(numCubes), resolution(resolution), viewport(CreateViewport(resolution))
 	{
 		D3D11_TEXTURE2D_DESC desc = {};
-		desc.ArraySize = numCubes*6;
-		desc.Height = resolution;
-		desc.Width = resolution;
+		desc.ArraySize = (unsigned int)numCubes * 6;
+		desc.Height = (unsigned int)resolution;
+		desc.Width = (unsigned int)resolution;
 		desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.CPUAccessFlags = 0x0;
@@ -27,11 +27,11 @@ namespace TEN::Renderer
 		viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 		RenderTargetView.resize(numCubes);
 
-		for (int i = 0; i < numCubes - 1; i++)
+		for (int i = 0; i < (int)numCubes - 1; i++)
 		{
 			for (int j = 0; j < 6; j++)
 			{
-				viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * numCubes + j, 1);
+				viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * (unsigned int)numCubes + j, 1);
 				res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, RenderTargetView[i][j].GetAddressOf());
 				Utils::throwIfFailed(res);
 			}
@@ -39,7 +39,7 @@ namespace TEN::Renderer
 		
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = colorFormat;
-		srvDesc.TextureCubeArray.NumCubes = numCubes;
+		srvDesc.TextureCubeArray.NumCubes = (unsigned int)numCubes;
 		srvDesc.TextureCubeArray.First2DArrayFace = 0;
 		srvDesc.TextureCubeArray.MipLevels = 1;
 		srvDesc.TextureCubeArray.MostDetailedMip = 0;
@@ -47,10 +47,10 @@ namespace TEN::Renderer
 		res = device->CreateShaderResourceView(Texture.Get(), &srvDesc,ShaderResourceView.GetAddressOf());
 		Utils::throwIfFailed(res);
 		D3D11_TEXTURE2D_DESC depthTexDesc = {};
-		depthTexDesc.Width = resolution;
-		depthTexDesc.Height = resolution;
+		depthTexDesc.Width = (unsigned int)resolution;
+		depthTexDesc.Height = (unsigned int)resolution;
 		depthTexDesc.MipLevels = 1;
-		depthTexDesc.ArraySize = numCubes*6;
+		depthTexDesc.ArraySize = (unsigned int)numCubes * 6;
 		depthTexDesc.SampleDesc.Count = 1;
 		depthTexDesc.SampleDesc.Quality = 0;
 		depthTexDesc.Format = depthFormat;
@@ -68,11 +68,11 @@ namespace TEN::Renderer
 		dsvDesc.Texture2DArray.ArraySize = 1;
 		DepthStencilView.resize(numCubes);
 
-		for (int i = 0; i < numCubes - 1; i++)
+		for (int i = 0; i < (int)numCubes - 1; i++)
 		{
 			for (int j = 0; j < 6; j++)
 			{
-				dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * numCubes + j, 1);
+				dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * (unsigned int)numCubes + j, 1);
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i][j].GetAddressOf());
 				Utils::throwIfFailed(res);
 			}

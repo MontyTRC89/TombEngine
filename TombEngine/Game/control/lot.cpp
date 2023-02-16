@@ -239,7 +239,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < (int)g_Level.Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -257,7 +257,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < (int)g_Level.Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

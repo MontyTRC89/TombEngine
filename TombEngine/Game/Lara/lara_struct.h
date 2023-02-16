@@ -947,7 +947,7 @@ enum class JumpDirection
 
 struct Ammo
 {
-	using CountType = uint16_t;
+	using CountType = int;
 
 private:
 	CountType Count;
@@ -956,7 +956,7 @@ private:
 public:
 	static CountType Clamp(int value)
 	{
-		return std::clamp(value, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
+		return std::clamp(value, 0, INT_MAX);
 	}
 
 	bool HasInfinite() const
@@ -1001,13 +1001,13 @@ public:
 		return temp;
 	}
 
-	Ammo& operator =(size_t value)
+	Ammo& operator =(int value)
 	{
 		this->Count = Clamp(value);
 		return *this;
 	}
 
-	bool operator ==(size_t value)
+	bool operator ==(int value)
 	{
 		return (Count == Clamp(value));
 	}
@@ -1019,28 +1019,28 @@ public:
 		return *this;
 	}
 
-	Ammo operator +(size_t value)
+	Ammo operator +(int value)
 	{
 		auto temp = *this;
 		temp += value;
 		return temp;
 	}
 
-	Ammo operator -(size_t value)
+	Ammo operator -(int value)
 	{
 		auto temp = *this;
 		temp -= value;
 		return temp;
 	}
 
-	Ammo& operator +=(size_t value)
+	Ammo& operator +=(int value)
 	{
 		int temp = Count + value;
 		this->Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t value)
+	Ammo& operator -=(int value)
 	{
 		int temp = Count - value;
 		this->Count = Clamp(temp);

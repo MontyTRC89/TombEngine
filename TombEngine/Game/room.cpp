@@ -29,7 +29,7 @@ void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
 
-	for (size_t i = 0; i < g_Level.Rooms.size(); i++)
+	for (int i = 0; i < (int)g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
 
@@ -51,7 +51,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(room);
 
-			g_Renderer.FlipRooms(static_cast<short>(i), room->flippedRoom);
+			g_Renderer.FlipRooms((short)i, room->flippedRoom);
 
 			for (auto& fd : room->floor)
 				fd.Room = i;
@@ -256,7 +256,7 @@ std::set<int> GetRoomList(int roomNumber)
 
 void InitializeNeighborRoomList()
 {
-	for (size_t i = 0; i < g_Level.Rooms.size(); i++)
+	for (int i = 0; i < (int)g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
 

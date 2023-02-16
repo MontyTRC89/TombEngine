@@ -451,7 +451,7 @@ namespace TEN::Renderer
 			// AddLine3D(v1, v2, Vector4::One);
 		}
 
-		return moveable.ObjectMeshes.size();
+		return (int)moveable.ObjectMeshes.size();
 	}
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)

@@ -68,8 +68,8 @@ namespace TEN::Renderer::Utils
 		if constexpr(DebugBuild)
 		{
 			char buffer[100];
-			size_t sz = std::wcstombs(buffer, fileName.c_str(), 100);
-			shader->SetPrivateData(WKPDID_D3DDebugObjectName, sz, buffer);
+			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
+			shader->SetPrivateData(WKPDID_D3DDebugObjectName, size, buffer);
 		}
 
 		return shader;
@@ -86,8 +86,8 @@ namespace TEN::Renderer::Utils
 		if constexpr(DebugBuild)
 		{
 			char buffer[100];
-			size_t sz = std::wcstombs(buffer, fileName.c_str(), 100);
-			shader->SetPrivateData(WKPDID_D3DDebugObjectName, sz, buffer);
+			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
+			shader->SetPrivateData(WKPDID_D3DDebugObjectName, size, buffer);
 		}
 
 		return shader;

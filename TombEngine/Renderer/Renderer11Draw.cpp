@@ -110,7 +110,7 @@ namespace TEN::Renderer
 		else 
 		{
 			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
-			m_stShadowMap.NumSpheres = nearestSpheres.size();
+			m_stShadowMap.NumSpheres = (int)nearestSpheres.size();
 		}
 	}
 
@@ -955,11 +955,11 @@ namespace TEN::Renderer
 					  }
 		);
 
-		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
+		for (int r = (int)view.roomsToDraw.size() - 1; r >= 0; r--)
 		{
 			RendererRoom& room = *view.roomsToDraw[r];
 
-			int size = room.TransparentFacesToDraw.size();
+			int size = (int)room.TransparentFacesToDraw.size();
 			int currentBlendMode = -1;
 			int texture = -1;
 			int lastType = 0;
@@ -1269,10 +1269,10 @@ namespace TEN::Renderer
 		SetBlendMode(info->blendMode);
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
-		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
+		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, (int)m_transparentFacesIndices.size());
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1329,7 +1329,7 @@ namespace TEN::Renderer
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1653,7 +1653,7 @@ namespace TEN::Renderer
 		m_stItem.Color = item->Color;
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
-		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+		for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
 			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -1697,7 +1697,7 @@ namespace TEN::Renderer
 		m_stItem.Color = info->color;
 		m_stItem.AmbientLight = info->item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
-		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+		for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
 			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -1717,7 +1717,7 @@ namespace TEN::Renderer
 		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1784,7 +1784,7 @@ namespace TEN::Renderer
 						if (DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
 							// Collect transparent faces
-							for (int j = 0; j < bucket.Polygons.size(); j++)
+							for (int j = 0; j < (int)bucket.Polygons.size(); j++)
 							{
 								RendererPolygon* p = &bucket.Polygons[j];
 
@@ -1895,7 +1895,7 @@ namespace TEN::Renderer
 		}
 
 		m_numRoomsTransparentPolygons = 0;
-		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
+		for (int i = (int)view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];
@@ -1951,7 +1951,7 @@ namespace TEN::Renderer
 					if (DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
-						for (int j = 0; j < bucket.Polygons.size(); j++)
+						for (int j = 0; j < (int)bucket.Polygons.size(); j++)
 						{
 							RendererPolygon* p = &bucket.Polygons[j];
 
@@ -2015,7 +2015,7 @@ namespace TEN::Renderer
 
 								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
-									if (j >= m_stAnimated.Textures.size())
+									if (j >= (int)m_stAnimated.Textures.size())
 									{
 										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
 										break;
@@ -2054,7 +2054,7 @@ namespace TEN::Renderer
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
-		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
+		for (int k = 0; k < (int)renderView.roomsToDraw.size(); k++)
 		{
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->RoomNumber];
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
@@ -2172,7 +2172,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
 			{
 				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
@@ -2229,7 +2229,7 @@ namespace TEN::Renderer
 			if (DoesBlendModeRequireSorting(bucket.BlendMode))
 			{
 				// Collect transparent faces
-				for (int j = 0; j < bucket.Polygons.size(); j++)
+				for (int j = 0; j < (int)bucket.Polygons.size(); j++)
 				{
 					RendererPolygon* p = &bucket.Polygons[j];
 

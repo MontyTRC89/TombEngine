@@ -280,7 +280,7 @@ Level* FlowHandler::GetCurrentLevel()
 
 int	FlowHandler::GetNumLevels() const
 {
-	return Levels.size();
+	return (int)Levels.size();
 }
 
 int FlowHandler::GetLevelNumber(std::string const& fileName)

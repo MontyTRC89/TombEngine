@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
-				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, RaptorDeathAnims.size() - 1)]);
+				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, (int)RaptorDeathAnims.size() - 1)]);
 		}
 		else
 		{

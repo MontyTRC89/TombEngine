@@ -1091,7 +1091,7 @@ namespace TEN::Renderer
 			BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
 			// Draw sprites with instancing
-			m_context->DrawInstanced(4, spriteBucket.SpritesToDraw.size(), 0, 0);
+			m_context->DrawInstanced(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0, 0);
 
 			m_numSpritesDrawCalls++;
 			m_numInstancedSpritesDrawCalls++;
@@ -1191,7 +1191,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, (int)m_transparentFacesVertices.size());
 		  
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1211,7 +1211,7 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
-		DrawTriangles(m_transparentFacesVertices.size(), 0);
+		DrawTriangles((int)m_transparentFacesVertices.size(), 0);
 
 		m_numTransparentDrawCalls++;
 		m_numSpritesTransparentDrawCalls++;

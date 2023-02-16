@@ -46,7 +46,7 @@ namespace TEN::Renderer
 
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = quadVertices.data();
-		initData.SysMemPitch = sizeof(RendererVertex) * quadVertices.size();
+		initData.SysMemPitch = sizeof(RendererVertex) * (int)quadVertices.size();
 		Utils::throwIfFailed(device->CreateBuffer(&bufferDesc, &initData, quadVertexBuffer.GetAddressOf()));
 	}
 }

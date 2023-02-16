@@ -109,7 +109,7 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 	bool isMeshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
 							 Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
 
-	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	for (int i = 0; i < (int)Model.MeshIndex.size(); i++)
 	{
 		if (isMeshSwapPresent && (flags & (1 << i)))
 		{

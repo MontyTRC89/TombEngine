@@ -208,11 +208,11 @@ namespace TEN::Renderer
 			vertices[i].Bone = 0.0f;
 		}
 
-		InnerVertexBuffer = VertexBuffer(m_device, vertices.size(), vertices.data());
-		InnerIndexBuffer = IndexBuffer(m_device, barIndices.size(), barIndices.data());
+		InnerVertexBuffer = VertexBuffer(m_device, (int)vertices.size(), vertices.data());
+		InnerIndexBuffer = IndexBuffer(m_device, (int)barIndices.size(), barIndices.data());
 
 		array<RendererVertex, barBorderVertices.size()> verticesBorder;
-		for (int i = 0; i < barBorderVertices.size(); i++)
+		for (int i = 0; i < (int)barBorderVertices.size(); i++)
 		{
 			verticesBorder[i].Position = barBorderVertices[i];
 			verticesBorder[i].Color = Vector4(1, 1, 1, 1);
@@ -220,8 +220,8 @@ namespace TEN::Renderer
 			verticesBorder[i].Normal = Vector3(0, 0, 0);
 			verticesBorder[i].Bone = 0.0f;
 		}
-		VertexBufferBorder = VertexBuffer(m_device, verticesBorder.size(), verticesBorder.data());
-		IndexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
+		VertexBufferBorder = VertexBuffer(m_device, (int)verticesBorder.size(), verticesBorder.data());
+		IndexBufferBorder = IndexBuffer(m_device, (int)barBorderIndices.size(), barBorderIndices.data());
 	}
 
 	float Renderer11::CalculateFrameRate()

@@ -88,7 +88,7 @@ namespace TEN::Control::Volumes
 
 			VolumeState* entryPtr = nullptr;
 
-			for (int j = volume.StateQueue.size() - 1; j >= 0; j--)
+			for (int j = (int)volume.StateQueue.size() - 1; j >= 0; j--)
 			{
 				auto& candidate = volume.StateQueue[j];
 

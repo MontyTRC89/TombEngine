@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, ApeDeathAnims.size() - 1)]);
+				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, (int)ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{

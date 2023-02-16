@@ -460,7 +460,7 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				RendererRoom& currentRoom = m_rooms[roomToCheck];
-				int numLights = currentRoom.Lights.size();
+				int numLights = (int)currentRoom.Lights.size();
 
 				for (int j = 0; j < numLights; j++)
 				{
