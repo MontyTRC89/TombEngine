@@ -122,7 +122,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	static void SpawnSpearGuardianSmoke(const Vector3i& pos, int roomNumber)
+	void SpawnSpearGuardianSmoke(const Vector3i& pos, int roomNumber)
 	{
 		auto& smoke = *GetFreeParticle();
 
@@ -590,13 +590,11 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		if (target.ItemFlags[1] == 1)
 		{
-			TENLog("Immortal");
 			if (pos.has_value())
 				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
 			return;
 		}
 
-		TENLog("Hit");
 		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }

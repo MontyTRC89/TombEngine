@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_sword_guardian.h"
+#include "tr2_spear_guardian.h"
 
 #include "Game/animation.h"
 #include "collision/collide_room.h"
@@ -50,7 +51,7 @@ namespace TEN::Entities::Creatures::TR2
 		SWORD_GUARDIAN_ANIM_AWAKE = 0
 	};
 
-	static void SpawnSpearGuardianSmoke(const Vector3i& pos, int roomNumber)
+	static void SpawnFlySmoke(const Vector3i& pos, int roomNumber)
 	{
 		auto& smoke = *GetFreeParticle();
 
@@ -67,60 +68,26 @@ namespace TEN::Entities::Creatures::TR2
 		smoke.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
 		smoke.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
 		smoke.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
-
-		if (isUnderwater)
-		{
-			smoke.sR = 255;
-			smoke.sG = 255;
-			smoke.sB = 255;
-			smoke.dR = 0;
-			smoke.dG = 0;
-			smoke.dB = 0;
-		}
-		else
-		{
-			smoke.sR = 0;
-			smoke.sG = 0;
-			smoke.sB = 0;
-			smoke.dR = 255;
-			smoke.dG = 255;
-			smoke.dB = 255;
-		}
-
+		smoke.sR = 0;
+		smoke.sG = 0;
+		smoke.sB = 0;
+		smoke.dR = 255;
+		smoke.dG = 255;
+		smoke.dB = 255;
 		smoke.colFadeSpeed = 8;
 		smoke.fadeToBlack = 64;
 		smoke.sLife = smoke.life = Random::GenerateInt(72, 128);
 		smoke.extras = 0;
 		smoke.dynamic = -1;
-
-		if (isUnderwater)
-		{
-			smoke.yVel /= 16;
-			smoke.y += 32;
-			smoke.friction = 4 | 16;
-		}
-		else
-		{
-			smoke.friction = 6;
-		}
-
+		smoke.friction = 6;
 		smoke.rotAng = Random::GenerateAngle();
 		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
 		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 		smoke.scalar = 3;
+		smoke.gravity = Random::GenerateInt(-8, -4);
+		smoke.maxYvel = Random::GenerateInt(-8, -4);
 
-		if (isUnderwater)
-		{
-			smoke.gravity = 0;
-			smoke.maxYvel = 0;
-		}
-		else
-		{
-			smoke.gravity = Random::GenerateInt(-8, -4);
-			smoke.maxYvel = Random::GenerateInt(-8, -4);
-		}
-
-		int scale = Random::GenerateInt(128, 172);
+		int scale = Random::GenerateInt(100, 132);
 		smoke.size = smoke.sSize = scale / 8;
 		smoke.dSize = scale;
 	}
@@ -185,12 +152,9 @@ namespace TEN::Entities::Creatures::TR2
 
 	static void SwordGuardianFlyEffect(ItemInfo* item)
 	{
-		auto pos = Vector3i(
-			(GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128,
-			(GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256,
-			(GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128);
-
-		SpawnSpearGuardianSmoke(pos, item->RoomNumber);
+		BoundingSphere sphere(item->Pose.Position.ToVector3(), 1.0f);
+		auto pos = Random::GeneratePointInSphere(sphere);
+		SpawnFlySmoke(pos, item->RoomNumber);
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}
 
@@ -395,13 +359,11 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		if (target.ItemFlags[1] == 1)
 		{
-			TENLog("Immortal");
 			if (pos.has_value())
 				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
 			return;
 		}
 
-		TENLog("Hit");
 		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }
