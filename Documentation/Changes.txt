@@ -11,6 +11,7 @@ Version 1.0.7
 	- Taking damage in stone mode.
 	- Wrong joint id for rotating the head and torso.
 	- Spear guardian not using left and right attack spear when walking (was having wrong state id set as target).
+	- Killing move for spear used wrong value.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
