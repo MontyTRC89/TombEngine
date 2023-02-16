@@ -201,7 +201,7 @@ namespace TEN::Control::Volumes
 				nodeCatalogs.push_back(path.path().filename().string());
 		}
 
-		if (nodeCatalogs.size() == 0)
+		if (nodeCatalogs.empty())
 			return;
 
 		TENLog("Loading node scripts...", LogLevel::Info);

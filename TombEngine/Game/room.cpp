@@ -51,10 +51,11 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(room);
 
-			g_Renderer.FlipRooms((short)i, room->flippedRoom);
+			g_Renderer.FlipRooms(i, room->flippedRoom);
 
 			for (auto& fd : room->floor)
 				fd.Room = i;
+
 			for (auto& fd : flipped->floor)
 				fd.Room = room->flippedRoom;
 		}
@@ -127,10 +128,10 @@ int IsRoomOutside(int x, int y, int z)
 	int xTable = x / SECTOR(1);
 	int zTable = z / SECTOR(1);
 
-	if (OutsideRoomTable[xTable][zTable].size() == 0)
+	if (OutsideRoomTable[xTable][zTable].empty())
 		return NO_ROOM;
 
-	for (size_t i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
+	for (int i = 0; i < (int)OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
 		auto* room = &g_Level.Rooms[roomNumber];

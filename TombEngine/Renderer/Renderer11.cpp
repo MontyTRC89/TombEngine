@@ -220,6 +220,7 @@ namespace TEN::Renderer
 			verticesBorder[i].Normal = Vector3(0, 0, 0);
 			verticesBorder[i].Bone = 0.0f;
 		}
+
 		VertexBufferBorder = VertexBuffer(m_device, (int)verticesBorder.size(), verticesBorder.data());
 		IndexBufferBorder = IndexBuffer(m_device, (int)barBorderIndices.size(), barBorderIndices.data());
 	}

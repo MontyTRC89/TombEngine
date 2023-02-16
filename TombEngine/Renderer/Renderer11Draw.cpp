@@ -498,7 +498,7 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
 
-						if (bucket->Polygons.size() == 0)
+						if (bucket->Polygons.empty())
 							continue;
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
@@ -532,7 +532,7 @@ namespace TEN::Renderer
 			{
 				RendererBucket* bucket = &mesh->Buckets[b];
 
-				if (bucket->Polygons.size() == 0)
+				if (bucket->Polygons.empty())
 					continue;
 
 				for (int i = 0; i < NUM_BATS; i++)
@@ -602,7 +602,7 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
 
-						if (bucket->Polygons.size() == 0)
+						if (bucket->Polygons.empty())
 							continue;
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
@@ -652,7 +652,7 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
 
-						if (bucket->Polygons.size() == 0)
+						if (bucket->Polygons.empty())
 							continue;
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
@@ -1745,7 +1745,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		// If no static textures are loaded, don't draw anything.
-		if (m_staticsTextures.size() == 0)
+		if (m_staticsTextures.empty())
 			return;
 
 		// Bind vertex and index buffer

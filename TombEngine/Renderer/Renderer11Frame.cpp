@@ -337,12 +337,12 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() == 0)
+		if (r->mesh.empty())
 		{
 			return;
 		}
 
-		for (int i = 0; i < room.Statics.size(); i++)
+		for (int i = 0; i < (int)room.Statics.size(); i++)
 		{
 			auto* mesh = &room.Statics[i];
 			MESH_INFO* nativeMesh = &r->mesh[i];
@@ -371,7 +371,7 @@ namespace TEN::Renderer
 
 			auto& obj = *m_staticObjects[mesh->ObjectNumber];
 
-			if (obj.ObjectMeshes.size() == 0)
+			if (obj.ObjectMeshes.empty())
 			{
 				continue;
 			}

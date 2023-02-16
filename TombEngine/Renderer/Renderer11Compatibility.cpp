@@ -10,10 +10,6 @@
 #include <stack>
 #include <execution>
 
-using std::optional;
-using std::stack;
-using std::vector;
-
 namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
@@ -238,8 +234,7 @@ namespace TEN::Renderer
 							room.x + oldDoor->vertices[k].x,
 							room.y + oldDoor->vertices[k].y,
 							room.z + oldDoor->vertices[k].z,
-							1.0f
-						);
+							1.0f);
 					}
 				}
 			}
@@ -267,7 +262,7 @@ namespace TEN::Renderer
 				}
 			}
 
-			if (room.positions.size() == 0)
+			if (room.positions.empty())
 				continue;
 			
 			for (auto& levelBucket : room.buckets)
@@ -426,6 +421,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
+
 		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)roomsVertices.size(), roomsVertices.data());
 		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)roomsIndices.size(), roomsIndices.data());
 
@@ -521,7 +517,7 @@ namespace TEN::Renderer
 					{
 						int *bone = &g_Level.Bones[obj->boneIndex];
 
-						stack<RendererBone *> stack;
+						std::stack<RendererBone *> stack;
 
 						RendererBone *currentBone = moveable.LinearizedBones[0];
 						RendererBone *stackBone = moveable.LinearizedBones[0];
@@ -750,6 +746,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
+
 		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)moveablesVertices.size(), moveablesVertices.data());
 		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)moveablesIndices.size(), moveablesIndices.data());
 
@@ -849,7 +846,7 @@ namespace TEN::Renderer
 		mesh->Sphere = meshPtr->sphere;
 		mesh->LightMode = LIGHT_MODES(meshPtr->lightMode);
 
-		if (meshPtr->positions.size() == 0)
+		if (meshPtr->positions.empty())
 			return mesh;
 
 		mesh->Positions.resize(meshPtr->positions.size());
