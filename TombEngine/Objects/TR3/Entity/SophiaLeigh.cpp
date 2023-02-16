@@ -791,13 +791,13 @@ namespace TEN::Entities::Creatures::TR3
 	}
 
 
-	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int multiplicatorSquared)
+	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int multiplier)
 	{
 		for (int i = 0; i < count; i++)
 		{
 			auto* spark = GetFreeParticle();
 			auto sphere = BoundingSphere(Vector3::Zero, BLOCK(2));
-			auto mulSqr = SQUARE(multiplicatorSquared);
+			auto mulSqr = SQUARE(multiplier);
 			auto vel = Random::GeneratePointInSphere(sphere) * mulSqr;
 
 			spark->on = true;

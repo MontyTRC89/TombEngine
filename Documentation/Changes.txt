@@ -7,9 +7,9 @@ Version 1.0.7
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
 * Add TR3 Sophia Leigh with following OCBs:
-	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Sophia is not immune to damage in this mode anymore, you can do it via lua instead to customize it.
-	- 3 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor via SetLocationAI.
+	- 0 – Normal mode. Sophia behaves like a regular enemy.
+	- 1 – Tower Mode. Behaviour matched from Tomb Raider III. Sophia is not immune to damage in this mode anymore, you can do it via lua instead to customize it.
+	- 2 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor via SetLocationAI.
 * Add knockback effect from TR3 to Sophia Leigh.
 * Add Airlock_Switch object. Achieved by putting valve switch trigger and door trigger on the same sector (Valves to open doors from TR5 submarine levels).  
 * Improved behaviour of Tiger and Lion enemies. 
