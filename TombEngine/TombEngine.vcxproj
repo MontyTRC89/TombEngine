@@ -166,8 +166,10 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
     <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
@@ -435,7 +437,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
+    <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
@@ -582,7 +584,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Game\effects\hair.h" />
-    <ClInclude Include="Game\health.h" />
+    <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_one_gun.h" />
@@ -643,8 +645,10 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
@@ -865,7 +869,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_machinegun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_fish_emitter.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_flamethrower.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_shiva.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_shotgun.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
@@ -944,7 +948,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
-    <ClCompile Include="Game\health.cpp" />
+    <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_one_gun.cpp" />
