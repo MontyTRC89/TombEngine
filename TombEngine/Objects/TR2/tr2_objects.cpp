@@ -405,6 +405,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
+		obj->HitRoutine = SwordGuardianHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 80;
 		obj->pivotLength = 0;
@@ -422,6 +423,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
+		obj->HitRoutine = SpearGuardianHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->pivotLength = 0;

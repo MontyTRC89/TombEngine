@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum SwordGuardianState
 	{
-		SWORD_GUARDIAN_STATE_STOP = 1,
+		SWORD_GUARDIAN_STATE_IDLE = 1,
 		SWORD_GUARDIAN_STATE_WALK = 2,
 		SWORD_GUARDIAN_STATE_ATTACK_FRONT_AIM = 3,
 		SWORD_GUARDIAN_STATE_ATTACK_FRONT = 4,
@@ -147,10 +147,9 @@ namespace TEN::Entities::Creatures::TR2
 		// Do mesh swaps.
 		if (creature.Flags == 0)
 		{
-			switch (item.ItemFlags[3])
+			// Jade to normal.
+			if (item.ItemFlags[3] == 0)
 			{
-				// Jade to normal.
-			case 0:
 				SwapJadeToNormal(item, item.ItemFlags[0]);
 				item.ItemFlags[0]++;
 				if (item.ItemFlags[0] >= object.nmeshes)
@@ -160,14 +159,11 @@ namespace TEN::Entities::Creatures::TR2
 					item.ItemFlags[3] = 0;
 					return true;
 				}
-
-				break;
-
-				// Normal to jade.
-			case 1:
+			}
+			else // Normal to jade.
+			{
 				SwapMeshToJade(item, item.ItemFlags[0]);
 				item.ItemFlags[0]--;
-
 				if (item.ItemFlags[0] < 0)
 				{
 					item.ItemFlags[0] = 0;
@@ -175,8 +171,6 @@ namespace TEN::Entities::Creatures::TR2
 					item.ItemFlags[3] = 1;
 					return true;
 				}
-
-				break;
 			}
 
 			creature.Flags = SWORD_GUARDIAN_SWAPMESH_TIME;
@@ -189,7 +183,7 @@ namespace TEN::Entities::Creatures::TR2
 		return false;
 	}
 
-	static void SwordGuardianFly(ItemInfo* item)
+	static void SwordGuardianFlyEffect(ItemInfo* item)
 	{
 		auto pos = Vector3i(
 			(GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128,
@@ -275,8 +269,9 @@ namespace TEN::Entities::Creatures::TR2
 				DoSwordGuardianSwapMesh(*item);
 				break;
 
-			case SWORD_GUARDIAN_STATE_STOP:
+			case SWORD_GUARDIAN_STATE_IDLE:
 				creature->MaxTurn = 0;
+				item->ItemFlags[1] = 0; // Remove the immunity effect.
 
 				if (AI.ahead)
 					neck = AI.angle;
@@ -304,11 +299,11 @@ namespace TEN::Entities::Creatures::TR2
 					neck = AI.angle;
 
 				if (!isLaraAlive)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else if (AI.bite && AI.distance < SWORD_GUARDIAN_WALK_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WALK_ATTACK_AIM;
 				else if (AI.zoneNumber != AI.enemyZone)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 
 				break;
 
@@ -319,7 +314,7 @@ namespace TEN::Entities::Creatures::TR2
 					torso = AI.angle;
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_FRONT;
 				break;
@@ -331,7 +326,7 @@ namespace TEN::Entities::Creatures::TR2
 					torso = AI.angle;
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL;
 
@@ -344,7 +339,7 @@ namespace TEN::Entities::Creatures::TR2
 					torso = AI.angle;
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_WALK_ATTACK_RANGE)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WALK_ATTACK;
 
@@ -354,9 +349,9 @@ namespace TEN::Entities::Creatures::TR2
 				creature->MaxTurn = SWORD_GUARDIAN_FLY_TURN_RATE_MAX;
 				if (AI.ahead)
 					neck = AI.angle;
-				SwordGuardianFly(item);
+				SwordGuardianFlyEffect(item);
 				if (creature->LOT.Fly == NO_FLYING)
-					item->Animation.TargetState = SWORD_GUARDIAN_STATE_STOP;
+					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 
 				break;
 
@@ -380,5 +375,19 @@ namespace TEN::Entities::Creatures::TR2
 		CreatureJoint(item, 0, neck);
 		CreatureJoint(item, 1, torso);
 		CreatureAnimation(itemNumber, angle, 0);
+	}
+
+	void SwordGuardianHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		if (target.ItemFlags[1] == 1)
+		{
+			TENLog("Immortal");
+			if (pos.has_value())
+				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+			return;
+		}
+
+		TENLog("Hit");
+		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }

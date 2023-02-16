@@ -827,21 +827,21 @@ enum LaraAnim
 
 enum LaraExtraAnim
 {
-	LEA_Unsure1,
-	LEA_WakingUp,
-	LEA_XianSpearDeath,
-	LEA_SubwayTrainDeath,
-	LEA_TyrannosaurDeath,
-	LEA_Unsure2,
-	LEA_GiantMutantDeath,
-	LEA_ShivaDeath,
-	LEA_TntActivate,
-	LEA_MidasGold,
-	LEA_MidasDeath,
-	LEA_GongStrike,
-	LEA_WillardDeath,
-	LEA_SubwayTrainDeathEnd,
-	LEA_SethDeath
+	LEA_PICK_DAGGER_FROM_DRAGON,
+	LEA_WAKING_UP,
+	LEA_SPEAR_GUARDIAN_DEATH,
+	LEA_SUBWAY_TRAIN_DEATH,
+	LEA_TYRANNOSAUR_DEATH,
+	LEA_SHARK_DEATH,
+	LEA_GIANT_MUTANT_DEATH,
+	LEA_SHIVA_DEATH,
+	LEA_ACTIVATE_TNT_SWITCH,
+	LEA_MIDAS_GOLD_SWITCH,
+	LEA_MIDAS_DEATH,
+	LEA_GONG_STRIKE,
+	LEA_WILLARD_DEATH,
+	LEA_SUBWAY_TRAIN_DEATH_END,
+	LEA_SETH_DEATH
 };
 
 enum LARA_MESHES
