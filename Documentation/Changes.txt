@@ -6,6 +6,7 @@ Version 1.0.7
 * Fix TR3 shiva not taking explosive damage (should still block with the sword).
 * Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
 * Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
+* Fix TR3 big gun spawning rocket with 0 life which cause a direct explosion.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
