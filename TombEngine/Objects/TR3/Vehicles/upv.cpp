@@ -8,7 +8,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -25,6 +25,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 using std::vector;
 
@@ -305,19 +306,17 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position));
+				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position)).ToVector3();
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
-				if ((GetRandomControl() & 1) == 0)
+				auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
+				if (Random::TestProbability(1 / 2.0f))
 				{
-					auto pos2 = Pose(
-						pos.x + (GetRandomControl() & 63) - 32,
-						pos.y + UPV_SHIFT,
-						pos.z + (GetRandomControl() & 63) - 32
-					);
-					short probedRoomNumber = GetCollision(pos2.Position.x, pos2.Position.y, pos2.Position.z, UPVItem->RoomNumber).RoomNumber;
+					auto bubblePos = Random::GeneratePointInSphere(sphere);
+					int probedRoomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, UPVItem->RoomNumber).RoomNumber;
 				
-					CreateBubble((Vector3i*)&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
+					for (int i = 0; i < 3; i++)
+						SpawnBubble(bubblePos, probedRoomNumber);
 				}
 			}
 		}
