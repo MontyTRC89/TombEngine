@@ -76,8 +76,8 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* bigGunItem = &g_Level.Items[itemNumber];
 		bigGunItem->Data = BigGunInfo();
-		auto* bigGun = GetBigGunInfo(bigGunItem);
 
+		auto* bigGun = GetBigGunInfo(bigGunItem);
 		bigGun->BaseOrientation = bigGunItem->Pose.Orientation;
 		bigGun->XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
 	}
@@ -98,7 +98,7 @@ namespace TEN::Entities::Vehicles
 		int y = laraItem->Pose.Position.y - bigGunItem->Pose.Position.y;
 		int z = laraItem->Pose.Position.z - bigGunItem->Pose.Position.z;
 
-		int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 		if (distance > SECTOR(30))
 			return false;
 
@@ -111,36 +111,30 @@ namespace TEN::Entities::Vehicles
 
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 
 		short itemNumber = CreateItem();
-		auto* projectileItem = &g_Level.Items[itemNumber];
-
 		if (itemNumber != NO_ITEM)
 		{
+			auto* projectileItem = &g_Level.Items[itemNumber];
 			projectileItem->ObjectNumber = ID_ROCKET;
 			projectileItem->RoomNumber = laraItem->RoomNumber;
-
-			auto pos = GetJointPosition(bigGunItem, 2, Vector3i(0, 0, CLICK(1))); // CLICK(1) or 520?
+			auto pos = GetJointPosition(bigGunItem, 2, Vector3i(0, 0, CLICK(1)));
 			projectileItem->Pose.Position = pos;
-
-			InitialiseItem(itemNumber);
-
-			projectileItem->Animation.Velocity.z = 16;
 			projectileItem->Pose.Orientation = EulerAngles(
 				-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
 				bigGunItem->Pose.Orientation.y,
 				0
 			);
+			InitialiseItem(itemNumber);
+
+			projectileItem->Animation.Velocity.z = 16;
 			projectileItem->ItemFlags[0] = BGUN_FLAG_UP_DOWN;
+			projectileItem->HitPoints = 1000; // NOTE: Time before it explose, TR5 use it, if 0, it will explode by default.
 
 			AddActiveItem(itemNumber);
-
-			lara->LeftArm.GunSmoke = 32;
-
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, 32);
 
 			SoundEffect(SFX_TR4_EXPLOSION1, &projectileItem->Pose);
 		}
