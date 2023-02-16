@@ -412,7 +412,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(17, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 
@@ -430,7 +430,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetBoneRotationFlags(16, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 

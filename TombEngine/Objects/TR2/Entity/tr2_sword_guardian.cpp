@@ -218,10 +218,9 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
-
+		auto torso = EulerAngles::Zero;
+		auto head = EulerAngles::Zero;
 		short angle = 0;
-		short neck = 0;
-		short torso = 0;
 
 		bool isLaraAlive = creature->Enemy != nullptr && creature->Enemy->IsLara() && creature->Enemy->HitPoints > 0;
 
@@ -261,6 +260,14 @@ namespace TEN::Entities::Creatures::TR2
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
+			if (AI.ahead &&
+			   (item->Animation.ActiveState != SWORD_GUARDIAN_STATE_AWAKE &&
+				item->Animation.ActiveState != SWORD_GUARDIAN_STATE_FLY))
+			{
+				head.x = AI.xAngle / 2;
+				head.y = AI.angle / 2;
+			}
+
 			switch (item->Animation.ActiveState)
 			{
 			case SWORD_GUARDIAN_STATE_AWAKE:
@@ -272,9 +279,6 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_IDLE:
 				creature->MaxTurn = 0;
 				item->ItemFlags[1] = 0; // Remove the immunity effect.
-
-				if (AI.ahead)
-					neck = AI.angle;
 
 				if (!isLaraAlive)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WAIT;
@@ -295,9 +299,6 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_WALK:
 				creature->MaxTurn = SWORD_GUARDIAN_WALK_TURN_RATE_MAX;
 
-				if (AI.ahead)
-					neck = AI.angle;
-
 				if (!isLaraAlive)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else if (AI.bite && AI.distance < SWORD_GUARDIAN_WALK_ATTACK_RANGE)
@@ -311,7 +312,10 @@ namespace TEN::Entities::Creatures::TR2
 				creature->Flags = 0;
 
 				if (AI.ahead)
-					torso = AI.angle;
+				{
+					torso.x = AI.xAngle;
+					torso.y = AI.angle;
+				}
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
@@ -321,9 +325,12 @@ namespace TEN::Entities::Creatures::TR2
 
 			case SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL_AIM:
 				creature->Flags = 0;
-
+				
 				if (AI.ahead)
-					torso = AI.angle;
+				{
+					torso.x = AI.xAngle;
+					torso.y = AI.angle;
+				}
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
@@ -336,7 +343,10 @@ namespace TEN::Entities::Creatures::TR2
 				creature->Flags = 0;
 
 				if (AI.ahead)
-					torso = AI.angle;
+				{
+					torso.x = AI.xAngle;
+					torso.y = AI.angle;
+				}
 
 				if (!AI.bite || AI.distance > SWORD_GUARDIAN_WALK_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
@@ -347,8 +357,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			case SWORD_GUARDIAN_STATE_FLY:
 				creature->MaxTurn = SWORD_GUARDIAN_FLY_TURN_RATE_MAX;
-				if (AI.ahead)
-					neck = AI.angle;
+
 				SwordGuardianFlyEffect(item);
 				if (creature->LOT.Fly == NO_FLYING)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
@@ -359,7 +368,10 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL:
 			case SWORD_GUARDIAN_STATE_WALK_ATTACK:
 				if (AI.ahead)
-					torso = AI.angle;
+				{
+					torso.x = AI.xAngle;
+					torso.y = AI.angle;
+				}
 
 				if (!creature->Flags && item->TouchBits.Test(SwordBite.meshNum))
 				{
@@ -372,8 +384,10 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureJoint(item, 0, neck);
-		CreatureJoint(item, 1, torso);
+		CreatureJoint(item, 0, torso.y);
+		CreatureJoint(item, 1, torso.x);
+		CreatureJoint(item, 2, head.y);
+		CreatureJoint(item, 3, head.x);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
