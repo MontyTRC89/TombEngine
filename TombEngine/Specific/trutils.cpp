@@ -23,6 +23,7 @@ namespace TEN::Utils
 		return converter.to_bytes(std::wstring(string));
 	}
 
+	// TODO: Sort out x64 compiler errors.
 	std::wstring ToWString(const std::string& string)
 	{
 		/*auto cString = string.c_str();
