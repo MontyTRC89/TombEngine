@@ -399,7 +399,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(collResult.FloorTilt));
+	auto floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 
 	if (coll->Setup.BlockFloorSlopeUp && 
 		coll->Front.FloorSlope && 
@@ -464,7 +465,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(collResult.FloorTilt));
+	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 
 	if (coll->Setup.BlockFloorSlopeUp &&
 		coll->MiddleLeft.FloorSlope &&
@@ -523,7 +525,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(collResult.FloorTilt));
+	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 
 	if (coll->Setup.BlockFloorSlopeUp &&
 		coll->FrontLeft.FloorSlope &&
@@ -587,7 +590,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(collResult.FloorTilt));
+	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 
 	if (coll->Setup.BlockFloorSlopeUp &&
 		coll->MiddleRight.FloorSlope &&
@@ -646,7 +650,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(collResult.FloorTilt));
+	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 
 	if (coll->Setup.BlockFloorSlopeUp &&
 		coll->FrontRight.FloorSlope &&
