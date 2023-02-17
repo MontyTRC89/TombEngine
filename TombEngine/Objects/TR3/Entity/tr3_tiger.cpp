@@ -244,7 +244,7 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 0, extraHeadRot.y);
 		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 
-		auto radius = Vector2(object->radius, object->radius);
+		auto radius = Vector2(object->radius);
 		AlignEntityToSurface(item, radius);
 	}
 }
