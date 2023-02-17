@@ -8,28 +8,27 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
-	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.55));
-	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.55));
+	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1));
 	
 	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
-	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const vector<int> DogBiteAttackJoints = { 3, 6 };
+	const auto DogJumpAttackJoints = std::vector<unsigned int>{ 3, 6, 9, 10, 13, 14 };
+	const auto DogBiteAttackJoints = std::vector<unsigned int>{ 3, 6 };
 
 	enum DogState
 	{
-		DOG_STATE_NONE = 0,
+		DOG_STATE_NONE = 0, // TODO: Check what this is actually used for an rename accordingling.
 		DOG_STATE_IDLE = 1,
 		DOG_STATE_WALK_FORWARD = 2,
 		DOG_STATE_RUN_FORWARD = 3,
@@ -107,7 +106,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.AnimNumber == object->animIndex + 1)
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
-				SetAnimation(item, DogDeathAnims[GenerateInt(0, DogDeathAnims.size() - 1)]);
+				SetAnimation(item, DogDeathAnims[Random::GenerateInt(0, DogDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -169,7 +168,7 @@ namespace TEN::Entities::TR4
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
-					if (creature->Flags > 300 && TestProbability(0.004f))
+					if (creature->Flags > 300 && Random::TestProbability(1.0f / 256))
 						item->Animation.TargetState = DOG_STATE_IDLE;
 				}
 
@@ -180,7 +179,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 
 				if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
-					item->Animation.RequiredState)
+					item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -190,7 +189,7 @@ namespace TEN::Entities::TR4
 				{
 					joint1 = AIGuard(creature);
 
-					if (TestProbability(0.996f))
+					if (Random::TestProbability(0.996f))
 						break;
 
 					if (item->Animation.ActiveState == DOG_STATE_IDLE)
@@ -202,7 +201,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
-						TestProbability(0.004f))
+						Random::TestProbability(1.0f / 256))
 					{
 						item->Animation.TargetState = DOG_STATE_IDLE;
 						break;
@@ -243,7 +242,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(1.0f);
 					creature->Flags = 0;
 
-					if (TestProbability(0.008f))
+					if (Random::TestProbability(1 / 128.0f))
 					{
 						if (item->AIBits & MODIFY)
 						{
@@ -256,9 +255,9 @@ namespace TEN::Entities::TR4
 						}
 					}
 
-					if (TestProbability(0.875f))
+					if (Random::TestProbability(0.875f))
 					{
-						if (TestProbability(0.03f))
+						if (Random::TestProbability(1 / 30.0f))
 							item->Animation.TargetState = DOG_STATE_HOWL;
 
 						break;
@@ -279,7 +278,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
-				else if (creature->Mood == MoodType::Bored && TestProbability(0.008f))
+				else if (creature->Mood == MoodType::Bored && Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
 					item->Animation.TargetState = DOG_STATE_STALK;
@@ -330,7 +329,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_JUMP_ATTACK:
-				if (AI.bite && item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
+				if (AI.bite && item->TouchBits.Test(DogJumpAttackJoints) &&
 					frame >= 4 && frame <= 14)
 				{
 					DoDamage(creature->Enemy, DOG_JUMP_ATTACK_DAMAGE);
@@ -346,7 +345,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_BITE_ATTACK:
-				if (AI.bite && item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
+				if (AI.bite && item->TouchBits.Test(DogBiteAttackJoints) &&
 					((frame >= 9 && frame <= 12) || (frame >= 22 && frame <= 25)))
 				{
 					DoDamage(creature->Enemy, DOG_BITE_ATTACK_DAMAGE);

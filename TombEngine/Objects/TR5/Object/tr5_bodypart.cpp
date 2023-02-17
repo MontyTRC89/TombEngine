@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr5_bodypart.h"
 #include "Game/effects/effects.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "tr5_missile.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Math::Random;
 
@@ -58,7 +58,7 @@ void ControlBodyPart(short fxNumber)
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
 		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
-			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 0);
+			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, FlameType::Big);
 	}
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);

@@ -51,7 +51,7 @@ strings.lua. __Default: false__.
 	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
 	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
 __Default: empty__
-@return A new DisplayString object.
+@treturn DisplayString A new DisplayString object.
 */
 static std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
 {
@@ -93,29 +93,29 @@ void DisplayString::Register(sol::table & parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
-		ScriptReserved_New, &CreateString,
 		sol::call_constructor, &CreateString,
 
 		/// Get the display string's color
-		// @function GetColor
+		// @function DisplayString:GetColor
 		// @treturn Color a copy of the display string's color
 		ScriptReserved_GetColor, &DisplayString::GetCol,
 
 		/// Set the display string's color 
-		// @function SetColor
+		// @function DisplayString:SetColor
 		// @tparam Color color the new color of the display string 
 		ScriptReserved_SetColor, &DisplayString::SetCol,
 
 		/// Get the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
+		// @function DisplayString:GetKey
 		// @treturn String a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
 		/// Set the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
-		// @function SetKey
+		// @function DisplayString:SetKey
 		// @tparam String string the new key for the display string 
 		ScriptReserved_SetKey, &DisplayString::SetKey, 
 

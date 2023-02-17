@@ -11,14 +11,14 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;
 
@@ -29,7 +29,7 @@ namespace TEN::Entities::TR2
 
 	enum KnifeThrowerState
 	{
-		KTHROWER_STATE_NONE = 0,
+		// No state 0.
 		KTHROWER_STATE_IDLE = 1,
 		KTHROWER_STATE_WALK_FORWARD = 2,
 		KTHROWER_STATE_RUN_FORWARD = 3,
@@ -101,7 +101,7 @@ namespace TEN::Entities::TR2
 
 		fx->pos.Orientation.z += ANGLE(30.0f);
 
-		if (ItemNearLara(&fx->pos, 200))
+		if (ItemNearLara(fx->pos.Position, 200))
 		{
 			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 
@@ -128,9 +128,9 @@ namespace TEN::Entities::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
+		short tilt = 0;
 		short torso = 0;
 		short head = 0;
-		short tilt = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -183,7 +183,7 @@ namespace TEN::Entities::TR2
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
-					else if (TestProbability(0.5f))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START;
 					else
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START;

@@ -1,124 +1,198 @@
 #include "framework.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Objects/objectslist.h"
+#include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
-#include "Specific/trmath.h"
 
-using std::vector;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
-extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
-
-void DisableBubbles()
+namespace TEN::Effects::Bubble
 {
-	for (int i = 0; i < MAX_BUBBLES; i++)
+	constexpr auto BUBBLE_COUNT_MAX		   = 1024;
+	constexpr auto BUBBLE_LIFE_MAX		   = 30.0f;
+	constexpr auto BUBBLE_SCALE_MAX		   = BLOCK(0.5f);
+	constexpr auto BUBBLE_OPACTY_MAX	   = 0.8f;
+	constexpr auto BUBBLE_OPACTY_MIN	   = BUBBLE_OPACTY_MAX / 2;
+	constexpr auto BUBBLE_OSC_VELOCITY_MAX = 0.4f;
+	constexpr auto BUBBLE_OSC_VELOCITY_MIN = BUBBLE_OSC_VELOCITY_MAX / 4;
+
+	std::deque<Bubble> Bubbles = {};
+
+	void SpawnBubble(const Vector3& pos, int roomNumber, float scale, float amplitude, const Vector3& inertia)
 	{
-		auto* bubble = &Bubbles[i];
-		bubble->active = false;
-	}
-}
+		constexpr auto GRAVITY_MAX		 = 12.0f;
+		constexpr auto GRAVITY_MIN		 = GRAVITY_MAX * (2 / 3.0f);
+		constexpr auto WAVE_VELOCITY_MAX = 1 / 8.0f;
+		constexpr auto WAVE_VELOCITY_MIN = WAVE_VELOCITY_MAX / 2;
 
-void UpdateBubbles()
-{
-	for (int i = 0; i < MAX_BUBBLES; i++)
-	{
-		auto* bubble = &Bubbles[i];
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
 
-		if (!bubble->active)
-			continue;
+		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
-		bubble->age++;
-		float alpha = bubble->age / 15.0f;
-		alpha = fmin(alpha, 1.0f);
+		scale = std::min(scale, BUBBLE_SCALE_MAX);
 
-		bubble->size = Lerp(0.0f, bubble->destinationSize, alpha);
-		bubble->color = Vector4::Lerp(bubble->sourceColor, bubble->destinationColor, alpha);
-		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
-		short roomNumber = bubble->roomNumber;
+		bubble.SpriteIndex = SPR_BUBBLES;
+		bubble.Position =
+		bubble.PositionBase = pos;
+		bubble.RoomNumber = roomNumber;
 
-		auto probe = GetCollision(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, bubble->roomNumber);
-		FloorInfo* floor = GetFloor(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, &roomNumber);
+		bubble.Color =
+		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
+		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 
-		if (bubble->worldPosition.y > probe.Position.Floor || !floor)
-		{
-			bubble->active = 0;
-			continue;
-		}
+		bubble.Inertia = inertia;
+		bubble.Amplitude = Random::GenerateDirection() * amplitude;
+		bubble.WavePeriod = Vector3::Zero;
+		bubble.WaveVelocity = Vector3(
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
+		
+		bubble.Scale =
+		bubble.ScaleMax = Vector2(scale);
+		bubble.ScaleMin = bubble.Scale * 0.7f;
 
-		if (!TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
-		{
-			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_INIT);
-			bubble->active = false;
-			continue;
-		}
-
-		if (probe.Position.Ceiling == NO_HEIGHT || bubble->worldPosition.y <= probe.Position.Ceiling)
-		{
-			bubble->active = false;
-			continue;
-		}
-
-		bubble->wavePeriod += bubble->waveSpeed;
-		bubble->worldPositionCenter.y -= bubble->speed;
-		bubble->worldPosition = bubble->worldPositionCenter + bubble->amplitude * Vector3(sin(bubble->wavePeriod.x), sin(bubble->wavePeriod.y), sin(bubble->wavePeriod.z));
-	}
-}
-
-int GetFreeBubble()
-{
-	int oldestLifeIndex = 0;
-	int oldestAge = 0;
-
-	for (int i = 0; i < MAX_BUBBLES; i++)
-	{
-		auto* bubble = &Bubbles[i];
-
-		if (!bubble->active)
-			return i;
-
-		if (oldestAge < bubble->age)
-		{
-			oldestAge = bubble->age;
-			oldestLifeIndex = i;
-		}
+		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
+		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, scale / BUBBLE_SCALE_MAX);
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
+		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / BUBBLE_SCALE_MAX);
 	}
 
-	// In case we don't find any inactive bubble, take the oldest one.
-	return oldestLifeIndex;
-}
-
-void CreateBubble(Vector3Int* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv)
-{
-	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
+	void SpawnBubble(const Vector3& pos, int roomNumber, int flags, const Vector3& inertia)
 	{
-		auto* bubble = &Bubbles[GetFreeBubble()];
+		constexpr auto SCALE_LARGE_MAX	  = BUBBLE_SCALE_MAX;
+		constexpr auto SCALE_LARGE_MIN	  = SCALE_LARGE_MAX / 2;
+		constexpr auto SCALE_SMALL_MAX	  = SCALE_LARGE_MIN / 2;
+		constexpr auto SCALE_SMALL_MIN	  = SCALE_SMALL_MAX / 4;
+		constexpr auto AMPLITUDE_MAX_HIGH = BLOCK(0.25f);
+		constexpr auto AMPLITUDE_MAX_LOW  = AMPLITUDE_MAX_HIGH / 8;
 
-		bubble->active = true;
-		bubble->size = 0;
-		bubble->age = 0;
-		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? GenerateFloat(8, 16) : GenerateFloat(8, 12);
-		bubble->sourceColor = Vector4(0, 0, 0, 1);
+		float scale = (flags & (int)BubbleFlags::Large) ?
+			Random::GenerateFloat(SCALE_LARGE_MIN, SCALE_LARGE_MAX) :
+			Random::GenerateFloat(SCALE_SMALL_MIN, SCALE_SMALL_MAX);
+		float amplitude = (flags & (int)BubbleFlags::HighAmplitude) ? AMPLITUDE_MAX_HIGH : AMPLITUDE_MAX_LOW;
 
-		float shade = GenerateFloat(0.3f, 0.8f);
+		SpawnBubble(pos, roomNumber, scale, amplitude, inertia);
+	}
+	
+	void SpawnChaffBubble(const Vector3& pos, int roomNumber)
+	{
+		constexpr auto SCALE_MAX		 = BUBBLE_SCALE_MAX / 8;
+		constexpr auto SCALE_MIN		 = SCALE_MAX / 2;
+		constexpr auto GRAVITY_MAX		 = 16.0f;
+		constexpr auto GRAVITY_MIN		 = GRAVITY_MAX / 4;
+		constexpr auto AMPLITUDE_MAX	 = BLOCK(1 / 16.0f);
+		constexpr auto WAVE_VELOCITY_MAX = 1 / 16.0f;
+		constexpr auto WAVE_VELOCITY_MIN = WAVE_VELOCITY_MAX / 2;
 
-		bubble->destinationColor = Vector4(shade, shade, shade, 1);
-		bubble->color = bubble->sourceColor;
-		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? GenerateFloat(256, 512) : GenerateFloat(32, 128);
-		bubble->spriteNum = flags & BUBBLE_FLAG_CLUMP ? SPR_UNKNOWN1 : SPR_BUBBLES;
-		bubble->rotation = 0;
-		bubble->worldPosition = Vector3(pos->x, pos->y, pos->z);
+		auto& bubble = GetNewEffect(Bubbles, BUBBLE_COUNT_MAX);
 
-		float maxAmplitude = (flags & BUBBLE_FLAG_HIGH_AMPLITUDE) ? 256 : 32;
+		float scale = Random::GenerateFloat(SCALE_MIN, SCALE_MAX);
 
-		bubble->amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
-		bubble->worldPositionCenter = bubble->worldPosition;
-		bubble->wavePeriod = Vector3::Zero;
-		bubble->waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
-		bubble->roomNumber = roomNum;
+		bubble.SpriteIndex = SPR_BUBBLES;
+		bubble.Position =
+		bubble.PositionBase = pos;
+		bubble.RoomNumber = roomNumber;
+
+		bubble.Color =
+		bubble.ColorStart = Vector4(1.0f, 1.0f, 1.0f, Random::GenerateFloat(BUBBLE_OPACTY_MIN, BUBBLE_OPACTY_MAX));
+		bubble.ColorEnd = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+
+		bubble.Inertia = Vector3::Zero;
+		bubble.Amplitude = Random::GenerateDirection() * AMPLITUDE_MAX;
+		bubble.WavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
+		bubble.WaveVelocity = Vector3(
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX),
+			Random::GenerateFloat(WAVE_VELOCITY_MIN, WAVE_VELOCITY_MAX));
+		
+		bubble.Scale =
+		bubble.ScaleMax = Vector2(scale);
+		bubble.ScaleMin = bubble.Scale * 0.7f;
+
+		bubble.Life = std::round(BUBBLE_LIFE_MAX * FPS);
+		bubble.Gravity = Lerp(GRAVITY_MIN, GRAVITY_MAX, scale / BUBBLE_SCALE_MAX);
+		bubble.OscillationPeriod = Random::GenerateFloat(0.0f, scale);
+		bubble.OscillationVelocity = Lerp(BUBBLE_OSC_VELOCITY_MAX, BUBBLE_OSC_VELOCITY_MIN, scale / SCALE_MAX);
+	}
+
+	void UpdateBubbles()
+	{
+		constexpr auto LIFE_FULL_SCALE	 = std::max(BUBBLE_LIFE_MAX - 0.25f, 0.0f);
+		constexpr auto LIFE_START_FADING = std::min(1.0f, BUBBLE_LIFE_MAX);
+
+		if (Bubbles.empty())
+			return;
+
+		for (auto& bubble : Bubbles)
+		{
+			if (bubble.Life <= 0.0f)
+				continue;
+
+			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z, bubble.RoomNumber);
+
+			// Hit floor or ceiling; set to despawn.
+			if ((bubble.Position.y - bubble.Gravity) >= pointColl.Position.Floor ||
+				(bubble.Position.y - bubble.Gravity) <= pointColl.Position.Ceiling)
+			{
+				bubble.Life = 0.0f;
+				continue;
+			}
+
+			// Hit water surface; spawn ripple.
+			if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+			{
+				bubble.Life = 0.0f;
+
+				// TODO: Also spawn small drip splash.
+
+				SetupRipple(
+					bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z,
+					//pointColl.RoomNumber,
+					((bubble.ScaleMax.x + bubble.ScaleMax.y) / 2) * 0.5f,
+					//RippleFlags::ShortInit);
+					RIPPLE_FLAG_SHORT_INIT);
+
+				continue;
+			}
+
+			// Update color.
+			float alpha = 1.0f - (bubble.Life / std::round(LIFE_START_FADING * FPS));
+			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
+
+			// Update position.
+			bubble.WavePeriod += bubble.WaveVelocity;
+			bubble.PositionBase += Vector3(0.0f, -bubble.Gravity, 0.0f) + bubble.Inertia;
+			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
+
+			//  TODO: Let bubbles be affected by sinks.
+			
+			// Update intertia.
+			bubble.Inertia *= 0.8f;
+
+			// Oscillate scale according to period.
+			bubble.OscillationPeriod += bubble.OscillationVelocity;
+			bubble.Scale = Vector2(
+				(bubble.ScaleMin.x / 2) + ((bubble.ScaleMax.x - bubble.ScaleMin.x) * (0.5f + (0.5f * sin(bubble.OscillationPeriod)))),
+				(bubble.ScaleMin.y / 2) + ((bubble.ScaleMax.y - bubble.ScaleMin.y) * (0.5f + (0.5f * cos(bubble.OscillationPeriod + 1.0f)))));
+			bubble.Scale *= Lerp(0.0f, 1.0f, bubble.Life / std::round(LIFE_FULL_SCALE * FPS));
+
+			// Update life.
+			bubble.Life -= 1.0f;
+		}
+		
+		ClearInactiveEffects(Bubbles);
+	}
+
+	void ClearBubbles()
+	{
+		Bubbles.clear();
 	}
 }

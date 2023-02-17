@@ -1,33 +1,35 @@
 #include "framework.h"
 #include "tr5_crowdove_switch.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
-#include "Specific/level.h"
+#include "Game/effects/debris.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/items.h"
-#include "Game/collision/collide_item.h"
-#include "Game/effects/debris.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
-using namespace TEN::Entities::Switches;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS CrowDoveBounds =
+	const ObjectCollisionBounds CrowDoveBounds =
 	{
-		-256, 256,
-		0, 0,
-		-512, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			-SECTOR(0.5f), SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	auto CrowDovePos = Vector3Int(0, 0, -400);
+	const auto CrowDovePos = Vector3i(0, 0, -400);
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{
@@ -55,9 +57,9 @@ namespace TEN::Entities::TR5
 		{
 			int oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
+			if (TestLaraPosition(CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
+				if (MoveLaraPosition(CrowDovePos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;

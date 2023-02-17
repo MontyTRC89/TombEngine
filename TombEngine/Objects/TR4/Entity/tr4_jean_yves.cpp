@@ -5,16 +5,17 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	enum JeanYvesState
 	{
+		// No state 0.
 		JEAN_YVES_STATE_HANDS_BEHIND_HEAD = 1,
 		JEAN_YVES_STATE_THINKING1 = 2,
 		JEAN_YVES_STATE_THINKING2 = 3,
@@ -35,8 +36,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* objectInfo = &Objects[item->ObjectNumber];
 
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		item->Animation.TargetState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
+		item->Animation.ActiveState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
 		item->Animation.AnimNumber = objectInfo->animIndex;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
@@ -49,7 +50,7 @@ namespace TEN::Entities::TR4
 		{
 			int state = 0;
 
-			if (TestProbability(0.75f))
+			if (Random::TestProbability(0.75f))
 				state = (GetRandomControl() & 1) + 1;
 			else
 				state = 3 * (GetRandomControl() & 1);

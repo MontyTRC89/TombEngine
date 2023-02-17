@@ -4,7 +4,7 @@ namespace TEN::Entities::Vehicles
 {
 	struct UPVInfo
 	{
-		Vector3Shrt TurnRate;
+		EulerAngles TurnRate;
 		short TurbineRotation = 0;
 		short LeftRudderRotation = 0;
 		short RightRudderRotation = 0;

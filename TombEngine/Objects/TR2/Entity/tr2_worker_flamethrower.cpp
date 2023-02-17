@@ -14,36 +14,47 @@
 #include "Game/people.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerFlamethrowerOffset = Vector3Int(0, 140, 0);
+	constexpr auto WORKER_FLAME_ATTACK_RANGE = SQUARE(SECTOR(2));
+	constexpr auto WORKER_FLAME_IDLE_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto WORKER_FLAME_WALK_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto WORKER_FLAME_RUN_RANGE	 = SQUARE(SECTOR(4));
+
+	constexpr auto WORKER_FLAME_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto WORKER_FLAME_RUN_TURN_RATE_MAX  = ANGLE(10.0f);
+
+	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
-	// TODO
 	enum WorkerFlamethrowerState
 	{
-
+		// No state 0.
+		WORKER_FLAME_STATE_IDLE = 1,
+		WORKER_FLAME_STATE_WALK_FORWARD = 2,
+		WORKER_FLAME_STATE_RUN = 3,
+		WORKER_FLAME_STATE_WAIT = 4,
+		WORKER_FLAME_STATE_ATTACK = 5,
+		WORKER_FLAME_STATE_WALK_FORWARD_ATTACK = 6,
+		WORKER_FLAME_STATE_DEATH = 7,
+		WORKER_FLAME_STATE_AIM = 8,
+		WORKER_FLAME_STATE_WALK_FORWARD_AIM = 9
 	};
 
-	// TODO
+	// TODO: Fill out the rest.
 	enum WorkerFlamethrowerAnim
 	{
-
+		WORKER_FLAME_ANIM_IDLE = 12,
+		WORKER_FLAME_ANIM_DEATH = 19
 	};
 
 	void InitialiseWorkerFlamethrower(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-
-		ClearItem(itemNumber);
-
-		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-		item->Animation.FrameNumber = anim->frameBase;
-		item->Animation.ActiveState = anim->ActiveState;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, WORKER_FLAME_ANIM_IDLE);
 	}
 
 	void WorkerFlamethrower(short itemNumber)
@@ -51,33 +62,24 @@ namespace TEN::Entities::TR2
 		if (!CreatureActive(itemNumber))
 			return;
 
-		Vector3Int pos;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
-		short headX = 0;
-		short headY = 0;
-		short torsoX = 0;
-		short torsoY = 0;
+		short tilt = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
-		pos = Vector3Int(WorkerFlamethrowerBite.Position);
-		GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
+		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.meshNum, Vector3i(WorkerFlamethrowerBite.Position));
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 7)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 7;
-			}
+			if (item->Animation.ActiveState != WORKER_FLAME_STATE_DEATH)
+				SetAnimation(item, WORKER_FLAME_ANIM_DEATH);
 		}
 		else
 		{
-			if (item->Animation.ActiveState != 5 && item->Animation.ActiveState != 6)
+			if (item->Animation.ActiveState != WORKER_FLAME_STATE_ATTACK && item->Animation.ActiveState != WORKER_FLAME_STATE_WALK_FORWARD_ATTACK)
 			{
 				TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
 				TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.meshNum);
@@ -98,80 +100,80 @@ namespace TEN::Entities::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case WORKER_FLAME_STATE_IDLE:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = WORKER_FLAME_STATE_RUN;
 				else if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
-						item->Animation.TargetState = 8;
+					if (AI.distance < WORKER_FLAME_ATTACK_RANGE || AI.zoneNumber != AI.enemyZone)
+						item->Animation.TargetState = WORKER_FLAME_STATE_AIM;
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = WORKER_FLAME_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Attack || !AI.ahead)
 				{
-					if (AI.distance <= pow(SECTOR(2), 2))
-						item->Animation.TargetState = 2;
-					else
-						item->Animation.TargetState = 3;
+					if (AI.distance <= WORKER_FLAME_WALK_RANGE)
+						item->Animation.TargetState = WORKER_FLAME_STATE_WALK_FORWARD;
+					else if (AI.distance >= WORKER_FLAME_RUN_RANGE)
+						item->Animation.TargetState = WORKER_FLAME_STATE_RUN;
 				}
 				else
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = WORKER_FLAME_STATE_WAIT;
 
 				break;
 
-			case 2:
-				creature->MaxTurn = ANGLE(5.0f);
+			case WORKER_FLAME_STATE_WALK_FORWARD:
+				creature->MaxTurn = WORKER_FLAME_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = WORKER_FLAME_STATE_RUN;
 				else if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
-						item->Animation.TargetState = 1;
-					else
-						item->Animation.TargetState = 6;
+					if (AI.distance < WORKER_FLAME_IDLE_RANGE || AI.zoneNumber != AI.enemyZone)
+						item->Animation.TargetState = WORKER_FLAME_STATE_IDLE;
+					else if (AI.distance < WORKER_FLAME_ATTACK_RANGE)
+						item->Animation.TargetState = WORKER_FLAME_STATE_WALK_FORWARD_AIM;
 				}
 				else if (creature->Mood == MoodType::Attack || !AI.ahead)
 				{
-					if (AI.distance > pow(SECTOR(2), 2))
-						item->Animation.TargetState = 3;
+					if (AI.distance > WORKER_FLAME_WALK_RANGE)
+						item->Animation.TargetState = WORKER_FLAME_STATE_RUN;
 				}
 				else
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = WORKER_FLAME_STATE_WAIT;
 
 				break;
 
-			case 3:
-				creature->MaxTurn = ANGLE(10.0f);
+			case WORKER_FLAME_STATE_RUN:
+				creature->MaxTurn = WORKER_FLAME_RUN_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood != MoodType::Escape)
 				{
 					if (Targetable(item, &AI))
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = WORKER_FLAME_STATE_WALK_FORWARD;
 					else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = WORKER_FLAME_STATE_WALK_FORWARD;
 				}
 
 				break;
@@ -179,62 +181,62 @@ namespace TEN::Entities::TR2
 			case 4:
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (Targetable(item, &AI))
-					item->Animation.TargetState = 5;
+					item->Animation.TargetState = WORKER_FLAME_STATE_ATTACK;
 				else
 				{
 					if (creature->Mood == MoodType::Attack)
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = WORKER_FLAME_STATE_IDLE;
 					else if (!AI.ahead)
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = WORKER_FLAME_STATE_IDLE;
 				}
 
 				break;
 
-			case 5:
-			case 6:
+			case WORKER_FLAME_STATE_ATTACK:
+			case WORKER_FLAME_STATE_WALK_FORWARD_ATTACK:
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
-				if (item->Animation.TargetState != 1 &&
-					(creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(10), 2) || !Targetable(item, &AI)))
+				if (item->Animation.TargetState != WORKER_FLAME_STATE_IDLE &&
+					(!Targetable(item, &AI) || creature->Mood == MoodType::Escape || AI.distance > WORKER_FLAME_ATTACK_RANGE))
 				{
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = WORKER_FLAME_STATE_IDLE;
 				}
 
 				break;
 
-			case 8:
-			case 9:
+			case WORKER_FLAME_STATE_AIM:
+			case WORKER_FLAME_STATE_WALK_FORWARD_AIM:
 				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
-				if (Targetable(item, &AI))
-					item->Animation.TargetState = (item->Animation.ActiveState == 8) ? 5 : 11;
+				if (Targetable(item, &AI) && AI.distance <= WORKER_FLAME_ATTACK_RANGE)
+					item->Animation.TargetState = (item->Animation.ActiveState == WORKER_FLAME_STATE_AIM) ? WORKER_FLAME_STATE_ATTACK : WORKER_FLAME_STATE_WALK_FORWARD_ATTACK;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = WORKER_FLAME_STATE_IDLE;
 
 				break;
 			}
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, headY);
-		CreatureJoint(item, 3, headX);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

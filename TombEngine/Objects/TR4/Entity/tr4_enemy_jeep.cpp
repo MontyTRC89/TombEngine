@@ -12,13 +12,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -30,7 +29,7 @@ namespace TEN::Entities::TR4
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
-			grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			grenadeItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
@@ -47,14 +46,14 @@ namespace TEN::Entities::TR4
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-			if (TestProbability(0.75f))
+			if (Random::TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = 1;
 			else
 				grenadeItem->ItemFlags[0] = 2;
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = 0;
+			grenadeItem->Animation.RequiredState = NO_STATE;
 			grenadeItem->Animation.Velocity.z = 32;
 			grenadeItem->Animation.Velocity.y = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
@@ -149,8 +148,7 @@ namespace TEN::Entities::TR4
 			else
 				distance = pow(dx, 2) + pow(dz, 2);
 
-			Vector3Int pos;
-
+			auto pos = Vector3i::Zero;
 			switch (item->Animation.ActiveState)
 			{
 			case 0:
@@ -158,15 +156,13 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[0] -= 128;
 				item->MeshBits = -98305;
 
-				pos = Vector3Int(0, -144, -1024);
-				GetJointAbsPosition(item, &pos, 11);
-
+				pos = GetJointPosition(item, 11, Vector3i(0, -144, -1024));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
 				if (item->ItemFlags[0] < 0)
 					item->ItemFlags[0] = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance > pow(SECTOR(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;
@@ -252,7 +248,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->ReachedGoal)
 			{
-				TestTriggers(target->Pose.Position.x, target->Pose.Position.y, target->Pose.Position.z, target->RoomNumber, true);
+				TestTriggers(target, true);
 
 				if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
 				{
@@ -310,9 +306,7 @@ namespace TEN::Entities::TR4
 						creature->Enemy = nullptr;
 						target->ObjectNumber = aiObject->objectNumber;
 						target->RoomNumber = aiObject->roomNumber;
-						target->Pose.Position.x = aiObject->pos.Position.x;
-						target->Pose.Position.y = aiObject->pos.Position.y;
-						target->Pose.Position.z = aiObject->pos.Position.z;
+						target->Pose.Position = aiObject->pos.Position;
 						target->Pose.Orientation.y = aiObject->pos.Orientation.y;
 						target->Flags = aiObject->flags;
 						target->TriggerFlags = aiObject->triggerFlags;
@@ -359,7 +353,7 @@ namespace TEN::Entities::TR4
 				creature->JointRotation[i] -= item->ItemFlags[0];
 
 			if (!creature->ReachedGoal)
-				ClampRotation(&item->Pose, AI.angle, item->ItemFlags[0] / 16);
+				ClampRotation(item->Pose, AI.angle, item->ItemFlags[0] / 16);
 
 			creature->MaxTurn = 0;
 			AnimateItem(item);

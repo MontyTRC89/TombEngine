@@ -3,9 +3,9 @@
 
 #include "Game/collision/collide_room.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include <Game/effects/tomb4fx.h>
 
 using std::vector;
@@ -21,7 +21,7 @@ vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 {
-	if (1 << node & item->MeshBits)
+	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
 		if (number == BODY_EXPLODE)
@@ -34,7 +34,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[node].x;
 		ShatterItem.sphere.y = CreatureSpheres[node].y;
 		ShatterItem.sphere.z = CreatureSpheres[node].z;
-		ShatterItem.color = item->Color;
+		ShatterItem.color = item->Model.Color;
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
@@ -52,10 +52,9 @@ DebrisFragment* GetFreeDebrisFragment()
 	for (auto& frag : DebrisFragments) 
 	{
 		if (!frag.active)
-		{
 			return &frag;
-		}
 	}
+
 	return nullptr;
 }
 
@@ -69,11 +68,19 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 
 	if (mesh)
 	{
+		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+			return;
+
 		isStatic = true;
 		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.Orientation.y;
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 		scale = mesh->scale;
+
+		mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+		SmashedMeshRoom[SmashedMeshCount] = roomNumber;
+		SmashedMesh[SmashedMeshCount] = mesh;
+		SmashedMeshCount++;
 	}
 	else
 	{
@@ -181,7 +188,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 	}
 }
 
-Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
+Vector3 CalculateFragmentImpactVelocity(const Vector3& fragmentWorldPosition, const Vector3& impactDirection, const Vector3& impactLocation)
 {
 	Vector3 radiusVector = (fragmentWorldPosition - impactLocation);
 	Vector3 radiusNormVec = radiusVector;

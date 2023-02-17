@@ -12,15 +12,18 @@
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
 #include "Game/collision/collide_item.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
+#include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
+using namespace TEN::Math;
 
 int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
 	auto* fx = &EffectList[itemNumber];
+
 	if (fx->flag1 == 2)
 	{
 		fx->pos.Orientation.z += 16 * fx->speed;
@@ -37,10 +40,9 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		auto angles = GetVectorAngles(
-			LaraItem->Pose.Position.x - fx->pos.Position.x,
-			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
-			LaraItem->Pose.Position.z - fx->pos.Position.z);
+		auto orient = Geometry::GetOrientToPoint(
+			Vector3(fx->pos.Position.x, fx->pos.Position.y + CLICK(1), fx->pos.Position.z),
+			LaraItem->Pose.Position.ToVector3());
 
 		int dh;
 		if (fx->flag1)
@@ -58,13 +60,13 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles.y - fx->pos.Orientation.y;
-			if (abs(dy) > ANGLE(180.0f))
+			int dy = orient.y - fx->pos.Orientation.y;
+			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles.x - fx->pos.Orientation.x;
-			if (abs(dx) > ANGLE(180.0f))
+			int dx = orient.x - fx->pos.Orientation.x;
+			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 			dx /= 8;
 
@@ -118,9 +120,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 			}
 			else if (fx->flag1 == 2)
 			{
@@ -131,12 +133,12 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
 		}
 		
 		KillEffect(itemNumber);
 	}
-	else if (ItemNearLara((PHD_3DPOS*)fx, 200))
+	else if (ItemNearLara(fx->pos.Position, 200))
 	{
 		if (fx->flag1)
 		{
@@ -145,9 +147,9 @@ void MissileControl(short itemNumber)
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 				KillEffect(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
@@ -170,11 +172,11 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
-				LaraBurn(LaraItem);
+				ItemBurn(LaraItem);
 			KillEffect(itemNumber);
 		}
 	}
@@ -185,8 +187,7 @@ void MissileControl(short itemNumber)
 
 		if (GlobalCounter & 1)
 		{
-			Vector3Int pos = { x, y, z };
-
+			auto pos = Vector3i(x, y, z);
 			int xv = x - fx->pos.Position.x;
 			int yv = y - fx->pos.Position.y;
 			int zv = z - fx->pos.Position.z;
@@ -196,7 +197,7 @@ void MissileControl(short itemNumber)
 			else
 			{
 				TriggerHydraMissileSparks(&pos, 4 * xv, 4 * yv, 4 * zv);
-				TriggerHydraMissileSparks((Vector3Int*)&fx, 4 * xv, 4 * yv, 4 * zv);
+				TriggerHydraMissileSparks(&fx->pos.Position, 4 * xv, 4 * yv, 4 * zv);
 			}
 		}
 	}

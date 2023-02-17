@@ -6,10 +6,13 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Objects/TR3/fish.h"
 #include "Specific/level.h"
 
-namespace TEN::Entities::TR3
+using namespace TEN::Math;
+
+namespace TEN::Entities::Creatures::TR3
 {
 	int PirahnaHitWait = false;
 	int CarcassItem = NO_ITEM;
@@ -52,23 +55,23 @@ namespace TEN::Entities::TR3
 		Fishes[leader].y = 0;
 		Fishes[leader].z = 0;
 		Fishes[leader].angle = 0;
-		Fishes[leader].speed = (GetRandomControl() & 63) + 8;
-		Fishes[leader].swim = GetRandomControl() & 63;
+		Fishes[leader].speed = (Random::GenerateInt() & 63) + 8;
+		Fishes[leader].swim = Random::GenerateInt() & 63;
 
 		for (int i = 0; i < 24; i++)
 		{
-			Fishes[MAX_FISH + (leader * 24) + i].x = (GetRandomControl() % (fishXRange * 2)) - fishXRange;
-			Fishes[MAX_FISH + (leader * 24) + i].y = (GetRandomControl() % fishYRange);
-			Fishes[MAX_FISH + (leader * 24) + i].destY = (GetRandomControl() % fishYRange);
-			Fishes[MAX_FISH + (leader * 24) + i].z = (GetRandomControl() % (fishZRange * 2)) - fishZRange;
-			Fishes[MAX_FISH + (leader * 24) + i].angle = GetRandomControl() & 4095;
-			Fishes[MAX_FISH + (leader * 24) + i].speed = (GetRandomControl() & 31) + 32;
-			Fishes[MAX_FISH + (leader * 24) + i].swim = GetRandomControl() & 63;
+			Fishes[MAX_FISH + (leader * 24) + i].x = (Random::GenerateInt() % (fishXRange * 2)) - fishXRange;
+			Fishes[MAX_FISH + (leader * 24) + i].y = (Random::GenerateInt() % fishYRange);
+			Fishes[MAX_FISH + (leader * 24) + i].destY = (Random::GenerateInt() % fishYRange);
+			Fishes[MAX_FISH + (leader * 24) + i].z = (Random::GenerateInt() % (fishZRange * 2)) - fishZRange;
+			Fishes[MAX_FISH + (leader * 24) + i].angle = Random::GenerateInt() & 4095;
+			Fishes[MAX_FISH + (leader * 24) + i].speed = (Random::GenerateInt() & 31) + 32;
+			Fishes[MAX_FISH + (leader * 24) + i].swim = Random::GenerateInt() & 63;
 		}
 
 		LeaderInfo[leader].on = 1;
 		LeaderInfo[leader].angle = 0;
-		LeaderInfo[leader].speed = (GetRandomControl() & 127) + 32;
+		LeaderInfo[leader].speed = (Random::GenerateInt() & 127) + 32;
 		LeaderInfo[leader].angleTime = 0;
 		LeaderInfo[leader].speedTime = 0;
 	}
@@ -115,8 +118,8 @@ namespace TEN::Entities::TR3
 			else
 				enemy = &g_Level.Items[CarcassItem];
 
-			LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Pose.Position.x, fish->z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + 0x4000)) / 16) & 4095;
-			LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
+			LeaderInfo[leader].angle = fish->angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->x + item->Pose.Position.x, 0.0f, fish->z + item->Pose.Position.z), enemy->Pose.Position.ToVector3()).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
+			LeaderInfo[leader].speed = (Random::GenerateInt() & 63) + 192;
 		}
 
 		int deltaAngle = fish->angle - LeaderInfo[leader].angle;
@@ -155,7 +158,7 @@ namespace TEN::Entities::TR3
 
 		if (deltaAngle < -4)
 		{
-			deltaAngle = fish->speed + (GetRandomControl() & 3) + 1;
+			deltaAngle = fish->speed + (Random::GenerateInt() & 3) + 1;
 			if (deltaAngle < 0)
 				deltaAngle = 0;
 
@@ -163,7 +166,7 @@ namespace TEN::Entities::TR3
 		}
 		else if (deltaAngle > 4)
 		{
-			deltaAngle = fish->speed - (GetRandomControl() & 3) - 1;
+			deltaAngle = fish->speed - (Random::GenerateInt() & 3) - 1;
 			if (deltaAngle > 255)
 				deltaAngle = 255;
 
@@ -189,11 +192,11 @@ namespace TEN::Entities::TR3
 				z = -fishZRange;
 
 				if (fish->angle < 2048)
-					LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle - ((Random::GenerateInt() & 127) + 128);
 				else
-					LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
 
-				LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
+				LeaderInfo[leader].angleTime = (Random::GenerateInt() & 15) + 8;
 				LeaderInfo[leader].speedTime = 0;
 			}
 			else if (z > fishZRange)
@@ -201,11 +204,11 @@ namespace TEN::Entities::TR3
 				z = fishZRange;
 
 				if (fish->angle > 3072)
-					LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle - ((Random::GenerateInt() & 127) + 128);
 				else
-					LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
 
-				LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
+				LeaderInfo[leader].angleTime = (Random::GenerateInt() & 15) + 8;
 				LeaderInfo[leader].speedTime = 0;
 			}
 
@@ -214,11 +217,11 @@ namespace TEN::Entities::TR3
 				x = -fishXRange;
 
 				if (fish->angle < 1024)
-					LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle - ((Random::GenerateInt() & 127) + 128);
 				else
-					LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
 
-				LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
+				LeaderInfo[leader].angleTime = (Random::GenerateInt() & 15) + 8;
 				LeaderInfo[leader].speedTime = 0;
 			}
 			else if (x > fishXRange)
@@ -226,25 +229,25 @@ namespace TEN::Entities::TR3
 				x = fishXRange;
 
 				if (fish->angle < 3072)
-					LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle - ((Random::GenerateInt() & 127) + 128);
 				else
-					LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+					LeaderInfo[leader].angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
 
-				LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
+				LeaderInfo[leader].angleTime = (Random::GenerateInt() & 15) + 8;
 				LeaderInfo[leader].speedTime = 0;
 			}
 
-			if ((GetRandomControl() & 15) == 0)
+			if ((Random::GenerateInt() & 15) == 0)
 				LeaderInfo[leader].angleTime = 0;
 
 			if (LeaderInfo[leader].angleTime)
 				LeaderInfo[leader].angleTime--;
 			else
 			{
-				LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-				int angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
+				LeaderInfo[leader].angleTime = (Random::GenerateInt() & 15) + 8;
+				int angAdd = ((Random::GenerateInt() & 63) + 16) - 8 - 32;
 
-				if ((GetRandomControl() & 3) == 0)
+				if ((Random::GenerateInt() & 3) == 0)
 					LeaderInfo[leader].angle += angAdd * 32;
 				else
 					LeaderInfo[leader].angle += angAdd;
@@ -256,18 +259,18 @@ namespace TEN::Entities::TR3
 				LeaderInfo[leader].speedTime--;
 			else
 			{
-				LeaderInfo[leader].speedTime = (GetRandomControl() & 31) + 32;
+				LeaderInfo[leader].speedTime = (Random::GenerateInt() & 31) + 32;
 
-				if ((GetRandomControl() & 7) == 0)
-					LeaderInfo[leader].speed = (GetRandomControl() & 127) + 128;
-				else if ((GetRandomControl() & 3) == 0)
-					LeaderInfo[leader].speed += (GetRandomControl() & 127) + 32;
+				if ((Random::GenerateInt() & 7) == 0)
+					LeaderInfo[leader].speed = (Random::GenerateInt() & 127) + 128;
+				else if ((Random::GenerateInt() & 3) == 0)
+					LeaderInfo[leader].speed += (Random::GenerateInt() & 127) + 32;
 				else if (LeaderInfo[leader].speed > 140)
-					LeaderInfo[leader].speed -= (GetRandomControl() & 31) + 48;
+					LeaderInfo[leader].speed -= (Random::GenerateInt() & 31) + 48;
 				else
 				{
-					LeaderInfo[leader].speedTime = (GetRandomControl() & 3) + 4;
-					LeaderInfo[leader].speed += (GetRandomControl() & 31) - 15;
+					LeaderInfo[leader].speedTime = (Random::GenerateInt() & 3) + 4;
+					LeaderInfo[leader].speed += (Random::GenerateInt() & 31) - 15;
 				}
 			}
 
@@ -285,7 +288,7 @@ namespace TEN::Entities::TR3
 		{
 			if (item->Flags & OCB_FISH_LETAL)
 			{
-				PHD_3DPOS pos;
+				Pose pos;
 				pos.Position.x = item->Pose.Position.x + fish->x;
 				pos.Position.y = item->Pose.Position.y + fish->y;
 				pos.Position.z = item->Pose.Position.z + fish->z;
@@ -303,7 +306,7 @@ namespace TEN::Entities::TR3
 				}
 			}
 
-			angle = ((-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000)) / 16) & 4095;
+			angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->x, 0.0f, fish->z), Vector3(ftx, 0.0f, ftz)).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
 			int dx = fish->x - ftx + ((24 - i) * 128);
 			int dz = fish->z - ftz - ((24 - i) * 128);
 
@@ -350,16 +353,16 @@ namespace TEN::Entities::TR3
 			else
 			{
 				if (fish->speed < 160 + (i / 2))
-					fish->speed += (GetRandomControl() & 3) + 1 + (i / 2);
+					fish->speed += (Random::GenerateInt() & 3) + 1 + (i / 2);
 
 				if (fish->speed > 160 + (i / 2) - (i * 4))
 					fish->speed = 160 + (i / 2) - (i * 4);
 			}
 
-			if (GetRandomControl() & 1)
-				fish->speed -= GetRandomControl() & 1;
+			if (Random::GenerateInt() & 1)
+				fish->speed -= Random::GenerateInt() & 1;
 			else
-				fish->speed += GetRandomControl() & 1;
+				fish->speed += Random::GenerateInt() & 1;
 
 			if (fish->speed < 32)
 				fish->speed = 32;
@@ -387,13 +390,13 @@ namespace TEN::Entities::TR3
 			if (pirahnaAttack == 0)
 			{
 				if (abs(fish->y - fish->destY) < 16)
-					fish->destY = GetRandomControl() % LeaderInfo[leader].yRange;
+					fish->destY = Random::GenerateInt() % LeaderInfo[leader].yRange;
 			}
 			else
 			{
 				int y = enemy->Pose.Position.y - item->Pose.Position.y;
 				if (abs(fish->y - fish->destY) < 16)
-					fish->destY = y + (GetRandomControl() & 255);
+					fish->destY = y + (Random::GenerateInt() & 255);
 			}
 
 			fish->y += (fish->destY - fish->y) / 16;
@@ -401,7 +404,7 @@ namespace TEN::Entities::TR3
 		}
 	}
 
-	bool FishNearLara(PHD_3DPOS* pos, int distance, ItemInfo* item)
+	bool FishNearLara(Pose* pos, int distance, ItemInfo* item)
 	{
 		int x = pos->Position.x - item->Pose.Position.x;
 		int y = abs(pos->Position.y - item->Pose.Position.y);

@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr5_dog.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/control/control.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
-#include "Game/items.h"
-#include "Game/misc.h"
+#include "Objects/TR5/Entity/tr5_dog.h"
 
-namespace TEN::Entities::TR5
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3);
 	static BYTE DogAnims[] = { 20, 21, 22, 20 };

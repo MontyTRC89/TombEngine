@@ -1,7 +1,8 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 #include "./ShaderLight.hlsli"
+
 cbuffer ItemBuffer : register(b1)
 {
 	float4x4 World;

@@ -9,27 +9,26 @@
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Specific/prng.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto BAT_ATTACK_DAMAGE = 50;
 
-	constexpr auto BAT_UNFURL_HEIGHT_RANGE = SECTOR(0.87f);
-	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(CLICK(1));
-	constexpr auto BAT_AWARE_RANGE		   = SQUARE(SECTOR(5));
+	constexpr auto BAT_UNFURL_HEIGHT_RANGE = BLOCK(0.87f);
+	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(BLOCK(1 / 4.0f));
+	constexpr auto BAT_AWARE_RANGE		   = SQUARE(BLOCK(5));
 
-	#define BAT_ANGLE ANGLE(20.0f)
+	constexpr auto BAT_ANGLE = ANGLE(20.0f);
 
 	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
 	enum BatState
 	{
-		BAT_STATE_NONE = 0,
+		// No state 0.
 		BAT_STATE_DROP_FROM_CEILING = 1,
 		BAT_STATE_FLY = 2,
 		BAT_STATE_ATTACK = 3,
@@ -50,7 +49,7 @@ namespace TEN::Entities::TR4
 
 	bool IsBatCollideTarget(ItemInfo* item)
 	{
-		return (item->TouchBits >= 0);
+		return (item->TouchBits.ToPackedBits() >= 0);
 	}
 
 	void InitialiseBat(short itemNumber)
@@ -102,12 +101,12 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(0.015f))
+				if (AI.distance < BAT_ATTACK_RANGE || Random::TestProbability(1 / 64.0f))
 					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits ||
+					if (item->TouchBits.TestAny() ||
 						(!creature->Enemy->IsLara() &&
 						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
@@ -120,7 +119,7 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
-					(item->TouchBits || !creature->Enemy->IsLara()) &&
+					(item->TouchBits.TestAny() || !creature->Enemy->IsLara()) &&
 					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{

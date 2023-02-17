@@ -7,7 +7,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_struct.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
@@ -19,15 +19,18 @@ char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
-static Vector3Int GameStixPosition = { 0, 0, -100 };
-OBJECT_COLLISION_BOUNDS GameStixBounds =
+const auto GameStixPosition = Vector3i(0, 0, -100);
+const ObjectCollisionBounds GameStixBounds =
 {
-	-256, 256,
-	-200, 200,
-	-256, 256,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
+	GameBoundingBox(
+		-CLICK(1), CLICK(1),
+		-200, 200,
+		-CLICK(1), CLICK(1)
+	),
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+	)
 };
 
 void InitialiseGameSticks(short itemNumber)
@@ -315,10 +318,10 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
 	item->Pose.Position.y -= STEPUP_HEIGHT;
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x2000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x4000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 	item->Pose.Position.y += STEPUP_HEIGHT;
 }
 
@@ -434,9 +437,9 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		laraItem->Pose.Orientation.y ^= 0x8000;
 
-		if (TestLaraPosition(&GameStixBounds, item, laraItem))
+		if (TestLaraPosition(GameStixBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(&GameStixPosition, item, laraItem))
+			if (MoveLaraPosition(GameStixPosition, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
 				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;

@@ -1,32 +1,30 @@
 #include "framework.h"
 #include "tr4_sarcophagus.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Input;
 
-static Vector3Int SarcophagusPosition(0, 0, -300);
-OBJECT_COLLISION_BOUNDS SarcophagusBounds =
+const auto SarcophagusPosition = Vector3i(0, 0, -300);
+const ObjectCollisionBounds SarcophagusBounds =
 {
-	-512, 512,
-	-100, 100,
-	-512, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
+	GameBoundingBox(
+		-SECTOR(0.5f), SECTOR(0.5f),
+		-100, 100,
+		-SECTOR(0.5f), 0
+	),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+		)
 };
-
-void InitialiseSarcophagus(short itemNumber)
-{
-
-}
 
 void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -40,9 +38,9 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
-		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
+		if (TestLaraPosition(SarcophagusBounds, sarcItem, laraItem))
 		{
-			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
+			if (MoveLaraPosition(SarcophagusPosition, sarcItem, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
@@ -69,29 +67,12 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		}
 	}
 	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+			 laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNumber, laraItem, coll);
 	}
 	else
 	{
-		short linkNumber;
-		for (linkNumber = g_Level.Items[g_Level.Rooms[sarcItem->RoomNumber].itemNumber].NextItem; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-		{
-			auto* currentItem = &g_Level.Items[linkNumber];
-
-			if (linkNumber != itemNumber &&
-				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
-				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
-			{
-				if (Objects[currentItem->ObjectNumber].isPickup)
-				{
-					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->ObjectNumber), 0);
-					currentItem->Status = ITEM_ACTIVE;
-					currentItem->ItemFlags[3] = 1;
-					AddDisplayPickup(currentItem->ObjectNumber);
-				}
-			}
-		}
+		CollectMultiplePickups(sarcItem->Index);
 	}
 }

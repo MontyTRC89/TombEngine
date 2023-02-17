@@ -1,6 +1,6 @@
 #pragma once
-#include "Specific/phd_global.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
+#include "Math/Math.h"
 
 struct ItemInfo;
 struct CollisionInfo;
@@ -9,19 +9,19 @@ struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
 
-constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// used by coll->Setup.LowerFloorBound
-constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// used by coll->Setup.UpperFloorBound
+constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
+constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
 
 enum CollisionType
 {
-	CT_NONE = 0,				// 0x00
-	CT_FRONT = (1 << 0),		// 0x01
-	CT_LEFT = (1 << 1),			// 0x02
-	CT_RIGHT = (1 << 2),		// 0x04
-	CT_TOP = (1 << 3),			// 0x08
-	CT_TOP_FRONT = (1 << 4),	// 0x10
-	CT_CLAMP = (1 << 5)			// 0x20
+	CT_NONE		 = 0,
+	CT_FRONT	 = (1 << 0),
+	CT_LEFT		 = (1 << 1),
+	CT_RIGHT	 = (1 << 2),
+	CT_TOP		 = (1 << 3),
+	CT_TOP_FRONT = (1 << 4),
+	CT_CLAMP	 = (1 << 5)
 };
 
 enum class CollisionProbeMode
@@ -48,21 +48,21 @@ struct CollisionPosition
 	bool CeilingSlope;
 	bool DiagonalStep;
 
-	bool HasDiagonalSplit() { return SplitAngle == 45.0f * RADIAN || SplitAngle == 135.0f * RADIAN; }
-	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != 45.0f * RADIAN; }
+	bool HasDiagonalSplit()		   { return ((SplitAngle == (45.0f * RADIAN)) || (SplitAngle == (135.0f * RADIAN))); }
+	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != (45.0f * RADIAN))); }
 };
 
 struct CollisionResult
 {
-	Vector3Int Coordinates;
+	Vector3i Coordinates;
 	int RoomNumber;
 
 	FloorInfo* Block;
 	FloorInfo* BottomBlock;
 
 	CollisionPosition Position;
-	Vector2 FloorTilt;			// x = x, y = z
-	Vector2 CeilingTilt;		// x = x, y = z
+	Vector2 FloorTilt;	 // x = x, y = z
+	Vector2 CeilingTilt; // x = x, y = z
 };
 
 struct CollisionSetup
@@ -87,7 +87,7 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	Vector3Int OldPosition;
+	Vector3i OldPosition;
 	int OldAnimNumber;
 	int OldFrameNumber;
 	int OldState;
@@ -104,33 +104,33 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3Int Shift;
+	Vector3i Shift;
 	CollisionType CollisionType;
-	Vector2 FloorTilt;				// x = x, y = z
-	Vector2 CeilingTilt;			// x = x, y = z
+	Vector2 FloorTilt;	 // x = x, y = z
+	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 
 	bool HitStatic;
 	bool HitTallObject;
 
-	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
-	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f)); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f)); }
+	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0.0f) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
+	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0.0f) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
+	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f))); }
+	bool DiagonalStepAtLeft()  { return (MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f))); }
 };
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float up = 0.0f, float right = 0.0f);
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
-void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
-int   GetQuadrant(short angle);
+int	  GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
@@ -152,12 +152,10 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle = 45.0f, Vector3Shrt tiltOffset = Vector3Shrt::Zero);
-
-short GetSurfaceAspectAngle(Vector2 tilt);
-short GetSurfaceSteepnessAngle(Vector2 tilt);
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, float constraintAngle = 70.0f);
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);

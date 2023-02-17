@@ -10,26 +10,25 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto GLADIATOR_ATTACK_DAMAGE = 120;
 
 	// TODO: Ranges.
 
-	const vector<int> GladiatorAttackJoints = { 13, 14 };
 	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
+	const auto GladiatorAttackJoints = std::vector<unsigned int>{ 13, 14 };
 
 	enum GladiatorState
 	{
-		GLADIATOR_STATE_NONE = 0,
+		// No state 0.
 		GLADIATOR_STATE_IDLE = 1,
 		GLADIATOR_STATE_WALK_FORWARD = 2,
 		GLADIATOR_STATE_RUN_FORWARD = 3,
@@ -73,11 +72,11 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, GLADIATOR_ANIM_IDLE);
 
 		if (item->TriggerFlags == 1)
-			item->MeshSwapBits = ALL_JOINT_BITS;
+			item->SetMeshSwapFlags(ALL_JOINT_BITS);
 	}
 
 	void ControlGladiator(short itemNumber)
@@ -88,8 +87,8 @@ namespace TEN::Entities::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -99,11 +98,7 @@ namespace TEN::Entities::TR5
 			item->HitPoints = 0;
 
 			if (item->Animation.ActiveState != GLADIATOR_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + GLADIATOR_ANIM_DEATH;
-				item->Animation.ActiveState = GLADIATOR_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			}
+				SetAnimation(item, GLADIATOR_ANIM_DEATH);
 		}
 		else
 		{
@@ -116,21 +111,21 @@ namespace TEN::Entities::TR5
 			CreatureAIInfo(item, &AI);
 
 			int unknown = true;
-			short rot;
+			short deltaAngle;
 			int distance;
 
 			if (creature->Enemy == LaraItem)
 			{
 				distance = AI.distance;
-				rot = AI.angle;
+				deltaAngle = AI.angle;
 			}
 			else
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				if (rot <= -ANGLE(90.0f) || rot >= ANGLE(90.0f))
+				deltaAngle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				if (deltaAngle <= -ANGLE(90.0f) || deltaAngle >= ANGLE(90.0f))
 					unknown = false;
 
 				distance = pow(dx, 2) + pow(dz, 2);
@@ -151,12 +146,12 @@ namespace TEN::Entities::TR5
 			switch (item->Animation.ActiveState)
 			{
 			case GLADIATOR_STATE_IDLE:
-				joint2 = rot;
+				joint2 = deltaAngle;
 				creature->MaxTurn = (-(int)(creature->Mood != MoodType::Bored)) & 0x16C;
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					!(GetRandomControl() & 0x1F) &&
+					Random::TestProbability(1.0f / 32) &&
 					(AI.distance > pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard(creature);
@@ -169,8 +164,7 @@ namespace TEN::Entities::TR5
 				{
 					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.TargetEntity != item &&
-							AI.ahead && !item->HitStatus)
+						if (Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
 						{
 							item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 							break;
@@ -179,13 +173,11 @@ namespace TEN::Entities::TR5
 					else
 					{
 						if (creature->Mood == MoodType::Bored ||
-							item->AIBits & FOLLOW &&
-							(creature->ReachedGoal ||
-								distance > pow(SECTOR(2), 2)))
+							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(SECTOR(2), 2))))
 						{
-							if (item->Animation.RequiredState)
+							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (!(GetRandomControl() & 0x3F))
+							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 
 							break;
@@ -193,8 +185,8 @@ namespace TEN::Entities::TR5
 
 						if (Lara.TargetEntity == item &&
 							unknown && distance < pow(SECTOR(1.5f), 2) &&
-							TestProbability(0.5f) &&
-							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
+							Random::TestProbability(1 / 2.0f) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = GLADIATOR_STATE_GUARD_START;
@@ -203,7 +195,7 @@ namespace TEN::Entities::TR5
 
 						if (AI.bite && AI.distance < pow(819, 2))
 						{
-							if (TestProbability(0.5f))
+							if (Random::TestProbability(1 / 2.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_1;
 							else
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_2;
@@ -218,7 +210,7 @@ namespace TEN::Entities::TR5
 				break;
 
 			case GLADIATOR_STATE_WALK_FORWARD:
-				joint2 = rot;
+				joint2 = deltaAngle;
 				creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7.0f) : ANGLE(2.0f);
 				creature->Flags = 0;
 
@@ -242,7 +234,7 @@ namespace TEN::Entities::TR5
 					else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
 						item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
 				}
-				else if (!(GetRandomControl() & 0x3F))
+				else if (Random::TestProbability(1 / 64.0f))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;
@@ -308,8 +300,7 @@ namespace TEN::Entities::TR5
 						break;
 					}
 				}
-				else if (Lara.TargetEntity != item ||
-					!(GetRandomControl() & 0x7F))
+				else if (Lara.TargetEntity != item || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;
@@ -343,8 +334,7 @@ namespace TEN::Entities::TR5
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3Int();
-					GetJointAbsPosition(item, &pos, 16);
+					auto pos = GetJointPosition(item, 16);
 
 					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
 					if (floor->Stopper)
@@ -361,7 +351,6 @@ namespace TEN::Entities::TR5
 									{
 										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);
-										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 										TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 									}
@@ -372,7 +361,7 @@ namespace TEN::Entities::TR5
 
 					if (!creature->Flags)
 					{
-						if (item->TestBits(JointBitType::Touch, GladiatorAttackJoints))
+						if (item->TouchBits.Test(GladiatorAttackJoints))
 						{
 							DoDamage(creature->Enemy, GLADIATOR_ATTACK_DAMAGE);
 							CreatureEffect2(item, GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);

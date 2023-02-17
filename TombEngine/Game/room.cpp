@@ -17,6 +17,14 @@ int FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
+bool ROOM_INFO::Active()
+{
+	if (flipNumber == NO_ROOM)
+		return true;
+
+	return !(FlipStats[flipNumber] && flippedRoom == NO_ROOM);
+}
+
 void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
@@ -54,8 +62,8 @@ void DoFlipMap(short group)
 
 	FlipStatus = FlipStats[group] = !FlipStats[group];
 
-	for (int i = 0; i < ActiveCreatures.size(); i++)
-		ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
+	for (auto& currentCreature : ActiveCreatures)
+		currentCreature->LOT.TargetBox = NO_BOX;
 }
 
 void AddRoomFlipItems(ROOM_INFO* room)
@@ -127,12 +135,9 @@ int IsRoomOutside(int x, int y, int z)
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
 		auto* room = &g_Level.Rooms[roomNumber];
 
-		if (y > room->maxceiling &&
-			y < room->minfloor &&
-			(z > (room->z + SECTOR(1)) &&
-				z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
-			(x > (room->x + SECTOR(1)) &&
-				x < (room->x + (room->xSize - 1) * SECTOR(1))))
+		if ((y > room->maxceiling && y < room->minfloor) &&
+			(z > (room->z + SECTOR(1)) && z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
+			(x > (room->x + SECTOR(1)) && x < (room->x + (room->xSize - 1) * SECTOR(1))))
 		{
 			auto probe = GetCollision(x, y, z, roomNumber);
 
@@ -167,28 +172,25 @@ FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 	return &room->floor[index];
 }
 
-BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility)
+GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility)
 {
-	static BOUNDING_BOX result;
+	static GameBoundingBox result;
 
 	if (visibility)
-		result = StaticObjects[mesh->staticNumber].visibilityBox * mesh->scale;
+		result = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
 	else
-		result = StaticObjects[mesh->staticNumber].collisionBox * mesh->scale;
+		result = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
 
-	return &result;
+	return result;
 }
 
-bool IsPointInRoom(Vector3Int pos, int roomNumber)
+bool IsPointInRoom(Vector3i pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	int xSector = (pos.x - room->x) / SECTOR(1);
-	int zSector = (pos.z - room->z) / SECTOR(1);
-
-	if ((xSector >= 0 && xSector <= (room->xSize - 1)) &&
-		(zSector >= 0 && zSector <= (room->zSize - 1)) &&
-		(pos.y <= room->minfloor && pos.y >= room->maxceiling)) // Up is -y, hence y should be "less" than floor.
+	if (pos.z >= (room->z + BLOCK(1)) && pos.z <= (room->z + ((room->zSize - 1) * BLOCK(1))) &&
+		pos.x >= (room->x + BLOCK(1)) && pos.x <= (room->x + ((room->xSize - 1) * BLOCK(1))) &&
+		pos.y <= room->minfloor && pos.y > room->maxceiling) // Up is -Y, hence Y should be "less" than floor.
 	{
 		return true;
 	}
@@ -196,16 +198,24 @@ bool IsPointInRoom(Vector3Int pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(Vector3Int position)
+int FindRoomNumber(Vector3i position, int startRoom)
 {
+	if (startRoom != NO_ROOM && startRoom < g_Level.Rooms.size())
+	{
+		auto& room = g_Level.Rooms[startRoom];
+		for (auto n : room.neighbors)
+			if (n != startRoom && IsPointInRoom(position, n) && g_Level.Rooms[n].Active())
+				return n;
+	}
+
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
-		if (IsPointInRoom(position, i))
+		if (IsPointInRoom(position, i) && g_Level.Rooms[i].Active())
 			return i;
 
-	return 0;
+	return (startRoom != NO_ROOM) ? startRoom : 0;
 }
 
-Vector3Int GetRoomCenter(int roomNumber)
+Vector3i GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
@@ -213,7 +223,7 @@ Vector3Int GetRoomCenter(int roomNumber)
 	auto halfDepth = SECTOR(room->zSize) / 2;
 	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
 
-	auto center = Vector3Int(
+	auto center = Vector3i(
 		room->x + halfLength,
 		room->minfloor + halfHeight,
 		room->z + halfDepth

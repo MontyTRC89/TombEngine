@@ -14,14 +14,8 @@
 // - Bacon Lara cannot be targeted.
 // - Bacon Lara cannot move like Lara.
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
-	// Original:
-	void InitialiseDoppelganger(short itemNumber)
-	{
-		ClearItem(itemNumber);
-	}
-
 	ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 	{
 		bool found = false;
@@ -42,7 +36,7 @@ namespace TEN::Entities::TR1
 		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
 	}
 
-	static short GetWeaponDamage(LaraWeaponType weaponType)
+	short GetWeaponDamage(LaraWeaponType weaponType)
 	{
 		return short(Weapons[(int)weaponType].Damage) * 25;
 	}
@@ -61,7 +55,7 @@ namespace TEN::Entities::TR1
 
 		if (!item->Data)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			if (reference == nullptr)
 			{
 				pos.x = item->Pose.Position.x;
@@ -80,26 +74,24 @@ namespace TEN::Entities::TR1
 			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
 
 			// Animate bacon Lara, mirroring Lara's position.
-			item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
 			item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
-			item->Pose.Position.x = pos.x;
-			item->Pose.Position.y = pos.y;
-			item->Pose.Position.z = pos.z;
+			item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
+			item->Pose.Position = pos;
 			item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
 			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
 			item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
 			ItemNewRoom(itemNumber, LaraItem->RoomNumber);
 
 			// Compare floor heights.
-			if (item->Floor >= laraFloorHeight + SECTOR(1) + 1 &&	// Add 1 to avoid bacon Lara dying when exiting water.
+			if (item->Floor >= (laraFloorHeight + SECTOR(1) + 1) && // Add 1 to avoid bacon Lara dying when exiting water.
 				!LaraItem->Animation.IsAirborne)
 			{
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START);
-				item->Animation.Velocity.z = 0;
-				item->Animation.Velocity.y = 0;
 				item->Animation.IsAirborne = true;
-				item->Data = -1;
+				item->Animation.Velocity.y = 0.0f;
+				item->Animation.Velocity.z = 0.0f;
 				item->Pose.Position.y += 50;
+				item->Data = -1;
 			}
 		}
 
@@ -114,10 +106,10 @@ namespace TEN::Entities::TR1
 				item->Pose.Position.y = item->Floor;
 				TestTriggers(item, true);
 
-				item->Animation.Velocity.y = 0;
-				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = LS_DEATH;
 				item->Animation.RequiredState = LS_DEATH;
+				item->Animation.IsAirborne = false;
+				item->Animation.Velocity.y = 0.0f;
 			}
 		}
 	}

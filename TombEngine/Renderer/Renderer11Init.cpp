@@ -21,7 +21,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_screenWidth = w;
 	m_screenHeight = h;
 	m_windowed = windowed;
-	InitialiseScreen(w, h, windowed, handle, false);
+	InitialiseScreen(w, h, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
@@ -37,6 +37,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", nullptr, blob);
+
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
 	{
@@ -80,6 +81,22 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
+
+	// Initialise input layout using the first vertex shader
+	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "VS", "vs_4_0", nullptr, blob);
+	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "PS", "ps_4_0", nullptr, blob);
+
+	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+		{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+	};
+	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayoutSprites, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayoutSprites));*/
 	
 	// Initialise constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
@@ -91,14 +108,15 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_cbRoom = CreateConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = CreateConstantBuffer<CAnimatedBuffer>();
 	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
-	m_cbAlphaTest = CreateConstantBuffer<CAlphaTestBuffer>();
+	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
+	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 
-	//Prepare HUD Constant buffer
+	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
 	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_SPACE_RES.x, 0, SCREEN_SPACE_RES.y, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 
@@ -207,7 +225,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	initQuad(m_device.Get());
 }
 
-void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool reset)
 {
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
@@ -300,23 +318,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 	m_viewportToolkit = Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
-	if (!windowed)
-	{
-		SetWindowLongPtr(handle, GWL_STYLE, 0);
-		SetWindowLongPtr(handle, GWL_EXSTYLE, WS_EX_TOPMOST);
-		SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-		ShowWindow(handle, SW_SHOWMAXIMIZED);
-	}
-	else
-	{
-		SetWindowLongPtr(handle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-		SetWindowLongPtr(handle, GWL_EXSTYLE, 0);
-		ShowWindow(handle, SW_SHOWNORMAL);
-		SetWindowPos(handle, HWND_TOP, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
-	}
-
-	UpdateWindow(handle);
-
+	SetFullScreen();
 }
 
 void TEN::Renderer::Renderer11::Create()
@@ -327,18 +329,28 @@ void TEN::Renderer::Renderer11::Create()
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 
-#ifndef _DEBUG
-	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
-#else
-	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
-#endif
+	if constexpr (DebugBuild)
+	{
+		res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, 
+			levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
+	}	
+	else
+	{
+		res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, 
+			levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
+	}
+
 	Utils::throwIfFailed(res);
 }
 
 void Renderer11::ToggleFullScreen(bool force)
 {
 	m_windowed = force ? false : !m_windowed;
+	SetFullScreen();
+}
 
+void Renderer11::SetFullScreen()
+{
 	if (!m_windowed)
 	{
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
@@ -348,10 +360,18 @@ void Renderer11::ToggleFullScreen(bool force)
 	}
 	else
 	{
+		int frameW = GetSystemMetrics(SM_CXPADDEDBORDER);
+		int frameX = GetSystemMetrics(SM_CXSIZEFRAME);
+		int frameY = GetSystemMetrics(SM_CYSIZEFRAME);
+		int frameC = GetSystemMetrics(SM_CYCAPTION);
+
+		int borderWidth  = (frameX + frameW) * 2;
+		int borderHeight = (frameY + frameW) * 2 + frameC;
+
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, 0);
 		ShowWindow(WindowsHandle, SW_SHOWNORMAL);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth, m_screenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth + borderWidth, m_screenHeight + borderHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 	UpdateWindow(WindowsHandle);

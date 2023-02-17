@@ -59,7 +59,7 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
+bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -67,13 +67,13 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 		return 0;
 	}
 
-	if (pointer == NULL || compSize <= 0)
+	if (pointer == nullptr || compSize <= 0)
 	{
 		TENLog("Sample size or memory address is incorrect for index " + std::to_string(index), LogLevel::Warning);
 		return 0;
 	}
 
-	// Load and uncompress sample to 32-bit float format
+	// Load and uncompress sample to 32-bit float format.
 	HSAMPLE sample = BASS_SampleLoad(true, pointer, 0, compSize, 1, SOUND_SAMPLE_FLAGS);
 
 	if (!sample)
@@ -83,7 +83,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	}
 
 	// Paranoid (c) TeslaRus
-	// Try to free sample before allocating new one
+	// Try to free sample before allocating new one.
 	Sound_FreeSample(index);
 
 	BASS_SAMPLE info;
@@ -140,7 +140,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
 	if (!g_Configuration.EnableSound)
 		return false;
@@ -154,7 +154,7 @@ bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	if (condition != SoundEnvironment::Always)
 	{
 		// Get current camera room's environment
-		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
@@ -195,7 +195,7 @@ bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 		sampleFlags |= BASS_SAMPLE_3D;
 
 	// Set & randomize volume (if needed)
-	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);;
+	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
 	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
 		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
 
@@ -407,9 +407,6 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 		break;
 	}
 
-	if (channelActive)
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
-	
 	auto fullTrackName = TRACKS_PATH + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
@@ -419,11 +416,14 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 			fullTrackName = TRACKS_PATH + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
-				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Error);
+				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);
 				return;
 			}
 		}
 	}
+
+	if (channelActive)
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
@@ -515,14 +515,17 @@ void PlaySoundTrack(int index, short mask)
 
 void StopSoundTracks()
 {
-	// Do quick fadeouts.
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
+	StopSoundTrack(SoundTrackType::OneShot, SOUND_XFADETIME_ONESHOT);
+	StopSoundTrack(SoundTrackType::BGM, SOUND_XFADETIME_ONESHOT);
+}
 
-	BASS_Soundtrack[(int)SoundTrackType::OneShot].Track = {};
-	BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel = NULL;
-	BASS_Soundtrack[(int)SoundTrackType::BGM].Track = {};
-	BASS_Soundtrack[(int)SoundTrackType::BGM].Channel = NULL;
+void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
+{
+	// Do fadeout.
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, fadeoutTime);
+
+	BASS_Soundtrack[(int)mode].Track = {};
+	BASS_Soundtrack[(int)mode].Channel = NULL;
 }
 
 void ClearSoundTrackMasks()
@@ -594,7 +597,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
+int Sound_EffectIsPlaying(int effectID, Pose *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -627,7 +630,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PHD_3DPOS *position)
+float Sound_DistanceToListener(Pose *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
@@ -668,7 +671,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
+bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -720,7 +723,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? (int)g_Level.Rooms[Camera.pos.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -854,7 +857,10 @@ void Sound_Init()
 void Sound_DeInit()
 {
 	if (g_Configuration.EnableSound)
+	{
+		TENLog("Shutting down BASS...", LogLevel::Info);
 		BASS_Free();
+	}
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)
@@ -881,7 +887,7 @@ void SayNo()
 
 void PlaySecretTrack()
 {
-	if (SoundTracks.size() <= SecretSoundIndex)
+	if (SoundTracks.find(SecretSoundIndex) == SoundTracks.end())
 	{
 		TENLog("No secret soundtrack index was found!", LogLevel::Warning);
 		return;
@@ -900,27 +906,26 @@ int GetShatterSound(int shatterID)
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;
 	else
-		return SFX_TR5_SMASH_GLASS;
+		return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()
 {
+	static constexpr int PLAY_ALWAYS    = 0x8000;
+	static constexpr int PLAY_BASE_ROOM = 0x4000;
+	static constexpr int PLAY_FLIP_ROOM = 0x2000;
+
 	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
 	{
-		SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+		const auto& sound = g_Level.SoundSources[i];
 
-		short t = sound->flags & 31;
-		short group = t & 1;
-		group += t & 2;
-		group += ((t >> 2) & 1) * 3;
-		group += ((t >> 3) & 1) * 4;
-		group += ((t >> 4) & 1) * 5;
+		int group = sound.Flags & 0x1FFF;
 
-		if (!FlipStats[group] && (sound->flags & 128) == 0)
+		if (!FlipStats[group] && (sound.Flags & PLAY_FLIP_ROOM))
 			continue;
-		else if (FlipStats[group] && (sound->flags & 128) == 0)
+		else if (FlipStats[group] && (sound.Flags & PLAY_BASE_ROOM))
 			continue;
 
-		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x);
+		SoundEffect(sound.SoundID, (Pose*)&sound.Position);
 	}
 }

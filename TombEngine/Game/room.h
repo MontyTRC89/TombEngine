@@ -2,11 +2,10 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
 #include "Specific/newtypes.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct TriggerVolume;
-
-constexpr auto MAX_FLIPMAP = 256;
+enum class ReverbType;
 
 struct ROOM_VERTEX
 {
@@ -41,13 +40,15 @@ struct ROOM_LIGHT
 
 struct MESH_INFO
 {
-	PHD_3DPOS pos;
+	Pose pos;
+	int roomNumber;
 	float scale;
 	short staticNumber;
 	short flags;
 	Vector4 color;
 	short HitPoints;
-	std::string luaName;
+	std::string Name;
+	bool Dirty;
 };
 
 struct LIGHTINFO
@@ -72,17 +73,18 @@ struct LIGHTINFO
 
 enum RoomEnvFlags
 {
-	ENV_FLAG_WATER = 0x0001,
-	ENV_FLAG_SWAMP = 0x0004,
-	ENV_FLAG_OUTSIDE = 0x0008,
-	ENV_FLAG_DYNAMIC_LIT = 0x0010,
-	ENV_FLAG_WIND = 0x0020,
-	ENV_FLAG_NOT_NEAR_OUTSIDE = 0x0040,
-	ENV_FLAG_NO_LENSFLARE = 0x0080, // Was quicksand in TR3.
-	ENV_FLAG_MIST = 0x0100,
-	ENV_FLAG_CAUSTICS = 0x0200,
-	ENV_FLAG_UNKNOWN3 = 0x0400,
-	ENV_FLAG_COLD = 0x1000
+	ENV_FLAG_WATER			  = (1 << 0),
+	ENV_FLAG_SWAMP			  = (1 << 2),
+	ENV_FLAG_OUTSIDE		  = (1 << 3),
+	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
+	ENV_FLAG_WIND			  = (1 << 5),
+	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
+	ENV_FLAG_NO_LENSFLARE	  = (1 << 7), // NOTE: Was quicksand in TR3.
+	ENV_FLAG_MIST			  = (1 << 8),
+	ENV_FLAG_CAUSTICS		  = (1 << 9),
+	ENV_FLAG_UNKNOWN3		  = (1 << 10),
+	ENV_FLAG_DAMAGE			  = (1 << 11),
+	ENV_FLAG_COLD			  = (1 << 12)
 };
 
 enum StaticMeshFlags : short
@@ -93,6 +95,7 @@ enum StaticMeshFlags : short
 
 struct ROOM_INFO
 {
+	int index;
 	int x;
 	int y;
 	int z;
@@ -104,7 +107,7 @@ struct ROOM_INFO
 	int flippedRoom;
 	int flags;
 	int meshEffect;
-	int reverbType;
+	ReverbType reverbType;
 	int flipNumber;
 	short itemNumber;
 	short fxNumber;
@@ -126,8 +129,11 @@ struct ROOM_INFO
 	std::vector<ROOM_DOOR> doors;
 
 	std::vector<int> neighbors; // TODO: Move to level struct
+
+	bool Active();
 };
 
+constexpr auto MAX_FLIPMAP = 256;
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
 constexpr auto OUTSIDE_Z = 64;
@@ -141,12 +147,12 @@ void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* room);
 void RemoveRoomFlipItems(ROOM_INFO* room);
 bool IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(Vector3Int pos, int roomNumber);
-int FindRoomNumber(Vector3Int pos);
-Vector3Int GetRoomCenter(int roomNumber);
+bool IsPointInRoom(Vector3i pos, int roomNumber);
+int FindRoomNumber(Vector3i pos, int startRoom = NO_ROOM);
+Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
-BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility);
+GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);

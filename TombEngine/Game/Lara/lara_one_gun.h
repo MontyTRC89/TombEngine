@@ -1,35 +1,10 @@
 #pragma once
 #include "Game/control/control.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
+#include "Specific/clock.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
-
-#define PELLET_SCATTER ANGLE(20.0f)
-
-constexpr auto HARPOON_DRAW_ANIM = 1;
-constexpr auto ROCKET_DRAW_ANIM = 0;
-constexpr auto HARPOON_VELOCITY = CLICK(1);
-constexpr auto HARPOON_TIME = 10 * FPS;
-constexpr auto GRENADE_TIME = 4 * FPS;
-constexpr auto ROCKET_TIME = 4.5f * FPS;
-constexpr auto EXPLOSION_TRIGGER_TIME = 4 * FPS - 2;
-constexpr auto ROCKET_VELOCITY = CLICK(2);
-constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
-constexpr auto MAX_GRENADE_VERTICAL_VELOCITY = CLICK(0.5f);
-constexpr auto GRENADE_Y_OFFSET = 180;
-constexpr auto GRENADE_Z_OFFSET = 80;
-constexpr auto CROSSBOW_DAMAGE = 5;
-constexpr auto CROSSBOW_AMMO1 = 1;
-constexpr auto CROSSBOW_AMMO2 = 2;
-constexpr auto CROSSBOW_AMMO3 = 2;
-constexpr auto CROSSBOW_HIT_RADIUS = CLICK(0.5f);
-constexpr auto CROSSBOW_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto GRENADE_HIT_RADIUS = CLICK(0.5f);
-constexpr auto GRENADE_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto ROCKET_HIT_RADIUS = CLICK(0.5f);
-constexpr auto ROCKET_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto HARPOON_HIT_RADIUS = CLICK(0.5f);
 
 enum class GrenadeType
 {
@@ -40,6 +15,17 @@ enum class GrenadeType
 	Flags
 };
 
+enum class ProjectileType
+{
+	Normal,
+	Poison,
+	Harpoon,
+	Explosive,
+	Grenade,
+	FragGrenade,
+	FlashGrenade
+};
+
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
 void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
 void FireShotgun(ItemInfo* laraItem);
@@ -48,21 +34,20 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
 void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
 void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
 
-void FireHarpoon(ItemInfo* laraItem);
+ItemInfo* FireHarpoon(ItemInfo* laraItem);
 void HarpoonBoltControl(short itemNumber);
 void FireGrenade(ItemInfo* laraItem);
 void GrenadeControl(short itemNumber);
-//void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos);
+void FireCrossbow(ItemInfo* laraItem, Pose* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target);
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target);
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
+void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType);
 
-void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* src, ItemInfo* dest, LaraWeaponType weaponType);
+void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile, int damage);
+void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage);
 void SomeSparkEffect(int x, int y, int z, int count);
-
-void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags);

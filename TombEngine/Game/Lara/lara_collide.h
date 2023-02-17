@@ -15,6 +15,7 @@ constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
 
 bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll);
+bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll);
 void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll);
@@ -35,4 +36,4 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHitCeiling(CollisionInfo* coll);
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
+bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, int down = 0, int right = 0);

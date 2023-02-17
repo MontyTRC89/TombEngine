@@ -1,22 +1,29 @@
 #include "framework.h"
-#include "EffectsFunctions.h"
-#include "LuaHandler.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
-#include "Color/Color.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
+
+#include "Effects/BlendIDs.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/control/los.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Electricity.h"
+#include "Game/control/los.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/setup.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "Effects/BlendIDs.h"
+#include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
+#include "Specific/clock.h"
 
 /***
 Functions to generate effects.
@@ -24,14 +31,13 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -45,15 +51,8 @@ namespace Effects
 	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
 	static void EmitLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
-		Vector3Int p1;
-		p1.x = src.x;
-		p1.y = src.y;
-		p1.z = src.z;
-
-		Vector3Int p2;
-		p2.x = dest.x;
-		p2.y = dest.y;
-		p2.z = dest.z;
+		auto p1 = Vector3(src.x, src.y, src.z);
+		auto p2 = Vector3(dest.x, dest.y, dest.z);
 
 		int segs = USE_IF_HAVE(int, segments, 10);
 
@@ -94,7 +93,7 @@ namespace Effects
 
 		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
 
-		TEN::Effects::Lightning::TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
+		SpawnElectricity(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
 	/*** Emit a particle.
@@ -107,7 +106,7 @@ namespace Effects
 	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
 	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
 	@tparam Color endColor (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
-	@tparam BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
+	@tparam Effects.BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
 	@tparam int startSize (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
 	@tparam int endSize (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
 	@tparam float lifetime (default 2) Lifespan in seconds 
@@ -169,7 +168,7 @@ namespace Effects
 		s->x = pos.x;
 		s->y = pos.y;
 		s->z = pos.z;
-		s->roomNumber = FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z));
+		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
 		float life = USE_IF_HAVE(float, lifetime, 2.0f);
@@ -232,7 +231,7 @@ namespace Effects
 */
 	static void EmitShockwave(Vec3 pos, TypeOrNil<int> innerRadius, TypeOrNil<int> outerRadius, TypeOrNil<ScriptColor> col, TypeOrNil<float> lifetime, TypeOrNil<int> speed, TypeOrNil<int> angle, TypeOrNil<bool> hurtsLara)
 	{
-		PHD_3DPOS p;
+		Pose p;
 		p.Position.x = pos.x;
 		p.Position.y = pos.y;
 		p.Position.z = pos.z;
@@ -257,7 +256,7 @@ namespace Effects
 
 		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
 
-		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, FROM_DEGREES(ang), short(damage));
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, EulerAngles(ANGLE(ang), 0.0f, 0.0f), short(damage), true, false, (int)ShockwaveStyle::Normal);
 	}
 
 /***Emit dynamic light that lasts for a single frame.
@@ -293,7 +292,7 @@ namespace Effects
 	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
 	{
 
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
 	}
 
 /***Make an explosion. Does not hurt Lara
@@ -304,7 +303,7 @@ namespace Effects
 */
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)));
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
 	}
 
 /***Make an earthquake
@@ -328,7 +327,8 @@ namespace Effects
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0))/ float(FPS));
 	}
 
-	void Register(sol::state* state, sol::table& parent) {
+	void Register(sol::state* state, sol::table& parent) 
+	{
 		sol::table table_effects{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Effects, table_effects);
 
@@ -344,6 +344,7 @@ namespace Effects
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_effects, ScriptReserved_BlendID, kBlendIDs);
+		handler.MakeReadOnlyTable(table_effects, ScriptReserved_EffectID, kEffectIDs);
 	}
 }
 

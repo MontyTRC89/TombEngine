@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -10,19 +11,23 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
 	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);
 
-	// TODO
-	enum EagleState
+	enum EagleOrCrowState
 	{
-
+		// No state 0.
+		EAGLE_CROW_STATE_FLY = 1,
+		EAGLE_CROW_STATE_IDLE = 2,
+		EAGLE_CROW_STATE_PLANE = 3,
+		EAGLE_CROW_STATE_DEATH_START = 4,
+		EAGLE_CROW_STATE_DEATH_END = 5,
+		EAGLE_CROW_STATE_ATTACK = 6
 	};
 
-	// TODO
-	enum EagleAnim
+	enum EagleOrCrowAnim
 	{
 
 	};
@@ -31,7 +36,7 @@ namespace TEN::Entities::TR2
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->ObjectNumber == ID_CROW)
 		{
@@ -62,12 +67,13 @@ namespace TEN::Entities::TR2
 			switch (item->Animation.ActiveState)
 			{
 			case 4:
-				if (item->Pose.Position.y > item->Floor)
+				if (item->Pose.Position.y >= item->Floor)
 				{
-					item->Pose.Position.y = item->Floor;
-					item->Animation.Velocity.y = 0;
+					item->Animation.Velocity.y = 0.0f;
 					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = 5;
+					item->Pose.Position.y = item->Floor;
+					AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 				}
 
 				break;
@@ -88,6 +94,7 @@ namespace TEN::Entities::TR2
 				item->Animation.IsAirborne = true;
 				break;
 			}
+
 			item->Pose.Orientation.x = 0;
 		}
 		else
@@ -123,7 +130,7 @@ namespace TEN::Entities::TR2
 			case 1:
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 2;
@@ -146,7 +153,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case 6:
-				if (!creature->Flags && item->TouchBits)
+				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 20);
 

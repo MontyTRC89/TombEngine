@@ -18,10 +18,10 @@
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
-using namespace TEN::Utils;
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Utils;
 
 using std::exception;
 using std::string;
@@ -32,8 +32,7 @@ WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;
 HACCEL hAccTable;
-byte receivedWmClose = false;
-bool Debug = false;
+bool DebugMode = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
@@ -44,30 +43,26 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#if _DEBUG
-string commit;
-#endif
-
 bool ArgEquals(wchar_t* incomingArg, std::string name)
 {
-	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::FromWchar(incomingArg));
+	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::ToString(incomingArg));
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
-Vector2Int GetScreenResolution()
+Vector2i GetScreenResolution()
 {
 	RECT desktop;
 	const HWND hDesktop = GetDesktopWindow();
 	GetWindowRect(hDesktop, &desktop);
-	Vector2Int resolution;
+	Vector2i resolution;
 	resolution.x = desktop.right;
 	resolution.y = desktop.bottom;
 	return resolution;
 }
 
-std::vector<Vector2Int> GetAllSupportedScreenResolutions()
+std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
-	std::vector<Vector2Int> result;
+	std::vector<Vector2i> result;
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
@@ -84,7 +79,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			Vector2Int resolution;
+			Vector2i resolution;
 			resolution.x = dm.dmPelsWidth;
 			resolution.y = dm.dmPelsHeight;
 			result.push_back(resolution);
@@ -94,7 +89,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 	std::sort(
 		result.begin(),
 		result.end(),
-		[](Vector2Int& a, Vector2Int& b)
+		[](Vector2i& a, Vector2i& b)
 		{
 			if (a.x == b.x)
 			{
@@ -108,6 +103,25 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 	);
 
 	return result;
+}
+
+void DisableDpiAwareness()
+{
+	// Don't use SHCore library directly, as it's not available on pre-win 8.1 systems.
+
+	typedef HRESULT(WINAPI* SetDpiAwarenessProc)(UINT);
+	static constexpr unsigned int PROCESS_SYSTEM_DPI_AWARE = 1;
+
+	auto lib = LoadLibrary("SHCore.dll");
+	if (lib == NULL)
+		return;
+
+	auto setDpiAwareness = (SetDpiAwarenessProc)GetProcAddress(lib, "SetProcessDpiAwareness");
+	if (setDpiAwareness == NULL)
+		return;
+
+	setDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
+	FreeLibrary(lib);
 }
 
 void WinProcMsg()
@@ -152,6 +166,8 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static bool receivedWmClose = false;
+
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
@@ -190,7 +206,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!g_Configuration.Windowed)
 				g_Renderer.ToggleFullScreen(true);
 
-			if (!Debug && ThreadHandle > 0)
+			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
@@ -205,7 +221,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!g_Configuration.Windowed)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
-		if (!Debug)
+		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
@@ -239,11 +255,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "debug"))
 		{
-			Debug = true;
+			DebugMode = true;
 		}
 		else if (ArgEquals(argv[i], "level") && argc > (i + 1))
 		{
-			levelFile = TEN::Utils::FromWchar(argv[i + 1]);
+			levelFile = TEN::Utils::ToString(argv[i + 1]);
 		}
 		else if (ArgEquals(argv[i], "hash") && argc > (i + 1))
 		{
@@ -254,7 +270,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Hide console window if mode isn't debug
 #ifndef _DEBUG
-	if (!Debug)
+	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
@@ -281,20 +297,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise scripting
 	try 
 	{
-		// TODO: make sure the right objects are deleted at the end
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
-		g_GameFlow->LoadFlowScript();
-		g_GameScript = ScriptInterfaceState::CreateGame();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
+
+		// This must be loaded last as it adds metafunctions to the global
+		// table so that every global variable added henceforth gets put
+		// into a special hidden table which we can clean up.
+		// By doing this last, we ensure that all built-in usertypes
+		// are added to a hierarchy in the REAL global table, not the fake
+		// hidden one.
+		g_GameScript = ScriptInterfaceState::CreateGame();
+
+		//todo Major hack. This should not be needed to leak outside of
+		//LogicHandler internals. In a future version stuff from FlowHandler
+		//should be moved to LogicHandler or vice versa to make this stuff
+		//less fragile (squidshire, 16/09/22)
+		g_GameScript->ShortenTENCalls();
+		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)
 	{
-		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+		std::string msg = std::string{ "A Lua error occurred while setting up scripts; " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
 		ShutdownTENLog();
 		return 0;
 	}
+
+	// Disable DPI scaling on Windows 8.1+ systems
+	DisableDpiAwareness();
 
 	// Setup main window
 	INITCOMMONCONTROLSEX commCtrlInit;
@@ -422,7 +453,9 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeInitialiseInput();
+	DeinitialiseInput();
+
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
@@ -439,4 +472,5 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
+
 }

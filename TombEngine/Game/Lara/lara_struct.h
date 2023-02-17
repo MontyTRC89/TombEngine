@@ -1,24 +1,27 @@
 #pragma once
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Specific/trmath.h"
 
-#define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
-#define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
-#define NUM_KEYS (ID_KEY_ITEM16 - ID_KEY_ITEM1 + 1)
-#define NUM_KEY_PIECES	(ID_KEY_ITEM16_COMBO2 - ID_KEY_ITEM1_COMBO1 + 1)
-#define NUM_PICKUPS (ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1)
-#define NUM_PICKUPS_PIECES	(ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1)
-#define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
-#define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
-
-struct CreatureInfo;
-struct ItemInfo;
-struct FX_INFO;
+using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
 	struct RendererMesh;
 }
+
+struct CreatureInfo;
+struct FX_INFO;
+struct ItemInfo;
+
+// Inventory object constants
+constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
+constexpr int NUM_PUZZLE_PIECES   = ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1;
+constexpr int NUM_KEYS			  = ID_KEY_ITEM16 - ID_KEY_ITEM1 + 1;
+constexpr int NUM_KEY_PIECES	  = ID_KEY_ITEM16_COMBO2 - ID_KEY_ITEM1_COMBO1 + 1;
+constexpr int NUM_PICKUPS		  = ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1;
+constexpr int NUM_PICKUPS_PIECES  = ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1;
+constexpr int NUM_EXAMINES		  = ID_EXAMINE8 - ID_EXAMINE1 + 1;
+constexpr int NUM_EXAMINES_PIECES = ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1;
 
 #pragma region state_and_animation
 enum LaraState
@@ -47,7 +50,7 @@ enum LaraState
 	LS_TURN_RIGHT_FAST = 20,
 	LS_STEP_RIGHT = 21,
 	LS_STEP_LEFT = 22,
-	LS_ROLL_BACK = 23,
+	LS_ROLL_180_BACKWARD = 23,
 	LS_SLIDE_FORWARD = 24,
 	LS_JUMP_BACK = 25,
 	LS_JUMP_RIGHT = 26,
@@ -69,7 +72,7 @@ enum LaraState
 	LS_INSERT_KEY = 42,
 	LS_INSERT_PUZZLE = 43,
 	LS_WATER_DEATH = 44,
-	LS_ROLL_FORWARD = 45,
+	LS_ROLL_180_FORWARD = 45,
 	LS_BOULDER_DEATH = 46,
 	LS_ONWATER_BACK = 47,
 	LS_ONWATER_LEFT = 48,
@@ -207,6 +210,7 @@ enum LaraState
 	LS_SOFT_SPLAT = 170,
 	LS_CROUCH_TURN_180 = 171,
 	LS_CRAWL_TURN_180 = 172,
+	LS_TURN_180 = 173,
 
 	NUM_LARA_STATES
 };
@@ -483,7 +487,7 @@ enum LaraAnim
 	LA_MONKEY_SHIMMY_RIGHT = 255,									// Monkey swing shimmy right (looped)
 	LA_MONKEY_SHIMMY_RIGHT_END = 256,								// Monkey swing shimmy right > monkey swing idle
 																		// TODO: generic shimmy anims between ledges and ladders?
-	LA_MONKEY_TURN_180 = 257,										// Monkey swing turn 180
+	LA_MONKEY_TURN_180_START = 257,									// Monkey swing turn 180 (1/2)
 	LA_CROUCH_TO_CRAWL_START = 258,									// Crouch > crawl (1/3)
 	LA_CRAWL_TO_CROUCH_START = 259,									// Crawl > crouch (1/3)
 	LA_CRAWL = 260,													// Crawl forward (looped)
@@ -491,22 +495,22 @@ enum LaraAnim
 	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
 	LA_CRAWL_IDLE = 263,											// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
-	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,								// Crouch > crawl (3/3) remove
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,							// TODO: remove.
+	LA_TURN_180_START = 265,										// Standing turn 180 (1/2)
+	LA_TURN_180_END = 266,											// Standing turn 180 (2/2)
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
+	LA_MONKEY_TURN_180_END = 268,									// Monkey swing turn 180 (2/2)
 	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
 	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
 	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
 	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
-	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crouch > crawl (2/3)
+	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crawl > crouch (2/3)
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,						// Crawl back > crawl idle, right foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Crawl back > crawl idle, right foot first (2/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,							// Crawl back > crawl idle, left foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Crawl back > crawl idle, left foot first (2/2)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Unused.
+	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
+	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
@@ -806,12 +810,16 @@ enum LaraAnim
 	LA_CROUCH_TURN_180_END = 562,
 	LA_CRAWL_TURN_180_START = 653,
 	LA_CRAWL_TURN_180_END = 654,
+	LA_LEDGE_JUMP_UP_START = 565,
+	LA_LEDGE_JUMP_UP_END = 566,
+	LA_LEDGE_JUMP_BACK_START = 567,
+	LA_LEDGE_JUMP_BACK_END = 568,
 
-	NUM_LARA_ANIMS,
+	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
-	// 265, 266, 268, 273, 274, 278, 280,
+	// 273, 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
@@ -887,7 +895,7 @@ enum class HolsterSlot
 	Shotgun			= ID_SHOTGUN_ANIM,
 	HK				= ID_HK_ANIM,
 	Harpoon			= ID_HARPOON_ANIM,
-	Crowssbow		= ID_CROSSBOW_ANIM,
+	Crossbow		= ID_CROSSBOW_ANIM,
 	GrenadeLauncher = ID_GRENADE_ANIM,
 	RocketLauncher	= ID_ROCKET_ANIM
 };
@@ -898,15 +906,6 @@ enum class ClothType
 	None,
 	Dry,
 	Wet
-};
-
-enum class BurnType
-{
-	None,
-	Normal,
-	Smoke,
-	Blue,
-	Blue2
 };
 
 enum class WaterStatus
@@ -951,123 +950,125 @@ struct Ammo
 	using CountType = uint16_t;
 
 private:
-	CountType count;
-	bool isInfinite;
+	CountType Count;
+	bool	  IsInfinite;
 
 public:
+	static CountType Clamp(int value)
+	{
+		return std::clamp(value, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
+	}
+
+	bool HasInfinite() const
+	{
+		return IsInfinite;
+	}
+
+	CountType GetCount() const
+	{
+		return Count;
+	}
+
+	void SetInfinite(bool infinite)
+	{
+		this->IsInfinite = infinite;
+	}
 
 	Ammo& operator --()
 	{
-		--count;
+		assertion(this->Count > 0, "Ammo count is already 0!");
+		--this->Count;
 		return *this;
 	}
 
 	Ammo operator --(int)
 	{
-		Ammo tmp = *this;
+		auto temp = *this;
 		--*this;
-		return tmp;
+		return temp;
 	}
 
 	Ammo& operator ++()
 	{
-		++count;
+		++this->Count;
 		return *this;
 	}
 
 	Ammo operator ++(int)
 	{
-		Ammo tmp = *this;
+		auto temp = *this;
 		++*this;
-		return tmp;
+		return temp;
 	}
 
-	Ammo& operator =(size_t val)
+	Ammo& operator =(size_t value)
 	{
-		count = clamp(val);
+		this->Count = Clamp(value);
 		return *this;
 	}
 
-	bool operator ==(size_t val)
+	bool operator ==(size_t value)
 	{
-		return count == clamp(val);
+		return (Count == Clamp(value));
 	}
 
 	Ammo& operator =(Ammo& rhs)
 	{
-		count = rhs.count;
-		isInfinite = rhs.count;
+		this->Count = rhs.Count;
+		this->IsInfinite = rhs.Count;
 		return *this;
 	}
 
-	Ammo operator +(size_t val)
+	Ammo operator +(size_t value)
 	{
-		Ammo tmp = *this;
-		tmp += val;
-		return tmp;
+		auto temp = *this;
+		temp += value;
+		return temp;
 	}
 
-	Ammo operator -(size_t val)
+	Ammo operator -(size_t value)
 	{
-		Ammo tmp = *this;
-		tmp -= val;
-		return tmp;
+		auto temp = *this;
+		temp -= value;
+		return temp;
 	}
 
-	Ammo& operator +=(size_t val)
+	Ammo& operator +=(size_t value)
 	{
-		int tmp = this->count + val;
-		this->count = clamp(tmp);
+		int temp = Count + value;
+		this->Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t val)
+	Ammo& operator -=(size_t value)
 	{
-		int tmp = this->count - val;
-		this->count = clamp(tmp);
+		int temp = Count - value;
+		this->Count = Clamp(temp);
 		return *this;
 	}
 
 	operator bool()
 	{
-		return isInfinite || (count > 0);
-	}
-
-	static CountType clamp(int val)
-	{
-		return std::clamp(val, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
-	}
-
-	bool hasInfinite() const
-	{
-		return isInfinite;
-	}
-
-	CountType getCount() const
-	{
-		return count;
-	}
-
-	void setInfinite(bool infinite)
-	{
-		isInfinite = infinite;
+		return (IsInfinite || Count > 0);
 	}
 };
 
 struct HolsterInfo
 {
-	HolsterSlot LeftHolster;
-	HolsterSlot RightHolster;
-	HolsterSlot BackHolster;
+	HolsterSlot LeftHolster  = HolsterSlot::Empty;
+	HolsterSlot RightHolster = HolsterSlot::Empty;
+	HolsterSlot BackHolster  = HolsterSlot::Empty;
 };
 
 struct CarriedWeaponInfo
 {
-	bool Present;
-	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes];
-	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
-	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
-	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
+	bool Present	   = false;
+	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
+	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
+
+	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
+	WeaponAmmoType SelectedAmmo = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo
@@ -1076,7 +1077,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 
-	Vector3Shrt Orientation;
+	EulerAngles Orientation;
 
 	bool Locked;
 	int GunFlash;
@@ -1096,27 +1097,27 @@ struct TorchData
 	bool IsLit;
 };
 
-// TODO: Someone's abandoned dairy feature.
-#define MaxDiaryPages	  64
-#define MaxStringsPerPage 8
+// TODO: Troye's abandoned dairy feature.
+constexpr int MAX_DIARY_PAGES			 = 64;
+constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	int x, y;
-	short stringID;
+	Vector2i Position;
+	int		StringID;
 };
 
 struct DiaryPage
 {
-	DiaryString	Strings[MaxStringsPerPage];
+	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE];
 };
 
 struct DiaryInfo
 {
-	bool Present;
-	short numPages;
-	short currentPage;
-	DiaryPage Pages[MaxDiaryPages];
+	bool		 Present;
+	DiaryPage	 Pages[MAX_DIARY_PAGES];
+	unsigned int NumPages;
+	unsigned int CurrentPage;
 };
 
 struct LaraInventoryData
@@ -1127,21 +1128,23 @@ struct LaraInventoryData
 	DiaryInfo Diary;
 
 	byte BeetleLife;
-	int BeetleComponents;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
-	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
+	int BeetleComponents; // BeetleComponentFlags enum
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
 
-	bool HasBinoculars;
-	bool HasCrowbar;
-	bool HasTorch;
-	bool HasLasersight; // TODO: Duplicated in CarriedWeaponInfo.
-	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
-
+	// TODO: Rename prefixes back to "Num".
 	int TotalSmallMedipacks;
 	int TotalLargeMedipacks;
 	int TotalFlares;
 	unsigned int TotalSecrets;
 
+	bool HasBinoculars;
+	bool HasCrowbar;
+	bool HasTorch;
+	bool HasLasersight;
+	bool HasSilencer; // TODO: Unused.
+
+	// TODO: Convert to bools.
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];
@@ -1158,22 +1161,26 @@ struct LaraCountData
 	unsigned int PositionAdjust;
 	unsigned int Run;
 	unsigned int Death;
-	unsigned int NoCheat;
 };
 
 struct WeaponControlData
 {
-	short WeaponItem;
-	bool HasFired;
-	bool Fired;
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+	
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
 
-	bool UziLeft;
-	bool UziRight;
+	bool UziLeft  = false;
+	bool UziRight = false;
 
-	LaraWeaponType GunType;
-	LaraWeaponType RequestGunType;
-	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo;
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData
@@ -1237,15 +1244,17 @@ struct LaraControlData
 	TightropeControlData Tightrope;
 	SubsuitControlData Subsuit;
 
-	bool CanLook;
-	bool IsMoving;
-	bool KeepLow;
-	bool IsLow;
-	bool CanClimbLadder;
-	bool IsClimbingLadder;
-	bool CanMonkeySwing;
-	bool RunJumpQueued;
-	bool Locked;
+	bool IsClimbingLadder = false;
+	bool Locked			  = false;
+	bool IsLow			  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool RunJumpQueued	  = false;
+	bool KeepLow		  = false;
+
+	bool CanClimbLadder = false;
+	bool CanLook		= false;
+	bool CanMonkeySwing = false;
 };
 
 struct LaraInfo
@@ -1257,14 +1266,14 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	EulerAngles ExtraHeadRot;
+	EulerAngles ExtraTorsoRot;
 	short WaterCurrentActive;
-	Vector3Int WaterCurrentPull;
+	Vector3i WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	Vector3Shrt TargetArmOrient;
+	EulerAngles TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
@@ -1280,19 +1289,11 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	Vector3Shrt TargetOrientation;
+	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
-	PHD_3DPOS NextCornerPos;
-
-	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
-	BurnType BurnType;
-	unsigned int BurnCount;
-	bool Burn;
-	byte BurnBlue;
-	bool BurnSmoke;
+	Pose NextCornerPos;
 
 	byte Wet[NUM_LARA_MESHES];
-	int MeshPtrs[NUM_LARA_MESHES];
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

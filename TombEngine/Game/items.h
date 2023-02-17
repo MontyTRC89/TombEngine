@@ -5,14 +5,23 @@
 
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
+#include "Math/Math.h"
 #include "Specific/newtypes.h"
-#include "Specific/phd_global.h"
+#include "Specific/BitField.h"
+
+using namespace TEN::Utils;
 
 enum GAME_OBJECT_ID : short;
 
-constexpr auto NO_ITEM = -1;
+constexpr auto NO_ITEM		  = -1;
 constexpr auto NOT_TARGETABLE = -16384;
-constexpr auto NUM_ITEMS = 1024;
+
+constexpr auto NUM_ITEMS	 = 1024;
+constexpr auto NUM_ITEM_FLAGS = 8;
+
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS = 0;
+constexpr int		   NO_JOINT = -1;
 
 enum AIObjectType
 {
@@ -36,49 +45,86 @@ enum ItemStatus
 
 enum ItemFlags
 {
-	IFLAG_CLEAR_BODY	  = (1 << 7),  // 0x0080
-	IFLAG_INVISIBLE		  = (1 << 8),  // 0x0100
-	IFLAG_REVERSE		  = (1 << 14), // 0x4000
-	IFLAG_KILLED		  = (1 << 15), // 0x8000
-	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
+	IFLAG_TRIGGERED       = (1 << 5),
+	IFLAG_CLEAR_BODY	  = (1 << 7),
+	IFLAG_INVISIBLE		  = (1 << 8),
+	IFLAG_REVERSE		  = (1 << 14),
+	IFLAG_KILLED		  = (1 << 15),
+	IFLAG_ACTIVATION_MASK = 0x3E00 // Bits 9-13 (IFLAG_CODEBITS)
 };
 
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
-
-enum class JointBitType
+enum class EffectType
 {
-	Touch,
-	Mesh,
-	MeshSwap
+	None,
+	Fire,
+	Sparks,
+	Smoke,
+	ElectricIgnite,
+	RedIgnite,
+	Cadaver,
+	Custom
 };
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = -1;
-	int FrameNumber	  = -1;
-	int ActiveState	  = -1;
-	int TargetState	  = -1;
-	int RequiredState = -1; // TODO: Phase out this weird feature.
+	int AnimNumber	  = 0;
+	int FrameNumber	  = 0;
+	int ActiveState	  = 0;
+	int TargetState	  = 0;
+	int RequiredState = NO_STATE;
 
 	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X is right, +Y is down, +Z is forward.
-	std::vector<BoneMutator> Mutator = {};
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 };
 
-//todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
+struct EntityModelData
+{
+	int BaseMesh = 0;
+
+	Vector4 Color = Vector4::Zero;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutator   = {};
+};
+
+struct EntityCallbackData
+{
+	std::string OnKilled;
+	std::string OnHit;
+	std::string OnObjectCollided;
+	std::string OnRoomCollided;
+};
+
+struct EntityEffectData
+{
+	EffectType Type = EffectType::None;
+	Vector3 LightColor = Vector3::Zero;
+	Vector3 PrimaryEffectColor = Vector3::Zero;
+	Vector3 SecondaryEffectColor = Vector3::Zero;
+	int Count = -1;
+};
+
+// TODO: We need to find good "default states" for a lot of these/ -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
+	std::string Name;
+
 	int Status;	// ItemStatus enum.
 	bool Active;
+
+	short Index;
 	short NextItem;
 	short NextActive;
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS StartPose;
-	PHD_3DPOS Pose;
+	EntityCallbackData Callbacks;
+	EntityModelData Model;
+	EntityEffectData Effect;
+	
+	Pose StartPose;
+	Pose Pose;
 	ROOM_VECTOR Location;
 	short RoomNumber;
 	int Floor;
@@ -91,14 +137,12 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	Vector4 Color;
 
-	unsigned int TouchBits;
-	unsigned int MeshBits;
-	unsigned int MeshSwapBits;
+	BitField TouchBits	  = BitField();
+	BitField MeshBits	  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
-	short ItemFlags[8];
+	short ItemFlags[NUM_ITEM_FLAGS];
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?
@@ -106,38 +150,34 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	// Lua
-	std::string LuaName;
-	std::string LuaCallbackOnKilledName;
-	std::string LuaCallbackOnHitName;
-	std::string LuaCallbackOnCollidedWithObjectName;
-	std::string LuaCallbackOnCollidedWithRoomName;
-
-	bool TestBits(JointBitType type, std::vector<int> jointIndices);
-	bool TestBits(JointBitType type, int jointIndex);
-	void SetBits(JointBitType type, std::vector<int> jointIndices);
-	void SetBits(JointBitType type, int jointIndex);
-	void ClearBits(JointBitType type, std::vector<int> jointIndices);
-	void ClearBits(JointBitType type, int jointIndex);
-
-	bool TestOcb(short ocbFlags);
+	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
+	
+	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
+	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
+	short GetFlagField(int id) const;				// ItemFlags[id]
+	void  SetFlagField(int id, short flags);		// ItemFlags[id] = flags
+	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
-	bool TestFlags(short id, short value);
-	void SetFlags(short id, short value);
+	bool TestMeshSwapFlags(unsigned int flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
+	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
 
-	bool IsLara();
-	bool IsCreature();
+	bool IsLara() const;
+	bool IsCreature() const;
+
+	void ResetModelToDefault();
 };
 
+bool TestState(int refState, const std::vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNumber);
+void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 void InitialiseFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);
@@ -145,8 +185,13 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
+bool UpdateItemRoom(short itemNumber);
+void UpdateAllItems();
+void UpdateAllEffects();
+const std::string& GetObjectName(GAME_OBJECT_ID id);
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);

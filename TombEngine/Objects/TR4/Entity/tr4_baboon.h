@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Game/items.h"
 
 namespace TEN::Entities::TR4
@@ -7,7 +7,7 @@ namespace TEN::Entities::TR4
 	struct BaboonRespawnData
 	{
 		int ID;
-		PHD_3DPOS Pose;
+		Pose Pose;
 		unsigned int Count;
 		unsigned int MaxCount;  // Used to limit the number of respawns.
 	};

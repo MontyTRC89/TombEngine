@@ -11,25 +11,25 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	#define VON_CROY_FLAG_JUMP 6
+	constexpr auto VON_CROY_FLAG_JUMP = 6;
 
 	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
-	const vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const auto VonCroyKnifeSwapJoints = std::vector<unsigned int>{ 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];
 
 	enum VonCroyState
 	{
+		// No state 0.
 		VON_CROY_STATE_IDLE = 1,
 		VON_CROY_STATE_WALK = 2,
 		VON_CROY_STATE_RUN = 3,
@@ -137,14 +137,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP);
+		item->SetMeshSwapFlags(VonCroyKnifeSwapJoints);
 
-		memset(VonCroyPassedWaypoints, 0, 128);
+		ZeroMemory(VonCroyPassedWaypoints, sizeof(VonCroyPassedWaypoints));
 	}
 
 	void VonCroyControl(short itemNumber)
@@ -232,10 +229,9 @@ namespace TEN::Entities::TR4
 			int distance;
 			auto* targetCreature = ActiveCreatures[0];
 
-			for (int i = 0; i < ActiveCreatures.size(); i++)
+			for (auto& currentCreature : ActiveCreatures)
 			{
-				targetCreature = ActiveCreatures[i];
-
+				targetCreature = currentCreature;
 				if (targetCreature->ItemNumber == NO_ITEM ||
 					targetCreature->ItemNumber == itemNumber ||
 					g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_VON_CROY ||
@@ -427,7 +423,7 @@ namespace TEN::Entities::TR4
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 				if (probe.Position.Ceiling == (probe.Position.Floor - 1536))
 				{
-					if (item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
+					if (item->TestMeshSwapFlags(VonCroyKnifeSwapJoints))
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 					else
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
@@ -502,7 +498,7 @@ namespace TEN::Entities::TR4
 				if (Lara.Location >= item->ItemFlags[3])
 				{
 					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= pow(SECTOR(3), 2)))
+						(item->TestMeshSwapFlags(18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
@@ -627,10 +623,7 @@ namespace TEN::Entities::TR4
 		case VON_CROY_STATE_TOGGLE_KNIFE:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
-					item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
-				else
-					item->ClearBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
+				item->SetMeshSwapFlags(VonCroyKnifeSwapJoints, item->TestMeshSwapFlags(VonCroyKnifeSwapJoints));
 			}
 
 			break;
@@ -679,12 +672,7 @@ namespace TEN::Entities::TR4
 				item->Pose = enemy->Pose;
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 			{
-				TestTriggers(
-					creature->AITarget->Pose.Position.x,
-					creature->AITarget->Pose.Position.y,
-					creature->AITarget->Pose.Position.z,
-					creature->AITarget->RoomNumber,
-					true);
+				TestTriggers(creature->AITarget, true);
 
 				creature->ReachedGoal = false;
 				creature->Enemy = nullptr;
@@ -696,7 +684,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{
@@ -731,9 +719,9 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 			if (item->ItemFlags[2] == 0)
-				ClampRotation(&item->Pose, laraAI.angle, ANGLE(2.8f));
+				ClampRotation(item->Pose, laraAI.angle, ANGLE(2.8f));
 			else
-				ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
+				ClampRotation(item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
 
 			break;
 
@@ -768,12 +756,12 @@ namespace TEN::Entities::TR4
 			}
 
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
-			if ((enemy == NULL || enemy->Flags != NULL) ||
+			if ((enemy == nullptr || enemy->Flags != 0) ||
 				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
 			{
-				if (creature->Flags == NULL && enemy != nullptr)
+				if (creature->Flags == 0 && enemy != nullptr)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
@@ -795,12 +783,7 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			TestTriggers(
-				creature->AITarget->Pose.Position.x,
-				creature->AITarget->Pose.Position.y,
-				creature->AITarget->Pose.Position.z,
-				creature->AITarget->RoomNumber,
-				true);
+			TestTriggers(creature->AITarget, true);
 
 			item->AIBits = FOLLOW;
 			creature->ReachedGoal = false;
@@ -811,7 +794,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_POINT:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle / 2, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{
@@ -829,7 +812,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.TargetState = VON_CROY_STATE_IDLE;
 
-				if (TestProbability(0.97f))
+				if (Random::TestProbability(0.97f))
 					break;
 			}
 
@@ -849,7 +832,7 @@ namespace TEN::Entities::TR4
 
 			item->Animation.TargetState = VON_CROY_STATE_WALK;
 			item->Animation.RequiredState = VON_CROY_STATE_RUN;
-			item->ItemFlags[2] = NULL;
+			item->ItemFlags[2] = 0;
 			//if (sVar3 == -1) goto LAB_0041a991;
 			if (!flags)
 			{
@@ -878,38 +861,38 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 2, joint2);
 		CreatureJoint(item, 3, joint3);
 
-		if ((item->Animation.ActiveState < VON_CROY_STATE_JUMP) && (item->Animation.ActiveState != VON_CROY_STATE_MONKEY))
+		if (item->Animation.ActiveState < VON_CROY_STATE_JUMP &&
+			item->Animation.ActiveState != VON_CROY_STATE_MONKEY)
 		{
 			switch (CreatureVault(itemNumber, angle, 2, 260))
 			{
-			case VON_CROY_STATE_WALK:
+			case 2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_2_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_2_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_RUN:
+			case 3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_3_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_3_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_START_MONKEY:
+			case 4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_4_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_4_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_LOOK_BEFORE_JUMP:
+			case 7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_JUMP_TO_HANG;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_GRAB_LADDER;
 				creature->MaxTurn = 0;
 				break;
-			// I am not sure what negative states are (probably the inverse of the above), I will leave them alone - Kubsy 18/06/2022
 			case -7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

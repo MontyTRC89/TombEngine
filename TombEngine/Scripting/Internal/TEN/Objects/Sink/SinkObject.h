@@ -1,18 +1,19 @@
 #pragma once
-
 #include "Objects/NamedBase.h"
-#include "Specific/phd_global.h"
+#include "Objects/Sink.h"
+#include "Math/Math.h"
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
 class Vec3;
 
-class Sink : public NamedBase<Sink, SINK_INFO &>
+class Sink : public NamedBase<Sink, SinkInfo &>
 {
 public:
-	using IdentifierType = std::reference_wrapper<SINK_INFO>;
-	Sink(SINK_INFO& ref);
+	using IdentifierType = std::reference_wrapper<SinkInfo>;
+	Sink(SinkInfo& ref);
 	~Sink() = default;
 
 	Sink& operator=(Sink const& other) = delete;
@@ -29,5 +30,5 @@ public:
 	void SetName(std::string const &);
 
 private:
-	SINK_INFO & m_sink;
+	SinkInfo& m_sink;
 };

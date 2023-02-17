@@ -15,14 +15,17 @@
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
-OBJECT_COLLISION_BOUNDS ScalesBounds =
+ObjectCollisionBounds ScalesBounds =
 {
-	-1408, -1408,
-	0, 0,
-	-512, 512,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	GameBoundingBox(
+		-CLICK(5.5f), -CLICK(5.5f),
+		0, 0,
+		-SECTOR(0.5f), SECTOR(0.5f)
+	),
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 void ScalesControl(short itemNumber)
@@ -119,12 +122,12 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			short rotY = item->Pose.Orientation.y;
 			item->Pose.Orientation.y = (short)(laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
 
-			ScalesBounds.boundingBox.X1 = -1408;
-			ScalesBounds.boundingBox.X2 = -640;
-			ScalesBounds.boundingBox.Z1 = -512;
-			ScalesBounds.boundingBox.Z2 = 0;
+			ScalesBounds.BoundingBox.X1 = -1408;
+			ScalesBounds.BoundingBox.X2 = -640;
+			ScalesBounds.BoundingBox.Z1 = -512;
+			ScalesBounds.BoundingBox.Z2 = 0;
 
-			if (TestLaraPosition(&ScalesBounds, item, laraItem))
+			if (TestLaraPosition(ScalesBounds, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -163,8 +166,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
 		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
-		Vector3Int pos = { 0, 0, 0 };
-		GetLaraJointPosition(&pos, LM_LHAND);
+		auto pos = GetJointPosition(laraItem, LM_LHAND);
 
 		auto* drip = &Drips[GetFreeDrip()];
 		drip->x = pos.x;

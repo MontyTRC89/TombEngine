@@ -5,19 +5,21 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/Bubble.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 
 using std::vector;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -170,7 +172,7 @@ namespace TEN::Entities::Vehicles
 
 		laraItem->Pose.Position = rBoatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
-		laraItem->Pose.Orientation = Vector3Shrt(0, rBoatItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, rBoatItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -220,7 +222,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3Int* pos, Vector3Int* old)
+	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -228,8 +230,8 @@ namespace TEN::Entities::Vehicles
 		int xOld = old->x / SECTOR(1);
 		int zOld = old->z / SECTOR(1);
 
-		int xShift = pos->x & (SECTOR(1) - 1);
-		int zShift = pos->z & (SECTOR(1) - 1);
+		int xShift = pos->x & WALL_MASK;
+		int zShift = pos->z & WALL_MASK;
 
 		if (x == xOld)
 		{
@@ -316,7 +318,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3Int* moved)
+	static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3i* moved)
 	{
 		moved->x = rBoatItem->Pose.Position.x - moved->x;
 		moved->z = rBoatItem->Pose.Position.z - moved->z;
@@ -356,14 +358,14 @@ namespace TEN::Entities::Vehicles
 
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
-		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, true, &backLeftOld);
 		int heightBackRightOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, true, &backRightOld);
 		int heightFrontOld = GetVehicleWaterHeight(rBoatItem, 1000, 0, true, &frontOld);
 	
-		Vector3Int old;
+		Vector3i old;
 		old.x = rBoatItem->Pose.Position.x;
 		old.y = rBoatItem->Pose.Position.y;
 		old.z = rBoatItem->Pose.Position.z;
@@ -392,13 +394,13 @@ namespace TEN::Entities::Vehicles
 		rBoatItem->Pose.Position.z -= slip * phd_cos(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
 
-		Vector3Int moved;
+		Vector3i moved;
 		moved.x = rBoatItem->Pose.Position.x;
 		moved.z = rBoatItem->Pose.Position.z;
 
 		DoRubberBoatShift(itemNumber, laraItem);
 
-		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
+		Vector3i frontLeft, frontRight, backRight, backLeft, front;
 		short rotation = 0;
 
 		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, &backLeft);
@@ -432,7 +434,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
 
 		if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
-			DoRubberBoatShift2(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
+			DoRubberBoatShift2(rBoatItem, (Vector3i*)&rBoatItem->Pose, &old);
 
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
@@ -800,7 +802,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity.z = 20;
 			laraItem->Animation.Velocity.y = -40;
-			lara->Vehicle = NO_ITEM;
+			lara->Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -834,7 +836,7 @@ namespace TEN::Entities::Vehicles
 
 		int pitch, height, ofs;
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		int collide = RubberBoatDynamics(itemNumber, laraItem);
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
@@ -964,9 +966,7 @@ namespace TEN::Entities::Vehicles
 		else
 			height = 1;
 
-		auto prop = Vector3Int(0, 0, -80);
-		GetJointAbsPosition(rBoatItem, &prop, 2);
-
+		auto prop = GetJointPosition(rBoatItem, 2, Vector3i(0, 0, -80));
 		probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
 
 		if (rBoatItem->Animation.Velocity.z &&
@@ -976,14 +976,16 @@ namespace TEN::Entities::Vehicles
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 			if ((GetRandomControl() & 1) == 0)
 			{
-				PHD_3DPOS pos;
-				pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
-				pos.Position.y = prop.y + (GetRandomControl() & 15);
-				pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;
+				auto pos = Vector3(
+					prop.x + (GetRandomControl() & 63) - 32,
+					prop.y + (GetRandomControl() & 15),
+					prop.z + (GetRandomControl() & 63) - 32);
 
 				short roomNumber = rBoatItem->RoomNumber;
-				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
-				CreateBubble((Vector3Int*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+
+				for (int i = 0; i < 5; i++)
+					SpawnBubble(pos, roomNumber);
 			}
 		}
 		else

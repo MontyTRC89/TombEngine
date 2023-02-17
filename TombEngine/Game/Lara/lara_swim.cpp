@@ -12,7 +12,7 @@
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 

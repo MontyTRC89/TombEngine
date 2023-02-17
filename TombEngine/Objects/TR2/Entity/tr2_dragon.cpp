@@ -13,32 +13,26 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
-	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
-	constexpr auto DRAGON_TOUCH_DAMAGE		  = 10;
+	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-
+	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
+	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
+	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
-	#define DRAGON_SWIPE_DAMAGE 250
-	#define DRAGON_TOUCH_DAMAGE 10
-
 	#define DRAGON_LIVE_TIME (30 * 11)
 	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
 	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
 	#define DRAGON_FLAME_SPEED 200
-
-	#define DRAGON_TOUCH_R 0x0fe
-	#define DRAGON_TOUCH_L 0x7f000000
 
 	#define DRAGON_ALMOST_LIVE 100
 	#define BOOM_TIME 130
@@ -58,7 +52,7 @@ namespace TEN::Entities::TR2
 
 	enum DragonState
 	{
-		DRAGON_STATE_NONE = 0,
+		// No state 0.
 		DRAGON_STATE_WALK = 1,
 		DRAGON_STATE_LEFT = 2,
 		DRAGON_STATE_RIGHT = 3,
@@ -117,11 +111,9 @@ namespace TEN::Entities::TR2
 			explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 			explosionItem->Pose.Position.z = item->Pose.Position.z;
 			explosionItem->RoomNumber = item->RoomNumber;
-			explosionItem->Pose.Orientation.y = 0;
-			explosionItem->Pose.Orientation.x = 0;
-			explosionItem->Pose.Orientation.z = 0;
-			explosionItem->Animation.Velocity.z = 0;
-			explosionItem->Animation.Velocity.y = 0;
+			explosionItem->Pose.Orientation = EulerAngles::Zero;
+			explosionItem->Animation.Velocity.y = 0.0f;
+			explosionItem->Animation.Velocity.z = 0.0f;
 
 			InitialiseItem(ExplosionIndex);
 			AddActiveItem(ExplosionIndex);
@@ -208,8 +200,8 @@ namespace TEN::Entities::TR2
 
 					laraItem->Pose = item->Pose;
 					laraItem->Animation.IsAirborne = false;
-					laraItem->Animation.Velocity.z = 0;
-					laraItem->Animation.Velocity.y = 0;
+					laraItem->Animation.Velocity.y = 0.0f;
+					laraItem->Animation.Velocity.z = 0.0f;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
 						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -220,7 +212,7 @@ namespace TEN::Entities::TR2
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.HitDirection = -1;
 
-					Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
 					((CreatureInfo*)g_Level.Items[(short)item->Data].Data)->Flags = -1;
 
@@ -255,8 +247,8 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
+		short head = 0;
 
 		bool ahead;
 
@@ -264,10 +256,7 @@ namespace TEN::Entities::TR2
 		{
 			if (item->Animation.ActiveState != DRAGON_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = DRAGON_STATE_DEATH;
-				item->Animation.TargetState = DRAGON_STATE_DEATH;
+				SetAnimation(item, 21);
 				creature->Flags = 0;
 			}
 			else if (creature->Flags >= 0)
@@ -317,10 +306,8 @@ namespace TEN::Entities::TR2
 
 			ahead = (AI.ahead && AI.distance > DRAGON_CLOSE_RANGE && AI.distance < DRAGON_STATE_IDLE_RANGE);
 
-			if (item->TouchBits)
-			{
-				DoDamage(creature->Enemy, DRAGON_TOUCH_DAMAGE);
-			}
+			if (item->TouchBits.TestAny())
+				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -350,19 +337,19 @@ namespace TEN::Entities::TR2
 				break;
 
 			case DRAGON_STATE_SWIPE_LEFT:
-				if (item->TouchBits & DRAGON_TOUCH_L)
+				if (item->TouchBits.Test(DragonSwipeAttackJointsLeft))
 				{
+					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;
-					DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 				}
 
 				break;
 
 			case DRAGON_STATE_SWIPE_RIGHT:
-				if (item->TouchBits & DRAGON_TOUCH_R)
+				if (item->TouchBits.Test(DragonSwipeAttackJointsRight))
 				{
+					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;
-					DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 				}
 
 				break;
@@ -404,13 +391,11 @@ namespace TEN::Entities::TR2
 			case DRAGON_STATE_TURN_LEFT:
 				item->Pose.Orientation.y += -(ANGLE(1.0f) - angle);
 				creature->Flags = 0;
-
 				break;
 
 			case DRAGON_STATE_TURN_RIGHT:
 				item->Pose.Orientation.y += (ANGLE(1.0f) - angle);
 				creature->Flags = 0;
-
 				break;
 
 			case DRAGON_STATE_AIM_1:
@@ -434,11 +419,10 @@ namespace TEN::Entities::TR2
 
 			case DRAGON_STATE_FIRE_1:
 				item->Pose.Orientation.y -= angle;
+				SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
 				if (AI.ahead)
 					head = -AI.angle;
-
-				SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
 				if (creature->Flags)
 				{
@@ -459,12 +443,7 @@ namespace TEN::Entities::TR2
 		back->Animation.ActiveState = item->Animation.ActiveState;
 		back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
 		back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
-		back->Pose.Position.x = item->Pose.Position.x;
-		back->Pose.Position.y = item->Pose.Position.y;
-		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.x = item->Pose.Orientation.x;
-		back->Pose.Orientation.y = item->Pose.Orientation.y;
-		back->Pose.Orientation.z = item->Pose.Orientation.z;
+		back->Pose = item->Pose;
 
 		if (back->RoomNumber != item->RoomNumber)
 			ItemNewRoom(backItemNumber, item->RoomNumber);
@@ -484,13 +463,11 @@ namespace TEN::Entities::TR2
 		{
 			auto* back = &g_Level.Items[backItem];
 			back->ObjectNumber = ID_DRAGON_BACK;
-			back->Pose.Position.x = item->Pose.Position.x;
-			back->Pose.Position.y = item->Pose.Position.y;
-			back->Pose.Position.z = item->Pose.Position.z;
+			back->Pose.Position = item->Pose.Position;
 			back->Pose.Orientation.y = item->Pose.Orientation.y;
 			back->RoomNumber = item->RoomNumber;
 			back->Status = ITEM_INVISIBLE;
-			back->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			back->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(backItem);
 			back->MeshBits = 0x1FFFFF;
@@ -500,13 +477,11 @@ namespace TEN::Entities::TR2
 			auto* front = &g_Level.Items[frontItem];
 
 			front->ObjectNumber = ID_DRAGON_FRONT;
-			front->Pose.Position.x = item->Pose.Position.x;
-			front->Pose.Position.y = item->Pose.Position.y;
-			front->Pose.Position.z = item->Pose.Position.z;
+			front->Pose.Position = item->Pose.Position;
 			front->Pose.Orientation.y = item->Pose.Orientation.y;
 			front->RoomNumber = item->RoomNumber;
 			front->Status = ITEM_INVISIBLE;
-			front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(frontItem);
 
@@ -553,7 +528,7 @@ namespace TEN::Entities::TR2
 					front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 					front->Pose.Position.z = item->Pose.Position.z;
 					front->RoomNumber = item->RoomNumber;
-					front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+					front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 					InitialiseItem(frontItem);
 					AddActiveItem(frontItem);
@@ -569,7 +544,7 @@ namespace TEN::Entities::TR2
 				front = &g_Level.Items[frontItem];
 
 				front->TouchBits = back->TouchBits = NO_JOINT_BITS;
-				EnableEntityAI(frontItem, 1);
+				EnableEntityAI(frontItem, true);
 				AddActiveItem(frontItem);
 				AddActiveItem(backItem);
 				back->Status = ITEM_ACTIVE;

@@ -6,23 +6,24 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/control/volume.h"
+#include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/items.h"
 #include "Game/room.h"
-#include "Game/spotcam.h"
 #include "Game/savegame.h"
+#include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/setup.h"
 
-
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
 int TriggerTimer;
@@ -30,11 +31,11 @@ int KeyTriggerActive;
 
 int TriggerActive(ItemInfo* item)
 {
-	int flag;
-
-	flag = (~item->Flags & IFLAG_REVERSE) >> 14;
+	int flag = (~item->Flags & IFLAG_REVERSE) >> 14;
 	if ((item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	{
 		flag = !flag;
+	}
 	else
 	{
 		if (item->Timer)
@@ -56,6 +57,7 @@ int TriggerActive(ItemInfo* item)
 				flag = !flag;
 		}
 	}
+
 	return flag;
 }
 
@@ -118,39 +120,47 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 
 int SwitchTrigger(short itemNumber, short timer)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_DEACTIVATED)
+	if (item.Status == ITEM_DEACTIVATED)
 	{
-		if ((!item->Animation.ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->Animation.ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&
+			timer > 0)
 		{
-			item->Timer = timer;
-			item->Status = ITEM_ACTIVE;
+			item.Timer = timer;
+			item.Status = ITEM_ACTIVE;
+
 			if (timer != 1)
-				item->Timer = FPS * timer;
+				item.Timer = FPS * timer;
+
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
+    
+		if (item.TriggerFlags >= 0 || item.Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
-			item->Status = ITEM_NOT_ACTIVE;
-			if (!item->ItemFlags[0] == 0)
-				item->Flags |= ONESHOT;
-			if (item->Animation.ActiveState != 1)
-				return 1;
-			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
-				return 1;
+			item.Status = ITEM_NOT_ACTIVE;
+			if (!item.ItemFlags[0] == 0)
+				item.Flags |= ONESHOT;
+			return 1;
 		}
 		else
 		{
-			item->Status = ITEM_ACTIVE;
+			item.Status = ITEM_ACTIVE;
 			return 1;
 		}
 	}
-	else if (item->Status)
+	else if (item.Status)
 	{
-		return (item->Flags & ONESHOT) >> 8;
+		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
+			item.Animation.AnimNumber == GetAnimNumber(item, 2) &&
+			item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+		{
+			return 1;
+		}
+
+		return ((item.Flags & ONESHOT) >> 8);
 	}
 	else
 	{
@@ -178,21 +188,22 @@ int KeyTrigger(short itemNum)
 	return oldkey;
 }
 
-int PickupTrigger(short itemNum)
+bool PickupTrigger(short itemNum)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
-	if (item->Flags & IFLAG_KILLED
-		|| (item->Status != ITEM_INVISIBLE
-			|| item->ItemFlags[3] != 1
-			|| item->TriggerFlags & 0x80))
+	if (((item->Flags & IFLAG_CLEAR_BODY) && (item->Flags & IFLAG_KILLED)) ||
+		item->Status != ITEM_INVISIBLE || 
+		item->ItemFlags[3] != 1 || 
+		item->TriggerFlags & 0x80)
 	{
-		return 0;
+		return false;
 	}
 
 	KillItem(itemNum);
+	item->Flags |= IFLAG_CLEAR_BODY;
 
-	return 1;
+	return true;
 }
 
 void RefreshCamera(short type, short* data)
@@ -262,13 +273,82 @@ short* GetTriggerIndex(ItemInfo* item)
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
 
-void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags)
+void Antitrigger(short const value, short const flags)
+{
+	ItemInfo* item = &g_Level.Items[value];
+	if (item->ObjectNumber == ID_EARTHQUAKE)
+	{
+		item->ItemFlags[0] = 0;
+		item->ItemFlags[1] = 100;
+	}
+
+	item->Flags &= ~(CODE_BITS | REVERSE);
+
+	if (flags & ONESHOT)
+		item->Flags |= ATONESHOT;
+
+	if (item->Active && Objects[item->ObjectNumber].intelligent)
+	{
+		DisableEntityAI(value);
+		RemoveActiveItem(value, false);
+		item->Active = false;
+		item->Status = ITEM_INVISIBLE;
+	}
+}
+
+void Trigger(short const value, short const flags)
+{
+	ItemInfo* item = &g_Level.Items[value];
+	item->Flags |= TRIGGERED;
+
+	if (flags & ONESHOT)
+		item->Flags |= ONESHOT;
+
+	if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
+	{
+		if (Objects[item->ObjectNumber].intelligent)
+		{
+			if (item->Status != ITEM_NOT_ACTIVE)
+			{
+				if (item->Status == ITEM_INVISIBLE)
+				{
+					item->TouchBits = NO_JOINT_BITS;
+					if (EnableEntityAI(value, false))
+					{
+						item->Status = ITEM_ACTIVE;
+						AddActiveItem(value);
+					}
+					else
+					{
+						item->Status = ITEM_INVISIBLE;
+						AddActiveItem(value);
+					}
+				}
+			}
+			else
+			{
+				item->TouchBits = NO_JOINT_BITS;
+				item->Status = ITEM_ACTIVE;
+				AddActiveItem(value);
+				EnableEntityAI(value, true);
+			}
+		}
+		else
+		{
+			item->TouchBits = NO_JOINT_BITS;
+			AddActiveItem(value);
+			item->Status = ITEM_ACTIVE;
+		}
+	}
+}
+
+void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activator, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
 	int newEffect = -1;
 	int switchOff = 0;
-	int switchFlag = 0;
+	//int switchFlag = 0;
 	short objectNumber = 0;
 	int keyResult = 0;
 	short cameraFlags = 0;
@@ -282,7 +362,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 	short triggerType = (*(data++) >> 8) & 0x3F;
 	short flags = *(data++);
-	short timer = flags & 0xFF;
+	short timer = flags & TIMER_BITS;
 
 	if (Camera.type != CameraType::Heavy)
 		RefreshCamera(triggerType, data);
@@ -324,7 +404,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 		switch (triggerType)
 		{
 		case TRIGGER_TYPES::SWITCH:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 
 			if (flags & ONESHOT)
 				g_Level.Items[value].ItemFlags[0] = 1;
@@ -333,8 +413,9 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				return;
 
 			objectNumber = g_Level.Items[value].ObjectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				switchFlag = 1;
+			//This disables the antitrigger of the Valve switch (ocb 5). I don't know the purpose of this in TR4.
+			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
+				//switchFlag = 1;
 
 			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
 
@@ -343,8 +424,8 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 		case TRIGGER_TYPES::MONKEY:
 			if (LaraItem->Animation.ActiveState >= LS_MONKEY_IDLE &&
 				(LaraItem->Animation.ActiveState <= LS_MONKEY_TURN_180 ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
+				 LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
+				 LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				break;
 			return;
 
@@ -386,14 +467,14 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			return;
 
 		case TRIGGER_TYPES::KEY:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 			keyResult = KeyTrigger(value);
 			if (keyResult != -1)
 				break;
 			return;
 
 		case TRIGGER_TYPES::PICKUP:
-			value = *(data++) & 0x3FF;
+			value = *(data++) & VALUE_BITS;
 			if (!PickupTrigger(value))
 				return;
 			break;
@@ -424,7 +505,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 	{
 		trigger = *(data++);
 		value = trigger & VALUE_BITS;
-		targetType = (trigger >> 10) & 0xF;
+		targetType = (trigger >> 10) & FUNCTION_BITS;
 
 		switch (targetType)
 		{
@@ -465,10 +546,11 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			{
 				if (heavyFlags >= 0)
 				{
-					if (switchFlag)
-						item->Flags |= (flags & CODE_BITS);
-					else
-						item->Flags ^= (flags & CODE_BITS);
+					//if (switchFlag)
+						//item->Flags |= (flags & CODE_BITS);
+					//else
+
+					item->Flags ^= (flags & CODE_BITS);
 
 					if (flags & ONESHOT)
 						item->Flags |= SWONESHOT;
@@ -484,26 +566,10 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				}
 			}
 			else if (triggerType == TRIGGER_TYPES::ANTIPAD ||
-				triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-				triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
+					 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
+					 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->ObjectNumber == ID_EARTHQUAKE)
-				{
-					item->ItemFlags[0] = 0;
-					item->ItemFlags[1] = 100;
-				}
-
-				item->Flags &= ~(CODE_BITS | REVERSE);
-
-				if (flags & ONESHOT)
-					item->Flags |= ATONESHOT;
-
-				if (item->Active && Objects[item->ObjectNumber].intelligent)
-				{
-					item->HitPoints = NOT_TARGETABLE;
-					DisableEntityAI(value);
-					KillItem(value);
-				}
+				Antitrigger(value, flags);
 			}
 			else if (flags & CODE_BITS)
 			{
@@ -512,47 +578,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if ((item->Flags & CODE_BITS) == CODE_BITS)
 			{
-				item->Flags |= TRIGGERED;
-
-				if (flags & ONESHOT)
-					item->Flags |= ONESHOT;
-
-				if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
-				{
-					if (Objects[item->ObjectNumber].intelligent)
-					{
-						if (item->Status != ITEM_NOT_ACTIVE)
-						{
-							if (item->Status == ITEM_INVISIBLE)
-							{
-								item->TouchBits = NO_JOINT_BITS;
-								if (EnableEntityAI(value, 0))
-								{
-									item->Status = ITEM_ACTIVE;
-									AddActiveItem(value);
-								}
-								else
-								{
-									item->Status = ITEM_INVISIBLE;
-									AddActiveItem(value);
-								}
-							}
-						}
-						else
-						{
-							item->TouchBits = NO_JOINT_BITS;
-							item->Status = ITEM_ACTIVE;
-							AddActiveItem(value);
-							EnableEntityAI(value, 1);
-						}
-					}
-					else
-					{
-						item->TouchBits = NO_JOINT_BITS;
-						AddActiveItem(value);
-						item->Status = ITEM_ACTIVE;
-					}
-				}
+				Trigger(value, flags);
 			}
 			break;
 
@@ -562,12 +588,12 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			if (keyResult == 1)
 				break;
 
-			if (g_Level.Cameras[value].flags & ONESHOT)
+			if (g_Level.Cameras[value].Flags & ONESHOT)
 				break;
 
 			Camera.number = value;
 
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].flags & 3))
+			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].Flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -578,10 +604,10 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & 0xFF) * FPS;
+				Camera.timer = (trigger & TIMER_BITS) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
-					g_Level.Cameras[Camera.number].flags |= ONESHOT;
+					g_Level.Cameras[Camera.number].Flags |= ONESHOT;
 			}
 			break;
 
@@ -654,13 +680,13 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStats[value])
+			if ((FlipMap[value] & CODE_BITS) == CODE_BITS && !FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStats[value])
+			if ((FlipMap[value] & CODE_BITS) == CODE_BITS && FlipStats[value])
 				flip = value;
 			break;
 
@@ -691,6 +717,34 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			}
 			break;
 
+		case TO_LUAEVENT:
+			trigger = *(data++);
+
+			if (g_Level.EventSets.size() > value)
+			{
+				auto& set = g_Level.EventSets[value];
+
+				auto activatorType = heavy ? (int)VolumeActivatorFlags::Flyby | 
+											 (int)VolumeActivatorFlags::Moveable | 
+											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
+
+				switch (trigger & TIMER_BITS)
+				{
+				case 0:
+					HandleEvent(set.OnEnter, activator);
+					break;
+
+				case 1:
+					HandleEvent(set.OnInside, activator);
+					break;
+
+				case 2:
+					HandleEvent(set.OnLeave, activator);
+					break;
+				}
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -709,7 +763,10 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, heavy, heavyFlags);
+	auto roomNum = item->RoomNumber;
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNum);
+
+	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, heavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -721,7 +778,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
-	TestTriggers(floor, x, y, z, heavy, heavyFlags);
+	TestTriggers(x, y, z, floor, nullptr, heavy, heavyFlags);
 }
 
 void ProcessSectorFlags(ItemInfo* item)
@@ -760,6 +817,11 @@ void ProcessSectorFlags(ItemInfo* item)
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
-			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
+		{
+			if (block->Material == FLOOR_MATERIAL::Water)
+				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+			else
+				ItemBurn(item);
+		}
 	}
 }

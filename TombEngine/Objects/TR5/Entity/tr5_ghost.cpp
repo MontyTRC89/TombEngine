@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr5_ghost.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_ghost.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
 
@@ -18,12 +19,8 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 		item->Pose.Position.y += CLICK(2);
 	}
 

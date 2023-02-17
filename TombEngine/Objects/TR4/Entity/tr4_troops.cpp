@@ -12,11 +12,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -24,6 +24,7 @@ namespace TEN::Entities::TR4
 
 	enum TroopState
 	{
+		// No state 0.
 		TROOP_STATE_IDLE = 1,
 		TROOP_STATE_WALK = 2,
 		TROOP_STATE_RUN = 3,
@@ -50,7 +51,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{
@@ -72,8 +73,8 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 		short tilt = 0;
@@ -86,13 +87,9 @@ namespace TEN::Entities::TR4
 		int dy = 0;
 		int dz = 0;
 
-		int distance = 0;
-
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(TroopsBite1.Position);
-			GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
-
+			auto pos = GetJointPosition(item, TroopsBite1.meshNum, Vector3i(TroopsBite1.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
 
 			creature->FiredWeapon--;
@@ -148,29 +145,20 @@ namespace TEN::Entities::TR4
 			{
 				// Search for active troops.
 				creature->Enemy = nullptr;
-				CreatureInfo* currentCreature = ActiveCreatures[0];
 
-				int minDistance = INT_MAX;
+				float minDistance = FLT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					currentCreature = ActiveCreatures[i];
-
 					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 					{
 						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
-
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
 								(!currentItem->IsLara() || creature->HurtByLara))
 							{
-								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-								dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-								distance = pow(dx, 2) + pow(dy, 2) + pow(dz, 2);
-
+								float distance = Vector3i::Distance(item->Pose.Position, currentItem->Pose.Position);
 								if (distance < minDistance)
 								{
 									minDistance = distance;
@@ -241,7 +229,7 @@ namespace TEN::Entities::TR4
 				{
 					joint2 = AIGuard(creature);
 
-					// TODO: Use TestProbability().
+					// TODO: Use Random::TestProbability().
 					if (!GetRandomControl())
 					{
 						if (item->Animation.ActiveState == TROOP_STATE_IDLE)
@@ -261,7 +249,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;
@@ -360,7 +348,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD)
 				{
-					// TODO: Use TestProbability().
+					// TODO: Use Random::TestProbability().
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 						item->Animation.TargetState = TROOP_STATE_IDLE;
@@ -455,7 +443,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && TestProbability(0.008f))
+				if (!FlashGrenadeAftershockTimer && Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;

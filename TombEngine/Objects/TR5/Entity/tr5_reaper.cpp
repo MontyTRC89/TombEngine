@@ -1,26 +1,23 @@
 #include "framework.h"
-#include "tr5_reaper.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_reaper.h"
+
 #include "Game/control/box.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseReaper(short itemNumber)
 	{
-		ClearItem(itemNumber);
-
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 2;
-		item->Animation.ActiveState = 2;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 1);
 	}
 
 	void ReaperControl(short itemNumber)

@@ -8,29 +8,29 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
+	constexpr auto MUMMY_SWIPE_ATTACK_DAMAGE = 100;
 
-	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
-	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(SECTOR(1));
-	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
+	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(1 / 2.0f));
+	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(2 / 3.0f));
+	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(BLOCK(1));
+	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(BLOCK(7));
 
-	#define MUMMY_WALK_TURN_ANGLE ANGLE(7.0f)
+	constexpr auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
+	constexpr auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
-	const vector<int> MummyAttackJoints { 11, 14 };
+	const auto MummySwipeAttackJoints = std::vector<unsigned int>{ 11, 14 };
 
 	enum MummyState
 	{
@@ -76,20 +76,16 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 2)
 		{
 			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_LYING_DOWN; // TODO: Check if needed. -- Sezz
-			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_LYING_DOWN;
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
 		{
 			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED; // TODO: Check if needed. -- Sezz
-			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
 		}
 	}
 
@@ -101,8 +97,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
-		short angle = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -123,12 +119,12 @@ namespace TEN::Entities::TR4
 					item->Animation.ActiveState != MUMMY_ANIM_WALK_FORWARD_ARMS_UP_TO_WALK_FORWARD_LEFT &&
 					item->Animation.ActiveState != MUMMY_ANIM_IDLE_TO_WALK_FORWARD)
 				{
-					if (TestProbability(0.75f) ||
+					if (Random::TestProbability(0.75f) ||
 						Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 					{
-						if (TestProbability(0.125f) ||
+						if (Random::TestProbability(1 / 8.0f) ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -163,7 +159,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			if (AI.ahead)
 			{
@@ -209,7 +205,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
+					creature->MaxTurn = MUMMY_WALK_TURN_RATE_MAX;
 
 					if (AI.distance >= MUMMY_ARMS_UP_RANGE)
 					{
@@ -223,7 +219,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case MUMMY_STATE_WALK_FORWARD_ARMS_UP:
-				creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
+				creature->MaxTurn = MUMMY_WALK_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (AI.distance < MUMMY_IDLE_SWIPE_ATTACK_RANGE)
@@ -260,7 +256,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(0.008f))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
@@ -272,26 +268,26 @@ namespace TEN::Entities::TR4
 			case MUMMY_STATE_IDLE_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= ANGLE(7.0f))
+				if (abs(AI.angle) >= MUMMY_ATTACK_TURN_RATE_MAX)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(7.0f);
+						item->Pose.Orientation.y += MUMMY_ATTACK_TURN_RATE_MAX;
 					else
-						item->Pose.Orientation.y -= ANGLE(7.0f);
+						item->Pose.Orientation.y -= MUMMY_ATTACK_TURN_RATE_MAX;
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, MummyAttackJoints))
+					if (item->TouchBits.Test(MummySwipeAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						{
-							DoDamage(creature->Enemy, MUMMY_ATTACK_DAMAGE);
+							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 
-							if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
+							if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT))
 								CreatureEffect2(item, MummyBite1, 5, -1, DoBloodSplat);
 							else
 								CreatureEffect2(item, MummyBite2, 5, -1, DoBloodSplat);
@@ -309,11 +305,9 @@ namespace TEN::Entities::TR4
 		}
 
 		CreatureTilt(item, 0);
-
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
-
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

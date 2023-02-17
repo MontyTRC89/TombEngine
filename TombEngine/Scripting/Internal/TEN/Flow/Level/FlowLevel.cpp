@@ -11,8 +11,8 @@ These are things things which aren't present in the compiled level file itself.
 */
 
 /*** Make a new Level object.
-	@function Level.new
-	@return a Level object
+	@function Level
+	@treturn Level a Level object
 	*/
 void Level::Register(sol::table & parent)
 {	
@@ -61,13 +61,6 @@ void Level::Register(sol::table & parent)
 /// (bool) Draw sky layer? (default: false)
 //@mem horizon
 		"horizon", &Level::Horizon,
-
-/// (bool) Enable smooth transition from horizon graphic to sky layer.
-// If set to false, there will be a black band between the two.
-//
-// __(not yet implemented)__
-//@mem colAddHorizon
-		"colAddHorizon", &Level::ColAddHorizon,
 
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
@@ -125,7 +118,11 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
-		"objects", &Level::InventoryObjects
+		"objects", &Level::InventoryObjects,
+
+/// (short) Set Secrets for Level
+//@mem secrets
+		"secrets", sol::property(&Level::SetSecrets)
 		);
 }
 
@@ -263,3 +260,17 @@ short Level::GetFarView() const
 	return float(LevelFarView);
 }
 
+void Level::SetSecrets(int secrets)
+{
+	LevelSecrets = secrets;
+}
+
+int Level::GetSecrets() const
+{
+	return LevelSecrets;
+}
+
+std::string Level::GetAmbientTrack() const
+{
+	return AmbientTrack;
+}

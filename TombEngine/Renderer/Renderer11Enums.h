@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 enum RENDERER_BUCKETS
 {
@@ -118,7 +118,8 @@ enum RENDERER_DEBUG_PAGE
 	RENDERER_STATS,
 	DIMENSION_STATS,
 	LARA_STATS,
-	LOGIC_STATS
+	LOGIC_STATS,
+	WIREFRAME_MODE
 };
 
 enum RendererTransparentFaceType
@@ -177,7 +178,8 @@ enum CONSTANT_BUFFERS
 	CB_SPRITE = 9,
 	CB_HUD = 10,
 	CB_HUD_BAR = 11,
-	CB_ALPHA_TEST = 12
+	CB_BLENDING = 12,
+	CB_INSTANCED_SPRITES = 13
 };
 
 enum ALPHA_TEST_MODES 
@@ -209,9 +211,6 @@ constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
 #define NUM_SPRITES_PER_BUCKET 4096
 #define NUM_LINES_PER_BUCKET 4096
 #define NUM_CAUSTICS_TEXTURES	16
-#define	FADEMODE_NONE 0
-#define FADEMODE_FADEIN 1
-#define FADEMODE_FADEOUT 2
 #define PRINTSTRING_CENTER 1
 #define PRINTSTRING_BLINK 2
 #define PRINTSTRING_OUTLINE	8
@@ -241,12 +240,12 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 
 constexpr auto MAX_BONES = 32;
 
-constexpr auto REFERENCE_FONT_SIZE = 35.0f;
-constexpr auto REFERENCE_RES_WIDTH = 800.0f;
-constexpr auto REFERENCE_RES_HEIGHT = 600.0f;
-constexpr auto HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
-constexpr auto HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
-constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
+constexpr auto SCREEN_SPACE_RES				 = Vector2(800.0f, 600.0f);
+constexpr auto INVALID_SCREEN_SPACE_POSITION = Vector2(FLT_MAX, FLT_MAX);
+constexpr auto REFERENCE_FONT_SIZE			 = 35.0f;
+constexpr auto HUD_UNIT_X					 = 1.0f / SCREEN_SPACE_RES.x;
+constexpr auto HUD_UNIT_Y					 = 1.0f / SCREEN_SPACE_RES.y;
+constexpr auto HUD_ZERO_Y					 = -SCREEN_SPACE_RES.y;
 
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
@@ -254,3 +253,5 @@ constexpr auto MAX_ROOM_BOUNDS = 256;
 
 constexpr auto MIN_FAR_VIEW = 3200.0f;
 constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
+
+constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 128;

@@ -1,9 +1,8 @@
 #pragma once
-
-#include "Game/items.h"
 #include "Game/collision/collide_room.h"
+#include "Game/items.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Switches
 {
 	void InitialiseCrowDoveSwitch(short itemNumber);
 	void CrowDoveSwitchControl(short itemNumber);

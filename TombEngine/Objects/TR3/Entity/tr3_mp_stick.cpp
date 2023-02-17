@@ -9,55 +9,59 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<int> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<int> MPStickKickAttackJoints = { 5, 6 };
+	const auto MPStickPunchAttackJoints = std::vector<unsigned int>{ 10, 13 };
+	const auto MPStickKickAttackJoints  = std::vector<unsigned int>{ 5, 6 };
+
+	constexpr auto MPSTICK_VAULT_SHIFT = 260;
 
 	enum MPStickState
 	{
-		MPSTICK_STATE_NONE,
-		MPSTICK_STATE_STOP,
-		MPSTICK_STATE_WALK,
-		MPSTICK_STATE_PUNCH2,
-		MPSTICK_STATE_AIM2,
-		MPSTICK_STATE_WAIT,
-		MPSTICK_STATE_AIM1,
-		MPSTICK_STATE_AIM0,
-		MPSTICK_STATE_PUNCH1,
-		MPSTICK_STATE_PUNCH0,
-		MPSTICK_STATE_RUN,
-		MPSTICK_STATE_DEATH,
-		MPSTICK_STATE_KICK,
-		MPSTICK_STATE_CLIMB3,
-		MPSTICK_STATE_CLIMB1,
-		MPSTICK_STATE_CLIMB2,
-		MPSTICK_STATE_FALL3
+		// No state 0.
+		MPSTICK_STATE_STOP = 1,
+		MPSTICK_STATE_WALK = 2,
+		MPSTICK_STATE_PUNCH2 = 3,
+		MPSTICK_STATE_AIM2 = 4,
+		MPSTICK_STATE_WAIT = 5,
+		MPSTICK_STATE_AIM1 = 6,
+		MPSTICK_STATE_AIM0 = 7,
+		MPSTICK_STATE_PUNCH1 = 8,
+		MPSTICK_STATE_PUNCH0 = 9,
+		MPSTICK_STATE_RUN = 10,
+		MPSTICK_STATE_DEATH = 11,
+		MPSTICK_STATE_KICK = 12,
+		MPSTICK_STATE_CLIMB3 = 13,
+		MPSTICK_STATE_CLIMB1 = 14,
+		MPSTICK_STATE_CLIMB2 = 15,
+		MPSTICK_STATE_FALL3 = 16
 	};
 
-	// TODO
 	enum MPStickAnim
 	{
-
+		MPSTICK_ANIM_IDLE = 6,
+		MPSTICK_ANIM_DEATH = 26,
+		MPSTICK_ANIM_VAULT_3_STEPS_UP = 27,
+		MPSTICK_ANIM_VAULT_1_STEPS_UP = 28,
+		MPSTICK_ANIM_VAULT_2_STEPS_UP = 29,
+		MPSTICK_ANIM_VAULT_4_STEPS_DOWN = 30
 	};
 
 	void InitialiseMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = item->Animation.TargetState = MPSTICK_STATE_STOP;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
 
 	void MPStickControl(short itemNumber)
@@ -68,11 +72,10 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
-		short torsoX = 0;
-		short torsoY = 0;
+		short head = 0;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
@@ -85,9 +88,7 @@ namespace TEN::Entities::TR3
 		{
 			if (item->Animation.ActiveState != MPSTICK_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_DEATH;
+				SetAnimation(item, 26);
 				creature->LOT.Step = 256;
 			}
 		}
@@ -103,10 +104,9 @@ namespace TEN::Entities::TR3
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.distance = pow(dx, 2) + pow(dx, 2);
 
-				int bestDistance = 0x7fffffff;
-				for (int slot = 0; slot < ActiveCreatures.size(); slot++)
+				int bestDistance = INT_MAX;
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentCreature = ActiveCreatures[slot];
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
 
@@ -145,7 +145,7 @@ namespace TEN::Entities::TR3
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -184,7 +184,7 @@ namespace TEN::Entities::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (!(GetRandomControl() & 0xFF))
+					if (Random::TestProbability(1 / 256.0f))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -194,7 +194,6 @@ namespace TEN::Entities::TR3
 
 					break;
 				}
-
 				else if (item->AIBits & PATROL1)
 					item->Animation.TargetState = MPSTICK_STATE_WALK;
 
@@ -208,7 +207,7 @@ namespace TEN::Entities::TR3
 				else if (creature->Mood == MoodType::Bored ||
 					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -240,7 +239,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
+					if (Random::TestProbability(1 / 128.0f))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -288,8 +287,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
@@ -305,8 +304,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
@@ -322,8 +321,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
@@ -338,32 +337,30 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MPStickPunchAttackJoints))
 					{
-						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						DoDamage(enemy, 80);
+						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							creature->Flags = 1;
-							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							DoDamage(enemy, 5);
+							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 1;
 						}
 					}
 				}
@@ -375,32 +372,30 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MPStickPunchAttackJoints))
 					{
+						DoDamage(creature->Enemy, 80);
 						CreatureEffect(item, MPStickBite1, DoBloodSplat);
-						DoDamage(enemy, 80);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && creature->Enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							creature->Flags = 1;
+							DoDamage(creature->Enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
-							DoDamage(enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 1;
 						}
 					}
 				}
@@ -415,32 +410,30 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
-					if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
+					if (creature->Flags != 2 && item->TouchBits.Test(MPStickPunchAttackJoints))
 					{
+						DoDamage(creature->Enemy, 100);
 						CreatureEffect(item, MPStickBite1, DoBloodSplat);
-						DoDamage(enemy, 100);
-						creature->Flags = 2;
 						SoundEffect(70, &item->Pose);
+						creature->Flags = 2;
 					}
 				}
 				else
 				{
-					if (creature->Flags != 2 && enemy)
+					if (creature->Flags != 2 && creature->Enemy)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							creature->Flags = 2;
+							DoDamage(creature->Enemy, 6);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
-							DoDamage(enemy, 6);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 2;
 						}
 					}
 				}
@@ -451,32 +444,30 @@ namespace TEN::Entities::TR3
 				creature->MaxTurn = ANGLE(6.0f);
 
 				if (AI.ahead)
-					torsoY = AI.angle;
+					extraTorsoRot.y = AI.angle;
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
-					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MPStickKickAttackJoints) &&
+					if (creature->Flags != 1 && item->TouchBits.Test(MPStickKickAttackJoints) &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
+						DoDamage(creature->Enemy, 150);
 						CreatureEffect(item, MPStickBite2, DoBloodSplat);
-						DoDamage(enemy, 150);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
 				}
 				else
 				{
-					if (!creature->Flags != 1 && enemy &&
+					if (!creature->Flags != 1 && creature->Enemy &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							creature->Flags = 1;
+							DoDamage(creature->Enemy, 9);
 							CreatureEffect(item, MPStickBite2, DoBloodSplat);
-							DoDamage(enemy, 9);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 1;
 						}
 					}
 				}
@@ -486,40 +477,32 @@ namespace TEN::Entities::TR3
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
 		CreatureJoint(item, 2, head);
 
 		if (item->Animation.ActiveState < MPSTICK_STATE_DEATH)
 		{
-			switch (CreatureVault(itemNumber, angle, 2, 260))
+			switch (CreatureVault(itemNumber, angle, 2, MPSTICK_VAULT_SHIFT))
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB1;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_1_STEPS_UP);
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB2;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_2_STEPS_UP);
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB3;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_3_STEPS_UP);
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_FALL3;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_4_STEPS_DOWN);
 				break;
 			}
 		}

@@ -60,9 +60,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT2];
@@ -71,9 +68,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT3];
@@ -82,9 +76,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT4];
@@ -93,9 +84,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT5];
@@ -104,9 +92,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT6];
@@ -115,9 +100,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT7];
@@ -126,9 +108,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_SMASH_OBJECT8];
@@ -137,9 +116,6 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_CRUMBLING_FLOOR];
@@ -148,19 +124,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveMesh = true;
 	}
-
-	/*obj = &Objects[ID_AIRLOCK_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = TEN::Entities::Switches::SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}*/
 
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
@@ -191,7 +155,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseTightrope;
 		obj->collision = TightropeCollision;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
+		
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -205,7 +169,6 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_HIGH_OBJECT2];
@@ -219,7 +182,7 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		//obj->drawRoutine = DrawLensFlare;
-		obj->saveFlags = true;
+		
 	}
 
 	obj = &Objects[ID_WATERFALLMIST];
@@ -227,7 +190,6 @@ void ObjectObjects()
 	{
 		obj->control = ControlWaterfallMist;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 	}
 
 	for (int objNum = ID_WATERFALL1; objNum <= ID_WATERFALL6; objNum++)
@@ -235,23 +197,20 @@ void ObjectObjects()
 		obj = &Objects[objNum];
 		if (obj->loaded)
 		{
-			obj->control = ControlWaterfall;
-			obj->saveFlags = true;
+			obj->control = nullptr;
 		}
 	}
 
 	obj = &Objects[ID_WATERFALLSS1];
 	if (obj->loaded)
 	{
-		obj->control = ControlWaterfall;
-		obj->saveFlags = true;
+		obj->control = nullptr;
 	}
 
 	obj = &Objects[ID_WATERFALLSS2];
 	if (obj->loaded)
 	{
-		obj->control = ControlWaterfall;
-		obj->saveFlags = true;
+		obj->control = nullptr;
 	}
 
 	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
@@ -262,9 +221,6 @@ void ObjectObjects()
 			obj->initialise = InitialiseShootSwitch;
 			obj->control = ControlAnimatingSlots;
 			obj->collision = ShootSwitchCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
 		}
 	}
 }
@@ -278,7 +234,6 @@ void TrapObjects()
 		obj->control = KillAllCurrentItems;
 		obj->drawRoutine = nullptr;
 		obj->HitPoints = 0;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -292,8 +247,6 @@ void TrapObjects()
 		obj->ceiling = FallingBlockCeiling;
 		obj->floorBorder = FallingBlockFloorBorder;
 		obj->ceilingBorder = FallingBlockCeilingBorder;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_FALLING_BLOCK2];
@@ -306,8 +259,6 @@ void TrapObjects()
 		obj->ceiling = FallingBlockCeiling;
 		obj->floorBorder = FallingBlockFloorBorder;
 		obj->ceilingBorder = FallingBlockCeilingBorder;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT2];
@@ -317,7 +268,6 @@ void TrapObjects()
 		obj->control = GenSlot2Control;
 		obj->drawRoutine = DrawGenSlot2;*/
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_PORTAL];
@@ -326,7 +276,7 @@ void TrapObjects()
 		//obj->initialise = InitialisePortal;
 		//obj->control = PortalControl;        // TODO: found the control procedure !
 		obj->drawRoutine = nullptr;             // go to nullsub_44() !
-		obj->saveFlags = true; 
+		 
 		obj->usingDrawAnimatingItem = false;
 	}
 	
@@ -335,7 +285,7 @@ void TrapObjects()
 	{
 		obj->control = ControlTriggerTriggerer;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
+		
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -363,7 +313,6 @@ void InitialiseSpecialEffects()
 	NextFireSpark = 1;
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
-	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
 
@@ -391,29 +340,23 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
+		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowType = ShadowMode::None;
 		obj->HitPoints = NOT_TARGETABLE;
-		obj->hitEffect = HIT_NONE;
+		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
 		obj->waterCreature = false;
-		obj->saveMesh = false;
-		obj->saveAnim = false;
-		obj->saveFlags = false;
-		obj->saveHitpoints = false;
-		obj->savePosition = false;
-		obj->nonLot = true;
+		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
-		obj->semiTransparent = false;
 		obj->undead = false;
-		obj->zoneType = ZONE_NULL;
+		obj->LotType = LotType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseEffectsObjects();

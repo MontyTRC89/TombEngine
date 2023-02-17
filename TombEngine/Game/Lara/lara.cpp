@@ -2,45 +2,49 @@
 #include "Game/Lara/lara.h"
 
 #include "Game/Lara/lara_basic.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_jump.h"
-#include "Game/Lara/lara_tests.h"
-#include "Game/Lara/lara_monkey.h"
-#include "Game/Lara/lara_crawl.h"
-#include "Game/Lara/lara_objects.h"
-#include "Game/Lara/lara_hang.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_slide.h"
-#include "Game/Lara/lara_fire.h"
-#include "Game/Lara/lara_surface.h"
-#include "Game/Lara/lara_swim.h"
-#include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
-#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_crawl.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_hang.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_initialise.h"
+#include "Game/Lara/lara_jump.h"
+#include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/lara_objects.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_slide.h"
+#include "Game/Lara/lara_surface.h"
+#include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/hair.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
-#include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Sound/sound.h"
 
-using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Items;
+using namespace TEN::Floordata;
 using namespace TEN::Input;
-using std::function;
+using namespace TEN::Math;
+
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara = {};
@@ -48,7 +52,7 @@ ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
-function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
+std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 {
 	lara_as_walk_forward,
 	lara_as_run_forward,
@@ -73,7 +77,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
-	lara_as_roll_back,
+	lara_as_roll_180_back,//23
 	lara_as_slide_forward,//24
 	lara_as_jump_back,//25
 	lara_as_jump_right,//26
@@ -95,7 +99,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_use_key,//42
 	lara_as_use_puzzle,//43
 	lara_as_underwater_death,//44
-	lara_as_roll_forward,//45
+	lara_as_roll_180_forward,//45
 	lara_as_special,//46
 	lara_as_surface_swim_back,//47
 	lara_as_surface_swim_left,//48
@@ -227,9 +231,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_idle,//170
 	lara_as_crouch_turn_180,//171
 	lara_as_crawl_turn_180,//172
+	lara_as_turn_180,//173
 };
 
-function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
+std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 {
 	lara_col_walk_forward,
 	lara_col_run_forward,
@@ -254,7 +259,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_turn_right_fast,
 	lara_col_step_right,
 	lara_col_step_left,
-	lara_col_roll_back,
+	lara_col_roll_180_back,
 	lara_col_slide_forward,//24
 	lara_col_jump_back,//25
 	lara_col_jump_right,//26
@@ -276,7 +281,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_col_underwater_death,//44
-	lara_col_roll_forward,//45
+	lara_col_roll_180_forward,//45
 	lara_void_func,//46
 	lara_col_surface_swim_back,//47
 	lara_col_surface_swim_left,//48
@@ -404,6 +409,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_idle,//170
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
+	lara_col_turn_180,//173
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -495,7 +501,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
 
-					UpdateItemRoom(item, 0);
+					UpdateLaraRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
@@ -590,7 +596,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						item->Pose.Position.y = waterHeight;
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
 
-						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
+						UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, SoundEnvironment::Always);
 					}
 				}
@@ -604,7 +610,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				item->Pose.Position.y = waterHeight + 1;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 
-				UpdateItemRoom(item, 0);
+				UpdateLaraRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, SoundEnvironment::Always);
 			}
 
@@ -648,7 +654,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Pose.Position.y += 1 - heightFromWater;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
 
-					UpdateItemRoom(item, 0);
+					UpdateLaraRoom(item, 0);
 				}
 			}
 			else
@@ -663,6 +669,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
+	{
+		item->HitPoints--;
+	}
+
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = -1;
@@ -671,7 +682,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			StopSoundTracks();
 
 		lara->Control.Count.Death++;
-		if ((item->Flags & 0x100))
+		if ((item->Flags & IFLAG_INVISIBLE))
 		{
 			lara->Control.Count.Death++;
 			return;
@@ -696,7 +707,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
-			if (lara->Vehicle == NO_ITEM)	// Only for UPV.
+			if (lara->Vehicle == NO_ITEM) // Only for UPV.
 			{
 				lara->Air += 10;
 				if (lara->Air > LARA_AIR_MAX)
@@ -768,6 +779,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK && lara->Control.CanLook &&
 		lara->ExtraAnim == NO_ITEM)
 	{
+		if (BinocularOn)
+			LookUpDown(item);
+
 		LookLeftRight(item);
 	}
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
@@ -777,17 +791,15 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Height = LARA_HEIGHT;
 	lara->Control.CanLook = true;
 
-	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	HandleLaraMovementParameters(item, coll);
-
 	// Handle current Lara status.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
-
+	HandleLaraMovementParameters(item, coll);
 	AnimateLara(item);
 
 	if (lara->ExtraAnim == NO_ITEM)
@@ -801,7 +813,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Handle weapons.
-	LaraGun(item);
+	HandleWeapon(item);
 
 	// Handle breath.
 	LaraBreath(item);
@@ -809,7 +821,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(Lara.ItemNumber, &coll->Setup);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
@@ -877,9 +889,9 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
-	UpdateItemRoom(item, LARA_RADIUS);
+	UpdateLaraRoom(item, LARA_RADIUS);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -966,9 +978,9 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
-	UpdateItemRoom(item, 0);
+	UpdateLaraRoom(item, 0);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1003,4 +1015,67 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
+}
+
+void UpdateLara(ItemInfo* item, bool isTitle)
+{
+	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
+		return;
+
+	// HACK: backup controls until proper control lock 
+	// is implemented -- Lwmte, 07.12.22
+
+	auto actionMap = ActionMap;
+	auto dbInput = DbInput;
+	auto trInput = TrInput;
+
+	if (isTitle)
+		ClearAllActions();
+
+	// Control Lara.
+	InItemControlLoop = true;
+	LaraControl(item, &LaraCollision);
+	LaraCheatyBits(item);
+	InItemControlLoop = false;
+	KillMoveItems();
+
+	if (isTitle)
+	{
+		ActionMap = actionMap;
+		DbInput = dbInput;
+		TrInput = trInput;
+	}
+
+	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
+	{
+		g_Gui.SetInventoryItemChosen(NO_ITEM);
+		SayNo();
+	}
+
+	// Update Lara's animations.
+	g_Renderer.UpdateLaraAnimations(true);
+
+	// Update Lara's effects.
+	TriggerLaraDrips(item);
+	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	ProcessEffects(item);
+}
+
+// Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
+bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
+{
+	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
+
+	// Hacky L-shaped Location traversal.
+	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
+	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
+	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
+
+	if (item->RoomNumber != item->Location.roomNumber)
+	{
+		ItemNewRoom(item->Index, item->Location.roomNumber);
+		return true;
+	}
+
+	return false;
 }

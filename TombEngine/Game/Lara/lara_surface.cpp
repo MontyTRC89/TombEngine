@@ -11,7 +11,7 @@
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 
@@ -68,7 +68,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	
 	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 

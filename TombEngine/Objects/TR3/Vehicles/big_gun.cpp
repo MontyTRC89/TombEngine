@@ -16,7 +16,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using std::vector;
@@ -122,15 +122,13 @@ namespace TEN::Entities::Vehicles
 			projectileItem->ObjectNumber = ID_ROCKET;
 			projectileItem->RoomNumber = laraItem->RoomNumber;
 
-			auto pos = Vector3Int(0, 0, CLICK(1)); // CLICK(1) or 520?
-			GetJointAbsPosition(bigGunItem, &pos, 2);
-
+			auto pos = GetJointPosition(bigGunItem, 2, Vector3i(0, 0, CLICK(1))); // CLICK(1) or 520?
 			projectileItem->Pose.Position = pos;
 
 			InitialiseItem(itemNumber);
 
 			projectileItem->Animation.Velocity.z = 16;
-			projectileItem->Pose.Orientation = Vector3Shrt(
+			projectileItem->Pose.Orientation = EulerAngles(
 				-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
 				bigGunItem->Pose.Orientation.y,
 				0
@@ -159,11 +157,11 @@ namespace TEN::Entities::Vehicles
 
 		if (BigGunTestMount(laraItem, bigGunItem))
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, bigGunItem);
 
 			DoVehicleFlareDiscard(laraItem);
-			laraItem->Animation.AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;
-			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT].frameBase;
+			laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_MOUNT;
+			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_MOUNT].frameBase;
 			laraItem->Animation.ActiveState = BGUN_STATE_MOUNT;
 			laraItem->Animation.TargetState = BGUN_STATE_MOUNT;
 			laraItem->Animation.IsAirborne = false;
@@ -269,7 +267,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (bigGun->XOrientFrame == BGUN_X_ORIENT_MIDDLE_FRAME)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_DISMOUNT;
+				laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_DISMOUNT;
 				laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_DISMOUNT].frameBase;
 				laraItem->Animation.ActiveState = BGUN_STATE_DISMOUNT;
 				laraItem->Animation.TargetState = BGUN_STATE_DISMOUNT;
@@ -290,13 +288,13 @@ namespace TEN::Entities::Vehicles
 		case BGUN_STATE_MOUNT:
 		case BGUN_STATE_DISMOUNT:
 			AnimateItem(laraItem);
-			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
+			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
 			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
 			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
 			{
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				lara->Control.HandStatus = HandStatus::Free;
 				bigGunItem->HitPoints = 0;
 			}
@@ -304,7 +302,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case BGUN_STATE_ROTATE_VERTICALLY:
-			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
+			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
 			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 			
 			if (bigGun->FireCount > 0)
@@ -314,7 +312,7 @@ namespace TEN::Entities::Vehicles
 
 			bigGun->Flags = BGUN_FLAG_UP_DOWN;
 
-			laraItem->Animation.AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_ROTATE_VERTICALLY;
+			laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_ROTATE_VERTICALLY;
 			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_ROTATE_VERTICALLY].frameBase + bigGun->XOrientFrame;
 			break;
 		}

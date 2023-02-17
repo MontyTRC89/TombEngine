@@ -9,12 +9,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -24,11 +22,11 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
 	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
-	const vector<int> BigBeetleAttackJoints = { 5, 6 };
+	const auto BigBeetleAttackJoints = std::vector<unsigned int>{ 5, 6 };
 
 	enum BigBeetleState
 	{
-		BBEETLE_STATE_NONE = 0,
+		// No state 0.
 		BBEETLE_STATE_IDLE = 1,
 		BBEETLE_STATE_TAKE_OFF = 2,
 		BBEETLE_STATE_FLY_FORWARD = 3,
@@ -122,7 +120,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
-				TestProbability(0.008f))
+				Random::TestProbability(1 / 128.0f))
 			{
 				creature->Flags = 0;
 			}
@@ -146,7 +144,7 @@ namespace TEN::Entities::TR4
 			case BBEETLE_STATE_FLY_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.ahead && AI.distance < BIG_BEETLE_ATTACK_RANGE)
 					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
@@ -175,7 +173,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (!creature->Flags &&
-					item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
+					item->TouchBits.Test(BigBeetleAttackJoints))
 				{
 					DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
 					CreatureEffect2(item, BigBeetleBite, 5, -1, DoBloodSplat);
@@ -196,11 +194,11 @@ namespace TEN::Entities::TR4
 			case BBEETLE_STATE_FLY_IDLE:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!item->HitStatus && item->AIBits != MODIFY &&
-					TestProbability(0.99f) &&
-					((creature->Mood != MoodType::Bored && TestProbability(0.996f)) ||
+					Random::TestProbability(0.99f) &&
+					((creature->Mood != MoodType::Bored && Random::TestProbability(0.996f)) ||
 						creature->HurtByLara || item->AIBits == MODIFY))
 				{
 					if (AI.ahead)

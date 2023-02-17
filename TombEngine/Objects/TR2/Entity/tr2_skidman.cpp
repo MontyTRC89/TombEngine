@@ -17,18 +17,19 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
-	#define SMAN_MIN_TURN (ANGLE(2.0f))
-	#define SMAN_TARGET_ANGLE ANGLE(15.0f)
-	#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
+	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
 	const auto SkidooBiteLeft  = BiteInfo(Vector3(240.0f, -190.0f, 540.0f), 0);
 	const auto SkidooBiteRight = BiteInfo(Vector3(-240.0f, -190.0f, 540.0f), 0);
 
+	constexpr auto SMAN_MIN_TURN = ANGLE(2.0f);
+	constexpr auto SMAN_TARGET_ANGLE = ANGLE(15.0f);
+
 	enum SnowmobileManState
 	{
-		SMAN_STATE_NONE = 0,
+		// No state 0.
 		SMAN_STATE_WAIT = 1,
 		SMAN_STATE_MOVING = 2,
 		SMAN_STATE_START_LEFT = 3,
@@ -53,13 +54,11 @@ namespace TEN::Entities::TR2
 			auto* skidooItem = &g_Level.Items[skidooItemNumber];
 
 			skidooItem->ObjectNumber = ID_SNOWMOBILE_GUN;
-			skidooItem->Pose.Position.x = riderItem->Pose.Position.x;
-			skidooItem->Pose.Position.y = riderItem->Pose.Position.y;
-			skidooItem->Pose.Position.z = riderItem->Pose.Position.z;
+			skidooItem->Pose.Position = riderItem->Pose.Position;
 			skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
 			skidooItem->RoomNumber = riderItem->RoomNumber;
 			skidooItem->Flags = ITEM_INVISIBLE;
-			skidooItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			InitialiseItem(skidooItemNumber);
 
@@ -84,21 +83,18 @@ namespace TEN::Entities::TR2
 
 		if (coll->Setup.EnableObjectPush)
 		{
-			if (item->Animation.Velocity.z > 0)
+			if (item->Animation.Velocity.z > 0.0f)
 				ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
 			else
-				ItemPushItem(item, laraItem, coll, 0, 0);
+				ItemPushItem(item, laraItem, coll, false, 0);
 		}
 
-		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0)
-		{
+		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0.0f)
 			DoDamage(laraItem, 100);
-		}
 	}
 
 	void SkidooManControl(short riderItemNumber)
 	{
-
 		auto* riderItem = &g_Level.Items[riderItemNumber];
 		if (!riderItem->Data)
 		{
@@ -228,9 +224,7 @@ namespace TEN::Entities::TR2
 
 		if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
 		{
-			riderItem->Pose.Position.x = item->Pose.Position.x;
-			riderItem->Pose.Position.y = item->Pose.Position.y;
-			riderItem->Pose.Position.z = item->Pose.Position.z;
+			riderItem->Pose.Position = item->Pose.Position;
 			riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
 
 			if (item->RoomNumber != riderItem->RoomNumber)

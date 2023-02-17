@@ -3,10 +3,11 @@
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
+#include "Renderer/RendererRectangle.h"
 
 using std::vector;
 
@@ -98,7 +99,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < 6; i++)
 		{
 			auto renderView = RenderView(pos, RenderTargetCube::forwardVectors[i], RenderTargetCube::upVectors[i],
-			                             dest.resolution, dest.resolution, Camera.pos.roomNumber, 10, 20480,
+			                             dest.resolution, dest.resolution, Camera.pos.RoomNumber, 10, 20480,
 			                             90 * RADIAN);
 			RenderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
@@ -116,7 +117,7 @@ namespace TEN::Renderer
 			Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
 
 		};
-		const float HUD_BORDER_WIDTH = borderSize * (REFERENCE_RES_WIDTH / REFERENCE_RES_HEIGHT);
+		const float HUD_BORDER_WIDTH = borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
 		const float HUD_BORDER_HEIGT = borderSize;
 		array<Vector3, 16> barBorderVertices = {
 			//top left
@@ -376,38 +377,41 @@ namespace TEN::Renderer
 			switch (blendMode)
 			{
 			case BLENDMODE_ALPHABLEND:
-				m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_ALPHATEST:
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_OPAQUE:
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_SUBTRACTIVE:
-				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_ADDITIVE:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_states->Additive(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_SCREEN:
-				m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_screenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_LIGHTEN:
-				m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_lightenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
 			case BLENDMODE_EXCLUDE:
-				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+				m_context->OMSetBlendState(m_excludeBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
-
 			}
+
+			m_stBlending.BlendMode = static_cast<unsigned int>(blendMode);
+			m_cbBlending.updateData(m_stBlending, m_context.Get());
+			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());
 
 			lastBlendMode = blendMode;
 		}
@@ -422,7 +426,6 @@ namespace TEN::Renderer
 		default:
 			SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 			break;
-
 		}
 	}
 
@@ -452,6 +455,12 @@ namespace TEN::Renderer
 
 	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
+		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+		{
+			m_context->RSSetState(m_states->Wireframe());
+			return;
+		}
+
 		if (cullMode != lastCullMode || force)
 		{
 			switch (cullMode)
@@ -467,7 +476,6 @@ namespace TEN::Renderer
 			case CULL_MODE_CW:
 				m_context->RSSetState(m_cullClockwiseRasterizerState.Get());
 				break;
-
 			}
 
 			lastCullMode = cullMode;
@@ -476,14 +484,14 @@ namespace TEN::Renderer
 
 	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
 	{
-		if (m_stAlphaTest.AlphaTest != static_cast<int>(mode) ||
-			m_stAlphaTest.AlphaThreshold != threshold ||
+		if (m_stBlending.AlphaTest != static_cast<int>(mode) ||
+			m_stBlending.AlphaThreshold != threshold ||
 			force)
 		{
-			m_stAlphaTest.AlphaTest = static_cast<int>(mode);
-			m_stAlphaTest.AlphaThreshold = threshold;
-			m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
-			BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
+			m_stBlending.AlphaTest = static_cast<int>(mode);
+			m_stBlending.AlphaThreshold = threshold;
+			m_cbBlending.updateData(m_stBlending, m_context.Get());
+			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());
 		}
 	}
 
@@ -491,9 +499,9 @@ namespace TEN::Renderer
 	{
 		D3D11_RECT rects;
 		rects.left = s.left;
-		rects.top = m_screenHeight - s.top;
+		rects.top = s.top;
 		rects.right = s.right;
-		rects.bottom = m_screenHeight - s.bottom;
+		rects.bottom = s.bottom;
 
 		m_context->RSSetScissorRects(1, &rects);
 	}

@@ -6,39 +6,41 @@
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
+using namespace TEN::Math;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
 	constexpr auto MUTANT_CONTACT_DAMAGE = 6;
 
-	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
+	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(BLOCK(5 / 2.0f));
+	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(BLOCK(2.2f));
 
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 0x2AF8;
-	constexpr auto MUTANT_ATTACK_2_CHANCE = 0x55F0;
+	// TODO: Chance values are unused. -- Sezz 2022.11.05
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 1 / 3.0f;
+	constexpr auto MUTANT_ATTACK_2_CHANCE = MUTANT_ATTACK_1_CHANCE * 2;
 
-	#define MUTANT_NEED_TURN ANGLE(45.0f)
-	#define MUTANT_TURN ANGLE(3.0f)
+	constexpr auto MUTANT_NEED_TURN = ANGLE(45.0f);
+	constexpr auto MUTANT_TURN	    = ANGLE(3.0f);
 
-	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
+	constexpr auto LARA_GIANT_MUTANT_DEATH = 6;
 
-	const vector<int> MutantAttackJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const vector<int> MutantAttackLeftJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-	const vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const auto MutantAttackJoints	   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const auto MutantAttackLeftJoint   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const auto MutantAttackRightJoints = std::vector<unsigned int>{ 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
 	{
-		MUTANT_STATE_NONE = 0,
+		MUTANT_STATE_DEATH = 0,
 		MUTANT_STATE_IDLE = 1,
 		MUTANT_STATE_TURN_LEFT = 2,
 		MUTANT_STATE_TURN_RIGHT = 3,
@@ -48,11 +50,11 @@ namespace TEN::Entities::TR1
 		MUTANT_STATE_FORWARD = 7,
 		MUTANT_STATE_SET = 8,
 		MUTANT_STATE_FALL = 9,
-		MUTANT_STATE_DEATH = 10,
+		// No state 10.
 		MUTANT_STATE_KILL = 11
 	};
 
-	// TODO
+	// TODO: Fill enum.
 	enum GiantMutantAnim
 	{
 		MUTANT_ANIM_DEATH = 13,
@@ -66,17 +68,13 @@ namespace TEN::Entities::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
-		short angle = 0;
+		short headingAngle = 0;
+		short headYOrient = 0;
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MUTANT_STATE_DEATH;
-			}
+				SetAnimation(item, MUTANT_ANIM_DEATH);
 		}
 		else
 		{
@@ -84,17 +82,15 @@ namespace TEN::Entities::TR1
 			CreatureAIInfo(item, &AI);
 
 			if (AI.ahead)
-				head = AI.angle;
+				headYOrient = AI.angle;
 
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+			headingAngle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
-			if (item->TouchBits)
-			{
+			if (item->TouchBits.TestAny())
 				DoDamage(creature->Enemy, MUTANT_CONTACT_DAMAGE);
-			}
 
 			switch (item->Animation.ActiveState)
 			{
@@ -109,9 +105,9 @@ namespace TEN::Entities::TR1
 
 				creature->Flags = 0;
 
-				if (angle > MUTANT_NEED_TURN)
+				if (headingAngle > MUTANT_NEED_TURN)
 					item->Animation.TargetState = MUTANT_STATE_TURN_RIGHT;
-				else if (angle < -MUTANT_NEED_TURN)
+				else if (headingAngle < -MUTANT_NEED_TURN)
 					item->Animation.TargetState = MUTANT_STATE_TURN_LEFT;
 				else if (AI.distance < MUTANT_ATTACK_RANGE)
 				{
@@ -122,7 +118,7 @@ namespace TEN::Entities::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (GetRandomControl() < 0x4000)
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
@@ -133,14 +129,14 @@ namespace TEN::Entities::TR1
 				break;
 
 			case MUTANT_STATE_FORWARD:
-				if (angle < -MUTANT_TURN)
+				if (headingAngle < -MUTANT_TURN)
 					item->Animation.TargetState -= MUTANT_TURN;
-				else if (angle > MUTANT_TURN)
+				else if (headingAngle > MUTANT_TURN)
 					item->Animation.TargetState += MUTANT_TURN;
 				else
-					item->Animation.TargetState += angle;
+					item->Animation.TargetState += headingAngle;
 
-				if (angle > MUTANT_NEED_TURN || angle < -MUTANT_NEED_TURN)
+				if (headingAngle > MUTANT_NEED_TURN || headingAngle < -MUTANT_NEED_TURN)
 					item->Animation.TargetState = MUTANT_STATE_IDLE;
 				else if (AI.distance < MUTANT_ATTACK_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_IDLE;
@@ -156,7 +152,7 @@ namespace TEN::Entities::TR1
 					item->Pose.Orientation.y += ANGLE(14.0f);
 				}
 
-				if (angle < MUTANT_NEED_TURN)
+				if (headingAngle < MUTANT_NEED_TURN)
 					item->Animation.TargetState = MUTANT_STATE_IDLE;
 
 				break;
@@ -170,31 +166,31 @@ namespace TEN::Entities::TR1
 					item->Pose.Orientation.y -= ANGLE(9.0f);
 				}
 
-				if (angle > -MUTANT_NEED_TURN)
+				if (headingAngle > -MUTANT_NEED_TURN)
 					item->Animation.TargetState = MUTANT_STATE_IDLE;
 
 				break;
 
 			case MUTANT_STATE_ATTACK_1:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackRightJoints))
+				if (!creature->Flags && item->TouchBits.Test(MutantAttackRightJoints))
 				{
-					creature->Flags = 1;
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
 
 				break;
 
 			case MUTANT_STATE_ATTACK_2:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(MutantAttackJoints))
 				{
-					creature->Flags = 1;
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
 
 				break;
 
 			case MUTANT_STATE_ATTACK_3:
-				if (item->TestBits(JointBitType::Touch, MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
+				if (item->TouchBits.Test(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
 					item->Animation.TargetState = MUTANT_STATE_KILL;
 					Camera.targetDistance = SECTOR(2);
@@ -202,14 +198,11 @@ namespace TEN::Entities::TR1
 
 					LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_GIANT_MUTANT_DEATH;
 					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-					LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
-					LaraItem->RoomNumber = item->RoomNumber;
-					LaraItem->Pose.Position.x = item->Pose.Position.x;
-					LaraItem->Pose.Position.y = item->Pose.Position.y;
-					LaraItem->Pose.Position.z = item->Pose.Position.z;
-					LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-					LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
+					LaraItem->Animation.ActiveState = 46;
+					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
+					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;
 					Lara.Control.HandStatus = HandStatus::Busy;
@@ -225,7 +218,7 @@ namespace TEN::Entities::TR1
 			}
 		}
 
-		CreatureJoint(item, 0, head);
+		CreatureJoint(item, 0, headYOrient);
 
 		if (item->Animation.ActiveState == MUTANT_STATE_FALL)
 		{
