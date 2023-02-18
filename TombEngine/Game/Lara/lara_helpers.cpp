@@ -245,25 +245,26 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 void DoPlayerLegIK(ItemInfo& item)
 {
-	static constexpr auto pivotAngleOffset = ANGLE(5.0f);
-	static constexpr auto heightTolerance  = (float)CLICK(1);
-	static constexpr auto heelHeight	   = 56.0f;
-	static constexpr auto alpha			   = 0.4f;
+	constexpr auto pivotAngleOffset = ANGLE(5.0f);
+	constexpr auto heightTolerance	= CLICK(1);
+	constexpr auto heelHeight		= 56.0f;
+	constexpr auto alpha			= 0.4f;
 
 	auto& player = *GetLaraInfo(&item);
 
 	// Get point collision.
+	auto hipsPos  = GetJointPosition(&item, LM_HIPS);
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
 	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
-	float vPos = item.Pose.Position.y;
-	float vPosVisual = vPos + player.VerticalOffset;
-	float lFloorHeight = lPointColl.Position.Floor;
-	float rFloorHeight = rPointColl.Position.Floor;
+	int vPos = item.Pose.Position.y;
+	int vPosVisual = vPos + player.VerticalOffset;
+	int lFloorHeight = lPointColl.Position.Floor;
+	int rFloorHeight = rPointColl.Position.Floor;
 
-	bool isPlayerUpright	   = (GameBoundingBox(&item).GetHeight() >= (LARA_HEIGHT * 0.6f));
+	bool isUpright			   = ((vPosVisual - hipsPos.y) >= (LARA_HEIGHT * 0.3f));
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
@@ -274,8 +275,8 @@ void DoPlayerLegIK(ItemInfo& item)
 		if (lFloorHeight < rFloorHeight)
 		{
 			// Solve IK chain for left leg.
-			if (abs(lFloorHeight - vPosVisual) <= heightTolerance &&
-				isPlayerUpright && isLeftFloorSteppable)
+			if (abs(vPosVisual - lFloorHeight) <= heightTolerance &&
+				isUpright && isLeftFloorSteppable)
 			{
 				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -pivotAngleOffset, heelHeight, alpha);
 			}
@@ -283,8 +284,8 @@ void DoPlayerLegIK(ItemInfo& item)
 		else
 		{
 			// Solve IK chain for right leg.
-			if (abs(rFloorHeight - vPosVisual) <= heightTolerance &&
-				isPlayerUpright && isRightFloorSteppable)
+			if (abs(vPosVisual - rFloorHeight) <= heightTolerance &&
+				isUpright && isRightFloorSteppable)
 			{
 				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, pivotAngleOffset, heelHeight, alpha);
 			}
@@ -292,7 +293,7 @@ void DoPlayerLegIK(ItemInfo& item)
 	}
 
 	// Determine vertical offset.
-	float vOffset = 0.0f;
+	int vOffset = 0;
 	if (isLeftFloorSteppable && !isRightFloorSteppable)
 	{
 		vOffset = lFloorHeight - vPos;
@@ -310,7 +311,7 @@ void DoPlayerLegIK(ItemInfo& item)
 	// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
 	// Must use it in GetJointPosition() as well?
 	// Or: modify mutators.
-	if (abs(vOffset) <= heightTolerance && isPlayerUpright)
+	if (abs(vOffset) <= heightTolerance && isUpright)
 	{
 		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
 		player.VerticalOffset = (int)round(Lerp(player.VerticalOffset, vOffset, alpha));
