@@ -74,7 +74,7 @@ namespace TEN::Math::Solvers
 		// Solution is invalid: define middle as point on line segment between origin and target.
 		else
 		{
-			middle = origin + (direction * (maxLength / 2));
+			middle = origin + (direction * length0);
 		}
 
 		return IKSolution2D{ origin, middle, scaledTarget };
