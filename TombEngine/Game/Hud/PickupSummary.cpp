@@ -30,7 +30,7 @@ namespace TEN::Hud
 		constexpr auto LIFE_BUFFER		   = 0.2f;
 		constexpr auto SCALE_MAX		   = 0.4f;
 		constexpr auto SCALE_MIN		   = 0.2f;
-		constexpr auto HIDE_VELOCITY_MAX   = 24.0f; // TODO: If SCREEN_SPACE_RES is changed, this will need updating. -- Sezz 2022.02.18
+		constexpr auto HIDE_VELOCITY_MAX   = SCREEN_SPACE_RES.x * 0.03f;
 		constexpr auto HIDE_VELOCITY_ACCEL = HIDE_VELOCITY_MAX / 4;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
