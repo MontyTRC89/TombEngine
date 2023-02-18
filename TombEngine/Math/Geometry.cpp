@@ -179,7 +179,10 @@ namespace TEN::Math::Geometry
 
 	Quaternion DirectionToQuaternion(const Vector3& direction)
 	{
-		auto axis = direction.Cross(Vector3::Up);
+		auto directionNorm = direction;
+		directionNorm.Normalize();
+
+		auto axis = directionNorm.Cross(Vector3::Up);
 
 		// Direction vectorand up vector are parallel, use X-axis as rotation axis instead.
 		if (axis.LengthSquared() == 0.0f)
@@ -189,7 +192,7 @@ namespace TEN::Math::Geometry
 		axis.Normalize();
 
 		// Calculate rotation angle as angle between direction vector and up vector.
-		float angle = acos(direction.y);
+		float angle = acos(directionNorm.y);
 
 		// Convert the axis-angle representation to a quaternion
 		return Quaternion(axis, angle);
