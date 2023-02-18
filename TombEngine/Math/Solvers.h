@@ -1,9 +1,9 @@
 #pragma once
-#include "Math/Containers/EulerAngles.h"
+#include "Math/Objects/EulerAngles.h"
 
 namespace TEN::Math::Solvers
 {
-	constexpr auto INVALID_QUADRATIC_SOLUTION = std::pair<float, float>(NAN, NAN);
+	constexpr auto INVALID_QUADRATIC_SOLUTION = std::pair<float, float>(FLT_MAX, FLT_MAX);
 
 	struct IKSolution2D
 	{

@@ -58,9 +58,9 @@ namespace TEN::Renderer
 			if (bone == nullptr)
 				return;
 
-			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			if (framePtr[0]->angles.size() <= bone->Index || (frac && framePtr[1]->angles.size() <= bone->Index))
 			{
-				TENLog("Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
+				TENLog("Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
 					" using incorrect animation data. Bad animations set for slot?", LogLevel::Error);
 
 				return;

@@ -5,17 +5,17 @@
 
 namespace TEN::Math
 {
-	const float Lerp(float value0, float value1, float alpha)
+	float Lerp(float value0, float value1, float alpha)
 	{
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
-	const float InterpolateCos(float value0, float value1, float alpha)
+	float InterpolateCos(float value0, float value1, float alpha)
 	{
 		return Lerp(value0, value1, (1.0f - cos(alpha * PI)) * 0.5f);
 	}
 
-	const float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
+	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
 	{
 		float p = (value3 - value2) - (value0 - value1);
 		float q = (value0 - value1) - p;
@@ -26,12 +26,12 @@ namespace TEN::Math
 		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
 	}
 
-	const float Smoothstep(float alpha)
+	float Smoothstep(float alpha)
 	{
 		return Smoothstep(0.0f, 1.0f, alpha);
 	}
 
-	const float Smoothstep(float value0, float value1, float alpha)
+	float Smoothstep(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, value0, value1);
 

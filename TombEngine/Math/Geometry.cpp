@@ -177,6 +177,24 @@ namespace TEN::Math::Geometry
 			slopeAngle * sinDeltaAngle);
 	}
 
+	Quaternion DirectionToQuaternion(const Vector3& direction)
+	{
+		auto axis = direction.Cross(Vector3::Up);
+
+		// Direction vectorand up vector are parallel, use X-axis as rotation axis instead.
+		if (axis.LengthSquared() == 0.0f)
+			axis = Vector3::Right;
+
+		// Normalize axis.
+		axis.Normalize();
+
+		// Calculate rotation angle as angle between direction vector and up vector.
+		float angle = acos(direction.y);
+
+		// Convert the axis-angle representation to a quaternion
+		return Quaternion(axis, angle);
+	}
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
