@@ -146,9 +146,9 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr auto rate				= 50;
-	static constexpr auto easingAlpha		= 0.35f;
-	static constexpr auto constantThreshold = STEPUP_HEIGHT / 2;
+	constexpr auto RATE				  = 50;
+	constexpr auto EASING_ALPHA		  = 0.35f;
+	constexpr auto CONSTANT_THRESHOLD = STEPUP_HEIGHT / 2;
 
 	// Check for wall.
 	if (height == NO_HEIGHT)
@@ -164,15 +164,15 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1 / 64.0f));
 
 	// Regular case.
-	if (abs(height) > constantThreshold)
+	if (abs(height) > CONSTANT_THRESHOLD)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += rate * sign;
+		item->Pose.Position.y += RATE * sign;
 	}
 	else if (abs(height) > easingThreshold)
 	{
 		float vPos = item->Pose.Position.y;
-		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
+		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
 	}
 	else
 	{
@@ -245,10 +245,10 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 void DoPlayerLegIK(ItemInfo& item)
 {
-	constexpr auto pivotAngleOffset = ANGLE(5.0f);
-	constexpr auto heightTolerance	= CLICK(1);
-	constexpr auto heelHeight		= 56.0f;
-	constexpr auto alpha			= 0.4f;
+	constexpr auto PIVOT_ANGLE_OFFSET = ANGLE(5.0f);
+	constexpr auto HEIGHT_TOLERANCE	  = CLICK(1);
+	constexpr auto HEEL_HEIGHT		  = 56.0f;
+	constexpr auto ALPHA			  = 0.4f;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -275,19 +275,19 @@ void DoPlayerLegIK(ItemInfo& item)
 		if (lFloorHeight < rFloorHeight)
 		{
 			// Solve IK chain for left leg.
-			if (abs(vPosVisual - lFloorHeight) <= heightTolerance &&
+			if (abs(vPosVisual - lFloorHeight) <= HEIGHT_TOLERANCE &&
 				isUpright && isLeftFloorSteppable)
 			{
-				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -pivotAngleOffset, heelHeight, alpha);
+				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -PIVOT_ANGLE_OFFSET, HEEL_HEIGHT, ALPHA);
 			}
 		}
 		else
 		{
 			// Solve IK chain for right leg.
-			if (abs(vPosVisual - rFloorHeight) <= heightTolerance &&
+			if (abs(vPosVisual - rFloorHeight) <= HEIGHT_TOLERANCE &&
 				isUpright && isRightFloorSteppable)
 			{
-				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, pivotAngleOffset, heelHeight, alpha);
+				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, PIVOT_ANGLE_OFFSET, HEEL_HEIGHT, ALPHA);
 			}
 		}
 	}
@@ -311,10 +311,10 @@ void DoPlayerLegIK(ItemInfo& item)
 	// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
 	// Must use it in GetJointPosition() as well?
 	// Or: modify mutators.
-	if (abs(vOffset) <= heightTolerance && isUpright)
+	if (abs(vOffset) <= HEIGHT_TOLERANCE && isUpright)
 	{
-		vOffset = std::clamp(vOffset, -heightTolerance, heightTolerance);
-		player.VerticalOffset = (int)round(Lerp(player.VerticalOffset, vOffset, alpha));
+		vOffset = std::clamp(vOffset, -HEIGHT_TOLERANCE, HEIGHT_TOLERANCE);
+		player.VerticalOffset = (int)round(Lerp(player.VerticalOffset, vOffset, ALPHA));
 
 		// TODO: Update mutator interpretation in renderer code.
 		//for (auto& mutator : item.Model.Mutator)
