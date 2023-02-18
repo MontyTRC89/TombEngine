@@ -1,13 +1,13 @@
 #include "framework.h"
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Specific/Input/Input.h"
-#include "Specific/level.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/animation.h"
-#include "Game/collision/collide_item.h"
-#include "Game/items.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -21,6 +21,19 @@ namespace TEN::Entities::Switches
 			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 		)
 	};
+
+	enum SwitchOCBs
+	{
+		SWT_BIG_LEVER = 0,
+		SWT_SMALL_LEVER = 1,
+		SWT_SMALL_BUTTON = 2,
+		SWT_BIG_BUTTON = 3,
+		SWT_GIANT_BUTTON = 4,
+		SWT_VALVE = 5,
+		SWT_WALL_HOLE = 6,
+		SWT_CUSTOM = 7
+	};
+
 	auto SwitchPos = Vector3i::Zero;
 
 	void SwitchControl(short itemNumber)
@@ -52,7 +65,7 @@ namespace TEN::Entities::Switches
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -63,85 +76,130 @@ namespace TEN::Entities::Switches
 		{
 			auto bounds = GameBoundingBox(switchItem);
 
-			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_ON)
+			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_OFF)
 				return;
 
-			SwitchBounds.BoundingBox.X1 = bounds.X1 - 256;
-			SwitchBounds.BoundingBox.X2 = bounds.X2 + 256;
+			SwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25);
+			SwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25);
 
-			if (switchItem->TriggerFlags)
+			switch (switchItem->TriggerFlags)
 			{
-				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 512;
-				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 512;
-
-				if (switchItem->TriggerFlags == 3)
-					SwitchPos.z = bounds.Z1 - 256;
-				else
+				default:
 					SwitchPos.z = bounds.Z1 - 128;
-			}
-			else
-			{
-				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 200;
-				SwitchPos.z = bounds.Z1 - 64;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_BIG_LEVER:
+					SwitchPos.z = bounds.Z1 - 64;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_SMALL_LEVER:
+					SwitchPos.z = bounds.Z1 - 112;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_SMALL_BUTTON:
+					SwitchPos.z = bounds.Z1 - 156;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_BIG_BUTTON:
+					SwitchPos.z = bounds.Z1 - 256;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_GIANT_BUTTON:
+					SwitchPos.z = bounds.Z1 - 384;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_VALVE:
+					SwitchPos.z = bounds.Z1 - 112;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_WALL_HOLE:
+					SwitchPos.z = bounds.Z1 - 196;
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
+
+				case SWT_CUSTOM:
+					SwitchPos.z = bounds.Z1 - switchItem->ItemFlags[6];
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
+					break;
 			}
 
 			if (TestLaraPosition(SwitchBounds, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(SwitchPos, switchItem, laraItem))
 				{
-					auto onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
-					auto offAnim = LaraAnim::LA_WALLSWITCH_UP;
+					int onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
+					int offAnim = LaraAnim::LA_WALLSWITCH_UP;
 
 					switch (switchItem->TriggerFlags)
 					{
-					case 0:
-						onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
-						offAnim = LaraAnim::LA_WALLSWITCH_UP;
-						break;
+						case SWT_BIG_LEVER:
+							onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
+							offAnim = LaraAnim::LA_WALLSWITCH_UP;
+							break;
 
-					case 1:
-						onAnim = LaraAnim::LA_SWITCH_SMALL_DOWN;
-						offAnim = LaraAnim::LA_SWITCH_SMALL_UP;
-						break;
+						case SWT_SMALL_LEVER:
+							onAnim = LaraAnim::LA_SWITCH_SMALL_DOWN;
+							offAnim = LaraAnim::LA_SWITCH_SMALL_UP;
+							break;
 
-					case 2:
-						onAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
-						offAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
-						break;
+						case SWT_SMALL_BUTTON:
+							onAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
+							offAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
+							break;
 
-					case 3:
-						onAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
-						offAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
-						break;
+						case SWT_BIG_BUTTON:
+							onAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
+							offAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
+							break;
 
-					case 4:
-						onAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
-						offAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
-						break;
+						case SWT_GIANT_BUTTON:
+							onAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
+							offAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
+							break;
 
-					case 5:
-						onAnim = LaraAnim::LA_VALVE_TURN;
-						offAnim = LaraAnim::LA_VALVE_TURN;
-						break;
+						case SWT_VALVE:
+							onAnim = LaraAnim::LA_VALVE_TURN;
+							offAnim = LaraAnim::LA_VALVE_TURN;
+							break;
 
-					case 6:
-						onAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
-						offAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
-						break;
+						case SWT_WALL_HOLE:
+							onAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
+							offAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
+							break;
 
-					default:
-						onAnim = (LaraAnim)(switchItem->TriggerFlags);
-						offAnim = (LaraAnim)(switchItem->TriggerFlags + 1);
-						break;
+						case SWT_CUSTOM:
+							onAnim = abs(switchItem->ItemFlags[4]);
+							offAnim = abs(switchItem->ItemFlags[5]);								
+							break;
+
+						default:
+							onAnim = (LaraAnim)(switchItem->TriggerFlags);
+							offAnim = (LaraAnim)(switchItem->TriggerFlags + 1);
+							break;
 					}
 
-					if (switchItem->Animation.ActiveState == SWITCH_OFF) /* Switch down */
+					if (switchItem->Animation.ActiveState == SWITCH_OFF)
 					{
 						SetAnimation(laraItem, offAnim);
 						switchItem->Animation.TargetState = SWITCH_ON;
 					}
-					else /* Switch up */
+					else
 					{
 						SetAnimation(laraItem, onAnim);
 						switchItem->Animation.TargetState = SWITCH_OFF;

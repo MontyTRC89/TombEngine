@@ -23,21 +23,21 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE  = 100;
 	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_DAMAGE     = 200;
 
-	constexpr auto WINGED_MUTANT_WALK_RANGE				= SQUARE(SECTOR(4.5f));
+	constexpr auto WINGED_MUTANT_WALK_RANGE				= SQUARE(BLOCK(4.5f));
 	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_RANGE		= SQUARE(CLICK(1.17f));
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_RANGE	= SQUARE(CLICK(2.34f));
-	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(SECTOR(3.75f));
+	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
+	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(BLOCK(3.75f));
 
-	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1.0f / 400;
-	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1.0f / 164;
+	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1 / 400.0f;
+	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1 / 164.0f;
 
-	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1) / 8;
+	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1 / 8.0f);
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;
 	constexpr auto WINGED_MUTANT_BOMB_VELOCITY  = 220;
 
-	const auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
-	const auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
+	constexpr auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
 
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
@@ -46,7 +46,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	enum WingedMutantState
 	{
-		WMUTANT_STATE_NONE = 0,
+		// No state 0.
 		WMUTANT_STATE_IDLE = 1,
 		WMUTANT_STATE_WALK_FORWARD = 2,
 		WMUTANT_STATE_RUN_FORWARD = 3,
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR1
 		case WMUTANT_PATH_AERIAL:
 			creature->LOT.Step = SECTOR(30);
 			creature->LOT.Drop = -SECTOR(30);
-			creature->LOT.Fly = WINGED_MUTANT_FLY_VELOCITY;
+			creature->LOT.Fly = (int)round(WINGED_MUTANT_FLY_VELOCITY);
 			break;
 		}
 	}
@@ -400,7 +400,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_IDLE_JUMP_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE);
@@ -411,7 +411,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_RUN_JUMP_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE);
@@ -422,7 +422,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_SWIPE_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_SWIPE_ATTACK_DAMAGE);

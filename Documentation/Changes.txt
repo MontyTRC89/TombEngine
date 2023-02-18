@@ -1,7 +1,10 @@
 Version 1.0.7
 =============
 
-* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt).
+* Fix entity taking damage when it's drawed by default (not invisible like shiva or sword/spear guardian) but still not triggered.
+* Fix blockable lot type (big entities like t-rex and shiva) which was not able to step up 1 click and drop 2 click.
+* Fix TR3 shiva not taking explosive damage (should still block with the sword).
+* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
 * Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
@@ -10,6 +13,22 @@ Version 1.0.7
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
 	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
+* Add Airlock_Switch object. Achieved by putting valve switch trigger and door trigger on the same sector (Valves to open doors from TR5 submarine levels).  
+* Improved behaviour of Tiger and Lion enemies. 
+* Fix Valve switch unable to untrigger objects.
+* Fix Valve and Wall Hole (OCB 5 nad 6) not work as a timed switch.
+* Polish the distance position between Lara and switch.
+* Add OCB 7 - Custom Lua switch (Usage of ItemFlags in lua required).
+	- ItemFlags[4] = on Animation (example: MySwitch:SetItemFlags(number ID of On Animation, 4)
+	- ItemFlags[5] = off Animation (example: MySwitch:SetItemFlags(number ID of Off Animation, 5)
+	- ItemFlags[6] = Distance to use the switch. (example: MySwitch:SetItemFlags(Distance Position, 6)
+* Implement squash and stretch water bubbles.
+* Implement a new pickup display inspired by OpenLara.
+
+Lua API Changes
+* Fix Camera:SetPosition not updating camera position when it is played simultaneously.
+* Add Moveable:GetAirborne and Moveable:SetAirborne.
+* Add Moveable:GetLocationAI and Moveable:SetLocationAI.
 
 Version 1.0.6
 =============
@@ -55,10 +74,12 @@ Lua API changes
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
 * Moveable:MeshIsSwapped is now GetMeshSwapped
+* Camera:SetPosition now updates the position if it's called while it's being played.
 * Primitive Classes (Color, Rotation, Vec3) can now be saved via Levelvars and Gamevars variables.
 * OnSave function now gets called just before data is saved, rather than just after.
 * Add new function CameraObject::PlayCamera()
 * Add new function Misc::GetCameraType()
+* Add new functions Moveable:GetAirborne() and Moveable:SetAirborne(bool input)
 
 Version 1.0.5 
 =============

@@ -12,17 +12,6 @@ using namespace TEN::Math;
 //{
 	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
 
-	EulerAngles::EulerAngles()
-	{
-	}
-
-	EulerAngles::EulerAngles(short x, short y, short z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
 	EulerAngles::EulerAngles(const Vector3& direction)
 	{
 		auto directionNorm = direction;
@@ -40,11 +29,11 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
-		constexpr auto singularityThreshold = 1.0f - EPSILON;
+		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
 
 		// Check for gimbal lock.
 		float sinP = ((quat.w * quat.x) - (quat.y * quat.z)) * 2;
-		if (abs(sinP) > singularityThreshold)
+		if (abs(sinP) > SINGULARITY_THRESHOLD)
 		{
 			if (sinP > 0.0f)
 				*this = EulerAngles(FROM_RAD(PI_DIV_2), 0, FROM_RAD(atan2(quat.z, quat.w) * 2.0f));

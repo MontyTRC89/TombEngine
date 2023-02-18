@@ -247,7 +247,7 @@ void AnimateItem(ItemInfo* item)
 
 		item->Animation.ActiveState = animPtr->ActiveState;
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
@@ -265,7 +265,7 @@ void AnimateItem(ItemInfo* item)
 		}
 
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	int frameCount = animPtr->frameEnd - animPtr->frameBase;
@@ -545,10 +545,8 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
 {
-	// Use matrices done in the renderer to transform the offset vector.
-	auto pos = relOffset.ToVector3();
-	g_Renderer.GetItemAbsBonePosition(item->Index, pos, jointIndex);
-	return Vector3i(pos);
+	// Use matrices done in renderer to transform relative offset.
+	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item->Index, jointIndex, relOffset.ToVector3()));
 }
 
 Matrix& GetJointMatrix(const ItemInfo& item, int jointIndex)

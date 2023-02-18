@@ -37,7 +37,7 @@ namespace TEN::Effects::Electricity
 
 	// 4-point Catmull-Rom spline interpolation.
 	// Function takes reference to array of knots and
-	// calculates using subset of 4 determined alpha value.
+	// calculates using subset of 4 determined by alpha value.
 	static Vector3 ElectricitySpline(const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, float alpha)
 	{
 		alpha *= ELECTRICITY_KNOTS_SIZE - 3;
