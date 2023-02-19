@@ -1424,10 +1424,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->style = style;
 
 		if (sound)
-		{
 			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
-		}	
-
 	}	
 }
 
@@ -1489,57 +1486,56 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 
 void UpdateShockwaves()
 {
-	for (int i = 0; i < MAX_SHOCKWAVE; i++)
+	for (auto& shockwave : ShockWaves)
 	{
-		auto* sw = &ShockWaves[i];
-		if (sw->life <= 0)
+		if (shockwave.life <= 0)
 			continue;
-		sw->life--;
 
+		shockwave.life--;
 
-		if (sw->style != (int)ShockwaveStyle::Knockback)
+		if (shockwave.style != (int)ShockwaveStyle::Knockback)
 		{
-			sw->outerRad += sw->speed;
-			if (sw->style == (int)ShockwaveStyle::Sophia)
-				sw->innerRad += sw->speed;
+			shockwave.outerRad += shockwave.speed;
+			if (shockwave.style == (int)ShockwaveStyle::Sophia)
+				shockwave.innerRad += shockwave.speed;
 		}
 		else
 		{
-			if (sw->life > (sw->sLife / 2))
+			if (shockwave.life > (shockwave.sLife / 2))
 			{
-				sw->outerRad += sw->speed;
-				sw->innerRad += sw->speed;
+				shockwave.outerRad += shockwave.speed;
+				shockwave.innerRad += shockwave.speed;
 			}
 			else
 			{
-				sw->outerRad -= sw->speed;
-				sw->innerRad -= sw->speed;
+				shockwave.outerRad -= shockwave.speed;
+				shockwave.innerRad -= shockwave.speed;
 			}
 		}
 
-		sw->speed -= (sw->speed >> 4);
+		shockwave.speed -= (shockwave.speed >> 4);
 
-		if (LaraItem->HitPoints > 0 && sw->damage)
+		if (LaraItem->HitPoints > 0 && shockwave.damage)
 		{
 			auto* frame = GetBestFrame(LaraItem);
-			auto dx = LaraItem->Pose.Position.x - sw->x;
-			auto dz = LaraItem->Pose.Position.z - sw->z;
+			auto dx = LaraItem->Pose.Position.x - shockwave.x;
+			auto dz = LaraItem->Pose.Position.z - shockwave.z;
 			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));
 			auto angle = phd_atan(dz, dx);
 
-			// Lara is inside the shockwave ?
-			if (sw->y > LaraItem->Pose.Position.y + frame->boundingBox.Y1
-			&&  sw->y < LaraItem->Pose.Position.y + frame->boundingBox.Y2 + CLICK(1)
-			&&  distance > sw->innerRad
-			&&  distance < sw->outerRad)
+			// Damage player if inside shockwave.
+			if (shockwave.y > (LaraItem->Pose.Position.y + frame->boundingBox.Y1) &&
+				shockwave.y < (LaraItem->Pose.Position.y + (frame->boundingBox.Y2 + CLICK(1))) &&
+				distance > shockwave.innerRad &&
+				distance < shockwave.outerRad)
 			{
 				TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
-					sw->y,
+					shockwave.y,
 					LaraItem->Pose.Position.z,
-					sw->r, sw->g, sw->b,
+					shockwave.r, shockwave.g, shockwave.b,
 					angle,
-					sw->speed);
-				DoDamage(LaraItem, sw->damage);
+					shockwave.speed);
+				DoDamage(LaraItem, shockwave.damage);
 			}
 		}
 	}
