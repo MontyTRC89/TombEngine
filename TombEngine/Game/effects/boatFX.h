@@ -12,6 +12,7 @@ class Vector3i;
 namespace TEN::Effects::BOATFX
 {
 	constexpr auto NUM_WAKE_SPRITES = 256;
+	constexpr auto NUM_WAKE_DIRECTION = 3;
 
 	struct WaveSegment
 	{
@@ -29,7 +30,7 @@ namespace TEN::Effects::BOATFX
 		int PreviousID;
 	};
 
-	extern WaveSegment Segments[NUM_WAKE_SPRITES][3];
+	extern WaveSegment Segments[NUM_WAKE_SPRITES][NUM_WAKE_DIRECTION];
 
 	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection, float width, int life, float fade);
 	void DoWakeEffect(ItemInfo* Item, int xOffset, int yOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);

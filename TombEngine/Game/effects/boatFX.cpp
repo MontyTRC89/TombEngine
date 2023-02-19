@@ -27,7 +27,7 @@ namespace TEN::Effects::BOATFX
 		WAVE_DIRECTION_RIGHT
 	};
 	
-	WaveSegment Segments[NUM_WAKE_SPRITES][3];
+	WaveSegment Segments[NUM_WAKE_SPRITES][NUM_WAKE_DIRECTION];
 	
 	void DoWakeEffect(ItemInfo* Item, int xOffset, int yOffset, int zOffset, int waveDirection, bool OnWater, float width, int life, float fade)
 	{
@@ -61,7 +61,7 @@ namespace TEN::Effects::BOATFX
 	{
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			for (int j = 0; j < 3; j++)
+			for (int j = 0; j < NUM_WAKE_DIRECTION; j++)
 			{
 				WaveSegment* segment = &Segments[i][j];
 
@@ -165,7 +165,6 @@ namespace TEN::Effects::BOATFX
 			segment.Vertices[0] = verticerPos;
 			segment.Vertices[3] = prevSegment->Vertices[0];
 			segment.Vertices[2] = prevSegment->Vertices[1];
-
 		}
 
 		segment.Opacity = 0.5f;

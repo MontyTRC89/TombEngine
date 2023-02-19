@@ -86,7 +86,7 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
-			for (int j = 0; j < 3; j++)
+			for (int j = 0; j < NUM_WAKE_DIRECTION; j++)
 			{
 				auto& segment = Segments[i][j];
 
