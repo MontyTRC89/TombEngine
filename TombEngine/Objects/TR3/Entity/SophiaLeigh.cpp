@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR3
 	enum class SophiaOCB
 	{
 		Normal = 0,			 // Move, climb, attack, and chase player.
-		Tower = 1,			 // TR3 one, with climbing only. Can't be killed unless trigger says otherwise (i.e. electrical box).
+		Tower = 1,			 // TR3 one, with climbing only.
 		TowerWithVolume = 2, // TR3 one, but uses volume to move instead of height check. Must increase/decrease creature->LocationAI to go up/down.
 	};
 
@@ -330,7 +330,7 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureMood(&item, &ai, true);
 
 		// Knockback the target if Sophia in tower mode.
-		 // Avoid spawning rings if target is dead.
+		// Avoid spawning rings if target is dead.
 		if (ai.distance < SOPHIALEIGH_KNOCKBACK_RANGE && creature->Flags <= 0 && creature->Enemy->HitPoints > 0)
 		{
 			TriggerKnockback(item);
