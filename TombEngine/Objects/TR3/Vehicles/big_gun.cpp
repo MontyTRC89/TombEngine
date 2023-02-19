@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/control/box.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
@@ -30,18 +31,21 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
+	constexpr auto BGUN_ROCKET_TIMER = 1000;
+	constexpr auto BGUN_ROCKET_SPEED = 16;
+	constexpr auto BGUN_SMOKE_DURATION = 32;
 	constexpr auto BGUN_MOUNT_DISTANCE = CLICK(2);
-
 	constexpr auto BGUN_RECOIL_TIME = 26;
 	constexpr auto BGUN_RECOIL_Z = 25;
-
+	constexpr auto BGUN_ROCKET_SPAWN_DISTANCE = CLICK(1);
 	constexpr auto BGUN_X_ORIENT_NUM_FRAMES = 59;
 	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
+	constexpr auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
+	constexpr auto BGUN_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto BGUN_X_ORIENT_STEP = (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES);
+	constexpr auto BGUN_X_ORIENT_MAX = ANGLE(40.0f);
 
-	#define BGUN_TURN_RATE_ACCEL ANGLE(0.5f)
-	#define BGUN_TURN_RATE_MAX	 ANGLE(4.0f)
-	#define BGUN_X_ORIENT_STEP	 (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES)
-	#define BGUN_X_ORIENT_MAX	 ANGLE(40.0f)
+	const auto BGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -119,7 +123,7 @@ namespace TEN::Entities::Vehicles
 
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
-		auto pos = GetJointPosition(bigGunItem, 2, Vector3i(0, 0, CLICK(1)));
+		auto pos = GetJointPosition(bigGunItem, BGunBite.meshNum, BGunBite.Position);
 		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
 		projectileItem->RoomNumber = probe.RoomNumber;
 		projectileItem->Pose.Position = pos;
@@ -130,12 +134,12 @@ namespace TEN::Entities::Vehicles
 		);
 		InitialiseItem(itemNumber);
 
-		projectileItem->Animation.Velocity.z = 16;
-		projectileItem->HitPoints = 1000; // NOTE: Time before it explode, TR5 use it, if 0, it will explode by default.
+		projectileItem->Animation.Velocity.z = BGUN_ROCKET_SPEED;
+		projectileItem->HitPoints = BGUN_ROCKET_TIMER; // NOTE: Time before it explode, TR5 use it, if 0, it will explode by default.
 
 		AddActiveItem(itemNumber);
 
-		lara->LeftArm.GunSmoke = 32;
+		lara->LeftArm.GunSmoke = BGUN_SMOKE_DURATION;
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
