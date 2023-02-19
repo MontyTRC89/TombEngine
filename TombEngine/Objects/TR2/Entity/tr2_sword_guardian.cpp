@@ -23,8 +23,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
-	constexpr auto SWORD_GUARDIAN_ATTACK_RANGE = SQUARE(SECTOR(1));
-	constexpr auto SWORD_GUARDIAN_WALK_ATTACK_RANGE = SQUARE(SECTOR(2));
+	constexpr auto SWORD_GUARDIAN_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SWORD_GUARDIAN_WALK_ATTACK_RANGE = SQUARE(BLOCK(2));
 
 	constexpr auto SWORD_GUARDIAN_SWAPMESH_TIME = 3;
 	constexpr auto SWORD_GUARDIAN_ATTACK_DAMAGE = 300;

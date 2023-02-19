@@ -24,11 +24,11 @@ namespace TEN::Entities::Creatures::TR2
 	const auto SpearBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
 	const auto SpearBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
 
-	constexpr auto SPEAR_GUARDIAN_SLASH_RANGE = SQUARE(SECTOR(1));
-	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE = SQUARE(SECTOR(1));
-	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto SPEAR_GUARDIAN_RUN_RANGE = SQUARE(SECTOR(3));
-	constexpr auto SPEAR_GUARDIAN_ATTACK_RANGE = SQUARE(SECTOR(2));
+	constexpr auto SPEAR_GUARDIAN_SLASH_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto SPEAR_GUARDIAN_RUN_RANGE = SQUARE(BLOCK(3));
+	constexpr auto SPEAR_GUARDIAN_ATTACK_RANGE = SQUARE(BLOCK(2));
 
 	constexpr auto SPEAR_GUARDIAN_BASIC_DAMAGE = 75;
 	constexpr auto SPEAR_GUARDIAN_POWERFUL_DAMAGE = 120;
