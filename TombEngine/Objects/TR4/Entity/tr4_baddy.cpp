@@ -645,7 +645,8 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_SWORD_NINJA) &&
+				if (item->ObjectNumber == ID_BADDY2 &&
+					item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_SWORD_NINJA) &&
 					item == Lara.TargetEntity &&
 					laraAI.ahead &&
 					laraAI.distance > pow(682, 2))

@@ -2,29 +2,29 @@ Version 1.0.7
 =============
 
 * Fix entity taking damage when it's drawed by default (not invisible like shiva or sword/spear guardian) but still not triggered.
-* Fix blockable lot type (big entities like t-rex and shiva) which was not able to step up 1 click and drop 2 click.
-* Fix TR3 shiva not taking explosive damage (should still block with the sword).
-* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
-* Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
-* Added boss effect for TR3 tony boss and improved tony explosion color.
+* Fix spark particles not being cleared on level reload.
+* Fix visible but inactive enemies (e.g. Shiva or Xian guardians) taking damage.
+* Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
+* Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
+* Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
+* Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
+* Fix valve switch unable to untrigger objects.
+* Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Added boss effect for TR3 tony boss and improved tony explosion color.
 * Add TR3 Sophia Leigh with following OCBs:	
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
-	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
-* Add Airlock_Switch object. Achieved by putting valve switch trigger and door trigger on the same sector (Valves to open doors from TR5 submarine levels).  
-* Improved behaviour of Tiger and Lion enemies. 
-* Fix Valve switch unable to untrigger objects.
-* Fix Valve and Wall Hole (OCB 5 nad 6) not work as a timed switch.
-* Polish the distance position between Lara and switch.
-* Add OCB 7 - Custom Lua switch (Usage of ItemFlags in lua required).
-	- ItemFlags[4] = on Animation (example: MySwitch:SetItemFlags(number ID of On Animation, 4)
-	- ItemFlags[5] = off Animation (example: MySwitch:SetItemFlags(number ID of Off Animation, 5)
-	- ItemFlags[6] = Distance to use the switch. (example: MySwitch:SetItemFlags(Distance Position, 6)
-* Implement squash and stretch water bubbles.
-* Implement a new pickup display inspired by OpenLara.
+	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
+	- 6 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
+* Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
+* Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
+* Polish the distance position between Lara and switch objects.
+* Improve behaviour of tiger and lion enemies. 
+* Implement more realistic water bubble effects.
+* Implement a new stacked pickup display inspired by OpenLara.
+* Prevent Lara from drawing weapons during parallel bar swinging.
 
 Lua API Changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
