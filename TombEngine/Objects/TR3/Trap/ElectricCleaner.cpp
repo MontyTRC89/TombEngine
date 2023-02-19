@@ -3,14 +3,10 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
-//#include "Game/effects/debris.h"
-//#include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
-//#include "Math/Math.h"
-//#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
@@ -86,7 +82,7 @@ namespace TEN::Entities::Traps
 		if (moveVel <= 0)
 			return;
 
-		float angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+		auto angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
 
 		bool flagDoDetection		= ((item.ItemFlags[1] & (1 << 0)) != 0);
 		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
@@ -95,13 +91,13 @@ namespace TEN::Entities::Traps
 
 		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-		float yaw = TO_RAD(item.Pose.Orientation.y);
+		auto yaw = TO_RAD(item.Pose.Orientation.y);
 
-		Vector3 ForwardDirection = Vector3(sin(yaw), 0, cos(yaw));
-		ForwardDirection.Normalize();
+		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
+		forwardDirection.Normalize();
 
-		Vector3 RightDirection = Vector3(cos(yaw), 0, -sin(yaw));
-		RightDirection.Normalize();
+		auto rightDirection = Vector3(cos(yaw), 0, -sin(yaw));
+		rightDirection.Normalize();
 		
 		if (angleDifference > TO_RAD(rotationVel))
 		{
@@ -111,7 +107,7 @@ namespace TEN::Entities::Traps
 				item.Pose.Orientation.y += rotationVel;
 
 			// Recalculate new difference to check if we should force align with axis for safety check.
-			angleDifference = abs (TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+			angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
 			if (angleDifference <= TO_RAD(rotationVel))
 				item.Pose.Orientation.y = goalAngle;
 		}
@@ -130,23 +126,23 @@ namespace TEN::Entities::Traps
 				if (flagPriorityForward)			
 				{
 					if (flagAntiClockWiseOrder)			//Forward Right Left
-						NewDirection = ElectricCleanerSearchDirections(item, ForwardDirection, RightDirection, -RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, rightDirection, -rightDirection);
 					else								//Forward Left Right
-						NewDirection = ElectricCleanerSearchDirections(item, ForwardDirection, -RightDirection, RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, -rightDirection, rightDirection);
 				}
 				else
 				{
 					if (flagAntiClockWiseOrder)			//Right Forward Left
-						NewDirection = ElectricCleanerSearchDirections(item, RightDirection, ForwardDirection, -RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, rightDirection, forwardDirection, -rightDirection);
 					else								//Left Forward Right
-						NewDirection = ElectricCleanerSearchDirections(item, -RightDirection, ForwardDirection, RightDirection);
+						NewDirection = ElectricCleanerSearchDirections(item, -rightDirection, forwardDirection, rightDirection);
 				}
 
 				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
-					NewDirection = -ForwardDirection;
+					NewDirection = -forwardDirection;
 								
 				//Will turn left or right?
-				auto crossProductResult = NewDirection.Cross(ForwardDirection);
+				auto crossProductResult = NewDirection.Cross(forwardDirection);
 				if (crossProductResult.y > 0)
 					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
 				else if (crossProductResult.y < 0)
@@ -157,7 +153,7 @@ namespace TEN::Entities::Traps
 
 				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
 					//If it doesn't have to rotate, do forward movement to keep smooth movement.
-					item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
+					item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
 				else
 					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
 					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
@@ -167,7 +163,7 @@ namespace TEN::Entities::Traps
 				item.Pose.Position.y = col.Position.Floor;
 
 				//Is not in the center of a tile, keep moving forward. 
-				item.Pose.Position = item.Pose.Position + ForwardDirection * moveVel;
+				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
 
 				auto slope = col.Block->FloorSlope(0);
 
@@ -191,9 +187,9 @@ namespace TEN::Entities::Traps
 		ElectricCleanerToItemCollision(item);
 	}
 
-	bool IsNextSectorValid(ItemInfo& item, const Vector3& Dir)
+	bool IsNextSectorValid(ItemInfo& item, const Vector3& dir)
 	{
-		GameVector detectionPoint = item.Pose.Position + Dir * BLOCK(1);
+		GameVector detectionPoint = item.Pose.Position + dir * BLOCK(1);
 		detectionPoint.RoomNumber = item.RoomNumber;
 
 		auto col = GetCollision(detectionPoint);
@@ -232,7 +228,7 @@ namespace TEN::Entities::Traps
 			else if (col.FloorTilt.y < 0 && -col.FloorTilt.y > abs(col.FloorTilt.x))
 				slopeAngle = ANGLE(0.0f);
 
-			auto angleDir = FROM_RAD(atan2(Dir.x, Dir.z));
+			auto angleDir = FROM_RAD(atan2(dir.x, dir.z));
 			auto alignment = slopeAngle - angleDir;
 
 			//Is slope not aligned with the direction?
@@ -246,7 +242,7 @@ namespace TEN::Entities::Traps
 
 		//Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
-		int cleanerHeight = 1024; //TODO change it for the collision bounding box height.
+		int cleanerHeight = BLOCK(1); //TODO change it for the collision bounding box height.
 		if (distanceToCeiling < cleanerHeight)
 			return false;
 
@@ -270,14 +266,14 @@ namespace TEN::Entities::Traps
 		return true;
 	}
 
-	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& Dir1, const Vector3& Dir2, const Vector3& Dir3)
+	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3)
 	{
-		if (IsNextSectorValid(item, Dir1))
-			return Dir1;
-		if (IsNextSectorValid(item, Dir2))
-			return Dir2;
-		if (IsNextSectorValid(item, Dir3))
-			return Dir3;
+		if (IsNextSectorValid(item, dir1))
+			return dir1;
+		if (IsNextSectorValid(item, dir2))
+			return dir2;
+		if (IsNextSectorValid(item, dir3))
+			return dir3;
 
 		return Vector3::Zero;
 	}
@@ -414,7 +410,7 @@ namespace TEN::Entities::Traps
 			if (currentObj == nullptr)
 				continue;
 
-			Vector3 PushablePos = currentObj->Pose.Position.ToVector3();
+			auto PushablePos = currentObj->Pose.Position.ToVector3();
 			auto currentDistance = Vector3::Distance(PushablePos, refPoint);
 
 			if (currentDistance < 1024)

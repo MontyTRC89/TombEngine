@@ -126,7 +126,7 @@ CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
-CollisionResult GetCollision(GameVector point);
+CollisionResult GetCollision(const GameVector& point);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);

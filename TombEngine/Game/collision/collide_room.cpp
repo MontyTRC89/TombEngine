@@ -168,7 +168,7 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
-CollisionResult GetCollision(GameVector point)
+CollisionResult GetCollision(const GameVector& point)
 {
 	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
 }
