@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/Generic/generic_objects.h"
+#include "Objects/Generic/Object/objects.h"
 
 #include "Game/pickup/pickup.h"
 #include "Game/collision/collide_item.h"
@@ -194,6 +195,16 @@ void StartSwitches(ObjectInfo* object)
 		object->collision = CrowbarSwitchCollision;
 		object->control = SwitchControl;
 		object->SetupHitEffect(true);
+	}
+
+	object = &Objects[ID_MINECART_SWITCH];
+	if (object->loaded)
+	{
+		object->initialise = InitialiseAnimating;
+		object->control = AnimatingControl;
+		object->collision = ObjectCollision;
+		object->SetupHitEffect(true);
+		object->shadowType = ShadowMode::All;
 	}
 
 	for (int objectNumber = ID_UNDERWATER_SWITCH1; objectNumber <= ID_UNDERWATER_SWITCH4; objectNumber++)
