@@ -118,7 +118,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -138,7 +138,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SWAT_PLUS];
@@ -181,7 +181,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SCIENTIST];
@@ -202,7 +202,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD2];
@@ -224,7 +224,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD3];
@@ -246,7 +246,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -364,7 +364,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -438,7 +438,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD_LASER];
