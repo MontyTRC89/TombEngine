@@ -1,22 +1,22 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/TonyBoss.h"
 
-#include "Objects/Effects/Boss.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/control/lot.h"
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Game/items.h"
-#include "Game/itemdata/creature_info.h"
+#include "Objects/Effects/Boss.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Boss;
@@ -42,11 +42,11 @@ namespace TEN::Entities::Creatures::TR3
 		NoFlame = 0,
 		CeilingLeftHand,
 		CeilingRightHand,
-		CeilingDebris, // It's the fire debris which is called when any of the fire from CeilingLeftHand/CeilingRightHand hit the ceiling, it will create small debris.
-		InFront, // Go from it's right hand to lara.
-		InFrontDebris, // Will create debris when it hit the wall.
-		ShowerFromCeiling, // It's called when the two flame have hit the ceiling, it will start fire rain to lara position.
-		ShowerFromCeilingDebris // Same as InFrontDebris but from ShowerFromCeiling fire when it hit the floor.
+		CeilingDebris,			// Debris spawned when fire from CeilingLeftHand/CeilingRightHand hits the ceiling.
+		InFront,				// Right-handed projectile toward player.
+		InFrontDebris,			// Small debris debris spawned when fire hits wall.
+		ShowerFromCeiling,		// Spawned when two flames have hit. Targets player.
+		ShowerFromCeilingDebris // Same as InFrontDebris, but spawned by ShowerFromCeiling fire when it hits floor.
 	};
 
 	enum TonyState
@@ -66,7 +66,7 @@ namespace TEN::Entities::Creatures::TR3
 		TONY_ANIM_RISE,
 		TONY_ANIM_FLY,			 // Real idle state.
 		TONY_ANIM_SHOOT_FIRE_RIGHT_HAND,
-		TONY_ANIM_SHOOT_CEILING, // Two-handed.
+		TONY_ANIM_SHOOT_CEILING, // Two-handed projectile.
 		TONY_ANIM_FLIPMAP,		 // Shockwave explosion.
 		TONY_ANIM_DEATH
 	};
@@ -120,51 +120,47 @@ namespace TEN::Entities::Creatures::TR3
 
 		flame.on = true;
 		flame.sR = 255;
-		flame.sG = 48 + (GetRandomControl() & 31);
+		flame.sG = Random::GenerateInt(48, 80);
 		flame.sB = 48;
-		flame.dR = 192 + (GetRandomControl() & 63);
-		flame.dG = 128 + (GetRandomControl() & 63);
+		flame.dR = Random::GenerateInt(192, 256);
+		flame.dG = Random::GenerateInt(128, 192);
 		flame.dB = 32;
-		flame.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		flame.colFadeSpeed = Random::GenerateInt(12, 16);
 		flame.fadeToBlack = 8;
-		flame.sLife = flame.life = (GetRandomControl() & 7) + 24;
+		flame.sLife =
+		flame.life = Random::GenerateInt(24, 32);
 		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		flame.extras = 0;
 		flame.dynamic = -1;
-		flame.x = ((GetRandomControl() & 15) - 8);
+		flame.x = Random::GenerateInt(-8, 8);
 		flame.y = 0;
-		flame.z = ((GetRandomControl() & 15) - 8);
-		flame.xVel = ((GetRandomControl() & 255) - 128);
-		flame.yVel = -(GetRandomControl() & 15) - 16;
-		flame.zVel = ((GetRandomControl() & 255) - 128);
+		flame.z = Random::GenerateInt(-8, 8);
+		flame.xVel = Random::GenerateInt(-128, 128);
+		flame.yVel = Random::GenerateInt(-32, -16);
+		flame.zVel = Random::GenerateInt(-128, 128);
 		flame.friction = 5;
 
-		if (GetRandomControl() & 1)
+		if (Random::TestProbability(1 / 2.0f))
 		{
 			flame.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-			flame.rotAng = GetRandomControl() & 4095;
-
-			if (Random::TestProbability(1 / 2.0f))
-				flame.rotAdd = -(GetRandomControl() & 15) - 16;
-			else
-				flame.rotAdd = (GetRandomControl() & 15) + 16;
+			flame.rotAng = Random::GenerateAngle();
+			flame.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
 		}
 		else
 		{
 			flame.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 		}
 
-		flame.gravity = -(GetRandomControl() & 31) - 16;
-		flame.maxYvel = -(GetRandomControl() & 7) - 16;
+		flame.gravity = Random::GenerateInt(-48, -16);
+		flame.maxYvel = Random::GenerateInt(-24, -16);
 		flame.fxObj = itemNumber;
 		flame.nodeNumber = hand;
 		flame.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		flame.scalar = 1;
 
-		float size = (GetRandomControl() & 31) + 64;
 		flame.size =
 		flame.sSize =
-		flame.dSize = size;
+		flame.dSize = Random::GenerateInt(64.0f, 96.0f);
 	}
 
 	static void TriggerFireBallFlame(int fxNumber, TonyFlameType type, int xv, int yv, int zv)
@@ -173,34 +169,31 @@ namespace TEN::Entities::Creatures::TR3
 
 		flame.on = true;
 		flame.sR = 255;
-		flame.sG = 48 + (GetRandomControl() & 31);
+		flame.sG = Random::GenerateInt(48, 80);
 		flame.sB = 48;
-		flame.dR = 192 + (GetRandomControl() & 63);
-		flame.dG = 128 + (GetRandomControl() & 63);
+		flame.dR = Random::GenerateInt(192, 256);
+		flame.dG = Random::GenerateInt(128, 192);
 		flame.dB = 32;
-		flame.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		flame.colFadeSpeed = Random::GenerateInt(12, 16);
 		flame.fadeToBlack = 8;
-		flame.sLife = flame.life = (GetRandomControl() & 7) + 24;
+		flame.sLife =
+		flame.life = Random::GenerateInt(24, 32);
 		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		flame.extras = 0;
 		flame.dynamic = -1;
-		flame.x = ((GetRandomControl() & 15) - 8);
+		flame.x = Random::GenerateInt(-8, 8);
 		flame.y = 0;
-		flame.z = ((GetRandomControl() & 15) - 8);
-		flame.xVel = xv + ((GetRandomControl() & 255) - 128);
+		flame.z = Random::GenerateInt(-8, 8);
+		flame.xVel = xv + Random::GenerateInt(-128, 128);
 		flame.yVel = yv;
-		flame.zVel = zv + ((GetRandomControl() & 255) - 128);
+		flame.zVel = zv + Random::GenerateInt(-128, 128);
 		flame.friction = 5;
 
-		if (GetRandomControl() & 1)
+		if (Random::TestProbability(1 / 2.0f))
 		{
 			flame.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
-			flame.rotAng = GetRandomControl() & 4095;
-
-			if (GetRandomControl() & 1)
-				flame.rotAdd = -(GetRandomControl() & 15) - 16;
-			else
-				flame.rotAdd = (GetRandomControl() & 15) + 16;
+			flame.rotAng = Random::GenerateAngle();
+			flame.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
 		}
 		else
 		{
@@ -209,8 +202,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		flame.fxObj = (unsigned char)fxNumber;
 		flame.spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
-		unsigned char size = (GetRandomControl() & 31) + 64;
-		flame.size = size;
+		float size = Random::GenerateInt(64.0f, 96.0f);
+		flame.size =
 		flame.sSize = size;
 		flame.dSize = size / 4;
 
@@ -218,8 +211,8 @@ namespace TEN::Entities::Creatures::TR3
 		{
 		case TonyFlameType::CeilingLeftHand:
 		case TonyFlameType::CeilingRightHand:
-			flame.gravity = (GetRandomControl() & 31) + 16;
-			flame.maxYvel = (GetRandomControl() & 15) + 48;
+			flame.gravity = Random::GenerateInt(16, 48);
+			flame.maxYvel = Random::GenerateInt(48, 64);
 			flame.yVel = -flame.yVel * 16;
 			flame.scalar = 2;
 			break;
@@ -232,14 +225,15 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case TonyFlameType::ShowerFromCeiling:
-			flame.gravity = -(GetRandomControl() & 31) - 16;
-			flame.maxYvel = -(GetRandomControl() & 31) - 64;
+			flame.gravity = Random::GenerateInt(-48, -16);
+			flame.maxYvel = Random::GenerateInt(-96, -64);
 			flame.yVel = flame.yVel * 16;
 			flame.scalar = 2;
 			break;
 
 		case TonyFlameType::InFront:
-			flame.gravity = flame.maxYvel = 0;
+			flame.gravity =
+			flame.maxYvel = 0;
 			flame.scalar = 2;
 			break;
 
@@ -277,7 +271,7 @@ namespace TEN::Entities::Creatures::TR3
 		case TonyFlameType::InFront:
 			flame.on = true;
 			flame.Position = GetJointPosition(item, 13);
-			flame.VerticalVelocity = (GetRandomControl() & 7) + 10;
+			flame.VerticalVelocity = Random::GenerateInt(10, 18);
 			flame.speed = 160;
 			flame.yRot = item->Pose.Orientation.y;
 			flame.RoomNumber = roomNumber;
@@ -288,7 +282,7 @@ namespace TEN::Entities::Creatures::TR3
 			flame.Position.x = laraPos->x;
 			flame.Position.y = laraPos->y + 64;
 			flame.Position.z = laraPos->z;
-			flame.VerticalVelocity = (GetRandomControl() & 3) + 4;
+			flame.VerticalVelocity = Random::GenerateInt(4, 8);
 			flame.speed = 0;
 			flame.yRot = angle;
 			flame.RoomNumber = roomNumber;
@@ -299,9 +293,9 @@ namespace TEN::Entities::Creatures::TR3
 			flame.Position.x = laraPos->x;
 			flame.Position.y = laraPos->y;
 			flame.Position.z = laraPos->z;
-			flame.VerticalVelocity = (GetRandomControl() & 3) - 2;
-			flame.speed = zdVelocity + (GetRandomControl() & 3);
-			flame.yRot = GetRandomControl() * 2;
+			flame.VerticalVelocity = Random::GenerateInt(-2, 2);
+			flame.speed = zdVelocity + Random::GenerateInt(0, 4);
+			flame.yRot = Random::GenerateAngle();
 			flame.RoomNumber = roomNumber;
 			break;
 
@@ -310,9 +304,9 @@ namespace TEN::Entities::Creatures::TR3
 			flame.Position.x = laraPos->x;
 			flame.Position.y = laraPos->y;
 			flame.Position.z = laraPos->z;
-			flame.VerticalVelocity = -(GetRandomControl() & 15) - 16;
-			flame.speed = (GetRandomControl() & 7) + 48;
-			angle += (GetRandomControl() & 0x1fff) - 0x9000;
+			flame.VerticalVelocity = Random::GenerateInt(-32, -16);
+			flame.speed = Random::GenerateInt(48, 56);
+			angle += (GetRandomControl() & 8191) - 36864;
 			flame.yRot = angle;
 			flame.RoomNumber = roomNumber;
 			break;
@@ -322,9 +316,9 @@ namespace TEN::Entities::Creatures::TR3
 			flame.Position.x = laraPos->x;
 			flame.Position.y = laraPos->y;
 			flame.Position.z = laraPos->z;
-			flame.VerticalVelocity = -(GetRandomControl() & 31) - 32;
-			flame.speed = (GetRandomControl() & 31) + 32;
-			flame.yRot = GetRandomControl() * 2;
+			flame.VerticalVelocity = Random::GenerateInt(-64, -32);
+			flame.speed = Random::GenerateInt(32, 64);
+			flame.yRot = Random::GenerateAngle();
 			flame.RoomNumber = roomNumber;
 			break;
 		}
