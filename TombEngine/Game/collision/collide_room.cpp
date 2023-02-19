@@ -830,7 +830,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, short constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
@@ -855,14 +855,14 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }
