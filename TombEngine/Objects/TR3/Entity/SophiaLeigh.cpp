@@ -628,8 +628,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
 			{
-				int position = -512;
-				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, position, 0.0f), BLOCK(1 / 16.0f));
+				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, BLOCK(0.5f), 0.0f), BLOCK(1 / 16.0f));
 				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
 				auto pos = Pose(item.Pose.Position, 0, 0, 0);
@@ -741,9 +740,13 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (item.TriggerFlags == (int)SophiaOCB::Tower ||
 				item.TriggerFlags == (int)SophiaOCB::TowerWithVolume)
+			{
 				SophiaLeighTowerControl(item, &creature, &data);
+			}
 			else
+			{
 				SophiaLeighNormalControl(item, &creature, &data);
+			}
 		}
 
 		CreatureTilt(&item, data.tilt);
@@ -760,14 +763,17 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB2CLICK);
 				break;
+
 			case 3:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB3CLICK);
 				break;
+
 			case 4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB4CLICK);
 				break;
+
 			case -4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_FALL4CLICK);
