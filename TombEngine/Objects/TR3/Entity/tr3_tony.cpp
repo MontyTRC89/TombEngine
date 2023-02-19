@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/TonyBoss.h"
+#include "Objects/TR3/Entity/tr3_tony.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
