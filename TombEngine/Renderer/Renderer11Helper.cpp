@@ -27,6 +27,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Specific/trutils.h"
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
@@ -532,13 +533,11 @@ namespace TEN::Renderer
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
 
-		// Calculate normalized device coords.
+		// Calculate NDC.
 		point /= point.w;
 
 		// Calculate and return screen space position.
-		return Vector2(
-			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+		return TEN::Utils::ConvertNDCToScreenSpacePos(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)

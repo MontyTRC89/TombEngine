@@ -3,6 +3,8 @@
 
 #include <codecvt>
 
+#include "Renderer/Renderer11Enums.h"
+
 namespace TEN::Utils
 {
 	std::string ToUpper(std::string string)
@@ -17,11 +19,18 @@ namespace TEN::Utils
 		return string;
 	}
 
-	std::string ToString(const wchar_t* string)
+	std::string ToString(const wchar_t* wString)
 	{
         auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
-		return converter.to_bytes(std::wstring(string));
+		return converter.to_bytes(std::wstring(wString));
 	}
+
+    std::wstring ToWString(const char* cString)
+    {
+        wchar_t buffer[UCHAR_MAX];
+        std::mbstowcs(buffer, cString, UCHAR_MAX);
+        return std::wstring(buffer);
+    }
 
     std::wstring ToWString(const std::string& string)
     {
@@ -32,18 +41,11 @@ namespace TEN::Utils
         return wString;
     }
 
-    std::wstring ToWString(const char* source)
-    {
-        wchar_t buffer[UCHAR_MAX];
-        std::mbstowcs(buffer, source, UCHAR_MAX);
-        return std::wstring(buffer);
-    }
-
 	std::vector<std::string> SplitString(const std::string& string)
 	{
         auto strings = std::vector<std::string>{};
 
-		// String is single line; exit early.
+		// Exit early if string is single line.
 		if (string.find('\n') == std::string::npos)
 		{
 			strings.push_back(string);
@@ -61,6 +63,20 @@ namespace TEN::Utils
 		strings.push_back(string.substr(prev));
 		return strings;
 	}
+
+    Vector2 ConvertScreenSpacePosToNDC(const Vector2& pos)
+    {
+        return Vector2(
+            ((pos.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
+            ((pos.y * 2) / SCREEN_SPACE_RES.y) - 1.0f);
+    }
+
+    Vector2 ConvertNDCToScreenSpacePos(const Vector2& pos)
+    {
+        return Vector2(
+            ((pos.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+            ((1.0f - pos.y) * SCREEN_SPACE_RES.y) / 2);
+    }
 
     std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
     {

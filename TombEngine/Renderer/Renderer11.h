@@ -550,6 +550,7 @@ namespace TEN::Renderer
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
+		void DrawSpriteInScreenSpace(RendererSprite* sprite, const Vector2& pos, short orient2D, const Vector4& color, float scale);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
