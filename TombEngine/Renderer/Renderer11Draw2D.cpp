@@ -349,18 +349,10 @@ namespace TEN::Renderer
 			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
 		};
 
-		auto screenRes = GetScreenResolution().ToVector2();
-		float aspectRatioDiff = (screenRes.x / screenRes.y) - (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
-
+		// Adjust for aspect ratio and convert to NDC.
 		for (auto& vertexPoint : vertexPoints)
 		{
-			// Adjust vertex positions according to screen aspect ratio.
-			if (aspectRatioDiff > EPSILON)
-				vertexPoint.x *= 1.0f - (aspectRatioDiff / 2);
-			else if (aspectRatioDiff < -EPSILON)
-				vertexPoint.y *= 1.0f - (aspectRatioDiff / 2); // TODO: Check.
-
-			// Convert to NDC.
+			vertexPoint = TEN::Utils::GetAspectCorrectScreenSpacePos(vertexPoint);
 			vertexPoint = TEN::Utils::ConvertScreenSpacePosToNDC(vertexPoint);
 		}
 

@@ -2,17 +2,16 @@
 
 namespace TEN::Utils
 {
-	// String case converters
+	// String utilities
 	std::string ToUpper(std::string string);
 	std::string ToLower(std::string string);
-
-	// String converters
-	std::string	 ToString(const wchar_t* wString);
+	std::string ToString(const wchar_t* wString);
 	std::wstring ToWString(const char* cString);
 	std::wstring ToWString(const std::string& string);
 	std::vector<std::string> SplitString(const std::string& string);
 
-	// 2D coordinate converters
+	// Screen space utilities
+	Vector2 GetAspectCorrectScreenSpacePos(const Vector2& pos);
 	Vector2 ConvertScreenSpacePosToNDC(const Vector2& pos);
 	Vector2 ConvertNDCToScreenSpacePos(const Vector2& pos);
 

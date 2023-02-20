@@ -3,7 +3,10 @@
 
 #include <codecvt>
 
+#include "Renderer/Renderer11.h"
 #include "Renderer/Renderer11Enums.h"
+
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Utils
 {
@@ -63,6 +66,23 @@ namespace TEN::Utils
 		strings.push_back(string.substr(prev));
 		return strings;
 	}
+
+    Vector2 GetAspectCorrectScreenSpacePos(const Vector2& pos)
+    {
+       constexpr auto SCREEN_SPACE_ASPECT_RATIO = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+
+        auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
+        float screenResAspectRatio = screenRes.x / screenRes.y;
+        float aspectRatioDelta = screenResAspectRatio - SCREEN_SPACE_ASPECT_RATIO;
+
+        auto screenPos = pos;
+        if (aspectRatioDelta > EPSILON)
+            screenPos.x *= 1.0f - (aspectRatioDelta / 2);
+        else if (aspectRatioDelta < -EPSILON)
+            screenPos.y *= 1.0f - (aspectRatioDelta / 2);
+
+        return screenPos;
+    }
 
     Vector2 ConvertScreenSpacePosToNDC(const Vector2& pos)
     {
