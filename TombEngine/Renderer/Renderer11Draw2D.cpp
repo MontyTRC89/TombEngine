@@ -344,9 +344,9 @@ namespace TEN::Renderer
 		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
 		{
 			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[0] * (scale / 2), rotMatrix),
-				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
-				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
-				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
+			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
+			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
+			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
 		};
 
 		auto screenRes = GetScreenResolution().ToVector2();
@@ -358,9 +358,7 @@ namespace TEN::Renderer
 			if (aspectRatioDiff > EPSILON)
 				vertexPoint.x *= 1.0f - (aspectRatioDiff / 2);
 			else if (aspectRatioDiff < -EPSILON)
-				vertexPoint.y *= 1.0f - (aspectRatioDiff / 2);
-
-			//vertexPoint += pos;
+				vertexPoint.y *= 1.0f - (aspectRatioDiff / 2); // TODO: Check.
 
 			// Convert to NDC.
 			vertexPoint = TEN::Utils::ConvertScreenSpacePosToNDC(vertexPoint);
