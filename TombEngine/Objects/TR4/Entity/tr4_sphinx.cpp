@@ -13,17 +13,15 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
-	#define SPHINX_WALK_TURN_ANGLE ANGLE(3.0f)
-	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
+	constexpr auto SPHINX_WALK_TURN_ANGLE = ANGLE(3.0f);
+	constexpr auto SPHINX_RUN_TURN_ANGLE  = ANGLE(0.33f);
 
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
-	const vector<unsigned int> SphinxAttackJoints = { 6 };
+	const auto SphinxAttackJoints = std::vector<unsigned int>{ 6 };
 
 	enum SphinxState
 	{

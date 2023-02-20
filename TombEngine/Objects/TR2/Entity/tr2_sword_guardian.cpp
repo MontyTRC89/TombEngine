@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (isLaraAlive)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-						item->Animation.TargetState = TestProbability(0.5f) ? 3 : 5;
+						item->Animation.TargetState = TestProbability(1 / 2.0f) ? 3 : 5;
 					else
 					{
 						if (AI.zoneNumber == AI.enemyZone)

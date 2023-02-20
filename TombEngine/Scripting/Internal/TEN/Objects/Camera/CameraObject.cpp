@@ -67,6 +67,7 @@ void CameraObject::Register(sol::table & parent)
 
 		/// Active the camera during that frame.
 		// @function Camera:PlayCamera
+		// @tparam sol::optional<Moveable&> (optional) If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
 		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
 		);
 }
@@ -79,6 +80,7 @@ Vec3 CameraObject::GetPos() const
 void CameraObject::SetPos(Vec3 const& pos)
 {
 	m_camera.Position = Vector3i(pos.x, pos.y, pos.z);
+	RefreshFixedCamera(m_camera.Index);
 }
 
 std::string CameraObject::GetName() const

@@ -7,6 +7,18 @@ enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
 struct ItemInfo;
 
+constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_UWEXPLOSION = 2;
+
+constexpr auto MAX_NODE		= 23;
+constexpr auto MAX_DYNAMICS = 64;
+constexpr auto MAX_RIPPLES	= 256;
+constexpr auto MAX_SPLASHES = 8;
+constexpr auto NUM_EFFECTS	= 256;
+
+constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLE_DYNAMICS = 8;
+
 enum RIPPLE_TYPE
 {
 	RIPPLE_FLAG_NONE = 0x00,
@@ -21,22 +33,23 @@ enum RIPPLE_TYPE
 
 enum SpriteEnumFlag
 {
-	SP_NONE = 0x0000,
-	SP_FIRE = 0x0001,
-	SP_SCALE = 0x0002,
-	SP_BLOOD = 0x0004,
-	SP_DEF = 0x0008,
-	SP_ROTATE = 0x0010,
-	SP_EXPLOSION = 0x0020,
-	SP_FX = 0x0040,
-	SP_ITEM = 0x0080,
-	SP_WIND = 0x0100,
-	SP_EXPDEF = 0x0200,
-	SP_DAMAGE = 0x0400,
-	SP_UNDERWEXP = 0x0800,
-	SP_NODEATTACH = 0x1000,
-	SP_PLASMAEXP = 0x2000,
-	SP_POISON = 0x4000
+	SP_NONE		  = 0,
+	SP_FIRE		  = (1 << 0),
+	SP_SCALE	  = (1 << 1),
+	SP_BLOOD	  = (1 << 2),
+	SP_DEF		  = (1 << 3),
+	SP_ROTATE	  = (1 << 4),
+	SP_EXPLOSION  = (1 << 5),
+	SP_FX		  = (1 << 6),
+	SP_ITEM		  = (1 << 7),
+	SP_WIND		  = (1 << 8),
+	SP_EXPDEF	  = (1 << 9),
+	SP_DAMAGE	  = (1 << 10),
+	SP_UNDERWEXP  = (1 << 11),
+	SP_NODEATTACH = (1 << 12),
+	SP_PLASMAEXP  = (1 << 13),
+	SP_POISON	  = (1 << 14),
+	SP_COLOR	  = (1 << 15),
 };
 
 enum class FlameType
@@ -206,11 +219,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 extern GameBoundingBox DeadlyBounds;
 
-
 // New particle class
-
-constexpr auto MAX_PARTICLES = 1024;
-constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
@@ -223,6 +232,41 @@ extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
+template <typename TEffect>
+TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+{
+	// Add and return new effect.
+	if (effects.size() < countMax)
+		return effects.emplace_back();
+
+	TEffect* effectPtr = nullptr;
+	float shortestLife = INFINITY;
+
+	// Find effect with shortest remaining life.
+	for (auto& effect : effects)
+	{
+		if (effect.Life < shortestLife)
+		{
+			effectPtr = &effect;
+			shortestLife = effect.Life;
+		}
+	}
+
+	// Clear and return existing effect.
+	*effectPtr = TEffect();
+	return *effectPtr;
+}
+
+template <typename TEffect>
+void ClearInactiveEffects(std::deque<TEffect>& effects)
+{
+	effects.erase(
+		std::remove_if(
+			effects.begin(), effects.end(),
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+		effects.end());
+}
+
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
@@ -231,7 +275,7 @@ void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
-void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
+void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor = Vector3::Zero, const Vector3& secondColor = Vector3::Zero);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);

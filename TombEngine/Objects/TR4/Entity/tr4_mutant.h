@@ -1,5 +1,4 @@
 #pragma once
-
 #include "framework.h"
 #include "Math/Math.h"
 

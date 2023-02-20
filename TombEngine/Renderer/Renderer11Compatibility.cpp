@@ -194,8 +194,8 @@ namespace TEN::Renderer
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
 			
-			Vector3 boxMin = Vector3(room.x + WALL_SIZE, room.maxceiling - STEP_SIZE, room.z + WALL_SIZE);
-			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * WALL_SIZE, room.minfloor + STEP_SIZE, room.z + (room.zSize - 1) * WALL_SIZE);
+			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
+			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
 			Vector3 center = (boxMin + boxMax) / 2.0f;
 			Vector3 extents = boxMax - center;
 			r->BoundingBox = BoundingBox(center, extents);

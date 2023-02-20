@@ -1,15 +1,35 @@
 Version 1.0.7
 =============
 
-* Fix TR3 puna boss not blocking projectiles (grenade, rocket, harpoon, bolt).
-* Fix TR3 puna boss and TR5 roman statue taking fire when shoot by explosive ammo.
+* Fix spark particles not being cleared on level reload.
+* Fix visible but inactive enemies (e.g. Shiva or Xian guardians) taking damage.
+* Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
+* Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
+* Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
+* Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
+* Fix valve switch unable to untrigger objects.
+* Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Add instant headshot to Guards.
+* Backport electric cleaner trap from TR3.
 * Add TR3 Sophia Leigh with following OCBs:	
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower Mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
-	- 6 – Tower Mode with Volumes. Same as Tower Mode but Sophia’s ascent can be controlled using volumes in Tomb Editor.
+	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
+	- 6 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
+* Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
+* Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
+* Polish the distance position between Lara and switch objects.
+* Improve behaviour of tiger and lion enemies. 
+* Implement more realistic water bubble effects.
+* Implement a new stacked pickup display inspired by OpenLara.
+* Prevent Lara from drawing weapons during parallel bar swinging.
+
+Lua API Changes
+* Fix Camera:SetPosition not updating camera position when it is played simultaneously.
+* Add Moveable:GetAirborne and Moveable:SetAirborne.
+* Add Moveable:GetLocationAI and Moveable:SetLocationAI.
 
 Version 1.0.6
 =============
@@ -55,10 +75,12 @@ Lua API changes
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
 * Moveable:MeshIsSwapped is now GetMeshSwapped
+* Camera:SetPosition now updates the position if it's called while it's being played.
 * Primitive Classes (Color, Rotation, Vec3) can now be saved via Levelvars and Gamevars variables.
 * OnSave function now gets called just before data is saved, rather than just after.
 * Add new function CameraObject::PlayCamera()
 * Add new function Misc::GetCameraType()
+* Add new functions Moveable:GetAirborne() and Moveable:SetAirborne(bool input)
 
 Version 1.0.5 
 =============

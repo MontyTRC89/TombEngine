@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr5_ghost.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_ghost.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
