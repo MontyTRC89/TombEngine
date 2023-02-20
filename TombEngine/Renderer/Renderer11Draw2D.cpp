@@ -333,10 +333,10 @@ namespace TEN::Renderer
 		constexpr auto UV_RANGE				 = std::pair<Vector2, Vector2>(Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f));
 		constexpr auto VERTEX_POINTS_DEFAULT = std::array<Vector2, VERTEX_COUNT>
 		{
-			Vector2(-SQRT_2, -SQRT_2),
-			Vector2( SQRT_2, -SQRT_2),
 			Vector2( SQRT_2,  SQRT_2),
-			Vector2(-SQRT_2,  SQRT_2)
+			Vector2(-SQRT_2,  SQRT_2),
+			Vector2(-SQRT_2, -SQRT_2),
+			Vector2( SQRT_2, -SQRT_2)
 		};
 
 		// Calculate relative screen space vertex positions.
