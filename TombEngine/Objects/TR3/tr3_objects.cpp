@@ -11,7 +11,9 @@
 // Creatures
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
+#include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/Compsognathus.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -21,7 +23,6 @@
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
-#include "Objects/TR3/Entity/tr3_shiva.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
@@ -341,6 +342,21 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_COMPSOGNATHUS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCompsognathus;
+		obj->control = CompsognathusControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 10;
+		obj->intelligent = true;
+		obj->radius = 204;
+		obj->pivotLength = 0;
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Z);
 		obj->SetupHitEffect();
 	}
 }

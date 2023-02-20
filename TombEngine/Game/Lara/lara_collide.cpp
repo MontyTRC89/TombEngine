@@ -361,20 +361,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 		}
 	}
@@ -384,20 +384,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 		}
 	}
@@ -625,7 +625,7 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	{
 		const auto& sink = g_Level.Sinks[lara->WaterCurrentActive - 1];
 
-		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position.ToVector3()).y;
+		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position).y;
 		lara->WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->WaterCurrentPull.x) / 16;
 		lara->WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->WaterCurrentPull.z) / 16;
 

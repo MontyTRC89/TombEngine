@@ -153,7 +153,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, float constraintAngle = 70.0f);
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);

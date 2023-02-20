@@ -12,11 +12,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -170,7 +171,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					extraHeadRot.y = AIGuard(creature);
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 						item->Animation.TargetState = FLAMETHROWER_STATE_WAIT;
 
 					break;
@@ -190,11 +191,11 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				}
-				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
+				else if (creature->Mood == MoodType::Bored && AI.ahead && Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = FLAMETHROWER_STATE_WAIT;
 				}
-				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
+				else if (creature->Mood == MoodType::Attack || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				}
@@ -208,7 +209,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					extraHeadRot.y = AIGuard(creature);
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 
 					break;
@@ -216,7 +217,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if ((Targetable(item, &AI) &&
 					AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack ||
 					creature->Mood != MoodType::Bored ||
-					TestProbability(1.0f / 128)))
+					Random::TestProbability(1 / 128.0f)))
 				{
 					item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 				}

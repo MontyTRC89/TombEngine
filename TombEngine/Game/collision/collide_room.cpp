@@ -150,7 +150,7 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 
-	Random::TestProbability(0.5f);
+	Random::TestProbability(1 / 2.0f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace
@@ -835,7 +835,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, short constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
@@ -852,29 +852,29 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2f(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
 		0,
-		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
-	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))) -
+		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
-	// Rotate X axis if forward height difference is not too significant.
+	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
-	// Rotate Z axis if lateral height difference is not too significant.
+	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }
 
 int GetQuadrant(short angle)
 {
-	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
+	return (unsigned short(angle + ANGLE(45.0f)) / ANGLE(90.0f));
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
@@ -954,10 +954,10 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ffpZ = eZ + frontFloorProbeOffset * c;
 
 			// Calculate block min/max points to filter out out-of-bounds checks.
-			float minX = floor(ffpX / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float minZ = floor(ffpZ / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float maxX =  ceil(ffpX / WALL_SIZE) * WALL_SIZE + 1.0f;
-			float maxZ =  ceil(ffpZ / WALL_SIZE) * WALL_SIZE + 1.0f;
+			float minX = floor(ffpX / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float minZ = floor(ffpZ / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float maxX =  ceil(ffpX / BLOCK(1)) * BLOCK(1) + 1.0f;
+			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
 			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
@@ -1151,7 +1151,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 		// A case when all 3 results are different (no priority) or prioritized result is a long-distance misfire.
 
-		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > BLOCK(1 / 2.0f))
 		{
 			// Prioritize angle which is similar to coll setup's forward angle.
 			// This helps to solve some borderline cases with diagonal shimmying,

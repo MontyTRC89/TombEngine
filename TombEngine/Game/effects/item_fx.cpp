@@ -62,6 +62,12 @@ namespace TEN::Effects::Items
 		item->Effect.Count = timeout;
 	}
 
+	void ItemSetAsCadaver(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::Cadaver;
+		item->Effect.Count = timeout;
+	}
+
 	void LavaBurn(ItemInfo* item)
 	{
 		if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)

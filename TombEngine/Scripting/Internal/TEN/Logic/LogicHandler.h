@@ -58,7 +58,11 @@ private:
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
 
+	std::vector<std::variant<std::string, uint32_t>> m_savedVarPath;
+
 	bool m_shortenedCalls = false;
+
+	std::string GetRequestedPath() const;
 
 	void ResetLevelTables();
 	void ResetGameTables();
