@@ -406,6 +406,7 @@ void CleanUp()
 	// Clear all kinds of particles.
 	ClearBubbles();
 	DisableSmokeParticles();
+	DisableSparkParticles();
 	DisableDripParticles();
 	DisableDebris();
 

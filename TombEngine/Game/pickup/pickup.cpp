@@ -217,18 +217,32 @@ void CollectMultiplePickups(int itemNumber)
 	auto* firstItem = &g_Level.Items[itemNumber];
 	GetCollidedObjects(firstItem, LARA_RADIUS, true, CollidedItems, CollidedMeshes, true);
 
+	unsigned int count = 0;
 	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 	{
 		auto* currentItem = CollidedItems[i];
 
-		if (!currentItem)
+		if (currentItem == nullptr)
 			currentItem = firstItem;
 
 		if (!Objects[currentItem->ObjectNumber].isPickup)
 			continue;
 
+		// HACK: Exclude flares and torches from pickup batches.
+		bool hasFlareOrTorch = false;
+		if (currentItem->ObjectNumber == ID_FLARE_ITEM ||
+			currentItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
+		{
+			if (count > 0)
+				continue;
+
+			hasFlareOrTorch = true;
+		}
+
+		count++;
+
 		g_Hud.PickupSummary.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
-		if (currentItem->TriggerFlags & 0x100)
+		if (currentItem->TriggerFlags & (1 << 8))
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
@@ -246,6 +260,9 @@ void CollectMultiplePickups(int itemNumber)
 
 		//currentItem->Pose.Orientation = prevOrient;
 		KillItem(currentItem->Index);
+
+		if (hasFlareOrTorch)
+			break;
 
 		if (currentItem == firstItem)
 			break;
@@ -344,7 +361,7 @@ void DoPickup(ItemInfo* laraItem)
 				}
 
 				g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
-				if (pickupItem->TriggerFlags & 0x100)
+				if (pickupItem->TriggerFlags & (1 << 8))
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
 					{
