@@ -938,36 +938,44 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer11::GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view)
+	Matrix Renderer11::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
 	{
-		Matrix spriteMatrix;
-		Matrix scale = Matrix::CreateScale((spr->Width) * spr->Scale, (spr->Height) * spr->Scale, spr->Scale);
+		auto spriteMatrix = Matrix::Identity;
+		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
-		if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+		switch (sprite->Type)
 		{
-			Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
-			spriteMatrix = scale * Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD:
+		{
+			auto cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM:
 		{
-			Matrix rotation = Matrix::CreateRotationY(spr->Rotation);
-			Vector3 quadForward = Vector3(0, 0, 1);
-			spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
-				spr->pos,
-				Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
-				spr->ConstrainAxis,
+			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
+			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
+			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
+				sprite->pos,
+				Camera.pos.ToVector3(),
+				sprite->ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT:
 		{
-			Matrix translation = Matrix::CreateTranslation(spr->pos);
-			Matrix rotation = Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr->LookAtAxis, Vector3::UnitZ);
-			spriteMatrix = scale * rotation * translation;
+			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
+			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-		{
-			spriteMatrix = Matrix::Identity;
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D:
+		default:
+			break;
 		}
 
 		return spriteMatrix;

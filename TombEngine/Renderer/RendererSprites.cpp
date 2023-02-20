@@ -4,6 +4,11 @@
 
 namespace TEN::Renderer 
 {
+	void AddSpriteScreenSpace()
+	{
+
+	}
+
 	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
