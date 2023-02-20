@@ -333,36 +333,38 @@ namespace TEN::Renderer
 		constexpr auto UV_RANGE				 = std::pair<Vector2, Vector2>(Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f));
 		constexpr auto VERTEX_POINTS_DEFAULT = std::array<Vector2, VERTEX_COUNT>
 		{
-			Vector2(-SQRT_2,  SQRT_2),
-			Vector2( SQRT_2,  SQRT_2),
+			Vector2(-SQRT_2, -SQRT_2),
 			Vector2( SQRT_2, -SQRT_2),
-			Vector2(-SQRT_2, -SQRT_2)
+			Vector2( SQRT_2,  SQRT_2),
+			Vector2(-SQRT_2,  SQRT_2)
 		};
 
 		// Calculate relative screen space vertex positions.
 		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D));
 		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
 		{
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[0] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
+			Vector2::Transform(VERTEX_POINTS_DEFAULT[0] * (scale / 2), rotMatrix),
+			Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
+			Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
+			Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
 		};
 
 		// Adjust for aspect ratio and convert to NDC.
 		for (auto& vertexPoint : vertexPoints)
 		{
 			vertexPoint = TEN::Utils::GetAspectCorrectScreenSpacePos(vertexPoint);
+			vertexPoint += pos;
 			vertexPoint = TEN::Utils::ConvertScreenSpacePosToNDC(vertexPoint);
 		}
+
+		g_Renderer.PrintDebugMessage("%.3f, %.3f", vertexPoints[0].x, vertexPoints[0].y);
 
 		// Define renderer vertices.
 		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
 
 		// Vertex 0
 		vertices[0].Position = Vector3(vertexPoints[0]);
-		vertices[0].UV.x = UV_RANGE.first.x;
-		vertices[0].UV.y = UV_RANGE.first.y;
+		vertices[0].UV = UV_RANGE.first;
 		vertices[0].Color = color;
 
 		// Vertex 1
@@ -373,8 +375,7 @@ namespace TEN::Renderer
 
 		// Vertex 2
 		vertices[2].Position = Vector3(vertexPoints[2]);
-		vertices[2].UV.x = UV_RANGE.second.x;
-		vertices[2].UV.y = UV_RANGE.second.y;
+		vertices[2].UV = UV_RANGE.second;
 		vertices[2].Color = color;
 
 		// Vertex 3

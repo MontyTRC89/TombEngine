@@ -88,7 +88,7 @@ namespace TEN::Utils
     {
         return Vector2(
             ((pos.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
-            ((pos.y * 2) / SCREEN_SPACE_RES.y) - 1.0f);
+            1.0f - ((pos.y * 2) / SCREEN_SPACE_RES.y));
     }
 
     Vector2 ConvertNDCToScreenSpacePos(const Vector2& pos)
