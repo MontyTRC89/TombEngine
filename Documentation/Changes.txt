@@ -14,6 +14,8 @@ Version 1.0.7
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
 * Add instant headshot to Guards.
 * Backport electric cleaner trap from TR3.
+* Add TR3 Wasp Mutant:
+	- AI_MODIFY: Don't allow to land, he will always fly (Used when spawned in the nest).
 * Add TR3 Sophia Leigh with following OCBs:	
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
