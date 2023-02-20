@@ -550,7 +550,6 @@ namespace TEN::Renderer
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
-		void DrawSpriteInScreenSpace(RendererSprite* sprite, const Vector2& pos, short orient2D, const Vector4& color, float scale);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
@@ -691,6 +690,8 @@ namespace TEN::Renderer
 		Vector2i GetScreenResolution() const;
 		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
 		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+
+		void DrawSpriteInScreenSpace(unsigned int spriteID, const Vector2& pos, short orient2D, const Vector4& color, float scale);
 	};
 
 	extern Renderer11 g_Renderer;

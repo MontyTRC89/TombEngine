@@ -186,25 +186,13 @@ namespace TEN::Renderer
 			DrawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor);
 		}
 
-		/*if (CurrentLevel == 0)
+		if (CurrentLevel == 0)
 			return;
 
 		if (!BinocularRange && !SpotcamOverlay)
-			return;*/
+			return;
 
 		SetBlendMode(BLENDMODE_ALPHABLEND);
-
-		// -----------------Debug
-
-		static short orient2D = 0;
-		orient2D += ANGLE(1.0f);
-
-		auto pos = SCREEN_SPACE_RES / 3;
-		DrawSpriteInScreenSpace(
-			&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex],
-			pos, orient2D, Vector4(1, 1, 1, 0.5f), 200.0f);
-
-		//------------------
 
 		if (BinocularRange && !LaserSight)
 		{
@@ -336,10 +324,10 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &m_viewport);
 		ResetScissor();
 
-		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), true);
+		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawSpriteInScreenSpace(RendererSprite* sprite, const Vector2& pos, short orient2D, const Vector4& color, float scale)
+	void Renderer11::DrawSpriteInScreenSpace(unsigned int spriteID, const Vector2& pos, short orient2D, const Vector4& color, float scale)
 	{
 		constexpr auto VERTEX_COUNT			 = 4;
 		constexpr auto UV_RANGE				 = std::pair<Vector2, Vector2>(Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f));
@@ -351,19 +339,32 @@ namespace TEN::Renderer
 			Vector2(-SQRT_2, -SQRT_2)
 		};
 
-		// Calculate screen space positions.
+		// Calculate relative screen space vertex positions.
 		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D));
 		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
 		{
 			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[0] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
-			pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
+				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
+				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
+				pos + Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
 		};
 
-		// Convert to NDC.
+		auto screenRes = GetScreenResolution().ToVector2();
+		float aspectRatioDiff = (screenRes.x / screenRes.y) - (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
+
 		for (auto& vertexPoint : vertexPoints)
+		{
+			// Adjust vertex positions according to screen aspect ratio.
+			if (aspectRatioDiff > EPSILON)
+				vertexPoint.x *= 1.0f - (aspectRatioDiff / 2);
+			else if (aspectRatioDiff < -EPSILON)
+				vertexPoint.y *= 1.0f - (aspectRatioDiff / 2);
+
+			//vertexPoint += pos;
+
+			// Convert to NDC.
 			vertexPoint = TEN::Utils::ConvertScreenSpacePosToNDC(vertexPoint);
+		}
 
 		// Define renderer vertices.
 		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
@@ -392,10 +393,13 @@ namespace TEN::Renderer
 		vertices[3].UV.y = UV_RANGE.second.y;
 		vertices[3].Color = color;
 
+		SetBlendMode(BLENDMODE_ALPHABLEND);
+
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
-		auto* texturePtr = sprite->Texture->ShaderResourceView.Get();
+		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex];
+		auto* texturePtr = spritePtr.Texture->ShaderResourceView.Get();
 		m_context->PSSetShaderResources(0, 1, &texturePtr);
 		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);

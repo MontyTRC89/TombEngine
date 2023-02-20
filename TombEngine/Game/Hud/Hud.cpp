@@ -26,6 +26,17 @@ namespace TEN::Hud
 
 	void HudController::Draw() const
 	{
+		// ----------------Debug
+		static short orient2D = 0;
+		orient2D += ANGLE(1.0f);
+
+		auto pos = SCREEN_SPACE_RES / 3;
+		g_Renderer.DrawSpriteInScreenSpace(
+			ID_BINOCULAR_GRAPHIC,
+			pos, orient2D, Vector4(1, 1, 1, 0.5f), 200.0f);
+
+		//------------------
+
 		this->PickupSummary.Draw();
 	}
 
