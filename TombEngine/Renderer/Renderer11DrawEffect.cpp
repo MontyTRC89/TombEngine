@@ -230,7 +230,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawParticles(RenderView& view)
 	{
-		for (int i = 0; i < MAX_NODE; i++)
+		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
 			NodeOffsets[i].gotIt = false;
 
 		for (int i = 0; i < MAX_PARTICLES; i++)
@@ -298,7 +298,7 @@ namespace TEN::Renderer
 
 							pos += nodePos.ToVector3();
 
-							if ((particle->sLife - particle->life) > ((rand() & 3) + 8))
+							if ((particle->sLife - particle->life) > Random::GenerateInt(3, 8))
 							{
 								particle->flags &= ~SP_ITEM;
 								particle->x = pos.x;

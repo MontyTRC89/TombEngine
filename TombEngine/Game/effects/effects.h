@@ -134,7 +134,7 @@ struct Particle
 	signed char dynamic;
 	unsigned char fxObj;
 	unsigned char roomNumber;
-	unsigned char nodeNumber;
+	unsigned char nodeNumber; // Use ParticleNodeOffsetIDs enum.
 };
 
 struct SPLASH_STRUCT
@@ -169,10 +169,36 @@ struct ParticleDynamic
 	byte Pad[2];
 };
 
+/// <summary>
+/// Used in Particle.nodeNumber
+/// </summary>
+enum ParticleNodeOffsetIDs
+{
+	NodeUnknown0, // TR5
+	NodeUnknown1,
+	NodeUnknown2,
+	NodeUnknown3,
+	NodeUnknown4,
+	NodeUnknown5,
+	NodeUnknown6,
+	NodeUnknown7,
+	NodeUnknown8,
+	NodePilotFlame, // TR3 there and after.
+	NodeWasp,
+	NodePunkFlame,
+	NodePendulumFlame,
+	NodeTonyHandLeftFlame,
+	NodeTonyHandRightFlame,
+	NodeClawMutantPlasma,
+	NodeWillardBossLeftPlasma,
+	NodeWillardBossRightPlasma,
+	NodeEmpty, // Empty node (mesh 0 and position 0)
+	NodeMax
+};
+
 constexpr auto SD_EXPLOSION = 1;
 constexpr auto SD_UWEXPLOSION = 2;
 
-#define MAX_NODE 23
 #define MAX_DYNAMICS 64
 #define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
@@ -192,8 +218,8 @@ extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-extern Vector3i NodeVectors[MAX_NODE];
-extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
+extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
+extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 

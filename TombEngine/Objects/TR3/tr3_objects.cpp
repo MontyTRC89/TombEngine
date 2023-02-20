@@ -27,7 +27,7 @@
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-#include "Objects/TR3/Entity/tr3_wasp.h" 
+#include "Objects/TR3/Entity/tr3_wasp.h" // OK
 
 // Effects
 #include "Objects/Effects/Boss.h"
@@ -341,6 +341,21 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_WASP_MUTANT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWaspMutant;
+		obj->control = WaspMutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->intelligent = true;
+		obj->HitPoints = 24;
+		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->LotType = LotType::Flyer;
 		obj->SetupHitEffect();
 	}
 }
