@@ -91,7 +91,7 @@ namespace TEN::Entities::Traps
 
 		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-		auto yaw = TO_RAD(item.Pose.Orientation.y);
+		float yaw = TO_RAD(item.Pose.Orientation.y);
 
 		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
 		forwardDirection.Normalize();
