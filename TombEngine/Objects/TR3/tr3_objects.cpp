@@ -32,6 +32,7 @@
 #include "Objects/Effects/Boss.h"
 
 // Traps
+#include "Objects/TR3/Trap/ElectricCleaner.h"
 #include "Objects/TR3/Trap/train.h"
 
 // Vehicles
@@ -44,6 +45,7 @@
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Effects::Boss;
 
 static void StartEntity(ObjectInfo* obj)
@@ -397,6 +399,18 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
 		obj->SetupHitEffect(true);
+	}
+
+	obj = &Objects[ID_ELECTRIC_CLEANER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseElectricCleaner;
+		obj->control = ElectricCleanerControl;
+		obj->collision = ElectricCleanerCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = NOT_TARGETABLE;
+		obj->nonLot = 1;
+		obj->radius = 512;
 	}
 }
 
