@@ -167,7 +167,6 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& flame = *GetFreeParticle();
 
-		flame.on = true;
 		flame.sR = 255;
 		flame.sG = Random::GenerateInt(48, 80);
 		flame.sB = 48;
@@ -232,7 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case TonyFlameType::InFront:
-			flame.gravity =
+			flame.gravity = 0;
 			flame.maxYvel = 0;
 			flame.scalar = 2;
 			break;
@@ -241,6 +240,8 @@ namespace TEN::Entities::Creatures::TR3
 			flame.scalar = 1;
 			break;
 		}
+
+		flame.on = true;
 	}
 
 	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3i* laraPos, short roomNumber, short angle, int zdVelocity)
@@ -271,7 +272,7 @@ namespace TEN::Entities::Creatures::TR3
 		case TonyFlameType::InFront:
 			flame.on = true;
 			flame.Position = GetJointPosition(item, 13);
-			flame.VerticalVelocity = Random::GenerateInt(10, 18);
+			flame.VerticalVelocity = 24;
 			flame.speed = 160;
 			flame.yRot = item->Pose.Orientation.y;
 			flame.RoomNumber = roomNumber;
