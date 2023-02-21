@@ -294,7 +294,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_CIVVIE];
+	obj = &Objects[ID_CIVVY];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCivvy;
