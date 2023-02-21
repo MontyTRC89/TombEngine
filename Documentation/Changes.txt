@@ -14,6 +14,7 @@ Version 1.0.7
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Backport Civvy from TR3.
 * Fix Tony boss from TR3. 
 * Added boss effect for TR3 tony boss and improved tony explosion color.
 * Add instant headshot to Guards.
