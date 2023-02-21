@@ -1487,8 +1487,7 @@ namespace TEN::Renderer
 		DrawLines2D();
 
 		// Draw HUD.
-		g_Hud.Draw();
-		DrawHud(LaraItem);
+		g_Hud.Draw(*LaraItem);
 
 		// Draw binoculars or lasersight
 		DrawOverlays(view); 
@@ -1496,7 +1495,7 @@ namespace TEN::Renderer
 		time2 = std::chrono::high_resolution_clock::now();
 		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
-
+		
 		DrawDebugInfo(view);
 		DrawAllStrings();
 

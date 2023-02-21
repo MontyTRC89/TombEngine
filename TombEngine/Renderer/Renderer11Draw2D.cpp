@@ -11,9 +11,9 @@
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
-TEN::Renderer::RendererHUDBar* g_HealthBar;
 TEN::Renderer::RendererHUDBar* g_AirBar;
-TEN::Renderer::RendererHUDBar* g_DashBar;
+TEN::Renderer::RendererHUDBar* g_HealthBar;
+TEN::Renderer::RendererHUDBar* g_SprintBar;
 TEN::Renderer::RendererHUDBar* g_LoadingBar;
 
 namespace TEN::Renderer
@@ -70,7 +70,7 @@ namespace TEN::Renderer
 
 		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
 		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, airColors);
-		g_DashBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
+		g_SprintBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
 		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 550, 150, 8, 1, airColors);
 	}
 

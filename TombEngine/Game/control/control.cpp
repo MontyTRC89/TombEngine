@@ -215,9 +215,8 @@ GameStatus ControlPhase(int numFrames)
 		UpdateLocusts();
 
 		// Update HUD.
-		UpdateBars(LaraItem);
+		g_Hud.Update(*LaraItem);
 		UpdateFadeScreenAndCinematicBars();
-		g_Hud.Update();
 
 		// Rumble screen (like in submarine level of TRC).
 		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
