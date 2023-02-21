@@ -7,6 +7,18 @@ enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
 struct ItemInfo;
 
+constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_UWEXPLOSION = 2;
+
+constexpr auto MAX_NODE		= 23;
+constexpr auto MAX_DYNAMICS = 64;
+constexpr auto MAX_RIPPLES	= 256;
+constexpr auto MAX_SPLASHES = 8;
+constexpr auto NUM_EFFECTS	= 256;
+
+constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLE_DYNAMICS = 8;
+
 enum RIPPLE_TYPE
 {
 	RIPPLE_FLAG_NONE = 0x00,
@@ -170,22 +182,9 @@ struct ParticleDynamic
 	byte Pad[2];
 };
 
-constexpr auto SD_EXPLOSION = 1;
-constexpr auto SD_UWEXPLOSION = 2;
-
-#define MAX_NODE 23
-#define MAX_DYNAMICS 64
-#define MAX_RIPPLES 256
-#define MAX_SPLASHES 8
-#define NUM_EFFECTS 256
-
 extern GameBoundingBox DeadlyBounds;
 
-
 // New particle class
-
-constexpr auto MAX_PARTICLES = 1024;
-constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
@@ -197,6 +196,41 @@ extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
+
+template <typename TEffect>
+TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+{
+	// Add and return new effect.
+	if (effects.size() < countMax)
+		return effects.emplace_back();
+
+	TEffect* effectPtr = nullptr;
+	float shortestLife = INFINITY;
+
+	// Find effect with shortest remaining life.
+	for (auto& effect : effects)
+	{
+		if (effect.Life < shortestLife)
+		{
+			effectPtr = &effect;
+			shortestLife = effect.Life;
+		}
+	}
+
+	// Clear and return existing effect.
+	*effectPtr = TEffect();
+	return *effectPtr;
+}
+
+template <typename TEffect>
+void ClearInactiveEffects(std::deque<TEffect>& effects)
+{
+	effects.erase(
+		std::remove_if(
+			effects.begin(), effects.end(),
+			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+		effects.end());
+}
 
 Particle* GetFreeParticle();
 

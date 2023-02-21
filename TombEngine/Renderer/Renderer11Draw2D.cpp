@@ -74,7 +74,7 @@ namespace TEN::Renderer
 		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 550, 150, 8, 1, airColors);
 	}
 
-	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison)
+	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -87,8 +87,8 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		
-		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsHUD.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psHUDTexture.Get(), nullptr, 0);
 
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_NONE);
@@ -108,11 +108,11 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		
-		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsHUD.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psHUDBarColor.Get(), nullptr, 0);
 
 		m_stHUDBar.Percent = percent;
-		m_stHUDBar.Poisoned = poison;
+		m_stHUDBar.Poisoned = isPoisoned;
 		m_stHUDBar.Frame = frame;
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
@@ -170,13 +170,9 @@ namespace TEN::Renderer
 		DrawIndexedTriangles(12, 0, 0);
 	}
 
-	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
-		RendererLine2D line;
-
-		line.Vertices[0] = Vector2(x1, y1);
-		line.Vertices[1] = Vector2(x2, y2);
-		line.Color = Vector4(r, g, b, a);
-
+	void Renderer11::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color)
+	{
+		auto line = RendererLine2D{ origin, target, color };
 		m_lines2DToDraw.push_back(line);
 	}
 

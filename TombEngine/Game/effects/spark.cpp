@@ -37,6 +37,12 @@ namespace TEN::Effects::Spark
 		}
 	}
 
+	void DisableSparkParticles()
+	{
+		for (int i = 0; i < SparkParticles.size(); i++)
+			SparkParticles[i].active = false;
+	}
+
 	SparkParticle& GetFreeSparkParticle()
 	{
 		for (int i = 0; i < SparkParticles.size(); i++)
