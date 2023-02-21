@@ -148,9 +148,10 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	constexpr auto RATE				  = 50;
-	constexpr auto EASING_ALPHA		  = 0.35f;
-	constexpr auto CONSTANT_THRESHOLD = STEPUP_HEIGHT / 2;
+	constexpr auto LINEAR_THRESHOLD		= STEPUP_HEIGHT / 2;
+	constexpr auto EASING_THRESHOLD_MIN = BLOCK(1.0f / 64);
+	constexpr auto LINEAR_RATE			= 50;
+	constexpr auto EASING_ALPHA			= 0.35f;
 
 	// Check for wall.
 	if (height == NO_HEIGHT)
@@ -163,13 +164,13 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 		return;
 	}
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z), BLOCK(1.0f / 64));
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z), EASING_THRESHOLD_MIN);
 
 	// Handle regular case.
-	if (abs(height) > CONSTANT_THRESHOLD)
+	if (abs(height) > LINEAR_THRESHOLD)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += RATE * sign;
+		item->Pose.Position.y += LINEAR_RATE * sign;
 	}
 	else if (abs(height) > easingThreshold)
 	{
