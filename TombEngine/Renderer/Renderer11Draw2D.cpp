@@ -41,7 +41,7 @@ namespace TEN::Renderer
 			Vector4(0.0f, 82 / 255.0f, 0.0f, 1.0f),
 
 			// Center
-			Vector4(78 / 255.0f, 81 / 255.0f, 0.0f, 1.0f),
+			Vector4(0.3f, 81 / 255.0f, 0.0f, 1.0f),
 
 			// Bottom
 			Vector4(82 / 255.0f, 0.0f, 0.0f, 1.0f),
@@ -51,14 +51,14 @@ namespace TEN::Renderer
 		static const auto sprintColors = std::array<Vector4, 5>
 		{
 			// Top
-			Vector4(78 / 255.0f, 4 / 255.0f, 0.0f, 1.0f),
+			Vector4(0.3f, 0.015f, 0.0f, 1.0f),
 			Vector4(136 / 255.0f, 117 / 255.0f, 5 / 255.0f, 1.0f),
 
 			// Center
 			Vector4(245 / 255.0f, 119 / 255, 24 / 255.0f, 1.0f),
 
 			// Bottom
-			Vector4(78 / 255.0f, 4 / 255.0f, 0.0f, 1.0f),
+			Vector4(0.3f, 0.015f, 0.0f, 1.0f),
 			Vector4(136 / 255.0f, 117 / 255.0f, 5 / 255.0f, 1.0f)
 		};
 
@@ -86,7 +86,6 @@ namespace TEN::Renderer
 	{
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
-		float color[] = { 0,0,0,1.0f };
 	
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		
@@ -135,7 +134,6 @@ namespace TEN::Renderer
 	{
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
-		float color[] = { 0,0,0,1.0f };
 		
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 	

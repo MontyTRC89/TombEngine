@@ -33,10 +33,6 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 
-extern TEN::Renderer::RendererHUDBar* g_HealthBar;
-extern TEN::Renderer::RendererHUDBar* g_AirBar;
-extern TEN::Renderer::RendererHUDBar* g_LoadingBar;
-
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
