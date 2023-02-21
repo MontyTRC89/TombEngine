@@ -20,57 +20,65 @@ namespace TEN::Renderer
 {
 	void Renderer11::InitialiseGameBars()
 	{
-		std::array<Vector4, 5> healthColors = 
+		static const auto airColors = std::array<Vector4, 5>
 		{
-			//top
-			Vector4(82 / 255.0f,0,0,1),
-			Vector4(0,82 / 255.0f,0,1),
-			//center
-			Vector4(78 / 255.0f,81 / 255.0f,0,1),
-			//bottom
-			Vector4(82 / 255.0f,0,0,1),
-			Vector4(0,82 / 255.0f,0,1),
+			// Top
+			Vector4(0.0f, 0.0f, 90 / 255.0f, 1.0f),
+			Vector4(0.0f, 47 / 255.0f, 96 / 255.0f, 1.0f),
+
+			// Center
+			Vector4(0.0f, 39 / 255.0f, 155 / 255.0f, 1.0f),
+
+			// Bottom
+			Vector4(0.0f, 0.0f, 90 / 255.0f, 1.0f),
+			Vector4(0.0f, 47 / 255.0f, 96 / 255.0f, 1.0f)
 		};
 
-		std::array<Vector4, 5> airColors = 
+		static const auto healthColors = std::array<Vector4, 5>
 		{
-			//top
-			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
-			//center
-			Vector4(0,39 / 255,155 / 255.0f,1),
-			//bottom
-			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
+			// Top
+			Vector4(82 / 255.0f, 0.0f, 0.0f, 1.0f),
+			Vector4(0.0f, 82 / 255.0f, 0.0f, 1.0f),
+
+			// Center
+			Vector4(78 / 255.0f, 81 / 255.0f, 0.0f, 1.0f),
+
+			// Bottom
+			Vector4(82 / 255.0f, 0.0f, 0.0f, 1.0f),
+			Vector4(0,82 / 255.0f, 0.0f, 1.0f)
+		};
+		
+		static const auto sprintColors = std::array<Vector4, 5>
+		{
+			// Top
+			Vector4(78 / 255.0f, 4 / 255.0f, 0.0f, 1.0f),
+			Vector4(136 / 255.0f, 117 / 255.0f, 5 / 255.0f, 1.0f),
+
+			// Center
+			Vector4(245 / 255.0f, 119 / 255, 24 / 255.0f, 1.0f),
+
+			// Bottom
+			Vector4(78 / 255.0f, 4 / 255.0f, 0.0f, 1.0f),
+			Vector4(136 / 255.0f, 117 / 255.0f, 5 / 255.0f, 1.0f)
 		};
 
-		std::array<Vector4, 5> loadingColors = 
+		static const auto loadingColors = std::array<Vector4, 5>
 		{
-			//top
-			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
-			//center
-			Vector4(0,39 / 255,155 / 255.0f,1),
-			//bottom
-			Vector4(0 ,0,90 / 255.0f,1),
-			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
+			// Top
+			Vector4(0.0f, 0.0f, 90 / 255.0f, 1.0f),
+			Vector4(0.0f, 47 / 255.0f, 96 / 255.0f, 1.0f),
+
+			// Center
+			Vector4(0.0f, 39 / 255.0f, 155 / 255.0f, 1.0f),
+
+			// Bottom
+			Vector4(0.0f, 0.0f, 90 / 255.0f, 1.0f),
+			Vector4(0.0f, 47 / 255.0f, 96 / 255.0f, 1.0f)
 		};
 
-		std::array<Vector4, 5> dashColors =
-		{
-			//top
-			Vector4(78 / 255.0f,4 / 255.0f,0,1),
-			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
-			//center
-			Vector4(245 / 255.0f,119 / 255,24 / 255.0f,1),
-			//bottom
-			Vector4(78 / 255.0f,4 / 255.0f,0,1),
-			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
-		};
-
-		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
 		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, airColors);
-		g_SprintBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
+		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
+		g_SprintBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, sprintColors);
 		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 550, 150, 8, 1, airColors);
 	}
 

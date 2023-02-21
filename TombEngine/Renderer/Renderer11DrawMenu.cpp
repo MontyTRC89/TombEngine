@@ -69,22 +69,24 @@ namespace TEN::Renderer
 	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
 	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
 
-	// These bars are only used in menus
+	// These bars are only used in menus.
 	TEN::Renderer::RendererHUDBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHUDBar* g_SFXVolumeBar = nullptr;
 
 	void Renderer11::InitialiseMenuBars(int y)
 	{
-		std::array<Vector4, 5> soundSettingColors =
+		static const auto soundSettingColors = std::array<Vector4, 5>
 		{
-			//top
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-			//center
-			Vector4(0.18f,0.3f,0.72f,1),
-			//bottom
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
+			// Top
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Center
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Bottom
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f)
 		};
 
 		int shift = MenuVerticalLineSpacing / 2;
