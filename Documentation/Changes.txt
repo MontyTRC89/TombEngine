@@ -8,12 +8,16 @@ Version 1.0.7
 * Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
 * Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
 * Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
+* Fix TR3 big gun spawning rocket with 0 life which cause a direct explosion.
 * Fix valve switch unable to untrigger objects.
 * Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Fix Tony boss from TR3. 
 * Added boss effect for TR3 tony boss and improved tony explosion color.
+* Add instant headshot to Guards.
+* Backport electric cleaner trap from TR3.
 * Add TR3 Sophia Leigh with following OCBs:	
 	- 1 – Normal mode. Sophia behaves like a regular enemy.
 	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
