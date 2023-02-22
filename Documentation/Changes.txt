@@ -26,9 +26,9 @@ Version 1.0.7
 * Add instant headshot to Guards.
 * Backport electric cleaner trap from TR3.
 * Add TR3 Sophia Leigh with following OCBs:	
-	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
-	- 6 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
+	- 0 – Normal mode. Sophia behaves like a regular enemy.
+	- 1 – Tower mode. Behaviour matched from Tomb Raider III.
+	- 2 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
 * Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
 * Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
 * Polish the distance position between Lara and switch objects.
