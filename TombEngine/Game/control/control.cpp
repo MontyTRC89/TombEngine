@@ -415,6 +415,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	DisableSmokeParticles();
+	DisableSparkParticles();
 	DisableDebris();
 
 	// Clear swarm enemies.
