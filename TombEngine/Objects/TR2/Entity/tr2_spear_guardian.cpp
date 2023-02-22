@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void MeshSwapNormalToJade(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
 		if (useEffect)
-			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN_STATUE].meshIndex + jointIndex;
 	}
@@ -136,7 +136,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void MeshSwapJadeToNormal(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
 		if (useEffect)
-			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN].meshIndex + jointIndex;
 	}
