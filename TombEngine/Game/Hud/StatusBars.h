@@ -13,11 +13,11 @@ namespace TEN::Hud
 {
 	struct StatusBar
 	{
-		float Life			  = 0.0f;
-		float LifeStartFading = 0.0f; // TODO
-		float Opacity		  = 0.0f; // TODO
-		float Value			  = 0.0f;
-		float TargetValue	  = 0.0f;
+		float Value		  = 0.0f;
+		float TargetValue = 0.0f;
+
+		float Life	  = 0.0f;
+		float Opacity = 0.0f;
 	};
 
 	class StatusBarsController
