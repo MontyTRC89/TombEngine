@@ -32,6 +32,10 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = CLICK(2);
 	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE   = SQUARE(BLOCK(5));
+	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = SQUARE(BLOCK(1));
+
+	constexpr auto SOPHIALEIGH_DAMAGE_SMALL_BOLT = 4;
+	constexpr auto SOPHIALEIGH_DAMAGE_LARGE_BOLT = 10;
 
 	constexpr auto SOPHIALEIGH_CHARGE_TIMER_DURATION = 600;
 	constexpr auto SOPHIALEIGH_EXPLOSION_NUM_MAX	 = 60;
@@ -51,6 +55,11 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_SPEED		   = -184;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_INNER_SIZE	   = 2700;
 	constexpr auto SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE	   = 2300;
+
+	constexpr auto SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE = 800;
+	constexpr auto SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE = 0;
+	constexpr auto SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE = 200;
+	constexpr auto SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE = -400;
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
@@ -118,86 +127,123 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum class SophiaOCB
 	{
-		OCB_Normal = 1,			 // Move, climb, attack, and chase player.
-		OCB_Tower = 2,			 // TR3 one, which only climb, can't be killed unless a trigger say otherwise (electrical box for example).
-		OCB_LuaToMoveUpDown = 6, // TR3 one but use volume to move her instead of height check, they need to increase or decrease creature->LocationAI for her to go up/down.
+		Normal = 0,			 // Move, climb, attack, and chase player.
+		Tower = 1,			 // TR3 one, with climbing only.
+		TowerWithVolume = 2, // TR3 one, but uses volume to move instead of height check. Must increase/decrease creature->LocationAI to go up/down.
 	};
 
-	void InitialiseSophiaLeigh(short itemNumber)
+	static void RotateTowardTarget(ItemInfo& item, const AI_INFO& ai, short turnRate)
 	{
-		auto& item = g_Level.Items[itemNumber];
-
-		InitialiseCreature(itemNumber);
-		CheckForRequiredObjects(item);
-
-		// Set to normal mode by default if none is set
-		if (item.TriggerFlags == 0)
-			item.TriggerFlags = (short)SophiaOCB::OCB_Normal;
-		item.SetFlagField((int)BossItemFlags::ChargedState, false); // Charged state. 1 = fully charged.
-		item.SetFlagField((int)BossItemFlags::DeathCount, 0);
-		item.SetFlagField((int)BossItemFlags::ExplodeCount, 0);
-		item.SetFlagField((int)BossItemFlags::Rotation, 0);
-		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START);			// Always start with projectile attack.
-	}
-
-	static Vector3i GetAIPosition(ItemInfo* item, int objectNumber, int currentFlagToSearch)
-	{
-		for (auto& aiObject : g_Level.AIObjects)
+		if (abs(ai.angle) < turnRate)
 		{
-			if (aiObject.objectNumber == objectNumber && aiObject.triggerFlags == currentFlagToSearch)
-				return aiObject.pos.Position;
+			item.Pose.Orientation.y += ai.angle;
 		}
-
-		return Vector3i::Zero;
-	}
-
-	static void RotateTowardTarget(ItemInfo& item, AI_INFO* ai, short angleRate)
-	{
-		if (abs(ai->angle) < angleRate)
+		else if (ai.angle < 0)
 		{
-			item.Pose.Orientation.y += ai->angle;
-		}
-		else if (ai->angle < 0)
-		{
-			item.Pose.Orientation.y -= angleRate;
+			item.Pose.Orientation.y -= turnRate;
 		}
 		else
 		{
-			item.Pose.Orientation.y += angleRate;
+			item.Pose.Orientation.y += turnRate;
 		}
 	}
 
-	static void TriggerSophiaLeightLight(ItemInfo& item, Pose& shockwavePos)
+	static void KnockbackCollision(ItemInfo& item, short headingAngle)
+	{
+		item.HitPoints -= 200;
+		item.HitStatus = true;
+
+		short diff = item.Pose.Orientation.y - headingAngle;
+		// Facing away from ring.
+		if (abs(diff) < ANGLE(90.0f))
+			item.Animation.Velocity.z = 75.0f;
+		// Facing toward ring.
+		else
+			item.Animation.Velocity.z = -75.0f;
+
+		item.Animation.IsAirborne = true;
+		item.Animation.Velocity.y = -50.0f;
+		item.Pose.Orientation.x = 0;
+		item.Pose.Orientation.z = 0;
+		SetAnimation(&item, LA_FALL_BACK);
+	}
+
+	static void TriggerKnockback(ItemInfo& item, int life = 32)
+	{
+		auto& creature = *GetCreatureInfo(&item);
+		auto& enemy = *creature.Enemy;
+
+		auto angle = Geometry::GetOrientToPoint(enemy.Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
+
+		float distance = Vector3::Distance(item.Pose.Position.ToVector3(), enemy.Pose.Position.ToVector3());
+		if (distance < SOPHIALEIGH_KNOCKBACK_RANGE)
+		{
+			byte red = SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX;
+			byte green = SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX;
+			byte blue = SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX;
+
+			auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
+			auto centerPos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
+
+			auto sphere1 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(3), 0.0f), BLOCK(1 / 16.0f));
+			auto upperPos = Pose(Random::GeneratePointInSphere(sphere1), item.Pose.Orientation);
+
+			auto sphere2 = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f), BLOCK(1 / 16.0f));
+			auto lowerPos = Pose(Random::GeneratePointInSphere(sphere2), item.Pose.Orientation);
+
+			// Upper position.
+			TriggerShockwave(
+				&upperPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+				red, green, blue,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+			// Center position.
+			TriggerShockwave(
+				&centerPos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
+				red, green, blue,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+			// Lower position.
+			TriggerShockwave(
+				&lowerPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
+				red, green, blue,
+				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+
+			TriggerExplosionSparks(enemy.Pose.Position.x, enemy.Pose.Position.y, enemy.Pose.Position.z, 3, -2, 2, enemy.RoomNumber);
+			// NOTE: TriggerPlasmaBall exists but isn't coded (uses EXTRAFX5 in OG).
+
+			KnockbackCollision(enemy, angle.y);
+		}
+	}
+
+	static void TriggerSophiaLeightLight(ItemInfo& item, const Vector3& pos)
 	{
 		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
-			item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
+			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
 			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
 		{
-
-			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+			TriggerDynamicLight(
+				pos.x, pos.y, pos.z,
+				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
 
-			if (item.ItemFlags[(int)BossItemFlags::Rotation] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
-				item.ItemFlags[(int)BossItemFlags::Rotation]++;
+			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
+				item.ItemFlags[1]++;
 		}
 		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
 		{
-			TriggerDynamicLight(shockwavePos.Position.x, shockwavePos.Position.y, shockwavePos.Position.z,
-				item.ItemFlags[(int)BossItemFlags::Rotation] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
+			TriggerDynamicLight(
+				pos.x, pos.y, pos.z,
+				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
 
-			item.ItemFlags[(int)BossItemFlags::Rotation]--;
-
+			item.ItemFlags[1]--;
 		}
-		else
-			item.ItemFlags[(int)BossItemFlags::AttackType] = 0;
-
 	}
 
-	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBigLaser, short angleAdd)
+	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
 		if (fxNumber == NO_ITEM)
@@ -205,7 +251,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& fx = EffectList[fxNumber];
 
-		auto laserType = isBigLaser ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
+		auto boltType = isBoltLarge ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
 
 		fx.pos.Position = GetJointPosition(&item, bite.meshNum, bite.Position);
 		fx.pos.Orientation.x = item.Pose.Orientation.x + data->torsoXAngle;
@@ -221,54 +267,22 @@ namespace TEN::Entities::Creatures::TR3
 		fx.pos.Orientation.z = 0;
 		fx.roomNumber = item.RoomNumber;
 		fx.counter = 0;
-		fx.flag1 = laserType;
-		fx.flag2 = isBigLaser ? 10 : 2; // Damage value.
+		fx.flag1 = boltType;
+		fx.flag2 = isBoltLarge ? SOPHIALEIGH_DAMAGE_LARGE_BOLT : SOPHIALEIGH_DAMAGE_SMALL_BOLT; // Damage value.
 		fx.speed = Random::GenerateInt(120, 160);
 		fx.objectNumber = ID_ENERGY_BUBBLES;
-		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (laserType - 1);
+		fx.frameNumber = Objects[fx.objectNumber].meshIndex + (boltType - 1);
 	}
 
-	static void TriggerSophiaShockwave(ItemInfo* item, const BiteInfo& bite)
-	{
-		static constexpr auto LIFE_MAX = 64.0f;
-		static constexpr auto VELOCITY = -400.0f;
-		static constexpr auto COLOR	   = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
-
-		int fxNumber = GetFreeShockwave();
-		if (fxNumber == NO_ITEM)
-			return;
-
-		auto* ringEffect = &ShockWaves[fxNumber];
-
-		auto pos = GetJointPosition(item, bite.meshNum, bite.Position);
-
-		ringEffect->x = pos.x;
-		ringEffect->y = pos.y;
-		ringEffect->z = pos.z;
-		ringEffect->innerRad = 620;
-		ringEffect->outerRad = 640;
-		ringEffect->xRot = Random::GenerateAngle(-ANGLE(0.25f), ANGLE(0.25f));
-		ringEffect->damage = 0;
-		ringEffect->r = COLOR.x;
-		ringEffect->g = COLOR.y * UCHAR_MAX;
-		ringEffect->b = COLOR.z * UCHAR_MAX;
-		ringEffect->speed = VELOCITY;
-		ringEffect->life = LIFE_MAX;
-	}
-
-	// TODO: Rename. What even is "tower"?
+	// TR3 Behaviour, which let sophia go to AI_X1 object to move up/down a "tower"
 	static void SophiaLeighTowerControl(ItemInfo& item, CreatureInfo* creature, SophiaData* data)
 	{
 		if (item.AIBits)
 			GetAITarget(creature);
 
-		// Immortal in tower mode.
-		auto& object = Objects[item.ObjectNumber];
-		item.HitPoints = object.HitPoints;
-
 		auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
-		TriggerSophiaLeightLight(item, shockwavePos);
+		TriggerSophiaLeightLight(item, shockwavePos.Position.ToVector3());
 
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
@@ -282,7 +296,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem; // TODO: Deal with LaraItem global.
 
-			if (!(item.TriggerFlags & (short)SophiaOCB::OCB_LuaToMoveUpDown))
+			if (item.TriggerFlags == (int)SophiaOCB::Tower)
 			{
 				// If enemy is above, get to next AI_X1.
 				if (ai.verticalDistance >= SOPHIALEIGH_Y_DISTANCE_RANGE)
@@ -315,12 +329,24 @@ namespace TEN::Entities::Creatures::TR3
 		GetCreatureMood(&item, &ai, true);
 		CreatureMood(&item, &ai, true);
 
+		// Knockback the target if Sophia in tower mode.
+		// Avoid spawning rings if target is dead.
+		if (ai.distance < SOPHIALEIGH_KNOCKBACK_RANGE && creature->Flags <= 0 && creature->Enemy->HitPoints > 0)
+		{
+			TriggerKnockback(item);
+			creature->Flags = 50;
+		}
+		else
+		{
+			creature->Flags--;
+		}
+
 		data->angle = CreatureTurn(&item, creature->MaxTurn);
 		switch (item.Animation.ActiveState)
 		{
 		case SOPHIALEIGH_STATE_LAUGH:
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 			break;
 
 		case SOPHIALEIGH_STATE_STAND:
@@ -333,7 +359,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else if (creature->ReachedGoal)
 			{
-				if (item.TestFlagField((int)BossItemFlags::ChargedState, true))
+				if (item.ItemFlags[4] == 1)
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
 				}
@@ -380,7 +406,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		case SOPHIALEIGH_STATE_SUMMON:
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
 			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
 			{
@@ -402,7 +428,8 @@ namespace TEN::Entities::Creatures::TR3
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
-				item.SetFlagField((int)BossItemFlags::ChargedState, true);
+				// Charged state.
+				item.ItemFlags[4] = 1;
 			}
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
@@ -432,9 +459,10 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
-			item.SetFlagField((int)BossItemFlags::ChargedState, false);
+			// Bolt has been shot, reset flag.
+			item.ItemFlags[4] = 0;
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
 			if (ai.ahead)
 			{
@@ -453,7 +481,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		case SOPHIALEIGH_STATE_SMALL_SHOOT:
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
 			if (ai.ahead)
 			{
@@ -471,16 +499,17 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	// TR3 Gold Behaviour, which let Sophia attack and chase the player normally.
 	static void SophiaLeighNormalControl(ItemInfo& item, CreatureInfo* creature, SophiaData* data)
 	{
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
-	
+
 		auto sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 		auto shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
-		TriggerSophiaLeightLight(item, shockwavePos);
+		TriggerSophiaLeightLight(item, shockwavePos.Position.ToVector3());
 
-		// Charge count. Sophia can start the charge animation again when at 0.
+		// Charge count. Sophia can start charge animation again when at 0.
 		if (item.Timer > 0)
 			item.Timer--;
 
@@ -502,7 +531,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 		case SOPHIALEIGH_STATE_LAUGH:
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 			break;
 
 		case SOPHIALEIGH_STATE_STAND:
@@ -515,7 +544,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else if (ai.distance < SOPHIALEIGH_NORMAL_ATTACK_RANGE && Targetable(&item, &ai))
 			{
-				if (item.TestFlagField((int)BossItemFlags::ChargedState, true))
+				if (item.ItemFlags[4] == 1)
 				{
 					item.Animation.TargetState = SOPHIALEIGH_STATE_BIG_SHOOT;
 				}
@@ -593,13 +622,13 @@ namespace TEN::Entities::Creatures::TR3
 			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
-				item.SetFlagField((int)BossItemFlags::ChargedState, true);
+				// Charged state.
+				item.ItemFlags[4] = 1;
 			}
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
 			{
-				int position = -512;
-				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, position, 0.0f), BLOCK(1 / 16.0f));
+				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, BLOCK(0.5f), 0.0f), BLOCK(1 / 16.0f));
 				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
 				auto pos = Pose(item.Pose.Position, 0, 0, 0);
@@ -625,7 +654,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case SOPHIALEIGH_STATE_BIG_SHOOT:
-			item.SetFlagField((int)BossItemFlags::ChargedState, false);
+			item.ItemFlags[4] = 0; // Bolt have been shoot, reset the flag.
 			creature->MaxTurn = 0;
 
 			if (ai.ahead)
@@ -645,7 +674,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		case SOPHIALEIGH_STATE_SMALL_SHOOT:
 			creature->MaxTurn = 0;
-			RotateTowardTarget(item, &ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
+			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
 			if (ai.ahead)
 			{
@@ -663,6 +692,19 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
+	void InitialiseSophiaLeigh(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		CheckForRequiredObjects(item);						// ItemFlags[0] is used.
+		item.ItemFlags[1] = 0;								// Light timer (for smoothing).
+		item.ItemFlags[4] = 0;								// Charged state (true or false).
+		item.ItemFlags[5] = 0;								// Death count.
+		item.ItemFlags[7] = 0;								// Explode count.
+		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START); // Always starts with projectile attack.
+	}
+
 	void SophiaLeighControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -672,7 +714,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
-		SophiaData data{};
+		auto data = SophiaData();
 
 		if (item.HitPoints <= 0)
 		{
@@ -686,8 +728,8 @@ namespace TEN::Entities::Creatures::TR3
 				item.Animation.FrameNumber = frameEnd;
 				item.MeshBits.ClearAll();
 
-				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < SOPHIALEIGH_EXPLOSION_NUM_MAX)
-					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
+				if (item.ItemFlags[7] < SOPHIALEIGH_EXPLOSION_NUM_MAX)
+					item.ItemFlags[7]++;
 
 				// Do explosion effect.
 				ExplodeBoss(itemNumber, item, SOPHIALEIGH_EXPLOSION_NUM_MAX, SOPHIALEIGH_SHOCKWAVE_COLOR, SOPHIALEIGH_EXPLOSION_MAIN_COLOR, SOPHIALEIGH_EXPLOSION_SECOND_COLOR, false);
@@ -696,11 +738,15 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-
-			if (item.TriggerFlags & (int)SophiaOCB::OCB_Tower)
+			if (item.TriggerFlags == (int)SophiaOCB::Tower ||
+				item.TriggerFlags == (int)SophiaOCB::TowerWithVolume)
+			{
 				SophiaLeighTowerControl(item, &creature, &data);
+			}
 			else
+			{
 				SophiaLeighNormalControl(item, &creature, &data);
+			}
 		}
 
 		CreatureTilt(&item, data.tilt);
@@ -717,14 +763,17 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB2CLICK);
 				break;
+
 			case 3:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB3CLICK);
 				break;
+
 			case 4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB4CLICK);
 				break;
+
 			case -4:
 				creature.MaxTurn = 0;
 				SetAnimation(&item, SOPHIALEIGH_ANIM_FALL4CLICK);
@@ -737,15 +786,14 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-
-	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int unk)
+	void SpawnSophiaSparks(const Vector3& pos, const Vector3& color, unsigned int count, int multiplier)
 	{
 		for (int i = 0; i < count; i++)
 		{
 			auto* spark = GetFreeParticle();
-
 			auto sphere = BoundingSphere(Vector3::Zero, BLOCK(2));
-			auto vel = Random::GeneratePointInSphere(sphere) * SQUARE(unk);
+			auto mulSqr = SQUARE(multiplier);
+			auto vel = Random::GeneratePointInSphere(sphere) * mulSqr;
 
 			spark->on = true;
 			spark->sR = color.x;
@@ -754,24 +802,25 @@ namespace TEN::Entities::Creatures::TR3
 			spark->dB = 0;
 			spark->dG = 0;
 			spark->dR = 0;
-			spark->colFadeSpeed = 9 * SQUARE(unk);
+			spark->colFadeSpeed = mulSqr * 9;
 			spark->fadeToBlack = 0;
-			spark->life = 9 * SQUARE(unk);
-			spark->sLife = 9 * SQUARE(unk);
+			spark->life =
+			spark->sLife = mulSqr * 9;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos.x;
 			spark->y = pos.y;
 			spark->z = pos.z;
-			spark->gravity = (GetRandomControl() / 128) & 0x1F;
+			spark->gravity = Random::GenerateInt(0, 32);
 			spark->yVel = vel.x;
 			spark->xVel = vel.y;
 			spark->zVel = vel.z;
 			spark->flags = SP_NONE;
 			spark->maxYvel = 0;
-			spark->friction = 34 * SQUARE(unk);
+			spark->friction =  mulSqr * 34;
 			spark->scalar = 3;
-			spark->dSize = spark->sSize = spark->size = Random::GenerateInt(84, 98);
+			spark->dSize =
+			spark->sSize =
+			spark->size = Random::GenerateInt(84, 98);
 		}
 	}
-
 }

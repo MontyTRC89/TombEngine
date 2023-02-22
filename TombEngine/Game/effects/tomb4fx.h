@@ -83,7 +83,7 @@ struct SHOCKWAVE_STRUCT
 	unsigned char sb;
 	unsigned char life;
 	short speed;
-	short temp;
+	short sLife;
 	bool fadeIn = false;
 	int style;
 };
@@ -190,7 +190,8 @@ struct BLOOD_STRUCT
 enum class ShockwaveStyle
 {
 	Normal = 0,
-	Sophia = 1
+	Sophia = 1,
+	Knockback = 2,
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0
