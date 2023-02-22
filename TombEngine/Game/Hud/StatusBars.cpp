@@ -25,9 +25,11 @@ namespace TEN::Hud
 	{
 		constexpr auto FLASH_INTERVAL = 0.2f;
 
+		// Update flash.
 		if ((GameTimer % (int)round(FLASH_INTERVAL * FPS)) == 0)
 			this->DoFlash = !DoFlash;
 
+		// Update bars.
 		this->UpdateAirBar(item);
 		this->UpdateHealthBar(item);
 		this->UpdateSprintBar(item);
@@ -35,9 +37,11 @@ namespace TEN::Hud
 
 	void StatusBarsController::Draw(ItemInfo& item) const
 	{
+		// Avoid drawing in title level and during cutscenes.
 		if (CurrentLevel == 0 || CinematicBarsHeight > 0)
 			return;
 
+		// Draw bars.
 		this->DrawAirBar(item);
 		this->DrawHealthBar(item);
 		this->DrawSprintBar(item);
