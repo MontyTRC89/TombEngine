@@ -111,12 +111,30 @@ namespace TEN::Hud
 
 	void StatusBarsController::UpdateSprintBar(ItemInfo& item)
 	{
-		// TODO
+		constexpr auto LIFE_MAX = 1.0f / FPS;
+
+		const auto& player = *GetLaraInfo(&item);
+
+		float sprintEnergy = std::clamp((float)player.SprintEnergy, 0.0f, LARA_SPRINT_ENERGY_MAX);
+		this->SprintBar.TargetValue = sprintEnergy / LARA_SPRINT_ENERGY_MAX;
+
+		if (SprintBar.Life > 0.0f)
+			this->SprintBar.Life -= 1.0f;
+
+		this->SprintBar.Value = Lerp(SprintBar.Value, SprintBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		if (abs(SprintBar.Value - SprintBar.TargetValue) <= EPSILON)
+			this->SprintBar.Value = SprintBar.TargetValue;
+
+		if (SprintBar.Value != SprintBar.TargetValue ||
+			SprintBar.Value != 1.0f)
+		{
+			this->SprintBar.Life = round(LIFE_MAX * FPS);
+		}
 	}
 
-	void StatusBarsController::DrawStatusBar(float value, RendererHUDBar* rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
+	void StatusBarsController::DrawStatusBar(float value, RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
 	{
-		g_Renderer.DrawBar(value, rHudBar, textureID, frame, isPoisoned);
+		g_Renderer.DrawBar(value, rHudBarPtr, textureID, frame, isPoisoned);
 	}
 
 	void StatusBarsController::DrawAirBar(ItemInfo& item) const
@@ -159,15 +177,13 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_SPRINT_ENERGY_CRITICAL / LARA_SPRINT_ENERGY_MAX;
 
-		const auto& player = *GetLaraInfo(&item);
-
-		if (player.SprintEnergy >= LARA_SPRINT_ENERGY_MAX)
+		if (SprintBar.Life <= 0.0f)
 			return;
 
-		float sprintEnergy = std::clamp((float)player.SprintEnergy, 0.0f, LARA_SPRINT_ENERGY_MAX);
-		float value = sprintEnergy / LARA_SPRINT_ENERGY_MAX;
+		const auto& player = *GetLaraInfo(&item);
 
-		if (sprintEnergy <= LARA_SPRINT_ENERGY_CRITICAL)
+		float value = SprintBar.Value;
+		if (SprintBar.Value <= CRITICAL_VALUE)
 			value = DoFlash ? value : 0.0f;
 
 		this->DrawStatusBar(value, g_SprintBar, TEXTURE_ID, 0, false);
