@@ -193,8 +193,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		auto torsoOrient = EulerAngles::Zero;
-		auto headOrient = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 
@@ -240,8 +240,8 @@ namespace TEN::Entities::Creatures::TR2
 			   (item->Animation.ActiveState != SWORD_GUARDIAN_STATE_AWAKE &&
 				   item->Animation.ActiveState != SWORD_GUARDIAN_STATE_FLY))
 			{
-				headOrient.x = ai.xAngle / 2;
-				headOrient.y = ai.angle / 2;
+				extraHeadRot.x = ai.xAngle / 2;
+				extraHeadRot.y = ai.angle / 2;
 			}
 
 			switch (item->Animation.ActiveState)
@@ -289,8 +289,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.bite || ai.distance > SWORD_GUARDIAN_ATTACK_RANGE)
@@ -305,8 +305,8 @@ namespace TEN::Entities::Creatures::TR2
 				
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.bite || ai.distance > SWORD_GUARDIAN_ATTACK_RANGE)
@@ -321,8 +321,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.bite || ai.distance > SWORD_GUARDIAN_WALK_ATTACK_RANGE)
@@ -346,8 +346,8 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_WALK_ATTACK:
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!creature->Flags && item->TouchBits.Test(SwordBite.meshNum))
@@ -361,10 +361,10 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureJoint(item, 0, torsoOrient.y);
-		CreatureJoint(item, 1, torsoOrient.x);
-		CreatureJoint(item, 2, headOrient.y);
-		CreatureJoint(item, 3, headOrient.x);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 

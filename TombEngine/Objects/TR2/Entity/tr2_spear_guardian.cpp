@@ -214,8 +214,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		auto torsoOrient = EulerAngles::Zero;
-		auto headOrient = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 
@@ -245,8 +245,8 @@ namespace TEN::Entities::Creatures::TR2
 
 			if (ai.ahead && item->Animation.ActiveState != SPEAR_GUARDIAN_STATE_AWAKE)
 			{
-				headOrient.x = ai.xAngle / 2;
-				headOrient.y = ai.angle / 2;
+				extraHeadRot.x = ai.xAngle / 2;
+				extraHeadRot.y = ai.angle / 2;
 			}
 
 			switch (item->Animation.ActiveState)
@@ -342,8 +342,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE)
@@ -358,8 +358,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE)
@@ -374,8 +374,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
@@ -390,8 +390,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
@@ -406,8 +406,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_SLASH_RANGE)
@@ -422,8 +422,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
@@ -436,8 +436,8 @@ namespace TEN::Entities::Creatures::TR2
 			case SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT:
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				DoSpearGuardianAttack(*item, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
@@ -448,8 +448,8 @@ namespace TEN::Entities::Creatures::TR2
 			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR:
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				DoSpearGuardianAttack(
@@ -474,8 +474,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
@@ -490,8 +490,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 				{
-					torsoOrient.x = ai.xAngle;
-					torsoOrient.y = ai.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
@@ -513,14 +513,14 @@ namespace TEN::Entities::Creatures::TR2
 		if (isPlayerAlive && creature->Enemy->HitPoints <= 0)
 		{
 			creature->MaxTurn = 0;
-			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL_LARA, LEA_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL_LARA, LARA_EXTRA_ANIM_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
 			return;
 		}
 
-		CreatureJoint(item, 0, torsoOrient.y);
-		CreatureJoint(item, 1, torsoOrient.x);
-		CreatureJoint(item, 2, headOrient.y);
-		CreatureJoint(item, 3, headOrient.x);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 
