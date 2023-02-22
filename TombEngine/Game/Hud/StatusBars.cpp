@@ -92,23 +92,21 @@ namespace TEN::Hud
 		if (HealthBar.Life > 0.0f)
 			this->HealthBar.Life -= 1.0f;
 
+		this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		if (abs(HealthBar.Value - HealthBar.TargetValue) <= EPSILON)
+			this->HealthBar.Value = HealthBar.TargetValue;
+
 		if (HealthBar.Value != HealthBar.TargetValue ||
-			HealthBar.TargetValue <= 0.0f ||
+			health <= LARA_HEALTH_CRITICAL ||
+			player.PoisonPotency != 0 ||
 			player.Control.HandStatus == HandStatus::WeaponReady)
 		{
-			this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_LERP_ALPHA);
-			if (abs(HealthBar.Value - HealthBar.TargetValue) <= EPSILON)
-				this->HealthBar.Value = HealthBar.TargetValue;
-
 			this->HealthBar.Life = round(LIFE_MAX * FPS);
-
-			// HACK: Hide health bar immediately when undrawing weapon.
-			if (player.Control.HandStatus == HandStatus::WeaponReady &&
-				player.Control.Weapon.GunType != LaraWeaponType::Torch)
-			{
-				this->HealthBar.Life = 0.0f;
-			}
 		}
+
+		// HACK: Special case for undrawing weapon.
+		if (player.Control.HandStatus == HandStatus::WeaponUndraw)
+			this->HealthBar.Life = 0.0f;
 	}
 
 	void StatusBarsController::UpdateSprintBar(ItemInfo& item)
@@ -143,26 +141,23 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_HEALTH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_HEALTH_CRITICAL / LARA_HEALTH_MAX;
 
+		if (HealthBar.Life <= 0.0f)
+			return;
+
 		const auto& player = *GetLaraInfo(&item);
 
-		if (HealthBar.Life > 0.0f || HealthBar.Value <= CRITICAL_VALUE ||
-			(player.Control.HandStatus == HandStatus::WeaponReady &&
-				player.Control.Weapon.GunType != LaraWeaponType::Torch) || // HACK: Torch is considered a weapon, so exclude it.
-			player.PoisonPotency)
-		{
-			bool isPoisoned = (player.PoisonPotency != 0);
+		float value = HealthBar.Value;
+		if (HealthBar.Value <= CRITICAL_VALUE)
+			value = DoFlash ? value : 0.0f;
 
-			float value = HealthBar.Value;
-			if (HealthBar.Value <= CRITICAL_VALUE)
-				value = DoFlash ? value : 0.0f;
-
-			this->DrawStatusBar(value, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
-		}
+		bool isPoisoned = (player.PoisonPotency != 0);
+		this->DrawStatusBar(value, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
 	void StatusBarsController::DrawSprintBar(ItemInfo& item) const
 	{
-		constexpr auto TEXTURE_ID = ID_DASH_BAR_TEXTURE;
+		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
+		constexpr auto CRITICAL_VALUE = LARA_SPRINT_ENERGY_CRITICAL / LARA_SPRINT_ENERGY_MAX;
 
 		const auto& player = *GetLaraInfo(&item);
 
