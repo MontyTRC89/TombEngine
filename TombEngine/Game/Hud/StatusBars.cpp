@@ -19,6 +19,7 @@ extern TEN::Renderer::RendererHUDBar* g_SprintBar;
 
 namespace TEN::Hud
 {
+	constexpr auto STATUS_BAR_LIFE_MAX	 = 1.0f;
 	constexpr auto STATUS_BAR_LERP_ALPHA = 0.4f;
 
 	void StatusBarsController::Update(ItemInfo& item)
@@ -54,8 +55,6 @@ namespace TEN::Hud
 
 	void StatusBarsController::UpdateAirBar(ItemInfo& item)
 	{
-		constexpr auto LIFE_MAX = 1.0f / FPS;
-
 		const auto& player = *GetLaraInfo(&item);
 
 		// Update life.
@@ -77,21 +76,19 @@ namespace TEN::Hud
 			player.Control.WaterStatus == WaterStatus::TreadWater ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
-			this->AirBar.Life = round(LIFE_MAX * FPS);
+			this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
 		if (player.Vehicle != NO_ITEM)
 		{
 			if (g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV)
-				this->AirBar.Life = round(LIFE_MAX * FPS);
+				this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
 	void StatusBarsController::UpdateHealthBar(ItemInfo& item)
 	{
-		constexpr auto LIFE_MAX = 1.5f;
-
 		const auto& player = *GetLaraInfo(&item);
 
 		// Update life.
@@ -111,20 +108,19 @@ namespace TEN::Hud
 		if (HealthBar.Value != HealthBar.TargetValue ||
 			health <= LARA_HEALTH_CRITICAL ||
 			player.PoisonPotency != 0 ||
+			player.Control.HandStatus == HandStatus::WeaponDraw ||
 			player.Control.HandStatus == HandStatus::WeaponReady)
 		{
-			this->HealthBar.Life = round(LIFE_MAX * FPS);
+			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
 		// HACK: Special case for undrawing weapon.
-		if (player.Control.HandStatus == HandStatus::WeaponUndraw)
+		if (player.Control.HandStatus == HandStatus::WeaponUndraw && health > LARA_HEALTH_CRITICAL)
 			this->HealthBar.Life = 0.0f;
 	}
 
 	void StatusBarsController::UpdateSprintBar(ItemInfo& item)
 	{
-		constexpr auto LIFE_MAX = 1.0f / FPS;
-
 		const auto& player = *GetLaraInfo(&item);
 
 		// Update life.
@@ -144,12 +140,15 @@ namespace TEN::Hud
 		if (SprintBar.Value != SprintBar.TargetValue ||
 			SprintBar.Value != 1.0f)
 		{
-			this->SprintBar.Life = round(LIFE_MAX * FPS);
+			this->SprintBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
-	void StatusBarsController::DrawStatusBar(float value, RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
+	void StatusBarsController::DrawStatusBar(float value, float criticalValue, RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
 	{
+		if (value <= criticalValue)
+			value = DoFlash ? value : 0.0f;;
+
 		g_Renderer.DrawBar(value, rHudBarPtr, textureID, frame, isPoisoned);
 	}
 
@@ -161,13 +160,7 @@ namespace TEN::Hud
 		if (AirBar.Life <= 0.0f)
 			return;
 
-		const auto& player = *GetLaraInfo(&item);
-
-		float value = AirBar.Value;
-		if (AirBar.Value <= CRITICAL_VALUE)
-			value = DoFlash ? value : 0.0f;
-
-		this->DrawStatusBar(value, g_AirBar, TEXTURE_ID, 0, false);
+		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, g_AirBar, TEXTURE_ID, 0, false);
 	}
 
 	void StatusBarsController::DrawHealthBar(ItemInfo& item) const
@@ -180,12 +173,8 @@ namespace TEN::Hud
 
 		const auto& player = *GetLaraInfo(&item);
 
-		float value = HealthBar.Value;
-		if (HealthBar.Value <= CRITICAL_VALUE)
-			value = DoFlash ? value : 0.0f;
-
 		bool isPoisoned = (player.PoisonPotency != 0);
-		this->DrawStatusBar(value, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
+		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
 	void StatusBarsController::DrawSprintBar(ItemInfo& item) const
@@ -196,12 +185,6 @@ namespace TEN::Hud
 		if (SprintBar.Life <= 0.0f)
 			return;
 
-		const auto& player = *GetLaraInfo(&item);
-
-		float value = SprintBar.Value;
-		if (SprintBar.Value <= CRITICAL_VALUE)
-			value = DoFlash ? value : 0.0f;
-
-		this->DrawStatusBar(value, g_SprintBar, TEXTURE_ID, 0, false);
+		this->DrawStatusBar(SprintBar.Value, CRITICAL_VALUE, g_SprintBar, TEXTURE_ID, 0, false);
 	}
 }

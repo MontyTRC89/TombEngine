@@ -13,9 +13,11 @@ namespace TEN::Hud
 {
 	struct StatusBar
 	{
-		float Life		  = 0.0f;
-		float Value		  = 0.0f;
-		float TargetValue = 0.0f;
+		float Life			  = 0.0f;
+		float LifeStartFading = 0.0f; // TODO
+		float Opacity		  = 0.0f; // TODO
+		float Value			  = 0.0f;
+		float TargetValue	  = 0.0f;
 	};
 
 	class StatusBarsController
@@ -40,7 +42,7 @@ namespace TEN::Hud
 		void UpdateSprintBar(ItemInfo& item);
 
 		// Draw helpers
-		void DrawStatusBar(float value, TEN::Renderer::RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
+		void DrawStatusBar(float value, float criticalValue, TEN::Renderer::RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
 		void DrawAirBar(ItemInfo& item) const;
 		void DrawHealthBar(ItemInfo& item) const;
 		void DrawSprintBar(ItemInfo& item) const;

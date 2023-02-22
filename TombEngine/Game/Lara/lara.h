@@ -75,7 +75,7 @@ constexpr auto LARA_AIR_CRITICAL		   = LARA_AIR_MAX / 4;
 constexpr auto LARA_HEALTH_MAX			   = 1000.0f;
 constexpr auto LARA_HEALTH_CRITICAL		   = LARA_HEALTH_MAX / 4;
 constexpr auto LARA_SPRINT_ENERGY_MAX	   = 120.0f;
-constexpr auto LARA_SPRINT_ENERGY_CRITICAL = LARA_SPRINT_ENERGY_MAX / 4;
+constexpr auto LARA_SPRINT_ENERGY_CRITICAL = LARA_SPRINT_ENERGY_MAX / 2;
 constexpr auto LARA_POISON_POTENCY_MAX	   = 64.0f;
 
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
