@@ -19,9 +19,9 @@ extern TEN::Renderer::RendererHUDBar* g_SprintBar;
 
 namespace TEN::Hud
 {
-	constexpr auto STATUS_BAR_LIFE_MAX	 = 1.0f;
-	constexpr auto STATUS_BAR_FADE_TIME	 = 0.3f; // TODO
-	constexpr auto STATUS_BAR_LERP_ALPHA = 0.4f;
+	constexpr auto STATUS_BAR_LIFE_MAX			= 1.0f;
+	constexpr auto STATUS_BAR_LIFE_START_FADING = 0.3f;
+	constexpr auto STATUS_BAR_VALUE_LERP_ALPHA	= 0.4f;
 
 	void StatusBarsController::Update(ItemInfo& item)
 	{
@@ -62,12 +62,16 @@ namespace TEN::Hud
 		if (AirBar.Life > 0.0f)
 			this->AirBar.Life -= 1.0f;
 
+		// Update opacity.
+		float alpha = std::clamp(AirBar.Life, 0.0f, STATUS_BAR_LIFE_START_FADING) / STATUS_BAR_LIFE_START_FADING;
+		this->AirBar.Opacity = Lerp(0.0f, 1.0f, alpha);
+
 		// Update target value.
 		float air = std::clamp((float)player.Air, 0.0f, LARA_AIR_MAX);
 		this->AirBar.TargetValue = air / LARA_AIR_MAX;
 
 		// Update value.
-		this->AirBar.Value = Lerp(AirBar.Value, AirBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		this->AirBar.Value = Lerp(AirBar.Value, AirBar.TargetValue, STATUS_BAR_VALUE_LERP_ALPHA);
 		if (abs(AirBar.Value - AirBar.TargetValue) <= EPSILON)
 			this->AirBar.Value = AirBar.TargetValue;
 
@@ -96,12 +100,16 @@ namespace TEN::Hud
 		if (HealthBar.Life > 0.0f)
 			this->HealthBar.Life -= 1.0f;
 
+		// Update opacity.
+		float alpha = std::clamp(HealthBar.Life, 0.0f, STATUS_BAR_LIFE_START_FADING) / STATUS_BAR_LIFE_START_FADING;
+		this->HealthBar.Opacity = Lerp(0.0f, 1.0f, alpha);
+
 		// Update target value.
 		float health = std::clamp((float)item.HitPoints, 0.0f, LARA_HEALTH_MAX);
 		this->HealthBar.TargetValue = health / LARA_HEALTH_MAX;
 
 		// Update value.
-		this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_VALUE_LERP_ALPHA);
 		if (abs(HealthBar.Value - HealthBar.TargetValue) <= EPSILON)
 			this->HealthBar.Value = HealthBar.TargetValue;
 
@@ -129,12 +137,16 @@ namespace TEN::Hud
 		if (SprintBar.Life > 0.0f)
 			this->SprintBar.Life -= 1.0f;
 
+		// Update opacity.
+		float alpha = std::clamp(SprintBar.Life, 0.0f, STATUS_BAR_LIFE_START_FADING) / STATUS_BAR_LIFE_START_FADING;
+		this->SprintBar.Opacity = Lerp(0.0f, 1.0f, alpha);
+
 		// Update target value.
 		float sprintEnergy = std::clamp((float)player.SprintEnergy, 0.0f, LARA_SPRINT_ENERGY_MAX);
 		this->SprintBar.TargetValue = sprintEnergy / LARA_SPRINT_ENERGY_MAX;
 
 		// Update value.
-		this->SprintBar.Value = Lerp(SprintBar.Value, SprintBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		this->SprintBar.Value = Lerp(SprintBar.Value, SprintBar.TargetValue, STATUS_BAR_VALUE_LERP_ALPHA);
 		if (abs(SprintBar.Value - SprintBar.TargetValue) <= EPSILON)
 			this->SprintBar.Value = SprintBar.TargetValue;
 

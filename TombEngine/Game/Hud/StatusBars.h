@@ -13,11 +13,10 @@ namespace TEN::Hud
 {
 	struct StatusBar
 	{
+		float Life		  = 0.0f;
+		float Opacity	  = 0.0f; // TODO: Opacity in renderer.
 		float Value		  = 0.0f;
 		float TargetValue = 0.0f;
-
-		float Life	  = 0.0f;
-		float Opacity = 0.0f;
 	};
 
 	class StatusBarsController
