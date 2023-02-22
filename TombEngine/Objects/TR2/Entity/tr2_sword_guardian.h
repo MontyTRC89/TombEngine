@@ -1,7 +1,7 @@
 #pragma once
 
-struct ItemInfo;
 class GameVector;
+struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR2
 {

@@ -10,8 +10,8 @@ Version 1.0.7
 * Fix TR2 sword and spear guardian:
 	- Not doing transition from alive to stone and stone to alive.
 	- Taking damage in stone mode.
-	- Wrong joint id for rotating the head and torso.
-	- Spear guardian not using left and right attack spear when walking (was having wrong state id set as target).
+	- Wrong joint index for rotating the head and torso.
+	- Spear guardian not using left and right spear attack when walking (had wrong state ID set as target).
 	- Killing move for spear used wrong value.
 * Fix valve switch unable to untrigger objects.
 * Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.

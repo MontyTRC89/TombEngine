@@ -1,33 +1,33 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_sword_guardian.h"
-#include "tr2_spear_guardian.h"
 
-#include "Game/animation.h"
 #include "collision/collide_room.h"
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Objects/TR2/Entity/tr2_spear_guardian.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
-	constexpr auto SWORD_GUARDIAN_FLY_TURN_RATE_MAX = ANGLE(7.0f);
-	constexpr auto SWORD_GUARDIAN_WALK_TURN_RATE_MAX = ANGLE(9.0f);
-
-	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
-
-	constexpr auto SWORD_GUARDIAN_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto SWORD_GUARDIAN_ATTACK_RANGE		= SQUARE(BLOCK(1));
 	constexpr auto SWORD_GUARDIAN_WALK_ATTACK_RANGE = SQUARE(BLOCK(2));
+
+	constexpr auto SWORD_GUARDIAN_FLY_TURN_RATE_MAX	 = ANGLE(7.0f);
+	constexpr auto SWORD_GUARDIAN_WALK_TURN_RATE_MAX = ANGLE(9.0f);
 
 	constexpr auto SWORD_GUARDIAN_SWAPMESH_TIME = 3;
 	constexpr auto SWORD_GUARDIAN_ATTACK_DAMAGE = 300;
+
+	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
 	enum SwordGuardianState
 	{
@@ -45,68 +45,72 @@ namespace TEN::Entities::Creatures::TR2
 		SWORD_GUARDIAN_STATE_DEATH = 12
 	};
 
-	// TODO: Found all name, also found some which is more appropriate.
+	// TODO: Determine names.
 	enum SwordGuardianAnim
 	{
 		SWORD_GUARDIAN_ANIM_AWAKE = 0
 	};
 
-	static void SpawnFlySmoke(const Vector3i& pos, int roomNumber)
+	static void SpawnSwordGuardianEffect(const Vector3& pos, int roomNumber)
 	{
-		auto& smoke = *GetFreeParticle();
+		auto& particle = *GetFreeParticle();
 
-		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, pos, roomNumber);
-		auto sphere = BoundingSphere(pos.ToVector3(), 16);
+		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, Vector3i(pos), roomNumber);
+		auto sphere = BoundingSphere(pos, 16);
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
-		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.on = true;
+		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		smoke.x = effectPos.x;
-		smoke.y = effectPos.y;
-		smoke.z = effectPos.z;
-		smoke.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
-		smoke.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
-		smoke.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
-		smoke.sR = 0;
-		smoke.sG = 0;
-		smoke.sB = 0;
-		smoke.dR = 255;
-		smoke.dG = 255;
-		smoke.dB = 255;
-		smoke.colFadeSpeed = 8;
-		smoke.fadeToBlack = 64;
-		smoke.sLife = smoke.life = Random::GenerateInt(72, 128);
-		smoke.extras = 0;
-		smoke.dynamic = -1;
-		smoke.friction = 6;
-		smoke.rotAng = Random::GenerateAngle();
-		smoke.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
-		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		smoke.scalar = 3;
-		smoke.gravity = Random::GenerateInt(-8, -4);
-		smoke.maxYvel = Random::GenerateInt(-8, -4);
+		particle.x = effectPos.x;
+		particle.y = effectPos.y;
+		particle.z = effectPos.z;
+		particle.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+		particle.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
+		particle.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+		particle.sR = 0;
+		particle.sG = 0;
+		particle.sB = 0;
+		particle.dR = 255;
+		particle.dG = 255;
+		particle.dB = 255;
+		particle.colFadeSpeed = 8;
+		particle.fadeToBlack = 64;
+		particle.sLife =
+		particle.life = Random::GenerateInt(72, 128);
+		particle.extras = 0;
+		particle.dynamic = -1;
+		particle.friction = 6;
+		particle.rotAng = Random::GenerateAngle();
+		particle.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+		particle.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		particle.scalar = 3;
+		particle.gravity = Random::GenerateInt(-8, -4);
+		particle.maxYvel = Random::GenerateInt(-8, -4);
 
 		int scale = Random::GenerateInt(100, 132);
-		smoke.size = smoke.sSize = scale / 8;
-		smoke.dSize = scale;
+		particle.size =
+		particle.sSize = scale / 8;
+		particle.dSize = scale;
 	}
 
-	static void SwapMeshToJade(ItemInfo& item, int jointIndex, bool useEffect = true)
+	static void MeshSwapNormalToJade(ItemInfo& item, int jointIndex, bool doEffect = true)
 	{
-		if (useEffect)
-			SpawnSpearGuardianSmoke(GetJointPosition(&item, jointIndex), item.RoomNumber);
+		if (doEffect)
+			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SWORD_GUARDIAN_STATUE].meshIndex + jointIndex;
 	}
 
-	static void SwapJadeToNormal(ItemInfo& item, int jointIndex, bool useEffect = true)
+	static void MeshSwapJadeToNormal(ItemInfo& item, int jointIndex, bool doEffect = true)
 	{
-		if (useEffect)
-			SpawnSpearGuardianSmoke(GetJointPosition(&item, jointIndex), item.RoomNumber);
+		if (doEffect)
+			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SWORD_GUARDIAN].meshIndex + jointIndex;
 	}
 
-	static bool DoSwordGuardianSwapMesh(ItemInfo& item)
+	static bool DoSwordGuardianMeshSwap(ItemInfo& item)
 	{
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
@@ -117,8 +121,9 @@ namespace TEN::Entities::Creatures::TR2
 			// Jade to normal.
 			if (item.ItemFlags[3] == 0)
 			{
-				SwapJadeToNormal(item, item.ItemFlags[0]);
+				MeshSwapJadeToNormal(item, item.ItemFlags[0]);
 				item.ItemFlags[0]++;
+
 				if (item.ItemFlags[0] >= object.nmeshes)
 				{
 					item.ItemFlags[0] = 0;
@@ -127,10 +132,12 @@ namespace TEN::Entities::Creatures::TR2
 					return true;
 				}
 			}
-			else // Normal to jade.
+			// Normal to jade.
+			else
 			{
-				SwapMeshToJade(item, item.ItemFlags[0]);
+				MeshSwapNormalToJade(item, item.ItemFlags[0]);
 				item.ItemFlags[0]--;
+
 				if (item.ItemFlags[0] < 0)
 				{
 					item.ItemFlags[0] = 0;
@@ -150,28 +157,30 @@ namespace TEN::Entities::Creatures::TR2
 		return false;
 	}
 
-	static void SwordGuardianFlyEffect(ItemInfo* item)
+	static void DoSwordGuardianFlyEffect(ItemInfo* item)
 	{
-		BoundingSphere sphere(item->Pose.Position.ToVector3(), 1.0f);
+		auto sphere = BoundingSphere(item->Pose.Position.ToVector3(), 1.0f);
 		auto pos = Random::GeneratePointInSphere(sphere);
-		SpawnFlySmoke(pos, item->RoomNumber);
+		SpawnSwordGuardianEffect(pos, item->RoomNumber);
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}
 
 	void InitialiseSwordGuardian(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
-		item->ItemFlags[0] = 0; // Joint index when swapping mesh.
-		item->ItemFlags[1] = 1; // Immune state. true = immune to damage.
-		item->ItemFlags[2] = 1; // If 1, swap to jade. If 2, swap to normal.
-		item->ItemFlags[3] = 0; // If mesh is swapped to jade, then it's true. Otherwise false.
-		SetAnimation(item, SWORD_GUARDIAN_ANIM_AWAKE);
-		item->Status &= ~ITEM_INVISIBLE; // This statue is draw by default.
+		auto& item = g_Level.Items[itemNumber];
+		const auto& object = Objects[item.ObjectNumber];
 
-		const auto& object = Objects[item->ObjectNumber];
+		InitialiseCreature(itemNumber);
+		SetAnimation(&item, SWORD_GUARDIAN_ANIM_AWAKE);
+		item.Status &= ~ITEM_INVISIBLE;
+
+		item.ItemFlags[0] = 0; // Joint index for mesh swap.
+		item.ItemFlags[1] = 1; // Immune state (bool).
+		item.ItemFlags[2] = 1; // 1 = swap to jade. 2 = swap to normal.
+		item.ItemFlags[3] = 0; // Set to true if mesh is swapped to jade, otherwise false.
+
 		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
-			SwapMeshToJade(*item, jointIndex, false);
+			MeshSwapNormalToJade(item, jointIndex, false);
 	}
 
 	void SwordGuardianControl(short itemNumber)
@@ -182,11 +191,12 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
-		auto torso = EulerAngles::Zero;
-		auto head = EulerAngles::Zero;
-		short angle = 0;
 
-		bool isLaraAlive = creature->Enemy != nullptr && creature->Enemy->IsLara() && creature->Enemy->HitPoints > 0;
+		short headingAngle = 0;
+		auto torsoOrient = EulerAngles::Zero;
+		auto headOrient = EulerAngles::Zero;
+
+		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 
 		if (item->HitPoints <= 0)
 		{
@@ -197,39 +207,41 @@ namespace TEN::Entities::Creatures::TR2
 				item->Animation.ActiveState = SWORD_GUARDIAN_STATE_DEATH;
 			}
 
-			if (DoSwordGuardianSwapMesh(*item))
+			if (DoSwordGuardianMeshSwap(*item))
 				CreatureDie(itemNumber, true);
+
 			return;
 		}
 		else
 		{
-
-			AI_INFO AI;
 			creature->LOT.Step = CLICK(1);
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
 			creature->LOT.Zone = ZoneType::Basic;
-			CreatureAIInfo(item, &AI);
-			if (AI.enemyZone != AI.zoneNumber && item->Animation.ActiveState == SWORD_GUARDIAN_STATE_FLY)
+
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
+
+			if (ai.enemyZone != ai.zoneNumber && item->Animation.ActiveState == SWORD_GUARDIAN_STATE_FLY)
 			{
 				creature->LOT.Step = BLOCK(20);
 				creature->LOT.Drop = -BLOCK(20);
 				creature->LOT.Fly = 64;
 				creature->LOT.Zone = ZoneType::Flyer;
-				CreatureAIInfo(item, &AI);
+				CreatureAIInfo(item, &ai);
 			}
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
-			if (AI.ahead &&
+			if (ai.ahead &&
 			   (item->Animation.ActiveState != SWORD_GUARDIAN_STATE_AWAKE &&
-				item->Animation.ActiveState != SWORD_GUARDIAN_STATE_FLY))
+				   item->Animation.ActiveState != SWORD_GUARDIAN_STATE_FLY))
 			{
-				head.x = AI.xAngle / 2;
-				head.y = AI.angle / 2;
+				headOrient.x = ai.xAngle / 2;
+				headOrient.y = ai.angle / 2;
 			}
 
 			switch (item->Animation.ActiveState)
@@ -237,23 +249,23 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_AWAKE:
 				creature->MaxTurn = 0;
 
-				DoSwordGuardianSwapMesh(*item);
+				DoSwordGuardianMeshSwap(*item);
 				break;
 
 			case SWORD_GUARDIAN_STATE_IDLE:
 				creature->MaxTurn = 0;
-				item->ItemFlags[1] = 0; // Remove the immunity effect.
+				item->ItemFlags[1] = 0; // Remove immunity.
 
-				if (!isLaraAlive)
+				if (!isPlayerAlive)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WAIT;
-				else if (AI.bite && AI.distance < SWORD_GUARDIAN_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < SWORD_GUARDIAN_ATTACK_RANGE)
 				{
 					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL_AIM;
 					else
 						item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_FRONT_AIM;
 				}
-				else if (AI.zoneNumber != AI.enemyZone)
+				else if (ai.zoneNumber != ai.enemyZone)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_FLY;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WALK;
@@ -263,11 +275,11 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_WALK:
 				creature->MaxTurn = SWORD_GUARDIAN_WALK_TURN_RATE_MAX;
 
-				if (!isLaraAlive)
+				if (!isPlayerAlive)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
-				else if (AI.bite && AI.distance < SWORD_GUARDIAN_WALK_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < SWORD_GUARDIAN_WALK_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WALK_ATTACK_AIM;
-				else if (AI.zoneNumber != AI.enemyZone)
+				else if (ai.zoneNumber != ai.enemyZone)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 
 				break;
@@ -275,28 +287,29 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_ATTACK_FRONT_AIM:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					torso.x = AI.xAngle;
-					torso.y = AI.angle;
+					torsoOrient.x = ai.xAngle;
+					torsoOrient.y = ai.angle;
 				}
 
-				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
+				if (!ai.bite || ai.distance > SWORD_GUARDIAN_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_FRONT;
+
 				break;
 
 			case SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL_AIM:
 				creature->Flags = 0;
 				
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					torso.x = AI.xAngle;
-					torso.y = AI.angle;
+					torsoOrient.x = ai.xAngle;
+					torsoOrient.y = ai.angle;
 				}
 
-				if (!AI.bite || AI.distance > SWORD_GUARDIAN_ATTACK_RANGE)
+				if (!ai.bite || ai.distance > SWORD_GUARDIAN_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL;
@@ -306,13 +319,13 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_WALK_ATTACK_AIM:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					torso.x = AI.xAngle;
-					torso.y = AI.angle;
+					torsoOrient.x = ai.xAngle;
+					torsoOrient.y = ai.angle;
 				}
 
-				if (!AI.bite || AI.distance > SWORD_GUARDIAN_WALK_ATTACK_RANGE)
+				if (!ai.bite || ai.distance > SWORD_GUARDIAN_WALK_ATTACK_RANGE)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_WALK_ATTACK;
@@ -322,7 +335,7 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_FLY:
 				creature->MaxTurn = SWORD_GUARDIAN_FLY_TURN_RATE_MAX;
 
-				SwordGuardianFlyEffect(item);
+				DoSwordGuardianFlyEffect(item);
 				if (creature->LOT.Fly == NO_FLYING)
 					item->Animation.TargetState = SWORD_GUARDIAN_STATE_IDLE;
 
@@ -331,10 +344,10 @@ namespace TEN::Entities::Creatures::TR2
 			case SWORD_GUARDIAN_STATE_ATTACK_FRONT:
 			case SWORD_GUARDIAN_STATE_ATTACK_HORIZONTAL:
 			case SWORD_GUARDIAN_STATE_WALK_ATTACK:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					torso.x = AI.xAngle;
-					torso.y = AI.angle;
+					torsoOrient.x = ai.xAngle;
+					torsoOrient.y = ai.angle;
 				}
 
 				if (!creature->Flags && item->TouchBits.Test(SwordBite.meshNum))
@@ -348,11 +361,11 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureJoint(item, 0, torso.y);
-		CreatureJoint(item, 1, torso.x);
-		CreatureJoint(item, 2, head.y);
-		CreatureJoint(item, 3, head.x);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureJoint(item, 0, torsoOrient.y);
+		CreatureJoint(item, 1, torsoOrient.x);
+		CreatureJoint(item, 2, headOrient.y);
+		CreatureJoint(item, 3, headOrient.x);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 
 	void SwordGuardianHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
