@@ -18,14 +18,16 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
+	constexpr auto SWORD_GUARDIAN_ATTACK_DAMAGE = 300;
+
+	// TODO: Fix names.
 	constexpr auto SWORD_GUARDIAN_ATTACK_RANGE		= SQUARE(BLOCK(1));
 	constexpr auto SWORD_GUARDIAN_WALK_ATTACK_RANGE = SQUARE(BLOCK(2));
 
 	constexpr auto SWORD_GUARDIAN_FLY_TURN_RATE_MAX	 = ANGLE(7.0f);
 	constexpr auto SWORD_GUARDIAN_WALK_TURN_RATE_MAX = ANGLE(9.0f);
 
-	constexpr auto SWORD_GUARDIAN_SWAPMESH_TIME = 3;
-	constexpr auto SWORD_GUARDIAN_ATTACK_DAMAGE = 300;
+	constexpr auto SWORD_GUARDIAN_MESH_SWAP_TIME = 3;
 
 	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
@@ -147,7 +149,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 			}
 
-			creature.Flags = SWORD_GUARDIAN_SWAPMESH_TIME;
+			creature.Flags = SWORD_GUARDIAN_MESH_SWAP_TIME;
 		}
 		else
 		{

@@ -18,22 +18,24 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
+	// TODO: Fix names.
 	constexpr auto SPEAR_GUARDIAN_BASIC_DAMAGE	  = 75;
 	constexpr auto SPEAR_GUARDIAN_POWERFUL_DAMAGE = 120;
 
 	constexpr auto SPEAR_GUARDIAN_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto SPEAR_GUARDIAN_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 
-	constexpr auto SPEAR_GUARDIAN_SLASH_RANGE = SQUARE(BLOCK(1));
-	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE = SQUARE(BLOCK(1));
+	// TODO: Fix names.
+	constexpr auto SPEAR_GUARDIAN_SLASH_RANGE			   = SQUARE(BLOCK(1));
+	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE	   = SQUARE(BLOCK(1));
 	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE = SQUARE(BLOCK(1.5f));
-	constexpr auto SPEAR_GUARDIAN_RUN_RANGE = SQUARE(BLOCK(3));
-	constexpr auto SPEAR_GUARDIAN_ATTACK_RANGE = SQUARE(BLOCK(2));
+	constexpr auto SPEAR_GUARDIAN_RUN_RANGE				   = SQUARE(BLOCK(3));
+	constexpr auto SPEAR_GUARDIAN_ATTACK_RANGE			   = SQUARE(BLOCK(2));
 
 	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
 
-	const auto SpearBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
-	const auto SpearBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
+	const auto SpearGuardianBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
+	const auto SpearGuardianBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
 
 	enum SpearGuardianState
 	{
@@ -59,7 +61,7 @@ namespace TEN::Entities::Creatures::TR2
 		SPEAR_GUARDIAN_STATE_KILL = 19
 	};
 
-	// TODO: Determine names.
+	// TODO: Fix names.
 	enum SpearGuardianAnim
 	{
 		SPEAR_GUARDIAN_ANIM_DOUBLE_ATTACK_FRONT_CANCEL = 0,
@@ -86,7 +88,7 @@ namespace TEN::Entities::Creatures::TR2
 		SPEAR_GUARDIAN_ANIM_STAND_TO_WALK = 30,
 		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_STAND = 31,
 		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_WALK = 32,
-		SPEAR_GUARDIAN_ANIM_STAND = 33,
+		SPEAR_GUARDIAN_ANIM_IDLE = 33,
 		SPEAR_GUARDIAN_ANIM_SLASH_IDLE = 34,
 		SPEAR_GUARDIAN_ANIM_WALK = 35,
 		SPEAR_GUARDIAN_ANIM_WALK_TO_RUN = 36,
@@ -99,25 +101,25 @@ namespace TEN::Entities::Creatures::TR2
 
 		SPEAR_GUARDIAN_ANIM_WALK_TO_SLASH_IDLE = 47,
 		SPEAR_GUARDIAN_ANIM_AWAKE = 48,
-		SPEAR_GUARDIAN_ANIM_KILL_LARA = 49,
+		SPEAR_GUARDIAN_ANIM_KILL = 49,
 	};
 
 	static void DoSpearGuardianAttack(ItemInfo& item, int damage)
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (!(creature.Flags & 1) && item.TouchBits.Test(SpearBiteRight.meshNum))
+		if (!(creature.Flags & 1) && item.TouchBits.Test(SpearGuardianBiteRight.meshNum))
 		{
 			DoDamage(creature.Enemy, damage);
-			CreatureEffect(&item, SpearBiteRight, DoBloodSplat);
+			CreatureEffect(&item, SpearGuardianBiteRight, DoBloodSplat);
 			creature.Flags |= 1;
 			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
 		}
 
-		if (!(creature.Flags & 2) && item.TouchBits.Test(SpearBiteLeft.meshNum))
+		if (!(creature.Flags & 2) && item.TouchBits.Test(SpearGuardianBiteLeft.meshNum))
 		{
 			DoDamage(creature.Enemy, damage);
-			CreatureEffect(&item, SpearBiteLeft, DoBloodSplat);
+			CreatureEffect(&item, SpearGuardianBiteLeft, DoBloodSplat);
 			creature.Flags |= 2;
 			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
 		}
@@ -513,7 +515,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (isPlayerAlive && creature->Enemy->HitPoints <= 0)
 		{
 			creature->MaxTurn = 0;
-			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL_LARA, LARA_EXTRA_ANIM_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LARA_EXTRA_ANIM_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
 			return;
 		}
 
