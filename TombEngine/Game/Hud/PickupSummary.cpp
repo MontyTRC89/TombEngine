@@ -193,7 +193,7 @@ namespace TEN::Hud
 
 		// Clear and return most recent display pickup.
 		auto& pickup = this->DisplayPickups.back();
-		pickup = DisplayPickup();
+		pickup = {};
 		return pickup;
 	}
 

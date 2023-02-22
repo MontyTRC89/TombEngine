@@ -22,9 +22,9 @@ namespace TEN::Hud
 	{
 	private:
 		// Components
-		//StatusBar AirBar	= {}; // TODO
+		StatusBar AirBar	= {};
 		StatusBar HealthBar = {};
-		//StatusBar SprintBar = {}; // TODO
+		StatusBar SprintBar = {};
 		bool	  DoFlash	= false;
 
 	public:
@@ -35,7 +35,9 @@ namespace TEN::Hud
 
 	private:
 		// Update helpers
+		void UpdateAirBar(ItemInfo& item);
 		void UpdateHealthBar(ItemInfo& item);
+		void UpdateSprintBar(ItemInfo& item);
 
 		// Draw helpers
 		void DrawStatusBar(float value, TEN::Renderer::RendererHUDBar* rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;

@@ -19,6 +19,8 @@ extern TEN::Renderer::RendererHUDBar* g_SprintBar;
 
 namespace TEN::Hud
 {
+	constexpr auto STATUS_BAR_LERP_ALPHA = 0.4f;
+
 	void StatusBarsController::Update(ItemInfo& item)
 	{
 		constexpr auto FLASH_INTERVAL = 0.2f;
@@ -26,7 +28,9 @@ namespace TEN::Hud
 		if ((GameTimer % (int)round(FLASH_INTERVAL * FPS)) == 0)
 			this->DoFlash = !DoFlash;
 
+		this->UpdateAirBar(item);
 		this->UpdateHealthBar(item);
+		this->UpdateSprintBar(item);
 	}
 
 	void StatusBarsController::Draw(ItemInfo& item) const
@@ -44,10 +48,41 @@ namespace TEN::Hud
 		*this = {};
 	}
 
+	void StatusBarsController::UpdateAirBar(ItemInfo& item)
+	{
+		constexpr auto LIFE_MAX = 1.0f / FPS;
+
+		const auto& player = *GetLaraInfo(&item);
+
+		float air = std::clamp((float)player.Air, 0.0f, LARA_AIR_MAX);
+		this->AirBar.TargetValue = air / LARA_AIR_MAX;
+
+		if (AirBar.Life > 0.0f)
+			this->AirBar.Life -= 1.0f;
+
+		this->AirBar.Value = Lerp(AirBar.Value, AirBar.TargetValue, STATUS_BAR_LERP_ALPHA);
+		if (abs(AirBar.Value - AirBar.TargetValue) <= EPSILON)
+			this->AirBar.Value = AirBar.TargetValue;
+
+		if (AirBar.Value != AirBar.TargetValue ||
+			player.Control.WaterStatus == WaterStatus::Wade ||
+			player.Control.WaterStatus == WaterStatus::TreadWater ||
+			player.Control.WaterStatus == WaterStatus::Underwater)
+		{
+			this->AirBar.Life = round(LIFE_MAX * FPS);
+		}
+
+		// HACK: Special case for UPV.
+		if (player.Vehicle != NO_ITEM)
+		{
+			if (g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV)
+				this->AirBar.Life = round(LIFE_MAX * FPS);
+		}
+	}
+
 	void StatusBarsController::UpdateHealthBar(ItemInfo& item)
 	{
-		constexpr auto LIFE_MAX	  = 1.5f;
-		constexpr auto LERP_ALPHA = 0.4f;
+		constexpr auto LIFE_MAX = 1.5f;
 
 		const auto& player = *GetLaraInfo(&item);
 
@@ -61,7 +96,7 @@ namespace TEN::Hud
 			HealthBar.TargetValue <= 0.0f ||
 			player.Control.HandStatus == HandStatus::WeaponReady)
 		{
-			this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, LERP_ALPHA);
+			this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_LERP_ALPHA);
 			if (abs(HealthBar.Value - HealthBar.TargetValue) <= EPSILON)
 				this->HealthBar.Value = HealthBar.TargetValue;
 
@@ -76,6 +111,11 @@ namespace TEN::Hud
 		}
 	}
 
+	void StatusBarsController::UpdateSprintBar(ItemInfo& item)
+	{
+		// TODO
+	}
+
 	void StatusBarsController::DrawStatusBar(float value, RendererHUDBar* rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
 	{
 		g_Renderer.DrawBar(value, rHudBar, textureID, frame, isPoisoned);
@@ -83,27 +123,16 @@ namespace TEN::Hud
 
 	void StatusBarsController::DrawAirBar(ItemInfo& item) const
 	{
-		constexpr auto TEXTURE_ID = ID_AIR_BAR_TEXTURE;
+		constexpr auto TEXTURE_ID	  = ID_AIR_BAR_TEXTURE;
+		constexpr auto CRITICAL_VALUE = LARA_AIR_CRITICAL / LARA_AIR_MAX;
+
+		if (AirBar.Life <= 0.0f)
+			return;
 
 		const auto& player = *GetLaraInfo(&item);
 
-		// HACK: Unique handling for UPV.
-		if (player.Vehicle == NO_ITEM || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV)
-		{
-			// Avoid showing air bar in these contexts.
-			if (player.Control.WaterStatus != WaterStatus::Wade &&
-				player.Control.WaterStatus != WaterStatus::TreadWater &&
-				player.Control.WaterStatus != WaterStatus::Underwater &&
-				!(TestEnvironment(ENV_FLAG_SWAMP, &item) && player.WaterSurfaceDist < -(CLICK(3) - 1)))
-			{
-				return;
-			}
-		}
-
-		float air = std::clamp((float)player.Air, 0.0f, LARA_AIR_MAX);
-		float value = air / LARA_AIR_MAX;
-
-		if (air <= LARA_AIR_CRITICAL)
+		float value = AirBar.Value;
+		if (AirBar.Value <= CRITICAL_VALUE)
 			value = DoFlash ? value : 0.0f;
 
 		this->DrawStatusBar(value, g_AirBar, TEXTURE_ID, 0, false);
@@ -121,11 +150,11 @@ namespace TEN::Hud
 				player.Control.Weapon.GunType != LaraWeaponType::Torch) || // HACK: Torch is considered a weapon, so exclude it.
 			player.PoisonPotency)
 		{
-			float value = HealthBar.Value;
 			bool isPoisoned = (player.PoisonPotency != 0);
 
+			float value = HealthBar.Value;
 			if (HealthBar.Value <= CRITICAL_VALUE)
-				value = (DoFlash || (HealthBar.Value != HealthBar.TargetValue)) ? value : 0.0f;
+				value = DoFlash ? value : 0.0f;
 
 			this->DrawStatusBar(value, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 		}
