@@ -54,16 +54,20 @@ namespace TEN::Hud
 
 		const auto& player = *GetLaraInfo(&item);
 
-		float air = std::clamp((float)player.Air, 0.0f, LARA_AIR_MAX);
-		this->AirBar.TargetValue = air / LARA_AIR_MAX;
-
+		// Update life.
 		if (AirBar.Life > 0.0f)
 			this->AirBar.Life -= 1.0f;
 
+		// Update target value.
+		float air = std::clamp((float)player.Air, 0.0f, LARA_AIR_MAX);
+		this->AirBar.TargetValue = air / LARA_AIR_MAX;
+
+		// Update value.
 		this->AirBar.Value = Lerp(AirBar.Value, AirBar.TargetValue, STATUS_BAR_LERP_ALPHA);
 		if (abs(AirBar.Value - AirBar.TargetValue) <= EPSILON)
 			this->AirBar.Value = AirBar.TargetValue;
 
+		// Set max life according to context.
 		if (AirBar.Value != AirBar.TargetValue ||
 			player.Control.WaterStatus == WaterStatus::Wade ||
 			player.Control.WaterStatus == WaterStatus::TreadWater ||
@@ -72,7 +76,7 @@ namespace TEN::Hud
 			this->AirBar.Life = round(LIFE_MAX * FPS);
 		}
 
-		// HACK: Special case for UPV.
+		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
 		if (player.Vehicle != NO_ITEM)
 		{
 			if (g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV)
@@ -86,16 +90,20 @@ namespace TEN::Hud
 
 		const auto& player = *GetLaraInfo(&item);
 
-		float health = std::clamp((float)item.HitPoints, 0.0f, LARA_HEALTH_MAX);
-		this->HealthBar.TargetValue = health / LARA_HEALTH_MAX;
-
+		// Update life.
 		if (HealthBar.Life > 0.0f)
 			this->HealthBar.Life -= 1.0f;
 
+		// Update target value.
+		float health = std::clamp((float)item.HitPoints, 0.0f, LARA_HEALTH_MAX);
+		this->HealthBar.TargetValue = health / LARA_HEALTH_MAX;
+
+		// Update value.
 		this->HealthBar.Value = Lerp(HealthBar.Value, HealthBar.TargetValue, STATUS_BAR_LERP_ALPHA);
 		if (abs(HealthBar.Value - HealthBar.TargetValue) <= EPSILON)
 			this->HealthBar.Value = HealthBar.TargetValue;
 
+		// Set max life according to context.
 		if (HealthBar.Value != HealthBar.TargetValue ||
 			health <= LARA_HEALTH_CRITICAL ||
 			player.PoisonPotency != 0 ||
@@ -115,16 +123,20 @@ namespace TEN::Hud
 
 		const auto& player = *GetLaraInfo(&item);
 
-		float sprintEnergy = std::clamp((float)player.SprintEnergy, 0.0f, LARA_SPRINT_ENERGY_MAX);
-		this->SprintBar.TargetValue = sprintEnergy / LARA_SPRINT_ENERGY_MAX;
-
+		// Update life.
 		if (SprintBar.Life > 0.0f)
 			this->SprintBar.Life -= 1.0f;
 
+		// Update target value.
+		float sprintEnergy = std::clamp((float)player.SprintEnergy, 0.0f, LARA_SPRINT_ENERGY_MAX);
+		this->SprintBar.TargetValue = sprintEnergy / LARA_SPRINT_ENERGY_MAX;
+
+		// Update value.
 		this->SprintBar.Value = Lerp(SprintBar.Value, SprintBar.TargetValue, STATUS_BAR_LERP_ALPHA);
 		if (abs(SprintBar.Value - SprintBar.TargetValue) <= EPSILON)
 			this->SprintBar.Value = SprintBar.TargetValue;
 
+		// Set max life according to context.
 		if (SprintBar.Value != SprintBar.TargetValue ||
 			SprintBar.Value != 1.0f)
 		{
