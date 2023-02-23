@@ -54,7 +54,7 @@ namespace TEN::Entities::Creatures::TR3
 		WASP_ANIM_FLY_FORWARD
 	};
 
-	static void SpawnWaspParticle(short itemNumber)
+	static void SpawnWaspVenomSackParticle(short itemNumber)
 	{
 		auto& particle = *GetFreeParticle();
 
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 		particle.dSize = size >> 1;
 	}
 
-	static void DoWaspEffects(short itemNumber, ItemInfo& item)
+	static void SpawnWaspVenomSackEffects(short itemNumber, ItemInfo& item)
 	{
 		constexpr auto PARTICLE_EFFECT_COUNT = 2;
 
@@ -109,13 +109,13 @@ namespace TEN::Entities::Creatures::TR3
 		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
 		TriggerDynamicLight(
 			pos.x, pos.y, pos.z, 10, 
-			WaspVenomSackLightColor.x * 255,
-			WaspVenomSackLightColor.y * 255,
-			WaspVenomSackLightColor.z * 255);
+			WaspVenomSackLightColor.x * UCHAR_MAX,
+			WaspVenomSackLightColor.y * UCHAR_MAX,
+			WaspVenomSackLightColor.z * UCHAR_MAX);
 
 		// Spawn wasp effect twice.
 		for (int i = 0; i < PARTICLE_EFFECT_COUNT; i++)
-			SpawnWaspParticle(itemNumber);
+			SpawnWaspVenomSackParticle(itemNumber);
 	}
 
 	void InitialiseWaspMutant(short itemNumber)
@@ -125,8 +125,6 @@ namespace TEN::Entities::Creatures::TR3
 		SetAnimation(&item, WASP_STATE_IDLE);
 	}
 
-	// NOTE: AI_MODIFY doesn't allow the wasp to land.
-	// If it spawns in the land state (set by default), it will be forced to fly.
 	void WaspMutantControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -184,13 +182,8 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
 				item.Pose.Position.y = item.Floor;
 
-				if (item.HitStatus ||
-					ai.distance < WASP_TAKE_OFF_RANGE ||
-					creature.HurtByLara ||
-					item.AIBits == MODIFY)
-				{
+				if (item.HitStatus || ai.distance < WASP_TAKE_OFF_RANGE || creature.HurtByLara)
 					item.Animation.TargetState = WASP_STATE_IDLE_TO_FLY_IDLE;
-				}
 
 				break;
 
@@ -213,12 +206,12 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				// NOTE: This causes the wasp to wait until probability is valid or
 				// the player has hit the wasp to move forward, which is conceptually bad.
-				else if (item.HitStatus || Random::TestProbability(WASP_LAND_CHANCE) || item.AIBits == MODIFY)
+				else if (item.HitStatus || Random::TestProbability(WASP_LAND_CHANCE))
 				{
 					item.Animation.TargetState = WASP_STATE_FLY_FORWARD;
 				}
 				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
-					!creature.HurtByLara && item.AIBits != MODIFY)
+					!creature.HurtByLara)
 				{
 					item.Animation.TargetState = WASP_STATE_FLY_IDLE_TO_IDLE;
 				}
@@ -238,7 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
 				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
-					!creature.HurtByLara && item.AIBits != MODIFY)
+					!creature.HurtByLara)
 				{
 					item.Animation.TargetState = WASP_STATE_FLY_IDLE;
 				}
@@ -277,7 +270,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Avoid spawning dynamic light when dead.
-			DoWaspEffects(itemNumber, item);
+			SpawnWaspVenomSackEffects(itemNumber, item);
 		}
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
