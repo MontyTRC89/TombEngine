@@ -103,9 +103,15 @@ namespace TEN::Renderer
 		}
 	}
 
-	RendererHudBar::RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, array<Vector4, 5> colors)
+	RendererHudBar::RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, array<Vector4, COLOR_COUNT> colors)
 	{
-		auto barVertices = std::array<Vector3, 5>
+		constexpr auto VERTEX_COUNT		  = 5;
+		constexpr auto UV_COUNT			  = 5;
+		constexpr auto BORDER_UV_COUNT	  = 16;
+		constexpr auto INDEX_COUNT		  = 12;
+		constexpr auto BORDER_INDEX_COUNT = 56;
+
+		auto barVertices = std::array<Vector3, VERTEX_COUNT>
 		{
 			Vector3(pos.x, HUD_ZERO_Y + pos.y, 0.5f),
 			Vector3(pos.x + size.x, HUD_ZERO_Y + pos.y, 0.5f),
@@ -145,7 +151,7 @@ namespace TEN::Renderer
 			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f)
 		};
 
-		auto barUVs = std::array<Vector2, 5>
+		auto barUVs = std::array<Vector2, UV_COUNT>
 		{
 			Vector2::Zero,
 			Vector2(1.0f, 0.0f),
@@ -153,7 +159,7 @@ namespace TEN::Renderer
 			Vector2(0.0f, 1.0f),
 			Vector2::One,
 		};
-		auto barBorderUVs = std::array<Vector2, 16>
+		auto barBorderUVs = std::array<Vector2, BORDER_UV_COUNT>
 		{
 			// Top left
 			Vector2::Zero,
@@ -167,7 +173,7 @@ namespace TEN::Renderer
 			Vector2(1.0f, 0.25f),
 			Vector2(0.75f, 0.25f),
 
-			//b Bottom right
+			// Bottom right
 			Vector2::One * 0.75f,
 			Vector2(1.0f, 0.75f),
 			Vector2::One,
@@ -180,14 +186,14 @@ namespace TEN::Renderer
 			Vector2(0.0f, 1.0f)
 		};
 
-		auto barIndices = std::array<int, 12>
+		auto barIndices = std::array<int, INDEX_COUNT>
 		{
 			2, 1, 0,
 			2, 0, 3,
 			2, 3, 4,
 			2, 4, 1
 		};
-		auto barBorderIndices = std::array<int, 56>
+		auto barBorderIndices = std::array<int, BORDER_INDEX_COUNT>
 		{
 			// Top left
 			0, 1, 3, 1, 2, 3,
@@ -208,8 +214,9 @@ namespace TEN::Renderer
 			// Center
 			2, 7, 13, 7, 8, 13
 		};
-		auto vertices = std::array<RendererVertex, 5>{};
-		for (int i = 0; i < 5; i++)
+
+		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
+		for (int i = 0; i < VERTEX_COUNT; i++)
 		{
 			vertices[i].Position = barVertices[i];
 			vertices[i].Color = colors[i];
@@ -221,17 +228,17 @@ namespace TEN::Renderer
 		this->InnerVertexBuffer = VertexBuffer(devicePtr, vertices.size(), vertices.data());
 		this->InnerIndexBuffer = IndexBuffer(devicePtr, barIndices.size(), barIndices.data());
 
-		auto verticesBorderVertices = std::array<RendererVertex, barBorderVertices.size()>{};
+		auto borderVertices = std::array<RendererVertex, barBorderVertices.size()>{};
 		for (int i = 0; i < barBorderVertices.size(); i++)
 		{
-			verticesBorderVertices[i].Position = barBorderVertices[i];
-			verticesBorderVertices[i].Color = Vector4::One;
-			verticesBorderVertices[i].UV = barBorderUVs[i];
-			verticesBorderVertices[i].Normal = Vector3::Zero;
-			verticesBorderVertices[i].Bone = 0.0f;
+			borderVertices[i].Position = barBorderVertices[i];
+			borderVertices[i].Color = Vector4::One;
+			borderVertices[i].UV = barBorderUVs[i];
+			borderVertices[i].Normal = Vector3::Zero;
+			borderVertices[i].Bone = 0.0f;
 		}
 
-		this->VertexBufferBorder = VertexBuffer(devicePtr, verticesBorderVertices.size(), verticesBorderVertices.data());
+		this->VertexBufferBorder = VertexBuffer(devicePtr, borderVertices.size(), borderVertices.data());
 		this->IndexBufferBorder = IndexBuffer(devicePtr, barBorderIndices.size(), barBorderIndices.data());
 	}
 

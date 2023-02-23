@@ -63,6 +63,8 @@ namespace TEN::Renderer
 
 	struct RendererHudBar
 	{
+		static const auto COLOR_COUNT = 5;
+
 		VertexBuffer VertexBufferBorder = VertexBuffer();
 		IndexBuffer	 IndexBufferBorder	= IndexBuffer();
 		VertexBuffer InnerVertexBuffer	= VertexBuffer();
@@ -78,7 +80,7 @@ namespace TEN::Renderer
 			3-------4
 		*/
 
-		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, 5> colors);
+		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
 	struct RendererAnimatedTexture
