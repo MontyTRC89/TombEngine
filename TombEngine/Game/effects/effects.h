@@ -204,7 +204,7 @@ TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 	}
 
 	// Clear and return existing effect.
-	*effectPtr = TEffect();
+	*effectPtr = {};
 	return *effectPtr;
 }
 
