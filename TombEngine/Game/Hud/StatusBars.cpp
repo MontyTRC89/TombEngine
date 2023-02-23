@@ -124,7 +124,7 @@ namespace TEN::Hud
 			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
-		// HACK: Special case for undrawing weapon.
+		// HACK: Special case for weapon undraw.
 		if (player.Control.HandStatus == HandStatus::WeaponUndraw && health > LARA_HEALTH_CRITICAL)
 			this->HealthBar.Life = 0.0f;
 	}
