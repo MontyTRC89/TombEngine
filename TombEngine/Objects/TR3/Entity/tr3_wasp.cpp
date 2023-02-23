@@ -113,7 +113,7 @@ namespace TEN::Entities::Creatures::TR3
 			WaspVenomSackLightColor.y * UCHAR_MAX,
 			WaspVenomSackLightColor.z * UCHAR_MAX);
 
-		// Spawn wasp effect twice.
+		// Spawn particles.
 		for (int i = 0; i < PARTICLE_EFFECT_COUNT; i++)
 			SpawnWaspVenomSackParticle(itemNumber);
 	}
