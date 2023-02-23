@@ -402,16 +402,17 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
-		obj->initialise = InitialiseCreature;
+		obj->initialise = InitialiseSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
+		obj->HitRoutine = SwordGuardianHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 80;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(17, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 
@@ -422,13 +423,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
+		obj->HitRoutine = SpearGuardianHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetBoneRotationFlags(16, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 

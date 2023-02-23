@@ -1,25 +1,36 @@
 Version 1.0.7
 =============
 
+* Fix entity taking damage when it's drawed by default (not invisible like shiva or sword/spear guardian) but still not triggered.
 * Fix spark particles not being cleared on level reload.
 * Fix visible but inactive enemies (e.g. Shiva or Xian guardians) taking damage.
 * Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
 * Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
 * Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
 * Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
+* Fix TR2 sword and spear guardian:
+	- Not doing transition from alive to stone and stone to alive.
+	- Taking damage in stone mode.
+	- Wrong joint index for rotating the head and torso.
+	- Spear guardian not using left and right spear attack when walking (had wrong state ID set as target).
+	- Killing move for spear used wrong value.
+* Fix TR3 big gun spawning rocket with 0 life which cause a direct explosion.
 * Fix valve switch unable to untrigger objects.
 * Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Backport Civvy from TR3.
+* Fix Tony boss from TR3. 
+* Added boss effect for TR3 tony boss and improved tony explosion color.
 * Add instant headshot to Guards.
 * Backport electric cleaner trap from TR3.
 * Add TR3 Wasp Mutant:
 	- AI_MODIFY: Don't allow to land, he will always fly (Used when spawned in the nest).
 * Add TR3 Sophia Leigh with following OCBs:	
-	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
-	- 6 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
+	- 0 – Normal mode. Sophia behaves like a regular enemy.
+	- 1 – Tower mode. Behaviour matched from Tomb Raider III.
+	- 2 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
 * Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
 * Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
 * Polish the distance position between Lara and switch objects.
