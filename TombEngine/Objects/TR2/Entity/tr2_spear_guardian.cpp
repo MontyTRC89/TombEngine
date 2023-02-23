@@ -515,7 +515,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (isPlayerAlive && creature->Enemy->HitPoints <= 0)
 		{
 			creature->MaxTurn = 0;
-			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LARA_EXTRA_ANIM_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LEA_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
 			return;
 		}
 
