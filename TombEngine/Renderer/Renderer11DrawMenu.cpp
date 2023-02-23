@@ -20,8 +20,8 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
-extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_SFXVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
 
 namespace TEN::Renderer
 {
@@ -70,8 +70,8 @@ namespace TEN::Renderer
 	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
 
 	// These bars are only used in menus.
-	TEN::Renderer::RendererHUDBar* g_MusicVolumeBar = nullptr;
-	TEN::Renderer::RendererHUDBar* g_SFXVolumeBar = nullptr;
+	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
+	TEN::Renderer::RendererHudBar* g_SFXVolumeBar = nullptr;
 
 	void Renderer11::InitialiseMenuBars(int y)
 	{
@@ -91,9 +91,9 @@ namespace TEN::Renderer
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), Vector2(150.0f, 8.0f), 1, soundSettingColors);
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), Vector2(150.0f, 8.0f), 1, soundSettingColors);
 	}
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)

@@ -61,23 +61,24 @@ namespace TEN::Renderer
 {
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
-	struct RendererHUDBar
+	struct RendererHudBar
 	{
-		VertexBuffer VertexBufferBorder;
-		IndexBuffer IndexBufferBorder;
-		VertexBuffer InnerVertexBuffer;
-		IndexBuffer InnerIndexBuffer;
+		VertexBuffer VertexBufferBorder = VertexBuffer();
+		IndexBuffer	 IndexBufferBorder	= IndexBuffer();
+		VertexBuffer InnerVertexBuffer	= VertexBuffer();
+		IndexBuffer	 InnerIndexBuffer	= IndexBuffer();
+
 		/*
-			Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
-			The colors are setup like this (4 triangles)
+			Initializes status bar for rendering. Coordinates are set in screen space.
+			Colors are set in 5 vertices as described in the diagram:
 			0-------1
 			| \   / |
 			|  >2<  |
 			| /   \ |
 			3-------4
 		*/
-		RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize,
-		               std::array<Vector4, 5> colors);
+
+		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, 5> colors);
 	};
 
 	struct RendererAnimatedTexture
@@ -640,7 +641,7 @@ namespace TEN::Renderer
 		~Renderer11();
 
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
-		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
+		void DrawBar(float percent, const RendererHudBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Render();

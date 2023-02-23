@@ -13,9 +13,9 @@
 
 using namespace TEN::Renderer;
 
-extern TEN::Renderer::RendererHUDBar* g_AirBar;
-extern TEN::Renderer::RendererHUDBar* g_HealthBar;
-extern TEN::Renderer::RendererHUDBar* g_SprintBar;
+extern TEN::Renderer::RendererHudBar* g_AirBar;
+extern TEN::Renderer::RendererHudBar* g_HealthBar;
+extern TEN::Renderer::RendererHudBar* g_SprintBar;
 
 namespace TEN::Hud
 {
@@ -158,7 +158,7 @@ namespace TEN::Hud
 		}
 	}
 
-	void StatusBarsController::DrawStatusBar(float value, float criticalValue, RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
+	void StatusBarsController::DrawStatusBar(float value, float criticalValue, RendererHudBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
 	{
 		if (value <= criticalValue)
 			value = DoFlash ? value : 0.0f;;

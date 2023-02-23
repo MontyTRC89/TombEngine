@@ -11,16 +11,18 @@
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
-TEN::Renderer::RendererHUDBar* g_AirBar;
-TEN::Renderer::RendererHUDBar* g_HealthBar;
-TEN::Renderer::RendererHUDBar* g_SprintBar;
-TEN::Renderer::RendererHUDBar* g_LoadingBar;
+TEN::Renderer::RendererHudBar* g_AirBar;
+TEN::Renderer::RendererHudBar* g_HealthBar;
+TEN::Renderer::RendererHudBar* g_SprintBar;
+TEN::Renderer::RendererHudBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
 	void Renderer11::InitialiseGameBars()
 	{
-		static const auto AIR_COLORS = std::array<Vector4, 5>
+		constexpr auto STATUS_BAR_COLOR_COUNT = 5;
+
+		static const auto AIR_BAR_COLORS = std::array<Vector4, STATUS_BAR_COLOR_COUNT>
 		{
 			// Top
 			Vector4(0.0f, 0.0f, 0.35f, 1.0f),
@@ -34,7 +36,7 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
 		};
 
-		static const auto HEALTH_COLORS = std::array<Vector4, 5>
+		static const auto HEALTH_BAR_COLORS = std::array<Vector4, STATUS_BAR_COLOR_COUNT>
 		{
 			// Top
 			Vector4(0.32f, 0.0f, 0.0f, 1.0f),
@@ -48,7 +50,7 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.32f, 0.0f, 1.0f)
 		};
 		
-		static const auto SPRINT_COLORS = std::array<Vector4, 5>
+		static const auto SPRINT_BAR_COLORS = std::array<Vector4, STATUS_BAR_COLOR_COUNT>
 		{
 			// Top
 			Vector4(0.3f, 0.02f, 0.0f, 1.0f),
@@ -62,7 +64,7 @@ namespace TEN::Renderer
 			Vector4(0.55f, 0.45f, 0.02f, 1.0f)
 		};
 
-		static const auto LOADING_COLORS = std::array<Vector4, 5>
+		static const auto LOADING_BAR_COLORS = std::array<Vector4, STATUS_BAR_COLOR_COUNT>
 		{
 			// Top
 			Vector4(0.0f, 0.0f, 0.35f, 1.0f),
@@ -76,13 +78,13 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
 		};
 
-		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, AIR_COLORS);
-		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, HEALTH_COLORS);
-		g_SprintBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, SPRINT_COLORS);
-		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 550, 150, 8, 1, LOADING_COLORS);
+		g_AirBar = new RendererHudBar(m_device.Get(), Vector2(630.0f, 32.0f), Vector2(150.0f, 8.0f), 1, AIR_BAR_COLORS);
+		g_HealthBar = new RendererHudBar(m_device.Get(), Vector2(20.0f, 32.0f), Vector2(150.0f, 8.0f), 1, HEALTH_BAR_COLORS);
+		g_SprintBar = new RendererHudBar(m_device.Get(), Vector2(630.0f, 44.0f), Vector2(150.0f, 8.0f), 1, SPRINT_BAR_COLORS);
+		g_LoadingBar = new RendererHudBar(m_device.Get(), Vector2(325.0f, 550.0f), Vector2(150.0f, 8.0f), 1, LOADING_BAR_COLORS);
 	}
 
-	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
+	void Renderer11::DrawBar(float percent, const RendererHudBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
 		unsigned int strides = sizeof(RendererVertex);
 		unsigned int offset = 0;

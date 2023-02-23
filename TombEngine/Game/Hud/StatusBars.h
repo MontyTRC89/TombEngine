@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Renderer
 {
-	struct RendererHUDBar;
+	struct RendererHudBar;
 }
 
 namespace TEN::Hud
@@ -41,7 +41,7 @@ namespace TEN::Hud
 		void UpdateSprintBar(ItemInfo& item);
 
 		// Draw helpers
-		void DrawStatusBar(float value, float criticalValue, TEN::Renderer::RendererHUDBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
+		void DrawStatusBar(float value, float criticalValue, TEN::Renderer::RendererHudBar* rHudBarPtr, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
 		void DrawAirBar(ItemInfo& item) const;
 		void DrawHealthBar(ItemInfo& item) const;
 		void DrawSprintBar(ItemInfo& item) const;

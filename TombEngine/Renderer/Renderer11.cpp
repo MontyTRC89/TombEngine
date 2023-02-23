@@ -9,12 +9,9 @@
 #include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"
 
-using std::vector;
-
 namespace TEN::Renderer
 {
 	using namespace Utils;
-	using std::array;
 	Renderer11 g_Renderer;
 
 	Renderer11::Renderer11() : gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90)
@@ -106,122 +103,136 @@ namespace TEN::Renderer
 		}
 	}
 
-	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize,
-	                               array<Vector4, 5> colors)
+	RendererHudBar::RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, array<Vector4, 5> colors)
 	{
-		array<Vector3, 9> barVertices = {
-			Vector3(x, HUD_ZERO_Y + y, 0.5),
-			Vector3(x + w, HUD_ZERO_Y + y, 0.5),
-			Vector3(x + (w / 2.0f), HUD_ZERO_Y + (y + h / 2.0f), 0.5),
-			Vector3(x, HUD_ZERO_Y + y + h, 0.5),
-			Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
-
-		};
-		const float HUD_BORDER_WIDTH = borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y);
-		const float HUD_BORDER_HEIGT = borderSize;
-		array<Vector3, 16> barBorderVertices = {
-			//top left
-			Vector3(x - HUD_BORDER_WIDTH, HUD_ZERO_Y + y - HUD_BORDER_HEIGT, 0),
-			Vector3(x, HUD_ZERO_Y + y - HUD_BORDER_HEIGT, 0),
-			Vector3(x, HUD_ZERO_Y + y, 0),
-			Vector3(x - HUD_BORDER_WIDTH, HUD_ZERO_Y + y, 0),
-			//top right
-			Vector3(x + w, HUD_ZERO_Y + y - HUD_BORDER_HEIGT, 0),
-			Vector3(x + w + HUD_BORDER_WIDTH, HUD_ZERO_Y + y - HUD_BORDER_HEIGT, 0),
-			Vector3(x + w + HUD_BORDER_WIDTH, HUD_ZERO_Y + y, 0),
-			Vector3(x + w, HUD_ZERO_Y + y, 0),
-			//bottom right
-			Vector3(x + w, HUD_ZERO_Y + y + h, 0),
-			Vector3(x + w + HUD_BORDER_WIDTH, HUD_ZERO_Y + y + h, 0),
-			Vector3(x + w + HUD_BORDER_WIDTH, HUD_ZERO_Y + y + h + HUD_BORDER_HEIGT, 0),
-			Vector3(x + w, HUD_ZERO_Y + y + h + HUD_BORDER_HEIGT, 0),
-			//bottom left
-			Vector3(x - HUD_BORDER_WIDTH, HUD_ZERO_Y + y + h, 0),
-			Vector3(x, HUD_ZERO_Y + y + h, 0),
-			Vector3(x, HUD_ZERO_Y + y + h + HUD_BORDER_HEIGT, 0),
-			Vector3(x - HUD_BORDER_WIDTH, HUD_ZERO_Y + y + h + HUD_BORDER_HEIGT, 0)
+		auto barVertices = std::array<Vector3, 5>
+		{
+			Vector3(pos.x, HUD_ZERO_Y + pos.y, 0.5f),
+			Vector3(pos.x + size.x, HUD_ZERO_Y + pos.y, 0.5f),
+			Vector3(pos.x + (size.x * 0.5f), HUD_ZERO_Y + (pos.y + (size.y * 0.5f)), 0.5f),
+			Vector3(pos.x, HUD_ZERO_Y + pos.y + size.y, 0.5f),
+			Vector3(pos.x + size.x, HUD_ZERO_Y + (pos.y + size.y), 0.5f),
 		};
 
-		array<Vector2, 5> barUVs = {
-			Vector2(0, 0),
-			Vector2(1, 0),
-			Vector2(0.5, 0.5),
-			Vector2(0, 1),
-			Vector2(1, 1),
-		};
-		array<Vector2, 16> barBorderUVs = {
-			//top left
-			Vector2(0, 0),
-			Vector2(0.25, 0),
-			Vector2(0.25, 0.25),
-			Vector2(0, 0.25),
-			//top right
-			Vector2(0.75, 0),
-			Vector2(1, 0),
-			Vector2(1, 0.25),
-			Vector2(0.75, 0.25),
-			//bottom right
-			Vector2(0.75, 0.75),
-			Vector2(1, 0.75),
-			Vector2(1, 1),
-			Vector2(0.75, 1),
-			//bottom left
-			Vector2(0, 0.75),
-			Vector2(0.25, 0.75),
-			Vector2(0.25, 1),
-			Vector2(0, 1),
+		auto hudBorderSize = Vector2(
+			borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y),
+			borderSize);
+
+		auto barBorderVertices = std::array<Vector3, 16>
+		{
+			// Top left
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y - hudBorderSize.y, 0.0f),
+			Vector3(pos.x, HUD_ZERO_Y + (pos.y - hudBorderSize.y), 0.0f),
+			Vector3(pos.x, HUD_ZERO_Y + pos.y, 0.0f),
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y, 0.0f),
+
+			// Top right
+			Vector3(pos.x + size.x, HUD_ZERO_Y + (pos.y - hudBorderSize.y), 0.0f),
+			Vector3(pos.x + size.x + hudBorderSize.x, HUD_ZERO_Y + (pos.y - hudBorderSize.y), 0.0f),
+			Vector3(pos.x + size.x + hudBorderSize.x, HUD_ZERO_Y + pos.y, 0.0f),
+			Vector3(pos.x + size.x, HUD_ZERO_Y + pos.y, 0.0f),
+
+			// Bottom right
+			Vector3(pos.x + size.x, HUD_ZERO_Y + (pos.y + size.y), 0.0f),
+			Vector3(pos.x + size.x + hudBorderSize.x, HUD_ZERO_Y + (pos.y + size.y), 0.0f),
+			Vector3(pos.x + size.x + hudBorderSize.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f),
+			Vector3(pos.x + size.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f),
+
+			// Bottom left
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y + size.y, 0.0f),
+			Vector3(pos.x, HUD_ZERO_Y + (pos.y + size.y), 0.0f),
+			Vector3(pos.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f),
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f)
 		};
 
-		array<int, 12> barIndices = {
+		auto barUVs = std::array<Vector2, 5>
+		{
+			Vector2::Zero,
+			Vector2(1.0f, 0.0f),
+			Vector2::One * 0.5f,
+			Vector2(0.0f, 1.0f),
+			Vector2::One,
+		};
+		auto barBorderUVs = std::array<Vector2, 16>
+		{
+			// Top left
+			Vector2::Zero,
+			Vector2(0.25f, 0.0f),
+			Vector2::One * 0.25f,
+			Vector2(0.0f, 0.25f),
+
+			// Top right
+			Vector2(0.75f, 0.0f),
+			Vector2(1.0f, 0.0f),
+			Vector2(1.0f, 0.25f),
+			Vector2(0.75f, 0.25f),
+
+			//b Bottom right
+			Vector2::One * 0.75f,
+			Vector2(1.0f, 0.75f),
+			Vector2::One,
+			Vector2(0.75f, 1.0f),
+
+			// Bottom left
+			Vector2(0.0f, 0.75f),
+			Vector2(0.25f, 0.75f),
+			Vector2(0.25f, 1.0f),
+			Vector2(0.0f, 1.0f)
+		};
+
+		auto barIndices = std::array<int, 12>
+		{
 			2, 1, 0,
 			2, 0, 3,
 			2, 3, 4,
 			2, 4, 1
 		};
-		array<int, 56> barBorderIndices = {
-			//top left
+		auto barBorderIndices = std::array<int, 56>
+		{
+			// Top left
 			0, 1, 3, 1, 2, 3,
-			//top center
+			// Top center
 			1, 4, 2, 4, 7, 2,
-			//top right
+			// Top right
 			4, 5, 7, 5, 6, 7,
-			//right
+			// Right
 			7, 6, 8, 6, 9, 8,
-			//bottom right
+			// Bottom right
 			8, 9, 11, 9, 10, 11,
-			//bottom
+			// Bottom
 			13, 8, 14, 8, 11, 14,
-			//bottom left
+			// Bottom left
 			12, 13, 15, 13, 14, 15,
-			//left
+			// Left
 			3, 2, 12, 2, 13, 12,
-			//center
+			// Center
 			2, 7, 13, 7, 8, 13
 		};
-		array<RendererVertex, 5> vertices;
+		auto vertices = std::array<RendererVertex, 5>{};
 		for (int i = 0; i < 5; i++)
 		{
 			vertices[i].Position = barVertices[i];
 			vertices[i].Color = colors[i];
 			vertices[i].UV = barUVs[i];
-			vertices[i].Normal = Vector3(0, 0, 0);
+			vertices[i].Normal = Vector3::Zero;
 			vertices[i].Bone = 0.0f;
 		}
 
-		InnerVertexBuffer = VertexBuffer(m_device, vertices.size(), vertices.data());
-		InnerIndexBuffer = IndexBuffer(m_device, barIndices.size(), barIndices.data());
+		this->InnerVertexBuffer = VertexBuffer(devicePtr, vertices.size(), vertices.data());
+		this->InnerIndexBuffer = IndexBuffer(devicePtr, barIndices.size(), barIndices.data());
 
-		array<RendererVertex, barBorderVertices.size()> verticesBorder;
+		auto verticesBorderVertices = std::array<RendererVertex, barBorderVertices.size()>{};
 		for (int i = 0; i < barBorderVertices.size(); i++)
 		{
-			verticesBorder[i].Position = barBorderVertices[i];
-			verticesBorder[i].Color = Vector4(1, 1, 1, 1);
-			verticesBorder[i].UV = barBorderUVs[i];
-			verticesBorder[i].Normal = Vector3(0, 0, 0);
-			verticesBorder[i].Bone = 0.0f;
+			verticesBorderVertices[i].Position = barBorderVertices[i];
+			verticesBorderVertices[i].Color = Vector4::One;
+			verticesBorderVertices[i].UV = barBorderUVs[i];
+			verticesBorderVertices[i].Normal = Vector3::Zero;
+			verticesBorderVertices[i].Bone = 0.0f;
 		}
-		VertexBufferBorder = VertexBuffer(m_device, verticesBorder.size(), verticesBorder.data());
-		IndexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
+
+		this->VertexBufferBorder = VertexBuffer(devicePtr, verticesBorderVertices.size(), verticesBorderVertices.data());
+		this->IndexBufferBorder = IndexBuffer(devicePtr, barBorderIndices.size(), barBorderIndices.data());
 	}
 
 	float Renderer11::CalculateFrameRate()
