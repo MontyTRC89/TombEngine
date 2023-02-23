@@ -26,14 +26,14 @@ namespace TEN::Math::Random
 
 	Vector2 GenerateDirection2D()
 	{
-		float angle = GenerateFloat(0.0f, 2.0f * PI); // Generate angle in full circle.
+		float angle = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
 		return Vector2(cos(angle), sin(angle));
 	}
 
 	Vector3 GenerateDirection()
 	{
-		float theta = GenerateFloat(0.0f, 2.0f * PI); // Generate angle in full circle.
-		float phi = GenerateFloat(0.0f, PI);		  // Generate angle in sphere's upper half.
+		float theta = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
+		float phi = GenerateFloat(0.0f, PI);		 // Generate angle in sphere's upper half.
 
 		auto direction = Vector3(
 			sin(phi) * cos(theta),
