@@ -56,49 +56,49 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnWaspParticle(short itemNumber)
 	{
-		auto* particle = GetFreeParticle();
+		auto& particle = *GetFreeParticle();
 
-		particle->on = true;
-		particle->sG = Random::GenerateInt(32, 96);
-		particle->sB = particle->sG >> 1;
-		particle->sR = particle->sG >> 2;
+		particle.on = true;
+		particle.sG = Random::GenerateInt(32, 96);
+		particle.sB = particle.sG >> 1;
+		particle.sR = particle.sG >> 2;
+		particle.dG = Random::GenerateInt(224, 256);
+		particle.dB = particle.dG >> 1;
+		particle.dR = particle.dG >> 2;
+		
+		particle.colFadeSpeed = 4;
+		particle.fadeToBlack = 2;
+		particle.sLife =
+		particle.life = 8;
 
-		particle->dG = Random::GenerateInt(224, 256);
-		particle->dB = particle->dG >> 1;
-		particle->dR = particle->dG >> 2;
+		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		particle->colFadeSpeed = 4;
-		particle->fadeToBlack = 2;
-		particle->sLife = particle->life = 8;
+		particle.extras = 0;
+		particle.dynamic = -1;
 
-		particle->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.x = Random::GenerateInt(-8, 8);
+		particle.y = Random::GenerateInt(-8, 8);
+		particle.z = Random::GenerateInt(-64, 64);
 
-		particle->extras = 0;
-		particle->dynamic = -1;
+		particle.xVel = Random::GenerateInt(-32, 32);
+		particle.yVel = Random::GenerateInt(-32, 32);
+		particle.zVel = Random::GenerateInt(-32, 32);
+		particle.friction = 2 | (2 << 4);
 
-		particle->x = Random::GenerateInt(-8, 8);
-		particle->y = Random::GenerateInt(-8, 8);
-		particle->z = Random::GenerateInt(-64, 64);
+		particle.flags = SP_SCALE | SP_ITEM | SP_NODEATTACH | SP_DEF;
+		particle.gravity = particle.maxYvel = 0;
 
-		particle->xVel = Random::GenerateInt(-32, 32);
-		particle->yVel = Random::GenerateInt(-32, 32);
-		particle->zVel = Random::GenerateInt(-32, 32);
-		particle->friction = 2 | (2 << 4);
+		particle.fxObj = itemNumber;
+		particle.nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
 
-		particle->flags = SP_SCALE | SP_ITEM | SP_NODEATTACH | SP_DEF;
-		particle->gravity = particle->maxYvel = 0;
-
-		particle->fxObj = itemNumber;
-		particle->nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
-
-		particle->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		particle->scalar = 3;
+		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		particle.scalar = 3;
 
 		int size = Random::GenerateInt(4, 8);
 
-		particle->size =
-		particle->sSize = size;
-		particle->dSize = size >> 1;
+		particle.size =
+		particle.sSize = size;
+		particle.dSize = size >> 1;
 	}
 
 	static void DoWaspEffects(short itemNumber, ItemInfo& item)
@@ -122,12 +122,11 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& item = g_Level.Items[itemNumber];
 		InitialiseCreature(itemNumber);
-		SetAnimation(&item, WASP_STATE_IDLE); // Start as flying idle.
+		SetAnimation(&item, WASP_STATE_IDLE);
 	}
 
-	// NOTE: AI_MODIFY not allow the wasp to land,
-	// and if he start at the land state (which is by default the case),
-	// he will be forced to fly !
+	// NOTE: AI_MODIFY doesn't allow the wasp to land.
+	// If it spawns in the land state (set by default), it will be forced to fly.
 	void WaspMutantControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -145,10 +144,10 @@ namespace TEN::Entities::Creatures::TR3
 			case WASP_STATE_FALL:
 				if (item.Pose.Position.y >= item.Floor)
 				{
-					item.Pose.Position.y = item.Floor;
+					item.Animation.TargetState = WASP_STATE_DEATH;
 					item.Animation.IsAirborne = false;
 					item.Animation.Velocity.y = 0.0f;
-					item.Animation.TargetState = WASP_STATE_DEATH;
+					item.Pose.Position.y = item.Floor;
 				}
 
 				break;
