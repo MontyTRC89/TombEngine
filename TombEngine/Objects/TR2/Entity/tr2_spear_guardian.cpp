@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void MeshSwapNormalToJade(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
 		if (useEffect)
-			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN_STATUE].meshIndex + jointIndex;
 	}
@@ -136,7 +136,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void MeshSwapJadeToNormal(ItemInfo& item, int jointIndex, bool useEffect = true)
 	{
 		if (useEffect)
-			SpawnSpearGuardianParticle(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
 
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN].meshIndex + jointIndex;
 	}
@@ -515,7 +515,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (isPlayerAlive && creature->Enemy->HitPoints <= 0)
 		{
 			creature->MaxTurn = 0;
-			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LARA_EXTRA_ANIM_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LEA_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
 			return;
 		}
 
