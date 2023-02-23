@@ -1,241 +1,286 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_wasp.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-    constexpr auto WASP_TURN_RATE_FLOOR_MAX = ANGLE(1.0f);
-    constexpr auto WASP_TURN_RATE_FLY_MAX = ANGLE(3.0f);
+	constexpr auto WASP_DAMAGE = 50;
 
-    constexpr auto WASP_START_TO_FLY_RANGE = SQUARE(BLOCK(3));
-    constexpr auto WASP_ATTACK_RANGE = SQUARE(CLICK(2.0f));
-    constexpr auto WASP_IDLE_TO_FLY_SPEED = BLOCK(1) / 20;
-    constexpr auto WASP_MOVE_CHANCE = 384;
-    constexpr auto WASP_LAND_CHANCE = 128;
-    constexpr auto WASP_DAMAGE = 50;
+	constexpr auto WASP_TAKE_OFF_RANGE = SQUARE(BLOCK(3));
+	constexpr auto WASP_ATTACK_RANGE   = SQUARE(BLOCK(0.5f));
 
-    const auto WaspVenomSackLightColor = Vector4(0, 0.35f, 0, 1.0f);
-    const auto WaspVenomSackBite = BiteInfo(Vector3::Zero, 10);
-    const auto WaspBite = BiteInfo(Vector3::Zero, 12);
+	constexpr auto WASP_LAND_CHANCE = 1 / 256.0f;
 
-    // NOTE: Same value for Animation.
-    enum WaspState
-    {
-        WASP_STATE_FLY_IDLE,
-        WASP_STATE_FLY_IDLE_TO_IDLE, // Floor
-        WASP_STATE_IDLE,  // Floor
-        WASP_STATE_IDLE_TO_FLY_IDLE,
-        WASP_STATE_ATTACK, // Flying
-        WASP_STATE_FALL,
-        WASP_STATE_DEATH,
-        WASP_STATE_FLY_FORWARD
-    };
+	constexpr auto WASP_LAND_TURN_RATE_MAX = ANGLE(1.0f);
+	constexpr auto WASP_AIR_TURN_RATE_MAX  = ANGLE(3.0f);
 
-    enum WaspAnims
-    {
-        WASP_ANIM_FLY_IDLE,
-        WASP_ANIM_FLY_IDLE_TO_IDLE,
-        WASP_ANIM_IDLE,
-        WASP_ANIM_IDLE_TO_FLY_IDLE,
-        WASP_ANIM_ATTACK,
-        WASP_ANIM_FALL,
-        WASP_ANIM_DEATH,
-        WASP_ANIM_FLY_FORWARD
-    };
+	constexpr auto WASP_IDLE_TO_FLY_VELOCITY = BLOCK(1 / 20.0f);
 
-    static void TriggerWaspParticles(short itemNumber)
-    {
-        auto* sptr = GetFreeParticle();
+	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-        sptr->on = 1;
-        sptr->sG = (GetRandomControl() & 63) + 32;
-        sptr->sB = sptr->sG >> 1;
-        sptr->sR = sptr->sG >> 2;
+	const auto WaspBite          = BiteInfo(Vector3::Zero, 12);
+	const auto WaspVenomSackBite = BiteInfo(Vector3::Zero, 10);
 
-        sptr->dG = (GetRandomControl() & 31) + 224;
-        sptr->dB = sptr->dG >> 1;
-        sptr->dR = sptr->dG >> 2;
+	enum WaspState
+	{
+		WASP_STATE_FLY_IDLE,
+		WASP_STATE_FLY_IDLE_TO_IDLE, // Floor
+		WASP_STATE_IDLE,			 // Floor
+		WASP_STATE_IDLE_TO_FLY_IDLE,
+		WASP_STATE_ATTACK,			 // Flying
+		WASP_STATE_FALL,
+		WASP_STATE_DEATH,
+		WASP_STATE_FLY_FORWARD
+	};
 
-        sptr->colFadeSpeed = 4;
-        sptr->fadeToBlack = 2;
-        sptr->sLife = sptr->life = 8;
+	enum WaspAnim
+	{
+		WASP_ANIM_FLY_IDLE,
+		WASP_ANIM_FLY_IDLE_TO_IDLE,
+		WASP_ANIM_IDLE,
+		WASP_ANIM_IDLE_TO_FLY_IDLE,
+		WASP_ANIM_ATTACK,
+		WASP_ANIM_FALL,
+		WASP_ANIM_DEATH,
+		WASP_ANIM_FLY_FORWARD
+	};
 
-        sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	static void SpawnWaspParticle(short itemNumber)
+	{
+		auto* particle = GetFreeParticle();
 
-        sptr->extras = 0;
-        sptr->dynamic = -1;
+		particle->on = true;
+		particle->sG = Random::GenerateInt(32, 96);
+		particle->sB = particle->sG >> 1;
+		particle->sR = particle->sG >> 2;
 
-        sptr->x = (GetRandomControl() & 15) - 8;
-        sptr->y = (GetRandomControl() & 15) - 8;
-        sptr->z = (GetRandomControl() & 127) - 64;
+		particle->dG = Random::GenerateInt(224, 256);
+		particle->dB = particle->dG >> 1;
+		particle->dR = particle->dG >> 2;
 
-        sptr->xVel = (GetRandomControl() & 31) - 16;
-        sptr->yVel = (GetRandomControl() & 31) - 16;
-        sptr->zVel = (GetRandomControl() & 31) - 16;
-        sptr->friction = 2 | (2 << 4);
+		particle->colFadeSpeed = 4;
+		particle->fadeToBlack = 2;
+		particle->sLife = particle->life = 8;
 
-        sptr->flags = SP_SCALE | SP_ITEM | SP_NODEATTACH | SP_DEF;
-        sptr->gravity = sptr->maxYvel = 0;
+		particle->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-        sptr->fxObj = itemNumber;
-        sptr->nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
+		particle->extras = 0;
+		particle->dynamic = -1;
 
-        sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-        sptr->scalar = 3;
-        auto size = (GetRandomControl() & 3) + 3;
-        sptr->size = sptr->sSize = size;
-        sptr->dSize = size >> 1;
-    }
+		particle->x = Random::GenerateInt(-8, 8);
+		particle->y = Random::GenerateInt(-8, 8);
+		particle->z = Random::GenerateInt(-64, 64);
 
-    static void WaspEffects(short itemNumber, ItemInfo& item)
-    {
-        // Spawn a light
-        auto lightpos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
-        TriggerDynamicLight(lightpos.x, lightpos.y, lightpos.z, 10, 
-            WaspVenomSackLightColor.x * 255,
-            WaspVenomSackLightColor.y * 255,
-            WaspVenomSackLightColor.z * 255);
+		particle->xVel = Random::GenerateInt(-32, 32);
+		particle->yVel = Random::GenerateInt(-32, 32);
+		particle->zVel = Random::GenerateInt(-32, 32);
+		particle->friction = 2 | (2 << 4);
 
-        // Then spawn the wasp effect (yes it's called 2 times).
-        for (int i = 0; i < 2; i++)
-            TriggerWaspParticles(itemNumber);
-    }
+		particle->flags = SP_SCALE | SP_ITEM | SP_NODEATTACH | SP_DEF;
+		particle->gravity = particle->maxYvel = 0;
 
-    void InitialiseWaspMutant(short itemNumber)
-    {
-        auto& item = g_Level.Items[itemNumber];
-        InitialiseCreature(itemNumber);
-        SetAnimation(&item, WASP_STATE_IDLE); // Start as flying idle.
-    }
+		particle->fxObj = itemNumber;
+		particle->nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
 
-    // NOTE: AI_MODIFY not allow the wasp to land,
-    // and if he start at the land state (which is by default the case),
-    // he will be forced to fly !
-    void WaspMutantControl(short itemNumber)
-    {
-        if (!CreatureActive(itemNumber))
-            return;
+		particle->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		particle->scalar = 3;
 
-        auto& item = g_Level.Items[itemNumber];
-        auto& creature = *GetCreatureInfo(&item);
-        short angle = 0;
+		int size = Random::GenerateInt(4, 8);
 
-        if (item.HitPoints <= 0)
-        {
-            switch (item.Animation.ActiveState)
-            {
-            case WASP_STATE_FALL:
-                if (item.Pose.Position.y >= item.Floor)
-                {
-                    item.Pose.Position.y = item.Floor;
-                    item.Animation.IsAirborne = false;
-                    item.Animation.Velocity.y = 0;
-                    item.Animation.TargetState = WASP_STATE_DEATH;
-                }
-                break;
-            case WASP_STATE_DEATH:
-                item.Pose.Position.y = item.Floor;
-                break;
-            default:
-                SetAnimation(&item, WASP_STATE_FALL);
-                item.Animation.IsAirborne = true;
-                item.Animation.Velocity = Vector3::Zero;
-                break;
-            }
-            item.Pose.Orientation.x = 0;
-        }
-        else
-        {
-            if (item.AIBits)
-                GetAITarget(&creature);
+		particle->size =
+		particle->sSize = size;
+		particle->dSize = size >> 1;
+	}
 
-            AI_INFO ai;
-            CreatureAIInfo(&item, &ai);
+	static void DoWaspEffects(short itemNumber, ItemInfo& item)
+	{
+		constexpr auto PARTICLE_EFFECT_COUNT = 2;
 
-            GetCreatureMood(&item, &ai, true);
-            CreatureMood(&item, &ai, true);
+		// Spawn light.
+		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
+		TriggerDynamicLight(
+			pos.x, pos.y, pos.z, 10, 
+			WaspVenomSackLightColor.x * 255,
+			WaspVenomSackLightColor.y * 255,
+			WaspVenomSackLightColor.z * 255);
 
-            angle = CreatureTurn(&item, creature.MaxTurn);
+		// Spawn wasp effect twice.
+		for (int i = 0; i < PARTICLE_EFFECT_COUNT; i++)
+			SpawnWaspParticle(itemNumber);
+	}
 
-            switch (item.Animation.ActiveState)
-            {
-            case WASP_STATE_IDLE:
-                creature.MaxTurn = WASP_TURN_RATE_FLOOR_MAX;
-                item.Pose.Position.y = item.Floor;
+	void InitialiseWaspMutant(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		InitialiseCreature(itemNumber);
+		SetAnimation(&item, WASP_STATE_IDLE); // Start as flying idle.
+	}
 
-                if (item.HitStatus ||
-                    ai.distance < WASP_START_TO_FLY_RANGE ||
-                    creature.HurtByLara ||
-                    item.AIBits == MODIFY)
-                    item.Animation.TargetState = WASP_STATE_IDLE_TO_FLY_IDLE;
-                break;
-            case WASP_STATE_FLY_IDLE_TO_IDLE:
-                creature.MaxTurn = WASP_TURN_RATE_FLOOR_MAX;
+	// NOTE: AI_MODIFY not allow the wasp to land,
+	// and if he start at the land state (which is by default the case),
+	// he will be forced to fly !
+	void WaspMutantControl(short itemNumber)
+	{
+		if (!CreatureActive(itemNumber))
+			return;
 
-                item.Pose.Position.y += WASP_IDLE_TO_FLY_SPEED;
-                if (item.Pose.Position.y >= item.Floor)
-                    item.Pose.Position.y = item.Floor;
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
-                break;
-            case WASP_STATE_FLY_IDLE:
-                creature.MaxTurn = WASP_TURN_RATE_FLY_MAX;
-                creature.Flags = 0;
+		short headingAngle = 0;
 
-                if (item.Animation.RequiredState)
-                    item.Animation.TargetState = item.Animation.RequiredState;
-                // NOTE: This cause the wasp to wait until the random value is valid or if lara has hit the wasp to move forward which is a bad conception !
-                else if (item.HitStatus || GetRandomControl() < WASP_MOVE_CHANCE || item.AIBits == MODIFY)
-                    item.Animation.TargetState = WASP_STATE_FLY_FORWARD;
-                else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) && !creature.HurtByLara && item.AIBits != MODIFY)
-                    item.Animation.TargetState = WASP_STATE_FLY_IDLE_TO_IDLE;
-                else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
-                    item.Animation.TargetState = WASP_STATE_ATTACK;
+		if (item.HitPoints <= 0)
+		{
+			switch (item.Animation.ActiveState)
+			{
+			case WASP_STATE_FALL:
+				if (item.Pose.Position.y >= item.Floor)
+				{
+					item.Pose.Position.y = item.Floor;
+					item.Animation.IsAirborne = false;
+					item.Animation.Velocity.y = 0.0f;
+					item.Animation.TargetState = WASP_STATE_DEATH;
+				}
 
-                break;
-            case WASP_STATE_FLY_FORWARD:
-                creature.MaxTurn = WASP_TURN_RATE_FLY_MAX;
-                creature.Flags = 0;
+				break;
 
-                if (item.Animation.RequiredState)
-                    item.Animation.TargetState = item.Animation.RequiredState;
-                else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) && !creature.HurtByLara && item.AIBits != MODIFY)
-                    item.Animation.TargetState = WASP_STATE_FLY_IDLE;
-                else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
-                    item.Animation.TargetState = WASP_STATE_ATTACK;
+			case WASP_STATE_DEATH:
+				item.Pose.Position.y = item.Floor;
+				break;
 
-                break;
-            case WASP_STATE_ATTACK:
-                creature.MaxTurn = WASP_TURN_RATE_FLY_MAX;
-                if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
-                    item.Animation.TargetState = WASP_STATE_ATTACK;
-                else if (ai.distance < WASP_ATTACK_RANGE)
-                    item.Animation.TargetState = WASP_STATE_FLY_IDLE;
-                else
-                {
-                    item.Animation.TargetState = WASP_STATE_FLY_IDLE;
-                    item.Animation.RequiredState = WASP_STATE_FLY_FORWARD;
-                }
+			default:
+				SetAnimation(&item, WASP_STATE_FALL);
+				item.Animation.IsAirborne = true;
+				item.Animation.Velocity = Vector3::Zero;
+				break;
+			}
 
-                if (!creature.Flags && item.TouchBits.Test(WaspBite.meshNum))
-                {
-                    DoDamage(creature.Enemy, WASP_DAMAGE);
-                    CreatureEffect(&item, WaspBite, DoBloodSplat);
-                    creature.Flags = 1;
-                }
+			item.Pose.Orientation.x = 0;
+		}
+		else
+		{
+			if (item.AIBits)
+				GetAITarget(&creature);
 
-                break;
-            }
+			AI_INFO ai;
+			CreatureAIInfo(&item, &ai);
 
-            // Avoid spawning dynamic light when dead.
-            WaspEffects(itemNumber, item);
-        }
+			GetCreatureMood(&item, &ai, true);
+			CreatureMood(&item, &ai, true);
 
-        CreatureAnimation(itemNumber, angle, 0);
-    }
+			headingAngle = CreatureTurn(&item, creature.MaxTurn);
+
+			switch (item.Animation.ActiveState)
+			{
+			case WASP_STATE_IDLE:
+				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
+				item.Pose.Position.y = item.Floor;
+
+				if (item.HitStatus ||
+					ai.distance < WASP_TAKE_OFF_RANGE ||
+					creature.HurtByLara ||
+					item.AIBits == MODIFY)
+				{
+					item.Animation.TargetState = WASP_STATE_IDLE_TO_FLY_IDLE;
+				}
+
+				break;
+
+			case WASP_STATE_FLY_IDLE_TO_IDLE:
+				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
+
+				item.Pose.Position.y += WASP_IDLE_TO_FLY_VELOCITY;
+				if (item.Pose.Position.y >= item.Floor)
+					item.Pose.Position.y = item.Floor;
+
+				break;
+
+			case WASP_STATE_FLY_IDLE:
+				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
+				creature.Flags = 0;
+
+				if (item.Animation.RequiredState)
+				{
+					item.Animation.TargetState = item.Animation.RequiredState;
+				}
+				// NOTE: This causes the wasp to wait until probability is valid or
+				// the player has hit the wasp to move forward, which is conceptually bad.
+				else if (item.HitStatus || Random::TestProbability(WASP_LAND_CHANCE) || item.AIBits == MODIFY)
+				{
+					item.Animation.TargetState = WASP_STATE_FLY_FORWARD;
+				}
+				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
+					!creature.HurtByLara && item.AIBits != MODIFY)
+				{
+					item.Animation.TargetState = WASP_STATE_FLY_IDLE_TO_IDLE;
+				}
+				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
+				{
+					item.Animation.TargetState = WASP_STATE_ATTACK;
+				}
+
+				break;
+
+			case WASP_STATE_FLY_FORWARD:
+				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
+				creature.Flags = 0;
+
+				if (item.Animation.RequiredState)
+				{
+					item.Animation.TargetState = item.Animation.RequiredState;
+				}
+				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
+					!creature.HurtByLara && item.AIBits != MODIFY)
+				{
+					item.Animation.TargetState = WASP_STATE_FLY_IDLE;
+				}
+				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
+				{
+					item.Animation.TargetState = WASP_STATE_ATTACK;
+				}
+
+				break;
+
+			case WASP_STATE_ATTACK:
+				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
+
+				if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
+				{
+					item.Animation.TargetState = WASP_STATE_ATTACK;
+				}
+				else if (ai.distance < WASP_ATTACK_RANGE)
+				{
+					item.Animation.TargetState = WASP_STATE_FLY_IDLE;
+				}
+				else
+				{
+					item.Animation.TargetState = WASP_STATE_FLY_IDLE;
+					item.Animation.RequiredState = WASP_STATE_FLY_FORWARD;
+				}
+
+				if (!creature.Flags && item.TouchBits.Test(WaspBite.meshNum))
+				{
+					DoDamage(creature.Enemy, WASP_DAMAGE);
+					CreatureEffect(&item, WaspBite, DoBloodSplat);
+					creature.Flags = 1;
+				}
+
+				break;
+			}
+
+			// Avoid spawning dynamic light when dead.
+			DoWaspEffects(itemNumber, item);
+		}
+
+		CreatureAnimation(itemNumber, headingAngle, 0);
+	}
 }
