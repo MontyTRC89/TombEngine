@@ -156,15 +156,6 @@ namespace TEN::Effects::Bubble
 			// Out of water.
 			if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			{
-				auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z, bubble.RoomNumber);
-
-				// Hit floor or ceiling; set to despawn.
-				if ((bubble.Position.y - bubble.Gravity) >= pointColl.Position.Floor ||
-					(bubble.Position.y - bubble.Gravity) <= pointColl.Position.Ceiling)
-				{
-					continue;
-				}
-
 				// Hit water surface; spawn ripple.
 				SpawnRipple(
 					Vector3(bubble.Position.x, g_Level.Rooms[prevRoomNumber].maxceiling, bubble.Position.z),
