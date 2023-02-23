@@ -11,6 +11,7 @@ namespace TEN::Math::Random
 	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg);
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
+	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere);
 
 	bool TestProbability(float probability);
 }

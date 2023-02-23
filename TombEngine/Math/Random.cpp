@@ -26,16 +26,21 @@ namespace TEN::Math::Random
 
 	Vector2 GenerateDirection2D()
 	{
-		auto vector = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
-		vector.Normalize();
-		return vector;
+		float angle = GenerateFloat(0.0f, 2.0f * PI); // Generate angle in full circle.
+		return Vector2(cos(angle), sin(angle));
 	}
 
 	Vector3 GenerateDirection()
 	{
-		auto vector = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
-		vector.Normalize();
-		return vector;
+		float theta = GenerateFloat(0.0f, 2.0f * PI); // Generate angle in full circle.
+		float phi = GenerateFloat(0.0f, PI);		  // Generate angle in sphere's upper half.
+
+		auto direction = Vector3(
+			sin(phi) * cos(theta),
+			sin(phi) * sin(theta),
+			cos(phi));
+		direction.Normalize();
+		return direction;
 	}
 
 	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg)
@@ -64,6 +69,21 @@ namespace TEN::Math::Random
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
 		return (sphere.Center + (GenerateDirection() * GenerateFloat(0.0f, sphere.Radius)));
+	}
+
+	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere)
+	{
+		float u = GenerateFloat(0.0f, 1.0f);
+		float v = GenerateFloat(0.0f, 1.0f);
+
+		float theta = u * PI_MUL_2;
+		float phi = acos((v * 2) - 1.0f);
+
+		auto offset = Vector3(
+			sphere.Radius * (sin(phi) * cos(theta)),
+			sphere.Radius * (sin(phi) * sin(theta)),
+			sphere.Radius * cos(phi));
+		return (sphere.Center + offset);
 	}
 
 	bool TestProbability(float probability)
