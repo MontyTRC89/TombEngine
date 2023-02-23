@@ -7,7 +7,7 @@ enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
 struct ItemInfo;
 
-constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_EXPLOSION	  = 1;
 constexpr auto SD_UWEXPLOSION = 2;
 
 constexpr auto MAX_NODE		= 23;
@@ -208,9 +208,6 @@ enum ParticleNodeOffsetIDs
 	NodeEmpty, // Empty node (mesh 0 and position 0)
 	NodeMax
 };
-
-constexpr auto SD_EXPLOSION = 1;
-constexpr auto SD_UWEXPLOSION = 2;
 
 #define MAX_DYNAMICS 64
 #define MAX_RIPPLES 256
