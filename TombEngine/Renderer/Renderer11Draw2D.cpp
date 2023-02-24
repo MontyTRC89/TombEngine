@@ -24,8 +24,6 @@ namespace TEN::Renderer
 		constexpr auto HEALTH_BAR_POS	= Vector2(20.0f, 32.0f);
 		constexpr auto SPRINT_BAR_POS	= Vector2(630.0f, 48.0f);
 		constexpr auto LOADING_BAR_POS	= Vector2(325.0f, 550.0f);
-		constexpr auto DEFAULT_BAR_SIZE = Vector2(150.0f, 10.0f);
-		constexpr auto LOADING_BAR_SIZE = Vector2(DEFAULT_BAR_SIZE.x * 1.5f, DEFAULT_BAR_SIZE.y); // TODO: Needs offset.
 
 		static const auto AIR_BAR_COLORS = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -83,10 +81,10 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
 		};
 
-		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, DEFAULT_BAR_SIZE, 1, AIR_BAR_COLORS);
-		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, DEFAULT_BAR_SIZE, 1, HEALTH_BAR_COLORS);
-		g_SprintBar = new RendererHudBar(m_device.Get(), SPRINT_BAR_POS, DEFAULT_BAR_SIZE, 1, SPRINT_BAR_COLORS);
-		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, DEFAULT_BAR_SIZE, 1, LOADING_BAR_COLORS);
+		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, AIR_BAR_COLORS);
+		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, HEALTH_BAR_COLORS);
+		g_SprintBar = new RendererHudBar(m_device.Get(), SPRINT_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, SPRINT_BAR_COLORS);
+		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, LOADING_BAR_COLORS);
 	}
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)

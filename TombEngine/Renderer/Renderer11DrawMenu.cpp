@@ -71,11 +71,11 @@ namespace TEN::Renderer
 
 	// These bars are only used in menus.
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
-	TEN::Renderer::RendererHudBar* g_SFXVolumeBar = nullptr;
+	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
 	void Renderer11::InitialiseMenuBars(int y)
 	{
-		static const auto soundSettingColors = std::array<Vector4, 5>
+		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
 			// Top
 			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
@@ -91,9 +91,9 @@ namespace TEN::Renderer
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), Vector2(150.0f, 8.0f), 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), Vector2(150.0f, 8.0f), 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 	}
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
@@ -508,7 +508,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawPickup(const DisplayPickup& pickup)
+	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
 		static const auto COUNT_STRING_PREFIX = std::string("  ");
 

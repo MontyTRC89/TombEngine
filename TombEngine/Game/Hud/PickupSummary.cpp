@@ -77,9 +77,9 @@ namespace TEN::Hud
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
-		constexpr auto SCREEN_POSITION_DEFAULT = Vector2(0.0f, 0.0f);
-		constexpr auto LIFE_MAX				   = 2.5f;
-		constexpr auto STRING_SCALAR_MAX	   = 0.6f;
+		constexpr auto SCREEN_POS_DEFAULT = Vector2(0.0f, 0.0f);
+		constexpr auto LIFE_MAX			  = 2.5f;
+		constexpr auto STRING_SCALAR_MAX  = 0.6f;
 
 		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
 		PickedUpObject(objectID);
@@ -103,14 +103,14 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = this->GetNewDisplayPickup();
 
-		auto screenPos = g_Renderer.GetScreenSpacePosition(pos);
-		if (screenPos == INVALID_SCREEN_SPACE_POSITION)
-			screenPos = SCREEN_POSITION_DEFAULT;
+		auto origin = g_Renderer.GetScreenSpacePosition(pos);
+		if (origin == INVALID_SCREEN_SPACE_POSITION)
+			origin = SCREEN_POS_DEFAULT;
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position =
-		pickup.Origin = screenPos;
+		pickup.Origin = origin;
 		pickup.Target = Vector2::Zero;
 		pickup.Life = round(LIFE_MAX * FPS);
 		pickup.Scale = 0.0f;
@@ -154,7 +154,7 @@ namespace TEN::Hud
 			if (pickup.IsOffscreen())
 				continue;
 
-			g_Renderer.DrawPickup(pickup);
+			g_Renderer.DrawDisplayPickup(pickup);
 		}
 	}
 

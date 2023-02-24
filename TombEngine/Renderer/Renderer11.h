@@ -63,7 +63,8 @@ namespace TEN::Renderer
 
 	struct RendererHudBar
 	{
-		static const auto COLOR_COUNT = 5;
+		static constexpr auto COLOR_COUNT  = 5;
+		static constexpr auto SIZE_DEFAULT = Vector2(150.0f, 10.0f);
 
 		VertexBuffer VertexBufferBorder = VertexBuffer();
 		IndexBuffer	 IndexBufferBorder	= IndexBuffer();
@@ -659,7 +660,7 @@ namespace TEN::Renderer
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
-		void DrawPickup(const DisplayPickup& pickup);
+		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
