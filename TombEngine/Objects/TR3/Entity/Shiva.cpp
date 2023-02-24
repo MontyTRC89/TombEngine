@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_shiva.h"
+#include "Objects/TR3/Entity/Shiva.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -30,6 +30,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
 	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
 
+	constexpr auto SHIVA_SWAPMESH_TIME	   = 3;
 	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
@@ -78,28 +79,24 @@ namespace TEN::Entities::Creatures::TR3
 		SHIVA_ANIM_DEATH = 22
 	};
 
-	// TODO: Figure these out.
-	enum ShivaFlags
+	static void ShivaDamage(ItemInfo& item, int damage)
 	{
+		auto& creature = *GetCreatureInfo(&item);
 
-	};
-
-	static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
-	{
-		if (!creature->Flags && item->TouchBits.Test(ShivaAttackRightJoints))
+		if (!creature.Flags && item.TouchBits.Test(ShivaAttackRightJoints))
 		{
-			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
-			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
-			creature->Flags = 1;
+			DoDamage(creature.Enemy, damage);
+			CreatureEffect(&item, ShivaBiteRight, DoBloodSplat);
+			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
+			creature.Flags = 1;
 		}
 
-		if (!creature->Flags && item->TouchBits.Test(ShivaAttackLeftJoints))
+		if (!creature.Flags && item.TouchBits.Test(ShivaAttackLeftJoints))
 		{
-			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
-			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
-			creature->Flags = 1;
+			DoDamage(creature.Enemy, damage);
+			CreatureEffect(&item, ShivaBiteLeft, DoBloodSplat);
+			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
+			creature.Flags = 1;
 		}
 	}
 
@@ -186,13 +183,19 @@ namespace TEN::Entities::Creatures::TR3
 		smoke.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 
-	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex)
+	static void SwapShivaMeshToStone(ItemInfo& item, int jointIndex, bool spawnSmoke = true)
 	{
+		if (spawnSmoke)
+			SpawnShivaSmoke(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA_STATUE].meshIndex + jointIndex;
 	}
 
-	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex)
+	static void SwapShivaMeshToNormal(ItemInfo& item, int jointIndex, bool spawnSmoke = true)
 	{
+		if (spawnSmoke)
+			SpawnShivaSmoke(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
 	}
 
@@ -201,52 +204,46 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (creature.Flags == 0 && (item.TestFlagField(2, 1) || item.TestFlagField(2, 2)))
+		// Do mesh swaps.
+		if (creature.Flags == 0)
 		{
-			creature.Flags = 1;
-
-			if (isDead && item.ItemFlags[0] < 0)
+			switch (item.ItemFlags[3])
 			{
-				item.SetFlagField(2, 0);
-			}
-			else if (!isDead && item.ItemFlags[0] >= object.nmeshes)
-			{
-				item.SetFlagField(2, 0);
-			}
-			else
-			{
-				auto pos = GetJointPosition(&item, item.ItemFlags[0]).ToVector3();
-				SpawnShivaSmoke(pos, item.RoomNumber);
-
-				if (isDead)
+			// Stone to normal.
+			case 0:
+				SwapShivaMeshToNormal(item, item.ItemFlags[0]);
+				item.ItemFlags[0]++;
+				if (item.ItemFlags[0] >= object.nmeshes)
 				{
-					SwapShivaMeshToStone(item, item.ItemFlags[0]);
-					item.ItemFlags[0]--;
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 0;
+					item.ItemFlags[3] = 0;
+					return true;
 				}
-				else
+
+				break;
+
+			// Normal to stone.
+			case 1:
+				SwapShivaMeshToStone(item, item.ItemFlags[0]);
+				item.ItemFlags[0]--;
+
+				if (item.ItemFlags[0] < 0)
 				{
-					SwapShivaMeshToNormal(item, item.ItemFlags[0]);
-					item.ItemFlags[0]++;
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 1;
+					item.ItemFlags[3] = 1;
+					return true;
 				}
+
+				break;
 			}
+
+			creature.Flags = SHIVA_SWAPMESH_TIME;
 		}
 		else
 		{
 			creature.Flags--;
-		}
-
-		if (item.TestFlagField(2, 0) && !isDead)
-		{
-			item.Animation.TargetState = SHIVA_STATE_IDLE;
-			creature.Flags = -45;
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 1); // Is alive (for savegame).
-		}
-		else if (item.TestFlagField(2, 0) && isDead)
-		{
-			item.SetFlagField(1, 0);
-			item.SetFlagField(1, 2); // Is dead.
-			return true;
 		}
 
 		return false;
@@ -255,23 +252,18 @@ namespace TEN::Entities::Creatures::TR3
 	void InitialiseShiva(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
+		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
 
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SHIVA_ANIM_INACTIVE);
-		item.Status &= ~ITEM_INVISIBLE;
+		item.ItemFlags[0] = 0; // Joint index when swapping mesh.
+		item.ItemFlags[1] = 1; // Immune state. true = immune to damage.
+		item.ItemFlags[2] = 1; // If 1, swap to stone. If 2, swap to normal.
+		item.ItemFlags[3] = 0; // If mesh is swapped to stone, then it's true. Otherwise false.
 
-		// Joint index used for swapping mesh.
-		item.SetFlagField(0, 0);
-
-		if (item.TestFlagField(1, 0))
-		{
-			for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
-				SwapShivaMeshToStone(item, jointIndex);
-
-			// Continue transition until finished.
-			item.SetFlagField(2, 1);
-		}
+		const auto& object = Objects[item.ObjectNumber];
+		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
+			SwapShivaMeshToStone(item, jointIndex, false);
 	}
 
 	void ShivaControl(short itemNumber)
@@ -281,7 +273,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto* item = &g_Level.Items[itemNumber];
 		const auto& object = Objects[item->ObjectNumber];
-		auto* creature = GetCreatureInfo(item);
+		auto& creature = *GetCreatureInfo(item);
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
@@ -293,16 +285,15 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != SHIVA_STATE_DEATH)
 			{
 				SetAnimation(item, SHIVA_ANIM_DEATH);
-				item->SetFlagField(0, object.nmeshes - 1);
-
-				// Redo mesh swap to stone.
-				item->SetFlagField(2, 2);
+				item->ItemFlags[0] = object.nmeshes - 1;
+				item->ItemFlags[2] = 1; // Redo mesh swap to stone.
+				item->ItemFlags[3] = 1;
 			}
 
 			int frameEnd = g_Level.Anims[object.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
 			if (item->Animation.FrameNumber >= frameEnd)
 			{
-				// Block frame until mesh is switched.
+				// Block frame until mesh is swapped.
 				item->Animation.FrameNumber = frameEnd;
 
 				if (DoShivaSwapMesh(*item, true))
@@ -317,56 +308,45 @@ namespace TEN::Entities::Creatures::TR3
 			GetCreatureMood(item, &ai, true);
 			CreatureMood(item, &ai, true);
 
-			// Shiva don't resent fear.
-			if (creature->Mood == MoodType::Escape)
+			// Shiva isn't fearful.
+			if (creature.Mood == MoodType::Escape)
 			{
-				creature->Target.x = creature->Enemy->Pose.Position.x;
-				creature->Target.z = creature->Enemy->Pose.Position.z;
+				creature.Target.x = creature.Enemy->Pose.Position.x;
+				creature.Target.z = creature.Enemy->Pose.Position.z;
 			}
 
-			bool isLaraAlive = (creature->Enemy->HitPoints > 0);
-			headingAngle = CreatureTurn(item, creature->MaxTurn);
+			bool isLaraAlive = (creature.Enemy->HitPoints > 0);
+			headingAngle = CreatureTurn(item, creature.MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case SHIVA_STATE_INACTIVE:
-				creature->MaxTurn = 0;
-				DoShivaSwapMesh(*item, false);
+				creature.MaxTurn = 0;
+
+				if (DoShivaSwapMesh(*item, false))
+					item->Animation.TargetState = SHIVA_STATE_IDLE;
+
 				break;
 
 			case SHIVA_STATE_IDLE:
-				creature->MaxTurn = 0;
-
-				if (creature->Flags < 0)
-				{
-					creature->Flags++;
-
-					auto extents = Vector3(BLOCK(0.75f));
-					auto box = BoundingOrientedBox(item->Pose.Position.ToVector3(), extents, item->Pose.Orientation.ToQuaternion());
-					auto pos = Random::GeneratePointInBox(box);
-					pos.y -= CLICK(1);
-					SpawnShivaSmoke(pos, item->RoomNumber);
-
-					return;
-				}
-
-				creature->Flags = 0;
+				creature.MaxTurn = 0;
+				creature.Flags = 0;
 
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
-				if (creature->Mood == MoodType::Escape)
+				if (creature.Mood == MoodType::Escape)
 				{
 					int x = item->Pose.Position.x + BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 					auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature->Flags)
+					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored)
+				else if (creature.Mood == MoodType::Bored)
 				{
 					if (Random::TestProbability(1 / 32.0f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
@@ -374,17 +354,17 @@ namespace TEN::Entities::Creatures::TR3
 				else if (ai.bite && ai.distance < SHIVA_GRAB_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_GRAB_ATTACK;
-					creature->Flags = 0;
+					creature.Flags = 0;
 				}
 				else if (ai.bite && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_DOWNWARD_ATTACK;
-					creature->Flags = 0;
+					creature.Flags = 0;
 				}
 				else if (item->HitStatus && ai.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
-					creature->Flags = 4;
+					creature.Flags = 4;
 				}
 				else
 				{
@@ -394,104 +374,104 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case SHIVA_STATE_GUARD_IDLE:
-				creature->MaxTurn = 0;
+				creature.MaxTurn = 0;
 
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
-				if (item->HitStatus || creature->Mood == MoodType::Escape)
-					creature->Flags = 4;
+				if (item->HitStatus || creature.Mood == MoodType::Escape)
+					creature.Flags = 4;
 
 				if (ai.bite && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE ||
-				   (item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature->Flags) ||
+				   (item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags) ||
 				   !ai.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					creature->Flags = 0;
+					creature.Flags = 0;
 				}
-				else if (creature->Flags)
+				else if (creature.Flags)
 				{
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 0) && creature->Flags > 1)
-					creature->Flags -= 2;
+				if (item->Animation.FrameNumber == GetFrameNumber(item, 0) && creature.Flags > 1)
+					creature.Flags -= 2;
 
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD:
-				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature.MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
-				if (creature->Mood == MoodType::Escape)
+				if (creature.Mood == MoodType::Escape)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored)
+				else if (creature.Mood == MoodType::Bored)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
 				else if (ai.bite && ai.distance < SHIVA_GRAB_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					creature->Flags = 0;
+					creature.Flags = 0;
 				}
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
-					creature->Flags = 4;
+					creature.Flags = 4;
 				}
 
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD_GUARDING:
-				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature.MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
 				if (item->HitStatus)
-					creature->Flags = 4;
+					creature.Flags = 4;
 
 				if ((ai.bite && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
-					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature->Flags))
+					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
-					creature->Flags = 0;
+					creature.Flags = 0;
 				}
-				else if (creature->Flags)
+				else if (creature.Flags)
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
 				}
 
 				if (item->Animation.FrameNumber == GetFrameNumber(item, 0))
-					creature->Flags = 0;
+					creature.Flags = 0;
 
 				break;
 
 			case SHIVA_STATE_WALK_BACK:
-				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature.MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
 				if ((ai.ahead && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
-					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature->Flags))
+					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					creature->Flags = 4;
+					creature.Flags = 4;
 				}
 
 				break;
 
 			case SHIVA_STATE_GRAB_ATTACK:
-				creature->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
+				creature.MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 
 				if (ai.ahead)
 				{
@@ -499,22 +479,22 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot = EulerAngles(ai.xAngle, ai.angle, 0);
 				}
 
-				ShivaDamage(item, creature, SHIVA_GRAB_ATTACK_DAMAGE);
+				ShivaDamage(*item, SHIVA_GRAB_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_DOWNWARD_ATTACK:
-				creature->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
+				creature.MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 				extraHeadRot.y = ai.angle;
 				extraTorsoRot.y = ai.angle;
 
 				if (ai.xAngle > 0)
 					extraTorsoRot.x = ai.xAngle;
 
-				ShivaDamage(item, creature, SHIVA_DOWNWARD_ATTACK_DAMAGE);
+				ShivaDamage(*item, SHIVA_DOWNWARD_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_KILL:
-				creature->MaxTurn = 0;
+				creature.MaxTurn = 0;
 				extraHeadRot = EulerAngles::Zero;
 				extraTorsoRot = EulerAngles::Zero;
 
@@ -549,24 +529,26 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ShivaHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		if (!pos.has_value())
-			return;
-
-		const auto& player = *GetLaraInfo(&source);
-		const auto& object = Objects[target.ObjectNumber];
-
-		// If guarded, ricochet without damage.
-		if ((target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
-			 target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE))
+		if (pos.has_value())
 		{
-			SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			// If immune, ricochet without damage.
+			if (target.ItemFlags[1] != 0)
+			{
+				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
+
+			// If guarded, ricochet without damage.
+			if (target.Animation.ActiveState == SHIVA_STATE_WALK_FORWARD_GUARDING ||
+				target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
+			{
+				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				return;
+			}
 		}
-		// Do basic hit effect.
-		else if (object.hitEffect == HitEffect::Blood)
-		{
-			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
-			DoItemHit(&target, damage, isExplosive);
-		}
+
+		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}
 }

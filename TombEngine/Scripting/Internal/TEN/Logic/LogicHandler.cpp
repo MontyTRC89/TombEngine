@@ -4,7 +4,6 @@
 #include <filesystem>
 #include "ScriptAssert.h"
 #include "Game/savegame.h"
-#include "Sound/sound.h"
 #include "ReservedScriptNames.h"
 #include "Game/effects/Electricity.h"
 #include "ScriptUtil.h"
@@ -446,6 +445,32 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 	return first->second;
 }
 
+std::string LogicHandler::GetRequestedPath() const
+{
+	std::string path;
+	for (uint32_t i = 0; i < m_savedVarPath.size(); ++i)
+	{
+		auto key = m_savedVarPath[i];
+		if (std::holds_alternative<uint32_t>(key))
+		{
+			path += "[" + std::to_string(std::get<uint32_t>(key)) + "]";
+		}
+		else if (std::holds_alternative<std::string>(key))
+		{
+			auto part = std::get<std::string>(key);
+			if (i > 0)
+			{
+				path += "." + part;
+			}
+			else
+			{
+				path += part;
+			};
+		}
+	}
+	return path;
+}
+
 //Used when saving
 void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
@@ -517,29 +542,50 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 			auto id = first->second;
 
 			vars.push_back(IndexTable{});
+
 			for (auto& [first, second] : obj)
 			{
+				bool validKey = true;
 				uint32_t keyIndex = 0;
-				
+				std::variant<std::string, uint32_t> key{uint32_t(0)};
 				// Strings and numbers can be keys AND values
 				switch (first.get_type())
 				{
 				case sol::type::string:
+				{
 					keyIndex = handleStr(first);
+					key = std::string{ first.as<sol::string_view>().data() };
+					m_savedVarPath.push_back(key);
+				}
 					break;
 				case sol::type::number:
-					keyIndex = handleNum(first.as<double>(), numMap);
+				{
+					if (double data = first.as<double>(); std::floor(data) != data)
+					{
+						ScriptAssert(false, "Tried using a non-integer number " + std::to_string(data) + " as a key in table " + GetRequestedPath());
+						validKey = false;
+					}
+					else
+					{
+						keyIndex = handleNum(data, numMap);
+						key = static_cast<uint32_t>(data);
+						m_savedVarPath.push_back(key);
+					}
+				}
 					break;
 				default:
-					ScriptAssert(false, "Tried saving an unsupported type as a key");
+					validKey = false;
+					ScriptAssert(false, "Tried using an unsupported type as a key in table " + GetRequestedPath());
 				}
+
+				if (!validKey)
+					continue;
 
 				auto putInVars = [&vars, id, keyIndex](uint32_t valIndex)
 				{
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 				};
 
-				uint32_t valIndex = 0;
 				switch (second.get_type())
 				{
 				case sol::type::table:
@@ -565,12 +611,14 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					else if(second.is<LevelFunc>())
 						putInVars(handleFuncName(second.as<LevelFunc>()));
 					else
-						ScriptAssert(false, "Tried saving an unsupported userdata as a value");
+						ScriptAssert(false, "Tried saving an unsupported userdata as a value; variable is " + GetRequestedPath());
 				}
-					break;
+				break;
 				default:
-					ScriptAssert(false, "Tried saving an unsupported type as a value");
+					ScriptAssert(false, "Tried saving an unsupported type as a value; variable is " + GetRequestedPath());
 				}
+
+				m_savedVarPath.pop_back();
 			}
 		}
 		return first->second;

@@ -48,7 +48,9 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Count.Pose++;
 	}
 	else
+	{
 		lara->Control.Count.Pose = 0;
+	}
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
@@ -146,36 +148,39 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr int   rate				 = 50;
-	static constexpr float easingAlpha		 = 0.35f;
-	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+	constexpr auto LINEAR_THRESHOLD		= STEPUP_HEIGHT / 2;
+	constexpr auto EASING_THRESHOLD_MIN = BLOCK(1.0f / 64);
+	constexpr auto LINEAR_RATE			= 50;
+	constexpr auto EASING_ALPHA			= 0.35f;
 
-	// Check for walls.
+	// Check for wall.
 	if (height == NO_HEIGHT)
 		return;
 
-	// Swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+	// Handle swamp case.
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
 	{
-		item->Pose.Position.y += (height > 0) ? SWAMP_GRAVITY : height;
+		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
 	}
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z), EASING_THRESHOLD_MIN);
 
-	// Regular case.
-	if (abs(height) > constantThreshold)
+	// Handle regular case.
+	if (abs(height) > LINEAR_THRESHOLD)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += rate * sign;
+		item->Pose.Position.y += LINEAR_RATE * sign;
 	}
 	else if (abs(height) > easingThreshold)
 	{
 		int vPos = item->Pose.Position.y;
-		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
+		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
 	}
 	else
+	{
 		item->Pose.Position.y += height;
+	}
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.

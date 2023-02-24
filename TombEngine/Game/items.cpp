@@ -832,11 +832,11 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}
