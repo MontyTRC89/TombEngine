@@ -30,12 +30,12 @@ namespace TEN::Math::Random
 		return Vector2(cos(angle), sin(angle));
 	}
 
-	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float radius)
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float apothem)
 	{
 		auto rotMatrix = Matrix::CreateRotationZ(orient2D);
 		auto relPoint = Vector2(
-			GenerateFloat(-radius, radius),
-			GenerateFloat(-radius, radius));
+			GenerateFloat(-apothem, apothem),
+			GenerateFloat(-apothem, apothem));
 
 		return (pos2D + Vector2::Transform(relPoint, rotMatrix));
 	}

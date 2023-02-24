@@ -9,7 +9,7 @@ namespace TEN::Math::Random
 
 	// 2D geometric generation
 	Vector2 GenerateDirection2D();
-	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float radius);
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float apothem);
 	Vector2 GeneratePoint2DInCircle(const Vector2& pos2D, float radius);
 
 	// 3D geometric generation
