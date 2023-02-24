@@ -103,6 +103,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& arm = isRightWeapon ? player.RightArm : player.LeftArm;
+	auto& uziBool = isRightWeapon ? player.Control.Weapon.UziRight : player.Control.Weapon.UziLeft;
 	const auto& weapon = Weapons[(int)weaponType];
 	const auto& weaponDef = WeaponDefs[(int)player.Control.Weapon.GunType];
 
@@ -147,12 +148,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 						arm.GunFlash = weapon.FlashTime;
 
 						if (weaponType == LaraWeaponType::Uzi)
-						{
-							if (isRightWeapon)
-								player.Control.Weapon.UziRight = true;
-							else
-								player.Control.Weapon.UziLeft = true;
-						}
+							uziBool = true;
 
 						if (!hasFired)
 						{
@@ -170,21 +166,10 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 			}
 			else
 			{
-				if (isRightWeapon)
+				if (uziBool)
 				{
-					if (player.Control.Weapon.UziRight)
-					{
-						SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
-						player.Control.Weapon.UziRight = false;
-					}
-				}
-				else
-				{
-					if (player.Control.Weapon.UziLeft)
-					{
-						SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
-						player.Control.Weapon.UziLeft = false;
-					}
+					SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
+					uziBool = false;
 				}
 			}
 		}
@@ -194,11 +179,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 			if (weaponType == LaraWeaponType::Uzi)
 			{
 				SoundEffect(weapon.SampleNum, &laraItem.Pose);
-
-				if (isRightWeapon)
-					player.Control.Weapon.UziRight = true;
-				else
-					player.Control.Weapon.UziLeft = true;
+				uziBool = true;
 			}
 
 			frame++;
@@ -226,21 +207,10 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 			frame--;
 		}
 
-		if (isRightWeapon)
+		if (uziBool)
 		{
-			if (player.Control.Weapon.UziRight)
-			{
-				SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
-				player.Control.Weapon.UziRight = false;
-			}
-		}
-		else
-		{
-			if (player.Control.Weapon.UziLeft)
-			{
-				SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
-				player.Control.Weapon.UziLeft = false;
-			}
+			SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
+			uziBool = false;
 		}
 	}
 
