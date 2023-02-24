@@ -355,20 +355,20 @@ void AnimatePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 void DrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
 	auto& lara = *GetLaraInfo(&laraItem);
-	auto* weaponDef = &WeaponDefs[(int)lara.Control.Weapon.GunType];
+	const auto& weaponDef = WeaponDefs[(int)lara.Control.Weapon.GunType];
 
 	int frame = lara.LeftArm.FrameNumber + 1;
 
-	if (frame < weaponDef->Draw1Anim || frame > (weaponDef->RecoilAnim - 1))
+	if (frame < weaponDef.Draw1Anim || frame > (weaponDef.RecoilAnim - 1))
 	{
-		frame = weaponDef->Draw1Anim;
+		frame = weaponDef.Draw1Anim;
 	}
-	else if (frame == weaponDef->Draw2Anim)
+	else if (frame == weaponDef.Draw2Anim)
 	{
 		DrawPistolMeshes(laraItem, weaponType);
 		SoundEffect(SFX_TR4_LARA_DRAW, &laraItem.Pose);
 	}
-	else if (frame == (weaponDef->RecoilAnim - 1))
+	else if (frame == (weaponDef.RecoilAnim - 1))
 	{
 		ReadyPistols(laraItem, weaponType);
 		frame = 0;
