@@ -139,48 +139,48 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void PushableBlockControl(short itemNumber)
+	void PushableBlockControl(const short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& pushableInfo = *GetPushableInfo(&item);
 
 		Lara.InteractedItem = itemNumber;
 
-		auto pos = Vector3i::Zero;
+		const int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 
-		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-
-		int x, z;
-		int blockHeight = GetStackHeight(&item);
-
-		// Control block falling.
+		// Check if the pushable block is falling.
 		if (item.Animation.IsAirborne)
 		{ 
-			int floorHeight = GetCollision(item.Pose.Position.x, item.Pose.Position.y + 10, item.Pose.Position.z, item.RoomNumber).Position.Floor;
+			const int floorHeight = GetCollision(item.Pose.Position.x, item.Pose.Position.y + pushableInfo.gravity, item.Pose.Position.z, item.RoomNumber).Position.Floor;
 
 			if (item.Pose.Position.y < (floorHeight - item.Animation.Velocity.y))
 			{
+				// Apply gravity to the pushable block.
 				if ((item.Animation.Velocity.y + pushableInfo.gravity) < PUSHABLE_FALL_VELOCITY_MAX)
 				{
 					item.Animation.Velocity.y += pushableInfo.gravity;
 				}
 				else
 				{
-					item.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX;
+					item.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX; //Originally item.Animation.Velocity.y++;
 				}
 
+				// Update the pushable block's position and move the block's stack.
 				item.Pose.Position.y += item.Animation.Velocity.y;
-
 				MoveStackY(itemNumber, item.Animation.Velocity.y);
 			}
 			else
 			{
+				// The pushable block has hit the ground.
 				item.Animation.IsAirborne = false;
-				int relY = floorHeight - item.Pose.Position.y;
+				const int relY = floorHeight - item.Pose.Position.y;
 				item.Pose.Position.y = floorHeight;
 
+				// Shake the floor if the pushable block fell at a high enough velocity.
 				if (item.Animation.Velocity.y >= PUSHABLE_FALL_RUMBLE_VELOCITY)
+				{
 					FloorShake(&item);
+				}
 
 				item.Animation.Velocity.y = 0.0f;
 				SoundEffect(pushableInfo.fallSound, &item.Pose, SoundEnvironment::Always);
@@ -206,6 +206,8 @@ namespace TEN::Entities::Generic
 		}
 
 		// Move pushable based on player bounds.Z2.
+		int blockHeight = GetStackHeight(&item);
+		int x, z;
 		int displaceDepth = 0;
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
 		auto prevPos = item.Pose.Position;
