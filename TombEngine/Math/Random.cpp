@@ -113,11 +113,11 @@ namespace TEN::Math::Random
 		float theta = u * PI_MUL_2;
 		float phi = acos((v * 2) - 1.0f);
 
-		auto offset = Vector3(
-			sphere.Radius * (sin(phi) * cos(theta)),
-			sphere.Radius * (sin(phi) * sin(theta)),
-			sphere.Radius * cos(phi));
-		return (sphere.Center + offset);
+		auto relPoint = Vector3(
+			sin(phi) * cos(theta),
+			sin(phi) * sin(theta),
+			cos(phi));
+		return (sphere.Center + (relPoint * sphere.Radius));
 	}
 
 	bool TestProbability(float probability)
