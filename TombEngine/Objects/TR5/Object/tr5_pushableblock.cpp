@@ -107,17 +107,16 @@ namespace TEN::Entities::Generic
 			return;
 
 		Lara.InteractedItem = itemNumber;
-
+		bool isPushableMoving = false;
+			
 		if (PushableBlockManageGravity(pushableItem, pushableInfo, itemNumber))
 			return;
 
-		auto prevPos = pushableItem.Pose.Position;
-
 		switch (LaraItem->Animation.AnimNumber)
 		{
-		case LA_PUSHABLE_PUSH:
 		case LA_PUSHABLE_PULL:
-			PushableBlockManageMoving(pushableItem, pushableInfo, itemNumber);
+		case LA_PUSHABLE_PUSH:
+			isPushableMoving = PushableBlockManageMoving(pushableItem, pushableInfo, itemNumber);
 			break;
 
 		case LA_PUSHABLE_GRAB:
@@ -132,8 +131,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Set pushable movement state.
-		const float distance = Vector3i::Distance(pushableItem.Pose.Position, prevPos);
-		if (distance > 0.0f)
+		if (isPushableMoving)
 		{
 			pushableInfo.MovementState = PushableMovementState::Moving;
 		}
@@ -379,6 +377,8 @@ namespace TEN::Entities::Generic
 		if (pushableItem.Status != ITEM_ACTIVE)
 			return;
 
+
+		//If it's not moving, it places at center, do some last checks and then it deactivate itself.
 		pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem);
 
 		MoveStackXZ(itemNumber);
@@ -393,11 +393,11 @@ namespace TEN::Entities::Generic
 		if (pushableInfo.hasFloorCeiling)
 		{
 			//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));
+			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));//This box function is only used by this pushable...
 		}
 	}
 	
-	void PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
+	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
 	{
 		// Moves pushable based on player bounds.Z2.
 
@@ -409,6 +409,8 @@ namespace TEN::Entities::Generic
 		int newPosZ = pushableInfo.moveZ;
 		int displaceDepth = 0;
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
+
+		bool isMovingResult = false;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
 
@@ -451,6 +453,7 @@ namespace TEN::Entities::Generic
 					(quadrant == SOUTH && pushableItem.Pose.Position.z < newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
+					isMovingResult = true;
 				}
 			}
 			else
@@ -459,6 +462,7 @@ namespace TEN::Entities::Generic
 					(quadrant == SOUTH && pushableItem.Pose.Position.z > newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
+					isMovingResult = true;
 				}
 			}
 		}
@@ -471,6 +475,7 @@ namespace TEN::Entities::Generic
 					(quadrant == WEST && pushableItem.Pose.Position.x < newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
+					isMovingResult = true;
 				}
 			}
 			else
@@ -479,6 +484,7 @@ namespace TEN::Entities::Generic
 					(quadrant == WEST && pushableItem.Pose.Position.x > newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
+					isMovingResult = true;
 				}
 			}
 		}
@@ -501,7 +507,7 @@ namespace TEN::Entities::Generic
 					pushableInfo.MovementState = PushableMovementState::None;
 
 					pushableItem.Animation.IsAirborne = true;
-					return;
+					return true;
 				}
 			}
 
@@ -526,11 +532,13 @@ namespace TEN::Entities::Generic
 				LaraItem->Animation.TargetState = LS_IDLE;
 			}
 		}
+
+		return isMovingResult;
 	}
 
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo)
 	{
-		auto SoundSourcePose = pushableItem.Pose; //TODO: remove this intermediary variable when SoundEffect gets refactored to receive const value.
+		auto SoundSourcePose = pushableItem.Pose;
 		if (pushableInfo.MovementState == PushableMovementState::Moving)
 		{
 			SoundEffect(pushableInfo.loopSound, &SoundSourcePose, SoundEnvironment::Always);

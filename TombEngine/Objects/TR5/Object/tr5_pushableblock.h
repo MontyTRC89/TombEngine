@@ -17,7 +17,7 @@ namespace TEN::Entities::Generic
 	// Behaviour functions
 	bool PushableBlockManageGravity(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber); //Maybe itemNumber could be cut out.
 	void PushableBlockManageIdle(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
-	void PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
+	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
 
 	// Test functions
