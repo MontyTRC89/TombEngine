@@ -170,7 +170,7 @@ namespace TEN::Hud
 		if (AirBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, g_AirBar, TEXTURE_ID, 0, false);
+		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
 	}
 
 	void StatusBarsController::DrawHealthBar(ItemInfo& item) const
@@ -184,7 +184,7 @@ namespace TEN::Hud
 		const auto& player = *GetLaraInfo(&item);
 
 		bool isPoisoned = (player.PoisonPotency != 0);
-		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
+		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
 	void StatusBarsController::DrawSprintBar(ItemInfo& item) const
@@ -195,6 +195,6 @@ namespace TEN::Hud
 		if (SprintBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(SprintBar.Value, CRITICAL_VALUE, g_SprintBar, TEXTURE_ID, 0, false);
+		this->DrawStatusBar(SprintBar.Value, CRITICAL_VALUE, *g_SprintBar, TEXTURE_ID, 0, false);
 	}
 }
