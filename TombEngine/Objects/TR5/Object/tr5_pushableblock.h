@@ -7,18 +7,26 @@ struct ItemInfo;
 namespace TEN::Entities::Generic
 {
 	struct PushableInfo;
-
 	PushableInfo* GetPushableInfo(ItemInfo* item);
-	void InitialisePushableBlock(short itemNumber);
 
-	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
+	// Main functions
+	void InitialisePushableBlock(short itemNumber);
 	void PushableBlockControl(short itemNumber);
 	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+
+	// Behaviour functions
+	bool PushableBlockManageGravity(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber); //Maybe itemNumber could be cut out.
+	void PushableBlockManageIdle(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
+	void PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
+	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
+
+	// Test functions
+	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 	bool TestBlockMovable(ItemInfo* item, int blockHeight);
 	bool TestBlockPush(ItemInfo* item, int blockHeight, int quadrant);
 	bool TestBlockPull(ItemInfo* item, int blockHeight, int quadrant);
 
-	// Pushable stack utilities
+	// Stack utilities functions
 	void MoveStackXZ(short itemNumber);
 	void MoveStackY(short itemNumber, int y);
 	void RemoveBridgeStack(short itemNumber);
@@ -28,6 +36,7 @@ namespace TEN::Entities::Generic
 	int GetStackHeight(ItemInfo* item);
 	bool CheckStackLimit(ItemInfo* item);
 
+	// Floor data collision functions
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
 	int PushableBlockFloorBorder(short itemNumber);
