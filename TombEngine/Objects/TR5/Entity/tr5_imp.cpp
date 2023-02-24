@@ -35,10 +35,26 @@ namespace TEN::Entities::Creatures::TR5
 		IMP_STATE_THROW_STONES = 11
 	};
 
-	// TODO
 	enum ImpAnim
 	{
-		IMP_ANIM_DEATH = 18
+		IMP_ANIM_WALK = 0,
+		IMP_ANIM_WAIT = 1,
+		IMP_ANIM_RUN = 2,
+		IMP_ANIM_ATTACK = 3,
+		IMP_ANIM_CRY = 4,
+		IMP_ANIM_JUMP_ATTACK = 5,
+		IMP_ANIM_SCARED_RUN_AWAY = 6,
+		IMP_ANIM_CLIMB_UP = 7,
+		IMP_ANIM_BARREL_ROLL = 8,
+		IMP_ANIM_FALL_BACKWARDS = 9,
+		IMP_ANIM_FALL_FORWARD = 10,
+		IMP_ANIM_LEFT_FOOT_START_WALK = 11,
+		IMP_ANIM_RIGHT_FOOT_START_WALK = 12,
+		IMP_ANIM_SLOW_TO_WAIT_LEFT = 13,
+		IMP_ANIM_SLOW_TO_WAIT_RIGHT = 14,
+		IMP_ANIM_SLOW_TO_RUN = 15,
+		IMP_ANIM_SLOW_TO_WALK = 16,
+		IMP_ANIM_THROW_ROCK = 17
 	};
 
 	void InitialiseImp(short itemNumber)
@@ -51,17 +67,17 @@ namespace TEN::Entities::Creatures::TR5
 		if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
 		{
 			state = IMP_STATE_START_ROLL;
-			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 8;
+			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_BARREL_ROLL;
 		}
 		else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
 		{
 			state = IMP_STATE_START_CLIMB;
-			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 7;
+			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_CLIMB_UP;
 		}
 		else
 		{
 			state = IMP_STATE_IDLE;
-			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 1;
+			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_WAIT;
 		}
 
 		item->Animation.TargetState = state;
@@ -270,7 +286,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->Animation.ActiveState != IMP_STATE_DEATH)
 				{
-					item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_DEATH;
+					item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_FALL_BACKWARDS;
 					item->Animation.ActiveState = IMP_STATE_DEATH;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
