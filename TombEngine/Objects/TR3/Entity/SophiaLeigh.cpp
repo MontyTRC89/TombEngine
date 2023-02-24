@@ -28,11 +28,11 @@ using namespace TEN::Entities::Effects;
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SOPHIALEIGH_WALK_RANGE		   = SQUARE(BLOCK(1));
-	constexpr auto SOPHIALEIGH_Y_DISTANCE_RANGE	   = BLOCK(1.5f);
-	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = CLICK(2);
 	constexpr auto SOPHIALEIGH_NORMAL_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto SOPHIALEIGH_NORMAL_WALK_RANGE   = SQUARE(BLOCK(5));
-	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = SQUARE(BLOCK(1));
+	constexpr auto SOPHIALEIGH_Y_DISTANCE_RANGE	   = BLOCK(1.5f);
+	constexpr auto SOPHIALEIGH_REACHED_GOAL_RANGE  = BLOCK(0.5f);
+	constexpr auto SOPHIALEIGH_KNOCKBACK_RANGE     = BLOCK(3);
 
 	constexpr auto SOPHIALEIGH_DAMAGE_SMALL_BOLT = 4;
 	constexpr auto SOPHIALEIGH_DAMAGE_LARGE_BOLT = 10;
@@ -176,7 +176,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto angle = Geometry::GetOrientToPoint(enemy.Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
 
 		float distance = Vector3::Distance(item.Pose.Position.ToVector3(), enemy.Pose.Position.ToVector3());
-		if (distance < SOPHIALEIGH_KNOCKBACK_RANGE)
+		if (distance <= SOPHIALEIGH_KNOCKBACK_RANGE)
 		{
 			byte red = SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX;
 			byte green = SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX;
