@@ -157,7 +157,7 @@ namespace TEN::Hud
 	void StatusBarsController::DrawStatusBar(float value, float criticalValue, const RendererHudBar& rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const
 	{
 		if (value <= criticalValue)
-			value = DoFlash ? value : 0.0f;;
+			value = DoFlash ? value : 0.0f;
 
 		g_Renderer.DrawBar(value, &rHudBar, textureID, frame, isPoisoned);
 	}
