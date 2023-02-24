@@ -173,7 +173,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto& creature = *GetCreatureInfo(&item);
 		auto& enemy = *creature.Enemy;
 
-		auto angle = Geometry::GetOrientToPoint(enemy.Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
+		auto orient = Geometry::GetOrientToPoint(enemy.Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
 
 		float distance = Vector3::Distance(item.Pose.Position.ToVector3(), enemy.Pose.Position.ToVector3());
 		if (distance <= SOPHIALEIGH_KNOCKBACK_RANGE)
@@ -212,7 +212,7 @@ namespace TEN::Entities::Creatures::TR3
 			TriggerExplosionSparks(enemy.Pose.Position.x, enemy.Pose.Position.y, enemy.Pose.Position.z, 3, -2, 2, enemy.RoomNumber);
 			// NOTE: TriggerPlasmaBall exists but isn't coded (uses EXTRAFX5 in OG).
 
-			KnockbackCollision(enemy, angle.y);
+			KnockbackCollision(enemy, orient.y);
 		}
 	}
 
