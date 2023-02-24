@@ -837,3 +837,16 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 	DoItemHit(&target, damage, isExplosive);
 }
+
+Vector3i PlaceInSectorCenter(const ItemInfo& item)
+{
+	const unsigned int maskLower8Bits = 0xFFFFFE00;	// mask for the bits [0-8]
+	const unsigned int mask9Bit = 0x200;			// mask for the bit [9] (512)
+
+	//Clears the 0-8 bits and set the bit 9 to put 512 at the end. (Placing the object in the sector center).
+	return Vector3i (
+					 item.Pose.Position.x & maskLower8Bits | mask9Bit,
+					 item.Pose.Position.y, 
+					 item.Pose.Position.z & maskLower8Bits | mask9Bit
+					);
+}
