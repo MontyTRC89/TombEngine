@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR5
 		IMP_STATE_IDLE = 1,
 		IMP_STATE_RUN = 2,
 		IMP_STATE_ATTACK_1 = 3,
-		IMP_STATE_ATTACK_2 = 5,
+		IMP_STATE_JUMP_ATTACK = 5,
 		IMP_STATE_SCARED = 6,
 		IMP_STATE_START_CLIMB = 7,
 		IMP_STATE_START_ROLL = 8,
@@ -214,7 +214,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (GetRandomControl() & 1)
 							item->Animation.TargetState = IMP_STATE_ATTACK_1;
 						else
-							item->Animation.TargetState = IMP_STATE_ATTACK_2;
+							item->Animation.TargetState = IMP_STATE_JUMP_ATTACK;
 					}
 					else if (item->AIBits & FOLLOW)
 						item->Animation.TargetState = IMP_STATE_WALK;
@@ -247,7 +247,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				case IMP_STATE_ATTACK_1:
-				case IMP_STATE_ATTACK_2:
+				case IMP_STATE_JUMP_ATTACK:
 					creature->MaxTurn = -1;
 
 					if (creature->Flags == 0 &&
