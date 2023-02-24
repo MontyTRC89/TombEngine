@@ -28,9 +28,6 @@ namespace TEN::Entities::Generic
 	int GetStackHeight(ItemInfo* item);
 	bool CheckStackLimit(ItemInfo* item);
 
-	void PushLoop(ItemInfo* item);
-	void PushEnd(ItemInfo* item);
-
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
 	int PushableBlockFloorBorder(short itemNumber);
