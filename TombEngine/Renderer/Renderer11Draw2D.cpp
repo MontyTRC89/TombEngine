@@ -20,10 +20,10 @@ namespace TEN::Renderer
 {
 	void Renderer11::InitialiseGameBars()
 	{
-		constexpr auto AIR_BAR_POS		= Vector2(630.0f, 32.0f);
-		constexpr auto HEALTH_BAR_POS	= Vector2(20.0f, 32.0f);
-		constexpr auto SPRINT_BAR_POS	= Vector2(630.0f, 48.0f);
-		constexpr auto LOADING_BAR_POS	= Vector2(325.0f, 550.0f);
+		constexpr auto AIR_BAR_POS	   = Vector2(630.0f, 32.0f);
+		constexpr auto HEALTH_BAR_POS  = Vector2(20.0f, 32.0f);
+		constexpr auto SPRINT_BAR_POS  = Vector2(630.0f, 48.0f);
+		constexpr auto LOADING_BAR_POS = Vector2(325.0f, 550.0f);
 
 		static const auto AIR_BAR_COLORS = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
