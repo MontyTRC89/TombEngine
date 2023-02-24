@@ -9,7 +9,7 @@ namespace TEN::Math::Random
 {
 	static std::mt19937 Engine;
 
-	int32_t GenerateInt(int32_t low, int32_t high)
+	int GenerateInt(int low, int high)
 	{
 		return (Engine() / (Engine.max() / (high - low + 1) + 1) + low);
 	}
@@ -28,6 +28,30 @@ namespace TEN::Math::Random
 	{
 		float angle = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
 		return Vector2(cos(angle), sin(angle));
+	}
+
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float radius)
+	{
+		auto rotMatrix = Matrix::CreateRotationZ(orient2D);
+		auto relPoint = Vector2(
+			GenerateFloat(-radius, radius),
+			GenerateFloat(-radius, radius));
+
+		return (pos2D + Vector2::Transform(relPoint, rotMatrix));
+	}
+	
+	Vector2 GeneratePoint2DInCircle(const Vector2& pos2D, float radius)
+	{
+		// Use rejection sampling.
+		auto relPoint = Vector2::Zero;
+		do
+		{
+			relPoint = Vector2(
+				GenerateFloat(-1.0f, 1.0f),
+				GenerateFloat(-1.0f, 1.0f));
+		} while (relPoint.LengthSquared() > 1.0f);
+
+		return (pos2D + (relPoint * radius));
 	}
 
 	Vector3 GenerateDirection()
@@ -68,7 +92,7 @@ namespace TEN::Math::Random
 
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
-		// Use rejection sampling method.
+		// Use rejection sampling.
 		auto relPoint = Vector3::Zero;
 		do
 		{
@@ -76,8 +100,7 @@ namespace TEN::Math::Random
 				GenerateFloat(-1.0f, 1.0f),
 				GenerateFloat(-1.0f, 1.0f),
 				GenerateFloat(-1.0f, 1.0f));
-		}
-		while (relPoint.LengthSquared() > 1.0f);
+		} while (relPoint.LengthSquared() > 1.0f);
 
 		return (sphere.Center + (relPoint * sphere.Radius));
 	}
