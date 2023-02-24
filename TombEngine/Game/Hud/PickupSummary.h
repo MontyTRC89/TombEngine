@@ -30,6 +30,9 @@ namespace TEN::Hud
 	class PickupSummaryController
 	{
 	private:
+		// Constants
+		static constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
+
 		// Components
 		std::vector<DisplayPickup> DisplayPickups = {};
 

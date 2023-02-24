@@ -12,8 +12,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
-	constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
-
 	bool DisplayPickup::IsOffscreen() const
 	{
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;

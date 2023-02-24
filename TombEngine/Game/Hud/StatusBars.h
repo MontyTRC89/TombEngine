@@ -13,15 +13,20 @@ namespace TEN::Hud
 {
 	struct StatusBar
 	{
-		float Life		  = 0.0f;
-		float Opacity	  = 0.0f; // TODO: Opacity in renderer.
 		float Value		  = 0.0f;
 		float TargetValue = 0.0f;
+		float Life		  = 0.0f;
+		float Opacity	  = 0.0f; // TODO: Opacity in renderer.
 	};
 
 	class StatusBarsController
 	{
 	private:
+		// Constants
+		static constexpr auto STATUS_BAR_LIFE_MAX		   = 0.75f;
+		static constexpr auto STATUS_BAR_LIFE_START_FADING = 0.2f;
+		static constexpr auto STATUS_BAR_VALUE_LERP_ALPHA  = 0.4f;
+
 		// Components
 		StatusBar AirBar	= {};
 		StatusBar HealthBar = {};

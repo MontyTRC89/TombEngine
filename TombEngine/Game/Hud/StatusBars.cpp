@@ -19,10 +19,6 @@ extern TEN::Renderer::RendererHudBar* g_SprintBar;
 
 namespace TEN::Hud
 {
-	constexpr auto STATUS_BAR_LIFE_MAX			= 1.0f;
-	constexpr auto STATUS_BAR_LIFE_START_FADING = 0.3f;
-	constexpr auto STATUS_BAR_VALUE_LERP_ALPHA	= 0.4f;
-
 	void StatusBarsController::Update(ItemInfo& item)
 	{
 		constexpr auto FLASH_INTERVAL = 0.2f;
