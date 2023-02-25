@@ -39,10 +39,13 @@ namespace TEN::Hud
 		if (CurrentLevel == 0 || CinematicBarsHeight > 0)
 			return;
 
+		const auto& player = *GetLaraInfo(&item);
+		bool isPoisoned = (player.PoisonPotency != 0);
+
 		// Draw bars.
-		this->DrawAirBar(item);
-		this->DrawHealthBar(item);
-		this->DrawSprintBar(item);
+		this->DrawAirBar();
+		this->DrawHealthBar(isPoisoned);
+		this->DrawSprintBar();
 	}
 
 	void StatusBarsController::Clear()
@@ -159,10 +162,10 @@ namespace TEN::Hud
 		if (value <= criticalValue)
 			value = DoFlash ? value : 0.0f;
 
-		g_Renderer.DrawBar(value, &rHudBar, textureID, frame, isPoisoned);
+		g_Renderer.DrawBar(value, rHudBar, textureID, frame, isPoisoned);
 	}
 
-	void StatusBarsController::DrawAirBar(ItemInfo& item) const
+	void StatusBarsController::DrawAirBar() const
 	{
 		constexpr auto TEXTURE_ID	  = ID_AIR_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_AIR_CRITICAL / LARA_AIR_MAX;
@@ -173,7 +176,7 @@ namespace TEN::Hud
 		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
 	}
 
-	void StatusBarsController::DrawHealthBar(ItemInfo& item) const
+	void StatusBarsController::DrawHealthBar(bool isPoisoned) const
 	{
 		constexpr auto TEXTURE_ID	  = ID_HEALTH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_HEALTH_CRITICAL / LARA_HEALTH_MAX;
@@ -181,13 +184,10 @@ namespace TEN::Hud
 		if (HealthBar.Life <= 0.0f)
 			return;
 
-		const auto& player = *GetLaraInfo(&item);
-
-		bool isPoisoned = (player.PoisonPotency != 0);
 		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
-	void StatusBarsController::DrawSprintBar(ItemInfo& item) const
+	void StatusBarsController::DrawSprintBar() const
 	{
 		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_SPRINT_ENERGY_CRITICAL / LARA_SPRINT_ENERGY_MAX;
