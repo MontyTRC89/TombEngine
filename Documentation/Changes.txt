@@ -37,7 +37,7 @@ Version 1.0.7
 * Prevent Lara from drawing weapons during parallel bar swinging.
 * Further renderer performance optimizations and bugfixes.
 
-Lua API Changes
+Lua API changes:
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
 * Add Moveable:GetAirborne and Moveable:SetAirborne.
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
@@ -81,7 +81,7 @@ Version 1.0.6
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
 * Improve level loading speed a lot.
 
-Lua API changes
+Lua API changes:
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
