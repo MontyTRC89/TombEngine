@@ -13,13 +13,18 @@
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Game/Lara/lara_helpers.h"
 
-using namespace TEN::Entities::Generic;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	using namespace TEN::Entities::Generic;
+	using namespace TEN::Math;
+
 	const auto ImpBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
+
+	constexpr auto IMP_SWIPE_ATTACK_DAMAGE = 60;
+	constexpr auto IMP_JUMP_ATTACK_DAMAGE = 60;
 
 	enum ImpState
 	{
@@ -42,7 +47,7 @@ namespace TEN::Entities::Creatures::TR5
 		IMP_ANIM_RUN = 2,
 		IMP_ANIM_ATTACK = 3,
 		IMP_ANIM_CRY = 4,
-		IMP_ANIM_JUMP_ATTACK = 5,
+		IMP_ANIM_JUMP_ATTACK = 5,  
 		IMP_ANIM_SCARED_RUN_AWAY = 6,
 		IMP_ANIM_CLIMB_UP = 7,
 		IMP_ANIM_BARREL_ROLL = 8,
@@ -199,6 +204,9 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
+				auto laraItem = LaraItem;
+				auto lara = GetLaraInfo(laraItem);
+
 				switch (item->Animation.ActiveState)
 				{
 				case IMP_STATE_WALK:
@@ -255,6 +263,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				case IMP_STATE_ATTACK_1:
+
 				case IMP_STATE_JUMP_ATTACK:
 					creature->MaxTurn = -1;
 
@@ -268,7 +277,12 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				case IMP_STATE_SCARED:
-					creature->MaxTurn = ANGLE(7.0f);
+
+					if (lara->Torch.State == TorchState::Holding)
+					{
+						creature->MaxTurn = ANGLE(7.0f);
+						SetAnimation(item, IMP_ANIM_SCARED_RUN_AWAY);
+					}
 					break;
 
 				case IMP_STATE_START_CLIMB:
