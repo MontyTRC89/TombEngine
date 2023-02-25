@@ -570,7 +570,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawShockwaves(RenderView& view) 
+	void Renderer11::DrawShockwaves(RenderView& view)
 	{
 		unsigned char r = 0;
 		unsigned char g = 0;
@@ -579,23 +579,23 @@ namespace TEN::Renderer
 		float s = 0;
 		float angle = 0;
 
-		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
+		for (int i = 0; i < MAX_SHOCKWAVE; i++)
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
-			if (shockwave->life) 
+			if (shockwave->life)
 			{
 				byte color = shockwave->life * 8;
 
 				//int dl = shockwave->outerRad - shockwave->innerRad;
 
-				shockwave->yRot +=  shockwave->yRot/FPS;
-				
+				shockwave->yRot += shockwave->yRot / FPS;
+
 				Matrix rotationMatrix =
 					Matrix::CreateRotationY(shockwave->yRot / 4) *
 					Matrix::CreateRotationZ(shockwave->zRot) *
 					Matrix::CreateRotationX(shockwave->xRot);
-					
+
 				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
@@ -618,7 +618,7 @@ namespace TEN::Renderer
 				float z1 = (shockwave->innerRad * s);
 				float x4 = (shockwave->outerRad * c);
 				float z4 = (shockwave->outerRad * s);
-			
+
 				Vector3 p1 = Vector3(x1, 0, z1);
 				Vector3 p4 = Vector3(x4, 0, z4);
 
@@ -629,7 +629,7 @@ namespace TEN::Renderer
 				{
 					if (shockwave->sr < shockwave->r)
 					{
-						shockwave->sr += shockwave->r/18;
+						shockwave->sr += shockwave->r / 18;
 						r = shockwave->sr * shockwave->life / 255.0f;
 					}
 					else
@@ -638,7 +638,7 @@ namespace TEN::Renderer
 
 					if (shockwave->sg < shockwave->g)
 					{
-						shockwave->sg += shockwave->g /18;
+						shockwave->sg += shockwave->g / 18;
 						g = shockwave->sg * shockwave->life / 255.0f;
 					}
 					else
@@ -663,18 +663,18 @@ namespace TEN::Renderer
 					g = shockwave->g * shockwave->life / 255.0f;
 					b = shockwave->b * shockwave->life / 255.0f;
 				}
-				
+
 				for (int j = 0; j < 16; j++)
 				{
 					c = cos(angle);
 					s = sin(angle);
 
-					float x2 =  (shockwave->innerRad * c);
+					float x2 = (shockwave->innerRad * c);
 					float z2 = (shockwave->innerRad * s);
 
 					float x3 = (shockwave->outerRad * c);
 					float z3 = (shockwave->outerRad * s);
-				
+
 					Vector3 p2 = Vector3(x2, 0, z2);
 					Vector3 p3 = Vector3(x3, 0, z3);
 
@@ -695,7 +695,7 @@ namespace TEN::Renderer
 								g / 16.0f,
 								b / 16.0f,
 								1.0f),
-							0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
+							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
 					}
 					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
 					{
@@ -718,7 +718,7 @@ namespace TEN::Renderer
 					{
 						angle -= PI / 4.0f;
 
-						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
 							pos + p4,
 							pos + p3,
 							pos + p2,
