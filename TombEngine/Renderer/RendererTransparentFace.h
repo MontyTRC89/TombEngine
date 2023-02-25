@@ -29,7 +29,6 @@ namespace TEN::Renderer
 		int bone;
 		bool animated;
 		bool doubleSided;
-		bool IsSoftParticle;
 		BLEND_MODES blendMode;
 	};
 

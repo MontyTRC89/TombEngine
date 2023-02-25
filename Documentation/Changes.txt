@@ -36,6 +36,9 @@ Version 1.0.7
 * Implement more realistic water bubble effects.
 * Implement a new stacked pickup display inspired by OpenLara.
 * Prevent Lara from drawing weapons during parallel bar swinging.
+* Further optimize renderer 
+	- Instance statics
+* Fix Alpha faces on items not displaying transparency correctly.
 
 Lua API Changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.

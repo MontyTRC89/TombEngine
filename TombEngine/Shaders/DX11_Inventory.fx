@@ -52,7 +52,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
     for (int i = 0; i < 2; i++)
     {
         output.xyz += DoDirectionalLight(input.WorldPosition, input.Normal, l[i]);
-        output.xyz += DoSpecularSun(input.Normal, l[i], input.Sheen);
+
+		// TODO: fix it, it causes noise
+        // output.xyz += DoSpecularSun(input.Normal, l[i], input.Sheen);
     }
 
 	return output;
