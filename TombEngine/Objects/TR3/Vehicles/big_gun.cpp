@@ -16,36 +16,38 @@
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
-#include "Specific/level.h"
 #include "Specific/Input/Input.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> BigGunMountTypes =
+	constexpr auto BGUN_ROCKET_SPAWN_DISTANCE = CLICK(1);
+	constexpr auto BGUN_MOUNT_DISTANCE		  = CLICK(2);
+
+	constexpr auto BGUN_RECOIL_TIME		= 26;
+	constexpr auto BGUN_RECOIL_Z		= 25;
+	constexpr auto BGUN_ROCKET_VELOCITY = 16;
+	constexpr auto BGUN_ROCKET_TIMER	= 1000;
+	constexpr auto BGUN_SMOKE_DURATION	= 32;
+
+	constexpr auto BGUN_X_ORIENT_NUM_FRAMES	  = 59;
+	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
+
+	constexpr auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
+	constexpr auto BGUN_TURN_RATE_MAX	= ANGLE(4.0f);
+	constexpr auto BGUN_X_ORIENT_STEP	= (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES);
+	constexpr auto BGUN_X_ORIENT_MAX	= ANGLE(40.0f);
+
+	const std::vector<VehicleMountType> BigGunMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Back
 	};
 
-	constexpr auto BGUN_ROCKET_TIMER = 1000;
-	constexpr auto BGUN_ROCKET_SPEED = 16;
-	constexpr auto BGUN_SMOKE_DURATION = 32;
-	constexpr auto BGUN_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto BGUN_RECOIL_TIME = 26;
-	constexpr auto BGUN_RECOIL_Z = 25;
-	constexpr auto BGUN_ROCKET_SPAWN_DISTANCE = CLICK(1);
-	constexpr auto BGUN_X_ORIENT_NUM_FRAMES = 59;
-	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
-	constexpr auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
-	constexpr auto BGUN_TURN_RATE_MAX = ANGLE(4.0f);
-	constexpr auto BGUN_X_ORIENT_STEP = (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES);
-	constexpr auto BGUN_X_ORIENT_MAX = ANGLE(40.0f);
-
-	const auto BGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -123,7 +125,7 @@ namespace TEN::Entities::Vehicles
 
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
-		auto pos = GetJointPosition(bigGunItem, BGunBite.meshNum, BGunBite.Position);
+		auto pos = GetJointPosition(bigGunItem, BigGunBite.meshNum, BigGunBite.Position);
 		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
 		projectileItem->RoomNumber = probe.RoomNumber;
 		projectileItem->Pose.Position = pos;
@@ -134,7 +136,7 @@ namespace TEN::Entities::Vehicles
 		);
 		InitialiseItem(itemNumber);
 
-		projectileItem->Animation.Velocity.z = BGUN_ROCKET_SPEED;
+		projectileItem->Animation.Velocity.z = BGUN_ROCKET_VELOCITY;
 		projectileItem->HitPoints = BGUN_ROCKET_TIMER; // NOTE: Time before it explode, TR5 use it, if 0, it will explode by default.
 
 		AddActiveItem(itemNumber);
