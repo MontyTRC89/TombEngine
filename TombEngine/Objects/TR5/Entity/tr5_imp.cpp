@@ -23,8 +23,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto ImpBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
 
-	constexpr auto IMP_SWIPE_ATTACK_DAMAGE = 60;
-	constexpr auto IMP_JUMP_ATTACK_DAMAGE = 60;
+	constexpr auto IMP_ATTACK_DAMAGE = 3;
+
 
 	enum ImpState
 	{
@@ -270,7 +270,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (creature->Flags == 0 &&
 						item->TouchBits & 0x280)
 					{
-						DoDamage(creature->Enemy, 3);
+						DoDamage(creature->Enemy, IMP_ATTACK_DAMAGE);
 						CreatureEffect2(item, ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
