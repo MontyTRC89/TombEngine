@@ -65,6 +65,7 @@ namespace TEN::Entities::Generic
 		int ocb = item.TriggerFlags;
 
 		pushableInfo.canFall = ocb & 0x20;
+		pushableInfo.doAlignCenter = false;
 		pushableInfo.disablePull = ocb & 0x80;
 		pushableInfo.disablePush = ocb & 0x100;
 		pushableInfo.disableW = pushableInfo.disableE = ocb & 0x200;
@@ -151,16 +152,82 @@ namespace TEN::Entities::Generic
 		auto& pushableInfo = *GetPushableInfo(&item);
 		auto& laraInfo = *GetLaraInfo(laraItem);
 
-		int blockHeight = GetStackHeight(&item);
+		const int blockHeight = GetStackHeight(&item);
 
-		if ((!IsHeld(In::Action) ||
-			laraItem->Animation.ActiveState != LS_IDLE ||
-			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraItem->Animation.IsAirborne ||
-			laraInfo.Control.HandStatus != HandStatus::Free ||
-			item.Status == ITEM_INVISIBLE ||
-			item.TriggerFlags < 0) &&
-			(!laraInfo.Control.IsMoving || laraInfo.InteractedItem != itemNumber))
+		if ((IsHeld(In::Action) &&
+			 !IsHeld(In::Forward) &&
+			 laraItem->Animation.ActiveState == LS_IDLE &&
+			 laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			 !laraItem->Animation.IsAirborne &&
+			 laraInfo.Control.HandStatus == HandStatus::Free &&
+			 item.Status != ITEM_INVISIBLE &&
+			 item.TriggerFlags >= 0) ||
+			 (laraInfo.Control.IsMoving && laraInfo.InteractedItem == itemNumber))
+		{
+
+			auto bounds = GameBoundingBox(&item);
+			PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
+			PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
+			PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
+			PushableBlockBounds.BoundingBox.Z2 = 0;
+
+			short yOrient = item.Pose.Orientation.y;
+			item.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
+
+			if (TestLaraPosition(PushableBlockBounds, &item, laraItem))
+			{
+				int quadrant = GetQuadrant(item.Pose.Orientation.y);
+				switch (quadrant)
+				{
+				case NORTH:
+					PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
+					PushableBlockPos.x = pushableInfo.doAlignCenter ? 0 : LaraItem->Pose.Position.x - item.Pose.Position.x;
+					break;
+
+				case SOUTH:
+					PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
+					PushableBlockPos.x = pushableInfo.doAlignCenter ? 0 : item.Pose.Position.x - LaraItem->Pose.Position.x;
+					break;
+
+				case EAST:
+					PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
+					PushableBlockPos.x = pushableInfo.doAlignCenter ? 0 : item.Pose.Position.z - LaraItem->Pose.Position.z;
+					break;
+
+				case WEST:
+					PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
+					PushableBlockPos.x = pushableInfo.doAlignCenter ? 0 : LaraItem->Pose.Position.z - item.Pose.Position.z;
+					break;
+
+				default:
+					break;
+				}
+
+				if (MoveLaraPosition(PushableBlockPos, &item, laraItem))
+				{
+					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
+					laraItem->Pose.Orientation = item.Pose.Orientation;
+					laraInfo.Control.IsMoving = false;
+					laraInfo.Control.HandStatus = HandStatus::Busy;
+					laraInfo.NextCornerPos.Position.x = itemNumber;
+				}
+				else
+				{
+					laraInfo.InteractedItem = itemNumber;
+				}
+			}
+			else
+			{
+				if (laraInfo.Control.IsMoving && laraInfo.InteractedItem == itemNumber)
+				{
+					laraInfo.Control.IsMoving = false;
+					laraInfo.Control.HandStatus = HandStatus::Free;
+				}
+			}
+
+			item.Pose.Orientation.y = yOrient;
+		}
+		else
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
@@ -228,75 +295,6 @@ namespace TEN::Entities::Generic
 			if (pushableInfo.hasFloorCeiling)
 			{
 				AdjustStopperFlag(&item, item.ItemFlags[0]);
-			}
-		}
-		else
-		{
-			auto bounds = GameBoundingBox(&item);
-			PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
-			PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
-			PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-			PushableBlockBounds.BoundingBox.Z2 = 0;
-
-			short yOrient = item.Pose.Orientation.y;
-			item.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
-
-			if (TestLaraPosition(PushableBlockBounds, &item, laraItem))
-			{
-				int quadrant = GetQuadrant(item.Pose.Orientation.y);
-				switch (quadrant)
-				{
-				case NORTH:
-				case SOUTH:
-					PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
-					break;
-
-				case EAST:
-				case WEST:
-					PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
-					break;
-
-				default:
-					break;
-				}
-
-				if (pushableInfo.hasFloorCeiling)
-				{
-					// NOTE: Not using auto align function because it interferes with vaulting.
-
-					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
-					laraItem->Pose.Orientation = item.Pose.Orientation;
-					laraInfo.Control.IsMoving = false;
-					laraInfo.Control.HandStatus = HandStatus::Busy;
-					laraInfo.NextCornerPos.Position.x = itemNumber;
-					item.Pose.Orientation.y = yOrient;
-				}
-				else
-				{
-					if (MoveLaraPosition(PushableBlockPos, &item, laraItem))
-					{
-						SetAnimation(laraItem, LA_PUSHABLE_GRAB);
-						laraInfo.Control.IsMoving = false;
-						laraInfo.Control.HandStatus = HandStatus::Busy;
-						laraInfo.NextCornerPos.Position.x = itemNumber;
-						item.Pose.Orientation.y = yOrient;
-					}
-					else
-					{
-						laraInfo.InteractedItem = itemNumber;
-						item.Pose.Orientation.y = yOrient;
-					}
-				}
-			}
-			else
-			{
-				if (laraInfo.Control.IsMoving && laraInfo.InteractedItem == itemNumber)
-				{
-					laraInfo.Control.IsMoving = false;
-					laraInfo.Control.HandStatus = HandStatus::Free;
-				}
-
-				item.Pose.Orientation.y = yOrient;
 			}
 		}
 	}

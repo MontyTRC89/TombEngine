@@ -25,6 +25,7 @@ namespace TEN::Entities::Generic
 		int fallSound;			// sound on hitting floor (if dropped)
 		int climb;				// not used for now
 		bool canFall;			// OCB 32
+		bool doAlignCenter;		// --
 		bool hasFloorCeiling;	// has floor and ceiling procedures (OCB 64)
 		bool disablePull;		// OCB 128
 		bool disablePush;		// OCB 256
