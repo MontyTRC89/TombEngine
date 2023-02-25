@@ -662,7 +662,7 @@ namespace TEN::Renderer
 					{
 						angle -= PI / 4.0f;
 
-						AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
 							pos + p4,
 							pos + p3,
 							pos + p2,
