@@ -33,7 +33,9 @@ namespace TEN::Entities::Traps::TR1
 		if (TriggerActive(item))
 		{
 			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_ENABLED;
-			if (item->TouchBits.TestAny())
+			AnimateItem(item);
+
+			if (item->TouchBits.TestAny() && item->Animation.ActiveState == TEETHSPIKEDOOR_ENABLED)
 			{
 				DoDamage(LaraItem, TEETH_SPIKE_DOOR_DAMAGE);
 				//TODO Add blood and check for individual spike in door(?)
@@ -44,5 +46,4 @@ namespace TEN::Entities::Traps::TR1
 			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_DISABLED;
 		}
 	}
-
 }

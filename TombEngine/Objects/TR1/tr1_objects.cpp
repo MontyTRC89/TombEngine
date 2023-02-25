@@ -22,6 +22,7 @@
 
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
+#include "Objects/TR1/Trap/TeethSpikeDoor.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;
@@ -186,6 +187,14 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = ControlDamoclesSword;
 		obj->collision = CollideDamoclesSword;
 		obj->shadowType = ShadowMode::All;
+		obj->SetupHitEffect(true);
+	}
+
+	obj = &Objects[ID_TEETH_SPIKE_DOOR];
+	if (obj->loaded)
+	{
+		obj->control = ControlTeethSpikeDoor;
+		obj->collision = GenericSphereBoxCollision;
 		obj->SetupHitEffect(true);
 	}
 }
