@@ -949,7 +949,7 @@ namespace TEN::Entities::Vehicles
 		Vector3i JointposR = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
 
 		
-		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))// && !(Wibble & 15))
 		{
 			DoWakeEffect(UPVItem, JointposL.x, JointposL.y, JointposL.z, 1, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);
 			DoWakeEffect(UPVItem, JointposR.x, JointposR.y, JointposR.z, 2, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);

@@ -167,7 +167,7 @@ namespace TEN::Effects::BOATFX
 			segment.Vertices[2] = prevSegment->Vertices[1];
 		}
 
-		segment.Opacity = 0.5f;
+		segment.Opacity = 0.7f;
 
 		segment.Life = life;		  
 	}

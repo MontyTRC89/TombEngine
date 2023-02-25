@@ -95,21 +95,38 @@ namespace TEN::Renderer
 
 				if (segment.Life)
 				{
+
 					Vector3 s1 = Vector3(segment.Vertices[0].x, segment.Vertices[0].y, segment.Vertices[0].z);
 					Vector3 s2 = Vector3(segment.Vertices[1].x, segment.Vertices[1].y, segment.Vertices[1].z);
 					Vector3 s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
 					Vector3 s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
 
-					AddColoredQuad(
-						segment.Vertices[0],
-						segment.Vertices[1],
-						segment.Vertices[2],
-						segment.Vertices[3], 
-						Vector4(0, 0, 0, 1),
-						Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-						Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-						Vector4(0, 0, 0, 1),
-						 BLENDMODE_WIREFRAME, view);
+					if (segment.StreamerID == 0) //No vertexcolor if central wave
+					{
+						AddColoredQuad(
+							segment.Vertices[0],
+							segment.Vertices[1],
+							segment.Vertices[2],
+							segment.Vertices[3],
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							BLENDMODE_WIREFRAME, view);
+					}
+					else
+					{
+						AddColoredQuad(
+							segment.Vertices[0],
+							segment.Vertices[1],
+							segment.Vertices[2],
+							segment.Vertices[3],
+							Vector4(0, 0, 0, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(0, 0, 0, 1),
+							BLENDMODE_WIREFRAME, view);
+					}
 				}
 			}			
 		}
