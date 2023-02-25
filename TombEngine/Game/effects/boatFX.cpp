@@ -20,12 +20,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::BOATFX
 {
-	enum WaveDirection
-	{
-		WAVE_DIRECTION_CENTRAL,
-		WAVE_DIRECTION_LEFT,
-		WAVE_DIRECTION_RIGHT
-	};
 	
 	WaveSegment Segments[NUM_WAKE_SPRITES][NUM_WAKE_DIRECTION];
 	
@@ -86,7 +80,7 @@ namespace TEN::Effects::BOATFX
 
 				switch (segment->StreamerID)
 				{
-					case WAVE_DIRECTION_LEFT:
+				case (int)WaveDirection::WAVE_DIRECTION_LEFT:
 
 						segment->Vertices[0] -= Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
 						segment->Vertices[1] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
@@ -95,7 +89,7 @@ namespace TEN::Effects::BOATFX
 
 						break;
 
-					case WAVE_DIRECTION_RIGHT:
+					case (int)WaveDirection::WAVE_DIRECTION_RIGHT:
 
 						segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
 						segment->Vertices[0] += Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
@@ -104,7 +98,7 @@ namespace TEN::Effects::BOATFX
 
 						break;
 
-					case WAVE_DIRECTION_CENTRAL:
+					case (int)WaveDirection::WAVE_DIRECTION_CENTRAL:
 
 						segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
 						segment->Vertices[0] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
@@ -152,7 +146,7 @@ namespace TEN::Effects::BOATFX
 		z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
 		Vector3 verticerPos = Vector3(x, origin.y, z);
 
-		if (waveDirection == WAVE_DIRECTION_LEFT)
+		if (waveDirection == (int)WaveDirection::WAVE_DIRECTION_LEFT)
 		{
 			segment.Vertices[0] = verticelPos;
 			segment.Vertices[1] = verticerPos;

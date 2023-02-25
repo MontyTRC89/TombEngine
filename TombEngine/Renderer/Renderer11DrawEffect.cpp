@@ -101,7 +101,7 @@ namespace TEN::Renderer
 					Vector3 s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
 					Vector3 s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
 
-					if (segment.StreamerID == 0) //No vertexcolor if central wave
+					if (segment.StreamerID == (int)WaveDirection::WAVE_DIRECTION_CENTRAL) //No vertexcolor if central wave
 					{
 						AddColoredQuad(
 							segment.Vertices[0],

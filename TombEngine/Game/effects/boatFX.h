@@ -14,6 +14,13 @@ namespace TEN::Effects::BOATFX
 	constexpr auto NUM_WAKE_SPRITES = 256;
 	constexpr auto NUM_WAKE_DIRECTION = 3;
 
+	enum class WaveDirection
+	{
+		WAVE_DIRECTION_CENTRAL = 0,
+		WAVE_DIRECTION_LEFT = 1,
+		WAVE_DIRECTION_RIGHT = 2
+	};
+
 	struct WaveSegment
 	{
 		//std::array<Vector3, 4> Vertices = {}; //NOTE: this cunfuses me, I will use that later when everything is set up and works
