@@ -21,9 +21,17 @@ namespace TEN::Entities::Traps::TR1
 		TEETHSPIKEDOOR_ENABLED = 1
 	};
 
+	enum TeethSpikeDoorAnim
+	{
+		TEETHSPIKEDOOR_ANIM_OPENED = 0,
+		TEETHSPIKEDOOR_ANIM_CLOSING = 1,
+		TEETHSPIKEDOOR_ANIM_OPENING = 2
+	};
+
 	void InitialiseTeethSpikeDoor(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
+		SetAnimation(&item, TEETHSPIKEDOOR_ANIM_OPENED);
 	}
 
 	void ControlTeethSpikeDoor(short itemNumber)
@@ -33,7 +41,6 @@ namespace TEN::Entities::Traps::TR1
 		if (TriggerActive(item))
 		{
 			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_ENABLED;
-			AnimateItem(item);
 
 			if (item->TouchBits.TestAny() && item->Animation.ActiveState == TEETHSPIKEDOOR_ENABLED)
 			{
@@ -45,5 +52,7 @@ namespace TEN::Entities::Traps::TR1
 		{
 			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_DISABLED;
 		}
+
+		AnimateItem(item);
 	}
 }

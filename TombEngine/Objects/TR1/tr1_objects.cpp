@@ -193,6 +193,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_TEETH_SPIKE_DOOR];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseTeethSpikeDoor;
 		obj->control = ControlTeethSpikeDoor;
 		obj->collision = GenericSphereBoxCollision;
 		obj->SetupHitEffect(true);

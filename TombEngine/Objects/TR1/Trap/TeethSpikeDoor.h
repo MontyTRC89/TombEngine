@@ -7,6 +7,5 @@ struct ObjectInfo;
 namespace TEN::Entities::Traps::TR1
 {
 	void InitialiseTeethSpikeDoor(short itemNumber);
-
 	void ControlTeethSpikeDoor(short itemNumber);
 }
