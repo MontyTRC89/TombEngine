@@ -16,8 +16,8 @@ namespace TEN::Entities::Generic
 		int height;				// height for collision, also in floor procedure
 		int weight;
 		int stackLimit;
-		int moveX;				// used for pushable movement code
-		int moveZ;				// used for pushable movement code
+		int refPosX;			// used for pushable movement code
+		int refPosZ;			// used for pushable movement code
 		int linkedIndex;		// using itemFlags[1] for now
 		int gravity;			// fall acceleration
 		int loopSound;			// looped sound index for movement

@@ -22,9 +22,9 @@ namespace TEN::Entities::Generic
 
 	// Test functions
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
-	bool TestBlockMovable(ItemInfo* item, int blockHeight);
-	bool TestBlockPush(ItemInfo* item, int blockHeight, int quadrant);
-	bool TestBlockPull(ItemInfo* item, int blockHeight, int quadrant);
+	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const int quadrant, const bool isPulling = true);
+	bool IsValidForLara(const ItemInfo& pushableItem, const Vector3i& offset, const int quadrant);
+	bool TestBlockMovable(ItemInfo& item, int blockHeight);
 
 	// Stack utilities functions
 	void MoveStackXZ(short itemNumber);
