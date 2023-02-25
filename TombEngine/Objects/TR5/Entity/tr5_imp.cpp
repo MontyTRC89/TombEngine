@@ -7,6 +7,7 @@
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/control/box.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
@@ -57,6 +58,16 @@ namespace TEN::Entities::Creatures::TR5
 		IMP_ANIM_THROW_ROCK = 17
 	};
 
+	enum ImpOCB
+	{
+		IMP_OCB_CLIMB_UP_START = 1,
+		IMP_OCB_BARREL_ROLL_START = 2,
+		IMP_OCB_THROW_ROCKS = 3,
+		
+	};
+
+
+
 	void InitialiseImp(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
@@ -64,12 +75,12 @@ namespace TEN::Entities::Creatures::TR5
 		InitialiseCreature(itemNumber);
 		ImpState state;
 
-		if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
+		if (item->TriggerFlags == IMP_OCB_BARREL_ROLL_START)
 		{
 			state = IMP_STATE_START_ROLL;
 			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_BARREL_ROLL;
 		}
-		else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
+		else if (item->TriggerFlags == IMP_OCB_CLIMB_UP_START)
 		{
 			state = IMP_STATE_START_CLIMB;
 			item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_CLIMB_UP;
@@ -129,6 +140,7 @@ namespace TEN::Entities::Creatures::TR5
 	}
 
 	void ImpControl(short itemNumber)
+
 	{
 		if (CreatureActive(itemNumber))
 		{
@@ -220,7 +232,7 @@ namespace TEN::Entities::Creatures::TR5
 						item->Animation.TargetState = IMP_STATE_WALK;
 					else
 					{
-						if (item->TriggerFlags == 3)
+						if (item->TriggerFlags == IMP_OCB_THROW_ROCKS)
 							item->Animation.TargetState = IMP_STATE_THROW_STONES;
 						else if (AI.distance <= pow(SECTOR(2), 2))
 						{
@@ -282,15 +294,22 @@ namespace TEN::Entities::Creatures::TR5
 			}
 			else
 			{
-				item->HitPoints = 0;
-
-				if (item->Animation.ActiveState != IMP_STATE_DEATH)
+				if (item->HitPoints <= 0)
 				{
-					item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_FALL_BACKWARDS;
-					item->Animation.ActiveState = IMP_STATE_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					if (item->Animation.ActiveState != IMP_STATE_DEATH)
+					{
+						AI_INFO AI;
+						CreatureAIInfo(item, &AI);
+						if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
+						{
+							SetAnimation(item, IMP_ANIM_FALL_FORWARD);
+						}
+						else
+						{
+							SetAnimation(item, IMP_ANIM_FALL_BACKWARDS);
+						}
+					}
 				}
-			}
 
 			if (creature->MaxTurn == -1)
 			{
