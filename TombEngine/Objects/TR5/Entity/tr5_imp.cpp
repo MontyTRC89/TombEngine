@@ -26,13 +26,13 @@ namespace TEN::Entities::Creatures::TR5
 		IMP_STATE_WALK = 0,
 		IMP_STATE_IDLE = 1,
 		IMP_STATE_RUN = 2,
-		IMP_STATE_SWIPE_ATTACK = 3,
-		IMP_STATE_JUMP_ATTACK = 4,
-		IMP_STATE_SCARED = 5,
-		IMP_STATE_START_CLIMB = 6,
-		IMP_STATE_START_ROLL = 7,
-		IMP_STATE_DEATH = 8,
-		IMP_STATE_THROW_STONES = 9
+		IMP_STATE_ATTACK_1 = 3,
+		IMP_STATE_JUMP_ATTACK = 5,
+		IMP_STATE_SCARED = 6,
+		IMP_STATE_START_CLIMB = 7,
+		IMP_STATE_START_ROLL = 8,
+		IMP_STATE_DEATH = 9,
+		IMP_STATE_THROW_STONES = 11
 	};
 
 	enum ImpAnim
@@ -220,7 +220,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (AI.bite && AI.distance < pow(170, 2) && item->TriggerFlags < 10)
 					{
 						if (GetRandomControl() & 1)
-							item->Animation.TargetState = IMP_STATE_SWIPE_ATTACK;
+							item->Animation.TargetState = IMP_STATE_ATTACK_1;
 						else
 							item->Animation.TargetState = IMP_STATE_JUMP_ATTACK;
 					}
@@ -254,7 +254,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					break;
 
-				case IMP_STATE_SWIPE_ATTACK:
+				case IMP_STATE_ATTACK_1:
 				case IMP_STATE_JUMP_ATTACK:
 					creature->MaxTurn = -1;
 
