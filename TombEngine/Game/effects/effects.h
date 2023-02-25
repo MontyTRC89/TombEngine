@@ -12,24 +12,11 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
-constexpr auto MAX_RIPPLES	= 256;
 constexpr auto MAX_SPLASHES = 8;
 constexpr auto NUM_EFFECTS	= 256;
 
 constexpr auto MAX_PARTICLES		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
-
-enum RIPPLE_TYPE
-{
-	RIPPLE_FLAG_NONE = 0x00,
-	RIPPLE_FLAG_ACTIVE = 0x01,
-	RIPPLE_FLAG_SHORT_INIT = 0x02,
-	RIPPLE_FLAG_RIPPLE_INNER = 0x04,
-	RIPPLE_FLAG_RIPPLE_MIDDLE = 0x08,
-	RIPPLE_FLAG_LOW_OPACITY = 0x10,
-	RIPPLE_FLAG_BLOOD = 0x20,
-	RIPPLE_FLAG_NO_RAND = 0x40
-};
 
 enum SpriteEnumFlag
 {
@@ -190,7 +177,6 @@ extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
@@ -198,7 +184,7 @@ extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 extern FX_INFO EffectList[NUM_EFFECTS];
 
 template <typename TEffect>
-TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
 	// Add and return new effect.
 	if (effects.size() < countMax)
@@ -218,12 +204,12 @@ TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
 	}
 
 	// Clear and return existing effect.
-	*effectPtr = TEffect();
+	*effectPtr = {};
 	return *effectPtr;
 }
 
 template <typename TEffect>
-void ClearInactiveEffects(std::deque<TEffect>& effects)
+void ClearInactiveEffects(std::vector<TEffect>& effects)
 {
 	effects.erase(
 		std::remove_if(
@@ -247,11 +233,9 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
-void SetupRipple(int x, int y, int z, int size, int flags);
 void TriggerLaraBlood();
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
-void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
