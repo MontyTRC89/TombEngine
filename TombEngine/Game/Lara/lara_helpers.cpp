@@ -731,6 +731,10 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 		SnapItemToLedge(item, coll, 0.2f, false);
 		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
+	else
+	{
+		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+	}
 
 	if (vaultResult.SetJumpVelocity)
 	{
