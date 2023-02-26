@@ -919,23 +919,6 @@ enum class HolsterSlot
 	RocketLauncher	= ID_ROCKET_ANIM
 };
 
-// TODO: Unused.
-enum class ClothType
-{
-	None,
-	Dry,
-	Wet
-};
-
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	TreadWater,
-	Underwater,
-	FlyCheat
-};
-
 enum class HandStatus
 {
 	None,
@@ -1281,7 +1264,7 @@ struct LaraControlData
 	int	  CalculatedJumpVelocity = 0;
 
 	HandStatus	  HandStatus	= HandStatus::None;
-	WaterStatus	  WaterStatus	= WaterStatus::None;
+	WaterStatus	  WaterStatus	= WaterStatus::Dry;
 	JumpDirection JumpDirection = JumpDirection::None;
 	LaraCountData Count			= {};
 

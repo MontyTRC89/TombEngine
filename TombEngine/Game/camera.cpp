@@ -28,22 +28,21 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-constexpr auto PARTICLE_FADE_THRESHOLD = SECTOR(14);
-constexpr auto COLL_CHECK_THRESHOLD    = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
+constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
+constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
+constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
-const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
-const auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
+constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
+constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
 
-const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
+constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
-	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0)
-);
+	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
 
-const auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
-const auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
+constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
+constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
 
 struct OLD_CAMERA
 {
@@ -117,21 +116,19 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	}
 
-	// Modulate turn rates.
 	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
 	if (BinocularRange)
 		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
+	// Modulate and apply turn rates.
 	player.Control.Look.TurnRate.x = ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
 	player.Control.Look.TurnRate.y = ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
-
-	// Apply turn rates.
 	player.Control.Look.Orientation += player.Control.Look.TurnRate;
 	player.Control.Look.Orientation.x = std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 	player.Control.Look.Orientation.y = std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
 
 	// Visually adapt head and torso orientations.
-	// TODO: "Rubber band" effect.
+	// TODO: Rubber band effect.
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
@@ -196,9 +193,10 @@ void LookCamera(ItemInfo* item)
 	// - Swamp collision.
 	// - Set modes in states.
 	// - Check main Lara control functions.
+	// - Fix water tread camera.
 
-	static constexpr auto cameraAlpha	 = 0.25f;
-	static constexpr auto cameraCollPush = BLOCK(1.0f / 4) - BLOCK(1.0f / 16);
+	constexpr auto POS_LERP_ALPHA = 0.25f;
+	constexpr auto COLL_PUSH	  = BLOCK(1.0f / 4) - BLOCK(1.0f / 16);
 
 	// Determine offsets.
 	float verticalOffset = -LaraCollision.Setup.Height;
@@ -211,7 +209,9 @@ void LookCamera(ItemInfo* item)
 		verticalOffset += BLOCK(1.0f / 2);
 	}
 	else
+	{
 		verticalOffset += -BLOCK(1.0f / 8);
+	}
 
 	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
 	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(3.0f / 4));
@@ -234,7 +234,7 @@ void LookCamera(ItemInfo* item)
 
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);
-	CameraCollisionBounds(&target, cameraCollPush, true);
+	CameraCollisionBounds(&target, COLL_PUSH, true);
 	ItemsCollideCamera();
 
 	// Doesn't seem necessary? Can use player's room number.
@@ -242,7 +242,7 @@ void LookCamera(ItemInfo* item)
 
 	// Smoothly update camera position.
 	MoveCamera(&target, Camera.speed);
-	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * cameraAlpha, item->RoomNumber);
+	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * POS_LERP_ALPHA, item->RoomNumber);
 
 	LookAt(&Camera, 0);
 	UpdateMikePos(item);
@@ -257,7 +257,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float r = TO_RAD(roll);
 
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
+	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
 
 	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
 }
@@ -282,30 +282,27 @@ inline void RumbleFromBounce()
 
 void InitialiseCamera()
 {
-	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
+	Camera.shift = LaraItem->Pose.Position.y - BLOCK(1);
 
 	LastTarget = GameVector(
 		LaraItem->Pose.Position.x,
 		Camera.shift,
 		LaraItem->Pose.Position.z,
-		LaraItem->RoomNumber
-	);
+		LaraItem->RoomNumber);
 
 	Camera.target = GameVector(
 		LastTarget.x,
 		Camera.shift,
 		LastTarget.z,
-		LaraItem->RoomNumber
-	);
+		LaraItem->RoomNumber);
 
 	Camera.pos = GameVector(
 		LastTarget.x,
 		Camera.shift,
 		LastTarget.z - 100,
-		LaraItem->RoomNumber
-	);
+		LaraItem->RoomNumber);
 
-	Camera.targetDistance = SECTOR(1.5f);
+	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
@@ -410,9 +407,9 @@ void MoveCamera(GameVector* ideal, int speed)
 	{
 		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 
-		if (abs(Camera.pos.x - ideal->x) < SECTOR(0.5f) &&
-			abs(Camera.pos.y - ideal->y) < SECTOR(0.5f) &&
-			abs(Camera.pos.z - ideal->z) < SECTOR(0.5f))
+		if (abs(Camera.pos.x - ideal->x) < BLOCK(0.5f) &&
+			abs(Camera.pos.y - ideal->y) < BLOCK(0.5f) &&
+			abs(Camera.pos.z - ideal->z) < BLOCK(0.5f))
 		{
 			auto origin = *ideal;
 			auto target = Camera.pos;
@@ -652,7 +649,7 @@ void ChaseCamera(ItemInfo* item)
 				float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
 
-				if ((dx + dz) > SQUARE(SECTOR(0.75f)))
+				if ((dx + dz) > SQUARE(BLOCK(0.75f)))
 				{
 					indexOfFarthestIdeal = 0;
 					break;
@@ -673,7 +670,7 @@ void UpdateCameraElevation()
 	if (Camera.laraNode != -1)
 	{
 		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), SECTOR(2)));
+		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		pos = pos1 - pos;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
@@ -749,7 +746,7 @@ void CombatCamera(ItemInfo* item)
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = SECTOR(1.5f);
+	Camera.targetDistance = BLOCK(1.5f);
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < maxSwivelSteps; i++)
@@ -799,7 +796,7 @@ void CombatCamera(ItemInfo* item)
 			{
 				float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
-				if ((dx + dz) > SQUARE(SECTOR(0.75f)))
+				if ((dx + dz) > SQUARE(BLOCK(0.75f)))
 				{
 					indexOfFarthestIdeal = 0;
 					break;
@@ -1042,10 +1039,10 @@ void BinocularCamera(ItemInfo* item)
 	Camera.pos.z = z;
 	Camera.pos.RoomNumber = probe.RoomNumber;
 
-	int l = SECTOR(20.25f) * phd_cos(headXRot);
+	int l = BLOCK(20.25f) * phd_cos(headXRot);
 
 	int tx = x + l * phd_sin(item->Pose.Orientation.y + headYRot);
-	int ty = y - SECTOR(20.25f) * phd_sin(headXRot);
+	int ty = y - BLOCK(20.25f) * phd_sin(headXRot);
 	int tz = z + l * phd_cos(item->Pose.Orientation.y + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
@@ -1355,7 +1352,7 @@ void CalculateCamera()
 		Camera.item = nullptr;
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
-		Camera.targetDistance = SECTOR(1.5f);
+		Camera.targetDistance = BLOCK(1.5f);
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
@@ -1620,8 +1617,8 @@ void UpdateMikePos(ItemInfo* item)
 
 		if (item->IsLara())
 		{
-			auto* lara = GetLaraInfo(item);
-			Camera.actualAngle += lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+			auto& player = *GetLaraInfo(item);
+			Camera.actualAngle += player.ExtraHeadRot.y + player.ExtraTorsoRot.y;
 		}
 	}
 	else
@@ -1776,7 +1773,7 @@ void HandleOptics(ItemInfo* item)
 		breakOptics = true;
 
 	// If lasersight, and weapon is holstered, exit optics.
-	if (LaserSight && IsHeld(In::Draw))
+	if (LaserSight && IsHeld(In::DrawWeapon))
 		breakOptics = true;
 
 	// Engage lasersight if available.
