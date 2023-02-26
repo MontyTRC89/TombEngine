@@ -26,7 +26,7 @@ namespace TEN::Entities::Generic
 		int climb;				// not used for now
 		bool canFall;			// OCB 32
 		bool doAlignCenter;		// --
-		bool hasFloorCeiling;	// has floor and ceiling procedures (OCB 64)
+		bool hasFloorColission;	// has floor and ceiling procedures (OCB 64)
 		bool disablePull;		// OCB 128
 		bool disablePush;		// OCB 256
 		bool disableW;			// OCB 512 (W+E)

@@ -79,22 +79,14 @@ namespace TEN::Entities::Generic
 		pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
 		pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
 		*/
-		pushableInfo.hasFloorCeiling = false;
-
-		int height = 0;
-
-		//pushableInfo.hasFloorCeiling = true;
-		//TEN::Floordata::AddBridge(itemNumber);
-
-		//int temporalHeight = -GameBoundingBox(&item).Y1;
-		//temporalHeight =  (int) (temporalHeight / CLICK(1));
-		//height = temporalHeight;
-
-		//height = (ocb & 0x1F) * CLICK(1);
+		//pushableInfo.hasFloorCeiling = false;
 
 
+		pushableInfo.hasFloorColission = true;
+		TEN::Floordata::AddBridge(itemNumber);
+		int height = -GameBoundingBox(&item).Y1;
 
-		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
+		/*if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushableInfo.hasFloorCeiling = true;
 			TEN::Floordata::AddBridge(itemNumber);
@@ -103,7 +95,7 @@ namespace TEN::Entities::Generic
 		else
 		{
 			height = -GameBoundingBox(&item).Y1;
-		}
+		}*/
 
 		pushableInfo.height = height;
 
@@ -246,7 +238,7 @@ namespace TEN::Entities::Generic
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				laraInfo.NextCornerPos.Position.x != itemNumber)
 			{
-				if (!pushableInfo.hasFloorCeiling)
+				if (!pushableInfo.hasFloorColission)
 					ObjectCollision(itemNumber, laraItem, coll);
 
 				return;
@@ -309,7 +301,7 @@ namespace TEN::Entities::Generic
 			pushableInfo.refPosX = item.Pose.Position.x;
 			pushableInfo.refPosZ = item.Pose.Position.z;
 
-			if (pushableInfo.hasFloorCeiling)
+			if (pushableInfo.hasFloorColission)
 			{
 				AdjustStopperFlag(&item, item.ItemFlags[0]);
 			}
@@ -376,7 +368,7 @@ namespace TEN::Entities::Generic
 			RemoveActiveItem(itemNumber);
 			pushableItem.Status = ITEM_NOT_ACTIVE;
 
-			if (pushableInfo.hasFloorCeiling)
+			if (pushableInfo.hasFloorColission)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));
@@ -404,7 +396,7 @@ namespace TEN::Entities::Generic
 		RemoveActiveItem(itemNumber);
 		pushableItem.Status = ITEM_NOT_ACTIVE;
 
-		if (pushableInfo.hasFloorCeiling)
+		if (pushableInfo.hasFloorColission)
 		{
 			//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));//This box function is only used by this pushable...
@@ -764,7 +756,7 @@ namespace TEN::Entities::Generic
 		detectionPoint.RoomNumber = LaraItem->RoomNumber;
 
 		CollisionResult col; 
-		if (pushableInfo.hasFloorCeiling)
+		if (pushableInfo.hasFloorColission)
 		{
 			RemoveBridge(pushableItem.Index);
 			col = GetCollision(detectionPoint);
@@ -774,7 +766,6 @@ namespace TEN::Entities::Generic
 		{
 			col = GetCollision(detectionPoint);
 		}
-		
 
 		//Is a stopper flag tile?
 		if (col.Block->Stopper)
@@ -879,13 +870,13 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		const auto* pushable = GetPushableInfo(item);
 
-		if (pushable->hasFloorCeiling)
+		if (pushable->hasFloorColission)
 			TEN::Floordata::AddBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
-			if (pushable->hasFloorCeiling)
+			if (pushable->hasFloorColission)
 				TEN::Floordata::AddBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
@@ -897,13 +888,13 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		const auto* pushable = GetPushableInfo(item);
 
-		if (pushable->hasFloorCeiling)
+		if (pushable->hasFloorColission)
 			TEN::Floordata::RemoveBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
-			if (pushable->hasFloorCeiling)
+			if (pushable->hasFloorColission)
 				TEN::Floordata::RemoveBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
@@ -1009,14 +1000,16 @@ namespace TEN::Entities::Generic
 
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		const auto* pushable = GetPushableInfo(item);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		const auto& pushableInfo = *GetPushableInfo(&pushableItem);
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-		if (item->Status != ITEM_INVISIBLE && pushable->hasFloorCeiling && boxHeight.has_value())
+		if (pushableItem.Status != ITEM_INVISIBLE && pushableInfo.hasFloorColission && boxHeight.has_value())
 		{
-			const auto height = item->Pose.Position.y - (item->TriggerFlags & 0x1F) * CLICK(1); //Here goes the bounding box height.
+			const auto height = pushableItem.Pose.Position.y + GameBoundingBox(&pushableItem).Y1;
+			//const auto height = item->Pose.Position.y - (item->TriggerFlags & 0x1F) * CLICK(1);
+
 			return std::optional{height};
 		}
 
@@ -1030,7 +1023,7 @@ namespace TEN::Entities::Generic
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-		if (item->Status != ITEM_INVISIBLE && pushable->hasFloorCeiling && boxHeight.has_value())
+		if (item->Status != ITEM_INVISIBLE && pushable->hasFloorColission && boxHeight.has_value())
 			return std::optional{item->Pose.Position.y};
 
 		return std::nullopt;
@@ -1038,9 +1031,11 @@ namespace TEN::Entities::Generic
 
 	int PushableBlockFloorBorder(short itemNumber)
 	{
-		const auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		const auto height = item->Pose.Position.y - (item->TriggerFlags & 0x1F) * CLICK(1);
+		const auto height = item.Pose.Position.y + GameBoundingBox(&item).Y1;
+		//const auto height = item->Pose.Position.y - (item->TriggerFlags & 0x1F) * CLICK(1);
+
 		return height;
 	}
 
