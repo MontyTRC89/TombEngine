@@ -241,7 +241,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			//If player is not grabbing it, then just activate the collision if required and finishes.
+			//If player is not grabbing it, then just do object collision rutine.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				laraInfo.NextCornerPos.Position.x != itemNumber)
@@ -633,7 +633,7 @@ namespace TEN::Entities::Generic
 		const auto& pushableInfo = *GetPushableInfo(&pushableItem);
 
 		GameVector detectionPoint = pushableItem.Pose.Position;
-		detectionPoint.y -= blockHeight;
+		//detectionPoint.y -= blockHeight;
 		detectionPoint.RoomNumber = pushableItem.RoomNumber;
 
 		switch (quadrant)
@@ -730,41 +730,51 @@ namespace TEN::Entities::Generic
 
 		if (isPulling)
 		{
-			if (!IsValidForLara(pushableItem, detectionPoint.ToVector3i(), quadrant))
+			if (!IsValidForLara(pushableItem, pushableInfo, quadrant))
 				return false;
 		}
 
 		return true;
 	}
 
-	bool IsValidForLara(const ItemInfo& pushableItem, const Vector3i& offset, const int quadrant)
+	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const int quadrant)
 	{
-		GameVector playerOffset = Vector3i::Zero;
-		playerOffset.y -= LARA_HEIGHT;
-		playerOffset.RoomNumber = LaraItem->RoomNumber;
-
+		auto playerOffset = Vector3i::Zero;
+		
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = LaraItem->Pose.Position.z + GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = GetBestFrame(LaraItem)->offsetZ + BLOCK(1);
 			break;
 
 		case EAST:
-			playerOffset.x = LaraItem->Pose.Position.x + GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = GetBestFrame(LaraItem)->offsetZ + BLOCK(1);
 			break;
 
 		case SOUTH:
-			playerOffset.z = LaraItem->Pose.Position.z - GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = -GetBestFrame(LaraItem)->offsetZ - BLOCK(1);
 			break;
 
 		case WEST:
-			playerOffset.x = LaraItem->Pose.Position.x - GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = -GetBestFrame(LaraItem)->offsetZ - BLOCK(1);
 			break;
 		}
 
-		playerOffset += offset;
+		GameVector detectionPoint = LaraItem->Pose.Position + playerOffset;
+		detectionPoint.RoomNumber = LaraItem->RoomNumber;
 
-		auto col = GetCollision(playerOffset);
+		CollisionResult col; 
+		if (pushableInfo.hasFloorCeiling)
+		{
+			RemoveBridge(pushableItem.Index);
+			col = GetCollision(detectionPoint);
+			AddBridge(pushableItem.Index);
+		}
+		else
+		{
+			col = GetCollision(detectionPoint);
+		}
+		
 
 		//Is a stopper flag tile?
 		if (col.Block->Stopper)
@@ -781,7 +791,7 @@ namespace TEN::Entities::Generic
 
 		//Is there any enemy or object?
 		auto prevPos = LaraItem->Pose.Position;
-		LaraItem->Pose.Position = playerOffset.ToVector3i();
+		LaraItem->Pose.Position = detectionPoint.ToVector3i();
 		GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
 		LaraItem->Pose.Position = prevPos;
 
