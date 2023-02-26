@@ -183,8 +183,8 @@ namespace TEN::Renderer
 		if (!totalVertices || !totalIndices)
 			throw std::exception("Level has no textured room geometry.");
 
-		roomsVertices.resize(totalVertices);
-		roomsIndices.resize(totalIndices);
+		m_roomsVertices.resize(totalVertices);
+		m_roomsIndices.resize(totalIndices);
 
 		TENLog("Loaded total " + std::to_string(totalVertices) + " room vertices.", LogLevel::Info);
 
@@ -300,7 +300,7 @@ namespace TEN::Renderer
 					int baseVertices = lastVertex;
 					for (int k = 0; k < (int)poly.indices.size(); k++)
 					{
-						RendererVertex* vertex = &roomsVertices[lastVertex];
+						RendererVertex* vertex = &m_roomsVertices[lastVertex];
 						int index = poly.indices[k];
 
 						vertex->Position.x = room.x + room.positions[index].x;
@@ -330,12 +330,12 @@ namespace TEN::Renderer
 					{
 						newPoly.baseIndex = lastIndex;
 
-						roomsIndices[lastIndex + 0] = baseVertices + 0;
-						roomsIndices[lastIndex + 1] = baseVertices + 1;
-						roomsIndices[lastIndex + 2] = baseVertices + 3;
-						roomsIndices[lastIndex + 3] = baseVertices + 2;
-						roomsIndices[lastIndex + 4] = baseVertices + 3;
-						roomsIndices[lastIndex + 5] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
+						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 2] = baseVertices + 3;
+						m_roomsIndices[lastIndex + 3] = baseVertices + 2;
+						m_roomsIndices[lastIndex + 4] = baseVertices + 3;
+						m_roomsIndices[lastIndex + 5] = baseVertices + 1;
 
 						lastIndex += 6;
 					}
@@ -343,9 +343,9 @@ namespace TEN::Renderer
 					{
 						newPoly.baseIndex = lastIndex;
  
-						roomsIndices[lastIndex + 0] = baseVertices + 0;
-						roomsIndices[lastIndex + 1] = baseVertices + 1;
-						roomsIndices[lastIndex + 2] = baseVertices + 2;
+						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
+						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 2] = baseVertices + 2;
 
 						lastIndex += 3;
 					}
@@ -421,9 +421,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-
-		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)roomsVertices.size(), roomsVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)roomsIndices.size(), roomsIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_roomsVertices.size(), (int)m_roomsVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_roomsIndices.size(), (int)m_roomsIndices.data());
 
 		std::for_each(std::execution::par_unseq,
 			m_rooms.begin(),
@@ -467,8 +466,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		moveablesVertices.resize(totalVertices);
-		moveablesIndices.resize(totalIndices);
+		m_moveablesVertices.resize(totalVertices);
+		m_moveablesIndices.resize(totalIndices);
 
 		lastVertex = 0;
 		lastIndex = 0;
@@ -613,7 +612,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									RendererVertex *jointVertex = &moveablesVertices[jointBucket->StartVertex + v1];
+									RendererVertex *jointVertex = &m_moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool done = false;
 
@@ -627,15 +626,15 @@ namespace TEN::Renderer
 											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												RendererVertex *skinVertex = &moveablesVertices[skinBucket->StartVertex + v2];
+												RendererVertex *skinVertex = &m_moveablesVertices[skinBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
+												int x1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
+												int y1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
+												int z1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
+												int x2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
+												int y2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
+												int z2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
 
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
@@ -675,7 +674,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
-									RendererVertex* currentVertex = &moveablesVertices[currentBucket->StartVertex + v1];
+									RendererVertex* currentVertex = &m_moveablesVertices[currentBucket->StartVertex + v1];
 									currentVertex->Bone = j + 1;
 
 									if (j == 0)
@@ -694,7 +693,7 @@ namespace TEN::Renderer
 												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
+													RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
 
 													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
 													{
@@ -717,15 +716,15 @@ namespace TEN::Renderer
 											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
+												RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
+												int x1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
+												int x2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
@@ -746,9 +745,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-
-		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)moveablesVertices.size(), moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)moveablesIndices.size(), moveablesIndices.data());
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)m_moveablesVertices.size(), (int)m_moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)m_moveablesIndices.size(), (int)m_moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);
 
@@ -766,8 +764,8 @@ namespace TEN::Renderer
 				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 			}
 		}
-		staticsVertices.resize(totalVertices);
-		staticsIndices.resize(totalIndices);
+		m_staticsVertices.resize(totalVertices);
+		m_staticsIndices.resize(totalIndices);
 
 		lastVertex = 0;
 		lastIndex = 0;
@@ -787,10 +785,10 @@ namespace TEN::Renderer
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 		}
 
-		if (staticsVertices.size() > 0)
+		if (m_staticsVertices.size() > 0)
 		{
-			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), (int)staticsVertices.size(), staticsVertices.data());
-			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), (int)staticsIndices.size(), staticsIndices.data());
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_staticsVertices.size(), (int)m_staticsVertices.data());
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_staticsIndices.size(), (int)m_staticsIndices.data());
 		}
 		else
 		{
@@ -814,6 +812,8 @@ namespace TEN::Renderer
 			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
 			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
 			sprite.Texture = &m_spritesTextures[oldSprite->tile];
+			sprite.Width = (oldSprite->x2 - oldSprite->x1) * sprite.Texture->Width + 1;
+			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
 		}
 
 		for (int i = 0; i < (int)MoveablesIds.size(); i++)
@@ -909,9 +909,9 @@ namespace TEN::Renderer
 							(unsigned int)std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
-						moveablesVertices[*lastVertex] = vertex;
+						m_moveablesVertices[*lastVertex] = vertex;
 					else
-						staticsVertices[*lastVertex] = vertex;
+						m_staticsVertices[*lastVertex] = vertex;
 
 					*lastVertex = *lastVertex + 1;
 				}
@@ -922,21 +922,21 @@ namespace TEN::Renderer
 
 					if (obj->Type == 0)
 					{
-						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						m_moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						m_moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						m_moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
 					}
 					else
 					{
-						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						m_staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						m_staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						m_staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
 					}
 
 					*lastIndex = *lastIndex + 6;
@@ -947,15 +947,15 @@ namespace TEN::Renderer
 
 					if (obj->Type == 0)
 					{
-						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
 					}
 					else
 					{
-						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
 					}
 
 					*lastIndex = *lastIndex + 3;

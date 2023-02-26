@@ -2832,7 +2832,7 @@ namespace TEN::Gui
 				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
 				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
 
-				g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, bits);
+				g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;

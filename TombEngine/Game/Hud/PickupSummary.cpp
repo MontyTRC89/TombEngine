@@ -30,7 +30,8 @@ namespace TEN::Hud
 		constexpr auto LIFE_BUFFER		   = 0.2f;
 		constexpr auto SCALE_MAX		   = 0.4f;
 		constexpr auto SCALE_MIN		   = 0.2f;
-		constexpr auto HIDE_VELOCITY_COEFF = 3 / 100.0f;
+		constexpr auto HIDE_VELOCITY_MAX   = SCREEN_SPACE_RES.x * 0.03f;
+		constexpr auto HIDE_VELOCITY_ACCEL = HIDE_VELOCITY_MAX / 4;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
 		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
@@ -38,8 +39,8 @@ namespace TEN::Hud
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
 		{
-			auto vel = Vector2(SCREEN_SPACE_RES.x * HIDE_VELOCITY_COEFF, 0.0f);
-			this->Position += vel;
+			this->HideVelocity = std::clamp(HideVelocity + HIDE_VELOCITY_ACCEL, 0.0f, HIDE_VELOCITY_MAX);
+			this->Position.x += HideVelocity;
 		}
 		// Update position, scale, and opacity.
 		else if (Life > 0.0f)

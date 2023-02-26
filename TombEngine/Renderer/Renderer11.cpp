@@ -29,7 +29,7 @@ namespace TEN::Renderer
 
 	void Renderer11::FreeRendererData()
 	{
-		shadowLight = nullptr;
+		m_shadowLight = nullptr;
 
 		ClearSceneItems();
 
@@ -324,12 +324,34 @@ namespace TEN::Renderer
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
-	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	void Renderer11::BindRoomLights(std::vector<RendererLight*>& lights)
 	{
-		BindLights(lights, NO_ROOM, NO_ROOM, 1.0f);
+		for (int i = 0; i < lights.size(); i++)
+		{ 
+			memcpy(&m_stRoom.RoomLights[i], lights[i], sizeof(ShaderLight));
+		}
+		m_stRoom.NumRoomLights = lights.size();
 	}
 
-	void Renderer11::BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
+	void Renderer11::BindStaticLights(std::vector<RendererLight*>& lights)
+	{
+		for (int i = 0; i < lights.size(); i++)
+		{
+			memcpy(&m_stStatic.Lights[i], lights[i], sizeof(ShaderLight));
+		}
+		m_stStatic.NumLights = lights.size();
+	}
+
+	void Renderer11::BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID)
+	{
+		for (int i = 0; i < lights.size(); i++)
+		{
+			memcpy(&m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
+		} 
+		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = lights.size();
+	}
+
+	void Renderer11::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
 	{
 		int numLights = 0;
 		for (int i = 0; i < lights.size(); i++)
@@ -350,15 +372,12 @@ namespace TEN::Renderer
 			if (fadedCoeff == 0.0f)
 				continue;
 
-			memcpy(&m_stLights.Lights[numLights], lights[i], sizeof(ShaderLight));
-			m_stLights.Lights[numLights].Intensity *= fadedCoeff;
+			memcpy(&m_stItem.Lights[numLights], lights[i], sizeof(ShaderLight));
+			m_stItem.Lights[numLights].Intensity *= fadedCoeff;
 			numLights++;
 		}
 
-		m_stLights.NumLights = numLights;
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
-		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());
+		m_stItem.NumLights = numLights;
 	}
 
 	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
