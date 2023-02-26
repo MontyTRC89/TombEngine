@@ -108,6 +108,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 		{
 			TENLog("Incorrect sample parameters, must be either 22050 Hz or 44100 Hz (Mono)", LogLevel::Error);
 		}
+		return false;
 	}
 
 	// Generate RIFF/WAV header to simplify loading sample data to stream. In case if RIFF/WAV header
