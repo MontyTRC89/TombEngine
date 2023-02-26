@@ -1038,7 +1038,7 @@ unsigned int _stdcall LoadLevel(void* data)
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::FromChar(level->LoadScreenFileName.c_str()));
+	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);

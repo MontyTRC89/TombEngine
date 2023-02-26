@@ -5,7 +5,7 @@
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/Gui.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
@@ -16,6 +16,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -505,61 +506,67 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawPickup(short objectNum)
+	void Renderer11::DrawPickup(const DisplayPickup& pickup)
 	{
-		// Clear just the Z-buffer so we can start drawing on top of the scene
+		static const auto COUNT_STRING_PREFIX = std::string("  ");
+
+		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
 		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, EulerAngles(0, m_pickupRotation, 0), 0.5f); // TODO: + PickupY
-		m_pickupRotation += 45 * 360 / 30;
+		// Draw display pickup.
+		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+
+		// Draw count string.
+		if (pickup.Count > 1)
+		{
+			AddString(
+				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
+				pickup.Position, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+		}
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits)
+	// TODO: Handle opacity
+	void Renderer11::DrawObjectOn2DPosition(int objectNumber, Vector2 screenPos, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
-		Matrix translation;
-		Matrix rotation;
-		Matrix world;
-		Matrix view;
-		Matrix projection;
-		Matrix scale;
+		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
-		float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
+		auto screenRes = GetScreenResolution();
+		auto factor = Vector2(
+			screenRes.x / SCREEN_SPACE_RES.x,
+			screenRes.y / SCREEN_SPACE_RES.y);
 
-		x *= factorX;
-		y *= factorY;
-		scale1 *= factorX > factorY ? factorY : factorX;
+		screenPos *= factor;
+		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
-		auto index = g_Gui.ConvertObjectToInventoryItem(objectNum);
-
+		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (index != -1)
 		{
-			auto& invObject = InventoryObjectTable[index];
-			y += invObject.YOffset;
+			const auto& invObject = InventoryObjectTable[index];
+
+			screenPos.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
 
-		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
-		projection = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -1024.0f, 1024.0f);
+		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(2)), Vector3::Zero, Vector3::Down);
+		auto projMatrix = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -BLOCK(1), BLOCK(1));
 
-		auto& moveableObj = m_moveableObjects[objectNum];
-		if (!moveableObj)
+		auto& moveableObject = m_moveableObjects[objectNumber];
+		if (!moveableObject)
 			return;
 
-		auto* obj = &Objects[objectNum];
-
-		if (obj->animIndex != -1)
+		const auto& object = Objects[objectNumber];
+		if (object.animIndex != -1)
 		{
-			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].FramePtr] };
-			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
+			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr] };
+			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
 		}
 
-		auto pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+		auto pos = m_viewportToolkit.Unproject(Vector3(screenPos.x, screenPos.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
 
 		// Set vertex buffer.
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -572,41 +579,39 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
 		// Set matrices.
-		CCameraMatrixBuffer HudCamera;
-		HudCamera.CamDirectionWS = -Vector4::UnitZ;
-		HudCamera.ViewProjection = view * projection;
-		m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
+		CCameraMatrixBuffer hudCamera;
+		hudCamera.CamDirectionWS = -Vector4::UnitZ;
+		hudCamera.ViewProjection = viewMatrix * projMatrix;
+		m_cbCameraMatrices.updateData(hudCamera, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 
-		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
+		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
 		{
 			if (meshBits && !(meshBits & (1 << n)))
 				continue;
+			
+			auto* mesh = (*moveableObject).ObjectMeshes[n];
 
-			auto* mesh = (*moveableObj).ObjectMeshes[n];
+			// Construct world matrix.
+			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
+			auto rotMatrix = orient.ToRotationMatrix();
+			auto scaleMatrix = Matrix::CreateScale(scale);
+			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
 
-			// Finish the world matrix
-			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-			rotation = orient.ToRotationMatrix();
-			scale = Matrix::CreateScale(scale1);
-
-			world = scale * rotation;
-			world = world * translation;
-
-			if (obj->animIndex != -1)
-				m_stItem.World = ((*moveableObj).AnimationTransforms[n] * world);
+			if (object.animIndex != -1)
+				m_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
 			else
-				m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
+				m_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
 
 			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.Color = Vector4::One;
-			m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			m_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-			for (auto& bucket : mesh->Buckets)
+			
+			for (const auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
@@ -619,12 +624,10 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
 				SetAlphaTest(
-					bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-					ALPHA_TEST_THRESHOLD
-				);
+					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
 				m_numMoveablesDrawCalls++;
 			}
 		}
@@ -633,7 +636,7 @@ namespace TEN::Renderer
 	void Renderer11::RenderTitleImage()
 	{
 		Texture2D texture;
-		SetTextureOrDefault(texture, TEN::Utils::FromChar(g_GameFlow->IntroImagePath.c_str()));
+		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->IntroImagePath.c_str()));
 
 		if (!texture.Texture)
 			return;
@@ -651,7 +654,9 @@ namespace TEN::Renderer
 					timeout--;
 			}
 			else
+			{
 				currentFade = std::clamp(currentFade -= FADE_FACTOR, 0.0f, 1.0f);
+			}
 
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), m_backBufferRTV, m_depthStencilView);
 			Synchronize();
@@ -662,6 +667,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawExamines()
 	{
+		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
+
 		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
 
@@ -695,23 +702,26 @@ namespace TEN::Renderer
 
 		float savedScale = object.Scale1;
 		object.Scale1 = scaler;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(invItem), orient, object.Scale1);
+		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
 		object.Scale1 = savedScale;
 	}
 
 	void Renderer11::DrawDiary()
 	{
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
+		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
 		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
+		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), object.Orientation, object.Scale1);
+		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
 
-		for (size_t i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
+		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
 			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
 				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
+			{
 				break;
+			}
 
 			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
 		}
@@ -719,8 +729,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		ID3D11ShaderResourceView* background)
+	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
 	{
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE, true);
@@ -761,12 +770,12 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)m_screenWidth / REFERENCE_RES_WIDTH;
-				float factorY = (float)m_screenHeight / REFERENCE_RES_HEIGHT;
+				float factorX = (float)m_screenWidth / SCREEN_SPACE_RES.x;
+				float factorY = (float)m_screenHeight / SCREEN_SPACE_RES.y;
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
-				int logoLeft   = (REFERENCE_RES_WIDTH / 2) - (LogoWidth / 2);
-				int logoRight  = (REFERENCE_RES_WIDTH / 2) + (LogoWidth / 2);
+				int logoLeft   = (SCREEN_SPACE_RES.x / 2) - (LogoWidth / 2);
+				int logoRight  = (SCREEN_SPACE_RES.x / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;
@@ -901,7 +910,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d (%d instanced)", m_numSpritesDrawCalls, m_numInstancedSpritesDrawCalls);
+				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
@@ -914,18 +923,18 @@ namespace TEN::Renderer
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
+				PrintDebugMessage("    dot products: %d", m_dotProducts);
+
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
 				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-					LaraItem->BoxNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
-					r->z + r->zSize * SECTOR(1));
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1), r->z + r->zSize * SECTOR(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);

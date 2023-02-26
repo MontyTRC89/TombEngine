@@ -21,9 +21,9 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls = 0;
 		m_biggestRoomIndexBuffer = 0;
 		m_numPolygons = 0;
-		m_numInstancedSpritesDrawCalls = 0; 
 		m_numCheckPortalCalls = 0;
 		m_numGetVisibleRoomsCalls = 0;
+		m_dotProducts = 0;
 	}
 
 	bool Renderer11::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)

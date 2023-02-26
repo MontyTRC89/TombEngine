@@ -178,6 +178,11 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+CollisionResult GetCollision(const GameVector& point)
+{
+	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
+}
+
 // A reworked legacy GetFloorHeight() function which writes data
 // into a special CollisionResult struct instead of global variables.
 // It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
@@ -840,7 +845,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, short constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
@@ -865,14 +870,14 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }

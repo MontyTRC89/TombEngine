@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"

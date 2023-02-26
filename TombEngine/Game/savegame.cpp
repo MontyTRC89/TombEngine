@@ -247,7 +247,7 @@ bool SaveGame::Save(int slot)
 
 	std::vector<byte> wet;
 	for (int i = 0; i < 15; i++)
-		wet.push_back(Lara.Wet[i] == 1);
+		wet.push_back(Lara.Effect.DripNodes[i] == 1);
 	auto wetOffset = fbb.CreateVector(wet);
 
 	std::vector<int> laraTargetAngles{};
@@ -1814,7 +1814,7 @@ bool SaveGame::Load(int slot)
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		Lara.Wet[i] = s->lara()->wet()->Get(i);
+		Lara.Effect.DripNodes[i] = s->lara()->wet()->Get(i);
 	}
 
 	Lara.Air = s->lara()->air();

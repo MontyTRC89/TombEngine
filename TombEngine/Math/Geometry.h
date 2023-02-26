@@ -42,4 +42,6 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Pose& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
+
+	const int FastVectorsDistance(int x1, int y1, int z1, int x2, int y2, int z2);
 }

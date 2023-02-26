@@ -18,24 +18,29 @@ namespace TEN::Renderer
 		quadVertices[0].Normal.Normalize();
 		quadVertices[0].UV = Vector2(0, 1);
 		quadVertices[0].Color = Vector4(1, 1, 1, 1);
-		//Top Left
+		quadVertices[0].IndexInPoly = 3;
+		//Top Left 
 		quadVertices[1].Position = Vector3(-0.5, 0.5, 0);
 		quadVertices[1].Normal = Vector3(-1, 1, 1);
 		quadVertices[1].Normal.Normalize();
 		quadVertices[1].UV = Vector2(0, 0);
 		quadVertices[1].Color = Vector4(1, 1, 1, 1);
+		quadVertices[1].IndexInPoly = 0;
 		//Top Right
 		quadVertices[3].Position = Vector3(0.5, 0.5, 0);
 		quadVertices[3].Normal = Vector3(1, 1, 1);
 		quadVertices[3].Normal.Normalize();
 		quadVertices[3].UV = Vector2(1, 0);
 		quadVertices[3].Color = Vector4(1, 1, 1, 1);
+		quadVertices[3].IndexInPoly = 1;
 		//Bottom Right
 		quadVertices[2].Position = Vector3(0.5, -0.5, 0);
 		quadVertices[2].Normal = Vector3(1, -1, 1);
 		quadVertices[2].Normal.Normalize();
 		quadVertices[2].UV = Vector2(1, 1);
 		quadVertices[2].Color = Vector4(1, 1, 1, 1);
+		quadVertices[2].IndexInPoly = 2;
+
 		D3D11_BUFFER_DESC bufferDesc = {};
 		bufferDesc.ByteWidth = sizeof(RendererVertex) * 4;
 		bufferDesc.MiscFlags = 0x0;

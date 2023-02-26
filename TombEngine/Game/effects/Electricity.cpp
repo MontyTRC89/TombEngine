@@ -201,7 +201,7 @@ namespace TEN::Effects::Electricity
 				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
-	void UpdateElectricitys()
+	void UpdateElectricityArcs()
 	{
 		// No active effects; return early.
 		if (ElectricityArcs.empty())

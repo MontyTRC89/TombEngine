@@ -127,6 +127,7 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 CollisionResult GetCollision(Vector3i pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, EulerAngles orient, float distance);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(const GameVector& point);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
@@ -153,7 +154,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, float constraintAngle = 70.0f);
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
