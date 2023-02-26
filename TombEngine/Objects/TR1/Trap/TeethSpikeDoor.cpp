@@ -74,9 +74,9 @@ namespace TEN::Entities::Traps::TR1
 		AnimateItem(item);
 	}
 
-	void DoBiteEffect(ItemInfo *item, BiteInfo bite)
+	void DoBiteEffect(ItemInfo* item, const BiteInfo& bite)
 	{
-		GetJointPosition(item, bite.meshNum);
-		DoBloodSplat(bite.Position.x, bite.Position.y, bite.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
+		auto pos = GetJointPosition(item, bite.meshNum);
+		DoBloodSplat(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 	}
 }
