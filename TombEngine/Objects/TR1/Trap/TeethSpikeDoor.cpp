@@ -1,19 +1,32 @@
 #include "framework.h"
 #include "Objects/TR1/Trap/TeethSpikeDoor.h"
 
-#include "Game/camera.h"
-#include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
+#include "Game/control/Box.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Math/Objects/Vector3i.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Traps::TR1
 {
 	constexpr auto TEETH_SPIKE_DOOR_DAMAGE = 400;
+
+	const auto Teeth1ABite = BiteInfo(Vector3(-23.0f, 0.0f, -1718.0f), 0);
+	const auto Teeth1BBite = BiteInfo(Vector3(71.0f, 0.0f, -1718.0f), 1);
+	const auto Teeth2ABite = BiteInfo(Vector3(-23.0f, 10.0f, -1718.0f), 0);
+	const auto Teeth2BBite = BiteInfo(Vector3(71.0f, 10.0f, -1718.0f), 1);
+	const auto Teeth3ABite = BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0);
+	const auto Teeth3BBite = BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1);
+
+	//const BiteInfo TeethSpikeBite[6] = {
+	//	BiteInfo(Vector3(-23.0f, 0.0f, -1718.0f), 0),
+	//	BiteInfo(Vector3(71.0f, 0.0f, -1718.0f), 1),
+	//	BiteInfo(Vector3(-23.0f, 10.0f, -1718.0f), 0),
+	//	BiteInfo(Vector3(71.0f, 10.0f, -1718.0f), 1),
+	//	BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0),
+	//	BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1),
+	//};
 
 	enum TeethSpikeDoorState
 	{
@@ -40,19 +53,30 @@ namespace TEN::Entities::Traps::TR1
 
 		if (TriggerActive(item))
 		{
-			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_ENABLED;
+			item->Animation.TargetState = TEETHSPIKEDOOR_ENABLED;
 
 			if (item->TouchBits.TestAny() && item->Animation.ActiveState == TEETHSPIKEDOOR_ENABLED)
 			{
 				DoDamage(LaraItem, TEETH_SPIKE_DOOR_DAMAGE);
-				//TODO Add blood and check for individual spike in door(?)
+				DoBiteEffect(item, Teeth1ABite);
+				DoBiteEffect(item, Teeth1BBite);
+				DoBiteEffect(item, Teeth2ABite);
+				DoBiteEffect(item, Teeth2BBite);
+				DoBiteEffect(item, Teeth3ABite);
+				DoBiteEffect(item, Teeth3BBite);
 			}
 		}
 		else
 		{
-			item->Animation.ActiveState = item->Animation.TargetState = TEETHSPIKEDOOR_DISABLED;
+			item->Animation.TargetState = TEETHSPIKEDOOR_DISABLED;
 		}
 
 		AnimateItem(item);
+	}
+
+	void DoBiteEffect(ItemInfo *item, BiteInfo bite)
+	{
+		GetJointPosition(item, bite.meshNum);
+		DoBloodSplat(bite.Position.x, bite.Position.y, bite.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 	}
 }
