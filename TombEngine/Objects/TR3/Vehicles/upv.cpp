@@ -316,7 +316,7 @@ namespace TEN::Entities::Vehicles
 					int probedRoomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, UPVItem->RoomNumber).RoomNumber;
 				
 					for (int i = 0; i < 3; i++)
-						SpawnBubble(bubblePos, probedRoomNumber);
+						SpawnBubble(bubblePos, probedRoomNumber, (int)BubbleFlags::HighAmplitude);
 				}
 			}
 		}
