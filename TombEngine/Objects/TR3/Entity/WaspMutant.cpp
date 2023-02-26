@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_wasp.h"
+#include "Objects/TR3/Entity/WaspMutant.h"
 
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"

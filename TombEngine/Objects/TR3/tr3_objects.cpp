@@ -14,6 +14,7 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
@@ -28,7 +29,6 @@
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-#include "Objects/TR3/Entity/tr3_wasp.h" // OK
 
 // Effects
 #include "Objects/Effects/Boss.h"
