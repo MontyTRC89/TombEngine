@@ -16,7 +16,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto WASP_DAMAGE = 50;
 
 	constexpr auto WASP_DETECTION_RANGE = SQUARE(BLOCK(15));
-	constexpr auto WASP_ATTACK_RANGE   = SQUARE(CLICK(2));
+	constexpr auto WASP_ATTACK_RANGE	= SQUARE(BLOCK(0.5f));
 
 	constexpr auto WASP_LAND_CHANCE = 1 / 256.0f;
 
@@ -28,10 +28,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-	const auto WaspBite          = BiteInfo(Vector3(0.0f, 0.0f, -260.0f), 12);
+	const auto WaspBite			 = BiteInfo(Vector3(0.0f, 0.0f, -260.0f), 12);
 	const auto WaspVenomSackBite = BiteInfo(Vector3::Zero, 10);
 
-	enum WaspState
+	enum WaspMutantState
 	{
 		WASP_STATE_FLY_IDLE,
 		WASP_STATE_FLY_IDLE_TO_IDLE, // Floor
@@ -43,7 +43,7 @@ namespace TEN::Entities::Creatures::TR3
 		WASP_STATE_FLY_FORWARD
 	};
 
-	enum WaspAnim
+	enum WaspMutantAnim
 	{
 		WASP_ANIM_FLY_IDLE,
 		WASP_ANIM_FLY_IDLE_TO_IDLE,
@@ -55,24 +55,30 @@ namespace TEN::Entities::Creatures::TR3
 		WASP_ANIM_FLY_FORWARD
 	};
 
-	static void SpawnWaspVenomSackParticle(short itemNumber)
+	static void SpawnWaspMutantVenomSackParticle(int itemNumber)
 	{
+		constexpr auto PARTICLE_SIZE_MAX = 8.0f;
+		constexpr auto PARTICLE_SIZE_MIN = PARTICLE_SIZE_MAX / 2;
+
 		auto& particle = *GetFreeParticle();
 
 		particle.on = true;
+		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.fxObj = itemNumber;
+		particle.nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
+
 		particle.sG = Random::GenerateInt(32, 96);
-		particle.sB = particle.sG >> 1;
-		particle.sR = particle.sG >> 2;
+		particle.sB = particle.sG / 2;
+		particle.sR = particle.sG / 4;
 		particle.dG = Random::GenerateInt(224, 256);
-		particle.dB = particle.dG >> 1;
-		particle.dR = particle.dG >> 2;
+		particle.dB = particle.dG / 2;
+		particle.dR = particle.dG / 4;
 		
 		particle.colFadeSpeed = 4;
 		particle.fadeToBlack = 2;
 		particle.sLife =
 		particle.life = 8;
-
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		particle.extras = 0;
 		particle.dynamic = -1;
@@ -88,28 +94,22 @@ namespace TEN::Entities::Creatures::TR3
 
 		particle.flags = SP_SCALE | SP_ITEM | SP_NODEATTACH | SP_DEF;
 		particle.gravity = particle.maxYvel = 0;
-
-		particle.fxObj = itemNumber;
-		particle.nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
-
-		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		particle.scalar = 3;
 
-		int size = Random::GenerateInt(4, 8);
-
 		particle.size =
-		particle.sSize = size;
-		particle.dSize = size >> 1;
+		particle.sSize = Random::GenerateFloat(PARTICLE_SIZE_MIN, PARTICLE_SIZE_MAX);
+		particle.dSize = particle.sSize / 2;
 	}
 
-	static void SpawnWaspVenomSackEffects(short itemNumber, ItemInfo& item)
+	static void SpawnWaspMutantVenomSackEffects(ItemInfo& item, int itemNumber)
 	{
 		constexpr auto PARTICLE_EFFECT_COUNT = 2;
 
-		// Spawn light.
-		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
 		if (item.ItemFlags[0] < 0)
 			item.ItemFlags[0] = 0;
+
+		// Spawn light.
+		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
 		TriggerDynamicLight(
 			pos.x, pos.y, pos.z, item.ItemFlags[0],
 			WaspVenomSackLightColor.x * UCHAR_MAX,
@@ -118,12 +118,13 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Spawn particles.
 		for (int i = 0; i < PARTICLE_EFFECT_COUNT; i++)
-			SpawnWaspVenomSackParticle(itemNumber);
+			SpawnWaspMutantVenomSackParticle(itemNumber);
 	}
 
 	void InitialiseWaspMutant(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, WASP_STATE_IDLE);
 		item.ItemFlags[0] = WASP_VENOM_SACK_LIGHT_POWER;
@@ -161,7 +162,9 @@ namespace TEN::Entities::Creatures::TR3
 					item.ItemFlags[1] = 6;
 				}
 				else
+				{
 					item.ItemFlags[1]--;
+				}
 
 				item.Pose.Position.y = item.Floor;
 				break;
@@ -191,8 +194,8 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item.Animation.ActiveState)
 			{
 			case WASP_STATE_IDLE:
-				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
 				item.Pose.Position.y = item.Floor;
+				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
 
 				if (item.HitStatus || ai.distance < WASP_DETECTION_RANGE || creature.HurtByLara)
 					item.Animation.TargetState = WASP_STATE_IDLE_TO_FLY_IDLE;
@@ -280,7 +283,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		SpawnWaspVenomSackEffects(itemNumber, item);
+		SpawnWaspMutantVenomSackEffects(item, itemNumber);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }
