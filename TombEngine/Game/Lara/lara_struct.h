@@ -832,6 +832,25 @@ enum LaraAnim
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
+
+enum LaraExtraAnim
+{
+	LEA_PULL_DAGGER_FROM_DRAGON = 0,
+	LEA_WAKE_UP = 1,
+	LEA_SPEAR_GUARDIAN_DEATH = 2,
+	LEA_TRAIN_DEATH_START = 3,
+	LEA_TREX_DEATH = 4,
+	LEA_SHARK_DEATH = 5,
+	LEA_GIANT_MUTANT_DEATH = 6,
+	LEA_SHIVA_DEATH = 7,
+	LEA_ACTIVATE_TNT_SWITCH = 8,
+	LEA_MIDAS_GOLD_SWITCH = 9,
+	LEA_MIDAS_DEATH = 10,
+	LEA_STRIKE_GONG = 11,
+	LEA_WILLARD_DEATH = 12,
+	LEA_TRAIN_DEATH_END = 13,
+	LEA_SETH_DEATH = 14
+};
 #pragma endregion
 
 enum LARA_MESHES
@@ -1266,6 +1285,12 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
+};
+
 struct LaraInfo
 {
 	short ItemNumber;
@@ -1294,7 +1319,7 @@ struct LaraInfo
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
-	FX_INFO* SpasmEffect;	// Not saved.
+	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
@@ -1302,7 +1327,8 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte Wet[NUM_LARA_MESHES];
+	PlayerEffectData Effect = {};
+
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

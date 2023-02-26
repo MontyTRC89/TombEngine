@@ -8,17 +8,17 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/items.h"
 #include "Game/room.h"
-#include "Game/spotcam.h"
 #include "Game/savegame.h"
+#include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/setup.h"
@@ -120,39 +120,47 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 
 int SwitchTrigger(short itemNumber, short timer)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_DEACTIVATED)
+	if (item.Status == ITEM_DEACTIVATED)
 	{
-		if ((!item->Animation.ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->Animation.ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&
+			timer > 0)
 		{
-			item->Timer = timer;
-			item->Status = ITEM_ACTIVE;
+			item.Timer = timer;
+			item.Status = ITEM_ACTIVE;
+
 			if (timer != 1)
-				item->Timer = FPS * timer;
+				item.Timer = FPS * timer;
+
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
+    
+		if (item.TriggerFlags >= 0 || item.Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
-			item->Status = ITEM_NOT_ACTIVE;
-			if (!item->ItemFlags[0] == 0)
-				item->Flags |= ONESHOT;
-			if (item->Animation.ActiveState != 1)
-				return 1;
-			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
-				return 1;
+			item.Status = ITEM_NOT_ACTIVE;
+			if (!item.ItemFlags[0] == 0)
+				item.Flags |= ONESHOT;
+			return 1;
 		}
 		else
 		{
-			item->Status = ITEM_ACTIVE;
+			item.Status = ITEM_ACTIVE;
 			return 1;
 		}
 	}
-	else if (item->Status)
+	else if (item.Status)
 	{
-		return (item->Flags & ONESHOT) >> 8;
+		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
+			item.Animation.AnimNumber == GetAnimNumber(item, 2) &&
+			item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+		{
+			return 1;
+		}
+
+		return ((item.Flags & ONESHOT) >> 8);
 	}
 	else
 	{
@@ -340,7 +348,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 	int flipAvailable = 0;
 	int newEffect = -1;
 	int switchOff = 0;
-	int switchFlag = 0;
+	//int switchFlag = 0;
 	short objectNumber = 0;
 	int keyResult = 0;
 	short cameraFlags = 0;
@@ -405,8 +413,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 				return;
 
 			objectNumber = g_Level.Items[value].ObjectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				switchFlag = 1;
+			//This disables the antitrigger of the Valve switch (ocb 5). I don't know the purpose of this in TR4.
+			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
+				//switchFlag = 1;
 
 			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
 
@@ -537,10 +546,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			{
 				if (heavyFlags >= 0)
 				{
-					if (switchFlag)
-						item->Flags |= (flags & CODE_BITS);
-					else
-						item->Flags ^= (flags & CODE_BITS);
+					//if (switchFlag)
+						//item->Flags |= (flags & CODE_BITS);
+					//else
+
+					item->Flags ^= (flags & CODE_BITS);
 
 					if (flags & ONESHOT)
 						item->Flags |= SWONESHOT;

@@ -152,25 +152,33 @@ CALL gen.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\control\volumeactivator.h" />
-    <ClInclude Include="Game\effects\bubble.h" />
+    <ClInclude Include="Game\effects\Blood.h" />
+    <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
+    <ClInclude Include="Game\effects\Ripple.h" />
     <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR3\Trap\ElectricCleaner.h" />
+    <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\InstancedStaticBuffer.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
@@ -182,7 +190,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
-    <ClInclude Include="Game\effects\drip.h" />
+    <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
     <ClInclude Include="Game\collision\floordata.h" />
@@ -437,9 +445,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
+    <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
     <ClInclude Include="Objects\TR3\fish.h" />
@@ -584,7 +591,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Game\effects\hair.h" />
-    <ClInclude Include="Game\health.h" />
+    <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_one_gun.h" />
@@ -626,26 +633,33 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
     <ClCompile Include="framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
-    <ClCompile Include="Game\effects\bubble.cpp" />
+    <ClCompile Include="Game\effects\Blood.cpp" />
+    <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
-    <ClCompile Include="Game\effects\drip.cpp" />
+    <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
+    <ClCompile Include="Game\effects\Ripple.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR3\Trap\ElectricCleaner.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
@@ -867,7 +881,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_machinegun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_fish_emitter.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_flamethrower.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_shiva.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_shotgun.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
@@ -880,7 +894,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
@@ -946,7 +959,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
-    <ClCompile Include="Game\health.cpp" />
+    <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_one_gun.cpp" />
@@ -1002,7 +1015,6 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
-    <None Include="Shaders\InstancedSpriteBuffer.hlsli" />
     <None Include="Shaders\Blending.hlsli" />
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
@@ -1182,16 +1194,25 @@ CALL gen.bat</Command>
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\DX11_InstancedStatics.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" />
-    <Import Project="..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets" Condition="Exists('..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets')" />
+    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets'))" />
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2017.2022.3.24.2\build\native\directxtk_desktop_2017.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets'))" />
   </Target>
 </Project>

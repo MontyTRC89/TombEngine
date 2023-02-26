@@ -12,22 +12,20 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto COBRA_BITE_ATTACK_DAMAGE	 = 80;
 	constexpr auto COBRA_BITE_POISON_POTENCY = 8;
 
-	constexpr auto COBRA_ATTACK_RANGE = SQUARE(SECTOR(1));
-	constexpr auto COBRA_AWARE_RANGE  = SQUARE(SECTOR(1.5f));
-	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(SECTOR(2.5f));
+	constexpr auto COBRA_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto COBRA_AWARE_RANGE  = SQUARE(BLOCK(1.5f));
+	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(BLOCK(2.5f));
 
 	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15.0f;
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
-	const vector<unsigned int> CobraAttackJoints = { 13 };
+	const auto CobraAttackJoints = std::vector<unsigned int>{ 13 };
 
 	enum CobraState
 	{

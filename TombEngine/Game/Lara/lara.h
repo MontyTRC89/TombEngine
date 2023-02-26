@@ -6,42 +6,42 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-const auto LARA_GRAB_THRESHOLD = ANGLE(40.0f);
-const auto FRONT_ARC		   = ANGLE(90.0f);
+constexpr auto LARA_GRAB_THRESHOLD = ANGLE(40.0f);
+constexpr auto FRONT_ARC		   = ANGLE(90.0f);
 
 // Lean rates
-const auto LARA_LEAN_RATE	   = ANGLE(1.5f);
-const auto LARA_SWIM_LEAN_RATE = ANGLE(2.0f);
+constexpr auto LARA_LEAN_RATE	   = ANGLE(1.5f);
+constexpr auto LARA_SWIM_LEAN_RATE = ANGLE(2.0f);
 
 // Lean maxes
 const auto LARA_LEAN_MAX = ANGLE(11.0f);
 
 // Turn rate acceleration rates
-const auto LARA_TURN_RATE_ACCEL			   = ANGLE(0.25f);
-const auto LARA_CRAWL_MOVE_TURN_RATE_ACCEL = ANGLE(0.15f);
-const auto LARA_POLE_TURN_RATE_ACCEL	   = ANGLE(0.25f);
-const auto LARA_SWIM_TURN_RATE_ACCEL	   = ANGLE(0.55f);
-const auto LARA_SUBSUIT_TURN_RATE_ACCEL	   = ANGLE(0.25f);
+constexpr auto LARA_TURN_RATE_ACCEL			   = ANGLE(0.25f);
+constexpr auto LARA_CRAWL_MOVE_TURN_RATE_ACCEL = ANGLE(0.15f);
+constexpr auto LARA_POLE_TURN_RATE_ACCEL	   = ANGLE(0.25f);
+constexpr auto LARA_SWIM_TURN_RATE_ACCEL	   = ANGLE(0.55f);
+constexpr auto LARA_SUBSUIT_TURN_RATE_ACCEL	   = ANGLE(0.25f);
 
 // Turn rate maxes
-const auto LARA_SLOW_TURN_RATE_MAX		  = ANGLE(2.0f);
-const auto LARA_SLOW_MED_TURN_RATE_MAX	  = ANGLE(3.0f);
-const auto LARA_MED_TURN_RATE_MAX		  = ANGLE(4.0f);
-const auto LARA_MED_FAST_TURN_RATE_MAX	  = ANGLE(5.0f);
-const auto LARA_FAST_TURN_RATE_MAX		  = ANGLE(6.0f);
-const auto LARA_WADE_TURN_RATE_MAX		  = ANGLE(3.5f);
-const auto LARA_SWAMP_TURN_RATE_MAX		  = ANGLE(1.5f);
-const auto LARA_JUMP_TURN_RATE_MAX		  = ANGLE(1.0f);
-const auto LARA_REACH_TURN_RATE_MAX		  = ANGLE(0.8f);
-const auto LARA_SLIDE_TURN_RATE_MAX		  = ANGLE(3.70f);
-const auto LARA_CRAWL_TURN_RATE_MAX		  = ANGLE(1.5f);
-const auto LARA_CRAWL_MOVE_TURN_RATE_MAX  = ANGLE(1.75f);
-const auto LARA_CROUCH_ROLL_TURN_RATE_MAX = ANGLE(0.75f);
-const auto LARA_POLE_TURN_RATE_MAX		  = ANGLE(2.5f);
+constexpr auto LARA_SLOW_TURN_RATE_MAX		  = ANGLE(2.0f);
+constexpr auto LARA_SLOW_MED_TURN_RATE_MAX	  = ANGLE(3.0f);
+constexpr auto LARA_MED_TURN_RATE_MAX		  = ANGLE(4.0f);
+constexpr auto LARA_MED_FAST_TURN_RATE_MAX	  = ANGLE(5.0f);
+constexpr auto LARA_FAST_TURN_RATE_MAX		  = ANGLE(6.0f);
+constexpr auto LARA_WADE_TURN_RATE_MAX		  = ANGLE(3.5f);
+constexpr auto LARA_SWAMP_TURN_RATE_MAX		  = ANGLE(1.5f);
+constexpr auto LARA_JUMP_TURN_RATE_MAX		  = ANGLE(1.0f);
+constexpr auto LARA_REACH_TURN_RATE_MAX		  = ANGLE(0.8f);
+constexpr auto LARA_SLIDE_TURN_RATE_MAX		  = ANGLE(3.70f);
+constexpr auto LARA_CRAWL_TURN_RATE_MAX		  = ANGLE(1.5f);
+constexpr auto LARA_CRAWL_MOVE_TURN_RATE_MAX  = ANGLE(1.75f);
+constexpr auto LARA_CROUCH_ROLL_TURN_RATE_MAX = ANGLE(0.75f);
+constexpr auto LARA_POLE_TURN_RATE_MAX		  = ANGLE(2.5f);
 
 // Flex rates
-const auto LARA_CRAWL_FLEX_RATE = ANGLE(2.25f);
-const auto LARA_CRAWL_FLEX_MAX	= ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+constexpr auto LARA_CRAWL_FLEX_RATE = ANGLE(2.25f);
+constexpr auto LARA_CRAWL_FLEX_MAX	= ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
 
 constexpr auto LARA_HEIGHT			  = CLICK(3) - 1; // Height in basic states.
 constexpr auto LARA_HEIGHT_CRAWL	  = 350;		  // Height in crawl states.
@@ -81,6 +81,9 @@ constexpr auto LARA_AIR_CRITICAL	   = LARA_AIR_MAX / 4;
 constexpr auto LARA_SPRINT_ENERGY_MAX  = 120.0f;
 constexpr auto LARA_POISON_POTENCY_MAX = 64.0f;
 
+constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
+constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
+
 constexpr auto STEPUP_HEIGHT		= (int)CLICK(3.0f / 2);
 constexpr auto CRAWL_STEPUP_HEIGHT	= CLICK(1) - 1;
 constexpr auto MONKEY_STEPUP_HEIGHT = (int)CLICK(5.0f / 4);
@@ -93,7 +96,6 @@ constexpr auto SLOPE_DIFFERENCE		= 60;
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
-extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)

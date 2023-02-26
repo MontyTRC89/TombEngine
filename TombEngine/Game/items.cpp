@@ -489,7 +489,7 @@ void InitialiseItem(short itemNumber)
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-	item->Animation.RequiredState = 0;
+	item->Animation.RequiredState = NO_STATE;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 
@@ -826,11 +826,11 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}

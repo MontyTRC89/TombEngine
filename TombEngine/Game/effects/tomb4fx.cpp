@@ -6,9 +6,10 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -20,11 +21,13 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
-using std::vector;
 using TEN::Renderer::g_Renderer;
 
 char LaserSightActive = 0;
@@ -37,8 +40,6 @@ int LaserSightZ;
 
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
-int NextBubble = 0;
-int NextDrip = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
 
@@ -47,7 +48,6 @@ FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
-DRIP_STRUCT Drips[MAX_DRIPS]; 
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
@@ -975,13 +975,18 @@ void UpdateGunShells()
 			gunshell->pos.Position.z += gunshell->speed * phd_cos(gunshell->dirXrot);
 
 			FloorInfo* floor = GetFloor(gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z, &gunshell->roomNumber);
-			if (g_Level.Rooms[gunshell->roomNumber].flags & ENV_FLAG_WATER
-				&& !(g_Level.Rooms[prevRoomNumber].flags & ENV_FLAG_WATER))
+			if (TestEnvironment(ENV_FLAG_WATER, gunshell->roomNumber) &&
+				!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 			{
 
-				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber);
+				SpawnSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber, 3, true);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
-				SetupRipple(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z, (GetRandomControl() & 3) + 8, RIPPLE_FLAG_SHORT_INIT);
+				SpawnRipple(
+					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z),
+					gunshell->roomNumber,
+					Random::GenerateFloat(8.0f, 12.0f),
+					(int)RippleFlags::SlowFade);
+				
 				gunshell->fallspeed >>= 5;
 				continue;
 			}
@@ -1058,155 +1063,6 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->z = z + (spark->zVel >> 3);
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0xF);
-	}
-}
-
-void LaraBubbles(ItemInfo* item)
-{
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
-
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	auto pos = Vector3i::Zero;
-
-	if (level->GetLaraType() == LaraType::Divesuit)
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160));
-	else
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
-
-	int numBubbles = (GetRandomControl() & 1) + 2;
-	for (int i = 0; i < numBubbles; i++)
-		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
-}
-
-int GetFreeDrip()
-{
-	auto* drip = &Drips[NextDrip];
-	int dripNum = NextDrip;
-	short minLife = 4095;
-	short minIndex = 0;
-	short count = 0;	
-
-	while (drip->on)
-	{
-		if (drip->life < minLife)
-		{
-			minIndex = dripNum;
-			minLife = drip->life;
-		}
-
-		if (dripNum == MAX_DRIPS - 1)
-		{
-			drip = &Drips[0];
-			dripNum = 0;
-		}
-		else
-		{
-			dripNum++;
-			drip++;
-		}
-
-		if (++count >= MAX_DRIPS)
-		{
-			NextDrip = (minIndex + 1) % MAX_DRIPS;
-			return minIndex;
-		}
-	}
-
-	NextDrip = (dripNum + 1) % MAX_DRIPS;
-
-	return dripNum;
-}
-
-void UpdateDrips()
-{
-	for (int i = 0; i < MAX_DRIPS; i++)
-	{
-		DRIP_STRUCT* drip = &Drips[i];
-
-		if (drip->on)
-		{
-			drip->life--;
-			if (!drip->life)
-			{
-				drip->on = false;
-				continue;
-			}
-
-			if (drip->life < 16)
-			{
-				drip->r -= drip->r >> 3;
-				drip->g -= drip->g >> 3;
-				drip->b -= drip->b >> 3;
-			}
-
-			drip->yVel += drip->gravity;
-			
-			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
-			{
-				drip->x += Weather.Wind().x;
-				drip->z += Weather.Wind().z;
-			}
-
-			drip->y += drip->yVel >> 5;
-			
-			FloorInfo* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
-			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
-				drip->on = false;
-
-			int height = GetFloorHeight(floor, drip->x, drip->y, drip->z);
-			if (drip->y > height)
-			{
-				if (i % 2 == 0)
-					AddWaterSparks(drip->x, drip->y, drip->z, 6);
-				drip->on = false;
-			}
-		}
-	}
-}
-
-void TriggerLaraDrips(ItemInfo* item)
-{
-	if (!(Wibble & 0xF))
-	{
-		for (int i = 0; i < NUM_LARA_MESHES; i++)
-		{
-			auto pos = GetJointPosition(item, i);
-			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
-
-			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
-				Lara.Wet[i] = UCHAR_MAX;
-
-			if (Lara.Wet[i] &&
-				!LaraNodeUnderwater[i] &&
-				(GetRandomControl() & 0x1FF) < Lara.Wet[i])
-			{
-				auto* drip = &Drips[GetFreeDrip()];
-
-				auto pos = GetJointPosition(item, 
-					i,
-					Vector3i(
-						(GetRandomControl() & 0x1F) - 16,
-						(GetRandomControl() & 0xF) + 16,
-						(GetRandomControl() & 0x1F) - 16
-					));
-				drip->x = pos.x;
-				drip->y = pos.y;
-				drip->z = pos.z;
-				drip->on = 1;
-				drip->r = (GetRandomControl() & 7) + 64;
-				drip->g = (GetRandomControl() & 7) + 96;
-				drip->b = (GetRandomControl() & 7) + 128;
-				drip->yVel = (GetRandomControl() & 0x1F) + 32;
-				drip->gravity = (GetRandomControl() & 0x1F) + 32;
-				drip->life = (GetRandomControl() & 0x1F) + 8;
-				drip->roomNumber = LaraItem->RoomNumber;
-
-				if (Lara.Wet[i] >= 4)
-					Lara.Wet[i] -= 4;
-				else
-					Lara.Wet[i] = 0;
-			}
-		}
 	}
 }
 
@@ -1415,6 +1271,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
+		sptr->sLife = life;
 		sptr->fadeIn = fadein;
 		
 		sptr->sr = 0;
@@ -1423,10 +1280,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->style = style;
 
 		if (sound)
-		{
 			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
-		}	
-
 	}	
 }
 
@@ -1488,56 +1342,56 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 
 void UpdateShockwaves()
 {
-	for (int i = 0; i < MAX_SHOCKWAVE; i++)
+	for (auto& shockwave : ShockWaves)
 	{
-		SHOCKWAVE_STRUCT* sw = &ShockWaves[i];
+		if (shockwave.life <= 0)
+			continue;
 
-		if (sw->life)
+		shockwave.life--;
+
+		if (shockwave.style != (int)ShockwaveStyle::Knockback)
 		{
-			sw->life--;
-
-			if (sw->life)
+			shockwave.outerRad += shockwave.speed;
+			if (shockwave.style == (int)ShockwaveStyle::Sophia)
+				shockwave.innerRad += shockwave.speed;
+		}
+		else
+		{
+			if (shockwave.life > (shockwave.sLife / 2))
 			{
-				sw->outerRad += sw->speed;
+				shockwave.outerRad += shockwave.speed;
+				shockwave.innerRad += shockwave.speed;
+			}
+			else
+			{
+				shockwave.outerRad -= shockwave.speed;
+				shockwave.innerRad -= shockwave.speed;
+			}
+		}
 
-				if (sw->style == (int)ShockwaveStyle::Sophia)
-				{
-					sw->innerRad += sw->speed;
-				}
+		shockwave.speed -= (shockwave.speed >> 4);
 
-				sw->speed -= (sw->speed >> 4);
+		if (LaraItem->HitPoints > 0 && shockwave.damage)
+		{
+			auto* frame = GetBestFrame(LaraItem);
+			auto dx = LaraItem->Pose.Position.x - shockwave.x;
+			auto dz = LaraItem->Pose.Position.z - shockwave.z;
+			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));
+			auto angle = phd_atan(dz, dx);
 
-				if (LaraItem->HitPoints > 0)
-				{
-					if (sw->damage)
-					{
-						AnimFrame* frame = GetBestFrame(LaraItem);
-
-						int dx = LaraItem->Pose.Position.x - sw->x;
-						int dz = LaraItem->Pose.Position.z - sw->z;
-						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
-						
-						if (sw->y <= LaraItem->Pose.Position.y + frame->boundingBox.Y1
-							|| sw->y >= LaraItem->Pose.Position.y + frame->boundingBox.Y2 + 256
-							|| distance <= sw->innerRad
-							|| distance >= sw->outerRad)
-						{
-							sw->temp = 0;
-						}
-						else
-						{
-							short angle = phd_atan(dz, dx);
-							TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
-								sw->y,
-								LaraItem->Pose.Position.z,
-								sw->r, sw->g, sw->b,
-								angle,
-								sw->speed);
-
-							DoDamage(LaraItem, sw->damage);
-						}
-					}
-				}
+			// Damage player if inside shockwave.
+			if (shockwave.y > (LaraItem->Pose.Position.y + frame->boundingBox.Y1) &&
+				shockwave.y < (LaraItem->Pose.Position.y + (frame->boundingBox.Y2 + CLICK(1))) &&
+				distance > shockwave.innerRad &&
+				distance < shockwave.outerRad)
+			{
+				TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
+					shockwave.y,
+					LaraItem->Pose.Position.z,
+					shockwave.r, shockwave.g, shockwave.b,
+					angle,
+					shockwave.speed);
+				DoDamage(LaraItem, shockwave.damage);
 			}
 		}
 	}
@@ -1545,50 +1399,43 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	constexpr auto BUBBLE_COUNT = 24;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	spark->sR = 128;
+	spark->dR = 128;
+	spark->dG = 128;
+	spark->dB = 128;
+	spark->on = 1;
+	spark->life = 24;
+	spark->sLife = 24;
+	spark->sG = 64;
+	spark->sB = 0;
+	spark->colFadeSpeed = 8;
+	spark->fadeToBlack = 12;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->x = x;
+	spark->y = y;
+	spark->z = z;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->friction = 0;
+	spark->flags = 2058;
+	spark->scalar = 3;
+	spark->gravity = 0;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->maxYvel = 0;
+	int size = (GetRandomControl() & 7) + 63;
+	spark->sSize = size >> 1;
+	spark->size = size >> 1;
+	spark->dSize = 2 * size;
+
+	auto sphere = BoundingSphere(Vector3(x, y, z), BLOCK(0.25f));
+	for (int i = 0; i < BUBBLE_COUNT; i++)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
-		spark->on = 1;
-		spark->life = 24;
-		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 2058;
-		spark->scalar = 3;
-		spark->gravity = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
-		spark->maxYvel = 0;
-		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = 2 * size;
-
-		for (int i = 0; i < 8; i++)
-		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
-			pos.y = (GetRandomControl() & 0x7F) + y - 64;
-			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNumber, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
-		}
+		auto pos = Random::GeneratePointInSphere(sphere);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::LargeScale | (int)BubbleFlags::HighAmplitude);
 	}
 }
 

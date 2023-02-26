@@ -32,6 +32,8 @@ namespace TEN::Entities::Creatures::TR5
 	
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
 
+	constexpr auto GUARD_HEAD_MESH = 14;
+
 	const auto SwatGunBite		  = BiteInfo(Vector3(80.0f, 200.0f, 13.0f), 0);
 	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
 	const auto ArmedMafia2GunBite = BiteInfo(Vector3(-50.0f, 220.0f, 60.0f), 13);
@@ -467,7 +469,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 					item->Animation.TargetState = GUARD_STATE_SURRENDER;
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & GUARD)
 				{
@@ -895,7 +897,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			case GUARD_STATE_SURRENDER:
 				creature->MaxTurn = 0;
-				if (item != Lara.TargetEntity && Random::TestProbability(1.0f / 64))
+
+				if (item != Lara.TargetEntity && Random::TestProbability(1 / 64.0f))
 				{
 					if (item->TriggerFlags == (int)GuardOcb::UseComputer || item->TriggerFlags == (int)GuardOcb::UseComputerScientist)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
@@ -1530,5 +1533,23 @@ namespace TEN::Entities::Creatures::TR5
 				return;
 			}
 		}
+	}
+
+	void GuardHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		if (pos.has_value())
+		{
+			if (jointIndex == GUARD_HEAD_MESH)
+			{
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+				DoDamage(&target, INT_MAX);
+
+				return;
+			}
+			else
+				DoBloodSplat(pos->x, pos->y, pos->z, 10, source.Pose.Orientation.y, pos->RoomNumber);
+		}
+
+		DoItemHit(&target, damage, isExplosive);
 	}
 }

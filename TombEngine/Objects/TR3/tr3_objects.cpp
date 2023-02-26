@@ -9,9 +9,12 @@
 #include "Specific/setup.h"
 
 // Creatures
+#include "Objects/TR3/Entity/Compsognathus.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
+#include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -21,9 +24,7 @@
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
-#include "Objects/TR3/Entity/tr3_shiva.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
-#include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 
@@ -31,6 +32,7 @@
 #include "Objects/Effects/Boss.h"
 
 // Traps
+#include "Objects/TR3/Trap/ElectricCleaner.h"
 #include "Objects/TR3/Trap/train.h"
 
 // Vehicles
@@ -43,6 +45,7 @@
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Effects::Boss;
 
 static void StartEntity(ObjectInfo* obj)
@@ -291,7 +294,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_CIVVIE];
+	obj = &Objects[ID_CIVVY];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCivvy;
@@ -341,6 +344,21 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetupHitEffect();
 	}
+
+	obj = &Objects[ID_COMPSOGNATHUS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCompsognathus;
+		obj->control = CompsognathusControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 10;
+		obj->intelligent = true;
+		obj->radius = 204;
+		obj->pivotLength = 0;
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Z);
+		obj->SetupHitEffect();
+	}
 }
 
 static void StartObject(ObjectInfo* obj)
@@ -381,6 +399,18 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
 		obj->SetupHitEffect(true);
+	}
+
+	obj = &Objects[ID_ELECTRIC_CLEANER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseElectricCleaner;
+		obj->control = ElectricCleanerControl;
+		obj->collision = ElectricCleanerCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = NOT_TARGETABLE;
+		obj->nonLot = 1;
+		obj->radius = 512;
 	}
 }
 

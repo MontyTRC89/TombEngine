@@ -299,15 +299,19 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @tparam index: (short) index the ItemFlags, can be between 0 and 7.
-// @treturn (short) the value contained in the ItemFlags[index]
+// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @treturn int the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
 /// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam value: (short) value to store in the moveable's ItemFlags[index]
-// @tparam index: (short) index of the ItemFlags where store the value.
+// @tparam short value to store in the moveable's ItemFlags[index]
+// @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
+
+	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
+
+	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -673,6 +677,10 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
 
+	case EffectType::Cadaver:
+		ItemSetAsCadaver(m_item, realTimeout);
+		break;
+
 	case EffectType::Custom:
 		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
 	}
@@ -701,6 +709,33 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn (short) the value contained in the LocationAI of the creature.
+short Moveable::GetLocationAI() const
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		return creature->LocationAI;
+	}
+	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	return 0;
+}
+
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam value: (short) value to store.
+void Moveable::SetLocationAI(short value)
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		creature->LocationAI = value;
+	}
+	else
+		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+}
 
 ScriptColor Moveable::GetColor() const
 {

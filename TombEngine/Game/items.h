@@ -61,16 +61,17 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
+	Cadaver,
 	Custom
 };
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = -1;
-	int FrameNumber	  = -1;
-	int ActiveState	  = -1;
-	int TargetState	  = -1;
-	int RequiredState = -1; // TODO: Phase out this weird feature.
+	int AnimNumber	  = 0;
+	int FrameNumber	  = 0;
+	int ActiveState	  = 0;
+	int TargetState	  = 0;
+	int RequiredState = NO_STATE;
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
@@ -96,14 +97,14 @@ struct EntityCallbackData
 
 struct EntityEffectData
 {
-	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::Zero;
-	Vector3 PrimaryEffectColor = Vector3::Zero;
-	Vector3 SecondaryEffectColor = Vector3::Zero;
-	int Count = -1;
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= -1;
 };
 
-// TODO: We need to find good "default states" for a lot of these/ -- squidshire 25/05/2022
+// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -137,8 +138,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits	  = BitField();
-	BitField MeshBits	  = BitField();
+	BitField TouchBits = BitField();
+	BitField MeshBits  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];
