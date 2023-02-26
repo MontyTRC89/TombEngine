@@ -97,14 +97,14 @@ struct EntityCallbackData
 
 struct EntityEffectData
 {
-	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::Zero;
-	Vector3 PrimaryEffectColor = Vector3::Zero;
-	Vector3 SecondaryEffectColor = Vector3::Zero;
-	int Count = -1;
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= -1;
 };
 
-// TODO: We need to find good "default states" for a lot of these/ -- squidshire 25/05/2022
+// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -138,8 +138,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits	  = BitField();
-	BitField MeshBits	  = BitField();
+	BitField TouchBits = BitField();
+	BitField MeshBits  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];

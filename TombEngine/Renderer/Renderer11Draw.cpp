@@ -1504,13 +1504,13 @@ namespace TEN::Renderer
 		DrawSparkParticles(view);
 		DrawExplosionParticles(view);
 		DrawFootprints(view);
-		DrawDripParticles(view);
 		DrawBlood(view);
 		DrawWeatherParticles(view);
 		DrawParticles(view);
 		DrawBubbles(view);
 		DrawDrips(view);
 		DrawRipples(view);
+		DrawUnderwaterBloodParticles(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
 		DrawElectricity(view);
@@ -1975,18 +1975,21 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
-		// Bind caustics and shadow map textures
-		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-		int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
-		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		// Bind caustics texture
+		if (!m_sprites.empty())
+		{
+			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
+			int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
+			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
+			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
-		// Strange packing due to particular HLSL 16 bytes alignment requirements
-		RendererSprite* causticsSprite = &m_sprites[causticsFrame];
-		m_stRoom.CausticsStartUV = causticsSprite->UV[0];
-		m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
+			// Strange packing due to particular HLSL 16 bytes alignment requirements
+			RendererSprite* causticsSprite = &m_sprites[causticsFrame];
+			m_stRoom.CausticsStartUV = causticsSprite->UV[0];
+			m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
+		}
 		
-		// Set shadow map data
+		// Set shadow map data and bind shadow map texture
 		if (m_shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
