@@ -39,18 +39,6 @@ constexpr int LegacyLoopingTrackMax = 111;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
-enum SampleRate
-{
-	TRLE_QUALITY_SAMPLES = 22050,
-	HIGH_QUALITY_SAMPLES = 44100,
-};
-
-enum Channels
-{
-	MONO = 1,
-	STEREO = 2
-};
-
 void SetVolumeMusic(int vol) 
 {
 	GlobalMusicVolume = vol;
