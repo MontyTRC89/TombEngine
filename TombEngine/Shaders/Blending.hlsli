@@ -20,7 +20,7 @@
 
 cbuffer BlendingBuffer : register(b12)
 {
-	unsigned int BlendMode;
+	uint BlendMode;
 	int AlphaTest;
 	float AlphaThreshold;
 };

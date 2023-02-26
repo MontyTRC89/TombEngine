@@ -4,10 +4,12 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -23,10 +25,13 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
@@ -42,7 +47,6 @@ FX_INFO EffectList[NUM_EFFECTS];
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
-RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 int SplashCount = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
@@ -753,7 +757,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 				(GetRandomControl() & 0x1FF) + x - 256,
 				(GetRandomControl() & 0x7F) + y - 64,
 				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber);
+			SpawnBubble(pos, roomNumber, (int)BubbleFlags::HighAmplitude);
 		}
 	}
 }
@@ -1013,7 +1017,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; // Splash texture.
 				splash.spriteSequenceEnd = 7; // Splash texture.
-				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
+				splash.animationSpeed = fmin(0.6f, (1 / splash.outerRadVel) * 2);
 
 				numSplashesSetup++;
 			}
@@ -1025,15 +1029,9 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
-	Pose soundPosition;
-	soundPosition.Position.x = setup->x;
-	soundPosition.Position.y = setup->y;
-	soundPosition.Position.z = setup->z;
-	soundPosition.Orientation.y = 0;
-	soundPosition.Orientation.x = 0;
-	soundPosition.Orientation.z = 0;
+	SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
 
+	auto soundPosition = Pose(Vector3i(setup->x, setup->y, setup->z));
 	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
 }
 
@@ -1071,45 +1069,13 @@ void UpdateSplashes()
 				splash.animationPhase = fmod(splash.animationPhase, sequenceLength);
 		}
 	}
-
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (ripple->flags & RIPPLE_FLAG_ACTIVE)
-		{
-			if (ripple->size < 252)
-			{
-				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
-					ripple->size += 2;
-				else
-					ripple->size += 4;
-			}
-
-			if (!ripple->init)
-			{
-				ripple->life -= 3;
-				if (ripple->life > 250)
-					ripple->flags = 0;
-			}
-			else if (ripple->init < ripple->life)
-			{
-				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
-					ripple->init += 8;
-				else
-					ripple->init += 4;
-				if (ripple->init >= ripple->life)
-					ripple->init = 0;
-			}
-		}
-	}
 }
 
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		TriggerUnderwaterBlood(x, y, z, speed);
+		SpawnUnderwaterBlood(Vector3(x, y, z), probedRoomNumber, speed);
 	else
 		TriggerBlood(x, y, z, direction >> 4, speed);
 
@@ -1147,28 +1113,6 @@ void TriggerLaraBlood()
 		}
 
 		node <<= 1;
-	}
-}
-
-void TriggerUnderwaterBlood(int x, int y, int z, int size) 
-{
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
-		{
-			ripple->flags = RIPPLE_FLAG_ACTIVE | RIPPLE_FLAG_LOW_OPACITY | RIPPLE_FLAG_BLOOD;
-
-			ripple->life = 240 + (GetRandomControl() & 7);
-			ripple->init = 1;
-			ripple->size = size;
-			ripple->x = x + (GetRandomControl() & 63) - 32;
-			ripple->y = y;
-			ripple->z = z + (GetRandomControl() & 63) - 32;
-			
-			return;
-		}
 	}
 }
 
@@ -1293,33 +1237,6 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void SetupRipple(int x, int y, int z, int size, int flags)
-{
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
-		{
-			ripple->flags = RIPPLE_FLAG_ACTIVE | flags;
-			ripple->life = 48 + (GetRandomControl() & 15);
-			ripple->init = 1;
-			ripple->size = size;
-			ripple->x = x;
-			ripple->y = y;
-			ripple->z = z;
-
-			if (flags & RIPPLE_FLAG_NO_RAND)
-			{
-				ripple->x += (GetRandomControl() & 127) - 64;
-				ripple->z += (GetRandomControl() & 127) - 64;
-			}
-
-			return;
-		}
-	}
-}
-
 void WadeSplash(ItemInfo* item, int wh, int wd)
 {
 	auto probe1 = GetCollision(item);
@@ -1343,9 +1260,9 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
 				if (item->Animation.ActiveState != LS_IDLE)
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				else
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_LOW_OPACITY);	
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::LowOpacity);
 			}
 		}
 	}
@@ -1363,9 +1280,6 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 
 void Splash(ItemInfo* item)
 {
-	constexpr auto BUBBLE_COUNT		   = 256;
-	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
-
 	int probedRoomNumber = GetCollision(item).RoomNumber;
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
@@ -1378,18 +1292,6 @@ void Splash(ItemInfo* item)
 	SplashSetup.splashPower = item->Animation.Velocity.y;
 	SplashSetup.innerRadius = 64;
 	SetupSplash(&SplashSetup, probedRoomNumber);
-
-	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
-	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
-
-	// Spawn bubbles.
-	for (int i = 0; i < BUBBLE_COUNT; i++)
-	{
-		auto pos = Random::GeneratePointInSphere(sphere);
-		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
-		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
-		SpawnBubble(pos, item->RoomNumber, 0, inertia);
-	}
 }
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
