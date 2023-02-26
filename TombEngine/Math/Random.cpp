@@ -10,7 +10,7 @@ namespace TEN::Math::Random
 {
 	static std::mt19937 Engine;
 
-	int32_t GenerateInt(int32_t low, int32_t high)
+	int GenerateInt(int low, int high)
 	{
 		return (Engine() / (Engine.max() / (high - low + 1) + 1) + low);
 	}
@@ -27,14 +27,43 @@ namespace TEN::Math::Random
 
 	Vector2 GenerateDirection2D()
 	{
-		auto direction2D = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
-		direction2D.Normalize();
-		return direction2D;
+		float angle = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
+		return Vector2(cos(angle), sin(angle));
+	}
+
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float apothem)
+	{
+		auto rotMatrix = Matrix::CreateRotationZ(orient2D);
+		auto relPoint = Vector2(
+			GenerateFloat(-apothem, apothem),
+			GenerateFloat(-apothem, apothem));
+
+		return (pos2D + Vector2::Transform(relPoint, rotMatrix));
+	}
+	
+	Vector2 GeneratePoint2DInCircle(const Vector2& pos2D, float radius)
+	{
+		// Use rejection sampling.
+		auto relPoint = Vector2::Zero;
+		do
+		{
+			relPoint = Vector2(
+				GenerateFloat(-1.0f, 1.0f),
+				GenerateFloat(-1.0f, 1.0f));
+		} while (relPoint.LengthSquared() > 1.0f);
+
+		return (pos2D + (relPoint * radius));
 	}
 
 	Vector3 GenerateDirection()
 	{
-		auto direction = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
+		float theta = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
+		float phi = GenerateFloat(0.0f, PI);		 // Generate angle in sphere's upper half.
+
+		auto direction = Vector3(
+			sin(phi) * cos(theta),
+			sin(phi) * sin(theta),
+			cos(phi));
 		direction.Normalize();
 		return direction;
 	}
@@ -64,7 +93,32 @@ namespace TEN::Math::Random
 
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
-		return Geometry::TranslatePoint(sphere.Center, GenerateDirection(), GenerateFloat(0.0f, sphere.Radius));
+		// Use rejection sampling.
+		auto relPoint = Vector3::Zero;
+		do
+		{
+			relPoint = Vector3(
+				GenerateFloat(-1.0f, 1.0f),
+				GenerateFloat(-1.0f, 1.0f),
+				GenerateFloat(-1.0f, 1.0f));
+		} while (relPoint.LengthSquared() > 1.0f);
+
+		return (sphere.Center + (relPoint * sphere.Radius));
+	}
+
+	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere)
+	{
+		float u = GenerateFloat(0.0f, 1.0f);
+		float v = GenerateFloat(0.0f, 1.0f);
+
+		float theta = u * PI_MUL_2;
+		float phi = acos((v * 2) - 1.0f);
+
+		auto relPoint = Vector3(
+			sin(phi) * cos(theta),
+			sin(phi) * sin(theta),
+			cos(phi));
+		return (sphere.Center + (relPoint * sphere.Radius));
 	}
 
 	bool TestProbability(float probability)

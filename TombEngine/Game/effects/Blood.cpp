@@ -18,7 +18,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_DRIP_COUNT_MAX  = 256;
 	constexpr auto BLOOD_STAIN_COUNT_MAX = 192;
 	constexpr auto BLOOD_MIST_COUNT_MAX  = 256;
-	constexpr auto UW_BLOOD_COUNT_MAX	 = 256;
+	constexpr auto UW_BLOOD_COUNT_MAX	 = 512;
 
 	constexpr auto BLOOD_DRIP_LIFE_START_FADING = 0.5f;
 	
@@ -29,10 +29,10 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
-	std::deque<BloodDrip>		BloodDrips				 = {};
-	std::deque<BloodStain>		BloodStains				 = {};
-	std::deque<BloodMist>		BloodMists				 = {};
-	std::deque<UnderwaterBlood> UnderwaterBloodParticles = {};
+	std::vector<BloodDrip>		 BloodDrips				  = {};
+	std::vector<BloodStain>		 BloodStains			  = {};
+	std::vector<BloodMist>		 BloodMists				  = {};
+	std::vector<UnderwaterBlood> UnderwaterBloodParticles = {};
 
 	static std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
@@ -236,30 +236,31 @@ namespace TEN::Effects::Blood
 			SpawnBloodMist(pos, roomNumber, direction);
 	}
 	
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
 	{
-		constexpr auto LIFE_MAX		 = 8.5f;
-		constexpr auto LIFE_MIN		 = 8.0f;
-		constexpr auto SPHERE_RADIUS = BLOCK(0.25f);
+		constexpr auto LIFE_MAX = 8.5f;
+		constexpr auto LIFE_MIN = 8.0f;
+		constexpr auto SPAWN_RADIUS = BLOCK(0.25f);
 
 		auto& uwBlood = GetNewEffect(UnderwaterBloodParticles, UW_BLOOD_COUNT_MAX);
 
-		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
+		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
 
 		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		uwBlood.Position = Random::GeneratePointInSphere(sphere);
+		uwBlood.RoomNumber = roomNumber;
 		uwBlood.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 		uwBlood.Init = 1.0f;
-		uwBlood.Scale = scale;
+		uwBlood.Size = size;
 	}
 
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count)
 	{
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
 		for (int i = 0; i < count; i++)
-			SpawnUnderwaterBlood(pos, roomNumber, scaleMax);
+			SpawnUnderwaterBlood(pos, roomNumber, sizeMax);
 	}
 
 	void UpdateBloodDrips()
@@ -290,7 +291,7 @@ namespace TEN::Effects::Blood
 
 			// Hit water; spawn underwater blood.
 			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
-			{
+	{
 				drip.Life = 0.0f;
 
 				if (drip.CanSpawnStain)
@@ -402,17 +403,19 @@ namespace TEN::Effects::Blood
 
 	void UpdateUnderwaterBloodParticles()
 	{
-		constexpr auto SCALE_MAX  = BLOCK(0.25f);
-		constexpr auto SCALE_RATE = 4.0f;
+		constexpr auto UW_BLOOD_SIZE_MAX = BLOCK(0.25f);
+
+		if (UnderwaterBloodParticles.empty())
+			return;
 
 		for (auto& uwBlood : UnderwaterBloodParticles)
 		{
 			if (uwBlood.Life <= 0.0f)
 				continue;
 
-			// Update scale.
-			if (uwBlood.Scale < SCALE_MAX)
-				uwBlood.Scale += SCALE_RATE;
+			// Update size.
+			if (uwBlood.Size < UW_BLOOD_SIZE_MAX)
+				uwBlood.Size += 4.0f;
 
 			// Update life.
 			if (uwBlood.Init == 0.0f)

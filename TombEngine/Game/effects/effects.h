@@ -7,9 +7,20 @@ enum class LaraWeaponType;
 struct CollisionInfo;
 struct ItemInfo;
 
-enum SpriteEnumFlags
+constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_UWEXPLOSION = 2;
+
+constexpr auto MAX_NODE		= 23;
+constexpr auto MAX_DYNAMICS = 64;
+constexpr auto MAX_SPLASHES = 8;
+constexpr auto NUM_EFFECTS	= 256;
+
+constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLE_DYNAMICS = 8;
+
+enum SpriteEnumFlag
 {
-	SP_NONE		  = (0 << 0),
+	SP_NONE		  = 0,
 	SP_FIRE		  = (1 << 0),
 	SP_SCALE	  = (1 << 1),
 	SP_BLOOD	  = (1 << 2),
@@ -147,9 +158,6 @@ struct ParticleDynamic
 	byte Pad[2];
 };
 
-constexpr auto SD_EXPLOSION = 1;
-constexpr auto SD_UWEXPLOSION = 2;
-
 #define MAX_NODE 23
 #define MAX_DYNAMICS 64
 #define MAX_SPLASHES 8
@@ -158,8 +166,6 @@ constexpr auto SD_UWEXPLOSION = 2;
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class
-constexpr auto MAX_PARTICLES = 1024;
-constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
@@ -170,9 +176,9 @@ extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
-template <typename TEffect>
 
-TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
+template <typename TEffect>
+TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
 	// Add and return new effect.
 	if (effects.size() < countMax)
@@ -192,12 +198,12 @@ TEffect& GetNewEffect(std::deque<TEffect>& effects, unsigned int countMax)
 	}
 
 	// Clear and return existing effect.
-	*effectPtr = TEffect();
+	*effectPtr = {};
 	return *effectPtr;
 }
 
 template <typename TEffect>
-void ClearInactiveEffects(std::deque<TEffect>& effects)
+void ClearInactiveEffects(std::vector<TEffect>& effects)
 {
 	effects.erase(
 		std::remove_if(
@@ -210,7 +216,7 @@ Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
 
-void DetatchSpark(int num, SpriteEnumFlags type);
+void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
 void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);

@@ -275,17 +275,24 @@ void UpdateRats()
 						if (!(GetRandomControl() & 0xF))
 							SpawnRipple(
 								Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
-								(GetRandomControl() & 3) + 48,
-								{ RippleFlags::ShortInit });
+								rat->RoomNumber,
+								Random::GenerateFloat(48.0f, 52.0f),
+								(int)RippleFlags::SlowFade);
 					}
 					else
 					{
 						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
+						SpawnRipple(
+							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+							rat->RoomNumber,
+							Random::GenerateFloat(48.0f, 52.0f),
+							(int)RippleFlags::SlowFade);
+						
 						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose);
 						SpawnRipple(
 							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
-							(GetRandomControl() & 3) + 48,
-							{ RippleFlags::ShortInit });
+							rat->RoomNumber,
+							(GetRandomControl() & 3) + 48);
 						
 					}
 				}

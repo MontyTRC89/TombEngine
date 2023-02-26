@@ -192,7 +192,7 @@ namespace TEN::Entities::Generic
 				if (pushable->hasFloorCeiling)
 				{
 					//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-					AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
+					AdjustStopperFlag(item, item->ItemFlags[0] + ANGLE(180));
 				}
 			}
 
@@ -390,7 +390,7 @@ namespace TEN::Entities::Generic
 				if (pushable->hasFloorCeiling)
 				{
 					//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-					AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
+					AdjustStopperFlag(item, item->ItemFlags[0] + ANGLE(180));
 				}
 			}
 
@@ -498,8 +498,7 @@ namespace TEN::Entities::Generic
 
 			if (pushable->hasFloorCeiling)
 			{
-				//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
-				AdjustStopperFlag(pushableItem, pushableItem->ItemFlags[0], false);
+				AdjustStopperFlag(pushableItem, pushableItem->ItemFlags[0]);
 			}
 		}
 		else

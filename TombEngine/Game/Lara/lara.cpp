@@ -58,7 +58,6 @@ using TEN::Renderer::g_Renderer;
 LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
-byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 {
@@ -469,12 +468,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		++lara->Control.Count.PositionAdjust;
 	}
 	else
+	{
 		lara->Control.Count.PositionAdjust = 0;
+	}
 
 	if (!lara->Control.Locked)
 		lara->LocationPad = -1;
 
-	auto oldPos = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -513,10 +514,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		switch (lara->Control.WaterStatus)
 		{
 		case WaterStatus::Dry:
+			for (int i = 0; i < NUM_LARA_MESHES; i++)
+				lara->Effect.BubbleNodes[i] = 0.0f;
+
 			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_DEPTH)
 				break;
 
-			Camera.targetElevation = -ANGLE(22.0f);
+			Camera.targetElevation = ANGLE(-22.0f);
 
 			// Water is deep enough to swim; dispatch dive.
 			if (waterDepth >= SWIM_DEPTH && !isSwamp)
@@ -527,6 +531,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.IsAirborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
+
+					for (int i = 0; i < NUM_LARA_MESHES; i++)
+						lara->Effect.BubbleNodes[i] = PLAYER_BUBBLE_NODE_MAX;
 
 					UpdateLaraRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
@@ -561,16 +568,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				lara->Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while is_airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
 					item->Animation.IsAirborne && !isSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
 				}
-				// Lara is grounded; don't splash again.
+				// Player is grounded; don't splash again.
 				else if (!item->Animation.IsAirborne)
+				{
 					item->Animation.TargetState = LS_IDLE;
+				}
 				else if (isSwamp)
 				{
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
@@ -778,7 +787,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -1079,11 +1088,12 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 		SayNo();
 	}
 
-	// Update Lara's animations.
+	// Update player animations.
 	g_Renderer.UpdateLaraAnimations(true);
 
-	// Update Lara's effects.
-	TriggerLaraDrips(item);
+	// Update player effects.
+	HandlePlayerWetnessDrips(*item);
+	HandlePlayerDiveBubbles(*item);
 	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);
 }

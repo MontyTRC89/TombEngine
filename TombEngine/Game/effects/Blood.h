@@ -78,14 +78,14 @@ namespace TEN::Effects::Blood
 
 		float Life	  = 0.0f;
 		float Init	  = 0.0f;
-		float Scale	  = 0.0f;
+		float Size	  = 0.0f;
 		float Opacity = 0.0f;
 	};
 
-	extern std::deque<BloodDrip>	   BloodDrips;
-	extern std::deque<BloodStain>	   BloodStains;
-	extern std::deque<BloodMist>	   BloodMists;
-	extern std::deque<UnderwaterBlood> UnderwaterBloodParticles;
+	extern std::vector<BloodDrip>		BloodDrips;
+	extern std::vector<BloodStain>		BloodStains;
+	extern std::vector<BloodMist>		BloodMists;
+	extern std::vector<UnderwaterBlood> UnderwaterBloodParticles;
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count);
@@ -97,8 +97,8 @@ namespace TEN::Effects::Blood
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale);
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count);
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size);
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);
 
 	void UpdateBloodDrips();
 	void UpdateBloodStains();

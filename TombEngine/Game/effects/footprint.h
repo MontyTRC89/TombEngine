@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Footprint
 {
-	struct Footprint 
+	struct Footprint
 	{
 		unsigned int SpriteIndex = 0;
 		bool		 IsRightFoot = false;
@@ -20,7 +20,7 @@ namespace TEN::Effects::Footprint
 		float OpacityStart	  = 0.0f;
 	};
 
-	extern std::deque<Footprint> Footprints;
+	extern std::vector<Footprint> Footprints;
 
 	void SpawnFootprint(const ItemInfo& item, bool isRightFoot);
 	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints);

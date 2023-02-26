@@ -1380,7 +1380,7 @@ bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
 		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
 		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
 
-		SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), Random::GenerateFloat(8.0f, 16.0f));
+		SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
 	}
 
 	ItemNewRoom(item.Index, coll.RoomNumber);

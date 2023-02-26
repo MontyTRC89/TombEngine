@@ -2,8 +2,8 @@
 #include "Objects/Effects/tr5_electricity.h"
 
 #include "Game/animation.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -200,16 +200,18 @@ void ElectricityWiresControl(short itemNumber)
 			short roomNumber = item->RoomNumber;
 			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
-			bool waterTouch = false;
-			if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
+			bool isTouchingWater = false;
+			if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			{
-				waterTouch = true;
+				isTouchingWater = true;
+
 				if ((GetRandomControl() & 127) < 16)
 				{
 					SpawnRipple(
 						Vector3(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z),
-						(GetRandomControl() & 7) + 32,
-						{ RippleFlags::LowOpacity });
+						roomNumber,
+						Random::GenerateFloat(32.0f, 40.0f),
+						(int)RippleFlags::LowOpacity);
 				}
 			}
 
@@ -222,7 +224,7 @@ void ElectricityWiresControl(short itemNumber)
 
 				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
 
-				if (!isWaterNearby && waterTouch && roomNumber == collJointRoom)
+				if (!isWaterNearby && isTouchingWater && roomNumber == collJointRoom)
 					isWaterNearby = true;
 			}
 

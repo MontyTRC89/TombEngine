@@ -1,43 +1,33 @@
 #pragma once
-#include "Specific/BitField.h"
-
-using namespace TEN::Utils;
 
 namespace TEN::Effects::Ripple
 {
-	constexpr auto RIPPLE_NUM_MAX = 256;
-
-	enum RippleFlags
+	enum class RippleFlags
 	{
-		ShortInit		  = 1,
-		LowOpacity		  = 2,
-		RandomizePosition = 3,
-		Ground			  = 4,
-
-		Count
+		SlowFade = (1 << 0),
+		LowOpacity = (1 << 1),
+		OnGround = (1 << 2)
 	};
 
 	struct Ripple
 	{
 		unsigned int SpriteIndex = 0;
-		bool		 IsActive	 = false;
 
 		Vector3 Position = Vector3::Zero;
-		Vector3 Normal	 = Vector3::Zero;
-		Vector4 Color	 = Vector4::Zero;
+		int		RoomNumber = 0;
+		Vector3 Normal = Vector3::Zero;
+		Vector4 Color = Vector4::Zero;
 
-		float Life	  = 0.0f;
-		float Init	  = 0.0f;
-		float Scale	  = 0.0f;
-
-		BitField Flags = BitField(RippleFlags::Count);
+		float Life = 0.0f;
+		float LifeMax = 0.0f;
+		float Size = 0.0f;
+		float FadeDuration = 0.0f;
+		int	  Flags = 0;
 	};
 
-	extern std::array<Ripple, RIPPLE_NUM_MAX> Ripples;
+	extern std::vector<Ripple> Ripples;
 
-	Ripple& GetFreeRipple();
-
-	void SpawnRipple(const Vector3& pos, float scale, const std::vector<unsigned int>& flags = {}, const Vector3& normal = Vector3::Down);
+	void SpawnRipple(const Vector3& pos, int roomNumber, float size, int flags = 0, const Vector3& normal = Vector3::Down);
 
 	void UpdateRipples();
 	void ClearRipples();

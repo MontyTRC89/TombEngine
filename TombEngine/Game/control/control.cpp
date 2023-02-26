@@ -13,6 +13,7 @@
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
@@ -27,11 +28,11 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/health.h"
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
@@ -73,6 +74,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -193,7 +195,7 @@ GameStatus ControlPhase(int numFrames)
 		// Update weather.
 		Weather.Update();
 
-		// Update special FX.
+		// Update effects.
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -207,24 +209,27 @@ GameStatus ControlPhase(int numFrames)
 		UpdateFootprints();
 		UpdateRipples();
 		UpdateSplashes();
-		UpdateElectricitys();
+		UpdateElectricityArcs();
 		UpdateHelicalLasers();
 		//UpdateDrips(); // TODO: Check what this was.
 		UpdateRats();
+		UpdateRipples();
 		UpdateBats();
 		UpdateSpiders();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDripParticles();
+		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
+		UpdateUnderwaterBloodParticles();
 
-		// Update screen UI and overlays.
+		// Update HUD.
 		UpdateBars(LaraItem);
 		UpdateFadeScreenAndCinematicBars();
+		g_Hud.Update();
 
 		// Rumble screen (like in submarine level of TRC).
 		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
@@ -294,7 +299,6 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	InitialiseFXArray(true);
-	InitialisePickupDisplay();
 	InitialiseCamera();
 	InitialiseSpotCamSequences(isTitle);
 	InitialiseHair();
@@ -411,21 +415,26 @@ void CleanUp()
 	ClearSpotCamSequences();
 	ClearCinematicBars();
 
-	// Clear all kinds of particles.
-	ClearBubbles();
-	DisableSmokeParticles();
-	ClearDripParticles();
+	// Clear effects.
 	ClearBloodDrips();
 	ClearBloodMists();
 	ClearBloodStains();
+	ClearBubbles();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDrips();
 	ClearFootprints();
 	ClearRipples();
+	DisableSparkParticles();
+	ClearUnderwaterBloodParticles();
 	DisableDebris();
+	DisableSmokeParticles();
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
+
+	// Clear HUD.
+	g_Hud.Clear();
 
 	// Clear soundtrack masks.
 	ClearSoundTrackMasks();
@@ -450,9 +459,10 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.AddString(float(x) / float(g_Configuration.Width) * REFERENCE_RES_WIDTH,
-								 float(y) / float(g_Configuration.Height) * REFERENCE_RES_HEIGHT,
-								 key.c_str(), col, flags);
+			g_Renderer.AddString(
+				float(x) / float(g_Configuration.Width) * SCREEN_SPACE_RES.x,
+				float(y) / float(g_Configuration.Height) * SCREEN_SPACE_RES.y,
+				key.c_str(), col, flags);
 		});
 	}
 

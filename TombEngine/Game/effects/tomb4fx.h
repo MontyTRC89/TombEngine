@@ -83,7 +83,7 @@ struct SHOCKWAVE_STRUCT
 	unsigned char sb;
 	unsigned char life;
 	short speed;
-	short temp;
+	short sLife;
 	bool fadeIn = false;
 	int style;
 };
@@ -147,7 +147,8 @@ struct FIRE_SPARKS
 enum class ShockwaveStyle
 {
 	Normal = 0,
-	Sophia = 1
+	Sophia = 1,
+	Knockback = 2,
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0
@@ -204,9 +205,6 @@ int GetFreeGunshell();
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
-void LaraBubbles(ItemInfo* item);
-void UpdateDrips();
-void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
 void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);

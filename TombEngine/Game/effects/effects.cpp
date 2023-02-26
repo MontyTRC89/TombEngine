@@ -9,6 +9,7 @@
 #include "Game/effects/Drip.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/spark.h"
@@ -27,6 +28,7 @@
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
@@ -76,7 +78,7 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 	{ 0, 0, 0, 0, false }, // Empty
 };
 
-void DetatchSpark(int number, SpriteEnumFlags type)
+void DetatchSpark(int number, SpriteEnumFlag type)
 {
 	auto* sptr = &Particles[0];
 
@@ -760,7 +762,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 				(GetRandomControl() & 0x1FF) + x - 256,
 				(GetRandomControl() & 0x7F) + y - 64,
 				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber);
+			SpawnBubble(pos, roomNumber, (int)BubbleFlags::HighAmplitude);
 		}
 	}
 }
@@ -1020,7 +1022,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; // Splash texture.
 				splash.spriteSequenceEnd = 7; // Splash texture.
-				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
+				splash.animationSpeed = fmin(0.6f, (1 / splash.outerRadVel) * 2);
 
 				numSplashesSetup++;
 			}
@@ -1032,15 +1034,9 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
-	Pose soundPosition;
-	soundPosition.Position.x = setup->x;
-	soundPosition.Position.y = setup->y;
-	soundPosition.Position.z = setup->z;
-	soundPosition.Orientation.y = 0;
-	soundPosition.Orientation.x = 0;
-	soundPosition.Orientation.z = 0;
+	SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
 
+	auto soundPosition = Pose(Vector3i(setup->x, setup->y, setup->z));
 	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
 }
 
@@ -1268,19 +1264,9 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
 				if (item->Animation.ActiveState != LS_IDLE)
-				{
-					SpawnRipple(
-						Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z),
-						112 + (GetRandomControl() & 15),
-						{ RippleFlags::ShortInit, RippleFlags::LowOpacity });
-				}
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				else
-				{
-					SpawnRipple(
-						Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z),
-						112 + (GetRandomControl() & 15),
-						{ RippleFlags::LowOpacity });
-				}
+					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::LowOpacity);
 			}
 		}
 	}
@@ -1298,9 +1284,6 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 
 void Splash(ItemInfo* item)
 {
-	constexpr auto BUBBLE_COUNT		   = 256;
-	constexpr auto BUBBLE_SPAWN_RADIUS = BLOCK(1 / 16.0f);
-
 	int probedRoomNumber = GetCollision(item).RoomNumber;
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
@@ -1313,18 +1296,6 @@ void Splash(ItemInfo* item)
 	SplashSetup.splashPower = item->Animation.Velocity.y;
 	SplashSetup.innerRadius = 64;
 	SetupSplash(&SplashSetup, probedRoomNumber);
-
-	auto pos = Vector3(SplashSetup.x, SplashSetup.y + BUBBLE_SPAWN_RADIUS, SplashSetup.z);
-	auto sphere = BoundingSphere(pos, BUBBLE_SPAWN_RADIUS);
-
-	// Spawn bubbles.
-	for (int i = 0; i < BUBBLE_COUNT; i++)
-	{
-		auto pos = Random::GeneratePointInSphere(sphere);
-		auto direction = Random::GenerateDirectionInCone(Vector3::Up, 20.0f);
-		auto inertia = direction * Random::GenerateFloat(BLOCK(0.1f), BLOCK(0.2f));
-		SpawnBubble(pos, item->RoomNumber, 0, inertia);
-	}
 }
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
@@ -1879,10 +1850,14 @@ void ProcessEffects(ItemInfo* item)
 			if (TestProbability(1 / 32.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
+
+		case EffectType::Cadaver:
+			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
+			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke)
+	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);

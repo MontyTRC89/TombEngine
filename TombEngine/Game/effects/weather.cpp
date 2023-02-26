@@ -297,7 +297,9 @@ namespace TEN::Effects::Environment
 				collisionCalculated = true;
 			}
 			else
+			{
 				p.CollisionCheckDelay--;
+			}
 
 			auto& r = g_Level.Rooms[p.Room];
 
@@ -337,12 +339,10 @@ namespace TEN::Effects::Environment
 					p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 
 					// Produce ripples if particle got into substance (water or swamp).
-
 					if (inSubstance)
-						SpawnRipple(p.Position, Random::GenerateFloat(16.0f, 24.0f), { RippleFlags::ShortInit, RippleFlags::LowOpacity });
+						SpawnRipple(p.Position, p.Room, Random::GenerateFloat(16.0f, 24.0f), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 
 					// Immediately disable rain particle because it doesn't need fading out.
-
 					if (p.Type == WeatherType::Rain)
 					{
 						p.Enabled = false;

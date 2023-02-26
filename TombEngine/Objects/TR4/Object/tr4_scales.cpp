@@ -7,6 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/tomb4fx.h"
 #include "tr4_ahmet.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -22,12 +23,10 @@ ObjectCollisionBounds ScalesBounds =
 	GameBoundingBox(
 		-CLICK(5.5f), -CLICK(5.5f),
 		0, 0,
-		-SECTOR(0.5f), SECTOR(0.5f)
-	),
+		-SECTOR(0.5f), SECTOR(0.5f)),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
 
 void ScalesControl(short itemNumber)
@@ -174,7 +173,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		float life = Random::GenerateFloat(16.0f, 48.0f);
 		float gravity = Random::GenerateFloat(32.0f, 64.0f);
 
-		SpawnDripParticle(pos, laraItem->RoomNumber, velocity, life, gravity);
+		SpawnDrip(pos, laraItem->RoomNumber, velocity, life, gravity);
 
 		// TODO: Generate colours.
 		/*drip->r = Random::GenerateFloat(24, 40);

@@ -31,7 +31,7 @@ namespace TEN::Effects::Footprint
 		FLOOR_MATERIAL::Custom4
 	};
 
-	std::deque<Footprint> Footprints = {};
+	std::vector<Footprint> Footprints = {};
 
 	static SOUND_EFFECTS GetFootprintSfx(FLOOR_MATERIAL material)
 	{

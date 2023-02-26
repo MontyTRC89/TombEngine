@@ -13,6 +13,7 @@ namespace TEN::Effects::Items
 	void ItemBlueElectricBurn(ItemInfo* item, int timeout = DEFAULT_NONLETHAL_EFFECT_TIMEOUT);
 	void ItemElectricBurn(ItemInfo* item, int timeout = DEFAULT_NONLETHAL_EFFECT_TIMEOUT);
 	void ItemSmoke(ItemInfo* item, int timeout = DEFAULT_NONLETHAL_EFFECT_TIMEOUT);
+	void ItemSetAsCadaver(ItemInfo* item, int timeout = -1);
 	void LavaBurn(ItemInfo* item);
 	void LaraBreath(ItemInfo* item);
 }
