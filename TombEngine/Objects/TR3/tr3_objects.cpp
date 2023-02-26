@@ -359,6 +359,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 0;
 		obj->LotType = LotType::Flyer;
+		obj->SetupHitEffect();
 	}
 	
 	obj = &Objects[ID_COMPSOGNATHUS];

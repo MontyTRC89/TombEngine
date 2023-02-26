@@ -15,8 +15,8 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto WASP_DAMAGE = 50;
 
-	constexpr auto WASP_TAKE_OFF_RANGE = SQUARE(BLOCK(3));
-	constexpr auto WASP_ATTACK_RANGE   = SQUARE(BLOCK(0.5f));
+	constexpr auto WASP_DETECTION_RANGE = SQUARE(BLOCK(15));
+	constexpr auto WASP_ATTACK_RANGE   = SQUARE(CLICK(2));
 
 	constexpr auto WASP_LAND_CHANCE = 1 / 256.0f;
 
@@ -24,10 +24,11 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto WASP_AIR_TURN_RATE_MAX  = ANGLE(3.0f);
 
 	constexpr auto WASP_IDLE_TO_FLY_VELOCITY = BLOCK(1 / 20.0f);
+	constexpr auto WASP_VENOM_SACK_LIGHT_POWER = 10;
 
 	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-	const auto WaspBite          = BiteInfo(Vector3::Zero, 12);
+	const auto WaspBite          = BiteInfo(Vector3(0.0f, 0.0f, -260.0f), 12);
 	const auto WaspVenomSackBite = BiteInfo(Vector3::Zero, 10);
 
 	enum WaspState
@@ -107,8 +108,10 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Spawn light.
 		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
+		if (item.ItemFlags[0] < 0)
+			item.ItemFlags[0] = 0;
 		TriggerDynamicLight(
-			pos.x, pos.y, pos.z, 10, 
+			pos.x, pos.y, pos.z, item.ItemFlags[0],
 			WaspVenomSackLightColor.x * UCHAR_MAX,
 			WaspVenomSackLightColor.y * UCHAR_MAX,
 			WaspVenomSackLightColor.z * UCHAR_MAX);
@@ -123,6 +126,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto& item = g_Level.Items[itemNumber];
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, WASP_STATE_IDLE);
+		item.ItemFlags[0] = WASP_VENOM_SACK_LIGHT_POWER;
 	}
 
 	void WaspMutantControl(short itemNumber)
@@ -151,6 +155,14 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case WASP_STATE_DEATH:
+				if (item.ItemFlags[0] > 0 && item.ItemFlags[1] == 0)
+				{
+					item.ItemFlags[0]--;
+					item.ItemFlags[1] = 6;
+				}
+				else
+					item.ItemFlags[1]--;
+
 				item.Pose.Position.y = item.Floor;
 				break;
 
@@ -182,7 +194,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_LAND_TURN_RATE_MAX;
 				item.Pose.Position.y = item.Floor;
 
-				if (item.HitStatus || ai.distance < WASP_TAKE_OFF_RANGE || creature.HurtByLara)
+				if (item.HitStatus || ai.distance < WASP_DETECTION_RANGE || creature.HurtByLara)
 					item.Animation.TargetState = WASP_STATE_IDLE_TO_FLY_IDLE;
 
 				break;
@@ -200,24 +212,22 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState)
+				if (item.Animation.RequiredState != NO_STATE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
-				// NOTE: This causes the wasp to wait until probability is valid or
-				// the player has hit the wasp to move forward, which is conceptually bad.
-				else if (item.HitStatus || Random::TestProbability(WASP_LAND_CHANCE))
+				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
 				{
-					item.Animation.TargetState = WASP_STATE_FLY_FORWARD;
+					item.Animation.TargetState = WASP_STATE_ATTACK;
 				}
 				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
 					!creature.HurtByLara)
 				{
 					item.Animation.TargetState = WASP_STATE_FLY_IDLE_TO_IDLE;
 				}
-				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
+				else
 				{
-					item.Animation.TargetState = WASP_STATE_ATTACK;
+					item.Animation.TargetState = WASP_STATE_FLY_FORWARD;
 				}
 
 				break;
@@ -226,18 +236,18 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState)
+				if (item.Animation.RequiredState != NO_STATE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
+				}
+				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
+				{
+					item.Animation.TargetState = WASP_STATE_ATTACK;
 				}
 				else if ((creature.Mood == MoodType::Bored || GetRandomControl() < WASP_LAND_CHANCE) &&
 					!creature.HurtByLara)
 				{
 					item.Animation.TargetState = WASP_STATE_FLY_IDLE;
-				}
-				else if (ai.ahead && ai.distance < WASP_ATTACK_RANGE)
-				{
-					item.Animation.TargetState = WASP_STATE_ATTACK;
 				}
 
 				break;
@@ -262,17 +272,15 @@ namespace TEN::Entities::Creatures::TR3
 				if (!creature.Flags && item.TouchBits.Test(WaspBite.meshNum))
 				{
 					DoDamage(creature.Enemy, WASP_DAMAGE);
-					CreatureEffect(&item, WaspBite, DoBloodSplat);
+					CreatureEffect2(&item, WaspBite, 10, item.Pose.Orientation.y, DoBloodSplat);
 					creature.Flags = 1;
 				}
 
 				break;
 			}
-
-			// Avoid spawning dynamic light when dead.
-			SpawnWaspVenomSackEffects(itemNumber, item);
 		}
 
+		SpawnWaspVenomSackEffects(itemNumber, item);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }
