@@ -251,7 +251,7 @@ namespace TEN::Entities::Traps
 			return false;
 
 		//Is a blocked grey box (So it's an Isolated box)
-		if (g_Level.Boxes[col.Block->Box].flags & BLOCKABLE)
+		if (g_Level.Boxes[col.Block->Box].flags & BLOCKABLE & BLOCKED)
 			return false;
 		
 		//Is a stopper tile? (There is still a shatter object).
