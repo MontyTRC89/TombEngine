@@ -146,6 +146,10 @@ void ClearLookAroundActions(ItemInfo* item)
 
 	switch (player.Control.Look.Mode)
 	{
+	default:
+	case LookMode::None:
+		break;
+
 	case LookMode::Vertical:
 		ClearAction(In::Forward);
 		ClearAction(In::Back);
@@ -161,9 +165,6 @@ void ClearLookAroundActions(ItemInfo* item)
 		ClearAction(In::Back);
 		ClearAction(In::Left);
 		ClearAction(In::Right);
-		break;
-
-	default:
 		break;
 	}
 }
@@ -190,32 +191,34 @@ void LookCamera(ItemInfo* item)
 	const auto& player = *GetLaraInfo(item);
 
 	// TODO:
-	// - Swamp collision.
-	// - Set modes in states.
-	// - Check main Lara control functions.
-	// - Fix water tread camera.
+	// - Set modes in remaining states.
 
-	constexpr auto POS_LERP_ALPHA = 0.25f;
-	constexpr auto COLL_PUSH	  = BLOCK(1.0f / 4) - BLOCK(1.0f / 16);
+	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1.0f / 8);
+	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.5f); // TODO
+	constexpr auto VERTICAL_OFFSET_MONKEY_SWING	  = BLOCK(0.25f);
+	constexpr auto VERTICAL_OFFSET_TREADING_WATER = BLOCK(0.5f);
+	constexpr auto POS_LERP_ALPHA				  = 0.25f;
+	constexpr auto COLL_PUSH					  = BLOCK(0.25f) - BLOCK(1.0f / 16);
 
-	// Determine offsets.
+	// Determine vertical offset.
 	float verticalOffset = -LaraCollision.Setup.Height;
-	if (LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY)
+	if (player.Control.IsMonkeySwinging)
 	{
-		verticalOffset += BLOCK(1.0f / 4);
+		verticalOffset += VERTICAL_OFFSET_MONKEY_SWING;
 	}
-	else if (LaraCollision.Setup.Height == LARA_HEIGHT_TREAD)
+	else if (player.Control.WaterStatus == WaterStatus::TreadWater)
 	{
-		verticalOffset += BLOCK(1.0f / 2);
+		verticalOffset += VERTICAL_OFFSET_TREADING_WATER;
 	}
 	else
 	{
-		verticalOffset += -BLOCK(1.0f / 8);
+		verticalOffset += VERTICAL_OFFSET_DEFAULT;
 	}
 
-	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
+	// Calculate key offsets.
+	auto pivotPosOffset = Vector3(0.0f, verticalOffset, 0.0f);
 	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(3.0f / 4));
-	float lookAtPosDist = BLOCK(1.0f / 2);
+	float lookAtPosDist = BLOCK(0.5f);
 
 	// Define absolute camera orientation.
 	auto orient = player.Control.Look.Orientation +
@@ -224,12 +227,12 @@ void LookCamera(ItemInfo* item)
 	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
 	// Define landmarks.
-	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use overload from ladder branch.
-	auto idealPos = Geometry::TranslatePoint(pivot, orient, idealPosDist);
-	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, lookAtPosDist);
+	auto pivotPos = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotPosOffset.z, pivotPosOffset.y, pivotPosOffset.x); // TODO: Use overload from ladder branch.
+	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealPosDist);
+	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, lookAtPosDist);
 
 	// Determine best position.
-	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
+	auto origin = GameVector(pivotPos, GetCollision(item, item->Pose.Orientation.y, pivotPosOffset.z, pivotPosOffset.y).RoomNumber);
 	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealPosDist).RoomNumber);
 
 	// Handle room and object collisions.
