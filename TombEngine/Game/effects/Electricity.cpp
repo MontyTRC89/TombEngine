@@ -37,7 +37,7 @@ namespace TEN::Effects::Electricity
 
 	// 4-point Catmull-Rom spline interpolation.
 	// Function takes reference to array of knots and
-	// calculates using subset of 4 determined alpha value.
+	// calculates using subset of 4 determined by alpha value.
 	static Vector3 ElectricitySpline(const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, float alpha)
 	{
 		alpha *= ELECTRICITY_KNOTS_SIZE - 3;
@@ -201,7 +201,7 @@ namespace TEN::Effects::Electricity
 				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
-	void UpdateElectricitys()
+	void UpdateElectricityArcs()
 	{
 		// No active effects; return early.
 		if (ElectricityArcs.empty())

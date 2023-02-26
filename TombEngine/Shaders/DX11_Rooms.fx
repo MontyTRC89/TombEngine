@@ -7,15 +7,16 @@
 #include "./AnimatedTextures.hlsli"
 #include "./Shadows.hlsli"
 
-cbuffer MiscBuffer : register(b3)
-{
-	int Caustics;
-};
-
 cbuffer RoomBuffer : register(b5)
 {
+	float2 CausticsStartUV;
+	float2 CausticsScale;
 	float4 AmbientColor;
-	unsigned int Water;
+	ShaderLight RoomLights[MAX_LIGHTS_PER_ROOM];
+	int NumRoomLights;
+	int Water;
+	int Caustics;
+	int Padding;
 };
 
 struct PixelShaderInput
@@ -99,6 +100,15 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+float3 UnpackNormalMap(float3 compressedNormalMap)
+{
+	float2 normalXY = compressedNormalMap.rg;
+
+	normalXY = normalXY * float2(2.0f, 2.0f) - float2(1.0f, 1.0f);
+	float normalZ = sqrt(saturate(1.0f - dot(normalXY, normalXY)));
+	return float3(normalXY.xy, normalZ);
+}
+
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
@@ -107,9 +117,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 	DoAlphaTest(output.Color);
 
-	float3 Normal = NormalTexture.Sample(Sampler, input.UV).rgb;
-	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal, input.TBN));
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(Sampler, input.UV).rgb);
+	normal = normalize(mul(normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -131,11 +140,11 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	if (doLights)
 	{
-		for (int i = 0; i < NumLights; i++)
+		for (int i = 0; i < NumRoomLights; i++)
 		{
-			float3 lightPos = Lights[i].Position.xyz;
-			float3 color = Lights[i].Color.xyz;
-			float radius = Lights[i].Out;
+			float3 lightPos = RoomLights[i].Position.xyz;
+			float3 color = RoomLights[i].Color.xyz;
+			float radius = RoomLights[i].Out;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
@@ -143,7 +152,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 				continue;
 
 			lightVec = normalize(lightVec);
-			float d = saturate(dot(Normal, -lightVec ));
+			float d = saturate(dot(normal, -lightVec ));
 			if (d < 0)
 				continue;
 			
@@ -156,8 +165,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	if (Caustics)
 	{
 		float3 position = input.WorldPosition.xyz;
-		float3 normal = Normal;
-
+		
 		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
 		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
@@ -170,9 +178,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 		blending /= float3(b, b, b);
 
 		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
-		float3 xaxis = CausticsTexture.Sample(Sampler, p.yz).xyz; 
-		float3 yaxis = CausticsTexture.Sample(Sampler, p.xz).xyz;  
-		float3 zaxis = CausticsTexture.Sample(Sampler, p.xy).xyz;  
+		float3 xaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 yaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 zaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}

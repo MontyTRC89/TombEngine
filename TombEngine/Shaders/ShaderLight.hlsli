@@ -5,7 +5,8 @@
 #define LT_SPOT		2
 #define LT_SHADOW	3
 
-#define MAX_LIGHTS	48
+#define MAX_LIGHTS_PER_ROOM	48
+#define MAX_LIGHTS_PER_ITEM	8
 #define SPEC_FACTOR 64
 
 struct ShaderLight
@@ -19,14 +20,7 @@ struct ShaderLight
 	float Out;
 	float InRange;
 	float OutRange;
-
-	float padding;
-};
-
-cbuffer LightsBuffer : register(b2)
-{
-	ShaderLight Lights[MAX_LIGHTS];
-	int NumLights;
+	float Padding;
 };
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
@@ -213,34 +207,34 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 		return (color * intensity * d);
 }
 
-float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
+float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen, const ShaderLight lights[MAX_LIGHTS_PER_ITEM], int numLights)
 {
 	float3 diffuse = 0;
 	float3 shadow  = 0;
 	float3 spec    = 0;
 
-	for (int i = 0; i < NumLights; i++)
+	for (int i = 0; i < numLights; i++)
 	{
-		int lightType = Lights[i].Type;
+		int lightType = lights[i].Type;
 
 		if (lightType == LT_POINT)
 		{
-			diffuse += DoPointLight(pos, normal, Lights[i]);
-			spec += DoSpecularPoint(pos, normal, Lights[i], sheen);
+			diffuse += DoPointLight(pos, normal, lights[i]);
+			spec += DoSpecularPoint(pos, normal, lights[i], sheen);
 		}
 		else if (lightType == LT_SHADOW)
 		{
-			shadow += DoShadowLight(pos, normal, Lights[i]);
+			shadow += DoShadowLight(pos, normal, lights[i]);
 		}
 		else if (lightType == LT_SUN)
 		{
-			diffuse += DoDirectionalLight(pos, normal, Lights[i]);
-			spec += DoSpecularSun(normal, Lights[i], sheen);
+			diffuse += DoDirectionalLight(pos, normal, lights[i]);
+			spec += DoSpecularSun(normal, lights[i], sheen);
 		}
 		else if (lightType == LT_SPOT)
 		{
-			diffuse += DoSpotLight(pos, normal, Lights[i]);
-			spec += DoSpecularSpot(pos, normal, Lights[i], sheen);
+			diffuse += DoSpotLight(pos, normal, lights[i]);
+			spec += DoSpecularSpot(pos, normal, lights[i], sheen);
 		}
 	}
 

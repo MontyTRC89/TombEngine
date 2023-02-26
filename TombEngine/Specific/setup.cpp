@@ -126,15 +126,6 @@ void ObjectObjects()
 		obj->control = FallingBlockControl;
 	}
 
-	/*obj = &Objects[ID_AIRLOCK_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = TEN::Entities::Switches::SwitchCollision;
-		obj->control = SwitchControl;
-		
-		
-	}*/
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -308,8 +299,6 @@ void InitialiseSpecialEffects()
 	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
-	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
-	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
@@ -322,8 +311,6 @@ void InitialiseSpecialEffects()
 	NextFireSpark = 1;
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
-	NextBubble = 0;
-	NextDrip = 0;
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
