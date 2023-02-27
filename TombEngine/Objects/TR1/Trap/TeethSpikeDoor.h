@@ -1,8 +1,6 @@
 #pragma once
 
-struct CollisionInfo;
 struct ItemInfo;
-struct ObjectInfo;
 struct BiteInfo;
 
 namespace TEN::Entities::Traps::TR1

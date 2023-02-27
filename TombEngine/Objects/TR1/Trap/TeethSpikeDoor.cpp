@@ -19,15 +19,6 @@ namespace TEN::Entities::Traps::TR1
 	const auto Teeth3ABite = BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0);
 	const auto Teeth3BBite = BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1);
 
-	//const BiteInfo TeethSpikeBite[6] = {
-	//	BiteInfo(Vector3(-23.0f, 0.0f, -1718.0f), 0),
-	//	BiteInfo(Vector3(71.0f, 0.0f, -1718.0f), 1),
-	//	BiteInfo(Vector3(-23.0f, 10.0f, -1718.0f), 0),
-	//	BiteInfo(Vector3(71.0f, 10.0f, -1718.0f), 1),
-	//	BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0),
-	//	BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1),
-	//};
-
 	enum TeethSpikeDoorState
 	{
 		TEETHSPIKEDOOR_DISABLED = 0,
@@ -76,7 +67,9 @@ namespace TEN::Entities::Traps::TR1
 
 	void DoBiteEffect(ItemInfo* item, const BiteInfo& bite)
 	{
-		auto pos = GetJointPosition(item, bite.meshNum);
-		DoBloodSplat(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
+		auto pos = GetJointPosition(item, bite.meshNum) + bite.Position;
+
+		//item->Animation.Velocity.z returned 0 so I put 1 for velocity. Kubsy 27/02/2023
+		DoBloodSplat(pos.x, pos.y, pos.z, 1, item->Pose.Orientation.y, item->RoomNumber);
 	}
 }
