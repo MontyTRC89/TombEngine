@@ -114,8 +114,7 @@ namespace TEN::Hud
 
 		// Set max life according to context.
 		if (HealthBar.Value != HealthBar.TargetValue ||
-			health <= LARA_HEALTH_CRITICAL ||
-			player.PoisonPotency != 0 ||
+			health <= LARA_HEALTH_CRITICAL || player.PoisonPotency != 0 ||
 			player.Control.HandStatus == HandStatus::WeaponDraw ||
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
 				player.Control.Weapon.GunType != LaraWeaponType::Torch)) // HACK: Exclude torch.
@@ -124,8 +123,11 @@ namespace TEN::Hud
 		}
 
 		// HACK: Special case for weapon undraw.
-		if (player.Control.HandStatus == HandStatus::WeaponUndraw && health > LARA_HEALTH_CRITICAL)
+		if (player.Control.HandStatus == HandStatus::WeaponUndraw &&
+			health > LARA_HEALTH_CRITICAL && player.PoisonPotency == 0)
+		{
 			this->HealthBar.Life = 0.0f;
+		}
 	}
 
 	void StatusBarsController::UpdateSprintBar(ItemInfo& item)

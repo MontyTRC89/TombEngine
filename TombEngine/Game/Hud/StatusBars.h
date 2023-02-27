@@ -25,7 +25,7 @@ namespace TEN::Hud
 		// Constants
 		static constexpr auto STATUS_BAR_LIFE_MAX		   = 0.75f;
 		static constexpr auto STATUS_BAR_LIFE_START_FADING = 0.2f;
-		static constexpr auto STATUS_BAR_VALUE_LERP_ALPHA  = 0.4f;
+		static constexpr auto STATUS_BAR_VALUE_LERP_ALPHA  = 0.3f;
 
 		// Components
 		StatusBar AirBar	= {};
