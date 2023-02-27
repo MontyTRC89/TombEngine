@@ -41,6 +41,7 @@ namespace TEN::Hud
 
 	private:
 		// Update helpers
+		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateAirBar(ItemInfo& item);
 		void UpdateHealthBar(ItemInfo& item);
 		void UpdateSprintBar(ItemInfo& item);
