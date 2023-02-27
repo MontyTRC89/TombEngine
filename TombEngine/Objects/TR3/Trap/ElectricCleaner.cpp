@@ -242,8 +242,7 @@ namespace TEN::Entities::Traps
 
 		//Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
-		int cleanerHeight = BLOCK(1); //TODO change it for the collision bounding box height.
-		if (distanceToCeiling < cleanerHeight)
+		if (distanceToCeiling < BLOCK(1))
 			return false;
 
 		//Is a non walkable tile? (So there is not any box)
