@@ -99,6 +99,8 @@ namespace TEN::Entities::Generic
 
 		pushableInfo.height = height;
 
+		SetStopperFlag(item, true);
+
 		// Check for stack formation.
 		FindStack(itemNumber);
 	}
@@ -301,10 +303,7 @@ namespace TEN::Entities::Generic
 			pushableInfo.refPosX = item.Pose.Position.x;
 			pushableInfo.refPosZ = item.Pose.Position.z;
 
-			if (pushableInfo.hasFloorColission)
-			{
-				AdjustStopperFlag(&item, item.ItemFlags[0]);
-			}
+			SetStopperFlag(item, false);
 		}
 	}
 
@@ -368,11 +367,7 @@ namespace TEN::Entities::Generic
 			RemoveActiveItem(itemNumber);
 			pushableItem.Status = ITEM_NOT_ACTIVE;
 
-			if (pushableInfo.hasFloorColission)
-			{
-				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-				AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));
-			}
+			SetStopperFlag(pushableItem, true);
 		}
 
 		return true;
@@ -396,11 +391,7 @@ namespace TEN::Entities::Generic
 		RemoveActiveItem(itemNumber);
 		pushableItem.Status = ITEM_NOT_ACTIVE;
 
-		if (pushableInfo.hasFloorColission)
-		{
-			//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));
-		}
+		SetStopperFlag(pushableItem, true);
 	}
 	
 	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
@@ -556,24 +547,6 @@ namespace TEN::Entities::Generic
 	}
 
 	//Floor Data update functions
-
-	void AdjustStopperFlag(ItemInfo* item, int direction)
-	{
-		int x = item->Pose.Position.x;
-		int z = item->Pose.Position.z;
-
-		auto* room = &g_Level.Rooms[item->RoomNumber];
-		auto* floor = GetSector(room, x - room->x, z - room->z);
-		floor->Stopper = !floor->Stopper;
-
-		x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
-		z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
-		room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
-
-		floor = GetSector(room, x - room->x, z - room->z);
-		floor->Stopper = !floor->Stopper;
-	}
-
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber) // TODO: Update with the new collision functions
 	{
 		FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -786,9 +759,9 @@ namespace TEN::Entities::Generic
 			col = GetCollision(detectionPoint);
 		}
 
-		//Is a stopper flag tile?
-		if (col.Block->Stopper)
-			return false;
+		//Is a stopper flag tile? (Lara may not need this, otherwise, it's needed to remove the stopper flag in the pushable to check this condition).
+		//if (col.Block->Stopper)
+			//return false;
 
 		//If floor is not flat
 		if (col.Position.Floor != LaraItem->Pose.Position.y)

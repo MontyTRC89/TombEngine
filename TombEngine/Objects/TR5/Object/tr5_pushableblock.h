@@ -21,7 +21,6 @@ namespace TEN::Entities::Generic
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
 
 	//Floor Data update functions
-	void AdjustStopperFlag(ItemInfo* item, int direction);
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 
 	// Test functions

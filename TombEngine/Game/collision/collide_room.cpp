@@ -1488,3 +1488,13 @@ bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags)
 {
 	return ((flags & environmentType) == environmentType);
 }
+
+void SetStopperFlag(const ItemInfo& item, const bool value)
+{
+	GameVector detectionPoint = item.Pose.Position;
+	detectionPoint.RoomNumber = item.RoomNumber;
+
+	auto col = GetCollision(detectionPoint);
+
+	col.Block->Stopper = value;
+}
