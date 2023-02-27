@@ -162,4 +162,4 @@ bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);
 
-void SetStopperFlag(const ItemInfo& item, const bool value);
+void SetStopperFlag(const GameVector& detectionPoint, const bool value);

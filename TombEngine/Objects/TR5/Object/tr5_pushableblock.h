@@ -1,6 +1,7 @@
 #pragma once
 
 class Vector3i;
+class GameVector;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -24,8 +25,8 @@ namespace TEN::Entities::Generic
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 
 	// Test functions
-	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const int quadrant, const bool isPulling = true);
-	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const int quadrant);
+	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const GameVector& quadrant, const bool isPulling = true);
+	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& quadrant);
 	bool TestBlockMovable(ItemInfo& item, int blockHeight);
 
 	// Stack utilities functions

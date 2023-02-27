@@ -18,8 +18,7 @@ namespace TEN::Entities::Generic
 		int gravity;			// fall acceleration
 		int stackLimit;
 
-		int refPosX;			// used for pushable movement code
-		int refPosZ;			// used for pushable movement code
+		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		
 		int linkedIndex;		// using itemFlags[1] for now
 		
