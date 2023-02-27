@@ -8,6 +8,27 @@ namespace TEN::Entities::Generic
 		Moving,
 		Stopping
 	};
+	
+	struct PushableSidesAttributes
+	{
+		bool pullable;
+		bool pushable;
+		bool climbable;
+
+		PushableSidesAttributes()
+		{
+			pullable = true;
+			pushable = true;
+			climbable = false;
+		}
+
+		PushableSidesAttributes(bool pullValue, bool pushValue, bool climbValue)
+		{
+			pullable = pullValue;
+			pushable = pushValue;
+			climbable = climbValue;
+		}
+	};
 
 	struct PushableInfo
 	{
@@ -16,25 +37,41 @@ namespace TEN::Entities::Generic
 		int height;				// height for collision, also in floor procedure
 		int weight;
 		int gravity;			// fall acceleration
-		
-		int stackLimit;
-		int stackItemNumber;			// 
+		int animationGrab;		// the pull and push are sorted by states, so setting the right grab animation can make the system works.
+
+		int stackLimit;			// max of pushables that can be over it so Lara can move it.
+		int stackItemNumber;	// the itemNumber of the pushable that is placed over it.
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		
-		int loopSound;			// looped sound index for movement
-		int stopSound;			// ending sound index
-		int fallSound;			// sound on hitting floor (if dropped)
+		std::map <int, PushableSidesAttributes> SidesMap;
 
-		int climb;				// not used for now
-		bool canFall;			// OCB 32
-		bool doAlignCenter;		// --
-		bool hasFloorColission;	// has floor and ceiling procedures (OCB 64)
-		bool disablePull;		// OCB 128
-		bool disablePush;		// OCB 256
-		bool disableW;			// OCB 512 (W+E)
-		bool disableE;			// OCB 512 (W+E)
-		bool disableN;			// OCB 1024 (N+S)
-		bool disableS;			// OCB 1024 (N+S)
+		//flags
+		bool canFall;			// OCB [0]
+		bool doAlignCenter;		// OCB [1]
+		bool hasFloorColission;	// per Slot? has floor and ceiling procedures (OCB 64)
+
+		PushableInfo()
+		{
+			MovementState = PushableMovementState::None;
+			height = BLOCK(1);
+			weight = 100;
+			gravity = 8;
+			animationGrab = LA_PUSHABLE_GRAB;
+
+			stackLimit = 3;
+			stackItemNumber = -1;
+
+			canFall = false;
+			doAlignCenter = true;
+			hasFloorColission = false;
+			SidesMap =
+			{
+				{0,	PushableSidesAttributes()},
+				{1,	PushableSidesAttributes()},
+				{2,	PushableSidesAttributes()},
+				{3,	PushableSidesAttributes()}
+			};
+		}
 	};
 }

@@ -11,6 +11,7 @@
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Sound/sound.h"
+#include "Sound/sound_effects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -34,11 +35,13 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
-
+	
 	PushableInfo* GetPushableInfo(ItemInfo* item)
 	{
 		return (PushableInfo*)item->Data;
 	}
+
+	std::unordered_map <FLOOR_MATERIAL, PushablesSounds> PushablesSoundsMap;
 
 	// Main functions
 
@@ -50,45 +53,20 @@ namespace TEN::Entities::Generic
 
 		item.ItemFlags[1] = NO_ITEM; // NOTE: ItemFlags[1] stores linked index.
 
-		pushableInfo.stackLimit = 3;
-		pushableInfo.stackItemNumber = NO_ITEM;
 
 		pushableInfo.StartPos = item.Pose.Position;
 		pushableInfo.StartPos.RoomNumber = item.RoomNumber;
 
-		// TODO: Attributes.
-		pushableInfo.gravity = 8;
-		pushableInfo.weight = 100;
-		pushableInfo.loopSound = SFX_TR4_PUSHABLE_SOUND;
-		pushableInfo.stopSound = SFX_TR4_PUSH_BLOCK_END;
-		pushableInfo.fallSound = SFX_TR4_BOULDER_FALL;
-
 		// Read OCB flags.
 		int ocb = item.TriggerFlags;
-
-		pushableInfo.canFall = ocb & 0x20;
-		pushableInfo.doAlignCenter = false;
-		pushableInfo.disablePull = ocb & 0x80;
-		pushableInfo.disablePush = ocb & 0x100;
-		pushableInfo.disableW = pushableInfo.disableE = ocb & 0x200;
-		pushableInfo.disableN = pushableInfo.disableS = ocb & 0x400;
-
-		// TODO: Must be a better way.  //Struct with booleans N,S,E,W,Diagonal
-		pushableInfo.climb = 0;
-		/*
-		pushable->climb |= (OCB & 0x800) ? CLIMB_WEST : 0;
-		pushable->climb |= (OCB & 0x1000) ? CLIMB_NORTH : 0;
-		pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
-		pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
-		*/
-		//pushableInfo.hasFloorCeiling = false;
-
 
 		pushableInfo.hasFloorColission = true;
 		TEN::Floordata::AddBridge(itemNumber);
 		int height = -GameBoundingBox(&item).Y1;
 
 		pushableInfo.height = height;
+
+		InitializePushablesSoundsMap();
 
 		SetStopperFlag(pushableInfo.StartPos, true);
 
@@ -238,35 +216,13 @@ namespace TEN::Entities::Generic
 			}
 
 			//Otherwise, player can input push/pull actions, but first we check the requirements.
-			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-			bool isQuadrantDisabled = false;
-			switch (quadrant)
-			{
-			case NORTH:
-				isQuadrantDisabled = pushableInfo.disableN;
-				break;
-
-			case EAST:
-				isQuadrantDisabled = pushableInfo.disableE;
-				break;
-
-			case SOUTH:
-				isQuadrantDisabled = pushableInfo.disableS;
-				break;
-
-			case WEST:
-				isQuadrantDisabled = pushableInfo.disableW;
-				break;
-			}
-
-			if (isQuadrantDisabled)
-				return;
-
 			if (!CheckStackLimit(pushableItem))
 				return;
 
-			//All good, we manage now the input and actions.
-			if (IsHeld(In::Forward))
+			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+			bool isQuadrantAvailable = false;
+		
+			if (IsHeld(In::Forward)) //Start PUSH
 			{
 				GameVector NextPos = pushableItem.Pose.Position;
 				NextPos.RoomNumber = pushableItem.RoomNumber;
@@ -274,29 +230,36 @@ namespace TEN::Entities::Generic
 				switch (quadrant)
 				{
 				case NORTH:
+					isQuadrantAvailable = pushableInfo.SidesMap[NORTH].pushable;
 					NextPos.z = NextPos.z + BLOCK(1);
 					break;
 
 				case EAST:
+					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pushable;
 					NextPos.x = NextPos.x + BLOCK(1);
 					break;
 
 				case SOUTH:
+					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pushable;
 					NextPos.z = NextPos.z - BLOCK(1);
 					break;
 
 				case WEST:
+					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pushable;
 					NextPos.x = NextPos.x - BLOCK(1);
 					break;
 				}
 
-				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, false) || pushableInfo.disablePush)
+				if (!isQuadrantAvailable)
+					return;
+
+				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, false))
 					return;
 
 				laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
 				SetStopperFlag(NextPos, true);
 			}
-			else if (IsHeld(In::Back))
+			else if (IsHeld(In::Back)) //Start PULL
 			{
 				GameVector NextPos = pushableItem.Pose.Position;
 				NextPos.RoomNumber = pushableItem.RoomNumber;
@@ -304,23 +267,30 @@ namespace TEN::Entities::Generic
 				switch (quadrant)
 				{
 				case NORTH:
+					isQuadrantAvailable = pushableInfo.SidesMap[NORTH].pullable;
 					NextPos.z = NextPos.z - BLOCK(1);
 					break;
 
 				case EAST:
+					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pullable;
 					NextPos.x = NextPos.x - BLOCK(1);
 					break;
 
 				case SOUTH:
+					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pullable;
 					NextPos.z = NextPos.z + BLOCK(1);
 					break;
 
 				case WEST:
+					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pullable;
 					NextPos.x = NextPos.x + BLOCK(1);
 					break;
 				}
 
-				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, true) || pushableInfo.disablePull)
+				if (!isQuadrantAvailable)
+					return;
+
+				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, true))
 					return;
 
 				laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
@@ -386,7 +356,7 @@ namespace TEN::Entities::Generic
 			}
 
 			pushableItem.Animation.Velocity.y = 0.0f;
-			SoundEffect(pushableInfo.fallSound, &pushableItem.Pose, SoundEnvironment::Always);
+			SoundEffect(PushableGetSound(FALL), &pushableItem.Pose, SoundEnvironment::Always);
 
 			MoveStackY(itemNumber, relY);
 			AddBridgeStack(itemNumber);
@@ -596,17 +566,76 @@ namespace TEN::Entities::Generic
 		return isMovingResult;
 	}
 
+
+	void InitializePushablesSoundsMap()
+	{
+		PushablesSoundsMap =
+		{
+			{FLOOR_MATERIAL::Mud,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Snow,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Sand,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Gravel,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Ice,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Water,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Stone,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Wood,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Metal,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Marble,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Grass,		PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Concrete,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::OldWood,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::OldMetal,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom1,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom2,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom3,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom4,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom5,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom6,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom7,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)},
+			{FLOOR_MATERIAL::Custom8,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL)}
+		};
+	}
+
+	// Sound functions
+	int PushableGetSound(PushableSoundsType type)
+	{
+		int materialID = 6;
+		//TODO: Sort the material detection here and use it as key to get the sounds from the sound map.
+		
+		int result = 0;
+		switch (type)
+		{ 
+		case (LOOP):
+			
+			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].loopSound;
+			break;
+
+		case (STOP):
+			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].stopSound;
+			break;
+
+		case (FALL):
+			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].fallSound;
+			break;
+
+		default:
+			break;
+		}
+
+		return result;
+	}
+
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo)
 	{
 		auto SoundSourcePose = pushableItem.Pose;
 		if (pushableInfo.MovementState == PushableMovementState::Moving)
 		{
-			SoundEffect(pushableInfo.loopSound, &SoundSourcePose, SoundEnvironment::Always);
+			SoundEffect(PushableGetSound(LOOP), &SoundSourcePose, SoundEnvironment::Always);
 		}
 		else if (pushableInfo.MovementState == PushableMovementState::Stopping)
 		{
 			pushableInfo.MovementState = PushableMovementState::None;
-			SoundEffect(pushableInfo.stopSound, &SoundSourcePose, SoundEnvironment::Always);
+			SoundEffect(PushableGetSound(STOP), &SoundSourcePose, SoundEnvironment::Always);
 		}
 	}
 
