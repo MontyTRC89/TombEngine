@@ -36,8 +36,8 @@ namespace TEN::Entities::Generic
 	void AddBridgeStack(short itemNumber);
 	void RemoveFromStack(short itemNumber);
 	int FindStack(short itemNumber);
-	int GetStackHeight(ItemInfo* item);
-	bool CheckStackLimit(ItemInfo* item);
+	int GetStackHeight(ItemInfo& item);
+	bool CheckStackLimit(ItemInfo& item);
 
 	// Floor data collision functions
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);

@@ -16,11 +16,11 @@ namespace TEN::Entities::Generic
 		int height;				// height for collision, also in floor procedure
 		int weight;
 		int gravity;			// fall acceleration
+		
 		int stackLimit;
+		int stackItemNumber;			// 
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
-		
-		int linkedIndex;		// using itemFlags[1] for now
 		
 		int loopSound;			// looped sound index for movement
 		int stopSound;			// ending sound index
