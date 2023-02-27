@@ -38,18 +38,6 @@ enum class SoundTrackType
 	Count
 };
 
-enum SampleRate
-{
-	TRLE_QUALITY_SAMPLES = 22050,
-	HIGH_QUALITY_SAMPLES = 44100,
-};
-
-enum Channels
-{
-	MONO = 1,
-	STEREO = 2
-};
-
 enum class SoundEnvironment
 {
 	Land,
