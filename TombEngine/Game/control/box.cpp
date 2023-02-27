@@ -70,10 +70,14 @@ void DrawNearbyPathfinding(int boxIndex)
 	if (boxIndex == NO_BOX)
 		return;
 
-	DrawBox(boxIndex, Vector3(0, 1, 1));
-
 	auto& currBox = g_Level.Boxes[boxIndex];
 	auto index = currBox.overlapIndex;
+
+	Vector3 currentBoxColor = Vector3(0, 1, 1);
+	if (currBox.flags & BLOCKABLE) //Grey flag box
+		currentBoxColor = (currBox.flags & BLOCKED) ? Vector3(1, 0, 0) : Vector3(0, 1, 0);
+	
+	DrawBox(boxIndex, currentBoxColor);
 
 	while (true)
 	{
@@ -2079,23 +2083,6 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 		target->y = box->height - STEPUP_HEIGHT;
 
 	return TARGET_TYPE::NO_TARGET;
-}
-
-void AdjustStopperFlag(ItemInfo* item, int direction)
-{
-	int x = item->Pose.Position.x;
-	int z = item->Pose.Position.z;
-
-	auto* room = &g_Level.Rooms[item->RoomNumber];
-	auto* floor = GetSector(room, x - room->x, z - room->z);
-	floor->Stopper = !floor->Stopper;
-
-	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
-	z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
-	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
-
-	floor = GetSector(room, x - room->x, z - room->z);
-	floor->Stopper = !floor->Stopper;
 }
 
 void InitialiseItemBoxData()

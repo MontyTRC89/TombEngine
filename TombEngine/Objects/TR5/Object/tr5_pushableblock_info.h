@@ -15,14 +15,18 @@ namespace TEN::Entities::Generic
 
 		int height;				// height for collision, also in floor procedure
 		int weight;
+		int gravity;			// fall acceleration
 		int stackLimit;
+
 		int refPosX;			// used for pushable movement code
 		int refPosZ;			// used for pushable movement code
+		
 		int linkedIndex;		// using itemFlags[1] for now
-		int gravity;			// fall acceleration
+		
 		int loopSound;			// looped sound index for movement
 		int stopSound;			// ending sound index
 		int fallSound;			// sound on hitting floor (if dropped)
+
 		int climb;				// not used for now
 		bool canFall;			// OCB 32
 		bool doAlignCenter;		// --

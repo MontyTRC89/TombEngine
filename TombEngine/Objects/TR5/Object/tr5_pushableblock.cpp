@@ -399,7 +399,7 @@ namespace TEN::Entities::Generic
 		if (pushableInfo.hasFloorColission)
 		{
 			//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));//This box function is only used by this pushable...
+			AdjustStopperFlag(&pushableItem, pushableItem.ItemFlags[0] + ANGLE(180));
 		}
 	}
 	
@@ -555,7 +555,24 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	// Test functions
+	//Floor Data update functions
+
+	void AdjustStopperFlag(ItemInfo* item, int direction)
+	{
+		int x = item->Pose.Position.x;
+		int z = item->Pose.Position.z;
+
+		auto* room = &g_Level.Rooms[item->RoomNumber];
+		auto* floor = GetSector(room, x - room->x, z - room->z);
+		floor->Stopper = !floor->Stopper;
+
+		x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
+		z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
+		room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
+
+		floor = GetSector(room, x - room->x, z - room->z);
+		floor->Stopper = !floor->Stopper;
+	}
 
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber) // TODO: Update with the new collision functions
 	{
@@ -567,7 +584,7 @@ namespace TEN::Entities::Generic
 
 		int height = g_Level.Boxes[floor->Box].height;
 		int baseRoomNumber = roomNumber;
-	
+
 		floor = GetFloor(pos.x + BLOCK(1), pos.y, pos.z, &roomNumber);
 		if (floor->Box != NO_BOX)
 		{
@@ -599,6 +616,8 @@ namespace TEN::Entities::Generic
 				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z - BLOCK(1)), roomNumber);
 		}
 	}
+
+	// Test functions
 
 	bool TestBlockMovable(ItemInfo& item, int blockHeight)
 	{

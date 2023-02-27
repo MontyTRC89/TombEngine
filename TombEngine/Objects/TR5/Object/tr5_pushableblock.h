@@ -20,8 +20,11 @@ namespace TEN::Entities::Generic
 	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
 
-	// Test functions
+	//Floor Data update functions
+	void AdjustStopperFlag(ItemInfo* item, int direction);
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
+
+	// Test functions
 	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const int quadrant, const bool isPulling = true);
 	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const int quadrant);
 	bool TestBlockMovable(ItemInfo& item, int blockHeight);

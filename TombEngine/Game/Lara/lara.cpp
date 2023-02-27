@@ -836,7 +836,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (DebugMode)
 	{
 		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
-		DrawNearbyTileFlags ( *item); //Not optimized, use only when testing floor data flags.
+		DrawNearbyTileFlags ( *item); //Not optimized, use only when testing floor data flags, (visible in debug page 5).
 	}
 }
 
