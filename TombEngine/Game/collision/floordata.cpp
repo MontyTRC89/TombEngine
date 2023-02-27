@@ -1,9 +1,11 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -839,4 +841,70 @@ namespace TEN::Floordata
 					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
 			}
 	}
+
+	void DrawNearbyTileFlags(const ItemInfo& item)
+	{
+		Vector3 color = Vector3(1, 1, 1);
+		Vector3 origin = Vector3::Zero;
+
+		GameVector detectionPoint = item.Pose.Position;
+		detectionPoint.RoomNumber = item.RoomNumber;
+		
+		auto col = GetCollision(detectionPoint);
+		const auto& currentRoom = g_Level.Rooms[detectionPoint.RoomNumber];
+
+		for (int x = 0; x < currentRoom.xSize; x++)
+		{
+			for (int z = 0; z < currentRoom.zSize; z++)
+			{
+				detectionPoint.x = currentRoom.x + (x * BLOCK(1));
+				detectionPoint.z = currentRoom.z + (z * BLOCK(1));
+				col = GetCollision(detectionPoint);
+				detectionPoint.y = col.Position.Floor;
+
+				if (col.Block->Stopper)
+				{
+					color = Vector3(1, 0, 0);
+					origin = detectionPoint.ToVector3() + Vector3(256, -512, 768);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+
+				if (col.Block->Flags.Death)
+				{
+					color = Vector3(0.3f, 1, 0);
+					origin = detectionPoint.ToVector3() + Vector3(768, -512, 768);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+
+				if (col.Block->Flags.Monkeyswing)
+				{
+					color = Vector3(0.75f, 0.5f, 0);
+					origin = detectionPoint.ToVector3() + Vector3(512, -512, 768);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+
+				if (col.Block->Flags.MinecartRight())
+				{
+					color = Vector3(0, 0, 1);
+					origin = detectionPoint.ToVector3() + Vector3(256, -512, 256);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+
+				if (col.Block->Flags.MinecartLeft())
+				{
+					color = Vector3(0, 1, 0);
+					origin = detectionPoint.ToVector3() + Vector3(768, -512, 256);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+
+				if (col.Block->Flags.MinecartStop())
+				{
+					color = Vector3(0, 1, 1);
+					origin = detectionPoint.ToVector3() + Vector3(512, -512, 256);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+				}
+			}
+		}
+	}
+
 }

@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
@@ -960,6 +961,14 @@ namespace TEN::Renderer
 				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
+				PrintDebugMessage("LaraItem BoxNumber: %d", GetCollision(LaraItem).BottomBlock->Box);
+				break;
+
+			case RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS:
+				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",GetCollision(LaraItem).BottomBlock->Box);
 				break;
 
 			default:
