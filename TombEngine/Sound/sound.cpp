@@ -39,18 +39,6 @@ constexpr int LegacyLoopingTrackMax = 111;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
-enum SampleRate
-{
-	TRLE_QUALITY_SAMPLES = 22050,
-	HIGH_QUALITY_SAMPLES = 44100,
-};
-
-enum Channels
-{
-	MONO = 1,
-	STEREO = 2
-};
-
 void SetVolumeMusic(int vol) 
 {
 	GlobalMusicVolume = vol;
@@ -102,12 +90,14 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 	BASS_SampleGetInfo(sample, &info);
 	int finalLength = info.length + 44;	// uncompSize is invalid after 16->32 bit conversion
 
-
+	if (info.freq != 22050 || info.chans != 1)
 	{
-		if (info.freq != TRLE_QUALITY_SAMPLES && info.freq != HIGH_QUALITY_SAMPLES || info.chans != MONO)
-		{
-			TENLog("Incorrect sample parameters, must be either 22050 Hz or 44100 Hz (Mono)", LogLevel::Error);
-		}
+		TENLog("Wrong sample parameters, must be either 22050 Hz or 44100 Hz (Mono)", LogLevel::Error);
+
+
+	if (info.freq != 44100 || info.chans != 1)
+		TENLog("Wrong sample parameters, must be either 22050 Hz or 44100 Hz (Mono)", LogLevel::Error);
+
 	}
 
 	// Generate RIFF/WAV header to simplify loading sample data to stream. In case if RIFF/WAV header
