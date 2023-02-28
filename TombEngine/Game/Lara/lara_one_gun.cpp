@@ -11,6 +11,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -32,6 +33,7 @@
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -1378,7 +1380,7 @@ bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
 		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
 		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
 
-		SetupRipple(item.Pose.Position.x, yPoint, item.Pose.Position.z, Random::GenerateInt(8, 16), 0);
+		SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
 	}
 
 	ItemNewRoom(item.Index, coll.RoomNumber);

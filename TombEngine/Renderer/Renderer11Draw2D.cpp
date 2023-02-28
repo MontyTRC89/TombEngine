@@ -107,7 +107,15 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-		BindTexture(TEXTURE_HUD, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
+
+		RendererSprite* borderSprite = &m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
+		m_stHUDBar.BarStartUV = borderSprite->UV[0];
+		m_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
+		 
+		BindTexture(TEXTURE_HUD, borderSprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -125,12 +133,16 @@ namespace TEN::Renderer
 
 		m_stHUDBar.Percent = percent;
 		m_stHUDBar.Poisoned = isPoisoned;
-		m_stHUDBar.Frame = frame;
+		m_stHUDBar.Frame = frame;	
+		RendererSprite* innerSprite = &m_sprites[Objects[textureSlot].meshIndex];
+		m_stHUDBar.BarStartUV = innerSprite->UV[0];
+		m_stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
 		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
-
-		BindTexture(TEXTURE_HUD, m_sprites[Objects[textureSlot].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
+		 
+		BindTexture(TEXTURE_HUD, innerSprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
@@ -156,6 +168,12 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
 		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+
+		m_stHUDBar.BarStartUV = Vector2::Zero;
+		m_stHUDBar.BarScale = Vector2::One;
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -206,11 +224,11 @@ namespace TEN::Renderer
 
 		if (BinocularRange && !LaserSight)
 		{
-			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+			DrawFullScreenSprite(&m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex], Vector3::One, false);
 		}
 		else if (BinocularRange && LaserSight)
 		{
-			DrawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One);
+			DrawFullScreenSprite(&m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
 
 			SetBlendMode(BLENDMODE_OPAQUE);
 
@@ -366,6 +384,83 @@ namespace TEN::Renderer
 				uvEnd.x   -= diff;
 			}
 		}
+
+		RendererVertex vertices[4];
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = uvStart.x;
+		vertices[0].UV.y = uvStart.y;
+		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = uvEnd.x;
+		vertices[1].UV.y = uvStart.y;
+		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = uvEnd.x;
+		vertices[2].UV.y = uvEnd.y;
+		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = uvStart.x;
+		vertices[3].UV.y = uvEnd.y;
+		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
+
+		m_context->PSSetShaderResources(0, 1, &texture);
+		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+	}
+
+	void Renderer11::DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit)
+	{
+		Vector2 uvStart = { 0.0f, 0.0f };
+		Vector2 uvEnd = { 1.0f, 1.0f };
+
+		ID3D11ShaderResourceView* texture = sprite->Texture->ShaderResourceView.Get();
+
+		if (fit)
+		{
+			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
+			float imageAspect = float(sprite->Width) / float(sprite->Height);
+
+			if (screenAspect > imageAspect)
+			{
+				float diff = (screenAspect - imageAspect) / screenAspect / 2;
+				uvStart.y += diff;
+				uvEnd.y -= diff;
+			}
+			else
+			{
+				float diff = (imageAspect - screenAspect) / imageAspect / 2;
+				uvStart.x += diff;
+				uvEnd.x -= diff;
+			}
+		}
+
+		Vector2 scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
+		uvStart.x = uvStart.x * scale.x + sprite->UV[0].x;
+		uvStart.y = uvStart.y * scale.y + sprite->UV[0].y;
+		uvEnd.x = uvEnd.x * scale.x + sprite->UV[0].x;
+		uvEnd.y = uvEnd.y * scale.y + sprite->UV[0].y;
 
 		RendererVertex vertices[4];
 

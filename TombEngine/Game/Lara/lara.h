@@ -78,6 +78,9 @@ constexpr auto LARA_SPRINT_ENERGY_MAX	   = 120.0f;
 constexpr auto LARA_SPRINT_ENERGY_CRITICAL = LARA_SPRINT_ENERGY_MAX / 2;
 constexpr auto LARA_POISON_POTENCY_MAX	   = 64.0f;
 
+constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
+constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
+
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);
 constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);
@@ -88,7 +91,6 @@ constexpr auto SLOPE_DIFFERENCE	   = 60;
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
-extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
