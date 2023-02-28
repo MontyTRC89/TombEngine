@@ -14,6 +14,8 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto SLAMMING_DOORS_DAMAGE = 400;
 	constexpr auto LARA_RADIUS = 100;
 
+	bool flagSpikeDoor = false;
+
 	enum SlammingDoorsState
 	{
 		SLAMMINGDOORS_DISABLED = 0,
@@ -31,36 +33,36 @@ namespace TEN::Entities::Traps::TR1
 	{
 		auto& item = g_Level.Items[itemNumber];
 		SetAnimation(&item, SLAMMINGDOORS_ANIM_OPENED);
+
+		// used by GenericSphereBoxCollision, var where each bit means each damaging mesh index.
+		// 3 = 000000000 000000011 so damage meshes are the 1 and 2 (both doors)
+		item.ItemFlags[0] = 3;
+
+		//used by GenericSphereBoxCollision, var for the trap damage value.
+		item.ItemFlags[3] = SLAMMING_DOORS_DAMAGE;
 	}
 
 	void ControlSlammingDoors(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		if (TriggerActive(item))
+		if (TriggerActive(&item))
 		{
-			item->Animation.TargetState = SLAMMINGDOORS_ENABLED;
-
-			if (item->TouchBits.TestAny() && item->Animation.ActiveState == SLAMMINGDOORS_ENABLED)
+			if (item.Animation.TargetState != SLAMMINGDOORS_ENABLED)
 			{
-				int x = LaraItem->Pose.Position.x + Random::GenerateInt(-LARA_RADIUS, LARA_RADIUS);
-				int y = LaraItem->Pose.Position.y - Random::GenerateInt(CLICK(1), CLICK(3));
-				int z = LaraItem->Pose.Position.z + Random::GenerateInt(-LARA_RADIUS, LARA_RADIUS);
-
-				DoDamage(LaraItem, SLAMMING_DOORS_DAMAGE);
-				DoBloodSplat(x, 
-					y, 
-					z, 
-					Random::GenerateFloat(-10.0f, 10.0f), 
-					LaraItem->Pose.Orientation.y, 
-					LaraItem->RoomNumber);
+				item.Animation.TargetState = SLAMMINGDOORS_ENABLED;
+				item.ItemFlags[0] = 3;
 			}
 		}
 		else
 		{
-			item->Animation.TargetState = SLAMMINGDOORS_DISABLED;
+			if (item.Animation.TargetState != SLAMMINGDOORS_DISABLED)
+			{
+				item.Animation.TargetState = SLAMMINGDOORS_DISABLED;
+				item.ItemFlags[0] = 0;
+			}
 		}
 
-		AnimateItem(item);
+		AnimateItem(&item);
 	}
 }
