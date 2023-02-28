@@ -12,6 +12,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Traps::TR1
 {
 	constexpr auto SLAMMING_DOORS_DAMAGE = 400;
+	constexpr auto LARA_RADIUS = 100;
 
 	enum SlammingDoorsState
 	{
@@ -42,9 +43,9 @@ namespace TEN::Entities::Traps::TR1
 
 			if (item->TouchBits.TestAny() && item->Animation.ActiveState == SLAMMINGDOORS_ENABLED)
 			{
-				int x = LaraItem->Pose.Position.x + Random::GenerateInt(128, 256);
-				int y = LaraItem->Pose.Position.y - Random::GenerateInt(128, 512);
-				int z = LaraItem->Pose.Position.z + Random::GenerateInt(128, 256);
+				int x = LaraItem->Pose.Position.x + Random::GenerateInt(-LARA_RADIUS, LARA_RADIUS);
+				int y = LaraItem->Pose.Position.y - Random::GenerateInt(CLICK(1), CLICK(3));
+				int z = LaraItem->Pose.Position.z + Random::GenerateInt(-LARA_RADIUS, LARA_RADIUS);
 
 				DoDamage(LaraItem, SLAMMING_DOORS_DAMAGE);
 				DoBloodSplat(x, 
