@@ -82,7 +82,6 @@ namespace TEN::Hud
 		
 		// Update life.
 		if (AirBar.Value != AirBar.TargetValue ||
-			(player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item)) ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
 			this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
