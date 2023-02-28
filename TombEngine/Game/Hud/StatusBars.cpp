@@ -82,7 +82,7 @@ namespace TEN::Hud
 		
 		// Update life.
 		if (AirBar.Value != AirBar.TargetValue ||
-			player.Control.WaterStatus == WaterStatus::Wade ||
+			(player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item)) ||
 			player.Control.WaterStatus == WaterStatus::TreadWater ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
