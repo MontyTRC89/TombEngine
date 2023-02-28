@@ -22,7 +22,7 @@
 
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
-#include "Objects/TR1/Trap/TeethSpikeDoor.h"
+#include "Objects/TR1/Trap/SlammingDoors.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;
@@ -190,11 +190,11 @@ static void StartTrap(ObjectInfo* obj)
 		obj->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_TEETH_SPIKE_DOOR];
+	obj = &Objects[ID_SLAMMING_DOORS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTeethSpikeDoor;
-		obj->control = ControlTeethSpikeDoor;
+		obj->initialise = InitialiseSlammingDoors;
+		obj->control = ControlSlammingDoors;
 		obj->collision = GenericSphereBoxCollision;
 		obj->SetupHitEffect(true);
 	}

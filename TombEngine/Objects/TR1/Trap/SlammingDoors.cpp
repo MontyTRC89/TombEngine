@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Trap/TeethSpikeDoor.h"
+#include "Objects/TR1/Trap/SlammingDoors.h"
 
 #include "Game/control/Box.h"
 #include "Game/effects/effects.h"
@@ -10,7 +10,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Traps::TR1
 {
-	constexpr auto TEETH_SPIKE_DOOR_DAMAGE = 400;
+	constexpr auto SLAMMING_DOORS_DAMAGE = 400;
 
 	const auto Teeth1ABite = BiteInfo(Vector3(-23.0f, 0.0f, -1718.0f), 0);
 	const auto Teeth1BBite = BiteInfo(Vector3(71.0f, 0.0f, -1718.0f), 1);
@@ -19,36 +19,36 @@ namespace TEN::Entities::Traps::TR1
 	const auto Teeth3ABite = BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0);
 	const auto Teeth3BBite = BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1);
 
-	enum TeethSpikeDoorState
+	enum SlammingDoorsState
 	{
-		TEETHSPIKEDOOR_DISABLED = 0,
-		TEETHSPIKEDOOR_ENABLED = 1
+		SLAMMINGDOORS_DISABLED = 0,
+		SLAMMINGDOORS_ENABLED = 1
 	};
 
-	enum TeethSpikeDoorAnim
+	enum SlammingDoorsAnim
 	{
-		TEETHSPIKEDOOR_ANIM_OPENED = 0,
-		TEETHSPIKEDOOR_ANIM_CLOSING = 1,
-		TEETHSPIKEDOOR_ANIM_OPENING = 2
+		SLAMMINGDOORS_ANIM_OPENED = 0,
+		SLAMMINGDOORS_ANIM_CLOSING = 1,
+		SLAMMINGDOORS_ANIM_OPENING = 2
 	};
 
-	void InitialiseTeethSpikeDoor(short itemNumber)
+	void InitialiseSlammingDoors(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		SetAnimation(&item, TEETHSPIKEDOOR_ANIM_OPENED);
+		SetAnimation(&item, SLAMMINGDOORS_ANIM_OPENED);
 	}
 
-	void ControlTeethSpikeDoor(short itemNumber)
+	void ControlSlammingDoors(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
-			item->Animation.TargetState = TEETHSPIKEDOOR_ENABLED;
+			item->Animation.TargetState = SLAMMINGDOORS_ENABLED;
 
-			if (item->TouchBits.TestAny() && item->Animation.ActiveState == TEETHSPIKEDOOR_ENABLED)
+			if (item->TouchBits.TestAny() && item->Animation.ActiveState == SLAMMINGDOORS_ENABLED)
 			{
-				DoDamage(LaraItem, TEETH_SPIKE_DOOR_DAMAGE);
+				DoDamage(LaraItem, SLAMMING_DOORS_DAMAGE);
 				DoBiteEffect(item, Teeth1ABite);
 				DoBiteEffect(item, Teeth1BBite);
 				DoBiteEffect(item, Teeth2ABite);
@@ -59,7 +59,7 @@ namespace TEN::Entities::Traps::TR1
 		}
 		else
 		{
-			item->Animation.TargetState = TEETHSPIKEDOOR_DISABLED;
+			item->Animation.TargetState = SLAMMINGDOORS_DISABLED;
 		}
 
 		AnimateItem(item);
