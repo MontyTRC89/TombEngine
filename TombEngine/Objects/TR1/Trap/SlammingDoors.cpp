@@ -36,7 +36,7 @@ namespace TEN::Entities::Traps::TR1
 
 		// used by GenericSphereBoxCollision, var where each bit means each damaging mesh index.
 		// 3 = 000000000 000000011 so damage meshes are the 1 and 2 (both doors)
-		item.ItemFlags[0] = 3;
+		item.ItemFlags[0] = 0;
 
 		//used by GenericSphereBoxCollision, var for the trap damage value.
 		item.ItemFlags[3] = SLAMMING_DOORS_DAMAGE;
