@@ -196,6 +196,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->initialise = InitialiseSlammingDoors;
 		obj->control = ControlSlammingDoors;
 		obj->collision = GenericSphereBoxCollision;
+		obj->shadowType = ShadowMode::All;
 		obj->SetupHitEffect(true);
 	}
 }
