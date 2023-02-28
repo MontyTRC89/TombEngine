@@ -628,7 +628,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (!data->shockwaveTimer && data->shockwaveCount < 4)
 			{
-				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, BLOCK(0.5f), 0.0f), BLOCK(1 / 16.0f));
+				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
 				auto pos = Pose(item.Pose.Position, 0, 0, 0);

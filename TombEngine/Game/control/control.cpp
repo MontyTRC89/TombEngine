@@ -11,13 +11,15 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
 #include "Game/effects/hair.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -57,12 +59,14 @@
 
 using namespace std::chrono;
 using namespace TEN::Effects;
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Generic;
@@ -191,7 +195,7 @@ GameStatus ControlPhase(int numFrames)
 		// Update weather.
 		Weather.Update();
 
-		// Update special FX.
+		// Update effects.
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -201,20 +205,22 @@ GameStatus ControlPhase(int numFrames)
 		UpdateGunShells();
 		UpdateFootprints();
 		UpdateSplashes();
-		UpdateElectricitys();
+		UpdateElectricityArcs();
 		UpdateHelicalLasers();
 		UpdateDrips();
 		UpdateRats();
+		UpdateRipples();
 		UpdateBats();
 		UpdateSpiders();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDripParticles();
+		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
+		UpdateUnderwaterBloodParticles();
 		UpdateWakeFX();
 
 		// Update HUD.
@@ -406,11 +412,13 @@ void CleanUp()
 	ClearSpotCamSequences();
 	ClearCinematicBars();
 
-	// Clear all kinds of particles.
+	// Clear effects.
+	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDrips();
+	ClearRipples();
 	DisableSmokeParticles();
 	DisableSparkParticles();
-	DisableDripParticles();
 	DisableDebris();
 
 	// Clear swarm enemies.

@@ -1276,6 +1276,12 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
+};
+
 struct LaraInfo
 {
 	short ItemNumber;
@@ -1304,7 +1310,7 @@ struct LaraInfo
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
-	FX_INFO* SpasmEffect;	// Not saved.
+	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
@@ -1312,7 +1318,8 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte Wet[NUM_LARA_MESHES];
+	PlayerEffectData Effect = {};
+
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;
