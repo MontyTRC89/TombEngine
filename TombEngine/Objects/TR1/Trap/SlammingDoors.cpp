@@ -5,19 +5,13 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Math/Objects/Vector3i.h"
+#include "Math/Random.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Traps::TR1
 {
 	constexpr auto SLAMMING_DOORS_DAMAGE = 400;
-
-	const auto Teeth1ABite = BiteInfo(Vector3(-23.0f, 0.0f, -1718.0f), 0);
-	const auto Teeth1BBite = BiteInfo(Vector3(71.0f, 0.0f, -1718.0f), 1);
-	const auto Teeth2ABite = BiteInfo(Vector3(-23.0f, 10.0f, -1718.0f), 0);
-	const auto Teeth2BBite = BiteInfo(Vector3(71.0f, 10.0f, -1718.0f), 1);
-	const auto Teeth3ABite = BiteInfo(Vector3(-23.0f, -10.0f, -1718.0f), 0);
-	const auto Teeth3BBite = BiteInfo(Vector3(71.0f, -10.0f, -1718.0f), 1);
 
 	enum SlammingDoorsState
 	{
@@ -48,13 +42,17 @@ namespace TEN::Entities::Traps::TR1
 
 			if (item->TouchBits.TestAny() && item->Animation.ActiveState == SLAMMINGDOORS_ENABLED)
 			{
+				int x = LaraItem->Pose.Position.x + Random::GenerateInt(128, 256);
+				int y = LaraItem->Pose.Position.y - Random::GenerateInt(128, 512);
+				int z = LaraItem->Pose.Position.z + Random::GenerateInt(128, 256);
+
 				DoDamage(LaraItem, SLAMMING_DOORS_DAMAGE);
-				DoBiteEffect(item, Teeth1ABite);
-				DoBiteEffect(item, Teeth1BBite);
-				DoBiteEffect(item, Teeth2ABite);
-				DoBiteEffect(item, Teeth2BBite);
-				DoBiteEffect(item, Teeth3ABite);
-				DoBiteEffect(item, Teeth3BBite);
+				DoBloodSplat(x, 
+					y, 
+					z, 
+					Random::GenerateFloat(-10.0f, 10.0f), 
+					LaraItem->Pose.Orientation.y, 
+					LaraItem->RoomNumber);
 			}
 		}
 		else
@@ -63,13 +61,5 @@ namespace TEN::Entities::Traps::TR1
 		}
 
 		AnimateItem(item);
-	}
-
-	void DoBiteEffect(ItemInfo* item, const BiteInfo& bite)
-	{
-		auto pos = GetJointPosition(item, bite.meshNum) + bite.Position;
-
-		//item->Animation.Velocity.z returned 0 so I put 1 for velocity. Kubsy 27/02/2023
-		DoBloodSplat(pos.x, pos.y, pos.z, 1, item->Pose.Orientation.y, item->RoomNumber);
 	}
 }
