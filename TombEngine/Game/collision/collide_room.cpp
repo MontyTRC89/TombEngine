@@ -168,6 +168,11 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+CollisionResult GetCollision(const GameVector& point)
+{
+	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
+}
+
 // A reworked legacy GetFloorHeight() function which writes data
 // into a special CollisionResult struct instead of global variables.
 // It writes for both floor and ceiling heights at the same coordinates, meaning it should be used

@@ -10,7 +10,7 @@ namespace TEN::Renderer
 		Vector2 UV;
 		Vector4 Color;
 		Vector3 Tangent;
-		unsigned char AnimationFrameOffset;
+		unsigned int AnimationFrameOffset;
 		Vector4 Effects;
 		float Bone;
 		unsigned int IndexInPoly;

@@ -1,30 +1,49 @@
+Version 1.0.8
+=============
+
+*Fix Sophia's charge ring drawing below floor.
+
 Version 1.0.7
 =============
 
 * Fix spark particles not being cleared on level reload.
 * Fix visible but inactive enemies (e.g. Shiva or Xian guardians) taking damage.
 * Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
-* Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
-* Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
-* Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
 * Fix valve switch unable to untrigger objects.
 * Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
+* Fix incorrect Lara alignment on monkeyswing autojump.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
+* Fix TR3 Shiva not taking explosive damage (should still block it with the sword).
+* Fix TR3 Puna boss not blocking projectiles (grenade, rocket, harpoon, bolt) with the shield.
+* Fix TR3 Puna boss and TR5 Roman statue taking fire when shot by explosive ammo.
+* Fix TR2 sword and spear guardian:
+	- Not doing transition from alive to stone and stone to alive.
+	- Taking damage in stone mode.
+	- Wrong joint index for rotating the head and torso.
+	- Spear guardian not using left and right spear attack when walking (had wrong state ID set as target).
+	- Killing move for spear used wrong value.
+* Fix TR3 big gun spawning rocket with 0 life which caused an immediate explosion.
+* Fix TR3 Tony and add boss effect for him.
+* Add TR3 civvy.
+* Add TR3 electric cleaner.
 * Add TR3 Sophia Leigh with following OCBs:	
-	- 1 – Normal mode. Sophia behaves like a regular enemy.
-	- 2 – Tower mode. Behaviour matched from Tomb Raider III. Invincible unless triggered to be killed.
-	- 6 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
+	- 0 – Normal mode. Sophia behaves like a regular enemy.
+	- 1 – Tower mode. Behaviour matched from Tomb Raider III.
+	- 2 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
 * Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
 * Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
+* Add instant headshot to guards.
 * Polish the distance position between Lara and switch objects.
+* Adjust rocket ammo pickup from 10 to 1.
 * Improve behaviour of tiger and lion enemies. 
 * Implement more realistic water bubble effects.
 * Implement a new stacked pickup display inspired by OpenLara.
 * Prevent Lara from drawing weapons during parallel bar swinging.
+* Further renderer performance optimizations and bugfixes.
 
-Lua API Changes
+Lua API changes:
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
 * Add Moveable:GetAirborne and Moveable:SetAirborne.
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
@@ -68,7 +87,7 @@ Version 1.0.6
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
 * Improve level loading speed a lot.
 
-Lua API changes
+Lua API changes:
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
