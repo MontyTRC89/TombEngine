@@ -421,8 +421,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_roomsVertices.size(), (int)m_roomsVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_roomsIndices.size(), (int)m_roomsIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_roomsVertices.size(), m_roomsVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_roomsIndices.size(), m_roomsIndices.data());
 
 		std::for_each(std::execution::par_unseq,
 			m_rooms.begin(),
@@ -745,8 +745,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)m_moveablesVertices.size(), (int)m_moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)m_moveablesIndices.size(), (int)m_moveablesIndices.data());
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)m_moveablesVertices.size(), m_moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)m_moveablesIndices.size(), m_moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);
 
@@ -787,8 +787,8 @@ namespace TEN::Renderer
 
 		if (m_staticsVertices.size() > 0)
 		{
-			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_staticsVertices.size(), (int)m_staticsVertices.data());
-			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_staticsIndices.size(), (int)m_staticsIndices.data());
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_staticsVertices.size(), m_staticsVertices.data());
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_staticsIndices.size(), m_staticsIndices.data());
 		}
 		else
 		{
