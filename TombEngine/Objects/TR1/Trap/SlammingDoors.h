@@ -1,7 +1,7 @@
 #pragma once
 
-struct ItemInfo;
 struct BiteInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Traps::TR1
 {
