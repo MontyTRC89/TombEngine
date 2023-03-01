@@ -38,8 +38,8 @@ namespace TEN::Entities::Creatures::TR3
 		WASP_STATE_IDLE,			 // Floor
 		WASP_STATE_IDLE_TO_FLY_IDLE,
 		WASP_STATE_ATTACK,			 // Flying
-		WASP_STATE_FALL,
-		WASP_STATE_DEATH,
+		WASP_STATE_DEATH_START,
+		WASP_STATE_DEATH_END,
 		WASP_STATE_FLY_FORWARD
 	};
 
@@ -50,8 +50,8 @@ namespace TEN::Entities::Creatures::TR3
 		WASP_ANIM_IDLE,
 		WASP_ANIM_IDLE_TO_FLY_IDLE,
 		WASP_ANIM_ATTACK,
-		WASP_ANIM_FALL,
-		WASP_ANIM_DEATH,
+		WASP_ANIM_DEATH_START,
+		WASP_ANIM_DEATH_END,
 		WASP_ANIM_FLY_FORWARD
 	};
 
@@ -111,7 +111,8 @@ namespace TEN::Entities::Creatures::TR3
 		// Spawn light.
 		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
 		TriggerDynamicLight(
-			pos.x, pos.y, pos.z, item.ItemFlags[0],
+			pos.x, pos.y, pos.z,
+			item.ItemFlags[0],
 			WaspVenomSackLightColor.x * UCHAR_MAX,
 			WaspVenomSackLightColor.y * UCHAR_MAX,
 			WaspVenomSackLightColor.z * UCHAR_MAX);
@@ -144,10 +145,10 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			switch (item.Animation.ActiveState)
 			{
-			case WASP_STATE_FALL:
+			case WASP_STATE_DEATH_START:
 				if (item.Pose.Position.y >= item.Floor)
 				{
-					item.Animation.TargetState = WASP_STATE_DEATH;
+					item.Animation.TargetState = WASP_STATE_DEATH_END;
 					item.Animation.IsAirborne = false;
 					item.Animation.Velocity.y = 0.0f;
 					item.Pose.Position.y = item.Floor;
@@ -155,7 +156,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case WASP_STATE_DEATH:
+			case WASP_STATE_DEATH_END:
 				if (item.ItemFlags[0] > 0 && item.ItemFlags[1] == 0)
 				{
 					item.ItemFlags[0]--;
@@ -170,7 +171,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			default:
-				SetAnimation(&item, WASP_STATE_FALL);
+				SetAnimation(&item, WASP_STATE_DEATH_START);
 				item.Animation.IsAirborne = true;
 				item.Animation.Velocity = Vector3::Zero;
 				break;

@@ -237,107 +237,102 @@ namespace TEN::Renderer
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
 			NodeOffsets[i].gotIt = false;
 
-		for (int i = 0; i < MAX_PARTICLES; i++)
+		for (auto& particle : Particles)
 		{
-			auto particle = &Particles[i];
-			if (particle->on)
+			if (!particle.on)
+				continue;
+
+			if (particle.flags & SP_DEF)
 			{
-				if (particle->flags & SP_DEF)
+				auto pos = Vector3(particle.x, particle.y, particle.z);
+
+				if (particle.flags & SP_FX)
 				{
-					auto pos = Vector3(particle->x, particle->y, particle->z);
+					const auto& fx = EffectList[particle.fxObj];
 
-					if (particle->flags & SP_FX)
+					pos += fx.pos.Position.ToVector3();
+
+					if ((particle.sLife - particle.life) > Random::GenerateInt(8, 12))
 					{
-						auto* fx = &EffectList[particle->fxObj];
-
-						pos.x += fx->pos.Position.x;
-						pos.y += fx->pos.Position.y;
-						pos.z += fx->pos.Position.z;
-
-						if ((particle->sLife - particle->life) > (rand() & 7) + 4)
-						{
-							particle->flags &= ~SP_FX;
-							particle->x = pos.x;
-							particle->y = pos.y;
-							particle->z = pos.z;
-						}
+						particle.flags &= ~SP_FX;
+						particle.x = pos.x;
+						particle.y = pos.y;
+						particle.z = pos.z;
 					}
-					else if (!(particle->flags & SP_ITEM))
-					{
-						pos.x = particle->x;
-						pos.y = particle->y;
-						pos.z = particle->z;
-					}
-					else
-					{
-						auto* item = &g_Level.Items[particle->fxObj];
-
-						auto nodePos = Vector3i::Zero;
-						if (particle->flags & SP_NODEATTACH)
-						{
-							if (NodeOffsets[particle->nodeNumber].gotIt)
-							{
-								nodePos.x = NodeVectors[particle->nodeNumber].x;
-								nodePos.y = NodeVectors[particle->nodeNumber].y;
-								nodePos.z = NodeVectors[particle->nodeNumber].z;
-							}
-							else
-							{
-								nodePos.x = NodeOffsets[particle->nodeNumber].x;
-								nodePos.y = NodeOffsets[particle->nodeNumber].y;
-								nodePos.z = NodeOffsets[particle->nodeNumber].z;
-
-								int meshIndex = NodeOffsets[particle->nodeNumber].meshNum;
-								if (meshIndex >= 0)
-									nodePos = GetJointPosition(item, meshIndex, nodePos);
-								else
-									nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
-
-								NodeOffsets[particle->nodeNumber].gotIt = true;
-
-								NodeVectors[particle->nodeNumber].x = nodePos.x;
-								NodeVectors[particle->nodeNumber].y = nodePos.y;
-								NodeVectors[particle->nodeNumber].z = nodePos.z;
-							}
-
-							pos += nodePos.ToVector3();
-
-							if ((particle->sLife - particle->life) > Random::GenerateInt(3, 8))
-							{
-								particle->flags &= ~SP_ITEM;
-								particle->x = pos.x;
-								particle->y = pos.y;
-								particle->z = pos.z;
-							}
-						}
-						else
-							pos += item->Pose.Position.ToVector3();
-					}
-
-					// Don't allow sprites out of bounds.
-					int spriteIndex = std::clamp(int(particle->spriteIndex), 0, int(m_sprites.size()));
-
-					AddSpriteBillboard(
-						&m_sprites[spriteIndex],
-						pos,
-						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
-						TO_RAD(particle->rotAng << 4), particle->scalar,
-						Vector2(particle->size, particle->size),
-						particle->blendMode, true, view);
+				}
+				else if (!(particle.flags & SP_ITEM))
+				{
+					pos.x = particle.x;
+					pos.y = particle.y;
+					pos.z = particle.z;
 				}
 				else
 				{
-					auto pos = Vector3(particle->x, particle->y, particle->z);
-					auto v = Vector3(particle->xVel, particle->yVel, particle->zVel);
-					v.Normalize();
-					AddSpriteBillboardConstrained(
-						&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
-						pos,
-						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
-						TO_RAD(particle->rotAng << 4),
-						particle->scalar,
-						Vector2(4, particle->size), particle->blendMode, v, true, view);
+					auto* item = &g_Level.Items[particle.fxObj];
+
+					auto nodePos = Vector3i::Zero;
+					if (particle.flags & SP_NODEATTACH)
+					{
+						if (NodeOffsets[particle.nodeNumber].gotIt)
+						{
+							nodePos = NodeVectors[particle.nodeNumber];
+						}
+						else
+						{
+							nodePos.x = NodeOffsets[particle.nodeNumber].x;
+							nodePos.y = NodeOffsets[particle.nodeNumber].y;
+							nodePos.z = NodeOffsets[particle.nodeNumber].z;
+
+							int meshIndex = NodeOffsets[particle.nodeNumber].meshNum;
+							if (meshIndex >= 0)
+								nodePos = GetJointPosition(item, meshIndex, nodePos);
+							else
+								nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
+
+							NodeOffsets[particle.nodeNumber].gotIt = true;
+							NodeVectors[particle.nodeNumber] = nodePos;
+						}
+
+						pos += nodePos.ToVector3();
+
+						if ((particle.sLife - particle.life) > Random::GenerateInt(4, 8))
+						{
+							particle.flags &= ~SP_ITEM;
+							particle.x = pos.x;
+							particle.y = pos.y;
+							particle.z = pos.z;
+						}
+					}
+					else
+					{
+						pos += item->Pose.Position.ToVector3();
+					}
 				}
+
+				// Don't allow sprites out of bounds.
+				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)m_sprites.size());
+
+				AddSpriteBillboard(
+					&m_sprites[spriteIndex],
+					pos,
+					Vector4(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+					TO_RAD(particle.rotAng << 4), particle.scalar,
+					Vector2(particle.size, particle.size),
+					particle.blendMode, true, view);
+			}
+			else
+			{
+				auto pos = Vector3(particle.x, particle.y, particle.z);
+				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
+				axis.Normalize();
+
+				AddSpriteBillboardConstrained(
+					&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
+					pos,
+					Vector4(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+					TO_RAD(particle.rotAng << 4),
+					particle.scalar,
+					Vector2(4, particle.size), particle.blendMode, axis, true, view);
 			}
 		}
 	}

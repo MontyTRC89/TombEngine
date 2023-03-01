@@ -39,6 +39,31 @@ enum SpriteEnumFlag
 	SP_COLOR	  = (1 << 15),
 };
 
+// Used by Particle.nodeNumber.
+enum ParticleNodeOffsetIDs
+{
+	NodeUnknown0, // TR5
+	NodeUnknown1,
+	NodeUnknown2,
+	NodeUnknown3,
+	NodeUnknown4,
+	NodeUnknown5,
+	NodeUnknown6,
+	NodeUnknown7,
+	NodeUnknown8,
+	NodePilotFlame, // TR3-5
+	NodeWasp,
+	NodePunkFlame,
+	NodePendulumFlame,
+	NodeTonyHandLeftFlame,
+	NodeTonyHandRightFlame,
+	NodeClawMutantPlasma,
+	NodeWillardBossLeftPlasma,
+	NodeWillardBossRightPlasma,
+	NodeEmpty, // Empty node (mesh 0, position 0)
+	NodeMax
+};
+
 enum class FlameType
 {
 	Big,
@@ -134,7 +159,7 @@ struct Particle
 	signed char dynamic;
 	unsigned char fxObj;
 	unsigned char roomNumber;
-	unsigned char nodeNumber; // Use ParticleNodeOffsetIDs enum.
+	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 };
 
 struct SPLASH_STRUCT
@@ -168,38 +193,6 @@ struct ParticleDynamic
 	byte Flags;
 	byte Pad[2];
 };
-
-/// <summary>
-/// Used in Particle.nodeNumber
-/// </summary>
-enum ParticleNodeOffsetIDs
-{
-	NodeUnknown0, // TR5
-	NodeUnknown1,
-	NodeUnknown2,
-	NodeUnknown3,
-	NodeUnknown4,
-	NodeUnknown5,
-	NodeUnknown6,
-	NodeUnknown7,
-	NodeUnknown8,
-	NodePilotFlame, // TR3 there and after.
-	NodeWasp,
-	NodePunkFlame,
-	NodePendulumFlame,
-	NodeTonyHandLeftFlame,
-	NodeTonyHandRightFlame,
-	NodeClawMutantPlasma,
-	NodeWillardBossLeftPlasma,
-	NodeWillardBossRightPlasma,
-	NodeEmpty, // Empty node (mesh 0 and position 0)
-	NodeMax
-};
-
-#define MAX_DYNAMICS 64
-#define MAX_RIPPLES 256
-#define MAX_SPLASHES 8
-#define NUM_EFFECTS 256
 
 extern GameBoundingBox DeadlyBounds;
 
