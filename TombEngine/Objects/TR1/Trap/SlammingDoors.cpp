@@ -2,17 +2,10 @@
 #include "Objects/TR1/Trap/SlammingDoors.h"
 
 #include "Game/control/Box.h"
-#include "Game/effects/effects.h"
-#include "Game/Lara/lara.h"
-#include "Math/Objects/Vector3i.h"
-#include "Math/Random.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Traps::TR1
 {
 	constexpr auto SLAMMING_DOORS_DAMAGE = 400;
-	constexpr auto LARA_RADIUS = 100;
 
 	bool flagSpikeDoor = false;
 
