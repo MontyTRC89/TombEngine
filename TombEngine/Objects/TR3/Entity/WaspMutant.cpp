@@ -62,6 +62,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& particle = *GetFreeParticle();
 
+		auto sphere = BoundingSphere(Vector3::Zero, BLOCK(1 / 32.0f));
+		auto pos = Random::GeneratePointInSphere(sphere);
+
 		particle.on = true;
 		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
@@ -83,9 +86,9 @@ namespace TEN::Entities::Creatures::TR3
 		particle.extras = 0;
 		particle.dynamic = -1;
 
-		particle.x = Random::GenerateInt(-8, 8);
-		particle.y = Random::GenerateInt(-8, 8);
-		particle.z = Random::GenerateInt(-64, 64);
+		particle.x = pos.x;
+		particle.y = pos.y;
+		particle.z = pos.z;
 
 		particle.xVel = Random::GenerateInt(-32, 32);
 		particle.yVel = Random::GenerateInt(-32, 32);
