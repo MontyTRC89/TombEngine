@@ -67,7 +67,7 @@ namespace TEN::Utils
 		return strings;
 	}
 
-    Vector2 GetAspectCorrectScreenSpacePos(const Vector2& pos)
+    Vector2 GetAspectCorrect2DPosition(Vector2 pos2D)
     {
        constexpr auto SCREEN_SPACE_ASPECT_RATIO = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
 
@@ -75,27 +75,30 @@ namespace TEN::Utils
         float screenResAspectRatio = screenRes.x / screenRes.y;
         float aspectRatioDelta = screenResAspectRatio - SCREEN_SPACE_ASPECT_RATIO;
 
-        auto screenPos = pos;
-        if (aspectRatioDelta > EPSILON)
-            screenPos.x *= 1.0f - (aspectRatioDelta / 2);
-        else if (aspectRatioDelta < -EPSILON)
-            screenPos.y *= 1.0f - (aspectRatioDelta / 2);
+        if (aspectRatioDelta >= EPSILON)
+        {
+            pos2D.x *= 1.0f - (aspectRatioDelta / 2);
+        }
+        else if (aspectRatioDelta <= -EPSILON)
+        {
+            pos2D.y *= 1.0f - (aspectRatioDelta / 2);
+        }
 
-        return screenPos;
+        return pos2D;
     }
 
-    Vector2 ConvertScreenSpacePosToNDC(const Vector2& pos)
+    Vector2 Convert2DPositionToNDC(const Vector2& pos2D)
     {
         return Vector2(
-            ((pos.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
-            1.0f - ((pos.y * 2) / SCREEN_SPACE_RES.y));
+            ((pos2D.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
+            1.0f - ((pos2D.y * 2) / SCREEN_SPACE_RES.y));
     }
 
-    Vector2 ConvertNDCToScreenSpacePos(const Vector2& pos)
+    Vector2 ConvertNDCTo2DPosition(const Vector2& pos2D)
     {
         return Vector2(
-            ((pos.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-            ((1.0f - pos.y) * SCREEN_SPACE_RES.y) / 2);
+            ((pos2D.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+            ((1.0f - pos2D.y) * SCREEN_SPACE_RES.y) / 2);
     }
 
     std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)

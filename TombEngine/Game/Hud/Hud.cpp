@@ -30,10 +30,10 @@ namespace TEN::Hud
 		static short orient2D = 0;
 		orient2D += ANGLE(1.0f);
 
-		auto pos = g_Renderer.GetScreenSpacePosition(LaraItem->Pose.Position.ToVector3());
-		g_Renderer.DrawSpriteInScreenSpace(
+		auto pos = SCREEN_SPACE_RES / 2;
+		g_Renderer.DrawSpriteIn2DSpace(
 			ID_BINOCULAR_GRAPHIC,
-			pos, 0, Vector4(1, 1, 1, 0.5f), 200.0f);
+			pos, orient2D, Vector4(1, 1, 1, 0.5f), Vector2(300.0f));
 
 		//------------------
 

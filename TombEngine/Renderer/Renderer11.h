@@ -716,10 +716,10 @@ namespace TEN::Renderer
 		std::string GetDefaultAdapterName();
 
 		Vector2i GetScreenResolution() const;
-		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
+		Vector2	 Get2DPosition(const Vector3& pos) const;
 		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
-		void DrawSpriteInScreenSpace(unsigned int spriteID, const Vector2& pos, short orient2D, const Vector4& color, float scale);
+		void DrawSpriteIn2DSpace(unsigned int spriteID, const Vector2& pos2D, short orient2D, const Vector4& color, const Vector2& size);
 	};
 
 	extern Renderer11 g_Renderer;

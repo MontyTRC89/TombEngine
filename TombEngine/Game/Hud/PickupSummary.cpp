@@ -105,7 +105,7 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = this->GetNewDisplayPickup();
 
-		auto screenPos = g_Renderer.GetScreenSpacePosition(pos);
+		auto screenPos = g_Renderer.Get2DPosition(pos);
 		if (screenPos == INVALID_SCREEN_SPACE_POSITION)
 			screenPos = DEFAULT_POSITION;
 

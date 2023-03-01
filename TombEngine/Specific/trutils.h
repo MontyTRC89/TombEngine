@@ -10,10 +10,10 @@ namespace TEN::Utils
 	std::wstring ToWString(const std::string& string);
 	std::vector<std::string> SplitString(const std::string& string);
 
-	// Screen space utilities
-	Vector2 GetAspectCorrectScreenSpacePos(const Vector2& pos);
-	Vector2 ConvertScreenSpacePosToNDC(const Vector2& pos);
-	Vector2 ConvertNDCToScreenSpacePos(const Vector2& pos);
+	// 2D space utilities
+	Vector2 GetAspectCorrect2DPosition(Vector2 pos2D);
+	Vector2 Convert2DPositionToNDC(const Vector2& pos2D);
+	Vector2 ConvertNDCTo2DPosition(const Vector2& pos2D);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
 }

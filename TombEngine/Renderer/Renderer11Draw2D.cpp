@@ -345,34 +345,32 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawSpriteInScreenSpace(unsigned int spriteID, const Vector2& pos, short orient2D, const Vector4& color, float scale)
+	void Renderer11::DrawSpriteIn2DSpace(unsigned int spriteID, const Vector2& pos2D, short orient2D, const Vector4& color, const Vector2& size)
 	{
-		constexpr auto VERTEX_COUNT			 = 4;
-		constexpr auto UV_RANGE				 = std::pair<Vector2, Vector2>(Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f));
-		constexpr auto VERTEX_POINTS_DEFAULT = std::array<Vector2, VERTEX_COUNT>
-		{
-			Vector2( SQRT_2,  SQRT_2),
-			Vector2(-SQRT_2,  SQRT_2),
-			Vector2(-SQRT_2, -SQRT_2),
-			Vector2( SQRT_2, -SQRT_2)
-		};
+		constexpr auto VERTEX_COUNT = 4;
+		constexpr auto UV_RANGE		= std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
 
-		// Calculate relative screen space vertex positions.
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D));
+		// Calculate vertex base.
+		auto halfSize = size / 2;
 		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
 		{
-			Vector2::Transform(VERTEX_POINTS_DEFAULT[0] * (scale / 2), rotMatrix),
-			Vector2::Transform(VERTEX_POINTS_DEFAULT[1] * (scale / 2), rotMatrix),
-			Vector2::Transform(VERTEX_POINTS_DEFAULT[2] * (scale / 2), rotMatrix),
-			Vector2::Transform(VERTEX_POINTS_DEFAULT[3] * (scale / 2), rotMatrix)
+			halfSize,
+			Vector2(-halfSize.x, halfSize.y),
+			-halfSize,
+			Vector2(halfSize.x, -halfSize.y)
 		};
 
-		// Adjust for aspect ratio and convert to NDC.
+		// Transform vertices.
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D));
 		for (auto& vertexPoint : vertexPoints)
 		{
-			vertexPoint = TEN::Utils::GetAspectCorrectScreenSpacePos(vertexPoint);
-			vertexPoint += pos;
-			vertexPoint = TEN::Utils::ConvertScreenSpacePosToNDC(vertexPoint);
+			// Rotate.
+			vertexPoint = Vector2::Transform(vertexPoint, rotMatrix);
+
+			// Adjust for aspect ratio and convert to NDC.
+			vertexPoint = TEN::Utils::GetAspectCorrect2DPosition(vertexPoint);
+			vertexPoint += pos2D;
+			vertexPoint = TEN::Utils::Convert2DPositionToNDC(vertexPoint);
 		}
 
 		g_Renderer.PrintDebugMessage("%.3f, %.3f", vertexPoints[0].x, vertexPoints[0].y);
@@ -424,6 +422,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit)
 	{
 		constexpr auto VERTEX_COUNT = 4;
+		constexpr auto UV_RANGE		= std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
 
 		auto uvStart = Vector2::Zero;
 		auto uvEnd	 = Vector2::One;

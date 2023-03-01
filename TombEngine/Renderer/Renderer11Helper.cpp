@@ -512,7 +512,7 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	Vector2 Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
@@ -537,7 +537,7 @@ namespace TEN::Renderer
 		point /= point.w;
 
 		// Calculate and return screen space position.
-		return TEN::Utils::ConvertNDCToScreenSpacePos(Vector2(point));
+		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
