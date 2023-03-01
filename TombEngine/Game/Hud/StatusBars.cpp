@@ -169,7 +169,7 @@ namespace TEN::Hud
 	void StatusBarsController::DrawSprintBar() const
 	{
 		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
-		constexpr auto CRITICAL_VALUE = LARA_SPRINT_ENERGY_CRITICAL / LARA_SPRINT_ENERGY_MAX;
+		constexpr auto CRITICAL_VALUE = 0;
 
 		if (SprintBar.Life <= 0.0f)
 			return;
