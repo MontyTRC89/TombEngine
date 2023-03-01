@@ -75,11 +75,11 @@ namespace TEN::Utils
         float screenResAspectRatio = screenRes.x / screenRes.y;
         float aspectRatioDelta = screenResAspectRatio - SCREEN_SPACE_ASPECT_RATIO;
 
-        if (aspectRatioDelta >= EPSILON)
+        if (aspectRatioDelta > EPSILON)
         {
             pos2D.x *= 1.0f - (aspectRatioDelta / 2);
         }
-        else if (aspectRatioDelta <= -EPSILON)
+        else if (aspectRatioDelta < -EPSILON)
         {
             pos2D.y *= 1.0f - (aspectRatioDelta / 2);
         }
