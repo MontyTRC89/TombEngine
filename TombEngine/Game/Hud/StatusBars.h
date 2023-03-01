@@ -35,12 +35,14 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
+		void Initialize(ItemInfo& item);
 		void Update(ItemInfo& item);
 		void Draw(ItemInfo& item) const;
 		void Clear();
 
 	private:
 		// Update helpers
+		void InitializeStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateAirBar(ItemInfo& item);
 		void UpdateHealthBar(ItemInfo& item);

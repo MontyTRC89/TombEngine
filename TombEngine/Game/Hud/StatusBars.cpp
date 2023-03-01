@@ -19,6 +19,15 @@ extern TEN::Renderer::RendererHudBar* g_SprintBar;
 
 namespace TEN::Hud
 {
+	void StatusBarsController::Initialize(ItemInfo& item)
+	{
+		const auto& player = *GetLaraInfo(&item);
+
+		this->InitializeStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
+		this->InitializeStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
+		this->InitializeStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);
+	}
+
 	void StatusBarsController::Update(ItemInfo& item)
 	{
 		constexpr auto FLASH_INTERVAL = 0.2f;
@@ -51,6 +60,12 @@ namespace TEN::Hud
 	void StatusBarsController::Clear()
 	{
 		*this = {};
+	}
+
+	void StatusBarsController::InitializeStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
+	{
+		float statusValueNorm = std::clamp(statusValue, 0.0f, statusValueMax);
+		bar.Value = statusValueNorm / statusValueMax;
 	}
 
 	void StatusBarsController::UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
