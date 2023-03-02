@@ -23,6 +23,7 @@ namespace TEN::Hud
 	{
 		const auto& player = *GetLaraInfo(&item);
 
+		// Initialize bar values.
 		this->InitializeStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
 		this->InitializeStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
 		this->InitializeStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);
@@ -132,7 +133,7 @@ namespace TEN::Hud
 			item.HitPoints > LARA_HEALTH_CRITICAL && player.PoisonPotency == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
 		{
-			this->HealthBar.Life = 0.0f;
+			this->HealthBar.Life = round(STATUS_BAR_LIFE_START_FADING * FPS);
 		}
 	}
 
