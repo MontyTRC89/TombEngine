@@ -16,10 +16,10 @@ namespace TEN::Hud
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
 		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, SCREEN_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
 
-		return (Position.x <= -SCREEN_THRESHOLD.x ||
-				Position.y <= -SCREEN_THRESHOLD.y ||
-				Position.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
-				Position.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y));
+		return (Position2D.x <= -SCREEN_THRESHOLD.x ||
+				Position2D.y <= -SCREEN_THRESHOLD.y ||
+				Position2D.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
+				Position2D.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y));
 	}
 
 	void DisplayPickup::Update(bool isHead)
@@ -37,25 +37,25 @@ namespace TEN::Hud
 		if (Life <= 0.0f && isHead)
 		{
 			this->HideVelocity = std::clamp(HideVelocity + HIDE_VELOCITY_ACCEL, 0.0f, HIDE_VELOCITY_MAX);
-			this->Position.x += HideVelocity;
+			this->Position2D.x += HideVelocity;
 		}
 		// Update position, scale, and opacity.
 		else if (Life > 0.0f)
 		{
-			float totalDist = Vector2::Distance(Origin, Target);
-			float coveredDist = Vector2::Distance(Origin, Position);
+			float totalDist = Vector2::Distance(Origin2D, Target2D);
+			float coveredDist = Vector2::Distance(Origin2D, Position2D);
 
 			// Handle edge case when stack shifts.
 			if (coveredDist > totalDist)
 			{
-				this->Origin = Position;
-				totalDist = Vector2::Distance(Origin, Target);
-				coveredDist = Vector2::Distance(Origin, Position);
+				this->Origin2D = Position2D;
+				totalDist = Vector2::Distance(Origin2D, Target2D);
+				coveredDist = Vector2::Distance(Origin2D, Position2D);
 			}
 
 			float alpha = coveredDist / totalDist;
 
-			this->Position = Vector2::Lerp(Position, Target, POSITION_LERP_ALPHA);
+			this->Position2D = Vector2::Lerp(Position2D, Target2D, POSITION_LERP_ALPHA);
 			this->Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
 			this->Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
 		}
@@ -107,9 +107,9 @@ namespace TEN::Hud
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
-		pickup.Position =
-		pickup.Origin = origin2D;
-		pickup.Target = Vector2::Zero;
+		pickup.Position2D =
+		pickup.Origin2D = origin2D;
+		pickup.Target2D = Vector2::Zero;
 		pickup.Life = round(LIFE_MAX * FPS);
 		pickup.Scale = 0.0f;
 		pickup.Opacity = 0.0f;
@@ -126,7 +126,7 @@ namespace TEN::Hud
 		// Get and apply stack screen positions as targets.
 		auto stack2DPositions = this->GetStack2DPositions();
 		for (int i = 0; i < stack2DPositions.size(); i++)
-			this->DisplayPickups[i].Target = stack2DPositions[i];
+			this->DisplayPickups[i].Target2D = stack2DPositions[i];
 
 		// Update display pickups.
 		bool isHead = true;

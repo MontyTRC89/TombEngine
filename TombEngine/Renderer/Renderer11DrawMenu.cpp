@@ -518,14 +518,14 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
 		if (pickup.Count > 1)
 		{
 			AddString(
 				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 
