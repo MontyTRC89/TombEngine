@@ -41,8 +41,10 @@ namespace TEN::Hud
 		void Clear();
 
 	private:
-		// Update helpers
+		// Initializer helpers
 		void InitializeStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
+
+		// Update helpers
 		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateAirBar(ItemInfo& item);
 		void UpdateHealthBar(ItemInfo& item);
