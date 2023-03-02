@@ -1852,6 +1852,8 @@ void ProcessEffects(ItemInfo* item)
 			break;
 
 		case EffectType::Cadaver:
+			if (TestProbability(1 / 32.0f))
+				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
 			break;
 		}
