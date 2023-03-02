@@ -38,7 +38,6 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
-#include "Specific/winmain.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
@@ -833,11 +832,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	TestTriggers(item, false);
 	TestVolumes(Lara.ItemNumber, &coll->Setup);
 
-	if (DebugMode)
-	{
-		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
-		DrawNearbyTileFlags ( *item); //Not optimized, use only when testing floor data flags, (visible in debug page 5).
-	}
+	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+	DrawNearbyTileFlags ( *item);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)

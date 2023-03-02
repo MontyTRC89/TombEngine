@@ -8,6 +8,7 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Math;
@@ -844,64 +845,74 @@ namespace TEN::Floordata
 
 	void DrawNearbyTileFlags(const ItemInfo& item)
 	{
-		Vector3 color = Vector3(1, 1, 1);
-		Vector3 origin = Vector3::Zero;
+		if (!DebugMode)
+			return;
 
+		const int range = 3 * BLOCK(1);
+
+		Vector4 color = Vector4::One;
+		Vector3 origin = Vector3::Zero;
+				
 		GameVector detectionPoint = item.Pose.Position;
 		detectionPoint.RoomNumber = item.RoomNumber;
 		
 		auto col = GetCollision(detectionPoint);
 		const auto& currentRoom = g_Level.Rooms[detectionPoint.RoomNumber];
+		
+		const int minX = std::max( item.Pose.Position.x - range, currentRoom.x) / BLOCK(1);
+		const int maxX = std::min( item.Pose.Position.x + range, currentRoom.x + (currentRoom.xSize * BLOCK(1))) / BLOCK(1);
+		const int minZ = std::max( item.Pose.Position.z - range, currentRoom.z) / BLOCK(1);
+		const int maxZ = std::min( item.Pose.Position.z + range, currentRoom.z + (currentRoom.zSize * BLOCK(1))) / BLOCK(1);
 
-		for (int x = 0; x < currentRoom.xSize; x++)
+		for (int x = minX; x < maxX; x ++)
 		{
-			for (int z = 0; z < currentRoom.zSize; z++)
+			for (int z = minZ; z < maxZ; z ++)
 			{
-				detectionPoint.x = currentRoom.x + (x * BLOCK(1));
-				detectionPoint.z = currentRoom.z + (z * BLOCK(1));
+				detectionPoint.x = x * BLOCK(1);
+				detectionPoint.z = z * BLOCK(1);
 				col = GetCollision(detectionPoint);
 				detectionPoint.y = col.Position.Floor;
 
 				if (col.Block->Stopper)
 				{
-					color = Vector3(1, 0, 0);
+					color = Vector4(1, 0, 0, 1);
 					origin = detectionPoint.ToVector3() + Vector3(256, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.Death)
 				{
-					color = Vector3(0.3f, 1, 0);
+					color = Vector4(0.3f, 1, 0, 1);
 					origin = detectionPoint.ToVector3() + Vector3(768, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.Monkeyswing)
 				{
-					color = Vector3(0.75f, 0.5f, 0);
+					color = Vector4(0.75f, 0.5f, 0, 1);
 					origin = detectionPoint.ToVector3() + Vector3(512, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.MinecartRight())
 				{
-					color = Vector3(0, 0, 1);
+					color = Vector4(0, 0, 1, 1);
 					origin = detectionPoint.ToVector3() + Vector3(256, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.MinecartLeft())
 				{
-					color = Vector3(0, 1, 0);
+					color = Vector4(0, 1, 0, 1);
 					origin = detectionPoint.ToVector3() + Vector3(768, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.MinecartStop())
 				{
-					color = Vector3(0, 1, 1);
+					color = Vector4(0, 1, 1, 1);
 					origin = detectionPoint.ToVector3() + Vector3(512, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 			}
 		}

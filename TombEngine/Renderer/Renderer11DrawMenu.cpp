@@ -966,9 +966,9 @@ namespace TEN::Renderer
 
 			case RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS:
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",GetCollision(LaraItem).BottomBlock->Box);
+				PrintDebugMessage("Lara RoomXZ: %d %d", r->x, r->z);
+				PrintDebugMessage("Lara SizeXZ: %d %d", r->xSize, r->zSize);
 				break;
 
 			default:

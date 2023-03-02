@@ -20,6 +20,7 @@
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/winmain.h"
 
 constexpr auto ESCAPE_DIST = SECTOR(5);
 constexpr auto STALK_DIST = SECTOR(3);
@@ -67,6 +68,9 @@ void DrawBox(int boxIndex, Vector3 color)
 
 void DrawNearbyPathfinding(int boxIndex)
 {
+	if (!DebugMode)
+		return;
+
 	if (boxIndex == NO_BOX)
 		return;
 
