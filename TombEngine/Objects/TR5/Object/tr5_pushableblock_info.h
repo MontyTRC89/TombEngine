@@ -61,7 +61,8 @@ namespace TEN::Entities::Generic
 			animationGrab = LA_PUSHABLE_GRAB;
 
 			stackLimit = 3;
-			stackItemNumber = -1;
+			stackUpperItem = -1;
+			stackLowerItem = -1;
 
 			canFall = false;
 			doAlignCenter = true;
