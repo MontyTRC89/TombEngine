@@ -2,7 +2,6 @@
 #include "Game/Hud/StatusBars.h"
 
 #include "Game/camera.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -133,7 +132,7 @@ namespace TEN::Hud
 			item.HitPoints > LARA_HEALTH_CRITICAL && player.PoisonPotency == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
 		{
-			this->HealthBar.Life = round(STATUS_BAR_LIFE_START_FADING * FPS);
+			this->HealthBar.Life = 0;// round(STATUS_BAR_LIFE_START_FADING * FPS);
 		}
 	}
 

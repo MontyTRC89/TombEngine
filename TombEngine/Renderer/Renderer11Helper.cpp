@@ -527,7 +527,7 @@ namespace TEN::Renderer
 		
 		// If point is behind camera, return invalid screen space position.
 		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_SCREEN_SPACE_POSITION;
+			return INVALID_2D_POSITION;
 
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);

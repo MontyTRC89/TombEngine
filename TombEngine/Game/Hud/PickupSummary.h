@@ -46,7 +46,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::vector<Vector2> GetStackPositions() const;
+		std::vector<Vector2> GetStack2DPositions() const;
 		DisplayPickup&		 GetNewDisplayPickup();
 		void				 ClearInactiveDisplayPickups();
 
