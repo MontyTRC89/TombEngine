@@ -52,7 +52,7 @@ namespace TEN::Entities::Generic
 
 	// Sound functions
 	void InitializePushablesSoundsMap();
-	int PushableGetSound(PushableSoundsType type);
+	int PushableGetSound(const PushableSoundsType& type, const GameVector& detectionPoint);
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
 
 	//Floor Data update functions
@@ -61,13 +61,13 @@ namespace TEN::Entities::Generic
 	// Test functions
 	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const GameVector& quadrant, const bool isPulling = true);
 	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& quadrant);
-	bool TestBlockMovable(ItemInfo& item, int blockHeight);
+	bool IsPushableOnValidSurface(ItemInfo& item);
 
 	// Stack utilities functions
+	void MoveStack(short itemNumber, const Vector3i& GoalPos);
 	void MoveStackXZ(short itemNumber);
 	void MoveStackY(short itemNumber, int y);
-	void RemoveBridgeStack(short itemNumber);
-	void AddBridgeStack(short itemNumber);
+	void UpdateBridgeStack(short itemNumber, bool addBridge);
 	void RemoveFromStack(short itemNumber);
 	int FindStack(short itemNumber);
 	int GetStackHeight(ItemInfo& item);

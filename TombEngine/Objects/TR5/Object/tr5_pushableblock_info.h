@@ -40,7 +40,8 @@ namespace TEN::Entities::Generic
 		int animationGrab;		// the pull and push are sorted by states, so setting the right grab animation can make the system works.
 
 		int stackLimit;			// max of pushables that can be over it so Lara can move it.
-		int stackItemNumber;	// the itemNumber of the pushable that is placed over it.
+		int stackUpperItem;		// the itemNumber of the pushable that is placed over it.
+		int stackLowerItem;		// the itemNumber of the pushable that is placed under it.
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		

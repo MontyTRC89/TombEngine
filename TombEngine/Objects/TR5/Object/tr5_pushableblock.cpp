@@ -356,13 +356,17 @@ namespace TEN::Entities::Generic
 			}
 
 			pushableItem.Animation.Velocity.y = 0.0f;
-			SoundEffect(PushableGetSound(FALL), &pushableItem.Pose, SoundEnvironment::Always);
+
+			GameVector detectionPoint = pushableItem.Pose.Position;
+			detectionPoint.RoomNumber = pushableItem.RoomNumber;
+
+			SoundEffect(PushableGetSound(FALL, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
 
 			MoveStackY(itemNumber, relY);
-			AddBridgeStack(itemNumber);
+			UpdateBridgeStack(itemNumber, true);
 
 			// If fallen on top of existing pushable, don't test triggers.
-			if (FindStack(itemNumber) == NO_ITEM)
+			if (pushableInfo.stackLowerItem == NO_ITEM)
 			{
 				const bool pushableActivationFlag = pushableItem.Flags & IFLAG_ACTIVATION_MASK;
 				TestTriggers(&pushableItem, true, pushableActivationFlag);
@@ -391,9 +395,12 @@ namespace TEN::Entities::Generic
 
 		MoveStackXZ(itemNumber);
 		FindStack(itemNumber);
-		AddBridgeStack(itemNumber);
+		UpdateBridgeStack(itemNumber, true);
 
-		TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+		if (pushableInfo.stackLowerItem == NO_ITEM)
+		{
+			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+		}
 
 		RemoveActiveItem(itemNumber);
 		pushableItem.Status = ITEM_NOT_ACTIVE;
@@ -421,7 +428,7 @@ namespace TEN::Entities::Generic
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
 			RemoveFromStack(itemNumber);
-			RemoveBridgeStack(itemNumber);
+			UpdateBridgeStack(itemNumber, false);
 		}
 
 		// Update the position
@@ -566,6 +573,7 @@ namespace TEN::Entities::Generic
 		return isMovingResult;
 	}
 
+	// Sound functions
 
 	void InitializePushablesSoundsMap()
 	{
@@ -596,46 +604,50 @@ namespace TEN::Entities::Generic
 		};
 	}
 
-	// Sound functions
-	int PushableGetSound(PushableSoundsType type)
+	int PushableGetSound(const PushableSoundsType& type, const GameVector& detectionPoint)
 	{
-		int materialID = 6;
-		//TODO: Sort the material detection here and use it as key to get the sounds from the sound map.
-		
-		int result = 0;
+		const auto col = GetCollision(detectionPoint);
+		const auto materialID = col.BottomBlock->Material;
+
+		int resultSound = 0;
 		switch (type)
 		{ 
 		case (LOOP):
 			
-			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].loopSound;
+			resultSound = PushablesSoundsMap[materialID].loopSound;
 			break;
 
 		case (STOP):
-			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].stopSound;
+			resultSound = PushablesSoundsMap[materialID].stopSound;
 			break;
 
 		case (FALL):
-			result = PushablesSoundsMap[(FLOOR_MATERIAL)materialID].fallSound;
+			resultSound = PushablesSoundsMap[materialID].fallSound;
 			break;
 
 		default:
+			assert(false);
 			break;
 		}
 
-		return result;
+		return resultSound;
 	}
 
 	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo)
 	{
-		auto SoundSourcePose = pushableItem.Pose;
+		auto SoundSourcePose = pushableItem.Pose; //Can't pass directly because SoundEffect doesn't const promise.
+
+		GameVector detectionPoint = pushableItem.Pose.Position;
+		detectionPoint.RoomNumber = pushableItem.RoomNumber;
+
 		if (pushableInfo.MovementState == PushableMovementState::Moving)
 		{
-			SoundEffect(PushableGetSound(LOOP), &SoundSourcePose, SoundEnvironment::Always);
+			SoundEffect(PushableGetSound(LOOP, detectionPoint), &SoundSourcePose, SoundEnvironment::Always);
 		}
 		else if (pushableInfo.MovementState == PushableMovementState::Stopping)
 		{
 			pushableInfo.MovementState = PushableMovementState::None;
-			SoundEffect(PushableGetSound(STOP), &SoundSourcePose, SoundEnvironment::Always);
+			SoundEffect(PushableGetSound(STOP, detectionPoint), &SoundSourcePose, SoundEnvironment::Always);
 		}
 	}
 
@@ -683,20 +695,32 @@ namespace TEN::Entities::Generic
 		}
 	}
 
+
 	// Test functions
 
-	bool TestBlockMovable(ItemInfo& item, int blockHeight)
+	bool IsPushableOnValidSurface(ItemInfo& pushableItem)
 	{
-		RemoveBridge(item.Index);
-		auto pointColl = GetCollision(&item);
-		AddBridge(item.Index);
+		auto pushableInfo = *GetPushableInfo(&pushableItem);
+
+		CollisionResult col;
+
+		if (pushableInfo.hasFloorColission)
+		{
+			RemoveBridge(pushableItem.Index);
+			col = GetCollision(&pushableItem);
+			AddBridge(pushableItem.Index);
+		}
+		else
+		{
+			col = GetCollision(&pushableItem);
+		}
 
 		//It's in a wall
-		if (pointColl.Block->IsWall(pointColl.Block->SectorPlane(item.Pose.Position.x, item.Pose.Position.z)))
+		if (col.Block->IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
 			return false;
 
 		//Or it isn't on the floor
-		if (pointColl.Position.Floor != item.Pose.Position.y)
+		if (col.Position.Floor != pushableItem.Pose.Position.y)
 			return false;
 
 		return true;
@@ -704,11 +728,10 @@ namespace TEN::Entities::Generic
 
 	bool IsNextSectorValid(ItemInfo& pushableItem, const int blockHeight, const GameVector& targetPoint, const bool checkIfLaraFits)
 	{
-		if (!TestBlockMovable(pushableItem, blockHeight))
+		if (!IsPushableOnValidSurface(pushableItem))
 			return false;
 
 		const auto& pushableInfo = *GetPushableInfo(&pushableItem);
-		
 		auto col = GetCollision(targetPoint);
 
 		//It's in a wall
@@ -880,22 +903,21 @@ namespace TEN::Entities::Generic
 
 	// Stack utilities functions
 
-	void MoveStackXZ(short itemNumber)
+	void MoveStack(short itemNumber, const Vector3i& GoalPos)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = *GetPushableInfo(&pushableItem);
 
-		int goalX = pushableItem.Pose.Position.x;
-		int goalZ = pushableItem.Pose.Position.z;
-
-		while (pushableInfo.stackItemNumber != NO_ITEM)
+		// Move stack together with bottom pushable
+		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
+			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
 			pushableInfo = *GetPushableInfo(&pushableItem);
 
-			pushableItem.Pose.Position.x = goalX;
-			pushableItem.Pose.Position.z = goalZ;
-
+			pushableItem.Pose.Position.x = GoalPos.x;
+			pushableItem.Pose.Position.z = GoalPos.z;
+			pushableItem.Pose.Position.y += GoalPos.y;
+			
 			pushableInfo.StartPos = pushableItem.Pose.Position;
 			pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
 			
@@ -907,65 +929,42 @@ namespace TEN::Entities::Generic
 			}
 		}
 	}
+	void MoveStackXZ (short itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		MoveStack(itemNumber, Vector3i (pushableItem.Pose.Position.x, 0, pushableItem.Pose.Position.z));
+	}
+	void MoveStackY (short itemNumber, int y)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		MoveStack(itemNumber, Vector3i (0, y, 0));
+	}
 
-	void MoveStackY(short itemNumber, int y)
+	void UpdateBridgeStack(short itemNumber, bool addBridge)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = *GetPushableInfo(&pushableItem);
 
-		// Move stack together with bottom pushable->
-		while (pushableInfo.stackItemNumber != NO_ITEM)
+		if (pushableInfo.hasFloorColission)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
+			if (addBridge)
+				TEN::Floordata::AddBridge(itemNumber);
+			else
+				TEN::Floordata::RemoveBridge(itemNumber);
+		}
+
+		while (pushableInfo.stackUpperItem != NO_ITEM)
+		{
+			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
 			pushableInfo = *GetPushableInfo(&pushableItem);
 
-			pushableItem.Pose.Position.y += y;
-
-			GameVector detectionPoint = pushableItem.Pose.Position;
-			detectionPoint.RoomNumber = pushableItem.RoomNumber;
-
-			auto col = GetCollision(detectionPoint);
-			if (col.RoomNumber != pushableItem.RoomNumber)
+			if (pushableInfo.hasFloorColission)
 			{
-				ItemNewRoom(itemNumber, col.RoomNumber);
-				detectionPoint.RoomNumber = col.RoomNumber;
+				if (addBridge)
+					TEN::Floordata::AddBridge(pushableInfo.stackUpperItem);
+				else
+					TEN::Floordata::RemoveBridge(pushableInfo.stackUpperItem);
 			}
-		}
-	}
-
-	void AddBridgeStack(short itemNumber)
-	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
-
-		if (pushableInfo.hasFloorColission)
-			TEN::Floordata::AddBridge(itemNumber);
-
-		while (pushableInfo.stackItemNumber != NO_ITEM)
-		{
-			if (pushableInfo.hasFloorColission)
-				TEN::Floordata::AddBridge(pushableInfo.stackItemNumber);
-
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
-			pushableInfo = *GetPushableInfo(&pushableItem);
-		}
-	}
-
-	void RemoveBridgeStack(short itemNumber)
-	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
-
-		if (pushableInfo.hasFloorColission)
-			TEN::Floordata::RemoveBridge(itemNumber);
-
-		while (pushableInfo.stackItemNumber != NO_ITEM)
-		{
-			if (pushableInfo.hasFloorColission)
-				TEN::Floordata::RemoveBridge(pushableInfo.stackItemNumber);
-
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
-			pushableInfo = *GetPushableInfo(&pushableItem);
 		}
 	}
 
@@ -983,8 +982,11 @@ namespace TEN::Entities::Generic
 			if (objectNumber >= ID_PUSHABLE_OBJECT1 && objectNumber <= ID_PUSHABLE_OBJECT10)
 			{
 				auto itemBelowInfo = GetPushableInfo(&itemBelow);
-				if (itemBelowInfo->stackItemNumber == itemNumber)
-					itemBelowInfo->stackItemNumber = NO_ITEM;
+				if (itemBelowInfo->stackUpperItem == itemNumber)
+				{
+					itemBelowInfo->stackUpperItem = NO_ITEM;
+					break;
+				}
 			}
 		}
 	}
@@ -1036,10 +1038,11 @@ namespace TEN::Entities::Generic
 		
 		int height = pushableInfo.height;
 		
-		while (pushableInfo.stackItemNumber != NO_ITEM)
+		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
+			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
 			pushableInfo = *GetPushableInfo(&pushableItem);
+
 			height += pushableInfo.height;
 		}
 
@@ -1054,10 +1057,11 @@ namespace TEN::Entities::Generic
 		int limit = pushableInfo.stackLimit;
 		int count = 1;
 		
-		while (pushableInfo.stackItemNumber != NO_ITEM)
+		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackItemNumber];
+			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
 			pushableInfo = *GetPushableInfo(&pushableItem);
+
 			count++;
 
 			if (count > limit)
