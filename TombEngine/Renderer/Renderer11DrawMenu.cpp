@@ -518,7 +518,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
 		if (pickup.Count > 1)
@@ -530,7 +530,7 @@ namespace TEN::Renderer
 	}
 
 	// TODO: Handle opacity
-	void Renderer11::DrawObjectOn2DPosition(int objectNumber, Vector2 screenPos, EulerAngles orient, float scale, float opacity, int meshBits)
+	void Renderer11::DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -542,7 +542,7 @@ namespace TEN::Renderer
 			screenRes.x / SCREEN_SPACE_RES.x,
 			screenRes.y / SCREEN_SPACE_RES.y);
 
-		screenPos *= factor;
+		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
@@ -550,7 +550,7 @@ namespace TEN::Renderer
 		{
 			const auto& invObject = InventoryObjectTable[index];
 
-			screenPos.y += invObject.YOffset;
+			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
 
@@ -568,7 +568,7 @@ namespace TEN::Renderer
 			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
 		}
 
-		auto pos = m_viewportToolkit.Unproject(Vector3(screenPos.x, screenPos.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
+		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
 
 		// Set vertex buffer.
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -704,7 +704,7 @@ namespace TEN::Renderer
 
 		float savedScale = object.Scale1;
 		object.Scale1 = scaler;
-		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
 		object.Scale1 = savedScale;
 	}
 
@@ -715,7 +715,7 @@ namespace TEN::Renderer
 		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
-		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
 
 		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
