@@ -69,9 +69,6 @@ namespace TEN::Entities::Generic
 		InitializePushablesSoundsMap();
 
 		SetStopperFlag(pushableInfo.StartPos, true);
-
-		// Check for stack formation.
-		FindStack(itemNumber);
 	}
 
 	void PushableBlockControl(const short itemNumber)
@@ -394,7 +391,7 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem);
 
 		MoveStackXZ(itemNumber);
-		FindStack(itemNumber);
+		UpdateAllPushablesStackLinks();
 		UpdateBridgeStack(itemNumber, true);
 
 		if (pushableInfo.stackLowerItem == NO_ITEM)
@@ -991,44 +988,59 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	int FindStack(short itemNumber)
+	std::vector<int> FindAllPushables()
 	{
-		int stackTop = NO_ITEM;		// Index of heighest pushable in stack.
-		int stackYmin = CLICK(256); // Set starting height.
+		std::vector<int> pushables;
 
-		// Check for pushable directly below current one.
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			if (i == itemNumber)
-				continue;
+			auto& item = g_Level.Items[i];
 
-			auto* itemBelow = &g_Level.Items[i];
-
-			int objectNumber = itemBelow->ObjectNumber;
-			if (objectNumber >= ID_PUSHABLE_OBJECT1 && objectNumber <= ID_PUSHABLE_OBJECT10)
+			if (item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10)
 			{
-				const auto* item = &g_Level.Items[itemNumber];
-
-				auto pos = item->Pose.Position;
-
-				if (itemBelow->Pose.Position.x == pos.x &&
-					itemBelow->Pose.Position.z == pos.z)
-				{
-					// Set heighest pushable so far as top of stack.
-					int belowY = itemBelow->Pose.Position.y;
-					if (belowY > pos.y && belowY < stackYmin)
-					{
-						stackTop = i;
-						stackYmin = itemBelow->Pose.Position.y;
-					}
-				}
+				pushables.push_back(i);
 			}
 		}
 
-		if (stackTop != NO_ITEM)
-			g_Level.Items[stackTop].ItemFlags[1] = itemNumber;
+		return pushables;
+	}
+	
+	void UpdateAllPushablesStackLinks()
+	{
+		auto& pushablesNumbersList = FindAllPushables();
+		for (auto& currentItemNumber : pushablesNumbersList)
+		{
+			auto& currentItem = g_Level.Items[currentItemNumber];
+			auto& currentInfo = *GetPushableInfo(&currentItem);
 
-		return stackTop;
+			const auto& currentPos = currentItem.Pose.Position;
+
+			// Compare with the next pushable object.
+			for (auto nextItemNumber : pushablesNumbersList)
+			{
+				if (nextItemNumber <= currentItemNumber)
+					continue;
+
+				auto& nextItem = g_Level.Items[nextItemNumber];
+				auto& nextInfo = *GetPushableInfo(&nextItem);
+
+				const auto& nextPos = nextItem.Pose.Position;
+
+				if (nextPos.x != currentPos.x || nextPos.z != currentPos.z)
+					break;
+
+				if (nextPos.y > currentPos.y)
+				{
+					currentInfo.stackLowerItem = nextItemNumber;
+					nextInfo.stackUpperItem = currentItemNumber;
+				}
+				else if (nextPos.y < currentPos.y)
+				{
+					currentInfo.stackUpperItem = nextItemNumber;
+					nextInfo.stackLowerItem = currentItemNumber;
+				}
+			}
+		}
 	}
 
 	int GetStackHeight(ItemInfo& item)

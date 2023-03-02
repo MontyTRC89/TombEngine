@@ -69,7 +69,8 @@ namespace TEN::Entities::Generic
 	void MoveStackY(short itemNumber, int y);
 	void UpdateBridgeStack(short itemNumber, bool addBridge);
 	void RemoveFromStack(short itemNumber);
-	int FindStack(short itemNumber);
+	std::vector<int> FindAllPushables();
+	void UpdateAllPushablesStackLinks();
 	int GetStackHeight(ItemInfo& item);
 	bool CheckStackLimit(ItemInfo& item);
 
