@@ -1,5 +1,4 @@
 #pragma once
-#include "Game/Lara/lara.h"
 
 enum GAME_OBJECT_ID : short;
 struct ItemInfo;
