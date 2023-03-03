@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto IMP_TORCH_LIT_SCARED_RANGE = BLOCK(2);
 	constexpr auto IMP_IDLE_ATTACK_RANGE = SQUARE(CLICK(4) / 6);
 	constexpr auto IMP_ATTACK_DAMAGE = 3;
-	constexpr auto ATTACK_VELOCITY = 10;
-	constexpr auto MESHSWAP_RANDOM = 8;
+
+	constexpr auto MESHSWAP_RATE = 16;
 
 	const auto ImpLeftHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 7);
 	const auto ImpRightHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
@@ -239,7 +239,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (Wibble & MESHSWAP_RANDOM)
+			if (Wibble & MESHSWAP_RATE)
 				item->SetMeshSwapFlags (ImpHeadSwapJoints);
 			else
 				item->SetMeshSwapFlags(NO_JOINT_BITS);
@@ -300,7 +300,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					item->Animation.TargetState = IMP_STATE_RUN;
 				}
-				else if (AI.distance > IMP_LOW_ATTACK_RANGE)
+				else if (AI.distance < IMP_LOW_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = IMP_STATE_WALK;
 				}
@@ -326,14 +326,13 @@ namespace TEN::Entities::Creatures::TR5
 			case IMP_STATE_ATTACK_1:
 				creature->MaxTurn = 0;
 
-				if (!(creature->Flags & 1) &&
-					item->TouchBits.Test(ImpRightHandBite.meshNum))
+				if (!(creature->Flags & 1) && item->TouchBits.Test(ImpRightHandBite.meshNum))
 				{
 					DoDamage(creature->Enemy, IMP_ATTACK_DAMAGE);
-					CreatureEffect2(item, ImpRightHandBite, ATTACK_VELOCITY, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, ImpRightHandBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags |= 1;
 				}
-
+				
 				break;
 			case IMP_STATE_JUMP_ATTACK:
 				RotateTowardTarget(*item, AI, IMP_ATTACKJUMP_OR_STONE_TURN_RATE_MAX);
