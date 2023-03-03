@@ -1,7 +1,8 @@
 Version 1.0.8
 =============
 
-*Fix Sophia's charge ring drawing below floor.
+* Fix Sophia's charge ring drawing below floor.
+* Fix TR5 Imp with better collision handling , fixed death and animations.
 
 Version 1.0.7
 =============
