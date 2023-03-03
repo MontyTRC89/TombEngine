@@ -26,8 +26,8 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto IMP_ATTACKJUMP_OR_STONE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto IMP_SHOOT_DEATH_ANGLE_BACKWARD = ANGLE(67.5f);
 
-	constexpr auto IMP_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
-	constexpr auto IMP_WALK_RANGE = SQUARE(SECTOR(2));
+	constexpr auto IMP_ATTACK_RANGE = SQUARE(BLOCK(0.25f));
+	constexpr auto IMP_WALK_RANGE = SQUARE(BLOCK(2));
 	constexpr auto IMP_TORCH_LIT_SCARED_RANGE = BLOCK(2);
 	constexpr auto IMP_ATTACK_DAMAGE = 3;
 
