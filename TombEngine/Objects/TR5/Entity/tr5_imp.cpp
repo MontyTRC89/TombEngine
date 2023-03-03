@@ -265,7 +265,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (AI.distance > IMP_WALK_RANGE)
 					item->Animation.TargetState = IMP_STATE_RUN;
-					else if (AI.distance < IMP_ATTACK_RANGE)
+				else if (AI.bite && AI.distance < IMP_ATTACK_RANGE)
 					item->Animation.TargetState = IMP_STATE_IDLE;
 
 				break;
@@ -299,7 +299,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					item->Animation.TargetState = IMP_STATE_RUN;
 				}
-				else if (AI.distance < IMP_ATTACK_RANGE)
+				else if (AI.distance > IMP_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = IMP_STATE_WALK;
 				}
