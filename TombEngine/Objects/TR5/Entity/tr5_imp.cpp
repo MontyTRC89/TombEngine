@@ -123,7 +123,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto pos2 = GetJointPosition(LaraItem, LM_HEAD);
 		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 		
-		int distance = (int)sqrt(SQUARE(pos2.x - pos1.x) + SQUARE(pos2.y - pos1.y) + SQUARE(pos2.z - pos1.z));
+		int distance = Vector3i::Distance(pos1, pos2);
 		if (distance < 8)
 			distance = 8;
 		orient.x += short(GetRandomControl() % (distance / 2) - (distance / 4));
