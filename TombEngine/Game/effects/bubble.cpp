@@ -147,7 +147,7 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			// Update room number. TODO: Should use GetCollision(), but calling the function for each bubble may be inefficient.
+			// Update room number. TODO: Should use GetCollision(), but calling it for each bubble is very inefficient.
 			auto roomVector = ROOM_VECTOR{ bubble.RoomNumber, int(bubble.Position.y - bubble.Gravity) };
 			int roomNumber = GetRoom(roomVector, bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z).roomNumber;
 			int prevRoomNumber = bubble.RoomNumber;
@@ -163,6 +163,13 @@ namespace TEN::Effects::Bubble
 					((bubble.SizeMax.x + bubble.SizeMax.y) / 2) * 0.5f,
 					(int)RippleFlags::SlowFade);
 
+				bubble.Life = 0.0f;
+				continue;
+			}
+			// Hit ceiling. NOTE: This is a hacky check. New collision fetching should provide fast info on a need-to-know basis.
+			else if (bubble.RoomNumber == prevRoomNumber &&
+				bubble.Position.y <= g_Level.Rooms[prevRoomNumber].maxceiling)
+			{
 				bubble.Life = 0.0f;
 				continue;
 			}
