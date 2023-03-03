@@ -2,13 +2,19 @@
 
 namespace TEN::Entities::Generic
 {
-	enum class PushableMovementState
+	enum class PushableSoundState
 	{
 		None,
 		Moving,
 		Stopping
 	};
 	
+	enum class PushableAnimationGroup
+	{
+		Statues,
+		Blocks
+	};
+
 	struct PushableSidesAttributes
 	{
 		bool pullable;
@@ -32,33 +38,32 @@ namespace TEN::Entities::Generic
 
 	struct PushableInfo
 	{
-		PushableMovementState MovementState = PushableMovementState::None;
+		PushableSoundState soundState = PushableSoundState::None;
 
-		int height;				// height for collision, also in floor procedure
-		int weight;
-		int gravity;			// fall acceleration
-		int animationGrab;		// the pull and push are sorted by states, so setting the right grab animation can make the system works.
-
-		int stackLimit;			// max of pushables that can be over it so Lara can move it.
-		int stackUpperItem;		// the itemNumber of the pushable that is placed over it.
-		int stackLowerItem;		// the itemNumber of the pushable that is placed under it.
+		int height;								// height for collision, also in floor procedure
+		int gravity;							// fall acceleration
+		
+		int stackLimit;							// max of pushables that can be over it so Lara can move it.
+		int stackUpperItem;						// the itemNumber of the pushable that is placed over it.
+		int stackLowerItem;						// the itemNumber of the pushable that is placed under it.
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		
 		std::map <int, PushableSidesAttributes> SidesMap;
 
 		//flags
-		bool canFall;			// OCB [0]
-		bool doAlignCenter;		// OCB [1]
-		bool hasFloorColission;	// per Slot? has floor and ceiling procedures (OCB 64)
+		bool canFall;							// OCB [0]. flag to indicate if item can fall or not.
+		bool doAlignCenter;						// OCB [1]. flag to decide if Lara has to put in center of the pushable to can move it.
+		bool buoyancy;							// OCB [2]. flag to indicate if float in water.
+		PushableAnimationGroup animationSystem;	// OCB [3]. flag to indicate which animations do.
+		bool hasFloorColission;					// per Slot. flag to indicate if it uses floor data collision or object collision.
 
 		PushableInfo()
 		{
-			MovementState = PushableMovementState::None;
+			soundState = PushableSoundState::None;
 			height = BLOCK(1);
-			weight = 100;
+
 			gravity = 8;
-			animationGrab = LA_PUSHABLE_GRAB;
 
 			stackLimit = 3;
 			stackUpperItem = -1;
@@ -66,7 +71,10 @@ namespace TEN::Entities::Generic
 
 			canFall = false;
 			doAlignCenter = true;
+			buoyancy = false;
+			animationSystem = PushableAnimationGroup::Statues;
 			hasFloorColission = false;
+			
 			SidesMap =
 			{
 				{0,	PushableSidesAttributes()},

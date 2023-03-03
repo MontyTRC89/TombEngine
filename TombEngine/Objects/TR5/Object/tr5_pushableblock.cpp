@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
-#include "Game/animation.h"
-#include "Game/items.h"
+//#include "Game/animation.h"
+//#include "Game/items.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
-#include "Game/collision/floordata.h"
+//#include "Game/collision/collide_room.h"
+//#include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
@@ -36,12 +36,12 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 	
-	PushableInfo* GetPushableInfo(ItemInfo* item)
-	{
-		return (PushableInfo*)item->Data;
-	}
-
 	std::unordered_map <FLOOR_MATERIAL, PushablesSounds> PushablesSoundsMap;
+
+	PushableInfo& GetPushableInfo(const ItemInfo& item)
+	{
+		return (PushableInfo&)item.Data;
+	}
 
 	// Main functions
 
@@ -49,47 +49,51 @@ namespace TEN::Entities::Generic
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = PushableInfo();
-		auto& pushableInfo = *GetPushableInfo(&item);
-
-		item.ItemFlags[1] = NO_ITEM; // NOTE: ItemFlags[1] stores linked index.
-
+		auto& pushableInfo = GetPushableInfo(item);
 
 		pushableInfo.StartPos = item.Pose.Position;
 		pushableInfo.StartPos.RoomNumber = item.RoomNumber;
 
+		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
+		{
+			pushableInfo.hasFloorColission = true;
+			TEN::Floordata::AddBridge(itemNumber);
+		}
+		else
+		{
+			pushableInfo.hasFloorColission = false;			
+		}
+
+		pushableInfo.height = -GameBoundingBox(&item).Y1;
+		
 		// Read OCB flags.
-		int ocb = item.TriggerFlags;
+		const int ocb = item.TriggerFlags;
 
-		pushableInfo.hasFloorColission = true;
-		TEN::Floordata::AddBridge(itemNumber);
-		int height = -GameBoundingBox(&item).Y1;
-
-		pushableInfo.height = height;
-
-		InitializePushablesSoundsMap();
-
+		pushableInfo.canFall			= (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
+		pushableInfo.doAlignCenter		= (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
+		pushableInfo.buoyancy			= (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
+		pushableInfo.animationSystem	= ((ocb & 0x08) != 0)? PushableAnimationGroup::Statues : PushableAnimationGroup::Blocks; // Check if bit 3 is set	(+8)
+		
 		SetStopperFlag(pushableInfo.StartPos, true);
 	}
 
-	void PushableBlockControl(const short itemNumber)
+	void PushableBlockControl(short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
 
 		if (pushableItem.Status != ITEM_ACTIVE)
 			return;
 
 		Lara.InteractedItem = itemNumber;
-		bool isPushableMoving = false;
 			
-		if (PushableBlockManageGravity(pushableItem, pushableInfo, itemNumber))
+		if (PushableBlockManageFalling(itemNumber))
 			return;
 
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PULL:
 		case LA_PUSHABLE_PUSH:
-			isPushableMoving = PushableBlockManageMoving(pushableItem, pushableInfo, itemNumber);
+			PushableBlockManageMoving(itemNumber);
 			break;
 
 		case LA_PUSHABLE_GRAB:
@@ -99,29 +103,18 @@ namespace TEN::Entities::Generic
 			break;
 
 		default:
-			PushableBlockManageIdle(pushableItem, pushableInfo, itemNumber);
+			PushableBlockManageIdle(itemNumber);
 			break;
 		}
 
-		// Set pushable movement state.
-		if (isPushableMoving)
-		{
-			pushableInfo.MovementState = PushableMovementState::Moving;
-		}
-		else
-		{
-			if (pushableInfo.MovementState == PushableMovementState::Moving)
-				pushableInfo.MovementState = PushableMovementState::Stopping;
-		}
-
 		// Do sound effects.
-		PushableBlockManageSounds(pushableItem,pushableInfo);
+		PushablesManageSounds(itemNumber);
 	}
 
 	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 		auto& laraInfo = *GetLaraInfo(laraItem);
 
 		const int blockHeight = GetStackHeight(pushableItem);
@@ -201,7 +194,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			//If player is not grabbing it, then just do object collision rutine.
+			//If player is not grabbing the pushable, then just do collision rutine if needed.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				laraInfo.NextCornerPos.Position.x != itemNumber)
@@ -212,93 +205,91 @@ namespace TEN::Entities::Generic
 				return;
 			}
 
-			//Otherwise, player can input push/pull actions, but first we check the requirements.
-			if (!CheckStackLimit(pushableItem))
+			//Otherwise, player can input push/pull actions
+			bool isPushAction = IsHeld(In::Forward);
+			bool isPullAction = IsHeld(In::Back);
+
+			if (!isPushAction && !isPullAction)
+			{
 				return;
+			}
 
 			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+
 			bool isQuadrantAvailable = false;
+			GameVector DetectionPoint = pushableItem.Pose.Position;
+			DetectionPoint.RoomNumber = pushableItem.RoomNumber;
 		
-			if (IsHeld(In::Forward)) //Start PUSH
+			switch (quadrant)
 			{
-				GameVector NextPos = pushableItem.Pose.Position;
-				NextPos.RoomNumber = pushableItem.RoomNumber;
-				
-				switch (quadrant)
+			case NORTH:
+				if (isPushAction)
 				{
-				case NORTH:
 					isQuadrantAvailable = pushableInfo.SidesMap[NORTH].pushable;
-					NextPos.z = NextPos.z + BLOCK(1);
-					break;
-
-				case EAST:
-					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pushable;
-					NextPos.x = NextPos.x + BLOCK(1);
-					break;
-
-				case SOUTH:
-					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pushable;
-					NextPos.z = NextPos.z - BLOCK(1);
-					break;
-
-				case WEST:
-					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pushable;
-					NextPos.x = NextPos.x - BLOCK(1);
-					break;
+					DetectionPoint.z = DetectionPoint.z + BLOCK(1);
 				}
-
-				if (!isQuadrantAvailable)
-					return;
-
-				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, false))
-					return;
-
-				laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
-				SetStopperFlag(NextPos, true);
-			}
-			else if (IsHeld(In::Back)) //Start PULL
-			{
-				GameVector NextPos = pushableItem.Pose.Position;
-				NextPos.RoomNumber = pushableItem.RoomNumber;
-
-				switch (quadrant)
+				else if (isPullAction)
 				{
-				case NORTH:
 					isQuadrantAvailable = pushableInfo.SidesMap[NORTH].pullable;
-					NextPos.z = NextPos.z - BLOCK(1);
-					break;
-
-				case EAST:
-					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pullable;
-					NextPos.x = NextPos.x - BLOCK(1);
-					break;
-
-				case SOUTH:
-					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pullable;
-					NextPos.z = NextPos.z + BLOCK(1);
-					break;
-
-				case WEST:
-					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pullable;
-					NextPos.x = NextPos.x + BLOCK(1);
-					break;
+					DetectionPoint.z = DetectionPoint.z - BLOCK(1);
 				}
-
-				if (!isQuadrantAvailable)
-					return;
-
-				if (!IsNextSectorValid(pushableItem, blockHeight, NextPos, true))
-					return;
-
-				laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
-				SetStopperFlag(NextPos, true);
+				break;
+			case EAST:
+				if (isPushAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pushable;
+					DetectionPoint.x = DetectionPoint.x + BLOCK(1);
+				}
+				else if (isPullAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[EAST].pullable;
+					DetectionPoint.x = DetectionPoint.x - BLOCK(1);
+				}
+				break;
+			case SOUTH:
+				if (isPushAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pushable;
+					DetectionPoint.z = DetectionPoint.z - BLOCK(1);
+				}
+				else if (isPullAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[SOUTH].pullable;
+					DetectionPoint.z = DetectionPoint.z + BLOCK(1);
+				}
+				break;
+			case WEST:
+				if (isPushAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pushable;
+					DetectionPoint.x = DetectionPoint.x - BLOCK(1);
+				}
+				else if (isPullAction)
+				{
+					isQuadrantAvailable = pushableInfo.SidesMap[WEST].pullable;
+					DetectionPoint.x = DetectionPoint.x + BLOCK(1);
+				}
+				break;
 			}
-			else
-			{
+
+			if (!isQuadrantAvailable || !IsNextSectorValid(pushableItem, DetectionPoint, isPushAction))
 				return;
+			
+			if (isPushAction)
+			{
+				laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
+			}
+			else if (isPullAction)
+			{
+				laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
 			}
 
-			//If the object has started to move, we activate it to do its mechanics in the Control function.
+			RemovePushableFromStack(itemNumber);
+			ManageStackBridges(itemNumber, false);
+
+			SetStopperFlag(DetectionPoint, true);
+
+			//If the object has started to move, we activate it to do its mechanics in the Control function 
 			pushableItem.Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
 			ResetLaraFlex(laraItem);
@@ -310,8 +301,11 @@ namespace TEN::Entities::Generic
 
 	// Behaviour functions
 
-	bool PushableBlockManageGravity(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
+	bool PushableBlockManageFalling(const short itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
+
 		// Check if the pushable block is falling.
 		if (!pushableItem.Animation.IsAirborne)
 		{
@@ -335,15 +329,16 @@ namespace TEN::Entities::Generic
 			pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_FALL_VELOCITY_MAX);
 			
 			// Update the pushable block's position and move the block's stack.
-			const float deltaY = pushableItem.Animation.Velocity.y;
-			pushableItem.Pose.Position.y = currentY + deltaY;
-			MoveStackY(itemNumber, deltaY);
+			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+			MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
 		}
 		else
 		{
 			// The pushable block has hit the ground.
-			pushableItem.Animation.IsAirborne = false;
-			const int relY = floorHeight - currentY;
+			
+			const int differenceY = floorHeight - currentY;
+			MoveStackY(itemNumber, differenceY);
+
 			pushableItem.Pose.Position.y = floorHeight;
 
 			// Shake the floor if the pushable block fell at a high enough velocity.
@@ -352,62 +347,46 @@ namespace TEN::Entities::Generic
 				FloorShake(&pushableItem);
 			}
 
+			pushableItem.Animation.IsAirborne = false;
 			pushableItem.Animation.Velocity.y = 0.0f;
 
 			GameVector detectionPoint = pushableItem.Pose.Position;
 			detectionPoint.RoomNumber = pushableItem.RoomNumber;
 
-			SoundEffect(PushableGetSound(FALL, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
+			SoundEffect(GetPushableSound(FALL, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
 
-			MoveStackY(itemNumber, relY);
-			UpdateBridgeStack(itemNumber, true);
-
-			// If fallen on top of existing pushable, don't test triggers.
-			if (pushableInfo.stackLowerItem == NO_ITEM)
-			{
-				const bool pushableActivationFlag = pushableItem.Flags & IFLAG_ACTIVATION_MASK;
-				TestTriggers(&pushableItem, true, pushableActivationFlag);
-			}
-
-			RemoveActiveItem(itemNumber);
-			pushableItem.Status = ITEM_NOT_ACTIVE;
-
-			SetStopperFlag(pushableInfo.StartPos, false);
-			pushableInfo.StartPos = pushableItem.Pose.Position;
-			pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
-			SetStopperFlag(pushableInfo.StartPos, true);
+			DeactivationRoutine(itemNumber);
+			
+			//SetStopperFlag(pushableInfo.StartPos, false);
+			//pushableInfo.StartPos = pushableItem.Pose.Position;
+			//pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
+			//SetStopperFlag(pushableInfo.StartPos, true);//Is this one redundant?
 		}
 
 		return true;
 	}
 
-	void PushableBlockManageIdle(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
+	void PushableBlockManageIdle(const short itemNumber)
 	{
-		if (pushableItem.Status != ITEM_ACTIVE)
-			return;
-
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		//If it's not moving, it places at center, do some last checks and then it deactivate itself.
-		pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem);
+		pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem.Pose.Position);
 
 		MoveStackXZ(itemNumber);
 		UpdateAllPushablesStackLinks();
-		UpdateBridgeStack(itemNumber, true);
-
-		if (pushableInfo.stackLowerItem == NO_ITEM)
-		{
-			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-		}
-
-		RemoveActiveItem(itemNumber);
-		pushableItem.Status = ITEM_NOT_ACTIVE;
+		
+		DeactivationRoutine(itemNumber);
 	}
 	
-	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber)
+	void PushableBlockManageMoving(const short itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
+
 		// Moves pushable based on player bounds.Z2.
 
-		const int blockHeight = GetStackHeight(pushableItem);
 		const bool isLaraPulling = LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL; //else, she is pushing.
 
 		int quadrantDir = GetQuadrant(LaraItem->Pose.Orientation.y);
@@ -416,18 +395,13 @@ namespace TEN::Entities::Generic
 		int displaceDepth = 0;
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
 
-		bool isMovingResult = false;
+		if (pushableInfo.soundState == PushableSoundState::Moving)
+			pushableInfo.soundState = PushableSoundState::Stopping;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
 
 		displaceBox -= isLaraPulling ? BLOCK(1) + displaceDepth : displaceDepth - BLOCK(1);
-
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
-		{
-			RemoveFromStack(itemNumber);
-			UpdateBridgeStack(itemNumber, false);
-		}
-
+				
 		// Update the position
 		switch (quadrantDir)
 		{
@@ -459,7 +433,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z < newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
-					isMovingResult = true;
+					pushableInfo.soundState = PushableSoundState::Moving;
 				}
 			}
 			else
@@ -468,7 +442,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z > newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
-					isMovingResult = true;
+					pushableInfo.soundState = PushableSoundState::Moving;
 				}
 			}
 		}
@@ -481,7 +455,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == WEST && pushableItem.Pose.Position.x < newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
-					isMovingResult = true;
+					pushableInfo.soundState = PushableSoundState::Moving;
 				}
 			}
 			else
@@ -490,7 +464,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == WEST && pushableItem.Pose.Position.x > newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
-					isMovingResult = true;
+					pushableInfo.soundState = PushableSoundState::Moving;
 				}
 			}
 		}
@@ -500,74 +474,67 @@ namespace TEN::Entities::Generic
 		//Manage the end of the animation
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
+			pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem.Pose.Position);
+			MoveStackXZ(itemNumber);
+
 			SetStopperFlag(pushableInfo.StartPos, false);
 
-			pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem);
-
-			// Check if pushing through an edge into falling.
+			// Check if pushing through an edge into falling.Then she can't keep pushing/pulling
 			if (pushableInfo.canFall && !isLaraPulling)
 			{
 				int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y + 10, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;// repeated?
 				if (floorHeight > pushableItem.Pose.Position.y)
 				{
-					MoveStackXZ(itemNumber);
 					LaraItem->Animation.TargetState = LS_IDLE;
-
-					pushableInfo.MovementState = PushableMovementState::None;
-
 					pushableItem.Animation.IsAirborne = true;
-					return true;
+					pushableInfo.soundState = PushableSoundState::None;
+
+					return;
 				}
 			}
 
-			if (IsHeld(In::Action))
+			//Otherwise, just check if action key is still pressed.
+			GameVector NextPos = pushableItem.Pose.Position;
+			NextPos.RoomNumber = pushableItem.RoomNumber;
+
+			if (isLaraPulling)
+				quadrantDir = (quadrantDir + 2) % 4; //Rotates the orientation 180º.
+
+			switch (quadrantDir)
 			{
-				GameVector NextPos = pushableItem.Pose.Position;
-				NextPos.RoomNumber = pushableItem.RoomNumber;
+			case NORTH:
+				NextPos.z = NextPos.z + BLOCK(1);
+				break;
 
-				if (isLaraPulling)
-					quadrantDir = (quadrantDir + 2) % 4;
+			case EAST:
+				NextPos.x = NextPos.x + BLOCK(1);
+				break;
 
-				switch (quadrantDir)
-				{
-				case NORTH:
-					NextPos.z = NextPos.z + BLOCK(1);
-					break;
+			case SOUTH:
+				NextPos.z = NextPos.z - BLOCK(1);
+				break;
 
-				case EAST:
-					NextPos.x = NextPos.x + BLOCK(1);
-					break;
-
-				case SOUTH:
-					NextPos.z = NextPos.z - BLOCK(1);
-					break;
-
-				case WEST:
-					NextPos.x = NextPos.x - BLOCK(1);
-					break;
-				}
-
-				if (IsNextSectorValid(pushableItem, blockHeight, NextPos, isLaraPulling))
-				{
-					pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem);
-					TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-
-					pushableInfo.StartPos = pushableItem.Pose.Position;
-					pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
-					SetStopperFlag(NextPos, true);
-				}
-				else
-				{
-					LaraItem->Animation.TargetState = LS_IDLE;
-				}
+			case WEST:
+				NextPos.x = NextPos.x - BLOCK(1);
+				break;
 			}
-			else
+
+			if (IsHeld(In::Action) &&
+				IsNextSectorValid(pushableItem, NextPos, isLaraPulling))
+			{
+				pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem.Pose.Position);
+				TestTriggers(&pushableItem, true, pushableItem.Flags& IFLAG_ACTIVATION_MASK);
+
+				pushableInfo.StartPos = pushableItem.Pose.Position;
+				pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
+				SetStopperFlag(NextPos, true);
+			}
+			else 
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
 			}
 		}
-
-		return isMovingResult;
+		return;
 	}
 
 	// Sound functions
@@ -601,7 +568,7 @@ namespace TEN::Entities::Generic
 		};
 	}
 
-	int PushableGetSound(const PushableSoundsType& type, const GameVector& detectionPoint)
+	int GetPushableSound(const PushableSoundsType& type, const GameVector& detectionPoint)
 	{
 		const auto col = GetCollision(detectionPoint);
 		const auto materialID = col.BottomBlock->Material;
@@ -630,25 +597,61 @@ namespace TEN::Entities::Generic
 		return resultSound;
 	}
 
-	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo)
+	void PushablesManageSounds(const short itemNumber)
 	{
-		auto SoundSourcePose = pushableItem.Pose; //Can't pass directly because SoundEffect doesn't const promise.
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		GameVector detectionPoint = pushableItem.Pose.Position;
 		detectionPoint.RoomNumber = pushableItem.RoomNumber;
 
-		if (pushableInfo.MovementState == PushableMovementState::Moving)
+		if (pushableInfo.soundState == PushableSoundState::Moving)
 		{
-			SoundEffect(PushableGetSound(LOOP, detectionPoint), &SoundSourcePose, SoundEnvironment::Always);
+			SoundEffect(GetPushableSound(LOOP, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushableInfo.MovementState == PushableMovementState::Stopping)
+		else if (pushableInfo.soundState == PushableSoundState::Stopping)
 		{
-			pushableInfo.MovementState = PushableMovementState::None;
-			SoundEffect(PushableGetSound(STOP, detectionPoint), &SoundSourcePose, SoundEnvironment::Always);
+			pushableInfo.soundState = PushableSoundState::None;
+			SoundEffect(GetPushableSound(STOP, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
 		}
 	}
 
-	//Floor Data update functions
+	//General functions
+
+	void InitialisePushablesGeneral()
+	{
+		//To execute on level start and on level loading.
+		InitializePushablesSoundsMap();
+		UpdateAllPushablesStackLinks();
+	}
+
+	void DeactivationRoutine(const short itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
+
+		ManageStackBridges(itemNumber, true); //Is it really needed? Is being called twice. In gravity and Idle.
+
+		// If fallen on top of existing pushable, don't test triggers.
+		if (pushableInfo.stackLowerItem == NO_ITEM)
+		{
+			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+		}
+
+		RemoveActiveItem(itemNumber);
+		pushableItem.Status = ITEM_NOT_ACTIVE;
+	}
+
+	bool IsClimbablePushable(int ObjectNumber)
+	{
+		return (ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10);
+	}
+
+	bool IsObjectPushable(int ObjectNumber)
+	{
+		return (ObjectNumber >= ID_PUSHABLE_OBJECT1 && ObjectNumber <= ID_PUSHABLE_OBJECT10);
+	}
+
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber) // TODO: Update with the new collision functions
 	{
 		FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -691,13 +694,13 @@ namespace TEN::Entities::Generic
 				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z - BLOCK(1)), roomNumber);
 		}
 	}
-
+		
 
 	// Test functions
 
 	bool IsPushableOnValidSurface(ItemInfo& pushableItem)
 	{
-		auto pushableInfo = *GetPushableInfo(&pushableItem);
+		auto pushableInfo = GetPushableInfo(pushableItem);
 
 		CollisionResult col;
 
@@ -723,12 +726,15 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool IsNextSectorValid(ItemInfo& pushableItem, const int blockHeight, const GameVector& targetPoint, const bool checkIfLaraFits)
+	bool IsNextSectorValid(ItemInfo& pushableItem, const GameVector& targetPoint, const bool checkIfLaraFits)
 	{
 		if (!IsPushableOnValidSurface(pushableItem))
 			return false;
 
-		const auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		if (!CheckStackLimit(pushableItem))
+			return false;
+
+		const auto& pushableInfo = GetPushableInfo(pushableItem);
 		auto col = GetCollision(targetPoint);
 
 		//It's in a wall
@@ -768,6 +774,7 @@ namespace TEN::Entities::Generic
 
 		//Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);
+		const int blockHeight = GetStackHeight(pushableItem);
 		if (distanceToCeiling < blockHeight)
 			return false;
 
@@ -903,13 +910,13 @@ namespace TEN::Entities::Generic
 	void MoveStack(short itemNumber, const Vector3i& GoalPos)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		// Move stack together with bottom pushable
 		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
 			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = *GetPushableInfo(&pushableItem);
+			pushableInfo = GetPushableInfo(pushableItem);
 
 			pushableItem.Pose.Position.x = GoalPos.x;
 			pushableItem.Pose.Position.z = GoalPos.z;
@@ -937,10 +944,10 @@ namespace TEN::Entities::Generic
 		MoveStack(itemNumber, Vector3i (0, y, 0));
 	}
 
-	void UpdateBridgeStack(short itemNumber, bool addBridge)
+	void ManageStackBridges(short itemNumber, bool addBridge)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		if (pushableInfo.hasFloorColission)
 		{
@@ -953,7 +960,7 @@ namespace TEN::Entities::Generic
 		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
 			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = *GetPushableInfo(&pushableItem);
+			pushableInfo = GetPushableInfo(pushableItem);
 
 			if (pushableInfo.hasFloorColission)
 			{
@@ -965,7 +972,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void RemoveFromStack(short itemNumber) 
+	void RemovePushableFromStack(short itemNumber) 
 	{
 		// Unlink pushable from stack.
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -978,25 +985,27 @@ namespace TEN::Entities::Generic
 			int objectNumber = itemBelow.ObjectNumber;
 			if (objectNumber >= ID_PUSHABLE_OBJECT1 && objectNumber <= ID_PUSHABLE_OBJECT10)
 			{
-				auto itemBelowInfo = GetPushableInfo(&itemBelow);
-				if (itemBelowInfo->stackUpperItem == itemNumber)
+				auto& itemBelowInfo = GetPushableInfo(itemBelow);
+				if (itemBelowInfo.stackUpperItem == itemNumber)
 				{
-					itemBelowInfo->stackUpperItem = NO_ITEM;
+					itemBelowInfo.stackUpperItem = NO_ITEM;
 					break;
 				}
 			}
 		}
 	}
 
-	std::vector<int> FindAllPushables()
+	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList)
 	{
 		std::vector<int> pushables;
 
-		for (int i = 0; i < g_Level.NumItems; i++)
+		for (int i = 0; i < objectsList.size(); i++)
 		{
-			auto& item = g_Level.Items[i];
+			auto& item = objectsList[i];
 
-			if (item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10)
+			if ((item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
+				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
+
 			{
 				pushables.push_back(i);
 			}
@@ -1007,11 +1016,11 @@ namespace TEN::Entities::Generic
 	
 	void UpdateAllPushablesStackLinks()
 	{
-		auto& pushablesNumbersList = FindAllPushables();
+		const auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
 		for (auto& currentItemNumber : pushablesNumbersList)
 		{
 			auto& currentItem = g_Level.Items[currentItemNumber];
-			auto& currentInfo = *GetPushableInfo(&currentItem);
+			auto& currentInfo = GetPushableInfo(currentItem);
 
 			const auto& currentPos = currentItem.Pose.Position;
 
@@ -1022,7 +1031,7 @@ namespace TEN::Entities::Generic
 					continue;
 
 				auto& nextItem = g_Level.Items[nextItemNumber];
-				auto& nextInfo = *GetPushableInfo(&nextItem);
+				auto& nextInfo = GetPushableInfo(nextItem);
 
 				const auto& nextPos = nextItem.Pose.Position;
 
@@ -1046,14 +1055,14 @@ namespace TEN::Entities::Generic
 	int GetStackHeight(ItemInfo& item)
 	{
 		auto& pushableItem = item;
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 		
 		int height = pushableInfo.height;
 		
 		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
 			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = *GetPushableInfo(&pushableItem);
+			pushableInfo = GetPushableInfo(pushableItem);
 
 			height += pushableInfo.height;
 		}
@@ -1064,7 +1073,7 @@ namespace TEN::Entities::Generic
 	bool CheckStackLimit(ItemInfo& item)
 	{
 		auto& pushableItem = item;
-		auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		int limit = pushableInfo.stackLimit;
 		int count = 1;
@@ -1072,7 +1081,7 @@ namespace TEN::Entities::Generic
 		while (pushableInfo.stackUpperItem != NO_ITEM)
 		{
 			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = *GetPushableInfo(&pushableItem);
+			pushableInfo = GetPushableInfo(pushableItem);
 
 			count++;
 
@@ -1088,7 +1097,7 @@ namespace TEN::Entities::Generic
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushableInfo = *GetPushableInfo(&pushableItem);
+		const auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
@@ -1104,13 +1113,13 @@ namespace TEN::Entities::Generic
 
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		const auto* pushable = GetPushableInfo(item);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		const auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-		if (item->Status != ITEM_INVISIBLE && pushable->hasFloorColission && boxHeight.has_value())
-			return std::optional{item->Pose.Position.y};
+		if (pushableItem.Status != ITEM_INVISIBLE && pushableInfo.hasFloorColission && boxHeight.has_value())
+			return std::optional{ pushableItem.Pose.Position.y};
 
 		return std::nullopt;
 	}

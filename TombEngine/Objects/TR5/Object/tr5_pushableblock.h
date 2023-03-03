@@ -41,36 +41,43 @@ namespace TEN::Entities::Generic
 	};
 
 	// Main functions
-	void InitialisePushableBlock(short itemNumber);
+	void InitialisePushableBlock(const short itemNumber);
 	void PushableBlockControl(short itemNumber);
 	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 	// Behaviour functions
-	bool PushableBlockManageGravity(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber); //Maybe itemNumber could be cut out.
-	void PushableBlockManageIdle(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
-	bool PushableBlockManageMoving(ItemInfo& pushableItem, PushableInfo& pushableInfo, const short itemNumber);
+	bool PushableBlockManageFalling	(const short itemNumber);
+	void PushableBlockManageIdle	(const short itemNumber);
+	void PushableBlockManageMoving	(const short itemNumber);
 
-	// Sound functions
+	// Sounds functions
 	void InitializePushablesSoundsMap();
-	int PushableGetSound(const PushableSoundsType& type, const GameVector& detectionPoint);
-	void PushableBlockManageSounds(const ItemInfo& pushableItem, PushableInfo& pushableInfo);
-
-	//Floor Data update functions
+	int GetPushableSound(const PushableSoundsType& type, const GameVector& detectionPoint);
+	void PushablesManageSounds(const short itemNumber);
+	
+	//General functions
+	void InitialisePushablesGeneral();
+	void DeactivationRoutine(const short itemNumber);
+	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
+	bool IsClimbablePushable(int ObjectNumber);
+	bool IsObjectPushable(int ObjectNumber);
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
-
-	// Test functions
-	bool IsNextSectorValid(ItemInfo& item, const int blockHeight, const GameVector& quadrant, const bool isPulling = true);
-	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& quadrant);
+	
+	// Collision test functions
+	bool IsNextSectorValid(ItemInfo& item, const GameVector& targetPoint, const bool checkIfLaraFits);
+	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& targetPoint);
 	bool IsPushableOnValidSurface(ItemInfo& item);
 
 	// Stack utilities functions
+	void UpdateAllPushablesStackLinks();
+	
 	void MoveStack(short itemNumber, const Vector3i& GoalPos);
 	void MoveStackXZ(short itemNumber);
 	void MoveStackY(short itemNumber, int y);
-	void UpdateBridgeStack(short itemNumber, bool addBridge);
-	void RemoveFromStack(short itemNumber);
-	std::vector<int> FindAllPushables();
-	void UpdateAllPushablesStackLinks();
+
+	void ManageStackBridges(short itemNumber, bool addBridge);
+	void RemovePushableFromStack(short itemNumber);
+	
 	int GetStackHeight(ItemInfo& item);
 	bool CheckStackLimit(ItemInfo& item);
 
