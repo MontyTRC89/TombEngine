@@ -59,8 +59,9 @@ namespace TEN::Entities::Generic
 	void InitialisePushablesGeneral();
 	void DeactivationRoutine(const short itemNumber);
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
-	bool IsClimbablePushable(int ObjectNumber);
-	bool IsObjectPushable(int ObjectNumber);
+	bool IsClimbablePushable(const int ObjectNumber);
+	bool IsObjectPushable(const int ObjectNumber);
+	void UpdateRoomNumbers(const short itemNumber);
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 	
 	// Collision test functions
@@ -71,9 +72,9 @@ namespace TEN::Entities::Generic
 	// Stack utilities functions
 	void UpdateAllPushablesStackLinks();
 	
-	void MoveStack(short itemNumber, const Vector3i& GoalPos);
-	void MoveStackXZ(short itemNumber);
-	void MoveStackY(short itemNumber, int y);
+	void MoveStack(const short itemNumber, const Vector3i& GoalPos);
+	void MoveStackXZ(const short itemNumber);
+	void MoveStackY(const short itemNumber, const int y);
 
 	void ManageStackBridges(short itemNumber, bool addBridge);
 	void RemovePushableFromStack(short itemNumber);
