@@ -62,6 +62,7 @@ namespace TEN::Entities::Generic
 	bool IsClimbablePushable(const int ObjectNumber);
 	bool IsObjectPushable(const int ObjectNumber);
 	void UpdateRoomNumbers(const short itemNumber);
+	int GetPushableHeight(ItemInfo& item);
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 	
 	// Collision test functions

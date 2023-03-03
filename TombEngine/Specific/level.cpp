@@ -19,6 +19,7 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -193,6 +194,8 @@ void LoadItems()
 
 		for (int i = 0; i < g_Level.NumItems; i++)
 			InitialiseItem(i);
+
+		InitialisePushablesGeneral();
 	}
 }
 

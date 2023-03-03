@@ -54,7 +54,7 @@ namespace TEN::Entities::Generic
 		pushableInfo.StartPos = item.Pose.Position;
 		pushableInfo.StartPos.RoomNumber = item.RoomNumber;
 
-		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
+		if (IsClimbablePushable (item.ObjectNumber))
 		{
 			pushableInfo.hasFloorColission = true;
 			TEN::Floordata::AddBridge(itemNumber);
@@ -64,7 +64,8 @@ namespace TEN::Entities::Generic
 			pushableInfo.hasFloorColission = false;			
 		}
 
-		pushableInfo.height = -GameBoundingBox(&item).Y1;
+		pushableInfo.height = GetPushableHeight(item);
+
 		
 		// Read OCB flags.
 		const int ocb = item.TriggerFlags;
@@ -371,7 +372,6 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position = PlaceInSectorCenter(pushableItem.Pose.Position);
 
 		MoveStackXZ(itemNumber);
-		UpdateAllPushablesStackLinks();
 		
 		DeactivationRoutine(itemNumber);
 	}
@@ -698,6 +698,13 @@ namespace TEN::Entities::Generic
 		}
 	}
 
+	int GetPushableHeight(ItemInfo& item)
+	{
+		int heightBoundingBox = -GameBoundingBox(&item).Y1;
+		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
+		return heightWorldAligned;
+	}
+
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber) // TODO: Update with the new collision functions
 	{
 		FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -786,10 +793,6 @@ namespace TEN::Entities::Generic
 		if (col.Block->IsWall(targetPoint.x, targetPoint.z))
 			return false;
 
-		//Is a floor higher step
-		if (col.Position.Floor < pushableItem.Pose.Position.y)
-			return false;
-
 		//Is it a sliding slope?
 		if (col.Position.FloorSlope)
 			return false;
@@ -803,17 +806,30 @@ namespace TEN::Entities::Generic
 
 		//Is a stopper flag tile?
 		if (col.Block->Stopper)
-			return false;
+		{
+			if (col.Position.Floor <= pushableItem.Pose.Position.y)
+			{
+				return false;
+			}
+			//else
+			//{
+				// Maybe the stopper is because there is another pushable down there.
+				// TODO: Need better search tools
 
-		//Is a gap, (Can it fall down?) (Only available for pushing).
+			//}
+		}
+			
+
+		//Is a gap or a step?, (Can it fall down?) (Only available for pushing).
+		int floorDiference = abs(col.Position.Floor - pushableItem.Pose.Position.y);
 		if (pushableInfo.canFall)
 		{
-			if (col.Position.Floor < pushableItem.Pose.Position.y)
+			if ((col.Position.Floor < pushableItem.Pose.Position.y) && (floorDiference >= 32))
 				return false;
 		}
 		else
 		{
-			if (col.Position.Floor != pushableItem.Pose.Position.y)
+			if (floorDiference >= 32)
 				return false;
 		}
 
@@ -1003,9 +1019,9 @@ namespace TEN::Entities::Generic
 			if (pushableInfo.hasFloorColission)
 			{
 				if (addBridge)
-					TEN::Floordata::AddBridge(pushableInfo.stackUpperItem);
+					TEN::Floordata::AddBridge(pushableItem.Index);
 				else
-					TEN::Floordata::RemoveBridge(pushableInfo.stackUpperItem);
+					TEN::Floordata::RemoveBridge(pushableItem.Index);
 			}
 		}
 	}
@@ -1027,42 +1043,30 @@ namespace TEN::Entities::Generic
 
 	void UpdateAllPushablesStackLinks()
 	{
-		const auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
-		for (auto& currentItemNumber : pushablesNumbersList)
+		auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
+	
+		if (pushablesNumbersList.empty())
+			return;
+
+		std::sort(pushablesNumbersList.begin(), pushablesNumbersList.end(), CompareItemByXZ);
+
+		for (std::size_t i = 0; i < pushablesNumbersList.size() - 1; ++i) 
 		{
-			auto& currentItem = g_Level.Items[currentItemNumber];
-			auto& currentInfo = GetPushableInfo(currentItem);
+			auto& objectA = g_Level.Items[pushablesNumbersList[i]];
+			auto& objectB = g_Level.Items[pushablesNumbersList[i + 1]];
 
-			const auto& currentPos = currentItem.Pose.Position;
-
-			// Compare with the next pushable object.
-			for (auto nextItemNumber : pushablesNumbersList)
+			// Are they in the same sector?
+			if ((objectA.Pose.Position.x == objectB.Pose.Position.x) && (objectA.Pose.Position.z == objectB.Pose.Position.z))
 			{
-				if (nextItemNumber <= currentItemNumber)
-					continue;
-
-				auto& nextItem = g_Level.Items[nextItemNumber];
-				auto& nextInfo = GetPushableInfo(nextItem);
-
-				const auto& nextPos = nextItem.Pose.Position;
-
-				if (nextPos.x != currentPos.x || nextPos.z != currentPos.z)
-					break;
-
-				if (nextPos.y > currentPos.y)
-				{
-					currentInfo.stackLowerItem = nextItemNumber;
-
-					if (nextInfo.hasFloorColission)
-						nextInfo.stackUpperItem = currentItemNumber;
-				}
-				else if (nextPos.y < currentPos.y)
-				{
-					nextInfo.stackLowerItem = currentItemNumber;
-
-					if (currentInfo.hasFloorColission)
-						currentInfo.stackUpperItem = nextItemNumber;
-				}
+				// Determine which object is up and which is down
+				auto& upperPushableItem = (objectA.Pose.Position.y < objectB.Pose.Position.y) ? objectA : objectB;
+				auto& lowerPushableItem = (objectA.Pose.Position.y < objectB.Pose.Position.y) ? objectB : objectA;
+				
+				// Set the stackUpperItem and stackLowerItem variables accordingly
+				auto& upperPushableInfo = GetPushableInfo(upperPushableItem);
+				auto& lowerPushableInfo = GetPushableInfo(lowerPushableItem);
+				upperPushableInfo.stackLowerItem = lowerPushableItem.Index;
+				lowerPushableInfo.stackUpperItem = upperPushableItem.Index;
 			}
 		}
 	}
@@ -1117,7 +1121,7 @@ namespace TEN::Entities::Generic
 	
 		if (pushableItem.Status != ITEM_INVISIBLE && pushableInfo.hasFloorColission && boxHeight.has_value())
 		{
-			const auto height = pushableItem.Pose.Position.y + GameBoundingBox(&pushableItem).Y1;
+			const auto height = pushableItem.Pose.Position.y - GetPushableHeight(pushableItem);
 
 			return std::optional{height};
 		}
@@ -1142,7 +1146,7 @@ namespace TEN::Entities::Generic
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		const auto height = item.Pose.Position.y + GameBoundingBox(&item).Y1;
+		const auto height = item.Pose.Position.y - GetPushableHeight(item);
 
 		return height;
 	}

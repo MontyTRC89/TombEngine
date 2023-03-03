@@ -850,3 +850,19 @@ Vector3i PlaceInSectorCenter(const Vector3i& pos)
 					 pos.z & maskLower8Bits | mask9Bit
 					);
 }
+
+bool CompareItemByXZ(const int a, const int b) 
+{
+	// Compare objects by their XZ position
+	auto& itemA = g_Level.Items[a];
+	auto& itemB = g_Level.Items[b];
+
+	if (itemA.Pose.Position.x == itemB.Pose.Position.x)
+	{
+		return itemA.Pose.Position.z < itemB.Pose.Position.z;
+	}
+	else 
+	{
+		return itemA.Pose.Position.x < itemB.Pose.Position.x;
+	}
+}

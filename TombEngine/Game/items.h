@@ -197,3 +197,4 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = 
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 
 Vector3i PlaceInSectorCenter(const Vector3i& pos);
+bool CompareItemByXZ(const int a, const int b);
