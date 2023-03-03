@@ -32,12 +32,12 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto IMP_IDLE_ATTACK_RANGE = SQUARE(CLICK(4) / 6);
 	constexpr auto IMP_ATTACK_DAMAGE = 3;
 	constexpr auto ATTACK_VELOCITY = 10;
+	constexpr auto MESHSWAP_RANDOM = 8;
 
 	const auto ImpLeftHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 7);
 	const auto ImpRightHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
 	const auto ImpHeadSwapJoints = std::vector <unsigned int> { 10 };
 	
-
 	enum ImpState
 	{
 		IMP_STATE_WALK = 0,
@@ -239,7 +239,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (Wibble & 0x10)
+			if (Wibble & MESHSWAP_RANDOM)
 				item->SetMeshSwapFlags (ImpHeadSwapJoints);
 			else
 				item->SetMeshSwapFlags(NO_JOINT_BITS);
@@ -281,7 +281,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				if (AI.bite && AI.distance < IMP_IDLE_ATTACK_RANGE && item->TriggerFlags < 10)
+				if (AI.bite && AI.distance < IMP_IDLE_ATTACK_RANGE)
 				{
 					if (GetRandomControl() & 1)
 						item->Animation.TargetState = IMP_STATE_ATTACK_1;
