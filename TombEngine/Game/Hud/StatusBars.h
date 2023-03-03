@@ -35,9 +35,9 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
-		void Initialize(ItemInfo& item);
-		void Update(ItemInfo& item);
-		void Draw(ItemInfo& item) const;
+		void Initialize(const ItemInfo& item);
+		void Update(const ItemInfo& item);
+		void Draw(const ItemInfo& item) const;
 		void Clear();
 
 	private:
@@ -46,9 +46,9 @@ namespace TEN::Hud
 
 		// Update helpers
 		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
-		void UpdateAirBar(ItemInfo& item);
-		void UpdateHealthBar(ItemInfo& item);
-		void UpdateSprintBar(ItemInfo& item);
+		void UpdateAirBar(const ItemInfo& item);
+		void UpdateHealthBar(const ItemInfo& item);
+		void UpdateSprintBar(const ItemInfo& item);
 
 		// Draw helpers
 		void DrawStatusBar(float value, float criticalValue, const TEN::Renderer::RendererHudBar& rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;

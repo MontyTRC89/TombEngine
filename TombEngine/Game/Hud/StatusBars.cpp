@@ -18,9 +18,9 @@ extern TEN::Renderer::RendererHudBar* g_SprintBar;
 
 namespace TEN::Hud
 {
-	void StatusBarsController::Initialize(ItemInfo& item)
+	void StatusBarsController::Initialize(const ItemInfo& item)
 	{
-		const auto& player = *GetLaraInfo(&item);
+		const auto& player = GetLaraInfo(item);
 
 		// Initialize bar values.
 		this->InitializeStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
@@ -28,7 +28,7 @@ namespace TEN::Hud
 		this->InitializeStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);
 	}
 
-	void StatusBarsController::Update(ItemInfo& item)
+	void StatusBarsController::Update(const ItemInfo& item)
 	{
 		constexpr auto FLASH_INTERVAL = 0.2f;
 
@@ -42,13 +42,13 @@ namespace TEN::Hud
 		this->UpdateSprintBar(item);
 	}
 
-	void StatusBarsController::Draw(ItemInfo& item) const
+	void StatusBarsController::Draw(const ItemInfo& item) const
 	{
 		// Avoid drawing in title level and during cutscenes.
 		if (CurrentLevel == 0 || CinematicBarsHeight > 0)
 			return;
 
-		const auto& player = *GetLaraInfo(&item);
+		const auto& player = GetLaraInfo(item);
 		bool isPoisoned = (player.PoisonPotency != 0);
 
 		// Draw bars.
@@ -88,9 +88,9 @@ namespace TEN::Hud
 			bar.Value = bar.TargetValue;
 	}
 
-	void StatusBarsController::UpdateAirBar(ItemInfo& item)
+	void StatusBarsController::UpdateAirBar(const ItemInfo& item)
 	{
-		const auto& player = *GetLaraInfo(&item);
+		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
 		this->UpdateStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
@@ -110,9 +110,9 @@ namespace TEN::Hud
 		}
 	}
 
-	void StatusBarsController::UpdateHealthBar(ItemInfo& item)
+	void StatusBarsController::UpdateHealthBar(const ItemInfo& item)
 	{
-		const auto& player = *GetLaraInfo(&item);
+		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
 		this->UpdateStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
@@ -136,9 +136,9 @@ namespace TEN::Hud
 		}
 	}
 
-	void StatusBarsController::UpdateSprintBar(ItemInfo& item)
+	void StatusBarsController::UpdateSprintBar(const ItemInfo& item)
 	{
-		const auto& player = *GetLaraInfo(&item);
+		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
 		this->UpdateStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);

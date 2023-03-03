@@ -408,16 +408,52 @@ void DoLaraFallDamage(ItemInfo* item)
 	}
 }
 
+LaraInfo& GetLaraInfo(ItemInfo& item)
+{
+	if (item.ObjectNumber == ID_LARA)
+	{
+		auto* player = (LaraInfo*&)item.Data;
+		return *player;
+	}
+	else
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
+
+		auto& firstLaraItem = *FindItem(ID_LARA);
+		auto* player = (LaraInfo*&)firstLaraItem.Data;
+		return *player;
+	}
+}
+
+const LaraInfo& GetLaraInfo(const ItemInfo& item)
+{
+	if (item.ObjectNumber == ID_LARA)
+	{
+		const auto* player = (LaraInfo*&)item.Data;
+		return *player;
+	}
+	else
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
+
+		const auto& firstPlayerItem = *FindItem(ID_LARA);
+		const auto* player = (LaraInfo*&)firstPlayerItem.Data;
+		return *player;
+	}
+}
+
 LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
+	{
 		return (LaraInfo*&)item->Data;
+	}
 	else
 	{
 		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 
-		auto* firstLaraItem = FindItem(ID_LARA);
-		return (LaraInfo*&)firstLaraItem->Data;
+		auto& firstPlayerItem = *FindItem(ID_LARA);
+		return (LaraInfo*&)firstPlayerItem.Data;
 	}
 }
 
