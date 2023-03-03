@@ -653,7 +653,7 @@ const std::string& GetObjectName(GAME_OBJECT_ID id)
 	return unknownSlot;
 }
 
-std::vector<int> FindAllItems(short objectNumber)
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectNumber)
 {
 	std::vector<int> itemList;
 
@@ -666,7 +666,24 @@ std::vector<int> FindAllItems(short objectNumber)
 	return itemList;
 }
 
-ItemInfo* FindItem(int objectNumber)
+std::vector<int> FoundCreatedItems(GAME_OBJECT_ID obj)
+{
+	std::vector<int> itemFound;
+	if (NextItemActive != NO_ITEM)
+	{
+		// NOTE: need to be a pointer, else you will mess up the function !
+		auto* found = &g_Level.Items[NextItemActive];
+		for (short nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = found->NextActive)
+		{
+			found = &g_Level.Items[nextActive];
+			if (found->ObjectNumber == obj)
+				itemFound.push_back(nextActive);
+		}
+	}
+	return itemFound;
+}
+
+ItemInfo* FindItem(GAME_OBJECT_ID objectNumber)
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
