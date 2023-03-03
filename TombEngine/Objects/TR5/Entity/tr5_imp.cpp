@@ -34,6 +34,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto ImpLeftHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 7);
 	const auto ImpRightHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
+	const auto ImpHeadSwapJoints = std::vector <unsigned int> { 10 };
 
 	enum ImpState
 	{
@@ -237,7 +238,7 @@ namespace TEN::Entities::Creatures::TR5
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (Wibble & 0x10)
-				item->SetMeshSwapFlags(0x400);
+				item->SetMeshSwapFlags (ImpHeadSwapJoints);
 			else
 				item->SetMeshSwapFlags(NO_JOINT_BITS);
 
