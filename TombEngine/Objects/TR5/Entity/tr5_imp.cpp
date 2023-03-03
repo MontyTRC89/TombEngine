@@ -147,8 +147,8 @@ namespace TEN::Entities::Creatures::TR5
 				return true;
 		}
 
-		auto torchItems = FoundCreatedItems(ID_BURNING_TORCH_ITEM);
-		for (auto& itemNumber : torchItems)
+		auto torchItemsNumbers = FindCreatedItems(ID_BURNING_TORCH_ITEM);
+		for (auto& itemNumber : torchItemsNumbers)
 		{
 			if (itemNumber == NO_ITEM)
 				continue;

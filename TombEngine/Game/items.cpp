@@ -641,11 +641,11 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-const std::string& GetObjectName(GAME_OBJECT_ID id)
+const std::string& GetObjectName(GAME_OBJECT_ID objectID)
 {
 	for (auto it = kObjIDs.begin(); it != kObjIDs.end(); ++it)
 	{
-		if (it->second == id)
+		if (it->second == objectID)
 			return it->first;
 	}
 
@@ -653,43 +653,46 @@ const std::string& GetObjectName(GAME_OBJECT_ID id)
 	return unknownSlot;
 }
 
-std::vector<int> FindAllItems(GAME_OBJECT_ID objectNumber)
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID)
 {
-	std::vector<int> itemList;
+	auto itemNumbers = std::vector<int>{};
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		if (g_Level.Items[i].ObjectNumber == objectNumber)
-			itemList.push_back(i);
+		if (g_Level.Items[i].ObjectNumber == objectID)
+			itemNumbers.push_back(i);
 	}
 
-	return itemList;
+	return itemNumbers;
 }
 
-std::vector<int> FoundCreatedItems(GAME_OBJECT_ID obj)
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID)
 {
-	std::vector<int> itemFound;
-	if (NextItemActive != NO_ITEM)
+	auto itemNumbers = std::vector<int>{};
+
+	if (NextItemActive == NO_ITEM)
+		return itemNumbers;
+
+	const auto* itemPtr = &g_Level.Items[NextItemActive];
+
+	for (int nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = itemPtr->NextActive)
 	{
-		// NOTE: need to be a pointer, else you will mess up the function !
-		auto* found = &g_Level.Items[NextItemActive];
-		for (short nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = found->NextActive)
-		{
-			found = &g_Level.Items[nextActive];
-			if (found->ObjectNumber == obj)
-				itemFound.push_back(nextActive);
-		}
+		itemPtr = &g_Level.Items[nextActive];
+
+		if (itemPtr->ObjectNumber == objectID)
+			itemNumbers.push_back(nextActive);
 	}
-	return itemFound;
+
+	return itemNumbers;
 }
 
-ItemInfo* FindItem(GAME_OBJECT_ID objectNumber)
+ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		auto* item = &g_Level.Items[i];
 
-		if (item->ObjectNumber == objectNumber)
+		if (item->ObjectNumber == objectID)
 			return item;
 	}
 
