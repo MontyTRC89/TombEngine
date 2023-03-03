@@ -26,10 +26,9 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto IMP_ATTACKJUMP_OR_STONE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto IMP_SHOOT_DEATH_ANGLE_BACKWARD = ANGLE(67.5f);
 
-	constexpr auto IMP_LOW_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
+	constexpr auto IMP_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
 	constexpr auto IMP_WALK_RANGE = SQUARE(SECTOR(2));
 	constexpr auto IMP_TORCH_LIT_SCARED_RANGE = BLOCK(2);
-	constexpr auto IMP_IDLE_ATTACK_RANGE = SQUARE(CLICK(4) / 6);
 	constexpr auto IMP_ATTACK_DAMAGE = 3;
 
 	constexpr auto MESHSWAP_RATE = 16;
@@ -266,7 +265,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (AI.distance > IMP_WALK_RANGE)
 					item->Animation.TargetState = IMP_STATE_RUN;
-				else if (AI.distance < IMP_LOW_ATTACK_RANGE)
+					else if (AI.distance < IMP_ATTACK_RANGE)
 					item->Animation.TargetState = IMP_STATE_IDLE;
 
 				break;
@@ -281,7 +280,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				if (AI.bite && AI.distance < IMP_IDLE_ATTACK_RANGE)
+				if (AI.bite && AI.distance < IMP_ATTACK_RANGE)
 				{
 					if (GetRandomControl() & 1)
 						item->Animation.TargetState = IMP_STATE_ATTACK_1;
@@ -300,7 +299,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					item->Animation.TargetState = IMP_STATE_RUN;
 				}
-				else if (AI.distance < IMP_LOW_ATTACK_RANGE)
+				else if (AI.distance < IMP_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = IMP_STATE_WALK;
 				}
@@ -316,7 +315,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				if (AI.distance < IMP_LOW_ATTACK_RANGE)
+				if (AI.distance < IMP_ATTACK_RANGE)
 					item->Animation.TargetState = IMP_STATE_IDLE;
 				else if (AI.distance < IMP_WALK_RANGE)
 					item->Animation.TargetState = IMP_STATE_WALK;
