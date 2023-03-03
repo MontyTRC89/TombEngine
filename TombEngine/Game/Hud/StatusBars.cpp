@@ -127,7 +127,7 @@ namespace TEN::Hud
 			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
-		// HACK: Special case for weapon undraw.
+		// Special case for weapon undraw.
 		if (HealthBar.Value == HealthBar.TargetValue &&
 			item.HitPoints > LARA_HEALTH_CRITICAL && player.PoisonPotency == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
