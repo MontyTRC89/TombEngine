@@ -679,6 +679,9 @@ static void StartObject(ObjectInfo *obj)
 	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
 		InitPushableObject(obj, objectNumber);
 
+	for (int objectNumber = ID_PUSHABLE_OBJECT_CLIMBABLE1; objectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10; objectNumber++)
+		InitPushableObject(obj, objectNumber);
+
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
