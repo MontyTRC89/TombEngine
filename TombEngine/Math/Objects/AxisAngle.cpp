@@ -118,6 +118,12 @@
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
+	Vector3 AxisAngle::ToDirection() const
+	{
+		auto quat = this->ToQuaternion();
+		return Vector3::Transform(Vector3::UnitZ, quat);
+	}
+
 	Quaternion AxisAngle::ToQuaternion() const
 	{
 		return Quaternion::CreateFromAxisAngle(Axis, TO_RAD(Angle));

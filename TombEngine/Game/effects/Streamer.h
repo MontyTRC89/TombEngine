@@ -1,7 +1,6 @@
 #pragma once
-#include "Math/Math.h"
 
-class Vector3i;
+struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
@@ -17,23 +16,28 @@ namespace TEN::Effects::Streamer
 
 	struct StreamerSegment
 	{
-		//std::array<Vector3, 4> Vertices = {}; // NOTE: this confuses me, will use later when everything is set up and works.
-		Vector3 Vertices[4];
-		Vector3i Direction = Vector3::Zero;
-		EulerAngles Orientation;
-		bool On = false;
-		int Life = 0;
-		float ScaleRate = 0.0f; 
-		float Opacity = 0.5f;
-		float width = 1.0f;
-		int StreamerID;
-		int FadeOut;
-		int PreviousID;
+	private:
+		static constexpr auto VERTEX_COUNT = 4;
+
+	public:
+		std::array<Vector3, VERTEX_COUNT> Vertices = {};
+
+		bool On			= false;
+		int	 StreamerID = 0;
+		int	 PreviousID = 0;
+
+		Vector3 Direction = Vector3::Zero;
+
+		float Life		= 0.0f;
+		float Opacity	= 0.0f;
+		float Width		= 0.0f;
+		float ScaleRate = 0.0f;
+		int	  FadeOut	= 0;
 	};
 
 	extern StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][STREAMER_DIRECTION_COUNT];
 
-	void SpawnStreamerSegment(const Vector3& origin, ItemInfo* item, int waveDirection, float width, int life, float fade);
-	void SpawnStreamer(ItemInfo* Item, int xOffset, int yOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int waveDirection, float width, int life, float fade);
+	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int waveDirection, bool isOnWater, float width, float life, float fade);
 	void UpdateStreamers();
 }

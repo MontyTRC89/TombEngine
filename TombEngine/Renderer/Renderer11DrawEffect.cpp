@@ -94,12 +94,7 @@ namespace TEN::Renderer
 
 				if (segment.Life)
 				{
-					auto s1 = Vector3(segment.Vertices[0].x, segment.Vertices[0].y, segment.Vertices[0].z);
-					auto s2 = Vector3(segment.Vertices[1].x, segment.Vertices[1].y, segment.Vertices[1].z);
-					auto s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
-					auto s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
-
-					// If central, no vertex color .
+					// If central, no vertex color.
 					if (segment.StreamerID == (int)WaveDirection::WAVE_DIRECTION_CENTRAL)
 					{
 						AddColoredQuad(

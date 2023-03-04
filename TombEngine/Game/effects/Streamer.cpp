@@ -39,63 +39,56 @@ namespace TEN::Effects::Streamer
 		return youngestStreamerIndex;
 	}
 
-	void SpawnStreamerSegment(const Vector3& origin, ItemInfo* Item, int waveDirection, float width, int life, float fade)
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int waveDirection, float width, int life, float fade)
 	{
+		constexpr auto OPACITY_MAX = 0.7f;
+
 		auto& segment = GetFreeStreamerSegment(waveDirection);
 
 		if (segment.On)
 			return;
 
-		int pvSegment = GetPreviousStreamerSegment(waveDirection);
-
-		auto* prevSegment = &Segments[pvSegment][waveDirection];
+		int previousSegmentID = GetPreviousStreamerSegment(waveDirection);
+		const auto& prevSegment = Segments[previousSegmentID][waveDirection];
 
 		segment.On = true;
-		segment.PreviousID = pvSegment;
+		segment.PreviousID = previousSegmentID;
 		segment.StreamerID = waveDirection;
-		segment.Direction = origin;
-		segment.Orientation = Item->Pose.Orientation;
+		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
+		segment.Life = life;
+		segment.Opacity = OPACITY_MAX;
+		segment.Width = 1.0f;
 		segment.ScaleRate = 1.0f * width;
-		segment.width = 1.0f;
 		segment.FadeOut = fade;
 
-		int zOffset = 0;
+		auto leftDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
+		auto rightDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
 
-		float sinY = phd_sin(Item->Pose.Orientation.y);
-		float cosY = phd_cos(Item->Pose.Orientation.y);
-
-		int x = segment.Direction.x + (zOffset * sinY) - (segment.width * cosY);
-		int z = segment.Direction.z + (zOffset * cosY) + (segment.width * sinY);
-		auto verticelPos = Vector3(x, origin.y, z);
-
-		x = segment.Direction.x + (zOffset * sinY) + (segment.width * cosY);
-		z = segment.Direction.z + (zOffset * cosY) - (segment.width * sinY);
-		auto verticerPos = Vector3(x, origin.y, z);
+		auto leftVertex = Geometry::TranslatePoint(pos, leftDirection, segment.Width);
+		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, segment.Width);;
 
 		if (waveDirection == (int)WaveDirection::WAVE_DIRECTION_LEFT)
 		{
-			segment.Vertices[0] = verticelPos;
-			segment.Vertices[1] = verticerPos;
-			segment.Vertices[3] = prevSegment->Vertices[0];
-			segment.Vertices[2] = prevSegment->Vertices[1];
+			segment.Vertices[0] = leftVertex;
+			segment.Vertices[1] = rightVertex;
+			segment.Vertices[3] = prevSegment.Vertices[0];
+			segment.Vertices[2] = prevSegment.Vertices[1];
 		}
 		else
 		{
-			segment.Vertices[1] = verticelPos;
-			segment.Vertices[0] = verticerPos;
-			segment.Vertices[3] = prevSegment->Vertices[0];
-			segment.Vertices[2] = prevSegment->Vertices[1];
+			segment.Vertices[1] = leftVertex;
+			segment.Vertices[0] = rightVertex;
+			segment.Vertices[3] = prevSegment.Vertices[0];
+			segment.Vertices[2] = prevSegment.Vertices[1];
 		}
-
-		segment.Opacity = 0.7f;
-		segment.Life = life;
 	}
 
-	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int waveDirection, bool isOnWater, float width, int life, float fade)
+	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int waveDirection, bool isOnWater, float width, float life, float fade)
 	{
 		float sinY = phd_sin(item->Pose.Orientation.y);
 		float cosY = phd_cos(item->Pose.Orientation.y);
 
+		//auto collPos = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, )
 		int x = item->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
 		int z = item->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
@@ -123,52 +116,62 @@ namespace TEN::Effects::Streamer
 		{
 			for (int j = 0; j < STREAMER_DIRECTION_COUNT; j++)
 			{
-				auto* segment = &Segments[i][j];
+				auto& segment = Segments[i][j];
 
-				if (!segment->On)
+				if (!segment.On)
 					continue;
 
-				auto* prevSegment = &Segments[segment->PreviousID][j];
+				auto* prevSegment = &Segments[segment.PreviousID][j];
 
-				if (segment->Opacity > 0.0f)
-					segment->Opacity -= 0.1f / segment->FadeOut;
+				if (segment.Opacity > 0.0f)
+					segment.Opacity -= 0.1f / segment.FadeOut;
 
-				if (segment->Life <= 0.0f )
+				if (segment.Life <= 0.0f )
 				{
-					segment->On = false;
+					segment.On = false;
 					continue;
 				}
 
+				auto leftDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
+				auto rightDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
+
+				/*auto leftVertex = Geometry::TranslatePoint(segment.Vertices[0], leftDirection, segment.Width);
+				auto rightVertex = Geometry::TranslatePoint(segment.Vertices[1], rightDirection, segment.Width);;
+
+				segment.Vertices[0] = leftVertex;
+				segment.Vertices[1] = rightVertex;
+				segment.Vertices[2] = prevSegment->Vertices[1];
+				segment.Vertices[3] = prevSegment->Vertices[0];*/
+
 				int zOffset = 0;
+				float sinY = phd_sin(EulerAngles(-segment.Direction).y);
+				float cosY = phd_cos(EulerAngles(-segment.Direction).y);
 
-				float sinY = phd_sin(segment->Orientation.y);
-				float cosY = phd_cos(segment->Orientation.y);
-
-				switch (segment->StreamerID)
+				switch (segment.StreamerID)
 				{
 				case (int)WaveDirection::WAVE_DIRECTION_LEFT:
-					segment->Vertices[0] -= Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
-					segment->Vertices[1] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
-					segment->Vertices[2] = prevSegment->Vertices[1];
-					segment->Vertices[3] = prevSegment->Vertices[0];
+					segment.Vertices[0] -= Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
+					segment.Vertices[1] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[2] = prevSegment->Vertices[1];
+					segment.Vertices[3] = prevSegment->Vertices[0];
 					break;
 
 				case (int)WaveDirection::WAVE_DIRECTION_RIGHT:
-					segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
-					segment->Vertices[0] += Vector3((zOffset * sinY) + ((segment->ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment->ScaleRate / 2) * sinY));
-					segment->Vertices[2] = prevSegment->Vertices[1];
-					segment->Vertices[3] = prevSegment->Vertices[0];
+					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[0] += Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
+					segment.Vertices[2] = prevSegment->Vertices[1];
+					segment.Vertices[3] = prevSegment->Vertices[0];
 					break;
 
 				case (int)WaveDirection::WAVE_DIRECTION_CENTRAL:
-					segment->Vertices[1] += Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
-					segment->Vertices[0] -= Vector3((zOffset * sinY) + (segment->ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment->ScaleRate * sinY));
-					segment->Vertices[2] = prevSegment->Vertices[1];
-					segment->Vertices[3] = prevSegment->Vertices[0];
+					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[0] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[2] = prevSegment->Vertices[1];
+					segment.Vertices[3] = prevSegment->Vertices[0];
 					break;
 				}
 
-				segment->Life--;				
+				segment.Life -= 1.0f;				
 			}
 		}			
 	}

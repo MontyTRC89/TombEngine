@@ -35,8 +35,9 @@ class EulerAngles;
 		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha = 1.0f);
 
 		// Converters
-		Quaternion	ToQuaternion() const;
-		Matrix		ToRotationMatrix() const;
+		Vector3	   ToDirection() const;
+		Quaternion ToQuaternion() const;
+		Matrix	   ToRotationMatrix() const;
 
 		// Operators
 		bool	   operator ==(const AxisAngle& axisAngle) const;
