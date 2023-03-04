@@ -5,20 +5,20 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/boatFX.h"
-#include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
 using std::vector;
 using namespace TEN::Effects::Bubble;
@@ -985,8 +985,8 @@ namespace TEN::Entities::Vehicles
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
 			
-			DoWakeEffect(rBoatItem, -RBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
-			DoWakeEffect(rBoatItem,  RBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(rBoatItem, -RBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(rBoatItem,  RBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
 
 			if ((GetRandomControl() & 1) == 0)
 			{

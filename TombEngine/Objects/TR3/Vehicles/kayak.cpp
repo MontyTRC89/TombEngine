@@ -7,6 +7,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
@@ -17,7 +18,6 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
-#include "Game/effects/boatFX.h"
 
 using std::vector;
 using namespace TEN::Effects::Streamer;
@@ -71,7 +71,7 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 	constexpr auto KAYAK_DRAW_SHIFT = 32;
-	constexpr auto NUM_WAKE_SPRITES = 32;
+	constexpr auto STREAMER_SEGMENT_COUNT_MAX = 32;
 	constexpr auto WAKE_SIZE = 32;
 	constexpr auto WAKE_VELOCITY = 4;
 	constexpr auto KAYAK_X = 128;
@@ -295,12 +295,12 @@ namespace TEN::Entities::Vehicles
 			//WakePts[kayak->CurrentStartWake].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
-			SpawnWaveSegment(pos1, kayakItem, 1, 1.0f, 84, 10.0f);
+			SpawnStreamerSegment(pos1, kayakItem, 1, 1.0f, 84, 10.0f);
 
 			if (rotate == 1)
 			{
 				kayak->CurrentStartWake++;
-				kayak->CurrentStartWake &= (NUM_WAKE_SPRITES - 1);
+				kayak->CurrentStartWake &= (STREAMER_SEGMENT_COUNT_MAX - 1);
 			}
 		}
 	}
@@ -1235,8 +1235,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			DoWakeEffect(kayakItem, -KAYAK_WAKE_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
-			DoWakeEffect(kayakItem,  KAYAK_WAKE_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(kayakItem, -KAYAK_WAKE_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(kayakItem,  KAYAK_WAKE_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
 		}
 
 		if (Wibble & 7)

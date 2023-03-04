@@ -18,6 +18,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -28,7 +29,6 @@
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/effects/boatFX.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -83,9 +83,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
-		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
+		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
 		{
-			for (int j = 0; j < NUM_WAKE_DIRECTION; j++)
+			for (int j = 0; j < STREAMER_DIRECTION_COUNT; j++)
 			{
 				auto& segment = Segments[i][j];
 

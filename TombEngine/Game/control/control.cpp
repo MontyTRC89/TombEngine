@@ -23,6 +23,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
@@ -55,7 +56,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
-#include "Game/effects/boatFX.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;

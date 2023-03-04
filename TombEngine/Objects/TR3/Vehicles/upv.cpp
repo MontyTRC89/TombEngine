@@ -8,9 +8,9 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/effects/boatFX.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -950,8 +950,8 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))// && !(Wibble & 15))
 		{
-			DoWakeEffect(UPVItem, jointPosLeft.x, jointPosLeft.y, jointPosLeft.z, 1, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
-			DoWakeEffect(UPVItem, jointPosRight.x, jointPosRight.y, jointPosRight.z, 2, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(UPVItem, jointPosLeft.x, jointPosLeft.y, jointPosLeft.z, 1, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
+			SpawnStreamer(UPVItem, jointPosRight.x, jointPosRight.y, jointPosRight.z, 2, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&

@@ -159,9 +159,9 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\control\volumeactivator.h" />
     <ClInclude Include="Game\effects\Blood.h" />
-     <ClInclude Include="Game\effects\boatFX.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
+    <ClInclude Include="Game\effects\Streamer.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
@@ -639,9 +639,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\Blood.cpp" />
-    <ClCompile Include="Game\effects\boatFX.cpp" />
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
+    <ClCompile Include="Game\effects\Streamer.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />

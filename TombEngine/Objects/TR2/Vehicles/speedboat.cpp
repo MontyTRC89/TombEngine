@@ -5,8 +5,8 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/boatFX.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -983,8 +983,8 @@ namespace TEN::Entities::Vehicles
 					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
 				}
 
-				DoWakeEffect(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
-				DoWakeEffect(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
+				SpawnStreamer(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
+				SpawnStreamer(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
 			}
 		}
 

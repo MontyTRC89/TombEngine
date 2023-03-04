@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
-#include "Game/effects/boatFX.h"
-#include "Game/effects/simple_particle.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/simple_particle.h"
+#include "Game/effects/Streamer.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
@@ -229,8 +229,8 @@ namespace TEN::Entities::Vehicles
 						auto front = Vector3i::Zero;
 						int height = GetVehicleHeight(vehicleItem, 0, 0, true, &front);
 						
-						DoWakeEffect(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
-						DoWakeEffect(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
+						SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
+						SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
 					}
 				}
 
