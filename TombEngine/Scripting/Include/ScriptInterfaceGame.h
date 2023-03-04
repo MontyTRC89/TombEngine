@@ -6,16 +6,9 @@
 #include "Game/room.h"
 #include "Specific/level.h"
 
+#include "VarMapVal.h"
+
 typedef DWORD D3DCOLOR;
-using VarMapVal = std::variant<
-	short,
-	std::reference_wrapper<MESH_INFO>,
-	std::reference_wrapper<LevelCameraInfo>,
-	std::reference_wrapper<SinkInfo>,
-	std::reference_wrapper<SoundSourceInfo>,
-	std::reference_wrapper<TriggerVolume>,
-	std::reference_wrapper<AI_OBJECT>,
-	std::reference_wrapper<ROOM_INFO>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;

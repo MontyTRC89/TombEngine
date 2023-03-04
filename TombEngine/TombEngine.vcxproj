@@ -181,6 +181,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Renderer\ConstantBuffers\InstancedStaticBuffer.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
+    <ClInclude Include="Scripting\Include\VarMapVal.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
