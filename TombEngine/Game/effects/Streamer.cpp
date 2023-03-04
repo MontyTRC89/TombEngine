@@ -45,7 +45,7 @@ namespace TEN::Effects::Streamer
 		return youngestStreamerIndex;
 	}
 
-	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, int life, float fade)
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade)
 	{
 		constexpr auto OPACITY_MAX = 0.7f;
 
@@ -89,7 +89,7 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int waveDirection, bool isOnWater, float width, float life, float fade)
+	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade)
 	{
 		float sinY = phd_sin(item->Pose.Orientation.y);
 		float cosY = phd_cos(item->Pose.Orientation.y);
@@ -106,13 +106,13 @@ namespace TEN::Effects::Streamer
 			if (waterHeight != NO_HEIGHT)
 			{
 				auto pos = Vector3(x, yOffset, z);
-				SpawnStreamerSegment(pos, item, waveDirection, width, life, fade);
+				SpawnStreamerSegment(pos, item, type, width, life, fade);
 			}
 		}
 		else
 		{
 			auto pos = Vector3(xOffset, yOffset, zOffset);
-			SpawnStreamerSegment(pos, item, waveDirection, width, life, fade);
+			SpawnStreamerSegment(pos, item, type, width, life, fade);
 		}
 	}
 

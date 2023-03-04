@@ -1,9 +1,51 @@
 #pragma once
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
+	struct nStreamerSegment
+	{
+	private:
+		static constexpr auto VERTEX_COUNT = 4;
+
+	public:
+		std::array<Vector3, VERTEX_COUNT> Vertices = {};
+
+		AxisAngle Orientation = AxisAngle::Identity;
+
+		float Life		= 0.0f;
+		float Opacity	= 0.0f;
+		float Width		= 0.0f;
+		float ScaleRate = 0.0f;
+		float FadeAlpha	= 0.0f;
+	};
+
+	struct Streamer
+	{
+		Vector3 AttachmentPoint = Vector3::Zero;
+		std::vector<nStreamerSegment> Segments = {};
+	};
+
+	class StreamerModule
+	{
+		// Key = tag.
+		std::map<int, Streamer> Streamers = {};
+	};
+
+	class StreamerController
+	{
+		// Key = entity number.
+		std::map<int, StreamerModule> Modules = {};
+	};
+
+	//StreamerController StreamerEffect = {};
+
+	// --------------
+
 	constexpr auto STREAMER_SEGMENT_COUNT_MAX = 256;
 
 	enum class StreamerType
@@ -33,12 +75,12 @@ namespace TEN::Effects::Streamer
 		float Opacity	= 0.0f;
 		float Width		= 0.0f;
 		float ScaleRate = 0.0f;
-		int	  FadeOut	= 0;
+		float FadeOut	= 0.0f;
 	};
 
 	extern StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][(int)StreamerType::Count];
 
-	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, int life, float fade);
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade);
 	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade);
 	void UpdateStreamers();
 }
