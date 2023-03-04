@@ -10,33 +10,33 @@ struct ItemInfo;
 namespace TEN::Entities::Generic
 {
 	struct PushableInfo;
-	PushableInfo* GetPushableInfo(ItemInfo* item);
+	PushableInfo& GetPushableInfo(const ItemInfo& item);
 
 	enum PushableSoundsType
 	{
-		LOOP = 0,
-		STOP = 1,
-		FALL = 2
+		Loop = 0,
+		Stop = 1,
+		Fall = 2
 	};
 
 	struct PushablesSounds
 	{
-		int loopSound;			// looped sound index for movement
-		int stopSound;			// ending sound index
-		int fallSound;			// sound on hitting floor (if dropped)
+		int LoopSound;			// looped sound index for movement
+		int StopSound;			// ending sound index
+		int FallSound;			// sound on hitting floor (if dropped)
 
 		PushablesSounds()
 		{
-			loopSound = SFX_TR4_PUSHABLE_SOUND;
-			stopSound = SFX_TR4_PUSH_BLOCK_END;
-			fallSound = SFX_TR4_BOULDER_FALL;
+			LoopSound = SFX_TR4_PUSHABLE_SOUND;
+			StopSound = SFX_TR4_PUSH_BLOCK_END;
+			FallSound = SFX_TR4_BOULDER_FALL;
 		}
 
 		PushablesSounds(int loopValue, int stopValue, int fallValue)
 		{
-			loopSound = loopValue;
-			stopSound = stopValue;
-			fallSound = fallValue;
+			LoopSound = loopValue;
+			StopSound = stopValue;
+			FallSound = fallValue;
 		}
 	};
 

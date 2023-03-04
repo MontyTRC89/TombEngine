@@ -134,7 +134,7 @@ void WreckingBallControl(short itemNumber)
 	{
 		oldX = item->Pose.Position.x;
 		oldZ = item->Pose.Position.z;
-		x = x & 0xFFFFFE00 | 0x200; //TODO use the PlaceInSectorCenter(pushableItem.Pose.Position) to avoid these explicit bitwise operations.
+		x = x & 0xFFFFFE00 | 0x200; //TODO use the GetNearestSectorCenter(pushableItem.Pose.Position) to avoid these explicit bitwise operations.
 		z = z & 0xFFFFFE00 | 0x200;
 		dx = x - item->Pose.Position.x;
 		dz = z - item->Pose.Position.z;

@@ -838,7 +838,9 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 	DoItemHit(&target, damage, isExplosive);
 }
 
-Vector3i PlaceInSectorCenter(const Vector3i& pos)
+
+//TODO: Originally was using a ItemInfo, but has been simplified to use only vector3i. Is other .cpp more suitable to contain this function?
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
 {
 	const unsigned int maskLower8Bits = 0xFFFFFE00;	// mask for the bits [0-8]
 	const unsigned int mask9Bit = 0x200;			// mask for the bit [9] (512)
@@ -851,11 +853,11 @@ Vector3i PlaceInSectorCenter(const Vector3i& pos)
 					);
 }
 
-bool CompareItemByXZ(const int a, const int b) 
+bool CompareItemByXZ(const int itemNumberA, const int itemNumberB)
 {
 	// Compare objects by their XZ position
-	auto& itemA = g_Level.Items[a];
-	auto& itemB = g_Level.Items[b];
+	auto& itemA = g_Level.Items[itemNumberA];
+	auto& itemB = g_Level.Items[itemNumberB];
 
 	if (itemA.Pose.Position.x == itemB.Pose.Position.x)
 	{
