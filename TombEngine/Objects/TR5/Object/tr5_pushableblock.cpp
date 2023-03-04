@@ -23,6 +23,7 @@ namespace TEN::Entities::Generic
 {
 	constexpr auto PUSHABLE_FALL_VELOCITY_MAX	 = BLOCK(1 / 8.0f);
 	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
+	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
 
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
@@ -678,7 +679,7 @@ namespace TEN::Entities::Generic
 		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		//Check and update the room number of the pushables and others linked in the stack.
-		auto col = GetCollision(pushableItem.Pose.Position);
+		auto col = GetCollision(&pushableItem);
 		if (col.RoomNumber != pushableItem.RoomNumber)
 		{
 			ItemNewRoom(itemNumber, col.RoomNumber);
@@ -693,7 +694,7 @@ namespace TEN::Entities::Generic
 
 		while (pushableLinkedInfo.stackUpperItem != NO_ITEM)
 		{
-			auto col = GetCollision(pushableLinkedItem.Pose.Position);
+			auto col = GetCollision(&pushableLinkedItem);
 			if (col.RoomNumber != pushableLinkedItem.RoomNumber)
 			{
 				ItemNewRoom(itemNumber, col.RoomNumber);
@@ -779,7 +780,8 @@ namespace TEN::Entities::Generic
 			return false;
 
 		//Or it isn't on the floor
-		if (col.Position.Floor != pushableItem.Pose.Position.y)
+		int floorDiference = abs(col.Position.Floor - pushableItem.Pose.Position.y);
+		if ((floorDiference >= PUSHABLE_HEIGHT_TOLERANCE))
 			return false;
 
 		return true;
@@ -831,12 +833,12 @@ namespace TEN::Entities::Generic
 		int floorDiference = abs(col.Position.Floor - pushableItem.Pose.Position.y);
 		if (pushableInfo.canFall)
 		{
-			if ((col.Position.Floor < pushableItem.Pose.Position.y) && (floorDiference >= 32))
+			if ((col.Position.Floor < pushableItem.Pose.Position.y) && (floorDiference >= PUSHABLE_HEIGHT_TOLERANCE))
 				return false;
 		}
 		else
 		{
-			if (floorDiference >= 32)
+			if (floorDiference >= PUSHABLE_HEIGHT_TOLERANCE)
 				return false;
 		}
 
