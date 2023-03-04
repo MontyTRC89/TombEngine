@@ -74,7 +74,7 @@ namespace TEN::Entities::Generic
 		pushableInfo.CanFall			= (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
 		pushableInfo.DoAlignCenter		= (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
 		pushableInfo.Buoyancy			= (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
-		pushableInfo.AnimationSystem	= ((ocb & 0x08) != 0)? PushableAnimationGroup::Statues : PushableAnimationGroup::Blocks; // Check if bit 3 is set	(+8)
+		pushableInfo.AnimationSystem	= ((ocb & 0x08) != 0)? PushableAnimationGroup::Blocks : PushableAnimationGroup::Statues; // Check if bit 3 is set	(+8)
 		
 		SetStopperFlag(pushableInfo.StartPos, true);
 	}
@@ -96,6 +96,8 @@ namespace TEN::Entities::Generic
 		{
 		case LA_PUSHABLE_PULL:
 		case LA_PUSHABLE_PUSH:
+		case LA_PUSHABLE_BLOCK_PULL:
+		case LA_PUSHABLE_BLOCK_PUSH:
 			//Moves the pushable (and stacked pushables).
 			PushableBlockManageMoving(itemNumber);
 			break;
@@ -283,11 +285,17 @@ namespace TEN::Entities::Generic
 
 			if (isPushAction)
 			{
-				laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
+				if (pushableInfo.AnimationSystem == PushableAnimationGroup::Statues)
+					laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
+				else 
+					SetAnimation(laraItem, LA_PUSHABLE_BLOCK_PUSH);
 			}
 			else if (isPullAction)
 			{
-				laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
+				if (pushableInfo.AnimationSystem == PushableAnimationGroup::Statues)
+					laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
+				else
+					SetAnimation(laraItem, LA_PUSHABLE_BLOCK_PULL);
 			}
 
 			RemovePushableFromStack(itemNumber);
@@ -388,7 +396,7 @@ namespace TEN::Entities::Generic
 
 		// Moves pushable based on player bounds.Z2.
 
-		const bool isLaraPulling = LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL; //else, she is pushing.
+		const bool isLaraPulling = LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL || LaraItem->Animation.AnimNumber == LA_PUSHABLE_BLOCK_PULL; //else, she is pushing.
 
 		int quadrantDir = GetQuadrant(LaraItem->Pose.Orientation.y);
 		int newPosX = pushableInfo.StartPos.x;
@@ -502,6 +510,10 @@ namespace TEN::Entities::Generic
 					return;
 				}
 			}
+
+			// Check if is using block animation system as it can't go on looping (affects the stopper flag).
+			if (pushableInfo.AnimationSystem == PushableAnimationGroup::Blocks)
+				return;
 
 			//Otherwise, just check if action key is still pressed.
 			GameVector NextPos = pushableItem.Pose.Position;

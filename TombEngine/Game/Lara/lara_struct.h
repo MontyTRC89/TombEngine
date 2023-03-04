@@ -815,6 +815,9 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
+	LA_PUSHABLE_BLOCK_PULL = 569,
+	LA_PUSHABLE_BLOCK_PUSH = 570,
+
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
