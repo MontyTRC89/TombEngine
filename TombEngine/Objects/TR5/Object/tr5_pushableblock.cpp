@@ -118,8 +118,6 @@ namespace TEN::Entities::Generic
 		auto& pushableInfo = GetPushableInfo(pushableItem);
 		auto& laraInfo = *GetLaraInfo(laraItem);
 
-		const int blockHeight = GetStackHeight(pushableItem);
-
 		if ((IsHeld(In::Action) &&
 			 !IsHeld(In::Forward) &&
 			 laraItem->Animation.ActiveState == LS_IDLE &&
@@ -273,9 +271,12 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			if (!isQuadrantAvailable || !IsNextSectorValid(pushableItem, DetectionPoint, isPullAction))
+			if (!isQuadrantAvailable)
 				return;
 			
+			if (!IsNextSectorValid(pushableItem, DetectionPoint, isPullAction))
+				return;
+
 			if (isPushAction)
 			{
 				laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
@@ -684,17 +685,23 @@ namespace TEN::Entities::Generic
 			pushableInfo.StartPos.RoomNumber = col.RoomNumber;
 		}
 
-		while (pushableInfo.stackUpperItem != NO_ITEM)
-		{
-			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = GetPushableInfo(pushableItem);
+		if (pushableInfo.stackUpperItem == NO_ITEM)
+			return;
 
-			auto col = GetCollision(pushableItem.Pose.Position);
-			if (col.RoomNumber != pushableItem.RoomNumber)
+		auto pushableLinkedItem = g_Level.Items[itemNumber];
+		auto& pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
+
+		while (pushableLinkedInfo.stackUpperItem != NO_ITEM)
+		{
+			auto col = GetCollision(pushableLinkedItem.Pose.Position);
+			if (col.RoomNumber != pushableLinkedItem.RoomNumber)
 			{
 				ItemNewRoom(itemNumber, col.RoomNumber);
-				pushableInfo.StartPos.RoomNumber = col.RoomNumber;
+				pushableLinkedInfo.StartPos.RoomNumber = col.RoomNumber;
 			}
+
+			pushableLinkedItem = g_Level.Items[pushableLinkedInfo.stackUpperItem];
+			pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
 		}
 	}
 
@@ -970,8 +977,8 @@ namespace TEN::Entities::Generic
 
 	void MoveStack(const short itemNumber, const Vector3i& GoalPos)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto pushableItem = g_Level.Items[itemNumber];
+		auto pushableInfo = GetPushableInfo(pushableItem);
 
 		// Move stack together with bottom pushable
 		while (pushableInfo.stackUpperItem != NO_ITEM)
@@ -1011,18 +1018,26 @@ namespace TEN::Entities::Generic
 				TEN::Floordata::RemoveBridge(itemNumber);
 		}
 
-		while (pushableInfo.stackUpperItem != NO_ITEM)
+		if (pushableInfo.stackUpperItem == NO_ITEM)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = GetPushableInfo(pushableItem);
+			return;
+		}
+		
+		auto pushableLinkedItem = g_Level.Items[pushableInfo.stackUpperItem];
+		auto pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
 
-			if (pushableInfo.hasFloorColission)
+		while (pushableLinkedInfo.stackUpperItem != NO_ITEM)
+		{
+			if (pushableLinkedInfo.hasFloorColission)
 			{
 				if (addBridge)
-					TEN::Floordata::AddBridge(pushableItem.Index);
+					TEN::Floordata::AddBridge(pushableLinkedItem.Index);
 				else
-					TEN::Floordata::RemoveBridge(pushableItem.Index);
+					TEN::Floordata::RemoveBridge(pushableLinkedItem.Index);
 			}
+
+			pushableLinkedItem = g_Level.Items[pushableLinkedInfo.stackUpperItem];
+			pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
 		}
 	}
 
@@ -1073,8 +1088,8 @@ namespace TEN::Entities::Generic
 
 	int GetStackHeight(ItemInfo& item)
 	{
-		auto& pushableItem = item;
-		auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto pushableItem = item;
+		auto pushableInfo = GetPushableInfo(pushableItem);
 		
 		int height = pushableInfo.height;
 		
@@ -1090,8 +1105,8 @@ namespace TEN::Entities::Generic
 	}
 	bool CheckStackLimit(ItemInfo& item)
 	{
-		auto& pushableItem = item;
-		auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto pushableItem = item;
+		auto pushableInfo = GetPushableInfo(pushableItem);
 
 		int limit = pushableInfo.stackLimit;
 		int count = 1;
