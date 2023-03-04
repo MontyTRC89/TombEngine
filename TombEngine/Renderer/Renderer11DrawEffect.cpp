@@ -85,7 +85,7 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
 		{
-			for (int j = 0; j < STREAMER_DIRECTION_COUNT; j++)
+			for (int j = 0; j < (int)StreamerType::Count; j++)
 			{
 				auto& segment = Segments[i][j];
 
@@ -95,7 +95,7 @@ namespace TEN::Renderer
 				if (segment.Life)
 				{
 					// If central, no vertex color.
-					if (segment.StreamerID == (int)WaveDirection::WAVE_DIRECTION_CENTRAL)
+					if (segment.Type == StreamerType::Center)
 					{
 						AddColoredQuad(
 							segment.Vertices[0],

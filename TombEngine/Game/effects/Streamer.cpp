@@ -7,53 +7,59 @@
 
 namespace TEN::Effects::Streamer
 {
-	StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][STREAMER_DIRECTION_COUNT];
+	StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][(int)StreamerType::Count];
 
-	static StreamerSegment& GetFreeStreamerSegment(int waveDirection)
+	static StreamerSegment& GetFreeStreamerSegment(StreamerType type)
 	{
-		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
+		for (auto& segment : Segments)
 		{
-			if (!Segments[i][waveDirection].On)
-				return Segments[i][waveDirection];
+			if (segment[(int)type].On)
+				continue;
+
+			return segment[(int)type];
 		}
 
-		return Segments[0][waveDirection];
+		return Segments[0][(int)type];
 	}
 
 	// TODO: If there is any segment on the water left, if lara stops and the velocity immidiatelly starts,
 	// segment 0 combines with the left segment and stretches.
-	static int GetPreviousStreamerSegment(int waveDirection)
+	static int GetPreviousStreamerSegmentIndex(StreamerType type)
 	{
 		int youngestStreamerIndex = 0;
 		int youngestAge = 0;
 
-		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
+		int index = 0;
+		for (auto& segment : Segments)
 		{
-			if (Segments[i][waveDirection].Life > youngestAge && Segments[i][waveDirection].On)
+			if (segment[(int)type].Life > youngestAge &&
+				segment[(int)type].On)
 			{
-				youngestAge = Segments[i][waveDirection].Life;
-				youngestStreamerIndex = i;
+				youngestAge = segment[(int)type].Life;
+				youngestStreamerIndex = index;
 			}
+
+			index++;
 		}
 
 		return youngestStreamerIndex;
 	}
 
-	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int waveDirection, float width, int life, float fade)
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, int life, float fade)
 	{
 		constexpr auto OPACITY_MAX = 0.7f;
 
-		auto& segment = GetFreeStreamerSegment(waveDirection);
+		auto& segment = GetFreeStreamerSegment((StreamerType)type);
 
 		if (segment.On)
 			return;
 
-		int previousSegmentID = GetPreviousStreamerSegment(waveDirection);
-		const auto& prevSegment = Segments[previousSegmentID][waveDirection];
+		int prevSegmentIndex = GetPreviousStreamerSegmentIndex((StreamerType)type);
+		const auto& prevSegment = Segments[prevSegmentIndex][type];
 
 		segment.On = true;
-		segment.PreviousID = previousSegmentID;
-		segment.StreamerID = waveDirection;
+		segment.PreviousIndex = prevSegmentIndex;
+		segment.Type = (StreamerType)type;
 		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
 		segment.Life = life;
 		segment.Opacity = OPACITY_MAX;
@@ -67,7 +73,7 @@ namespace TEN::Effects::Streamer
 		auto leftVertex = Geometry::TranslatePoint(pos, leftDirection, segment.Width);
 		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, segment.Width);;
 
-		if (waveDirection == (int)WaveDirection::WAVE_DIRECTION_LEFT)
+		if ((StreamerType)type == StreamerType::Left)
 		{
 			segment.Vertices[0] = leftVertex;
 			segment.Vertices[1] = rightVertex;
@@ -114,14 +120,14 @@ namespace TEN::Effects::Streamer
 	{
 		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
 		{
-			for (int j = 0; j < STREAMER_DIRECTION_COUNT; j++)
+			for (int j = 0; j < (int)StreamerType::Count; j++)
 			{
 				auto& segment = Segments[i][j];
 
 				if (!segment.On)
 					continue;
 
-				auto* prevSegment = &Segments[segment.PreviousID][j];
+				auto* prevSegment = &Segments[segment.PreviousIndex][j];
 
 				if (segment.Opacity > 0.0f)
 					segment.Opacity -= 0.1f / segment.FadeOut;
@@ -147,25 +153,25 @@ namespace TEN::Effects::Streamer
 				float sinY = phd_sin(EulerAngles(-segment.Direction).y);
 				float cosY = phd_cos(EulerAngles(-segment.Direction).y);
 
-				switch (segment.StreamerID)
+				switch (segment.Type)
 				{
-				case (int)WaveDirection::WAVE_DIRECTION_LEFT:
+				case StreamerType::Center:
+					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[0] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
+					segment.Vertices[2] = prevSegment->Vertices[1];
+					segment.Vertices[3] = prevSegment->Vertices[0];
+					break;
+
+				case StreamerType::Left:
 					segment.Vertices[0] -= Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
 					segment.Vertices[1] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
 					segment.Vertices[2] = prevSegment->Vertices[1];
 					segment.Vertices[3] = prevSegment->Vertices[0];
 					break;
 
-				case (int)WaveDirection::WAVE_DIRECTION_RIGHT:
+				case StreamerType::Right:
 					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
 					segment.Vertices[0] += Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
-					segment.Vertices[2] = prevSegment->Vertices[1];
-					segment.Vertices[3] = prevSegment->Vertices[0];
-					break;
-
-				case (int)WaveDirection::WAVE_DIRECTION_CENTRAL:
-					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-					segment.Vertices[0] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
 					segment.Vertices[2] = prevSegment->Vertices[1];
 					segment.Vertices[3] = prevSegment->Vertices[0];
 					break;

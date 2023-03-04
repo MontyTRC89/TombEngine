@@ -5,13 +5,14 @@ struct ItemInfo;
 namespace TEN::Effects::Streamer
 {
 	constexpr auto STREAMER_SEGMENT_COUNT_MAX = 256;
-	constexpr auto STREAMER_DIRECTION_COUNT = 3;
 
-	enum class WaveDirection
+	enum class StreamerType
 	{
-		WAVE_DIRECTION_CENTRAL = 0,
-		WAVE_DIRECTION_LEFT = 1,
-		WAVE_DIRECTION_RIGHT = 2
+		Center,
+		Left,
+		Right,
+
+		Count
 	};
 
 	struct StreamerSegment
@@ -22,9 +23,9 @@ namespace TEN::Effects::Streamer
 	public:
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
-		bool On			= false;
-		int	 StreamerID = 0;
-		int	 PreviousID = 0;
+		bool		 On			   = false;
+		int			 PreviousIndex = 0;
+		StreamerType Type		   = StreamerType::Center;
 
 		Vector3 Direction = Vector3::Zero;
 
@@ -35,9 +36,9 @@ namespace TEN::Effects::Streamer
 		int	  FadeOut	= 0;
 	};
 
-	extern StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][STREAMER_DIRECTION_COUNT];
+	extern StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][(int)StreamerType::Count];
 
-	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int waveDirection, float width, int life, float fade);
-	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int waveDirection, bool isOnWater, float width, float life, float fade);
+	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, int life, float fade);
+	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade);
 	void UpdateStreamers();
 }
