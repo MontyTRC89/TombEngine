@@ -845,6 +845,9 @@ namespace TEN::Floordata
 
 	void DrawNearbyTileFlags(const ItemInfo& item)
 	{
+		//This functions, paint a sphere on the Lara's nearby tiles, depending if these have any tile flag.
+		//The color of the sphere is unique for each tile flag.
+
 		if (!DebugMode)
 			return;
 
@@ -859,6 +862,7 @@ namespace TEN::Floordata
 		auto col = GetCollision(detectionPoint);
 		const auto& currentRoom = g_Level.Rooms[detectionPoint.RoomNumber];
 		
+		//To optimize the process, we only check the tiles that are in Lara's room, and are near of her (according to the range).
 		const int minX = std::max( item.Pose.Position.x - range, currentRoom.x) / BLOCK(1);
 		const int maxX = std::min( item.Pose.Position.x + range, currentRoom.x + (currentRoom.xSize * BLOCK(1))) / BLOCK(1);
 		const int minZ = std::max( item.Pose.Position.z - range, currentRoom.z) / BLOCK(1);
@@ -882,14 +886,14 @@ namespace TEN::Floordata
 
 				if (col.Block->Flags.Death)
 				{
-					color = Vector4(0.3f, 1, 0, 1);
+					color = Vector4(0, 1, 0, 1);
 					origin = detectionPoint.ToVector3() + Vector3(768, -512, 768);
 					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
 				if (col.Block->Flags.Monkeyswing)
 				{
-					color = Vector4(0.75f, 0.5f, 0, 1);
+					color = Vector4(1.0f, 0.5f, 0.5f, 1);
 					origin = detectionPoint.ToVector3() + Vector3(512, -512, 768);
 					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
@@ -903,7 +907,7 @@ namespace TEN::Floordata
 
 				if (col.Block->Flags.MinecartLeft())
 				{
-					color = Vector4(0, 1, 0, 1);
+					color = Vector4(1, 0, 1, 1);
 					origin = detectionPoint.ToVector3() + Vector3(768, -512, 256);
 					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}

@@ -965,10 +965,12 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS:
+				PrintDebugMessage("Floordata flags page:");
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
 				PrintDebugMessage("Lara RoomXZ: %d %d", r->x, r->z);
 				PrintDebugMessage("Lara SizeXZ: %d %d", r->xSize, r->zSize);
+				PrintDebugMessage("\n red stopper\n orange monkey\n green death\n pink minecartL\n blue minecartR\n cyan minecartStop\n");
 				break;
 
 			default:
