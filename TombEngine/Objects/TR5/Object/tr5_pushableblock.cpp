@@ -974,27 +974,35 @@ namespace TEN::Entities::Generic
 	}
 
 	// Stack utilities functions
-
 	void MoveStack(const short itemNumber, const Vector3i& GoalPos)
 	{
-		auto pushableItem = g_Level.Items[itemNumber];
-		auto pushableInfo = GetPushableInfo(pushableItem);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
-		// Move stack together with bottom pushable
-		while (pushableInfo.stackUpperItem != NO_ITEM)
+		if (pushableInfo.stackUpperItem == NO_ITEM)
+			return;
+
+		auto& pushableLinkedItem = g_Level.Items[pushableInfo.stackUpperItem];
+		auto& pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
+
+		while (true)
 		{
-			pushableItem = g_Level.Items[pushableInfo.stackUpperItem];
-			pushableInfo = GetPushableInfo(pushableItem);
+			pushableLinkedItem.Pose.Position.x = GoalPos.x;
+			pushableLinkedItem.Pose.Position.z = GoalPos.z;
+			pushableLinkedItem.Pose.Position.y += GoalPos.y; //The vertical movement receives a velocity, not a fixed value.
 
-			pushableItem.Pose.Position.x = GoalPos.x;
-			pushableItem.Pose.Position.z = GoalPos.z;
-			pushableItem.Pose.Position.y += GoalPos.y; //The vertical movement receives a velocity, not a fixed value.
-			
-			pushableInfo.StartPos = pushableItem.Pose.Position;
-			pushableInfo.StartPos.RoomNumber = pushableItem.RoomNumber;
+			pushableLinkedInfo.StartPos = pushableLinkedItem.Pose.Position;
+			pushableLinkedInfo.StartPos.RoomNumber = pushableLinkedItem.RoomNumber;
+
+			if (pushableLinkedInfo.stackUpperItem == NO_ITEM)
+				break;
+
+			pushableLinkedItem = g_Level.Items[pushableLinkedInfo.stackUpperItem];
+			pushableLinkedInfo = GetPushableInfo(pushableLinkedItem);
 
 		}
 	}
+
 	void MoveStackXZ (const short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
