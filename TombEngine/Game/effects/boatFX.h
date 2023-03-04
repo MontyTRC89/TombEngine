@@ -1,11 +1,5 @@
 #pragma once
-#include <cstddef>
-#include <vector>
 #include "Math/Math.h"
-#include "Math/Math.h"
-
-using std::vector;
-using std::array;
 
 class Vector3i;
 
@@ -46,5 +40,4 @@ namespace TEN::Effects::BOATFX
 
 	int GetPreviousSegment(int waveDirection);
 	WaveSegment&  GetFreeWaveSegment(int waveDirection);
-
 }
