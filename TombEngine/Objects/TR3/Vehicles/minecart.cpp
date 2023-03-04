@@ -53,9 +53,10 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_FALL_DAMAGE_COEFF		 = 0.25f;
 	constexpr auto MINECART_FALL_DAMAGE_DELAY_TIME	 = 0.2f * FPS;
 	constexpr auto MINECART_WRENCH_MESH_TOGGLE_FRAME = 20;
-	constexpr auto MINECART_WAKEFX_OFFSET = Vector3(CLICK(0.5f), 0, CLICK(0.7f));
 
 	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
+
+	constexpr auto MINECART_WAKE_OFFSET = Vector3(BLOCK(1 / 8.0f), 0.0f, CLICK(0.7f));
 
 	constexpr auto MINECART_IN_DUCK	 = IN_CROUCH;
 	constexpr auto MINECART_IN_SWIPE = IN_ACTION | IN_DRAW;
@@ -586,7 +587,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		minecart->Velocity = DoVehicleWaterMovement(minecartItem, laraItem, minecart->Velocity, CLICK(1), &minecart->TurnRot, MINECART_WAKEFX_OFFSET);
+		minecart->Velocity = DoVehicleWaterMovement(minecartItem, laraItem, minecart->Velocity, CLICK(1), &minecart->TurnRot, MINECART_WAKE_OFFSET);
 		minecartItem->Pose.Orientation.x = minecart->Gradient * 32;
 
 		if (minecart->Flags & (MINECART_FLAG_TURNING_LEFT | MINECART_FLAG_TURNING_RIGHT))

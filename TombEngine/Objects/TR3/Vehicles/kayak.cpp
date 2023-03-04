@@ -20,8 +20,8 @@
 #include "Game/effects/boatFX.h"
 
 using std::vector;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -38,9 +38,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
-	constexpr auto KAYAK_WAKEFX_OFFSET = CLICK(0.5f);
-	constexpr auto KAYAK_WAKEFX_SEGMENT_LIFE = 84;
-	constexpr auto KAYAK_WAKEFX_SEGMENT_FADEOUT = 10.0f;
 
 	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
@@ -48,6 +45,10 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
+
+	constexpr auto KAYAK_WAKE_OFFSET		  = BLOCK(1 / 8.0f);
+	constexpr auto KAYAK_WAKE_SEGMENT_LIFE	  = 84;
+	constexpr auto KAYAK_WAKE_SEGMENT_FADEOUT = 10.0f;
 
 	// TODO: Very confusing.
 	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
@@ -275,32 +276,26 @@ namespace TEN::Entities::Vehicles
 			int offset1 = -128;
 			int offset2 = 0;
 
-			int s = phd_sin(kayakItem->Pose.Orientation.y);
-			int c = phd_cos(kayakItem->Pose.Orientation.y);
-			int x1 = (kayakItem->Pose.Position.x +  ((offset2 * s + offset1 * c) >> W2V_SHIFT));
+			int sinY = phd_sin(kayakItem->Pose.Orientation.y);
+			int cosY = phd_cos(kayakItem->Pose.Orientation.y);
+			int x1 = (kayakItem->Pose.Position.x +  ((offset2 * sinY + offset1 * cosY) >> W2V_SHIFT));
 			int y1 = kayakItem->Pose.Position.y;
-			int z1 = (kayakItem->Pose.Position.z +  ((offset2 * c - offset1 * s) >> W2V_SHIFT));
+			int z1 = (kayakItem->Pose.Position.z +  ((offset2 * cosY - offset1 * sinY) >> W2V_SHIFT));
 
 			//Vector3 pos1 = Vector3(x1, y1, z1);
 			// 
 			//Vector3 pos1 = Vector3(kayakItem->Pose.Position.x , kayakItem->Pose.Position.y , kayakItem->Pose.Position.z );
 			//Vector3 pos2 = Vector3(kayak->OldPose.Position.x , kayak->OldPose.Position.y , kayak->OldPose.Position.z );
 
-			Vector3 pos1 = Vector3(x, kayakItem->Pose.Position.y, z);
-			Vector3 pos2 = Vector3(x1, kayak->OldPose.Position.y, z1);
-
-
-			Vector3 pos3 = Vector3(x1,y1,z1);
-
-			
-
-			Vector4 color = Vector4(255, 255, 255, 1);
+			auto pos1 = Vector3(x, kayakItem->Pose.Position.y, z);
+			auto pos2 = Vector3(x1, kayak->OldPose.Position.y, z1);
+			auto pos3 = Vector3(x1,y1,z1);
+			auto color = Vector4(255.0f, 255.0f, 255.0f, 1.0f);
 
 			//WakePts[kayak->CurrentStartWake].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
 			//WakePts[kayak->CurrentStartWake].life = 0x40;
 
-
-			SpawnWaveSegment(pos1, kayakItem, 1,1,84,10.0f);
+			SpawnWaveSegment(pos1, kayakItem, 1, 1.0f, 84, 10.0f);
 
 			if (rotate == 1)
 			{
@@ -1240,8 +1235,8 @@ namespace TEN::Entities::Vehicles
 
 		if (!(Wibble & 15) && kayak->TrueWater)
 		{
-			DoWakeEffect(kayakItem, -KAYAK_WAKEFX_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
-			DoWakeEffect(kayakItem,  KAYAK_WAKEFX_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKEFX_SEGMENT_LIFE, KAYAK_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(kayakItem, -KAYAK_WAKE_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
+			DoWakeEffect(kayakItem,  KAYAK_WAKE_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
 		}
 
 		if (Wibble & 7)

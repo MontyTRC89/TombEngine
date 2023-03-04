@@ -53,10 +53,11 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * VEHICLE_VELOCITY_SCALE); // TODO: Float velocities. @Sezz 2022.06.16
 	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * VEHICLE_VELOCITY_SCALE;
-	constexpr auto MOTORBIKE_WAKEFX_OFFSET = Vector3(CLICK(0.3f), 0, -CLICK(0.5f));
 
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
 	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
+
+	constexpr auto MOTORBIKE_WAKE_OFFSET = Vector3(CLICK(0.3f), 0, -CLICK(0.5f));
 
 	#define MOTORBIKE_FORWARD_TURN_ANGLE ANGLE(1.5f)
 	#define MOTORBIKE_BACK_TURN_ANGLE ANGLE(0.5f)
@@ -1252,7 +1253,7 @@ namespace TEN::Entities::Vehicles
 
 		int newY = motorbikeItem->Pose.Position.y;
 		motorbikeItem->Animation.Velocity.y = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.Velocity.y, &motorbikeItem->Pose.Position.y, 0);
-		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate, MOTORBIKE_WAKEFX_OFFSET);
+		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate, MOTORBIKE_WAKE_OFFSET);
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;
 		int r2 = (frontRight.y + frontLeft.y) / 2;

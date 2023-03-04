@@ -37,10 +37,9 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
-using namespace TEN::Entities::Vehicles;
-using namespace TEN::Effects::BOATFX;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -71,8 +70,7 @@ BiteInfo EnemyBites[12] =
 
 namespace TEN::Renderer 
 {
-	using std::vector;
-	using std::array;
+	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
 	struct RendererSpriteBucket
 	{
@@ -83,9 +81,7 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
-	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
-
-	void Renderer11::DrawWakeFX(RenderView& view)
+	void Renderer11::DrawStreamers(RenderView& view)
 	{
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
@@ -98,23 +94,23 @@ namespace TEN::Renderer
 
 				if (segment.Life)
 				{
+					auto s1 = Vector3(segment.Vertices[0].x, segment.Vertices[0].y, segment.Vertices[0].z);
+					auto s2 = Vector3(segment.Vertices[1].x, segment.Vertices[1].y, segment.Vertices[1].z);
+					auto s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
+					auto s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
 
-					Vector3 s1 = Vector3(segment.Vertices[0].x, segment.Vertices[0].y, segment.Vertices[0].z);
-					Vector3 s2 = Vector3(segment.Vertices[1].x, segment.Vertices[1].y, segment.Vertices[1].z);
-					Vector3 s3 = Vector3(segment.Vertices[2].x, segment.Vertices[2].y, segment.Vertices[2].z);
-					Vector3 s4 = Vector3(segment.Vertices[3].x, segment.Vertices[3].y, segment.Vertices[3].z);
-
-					if (segment.StreamerID == (int)WaveDirection::WAVE_DIRECTION_CENTRAL) //No vertexcolor if central wave
+					// If central, no vertex color .
+					if (segment.StreamerID == (int)WaveDirection::WAVE_DIRECTION_CENTRAL)
 					{
 						AddColoredQuad(
 							segment.Vertices[0],
 							segment.Vertices[1],
 							segment.Vertices[2],
 							segment.Vertices[3],
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
 							BLENDMODE_WIREFRAME, view);
 					}
 					else
@@ -124,14 +120,14 @@ namespace TEN::Renderer
 							segment.Vertices[1],
 							segment.Vertices[2],
 							segment.Vertices[3],
-							Vector4(0, 0, 0, 1),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1),
-							Vector4(0, 0, 0, 1),
+							Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							Vector4(0.0f, 0.0f, 0.0f, 1.0f),
 							BLENDMODE_WIREFRAME, view);
 					}
 				}
-			}			
+			}
 		}
 	}
 
@@ -570,12 +566,12 @@ namespace TEN::Renderer
 
 				shockwave->yRot += shockwave->yRot / FPS;
 
-				Matrix rotationMatrix =
+				auto rotMatrix =
 					Matrix::CreateRotationY(shockwave->yRot / 4) *
 					Matrix::CreateRotationZ(shockwave->zRot) *
 					Matrix::CreateRotationX(shockwave->xRot);
 
-				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
+				auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
 				if (shockwave->style == (int)ShockwaveStyle::Normal)
@@ -598,11 +594,11 @@ namespace TEN::Renderer
 				float x4 = (shockwave->outerRad * c);
 				float z4 = (shockwave->outerRad * s);
 
-				Vector3 p1 = Vector3(x1, 0, z1);
-				Vector3 p4 = Vector3(x4, 0, z4);
+				auto p1 = Vector3(x1, 0, z1);
+				auto p4 = Vector3(x4, 0, z4);
 
-				p1 = Vector3::Transform(p1, rotationMatrix);
-				p4 = Vector3::Transform(p4, rotationMatrix);
+				p1 = Vector3::Transform(p1, rotMatrix);
+				p4 = Vector3::Transform(p4, rotMatrix);
 
 				if (shockwave->fadeIn == true)
 				{
@@ -612,7 +608,9 @@ namespace TEN::Renderer
 						r = shockwave->sr * shockwave->life / 255.0f;
 					}
 					else
+					{
 						r = shockwave->r * shockwave->life / 255.0f;
+					}
 
 
 					if (shockwave->sg < shockwave->g)
@@ -621,7 +619,9 @@ namespace TEN::Renderer
 						g = shockwave->sg * shockwave->life / 255.0f;
 					}
 					else
+					{
 						g = shockwave->g * shockwave->life / 255.0f;
+					}
 
 
 					if (shockwave->sb < shockwave->b)
@@ -630,7 +630,9 @@ namespace TEN::Renderer
 						b = shockwave->sb * shockwave->life / 255.0f;
 					}
 					else
+					{
 						b = shockwave->b * shockwave->life / 255.0f;
+					}
 
 					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
 						shockwave->fadeIn = false;
@@ -654,11 +656,11 @@ namespace TEN::Renderer
 					float x3 = (shockwave->outerRad * c);
 					float z3 = (shockwave->outerRad * s);
 
-					Vector3 p2 = Vector3(x2, 0, z2);
-					Vector3 p3 = Vector3(x3, 0, z3);
+					auto p2 = Vector3(x2, 0, z2);
+					auto p3 = Vector3(x3, 0, z3);
 
-					p2 = Vector3::Transform(p2, rotationMatrix);
-					p3 = Vector3::Transform(p3, rotationMatrix);
+					p2 = Vector3::Transform(p2, rotMatrix);
+					p3 = Vector3::Transform(p3, rotMatrix);
 
 					if (shockwave->style == (int)ShockwaveStyle::Normal)
 					{

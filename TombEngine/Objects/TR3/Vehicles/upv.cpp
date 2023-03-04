@@ -27,8 +27,8 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using namespace TEN::Effects::BOATFX;
 using std::vector;
 
 // TODO:
@@ -69,8 +69,8 @@ namespace TEN::Entities::Vehicles
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
 	constexpr int UPV_SHIFT = 128;
 
-	constexpr auto UPV_WAKEFX_SEGMENT_LIFE = 40;
-	constexpr auto UPV_WAKEFX_SEGMENT_FADEOUT = 5.0f;
+	constexpr auto UPV_WAKE_SEGMENT_LIFE	= 40;
+	constexpr auto UPV_WAKE_SEGMENT_FADEOUT = 5.0f;
 
 	// TODO: These should probably be done in the wad. @Sezz 2022.06.24
 	constexpr auto UPV_DEATH_FRAME_1 = 16;
@@ -945,14 +945,13 @@ namespace TEN::Entities::Vehicles
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Vehicle);
 
-		Vector3i JointposL = GetJointPosition(UPVItem, UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].meshNum, Vector3i(UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].Position));
-		Vector3i JointposR = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
+		auto jointPosLeft = GetJointPosition(UPVItem, UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].meshNum, Vector3i(UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].Position));
+		auto jointPosRight = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
 
-		
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))// && !(Wibble & 15))
 		{
-			DoWakeEffect(UPVItem, JointposL.x, JointposL.y, JointposL.z, 1, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);
-			DoWakeEffect(UPVItem, JointposR.x, JointposR.y, JointposR.z, 2, false, 5.0f, UPV_WAKEFX_SEGMENT_LIFE, UPV_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(UPVItem, jointPosLeft.x, jointPosLeft.y, jointPosLeft.z, 1, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
+			DoWakeEffect(UPVItem, jointPosRight.x, jointPosRight.y, jointPosRight.z, 2, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&

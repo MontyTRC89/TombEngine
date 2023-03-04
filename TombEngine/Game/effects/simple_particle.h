@@ -1,12 +1,8 @@
 #pragma once
-#include <array>
-#include <unordered_map>
-#include <d3d11.h>
-#include <SimpleMath.h>
 #include "Objects\objectslist.h"
 
-struct ItemInfo;
 enum BLEND_MODES;
+struct ItemInfo;
 
 namespace TEN::Effects
 {

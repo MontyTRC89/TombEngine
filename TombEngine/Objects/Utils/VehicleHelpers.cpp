@@ -14,9 +14,9 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -199,7 +199,7 @@ namespace TEN::Entities::Vehicles
 		DoObjectCollision(vehicleItem, &coll);
 	}
 
-	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate, Vector3 waveOffset)
+	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate, const Vector3& wakeOffset)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -226,11 +226,11 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						Vector3i front;
+						auto front = Vector3i::Zero;
 						int height = GetVehicleHeight(vehicleItem, 0, 0, true, &front);
 						
-							DoWakeEffect(vehicleItem, -waveOffset.x,   waterHeight/2, waveOffset.z, 1, true, 5.0f, 50, 9.0f);
-							DoWakeEffect(vehicleItem, waveOffset.x, waterHeight / 2, waveOffset.z, 2, true, 5.0f, 50, 9.0f);
+						DoWakeEffect(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
+						DoWakeEffect(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
 					}
 				}
 

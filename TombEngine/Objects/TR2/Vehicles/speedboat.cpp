@@ -19,8 +19,8 @@
 #include "Specific/setup.h"
 
 using std::vector;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -41,10 +41,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2.25f);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
-	constexpr auto SPEEDBOAT_WAKEFX_OFFSET = 344;
-	constexpr auto SPEEDBOAT_WAKEFX_SEGMENT_LIFE = 50;
-	constexpr auto SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT = 4.0f;
-
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto SPEEDBOAT_VELOCITY_DECEL = 1;
 	constexpr auto SPEEDBOAT_VELOCITY_BRAKE_DECEL = 5;
@@ -59,6 +55,10 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
+
+	constexpr auto SPEEDBOAT_WAKE_OFFSET		   = 344;
+	constexpr auto SPEEDBOAT_WAKE_SEGMENT_LIFE	   = 50;
+	constexpr auto SPEEDBOAT_WAKE_SEGMENT_FADE_OUT = 4.0f;
 
 	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
@@ -98,6 +98,60 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_LEAP_END = 17,
 		SPEEDBOAT_ANIM_DEATH = 18
 	};
+
+	static void SpawnSpeedboatBoatMist(const Vector3& pos, float velocity, short angle)
+	{
+		auto& mist = *GetFreeParticle();
+
+		mist.on = true;
+		mist.sR = 0;
+		mist.sG = 0;
+		mist.sB = 0;
+
+		mist.dR = 64;
+		mist.dG = 64;
+		mist.dB = 64;
+
+		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
+		mist.fadeToBlack = 12;
+		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
+		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.extras = 0;
+		mist.dynamic = -1;
+
+		mist.x = pos.x + ((GetRandomControl() & 15) - 8);
+		mist.y = pos.y + ((GetRandomControl() & 15) - 8);
+		mist.z = pos.z + ((GetRandomControl() & 15) - 8);
+		int zv = velocity * phd_cos(angle) / 4;
+		int xv = velocity * phd_sin(angle) / 4;
+		mist.xVel = xv + ((GetRandomControl() & 127) - 64);
+		mist.yVel = 0;
+		mist.zVel = zv + ((GetRandomControl() & 127) - 64);
+		mist.friction = 3;
+
+		if (GetRandomControl() & 1)
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			mist.rotAng = GetRandomControl() & 4095;
+
+			if (GetRandomControl() & 1)
+				mist.rotAdd = -(GetRandomControl() & 15) - 16;
+			else
+				mist.rotAdd = (GetRandomControl() & 15) + 16;
+		}
+		else
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+		}
+
+		mist.scalar = 3;
+		mist.gravity = mist.maxYvel = 0;
+
+		float size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+		mist.size =
+		mist.sSize = size / 4;
+		mist.dSize = size;
+	}
 
 	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem)
 	{
@@ -914,12 +968,14 @@ namespace TEN::Entities::Vehicles
 			{
 				if (speedboatItem->TriggerFlags == 1)
 				{
-					TriggerSpeedboatBoatMist(pos1.x, pos1.y,
-						pos1.z, abs(speedboatItem->Animation.Velocity.z),
+					SpawnSpeedboatBoatMist(
+						pos1.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
 						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
 
-					TriggerSpeedboatBoatMist(pos2.x, pos2.y,
-						pos2.z, abs(speedboatItem->Animation.Velocity.z),
+					SpawnSpeedboatBoatMist(
+						pos2.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
 						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
 				}
 				else
@@ -927,8 +983,8 @@ namespace TEN::Entities::Vehicles
 					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
 				}
 
-				DoWakeEffect(speedboatItem, -SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
-				DoWakeEffect(speedboatItem, SPEEDBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKEFX_SEGMENT_LIFE, SPEEDBOAT_WAKEFX_SEGMENT_FADEOUT);
+				DoWakeEffect(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
+				DoWakeEffect(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
 			}
 		}
 
@@ -936,55 +992,5 @@ namespace TEN::Entities::Vehicles
 			return;
 
 		DoSpeedboatDismount(speedboatItem, laraItem);
-	}
-
-	void TriggerSpeedboatBoatMist(long x, long y, long z, long velocity, short angle)
-	{
-		auto* sptr = GetFreeParticle();
-
-		sptr->on = 1;
-		sptr->sR = 0;
-		sptr->sG = 0;
-		sptr->sB = 0;
-
-		sptr->dR = 64;
-		sptr->dG = 64;
-		sptr->dB = 64;
-
-		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 12;
-		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->extras = 0;
-		sptr->dynamic = -1;
-
-		sptr->x = x + ((GetRandomControl() & 15) - 8);
-		sptr->y = y + ((GetRandomControl() & 15) - 8);
-		sptr->z = z + ((GetRandomControl() & 15) - 8);
-		long zv = velocity * phd_cos(angle) / 4;
-		long xv = velocity * phd_sin(angle) / 4;
-		sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
-		sptr->yVel = 0;
-		sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
-		sptr->friction = 3;
-
-		if (GetRandomControl() & 1)
-		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-			sptr->rotAng = GetRandomControl() & 4095;
-
-			if (GetRandomControl() & 1)
-				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
-			else
-				sptr->rotAdd = (GetRandomControl() & 15) + 16;
-		}
-		else
-			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-
-		sptr->scalar = 3;
-		sptr->gravity = sptr->maxYvel = 0;
-		long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
-		sptr->size = sptr->sSize = size / 4;
-		sptr->dSize = size;
 	}
 }

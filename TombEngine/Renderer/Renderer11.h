@@ -569,6 +569,7 @@ namespace TEN::Renderer
 		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
+		void DrawStreamers(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
@@ -713,7 +714,6 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(int objectNumber, Vector2 pos, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
-		void DrawWakeFX(RenderView& view);
 		std::string GetDefaultAdapterName();
 
 		Vector2i GetScreenResolution() const;

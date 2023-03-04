@@ -69,6 +69,7 @@ using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -77,7 +78,6 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Effects::BOATFX;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -221,7 +221,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
-		UpdateWakeFX();
+		UpdateStreamers();
 
 		// Update HUD.
 		UpdateBars(LaraItem);

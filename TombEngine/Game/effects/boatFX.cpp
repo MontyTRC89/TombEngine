@@ -5,7 +5,7 @@
 #include "Game/items.h"
 #include "Math/Math.h"
 
-namespace TEN::Effects::BOATFX
+namespace TEN::Effects::Streamer
 {
 	WaveSegment Segments[NUM_WAKE_SPRITES][NUM_WAKE_DIRECTION];
 	
@@ -35,7 +35,7 @@ namespace TEN::Effects::BOATFX
 		}
 	}
 
-	void UpdateWakeFX()
+	void UpdateStreamers()
 	{
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{

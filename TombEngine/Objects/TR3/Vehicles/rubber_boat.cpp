@@ -12,18 +12,18 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Objects/TR3/Vehicles/upv.h"
 
 using std::vector;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using namespace TEN::Effects::BOATFX;
 
 namespace TEN::Entities::Vehicles
 {
@@ -53,9 +53,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
-	constexpr auto RBOAT_WAKEFX_OFFSET = 344;
-	constexpr auto RBOAT_WAKEFX_SEGMENT_LIFE = 50;
-	constexpr auto RBOAT_WAKEFX_SEGMENT_FADEOUT = 4.0f;
+	constexpr auto RBOAT_WAKE_OFFSET		  = 344;
+	constexpr auto RBOAT_WAKE_SEGMENT_LIFE	  = 50;
+	constexpr auto RBOAT_WAKE_SEGMENT_FADEOUT = 4.0f;
 
 	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
@@ -775,14 +775,18 @@ namespace TEN::Entities::Vehicles
 				sptr->rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
+		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+		}
 
 		if (!snow)
 		{
 			sptr->scalar = 4;
 			sptr->gravity = sptr->maxYvel = 0;
-			long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
-			sptr->size = sptr->sSize = size / 4;
+
+			float size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+			sptr->size =
+			sptr->sSize = size / 4;
 			sptr->dSize = size;
 		}
 	}
@@ -981,8 +985,8 @@ namespace TEN::Entities::Vehicles
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
 			
-			DoWakeEffect(rBoatItem, -RBOAT_WAKEFX_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
-			DoWakeEffect(rBoatItem,  RBOAT_WAKEFX_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKEFX_SEGMENT_LIFE, RBOAT_WAKEFX_SEGMENT_FADEOUT);
+			DoWakeEffect(rBoatItem, -RBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
+			DoWakeEffect(rBoatItem,  RBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
 
 			if ((GetRandomControl() & 1) == 0)
 			{

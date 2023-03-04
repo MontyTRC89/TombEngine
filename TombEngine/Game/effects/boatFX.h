@@ -3,7 +3,7 @@
 
 class Vector3i;
 
-namespace TEN::Effects::BOATFX
+namespace TEN::Effects::Streamer
 {
 	constexpr auto NUM_WAKE_SPRITES = 256;
 	constexpr auto NUM_WAKE_DIRECTION = 3;
@@ -36,7 +36,7 @@ namespace TEN::Effects::BOATFX
 	void SpawnWaveSegment(const Vector3& origin, ItemInfo* Item, int waveDirection, float width, int life, float fade);
 	void DoWakeEffect(ItemInfo* Item, int xOffset, int yOffset, int zOffset, int waveDirection, bool OnWaterint, float width, int life, float fade);
 
-	void UpdateWakeFX();
+	void UpdateStreamers();
 
 	int GetPreviousSegment(int waveDirection);
 	WaveSegment&  GetFreeWaveSegment(int waveDirection);
