@@ -88,6 +88,7 @@ namespace TEN::Entities::Generic
 
 		Lara.InteractedItem = itemNumber;
 			
+		//If is on air, do gravity routine.
 		if (PushableBlockManageFalling(itemNumber))
 			return;
 
@@ -95,6 +96,7 @@ namespace TEN::Entities::Generic
 		{
 		case LA_PUSHABLE_PULL:
 		case LA_PUSHABLE_PUSH:
+			//Moves the pushable (and stacked pushables).
 			PushableBlockManageMoving(itemNumber);
 			break;
 
@@ -105,6 +107,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		default:
+			//Do last actions and deactivate. (It's reactivated in collision function).
 			PushableBlockManageIdle(itemNumber);
 			break;
 		}
@@ -594,7 +597,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		default:
-			assert(false);
+			TENLog("Error, requesting an inexistent pushable sound type", LogLevel::Error, LogConfig::All, true);
 			break;
 		}
 
