@@ -57,26 +57,6 @@ namespace TEN::Effects::Streamer
 		return segment;
 	}
 
-	static const StreamerSegment& GetPrevStreamerSegment(StreamerType type)
-	{
-		const StreamerSegment* segmentPtr = nullptr;
-		float longestLife = 0.0f;
-
-		for (const auto& segment : Streamers[(int)type])
-		{
-			if (segment.Life > longestLife)
-			{
-				segmentPtr = &segment;
-				longestLife = segment.Life;
-			}
-		}
-
-		if (segmentPtr == nullptr)
-			return GetNewStreamerSegment(type);
-
-		return *segmentPtr;
-	}
-
 	void ClearInactiveStreamerSegments()
 	{
 		for (auto& streamer : Streamers)
@@ -94,7 +74,7 @@ namespace TEN::Effects::Streamer
 		constexpr auto OPACITY_MAX = 0.7f;
 
 		auto& segment = GetNewStreamerSegment((StreamerType)type);
-		const auto& prevSegment = GetPrevStreamerSegment((StreamerType)type);
+		const auto& prevSegment = Streamers[type][std::max((int)Streamers[type].size() - 2, 0)];
 
 		segment.Type = (StreamerType)type;
 		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
