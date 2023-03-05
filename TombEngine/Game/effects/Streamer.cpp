@@ -211,7 +211,7 @@ namespace TEN::Effects::Streamer
 					break;
 				}
 
-				segment.Life -= 1.0f;				
+				segment.Life -= 1.0f;
 			}
 		}			
 	}

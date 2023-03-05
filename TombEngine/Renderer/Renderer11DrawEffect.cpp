@@ -92,6 +92,7 @@ namespace TEN::Renderer
 				if (!segment.On)
 					continue;
 
+				auto color = Vector4(segment.Opacity);
 				if (segment.Life)
 				{
 					// If central, no vertex color.
@@ -102,10 +103,7 @@ namespace TEN::Renderer
 							segment.Vertices[1],
 							segment.Vertices[2],
 							segment.Vertices[3],
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
+							color, color, color, color,
 							BLENDMODE_WIREFRAME, view);
 					}
 					else
@@ -115,10 +113,7 @@ namespace TEN::Renderer
 							segment.Vertices[1],
 							segment.Vertices[2],
 							segment.Vertices[3],
-							Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
-							Vector4(segment.Opacity, segment.Opacity, segment.Opacity, 1.0f),
-							Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+							Vector4::Zero, color, color, Vector4::Zero,
 							BLENDMODE_WIREFRAME, view);
 					}
 				}
