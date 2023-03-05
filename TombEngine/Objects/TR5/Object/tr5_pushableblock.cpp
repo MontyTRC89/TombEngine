@@ -27,7 +27,7 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
 
 	const float GRAVITY_AIR = 8.0f;
-	const float GRAVITY_CHANGE_SPEED = 2.0f; // adjust this value as needed
+	const float GRAVITY_CHANGE_SPEED = 0.5f; // adjust this value as needed
 
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
@@ -76,9 +76,9 @@ namespace TEN::Entities::Generic
 		// Read OCB flags.
 		const int ocb = item.TriggerFlags;
 
-		pushableInfo.CanFall = true; // (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
-		pushableInfo.DoAlignCenter = true;// = (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
-		pushableInfo.Buoyancy = true;// (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
+		pushableInfo.CanFall = (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
+		pushableInfo.DoAlignCenter = (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
+		pushableInfo.Buoyancy = (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
 		pushableInfo.AnimationSystemIndex = ((ocb & 0x08) != 0) ? 1 : 0; // Check if bit 3 is set	(+8)
 		
 		SetStopperFlag(pushableInfo.StartPos, true);
