@@ -107,7 +107,7 @@ namespace TEN::Effects::Streamer
 		float FadeOut	= 0.0f;
 	};
 
-	extern StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][(int)StreamerType::Count];
+	extern std::array<std::array<StreamerSegment, STREAMER_SEGMENT_COUNT_MAX>, (int)StreamerType::Count> Streamers;
 
 	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade);
 	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade);

@@ -83,12 +83,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
-		for (int i = 0; i < STREAMER_SEGMENT_COUNT_MAX; i++)
+		for (const auto& streamer : Streamers)
 		{
-			for (int j = 0; j < (int)StreamerType::Count; j++)
+			for (const auto& segment : streamer)
 			{
-				auto& segment = Segments[i][j];
-
 				if (!segment.On)
 					continue;
 
