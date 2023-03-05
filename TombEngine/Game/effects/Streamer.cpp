@@ -41,58 +41,61 @@ namespace TEN::Effects::Streamer
 
 	//------------------------
 
-	std::array<std::array<StreamerSegment, STREAMER_SEGMENT_COUNT_MAX>, (int)StreamerType::Count> Streamers = {};
+	std::array<std::vector<StreamerSegment>, (int)StreamerType::Count> Streamers = {};
 
-	static StreamerSegment& GetFreeStreamerSegment(StreamerType type)
+	static StreamerSegment& GetNewStreamerSegment(StreamerType type)
 	{
-		for (auto& segment : Streamers[(int)type])
-		{
-			if (segment.On)
-				continue;
+		constexpr auto COUNT_MAX = 256;
 
-			return segment;
-		}
+		// Add and return new segment.
+		if (Streamers[(int)type].size() < COUNT_MAX)
+			return Streamers[(int)type].emplace_back();
 
-		return Streamers[(int)type][0];
+		// Clear and return oldest segment.
+		auto& segment = Streamers[(int)type][0];
+		segment = {};
+		return segment;
 	}
 
-	// TODO: If there is any segment on the water left, if lara stops and the velocity immidiatelly starts,
-	// segment 0 combines with the left segment and stretches.
-	static int GetPrevStreamerSegmentIndex(StreamerType type)
+	static const StreamerSegment& GetPrevStreamerSegment(StreamerType type)
 	{
-		int youngestIndex = 0;
-		int youngestAge = 0;
+		const StreamerSegment* segmentPtr = nullptr;
+		float longestLife = 0.0f;
 
-		int index = 0;
 		for (const auto& segment : Streamers[(int)type])
 		{
-			if (segment.Life > youngestAge &&
-				segment.On)
+			if (segment.Life > longestLife)
 			{
-				youngestAge = segment.Life;
-				youngestIndex = index;
+				segmentPtr = &segment;
+				longestLife = segment.Life;
 			}
-
-			index++;
 		}
 
-		return youngestIndex;
+		if (segmentPtr == nullptr)
+			return GetNewStreamerSegment(type);
+
+		return *segmentPtr;
+	}
+
+	void ClearInactiveStreamerSegments()
+	{
+		for (auto& streamer : Streamers)
+		{
+			streamer.erase(
+				std::remove_if(
+					streamer.begin(), streamer.end(),
+					[](const StreamerSegment& segment) { return (segment.Life <= 0.0f); }),
+				streamer.end());
+		}
 	}
 
 	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade)
 	{
 		constexpr auto OPACITY_MAX = 0.7f;
 
-		auto& segment = GetFreeStreamerSegment((StreamerType)type);
+		auto& segment = GetNewStreamerSegment((StreamerType)type);
+		const auto& prevSegment = GetPrevStreamerSegment((StreamerType)type);
 
-		if (segment.On)
-			return;
-
-		int prevSegmentIndex = GetPrevStreamerSegmentIndex((StreamerType)type);
-		const auto& prevSegment = Streamers[type][prevSegmentIndex];
-
-		segment.On = true;
-		segment.PreviousIndex = prevSegmentIndex;
 		segment.Type = (StreamerType)type;
 		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
 		segment.Life = life;
@@ -154,21 +157,15 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto& streamer : Streamers)
 		{
+			int type = 0;
+
+			int index = 0;
 			for (auto& segment : streamer)
 			{
-				if (!segment.On)
-					continue;
-
-				const auto& prevSegment = streamer[segment.PreviousIndex];
+				const auto& prevSegment = streamer[std::max(index - 1, 0)];
 
 				if (segment.Opacity > 0.0f)
 					segment.Opacity -= 0.1f / segment.FadeOut;
-
-				if (segment.Life <= 0.0f )
-				{
-					segment.On = false;
-					continue;
-				}
 
 				auto leftDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
 				auto rightDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
@@ -210,7 +207,13 @@ namespace TEN::Effects::Streamer
 				}
 
 				segment.Life -= 1.0f;
+
+				index++;
 			}
-		}			
+
+			type++;
+		}
+
+		ClearInactiveStreamerSegments();
 	}
 }

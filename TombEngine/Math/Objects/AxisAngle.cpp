@@ -97,10 +97,8 @@
 		auto axis = Vector3::Zero;
 		float angle = 0.0f;
 
-		// Find angle between the two axes.
+		// If angle between axes is close to 0, do simple interpolation of angle values.
 		float angleBetweenAxes = acos(axisAngleFrom.GetAxis().Dot(axisAngleTo.GetAxis()));
-
-		// If angle between the axes is close to 0, do simple interpolation of angle values.
 		if (abs(angleBetweenAxes) <= EPSILON)
 		{
 			axis = axisAngleFrom.GetAxis();

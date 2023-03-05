@@ -75,8 +75,6 @@ namespace TEN::Effects::Streamer
 
 	// --------------
 
-	constexpr auto STREAMER_SEGMENT_COUNT_MAX = 256;
-
 	enum class StreamerType
 	{
 		Center,
@@ -94,11 +92,9 @@ namespace TEN::Effects::Streamer
 	public:
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
-		bool		 On			   = false;
-		int			 PreviousIndex = 0;
-		StreamerType Type		   = StreamerType::Center;
+		StreamerType Type	   = StreamerType::Center;
+		Vector3		 Direction = Vector3::Zero;
 
-		Vector3 Direction = Vector3::Zero;
 
 		float Life		= 0.0f;
 		float Opacity	= 0.0f;
@@ -107,7 +103,7 @@ namespace TEN::Effects::Streamer
 		float FadeOut	= 0.0f;
 	};
 
-	extern std::array<std::array<StreamerSegment, STREAMER_SEGMENT_COUNT_MAX>, (int)StreamerType::Count> Streamers;
+	extern std::array<std::vector<StreamerSegment>, (int)StreamerType::Count> Streamers;
 
 	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade);
 	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade);

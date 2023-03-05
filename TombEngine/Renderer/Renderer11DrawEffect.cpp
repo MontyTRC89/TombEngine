@@ -87,9 +87,6 @@ namespace TEN::Renderer
 		{
 			for (const auto& segment : streamer)
 			{
-				if (!segment.On)
-					continue;
-
 				auto color = Vector4(segment.Opacity);
 				if (segment.Life)
 				{
