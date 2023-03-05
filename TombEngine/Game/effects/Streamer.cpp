@@ -2,6 +2,7 @@
 #include "Game/effects/Streamer.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Math/Math.h"
 
@@ -60,13 +61,7 @@ namespace TEN::Effects::Streamer
 	void ClearInactiveStreamerSegments()
 	{
 		for (auto& streamer : Streamers)
-		{
-			streamer.erase(
-				std::remove_if(
-					streamer.begin(), streamer.end(),
-					[](const StreamerSegment& segment) { return (segment.Life <= 0.0f); }),
-				streamer.end());
-		}
+			ClearInactiveEffects(streamer);
 	}
 
 	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade)
@@ -74,7 +69,8 @@ namespace TEN::Effects::Streamer
 		constexpr auto OPACITY_MAX = 0.7f;
 
 		auto& segment = GetNewStreamerSegment((StreamerType)type);
-		const auto& prevSegment = Streamers[type][std::max((int)Streamers[type].size() - 2, 0)];
+		int prevSegmentIndex = std::max((int)Streamers[type].size() - 2, 0);
+		const auto& prevSegment = Streamers[type][prevSegmentIndex];
 
 		segment.Type = (StreamerType)type;
 		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
@@ -137,12 +133,10 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto& streamer : Streamers)
 		{
-			int type = 0;
-
-			int index = 0;
-			for (auto& segment : streamer)
+			for (int i = 0; i < streamer.size(); i++)
 			{
-				const auto& prevSegment = streamer[std::max(index - 1, 0)];
+				auto& segment = streamer[i];
+				const auto& prevSegment = streamer[std::max(i - 1, 0)];
 
 				if (segment.Opacity > 0.0f)
 					segment.Opacity -= 0.1f / segment.FadeOut;
@@ -187,11 +181,7 @@ namespace TEN::Effects::Streamer
 				}
 
 				segment.Life -= 1.0f;
-
-				index++;
 			}
-
-			type++;
 		}
 
 		ClearInactiveStreamerSegments();

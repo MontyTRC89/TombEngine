@@ -28,7 +28,7 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-		static constexpr auto SEGMENT_COUNT_MAX = 64;
+		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
 		// Components
 		Vector3 AttachmentPoint = Vector3::Zero;
