@@ -90,15 +90,11 @@ namespace TEN::Effects::Streamer
 		{
 			segment.Vertices[0] = leftVertex;
 			segment.Vertices[1] = rightVertex;
-			segment.Vertices[3] = prevSegment.Vertices[0];
-			segment.Vertices[2] = prevSegment.Vertices[1];
 		}
 		else
 		{
 			segment.Vertices[1] = leftVertex;
 			segment.Vertices[0] = rightVertex;
-			segment.Vertices[3] = prevSegment.Vertices[0];
-			segment.Vertices[2] = prevSegment.Vertices[1];
 		}
 	}
 
@@ -148,9 +144,7 @@ namespace TEN::Effects::Streamer
 				auto rightVertex = Geometry::TranslatePoint(segment.Vertices[1], rightDirection, segment.Width);;
 
 				segment.Vertices[0] = leftVertex;
-				segment.Vertices[1] = rightVertex;
-				segment.Vertices[2] = prevSegment.Vertices[1];
-				segment.Vertices[3] = prevSegment.Vertices[0];*/
+				segment.Vertices[1] = rightVertex;*/
 
 				int zOffset = 0;
 				float sinY = phd_sin(EulerAngles(-segment.Direction).y);
@@ -161,22 +155,16 @@ namespace TEN::Effects::Streamer
 				case StreamerType::Center:
 					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
 					segment.Vertices[0] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-					segment.Vertices[2] = prevSegment.Vertices[1];
-					segment.Vertices[3] = prevSegment.Vertices[0];
 					break;
 
 				case StreamerType::Left:
 					segment.Vertices[0] -= Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
 					segment.Vertices[1] -= Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
-					segment.Vertices[2] = prevSegment.Vertices[1];
-					segment.Vertices[3] = prevSegment.Vertices[0];
 					break;
 
 				case StreamerType::Right:
 					segment.Vertices[1] += Vector3((zOffset * sinY) + (segment.ScaleRate * cosY), 0.0f, (zOffset * cosY) - (segment.ScaleRate * sinY));
 					segment.Vertices[0] += Vector3((zOffset * sinY) + ((segment.ScaleRate / 2) * cosY), 0.0f, (zOffset * cosY) - ((segment.ScaleRate / 2) * sinY));
-					segment.Vertices[2] = prevSegment.Vertices[1];
-					segment.Vertices[3] = prevSegment.Vertices[0];
 					break;
 				}
 

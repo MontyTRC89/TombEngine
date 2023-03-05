@@ -10,7 +10,7 @@ namespace TEN::Effects::Streamer
 	struct nStreamerSegment
 	{
 	private:
-		static constexpr auto VERTEX_COUNT = 4;
+		static constexpr auto VERTEX_COUNT = 2;
 
 	public:
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
@@ -31,7 +31,6 @@ namespace TEN::Effects::Streamer
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
 		// Components
-		Vector3 AttachmentPoint = Vector3::Zero;
 		std::vector<nStreamerSegment> Segments = {};
 
 	public:
@@ -94,7 +93,6 @@ namespace TEN::Effects::Streamer
 
 		StreamerType Type	   = StreamerType::Center;
 		Vector3		 Direction = Vector3::Zero;
-
 
 		float Life		= 0.0f;
 		float Opacity	= 0.0f;

@@ -85,32 +85,36 @@ namespace TEN::Renderer
 	{
 		for (const auto& streamer : Streamers)
 		{
-			for (const auto& segment : streamer)
+			for (int i = 0; i < streamer.size(); i++)
 			{
+				auto& segment = streamer[i];
+				const auto& prevSegment = streamer[std::max(i - 1, 0)];
+
+				if (segment.Life <= 0.0f)
+					continue;
+
 				auto color = Vector4(segment.Opacity);
-				if (segment.Life)
+
+				// If central, no vertex color.
+				if (segment.Type == StreamerType::Center)
 				{
-					// If central, no vertex color.
-					if (segment.Type == StreamerType::Center)
-					{
-						AddColoredQuad(
-							segment.Vertices[0],
-							segment.Vertices[1],
-							segment.Vertices[2],
-							segment.Vertices[3],
-							color, color, color, color,
-							BLENDMODE_WIREFRAME, view);
-					}
-					else
-					{
-						AddColoredQuad(
-							segment.Vertices[0],
-							segment.Vertices[1],
-							segment.Vertices[2],
-							segment.Vertices[3],
-							Vector4::Zero, color, color, Vector4::Zero,
-							BLENDMODE_WIREFRAME, view);
-					}
+					AddColoredQuad(
+						segment.Vertices[0],
+						segment.Vertices[1],
+						prevSegment.Vertices[1],
+						prevSegment.Vertices[0],
+						color, color, color, color,
+						BLENDMODE_WIREFRAME, view);
+				}
+				else
+				{
+					AddColoredQuad(
+						segment.Vertices[0],
+						segment.Vertices[1],
+						prevSegment.Vertices[1],
+						prevSegment.Vertices[0],
+						Vector4::Zero, color, color, Vector4::Zero,
+						BLENDMODE_WIREFRAME, view);
 				}
 			}
 		}
