@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
-	struct nStreamerSegment
+	struct StreamerSegment
 	{
 	private:
 		static constexpr auto VERTEX_COUNT = 2;
@@ -19,9 +19,10 @@ namespace TEN::Effects::Streamer
 
 		float Life		= 0.0f;
 		float Opacity	= 0.0f;
-		float Width		= 0.0f;
 		float ScaleRate = 0.0f;
 		float FadeAlpha	= 0.0f;
+
+		void Update();
 	};
 
 	class Streamer
@@ -31,11 +32,17 @@ namespace TEN::Effects::Streamer
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
 		// Components
-		std::vector<nStreamerSegment> Segments = {};
+		bool IsBroken = false;
+		std::vector<StreamerSegment> Segments = {};
 
 	public:
 		// Utilities
-		void AddSegment();
+		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
+		void Update();
+
+	private:
+		// Helpers
+		StreamerSegment& GetNewSegment();
 	};
 
 	class StreamerModule
@@ -49,7 +56,8 @@ namespace TEN::Effects::Streamer
 
 	public:
 		// Utilities
-		void AddStreamer();
+		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
+		void Update();
 	};
 
 	class StreamerController
@@ -63,7 +71,7 @@ namespace TEN::Effects::Streamer
 
 	public:
 		// Utilities
-		void GrowStreamer(int entityID, int tag, const Vector3& pos, const AxisAngle& orient, float life, float scaleRate, float width, float fadeAlpha);
+		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
 
 		void Update();
 		void Draw() const;
@@ -83,10 +91,10 @@ namespace TEN::Effects::Streamer
 		Count
 	};
 
-	struct StreamerSegment
+	struct StreamerSegmentOld
 	{
 	private:
-		static constexpr auto VERTEX_COUNT = 4;
+		static constexpr auto VERTEX_COUNT = 2;
 
 	public:
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
@@ -96,12 +104,11 @@ namespace TEN::Effects::Streamer
 
 		float Life		= 0.0f;
 		float Opacity	= 0.0f;
-		float Width		= 0.0f;
 		float ScaleRate = 0.0f;
 		float FadeOut	= 0.0f;
 	};
 
-	extern std::array<std::vector<StreamerSegment>, (int)StreamerType::Count> Streamers;
+	extern std::array<std::vector<StreamerSegmentOld>, (int)StreamerType::Count> Streamers;
 
 	void SpawnStreamerSegment(const Vector3& pos, ItemInfo* item, int type, float width, float life, float fade);
 	void SpawnStreamer(ItemInfo* item, int xOffset, int yOffset, int zOffset, int type, bool isOnWater, float width, float life, float fade);

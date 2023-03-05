@@ -8,24 +8,94 @@
 
 namespace TEN::Effects::Streamer
 {
-	void Streamer::AddSegment()
+	static Vector3 TranslateStreamerVertex(const Vector3& vertex, const AxisAngle& orient, float distance, bool moveRight)
+	{
+		// Determine lateral translation direction.
+		auto lateralDirection = moveRight ?
+			orient.ToDirection() :
+			AxisAngle(orient.GetAxis(), orient.GetAngle() + ANGLE(180.0f)).ToDirection();
+
+		// Translate along axis.
+		auto newVertex = Geometry::TranslatePoint(vertex, orient.GetAxis(), distance);
+
+		// Translate along lateral direction and return.
+		newVertex = Geometry::TranslatePoint(newVertex, lateralDirection, distance);
+		return newVertex;
+	}
+
+	void StreamerSegment::Update()
+	{
+		// Update opacity.
+		if (Opacity > 0.0f)
+			this->Opacity -= 0.1f / FadeAlpha;
+
+		// TODO: Directional bias like in the older version.
+		
+		// Update vertices.
+		this->Vertices[0] = TranslateStreamerVertex(Vertices[0], Orientation, ScaleRate, false);
+		this->Vertices[1] = TranslateStreamerVertex(Vertices[1], Orientation, ScaleRate, true);
+
+		// Update life.
+		this->Life -= 1.0f;
+	}
+
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
+	{
+		constexpr auto OPACITY_MAX = 0.7f;
+
+		auto& segment = this->GetNewSegment();
+
+		segment.Orientation = AxisAngle(direction, orient2D - ANGLE(90.0f));
+		segment.Life = life;
+		segment.Opacity = OPACITY_MAX;
+		segment.ScaleRate = scaleRate;
+		segment.FadeAlpha = fadeAlpha;
+
+		// Calculate vertices.
+		segment.Vertices[0] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, false);
+		segment.Vertices[1] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, true);
+	}
+
+	StreamerSegment& Streamer::GetNewSegment()
+	{
+		// Clear range of segments if vector is full.
+		if (Segments.size() >= SEGMENT_COUNT_MAX)
+		{
+			int numSegmentsToRemove = Segments.size() - SEGMENT_COUNT_MAX;
+			auto endIterator = Segments.end() + numSegmentsToRemove;
+			this->Segments.erase(Segments.begin(), endIterator);
+		}
+
+		// Add and return new segment.
+		return this->Segments.emplace_back();
+	}
+
+	void Streamer::Update()
+	{
+		for (auto& segment : this->Segments)
+			segment.Update();
+	}
+
+	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
 	{
 
 	}
 
-	void StreamerModule::AddStreamer()
+	void StreamerModule::Update()
 	{
-
+		for (auto& [tag, streamer] : this->Streamers)
+			streamer.Update();
 	}
 
-	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const AxisAngle& orient, float life, float scaleRate, float width, float fadeAlpha)
+	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
 	{
 
 	}
 
 	void StreamerController::Update()
 	{
-
+		for (auto& [entityNumber, module] : this->Modules)
+			module.Update();
 	}
 
 	void StreamerController::Draw() const
@@ -42,9 +112,9 @@ namespace TEN::Effects::Streamer
 
 	//------------------------
 
-	std::array<std::vector<StreamerSegment>, (int)StreamerType::Count> Streamers = {};
+	std::array<std::vector<StreamerSegmentOld>, (int)StreamerType::Count> Streamers = {};
 
-	static StreamerSegment& GetNewStreamerSegment(StreamerType type)
+	static StreamerSegmentOld& GetNewStreamerSegment(StreamerType type)
 	{
 		constexpr auto COUNT_MAX = 256;
 
@@ -69,22 +139,19 @@ namespace TEN::Effects::Streamer
 		constexpr auto OPACITY_MAX = 0.7f;
 
 		auto& segment = GetNewStreamerSegment((StreamerType)type);
-		int prevSegmentIndex = std::max((int)Streamers[type].size() - 2, 0);
-		const auto& prevSegment = Streamers[type][prevSegmentIndex];
 
 		segment.Type = (StreamerType)type;
 		segment.Direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
 		segment.Life = life;
 		segment.Opacity = OPACITY_MAX;
-		segment.Width = 1.0f;
-		segment.ScaleRate = 1.0f * width;
+		segment.ScaleRate = width;
 		segment.FadeOut = fade;
 
 		auto leftDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(-90.0f), 0));
 		auto rightDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
 
-		auto leftVertex = Geometry::TranslatePoint(pos, leftDirection, segment.Width);
-		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, segment.Width);;
+		auto leftVertex = Geometry::TranslatePoint(pos, leftDirection, width);
+		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, width);;
 
 		if ((StreamerType)type == StreamerType::Left)
 		{
@@ -129,11 +196,8 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto& streamer : Streamers)
 		{
-			for (int i = 0; i < streamer.size(); i++)
+			for (auto& segment : streamer)
 			{
-				auto& segment = streamer[i];
-				const auto& prevSegment = streamer[std::max(i - 1, 0)];
-
 				if (segment.Opacity > 0.0f)
 					segment.Opacity -= 0.1f / segment.FadeOut;
 
