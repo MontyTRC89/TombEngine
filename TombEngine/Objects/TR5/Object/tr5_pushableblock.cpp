@@ -6,7 +6,7 @@
 #include "Game/collision/collide_item.h"
 //#include "Game/collision/collide_room.h"
 //#include "Game/collision/floordata.h"
-#include "Game/Lara/lara.h"
+//#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
@@ -38,6 +38,7 @@ namespace TEN::Entities::Generic
 	};
 	
 	std::unordered_map <FLOOR_MATERIAL, PushablesSounds> PushablesSoundsMap;
+	std::vector<PushableAnimationInfo> PushableAnimationVector;
 
 	PushableInfo& GetPushableInfo(const ItemInfo& item)
 	{
@@ -74,7 +75,7 @@ namespace TEN::Entities::Generic
 		pushableInfo.CanFall			= (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
 		pushableInfo.DoAlignCenter		= (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
 		pushableInfo.Buoyancy			= (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
-		pushableInfo.AnimationSystem	= ((ocb & 0x08) != 0)? PushableAnimationGroup::Blocks : PushableAnimationGroup::Statues; // Check if bit 3 is set	(+8)
+		pushableInfo.AnimationSystemIndex = ((ocb & 0x08) != 0) ? 1 : 0; // Check if bit 3 is set	(+8)
 		
 		SetStopperFlag(pushableInfo.StartPos, true);
 	}
@@ -82,6 +83,7 @@ namespace TEN::Entities::Generic
 	void PushableBlockControl(short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		if (pushableItem.Status != ITEM_ACTIVE)
 			return;
@@ -92,26 +94,17 @@ namespace TEN::Entities::Generic
 		if (PushableBlockManageFalling(itemNumber))
 			return;
 
-		switch (LaraItem->Animation.AnimNumber)
+		int pullAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PullAnimIndex;
+		int pushAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PushAnimIndex;
+
+		if (LaraItem->Animation.AnimNumber == pullAnim || LaraItem->Animation.AnimNumber == pushAnim) 
 		{
-		case LA_PUSHABLE_PULL:
-		case LA_PUSHABLE_PUSH:
-		case LA_PUSHABLE_BLOCK_PULL:
-		case LA_PUSHABLE_BLOCK_PUSH:
-			//Moves the pushable (and stacked pushables).
 			PushableBlockManageMoving(itemNumber);
-			break;
-
-		case LA_PUSHABLE_GRAB:
-		case LA_PUSHABLE_RELEASE:
-		case LA_PUSHABLE_PUSH_TO_STAND:
-		case LA_PUSHABLE_PULL_TO_STAND:
-			break;
-
-		default:
+		}
+		else if (LaraItem->Animation.ActiveState == LS_IDLE)
+		{
 			//Do last actions and deactivate. (It's reactivated in collision function).
 			PushableBlockManageIdle(itemNumber);
-			break;
 		}
 
 		// Do sound effects.
@@ -285,17 +278,13 @@ namespace TEN::Entities::Generic
 
 			if (isPushAction)
 			{
-				if (pushableInfo.AnimationSystem == PushableAnimationGroup::Statues)
-					laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
-				else 
-					SetAnimation(laraItem, LA_PUSHABLE_BLOCK_PUSH);
+				int pushAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PushAnimIndex;
+				SetAnimation(laraItem, pushAnim);
 			}
 			else if (isPullAction)
 			{
-				if (pushableInfo.AnimationSystem == PushableAnimationGroup::Statues)
-					laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
-				else
-					SetAnimation(laraItem, LA_PUSHABLE_BLOCK_PULL);
+				int pullAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PullAnimIndex;
+				SetAnimation(laraItem, pullAnim);
 			}
 
 			RemovePushableFromStack(itemNumber);
@@ -512,7 +501,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Check if is using block animation system as it can't go on looping (affects the stopper flag).
-			if (pushableInfo.AnimationSystem == PushableAnimationGroup::Blocks)
+			if (!PushableAnimationVector[pushableInfo.AnimationSystemIndex].AllowLoop)
 				return;
 
 			//Otherwise, just check if action key is still pressed.
@@ -640,6 +629,13 @@ namespace TEN::Entities::Generic
 	void InitialisePushablesGeneral()
 	{
 		//To execute on level start and on level loading.
+
+		PushableAnimationVector =
+		{
+			PushableAnimationInfo(LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true),				//TR4-TR5 animations
+			PushableAnimationInfo(LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false)	//TR1-TR3 animations
+		};
+
 		InitializePushablesSoundsMap();
 		UpdateAllPushablesStackLinks();
 	}

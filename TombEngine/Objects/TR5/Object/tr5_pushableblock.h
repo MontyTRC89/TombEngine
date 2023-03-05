@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/collision/floordata.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound_effects.h"
 
 class Vector3i;
@@ -37,6 +38,27 @@ namespace TEN::Entities::Generic
 			LoopSound = loopValue;
 			StopSound = stopValue;
 			FallSound = fallValue;
+		}
+	};
+
+	struct PushableAnimationInfo
+	{
+		int PullAnimIndex;
+		int PushAnimIndex;
+		bool AllowLoop;
+
+		PushableAnimationInfo()
+		{
+			PullAnimIndex = LA_PUSHABLE_PULL;
+			PushAnimIndex = LA_PUSHABLE_PUSH;
+			AllowLoop = true;
+		}
+
+		PushableAnimationInfo(int pullAnim, int pushAnim, bool isLoop)
+		{
+			PullAnimIndex = pullAnim;
+			PushAnimIndex = pushAnim;
+			AllowLoop = isLoop;
 		}
 	};
 

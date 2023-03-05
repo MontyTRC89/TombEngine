@@ -8,12 +8,6 @@ namespace TEN::Entities::Generic
 		Moving,
 		Stopping
 	};
-	
-	enum class PushableAnimationGroup
-	{
-		Statues,
-		Blocks
-	};
 
 	struct PushableSidesAttributes
 	{
@@ -35,7 +29,7 @@ namespace TEN::Entities::Generic
 			Climbable = climbValue;
 		}
 	};
-
+	
 	struct PushableInfo
 	{
 		PushableSoundState CurrentSoundState = PushableSoundState::None;
@@ -46,6 +40,7 @@ namespace TEN::Entities::Generic
 		int StackLimit;							// max of pushables that can be over it so Lara can move it.
 		int StackUpperItem;						// the itemNumber of the pushable that is placed over it.
 		int StackLowerItem;						// the itemNumber of the pushable that is placed under it.
+		int AnimationSystemIndex;				// the index of the int PushableAnimationVector where are located the pull / push animation indices for this object.
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		
@@ -55,13 +50,15 @@ namespace TEN::Entities::Generic
 		bool CanFall;							// OCB [0]. flag to indicate if item can fall or not.
 		bool DoAlignCenter;						// OCB [1]. flag to decide if Lara has to put in center of the pushable to can move it.
 		bool Buoyancy;							// OCB [2]. flag to indicate if float in water.
-		PushableAnimationGroup AnimationSystem;	// OCB [3]. flag to indicate which animations do.
 		bool HasFloorColission;					// per Slot. flag to indicate if it uses floor data collision or object collision.
-
+		
+		//constructor
 		PushableInfo()
 		{
 			CurrentSoundState = PushableSoundState::None;
 			Height = BLOCK(1);
+
+			AnimationSystemIndex = 0;
 
 			Gravity = 8;
 
@@ -72,7 +69,6 @@ namespace TEN::Entities::Generic
 			CanFall = false;
 			DoAlignCenter = true;
 			Buoyancy = false;
-			AnimationSystem = PushableAnimationGroup::Statues;
 			HasFloorColission = false;
 			
 			SidesMap =
