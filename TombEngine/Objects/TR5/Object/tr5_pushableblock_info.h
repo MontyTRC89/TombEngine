@@ -9,6 +9,17 @@ namespace TEN::Entities::Generic
 		Stopping
 	};
 
+	enum class PushableGravityState
+	{
+		None,
+		Ground,
+		Falling,
+		Sinking,
+		Floating,
+		OnWater,
+		Sliding //TODO.
+	};
+
 	struct PushableSidesAttributes
 	{
 		bool Pullable;
@@ -35,7 +46,8 @@ namespace TEN::Entities::Generic
 		PushableSoundState CurrentSoundState = PushableSoundState::None;
 
 		int Height;								// height for collision, also in floor procedure
-		int Gravity;							// fall acceleration
+		float Gravity;							// fall acceleration
+		PushableGravityState GravityState;
 		
 		int StackLimit;							// max of pushables that can be over it so Lara can move it.
 		int StackUpperItem;						// the itemNumber of the pushable that is placed over it.
@@ -60,7 +72,8 @@ namespace TEN::Entities::Generic
 
 			AnimationSystemIndex = 0;
 
-			Gravity = 8;
+			Gravity = 8.0f;
+			GravityState = PushableGravityState::Ground;
 
 			StackLimit = 3;
 			StackUpperItem = -1;

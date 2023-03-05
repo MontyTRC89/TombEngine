@@ -68,7 +68,7 @@ namespace TEN::Entities::Generic
 	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 	// Behaviour functions
-	bool PushableBlockManageFalling	(const short itemNumber);
+	bool PushableBlockManageGravity (const short itemNumber);
 	void PushableBlockManageIdle	(const short itemNumber);
 	void PushableBlockManageMoving	(const short itemNumber);
 
@@ -110,4 +110,6 @@ namespace TEN::Entities::Generic
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
 	int PushableBlockFloorBorder(short itemNumber);
 	int PushableBlockCeilingBorder(short itemNumber);
+
+	void FloatingItem(ItemInfo& item);
 }

@@ -22,8 +22,12 @@ using namespace TEN::Input;
 namespace TEN::Entities::Generic
 {
 	constexpr auto PUSHABLE_FALL_VELOCITY_MAX	 = BLOCK(1 / 8.0f);
+	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
 	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
 	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
+
+	const float GRAVITY_AIR = 8.0f;
+	const float GRAVITY_CHANGE_SPEED = 2.0f; // adjust this value as needed
 
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
@@ -72,9 +76,9 @@ namespace TEN::Entities::Generic
 		// Read OCB flags.
 		const int ocb = item.TriggerFlags;
 
-		pushableInfo.CanFall			= (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
-		pushableInfo.DoAlignCenter		= (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
-		pushableInfo.Buoyancy			= (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
+		pushableInfo.CanFall = true; // (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
+		pushableInfo.DoAlignCenter = true;// = (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
+		pushableInfo.Buoyancy = true;// (ocb & 0x04) != 0; // Check if bit 2 is set	(+4)
 		pushableInfo.AnimationSystemIndex = ((ocb & 0x08) != 0) ? 1 : 0; // Check if bit 3 is set	(+8)
 		
 		SetStopperFlag(pushableInfo.StartPos, true);
@@ -88,17 +92,18 @@ namespace TEN::Entities::Generic
 		if (pushableItem.Status != ITEM_ACTIVE)
 			return;
 
-		Lara.InteractedItem = itemNumber;
-			
-		//If is on air, do gravity routine.
-		if (PushableBlockManageFalling(itemNumber))
+		//Check and do gravity routine if it must.
+		if (PushableBlockManageGravity(itemNumber))
 			return;
+
+		Lara.InteractedItem = itemNumber;
 
 		int pullAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PullAnimIndex;
 		int pushAnim = PushableAnimationVector[pushableInfo.AnimationSystemIndex].PushAnimIndex;
 
 		if (LaraItem->Animation.AnimNumber == pullAnim || LaraItem->Animation.AnimNumber == pushAnim) 
 		{
+			pushableInfo.GravityState = PushableGravityState::None;
 			PushableBlockManageMoving(itemNumber);
 		}
 		else if (LaraItem->Animation.ActiveState == LS_IDLE)
@@ -303,68 +308,241 @@ namespace TEN::Entities::Generic
 	}
 
 	// Behaviour functions
-
-	bool PushableBlockManageFalling(const short itemNumber)
+	bool PushableBlockManageGravity(const short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = GetPushableInfo(pushableItem);
-
-		// Check if the pushable block is falling.
-		if (!pushableItem.Animation.IsAirborne)
-		{
-			return false;
-		}
-
-		const int floorHeight = GetCollision(
-												pushableItem.Pose.Position.x, 
-												pushableItem.Pose.Position.y + pushableInfo.Gravity, 
-												pushableItem.Pose.Position.z, 
-												pushableItem.RoomNumber
-											).Position.Floor;
+				
+		auto col = GetCollision(&pushableItem);
 
 		const float currentY = pushableItem.Pose.Position.y;
 		const float velocityY = pushableItem.Animation.Velocity.y;
 
-		if (currentY < (floorHeight - velocityY))
+		int goalHeight = 0;
+
+		int waterDepth = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+		if (waterDepth != NO_HEIGHT)
 		{
-			// Apply gravity to the pushable block.
-			const float newVelocityY = velocityY + pushableInfo.Gravity;
-			pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_FALL_VELOCITY_MAX);
-			
-			// Update the pushable block's position and move the block's stack.
-			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
-			MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
-			UpdateRoomNumbers(itemNumber);
+			goalHeight = waterDepth - CLICK(1) + pushableInfo.Height;
 		}
 		else
 		{
-			// The pushable block has hit the ground.
-			
-			const int differenceY = floorHeight - currentY;
-			MoveStackY(itemNumber, differenceY);
+			goalHeight = col.Position.Ceiling + pushableInfo.Height;
+		}
 
-			pushableItem.Pose.Position.y = floorHeight;
 
-			// Shake the floor if the pushable block fell at a high enough velocity.
-			if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
+		switch (pushableInfo.GravityState)
+		{
+		case PushableGravityState::None:
+			return false;
+			break;
+
+		case PushableGravityState::Ground:
+
+			if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
-				FloorShake(&pushableItem);
+				pushableInfo.GravityState = PushableGravityState::Sinking;
+			}
+			else
+			{
+				int heightDifference = abs(currentY - col.Position.Floor);
+				if (heightDifference > 0)
+				{
+					pushableInfo.GravityState = PushableGravityState::Falling;
+				}
+				else
+				{
+					if ((col.FloorTilt.x != 0) || (col.FloorTilt.y != 0))
+					{
+						pushableInfo.GravityState = PushableGravityState::Sliding;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			}
+			break;
+
+		case PushableGravityState::Falling:
+						
+			if (currentY < col.Position.Floor - velocityY)
+			{
+				// Is on air.
+				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_FALL_VELOCITY_MAX);
+
+				// Update the pushable block's position and move the block's stack.
+				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
+				UpdateRoomNumbers(itemNumber);
+
+				if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+				{
+					pushableInfo.GravityState = PushableGravityState::Sinking;
+				}
+			}
+			else
+			{
+				// It has hit the ground.
+				pushableInfo.GravityState = PushableGravityState::Ground;
+				pushableItem.Pose.Position.y = col.Position.Floor;
+
+				// Shake the floor if the pushable block fell at a high enough velocity.
+				if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
+				{
+					FloorShake(&pushableItem);
+				}
+				
+				pushableItem.Animation.Velocity.y = 0.0f;
+
+				GameVector detectionPoint = pushableItem.Pose.Position;
+				detectionPoint.RoomNumber = pushableItem.RoomNumber;
+
+				SoundEffect(GetPushableSound(Fall, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
+
+				const int differenceY = col.Position.Floor - currentY;
+				MoveStackY(itemNumber, differenceY);
+
+				DeactivationRoutine(itemNumber);
+			}
+			break;
+
+		case PushableGravityState::Sinking:
+
+			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+			{
+				pushableInfo.GravityState = PushableGravityState::Falling;
+				pushableInfo.Gravity = GRAVITY_AIR;
+				return true;
 			}
 
-			pushableItem.Animation.IsAirborne = false;
-			pushableItem.Animation.Velocity.y = 0.0f;
+			if (pushableInfo.Buoyancy)
+			{
+				//It slowly reverses the gravity direction. If gravity is 0, then it pass to floating.
+				pushableInfo.Gravity = pushableInfo.Gravity - GRAVITY_CHANGE_SPEED;
+				if (pushableInfo.Gravity <= 0)
+				{
+					pushableInfo.GravityState = PushableGravityState::Floating;
+					return true;
+				}
+			}
+			else
+			{
+				//It decreases its gravity but keep falling till the ground.
+				pushableInfo.Gravity = std::max(pushableInfo.Gravity - GRAVITY_CHANGE_SPEED, 4.0f);
+			}
 
-			GameVector detectionPoint = pushableItem.Pose.Position;
-			detectionPoint.RoomNumber = pushableItem.RoomNumber;
+			if (currentY < col.Position.Floor - velocityY)
+			{
+				// Is on sunking down.
+				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
 
-			SoundEffect(GetPushableSound(Fall, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
+				// Update the pushable block's position and move the block's stack.
+				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
+				UpdateRoomNumbers(itemNumber);
+			}
+			else
+			{
+				// It has hit the water ground.
+				pushableInfo.GravityState = PushableGravityState::Ground;
+				pushableItem.Pose.Position.y = col.Position.Floor;
+								
+				pushableItem.Animation.Velocity.y = 0.0f;
 
-			DeactivationRoutine(itemNumber);
+				const int differenceY = col.Position.Floor - currentY;
+				MoveStackY(itemNumber, differenceY);
+
+				DeactivationRoutine(itemNumber);
+			}
+
+			break;
+
+		case PushableGravityState::Floating:
+
+			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+			{
+				pushableInfo.GravityState = PushableGravityState::Falling;
+				pushableInfo.Gravity = GRAVITY_AIR;
+				return true;
+			}
+
+			pushableInfo.Gravity = std::max(pushableInfo.Gravity - GRAVITY_CHANGE_SPEED, -4.0f);
+
+			if (currentY > goalHeight)
+			{
+				// Is floating up.
+				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
+
+				// Update the pushable block's position and move the block's stack.
+				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
+				UpdateRoomNumbers(itemNumber);
+			}
+			else
+			{
+				// It has reached the water surface.
+				pushableInfo.GravityState = PushableGravityState::OnWater;
+				pushableItem.Pose.Position.y = goalHeight;
+
+				pushableItem.Animation.Velocity.y = 0.0f;
+
+				const int differenceY = goalHeight - currentY;
+				MoveStackY(itemNumber, differenceY);
+
+				DeactivationRoutine(itemNumber);
+			}
+			break;
+
+		case PushableGravityState::OnWater:
+
+			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+			{
+				pushableInfo.GravityState = PushableGravityState::Falling;
+				pushableInfo.Gravity = GRAVITY_AIR;
+				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+				return true;
+			}
+
+			FloatingItem(pushableItem);
+
+			//Spawn water waves effects?
+
+			break;
+
+		case PushableGravityState::Sliding:
+			break;
+
+		default:
+			return false;
+			break;
 		}
 
 		return true;
+
 	}
 
+	void FloatingItem(ItemInfo& item)
+	{
+		auto& time = item.Animation.Velocity.y;
+		time += 1.0f; // Get the current time
+
+		float tiltOscilation = std::sin(time * 0.05f) * 0.5f;
+		float rollOscilation = std::sin(time * 0.1f) * 0.75f;
+
+		float tilt = tiltOscilation * 20.0f;
+		float roll = rollOscilation * 20.0f;
+
+		item.Pose.Orientation = EulerAngles(ANGLE(tilt), item.Pose.Orientation.y, ANGLE (roll));
+
+		// Reset the time after a certain amount of time has passed
+		if (time > 125.0f)
+			time = 0.0f;
+	}
+	
 	void PushableBlockManageIdle(const short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -375,6 +553,8 @@ namespace TEN::Entities::Generic
 
 		MoveStackXZ(itemNumber);
 		
+		pushableInfo.GravityState = PushableGravityState::Ground;
+
 		DeactivationRoutine(itemNumber);
 	}
 	
@@ -493,7 +673,7 @@ namespace TEN::Entities::Generic
 				if (floorHeight > pushableItem.Pose.Position.y)
 				{
 					LaraItem->Animation.TargetState = LS_IDLE;
-					pushableItem.Animation.IsAirborne = true;
+					pushableInfo.GravityState = PushableGravityState::Falling;
 					pushableInfo.CurrentSoundState = PushableSoundState::None;
 
 					return;
@@ -645,18 +825,24 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = GetPushableInfo(pushableItem);
 
+		//Re-apply the bridges colliders
 		ManageStackBridges(itemNumber, true);
 
+		//Check if it has fall over another pushable.
 		UpdateAllPushablesStackLinks();
 
-		// If fallen on top of existing pushable, don't test triggers.
-		if (pushableInfo.StackLowerItem == NO_ITEM)
+		// If it has fallen on top of existing pushable
+		// Or it's floating in water, don't test triggers.
+		if ((pushableInfo.StackLowerItem == NO_ITEM) || (pushableInfo.GravityState == PushableGravityState::Floating))
 		{
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 		}
 
-		RemoveActiveItem(itemNumber);
-		pushableItem.Status = ITEM_NOT_ACTIVE;
+		if (pushableItem.Status == ITEM_ACTIVE && (pushableInfo.GravityState <= PushableGravityState::Falling))
+		{
+			RemoveActiveItem(itemNumber);
+			pushableItem.Status = ITEM_NOT_ACTIVE;
+		}
 	}
 
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList)
