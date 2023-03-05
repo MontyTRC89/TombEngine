@@ -7,6 +7,40 @@
 
 namespace TEN::Effects::Streamer
 {
+	void Streamer::AddSegment()
+	{
+
+	}
+
+	void StreamerModule::AddStreamer()
+	{
+
+	}
+
+	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const AxisAngle& orient, float life, float scaleRate, float width, float fadeAlpha)
+	{
+
+	}
+
+	void StreamerController::Update()
+	{
+
+	}
+
+	void StreamerController::Draw() const
+	{
+
+	}
+
+	void StreamerController::Clear()
+	{
+		*this = {};
+	}
+
+	StreamerController StreamerEffect = {};
+
+	//------------------------
+
 	StreamerSegment Segments[STREAMER_SEGMENT_COUNT_MAX][(int)StreamerType::Count];
 
 	static StreamerSegment& GetFreeStreamerSegment(StreamerType type)

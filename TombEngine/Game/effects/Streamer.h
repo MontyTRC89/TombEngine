@@ -24,25 +24,54 @@ namespace TEN::Effects::Streamer
 		float FadeAlpha	= 0.0f;
 	};
 
-	struct Streamer
+	class Streamer
 	{
+	private:
+		// Constants
+		static constexpr auto SEGMENT_COUNT_MAX = 64;
+
+		// Components
 		Vector3 AttachmentPoint = Vector3::Zero;
 		std::vector<nStreamerSegment> Segments = {};
+
+	public:
+		// Utilities
+		void AddSegment();
 	};
 
 	class StreamerModule
 	{
-		// Key = tag.
-		std::map<int, Streamer> Streamers = {};
+	private:
+		// Constants
+		static constexpr auto STREAMER_COUNT_MAX = 8;
+
+		// Components
+		std::map<int, Streamer> Streamers = {}; // Key = tag.
+
+	public:
+		// Utilities
+		void AddStreamer();
 	};
 
 	class StreamerController
 	{
-		// Key = entity number.
-		std::map<int, StreamerModule> Modules = {};
+	private:
+		// Constants
+		static constexpr auto MODULE_COUNT_MAX = 32;
+
+		// Components
+		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
+
+	public:
+		// Utilities
+		void GrowStreamer(int entityID, int tag, const Vector3& pos, const AxisAngle& orient, float life, float scaleRate, float width, float fadeAlpha);
+
+		void Update();
+		void Draw() const;
+		void Clear();
 	};
 
-	//StreamerController StreamerEffect = {};
+	extern StreamerController StreamerEffect;
 
 	// --------------
 
