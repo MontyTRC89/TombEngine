@@ -196,6 +196,8 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		StreamerEffect.Update();
+		UpdateStreamers();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -221,7 +223,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
-		UpdateStreamers();
 
 		// Update HUD.
 		UpdateBars(LaraItem);

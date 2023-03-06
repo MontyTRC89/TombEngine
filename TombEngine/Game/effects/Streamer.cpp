@@ -66,8 +66,6 @@ namespace TEN::Effects::Streamer
 		segment.Life =
 		segment.LifeMax = life;
 		segment.ScaleRate = scaleRate;
-
-		// Calculate vertices.
 		segment.Vertices[0] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, false);
 		segment.Vertices[1] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, true);
 	}
@@ -91,8 +89,8 @@ namespace TEN::Effects::Streamer
 
 	Streamer::StreamerSegment& Streamer::GetNewSegment()
 	{
-		// Clear tail segment if vector is full.
-		if (Segments.size() == SEGMENT_COUNT_MAX)
+		// Clear oldest segment if vector is full.
+		if (Segments.size() >= SEGMENT_COUNT_MAX)
 			this->Segments.erase(Segments.begin());
 
 		// Add and return new segment.
@@ -113,10 +111,6 @@ namespace TEN::Effects::Streamer
 
 	Streamer& StreamerModule::StreamerInstancer::GetUnbrokenStreamer()
 	{
-		// Clear oldest streamer if vector is full.
-		if (Streamers.size() == STREAMER_COUNT_MAX)
-			this->Streamers.erase(Streamers.begin());
-
 		// Return unbroken streamer at back of vector if it exists.
 		if (!Streamers.empty())
 		{
@@ -124,6 +118,10 @@ namespace TEN::Effects::Streamer
 			if (!streamer.IsBroken)
 				return streamer;
 		}
+
+		// Clear oldest streamer if vector is full.
+		if (Streamers.size() >= STREAMER_COUNT_MAX)
+			this->Streamers.erase(Streamers.begin());
 
 		// Add and return new streamer.
 		return this->Streamers.emplace_back();

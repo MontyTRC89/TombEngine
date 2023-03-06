@@ -83,8 +83,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
-		// TODO
-		StreamerEffect.Update();
+		constexpr auto BLEND_MODE = BLENDMODE_ALPHABLEND;
 
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
@@ -95,20 +94,21 @@ namespace TEN::Renderer
 					for (int i = 0; i < streamer.Segments.size(); i++)
 					{
 						const auto& segment = streamer.Segments[i];
-						const auto& prevSegment = streamer.Segments[std::max(i - 1, 0)];
+						const auto& prevSegment = streamer.Segments[(i > 0) ? (i - 1) : 0];
 
 						if (segment.Life <= 0.0f)
 							continue;
 
 						auto color = segment.Color;
 						auto prevColor = prevSegment.Color;
+
 						AddColoredQuad(
 							segment.Vertices[0],
 							segment.Vertices[1],
 							prevSegment.Vertices[1],
 							prevSegment.Vertices[0],
 							color, color, prevColor, prevColor,
-							BLENDMODE_ALPHABLEND, view);
+							BLEND_MODE, view);
 					}
 				}
 			}
@@ -135,7 +135,7 @@ namespace TEN::Renderer
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
 						color, color, color, color,
-						BLENDMODE_ADDITIVE, view);
+						BLEND_MODE, view);
 				}
 				else
 				{
@@ -145,7 +145,7 @@ namespace TEN::Renderer
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
 						color, color, color, color,
-						BLENDMODE_ADDITIVE, view);
+						BLEND_MODE, view);
 				}
 			}
 		}
