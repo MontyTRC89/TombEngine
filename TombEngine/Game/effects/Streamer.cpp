@@ -8,26 +8,42 @@
 
 namespace TEN::Effects::Streamer
 {
+	constexpr auto OPACITY_MAX = 0.8f;
+
 	static Vector3 TranslateStreamerVertex(const Vector3& vertex, const AxisAngle& orient, float distance, bool moveRight)
 	{
-		// Determine lateral translation direction.
-		auto lateralDirection = moveRight ?
-			orient.ToDirection() :
-			AxisAngle(orient.GetAxis(), orient.GetAngle() + ANGLE(180.0f)).ToDirection();
+		// ---------------------TEMP: 2D solution.
 
-		// Translate along axis.
-		auto newVertex = Geometry::TranslatePoint(vertex, orient.GetAxis(), distance);
+		/*auto rot = moveRight ?
+			EulerAngles(0, ANGLE(90.0f), orient.GetAngle()) :
+			EulerAngles(0, ANGLE(-90.0f), orient.GetAngle() + ANGLE(180.0f));
 
-		// Translate along lateral direction and return.
-		newVertex = Geometry::TranslatePoint(newVertex, lateralDirection, distance);
-		return newVertex;
+		auto direction = Geometry::RotatePoint(orient.GetAxis(), rot);
+		direction.Normalize();*/
+		auto direction = moveRight ? Vector3::Up : Vector3::Down;
+		return Geometry::TranslatePoint(vertex, direction, distance);
+
+		// ---------------------
+		
+		//// Determine lateral translation direction.
+		//auto lateralDirection = moveRight ?
+		//	orient.ToDirection() :
+		//	AxisAngle(orient.GetAxis(), orient.GetAngle()*6 + ANGLE(180.0f)).ToDirection(); // TODO: Tilt is flipped.
+		//lateralDirection.Normalize();
+
+		//// Translate along axis.
+		//auto newVertex = Geometry::TranslatePoint(vertex, orient.GetAxis(), 0);
+
+		//// Translate along lateral direction and return.
+		//newVertex = Geometry::TranslatePoint(newVertex, lateralDirection, distance);
+		//return newVertex;
 	}
 
-	void StreamerSegment::Update()
+	void Streamer::StreamerSegment::Update()
 	{
 		// Update opacity.
-		if (Opacity > 0.0f)
-			this->Opacity -= 0.1f / FadeAlpha;
+		if (Color.w > 0.0f)
+			this->Color.w = InterpolateCos(0.0f, OPACITY_MAX, Life / LifeMax);
 
 		// TODO: Directional bias like in the older version.
 		
@@ -39,68 +55,93 @@ namespace TEN::Effects::Streamer
 		this->Life -= 1.0f;
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
 	{
-		constexpr auto OPACITY_MAX = 0.7f;
-
 		auto& segment = this->GetNewSegment();
 
-		segment.Orientation = AxisAngle(direction, orient2D - ANGLE(90.0f));
-		segment.Life = life;
-		segment.Opacity = OPACITY_MAX;
+		segment.Orientation = AxisAngle(direction, orient2D);
+		segment.Color = Vector4(color.x, color.y, color.z, OPACITY_MAX);
+		segment.Life =
+		segment.LifeMax = life;
 		segment.ScaleRate = scaleRate;
-		segment.FadeAlpha = fadeAlpha;
 
 		// Calculate vertices.
 		segment.Vertices[0] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, false);
 		segment.Vertices[1] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, true);
 	}
 
-	StreamerSegment& Streamer::GetNewSegment()
+	void Streamer::Update()
 	{
-		// Clear range of segments if vector is full.
-		if (Segments.size() >= SEGMENT_COUNT_MAX)
-		{
-			int numSegmentsToRemove = Segments.size() - SEGMENT_COUNT_MAX;
-			auto endIterator = Segments.end() + numSegmentsToRemove;
-			this->Segments.erase(Segments.begin(), endIterator);
-		}
+		for (auto& segment : this->Segments)
+			segment.Update();
+
+		ClearInactiveEffects(this->Segments);
+	}
+
+	Streamer::StreamerSegment& Streamer::GetNewSegment()
+	{
+		// Clear tail segment if vector is full.
+		if (Segments.size() == SEGMENT_COUNT_MAX)
+			this->Segments.erase(Segments.begin());
 
 		// Add and return new segment.
 		return this->Segments.emplace_back();
 	}
 
-	void Streamer::Update()
+	void StreamerModule::StreamerInstancer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
 	{
-		for (auto& segment : this->Segments)
-			segment.Update();
+		auto& streamer = this->GetUnbrokenStreamer();
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
 	}
 
-	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
+	void StreamerModule::StreamerInstancer::Update()
 	{
+		for (auto& streamer : this->Streamers)
+			streamer.Update();
+	}
 
+	Streamer& StreamerModule::StreamerInstancer::GetUnbrokenStreamer()
+	{
+		// Clear oldest streamer if vector is full.
+		if (Streamers.size() == STREAMER_COUNT_MAX)
+			this->Streamers.erase(Streamers.begin());
+
+		// Return unbroken streamer at back of vector if it exists.
+		if (!Streamers.empty())
+		{
+			auto& streamer = this->Streamers.back();
+			if (!streamer.IsBroken)
+				return streamer;
+		}
+
+		// Add and return new streamer.
+		return this->Streamers.emplace_back();
+	}
+
+	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
+	{
+		this->Instancers.insert({ tag, {} });
+		this->Instancers.at(tag).AddSegment(pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
+
+		// TODO: Don't insert if map is full. Use INSTANCE_COUNT_MAX
 	}
 
 	void StreamerModule::Update()
 	{
-		for (auto& [tag, streamer] : this->Streamers)
-			streamer.Update();
+		for (auto& [tag, instancer] : this->Instancers)
+			instancer.Update();
 	}
 
-	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha)
+	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
 	{
-
+		this->Modules.insert({ entityNumber, {} });
+		this->Modules.at(entityNumber).AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
 	}
 
 	void StreamerController::Update()
 	{
 		for (auto& [entityNumber, module] : this->Modules)
 			module.Update();
-	}
-
-	void StreamerController::Draw() const
-	{
-
 	}
 
 	void StreamerController::Clear()
@@ -151,7 +192,7 @@ namespace TEN::Effects::Streamer
 		auto rightDirection = Geometry::RotatePoint(segment.Direction, EulerAngles(0, ANGLE(90.0f), 0));
 
 		auto leftVertex = Geometry::TranslatePoint(pos, leftDirection, width);
-		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, width);;
+		auto rightVertex = Geometry::TranslatePoint(pos, rightDirection, width);
 
 		if ((StreamerType)type == StreamerType::Left)
 		{

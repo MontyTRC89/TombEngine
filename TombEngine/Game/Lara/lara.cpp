@@ -411,9 +411,56 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
+// --------------STREAMER DEBUG
+#include "Streamer.h"
+using namespace TEN::Effects::Streamer;
+// --------------
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	// STREAMER DEBUG
+	if (false)
+	{
+		float width = coll->Setup.Height / 5;
+
+		auto headPos = GetJointPosition(item, LM_HEAD).ToVector3();
+		auto direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
+		short orient2D = /*item->Pose.Orientation.z + */ANGLE(90.0f);
+		float life = 30.0f;
+		float scaleRate = 0.0f;
+		float opacityAlpha = 0.0f;
+
+		auto color4 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+		auto color3 = Vector4(0.0f, 0.6f, 0.2f, 1.0f);
+		auto color2 = Vector4(0.2f, 0.6f, 0.6f, 1.0f);
+		auto color1 = Vector4(0.9f, 0.4f, 0.6f, 1.0f);
+		auto color0 = Vector4(0.2f, 0.2f, 0.5f, 1.0f);
+
+		float halfWidth = width / 2;
+		auto basePos = item->Pose.Position.ToVector3() - Vector3(0.0f, width / 2, 0.0f);
+		auto offset = Vector3(0.0f, -width, 0.0f);
+		auto streamerPositions = std::vector<Vector3>
+		{
+			basePos,
+			basePos + offset,
+			basePos + (offset * 2),
+			basePos + (offset * 3),
+			basePos + (offset * 4)
+		};
+
+		// Spawn Commander Video rainbow.
+		StreamerEffect.GrowStreamer(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, scaleRate, opacityAlpha);
+		StreamerEffect.GrowStreamer(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, scaleRate, opacityAlpha);
+		StreamerEffect.GrowStreamer(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, scaleRate, opacityAlpha);
+		StreamerEffect.GrowStreamer(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, scaleRate, opacityAlpha);
+		StreamerEffect.GrowStreamer(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate, opacityAlpha);
+
+		auto segment = StreamerEffect.Modules.at(item->Index).Instancers.at(0).Streamers[0].Segments.back();
+		auto target = Geometry::TranslatePoint(headPos, segment.Orientation.ToDirection(), BLOCK(0.25f));
+		//g_Renderer.AddLine3D(headPos, target, Vector4::One);
+	}
 
 	if (lara->Control.Weapon.HasFired)
 	{

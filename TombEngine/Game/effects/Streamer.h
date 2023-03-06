@@ -7,37 +7,37 @@ struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
-	struct StreamerSegment
-	{
-	private:
-		static constexpr auto VERTEX_COUNT = 2;
-
-	public:
-		std::array<Vector3, VERTEX_COUNT> Vertices = {};
-
-		AxisAngle Orientation = AxisAngle::Identity;
-
-		float Life		= 0.0f;
-		float Opacity	= 0.0f;
-		float ScaleRate = 0.0f;
-		float FadeAlpha	= 0.0f;
-
-		void Update();
-	};
-
 	class Streamer
 	{
 	private:
 		// Constants
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
+		struct StreamerSegment
+		{
+		private:
+			static constexpr auto VERTEX_COUNT = 2;
+
+		public:
+			std::array<Vector3, VERTEX_COUNT> Vertices = {};
+
+			AxisAngle Orientation = AxisAngle::Identity;
+			Vector4	  Color = Vector4::Zero;
+
+			float Life		= 0.0f;
+			float LifeMax	= 0.0f;
+			float ScaleRate = 0.0f;
+
+			void Update();
+		};
+
+	public:
 		// Components
 		bool IsBroken = false;
 		std::vector<StreamerSegment> Segments = {};
 
-	public:
 		// Utilities
-		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
+		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
 		void Update();
 
 	private:
@@ -49,14 +49,33 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-		static constexpr auto STREAMER_COUNT_MAX = 8;
+		static constexpr auto INSTANCE_COUNT_MAX = 8;
 
-		// Components
-		std::map<int, Streamer> Streamers = {}; // Key = tag.
+		class StreamerInstancer
+		{
+		private:
+			// Constants
+			static constexpr auto STREAMER_COUNT_MAX = 8;
+
+		public:
+			// Components
+			std::vector<Streamer> Streamers = {};
+
+			// Utilities
+			void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
+			void Update();
+
+		private:
+			// Helpers
+			Streamer& GetUnbrokenStreamer();
+		};
 
 	public:
+		// Components
+		std::map<int, StreamerInstancer> Instancers = {}; // Key = tag.
+
 		// Utilities
-		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
+		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
 		void Update();
 	};
 
@@ -64,17 +83,16 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-		static constexpr auto MODULE_COUNT_MAX = 32;
+		static constexpr auto MODULE_COUNT_MAX = 64;
 
+	public:
 		// Components
 		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
 
-	public:
 		// Utilities
-		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, float width, float life, float scaleRate, float fadeAlpha);
+		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
 
 		void Update();
-		void Draw() const;
 		void Clear();
 	};
 

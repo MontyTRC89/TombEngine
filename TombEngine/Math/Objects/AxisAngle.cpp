@@ -116,10 +116,27 @@
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
+	// TODO: Get this working properly.
 	Vector3 AxisAngle::ToDirection() const
 	{
-		auto quat = this->ToQuaternion();
-		return Vector3::Transform(Vector3::UnitZ, quat);
+		float sinAngle = sin(TO_RAD(Angle));
+		float cosAngle = cos(TO_RAD(Angle));
+
+		auto a = Vector3(cosAngle, sinAngle, 0.0f);
+		auto b = Axis;
+
+		// Calculate the normal vector of the plane
+		auto n = (b.Cross(-Vector3::UnitY).LengthSquared() > 0.0f) ?
+			b.Cross(-Vector3::UnitY) :
+			b.Cross(Vector3::UnitX);
+
+		// Project the vector a onto the plane
+		auto projection = a - (a.Dot(n) * n);
+		projection.Normalize();
+		return projection;
+
+		//auto quat = this->ToQuaternion();
+		//return Vector3::Transform(Vector3::UnitZ, quat);
 	}
 
 	Quaternion AxisAngle::ToQuaternion() const
