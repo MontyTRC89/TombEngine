@@ -37,4 +37,5 @@ namespace TEN::Effects::Smoke
 	void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int velocity, int moving);
 	void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 	void TriggerBreathSmoke(long x, long y, long z, short angle);
+	void TriggerCadaverCloud(int x, int y, int z, int bodyPart);
 }

@@ -235,6 +235,25 @@ namespace TEN::Effects::Smoke
 		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
 	}
 
+	void TriggerCadaverCloud(int x, int y, int z, int bodyPart)
+	{
+		auto& s = GetFreeSmokeParticle();
+		s = {};
+		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f));
+		s.sourceColor = Vector4(0.8f, 0.8f, 0, 1);
+		s.destinationColor = Vector4(0, 0, 0, 0);
+		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
+		s.active = true;
+		s.velocity = Random::GenerateDirection() * Random::GenerateFloat(0.1f, 0.2f);
+		s.affectedByWind = true;
+		s.friction = 0.979f;
+		s.gravity = 0;;
+		s.life = Random::GenerateFloat(100, 220);
+		s.destinationSize = Random::GenerateFloat(1024, 1152);
+		s.angularVelocity = Random::GenerateFloat(-0.1f, 0.1f);
+		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
+	}
+
 	void TriggerBreathSmoke(long x, long y, long z, short angle)
 	{
 		auto& s = GetFreeSmokeParticle();

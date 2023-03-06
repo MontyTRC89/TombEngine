@@ -1412,6 +1412,11 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
+void TriggerCadaverCloud(int x, int y, int z, int bodyPart)
+{
+	TEN::Effects::Smoke::TriggerCadaverCloud(x, y, z, 0);
+}
+
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
@@ -1852,9 +1857,8 @@ void ProcessEffects(ItemInfo* item)
 			break;
 
 		case EffectType::Cadaver:
-			if (TestProbability(1 / 32.0f))
-				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
-			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
+			if (TestProbability(1 / 72.0f))
+				TriggerCadaverCloud(pos.x, pos.y, pos.z, 0);
 			break;
 		}
 	}
