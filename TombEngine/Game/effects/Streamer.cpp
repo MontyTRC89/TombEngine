@@ -8,8 +8,6 @@
 
 namespace TEN::Effects::Streamer
 {
-	constexpr auto OPACITY_MAX = 0.8f;
-
 	static void TransformStreamerVertices(std::array<Vector3, Streamer::StreamerSegment::VERTEX_COUNT>& vertices, const AxisAngle& orient, float distance)
 	{
 		// ---------------------TEMP: 2D solution.
@@ -43,7 +41,7 @@ namespace TEN::Effects::Streamer
 	{
 		// Update opacity.
 		if (Color.w > 0.0f)
-			this->Color.w = InterpolateCos(0.0f, OPACITY_MAX, Life / LifeMax);
+			this->Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
 
 		// TODO: Directional bias like in the older version.
 		
@@ -60,12 +58,13 @@ namespace TEN::Effects::Streamer
 
 		auto& segment = this->GetNewSegment();
 
-		// TODO: Set life according to segment count.
+		float opacityMax = InterpolateCos(0.0f, StreamerSegment::OPACITY_MAX, 1.0f - (1.0f / segmentCount));
 
 		segment.Orientation = AxisAngle(direction, orient2D);
-		segment.Color = Vector4(color.x, color.y, color.z, OPACITY_MAX);
+		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
 		segment.Life =
 		segment.LifeMax = life;
+		segment.OpacityMax = opacityMax;
 		segment.ScaleRate = scaleRate;
 		segment.Vertices[0] = pos;
 		segment.Vertices[1] = pos;

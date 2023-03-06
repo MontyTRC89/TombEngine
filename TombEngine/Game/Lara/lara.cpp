@@ -456,7 +456,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		StreamerEffect.Spawn(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, scaleRate);
 		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate);
 
-		//auto segment = StreamerEffect.Modules.at(item->Index).Instancers.at(0).Streamers[0].Segments.back();
+		//auto segment = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.back();
+		int count = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.size();
+		g_Renderer.PrintDebugMessage("Num Segments: %d", count);
 		//auto target = Geometry::TranslatePoint(headPos, segment.Orientation.ToDirection(), BLOCK(0.25f));
 		//g_Renderer.AddLine3D(headPos, target, Vector4::One);
 	}

@@ -17,15 +17,17 @@ namespace TEN::Effects::Streamer
 		struct StreamerSegment
 		{
 			static constexpr auto VERTEX_COUNT = 2;
+			static constexpr auto OPACITY_MAX  = 0.8f;
 
 			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
 			AxisAngle Orientation = AxisAngle::Identity;
-			Vector4	  Color = Vector4::Zero;
+			Vector4	  Color		  = Vector4::Zero;
 
-			float Life = 0.0f;
-			float LifeMax = 0.0f;
-			float ScaleRate = 0.0f;
+			float Life		 = 0.0f;
+			float LifeMax	 = 0.0f;
+			float OpacityMax = 0.0f;
+			float ScaleRate	 = 0.0f;
 
 			void Update();
 		};
