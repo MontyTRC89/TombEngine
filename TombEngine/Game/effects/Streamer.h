@@ -22,7 +22,7 @@ namespace TEN::Effects::Streamer
 			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
 			AxisAngle Orientation = AxisAngle::Identity;
-			Vector4	  Color = Vector4::Zero;
+			Vector4	  Color		  = Vector4::Zero;
 
 			float Life		= 0.0f;
 			float LifeMax	= 0.0f;
@@ -37,7 +37,7 @@ namespace TEN::Effects::Streamer
 		std::vector<StreamerSegment> Segments = {};
 
 		// Utilities
-		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
+		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 		void Update();
 
 	private:
@@ -49,7 +49,7 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-		static constexpr auto INSTANCE_COUNT_MAX = 8;
+		static constexpr auto INSTANCER_COUNT_MAX = 8;
 
 		class StreamerInstancer
 		{
@@ -62,7 +62,7 @@ namespace TEN::Effects::Streamer
 			std::vector<Streamer> Streamers = {};
 
 			// Utilities
-			void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
+			void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 			void Update();
 
 		private:
@@ -75,7 +75,7 @@ namespace TEN::Effects::Streamer
 		std::map<int, StreamerInstancer> Instancers = {}; // Key = tag.
 
 		// Utilities
-		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
+		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 		void Update();
 	};
 
@@ -90,7 +90,7 @@ namespace TEN::Effects::Streamer
 		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
 
 		// Utilities
-		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha);
+		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 
 		void Update();
 		void Clear();

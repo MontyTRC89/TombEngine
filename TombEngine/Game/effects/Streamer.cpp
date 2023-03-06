@@ -55,8 +55,10 @@ namespace TEN::Effects::Streamer
 		this->Life -= 1.0f;
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
+		this->IsBroken = false;
+
 		auto& segment = this->GetNewSegment();
 
 		segment.Orientation = AxisAngle(direction, orient2D);
@@ -72,6 +74,15 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::Update()
 	{
+		// If streamer was broken, set flag to track it.
+		if (!Segments.empty())
+		{
+			const auto& newestSegment = Segments.back();
+			if (newestSegment.Life != newestSegment.LifeMax)
+				this->IsBroken = true;
+		}
+
+		// Update segments.
 		for (auto& segment : this->Segments)
 			segment.Update();
 
@@ -88,10 +99,10 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	void StreamerModule::StreamerInstancer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
+	void StreamerModule::StreamerInstancer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
 		auto& streamer = this->GetUnbrokenStreamer();
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
 	void StreamerModule::StreamerInstancer::Update()
@@ -118,12 +129,14 @@ namespace TEN::Effects::Streamer
 		return this->Streamers.emplace_back();
 	}
 
-	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
+	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
-		this->Instancers.insert({ tag, {} });
-		this->Instancers.at(tag).AddSegment(pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
+		// Instancer map is full; return early.
+		if (Instancers.size() >= INSTANCER_COUNT_MAX)
+			return;
 
-		// TODO: Don't insert if map is full. Use INSTANCE_COUNT_MAX
+		this->Instancers.insert({ tag, {} });
+		this->Instancers.at(tag).AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
 	void StreamerModule::Update()
@@ -132,10 +145,14 @@ namespace TEN::Effects::Streamer
 			instancer.Update();
 	}
 
-	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, float fadeAlpha)
+	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
+		// Module map is full; return early.
+		if (Modules.size() >= MODULE_COUNT_MAX)
+			return;
+
 		this->Modules.insert({ entityNumber, {} });
-		this->Modules.at(entityNumber).AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate, fadeAlpha);
+		this->Modules.at(entityNumber).AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
 	void StreamerController::Update()
