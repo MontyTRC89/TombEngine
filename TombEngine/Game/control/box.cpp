@@ -2094,9 +2094,6 @@ void InitialiseItemBoxData()
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{
 		auto* currentItem = &g_Level.Items[i];
-
-		if (currentItem->Active && currentItem->Data.is<PushableInfo>())
-			ClearMovableBlockSplitters(currentItem->Pose.Position, currentItem->RoomNumber);
 	}
 
 	for (auto& room : g_Level.Rooms)

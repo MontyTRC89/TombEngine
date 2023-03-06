@@ -60,7 +60,7 @@ namespace TEN::Entities::Generic
 		pushableInfo.StartPos = item.Pose.Position;
 		pushableInfo.StartPos.RoomNumber = item.RoomNumber;
 
-		if (IsClimbablePushable (item.ObjectNumber))
+		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushableInfo.HasFloorColission = true;
 			TEN::Floordata::AddBridge(itemNumber);
@@ -853,21 +853,12 @@ namespace TEN::Entities::Generic
 		{
 			auto& item = objectsList[i];
 
-			if (IsObjectPushable(item.ObjectNumber) || IsClimbablePushable(item.ObjectNumber))
+			if ((item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
+				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
 				pushables.push_back(i);
 		}
 
 		return pushables;
-	}
-
-	bool IsClimbablePushable(const int ObjectNumber)
-	{
-		return (ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10);
-	}
-
-	bool IsObjectPushable(const int ObjectNumber)
-	{
-		return (ObjectNumber >= ID_PUSHABLE_OBJECT1 && ObjectNumber <= ID_PUSHABLE_OBJECT10);
 	}
 
 	void UpdateRoomNumbers(const short itemNumber)
@@ -909,50 +900,7 @@ namespace TEN::Entities::Generic
 		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
 		return heightWorldAligned;
 	}
-
-	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber) // TODO: Update with the new collision functions
-	{
-		FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		if (floor->Box == NO_BOX) //Not walkable (blue floor flag)
-			return;
-
-		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;  //Unblock the isolated box (grey floor flag)
-
-		int height = g_Level.Boxes[floor->Box].height;
-		int baseRoomNumber = roomNumber;
-
-		floor = GetFloor(pos.x + BLOCK(1), pos.y, pos.z, &roomNumber);
-		if (floor->Box != NO_BOX)
-		{
-			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(Vector3i(pos.x + BLOCK(1), pos.y, pos.z), roomNumber);
-		}
-
-		roomNumber = baseRoomNumber;
-		floor = GetFloor(pos.x - BLOCK(1), pos.y, pos.z, &roomNumber);
-		if (floor->Box != NO_BOX)
-		{
-			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(Vector3i(pos.x - BLOCK(1), pos.y, pos.z), roomNumber);
-		}
-
-		roomNumber = baseRoomNumber;
-		floor = GetFloor(pos.x, pos.y, pos.z + BLOCK(1), &roomNumber);
-		if (floor->Box != NO_BOX)
-		{
-			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z + BLOCK(1)), roomNumber);
-		}
-
-		roomNumber = baseRoomNumber;
-		floor = GetFloor(pos.x, pos.y, pos.z - BLOCK(1), &roomNumber);
-		if (floor->Box != NO_BOX)
-		{
-			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z - BLOCK(1)), roomNumber);
-		}
-	}
-
+	
 	// Test functions
 
 	bool IsPushableOnValidSurface(ItemInfo& pushableItem)
