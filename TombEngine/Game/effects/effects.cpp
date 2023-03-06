@@ -1888,7 +1888,7 @@ void ProcessEffects(ItemInfo* item)
 		break;
 	}
 
-	if (item->Effect.Type != EffectType::Smoke)
+	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
 	{
 		if (item->IsLara() ||
 			(item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))
