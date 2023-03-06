@@ -87,9 +87,9 @@ namespace TEN::Renderer
 
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
-			for (const auto& [tag, instancer] : module.Instancers)
+			for (const auto& [tag, pool] : module.Pools)
 			{
-				for (const auto& streamer : instancer.Streamers)
+				for (const auto& streamer : pool)
 				{
 					for (int i = 0; i < streamer.Segments.size(); i++)
 					{

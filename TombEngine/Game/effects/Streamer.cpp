@@ -97,56 +97,50 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	void StreamerModule::StreamerInstancer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
+	Streamer& StreamerModule::GetUnbrokenStreamer(int tag)
 	{
-		auto& streamer = this->GetUnbrokenStreamer();
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
-	}
+		this->Pools.insert({ tag, {} });
+		auto& pool = this->Pools.at(tag);
 
-	void StreamerModule::StreamerInstancer::Update()
-	{
-		for (auto& streamer : this->Streamers)
-			streamer.Update();
-	}
-
-	Streamer& StreamerModule::StreamerInstancer::GetUnbrokenStreamer()
-	{
 		// Return unbroken streamer at back of vector if it exists.
-		if (!Streamers.empty())
+		if (!pool.empty())
 		{
-			auto& streamer = this->Streamers.back();
+			auto& streamer = pool.back();
 			if (!streamer.IsBroken)
 				return streamer;
 		}
 
-		// Clear oldest streamer if vector is full.
-		if (Streamers.size() >= STREAMER_COUNT_MAX)
-			this->Streamers.erase(Streamers.begin());
+		// Clear oldest streamer if pool is full.
+		if (pool.size() >= STREAMER_COUNT_MAX)
+			pool.erase(pool.begin());
 
 		// Add and return new streamer.
-		return this->Streamers.emplace_back();
+		return pool.emplace_back();
 	}
 
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
-		// Instancer map is full; return early.
-		if (Instancers.size() >= INSTANCER_COUNT_MAX)
+		// Pool map is full and tag key doesn't exist; return early.
+		if (Pools.size() >= POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
-		this->Instancers.insert({ tag, {} });
-		this->Instancers.at(tag).AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
+		auto& streamer = this->GetUnbrokenStreamer(tag);
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
 	void StreamerModule::Update()
 	{
-		for (auto& [tag, instancer] : this->Instancers)
-			instancer.Update();
+		for (auto& [tag, pool] : this->Pools)
+		{
+			for (auto& streamer : pool)
+				streamer.Update();
+		}
 	}
 
 	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
-		// Module map is full; return early.
-		if (Modules.size() >= MODULE_COUNT_MAX)
+		// Module map is full and entityNumber key doesn't exist; return early.
+		if (Modules.size() >= MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
 		this->Modules.insert({ entityNumber, {} });
