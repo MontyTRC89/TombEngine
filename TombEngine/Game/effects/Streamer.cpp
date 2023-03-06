@@ -5,6 +5,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 
 namespace TEN::Effects::Streamer
 {
@@ -58,12 +59,13 @@ namespace TEN::Effects::Streamer
 
 		auto& segment = this->GetNewSegment();
 
-		float opacityMax = InterpolateCos(0.0f, StreamerSegment::OPACITY_MAX, 1.0f - (1.0f / segmentCount));
+		float lifeMax = round(life * FPS);
+		float opacityMax = InterpolateCos(0.0f, StreamerSegment::OPACITY_MAX, segmentCount / lifeMax);
 
 		segment.Orientation = AxisAngle(direction, orient2D);
 		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
 		segment.Life =
-		segment.LifeMax = life;
+		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
 		segment.ScaleRate = scaleRate;
 		segment.Vertices[0] = pos;
