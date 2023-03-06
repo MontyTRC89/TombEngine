@@ -135,7 +135,7 @@ namespace TEN::Renderer
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
 						color, color, color, color,
-						BLEND_MODE, view);
+						BLENDMODE_ADDITIVE, view);
 				}
 				else
 				{
@@ -145,7 +145,7 @@ namespace TEN::Renderer
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
 						color, color, color, color,
-						BLEND_MODE, view);
+						BLENDMODE_ADDITIVE, view);
 				}
 			}
 		}
