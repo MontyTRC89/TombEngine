@@ -381,6 +381,8 @@ namespace TEN::Entities::Generic
 				if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 				{
 					pushableInfo.GravityState = PushableGravityState::Sinking;
+					
+					//TODO [Effects Requirement] Add Water splash.
 				}
 			}
 			else
@@ -417,6 +419,8 @@ namespace TEN::Entities::Generic
 				pushableInfo.Gravity = GRAVITY_AIR;
 				return true;
 			}
+
+			//TODO [Effects Requirement] Add bubbles during this phase
 
 			if (pushableInfo.Buoyancy)
 			{
@@ -510,7 +514,7 @@ namespace TEN::Entities::Generic
 
 			FloatingSolidItem(pushableItem, pushableInfo.FloatingForce);
 
-			//Spawn water waves effects?
+			//TODO [Effects Requirement] Spawn circular water waves
 
 			break;
 
@@ -647,6 +651,8 @@ namespace TEN::Entities::Generic
 
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 
+			//TODO: [Bug] If the pushable is pasing over another pushable, this is removing the stopper flag of the old one.
+			//If should check if there remains another pushable in the place to decide if quit the StopperFlag or not.
 			SetStopperFlag(pushableInfo.StartPos, false);
 
 			// Check if pushing pushable through an edge into falling.Then she can't keep pushing/pulling
