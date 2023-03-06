@@ -152,6 +152,7 @@ CALL gen.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Math\Interpolation.h" />
     <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
@@ -631,6 +632,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Math\Interpolation.cpp" />
     <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
     <ClCompile Include="framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
