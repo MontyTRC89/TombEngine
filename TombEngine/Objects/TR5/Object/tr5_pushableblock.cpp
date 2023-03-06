@@ -26,8 +26,8 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
 	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
 
-	const float GRAVITY_AIR = 8.0f;
-	const float GRAVITY_CHANGE_SPEED = 0.5f; // adjust this value as needed
+	constexpr float GRAVITY_AIR = 8.0f;
+	constexpr float GRAVITY_CHANGE_SPEED = 0.5f; // adjust this value as needed
 
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
@@ -74,7 +74,7 @@ namespace TEN::Entities::Generic
 
 		
 		// Read OCB flags.
-		const int ocb = item.TriggerFlags;
+		int ocb = item.TriggerFlags;
 
 		pushableInfo.CanFall = (ocb & 0x01) != 0; // Check if bit 0 is set	(+1)
 		pushableInfo.DoAlignCenter = (ocb & 0x02) != 0; // Check if bit 1 is set	(+2)
@@ -315,8 +315,8 @@ namespace TEN::Entities::Generic
 				
 		auto col = GetCollision(&pushableItem);
 
-		const float currentY = pushableItem.Pose.Position.y;
-		const float velocityY = pushableItem.Animation.Velocity.y;
+		float currentY = pushableItem.Pose.Position.y;
+		float velocityY = pushableItem.Animation.Velocity.y;
 
 		int goalHeight = 0;
 
@@ -369,7 +369,7 @@ namespace TEN::Entities::Generic
 			if (currentY < col.Position.Floor - velocityY)
 			{
 				// Is on air.
-				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				float newVelocityY = velocityY + pushableInfo.Gravity;
 				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_FALL_VELOCITY_MAX);
 
 				// Update the pushable block's position and move the block's stack.
@@ -401,7 +401,7 @@ namespace TEN::Entities::Generic
 
 				SoundEffect(GetPushableSound(Fall, detectionPoint), &pushableItem.Pose, SoundEnvironment::Always);
 
-				const int differenceY = col.Position.Floor - currentY;
+				int differenceY = col.Position.Floor - currentY;
 				MoveStackY(itemNumber, differenceY);
 
 				DeactivationRoutine(itemNumber);
@@ -436,7 +436,7 @@ namespace TEN::Entities::Generic
 			if (currentY < col.Position.Floor - velocityY)
 			{
 				// Is on sunking down.
-				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				float newVelocityY = velocityY + pushableInfo.Gravity;
 				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
 
 				// Update the pushable block's position and move the block's stack.
@@ -452,7 +452,7 @@ namespace TEN::Entities::Generic
 								
 				pushableItem.Animation.Velocity.y = 0.0f;
 
-				const int differenceY = col.Position.Floor - currentY;
+				int differenceY = col.Position.Floor - currentY;
 				MoveStackY(itemNumber, differenceY);
 
 				DeactivationRoutine(itemNumber);
@@ -474,7 +474,7 @@ namespace TEN::Entities::Generic
 			if (currentY > goalHeight)
 			{
 				// Is floating up.
-				const float newVelocityY = velocityY + pushableInfo.Gravity;
+				float newVelocityY = velocityY + pushableInfo.Gravity;
 				pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
 
 				// Update the pushable block's position and move the block's stack.
@@ -490,7 +490,7 @@ namespace TEN::Entities::Generic
 
 				pushableItem.Animation.Velocity.y = 0.0f;
 
-				const int differenceY = goalHeight - currentY;
+				int differenceY = goalHeight - currentY;
 				MoveStackY(itemNumber, differenceY);
 
 				DeactivationRoutine(itemNumber);
@@ -565,7 +565,7 @@ namespace TEN::Entities::Generic
 
 		// Moves pushable based on player bounds.Z2.
 
-		const bool isLaraPulling = LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL || LaraItem->Animation.AnimNumber == LA_PUSHABLE_BLOCK_PULL; //else, she is pushing.
+		bool isLaraPulling = LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL || LaraItem->Animation.AnimNumber == LA_PUSHABLE_BLOCK_PULL; //else, she is pushing.
 
 		int quadrantDir = GetQuadrant(LaraItem->Pose.Orientation.y);
 		int newPosX = pushableInfo.StartPos.x;
@@ -758,8 +758,8 @@ namespace TEN::Entities::Generic
 
 	int GetPushableSound(const PushableSoundsType& type, const GameVector& detectionPoint)
 	{
-		const auto col = GetCollision(detectionPoint);
-		const auto materialID = col.BottomBlock->Material;
+		auto col = GetCollision(detectionPoint);
+		auto materialID = col.BottomBlock->Material;
 
 		int resultSound = 0;
 		switch (type)
@@ -940,7 +940,7 @@ namespace TEN::Entities::Generic
 		if (!CheckStackLimit(pushableItem))
 			return false;
 
-		const auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 		auto col = GetCollision(targetPoint);
 
 		//It's in a wall
@@ -989,7 +989,7 @@ namespace TEN::Entities::Generic
 
 		//Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);
-		const int blockHeight = GetStackHeight(pushableItem);
+		int blockHeight = GetStackHeight(pushableItem);
 		if (distanceToCeiling < blockHeight)
 			return false;
 
@@ -1013,7 +1013,7 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr) //¿¿??
 				return false;
 
-			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+			auto& object = Objects[CollidedItems[i]->ObjectNumber];
 			int collidedIndex = CollidedItems[i] - g_Level.Items.data(); // Index of CollidedItems[i].
 
 			auto colPos = CollidedItems[i]->Pose.Position;
@@ -1106,7 +1106,7 @@ namespace TEN::Entities::Generic
 				return false;
 			else
 			{
-				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+				auto& object = Objects[CollidedItems[i]->ObjectNumber];
 				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
 				int xCol = CollidedItems[i]->Pose.Position.x;
 				int yCol = CollidedItems[i]->Pose.Position.y;
@@ -1285,7 +1285,7 @@ namespace TEN::Entities::Generic
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
@@ -1302,7 +1302,7 @@ namespace TEN::Entities::Generic
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushableInfo = GetPushableInfo(pushableItem);
+		auto& pushableInfo = GetPushableInfo(pushableItem);
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
@@ -1316,14 +1316,14 @@ namespace TEN::Entities::Generic
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		const auto height = item.Pose.Position.y - GetPushableHeight(item);
+		auto height = item.Pose.Position.y - GetPushableHeight(item);
 
 		return height;
 	}
 
 	int PushableBlockCeilingBorder(short itemNumber)
 	{
-		const auto* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		return item->Pose.Position.y;
 	}
