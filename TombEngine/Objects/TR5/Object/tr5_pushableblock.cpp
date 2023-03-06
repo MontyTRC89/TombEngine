@@ -27,7 +27,8 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
 
 	constexpr float GRAVITY_AIR = 8.0f;
-	constexpr float GRAVITY_CHANGE_SPEED = 0.5f; // adjust this value as needed
+	constexpr float GRAVITY_CHANGE_SPEED = 0.5f;
+	constexpr float WATER_SURFACE_DISTANCE = CLICK(0.5f);
 
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
@@ -323,11 +324,11 @@ namespace TEN::Entities::Generic
 		int waterDepth = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 		if (waterDepth != NO_HEIGHT)
 		{
-			goalHeight = waterDepth - CLICK(1) + pushableInfo.Height;
+			goalHeight = waterDepth - WATER_SURFACE_DISTANCE + pushableInfo.Height;
 		}
 		else
 		{
-			goalHeight = col.Position.Ceiling + pushableInfo.Height;
+			goalHeight = col.Position.Ceiling + WATER_SURFACE_DISTANCE + pushableInfo.Height;
 		}
 
 
@@ -507,7 +508,7 @@ namespace TEN::Entities::Generic
 				return true;
 			}
 
-			FloatingItem(pushableItem);
+			FloatingSolidItem(pushableItem, pushableInfo.FloatingForce);
 
 			//Spawn water waves effects?
 
@@ -523,24 +524,6 @@ namespace TEN::Entities::Generic
 
 		return true;
 
-	}
-
-	void FloatingItem(ItemInfo& item)
-	{
-		auto& time = item.Animation.Velocity.y;
-		time += 1.0f; // Get the current time
-
-		float tiltOscilation = std::sin(time * 0.05f) * 0.5f;
-		float rollOscilation = std::sin(time * 0.1f) * 0.75f;
-
-		float tilt = tiltOscilation * 20.0f;
-		float roll = rollOscilation * 20.0f;
-
-		item.Pose.Orientation = EulerAngles(ANGLE(tilt), item.Pose.Orientation.y, ANGLE (roll));
-
-		// Reset the time after a certain amount of time has passed
-		if (time > 125.0f)
-			time = 0.0f;
 	}
 	
 	void PushableBlockManageIdle(const short itemNumber)

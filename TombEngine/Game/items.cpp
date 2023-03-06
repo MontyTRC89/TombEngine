@@ -868,3 +868,31 @@ bool CompareItemByXZ(const int itemNumberA, const int itemNumberB)
 		return itemA.Pose.Position.x < itemB.Pose.Position.x;
 	}
 }
+
+void FloatingSolidItem(ItemInfo& item, float floatingForce)
+{
+	auto& time = item.Animation.Velocity.y; 
+	time += 1.0f;
+
+	// Calculate the bounding box volume scaling factor
+	float bboxVolume = GameBoundingBox(&item).GetWidth() * GameBoundingBox(&item).GetDepth() * GameBoundingBox(&item).GetHeight();
+	float minVolume = 512.0f;
+	float bboxScale = std::sqrt(std::min(minVolume, bboxVolume)) / 32.0f;
+
+	bboxScale *= floatingForce;
+
+	float tiltOscilation = std::sin(time * 0.05f) * 0.5f * bboxScale;
+	float rollOscilation = std::sin(time * 0.1f) * 0.75f * bboxScale;
+
+	float tilt = tiltOscilation * 20.0f;
+	float roll = rollOscilation * 20.0f;
+
+	item.Pose.Orientation = EulerAngles(ANGLE(tilt), item.Pose.Orientation.y, ANGLE(roll));
+
+	// Reset the time after a certain amount of time has passed
+	//125 is the lap of frames needed to finish the tilt sin cycle with these values.
+	//If frequency and amplitude changes, this value must be changed too.
+	if (time > 125.0f)
+		time = 0.0f;
+}
+

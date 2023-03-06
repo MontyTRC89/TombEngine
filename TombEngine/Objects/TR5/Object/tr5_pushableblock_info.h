@@ -48,6 +48,7 @@ namespace TEN::Entities::Generic
 		int Height;								// height for collision, also in floor procedure
 		float Gravity;							// fall acceleration
 		PushableGravityState GravityState;
+		float FloatingForce;					// how strong are the oscilations while the object is floating in water. (recomended range 0.0f - 2.0f)
 		
 		int StackLimit;							// max of pushables that can be over it so Lara can move it.
 		int StackUpperItem;						// the itemNumber of the pushable that is placed over it.
@@ -74,6 +75,7 @@ namespace TEN::Entities::Generic
 
 			Gravity = 8.0f;
 			GravityState = PushableGravityState::Ground;
+			FloatingForce = 0.75f;
 
 			StackLimit = 3;
 			StackUpperItem = -1;

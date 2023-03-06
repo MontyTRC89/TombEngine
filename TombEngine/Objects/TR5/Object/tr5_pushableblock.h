@@ -107,6 +107,4 @@ namespace TEN::Entities::Generic
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
 	int PushableBlockFloorBorder(short itemNumber);
 	int PushableBlockCeilingBorder(short itemNumber);
-
-	void FloatingItem(ItemInfo& item);
 }
