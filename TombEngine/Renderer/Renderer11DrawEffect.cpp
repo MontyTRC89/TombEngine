@@ -118,13 +118,14 @@ namespace TEN::Renderer
 		{
 			for (int i = 0; i < streamer.size(); i++)
 			{
-				auto& segment = streamer[i];
-				const auto& prevSegment = streamer[std::max(i - 1, 0)];
+				const auto& segment = streamer[i];
+				const auto& prevSegment = streamer[(i > 0) ? (i - 1) : 0];
 
 				if (segment.Life <= 0.0f)
 					continue;
 
 				auto color = Vector4(segment.Opacity);
+				auto prevColor = Vector4(prevSegment.Opacity);
 
 				// If central, no vertex color.
 				if (segment.Type == StreamerType::Center)
@@ -134,7 +135,7 @@ namespace TEN::Renderer
 						segment.Vertices[1],
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
-						color, color, color, color,
+						color, color, prevColor, prevColor,
 						BLENDMODE_ADDITIVE, view);
 				}
 				else
@@ -144,7 +145,7 @@ namespace TEN::Renderer
 						segment.Vertices[1],
 						prevSegment.Vertices[1],
 						prevSegment.Vertices[0],
-						color, color, color, color,
+						Vector4::Zero, color, prevColor, Vector4::Zero,
 						BLENDMODE_ADDITIVE, view);
 				}
 			}
