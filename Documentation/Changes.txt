@@ -1,7 +1,10 @@
 Version 1.0.8
 =============
 
-*Fix Sophia's charge ring drawing below floor.
+* Fix Sophia's charge ring drawing below floor.
+* Fix bubbles phasing through ceilings.
+* Fix TR5 imp collision handling and animations.
+* Add TR1 slamming doors.
 
 Version 1.0.7
 =============
