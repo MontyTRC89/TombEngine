@@ -49,8 +49,8 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-		static constexpr auto POOL_COUNT_MAX	 = 8;
 		static constexpr auto STREAMER_COUNT_MAX = 8;
+		static constexpr auto POOL_COUNT_MAX	 = 8;
 
 	public:
 		// Components
@@ -62,7 +62,7 @@ namespace TEN::Effects::Streamer
 
 	private:
 		// Helpers
-		Streamer& GetUnbrokenStreamer(std::vector<Streamer>& pool);
+		Streamer& GetStreamer(std::vector<Streamer>& pool);
 		void	  ClearInactiveStreamers(std::vector<Streamer>& pool);
 		void	  ClearInactivePools();
 	};

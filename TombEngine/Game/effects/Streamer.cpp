@@ -55,8 +55,6 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount)
 	{
-		this->IsBroken = false;
-
 		auto& segment = this->GetNewSegment();
 
 		float lifeMax = round(life * FPS);
@@ -100,7 +98,7 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	Streamer& StreamerModule::GetUnbrokenStreamer(std::vector<Streamer>& pool)
+	Streamer& StreamerModule::GetStreamer(std::vector<Streamer>& pool)
 	{
 		// Return unbroken streamer at back of vector if it exists.
 		if (!pool.empty())
@@ -120,7 +118,7 @@ namespace TEN::Effects::Streamer
 
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
-		// Pool map is full and tag key doesn't exist; return early.
+		// Return early if pool map is full and tag key doesn't exist.
 		if (Pools.size() >= POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
@@ -129,7 +127,7 @@ namespace TEN::Effects::Streamer
 		auto& pool = this->Pools.at(tag);
 
 		// Get and extend streamer with new segment.
-		auto& streamer = this->GetUnbrokenStreamer(pool);
+		auto& streamer = this->GetStreamer(pool);
 		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, streamer.Segments.size());
 	}
 
@@ -151,7 +149,7 @@ namespace TEN::Effects::Streamer
 		pool.erase(
 			std::remove_if(
 				pool.begin(), pool.end(),
-				[](const auto& streamers) { return streamers.Segments.empty(); }),
+				[](const auto& streamer) { return streamer.Segments.empty(); }),
 			pool.end());
 	}
 
@@ -168,7 +166,7 @@ namespace TEN::Effects::Streamer
 
 	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
-		// Module map is full and entityNumber key doesn't exist; return early.
+		// Return early if module map is full and entityNumber key doesn't exist.
 		if (Modules.size() >= MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
