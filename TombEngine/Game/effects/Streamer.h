@@ -77,7 +77,6 @@ namespace TEN::Effects::Streamer
 
 		// Utilities
 		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
-
 		void Update();
 		void Clear();
 	};

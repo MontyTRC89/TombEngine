@@ -61,6 +61,8 @@ namespace TEN::Effects::Streamer
 
 		auto& segment = this->GetNewSegment();
 
+		// TODO: Set life according to segment count.
+
 		segment.Orientation = AxisAngle(direction, orient2D);
 		segment.Color = Vector4(color.x, color.y, color.z, OPACITY_MAX);
 		segment.Life =
@@ -99,6 +101,7 @@ namespace TEN::Effects::Streamer
 
 	Streamer& StreamerModule::GetUnbrokenStreamer(int tag)
 	{
+		// Get pool at tag key.
 		this->Pools.insert({ tag, {} });
 		auto& pool = this->Pools.at(tag);
 
@@ -143,8 +146,12 @@ namespace TEN::Effects::Streamer
 		if (Modules.size() >= MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
+		// Get module at entityNumber key.
 		this->Modules.insert({ entityNumber, {} });
-		this->Modules.at(entityNumber).AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate);
+		auto& module = this->Modules.at(entityNumber);
+
+		// Add streamer to module.
+		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
 	void StreamerController::Update()
