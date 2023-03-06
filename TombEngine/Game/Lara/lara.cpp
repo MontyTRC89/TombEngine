@@ -450,11 +450,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		};
 
 		// Spawn Commander Video rainbow.
-		StreamerEffect.GrowStreamer(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, scaleRate);
-		StreamerEffect.GrowStreamer(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, scaleRate);
-		StreamerEffect.GrowStreamer(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, scaleRate);
-		StreamerEffect.GrowStreamer(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, scaleRate);
-		StreamerEffect.GrowStreamer(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate);
 
 		//auto segment = StreamerEffect.Modules.at(item->Index).Instancers.at(0).Streamers[0].Segments.back();
 		//auto target = Geometry::TranslatePoint(headPos, segment.Orientation.ToDirection(), BLOCK(0.25f));

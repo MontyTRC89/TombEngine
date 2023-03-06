@@ -10,7 +10,7 @@ namespace TEN::Effects::Streamer
 {
 	constexpr auto OPACITY_MAX = 0.8f;
 
-	static Vector3 TranslateStreamerVertex(const Vector3& vertex, const AxisAngle& orient, float distance, bool moveRight)
+	static void TransformStreamerVertices(std::array<Vector3, Streamer::StreamerSegment::VERTEX_COUNT>& vertices, const AxisAngle& orient, float distance)
 	{
 		// ---------------------TEMP: 2D solution.
 
@@ -20,8 +20,8 @@ namespace TEN::Effects::Streamer
 
 		auto direction = Geometry::RotatePoint(orient.GetAxis(), rot);
 		direction.Normalize();*/
-		auto direction = moveRight ? Vector3::Up : Vector3::Down;
-		return Geometry::TranslatePoint(vertex, direction, distance);
+		vertices[0] = Geometry::TranslatePoint(vertices[0], Vector3::Down, distance);
+		vertices[1] = Geometry::TranslatePoint(vertices[1], Vector3::Up, distance);
 
 		// ---------------------
 		
@@ -48,14 +48,13 @@ namespace TEN::Effects::Streamer
 		// TODO: Directional bias like in the older version.
 		
 		// Update vertices.
-		this->Vertices[0] = TranslateStreamerVertex(Vertices[0], Orientation, ScaleRate, false);
-		this->Vertices[1] = TranslateStreamerVertex(Vertices[1], Orientation, ScaleRate, true);
+		TransformStreamerVertices(this->Vertices, Orientation, ScaleRate);
 
 		// Update life.
 		this->Life -= 1.0f;
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount)
 	{
 		this->IsBroken = false;
 
@@ -68,8 +67,9 @@ namespace TEN::Effects::Streamer
 		segment.Life =
 		segment.LifeMax = life;
 		segment.ScaleRate = scaleRate;
-		segment.Vertices[0] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, false);
-		segment.Vertices[1] = TranslateStreamerVertex(pos, segment.Orientation, width / 2, true);
+		segment.Vertices[0] = pos;
+		segment.Vertices[1] = pos;
+		TransformStreamerVertices(segment.Vertices, segment.Orientation, width / 2);
 	}
 
 	void Streamer::Update()
@@ -99,12 +99,8 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	Streamer& StreamerModule::GetUnbrokenStreamer(int tag)
+	Streamer& StreamerModule::GetUnbrokenStreamer(std::vector<Streamer>& pool)
 	{
-		// Get pool at tag key.
-		this->Pools.insert({ tag, {} });
-		auto& pool = this->Pools.at(tag);
-
 		// Return unbroken streamer at back of vector if it exists.
 		if (!pool.empty())
 		{
@@ -127,8 +123,13 @@ namespace TEN::Effects::Streamer
 		if (Pools.size() >= POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
-		auto& streamer = this->GetUnbrokenStreamer(tag);
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate);
+		// Get pool at tag key.
+		this->Pools.insert({ tag, {} });
+		auto& pool = this->Pools.at(tag);
+
+		// Get and extend streamer with new segment.
+		auto& streamer = this->GetUnbrokenStreamer(pool);
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, streamer.Segments.size());
 	}
 
 	void StreamerModule::Update()
@@ -140,7 +141,7 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	void StreamerController::GrowStreamer(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
+	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
 		// Module map is full and entityNumber key doesn't exist; return early.
 		if (Modules.size() >= MODULE_COUNT_MAX && !Modules.count(entityNumber))

@@ -13,31 +13,29 @@ namespace TEN::Effects::Streamer
 		// Constants
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
+	public:
 		struct StreamerSegment
 		{
-		private:
 			static constexpr auto VERTEX_COUNT = 2;
 
-		public:
 			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
 			AxisAngle Orientation = AxisAngle::Identity;
-			Vector4	  Color		  = Vector4::Zero;
+			Vector4	  Color = Vector4::Zero;
 
-			float Life		= 0.0f;
-			float LifeMax	= 0.0f;
+			float Life = 0.0f;
+			float LifeMax = 0.0f;
 			float ScaleRate = 0.0f;
 
 			void Update();
 		};
 
-	public:
 		// Components
 		bool IsBroken = false;
 		std::vector<StreamerSegment> Segments = {};
 
 		// Utilities
-		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
+		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount);
 		void Update();
 
 	private:
@@ -62,7 +60,7 @@ namespace TEN::Effects::Streamer
 
 	private:
 		// Helpers
-		Streamer& GetUnbrokenStreamer(int tag);
+		Streamer& GetUnbrokenStreamer(std::vector<Streamer>& pool);
 	};
 
 	class StreamerController
@@ -76,7 +74,7 @@ namespace TEN::Effects::Streamer
 		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
 
 		// Utilities
-		void GrowStreamer(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
+		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 		void Update();
 		void Clear();
 	};
