@@ -139,6 +139,30 @@ namespace TEN::Effects::Streamer
 		{
 			for (auto& streamer : pool)
 				streamer.Update();
+
+			this->ClearInactiveStreamers(pool);
+		}
+
+		this->ClearInactivePools();
+	}
+
+	void StreamerModule::ClearInactiveStreamers(std::vector<Streamer>& pool)
+	{
+		pool.erase(
+			std::remove_if(
+				pool.begin(), pool.end(),
+				[](const auto& streamers) { return streamers.Segments.empty(); }),
+			pool.end());
+	}
+
+	void StreamerModule::ClearInactivePools()
+	{
+		for (auto it = Pools.begin(); it != Pools.end();)
+		{
+			if (it->second.empty())
+				it = this->Pools.erase(it);
+			else
+				++it;
 		}
 	}
 
@@ -160,11 +184,24 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto& [entityNumber, module] : this->Modules)
 			module.Update();
+
+		this->ClearInactiveModules();
 	}
 
 	void StreamerController::Clear()
 	{
 		*this = {};
+	}
+
+	void StreamerController::ClearInactiveModules()
+	{
+		for (auto it = Modules.begin(); it != Modules.end();)
+		{
+			if (it->second.Pools.empty())
+				it = this->Modules.erase(it);
+			else
+				++it;
+		}
 	}
 
 	StreamerController StreamerEffect = {};

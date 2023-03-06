@@ -63,6 +63,8 @@ namespace TEN::Effects::Streamer
 	private:
 		// Helpers
 		Streamer& GetUnbrokenStreamer(std::vector<Streamer>& pool);
+		void	  ClearInactiveStreamers(std::vector<Streamer>& pool);
+		void	  ClearInactivePools();
 	};
 
 	class StreamerController
@@ -79,6 +81,9 @@ namespace TEN::Effects::Streamer
 		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate);
 		void Update();
 		void Clear();
+
+	private:
+		void ClearInactiveModules();
 	};
 
 	extern StreamerController StreamerEffect;
