@@ -8,7 +8,7 @@ class EulerAngles;
 	{
 	private:
 		// Components
-		Vector3 Axis  = Vector3::Zero;
+		Vector3 Axis  = Vector3::Backward;
 		short	Angle = 0;
 
 	public:

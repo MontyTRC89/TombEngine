@@ -25,8 +25,6 @@ namespace TEN::Effects::Streamer
 			static constexpr auto VERTEX_COUNT = 2;
 			static constexpr auto OPACITY_MAX  = 0.8f;
 
-			std::array<Vector3, VERTEX_COUNT> Vertices = {};
-
 			AxisAngle Orientation = AxisAngle::Identity;
 			Vector4	  Color		  = Vector4::Zero;
 
@@ -36,6 +34,8 @@ namespace TEN::Effects::Streamer
 			float Velocity	 = 0.0f;
 			float ScaleRate	 = 0.0f;
 			int	  Flags		 = 0;
+
+			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
