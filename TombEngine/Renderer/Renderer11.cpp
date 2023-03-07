@@ -127,7 +127,7 @@ namespace TEN::Renderer
 		auto barBorderVertices = std::array<Vector3, 16>
 		{
 			// Top left
-			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y - hudBorderSize.y, 0.0f),
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + (pos.y - hudBorderSize.y), 0.0f),
 			Vector3(pos.x, HUD_ZERO_Y + (pos.y - hudBorderSize.y), 0.0f),
 			Vector3(pos.x, HUD_ZERO_Y + pos.y, 0.0f),
 			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y, 0.0f),
@@ -145,7 +145,7 @@ namespace TEN::Renderer
 			Vector3(pos.x + size.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f),
 
 			// Bottom left
-			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + pos.y + size.y, 0.0f),
+			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + (pos.y + size.y), 0.0f),
 			Vector3(pos.x, HUD_ZERO_Y + (pos.y + size.y), 0.0f),
 			Vector3(pos.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f),
 			Vector3(pos.x - hudBorderSize.x, HUD_ZERO_Y + ((pos.y + size.y) + hudBorderSize.y), 0.0f)
@@ -197,20 +197,28 @@ namespace TEN::Renderer
 		{
 			// Top left
 			0, 1, 3, 1, 2, 3,
+
 			// Top center
 			1, 4, 2, 4, 7, 2,
+
 			// Top right
 			4, 5, 7, 5, 6, 7,
+
 			// Right
 			7, 6, 8, 6, 9, 8,
+
 			// Bottom right
 			8, 9, 11, 9, 10, 11,
+
 			// Bottom
 			13, 8, 14, 8, 11, 14,
+
 			// Bottom left
 			12, 13, 15, 13, 14, 15,
+
 			// Left
 			3, 2, 12, 2, 13, 12,
+
 			// Center
 			2, 7, 13, 7, 8, 13
 		};
