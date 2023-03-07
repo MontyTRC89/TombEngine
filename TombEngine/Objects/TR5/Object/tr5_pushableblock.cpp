@@ -376,7 +376,7 @@ namespace TEN::Entities::Generic
 				// Update the pushable block's position and move the block's stack.
 				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
 				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
-				UpdateRoomNumbers(itemNumber);
+				UpdatePushablesRoomNumbers(itemNumber);
 
 				if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 				{
@@ -407,7 +407,7 @@ namespace TEN::Entities::Generic
 				int differenceY = col.Position.Floor - currentY;
 				MoveStackY(itemNumber, differenceY);
 
-				DeactivationRoutine(itemNumber);
+				DeactivationPushablesRoutine(itemNumber);
 			}
 			break;
 
@@ -447,7 +447,7 @@ namespace TEN::Entities::Generic
 				// Update the pushable block's position and move the block's stack.
 				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
 				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
-				UpdateRoomNumbers(itemNumber);
+				UpdatePushablesRoomNumbers(itemNumber);
 			}
 			else
 			{
@@ -460,7 +460,7 @@ namespace TEN::Entities::Generic
 				int differenceY = col.Position.Floor - currentY;
 				MoveStackY(itemNumber, differenceY);
 
-				DeactivationRoutine(itemNumber);
+				DeactivationPushablesRoutine(itemNumber);
 			}
 
 			break;
@@ -485,7 +485,7 @@ namespace TEN::Entities::Generic
 				// Update the pushable block's position and move the block's stack.
 				pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
 				MoveStackY(itemNumber, pushableItem.Animation.Velocity.y);
-				UpdateRoomNumbers(itemNumber);
+				UpdatePushablesRoomNumbers(itemNumber);
 			}
 			else
 			{
@@ -497,8 +497,9 @@ namespace TEN::Entities::Generic
 
 				int differenceY = goalHeight - currentY;
 				MoveStackY(itemNumber, differenceY);
+				UpdatePushablesRoomNumbers(itemNumber);
 
-				DeactivationRoutine(itemNumber);
+				DeactivationPushablesRoutine(itemNumber);
 			}
 			break;
 
@@ -542,7 +543,7 @@ namespace TEN::Entities::Generic
 		
 		pushableInfo.GravityState = PushableGravityState::Ground;
 
-		DeactivationRoutine(itemNumber);
+		DeactivationPushablesRoutine(itemNumber);
 	}
 	
 	void PushableBlockManageMoving(const short itemNumber)
@@ -647,7 +648,7 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position = GetNearestSectorCenter(pushableItem.Pose.Position);
 
 			MoveStackXZ(itemNumber);
-			UpdateRoomNumbers(itemNumber);
+			UpdatePushablesRoomNumbers(itemNumber);
 
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 
@@ -809,7 +810,7 @@ namespace TEN::Entities::Generic
 		UpdateAllPushablesStackLinks();
 	}
 
-	void DeactivationRoutine(const short itemNumber)
+	void DeactivationPushablesRoutine(const short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = GetPushableInfo(pushableItem);
@@ -850,7 +851,7 @@ namespace TEN::Entities::Generic
 		return pushables;
 	}
 
-	void UpdateRoomNumbers(const short itemNumber)
+	void UpdatePushablesRoomNumbers(const short itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = GetPushableInfo(pushableItem);
