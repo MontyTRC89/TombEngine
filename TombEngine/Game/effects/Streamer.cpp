@@ -43,8 +43,9 @@ namespace TEN::Effects::Streamer
 		// Apply directional velocity.
 		if (vel != 0.0f)
 		{
-			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], Orientation.GetAxis(), vel);
-			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], Orientation.GetAxis(), vel);
+			auto direction = Orientation.GetAxis();
+			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], direction, vel);
+			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, vel);
 		}
 	}
 
