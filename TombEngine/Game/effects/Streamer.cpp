@@ -9,7 +9,7 @@
 
 namespace TEN::Effects::Streamer
 {
-	static void TransformStreamerVertices(std::array<Vector3, Streamer::StreamerSegment::VERTEX_COUNT>& vertices, const AxisAngle& orient, float distance)
+	static void TransformStreamerSegment(std::array<Vector3, Streamer::StreamerSegment::VERTEX_COUNT>& vertices, const AxisAngle& orient, float distance)
 	{
 		// ---------------------TEMP: 2D solution.
 
@@ -20,9 +20,7 @@ namespace TEN::Effects::Streamer
 		auto direction = Geometry::RotatePoint(orient.GetAxis(), rot);
 		direction.Normalize();*/
 		vertices[0] = Geometry::TranslatePoint(vertices[0], Vector3::Down, distance);
-		//vertices[0] = Geometry::TranslatePoint(vertices[0], orient.GetAxis(), 50.0f);
 		vertices[1] = Geometry::TranslatePoint(vertices[1], Vector3::Up, distance);
-		//vertices[1] = Geometry::TranslatePoint(vertices[1], orient.GetAxis(), 50.0f);
 
 		// ---------------------
 		
@@ -40,6 +38,12 @@ namespace TEN::Effects::Streamer
 		//return newVertex;
 	}
 
+	void Streamer::StreamerSegment::InitializeVertices(const Vector3& pos, float width)
+	{
+		this->Vertices = { pos, pos };
+		this->TransformVertices(0.0f, width / 2);
+	}
+
 	void Streamer::StreamerSegment::Update()
 	{
 		// Update opacity.
@@ -49,10 +53,23 @@ namespace TEN::Effects::Streamer
 		// TODO: Directional bias like in the older version.
 		
 		// Update vertices.
-		TransformStreamerVertices(this->Vertices, Orientation, ScaleRate);
+		this->TransformVertices(Velocity, ScaleRate);
 
 		// Update life.
 		this->Life -= 1.0f;
+	}
+
+	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)
+	{
+		// Apply expansion.
+		// TODO: Use AxisAngle properly. The ToDirection() method doesn't do what I need.
+		this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], Vector3::Down, scaleRate);
+		this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], Vector3::Up, scaleRate);
+
+		// Apply directional velocity.
+		auto directionalVel = Orientation.GetAxis() * vel;
+		this->Vertices[0] += directionalVel;
+		this->Vertices[1] += directionalVel;
 	}
 
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount)
@@ -67,9 +84,9 @@ namespace TEN::Effects::Streamer
 		segment.Life =
 		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
+		segment.Velocity = 0.0f; // TODO
 		segment.ScaleRate = scaleRate;
-		segment.Vertices = { pos, pos };
-		TransformStreamerVertices(segment.Vertices, segment.Orientation, width / 2);
+		segment.InitializeVertices(pos, width);
 	}
 
 	void Streamer::Update()

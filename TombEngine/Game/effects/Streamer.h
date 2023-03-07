@@ -27,9 +27,14 @@ namespace TEN::Effects::Streamer
 			float Life		 = 0.0f;
 			float LifeMax	 = 0.0f;
 			float OpacityMax = 0.0f;
+			float Velocity	 = 0.0f;
 			float ScaleRate	 = 0.0f;
 
+			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
+
+		private:
+			void TransformVertices(float vel, float scaleRate);
 		};
 
 		// Components
