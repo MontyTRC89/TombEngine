@@ -426,8 +426,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		float width = coll->Setup.Height / 5;
 
 		auto headPos = GetJointPosition(item, LM_HEAD).ToVector3();
-		auto direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
-		short orient2D = /*item->Pose.Orientation.z + */ANGLE(90.0f);
+		auto direction = EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
+		short orient2D = (item->Pose.Orientation.z + ANGLE(90.0f)) * 5;
 		float life = 1.5f;
 		float scaleRate = 0.0f;
 

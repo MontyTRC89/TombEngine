@@ -7,6 +7,12 @@ struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
+	enum class StreamerFlags
+	{
+		FadeLeft,
+		FadeRight
+	};
+
 	class Streamer
 	{
 	private:
@@ -29,6 +35,7 @@ namespace TEN::Effects::Streamer
 			float OpacityMax = 0.0f;
 			float Velocity	 = 0.0f;
 			float ScaleRate	 = 0.0f;
+			int	  Flags		 = 0;
 
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();

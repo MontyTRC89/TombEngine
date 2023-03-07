@@ -9,35 +9,6 @@
 
 namespace TEN::Effects::Streamer
 {
-	static void TransformStreamerSegment(std::array<Vector3, Streamer::StreamerSegment::VERTEX_COUNT>& vertices, const AxisAngle& orient, float distance)
-	{
-		// ---------------------TEMP: 2D solution.
-
-		/*auto rot = moveRight ?
-			EulerAngles(0, ANGLE(90.0f), orient.GetAngle()) :
-			EulerAngles(0, ANGLE(-90.0f), orient.GetAngle() + ANGLE(180.0f));
-
-		auto direction = Geometry::RotatePoint(orient.GetAxis(), rot);
-		direction.Normalize();*/
-		vertices[0] = Geometry::TranslatePoint(vertices[0], Vector3::Down, distance);
-		vertices[1] = Geometry::TranslatePoint(vertices[1], Vector3::Up, distance);
-
-		// ---------------------
-		
-		//// Determine lateral translation direction.
-		//auto lateralDirection = moveRight ?
-		//	orient.ToDirection() :
-		//	AxisAngle(orient.GetAxis(), orient.GetAngle()*6 + ANGLE(180.0f)).ToDirection(); // TODO: Tilt is flipped.
-		//lateralDirection.Normalize();
-
-		//// Translate along axis.
-		//auto newVertex = Geometry::TranslatePoint(vertex, orient.GetAxis(), 0);
-
-		//// Translate along lateral direction and return.
-		//newVertex = Geometry::TranslatePoint(newVertex, lateralDirection, distance);
-		//return newVertex;
-	}
-
 	void Streamer::StreamerSegment::InitializeVertices(const Vector3& pos, float width)
 	{
 		this->Vertices = { pos, pos };
@@ -62,14 +33,19 @@ namespace TEN::Effects::Streamer
 	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)
 	{
 		// Apply expansion.
-		// TODO: Use AxisAngle properly. The ToDirection() method doesn't do what I need.
-		this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], Vector3::Down, scaleRate);
-		this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], Vector3::Up, scaleRate);
+		if (scaleRate != 0.0f)
+		{
+			auto direction = Orientation.ToDirection();
+			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], -direction, scaleRate);
+			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, scaleRate);
+		}
 
 		// Apply directional velocity.
-		auto directionalVel = Orientation.GetAxis() * vel;
-		this->Vertices[0] += directionalVel;
-		this->Vertices[1] += directionalVel;
+		if (vel != 0.0f)
+		{
+			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], Orientation.GetAxis(), vel);
+			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], Orientation.GetAxis(), vel);
+		}
 	}
 
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount)
@@ -86,6 +62,7 @@ namespace TEN::Effects::Streamer
 		segment.OpacityMax = opacityMax;
 		segment.Velocity = 0.0f; // TODO
 		segment.ScaleRate = scaleRate;
+		segment.Flags = 0; // TODO
 		segment.InitializeVertices(pos, width);
 	}
 

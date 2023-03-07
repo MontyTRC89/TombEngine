@@ -2,12 +2,15 @@
 #include "Math/Objects/AxisAngle.h"
 
 #include "Math/Constants.h"
+#include "Math/Geometry.h"
 #include "Math/Legacy.h"
 #include "Math/Objects/EulerAngles.h"
 
+using namespace TEN::Math;
+
 //namespace TEN::Math
 //{
-	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Zero, 0);
+	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Backward, 0);
 
 	AxisAngle::AxisAngle()
 	{
@@ -116,27 +119,11 @@
 		return AxisAngle(axis, FROM_RAD(angle));
 	}
 
-	// TODO: Get this working properly.
 	Vector3 AxisAngle::ToDirection() const
 	{
-		float sinAngle = sin(TO_RAD(Angle));
-		float cosAngle = cos(TO_RAD(Angle));
-
-		auto a = Vector3(cosAngle, sinAngle, 0.0f);
-		auto b = Axis;
-
-		// Calculate the normal vector of the plane
-		auto n = (b.Cross(-Vector3::UnitY).LengthSquared() > 0.0f) ?
-			b.Cross(-Vector3::UnitY) :
-			b.Cross(Vector3::UnitX);
-
-		// Project the vector a onto the plane
-		auto projection = a - (a.Dot(n) * n);
-		projection.Normalize();
-		return projection;
-
-		//auto quat = this->ToQuaternion();
-		//return Vector3::Transform(Vector3::UnitZ, quat);
+		// TODO: Works, but need to find a way without EulerAngles. -- Sezz 2023.03.08
+		auto refDirection = Geometry::RotatePoint(Vector3::Right, EulerAngles(Axis));
+		return Geometry::RotatePoint(refDirection, *this);
 	}
 
 	Quaternion AxisAngle::ToQuaternion() const
