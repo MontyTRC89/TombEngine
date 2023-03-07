@@ -428,7 +428,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto headPos = GetJointPosition(item, LM_HEAD).ToVector3();
 		auto direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
 		short orient2D = /*item->Pose.Orientation.z + */ANGLE(90.0f);
-		float life = 1.0f;
+		float life = 1.5f;
 		float scaleRate = 0.0f;
 
 		auto color4 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
@@ -457,8 +457,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate);
 
 		//auto segment = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.back();
-		int count = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.size();
-		g_Renderer.PrintDebugMessage("Num Segments: %d", count);
+		//int count = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.size();
+		//g_Renderer.PrintDebugMessage("Num Segments: %d", count);
 		//auto target = Geometry::TranslatePoint(headPos, segment.Orientation.ToDirection(), BLOCK(0.25f));
 		//g_Renderer.AddLine3D(headPos, target, Vector4::One);
 	}

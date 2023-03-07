@@ -100,8 +100,12 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	Streamer& StreamerModule::GetStreamer(std::vector<Streamer>& pool)
+	Streamer& StreamerModule::GetStreamer(int tag)
 	{
+		// Get pool at tag key.
+		this->Pools.insert({ tag, {} });
+		auto& pool = this->Pools.at(tag);
+
 		assert(pool.size() <= STREAMER_COUNT_MAX);
 
 		// Return unbroken streamer at back of vector if it exists.
@@ -128,12 +132,8 @@ namespace TEN::Effects::Streamer
 		if (Pools.size() == POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
-		// Get pool at tag key.
-		this->Pools.insert({ tag, {} });
-		auto& pool = this->Pools.at(tag);
-
 		// Get and extend streamer with new segment.
-		auto& streamer = this->GetStreamer(pool);
+		auto& streamer = this->GetStreamer(tag);
 		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, streamer.Segments.size());
 	}
 
@@ -144,14 +144,16 @@ namespace TEN::Effects::Streamer
 			for (auto& streamer : pool)
 				streamer.Update();
 
-			this->ClearInactiveStreamers(pool);
+			this->ClearInactiveStreamers(tag);
 		}
 
 		this->ClearInactivePools();
 	}
 
-	void StreamerModule::ClearInactiveStreamers(std::vector<Streamer>& pool)
+	void StreamerModule::ClearInactiveStreamers(int tag)
 	{
+		auto& pool = this->Pools.at(tag);
+
 		pool.erase(
 			std::remove_if(
 				pool.begin(), pool.end(),
@@ -181,11 +183,8 @@ namespace TEN::Effects::Streamer
 		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
-		// Get module at entityNumber key.
-		this->Modules.insert({ entityNumber, {} });
-		auto& module = this->Modules.at(entityNumber);
-
-		// Add streamer to module.
+		// Get module and extend streamer within pool.
+		auto& module = this->GetModule(entityNumber);
 		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate);
 	}
 
@@ -200,6 +199,14 @@ namespace TEN::Effects::Streamer
 	void StreamerController::Clear()
 	{
 		*this = {};
+	}
+
+	StreamerModule& StreamerController::GetModule(int entityNumber)
+	{
+		// Get module at entityNumber key.
+		this->Modules.insert({ entityNumber, {} });
+		auto& module = this->Modules.at(entityNumber);
+		return module;
 	}
 
 	void StreamerController::ClearInactiveModules()

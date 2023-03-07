@@ -62,8 +62,8 @@ namespace TEN::Effects::Streamer
 
 	private:
 		// Helpers
-		Streamer& GetStreamer(std::vector<Streamer>& pool);
-		void	  ClearInactiveStreamers(std::vector<Streamer>& pool);
+		Streamer& GetStreamer(int tag);
+		void	  ClearInactiveStreamers(int tag);
 		void	  ClearInactivePools();
 	};
 
@@ -83,7 +83,9 @@ namespace TEN::Effects::Streamer
 		void Clear();
 
 	private:
-		void ClearInactiveModules();
+		// Helpers
+		StreamerModule& GetModule(int entityNumber);
+		void			ClearInactiveModules();
 	};
 
 	extern StreamerController StreamerEffect;
