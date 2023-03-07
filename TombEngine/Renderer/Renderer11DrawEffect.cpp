@@ -127,21 +127,19 @@ namespace TEN::Renderer
 				if (segment.Type == StreamerType::Center)
 				{
 					AddColoredQuad(
-						segment.Vertices[0],
-						segment.Vertices[1],
-						prevSegment.Vertices[1],
-						prevSegment.Vertices[0],
-						color, color, prevColor, prevColor,
+						segment.Vertices[0], segment.Vertices[1],
+						prevSegment.Vertices[1], prevSegment.Vertices[0],
+						color, color,
+						prevColor, prevColor,
 						BLENDMODE_ADDITIVE, view);
 				}
 				else
 				{
 					AddColoredQuad(
-						segment.Vertices[0],
-						segment.Vertices[1],
-						prevSegment.Vertices[1],
-						prevSegment.Vertices[0],
-						Vector4::Zero, color, prevColor, Vector4::Zero,
+						segment.Vertices[0], segment.Vertices[1],
+						prevSegment.Vertices[1], prevSegment.Vertices[0],
+						Vector4::Zero, color,
+						prevColor, Vector4::Zero,
 						BLENDMODE_ADDITIVE, view);
 				}
 			}

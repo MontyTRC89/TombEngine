@@ -20,7 +20,9 @@ namespace TEN::Effects::Streamer
 		auto direction = Geometry::RotatePoint(orient.GetAxis(), rot);
 		direction.Normalize();*/
 		vertices[0] = Geometry::TranslatePoint(vertices[0], Vector3::Down, distance);
+		//vertices[0] = Geometry::TranslatePoint(vertices[0], orient.GetAxis(), 50.0f);
 		vertices[1] = Geometry::TranslatePoint(vertices[1], Vector3::Up, distance);
+		//vertices[1] = Geometry::TranslatePoint(vertices[1], orient.GetAxis(), 50.0f);
 
 		// ---------------------
 		
@@ -73,13 +75,13 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::Update()
 	{
+		if (Segments.empty())
+			return;
+
 		// If streamer was broken, set flag to track it.
-		if (!Segments.empty())
-		{
-			const auto& newestSegment = Segments.back();
-			if (newestSegment.Life != newestSegment.LifeMax)
-				this->IsBroken = true;
-		}
+		const auto& newestSegment = Segments.back();
+		if (newestSegment.Life != newestSegment.LifeMax)
+			this->IsBroken = true;
 
 		// Update segments.
 		for (auto& segment : this->Segments)
@@ -139,6 +141,9 @@ namespace TEN::Effects::Streamer
 
 	void StreamerModule::Update()
 	{
+		if (Pools.empty())
+			return;
+
 		for (auto& [tag, pool] : this->Pools)
 		{
 			for (auto& streamer : pool)
@@ -190,6 +195,9 @@ namespace TEN::Effects::Streamer
 
 	void StreamerController::Update()
 	{
+		if (Modules.empty())
+			return;
+
 		for (auto& [entityNumber, module] : this->Modules)
 			module.Update();
 
