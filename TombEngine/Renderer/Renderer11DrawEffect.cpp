@@ -99,15 +99,11 @@ namespace TEN::Renderer
 						if (segment.Life <= 0.0f)
 							continue;
 
-						auto color = segment.Color;
-						auto prevColor = prevSegment.Color;
-
 						AddColoredQuad(
-							segment.Vertices[0],
-							segment.Vertices[1],
-							prevSegment.Vertices[1],
-							prevSegment.Vertices[0],
-							color, color, prevColor, prevColor,
+							segment.Vertices[0], segment.Vertices[1],
+							prevSegment.Vertices[1], prevSegment.Vertices[0],
+							segment.Color, segment.Color,
+							prevSegment.Color, prevSegment.Color,
 							BLEND_MODE, view);
 					}
 				}
