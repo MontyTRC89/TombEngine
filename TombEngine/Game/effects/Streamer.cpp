@@ -101,35 +101,11 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	Streamer& StreamerModule::GetStreamer(int tag)
-	{
-		// Get pool at tag key.
-		this->Pools.insert({ tag, {} });
-		auto& pool = this->Pools.at(tag);
-
-		assert(pool.size() <= STREAMER_COUNT_MAX);
-
-		// Return unbroken streamer at back of vector if it exists.
-		if (!pool.empty())
-		{
-			auto& streamer = pool.back();
-			if (!streamer.IsBroken)
-				return streamer;
-		}
-
-		// Clear oldest streamer if pool is full.
-		if (pool.size() == STREAMER_COUNT_MAX)
-			pool.erase(pool.begin());
-
-		// Add and return new streamer.
-		return pool.emplace_back();
-	}
-
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
 		assert(Pools.size() <= POOL_COUNT_MAX);
 
-		// Return early if pool map is full and tag key doesn't exist.
+		// Return early if pool map is full and element with tag key doesn't already exist.
 		if (Pools.size() == POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
@@ -154,15 +130,34 @@ namespace TEN::Effects::Streamer
 		this->ClearInactivePools();
 	}
 
-	void StreamerModule::ClearInactiveStreamers(int tag)
+	std::vector<Streamer>& StreamerModule::GetPool(int tag)
 	{
+		// Get pool at tag key.
+		this->Pools.insert({ tag, {} });
 		auto& pool = this->Pools.at(tag);
+		return pool;
+	}
 
-		pool.erase(
-			std::remove_if(
-				pool.begin(), pool.end(),
-				[](const auto& streamer) { return streamer.Segments.empty(); }),
-			pool.end());
+	Streamer& StreamerModule::GetStreamer(int tag)
+	{
+		auto& pool = this->GetPool(tag);
+
+		assert(pool.size() <= STREAMER_COUNT_MAX);
+
+		// Return unbroken streamer at back of vector if it exists.
+		if (!pool.empty())
+		{
+			auto& streamer = pool.back();
+			if (!streamer.IsBroken)
+				return streamer;
+		}
+
+		// Clear oldest streamer if pool is full.
+		if (pool.size() == STREAMER_COUNT_MAX)
+			pool.erase(pool.begin());
+
+		// Add and return new streamer.
+		return pool.emplace_back();
 	}
 
 	void StreamerModule::ClearInactivePools()
@@ -179,11 +174,22 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
+	void StreamerModule::ClearInactiveStreamers(int tag)
+	{
+		auto& pool = this->Pools.at(tag);
+
+		pool.erase(
+			std::remove_if(
+				pool.begin(), pool.end(),
+				[](const auto& streamer) { return streamer.Segments.empty(); }),
+			pool.end());
+	}
+
 	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
 	{
 		assert(Modules.size() <= MODULE_COUNT_MAX);
 
-		// Return early if module map is full and entityNumber key doesn't exist.
+		// Return early if module map is full and element with entityNumber key doesn't already exist.
 		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
