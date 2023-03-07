@@ -164,9 +164,12 @@ namespace TEN::Effects::Streamer
 		for (auto it = Pools.begin(); it != Pools.end();)
 		{
 			if (it->second.empty())
+			{
 				it = this->Pools.erase(it);
-			else
-				++it;
+				continue;
+			}
+			
+			++it;
 		}
 	}
 
@@ -204,9 +207,12 @@ namespace TEN::Effects::Streamer
 		for (auto it = Modules.begin(); it != Modules.end();)
 		{
 			if (it->second.Pools.empty())
+			{
 				it = this->Modules.erase(it);
-			else
-				++it;
+				continue;
+			}
+			
+			++it;
 		}
 	}
 
