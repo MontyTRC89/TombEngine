@@ -186,8 +186,10 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
+	assert(effects.size() <= countMax);
+
 	// Add and return new effect.
-	if (effects.size() < countMax)
+	if (effects.size() != countMax)
 		return effects.emplace_back();
 
 	TEffect* effectPtr = nullptr;
@@ -214,7 +216,7 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+			[](const auto& effect) { return (effect.Life <= 0.0f); }),
 		effects.end());
 }
 
