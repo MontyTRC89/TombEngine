@@ -414,6 +414,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
 	ClearDrips();
