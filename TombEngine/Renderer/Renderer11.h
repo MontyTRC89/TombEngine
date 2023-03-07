@@ -605,12 +605,15 @@ namespace TEN::Renderer
 		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
 												 bool softParticles, RenderView& view);
 		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
-		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
+					 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1,
 			Vector4 c2, Vector4 c3, Vector4 c4, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,
 			bool softParticles, RenderView& view);
-		void AddColoredQuad(Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, BLEND_MODES blendMode, RenderView& view);
-		void AddColoredQuad(Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1, Vector4 c2, Vector4 c3, Vector4 c4, BLEND_MODES blendMode, RenderView& view);
+		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+							const Vector4& color, BLEND_MODES blendMode, RenderView& view);
+		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
+							BLEND_MODES blendMode, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);

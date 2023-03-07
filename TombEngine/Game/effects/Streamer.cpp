@@ -68,8 +68,7 @@ namespace TEN::Effects::Streamer
 		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
 		segment.ScaleRate = scaleRate;
-		segment.Vertices[0] = pos;
-		segment.Vertices[1] = pos;
+		segment.Vertices = { pos, pos };
 		TransformStreamerVertices(segment.Vertices, segment.Orientation, width / 2);
 	}
 
