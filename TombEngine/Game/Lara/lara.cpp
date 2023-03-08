@@ -421,15 +421,17 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// STREAMER DEBUG
-	if (IsHeld(In::Action))
+	if (!IsHeld(In::Action))
 	{
 		float width = coll->Setup.Height / 5;
 
 		auto headPos = GetJointPosition(item, LM_HEAD).ToVector3();
-		auto direction = EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
-		short orient2D = (item->Pose.Orientation.z + ANGLE(90.0f)) * 5;
-		float life = 1.5f;
+		auto direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
+		short orient2D = /*(item->Pose.Orientation.z + */ANGLE(90.0f);//)// *5;
+		float life = 1.0f;
+		float vel = 0.0f;
 		float scaleRate = 0.0f;
+		short rot2D = ANGLE(3.0f);
 
 		auto color4 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 		auto color3 = Vector4(0.0f, 0.6f, 0.2f, 1.0f);
@@ -450,11 +452,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		};
 
 		// Spawn Commander Video rainbow.
-		StreamerEffect.Spawn(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, scaleRate);
-		StreamerEffect.Spawn(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, scaleRate);
-		StreamerEffect.Spawn(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, scaleRate);
-		StreamerEffect.Spawn(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, scaleRate);
-		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, scaleRate);
+		StreamerEffect.Spawn(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, vel, scaleRate, rot2D);
+		StreamerEffect.Spawn(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, vel, scaleRate, rot2D);
+		StreamerEffect.Spawn(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, vel, scaleRate, rot2D);
+		StreamerEffect.Spawn(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, vel, scaleRate, rot2D);
+		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, vel, scaleRate, rot2D);
 
 		//auto segment = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.back();
 		//int count = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.size();

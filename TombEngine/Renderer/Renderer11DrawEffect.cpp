@@ -99,12 +99,33 @@ namespace TEN::Renderer
 						if (segment.Life <= 0.0f)
 							continue;
 
-						AddColoredQuad(
-							segment.Vertices[0], segment.Vertices[1],
-							prevSegment.Vertices[1], prevSegment.Vertices[0],
-							segment.Color, segment.Color,
-							prevSegment.Color, prevSegment.Color,
-							BLEND_MODE, view);
+						if (segment.Flags & (int)StreamerFlags::FadeLeft)
+						{
+							AddColoredQuad(
+								segment.Vertices[0], segment.Vertices[1],
+								prevSegment.Vertices[1], prevSegment.Vertices[0],
+								Vector4::Zero, segment.Color,
+								prevSegment.Color, Vector4::Zero,
+								BLEND_MODE, view);
+						}
+						else if (segment.Flags & (int)StreamerFlags::FadeRight)
+						{
+							AddColoredQuad(
+								segment.Vertices[0], segment.Vertices[1],
+								prevSegment.Vertices[1], prevSegment.Vertices[0],
+								segment.Color, Vector4::Zero,
+								Vector4::Zero, prevSegment.Color,
+								BLEND_MODE, view);
+						}
+						else
+						{
+							AddColoredQuad(
+								segment.Vertices[0], segment.Vertices[1],
+								prevSegment.Vertices[1], prevSegment.Vertices[0],
+								segment.Color, segment.Color,
+								prevSegment.Color, prevSegment.Color,
+								BLEND_MODE, view);
+						}
 					}
 				}
 			}

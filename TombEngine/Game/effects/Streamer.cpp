@@ -7,6 +7,8 @@
 #include "Math/Math.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Math;
+
 namespace TEN::Effects::Streamer
 {
 	void Streamer::StreamerSegment::InitializeVertices(const Vector3& pos, float width)
@@ -23,7 +25,6 @@ namespace TEN::Effects::Streamer
 
 		// Update orientation.
 		this->Orientation.SetAngle(Orientation.GetAngle() + Rotation);
-
 		// TODO: Directional bias like in the older version.
 		
 		// Update vertices.
@@ -52,7 +53,8 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate, unsigned int segmentCount)
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
+							  float width, float life, float vel, float scaleRate, float rot2D, int flags, unsigned int segmentCount)
 	{
 		auto& segment = this->GetNewSegment();
 
@@ -64,10 +66,10 @@ namespace TEN::Effects::Streamer
 		segment.Life =
 		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
-		segment.Velocity = 0.0f; // TODO
+		segment.Velocity = vel;
 		segment.ScaleRate = scaleRate;
-		segment.Rotation = 0; // TODO
-		segment.Flags = 0; // TODO
+		segment.Rotation = rot2D;
+		segment.Flags = flags;
 		segment.InitializeVertices(pos, width);
 	}
 
@@ -100,7 +102,8 @@ namespace TEN::Effects::Streamer
 		return this->Segments.emplace_back();
 	}
 
-	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
+	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
+									 float width, float life, float vel, float scaleRate, float rot2D, int flags)
 	{
 		assert(Pools.size() <= POOL_COUNT_MAX);
 
@@ -110,7 +113,7 @@ namespace TEN::Effects::Streamer
 
 		// Get and extend streamer with new segment.
 		auto& streamer = this->GetStreamer(tag);
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, scaleRate, streamer.Segments.size());
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags, streamer.Segments.size());
 	}
 
 	void StreamerModule::Update()
@@ -184,7 +187,8 @@ namespace TEN::Effects::Streamer
 			pool.end());
 	}
 
-	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color, float width, float life, float scaleRate)
+	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
+								   float width, float life, float vel, float scaleRate, float rot2D, int flags)
 	{
 		assert(Modules.size() <= MODULE_COUNT_MAX);
 
@@ -194,7 +198,7 @@ namespace TEN::Effects::Streamer
 
 		// Get module and extend streamer within pool.
 		auto& module = this->GetModule(entityNumber);
-		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, scaleRate);
+		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags);
 	}
 
 	void StreamerController::Update()
