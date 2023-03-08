@@ -21,6 +21,9 @@ namespace TEN::Effects::Streamer
 		if (Color.w > 0.0f)
 			this->Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
 
+		// Update orientation.
+		this->Orientation.SetAngle(Orientation.GetAngle() + Rotation);
+
 		// TODO: Directional bias like in the older version.
 		
 		// Update vertices.
@@ -63,6 +66,7 @@ namespace TEN::Effects::Streamer
 		segment.OpacityMax = opacityMax;
 		segment.Velocity = 0.0f; // TODO
 		segment.ScaleRate = scaleRate;
+		segment.Rotation = 0; // TODO
 		segment.Flags = 0; // TODO
 		segment.InitializeVertices(pos, width);
 	}

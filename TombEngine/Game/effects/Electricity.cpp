@@ -309,16 +309,13 @@ namespace TEN::Effects::Electricity
 
 		float lengthStep = laser.Length / laser.NumSegments;
 		float radiusStep = laser.Radius;
-
-		auto refPoint = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
 		auto axisAngle = AxisAngle(direction, laser.Orientation2D);
 
 		for (int i = 0; i < laser.NumSegments; i++)
 		{
 			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
-
-			auto offset = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
-			auto knot = Geometry::TranslatePoint(offset, axisAngle.GetAxis(), lengthStep * i);
+			auto knot = Geometry::TranslatePoint(origin, axisAngle.GetAxis(), lengthStep * i);
+			knot = Geometry::TranslatePoint(knot, axisAngle.ToDirection(), radiusStep * i);
 
 			buffer[bufferIndex] = origin + knot;
 			bufferIndex++;
