@@ -34,9 +34,9 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (potency.has_value())
-		lara->PoisonPotency = std::clamp(potency.value(), 0, (int)LARA_POISON_POTENCY_MAX);
+		lara->Status.PoisonPotency = std::clamp(potency.value(), 0, (int)LARA_POISON_POTENCY_MAX);
 	else
-		lara->PoisonPotency = 0;
+		lara->Status.PoisonPotency = 0;
 }
 
 /// Get poison potency of Lara
@@ -47,7 +47,7 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 int LaraObject::GetPoison() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->PoisonPotency;
+	return lara->Status.PoisonPotency;
 }
 
 /// Set air value of Lara
@@ -60,9 +60,9 @@ void LaraObject::SetAir(sol::optional<int> air)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (air.has_value())
-		lara->Air = std::clamp(air.value(), 0, (int)LARA_AIR_MAX);
+		lara->Status.Air = std::clamp(air.value(), 0, (int)LARA_AIR_MAX);
 	else
-		lara->Air = LARA_AIR_MAX;
+		lara->Status.Air = LARA_AIR_MAX;
 }
 
 /// Get air value of Lara
@@ -73,7 +73,7 @@ void LaraObject::SetAir(sol::optional<int> air)
 int LaraObject::GetAir() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->Air;
+	return lara->Status.Air;
 }
 
 /// Set wetness value of Lara (causes dripping)
@@ -111,9 +111,9 @@ void LaraObject::SetSprintEnergy(sol::optional<int> value)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (value.has_value())
-		lara->SprintEnergy = std::clamp(value.value(), 0, (int)LARA_SPRINT_ENERGY_MAX);
+		lara->Status.SprintEnergy = std::clamp(value.value(), 0, (int)LARA_SPRINT_ENERGY_MAX);
 	else
-		lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+		lara->Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 }
 
 /// Get sprint energy value of Lara
@@ -124,7 +124,7 @@ void LaraObject::SetSprintEnergy(sol::optional<int> value)
 int LaraObject::GetSprintEnergy() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->SprintEnergy;
+	return lara->Status.SprintEnergy;
 }
 
 /// Get the moveable's airborne status

@@ -28,6 +28,7 @@ namespace TEN::Hud
 
 		// Components
 		StatusBar AirBar	= {};
+		StatusBar ColdBar	= {};
 		StatusBar HealthBar = {};
 		StatusBar SprintBar = {};
 		bool	  DoFlash	= false;
@@ -46,12 +47,14 @@ namespace TEN::Hud
 		// Update helpers
 		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateAirBar(const ItemInfo& item);
+		void UpdateColdBar(const ItemInfo& item);
 		void UpdateHealthBar(const ItemInfo& item);
 		void UpdateSprintBar(const ItemInfo& item);
 
 		// Draw helpers
 		void DrawStatusBar(float value, float criticalValue, const TEN::Renderer::RendererHudBar& rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
 		void DrawAirBar() const;
+		void DrawColdBar() const;
 		void DrawHealthBar(bool isPoisoned) const;
 		void DrawSprintBar() const;
 	};

@@ -434,7 +434,7 @@ bool SaveGame::Save(int slot)
 	auto carriedWeaponsOffset = fbb.CreateVector(carriedWeapons);
 
 	Save::LaraBuilder lara{ fbb };
-	lara.add_air(Lara.Air);
+	lara.add_air(Lara.Status.Air);
 
 	lara.add_control(controlOffset);
 	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
@@ -451,10 +451,10 @@ bool SaveGame::Save(int slot)
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_poison_potency(Lara.PoisonPotency);
+	lara.add_poison_potency(Lara.Status.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_sprint_energy(Lara.SprintEnergy);
+	lara.add_sprint_energy(Lara.Status.SprintEnergy);
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
@@ -1818,7 +1818,7 @@ bool SaveGame::Load(int slot)
 		Lara.Effect.DripNodes[i] = s->lara()->wet()->Get(i);
 	}
 
-	Lara.Air = s->lara()->air();
+	Lara.Status.Air = s->lara()->air();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
@@ -1895,7 +1895,7 @@ bool SaveGame::Load(int slot)
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
-	Lara.PoisonPotency = s->lara()->poison_potency();
+	Lara.Status.PoisonPotency = s->lara()->poison_potency();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
@@ -1934,7 +1934,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
 	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.SprintEnergy = s->lara()->sprint_energy();
+	Lara.Status.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);

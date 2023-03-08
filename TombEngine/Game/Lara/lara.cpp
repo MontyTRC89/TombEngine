@@ -421,13 +421,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Weapon.HasFired = false;
 	}
 
-	if (lara->PoisonPotency)
+	if (lara->Status.PoisonPotency)
 	{
-		if (lara->PoisonPotency > LARA_POISON_POTENCY_MAX)
-			lara->PoisonPotency = LARA_POISON_POTENCY_MAX;
+		if (lara->Status.PoisonPotency > LARA_POISON_POTENCY_MAX)
+			lara->Status.PoisonPotency = LARA_POISON_POTENCY_MAX;
 
 		if (!(Wibble & 0xFF))
-			item->HitPoints -= lara->PoisonPotency;
+			item->HitPoints -= lara->Status.PoisonPotency;
 	}
 
 	if (lara->Control.IsMoving)
@@ -459,13 +459,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 
-	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
-		lara->SprintEnergy++;
+	if (lara->Status.SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
+		lara->Status.SprintEnergy++;
 
 	RumbleLaraHealthCondition(item);
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isCold	 = TestEnvironment(ENV_FLAG_COLD, item);
 
 	bool isWaterOnHeadspace = false;
 
@@ -503,7 +504,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Pose.Position.y += CLICK(0.5f) - 28;
 					item->Animation.IsAirborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
-					lara->Air = LARA_AIR_MAX;
+					lara->Status.Air = LARA_AIR_MAX;
 
 					for (int i = 0; i < NUM_LARA_MESHES; i++)
 						lara->Effect.BubbleNodes[i] = PLAYER_BUBBLE_NODE_MAX;
@@ -706,21 +707,43 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (item->HitPoints >= 0)
 			{
-				lara->Air -= 6;
-				if (lara->Air < 0)
+				lara->Status.Air -= 6;
+				if (lara->Status.Air < 0)
 				{
-					lara->Air = -1;
+					lara->Status.Air = -1;
 					item->HitPoints -= 10;
 				}
 			}
 		}
-		else if (lara->Air < LARA_AIR_MAX && item->HitPoints >= 0)
+		else if (lara->Status.Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
 			if (lara->Vehicle == NO_ITEM) // Only for UPV.
 			{
-				lara->Air += 10;
-				if (lara->Air > LARA_AIR_MAX)
-					lara->Air = LARA_AIR_MAX;
+				lara->Status.Air += 10;
+				if (lara->Status.Air > LARA_AIR_MAX)
+					lara->Status.Air = LARA_AIR_MAX;
+			}
+		}
+
+		if (item->HitPoints >= 0)
+		{
+			if (lara->Control.WaterStatus == WaterStatus::Dry)
+			{
+				lara->Status.ColdExposure++;
+				if (lara->Status.ColdExposure >= LARA_COLD_EXPOSURE_MAX)
+					lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+			}
+			else
+			{
+				if (isCold)
+				{
+					lara->Status.ColdExposure--;
+					if (lara->Status.ColdExposure <= 0)
+					{
+						lara->Status.ColdExposure = 0;
+						item->HitPoints -= 10;
+					}
+				}
 			}
 		}
 
@@ -732,12 +755,22 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto level = g_GameFlow->GetLevel(CurrentLevel);
 			if (level->GetLaraType() != LaraType::Divesuit)
-				lara->Air--;
+				lara->Status.Air--;
 
-			if (lara->Air < 0)
+			if (lara->Status.Air < 0)
 			{
 				item->HitPoints -= 5;
-				lara->Air = -1;
+				lara->Status.Air = -1;
+			}
+
+			if (isCold)
+			{
+				lara->Status.ColdExposure -= 2;
+				if (lara->Status.ColdExposure <= 0)
+				{
+					lara->Status.ColdExposure = 0;
+					item->HitPoints -= 10;
+				}
 			}
 		}
 
@@ -747,9 +780,19 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	case WaterStatus::TreadWater:
 		if (item->HitPoints >= 0)
 		{
-			lara->Air += 10;
-			if (lara->Air > LARA_AIR_MAX)
-				lara->Air = LARA_AIR_MAX;
+			lara->Status.Air += 10;
+			if (lara->Status.Air > LARA_AIR_MAX)
+				lara->Status.Air = LARA_AIR_MAX;
+
+			if (isCold)
+			{
+				lara->Status.ColdExposure -= 2;
+				if (lara->Status.ColdExposure <= 0)
+				{
+					lara->Status.ColdExposure = 0;
+					item->HitPoints -= 10;
+				}
+			}
 		}
 
 		LaraWaterSurface(item, coll);
@@ -1001,6 +1044,11 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->HitPoints = LARA_HEALTH_MAX;
+	lara->Status.Air = LARA_AIR_MAX;
+	lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+	lara->Status.PoisonPotency = 0;
+	lara->Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+	
 	LaraUnderwater(item, coll);
 
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))

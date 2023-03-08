@@ -248,7 +248,7 @@ namespace TEN::Entities::TR4
 					if (item->Animation.ActiveState == BSCORPION_STATE_STINGER_ATTACK)
 					{
 						if (creature->Enemy->IsLara())
-							GetLaraInfo(creature->Enemy)->PoisonPotency += BIG_SCORPION_STINGER_POISON_POTENCY;
+							GetLaraInfo(creature->Enemy)->Status.PoisonPotency += BIG_SCORPION_STINGER_POISON_POTENCY;
 
 						CreatureEffect2(item, BigScorpionBite1, 10, item->Pose.Orientation.y - ANGLE(180.0f), DoBloodSplat);
 					}

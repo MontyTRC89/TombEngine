@@ -1248,6 +1248,14 @@ struct SubsuitControlData
 	unsigned short HitCount;
 };
 
+struct PlayerStatusData
+{
+	int Air			  = 0;
+	int ColdExposure  = 0; // TODO: savegame
+	int PoisonPotency = 0;
+	int SprintEnergy  = 0;
+};
+
 struct LaraControlData
 {
 	short MoveAngle;
@@ -1284,7 +1292,9 @@ struct PlayerEffectData
 
 struct LaraInfo
 {
-	short ItemNumber;
+	int ItemNumber; // TODO: Remove. No longer necessary since ItemInfo already has this.
+
+	PlayerStatusData Status = {};
 	LaraControlData Control;
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
@@ -1301,10 +1311,6 @@ struct LaraInfo
 	EulerAngles TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
-
-	int Air;
-	int SprintEnergy;
-	int PoisonPotency;
 
 	short Vehicle;
 	int ExtraAnim;

@@ -12,6 +12,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
 TEN::Renderer::RendererHudBar* g_AirBar;
+TEN::Renderer::RendererHudBar* g_ColdBar;
 TEN::Renderer::RendererHudBar* g_HealthBar;
 TEN::Renderer::RendererHudBar* g_SprintBar;
 TEN::Renderer::RendererHudBar* g_LoadingBar;
@@ -21,6 +22,7 @@ namespace TEN::Renderer
 	void Renderer11::InitialiseGameBars()
 	{
 		constexpr auto AIR_BAR_POS	   = Vector2(630.0f, 30.0f);
+		constexpr auto COLD_BAR_POS = Vector2(630.0f, 70.0f);
 		constexpr auto HEALTH_BAR_POS  = Vector2(20.0f, 30.0f);
 		constexpr auto SPRINT_BAR_POS  = Vector2(630.0f, 50.0f);
 		constexpr auto LOADING_BAR_POS = Vector2(325.0f, 550.0f);
@@ -37,6 +39,20 @@ namespace TEN::Renderer
 			// Bottom
 			Vector4(0.0f, 0.0f, 0.35f, 1.0f),
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
+		};
+		
+		static const auto COLD_BAR_COLORS = std::array<Vector4, RendererHudBar::COLOR_COUNT>
+		{
+			// Top
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Center
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Bottom
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f)
 		};
 
 		static const auto HEALTH_BAR_COLORS = std::array<Vector4, RendererHudBar::COLOR_COUNT>
@@ -82,6 +98,7 @@ namespace TEN::Renderer
 		};
 
 		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, AIR_BAR_COLORS);
+		g_ColdBar = new RendererHudBar(m_device.Get(), COLD_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, COLD_BAR_COLORS);
 		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, HEALTH_BAR_COLORS);
 		g_SprintBar = new RendererHudBar(m_device.Get(), SPRINT_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, SPRINT_BAR_COLORS);
 		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, LOADING_BAR_COLORS);

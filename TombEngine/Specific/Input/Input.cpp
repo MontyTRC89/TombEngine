@@ -542,7 +542,7 @@ namespace TEN::Input
 		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara.PoisonPotency)
+				lara.Status.PoisonPotency)
 			{
 				bool hasUsedMedipack = false;
 
@@ -570,7 +570,7 @@ namespace TEN::Input
 
 				if (hasUsedMedipack)
 				{
-					lara.PoisonPotency = 0;
+					lara.Status.PoisonPotency = 0;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 					Statistics.Game.HealthUsed++;
 				}
