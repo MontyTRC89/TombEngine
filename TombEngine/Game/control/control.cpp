@@ -428,6 +428,9 @@ void CleanUp()
 
 	// Clear all remaining renderer data.
 	g_Renderer.ClearScene();
+
+	// Reset Itemcamera
+	ClearObjCamera();
 }
 
 void InitialiseScripting(int levelIndex, bool loadGame)
