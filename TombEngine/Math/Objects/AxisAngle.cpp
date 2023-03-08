@@ -126,6 +126,11 @@ using namespace TEN::Math;
 		return Geometry::RotatePoint(refDirection, *this);
 	}
 
+	EulerAngles AxisAngle::ToEulerAngles() const
+	{
+		return EulerAngles(*this);
+	}
+
 	Quaternion AxisAngle::ToQuaternion() const
 	{
 		return Quaternion::CreateFromAxisAngle(Axis, TO_RAD(Angle));
