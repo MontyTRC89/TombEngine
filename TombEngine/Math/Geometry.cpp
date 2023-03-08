@@ -30,6 +30,11 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const AxisAngle& orient, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
@@ -63,6 +68,12 @@ namespace TEN::Math::Geometry
 		if (distance == 0.0f)
 			return point;
 
+		auto direction = orient.ToDirection();
+		return TranslatePoint(point, direction, distance);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, const AxisAngle& orient, float distance)
+	{
 		auto direction = orient.ToDirection();
 		return TranslatePoint(point, direction, distance);
 	}

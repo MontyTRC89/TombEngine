@@ -315,7 +315,7 @@ namespace TEN::Effects::Electricity
 		{
 			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
 			auto knot = Geometry::TranslatePoint(origin, axisAngle.GetAxis(), lengthStep * i);
-			knot = Geometry::TranslatePoint(knot, axisAngle.ToDirection(), radiusStep * i);
+			knot = Geometry::TranslatePoint(knot, axisAngle, radiusStep * i);
 
 			buffer[bufferIndex] = origin + knot;
 			bufferIndex++;
