@@ -25,7 +25,6 @@ namespace TEN::Effects::Hair
 
 	void HairUnit::HairSegment::CollideSpheres(const std::vector<SPHERE>& spheres)
 	{
-		// Handle sphere collision.
 		for (const auto& sphere : spheres)
 		{
 			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
@@ -49,30 +48,23 @@ namespace TEN::Effects::Hair
 
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
+		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
 		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
 
-		if (hairUnitIndex)
-		{
-			worldMatrix = Matrix::CreateTranslation(44.0f, -48.0f, -50.0f) * worldMatrix;
-		}
-		else if (isYoung)
-		{
-			worldMatrix = Matrix::CreateTranslation(-52.0f, -48.0f, -50.0f) * worldMatrix;
-		}
-		else
-		{
-			worldMatrix = Matrix::CreateTranslation(-4.0f, -4.0f, -48.0f) * worldMatrix;
-		}
+		// Apply base offset to world matrix.
+		auto relOffset = this->GetRelBaseOffset(hairUnitIndex, isYoung);
+		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 
-		auto pos = worldMatrix.Translation();
+		// Set position of base segment.
+		auto basePos = worldMatrix.Translation();
+		this->Segments[0].Position = basePos;
 
 		int* bonePtr = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
 		if (IsInitialized)
 		{
 			this->IsInitialized = false;
-			this->Segments[0].Position = pos;
 
 			// Update segment positions.
 			for (int i = 0; i < SEGMENT_COUNT_MAX; i++, bonePtr += 4)
@@ -90,8 +82,6 @@ namespace TEN::Effects::Hair
 		else
 		{
 			auto* framePtr = this->GetFramePtr(item);
-
-			this->Segments[0].Position = pos;
 
 			auto pos = item.Pose.Position + framePtr->boundingBox.GetCenter();
 			int roomNumber = item.RoomNumber;
@@ -179,10 +169,37 @@ namespace TEN::Effects::Hair
 				segment.Velocity = segment.Position - Segments[0].Velocity;
 
 				// DEBUG
-				if (drawSpheres)
-					g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
+				//if (drawSpheres)
+					//g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
 			}
 		}
+	}
+
+	Vector3 HairUnit::GetRelBaseOffset(int hairUnitIndex, bool isYoung)
+	{
+		auto relOffset = Vector3::Zero;
+		if (isYoung)
+		{
+			switch (hairUnitIndex)
+			{
+				// Left braid offset.
+			case 0:
+				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
+				break;
+
+				// Right braid offset.
+			case 1:
+				relOffset = Vector3(44.0f, -48.0f, -50.0f);
+				break;
+			}
+		}
+		else
+		{
+			// Center braid offset.
+			relOffset = Vector3(-4.0f, -4.0f, -48.0f);
+		}
+
+		return relOffset;
 	}
 
 	AnimFrame* HairUnit::GetFramePtr(const ItemInfo& item)

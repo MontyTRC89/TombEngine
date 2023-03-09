@@ -36,6 +36,7 @@ namespace TEN::Effects::Hair
 
 	private:
 		// Helpers
+		Vector3				GetRelBaseOffset(int hairUnitIndex, bool isYoung);
 		AnimFrame*			GetFramePtr(const ItemInfo& item);
 		std::vector<SPHERE> GetSpheres(const ItemInfo& item, bool isYoung);
 	};
