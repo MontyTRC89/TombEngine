@@ -40,6 +40,7 @@
 #include "Sound/sound.h"
 
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -1063,9 +1064,9 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update player effects.
+	HairEffect.Update(*item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	HandlePlayerWetnessDrips(*item);
 	HandlePlayerDiveBubbles(*item);
-	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);
 }
 

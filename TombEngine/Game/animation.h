@@ -101,15 +101,16 @@ int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
-int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
+int GetFrame(const ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
 AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber);
 AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber);
 AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber);
-AnimFrame* GetBestFrame(ItemInfo* item);
+AnimFrame* GetBestFrame(const ItemInfo* item);
 
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
+Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
 
 void PerformAnimCommands(ItemInfo* item, bool isFrameBased);

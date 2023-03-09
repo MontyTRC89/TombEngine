@@ -1,24 +1,62 @@
 #pragma once
 #include "Math/Math.h"
 
-constexpr auto HAIR_MAX = 2; // HAIR_NORMAL = 0, HAIR_YOUNG = 1
-constexpr auto HAIR_SEGMENTS = 6; // classic = 7, young = 14
-constexpr auto HAIR_SPHERE = 6; // current hair max collision
+using namespace TEN::Math;
 
 struct AnimFrame;
 struct ItemInfo;
+struct SPHERE;
 
-struct HAIR_STRUCT
+namespace TEN::Effects::Hair
 {
-	Pose pos;
-	Vector3i hvel;
-	Vector3i unknown;
+	class HairUnit
+	{
+	private:
+		// Constants
+		static constexpr auto SEGMENT_COUNT_MAX = 6;
+		static constexpr auto HAIR_GRAVITY		= 10.0f;
 
-	bool initialised = false;
-	bool enabled = false;
-};
-extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
+		struct HairSegment
+		{
+			Vector3		Position	= Vector3::Zero;
+			EulerAngles Orientation = EulerAngles::Zero;
+			Vector3		Velocity	= Vector3::Zero;
+		};
 
-void InitialiseHair();
-void HairControl(ItemInfo* item, bool young);
-void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr);
+	public:
+		// Constants
+		static constexpr auto SPHERE_COUNT_MAX = 6;
+
+		// Components
+		bool IsInitialized = false;
+		bool IsEnabled	   = false;
+
+		std::array <HairSegment, SEGMENT_COUNT_MAX + 1> Segments = {};
+
+		// Utilities
+		void Update(const ItemInfo& item, int hairUnitIndex);
+
+	private:
+		// Helpers
+		AnimFrame*							 GetFramePtr(const ItemInfo& item);
+		std::array<SPHERE, SPHERE_COUNT_MAX> GetSpheres(const ItemInfo& item, bool isYoung);
+		void								 UpdateSegments(const ItemInfo& item, int hairUnitIndex, bool isYoung);
+	};
+
+	class HairEffectController
+	{
+	private:
+		// Constants
+		static constexpr auto UNIT_COUNT_MAX = 2;
+
+	public:
+		// Components
+		std::array<HairUnit, UNIT_COUNT_MAX> Units = {};
+
+		// Utilities
+		void Initialize();
+		void Update(ItemInfo& item, bool isYoung);
+	};
+
+	extern HairEffectController HairEffect;
+}

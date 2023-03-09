@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Hair;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -315,26 +316,27 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent)
 {
-	if (!m_moveableObjects[ID_HAIR].has_value())
+	if (!Objects[ID_HAIR].loaded)
 		return;
 
-	RendererObject& hairsObj = *m_moveableObjects[ID_HAIR];
+	const auto& hairObject = *m_moveableObjects[ID_HAIR];
 
-	for (int h = 0; h < HAIR_MAX; h++)
+	for (const auto& unit : HairEffect.Units)
 	{
-		if (!Hairs[h][0].enabled)
+		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+		// First matrix is Lara's head matrix, then all 6 hair segment matrices.
+		// Bones are adjusted at load time to account for this.
 		m_stItem.World = Matrix::Identity;
 		m_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+		for (int i = 0; i < unit.Segments.size(); i++)
 		{
-			auto* hairs = &Hairs[h][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			m_stItem.BonesMatrices[i + 1] = world;
+			const auto& segment = unit.Segments[i];
+			auto worldMatrix = segment.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(segment.Position);
+
+			m_stItem.BonesMatrices[i + 1] = worldMatrix;
 			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		}
 
@@ -342,10 +344,10 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+		for (int j = 0; j < (int)hairObject.ObjectMeshes.size(); j++)
 		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-			DrawMoveableMesh(itemToDraw, mesh, room, k, transparent);
+			auto& mesh = *hairObject.ObjectMeshes[j];
+			DrawMoveableMesh(itemToDraw, &mesh, room, j, transparent);
 		}
 	}
 }
