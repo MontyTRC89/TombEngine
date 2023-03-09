@@ -123,7 +123,7 @@ namespace TEN::Hud
 
 		// Update life.
 		if (ColdBar.Value != ColdBar.TargetValue ||
-			TestEnvironment(ENV_FLAG_COLD, &item))
+			(TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) && TestEnvironment(ENV_FLAG_COLD, item.RoomNumber)))
 		{
 			this->ColdBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
@@ -142,7 +142,7 @@ namespace TEN::Hud
 			(player.Control.HandStatus == HandStatus::WeaponDraw &&
 				player.Control.Weapon.GunType != LaraWeaponType::Flare) || // HACK: Exclude flare.
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
-				player.Control.Weapon.GunType != LaraWeaponType::Torch)) // HACK: Exclude torch.
+				player.Control.Weapon.GunType != LaraWeaponType::Torch))   // HACK: Exclude torch.
 		{
 			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
@@ -184,6 +184,8 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_AIR_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_AIR_CRITICAL / LARA_AIR_MAX;
 
+		if (AirBar.Life <= 0.0f)
+			return;
 
 		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
 	}
@@ -193,6 +195,8 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_SFX_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_COLD_EXPOSURE_CRITICAL / LARA_COLD_EXPOSURE_MAX;
 
+		if (ColdBar.Life <= 0.0f)
+			return;
 
 		this->DrawStatusBar(ColdBar.Value, CRITICAL_VALUE, *g_ColdBar, TEXTURE_ID, 0, false);
 	}
@@ -202,6 +206,8 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_HEALTH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = LARA_HEALTH_CRITICAL / LARA_HEALTH_MAX;
 
+		if (HealthBar.Life <= 0.0f)
+			return;
 
 		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
@@ -211,6 +217,8 @@ namespace TEN::Hud
 		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = 0;
 
+		if (StaminaBar.Life <= 0.0f)
+			return;
 
 		this->DrawStatusBar(StaminaBar.Value, CRITICAL_VALUE, *g_StaminaBar, TEXTURE_ID, 0, false);
 	}

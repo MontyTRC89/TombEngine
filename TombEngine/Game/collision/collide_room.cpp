@@ -1469,7 +1469,7 @@ bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber)
 	return TestEnvironment(environmentType, GetCollision(pos.x, pos.y, pos.z, roomNumber).RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item)
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 {
 	return TestEnvironment(environmentType, item->RoomNumber);
 }
