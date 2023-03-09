@@ -20,8 +20,6 @@ namespace TEN::Effects::Hair
 			Vector3		Position	= Vector3::Zero;
 			EulerAngles Orientation = EulerAngles::Zero;
 			Vector3		Velocity	= Vector3::Zero;
-
-			void CollideSpheres(const std::vector<SPHERE>& spheres);
 		};
 
 	public:
@@ -39,6 +37,10 @@ namespace TEN::Effects::Hair
 		Vector3				GetRelBaseOffset(int hairUnitIndex, bool isYoung);
 		AnimFrame*			GetFramePtr(const ItemInfo& item);
 		std::vector<SPHERE> GetSpheres(const ItemInfo& item, bool isYoung);
+		EulerAngles			GetOrientation(const Vector3& origin, const Vector3& target);
+
+		void CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand);
+		void CollideSegmentWithSpheres(HairSegment& segment, const std::vector<SPHERE>& spheres);
 	};
 
 	class HairEffectController

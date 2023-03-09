@@ -23,25 +23,6 @@ namespace TEN::Effects::Hair
 
 	HairEffectController HairEffect = {};
 
-	void HairUnit::HairSegment::CollideSpheres(const std::vector<SPHERE>& spheres)
-	{
-		for (const auto& sphere : spheres)
-		{
-			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
-			auto direction = Position - spherePos;
-
-			float distance = Vector3::Distance(Position, spherePos);
-			if (distance < sphere.r)
-			{
-				// Avoid division by zero.
-				if (distance == 0.0f)
-					distance = 1.0f;
-
-				this->Position = spherePos + (direction * (sphere.r / distance));
-			}
-		}
-	}
-
 	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
 	{
 		const auto& player = GetLaraInfo(item);
@@ -83,10 +64,12 @@ namespace TEN::Effects::Hair
 		{
 			auto* framePtr = this->GetFramePtr(item);
 
+			// Get water height.
 			auto pos = item.Pose.Position + framePtr->boundingBox.GetCenter();
 			int roomNumber = item.RoomNumber;
 			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
 
+			// Get collision spheres.
 			auto spheres = GetSpheres(item, isYoung);
 
 			// Update segments.
@@ -95,68 +78,21 @@ namespace TEN::Effects::Hair
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
 
-				this->Segments[0].Velocity = segment.Position;
-
-				auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, item.RoomNumber);
-				int floorHeight = pointColl.Position.Floor;
-
-				segment.Position += segment.Velocity * 0.75f;
-
 				// TR3 UPV uses a hack which forces Lara water status to dry. 
-				// Therefore, we can't directly use water status value to determine hair mode.
-				bool dryMode = ((player.Control.WaterStatus == WaterStatus::Dry) &&
-								(player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
-				if (dryMode)
-				{
-					// Let wind affect position.
-					if (TestEnvironment(ENV_FLAG_WIND, pointColl.RoomNumber))
-						segment.Position += Weather.Wind() * 2;
+				// Therefore, cannot directly use water status value to determine enrironment.
+				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
+								 (player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
 
-					// Apply gravity.
-					segment.Position.y += HAIR_GRAVITY;
+				// Handle room collision for segment.
+				this->CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
 
-					// Float on water surface.
-					if (waterHeight != NO_HEIGHT && segment.Position.y > waterHeight)
-					{
-						segment.Position.y = waterHeight;
-					}
-					// Avoid clipping through floor.
-					else if (floorHeight > Segments[0].Position.y && segment.Position.y > floorHeight)
-					{
-						segment.Position = Segments[0].Velocity;
-					}
-				}
-				else
-				{
-					if (segment.Position.y < waterHeight)
-					{
-						segment.Position.y = waterHeight;
-					}
-					else if (segment.Position.y > floorHeight)
-					{
-						segment.Position.y = floorHeight;
-					}
-				}
+				// Handle sphere collision for segment.
+				this->CollideSegmentWithSpheres(segment, spheres);
 
-				// Handle sphere collision.
-				segment.CollideSpheres(spheres);
+				// Calculate orientation.
+				prevSegment.Orientation = this->GetOrientation(prevSegment.Position, segment.Position);
 
-				// Calculate 2D distance (on XZ plane) between segments.
-				float distance2D = Vector2::Distance(
-					Vector2(segment.Position.x, segment.Position.z),
-					Vector2(prevSegment.Position.x, prevSegment.Position.z));
-
-				// Calculate segment orientation.
-				// BUG: Gimbal lock causes twisting.
-				prevSegment.Orientation = EulerAngles(
-					-(short)phd_atan(
-						distance2D,
-						segment.Position.y - prevSegment.Position.y),
-					(short)phd_atan(
-						segment.Position.z - prevSegment.Position.z,
-						segment.Position.x - prevSegment.Position.x),
-					0);
-
+				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
@@ -289,6 +225,87 @@ namespace TEN::Effects::Hair
 			isYoung ? 0 : int(float(spheres[2].r * 3) / 4)));
 
 		return spheres;
+	}
+
+	EulerAngles HairUnit::GetOrientation(const Vector3& origin, const Vector3& target)
+	{
+		// Calculate 2D distance between segments.
+		float distance2D = Vector2::Distance(
+			Vector2(target.x, target.z),
+			Vector2(origin.x, origin.z));
+
+		// Calculate segment orientation.
+		// BUG: Aggressive gimbal lock causes major twisting.
+		return EulerAngles(
+			-(short)phd_atan(
+				distance2D,
+				target.y - origin.y),
+			(short)phd_atan(
+				target.z - origin.z,
+				target.x - origin.x),
+			0);
+	}
+
+	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
+	{
+		auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, roomNumber);
+		int floorHeight = pointColl.Position.Floor;
+
+		this->Segments[0].Velocity = segment.Position;
+		segment.Position += segment.Velocity * 0.75f;
+
+		// Land collision.
+		if (isOnLand)
+		{
+			// Let wind affect position.
+			if (TestEnvironment(ENV_FLAG_WIND, pointColl.RoomNumber))
+				segment.Position += Weather.Wind() * 2;
+
+			// Apply gravity.
+			segment.Position.y += HAIR_GRAVITY;
+
+			// Float on water surface.
+			if (waterHeight != NO_HEIGHT && segment.Position.y > waterHeight)
+			{
+				segment.Position.y = waterHeight;
+			}
+			// Avoid clipping through floor.
+			else if (floorHeight > Segments[0].Position.y && segment.Position.y > floorHeight)
+			{
+				segment.Position = Segments[0].Velocity;
+			}
+		}
+		// Water collision.
+		else
+		{
+			if (segment.Position.y < waterHeight)
+			{
+				segment.Position.y = waterHeight;
+			}
+			else if (segment.Position.y > floorHeight)
+			{
+				segment.Position.y = floorHeight;
+			}
+		}
+	}
+
+	void HairUnit::CollideSegmentWithSpheres(HairSegment& segment, const std::vector<SPHERE>& spheres)
+	{
+		for (const auto& sphere : spheres)
+		{
+			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
+			auto direction = segment.Position - spherePos;
+
+			float distance = Vector3::Distance(segment.Position, spherePos);
+			if (distance < sphere.r)
+			{
+				// Avoid division by zero.
+				if (distance == 0.0f)
+					distance = 1.0f;
+
+				segment.Position = spherePos + (direction * (sphere.r / distance));
+			}
+		}
 	}
 
 	void HairEffectController::Initialize()
