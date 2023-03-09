@@ -770,6 +770,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->HitPoints -= 10;
 				}
 			}
+			else
+			{
+				lara->Status.ColdExposure++;
+				if (lara->Status.ColdExposure >= LARA_COLD_EXPOSURE_MAX)
+					lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+			}
 		}
 
 		LaraUnderwater(item, coll);
