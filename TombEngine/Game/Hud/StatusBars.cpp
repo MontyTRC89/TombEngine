@@ -105,7 +105,7 @@ namespace TEN::Hud
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
 		if (player.Vehicle != NO_ITEM)
 		{
-			if (g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV)
+			if (g_Level.Items[player.Vehicle].ObjectNumber == ID_UPV)
 				this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
@@ -120,7 +120,8 @@ namespace TEN::Hud
 		// Update life.
 		if (HealthBar.Value != HealthBar.TargetValue ||
 			item.HitPoints <= LARA_HEALTH_CRITICAL || player.PoisonPotency != 0 ||
-			player.Control.HandStatus == HandStatus::WeaponDraw ||
+			(player.Control.HandStatus == HandStatus::WeaponDraw &&
+				player.Control.Weapon.GunType != LaraWeaponType::Flare) || // HACK: Exclude flare.
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
 				player.Control.Weapon.GunType != LaraWeaponType::Torch)) // HACK: Exclude torch.
 		{
