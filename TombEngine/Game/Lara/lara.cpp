@@ -421,13 +421,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Weapon.HasFired = false;
 	}
 
-	if (lara->Status.PoisonPotency)
+	if (lara->Status.Poison)
 	{
-		if (lara->Status.PoisonPotency > LARA_POISON_POTENCY_MAX)
-			lara->Status.PoisonPotency = LARA_POISON_POTENCY_MAX;
+		if (lara->Status.Poison > LARA_POISON_MAX)
+			lara->Status.Poison = LARA_POISON_MAX;
 
 		if (!(Wibble & 0xFF))
-			item->HitPoints -= lara->Status.PoisonPotency;
+			item->HitPoints -= lara->Status.Poison;
 	}
 
 	if (lara->Control.IsMoving)
@@ -459,8 +459,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 
-	if (lara->Status.SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
-		lara->Status.SprintEnergy++;
+	if (lara->Status.Stamina < LARA_STAMINA_MAX && item->Animation.ActiveState != LS_SPRINT)
+		lara->Status.Stamina++;
 
 	RumbleLaraHealthCondition(item);
 
@@ -1044,8 +1044,8 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	item->HitPoints = LARA_HEALTH_MAX;
 	lara->Status.Air = LARA_AIR_MAX;
 	lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
-	lara->Status.PoisonPotency = 0;
-	lara->Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+	lara->Status.Poison = 0;
+	lara->Status.Stamina = LARA_STAMINA_MAX;
 	
 	LaraUnderwater(item, coll);
 

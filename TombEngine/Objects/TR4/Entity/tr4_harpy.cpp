@@ -451,7 +451,7 @@ namespace TEN::Entities::TR4
 					)
 				{
 					if (creature->Enemy->IsLara())
-						GetLaraInfo(creature->Enemy)->Status.PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+						GetLaraInfo(creature->Enemy)->Status.Poison += HARPY_STINGER_POISON_POTENCY;
 
 					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
 					CreatureEffect2(item, HarpyBite3, 10, -1, DoBloodSplat);

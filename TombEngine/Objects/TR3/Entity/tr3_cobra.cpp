@@ -156,7 +156,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Flags |= 1; // 1 = is attacking.
 
 					if (creature->Enemy->IsLara())
-						GetLaraInfo(creature->Enemy)->Status.PoisonPotency += COBRA_BITE_POISON_POTENCY;
+						GetLaraInfo(creature->Enemy)->Status.Poison += COBRA_BITE_POISON_POTENCY;
 				}
 
 				break;

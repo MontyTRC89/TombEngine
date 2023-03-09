@@ -1250,10 +1250,10 @@ struct SubsuitControlData
 
 struct PlayerStatusData
 {
-	int Air			  = 0;
-	int ColdExposure  = 0; // TODO: savegame
-	int PoisonPotency = 0;
-	int SprintEnergy  = 0;
+	int Air			 = 0;
+	int ColdExposure = 0; // TODO: savegame
+	int Poison		 = 0;
+	int Stamina		 = 0;
 };
 
 struct LaraControlData

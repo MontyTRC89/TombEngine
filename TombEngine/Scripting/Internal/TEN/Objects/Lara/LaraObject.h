@@ -38,8 +38,8 @@ public:
 	int GetPoison() const;
 	void SetAir(sol::optional<int> air);
 	int GetAir() const;
-	void SetSprintEnergy(sol::optional<int> value);
-	int GetSprintEnergy() const;
+	void SetStamina(sol::optional<int> value);
+	int GetStamina() const;
 	void SetWet(sol::optional<int> wetness);
 	int GetWet() const;
 	[[nodiscard]] bool GetAirborne() const;

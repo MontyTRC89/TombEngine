@@ -32,8 +32,8 @@ void InitialiseLara(bool restore)
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
-	Lara.Status.PoisonPotency = 0;
-	Lara.Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+	Lara.Status.Poison = 0;
+	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
 	Lara.Control.CanLook = true;
 	Lara.ItemNumber = itemNumber;

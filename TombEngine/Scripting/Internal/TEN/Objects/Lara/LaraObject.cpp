@@ -24,9 +24,9 @@ In addition, LaraObject inherits all the functions of @{Objects.Moveable|Moveabl
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_LaraObject };
 using namespace TEN::Entities::Generic;
 
-/// Set Lara poison potency
+/// Set Lara poison
 // @function LaraObject:SetPoison
-// @tparam[opt] int Potency; maximum value is 64 (default 0)
+// @tparam[opt] int Poison; maximum value is 128 (default 0)
 // @usage
 // Lara:SetPoison(10)
 void LaraObject::SetPoison(sol::optional<int> potency)
@@ -34,9 +34,9 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (potency.has_value())
-		lara->Status.PoisonPotency = std::clamp(potency.value(), 0, (int)LARA_POISON_POTENCY_MAX);
+		lara->Status.Poison = std::clamp(potency.value(), 0, (int)LARA_POISON_MAX);
 	else
-		lara->Status.PoisonPotency = 0;
+		lara->Status.Poison = 0;
 }
 
 /// Get poison potency of Lara
@@ -47,7 +47,7 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 int LaraObject::GetPoison() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->Status.PoisonPotency;
+	return lara->Status.Poison;
 }
 
 /// Set air value of Lara
@@ -102,29 +102,29 @@ int LaraObject::GetWet() const
 }
 
 /// Set sprint energy value of Lara
-// @function LaraObject:SetSprintEnergy
-// @tparam int sprint energy to give to Lara; maximum value is 120. 
+// @function LaraObject:SetStamina
+// @tparam int stamina to give to Lara; maximum value is 120. 
 // @usage
-// Lara:SetSprintEnergy(120)
-void LaraObject::SetSprintEnergy(sol::optional<int> value)
+// Lara:SetStamina(120)
+void LaraObject::SetStamina(sol::optional<int> value)
 {
 	auto* lara = GetLaraInfo(m_item);
 
 	if (value.has_value())
-		lara->Status.SprintEnergy = std::clamp(value.value(), 0, (int)LARA_SPRINT_ENERGY_MAX);
+		lara->Status.Stamina = std::clamp(value.value(), 0, (int)LARA_STAMINA_MAX);
 	else
-		lara->Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+		lara->Status.Stamina = LARA_STAMINA_MAX;
 }
 
-/// Get sprint energy value of Lara
-// @function LaraObject:GetSprintEnergy
+/// Get stamina value of Lara
+// @function LaraObject:GetStamina
 // @treturn int current sprint value
 // @usage
-// local sprintEnergy = Lara:GetSprintEnergy()
-int LaraObject::GetSprintEnergy() const
+// local sprintEnergy = Lara:GetStamina()
+int LaraObject::GetStamina() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->Status.SprintEnergy;
+	return lara->Status.Stamina;
 }
 
 /// Get the moveable's airborne status
@@ -303,8 +303,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAir, &LaraObject::GetAir,
 			ScriptReserved_SetWet, &LaraObject::SetWet,
 			ScriptReserved_GetWet, &LaraObject::GetWet,
-			ScriptReserved_SetSprintEnergy, &LaraObject::SetSprintEnergy,
-			ScriptReserved_GetSprintEnergy, &LaraObject::GetSprintEnergy,
+			ScriptReserved_SetStamina, &LaraObject::SetStamina,
+			ScriptReserved_GetStamina, &LaraObject::GetStamina,
 			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
 			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,

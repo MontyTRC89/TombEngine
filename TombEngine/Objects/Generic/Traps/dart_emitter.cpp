@@ -20,7 +20,7 @@ namespace TEN::Entities::Traps
 		if (item->TouchBits.TestAny())
 		{
 			if (item->TriggerFlags < 0)
-				Lara.Status.PoisonPotency += 1;
+				Lara.Status.Poison += 1;
 
 			DoDamage(LaraItem, item->TriggerFlags ? abs(item->TriggerFlags) : DART_DEFAULT_DAMAGE);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);

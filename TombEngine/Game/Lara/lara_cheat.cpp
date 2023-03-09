@@ -81,8 +81,8 @@ void LaraCheatyBits(ItemInfo* item)
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
 					lara->Control.Count.Death = 0;
 					lara->Status.Air = LARA_AIR_MAX;
-					lara->Status.PoisonPotency = 0;
-					lara->Status.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+					lara->Status.Poison = 0;
+					lara->Status.Stamina = LARA_STAMINA_MAX;
 				}
 			}
 			else

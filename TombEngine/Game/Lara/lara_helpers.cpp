@@ -1042,7 +1042,7 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (item->HitPoints > LARA_HEALTH_CRITICAL && lara->Status.PoisonPotency == 0)
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && lara->Status.Poison == 0)
 		return;
 
 	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;

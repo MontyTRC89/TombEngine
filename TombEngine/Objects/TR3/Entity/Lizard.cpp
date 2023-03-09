@@ -125,7 +125,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			bool isPlayerPoisonedOrTargetBlocked = 
-				(creature.Enemy != nullptr && GetLaraInfo(creature.Enemy)->Status.PoisonPotency < 256) ||
+				(creature.Enemy != nullptr && GetLaraInfo(creature.Enemy)->Status.Poison < 256) ||
 				IsLizardTargetBlocked(item);
 
 			switch (item.Animation.ActiveState)
