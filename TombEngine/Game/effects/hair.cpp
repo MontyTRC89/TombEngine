@@ -100,8 +100,8 @@ namespace TEN::Effects::Hair
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
 				auto boneOffset = (i == SEGMENT_COUNT_MAX) ?
-					Vector3(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) :
-					Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+					Vector3(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) : // Previous bone.
+					Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));  // Current bone.
 				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
