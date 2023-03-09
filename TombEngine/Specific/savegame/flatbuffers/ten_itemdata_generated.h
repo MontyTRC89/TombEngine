@@ -2111,14 +2111,142 @@ flatbuffers::Offset<Rubberboat> CreateRubberboat(flatbuffers::FlatBufferBuilder 
 
 struct PushableT : public flatbuffers::NativeTable {
   typedef Pushable TableType;
+  float pushable_gravity = 0.0f;
+  int32_t pushable_gravity_state = 0;
+  float pushable_water_force = 0.0f;
+  int32_t pushable_stackLimit = 0;
+  int32_t pushable_stackUpper = 0;
+  int32_t pushable_stackLower = 0;
+  int32_t pushable_startX = 0;
+  int32_t pushable_startZ = 0;
+  int32_t pushable_roomNumber = 0;
+  bool pushable_north_pullable = false;
+  bool pushable_north_pushable = false;
+  bool pushable_north_climbable = false;
+  bool pushable_east_pullable = false;
+  bool pushable_east_pushable = false;
+  bool pushable_east_climbable = false;
+  bool pushable_south_pullable = false;
+  bool pushable_south_pushable = false;
+  bool pushable_south_climbable = false;
+  bool pushable_west_pullable = false;
+  bool pushable_west_pushable = false;
+  bool pushable_west_climbable = false;
 };
 
 struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef PushableT NativeTableType;
   typedef PushableBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_PUSHABLE_GRAVITY = 4,
+    VT_PUSHABLE_GRAVITY_STATE = 6,
+    VT_PUSHABLE_WATER_FORCE = 8,
+    VT_PUSHABLE_STACKLIMIT = 10,
+    VT_PUSHABLE_STACKUPPER = 12,
+    VT_PUSHABLE_STACKLOWER = 14,
+    VT_PUSHABLE_STARTX = 16,
+    VT_PUSHABLE_STARTZ = 18,
+    VT_PUSHABLE_ROOMNUMBER = 20,
+    VT_PUSHABLE_NORTH_PULLABLE = 22,
+    VT_PUSHABLE_NORTH_PUSHABLE = 24,
+    VT_PUSHABLE_NORTH_CLIMBABLE = 26,
+    VT_PUSHABLE_EAST_PULLABLE = 28,
+    VT_PUSHABLE_EAST_PUSHABLE = 30,
+    VT_PUSHABLE_EAST_CLIMBABLE = 32,
+    VT_PUSHABLE_SOUTH_PULLABLE = 34,
+    VT_PUSHABLE_SOUTH_PUSHABLE = 36,
+    VT_PUSHABLE_SOUTH_CLIMBABLE = 38,
+    VT_PUSHABLE_WEST_PULLABLE = 40,
+    VT_PUSHABLE_WEST_PUSHABLE = 42,
+    VT_PUSHABLE_WEST_CLIMBABLE = 44
+  };
+  float pushable_gravity() const {
+    return GetField<float>(VT_PUSHABLE_GRAVITY, 0.0f);
+  }
+  int32_t pushable_gravity_state() const {
+    return GetField<int32_t>(VT_PUSHABLE_GRAVITY_STATE, 0);
+  }
+  float pushable_water_force() const {
+    return GetField<float>(VT_PUSHABLE_WATER_FORCE, 0.0f);
+  }
+  int32_t pushable_stackLimit() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACKLIMIT, 0);
+  }
+  int32_t pushable_stackUpper() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACKUPPER, 0);
+  }
+  int32_t pushable_stackLower() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACKLOWER, 0);
+  }
+  int32_t pushable_startX() const {
+    return GetField<int32_t>(VT_PUSHABLE_STARTX, 0);
+  }
+  int32_t pushable_startZ() const {
+    return GetField<int32_t>(VT_PUSHABLE_STARTZ, 0);
+  }
+  int32_t pushable_roomNumber() const {
+    return GetField<int32_t>(VT_PUSHABLE_ROOMNUMBER, 0);
+  }
+  bool pushable_north_pullable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_NORTH_PULLABLE, 0) != 0;
+  }
+  bool pushable_north_pushable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_NORTH_PUSHABLE, 0) != 0;
+  }
+  bool pushable_north_climbable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_NORTH_CLIMBABLE, 0) != 0;
+  }
+  bool pushable_east_pullable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_EAST_PULLABLE, 0) != 0;
+  }
+  bool pushable_east_pushable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_EAST_PUSHABLE, 0) != 0;
+  }
+  bool pushable_east_climbable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_EAST_CLIMBABLE, 0) != 0;
+  }
+  bool pushable_south_pullable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_SOUTH_PULLABLE, 0) != 0;
+  }
+  bool pushable_south_pushable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_SOUTH_PUSHABLE, 0) != 0;
+  }
+  bool pushable_south_climbable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_SOUTH_CLIMBABLE, 0) != 0;
+  }
+  bool pushable_west_pullable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_WEST_PULLABLE, 0) != 0;
+  }
+  bool pushable_west_pushable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_WEST_PUSHABLE, 0) != 0;
+  }
+  bool pushable_west_climbable() const {
+    return GetField<uint8_t>(VT_PUSHABLE_WEST_CLIMBABLE, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_PUSHABLE_GRAVITY) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_GRAVITY_STATE) &&
+           VerifyField<float>(verifier, VT_PUSHABLE_WATER_FORCE) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKLIMIT) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKUPPER) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKLOWER) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTX) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTZ) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_ROOMNUMBER) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PULLABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PUSHABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_CLIMBABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_EAST_PULLABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_EAST_PUSHABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_EAST_CLIMBABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_SOUTH_PULLABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_SOUTH_PUSHABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_SOUTH_CLIMBABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_WEST_PULLABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_WEST_PUSHABLE) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_WEST_CLIMBABLE) &&
            verifier.EndTable();
   }
   PushableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -2130,6 +2258,69 @@ struct PushableBuilder {
   typedef Pushable Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_pushable_gravity(float pushable_gravity) {
+    fbb_.AddElement<float>(Pushable::VT_PUSHABLE_GRAVITY, pushable_gravity, 0.0f);
+  }
+  void add_pushable_gravity_state(int32_t pushable_gravity_state) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_GRAVITY_STATE, pushable_gravity_state, 0);
+  }
+  void add_pushable_water_force(float pushable_water_force) {
+    fbb_.AddElement<float>(Pushable::VT_PUSHABLE_WATER_FORCE, pushable_water_force, 0.0f);
+  }
+  void add_pushable_stackLimit(int32_t pushable_stackLimit) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKLIMIT, pushable_stackLimit, 0);
+  }
+  void add_pushable_stackUpper(int32_t pushable_stackUpper) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKUPPER, pushable_stackUpper, 0);
+  }
+  void add_pushable_stackLower(int32_t pushable_stackLower) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKLOWER, pushable_stackLower, 0);
+  }
+  void add_pushable_startX(int32_t pushable_startX) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STARTX, pushable_startX, 0);
+  }
+  void add_pushable_startZ(int32_t pushable_startZ) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STARTZ, pushable_startZ, 0);
+  }
+  void add_pushable_roomNumber(int32_t pushable_roomNumber) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_ROOMNUMBER, pushable_roomNumber, 0);
+  }
+  void add_pushable_north_pullable(bool pushable_north_pullable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_NORTH_PULLABLE, static_cast<uint8_t>(pushable_north_pullable), 0);
+  }
+  void add_pushable_north_pushable(bool pushable_north_pushable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_NORTH_PUSHABLE, static_cast<uint8_t>(pushable_north_pushable), 0);
+  }
+  void add_pushable_north_climbable(bool pushable_north_climbable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_NORTH_CLIMBABLE, static_cast<uint8_t>(pushable_north_climbable), 0);
+  }
+  void add_pushable_east_pullable(bool pushable_east_pullable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_EAST_PULLABLE, static_cast<uint8_t>(pushable_east_pullable), 0);
+  }
+  void add_pushable_east_pushable(bool pushable_east_pushable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_EAST_PUSHABLE, static_cast<uint8_t>(pushable_east_pushable), 0);
+  }
+  void add_pushable_east_climbable(bool pushable_east_climbable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_EAST_CLIMBABLE, static_cast<uint8_t>(pushable_east_climbable), 0);
+  }
+  void add_pushable_south_pullable(bool pushable_south_pullable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_SOUTH_PULLABLE, static_cast<uint8_t>(pushable_south_pullable), 0);
+  }
+  void add_pushable_south_pushable(bool pushable_south_pushable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_SOUTH_PUSHABLE, static_cast<uint8_t>(pushable_south_pushable), 0);
+  }
+  void add_pushable_south_climbable(bool pushable_south_climbable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_SOUTH_CLIMBABLE, static_cast<uint8_t>(pushable_south_climbable), 0);
+  }
+  void add_pushable_west_pullable(bool pushable_west_pullable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_WEST_PULLABLE, static_cast<uint8_t>(pushable_west_pullable), 0);
+  }
+  void add_pushable_west_pushable(bool pushable_west_pushable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_WEST_PUSHABLE, static_cast<uint8_t>(pushable_west_pushable), 0);
+  }
+  void add_pushable_west_climbable(bool pushable_west_climbable) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_WEST_CLIMBABLE, static_cast<uint8_t>(pushable_west_climbable), 0);
+  }
   explicit PushableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2142,8 +2333,50 @@ struct PushableBuilder {
 };
 
 inline flatbuffers::Offset<Pushable> CreatePushable(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    float pushable_gravity = 0.0f,
+    int32_t pushable_gravity_state = 0,
+    float pushable_water_force = 0.0f,
+    int32_t pushable_stackLimit = 0,
+    int32_t pushable_stackUpper = 0,
+    int32_t pushable_stackLower = 0,
+    int32_t pushable_startX = 0,
+    int32_t pushable_startZ = 0,
+    int32_t pushable_roomNumber = 0,
+    bool pushable_north_pullable = false,
+    bool pushable_north_pushable = false,
+    bool pushable_north_climbable = false,
+    bool pushable_east_pullable = false,
+    bool pushable_east_pushable = false,
+    bool pushable_east_climbable = false,
+    bool pushable_south_pullable = false,
+    bool pushable_south_pushable = false,
+    bool pushable_south_climbable = false,
+    bool pushable_west_pullable = false,
+    bool pushable_west_pushable = false,
+    bool pushable_west_climbable = false) {
   PushableBuilder builder_(_fbb);
+  builder_.add_pushable_roomNumber(pushable_roomNumber);
+  builder_.add_pushable_startZ(pushable_startZ);
+  builder_.add_pushable_startX(pushable_startX);
+  builder_.add_pushable_stackLower(pushable_stackLower);
+  builder_.add_pushable_stackUpper(pushable_stackUpper);
+  builder_.add_pushable_stackLimit(pushable_stackLimit);
+  builder_.add_pushable_water_force(pushable_water_force);
+  builder_.add_pushable_gravity_state(pushable_gravity_state);
+  builder_.add_pushable_gravity(pushable_gravity);
+  builder_.add_pushable_west_climbable(pushable_west_climbable);
+  builder_.add_pushable_west_pushable(pushable_west_pushable);
+  builder_.add_pushable_west_pullable(pushable_west_pullable);
+  builder_.add_pushable_south_climbable(pushable_south_climbable);
+  builder_.add_pushable_south_pushable(pushable_south_pushable);
+  builder_.add_pushable_south_pullable(pushable_south_pullable);
+  builder_.add_pushable_east_climbable(pushable_east_climbable);
+  builder_.add_pushable_east_pushable(pushable_east_pushable);
+  builder_.add_pushable_east_pullable(pushable_east_pullable);
+  builder_.add_pushable_north_climbable(pushable_north_climbable);
+  builder_.add_pushable_north_pushable(pushable_north_pushable);
+  builder_.add_pushable_north_pullable(pushable_north_pullable);
   return builder_.Finish();
 }
 
@@ -3222,6 +3455,27 @@ inline PushableT *Pushable::UnPack(const flatbuffers::resolver_function_t *_reso
 inline void Pushable::UnPackTo(PushableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = pushable_gravity(); _o->pushable_gravity = _e; }
+  { auto _e = pushable_gravity_state(); _o->pushable_gravity_state = _e; }
+  { auto _e = pushable_water_force(); _o->pushable_water_force = _e; }
+  { auto _e = pushable_stackLimit(); _o->pushable_stackLimit = _e; }
+  { auto _e = pushable_stackUpper(); _o->pushable_stackUpper = _e; }
+  { auto _e = pushable_stackLower(); _o->pushable_stackLower = _e; }
+  { auto _e = pushable_startX(); _o->pushable_startX = _e; }
+  { auto _e = pushable_startZ(); _o->pushable_startZ = _e; }
+  { auto _e = pushable_roomNumber(); _o->pushable_roomNumber = _e; }
+  { auto _e = pushable_north_pullable(); _o->pushable_north_pullable = _e; }
+  { auto _e = pushable_north_pushable(); _o->pushable_north_pushable = _e; }
+  { auto _e = pushable_north_climbable(); _o->pushable_north_climbable = _e; }
+  { auto _e = pushable_east_pullable(); _o->pushable_east_pullable = _e; }
+  { auto _e = pushable_east_pushable(); _o->pushable_east_pushable = _e; }
+  { auto _e = pushable_east_climbable(); _o->pushable_east_climbable = _e; }
+  { auto _e = pushable_south_pullable(); _o->pushable_south_pullable = _e; }
+  { auto _e = pushable_south_pushable(); _o->pushable_south_pushable = _e; }
+  { auto _e = pushable_south_climbable(); _o->pushable_south_climbable = _e; }
+  { auto _e = pushable_west_pullable(); _o->pushable_west_pullable = _e; }
+  { auto _e = pushable_west_pushable(); _o->pushable_west_pushable = _e; }
+  { auto _e = pushable_west_climbable(); _o->pushable_west_climbable = _e; }
 }
 
 inline flatbuffers::Offset<Pushable> Pushable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PushableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -3232,8 +3486,50 @@ inline flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuild
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PushableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _pushable_gravity = _o->pushable_gravity;
+  auto _pushable_gravity_state = _o->pushable_gravity_state;
+  auto _pushable_water_force = _o->pushable_water_force;
+  auto _pushable_stackLimit = _o->pushable_stackLimit;
+  auto _pushable_stackUpper = _o->pushable_stackUpper;
+  auto _pushable_stackLower = _o->pushable_stackLower;
+  auto _pushable_startX = _o->pushable_startX;
+  auto _pushable_startZ = _o->pushable_startZ;
+  auto _pushable_roomNumber = _o->pushable_roomNumber;
+  auto _pushable_north_pullable = _o->pushable_north_pullable;
+  auto _pushable_north_pushable = _o->pushable_north_pushable;
+  auto _pushable_north_climbable = _o->pushable_north_climbable;
+  auto _pushable_east_pullable = _o->pushable_east_pullable;
+  auto _pushable_east_pushable = _o->pushable_east_pushable;
+  auto _pushable_east_climbable = _o->pushable_east_climbable;
+  auto _pushable_south_pullable = _o->pushable_south_pullable;
+  auto _pushable_south_pushable = _o->pushable_south_pushable;
+  auto _pushable_south_climbable = _o->pushable_south_climbable;
+  auto _pushable_west_pullable = _o->pushable_west_pullable;
+  auto _pushable_west_pushable = _o->pushable_west_pushable;
+  auto _pushable_west_climbable = _o->pushable_west_climbable;
   return TEN::Save::CreatePushable(
-      _fbb);
+      _fbb,
+      _pushable_gravity,
+      _pushable_gravity_state,
+      _pushable_water_force,
+      _pushable_stackLimit,
+      _pushable_stackUpper,
+      _pushable_stackLower,
+      _pushable_startX,
+      _pushable_startZ,
+      _pushable_roomNumber,
+      _pushable_north_pullable,
+      _pushable_north_pushable,
+      _pushable_north_climbable,
+      _pushable_east_pullable,
+      _pushable_east_pushable,
+      _pushable_east_climbable,
+      _pushable_south_pullable,
+      _pushable_south_pushable,
+      _pushable_south_climbable,
+      _pushable_west_pullable,
+      _pushable_west_pushable,
+      _pushable_west_climbable);
 }
 
 inline MinecartT *Minecart::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

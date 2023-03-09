@@ -141,7 +141,33 @@ table Rubberboat {
 }
 
 table Pushable {
+	pushable_gravity: float;
+	pushable_gravity_state: int32;
+	pushable_water_force: float;
 
+	pushable_stackLimit: int32;
+	pushable_stackUpper: int32;
+	pushable_stackLower: int32;
+
+	pushable_startX: int32;
+	pushable_startZ: int32;
+	pushable_roomNumber: int32;
+
+	pushable_north_pullable: bool;
+	pushable_north_pushable: bool;
+	pushable_north_climbable: bool;
+
+	pushable_east_pullable: bool;
+	pushable_east_pushable: bool;
+	pushable_east_climbable: bool;
+
+	pushable_south_pullable: bool;
+	pushable_south_pushable: bool;
+	pushable_south_climbable: bool;
+
+	pushable_west_pullable: bool;
+	pushable_west_pushable: bool;
+	pushable_west_climbable: bool;
 }
 
 table Minecart {
