@@ -77,11 +77,14 @@ namespace TEN::Effects::Hair
 			// Update segment positions.
 			for (int i = 0; i < SEGMENT_COUNT_MAX; i++, bonePtr += 4)
 			{
-				worldMatrix = Matrix::CreateTranslation(Segments[i].Position);
-				worldMatrix = Segments[i].Orientation.ToRotationMatrix() * worldMatrix;
+				auto& segment = this->Segments[i];
+				auto& nextSegment = this->Segments[i + 1];
+
+				worldMatrix = Matrix::CreateTranslation(segment.Position);
+				worldMatrix = segment.Orientation.ToRotationMatrix() * worldMatrix;
 				worldMatrix = Matrix::CreateTranslation(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3)) * worldMatrix;
 
-				this->Segments[i + 1].Position = worldMatrix.Translation();
+				nextSegment.Position = worldMatrix.Translation();
 			}
 		}
 		else
@@ -148,28 +151,21 @@ namespace TEN::Effects::Hair
 				// Handle sphere collision.
 				segment.CollideSpheres(spheres);
 
-				// Old method.
-				//if (false)
-				{
-					// Calculate 2D distance (on XZ plane) between segments.
-					float distance2D = Vector2::Distance(
-						Vector2(segment.Position.x, segment.Position.z),
-						Vector2(prevSegment.Position.x, prevSegment.Position.z));
+				// Calculate 2D distance (on XZ plane) between segments.
+				float distance2D = Vector2::Distance(
+					Vector2(segment.Position.x, segment.Position.z),
+					Vector2(prevSegment.Position.x, prevSegment.Position.z));
 
-					// Calculate segment orientation.
-					// BUG: phd_atan causes twisting!
-					prevSegment.Orientation = EulerAngles(
-						-(short)phd_atan(
-							distance2D,
-							segment.Position.y - prevSegment.Position.y),
-						(short)phd_atan(
-							segment.Position.z - prevSegment.Position.z,
-							segment.Position.x - prevSegment.Position.x),
-						0);
-				}
-
-				// New method.
-				//prevSegment.Orientation = Geometry::GetOrientToPoint(prevSegment.Position, segment.Position);
+				// Calculate segment orientation.
+				// BUG: Gimbal lock causes twisting.
+				prevSegment.Orientation = EulerAngles(
+					-(short)phd_atan(
+						distance2D,
+						segment.Position.y - prevSegment.Position.y),
+					(short)phd_atan(
+						segment.Position.z - prevSegment.Position.z,
+						segment.Position.x - prevSegment.Position.x),
+					0);
 
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
