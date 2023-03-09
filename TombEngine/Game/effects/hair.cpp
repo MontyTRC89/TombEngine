@@ -168,12 +168,15 @@ namespace TEN::Effects::Hair
 			// Update segments.
 			for (int i = 1; i < SEGMENT_COUNT_MAX + 1; i++, bonePtr += 4)
 			{
-				this->Segments[0].Velocity = Segments[i].Position;
+				auto& segment = this->Segments[i];
+				auto& prevSegment = this->Segments[i - 1];
 
-				auto pointColl = GetCollision(Segments[i].Position.x, Segments[i].Position.y, Segments[i].Position.z, item.RoomNumber);
+				this->Segments[0].Velocity = segment.Position;
+
+				auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, item.RoomNumber);
 				int floorHeight = pointColl.Position.Floor;
 
-				this->Segments[i].Position += Segments[i].Velocity * 0.75f;
+				segment.Position += segment.Velocity * 0.75f;
 
 				// TR3 UPV uses a hack which forces Lara water status to dry. 
 				// Therefore, we can't directly use water status value to determine hair mode.
@@ -183,78 +186,78 @@ namespace TEN::Effects::Hair
 				{
 					// Let wind affect position.
 					if (TestEnvironment(ENV_FLAG_WIND, pointColl.RoomNumber))
-						this->Segments[i].Position += Weather.Wind() * 2;
+						segment.Position += Weather.Wind() * 2;
 
 					// Apply gravity.
-					this->Segments[i].Position.y += HAIR_GRAVITY;
+					segment.Position.y += HAIR_GRAVITY;
 
 					// Float on water surface.
-					if (waterHeight != NO_HEIGHT && Segments[i].Position.y > waterHeight)
+					if (waterHeight != NO_HEIGHT && segment.Position.y > waterHeight)
 					{
-						this->Segments[i].Position.y = waterHeight;
+						segment.Position.y = waterHeight;
 					}
 					// Avoid clipping through floor.
-					else if (floorHeight > Segments[0].Position.y && Segments[i].Position.y > floorHeight)
+					else if (floorHeight > Segments[0].Position.y && segment.Position.y > floorHeight)
 					{
-						this->Segments[i].Position = Segments[0].Velocity;
+						segment.Position = Segments[0].Velocity;
 					}
 				}
 				else
 				{
-					if (Segments[i].Position.y < waterHeight)
+					if (segment.Position.y < waterHeight)
 					{
-						this->Segments[i].Position.y = waterHeight;
+						segment.Position.y = waterHeight;
 					}
-					else if (Segments[i].Position.y > floorHeight)
+					else if (segment.Position.y > floorHeight)
 					{
-						this->Segments[i].Position.y = floorHeight;
+						segment.Position.y = floorHeight;
 					}
 				}
 
 				// Handle sphere collision.
-				auto spheres = this->GetSpheres(item, isYoung);
+				auto spheres = GetSpheres(item, isYoung);
 				for (int j = 0; j < SPHERE_COUNT_MAX; j++)
 				{
 					auto spherePos = Vector3(spheres[j].x, spheres[j].y, spheres[j].z);
-					auto direction = Segments[i].Position - spherePos;
+					auto direction = segment.Position - spherePos;
 
-					float distance = Vector3::Distance(Segments[i].Position, Vector3(spheres[j].x, spheres[j].y, spheres[j].z));
+					float distance = Vector3::Distance(segment.Position, Vector3(spheres[j].x, spheres[j].y, spheres[j].z));
 					if (distance < spheres[j].r)
 					{
 						// Avoid division by zero.
 						if (distance == 0.0f)
 							distance = 1.0f;
 
-						this->Segments[i].Position = spherePos + (direction * (spheres[j].r / distance));
+						segment.Position = spherePos + (direction * (spheres[j].r / distance));
 					}
 				}
 
 				// Calculate 2D distance (on XZ plane) between segments.
 				float distance2D = Vector2::Distance(
-					Vector2(Segments[i].Position.x, Segments[i].Position.z),
-					Vector2(Segments[i - 1].Position.x, Segments[i - 1].Position.z));
+					Vector2(segment.Position.x, segment.Position.z),
+					Vector2(prevSegment.Position.x, prevSegment.Position.z));
 
 				// Calculate segment orientation.
 				// BUG: phd_atan causes twisting!
-				this->Segments[i - 1].Orientation = EulerAngles(
+				prevSegment.Orientation = EulerAngles(
 					-(short)phd_atan(
 						distance2D,
-						Segments[i].Position.y - Segments[i - 1].Position.y),
+						segment.Position.y - prevSegment.Position.y),
 					(short)phd_atan(
-						Segments[i].Position.z - Segments[i - 1].Position.z,
-						Segments[i].Position.x - Segments[i - 1].Position.x),
+						segment.Position.z - prevSegment.Position.z,
+						segment.Position.x - prevSegment.Position.x),
 					0);
 
-				worldMatrix = Matrix::CreateTranslation(Segments[i - 1].Position);
-				worldMatrix = Segments[i - 1].Orientation.ToRotationMatrix() * worldMatrix;
+				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
+				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
 				if (i == SEGMENT_COUNT_MAX)
 					worldMatrix = Matrix::CreateTranslation(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) * worldMatrix;
 				else
 					worldMatrix = Matrix::CreateTranslation(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3)) * worldMatrix;
 
-				this->Segments[i].Position = worldMatrix.Translation();
-				this->Segments[i].Velocity = Segments[i].Position - Segments[0].Velocity;
+				segment.Position = worldMatrix.Translation();
+				segment.Velocity = segment.Position - Segments[0].Velocity;
 			}
 		}
 	}
