@@ -31,7 +31,7 @@ namespace TEN::Effects::Hair
 			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
 			auto direction = Position - spherePos;
 
-			float distance = Vector3::Distance(Position, Vector3(sphere.x, sphere.y, sphere.z));
+			float distance = Vector3::Distance(Position, spherePos);
 			if (distance < sphere.r)
 			{
 				// Avoid division by zero.
@@ -74,7 +74,7 @@ namespace TEN::Effects::Hair
 			this->IsInitialized = false;
 			this->Segments[0].Position = pos;
 
-			// Update segments.
+			// Update segment positions.
 			for (int i = 0; i < SEGMENT_COUNT_MAX; i++, bonePtr += 4)
 			{
 				worldMatrix = Matrix::CreateTranslation(Segments[i].Position);
@@ -90,10 +90,7 @@ namespace TEN::Effects::Hair
 
 			this->Segments[0].Position = pos;
 
-			auto pos = item.Pose.Position + Vector3i(
-				(framePtr->boundingBox.X1 + framePtr->boundingBox.X2) / 2,
-				(framePtr->boundingBox.Y1 + framePtr->boundingBox.Y2) / 2,
-				(framePtr->boundingBox.Z1 + framePtr->boundingBox.Z2) / 2);
+			auto pos = item.Pose.Position + framePtr->boundingBox.GetCenter();
 			int roomNumber = item.RoomNumber;
 			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
 
@@ -104,7 +101,6 @@ namespace TEN::Effects::Hair
 			{
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
-				auto& nextSegment = this->Segments[std::min(i + 1, SEGMENT_COUNT_MAX)];
 
 				this->Segments[0].Velocity = segment.Position;
 
@@ -116,7 +112,7 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces Lara water status to dry. 
 				// Therefore, we can't directly use water status value to determine hair mode.
 				bool dryMode = ((player.Control.WaterStatus == WaterStatus::Dry) &&
-					(player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
+								(player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
 				if (dryMode)
 				{
 					// Let wind affect position.
