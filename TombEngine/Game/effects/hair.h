@@ -40,7 +40,8 @@ namespace TEN::Effects::Hair
 		// Helpers
 		AnimFrame*							 GetFramePtr(const ItemInfo& item);
 		std::array<SPHERE, SPHERE_COUNT_MAX> GetSpheres(const ItemInfo& item, bool isYoung);
-		void								 UpdateSegments(const ItemInfo& item, int hairUnitIndex, bool isYoung);
+		
+		void UpdateSegments(const ItemInfo& item, int hairUnitIndex, bool isYoung);
 	};
 
 	class HairEffectController

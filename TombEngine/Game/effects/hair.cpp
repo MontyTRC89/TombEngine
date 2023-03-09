@@ -211,9 +211,8 @@ namespace TEN::Effects::Hair
 					}
 				}
 
+				// Handle sphere collision.
 				auto spheres = this->GetSpheres(item, isYoung);
-
-				// Push away from spheres.
 				for (int j = 0; j < SPHERE_COUNT_MAX; j++)
 				{
 					auto spherePos = Vector3(spheres[j].x, spheres[j].y, spheres[j].z);
@@ -230,10 +229,13 @@ namespace TEN::Effects::Hair
 					}
 				}
 
+				// Calculate 2D distance (on XZ plane) between segments.
 				float distance2D = Vector2::Distance(
 					Vector2(Segments[i].Position.x, Segments[i].Position.z),
 					Vector2(Segments[i - 1].Position.x, Segments[i - 1].Position.z));
 
+				// Calculate segment orientation.
+				// BUG: phd_atan causes twisting!
 				this->Segments[i - 1].Orientation = EulerAngles(
 					-(short)phd_atan(
 						distance2D,
@@ -271,7 +273,7 @@ namespace TEN::Effects::Hair
 
 			unit.IsEnabled = (!isHead || isYoung);
 			unit.IsInitialized = true;
-
+			
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
@@ -286,9 +288,12 @@ namespace TEN::Effects::Hair
 
 	void HairEffectController::Update(ItemInfo& item, bool isYoung)
 	{
-		this->Units[0].Update(item, 0);
+		for (int i = 0; i < Units.size(); i++)
+		{
+			this->Units[i].Update(item, i);
 
-		//if (isYoung)
-			this->Units[1].Update(item, 1);
+			if (isYoung && i == 1)
+				this->Units[i].Update(item, i);
+		}
 	}
 }
