@@ -12,7 +12,6 @@ namespace TEN::Effects::Hair
 	class HairUnit
 	{
 	private:
-		// Constants
 		static constexpr auto SEGMENT_COUNT_MAX = 6;
 		static constexpr auto HAIR_GRAVITY		= 10.0f;
 
@@ -21,12 +20,11 @@ namespace TEN::Effects::Hair
 			Vector3		Position	= Vector3::Zero;
 			EulerAngles Orientation = EulerAngles::Zero;
 			Vector3		Velocity	= Vector3::Zero;
+
+			void CollideSpheres(const std::vector<SPHERE>& spheres);
 		};
 
 	public:
-		// Constants
-		static constexpr auto SPHERE_COUNT_MAX = 6;
-
 		// Components
 		bool IsInitialized = false;
 		bool IsEnabled	   = false;
@@ -38,10 +36,8 @@ namespace TEN::Effects::Hair
 
 	private:
 		// Helpers
-		AnimFrame*							 GetFramePtr(const ItemInfo& item);
-		std::array<SPHERE, SPHERE_COUNT_MAX> GetSpheres(const ItemInfo& item, bool isYoung);
-		
-		void UpdateSegments(const ItemInfo& item, int hairUnitIndex, bool isYoung);
+		AnimFrame*			GetFramePtr(const ItemInfo& item);
+		std::vector<SPHERE> GetSpheres(const ItemInfo& item, bool isYoung);
 	};
 
 	class HairEffectController

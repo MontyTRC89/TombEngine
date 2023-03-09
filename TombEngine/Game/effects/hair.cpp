@@ -19,103 +19,35 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Hair
 {
+	static bool drawSpheres = false;
+
 	HairEffectController HairEffect = {};
+
+	void HairUnit::HairSegment::CollideSpheres(const std::vector<SPHERE>& spheres)
+	{
+		// Handle sphere collision.
+		for (const auto& sphere : spheres)
+		{
+			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
+			auto direction = Position - spherePos;
+
+			float distance = Vector3::Distance(Position, Vector3(sphere.x, sphere.y, sphere.z));
+			if (distance < sphere.r)
+			{
+				// Avoid division by zero.
+				if (distance == 0.0f)
+					distance = 1.0f;
+
+				this->Position = spherePos + (direction * (sphere.r / distance));
+			}
+		}
+	}
 
 	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
 	{
+		const auto& player = GetLaraInfo(item);
+
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-		this->UpdateSegments(item, hairUnitIndex, isYoung);
-	}
-
-	AnimFrame* HairUnit::GetFramePtr(const ItemInfo& item)
-	{
-		const auto& player = GetLaraInfo(item);
-
-		AnimFrame* framePtr = nullptr;
-		if (player.HitDirection >= 0)
-		{
-			int spasm = 0;
-			switch (player.HitDirection)
-			{
-			case NORTH:
-				spasm = (player.Control.IsLow) ? 294 : 125;
-				break;
-
-			case SOUTH:
-				spasm = (player.Control.IsLow) ? 293 : 126;
-				break;
-
-			case EAST:
-				spasm = (player.Control.IsLow) ? 295 : 127;
-				break;
-
-			default:
-				spasm = (player.Control.IsLow) ? 296 : 128;
-				break;
-			}
-
-			framePtr = &g_Level.Frames[g_Level.Anims[spasm].FramePtr + player.HitFrame];
-		}
-		else
-		{
-			framePtr = GetBestFrame(&item);
-		}
-
-		return framePtr;
-	}
-
-	std::array<SPHERE, HairUnit::SPHERE_COUNT_MAX> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
-	{
-		auto spheres = std::array<SPHERE, SPHERE_COUNT_MAX>{};
-
-		// Hips sphere.
-		auto* meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HIPS]];
-		auto pos = GetJointPosition(item, LM_HIPS, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres[0] = SPHERE(pos, meshPtr->sphere.Radius);
-
-		// Torso sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + Vector3i(-10, 0, 25)).ToVector3();
-		spheres[1] = SPHERE(pos, meshPtr->sphere.Radius);
-		if (isYoung)
-			spheres[1].r = spheres[1].r - ((spheres[1].r / 4) + (spheres[1].r / 8));
-
-		// Head sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + Vector3i(-2, 0, 0)).ToVector3();
-		spheres[2] = SPHERE(pos, meshPtr->sphere.Radius);
-
-		// Right arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
-		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres[3] = SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4);
-
-		// Left arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
-		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres[4] = SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4);
-
-		if (isYoung)
-		{
-			spheres[1].x = (spheres[1].x + spheres[2].x) / 2;
-			spheres[1].y = (spheres[1].y + spheres[2].y) / 2;
-			spheres[1].z = (spheres[1].z + spheres[2].z) / 2;
-		}
-
-		// Neck sphere.
-		spheres[5] = SPHERE(
-			Vector3(
-				(spheres[2].x * 2) + spheres[1].x,
-				(spheres[2].y * 2) + spheres[1].y,
-				(spheres[2].z * 2) + spheres[1].z) / 3,
-			spheres[5].r = isYoung ? 0 : int(float(spheres[2].r * 3) / 4));
-
-		return spheres;
-	}
-
-	void HairUnit::UpdateSegments(const ItemInfo& item, int hairUnitIndex, bool isYoung)
-	{
-		const auto& player = GetLaraInfo(item);
 
 		auto worldMatrix = Matrix::Identity;
 		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
@@ -165,11 +97,14 @@ namespace TEN::Effects::Hair
 			int roomNumber = item.RoomNumber;
 			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
 
+			auto spheres = GetSpheres(item, isYoung);
+
 			// Update segments.
 			for (int i = 1; i < SEGMENT_COUNT_MAX + 1; i++, bonePtr += 4)
 			{
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
+				auto& nextSegment = this->Segments[std::min(i + 1, SEGMENT_COUNT_MAX)];
 
 				this->Segments[0].Velocity = segment.Position;
 
@@ -181,7 +116,7 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces Lara water status to dry. 
 				// Therefore, we can't directly use water status value to determine hair mode.
 				bool dryMode = ((player.Control.WaterStatus == WaterStatus::Dry) &&
-								(player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
+					(player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
 				if (dryMode)
 				{
 					// Let wind affect position.
@@ -215,38 +150,30 @@ namespace TEN::Effects::Hair
 				}
 
 				// Handle sphere collision.
-				auto spheres = GetSpheres(item, isYoung);
-				for (int j = 0; j < SPHERE_COUNT_MAX; j++)
+				segment.CollideSpheres(spheres);
+
+				// Old method.
+				//if (false)
 				{
-					auto spherePos = Vector3(spheres[j].x, spheres[j].y, spheres[j].z);
-					auto direction = segment.Position - spherePos;
+					// Calculate 2D distance (on XZ plane) between segments.
+					float distance2D = Vector2::Distance(
+						Vector2(segment.Position.x, segment.Position.z),
+						Vector2(prevSegment.Position.x, prevSegment.Position.z));
 
-					float distance = Vector3::Distance(segment.Position, Vector3(spheres[j].x, spheres[j].y, spheres[j].z));
-					if (distance < spheres[j].r)
-					{
-						// Avoid division by zero.
-						if (distance == 0.0f)
-							distance = 1.0f;
-
-						segment.Position = spherePos + (direction * (spheres[j].r / distance));
-					}
+					// Calculate segment orientation.
+					// BUG: phd_atan causes twisting!
+					prevSegment.Orientation = EulerAngles(
+						-(short)phd_atan(
+							distance2D,
+							segment.Position.y - prevSegment.Position.y),
+						(short)phd_atan(
+							segment.Position.z - prevSegment.Position.z,
+							segment.Position.x - prevSegment.Position.x),
+						0);
 				}
 
-				// Calculate 2D distance (on XZ plane) between segments.
-				float distance2D = Vector2::Distance(
-					Vector2(segment.Position.x, segment.Position.z),
-					Vector2(prevSegment.Position.x, prevSegment.Position.z));
-
-				// Calculate segment orientation.
-				// BUG: phd_atan causes twisting!
-				prevSegment.Orientation = EulerAngles(
-					-(short)phd_atan(
-						distance2D,
-						segment.Position.y - prevSegment.Position.y),
-					(short)phd_atan(
-						segment.Position.z - prevSegment.Position.z,
-						segment.Position.x - prevSegment.Position.x),
-					0);
+				// New method.
+				//prevSegment.Orientation = Geometry::GetOrientToPoint(prevSegment.Position, segment.Position);
 
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
@@ -258,8 +185,101 @@ namespace TEN::Effects::Hair
 
 				segment.Position = worldMatrix.Translation();
 				segment.Velocity = segment.Position - Segments[0].Velocity;
+
+				// DEBUG
+				if (drawSpheres)
+					g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
 			}
 		}
+	}
+
+	AnimFrame* HairUnit::GetFramePtr(const ItemInfo& item)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		AnimFrame* framePtr = nullptr;
+		if (player.HitDirection >= 0)
+		{
+			int spasm = 0;
+			switch (player.HitDirection)
+			{
+			case NORTH:
+				spasm = (player.Control.IsLow) ? 294 : 125;
+				break;
+
+			case SOUTH:
+				spasm = (player.Control.IsLow) ? 293 : 126;
+				break;
+
+			case EAST:
+				spasm = (player.Control.IsLow) ? 295 : 127;
+				break;
+
+			default:
+				spasm = (player.Control.IsLow) ? 296 : 128;
+				break;
+			}
+
+			framePtr = &g_Level.Frames[g_Level.Anims[spasm].FramePtr + player.HitFrame];
+		}
+		else
+		{
+			framePtr = GetBestFrame(&item);
+		}
+
+		return framePtr;
+	}
+
+	std::vector<SPHERE> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
+	{
+		constexpr auto SPHERE_COUNT = 6;
+
+		auto spheres = std::vector<SPHERE>{};
+		spheres.reserve(SPHERE_COUNT);
+
+		// Hips sphere.
+		auto* meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HIPS]];
+		auto pos = GetJointPosition(item, LM_HIPS, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+
+		// Torso sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + Vector3i(-10, 0, 25)).ToVector3();
+		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+		if (isYoung)
+			spheres.back().r = spheres.back().r - ((spheres.back().r / 4) + (spheres.back().r / 8));
+
+		// Head sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + Vector3i(-2, 0, 0)).ToVector3();
+		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+
+		// Right arm sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
+		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
+
+		// Left arm sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
+		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
+
+		if (isYoung)
+		{
+			spheres[1].x = (spheres[1].x + spheres[2].x) / 2;
+			spheres[1].y = (spheres[1].y + spheres[2].y) / 2;
+			spheres[1].z = (spheres[1].z + spheres[2].z) / 2;
+		}
+
+		// Neck sphere.
+		spheres.push_back(SPHERE(
+			Vector3(
+				(spheres[2].x * 2) + spheres[1].x,
+				(spheres[2].y * 2) + spheres[1].y,
+				(spheres[2].z * 2) + spheres[1].z) / 3,
+			isYoung ? 0 : int(float(spheres[2].r * 3) / 4)));
+
+		return spheres;
 	}
 
 	void HairEffectController::Initialize()
@@ -293,6 +313,12 @@ namespace TEN::Effects::Hair
 	{
 		for (int i = 0; i < Units.size(); i++)
 		{
+			// DEBUG
+			if (i == 0)
+				drawSpheres = true;
+			else
+				drawSpheres = false;
+
 			this->Units[i].Update(item, i);
 
 			if (isYoung && i == 1)
