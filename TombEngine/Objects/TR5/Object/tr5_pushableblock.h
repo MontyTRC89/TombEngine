@@ -79,11 +79,12 @@ namespace TEN::Entities::Generic
 	
 	//General functions
 	void InitialisePushablesGeneral();
+	void DeactivationPushablesRoutine(const short itemNumber);
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
 	int GetPushableHeight(ItemInfo& item);
-	void UpdatePushablesRoomNumbers(const short itemNumber);
-	void DeactivationPushablesRoutine(const short itemNumber);
-	
+	void UpdatePushablesRoomNumbers(const short itemNumber);	
+	void ForcePushableActivation(const short itemNumber);
+
 	// Collision test functions
 	bool IsNextSectorValid(ItemInfo& item, const GameVector& targetPoint, const bool checkIfLaraFits);
 	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& targetPoint);

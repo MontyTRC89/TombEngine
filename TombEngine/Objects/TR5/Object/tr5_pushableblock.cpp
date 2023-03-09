@@ -313,7 +313,7 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushableInfo = GetPushableInfo(pushableItem);
-				
+		
 		auto col = GetCollision(&pushableItem);
 
 		float currentY = pushableItem.Pose.Position.y;
@@ -426,7 +426,7 @@ namespace TEN::Entities::Generic
 			{
 				//It slowly reverses the gravity direction. If gravity is 0, then it pass to floating.
 				pushableInfo.Gravity = pushableInfo.Gravity - GRAVITY_CHANGE_SPEED;
-				if (pushableInfo.Gravity <= 0)
+				if (pushableInfo.Gravity <= 0.0f)
 				{
 					pushableInfo.GravityState = PushableGravityState::Floating;
 					return true;
@@ -452,15 +452,21 @@ namespace TEN::Entities::Generic
 			else
 			{
 				// It has hit the water ground.
-				pushableInfo.GravityState = PushableGravityState::Ground;
-				pushableItem.Pose.Position.y = col.Position.Floor;
+				if (pushableInfo.Buoyancy)
+				{
+					pushableInfo.Gravity = 0.0f;
+					pushableInfo.GravityState = PushableGravityState::Floating;
+				}
+				else
+				{
+					pushableInfo.GravityState = PushableGravityState::Ground;
+					pushableItem.Pose.Position.y = col.Position.Floor;
+				}
 								
 				pushableItem.Animation.Velocity.y = 0.0f;
 
 				int differenceY = col.Position.Floor - currentY;
 				MoveStackY(itemNumber, differenceY);
-
-				DeactivationPushablesRoutine(itemNumber);
 			}
 
 			break;
@@ -890,6 +896,21 @@ namespace TEN::Entities::Generic
 		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
 		return heightWorldAligned;
 	}
+
+	void ForcePushableActivation(const short itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushableInfo = GetPushableInfo(pushableItem);
+
+		if (pushableInfo.HasFloorColission)
+		{
+			RemovePushableFromStack(itemNumber);
+			ManageStackBridges(itemNumber, false);
+		}
+
+		pushableItem.Status = ITEM_ACTIVE;
+		AddActiveItem(itemNumber);
+	}
 	
 	// Test functions
 
@@ -1317,4 +1338,5 @@ namespace TEN::Entities::Generic
 
 		return item->Pose.Position.y;
 	}
+
 }

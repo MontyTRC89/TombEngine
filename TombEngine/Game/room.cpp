@@ -6,6 +6,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Floordata;
@@ -74,6 +75,9 @@ void AddRoomFlipItems(ROOM_INFO* room)
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(linkNumber);
+
+		if (item->Data.is<PushableInfo>())
+			ForcePushableActivation(item->Index);
 	}
 }
 
