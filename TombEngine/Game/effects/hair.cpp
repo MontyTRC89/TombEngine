@@ -53,9 +53,12 @@ namespace TEN::Effects::Hair
 				auto& segment = this->Segments[i];
 				auto& nextSegment = this->Segments[i + 1];
 
+				// NOTE: Bone offset determines segment length.
+				auto boneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+
 				worldMatrix = Matrix::CreateTranslation(segment.Position);
 				worldMatrix = segment.Orientation.ToRotationMatrix() * worldMatrix;
-				worldMatrix = Matrix::CreateTranslation(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3)) * worldMatrix;
+				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
 
 				nextSegment.Position = worldMatrix.Translation();
 			}
@@ -78,15 +81,15 @@ namespace TEN::Effects::Hair
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
 
-				// TR3 UPV uses a hack which forces Lara water status to dry. 
+				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
 								 (player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
 
-				// Handle room collision for segment.
+				// Handle segment room collision.
 				this->CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
 
-				// Handle sphere collision for segment.
+				// Handle segment sphere collision.
 				this->CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
@@ -96,10 +99,10 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
-				if (i == SEGMENT_COUNT_MAX)
-					worldMatrix = Matrix::CreateTranslation(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) * worldMatrix;
-				else
-					worldMatrix = Matrix::CreateTranslation(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3)) * worldMatrix;
+				auto boneOffset = (i == SEGMENT_COUNT_MAX) ?
+					Vector3(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) :
+					Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
 				segment.Velocity = segment.Position - Segments[0].Velocity;
@@ -118,12 +121,12 @@ namespace TEN::Effects::Hair
 		{
 			switch (hairUnitIndex)
 			{
-				// Left braid offset.
+			// Left pigtail offset.
 			case 0:
 				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
 				break;
 
-				// Right braid offset.
+			// Right pigtail offset.
 			case 1:
 				relOffset = Vector3(44.0f, -48.0f, -50.0f);
 				break;
@@ -142,6 +145,7 @@ namespace TEN::Effects::Hair
 	{
 		const auto& player = GetLaraInfo(item);
 
+		// TODO: Not needed?
 		AnimFrame* framePtr = nullptr;
 		if (player.HitDirection >= 0)
 		{
@@ -248,11 +252,13 @@ namespace TEN::Effects::Hair
 
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
 	{
+		constexpr auto VELOCITY_COEFF = 0.75f;
+
 		auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, roomNumber);
 		int floorHeight = pointColl.Position.Floor;
 
 		this->Segments[0].Velocity = segment.Position;
-		segment.Position += segment.Velocity * 0.75f;
+		segment.Position += segment.Velocity * VELOCITY_COEFF;
 
 		// Land collision.
 		if (isOnLand)
@@ -326,7 +332,9 @@ namespace TEN::Effects::Hair
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
-				segment.Position = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+				auto boneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+
+				segment.Position = boneOffset;
 				segment.Orientation = ORIENT_DEFAULT;
 				segment.Velocity = Vector3::Zero;
 			}
