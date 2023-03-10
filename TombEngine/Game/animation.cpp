@@ -557,8 +557,7 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOff
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 {
 	int* bonePtr = &g_Level.Bones[Objects[objectID].boneIndex + (jointIndex * 4)];
-	auto jointOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
-	return jointOffset;
+	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.
