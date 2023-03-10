@@ -26,7 +26,7 @@ namespace TEN::Effects::Hair
 		bool IsInitialized = false;
 		bool IsEnabled	   = false;
 
-		std::array <HairSegment, SEGMENT_COUNT_MAX + 1> Segments = {};
+		std::array <HairSegment, SEGMENT_COUNT_MAX + 1> Segments = {}; // +1 for base position.
 
 		// Utilities
 		void Update(const ItemInfo& item, int hairUnitIndex);

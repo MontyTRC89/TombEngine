@@ -76,7 +76,7 @@ namespace TEN::Effects::Hair
 			auto spheres = GetSpheres(item, isYoung);
 
 			// Update segments.
-			for (int i = 1; i < SEGMENT_COUNT_MAX + 1; i++, bonePtr += 4)
+			for (int i = 1; i < SEGMENT_COUNT_MAX + 1; i++, bonePtr += 4) // +1 for base position.
 			{
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
