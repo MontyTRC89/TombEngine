@@ -94,7 +94,7 @@ namespace TEN::Renderer
 					for (int i = 0; i < streamer.Segments.size(); i++)
 					{
 						const auto& segment = streamer.Segments[i];
-						const auto& prevSegment = streamer.Segments[(i > 0) ? (i - 1) : 0];
+						const auto& prevSegment = streamer.Segments[std::min(i - 1, 0)];
 
 						if (segment.Life <= 0.0f)
 							continue;
@@ -143,7 +143,7 @@ namespace TEN::Renderer
 			for (int i = 0; i < streamer.size(); i++)
 			{
 				const auto& segment = streamer[i];
-				const auto& prevSegment = streamer[(i > 0) ? (i - 1) : 0];
+				const auto& prevSegment = streamer[std::min(i - 1, 0)];
 
 				if (segment.Life <= 0.0f)
 					continue;
