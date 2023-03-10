@@ -569,8 +569,7 @@ float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
 	if (object.nmeshes == boneIndex)
 		return 0.0f;
 
-	int* bonePtr = &g_Level.Bones[object.boneIndex + (boneIndex * 4)];
-	auto bone0 = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
-	auto bone1 = Vector3(*(bonePtr + 4), *(bonePtr + 5), *(bonePtr + 6));
-	return (bone1 - bone0).Length();
+	int* bonePtr = &g_Level.Bones[object.boneIndex + ((boneIndex + 1) * 4)];
+	auto nextBoneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+	return (nextBoneOffset).Length();
 }
