@@ -187,7 +187,7 @@ namespace TEN::Effects::Streamer
 			pool.end());
 	}
 
-	void StreamerController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
+	void StreamerEffectController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
 								   float width, float life, float vel, float scaleRate, float rot2D, int flags)
 	{
 		assert(Modules.size() <= MODULE_COUNT_MAX);
@@ -201,7 +201,7 @@ namespace TEN::Effects::Streamer
 		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags);
 	}
 
-	void StreamerController::Update()
+	void StreamerEffectController::Update()
 	{
 		if (Modules.empty())
 			return;
@@ -212,12 +212,12 @@ namespace TEN::Effects::Streamer
 		this->ClearInactiveModules();
 	}
 
-	void StreamerController::Clear()
+	void StreamerEffectController::Clear()
 	{
 		*this = {};
 	}
 
-	StreamerModule& StreamerController::GetModule(int entityNumber)
+	StreamerModule& StreamerEffectController::GetModule(int entityNumber)
 	{
 		// Get module at entityNumber key.
 		this->Modules.insert({ entityNumber, {} });
@@ -225,7 +225,7 @@ namespace TEN::Effects::Streamer
 		return module;
 	}
 
-	void StreamerController::ClearInactiveModules()
+	void StreamerEffectController::ClearInactiveModules()
 	{
 		for (auto it = Modules.begin(); it != Modules.end();)
 		{
@@ -239,7 +239,7 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	StreamerController StreamerEffect = {};
+	StreamerEffectController StreamerEffect = {};
 
 	//------------------------
 

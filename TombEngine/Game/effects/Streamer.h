@@ -83,7 +83,7 @@ namespace TEN::Effects::Streamer
 		void				   ClearInactiveStreamers(int tag);
 	};
 
-	class StreamerController
+	class StreamerEffectController
 	{
 	private:
 		// Constants
@@ -105,7 +105,7 @@ namespace TEN::Effects::Streamer
 		void			ClearInactiveModules();
 	};
 
-	extern StreamerController StreamerEffect;
+	extern StreamerEffectController StreamerEffect;
 
 	// --------------
 
