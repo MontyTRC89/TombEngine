@@ -49,7 +49,7 @@ namespace TEN::Effects::Hair
 			this->IsInitialized = false;
 
 			// Update segment positions.
-			for (int i = 0; i < SEGMENT_COUNT_MAX; i++, bonePtr += 4)
+			for (int i = 0; i < Segments.size() - 1; i++, bonePtr += 4)
 			{
 				auto& segment = this->Segments[i];
 				auto& nextSegment = this->Segments[i + 1];
@@ -77,7 +77,7 @@ namespace TEN::Effects::Hair
 			auto spheres = GetSpheres(item, isYoung);
 
 			// Update segments.
-			for (int i = 1; i < SEGMENT_COUNT_MAX + 1; i++, bonePtr += 4) // +1 for base position.
+			for (int i = 1; i < Segments.size(); i++, bonePtr += 4)
 			{
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
@@ -100,7 +100,7 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
-				auto boneOffset = (i == SEGMENT_COUNT_MAX) ?
+				auto boneOffset = (i == Segments.size()) ?
 					Vector3(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) : // Previous bone.
 					Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));  // Current bone.
 				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
@@ -109,8 +109,8 @@ namespace TEN::Effects::Hair
 				segment.Velocity = segment.Position - Segments[0].Velocity;
 
 				// DEBUG
-				if (drawSpheres)
-					g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
+				//if (drawSpheres)
+					//g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
 			}
 		}
 	}
@@ -323,6 +323,9 @@ namespace TEN::Effects::Hair
 			unit.IsEnabled = (!isHead || isYoung);
 			unit.IsInitialized = true;
 			
+			unsigned int segmentCount = Objects[ID_HAIR].nmeshes;
+			unit.Segments.resize(segmentCount);
+
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
@@ -339,6 +342,9 @@ namespace TEN::Effects::Hair
 
 	void HairEffectController::Update(ItemInfo& item, bool isYoung)
 	{
+		if (Units[0].Segments.empty())
+			return;
+
 		for (int i = 0; i < Units.size(); i++)
 		{
 			// DEBUG

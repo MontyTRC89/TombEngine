@@ -11,8 +11,7 @@ namespace TEN::Effects::Hair
 	class HairUnit
 	{
 	private:
-		static constexpr auto SEGMENT_COUNT_MAX = 6;
-		static constexpr auto HAIR_GRAVITY		= 10.0f;
+		static constexpr auto HAIR_GRAVITY = 10.0f;
 
 		struct HairSegment
 		{
@@ -26,7 +25,7 @@ namespace TEN::Effects::Hair
 		bool IsInitialized = false;
 		bool IsEnabled	   = false;
 
-		std::array <HairSegment, SEGMENT_COUNT_MAX + 1> Segments = {}; // +1 for base position.
+		std::vector<HairSegment> Segments = {};
 
 		// Utilities
 		void Update(const ItemInfo& item, int hairUnitIndex);

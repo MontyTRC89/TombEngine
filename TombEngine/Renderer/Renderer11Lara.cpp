@@ -326,7 +326,7 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all 6 hair segment matrices.
+		// First matrix is Lara's head matrix, then all hair unit segment matrices.
 		// Bones are adjusted at load time to account for this.
 		m_stItem.World = Matrix::Identity;
 		m_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
