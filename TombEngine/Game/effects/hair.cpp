@@ -19,6 +19,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Hair
 {
+	// DEBUG
 	static bool drawSpheres = false;
 
 	HairEffectController HairEffect = {};
@@ -108,8 +109,8 @@ namespace TEN::Effects::Hair
 				segment.Velocity = segment.Position - Segments[0].Velocity;
 
 				// DEBUG
-				//if (drawSpheres)
-					//g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
+				if (drawSpheres)
+					g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
 			}
 		}
 	}
@@ -218,7 +219,7 @@ namespace TEN::Effects::Hair
 
 		// Neck sphere.
 		spheres.push_back(BoundingSphere(
-			((spheres[2].Center * 2) + spheres[1].Center) / 3,
+			(spheres[1].Center + (spheres[2].Center * 2)) / 3,
 			isYoung ? 0 : int(float(spheres[2].Radius * 3) / 4)));
 
 		return spheres;
