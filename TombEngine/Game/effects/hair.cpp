@@ -98,9 +98,9 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
-				auto jointOffset = (i == (Segments.size() - 1)) ?
-					GetJointOffset(ID_HAIR, i - 1) : // Previous joint.
-					GetJointOffset(ID_HAIR, i);		 // Current joint.
+				auto jointOffset = ((i - 1) == (Segments.size() - 1)) ?
+					GetJointOffset(ID_HAIR, (i - 1) - 1) :
+					GetJointOffset(ID_HAIR, (i - 1));
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
