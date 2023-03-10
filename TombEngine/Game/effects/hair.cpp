@@ -325,9 +325,7 @@ namespace TEN::Effects::Hair
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
-				auto jointOffset = GetJointOffset(ID_HAIR, 0);
-
-				segment.Position = jointOffset;
+				segment.Position = GetJointOffset(ID_HAIR, 0);
 				segment.Orientation = ORIENT_DEFAULT;
 				segment.Velocity = Vector3::Zero;
 			}
@@ -338,9 +336,6 @@ namespace TEN::Effects::Hair
 
 	void HairEffectController::Update(ItemInfo& item, bool isYoung)
 	{
-		if (Units[0].Segments.empty())
-			return;
-
 		for (int i = 0; i < Units.size(); i++)
 		{
 			// DEBUG
