@@ -11,6 +11,7 @@ namespace TEN::Effects::Hair
 	class HairUnit
 	{
 	private:
+		// Constants
 		static constexpr auto HAIR_GRAVITY = 10.0f;
 
 		struct HairSegment
@@ -22,9 +23,8 @@ namespace TEN::Effects::Hair
 
 	public:
 		// Components
-		bool IsInitialized = false;
 		bool IsEnabled	   = false;
-
+		bool IsInitialized = false;
 		std::vector<HairSegment> Segments = {};
 
 		// Utilities

@@ -42,10 +42,8 @@ namespace TEN::Effects::Hair
 		auto basePos = worldMatrix.Translation();
 		this->Segments[0].Position = basePos;
 
-		if (IsInitialized)
+		if (!IsInitialized)
 		{
-			this->IsInitialized = false;
-
 			// Update segment positions.
 			for (int i = 0; i < Segments.size() - 1; i++)
 			{
@@ -61,6 +59,8 @@ namespace TEN::Effects::Hair
 
 				nextSegment.Position = worldMatrix.Translation();
 			}
+
+			this->IsInitialized = true;
 		}
 		else
 		{
@@ -313,11 +313,11 @@ namespace TEN::Effects::Hair
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
 		// Initialize hair units.
-		bool isHead = false;
+		bool isHead = true;
 		for (auto& unit : Units)
 		{
 			unit.IsEnabled = (!isHead || isYoung);
-			unit.IsInitialized = true;
+			unit.IsInitialized = false;
 			
 			unsigned int segmentCount = Objects[ID_HAIR].nmeshes;
 			unit.Segments.resize(segmentCount);
@@ -330,7 +330,7 @@ namespace TEN::Effects::Hair
 				segment.Velocity = Vector3::Zero;
 			}
 
-			isHead = true;
+			isHead = false;
 		}
 	}
 
