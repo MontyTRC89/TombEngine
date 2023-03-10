@@ -42,24 +42,22 @@ namespace TEN::Effects::Hair
 		auto basePos = worldMatrix.Translation();
 		this->Segments[0].Position = basePos;
 
-		int* bonePtr = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
-
 		if (IsInitialized)
 		{
 			this->IsInitialized = false;
 
 			// Update segment positions.
-			for (int i = 0; i < Segments.size() - 1; i++, bonePtr += 4)
+			for (int i = 0; i < Segments.size() - 1; i++)
 			{
 				auto& segment = this->Segments[i];
 				auto& nextSegment = this->Segments[i + 1];
 
-				// NOTE: Bone offset determines segment length.
-				auto boneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+				// NOTE: Joint offset determines segment length.
+				auto jointOffset = GetJointOffset(ID_HAIR, i);
 
 				worldMatrix = Matrix::CreateTranslation(segment.Position);
 				worldMatrix = segment.Orientation.ToRotationMatrix() * worldMatrix;
-				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
+				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				nextSegment.Position = worldMatrix.Translation();
 			}
@@ -77,7 +75,7 @@ namespace TEN::Effects::Hair
 			auto spheres = GetSpheres(item, isYoung);
 
 			// Update segments.
-			for (int i = 1; i < Segments.size(); i++, bonePtr += 4)
+			for (int i = 1; i < Segments.size(); i++)
 			{
 				auto& segment = this->Segments[i];
 				auto& prevSegment = this->Segments[i - 1];
@@ -100,10 +98,10 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
-				auto boneOffset = (i == Segments.size()) ?
-					Vector3(*(bonePtr - 3), *(bonePtr - 2), *(bonePtr - 1)) : // Previous bone.
-					Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));  // Current bone.
-				worldMatrix = Matrix::CreateTranslation(boneOffset) * worldMatrix;
+				auto jointOffset = (i == Segments.size()-1) ?
+					GetJointOffset(ID_HAIR, i - 1) : // Previous joint.
+					GetJointOffset(ID_HAIR, i);		 // Current joint.
+				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
 				segment.Velocity = segment.Position - Segments[0].Velocity;
@@ -318,8 +316,6 @@ namespace TEN::Effects::Hair
 		bool isHead = false;
 		for (auto& unit : Units)
 		{
-			int* bonePtr = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
-
 			unit.IsEnabled = (!isHead || isYoung);
 			unit.IsInitialized = true;
 			
@@ -329,9 +325,9 @@ namespace TEN::Effects::Hair
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
-				auto boneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+				auto jointOffset = GetJointOffset(ID_HAIR, 0);
 
-				segment.Position = boneOffset;
+				segment.Position = jointOffset;
 				segment.Orientation = ORIENT_DEFAULT;
 				segment.Velocity = Vector3::Zero;
 			}
