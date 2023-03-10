@@ -83,7 +83,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
-		constexpr auto BLEND_MODE = BLENDMODE_ALPHABLEND;
+		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ALPHABLEND;
 
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
@@ -99,6 +99,13 @@ namespace TEN::Renderer
 						if (segment.Life <= 0.0f)
 							continue;
 
+						// Determine blend mode.
+						auto blendMode = (BLEND_MODES)BLEND_MODE_DEFAULT;
+						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
+							blendMode = BLENDMODE_ADDITIVE;
+
+						// TODO: For additive blend mode to work, colour values must be adjusted according to opacity.
+
 						if (segment.Flags & (int)StreamerFlags::FadeLeft)
 						{
 							AddColoredQuad(
@@ -106,7 +113,7 @@ namespace TEN::Renderer
 								prevSegment.Vertices[1], prevSegment.Vertices[0],
 								Vector4::Zero, segment.Color,
 								prevSegment.Color, Vector4::Zero,
-								BLEND_MODE, view);
+								blendMode, view);
 						}
 						else if (segment.Flags & (int)StreamerFlags::FadeRight)
 						{
@@ -115,7 +122,7 @@ namespace TEN::Renderer
 								prevSegment.Vertices[1], prevSegment.Vertices[0],
 								segment.Color, Vector4::Zero,
 								Vector4::Zero, prevSegment.Color,
-								BLEND_MODE, view);
+								blendMode, view);
 						}
 						else
 						{
@@ -124,7 +131,7 @@ namespace TEN::Renderer
 								prevSegment.Vertices[1], prevSegment.Vertices[0],
 								segment.Color, segment.Color,
 								prevSegment.Color, prevSegment.Color,
-								BLEND_MODE, view);
+								blendMode, view);
 						}
 					}
 				}
