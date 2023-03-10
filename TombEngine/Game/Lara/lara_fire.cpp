@@ -242,7 +242,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		ANGLE(8.0f),
 		500,
 		SECTOR(8),
-		1,
+		6,
 		0,
 		2,
 		10,
