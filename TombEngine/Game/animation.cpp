@@ -556,7 +556,9 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOff
 
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 {
-	int* bonePtr = &g_Level.Bones[Objects[objectID].boneIndex + (jointIndex * 4)];
+	const auto& object = Objects[objectID];
+
+	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
