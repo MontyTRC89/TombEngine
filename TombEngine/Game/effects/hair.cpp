@@ -179,54 +179,47 @@ namespace TEN::Effects::Hair
 		return framePtr;
 	}
 
-	std::vector<SPHERE> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
+	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
 	{
 		constexpr auto SPHERE_COUNT = 6;
 
-		auto spheres = std::vector<SPHERE>{};
+		auto spheres = std::vector<BoundingSphere>{};
 		spheres.reserve(SPHERE_COUNT);
 
 		// Hips sphere.
 		auto* meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HIPS]];
 		auto pos = GetJointPosition(item, LM_HIPS, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 
 		// Torso sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
 		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + Vector3i(-10, 0, 25)).ToVector3();
-		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 		if (isYoung)
-			spheres.back().r = spheres.back().r - ((spheres.back().r / 4) + (spheres.back().r / 8));
+			spheres.back().Radius = spheres.back().Radius - ((spheres.back().Radius / 4) + (spheres.back().Radius / 8));
 
 		// Head sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
 		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + Vector3i(-2, 0, 0)).ToVector3();
-		spheres.push_back(SPHERE(pos, meshPtr->sphere.Radius));
+		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 
 		// Right arm sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
 		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
+		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
 
 		// Left arm sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
 		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(SPHERE(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
+		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
 
 		if (isYoung)
-		{
-			spheres[1].x = (spheres[1].x + spheres[2].x) / 2;
-			spheres[1].y = (spheres[1].y + spheres[2].y) / 2;
-			spheres[1].z = (spheres[1].z + spheres[2].z) / 2;
-		}
+			spheres[1].Center = (spheres[1].Center + spheres[2].Center) / 2;
 
 		// Neck sphere.
-		spheres.push_back(SPHERE(
-			Vector3(
-				(spheres[2].x * 2) + spheres[1].x,
-				(spheres[2].y * 2) + spheres[1].y,
-				(spheres[2].z * 2) + spheres[1].z) / 3,
-			isYoung ? 0 : int(float(spheres[2].r * 3) / 4)));
+		spheres.push_back(BoundingSphere(
+			((spheres[2].Center * 2) + spheres[1].Center) / 3,
+			isYoung ? 0 : int(float(spheres[2].Radius * 3) / 4)));
 
 		return spheres;
 	}
@@ -295,21 +288,21 @@ namespace TEN::Effects::Hair
 		}
 	}
 
-	void HairUnit::CollideSegmentWithSpheres(HairSegment& segment, const std::vector<SPHERE>& spheres)
+	void HairUnit::CollideSegmentWithSpheres(HairSegment& segment, const std::vector<BoundingSphere>& spheres)
 	{
 		for (const auto& sphere : spheres)
 		{
-			auto spherePos = Vector3(sphere.x, sphere.y, sphere.z);
-			auto direction = segment.Position - spherePos;
+			auto direction = segment.Position - sphere.Center;
 
-			float distance = Vector3::Distance(segment.Position, spherePos);
-			if (distance < sphere.r)
+			float distance = Vector3::Distance(segment.Position, sphere.Center);
+			if (distance < sphere.Radius)
 			{
 				// Avoid division by zero.
 				if (distance == 0.0f)
 					distance = 1.0f;
 
-				segment.Position = spherePos + (direction * (sphere.r / distance));
+				// Push segment away from sphere.
+				segment.Position = sphere.Center + (direction * (sphere.Radius / distance));
 			}
 		}
 	}

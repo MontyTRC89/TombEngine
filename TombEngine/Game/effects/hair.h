@@ -5,7 +5,6 @@ using namespace TEN::Math;
 
 struct AnimFrame;
 struct ItemInfo;
-struct SPHERE;
 
 namespace TEN::Effects::Hair
 {
@@ -34,13 +33,13 @@ namespace TEN::Effects::Hair
 
 	private:
 		// Helpers
-		Vector3				GetRelBaseOffset(int hairUnitIndex, bool isYoung);
-		AnimFrame*			GetFramePtr(const ItemInfo& item);
-		std::vector<SPHERE> GetSpheres(const ItemInfo& item, bool isYoung);
-		EulerAngles			GetOrientation(const Vector3& origin, const Vector3& target);
+		Vector3						GetRelBaseOffset(int hairUnitIndex, bool isYoung);
+		AnimFrame*					GetFramePtr(const ItemInfo& item);
+		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);
+		EulerAngles					GetOrientation(const Vector3& origin, const Vector3& target);
 
 		void CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand);
-		void CollideSegmentWithSpheres(HairSegment& segment, const std::vector<SPHERE>& spheres);
+		void CollideSegmentWithSpheres(HairSegment& segment, const std::vector<BoundingSphere>& spheres);
 	};
 
 	class HairEffectController
