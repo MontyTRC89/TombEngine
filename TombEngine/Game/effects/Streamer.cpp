@@ -23,9 +23,9 @@ namespace TEN::Effects::Streamer
 		if (Color.w > 0.0f)
 			this->Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
 
+		// TODO: Not working.
 		// Update orientation.
 		this->Orientation.SetAngle(Orientation.GetAngle() + Rotation);
-		// TODO: Directional bias like in the older version.
 		
 		// Update vertices.
 		this->TransformVertices(Velocity, ScaleRate);
@@ -78,7 +78,7 @@ namespace TEN::Effects::Streamer
 		if (Segments.empty())
 			return;
 
-		// If streamer was broken, set flag to track it.
+		// If streamer was broken, set bool flag to track it.
 		const auto& newestSegment = Segments.back();
 		if (newestSegment.Life != newestSegment.LifeMax)
 			this->IsBroken = true;
@@ -146,7 +146,7 @@ namespace TEN::Effects::Streamer
 
 		assert(pool.size() <= STREAMER_COUNT_MAX);
 
-		// Return unbroken streamer at back of vector if it exists.
+		// Return most recent streamer iteration if it exists and is unbroken.
 		if (!pool.empty())
 		{
 			auto& streamer = pool.back();
@@ -158,7 +158,7 @@ namespace TEN::Effects::Streamer
 		if (pool.size() == STREAMER_COUNT_MAX)
 			pool.erase(pool.begin());
 
-		// Add and return new streamer.
+		// Add and return new streamer iteration.
 		return pool.emplace_back();
 	}
 
@@ -166,7 +166,8 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto it = Pools.begin(); it != Pools.end();)
 		{
-			if (it->second.empty())
+			const auto& pool = it->second;
+			if (pool.empty())
 			{
 				it = this->Pools.erase(it);
 				continue;
@@ -229,7 +230,8 @@ namespace TEN::Effects::Streamer
 	{
 		for (auto it = Modules.begin(); it != Modules.end();)
 		{
-			if (it->second.Pools.empty())
+			const auto& module = it->second;
+			if (module.Pools.empty())
 			{
 				it = this->Modules.erase(it);
 				continue;
