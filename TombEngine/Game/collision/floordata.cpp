@@ -10,64 +10,66 @@
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 
-int FloorInfo::GetSectorPlaneIndex(int x, int z, bool getFloor) const
+int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool checkFloor) const
 {
 	// Calculate bias.
 	auto point = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(getFloor ? FloorCollision.SplitAngle : CeilingCollision.SplitAngle);
+	auto rotMatrix = Matrix::CreateRotationZ(checkFloor ? FloorCollision.SplitAngle : CeilingCollision.SplitAngle);
 	Vector2::Transform(point, rotMatrix, point);
 
 	// Determine and return plane index.
 	return ((point.x < 0) ? 0 : 1);
 }
 
-Vector2 FloorInfo::GetSectorTilt(int x, int z, bool getFloor) const
+Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool checkFloor) const
 {
-	// Get surface plane
-	auto plane = getFloor ?
-		FloorCollision.Planes[GetSectorPlaneIndex(x, z, true)] :
-		CeilingCollision.Planes[GetSectorPlaneIndex(x, z, true)];
+	// Get surface plane.
+	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	int planeIndex = GetSurfacePlaneIndex(x, z, true); // TODO: Check why it only looks at floor planes.
+	auto plane = planes[planeIndex];
 
-	// Calculate and return tilt.
+	// Calculate and return plane tilt.
 	return Vector2(
 		-int((plane.x * BLOCK(1)) / CLICK(1)),
 		-int((plane.y * BLOCK(1)) / CLICK(1)));
 }
 
-bool FloorInfo::FloorIsSplit() const
+bool FloorInfo::IsSurfaceSplit(bool checkFloor) const
 {
-	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
-	return differentPlanes || FloorHasSplitPortal();
+	// Check if surface planes are different.
+	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	bool arePlanesDifferent = (planes[0] != planes[1]);
+
+	return (arePlanesDifferent || IsSurfaceSplitPortal(checkFloor));
 }
 
-bool FloorInfo::FloorIsDiagonalStep() const
+bool FloorInfo::IsSurfaceDiagonalStep(bool checkFloor) const
 {
-	return FloorIsSplit() && 
-		   round(FloorCollision.Planes[0].z) != round(FloorCollision.Planes[1].z) &&
-		   (FloorCollision.SplitAngle == 45.0f * RADIAN || FloorCollision.SplitAngle == 135.0f * RADIAN);
+	// Check if surface is split.
+	if (!IsSurfaceSplit(checkFloor))
+		return false;
+
+	const auto& collData = checkFloor ? this->FloorCollision : this->CeilingCollision;
+	
+	// Check if ??
+	if (round(collData.Planes[0].z) == round(collData.Planes[1].z))
+		return false;
+
+	// Check if ??
+	if (collData.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_1 &&
+		collData.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_2)
+		{
+			return false;
+		}
+
+	return true;
 }
 
-bool FloorInfo::CeilingIsDiagonalStep() const
+bool FloorInfo::IsSurfaceSplitPortal(bool checkFloor) const
 {
-	return CeilingIsSplit() &&
-		round(CeilingCollision.Planes[0].z) != round(CeilingCollision.Planes[1].z) &&
-		(CeilingCollision.SplitAngle == 45.0f * RADIAN || CeilingCollision.SplitAngle == 135.0f * RADIAN);
-}
-
-bool FloorInfo::CeilingIsSplit() const
-{
-	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
-	return differentPlanes || CeilingHasSplitPortal();
-}
-
-bool FloorInfo::FloorHasSplitPortal() const
-{
-	return FloorCollision.Portals[0] != FloorCollision.Portals[1];
-}
-
-bool FloorInfo::CeilingHasSplitPortal() const
-{
-	return CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
+	// Check if surface planes are different.
+	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	return (planes[0] != planes[1]);
 }
 
 std::optional<int> FloorInfo::RoomBelow(int plane) const
@@ -78,7 +80,7 @@ std::optional<int> FloorInfo::RoomBelow(int plane) const
 
 std::optional<int> FloorInfo::RoomBelow(int x, int z) const
 {
-	return RoomBelow(GetSectorPlaneIndex(x, z, true));
+	return RoomBelow(GetSurfacePlaneIndex(x, z, true));
 }
 
 std::optional<int> FloorInfo::RoomBelow(int x, int y, int z) const
@@ -105,7 +107,7 @@ std::optional<int> FloorInfo::RoomAbove(int plane) const
 
 std::optional<int> FloorInfo::RoomAbove(int x, int z) const
 {
-	return RoomAbove(GetSectorPlaneIndex(x, z, false));
+	return RoomAbove(GetSurfacePlaneIndex(x, z, false));
 }
 
 std::optional<int> FloorInfo::RoomAbove(int x, int y, int z) const
@@ -131,7 +133,7 @@ std::optional<int> FloorInfo::RoomSide() const
 
 int FloorInfo::FloorHeight(int x, int z) const
 {
-	const auto plane = GetSectorPlaneIndex(x, z, true);
+	const auto plane = GetSurfacePlaneIndex(x, z, true);
 	const auto vector = GetSectorPoint(x, z);
 
 	return FloorCollision.Planes[plane].x * vector.x + FloorCollision.Planes[plane].y * vector.y + FloorCollision.Planes[plane].z;
@@ -169,7 +171,7 @@ int FloorInfo::BridgeFloorHeight(int x, int y, int z) const
 
 int FloorInfo::CeilingHeight(int x, int z) const
 {
-	const auto plane = GetSectorPlaneIndex(x, z, false);
+	const auto plane = GetSurfacePlaneIndex(x, z, false);
 	const auto vector = GetSectorPoint(x, z);
 
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
@@ -212,7 +214,7 @@ Vector2 FloorInfo::FloorSlope(int plane) const
 
 Vector2 FloorInfo::FloorSlope(int x, int z) const
 {
-	return FloorSlope(GetSectorPlaneIndex(x, z, true));
+	return FloorSlope(GetSurfacePlaneIndex(x, z, true));
 }
 
 Vector2 FloorInfo::CeilingSlope(int plane) const
@@ -222,7 +224,7 @@ Vector2 FloorInfo::CeilingSlope(int plane) const
 
 Vector2 FloorInfo::CeilingSlope(int x, int z) const
 {
-	return CeilingSlope(GetSectorPlaneIndex(x, z, false));
+	return CeilingSlope(GetSurfacePlaneIndex(x, z, false));
 }
 
 bool FloorInfo::IsWall(int plane) const
@@ -232,7 +234,7 @@ bool FloorInfo::IsWall(int plane) const
 
 bool FloorInfo::IsWall(int x, int z) const
 {
-	return IsWall(GetSectorPlaneIndex(x, z, true));
+	return IsWall(GetSurfacePlaneIndex(x, z, true));
 }
 
 int FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const

@@ -1,6 +1,4 @@
 #pragma once
-#include <optional>
-
 #include "Math/Math.h"
 #include "Specific/newtypes.h"
 
@@ -8,15 +6,7 @@ using namespace TEN::Math;
 
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
-enum class ClimbDirection : short
-{
-	North = (1 << 8),
-	East  = (1 << 9),
-	South = (1 << 10),
-	West  = (1 << 11)
-};
-
-enum class FLOOR_MATERIAL : unsigned char
+enum class MaterialType
 {
 	Mud = 0,
 	Snow = 1,
@@ -39,17 +29,33 @@ enum class FLOOR_MATERIAL : unsigned char
 	Custom5 = 18,
 	Custom6 = 19,
 	Custom7 = 20,
-	Custom8 = 21,
+	Custom8 = 21
 };
 
-struct SECTOR_COLLISION_INFO
+enum class ClimbDirectionFlags
 {
-	float SplitAngle;
-	int Portals[2];
-	Vector3 Planes[2];
+	North = (1 << 8),
+	East  = (1 << 9),
+	South = (1 << 10),
+	West  = (1 << 11)
 };
 
-struct SECTOR_FLAGS
+struct SurfaceCollisionData
+{
+private:
+	static constexpr auto SURFACE_TRIANGLE_COUNT = 2;
+
+public:
+	static constexpr auto SPLIT_ANGLE_1 = 45.0f * RADIAN;
+	static constexpr auto SPLIT_ANGLE_2 = 135.0f * RADIAN;
+
+	float SplitAngle = 0.0f;
+
+	std::array<int, SURFACE_TRIANGLE_COUNT>		Portals = {};
+	std::array<Vector3, SURFACE_TRIANGLE_COUNT> Planes	= {};
+};
+
+struct SectorFlagData
 {
 	bool Death		 = false;
 	bool Monkeyswing = false;
@@ -66,20 +72,20 @@ struct SECTOR_FLAGS
 	bool MinecartRight() { return MarkBeetle; }
 	bool MinecartStop() { return (MarkBeetle && MarkTriggerer); }
 
-	bool IsWallClimbable(ClimbDirection direction)
+	bool IsWallClimbable(ClimbDirectionFlags flag)
 	{
-		switch (direction)
+		switch (flag)
 		{
-		case ClimbDirection::North:
+		case ClimbDirectionFlags::North:
 			return ClimbNorth;
 
-		case ClimbDirection::South:
+		case ClimbDirectionFlags::South:
 			return ClimbSouth;
 
-		case ClimbDirection::East:
+		case ClimbDirectionFlags::East:
 			return ClimbEast;
 
-		case ClimbDirection::West:
+		case ClimbDirectionFlags::West:
 			return ClimbWest;
 		}
 
@@ -87,6 +93,7 @@ struct SECTOR_FLAGS
 	}
 };
 
+// Sector
 class FloorInfo
 {
 	public:
@@ -97,21 +104,18 @@ class FloorInfo
 		int			   Box			= 0;
 		bool		   Stopper		= true;
 		int			   TriggerIndex = 0;
-		FLOOR_MATERIAL Material		= FLOOR_MATERIAL::Mud;
-		SECTOR_FLAGS   Flags		= {};
+		MaterialType   Material		= MaterialType::Stone;
+		SectorFlagData Flags		= {};
 
-		SECTOR_COLLISION_INFO FloorCollision   = {};
-		SECTOR_COLLISION_INFO CeilingCollision = {};
+		SurfaceCollisionData FloorCollision	  = {};
+		SurfaceCollisionData CeilingCollision = {};
 
-		int		GetSectorPlaneIndex(int x, int z, bool getFloor) const;
-		Vector2 GetSectorTilt(int x, int z, bool getFloor) const;
+		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
+		Vector2 GetSurfaceTilt(int x, int z, bool checkFloor) const;
 
-		bool FloorIsSplit() const;
-		bool CeilingIsSplit() const;
-		bool FloorIsDiagonalStep() const;
-		bool CeilingIsDiagonalStep() const;
-		bool FloorHasSplitPortal() const;
-		bool CeilingHasSplitPortal() const;
+		bool IsSurfaceSplit(bool checkFloor) const;
+		bool IsSurfaceDiagonalStep(bool checkFloor) const;
+		bool IsSurfaceSplitPortal(bool checkFloor) const;
 
 		std::optional<int> RoomBelow(int plane) const;
 		std::optional<int> RoomBelow(int x, int z) const;
