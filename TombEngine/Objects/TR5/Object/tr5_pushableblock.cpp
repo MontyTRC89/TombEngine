@@ -593,7 +593,7 @@ namespace TEN::Entities::Generic
 		auto pointColl = GetCollision(item);
 		AddBridge(item->Index);
 
-		if (pointColl.Block->IsWall(pointColl.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
+		if (pointColl.Block->IsWall(pointColl.Block->GetSectorPlaneIndex(item->Pose.Position.x, item->Pose.Position.z, true)))
 			return false;
 
 		if (pointColl.Position.Floor != item->Pose.Position.y)

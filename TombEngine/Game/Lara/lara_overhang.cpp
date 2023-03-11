@@ -1117,7 +1117,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 			int y = item->Pose.Position.y - coll->Setup.Height;
 			auto probe = GetCollision(down.x, item->Pose.Position.y - coll->Setup.Height, down.z, item->RoomNumber);
 
-			if (probe.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Pose.Orientation.y + ANGLE(180.0f))) &&
+			if (probe.BottomBlock->Flags.IsWallClimbable(GetClimbDirection(item->Pose.Orientation.y + ANGLE(180.0f))) &&
 				probe.Position.Floor >= (item->Pose.Position.y - CLICK(1)) &&
 				probe.Position.Ceiling <= (y - CLICK(1)))
 			{

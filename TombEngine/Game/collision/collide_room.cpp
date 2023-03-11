@@ -202,8 +202,8 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.BottomBlock = floor;
 
 	// Get tilts.
-	result.FloorTilt = floor->TiltXZ(x, z, true);
-	result.CeilingTilt = floor->TiltXZ(x, z, false);
+	result.FloorTilt = floor->GetSectorTilt(x, z, true);
+	result.CeilingTilt = floor->GetSectorTilt(x, z, false);
 
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
@@ -1104,7 +1104,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 						if (i == 4)
 						{
-							auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(eX, eZ) : block->SectorPlane(eX, eZ);
+							auto usedSectorPlane = useCeilingLedge ? block->GetSectorPlaneIndex(eX, eZ, false) : block->GetSectorPlaneIndex(eX, eZ, true);
 							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90.0f);
 						}
 						else

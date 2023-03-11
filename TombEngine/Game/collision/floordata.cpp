@@ -10,33 +10,28 @@
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 
-int FloorInfo::SectorPlane(int x, int z) const
+int FloorInfo::GetSectorPlaneIndex(int x, int z, bool getFloor) const
 {
-	const auto point = GetSectorPoint(x, z);
-	auto vector = point.ToVector2();
-	const auto matrix = Matrix::CreateRotationZ(FloorCollision.SplitAngle);
-	Vector2::Transform(vector, matrix, vector);
+	// Calculate bias.
+	auto point = GetSectorPoint(x, z).ToVector2();
+	auto rotMatrix = Matrix::CreateRotationZ(getFloor ? FloorCollision.SplitAngle : CeilingCollision.SplitAngle);
+	Vector2::Transform(point, rotMatrix, point);
 
-	return vector.x < 0 ? 0 : 1;
+	// Determine and return plane index.
+	return ((point.x < 0) ? 0 : 1);
 }
 
-int FloorInfo::SectorPlaneCeiling(int x, int z) const
+Vector2 FloorInfo::GetSectorTilt(int x, int z, bool getFloor) const
 {
-	const auto point = GetSectorPoint(x, z);
-	auto vector = point.ToVector2();
-	const auto matrix = Matrix::CreateRotationZ(CeilingCollision.SplitAngle);
-	Vector2::Transform(vector, matrix, vector);
+	// Get surface plane
+	auto plane = getFloor ?
+		FloorCollision.Planes[GetSectorPlaneIndex(x, z, true)] :
+		CeilingCollision.Planes[GetSectorPlaneIndex(x, z, true)];
 
-	return vector.x < 0 ? 0 : 1;
-}
-
-Vector2 FloorInfo::TiltXZ(int x, int z, bool floor) const
-{
-	auto plane = floor ? FloorCollision.Planes[SectorPlane(x, z)] : CeilingCollision.Planes[SectorPlane(x, z)];
-	auto tiltX = (int)-(plane.x * BLOCK(1) / CLICK(1));
-	auto tiltZ = (int)-(plane.y * BLOCK(1) / CLICK(1));
-
-	return Vector2(tiltX, tiltZ);
+	// Calculate and return tilt.
+	return Vector2(
+		-int((plane.x * BLOCK(1)) / CLICK(1)),
+		-int((plane.y * BLOCK(1)) / CLICK(1)));
 }
 
 bool FloorInfo::FloorIsSplit() const
@@ -78,12 +73,12 @@ bool FloorInfo::CeilingHasSplitPortal() const
 std::optional<int> FloorInfo::RoomBelow(int plane) const
 {
 	const auto room = FloorCollision.Portals[plane];
-	return room != -1 ? std::optional{room} : std::nullopt;
+	return room != NO_ROOM ? std::optional{room} : std::nullopt;
 }
 
 std::optional<int> FloorInfo::RoomBelow(int x, int z) const
 {
-	return RoomBelow(SectorPlane(x, z));
+	return RoomBelow(GetSectorPlaneIndex(x, z, true));
 }
 
 std::optional<int> FloorInfo::RoomBelow(int x, int y, int z) const
@@ -110,7 +105,7 @@ std::optional<int> FloorInfo::RoomAbove(int plane) const
 
 std::optional<int> FloorInfo::RoomAbove(int x, int z) const
 {
-	return RoomAbove(SectorPlaneCeiling(x, z));
+	return RoomAbove(GetSectorPlaneIndex(x, z, false));
 }
 
 std::optional<int> FloorInfo::RoomAbove(int x, int y, int z) const
@@ -131,12 +126,12 @@ std::optional<int> FloorInfo::RoomAbove(int x, int y, int z) const
 
 std::optional<int> FloorInfo::RoomSide() const
 {
-	return WallPortal != -1 ? std::optional{WallPortal} : std::nullopt;
+	return WallPortal != NO_ROOM ? std::optional{WallPortal} : std::nullopt;
 }
 
 int FloorInfo::FloorHeight(int x, int z) const
 {
-	const auto plane = SectorPlane(x, z);
+	const auto plane = GetSectorPlaneIndex(x, z, true);
 	const auto vector = GetSectorPoint(x, z);
 
 	return FloorCollision.Planes[plane].x * vector.x + FloorCollision.Planes[plane].y * vector.y + FloorCollision.Planes[plane].z;
@@ -174,7 +169,7 @@ int FloorInfo::BridgeFloorHeight(int x, int y, int z) const
 
 int FloorInfo::CeilingHeight(int x, int z) const
 {
-	const auto plane = SectorPlaneCeiling(x, z);
+	const auto plane = GetSectorPlaneIndex(x, z, false);
 	const auto vector = GetSectorPoint(x, z);
 
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
@@ -217,7 +212,7 @@ Vector2 FloorInfo::FloorSlope(int plane) const
 
 Vector2 FloorInfo::FloorSlope(int x, int z) const
 {
-	return FloorSlope(SectorPlane(x, z));
+	return FloorSlope(GetSectorPlaneIndex(x, z, true));
 }
 
 Vector2 FloorInfo::CeilingSlope(int plane) const
@@ -227,7 +222,7 @@ Vector2 FloorInfo::CeilingSlope(int plane) const
 
 Vector2 FloorInfo::CeilingSlope(int x, int z) const
 {
-	return CeilingSlope(SectorPlaneCeiling(x, z));
+	return CeilingSlope(GetSectorPlaneIndex(x, z, false));
 }
 
 bool FloorInfo::IsWall(int plane) const
@@ -237,10 +232,10 @@ bool FloorInfo::IsWall(int plane) const
 
 bool FloorInfo::IsWall(int x, int z) const
 {
-	return IsWall(SectorPlane(x, z));
+	return IsWall(GetSectorPlaneIndex(x, z, true));
 }
 
-short FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const
+int FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const
 {
 	for (const auto itemNumber : BridgeItem)
 	{
@@ -251,15 +246,15 @@ short FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilin
 			return itemNumber;
 	}
 
-	return -1;
+	return NO_ITEM;
 }
 
-void FloorInfo::AddItem(short itemNumber)
+void FloorInfo::AddItem(int itemNumber)
 {
 	BridgeItem.insert(itemNumber);
 }
 
-void FloorInfo::RemoveItem(short itemNumber)
+void FloorInfo::RemoveItem(int itemNumber)
 {
 	BridgeItem.erase(itemNumber);
 }
@@ -690,7 +685,7 @@ namespace TEN::Floordata
 		return location;
 	}
 
-	void AddBridge(short itemNumber, int x, int z)
+	void AddBridge(int itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		x += item.Pose.Position.x;
@@ -722,7 +717,7 @@ namespace TEN::Floordata
 		}
 	}
 
-	void RemoveBridge(short itemNumber, int x, int z)
+	void RemoveBridge(int itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		x += item.Pose.Position.x;

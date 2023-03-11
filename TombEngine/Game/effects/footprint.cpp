@@ -168,7 +168,7 @@ namespace TEN::Effects::Footprints
 		}
 
 		// Calculate footprint tilts.
-		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
+		auto plane = floor->FloorCollision.Planes[floor->GetSectorPlaneIndex(footPos.x, footPos.z, true)];
 		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto yRot = TO_RAD(item->Pose.Orientation.y);
