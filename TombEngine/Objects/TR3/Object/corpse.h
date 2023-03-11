@@ -1,7 +1,12 @@
 #pragma once
 
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+class GameVector;
+struct ItemInfo;
 
-void TrainControl(short itemNumber);
-void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+namespace TEN::Entities
+{
+	void InitialiseCorpse(short itemNumber);
+	void CorpseControl(short itemNumber);
+	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
+}
+

@@ -31,6 +31,9 @@
 // Effects
 #include "Objects/Effects/Boss.h"
 
+// Objects
+#include "Objects/TR3/Object/corpse.h"
+
 // Traps
 #include "Objects/TR3/Trap/ElectricCleaner.h"
 #include "Objects/TR3/Trap/train.h"
@@ -47,6 +50,7 @@
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Effects::Boss;
+using namespace TEN::Entities;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -389,6 +393,18 @@ static void StartObject(ObjectInfo* obj)
 		obj->control = ShockwaveExplosionControl;
 		obj->shadowType = ShadowMode::None;
 	}
+
+	obj = &Objects[ID_CORPSE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCorpse;
+		obj->collision = CreatureCollision;
+		obj->control = CorpseControl;
+		obj->HitRoutine = CorpseHit;
+		obj->shadowType = ShadowMode::None;
+		obj->SetupHitEffect();
+	}
+
 }
 
 static void StartTrap(ObjectInfo* obj)
