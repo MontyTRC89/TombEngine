@@ -19,9 +19,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::Hair
 {
-	// DEBUG
-	static bool drawSpheres = false;
-
 	HairEffectController HairEffect = {};
 
 	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
@@ -105,10 +102,6 @@ namespace TEN::Effects::Hair
 
 				segment.Position = worldMatrix.Translation();
 				segment.Velocity = segment.Position - Segments[0].Velocity;
-
-				// DEBUG
-				//if (drawSpheres)
-					//g_Renderer.AddSphere(segment.Position, 20, Vector4::One);
 			}
 		}
 	}
@@ -338,12 +331,6 @@ namespace TEN::Effects::Hair
 	{
 		for (int i = 0; i < Units.size(); i++)
 		{
-			// DEBUG
-			if (i == 0)
-				drawSpheres = true;
-			else
-				drawSpheres = false;
-
 			this->Units[i].Update(item, i);
 
 			if (isYoung && i == 1)
