@@ -95,7 +95,7 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
 
-				auto jointOffset = ((i - 1) == (Segments.size() - 1)) ?
+				auto jointOffset = (i == (Segments.size() - 1)) ?
 					GetJointOffset(ID_HAIR, (i - 1) - 1) :
 					GetJointOffset(ID_HAIR, (i - 1));
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
@@ -312,7 +312,7 @@ namespace TEN::Effects::Hair
 			unit.IsEnabled = (!isHead || isYoung);
 			unit.IsInitialized = false;
 			
-			unsigned int segmentCount = Objects[ID_HAIR].nmeshes;
+			unsigned int segmentCount = Objects[ID_HAIR].nmeshes + 1;
 			unit.Segments.resize(segmentCount);
 
 			// Initialize segments.
