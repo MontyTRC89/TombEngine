@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/effects/hair.h"
 #include "Game/items.h"
@@ -12,6 +11,8 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -321,6 +322,10 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 
 	const auto& hairObject = *m_moveableObjects[ID_HAIR];
 
+	// TODO
+	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+
+	bool isHead = true;
 	for (const auto& unit : HairEffect.Units)
 	{
 		if (!unit.IsEnabled)
@@ -344,11 +349,13 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		for (int j = 0; j < (int)hairObject.ObjectMeshes.size(); j++)
+		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{
-			auto& mesh = *hairObject.ObjectMeshes[j];
-			DrawMoveableMesh(itemToDraw, &mesh, room, j, transparent);
+			auto& rMesh = *hairObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rMesh, room, i, transparent);
 		}
+
+		isHead = false;
 	}
 }
 
