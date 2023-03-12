@@ -399,7 +399,6 @@ static void StartObject(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseCorpse;
 		obj->collision = CreatureCollision;
-		//obj->intelligent = true;
 		obj->undead = true;
 		obj->control = CorpseControl;
 		obj->HitRoutine = CorpseHit;
@@ -407,7 +406,6 @@ static void StartObject(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::None;
 		obj->SetupHitEffect();
 	}
-
 }
 
 static void StartTrap(ObjectInfo* obj)

@@ -18,10 +18,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-
-#define TRAIN_VEL	260
-#define LARA_TRAIN_DEATH_ANIM 3;
-
 using namespace TEN::Effects::Ripple;
 
 namespace TEN::Entities
@@ -56,8 +52,6 @@ namespace TEN::Entities
 
 		item.ItemFlags[2] = (int)EffectType::Cadaver;
 
-		//item.Effect.Type = EffectType::Cadaver;
-
 		if (item.TriggerFlags == 1)
 		{
 			item.ItemFlags[1] = CadaverHanging;
@@ -73,29 +67,6 @@ namespace TEN::Entities
 
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
-	}
-
-
-	bool TestCorpseNewRoom(ItemInfo& item, const CollisionResult& coll)
-	{
-		// Has corpse changed room?
-		if (item.RoomNumber == coll.RoomNumber)
-			return false;
-
-		// If currently in water and previously on land, add a ripple.
-		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, coll.RoomNumber))
-		{
-			int floorDiff = abs(coll.Position.Floor - item.Pose.Position.y);
-			int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
-			int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
-
-			SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
-		}
-
-		item.Animation.Velocity.y = 0.0f;
-
-		ItemNewRoom(item.Index, coll.RoomNumber);
-		return true;
 	}
 
 	void CorpseControl(short itemNumber)
@@ -114,7 +85,6 @@ namespace TEN::Entities
 
 		if (item.ItemFlags[1] == CadaverFalling)
 		{
-
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			int vDivider = isWater ? 81 : 1;
 			
@@ -141,15 +111,19 @@ namespace TEN::Entities
 			auto floorColl = GetCollision(&item);
 			item.Animation.IsAirborne = true;
 
-				if (floorColl.Position.Floor < item.Pose.Position.y)
+			if (floorColl.Position.Floor < item.Pose.Position.y)
 			{
 					if (!isWater)
 					{
+						item.Pose.Position.y = item.Pose.Position.y - item.Animation.Velocity.y;
 						SoundEffect(SFX_TR4_CROCGOD_LAND, &item.Pose);
 						item.Effect.Type = EffectType::Smoke;
 					}
+					else
+					{
+						item.Pose.Position.y = item.Pose.Position.y;
+					}
 
-				item.Pose.Position.y = item.Pose.Position.y - item.Animation.Velocity.y;
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity = Vector3::Zero;
 				item.Animation.TargetState = CORPSE_STATE_LANDING;
@@ -207,5 +181,5 @@ namespace TEN::Entities
 			DoItemHit(&target, 0, isExplosive, false);
 		}
 	}
-
 }
+
