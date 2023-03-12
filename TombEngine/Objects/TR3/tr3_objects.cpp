@@ -398,9 +398,11 @@ static void StartObject(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCorpse;
-		obj->collision = CreatureCollision;
+		//obj->collision = CreatureCollision;
+		obj->collision = ObjectCollision;
 		obj->control = CorpseControl;
 		obj->HitRoutine = CorpseHit;
+		obj->HitPoints = NOT_TARGETABLE;
 		obj->shadowType = ShadowMode::None;
 		obj->SetupHitEffect();
 	}

@@ -38,7 +38,9 @@ namespace TEN::Entities
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.Effect.Type = EffectType::Cadaver;
+		item.ItemFlags[2] = (int)EffectType::Cadaver;
+
+		//item.Effect.Type = EffectType::Cadaver;
 
 		if (item.TriggerFlags == 1)
 			item.ItemFlags[1] = CadaverHanging;
@@ -66,6 +68,8 @@ namespace TEN::Entities
 			SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
 		}
 
+		item.Animation.Velocity.y = 0.0f;
+
 		ItemNewRoom(item.Index, coll.RoomNumber);
 		return true;
 	}
@@ -74,61 +78,69 @@ namespace TEN::Entities
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (!TriggerActive(&item))
-			return;
+		item.Effect.Type = (EffectType)item.ItemFlags[2];
 
 		if (item.ItemFlags[1] == CadaverFalling)
 		{
-			int oldRoom = item.RoomNumber;
 
-			//item->Pose.Position.y += item->ItemFlags[1];
+			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
+			int vDivider = isWater ? 81 : 1;
+			
+			auto roomNumber = GetCollision(&item).RoomNumber;
 
+			if (item.RoomNumber != roomNumber)
+			{
+				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
+				{
+					int waterHeight = GetWaterHeight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
+					SplashSetup.y = waterHeight - 1;
+					SplashSetup.x = item.Pose.Position.x;
+					SplashSetup.z = item.Pose.Position.z;
+					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
+					SplashSetup.innerRadius = 160;
+					SetupSplash(&SplashSetup, roomNumber);
+					item.Animation.Velocity.y = 0.0f;
+				}
 
+				ItemNewRoom(itemNumber, roomNumber);
+			}
 
-			short roomNumber = item.RoomNumber;
-			auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
-			//h = GetHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-
-			item.Pose.Position.y = item.Floor;
-
-
-			auto pointColl = GetCollision(&item);
-			TestCorpseNewRoom(item, pointColl);
-
-
-			//if (item.RoomNumber != roomNumber)
-				//ItemNewRoom(itemNumber, roomNumber);
-
+			auto floorColl = GetCollision(&item);
 			item.Animation.IsAirborne = true;
 
-			if (item.Pose.Position.y >= item.Floor || (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber)))
+				if (floorColl.Position.Floor < item.Pose.Position.y)
 			{
-				item.Pose.Position.y = item.Floor;
+
+				item.Pose.Position.y = item.Pose.Position.y - item.Animation.Velocity.y;
 				item.Animation.IsAirborne = false;
-				item.Animation.Velocity.y = 0.0f;
+				item.Animation.Velocity = Vector3::Zero;
 
-
-				//item->Pose.Position.y = h;
-				//item->ItemFlags[1] = 0;
-				item.Pose.Orientation.z = 0x4000;
 				item.ItemFlags[1] = CadaverLying;
 				return;
 			}
+			else
+			{
 
-			item.Pose.Orientation.z = item.Floor; // += item->ItemFlags[1];
+				if (isWater)
 
-
-
-
+				{
+					item.Animation.Velocity.y += 0.1f / vDivider;
+				}
+				else
+				{
+					item.Animation.Velocity.y += GRAVITY;;
+				}
+			}
 		}
 
+		AnimateItem(&item);
 	}
 
 	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
 		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
-
 
 		if (pos.has_value() && (player.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 			player.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
@@ -138,7 +150,7 @@ namespace TEN::Entities
 		{
 			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 
-			if (target.ItemFlags[1] = CadaverHanging)
+			if (target.ItemFlags[1] == CadaverHanging)
 				target.ItemFlags[1] = CadaverFalling;
 
 		}
