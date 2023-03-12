@@ -398,8 +398,9 @@ static void StartObject(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCorpse;
-		//obj->collision = CreatureCollision;
-		obj->collision = ObjectCollision;
+		obj->collision = CreatureCollision;
+		//obj->intelligent = true;
+		obj->undead = true;
 		obj->control = CorpseControl;
 		obj->HitRoutine = CorpseHit;
 		obj->HitPoints = NOT_TARGETABLE;

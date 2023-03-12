@@ -41,7 +41,8 @@ namespace TEN::Entities::Creatures::TR3
 		COMPY_STATE_IDLE = 0,
 		COMPY_STATE_RUN_FORWARD = 1,
 		COMPY_STATE_JUMP_ATTACK = 2,
-		COMPY_STATE_ATTACK = 3
+		COMPY_STATE_ATTACK = 3,
+		COMPY_STATE_DIE = 4
 	};
 
 	enum CompyAnim
@@ -89,14 +90,17 @@ namespace TEN::Entities::Creatures::TR3
 
 		int random = 0;
 		int roomNumber = 0;
-		int target = 0;;
+		int target = 0;
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
 		
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != COMPY_STATE_IDLE)
+			if (item->Animation.ActiveState != COMPY_STATE_DIE)
+			{
+				item->Animation.TargetState = COMPY_STATE_DIE;
 				SetAnimation(item, COMPY_ANIM_DEATH);
+			}
 		}
 		else
 		{
@@ -116,11 +120,12 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
+					
 
 					if (SameZone(creature, &targetItem))
 					{
 						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Cadaver)
+						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Cadaver && targetItem.Active)
 						{
 							cadaverPos = targetItem.Pose.Position.ToVector3();
 							shortestDistance = distance;
