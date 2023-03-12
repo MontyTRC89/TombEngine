@@ -715,7 +715,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Status.Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
-			if (lara->Vehicle == NO_ITEM) // Only for UPV.
+			// HACK: Special case for UPV.
+			if (lara->Vehicle == NO_ITEM)
 			{
 				lara->Status.Air += 10;
 				if (lara->Status.Air > LARA_AIR_MAX)
@@ -727,9 +728,32 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (lara->Control.WaterStatus == WaterStatus::Dry)
 			{
-				lara->Status.Exposure++;
-				if (lara->Status.Exposure >= LARA_EXPOSURE_MAX)
-					lara->Status.Exposure = LARA_EXPOSURE_MAX;
+				// HACK: Special case for UPV.
+				if (lara->Vehicle != NO_ITEM)
+				{
+					auto& vehicleItem = g_Level.Items[lara->Vehicle];
+					if (vehicleItem.ObjectNumber == ID_UPV)
+					{
+						auto pointColl = GetCollision(item, 0, 0, CLICK(1));
+						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
+					}
+				}
+
+				if (isCold)
+				{
+					lara->Status.Exposure--;
+					if (lara->Status.Exposure <= 0)
+					{
+						lara->Status.Exposure = 0;
+						item->HitPoints -= 10;
+					}
+				}
+				else
+				{
+					lara->Status.Exposure++;
+					if (lara->Status.Exposure >= LARA_EXPOSURE_MAX)
+						lara->Status.Exposure = LARA_EXPOSURE_MAX;
+				}
 			}
 			else
 			{
