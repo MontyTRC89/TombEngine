@@ -10,7 +10,7 @@ using namespace TEN::Math;
 // Floor:		Lower surface of a collision block.
 // Floordata:	Name of the engine's level geometry collision system consisting of rooms and their divisions within a grid.
 // Plane:		One of two surface triangles.
-// Portal:		Link from one room to another allowing traversal between them.
+// Portal:		Link from one room to another allowing traversal.
 // Room number: Unique numeric index of a room.
 // Surface:		Floor or ceiling.
 // Wall:		Inferred from a floor or ceiling with max height. Note that true "walls" do not exist.
