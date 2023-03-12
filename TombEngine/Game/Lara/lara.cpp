@@ -727,18 +727,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (lara->Control.WaterStatus == WaterStatus::Dry)
 			{
-				lara->Status.ColdExposure++;
-				if (lara->Status.ColdExposure >= LARA_COLD_EXPOSURE_MAX)
-					lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+				lara->Status.Exposure++;
+				if (lara->Status.Exposure >= LARA_EXPOSURE_MAX)
+					lara->Status.Exposure = LARA_EXPOSURE_MAX;
 			}
 			else
 			{
 				if (isCold)
 				{
-					lara->Status.ColdExposure--;
-					if (lara->Status.ColdExposure <= 0)
+					lara->Status.Exposure--;
+					if (lara->Status.Exposure <= 0)
 					{
-						lara->Status.ColdExposure = 0;
+						lara->Status.Exposure = 0;
 						item->HitPoints -= 10;
 					}
 				}
@@ -763,18 +763,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			if (isCold)
 			{
-				lara->Status.ColdExposure -= 2;
-				if (lara->Status.ColdExposure <= 0)
+				lara->Status.Exposure -= 2;
+				if (lara->Status.Exposure <= 0)
 				{
-					lara->Status.ColdExposure = 0;
+					lara->Status.Exposure = 0;
 					item->HitPoints -= 10;
 				}
 			}
 			else
 			{
-				lara->Status.ColdExposure++;
-				if (lara->Status.ColdExposure >= LARA_COLD_EXPOSURE_MAX)
-					lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+				lara->Status.Exposure++;
+				if (lara->Status.Exposure >= LARA_EXPOSURE_MAX)
+					lara->Status.Exposure = LARA_EXPOSURE_MAX;
 			}
 		}
 
@@ -790,10 +790,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			if (isCold)
 			{
-				lara->Status.ColdExposure -= 2;
-				if (lara->Status.ColdExposure <= 0)
+				lara->Status.Exposure -= 2;
+				if (lara->Status.Exposure <= 0)
 				{
-					lara->Status.ColdExposure = 0;
+					lara->Status.Exposure = 0;
 					item->HitPoints -= 10;
 				}
 			}
@@ -1049,7 +1049,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 	item->HitPoints = LARA_HEALTH_MAX;
 	lara->Status.Air = LARA_AIR_MAX;
-	lara->Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+	lara->Status.Exposure = LARA_EXPOSURE_MAX;
 	lara->Status.Poison = 0;
 	lara->Status.Stamina = LARA_STAMINA_MAX;
 	

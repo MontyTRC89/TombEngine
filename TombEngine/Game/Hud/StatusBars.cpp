@@ -13,7 +13,7 @@
 using namespace TEN::Renderer;
 
 extern TEN::Renderer::RendererHudBar* g_AirBar;
-extern TEN::Renderer::RendererHudBar* g_ColdBar;
+extern TEN::Renderer::RendererHudBar* g_ExposureBar;
 extern TEN::Renderer::RendererHudBar* g_HealthBar;
 extern TEN::Renderer::RendererHudBar* g_StaminaBar;
 
@@ -25,7 +25,7 @@ namespace TEN::Hud
 
 		// Initialize bar values.
 		this->InitializeStatusBar(this->AirBar, player.Status.Air, LARA_AIR_MAX);
-		this->InitializeStatusBar(this->ColdBar, player.Status.ColdExposure, LARA_COLD_EXPOSURE_MAX);
+		this->InitializeStatusBar(this->ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
 		this->InitializeStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
 		this->InitializeStatusBar(this->StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
 	}
@@ -40,7 +40,7 @@ namespace TEN::Hud
 
 		// Update bars.
 		this->UpdateAirBar(item);
-		this->UpdateColdBar(item);
+		this->UpdateExposureBar(item);
 		this->UpdateHealthBar(item);
 		this->UpdateStaminaBar(item);
 	}
@@ -56,7 +56,7 @@ namespace TEN::Hud
 
 		// Draw bars.
 		this->DrawAirBar();
-		this->DrawColdBar();
+		this->DrawExposureBar();
 		this->DrawHealthBar(isPoisoned);
 		this->DrawStaminaBar();
 	}
@@ -109,23 +109,24 @@ namespace TEN::Hud
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
 		if (player.Vehicle != NO_ITEM)
 		{
-			if (g_Level.Items[player.Vehicle].ObjectNumber == ID_UPV)
+			const auto& vehicleItem = g_Level.Items[player.Vehicle];
+			if (vehicleItem.ObjectNumber == ID_UPV)
 				this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
-	void StatusBarsController::UpdateColdBar(const ItemInfo& item)
+	void StatusBarsController::UpdateExposureBar(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->ColdBar, player.Status.ColdExposure, LARA_COLD_EXPOSURE_MAX);
+		this->UpdateStatusBar(this->ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
 
 		// Update life.
-		if (ColdBar.Value != ColdBar.TargetValue ||
+		if (ExposureBar.Value != ExposureBar.TargetValue ||
 			(TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) && TestEnvironment(ENV_FLAG_COLD, item.RoomNumber)))
 		{
-			this->ColdBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			this->ExposureBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
@@ -190,15 +191,15 @@ namespace TEN::Hud
 		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
 	}
 	
-	void StatusBarsController::DrawColdBar() const
+	void StatusBarsController::DrawExposureBar() const
 	{
 		constexpr auto TEXTURE_ID	  = ID_SFX_BAR_TEXTURE;
-		constexpr auto CRITICAL_VALUE = LARA_COLD_EXPOSURE_CRITICAL / LARA_COLD_EXPOSURE_MAX;
+		constexpr auto CRITICAL_VALUE = LARA_EXPOSURE_CRITICAL / LARA_EXPOSURE_MAX;
 
-		if (ColdBar.Life <= 0.0f)
+		if (ExposureBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(ColdBar.Value, CRITICAL_VALUE, *g_ColdBar, TEXTURE_ID, 0, false);
+		this->DrawStatusBar(ExposureBar.Value, CRITICAL_VALUE, *g_ExposureBar, TEXTURE_ID, 0, false);
 	}
 
 	void StatusBarsController::DrawHealthBar(bool isPoisoned) const

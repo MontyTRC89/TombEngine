@@ -31,7 +31,7 @@ void InitialiseLara(bool restore)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	Lara.Status.Air = LARA_AIR_MAX;
-	Lara.Status.ColdExposure = LARA_COLD_EXPOSURE_MAX;
+	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
 	Lara.Status.Poison = 0;
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
