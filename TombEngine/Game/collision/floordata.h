@@ -4,6 +4,17 @@
 
 using namespace TEN::Math;
 
+// GLOSSARY OF TERMS:
+// Ceiling:		Upper surface of a grid cell.
+// Cell:		Collision unit describing a room's grid cell. Also "block" or "sector".
+// Floor:		Lower surface of a grid cell.
+// Floordata:	Name of the engine's level geometry collision system consisting of rooms divided into a grid with cells.
+// Plane:		One of the two surface triangles.
+// Portal:		Link to another room allowing traversal through to it.
+// Room number: Unique numeric index of a room.
+// Surface:		Floor or ceiling.
+// Wall:		Inferred from a floor or ceiling with max height. Note that true "walls" do not exist.
+
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
 enum class MaterialType
@@ -93,7 +104,7 @@ struct SectorFlagData
 	}
 };
 
-// Sector
+// Cell
 class FloorInfo
 {
 	public:
