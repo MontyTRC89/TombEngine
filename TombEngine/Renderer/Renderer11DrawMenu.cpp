@@ -20,8 +20,8 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
-extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_SFXVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
 
 namespace TEN::Renderer
 {
@@ -69,29 +69,31 @@ namespace TEN::Renderer
 	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
 	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
 
-	// These bars are only used in menus
-	TEN::Renderer::RendererHUDBar* g_MusicVolumeBar = nullptr;
-	TEN::Renderer::RendererHUDBar* g_SFXVolumeBar = nullptr;
+	// These bars are only used in menus.
+	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
+	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
 	void Renderer11::InitialiseMenuBars(int y)
 	{
-		std::array<Vector4, 5> soundSettingColors =
+		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
-			//top
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-			//center
-			Vector4(0.18f,0.3f,0.72f,1),
-			//bottom
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
+			// Top
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Center
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Bottom
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f)
 		};
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 	}
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
@@ -208,12 +210,12 @@ namespace TEN::Renderer
 
 			// Music volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, *g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, *g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
 
@@ -506,7 +508,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawPickup(const DisplayPickup& pickup)
+	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
 		static const auto COUNT_STRING_PREFIX = std::string("  ");
 
@@ -516,19 +518,19 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectOn2DPosition(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
 		if (pickup.Count > 1)
 		{
 			AddString(
 				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 
 	// TODO: Handle opacity
-	void Renderer11::DrawObjectOn2DPosition(int objectNumber, Vector2 screenPos, EulerAngles orient, float scale, float opacity, int meshBits)
+	void Renderer11::DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -540,7 +542,7 @@ namespace TEN::Renderer
 			screenRes.x / SCREEN_SPACE_RES.x,
 			screenRes.y / SCREEN_SPACE_RES.y);
 
-		screenPos *= factor;
+		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
@@ -548,7 +550,7 @@ namespace TEN::Renderer
 		{
 			const auto& invObject = InventoryObjectTable[index];
 
-			screenPos.y += invObject.YOffset;
+			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
 
@@ -566,7 +568,7 @@ namespace TEN::Renderer
 			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
 		}
 
-		auto pos = m_viewportToolkit.Unproject(Vector3(screenPos.x, screenPos.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
+		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
 
 		// Set vertex buffer.
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -702,7 +704,7 @@ namespace TEN::Renderer
 
 		float savedScale = object.Scale1;
 		object.Scale1 = scaler;
-		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
 		object.Scale1 = savedScale;
 	}
 
@@ -713,7 +715,7 @@ namespace TEN::Renderer
 		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
-		DrawObjectOn2DPosition(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
 
 		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
@@ -910,7 +912,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d (%d instanced)", m_numSpritesDrawCalls, m_numInstancedSpritesDrawCalls);
+				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
@@ -923,6 +925,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
+				PrintDebugMessage("    dot products: %d", m_dotProducts);
+
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

@@ -707,10 +707,11 @@ e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`</description>
 		<parameter>
 			<name>action</name>
 			<type>ItemAction</type>
-			<description>is this usable, equippable, or examinable?<br/>
+			<description>is this usable, equippable, combineable or examinable?<br/>
 Must be one of:
 	EQUIP
 	USE
+	COMBINE
 	EXAMINE
 e.g. `myItem.action = ItemAction.EXAMINE`</description>
 		</parameter>
@@ -1308,8 +1309,8 @@ eyes of the creatures would be.</description>
 	<module>Objects.AIObject</module>
 	<caller>AIObject</caller>
 	<name>GetRotationY</name>
-	<summary>Get the object's Y-axis rotation
- To the best of my knowledge, the rotation of an AIObject has no effect.</summary>
+	<summary>Get the object's Y-axis rotation.</summary>
+	<description>To the best of my knowledge, the rotation of an AIObject has no effect.</description>
 	<returns>
 		<return>
 			<type>number</type>
@@ -1322,13 +1323,13 @@ eyes of the creatures would be.</description>
 	<module>Objects.AIObject</module>
 	<caller>AIObject</caller>
 	<name>SetRotationY</name>
-	<summary>Set the object's Y-axis rotation
- To the best of my knowledge, the rotation of an AIObject has no effect.</summary>
+	<summary>Set the object's Y-axis rotation.</summary>
+	<description>To the best of my knowledge, the rotation of an AIObject has no effect.</description>
 	<parameters>
 		<parameter>
-			<name>The</name>
+			<name>rotation</name>
 			<type>number</type>
-			<description>object's new Y-axis rotation</description>
+			<description>The object's new Y-axis rotation</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1534,6 +1535,13 @@ eyes of the creatures would be.</description>
 	<caller>Camera</caller>
 	<name>PlayCamera</name>
 	<summary>Active the camera during that frame.</summary>
+	<parameters>
+		<parameter>
+			<name>Target</name>
+			<type>Moveable</type>
+			<description>If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
@@ -1642,6 +1650,33 @@ eyes of the creatures would be.</description>
 			<description>current sprint value</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>Moveable</caller>
+	<name>GetAirborne</name>
+	<summary>Get the moveable's airborne status</summary>
+	<returns>
+		<return>
+			<type>(bool)</type>
+			<description>true if Lara state must react to aerial forces.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>Moveable</caller>
+	<name>SetAirborne</name>
+	<summary>Set the moveable's airborne status</summary>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>(bool)</type>
+			<description>airborn status for Lara.</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
@@ -2154,14 +2189,14 @@ most can just be ignored (see usage).</description>
 	<summary>Get the value stored in ItemFlags[index]</summary>
 	<parameters>
 		<parameter>
-			<name>short</name>
-			<type>index:</type>
-			<description>) index the ItemFlags, can be between 0 and 7.</description>
+			<name>index</name>
+			<type>int</type>
+			<description>of the ItemFlags, can be between 0 and 7.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
-			<type>(short)</type>
+			<type>int</type>
 			<description>the value contained in the ItemFlags[index]</description>
 		</return>
 	</returns>
@@ -2174,14 +2209,14 @@ most can just be ignored (see usage).</description>
 	<summary>Stores a value in ItemFlags[index]</summary>
 	<parameters>
 		<parameter>
-			<name>short</name>
-			<type>value:</type>
-			<description>) index of the ItemFlags where store the value.</description>
+			<name>value</name>
+			<type>short</type>
+			<description>to store in the moveable's ItemFlags[index]</description>
 		</parameter>
 		<parameter>
-			<name>short</name>
-			<type>index:</type>
-			<description>) index of the ItemFlags where store the value.</description>
+			<name>index</name>
+			<type>int</type>
+			<description>of the ItemFlags where store the value.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2485,6 +2520,33 @@ most can just be ignored (see usage).</description>
 			<name>HP</name>
 			<type>int</type>
 			<description>the amount of HP to give the moveable</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetLocationAI</name>
+	<summary>Get the location value stored in the Enemy AI</summary>
+	<returns>
+		<return>
+			<type>(short)</type>
+			<description>the value contained in the LocationAI of the creature.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetLocationAI</name>
+	<summary>Updates the location in the enemy AI with the given value.</summary>
+	<parameters>
+		<parameter>
+			<name>short</name>
+			<type>value:</type>
+			<description>) value to store.</description>
 		</parameter>
 	</parameters>
 </function>

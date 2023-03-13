@@ -3,15 +3,19 @@
 
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Game/effects/Bubble.h"
+#include "Game/effects/Drip.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -27,6 +31,9 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -48,7 +55,9 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Count.Pose++;
 	}
 	else
+	{
 		lara->Control.Count.Pose = 0;
+	}
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
@@ -140,42 +149,135 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+void HandlePlayerWetnessDrips(ItemInfo& item)
+{
+	auto& player = *GetLaraInfo(&item);
+
+	if (Wibble & 0xF)
+		return;
+
+	int jointIndex = 0;
+	for (auto& node : player.Effect.DripNodes)
+	{
+		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
+		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		jointIndex++;
+
+		// Node underwater; set max wetness value.
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+		{
+			node = PLAYER_DRIP_NODE_MAX;
+			continue;
+		}
+
+		// Node inactive; continue.
+		if (node <= 0.0f)
+			continue;
+
+		// Spawn drip.
+		float chance = (node / PLAYER_DRIP_NODE_MAX) / 2;
+		if (Random::TestProbability(chance))
+		{
+			SpawnWetnessDrip(pos, item.RoomNumber);
+
+			node -= 1.0f;
+			if (node <= 0.0f)
+				node = 0.0f;
+		}
+	}
+}
+
+void HandlePlayerDiveBubbles(ItemInfo& item)
+{
+	constexpr auto BUBBLE_COUNT_MULT = 6;
+
+	auto& player = *GetLaraInfo(&item);
+
+	int jointIndex = 0;
+	for (auto& node : player.Effect.BubbleNodes)
+	{
+		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
+		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		jointIndex++;
+
+		// Node inactive; continue.
+		if (node <= 0.0f)
+			continue;
+
+		// Node above water; continue.
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			continue;
+
+		// Spawn bubbles.
+		float chance = node / PLAYER_BUBBLE_NODE_MAX;
+		if (Random::TestProbability(chance))
+		{
+			unsigned int count = (int)round(node * BUBBLE_COUNT_MULT);
+			SpawnDiveBubbles(pos, roomNumber, count);
+
+			node -= 1.0f;
+			if (node <= 0.0f)
+				node = 0.0f;
+		}
+	}
+}
+
+void HandlePlayerAirBubbles(ItemInfo* item)
+{
+	constexpr auto BUBBLE_COUNT_MAX = 3;
+
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
+
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+	
+	auto pos = (level.GetLaraType() == LaraType::Divesuit) ?
+		GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3() :
+		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
+
+	unsigned int bubbleCount = Random::GenerateInt(0, BUBBLE_COUNT_MAX);
+	for (int i = 0; i < bubbleCount; i++)
+		SpawnBubble(pos, item->RoomNumber);
+}
+
 // TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr int   rate				 = 50;
-	static constexpr float easingAlpha		 = 0.35f;
-	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+	constexpr auto LINEAR_THRESHOLD		= STEPUP_HEIGHT / 2;
+	constexpr auto EASING_THRESHOLD_MIN = BLOCK(1.0f / 64);
+	constexpr auto LINEAR_RATE			= 50;
+	constexpr auto EASING_ALPHA			= 0.35f;
 
-	// Check for walls.
+	// Check for wall.
 	if (height == NO_HEIGHT)
 		return;
 
-	// Swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+	// Handle swamp case.
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
 	{
-		item->Pose.Position.y += (height > 0) ? SWAMP_GRAVITY : height;
+		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
 	}
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z), EASING_THRESHOLD_MIN);
 
-	// Regular case.
-	if (abs(height) > constantThreshold)
+	// Handle regular case.
+	if (abs(height) > LINEAR_THRESHOLD)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += rate * sign;
+		item->Pose.Position.y += LINEAR_RATE * sign;
 	}
 	else if (abs(height) > easingThreshold)
 	{
 		int vPos = item->Pose.Position.y;
-		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
+		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
 	}
 	else
+	{
 		item->Pose.Position.y += height;
+	}
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
@@ -291,32 +393,65 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 
 void DoLaraFallDamage(ItemInfo* item)
 {
+	constexpr auto RUMBLE_POWER_COEFF = 0.7f;
+	constexpr auto RUMBLE_DELAY		  = 0.3f;
+
 	if (item->Animation.Velocity.y >= LARA_DAMAGE_VELOCITY)
 	{
 		if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
-			item->HitPoints = 0;
-		else USE_FEATURE_IF_CPP20([[likely]])
 		{
-			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1);
-			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
+			item->HitPoints = 0;
+		}
+		else
+		{
+			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
+			item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
 		}
 
-		float rumblePower = ((float)item->Animation.Velocity.y / (float)LARA_DEATH_VELOCITY) * 0.7f;
-		Rumble(rumblePower, 0.3f);
+		float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;
+		Rumble(rumblePower, RUMBLE_DELAY);
 	}
+}
+
+LaraInfo& GetLaraInfo(ItemInfo& item)
+{
+	if (item.ObjectNumber == ID_LARA)
+	{
+		auto* player = (LaraInfo*&)item.Data;
+		return *player;
+	}
+
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
+
+	auto& firstLaraItem = *FindItem(ID_LARA);
+	auto* player = (LaraInfo*&)firstLaraItem.Data;
+	return *player;
+}
+
+const LaraInfo& GetLaraInfo(const ItemInfo& item)
+{
+	if (item.ObjectNumber == ID_LARA)
+	{
+		const auto* player = (LaraInfo*&)item.Data;
+		return *player;
+	}
+
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
+
+	const auto& firstPlayerItem = *FindItem(ID_LARA);
+	const auto* player = (LaraInfo*&)firstPlayerItem.Data;
+	return *player;
 }
 
 LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
 		return (LaraInfo*&)item->Data;
-	else
-	{
-		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 
-		auto* firstLaraItem = FindItem(ID_LARA);
-		return (LaraInfo*&)firstLaraItem->Data;
-	}
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+
+	auto& firstPlayerItem = *FindItem(ID_LARA);
+	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
@@ -628,6 +763,10 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
 		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+	}
+	else
+	{
+		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)

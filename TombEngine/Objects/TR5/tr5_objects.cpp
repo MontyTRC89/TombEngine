@@ -114,7 +114,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -133,7 +133,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -176,7 +176,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -198,6 +198,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -218,7 +219,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -240,7 +241,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -357,7 +358,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 26;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
@@ -433,7 +434,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->explodableMeshbits = 0x4000;
+		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -484,7 +485,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = ImpControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 12;
 		obj->pivotLength = 20;
 		obj->radius = 102;

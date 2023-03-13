@@ -5,10 +5,13 @@
 #include "Game/control/flipeffect.h"
 #include "Specific/setup.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
+
+using namespace TEN::Effects::Ripple;
 
 int NextRat;
 RatData Rats[NUM_RATS];
@@ -269,12 +272,21 @@ void UpdateRats()
 					if (TestEnvironment(ENV_FLAG_WATER, oldRoomNumber))
 					{
 						if (!(GetRandomControl() & 0xF))
-							SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, RIPPLE_FLAG_SHORT_INIT);
+							SpawnRipple(
+								Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+								rat->RoomNumber,
+								Random::GenerateFloat(48.0f, 52.0f),
+								(int)RippleFlags::SlowFade);
 					}
 					else
 					{
 						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
-						SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, RIPPLE_FLAG_SHORT_INIT);
+						SpawnRipple(
+							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+							rat->RoomNumber,
+							Random::GenerateFloat(48.0f, 52.0f),
+							(int)RippleFlags::SlowFade);
+						
 						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose);
 					}
 				}

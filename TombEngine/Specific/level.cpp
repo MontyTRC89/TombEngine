@@ -685,7 +685,7 @@ void ReadRooms()
 
 			floor.TriggerIndex = ReadInt32();
 			floor.Box = ReadInt32();
-			floor.Material = (FLOOR_MATERIAL)ReadInt32();
+			floor.Material = (MaterialType)ReadInt32();
 			floor.Stopper = (bool)ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
