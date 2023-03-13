@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-
 #include "Specific/trutils.h"
 
 namespace TEN::Renderer

@@ -1,6 +1,4 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
-
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -25,6 +23,7 @@
 #include "Game/misc.h"
 #include "Math/Math.h"
 #include "Quad/RenderQuad.h"
+#include "Renderer/Renderer11.h"
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"

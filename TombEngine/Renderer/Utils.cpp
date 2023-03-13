@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "Utils.h"
-#include <winerror.h>
-#include <iostream>
-#include <wrl/client.h>
-#include <d3dcompiler.h>
-
-#include <locale>
 #include <codecvt>
+#include <d3dcompiler.h>
+#include <iostream>
+#include <locale>
+#include <winerror.h>
+#include <wrl/client.h>
 
 namespace TEN::Renderer::Utils
 {

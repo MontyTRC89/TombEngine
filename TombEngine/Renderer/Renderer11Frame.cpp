@@ -1,7 +1,5 @@
-#include "framework.h"
-#include "Renderer/Renderer11.h"
-
 #include "Flow/ScriptInterfaceFlowHandler.h"
+#include "framework.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -10,9 +8,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
+#include "RenderView/RenderView.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "RenderView/RenderView.h"
 
 using namespace TEN::Math;
 

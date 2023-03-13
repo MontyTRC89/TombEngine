@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "Objects/Effects/enemy_missile.h"
-
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
@@ -11,8 +10,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
-#include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
+#include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 

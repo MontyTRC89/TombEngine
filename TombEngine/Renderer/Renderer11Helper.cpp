@@ -1,8 +1,7 @@
-#include "framework.h"
 
-#include <algorithm>
 
 #include "Flow/ScriptInterfaceFlowHandler.h"
+#include "framework.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -22,11 +21,12 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Renderer/RenderView/RenderView.h"
 #include "Renderer/Renderer11.h"
+#include "Renderer/RenderView/RenderView.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include <algorithm>
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;

@@ -1,6 +1,4 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
-
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -9,6 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"

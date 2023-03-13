@@ -1,14 +1,14 @@
 #include "framework.h"
+#include "Game/control/control.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/savegame.h"
+#include "Objects/Generic/Object/objects.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/level.h"
-#include "Game/savegame.h"
 #include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Objects/Generic/Object/objects.h"
-#include "Game/Lara/lara_struct.h"
-#include <tuple>
-#include <stack>
 #include <execution>
+#include <stack>
+#include <tuple>
 
 using std::optional;
 using std::stack;

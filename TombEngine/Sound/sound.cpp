@@ -1,16 +1,15 @@
 #include "framework.h"
-#include "Sound/sound.h"
-
-#include <filesystem>
-#include <regex>
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Specific/winmain.h"
+#include <filesystem>
+#include <regex>
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[(int)SoundFilter::Count];

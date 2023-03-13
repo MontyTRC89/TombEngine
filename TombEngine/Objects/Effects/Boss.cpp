@@ -1,12 +1,11 @@
 #include "framework.h"
-#include "Objects/Effects/Boss.h"
-
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Objects/Effects/Boss.h"
 #include "Objects/TR3/Entity/PunaBoss.h"
 #include "Specific/setup.h"
 

@@ -1,15 +1,14 @@
 #include "framework.h"
 #include "Objects/Effects/effect_objects.h"
-
-#include "Objects/Effects/flame_emitters.h"
-#include "Objects/Effects/enemy_missile.h"
-#include "Objects/Effects/light.h"
 #include "Specific/setup.h"
 
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Entities::Effects::Light;
 
+#include "Objects/Effects/enemy_missile.h"
+#include "Objects/Effects/flame_emitters.h"
+#include "Objects/Effects/light.h"
 
 void InitialiseEffectsObjects()
 {

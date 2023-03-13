@@ -1,6 +1,4 @@
 #include "framework.h"
-#include "Objects/Generic/Switches/underwater_switch.h"
-
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -8,6 +6,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/Switches/underwater_switch.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
