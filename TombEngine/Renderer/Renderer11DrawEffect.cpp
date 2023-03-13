@@ -83,7 +83,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
-		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ALPHABLEND;
+		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ADDITIVE;
 
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
@@ -100,11 +100,9 @@ namespace TEN::Renderer
 							continue;
 
 						// Determine blend mode.
-						auto blendMode = (BLEND_MODES)BLEND_MODE_DEFAULT;
+						auto blendMode = BLEND_MODE_DEFAULT;
 						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
-							blendMode = BLENDMODE_ADDITIVE;
-
-						// TODO: For additive blend mode to work, colour values must be adjusted according to opacity.
+							blendMode = BLENDMODE_ALPHABLEND;
 
 						if (segment.Flags & (int)StreamerFlags::FadeLeft)
 						{
@@ -1104,25 +1102,31 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSprites(RenderView& view)
 	{
-		if (view.spritesToDraw.size() == 0)
+		if (view.spritesToDraw.empty())
 			return;
 
-		// Sort sprites by sprite and blend mode for faster batching
+		// Sort sprites by sprite and blend mode for faster batching.
 		std::sort(
 			view.spritesToDraw.begin(),
 			view.spritesToDraw.end(),
-			[](RendererSpriteToDraw& a, RendererSpriteToDraw& b)
+			[](RendererSpriteToDraw& rDrawSprite0, RendererSpriteToDraw& rDrawSprite1)
 			{
-				if (a.Sprite != b.Sprite)
-					return (a.Sprite > b.Sprite);
-				else if (a.BlendMode != b.BlendMode)
-					return (a.BlendMode > b.BlendMode);
+				if (rDrawSprite0.Sprite != rDrawSprite1.Sprite)
+				{
+					return (rDrawSprite0.Sprite > rDrawSprite1.Sprite);
+				}
+				else if (rDrawSprite0.BlendMode != rDrawSprite1.BlendMode)
+				{
+					return (rDrawSprite0.BlendMode > rDrawSprite1.BlendMode);
+				}
 				else
-					return (a.Type > b.Type);
+				{
+					return (rDrawSprite0.Type > rDrawSprite1.Type);
+				}
 			}
 		);
 
-		// Group sprites to draw in buckets for instancing (only billboards)
+		// Group sprites to draw in buckets for instancing (billboards only).
 		std::vector<RendererSpriteBucket> spriteBuckets;
 		RendererSpriteBucket currentSpriteBucket;
 
@@ -1131,52 +1135,50 @@ namespace TEN::Renderer
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
 
-		for (int i = 0; i < view.spritesToDraw.size(); i++)
+		for (auto& rDrawSprite : view.spritesToDraw)
 		{
-			RendererSpriteToDraw& spr = view.spritesToDraw[i];
+			bool isBillboard = rDrawSprite.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
-			bool isBillboard = spr.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
-
-			if (spr.Sprite != currentSpriteBucket.Sprite || 
-				spr.BlendMode != currentSpriteBucket.BlendMode ||
-				spr.SoftParticle != currentSpriteBucket.IsSoftParticle ||
+			if (rDrawSprite.Sprite != currentSpriteBucket.Sprite || 
+				rDrawSprite.BlendMode != currentSpriteBucket.BlendMode ||
+				rDrawSprite.SoftParticle != currentSpriteBucket.IsSoftParticle ||
 				currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE || 
 				isBillboard != currentSpriteBucket.IsBillboard)
 			{
 				spriteBuckets.push_back(currentSpriteBucket);
 
-				currentSpriteBucket.Sprite = spr.Sprite;
-				currentSpriteBucket.BlendMode = spr.BlendMode;
+				currentSpriteBucket.Sprite = rDrawSprite.Sprite;
+				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
-				currentSpriteBucket.IsSoftParticle = spr.SoftParticle;
+				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
-			if (DoesBlendModeRequireSorting(spr.BlendMode))
+			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode))
 			{
-				// If the blend mode requires sorting, save the sprite for later
-				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				// If blend mode requires sorting, save sprite for later.
+				int distance = (rDrawSprite.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
-				face.info.sprite = &spr;
+				face.info.sprite = &rDrawSprite;
 				face.distance = distance;
-				face.info.world = GetWorldMatrixForSprite(&spr, view);
-				face.info.blendMode = spr.BlendMode;
+				face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
+				face.info.blendMode = rDrawSprite.BlendMode;
 
 				for (int j = 0; j < view.roomsToDraw.size(); j++)
 				{
 					short roomNumber = view.roomsToDraw[j]->RoomNumber;
-					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(spr.pos), roomNumber))
+					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(rDrawSprite.pos), roomNumber))
 					{
 						view.roomsToDraw[j]->TransparentFacesToDraw.push_back(face);
 						break;
 					}
 				}
 			}
+			// Add sprite to current bucket.
 			else
 			{
-				// Otherwise, add the sprite to the current bucket
-				currentSpriteBucket.SpritesToDraw.push_back(spr);
+				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
 			}
 		}
 
@@ -1187,10 +1189,10 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
 
-		m_context->VSSetShader(m_vsInstancedSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInstancedSprites.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsInstancedSprites.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psInstancedSprites.Get(), nullptr, 0);
 
-		// Set up vertex buffer and parameters
+		// Set up vertex buffer and parameters.
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1202,25 +1204,25 @@ namespace TEN::Renderer
 			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
 				continue;
 
-			// Prepare the constant buffer for instanced sprites
+			// Prepare constant buffer for instanced sprites.
 			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
 			{
-				RendererSpriteToDraw& spr = spriteBucket.SpritesToDraw[i];
+				auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
 
-				m_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&spr, view);
-				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
+				m_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
+				m_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
 				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
-				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spr.SoftParticle ? 1 : 0;
+				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
 				 
-				// Strange packing due to particular HLSL 16 bytes alignment requirements
-				m_stInstancedSpriteBuffer.Sprites[i].UV[0].x = spr.Sprite->UV[0].x;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[0].y = spr.Sprite->UV[1].x;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[0].z = spr.Sprite->UV[2].x;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[0].w = spr.Sprite->UV[3].x;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[1].x = spr.Sprite->UV[0].y;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[1].y = spr.Sprite->UV[1].y;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[1].z = spr.Sprite->UV[2].y;
-				m_stInstancedSpriteBuffer.Sprites[i].UV[1].w = spr.Sprite->UV[3].y;
+				// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+				m_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
 			}
 
 			SetBlendMode(spriteBucket.BlendMode);
@@ -1235,18 +1237,18 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 			BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
-			// Draw sprites with instancing
+			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, spriteBucket.SpritesToDraw.size(), 0);
 
 			m_numSpritesDrawCalls++;
 		}
 
-		// Draw 3D sprites
+		// Draw 3D sprites.
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
 
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsSprites.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSprites.Get(), nullptr, 0);
 
 		stride = sizeof(RendererVertex);
 		offset = 0;
@@ -1256,7 +1258,7 @@ namespace TEN::Renderer
 
 		for (auto& spriteBucket : spriteBuckets)
 		{
-			if (spriteBucket.SpritesToDraw.size() == 0 || spriteBucket.IsBillboard)
+			if (spriteBucket.SpritesToDraw.empty() || spriteBucket.IsBillboard)
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
@@ -1274,59 +1276,30 @@ namespace TEN::Renderer
 
 			m_primitiveBatch->Begin();
 
-			for (auto& spr : spriteBucket.SpritesToDraw)
+			for (auto& rDrawSprite : spriteBucket.SpritesToDraw)
 			{
-				Vector3 p0t = spr.vtx1;
-				Vector3 p1t = spr.vtx2;
-				Vector3 p2t = spr.vtx3;
-				Vector3 p3t = spr.vtx4;
+				auto vertex0 = RendererVertex{};
+				vertex0.Position = rDrawSprite.vtx1;
+				vertex0.UV = rDrawSprite.Sprite->UV[0];
+				vertex0.Color = rDrawSprite.c1;
 
-				RendererVertex v0;
-				v0.Position.x = p0t.x;
-				v0.Position.y = p0t.y;
-				v0.Position.z = p0t.z;
-				v0.UV.x = spr.Sprite->UV[0].x;
-				v0.UV.y = spr.Sprite->UV[0].y;
-				v0.Color.x = spr.c1.x;
-				v0.Color.y = spr.c1.y;
-				v0.Color.z = spr.c1.z;
-				v0.Color.w = 1.0f;
+				auto vertex1 = RendererVertex{};
+				vertex1.Position = rDrawSprite.vtx2;
+				vertex1.UV = rDrawSprite.Sprite->UV[1];
+				vertex1.Color = rDrawSprite.c2;
 
-				RendererVertex v1;
-				v1.Position.x = p1t.x;
-				v1.Position.y = p1t.y;
-				v1.Position.z = p1t.z;
-				v1.UV.x = spr.Sprite->UV[1].x;
-				v1.UV.y = spr.Sprite->UV[1].y;
-				v1.Color.x = spr.c2.x;
-				v1.Color.y = spr.c2.y;
-				v1.Color.z = spr.c2.z;
-				v1.Color.w = 1.0f;
+				auto vertex2 = RendererVertex{};
+				vertex2.Position = rDrawSprite.vtx3;
+				vertex2.UV = rDrawSprite.Sprite->UV[2];
+				vertex2.Color = rDrawSprite.c3;
 
-				RendererVertex v2;
-				v2.Position.x = p2t.x;
-				v2.Position.y = p2t.y;
-				v2.Position.z = p2t.z;
-				v2.UV.x = spr.Sprite->UV[2].x;
-				v2.UV.y = spr.Sprite->UV[2].y;
-				v2.Color.x = spr.c3.x;
-				v2.Color.y = spr.c3.y;
-				v2.Color.z = spr.c3.z;
-				v2.Color.w = 1.0f;
+				auto vertex3 = RendererVertex{};
+				vertex3.Position = rDrawSprite.vtx4;
+				vertex3.UV = rDrawSprite.Sprite->UV[3];
+				vertex3.Color = rDrawSprite.c4;
 
-				RendererVertex v3;
-				v3.Position.x = p3t.x;
-				v3.Position.y = p3t.y;
-				v3.Position.z = p3t.z;
-				v3.UV.x = spr.Sprite->UV[3].x;
-				v3.UV.y = spr.Sprite->UV[3].y;
-				v3.Color.x = spr.c4.x;
-				v3.Color.y = spr.c4.y;
-				v3.Color.z = spr.c4.z;
-				v3.Color.w = 1.0f;
-
-				m_primitiveBatch->DrawTriangle(v0, v1, v3);
-				m_primitiveBatch->DrawTriangle(v1, v2, v3);
+				m_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
+				m_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
 			}
 
 			m_primitiveBatch->End();

@@ -452,11 +452,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		};
 
 		// Spawn Commander Video rainbow.
-		StreamerEffect.Spawn(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, vel, scaleRate, rot2D, (int)StreamerFlags::FadeRight);
+		StreamerEffect.Spawn(item->Index, 0, streamerPositions[0], direction, orient2D, color0, width, life, vel, scaleRate, rot2D);
 		StreamerEffect.Spawn(item->Index, 1, streamerPositions[1], direction, orient2D, color1, width, life, vel, scaleRate, rot2D);
 		StreamerEffect.Spawn(item->Index, 2, streamerPositions[2], direction, orient2D, color2, width, life, vel, scaleRate, rot2D);
 		StreamerEffect.Spawn(item->Index, 3, streamerPositions[3], direction, orient2D, color3, width, life, vel, scaleRate, rot2D);
-		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, vel, scaleRate, rot2D, (int)StreamerFlags::FadeLeft);
+		StreamerEffect.Spawn(item->Index, 4, streamerPositions[4], direction, orient2D, color4, width, life, vel, scaleRate, rot2D);
 
 		//auto segment = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.back();
 		//int count = StreamerEffect.Modules.at(item->Index).Pools.at(0)[0].Segments.size();
