@@ -11,9 +11,9 @@ namespace TEN::Hud
 		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
 		unsigned int   Count	= 0;
 
-		Vector2		Position	= Vector2::Zero;
-		Vector2		Origin		= Vector2::Zero;
-		Vector2		Target		= Vector2::Zero;
+		Vector2		Position2D	= Vector2::Zero;
+		Vector2		Origin2D	= Vector2::Zero;
+		Vector2		Target2D	= Vector2::Zero;
 		EulerAngles Orientation = EulerAngles::Zero;
 
 		float Life		   = 0.0f;
@@ -30,6 +30,9 @@ namespace TEN::Hud
 	class PickupSummaryController
 	{
 	private:
+		// Constants
+		static constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
+
 		// Components
 		std::vector<DisplayPickup> DisplayPickups = {};
 
@@ -43,7 +46,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::vector<Vector2> GetStackPositions() const;
+		std::vector<Vector2> GetStack2DPositions() const;
 		DisplayPickup&		 GetNewDisplayPickup();
 		void				 ClearInactiveDisplayPickups();
 
