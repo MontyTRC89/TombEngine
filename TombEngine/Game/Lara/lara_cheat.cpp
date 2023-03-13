@@ -82,7 +82,6 @@ void LaraCheatyBits(ItemInfo* item)
 					lara->Control.Count.Death = 0;
 					lara->PoisonPotency = 0;
 					lara->Air = LARA_AIR_MAX;
-					lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 				}
 			}
 			else

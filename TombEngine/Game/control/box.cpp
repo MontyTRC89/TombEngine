@@ -573,6 +573,7 @@ void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 	Lara.HitDirection = -1;
+	Lara.Air = -1;
 
 	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;

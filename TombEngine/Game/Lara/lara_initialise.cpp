@@ -10,8 +10,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Hud;
-
 void InitialiseLara(bool restore)
 {
 	if (Lara.ItemNumber == NO_ITEM)
@@ -54,8 +52,6 @@ void InitialiseLara(bool restore)
 
 	InitialiseLaraMeshes(LaraItem);
 	InitialiseLaraAnims(LaraItem);
-
-	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
 void InitialiseLaraMeshes(ItemInfo* item)

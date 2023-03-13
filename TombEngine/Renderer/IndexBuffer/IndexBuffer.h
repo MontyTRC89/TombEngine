@@ -6,10 +6,8 @@
 #include "Game/debug/debug.h"
 #include "Specific/fast_vector.h"
 
-namespace TEN::Renderer
-{
-	class IndexBuffer
-	{
+namespace TEN::Renderer {
+	class IndexBuffer {
 	private:
 		int m_numIndices;
 
@@ -21,4 +19,5 @@ namespace TEN::Renderer
 		bool Update(ID3D11DeviceContext* context, std::vector<int>& data, int startIndex, int count);
 		bool Update(ID3D11DeviceContext* context, fast_vector<int>& data, int startIndex, int count);
 	};
+
 }

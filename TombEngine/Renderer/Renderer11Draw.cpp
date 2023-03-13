@@ -33,6 +33,10 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 
+extern TEN::Renderer::RendererHUDBar* g_HealthBar;
+extern TEN::Renderer::RendererHUDBar* g_AirBar;
+extern TEN::Renderer::RendererHUDBar* g_LoadingBar;
+
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
@@ -1535,7 +1539,8 @@ namespace TEN::Renderer
 		DrawLines2D();
 
 		// Draw HUD.
-		g_Hud.Draw(*LaraItem);
+		g_Hud.Draw();
+		DrawHud(LaraItem);
 
 		// Draw binoculars or lasersight
 		DrawOverlays(view); 
@@ -1543,7 +1548,7 @@ namespace TEN::Renderer
 		time2 = std::chrono::high_resolution_clock::now();
 		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
-		
+
 		DrawDebugInfo(view);
 		DrawAllStrings();
 

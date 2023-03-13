@@ -393,65 +393,32 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 
 void DoLaraFallDamage(ItemInfo* item)
 {
-	constexpr auto RUMBLE_POWER_COEFF = 0.7f;
-	constexpr auto RUMBLE_DELAY		  = 0.3f;
-
 	if (item->Animation.Velocity.y >= LARA_DAMAGE_VELOCITY)
 	{
 		if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
-		{
 			item->HitPoints = 0;
-		}
-		else
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
-			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
-			item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
+			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1);
+			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 
-		float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;
-		Rumble(rumblePower, RUMBLE_DELAY);
+		float rumblePower = ((float)item->Animation.Velocity.y / (float)LARA_DEATH_VELOCITY) * 0.7f;
+		Rumble(rumblePower, 0.3f);
 	}
-}
-
-LaraInfo& GetLaraInfo(ItemInfo& item)
-{
-	if (item.ObjectNumber == ID_LARA)
-	{
-		auto* player = (LaraInfo*&)item.Data;
-		return *player;
-	}
-
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
-
-	auto& firstLaraItem = *FindItem(ID_LARA);
-	auto* player = (LaraInfo*&)firstLaraItem.Data;
-	return *player;
-}
-
-const LaraInfo& GetLaraInfo(const ItemInfo& item)
-{
-	if (item.ObjectNumber == ID_LARA)
-	{
-		const auto* player = (LaraInfo*&)item.Data;
-		return *player;
-	}
-
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item.ObjectNumber), LogLevel::Warning);
-
-	const auto& firstPlayerItem = *FindItem(ID_LARA);
-	const auto* player = (LaraInfo*&)firstPlayerItem.Data;
-	return *player;
 }
 
 LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
 		return (LaraInfo*&)item->Data;
+	else
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-
-	auto& firstPlayerItem = *FindItem(ID_LARA);
-	return (LaraInfo*&)firstPlayerItem.Data;
+		auto* firstLaraItem = FindItem(ID_LARA);
+		return (LaraInfo*&)firstLaraItem->Data;
+	}
 }
 
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
