@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
-	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(BLOCK(0.3f), 0.0f, SPEEDBOAT_FRONT / 2);
+	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE, 0.0f, SPEEDBOAT_FRONT / 2);
 
 	constexpr auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
 	constexpr auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);

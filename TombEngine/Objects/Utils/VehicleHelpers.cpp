@@ -307,12 +307,13 @@ namespace TEN::Entities::Vehicles
 	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight)
 	{
 		constexpr auto COLOR		 = Vector4(1.0f, 1.0f, 1.0f, 0.5f);
-		constexpr auto LIFE			 = 2.0f;
-		constexpr auto SCALE_RATE	 = 12.0f;
+		constexpr auto LIFE			 = 4.0f;
+		constexpr auto SCALE_RATE	 = 8.0f;
 		constexpr auto HEIGHT_OFFSET = 4.0f;
 
 		// TODO: Consider general movement direction.
 
+		// Vehicle is out of water; return early.
 		if (waterHeight == NO_HEIGHT)
 			return;
 
@@ -323,15 +324,15 @@ namespace TEN::Entities::Vehicles
 		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
 
 		// Calculate positions.
-		auto basePos = Vector3(item.Pose.Position.x, waterHeight - HEIGHT_OFFSET, item.Pose.Position.z);
+		auto posBase = Vector3(item.Pose.Position.x, waterHeight - HEIGHT_OFFSET, item.Pose.Position.z);
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-		auto posLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
-		auto posRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
+		auto posLeft = posBase + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto posRight = posBase + Vector3::Transform(relOffsetRight, rotMatrix);
 
 		// Calculate directions.
 		auto direction = -item.Pose.Orientation.ToDirection();
-		auto directionLeft = Geometry::RotatePoint(direction, EulerAngles(0, ANGLE(40.0f), 0));
-		auto directionRight = Geometry::RotatePoint(direction, EulerAngles(0, -ANGLE(40.0f), 0));
+		auto directionLeft = Geometry::RotatePoint(direction, EulerAngles(0, ANGLE(20.0f), 0));
+		auto directionRight = Geometry::RotatePoint(direction, EulerAngles(0, -ANGLE(20.0f), 0));
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(

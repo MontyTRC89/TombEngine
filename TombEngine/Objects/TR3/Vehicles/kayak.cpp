@@ -46,9 +46,7 @@ namespace TEN::Entities::Vehicles
 
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
-	constexpr auto KAYAK_WAKE_OFFSET		  = BLOCK(1 / 8.0f);
-	constexpr auto KAYAK_WAKE_SEGMENT_LIFE	  = 84;
-	constexpr auto KAYAK_WAKE_SEGMENT_FADEOUT = 10.0f;
+	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	// TODO: Very confusing.
 	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
@@ -1233,10 +1231,10 @@ namespace TEN::Entities::Vehicles
 			Camera.targetDistance = CLICK(8);
 		}
 
-		if (!(Wibble & 15) && kayak->TrueWater)
+		if (kayak->TrueWater)
 		{
-			SpawnStreamer(kayakItem, -KAYAK_WAKE_OFFSET, 0, 0, 1, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
-			SpawnStreamer(kayakItem,  KAYAK_WAKE_OFFSET, 0, 0, 2, true, 4.0f, KAYAK_WAKE_SEGMENT_LIFE, KAYAK_WAKE_SEGMENT_FADEOUT);
+			int waterHeight = GetWaterHeight(kayakItem);
+			SpawnVehicleWake(*kayakItem, KAYAK_WAKE_OFFSET, waterHeight);
 		}
 
 		if (Wibble & 7)
