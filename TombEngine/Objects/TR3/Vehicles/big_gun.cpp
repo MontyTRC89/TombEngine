@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/control/box.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
@@ -16,8 +17,8 @@
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
-#include "Specific/level.h"
 #include "Specific/Input/Input.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
@@ -25,23 +26,30 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto BGUN_MOUNT_DISTANCE_MAX = CLICK(2);
+	constexpr auto BGUN_ROCKET_SPAWN_DISTANCE = BLOCK(0.25f);
+	constexpr auto BGUN_MOUNT_DISTANCE_MAX	  = BLOCK(0.5f);
 
-	constexpr auto BGUN_RECOIL_TIME = 26;
-	constexpr auto BGUN_RECOIL_Z = 25;
-	constexpr auto BGUN_X_ORIENT_NUM_FRAMES = 59;
+	constexpr auto BGUN_RECOIL_TIME		= 26;
+	constexpr auto BGUN_RECOIL_Z		= 25;
+	constexpr auto BGUN_ROCKET_VELOCITY = 16;
+	constexpr auto BGUN_ROCKET_TIMER	= 1000;
+	constexpr auto BGUN_SMOKE_DURATION	= 32;
+
+	constexpr auto BGUN_X_ORIENT_NUM_FRAMES	  = 59;
 	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
 
-	const auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
-	const auto BGUN_TURN_RATE_MAX	= ANGLE(4.0f);
-	const auto BGUN_X_ORIENT_STEP	= ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES;
-	const auto BGUN_X_ORIENT_MAX	= ANGLE(40.0f);
+	constexpr auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
+	constexpr auto BGUN_TURN_RATE_MAX	= ANGLE(4.0f);
+	constexpr auto BGUN_X_ORIENT_STEP	= (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES);
+	constexpr auto BGUN_X_ORIENT_MAX	= ANGLE(40.0f);
 
-	const auto BigGunMountTypes = std::vector<VehicleMountType>
+	const std::vector<VehicleMountType> BigGunMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Back
 	};
+
+	const auto BigGunBite = BiteInfo(Vector3(0.0f, 0.0f, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -98,7 +106,7 @@ namespace TEN::Entities::Vehicles
 		int y = laraItem.Pose.Position.y - bigGunItem.Pose.Position.y;
 		int z = laraItem.Pose.Position.z - bigGunItem.Pose.Position.z;
 
-		int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 		if (distance > SECTOR(30))
 			return false;
 
@@ -111,38 +119,38 @@ namespace TEN::Entities::Vehicles
 
 	void BigGunFire(ItemInfo& bigGunItem, ItemInfo& laraItem)
 	{
-		auto& player = *GetLaraInfo(&laraItem);
+		int itemNumber = CreateItem();
+		if (itemNumber == NO_ITEM)
+			return;
+
+		auto& player = GetLaraInfo(laraItem);
 		auto& bigGun = GetBigGunInfo(bigGunItem);
 
-		short itemNumber = CreateItem();
-		auto* projectileItem = &g_Level.Items[itemNumber];
+		auto& projectileItem = g_Level.Items[itemNumber];
 
-		if (itemNumber != NO_ITEM)
-		{
-			projectileItem->ObjectNumber = ID_ROCKET;
-			projectileItem->RoomNumber = laraItem.RoomNumber;
+		projectileItem.ObjectNumber = ID_ROCKET;
+		auto pos = GetJointPosition(&bigGunItem, BigGunBite.meshNum, BigGunBite.Position);
+		auto pointColl = GetCollision(pos.x, pos.y, pos.z, bigGunItem.RoomNumber);
 
-			auto pos = GetJointPosition(&bigGunItem, 2, Vector3i(0, 0, CLICK(1))); // CLICK(1) or 520?
-			projectileItem->Pose.Position = pos;
+		projectileItem.RoomNumber = pointColl.RoomNumber;
+		projectileItem.Pose.Position = pos;
+		projectileItem.Pose.Orientation = EulerAngles(
+			-((bigGun.XOrientFrame - 32) * ANGLE(1.0f)),
+			bigGunItem.Pose.Orientation.y,
+			0);
 
-			InitialiseItem(itemNumber);
+		InitialiseItem(itemNumber);
 
-			projectileItem->Animation.Velocity.z = 16;
-			projectileItem->Pose.Orientation = EulerAngles(
-				-((bigGun.XOrientFrame - 32) * ANGLE(1.0f)),
-				bigGunItem.Pose.Orientation.y,
-				0);
-			projectileItem->ItemFlags[0] = BGUN_FLAG_UP_DOWN;
+		projectileItem.Animation.Velocity.z = BGUN_ROCKET_VELOCITY;
+		projectileItem.HitPoints = BGUN_ROCKET_TIMER; // NOTE: Time before explosion. If 0, explodes by default.
 
-			AddActiveItem(itemNumber);
+		AddActiveItem(itemNumber);
 
-			player.LeftArm.GunSmoke = 32;
+		player.LeftArm.GunSmoke = BGUN_SMOKE_DURATION;
+		for (int i = 0; i < 5; i++)
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, player.LeftArm.GunSmoke);
 
-			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, player.LeftArm.GunSmoke);
-
-			SoundEffect(SFX_TR4_EXPLOSION1, &projectileItem->Pose);
-		}
+		SoundEffect(SFX_TR4_EXPLOSION1, &projectileItem.Pose);
 	}
 
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

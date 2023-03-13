@@ -85,8 +85,8 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
-	for (unsigned char& i : lara->Wet)
+	float value = wetness.has_value() ? (float)wetness.value() : PLAYER_DRIP_NODE_MAX;
+	for (float& i : lara->Effect.DripNodes)
 		i = value;
 }
 
@@ -98,7 +98,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 int LaraObject::GetWet() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	return lara->Wet[0];
+	return lara->Effect.DripNodes[0];
 }
 
 /// Set sprint energy value of Lara
@@ -125,6 +125,22 @@ int LaraObject::GetSprintEnergy() const
 {
 	auto* lara = GetLaraInfo(m_item);
 	return lara->SprintEnergy;
+}
+
+/// Get the moveable's airborne status
+// @function Moveable:GetAirborne
+// @treturn (bool) true if Lara state must react to aerial forces.
+bool LaraObject::GetAirborne() const
+{
+	return m_item->Animation.IsAirborne;
+}
+
+/// Set the moveable's airborne status
+// @function Moveable:SetAirborne
+// @tparam (bool) New airborn status for Lara.
+void LaraObject::SetAirborne(bool newAirborne)
+{
+	m_item->Animation.IsAirborne = newAirborne;
 }
 
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
@@ -289,6 +305,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetWet, &LaraObject::GetWet,
 			ScriptReserved_SetSprintEnergy, &LaraObject::SetSprintEnergy,
 			ScriptReserved_GetSprintEnergy, &LaraObject::GetSprintEnergy,
+			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
+			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,

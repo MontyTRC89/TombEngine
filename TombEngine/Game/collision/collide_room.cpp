@@ -150,7 +150,7 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 
-	Random::TestProbability(0.5f);
+	Random::TestProbability(1 / 2.0f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace
@@ -166,6 +166,11 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 
 	result.RoomNumber = room;
 	return result;
+}
+
+CollisionResult GetCollision(const GameVector& point)
+{
+	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
 }
 
 // A reworked legacy GetFloorHeight() function which writes data
@@ -197,19 +202,15 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.BottomBlock = floor;
 
 	// Get tilts.
-	result.FloorTilt = floor->TiltXZ(x, z, true);
-	result.CeilingTilt = floor->TiltXZ(x, z, false);
+	result.FloorTilt = floor->GetSurfaceTilt(x, z, true);
+	result.CeilingTilt = floor->GetSurfaceTilt(x, z, false);
 
-	// Split, bridge and slope data
-	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
+	// Split, bridge and slope data.
+	result.Position.DiagonalStep = floor->IsSurfaceDiagonalStep(true);
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
 	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4; // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
-
-	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
-	/*if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
-		result.FloorTilt = Vector2::Zero;*/
 
 	return result;
 }
@@ -830,7 +831,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, short constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
@@ -847,29 +848,29 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2f(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
 		0,
-		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
-	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))) -
+		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
-	// Rotate X axis if forward height difference is not too significant.
+	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
-	// Rotate Z axis if lateral height difference is not too significant.
+	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }
 
 int GetQuadrant(short angle)
 {
-	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
+	return (unsigned short(angle + ANGLE(45.0f)) / ANGLE(90.0f));
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
@@ -949,10 +950,10 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ffpZ = eZ + frontFloorProbeOffset * c;
 
 			// Calculate block min/max points to filter out out-of-bounds checks.
-			float minX = floor(ffpX / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float minZ = floor(ffpZ / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float maxX =  ceil(ffpX / WALL_SIZE) * WALL_SIZE + 1.0f;
-			float maxZ =  ceil(ffpZ / WALL_SIZE) * WALL_SIZE + 1.0f;
+			float minX = floor(ffpX / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float minZ = floor(ffpZ / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float maxX =  ceil(ffpX / BLOCK(1)) * BLOCK(1) + 1.0f;
+			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
 			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
@@ -1072,7 +1073,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				};
 
 				// If split angle exists, take split plane into account too.
-				auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
+				auto useSplitAngle = (useCeilingLedge ? block->IsSurfaceSplit(false) : block->IsSurfaceSplit(true));
 
 				// Find closest block edge plane.
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
@@ -1099,7 +1100,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 						if (i == 4)
 						{
-							auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(eX, eZ) : block->SectorPlane(eX, eZ);
+							auto usedSectorPlane = useCeilingLedge ? block->GetSurfacePlaneIndex(eX, eZ, false) : block->GetSurfacePlaneIndex(eX, eZ, true);
 							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90.0f);
 						}
 						else
@@ -1146,7 +1147,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 		// A case when all 3 results are different (no priority) or prioritized result is a long-distance misfire.
 
-		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > BLOCK(1 / 2.0f))
 		{
 			// Prioritize angle which is similar to coll setup's forward angle.
 			// This helps to solve some borderline cases with diagonal shimmying,

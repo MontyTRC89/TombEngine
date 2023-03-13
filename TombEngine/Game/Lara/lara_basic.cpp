@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
@@ -1393,7 +1393,6 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->HitPoints = -1;
-	lara->Air = -1;
 
 	ShiftItem(item, coll);
 

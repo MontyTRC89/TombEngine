@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Entity/tr5_lion.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -9,23 +10,33 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LION_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto LION_BITE_ATTACK_DAMAGE	 = 60;
 
-	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(BLOCK(1.25f));
+	constexpr auto LION_BITE_ATTACK_RANGE	= SQUARE(BLOCK(0.7f));
+	constexpr auto LION_ATTACK_RANGE		= SQUARE(BLOCK(0.4f));
+
+	constexpr auto LION_WALK_CHANCE = 63 / 64.0f;
+	constexpr auto LION_ROAR_CHANCE = 1 / 256.0f;
+
+	constexpr auto LION_HEAD_DISTANCE = BLOCK(0.4f);
+
+	constexpr auto LION_WALK_TURN_RATE_MAX	 = ANGLE(2.0f);
+	constexpr auto LION_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
+	constexpr auto LION_ATTACK_TURN_RATE_MAX = ANGLE(1.0f);
 
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
-	const vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
+	const auto LionAttackJoints = std::vector<unsigned int>{ 3, 6, 21 };
 
 	enum LionState
 	{
@@ -62,151 +73,176 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, LION_ANIM_IDLE);
 	}
 
 	void LionControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		if (!CreatureActive(itemNumber))
+			return;
 
-		short angle = 0;
-		short tilt = 0;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 
-		if (CreatureActive(itemNumber))
+		bool isTargetAhead = false;
+
+		if (item->HitPoints <= 0)
 		{
-			auto* creature = GetCreatureInfo(item);
+			item->HitPoints = 0;
 
-			if (item->HitPoints <= 0)
+			if (item->Animation.ActiveState != LION_STATE_DEATH)
+				SetAnimation(item, LionDeathAnims[Random::GenerateInt(0, LionDeathAnims.size() - 1)]);
+		}
+		else
+		{
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
+
+			// NOTE: Because the lion is quite big, AI.ahead doesn't calculate the lion's head angle properly.
+			// Calculate manually like with tr1_giant_mutant.
+
+			auto forwardVector = Vector3(
+				cos(item->Pose.Orientation.x) * sin(item->Pose.Orientation.y),
+				-sin(item->Pose.Orientation.x),
+				cos(item->Pose.Orientation.x) * cos(item->Pose.Orientation.y));
+			forwardVector.Normalize();
+			forwardVector *= LION_HEAD_DISTANCE;
+
+			short headAngle = (short)phd_atan(
+				creature->Target.z - item->Pose.Position.z + forwardVector.z,
+				creature->Target.x - item->Pose.Position.x + forwardVector.x) -
+				item->Pose.Orientation.y;
+			isTargetAhead = (headAngle > -FRONT_ARC && headAngle < FRONT_ARC);
+
+			if (isTargetAhead)
+				joint1 = headAngle;
+
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
+
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
+			joint0 = headingAngle * -16;
+
+			switch (item->Animation.ActiveState)
 			{
-				item->HitPoints = 0;
+			case LION_STATE_IDLE:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
-				if (item->Animation.ActiveState != LION_STATE_DEATH)
-					SetAnimation(item, LionDeathAnims[GenerateInt(0, LionDeathAnims.size() - 1)]);
-			}
-			else
-			{
-				AI_INFO AI;
-				CreatureAIInfo(item, &AI);
-
-				if (AI.ahead)
-					joint1 = AI.angle;
-
-				GetCreatureMood(item, &AI, true);
-				CreatureMood(item, &AI, true);
-
-				angle = CreatureTurn(item, creature->MaxTurn);
-				joint0 = angle * -16;
-
-				switch (item->Animation.ActiveState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
-				case LION_STATE_IDLE:
-					creature->MaxTurn = 0;
+					item->Animation.TargetState = item->Animation.RequiredState;
+					break;
+				}
 
-					if (item->Animation.RequiredState)
+				if (creature->Mood == MoodType::Bored)
+				{
+					if (Random::TestProbability(LION_WALK_CHANCE))
+						item->Animation.TargetState = LION_STATE_WALK_FORWARD;
+
+					break;
+				}
+
+				if (isTargetAhead && ai.bite)
+				{
+					if (ai.distance >= LION_ATTACK_RANGE)
 					{
-						item->Animation.TargetState = item->Animation.RequiredState;
-						break;
-					}
-
-					if (creature->Mood == MoodType::Bored)
-					{
-						if (!(GetRandomControl() & 0x3F))
-							item->Animation.TargetState = LION_STATE_WALK_FORWARD;
-
-						break;
-					}
-
-					if (AI.ahead)
-					{
-						if (item->TouchBits.Test(LionAttackJoints))
+						if (ai.distance <= LION_BITE_ATTACK_RANGE)
 						{
 							item->Animation.TargetState = LION_STATE_BITE_ATTACK;
 							break;
 						}
 
-						if (AI.distance < LION_POUNCE_ATTACK_RANGE)
+						if (ai.distance < LION_POUNCE_ATTACK_RANGE)
 						{
 							item->Animation.TargetState = LION_STATE_POUNCE_ATTACK;
 							break;
 						}
 					}
-
-					item->Animation.TargetState = LION_STATE_RUN_FORWARD;
-					break;
-
-				case LION_STATE_WALK_FORWARD:
-					creature->MaxTurn = ANGLE(2.0f);
-
-					if (creature->Mood == MoodType::Bored)
-					{
-						if (TestProbability(1.0f / 256))
-						{
-							item->Animation.TargetState = LION_STATE_IDLE;
-							item->Animation.RequiredState = LION_STATE_ROAR;
-						}
-					}
-					else
-						item->Animation.TargetState = LION_STATE_IDLE;
-
-					break;
-
-				case LION_STATE_RUN_FORWARD:
-					creature->MaxTurn = ANGLE(5.0f);
-					tilt = angle;
-
-					if (creature->Mood != MoodType::Bored)
-					{
-						if (AI.ahead && AI.distance < LION_POUNCE_ATTACK_RANGE)
-							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (item->TouchBits.Test(LionAttackJoints) && AI.ahead)
-							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (creature->Mood != MoodType::Escape)
-						{
-							if (TestProbability(1.0f / 256))
-							{
-								item->Animation.TargetState = LION_STATE_IDLE;
-								item->Animation.RequiredState = LION_STATE_ROAR;
-							}
-						}
-					}
-					else
-						item->Animation.TargetState = LION_STATE_IDLE;
-
-					break;
-
-				case LION_STATE_POUNCE_ATTACK:
-					if (!item->Animation.RequiredState &&
-						item->TouchBits.Test(LionAttackJoints))
-					{
-						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
-						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
-						item->Animation.RequiredState = LION_STATE_IDLE;
-					}
-
-					break;
-
-				case LION_STATE_BITE_ATTACK:
-					creature->MaxTurn = ANGLE(1.0f);
-
-					if (!item->Animation.RequiredState &&
-						item->TouchBits.Test(LionAttackJoints))
-					{
-						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
-						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
-						item->Animation.RequiredState = LION_STATE_IDLE;
-					}
-
-					break;
 				}
+
+				item->Animation.TargetState = LION_STATE_RUN_FORWARD;
+				break;
+
+			case LION_STATE_WALK_FORWARD:
+				creature->MaxTurn = LION_WALK_TURN_RATE_MAX;
+
+				if (creature->Mood == MoodType::Bored && Random::TestProbability(LION_ROAR_CHANCE))
+					item->Animation.TargetState = LION_STATE_ROAR;
+				else
+					item->Animation.TargetState = LION_STATE_IDLE;
+
+			break;
+
+			case LION_STATE_RUN_FORWARD:
+				creature->MaxTurn = LION_RUN_TURN_RATE_MAX;
+				tiltAngle = headingAngle;
+
+				if (creature->Mood != MoodType::Bored)
+				{
+					if (isTargetAhead &&
+						ai.bite &&
+						ai.distance < LION_POUNCE_ATTACK_RANGE &&
+						ai.distance >= LION_ATTACK_RANGE)
+					{
+						item->Animation.TargetState = LION_STATE_IDLE;
+					}
+					else if (creature->Mood != MoodType::Escape)
+					{
+						if (Random::TestProbability(LION_ROAR_CHANCE))
+							item->Animation.TargetState = LION_STATE_ROAR;
+					}
+				}
+				else
+				{
+					item->Animation.TargetState = LION_STATE_IDLE;
+				}
+
+			break;
+
+			case LION_STATE_POUNCE_ATTACK:
+				creature->MaxTurn = LION_ATTACK_TURN_RATE_MAX;
+
+				if (!creature->Flags &&
+					item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_POUNCE_ATTACK_END) &&
+					item->TouchBits.Test(LionAttackJoints))
+				{
+					DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
+					CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
+					creature->Flags = 1;
+				}
+
+				break;
+
+			case LION_STATE_BITE_ATTACK:
+				creature->MaxTurn = LION_ATTACK_TURN_RATE_MAX;
+
+				if (!creature->Flags &&
+					item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_BITE_ATTACK) &&
+					item->TouchBits.Test(LionAttackJoints))
+				{
+					DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
+					CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
+					creature->Flags = 1;
+				}
+
+				break;
 			}
 		}
 
-		CreatureTilt(item, tilt);
+		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
+
+		auto radius = Vector2(object->radius);
+		AlignEntityToSurface(item, radius);
 	}
 }

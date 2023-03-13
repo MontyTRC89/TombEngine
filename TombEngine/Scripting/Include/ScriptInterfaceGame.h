@@ -14,7 +14,8 @@ using VarMapVal = std::variant<
 	std::reference_wrapper<SinkInfo>,
 	std::reference_wrapper<SoundSourceInfo>,
 	std::reference_wrapper<TriggerVolume>,
-	std::reference_wrapper<AI_OBJECT>>;
+	std::reference_wrapper<AI_OBJECT>,
+	std::reference_wrapper<ROOM_INFO>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;
@@ -25,7 +26,32 @@ struct FuncName
 	std::string name;
 };
 
-using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3i, FuncName>;
+enum class SavedVarType
+{
+	Bool,
+	String,
+	Number,
+	IndexTable,
+	Vec3,
+	Rotation,
+	Color,
+	FuncName,
+
+	NumTypes
+};
+
+using SavedVar = std::variant<
+	bool,
+	std::string,
+	double,
+	IndexTable,
+	Vector3i, //Vec3
+	Vector3, //Rotation
+	D3DCOLOR, //Color
+	FuncName>;
+
+// Make sure SavedVarType and SavedVar have the same number of types
+static_assert(static_cast<int>(SavedVarType::NumTypes) == std::variant_size_v<SavedVar>);
 
 class ScriptInterfaceGame
 {

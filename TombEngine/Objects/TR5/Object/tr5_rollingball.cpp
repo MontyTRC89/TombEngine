@@ -20,21 +20,26 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) && 
-		TestCollision(ballItem, laraItem))
+	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
+		!TestCollision(ballItem, laraItem))
 	{
-		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.Velocity.y))
-		{
-			laraItem->HitPoints = 0;
+		return;
+	}
 
-			if (!laraItem->Animation.IsAirborne && 
-				!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
-			{
-				SetAnimation(laraItem, LA_BOULDER_DEATH);
-			}
+	if (TriggerActive(ballItem) && 
+		(ballItem->ItemFlags[0] || ballItem->ItemFlags[1] || ballItem->Animation.Velocity.y))
+	{
+		laraItem->HitPoints = 0;
+
+		if (!laraItem->Animation.IsAirborne && 
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
+		{
+			SetAnimation(laraItem, LA_BOULDER_DEATH);
 		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
+	}
+	else
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
 	}
 }
 
@@ -302,7 +307,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
 
 	TestTriggers(item, true);
-	DoVehicleCollision(*item, CLICK(0.9f));
+	DoVehicleCollision(*item, bigRadius * 0.9f);
 }
 
 void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
@@ -370,8 +375,8 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 
 void ClassicRollingBallControl(short itemNum)
 {
-	short x, z, dist, oldx, oldz, roomNum;
-	short y1, y2, ydist;
+	short roomNum;
+	int y1, y2, ydist, x, z, dist, oldx, oldz;
 	FloorInfo* floor;
 	GameVector* old;
 	ROOM_INFO* r;
@@ -407,7 +412,8 @@ void ClassicRollingBallControl(short itemNum)
 
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-		TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNum, true);
+		TestTriggers(item, true);
+		DoVehicleCollision(*item, CLICK(1.5f));
 
 		if (item->Pose.Position.y >= item->Floor - CLICK(1))
 		{
@@ -420,7 +426,6 @@ void ClassicRollingBallControl(short itemNum)
 				Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
 		}
 
-//		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
 		if (item->ObjectNumber == ID_CLASSIC_ROLLING_BALL)
 		{
 			dist = 320;
@@ -482,7 +487,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState; 
 			item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 			RemoveActiveItem(itemNum);
 		}
 	}

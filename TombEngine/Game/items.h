@@ -13,9 +13,15 @@ using namespace TEN::Utils;
 
 enum GAME_OBJECT_ID : short;
 
-constexpr auto NO_ITEM = -1;
+constexpr auto NO_ITEM		  = -1;
 constexpr auto NOT_TARGETABLE = -16384;
-constexpr auto NUM_ITEMS = 1024;
+
+constexpr auto NUM_ITEMS	 = 1024;
+constexpr auto NUM_ITEM_FLAGS = 8;
+
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS = 0;
+constexpr int		   NO_JOINT = -1;
 
 enum AIObjectType
 {
@@ -39,21 +45,12 @@ enum ItemStatus
 
 enum ItemFlags
 {
+	IFLAG_TRIGGERED       = (1 << 5),
 	IFLAG_CLEAR_BODY	  = (1 << 7),
 	IFLAG_INVISIBLE		  = (1 << 8),
 	IFLAG_REVERSE		  = (1 << 14),
 	IFLAG_KILLED		  = (1 << 15),
-	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
-};
-
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
-
-enum class JointBitType
-{
-	Touch,
-	Mesh,
-	MeshSwap
+	IFLAG_ACTIVATION_MASK = 0x3E00 // Bits 9-13 (IFLAG_CODEBITS)
 };
 
 enum class EffectType
@@ -64,16 +61,17 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
+	Cadaver,
 	Custom
 };
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = -1;
-	int FrameNumber	  = -1;
-	int ActiveState	  = -1;
-	int TargetState	  = -1;
-	int RequiredState = -1; // TODO: Phase out this weird feature.
+	int AnimNumber	  = 0;
+	int FrameNumber	  = 0;
+	int ActiveState	  = 0;
+	int TargetState	  = 0;
+	int RequiredState = NO_STATE;
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
@@ -81,9 +79,12 @@ struct EntityAnimationData
 
 struct EntityModelData
 {
-	int BaseMesh;
-	std::vector<int> MeshIndex = {};
-	std::vector<BoneMutator> Mutator = {};
+	int BaseMesh = 0;
+
+	Vector4 Color = Vector4::Zero;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutator   = {};
 };
 
 struct EntityCallbackData
@@ -96,14 +97,14 @@ struct EntityCallbackData
 
 struct EntityEffectData
 {
-	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::Zero;
-	Vector3 PrimaryEffectColor = Vector3::Zero;
-	Vector3 SecondaryEffectColor = Vector3::Zero;
-	int Count = -1;
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= -1;
 };
 
-//todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
+// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -136,13 +137,12 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	Vector4 Color;
 
-	BitField TouchBits	  = BitField();
-	BitField MeshBits	  = BitField();
+	BitField TouchBits = BitField();
+	BitField MeshBits  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
-	short ItemFlags[8];
+	short ItemFlags[NUM_ITEM_FLAGS];
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?
@@ -150,12 +150,15 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	bool TestOcb(short ocbFlags);
+	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
-
-	bool TestFlags(short id, short value);
-	void SetFlags(short id, short value);
+	
+	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
+	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
+	short GetFlagField(int id) const;				// ItemFlags[id]
+	void  SetFlagField(int id, short flags);		// ItemFlags[id] = flags
+	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
@@ -172,10 +175,9 @@ bool TestState(int refState, const std::vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNumber);
+void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 void InitialiseFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);
@@ -186,7 +188,11 @@ void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
-std::vector<int> FindAllItems(short objectNumber);
-ItemInfo* FindItem(int objectNumber);
+const std::string& GetObjectName(GAME_OBJECT_ID objectID);
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
+ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
+void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
+void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);

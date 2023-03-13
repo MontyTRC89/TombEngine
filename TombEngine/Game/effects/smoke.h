@@ -1,10 +1,7 @@
 #pragma once
-#include <d3d11.h>
-#include <SimpleMath.h>
-#include <array>
 
-struct ItemInfo;
 enum class LaraWeaponType;
+struct ItemInfo;
 
 namespace TEN::Effects::Smoke
 {

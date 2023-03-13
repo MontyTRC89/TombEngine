@@ -27,13 +27,15 @@ template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++2
 
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
 
 class ITEM_DATA
 {
-	std::variant<std::nullptr_t,
+	std::variant<
+		std::nullptr_t,
 		char,
 		short,
 		int,
@@ -55,7 +57,7 @@ class ITEM_DATA
 		LaraInfo*,
 		CreatureInfo,
 		WraithInfo,
-		LaserHeadInfo,
+		GuardianInfo,
 		QuadBikeInfo,
 		BigGunInfo,
 		MotorbikeInfo,

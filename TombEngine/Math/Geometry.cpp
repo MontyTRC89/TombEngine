@@ -2,10 +2,11 @@
 #include "Math/Geometry.h"
 
 #include "Math/Constants.h"
-#include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/Pose.h"
-#include "Math/Containers/Vector3i.h"
 #include "Math/Legacy.h"
+#include "Math/Objects/AxisAngle.h"
+#include "Math/Objects/EulerAngles.h"
+#include "Math/Objects/Pose.h"
+#include "Math/Objects/Vector3i.h"
 
 namespace TEN::Math::Geometry
 {
@@ -14,18 +15,14 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
 	{
-		if (forward == 0.0f && down == 0.0f && right == 0.0f)
-			return point;
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3()));
+	}
 
-		float sinHeading = phd_sin(headingAngle);
-		float cosHeading = phd_cos(headingAngle);
-
-		return Vector3(
-			point.x + ((forward * sinHeading) + (right * cosHeading)),
-			point.y + down,
-			point.z + ((forward * cosHeading) - (right * sinHeading)));
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, relOffset.ToVector3()));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
@@ -33,25 +30,41 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	{
+		if (forward == 0.0f && down == 0.0f && right == 0.0f)
+			return point;
+
+		auto orient = EulerAngles(0, headingAngle, 0);
+		auto relOffset = Vector3(right, down, forward);
+		return TranslatePoint(point, orient, relOffset);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
+	{
+		auto orient = EulerAngles(0, headingAngle, 0);
+		return TranslatePoint(point, orient, relOffset);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset)
+	{
+		auto rotMatrix = orient.ToRotationMatrix();
+		return (point + Vector3::Transform(relOffset, rotMatrix));
+	}
+
+	// NOTE: Roll (Z axis) of EulerAngles orientation is disregarded.
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
 
-		float sinX = phd_sin(orient.x);
-		float cosX = phd_cos(orient.x);
-		float sinY = phd_sin(orient.y);
-		float cosY = phd_cos(orient.y);
-
-		return Vector3(
-			point.x + (distance * (sinY * cosX)),
-			point.y - (distance * sinX),
-			point.z + (distance * (cosX * cosY)));
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+		auto direction = orient.ToDirection();
+		return TranslatePoint(point, direction, distance);
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
@@ -64,6 +77,32 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation)
+	{
+		auto rotMatrix = rotation.ToRotationMatrix();
+		return Vector3::Transform(point, rotMatrix);
+	}
+
+	Vector3 GetFloorNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
+	Vector3 GetCeilingNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
@@ -72,19 +111,21 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSteepnessAngle(Vector2 tilt)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force)
 	{
-		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
-
-		return (short)sqrt(SQUARE(tilt.x * qtrBlockAngleIncrement) + SQUARE(tilt.y * qtrBlockAngleIncrement));
-	}
-
-	short GetSurfaceAspectAngle(Vector2 tilt)
-	{
-		if (tilt == Vector2::Zero)
+		if (normal == -force)
 			return 0;
 
-		return FROM_RAD(atan2(-tilt.x, -tilt.y));
+		return FROM_RAD(acos(normal.Dot(-force)));
+	}
+
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force)
+	{
+		if (normal == -force)
+			return 0;
+
+		// TODO: Consider normal of downward force.
+		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -117,11 +158,30 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
+	{
+		// TODO: Consider normal of downward force.
+
+		// Determine relative angle properties of normal.
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
+
+		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
+		float sinDeltaAngle = phd_sin(deltaAngle);
+		float cosDeltaAngle = phd_cos(deltaAngle);
+
+		// Calculate relative orientation adhering to normal.
+		return EulerAngles(
+			-slopeAngle * cosDeltaAngle,
+			orient2D,
+			slopeAngle * sinDeltaAngle);
+	}
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
-	
+
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)
@@ -199,5 +259,10 @@ namespace TEN::Math::Geometry
 			return true;
 
 		return false;
+	}
+
+	const int FastVectorsDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+	{
+		return sqrt(SQUARE(x2 - x1) + SQUARE(y2 - y1) + SQUARE(z2 - z1));
 	}
 }

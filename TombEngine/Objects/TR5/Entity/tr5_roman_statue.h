@@ -1,9 +1,13 @@
 #pragma once
-#include "Math/Math.h"
+
+class GameVector;
+class Vector3i;
+struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseRomanStatue(short itemNumber);
 	void RomanStatueControl(short itemNumber);
-	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject);
+	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
+	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject);;
 }

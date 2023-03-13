@@ -20,6 +20,6 @@ namespace TEN::Entities::Vehicles
 	void FireUpvHarpoon(ItemInfo& upvItem, ItemInfo& laraItem);
 	void UpvBackgroundCollision(ItemInfo& upvItem, ItemInfo& laraItem);
 	void DoUpvCurrent(ItemInfo& upvItem, ItemInfo& laraItem);
-	void TriggerUpvEffects(short itemNumber);
+	void UpvEffects(short itemNumber);
 	void TriggerUpvMistEffect(long x, long y, long z, long velocity, short angle);
 }

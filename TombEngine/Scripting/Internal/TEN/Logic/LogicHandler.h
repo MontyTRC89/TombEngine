@@ -51,13 +51,18 @@ private:
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
 	sol::protected_function										m_onControlPhase{};
+	sol::protected_function										m_preSave{};
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
 
+	std::vector<std::variant<std::string, uint32_t>> m_savedVarPath;
+
 	bool m_shortenedCalls = false;
+
+	std::string GetRequestedPath() const;
 
 	void ResetLevelTables();
 	void ResetGameTables();

@@ -14,11 +14,13 @@ Constants for effect IDs.
 
 The following constants are inside EffectID.
 
+	NONE
 	FIRE
 	SPARKS
 	SMOKE
-	ELECTRICDEATH
-	LASERDEATH
+	ELECTRICIGNITE
+	REDIGNITE
+	CADAVER
 	CUSTOM
 
 @section Effects.EffectID
@@ -36,5 +38,6 @@ static const std::unordered_map<std::string, EffectType> kEffectIDs
 	{"SMOKE", EffectType::Smoke},
 	{"ELECTRICIGNITE", EffectType::ElectricIgnite},
 	{"REDIGNITE", EffectType::RedIgnite},
+	{"CADAVER", EffectType::Cadaver},
 	{"CUSTOM", EffectType::Custom}
 };

@@ -60,7 +60,7 @@ namespace TEN::Entities::Switches
 
 		// Door was not found, do ordinary collision and exit.
 
-		if (door == nullptr)
+		if ((door == nullptr) && (!switchItem->TriggerFlags))
 		{
 			ObjectCollision(itemNum, laraItem, coll);
 			return;
@@ -96,7 +96,7 @@ namespace TEN::Entities::Switches
 						switchItem->Animation.TargetState = SWITCH_ON;
 						switchItem->Status = ITEM_ACTIVE;
 
-						if (door != NULL)
+						if ((door != nullptr) && (!switchItem->TriggerFlags))
 						{
 							if (!door->opened)
 							{
@@ -131,7 +131,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->Animation.TargetState = LS_IDLE;
+				LaraItem->Animation.TargetState = LS_COGWHEEL_UNGRAB;
 				switchItem->Animation.TargetState = SWITCH_OFF;
 			}
 
@@ -139,25 +139,31 @@ namespace TEN::Entities::Switches
 			{
 				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 10)
 				{
-					auto* doorItem = &g_Level.Items[Lara.InteractedItem];
-					doorItem->ItemFlags[0] = COG_DOOR_TURN;
+					if (!switchItem->TriggerFlags)
+					{
+						auto* doorItem = &g_Level.Items[Lara.InteractedItem];
+						doorItem->ItemFlags[0] = COG_DOOR_TURN;
+					}
 				}
 			}
 		}
 		else
 		{
-			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+			if ((switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+				&& (LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE))
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
 
-				LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-				LaraItem->Animation.TargetState = LS_IDLE;
-				LaraItem->Animation.ActiveState = LS_IDLE;
 				Lara.Control.HandStatus = HandStatus::Free;
+			}
+			else
+			{
+				//If Lara is repeating the PULL animation (because player dropped after the frame check).
+				//do the wheel animation again.
+				switchItem->Animation.TargetState = SWITCH_ON;
 			}
 		}
 	}

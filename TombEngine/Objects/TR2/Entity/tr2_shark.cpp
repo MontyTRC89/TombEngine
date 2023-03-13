@@ -11,14 +11,12 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
 
 	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
-	const vector<unsigned int> SharkBiteAttackJoints = { 10, 12, 13 };
+	const auto SharkBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	void SharkControl(short itemNumber)
 	{
@@ -43,7 +41,6 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 

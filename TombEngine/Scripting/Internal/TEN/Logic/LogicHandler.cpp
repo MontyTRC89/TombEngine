@@ -4,15 +4,16 @@
 #include <filesystem>
 #include "ScriptAssert.h"
 #include "Game/savegame.h"
-#include "Sound/sound.h"
 #include "ReservedScriptNames.h"
-#include "Game/effects/lightning.h"
+#include "Game/effects/Electricity.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Rotation/Rotation.h"
+#include "Color/Color.h"
 #include "LevelFunc.h"
 
-using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Electricity;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.
@@ -36,13 +37,8 @@ static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
-	switch (value.get_type())
+	auto PutVar = [](sol::table tab, sol::object key, sol::object value)
 	{
-	case sol::type::lua_nil:
-	case sol::type::boolean:
-	case sol::type::number:
-	case sol::type::string:
-	case sol::type::table:
 		switch (key.get_type())
 		{
 		case sol::type::number:
@@ -53,8 +49,10 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
 		}
-		break;
-	default:
+	};
+
+	auto UnsupportedValue = [](sol::table tab, sol::object key)
+	{
 		key.push();
 		size_t strLen;
 		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
@@ -68,7 +66,33 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
 		}
 		key.pop();
+	};
+
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+	case sol::type::boolean:
+	case sol::type::number:
+	case sol::type::string:
+	case sol::type::table:
+		PutVar(tab, key, value);
 		break;
+	case sol::type::userdata:
+	{
+		if (value.is<Vec3>() ||
+			value.is<Rotation>() ||
+			value.is<ScriptColor>())
+		{
+			PutVar(tab, key, value);
+		}
+		else
+		{
+			UnsupportedValue(tab, key);
+		}
+	}
+	break;
+	default:
+		UnsupportedValue(tab, key);
 	}
 }
 
@@ -313,11 +337,13 @@ void LogicHandler::FreeLevelScripts()
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
+	m_preSave = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
+//Used when loading
 void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 	ResetGameTables();
@@ -350,17 +376,27 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 					// outside of these bounds? - squidshire 30/04/2022
 					if (std::trunc(theNum) == theNum && theNum <= INT64_MAX && theNum >= INT64_MIN)
 					{
-						solTables[i][vars[first]] = static_cast<int64_t>(theNum);
+						solTables[i][vars[first]] = (int64_t)theNum;
 					}
 					else
 					{
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (std::holds_alternative<Vector3i>(vars[second]))
+				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto theVec = Vec3{ std::get<Vector3i>(vars[second]) };
+					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
 					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Rotation))
+				{
+					auto theVec = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
+				else if (vars[second].index() == int(SavedVarType::Color))
+				{
+					auto theCol = D3DCOLOR{std::get<int(SavedVarType::Color)>(vars[second]) };
+					solTables[i][vars[first]] = ScriptColor{theCol};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
@@ -392,6 +428,50 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	}
 }
 
+
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom & var, MapType & varsMap, size_t & nVars, std::vector<SavedVar> & vars)
+{
+	auto [first, second] = varsMap.insert(std::make_pair(&var, nVars));
+
+	if (second)
+	{
+		SavedVar savedVar;
+		TypeTo varTo = (TypeTo)var;
+		savedVar.emplace<(int)TypeEnum>(varTo);
+		vars.push_back(varTo);
+		++nVars;
+	}
+
+	return first->second;
+}
+
+std::string LogicHandler::GetRequestedPath() const
+{
+	std::string path;
+	for (uint32_t i = 0; i < m_savedVarPath.size(); ++i)
+	{
+		auto key = m_savedVarPath[i];
+		if (std::holds_alternative<uint32_t>(key))
+		{
+			path += "[" + std::to_string(std::get<uint32_t>(key)) + "]";
+		}
+		else if (std::holds_alternative<std::string>(key))
+		{
+			auto part = std::get<std::string>(key);
+			if (i > 0)
+			{
+				path += "." + part;
+			}
+			else
+			{
+				path += part;
+			};
+		}
+	}
+	return path;
+}
+
+//Used when saving
 void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 	sol::table tab{ *m_handler.GetState(), sol::create };
@@ -411,22 +491,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	// The purpose of this is to only store each value once, and to fill our tables with
 	// indices to the values rather than copies of the values.
-	auto handleNum = [&](double num)
+
+	auto handleNum = [&](auto num, auto map)
 	{
-		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
-
-		if (second)
-		{
-			vars.push_back(num);
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleBool = [&](bool num)
-	{
-		auto [first, second] = boolMap.insert(std::make_pair(num, nVars));
+		auto [first, second] = map.insert(std::make_pair(num, nVars));
 
 		if (second)
 		{
@@ -445,19 +513,6 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
-			++nVars;
-		}
-
-		return first->second;
-	};
-
-	auto handleVec3 = [&](Vec3 const & vec)
-	{
-		auto [first, second] = varsMap.insert(std::make_pair(&vec, nVars));
-
-		if (second)
-		{
-			vars.push_back(vec);
 			++nVars;
 		}
 
@@ -487,29 +542,50 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 			auto id = first->second;
 
 			vars.push_back(IndexTable{});
+
 			for (auto& [first, second] : obj)
 			{
+				bool validKey = true;
 				uint32_t keyIndex = 0;
-				
+				std::variant<std::string, uint32_t> key{uint32_t(0)};
 				// Strings and numbers can be keys AND values
 				switch (first.get_type())
 				{
 				case sol::type::string:
+				{
 					keyIndex = handleStr(first);
+					key = std::string{ first.as<sol::string_view>().data() };
+					m_savedVarPath.push_back(key);
+				}
 					break;
 				case sol::type::number:
-					keyIndex = handleNum(first.as<double>());
+				{
+					if (double data = first.as<double>(); std::floor(data) != data)
+					{
+						ScriptAssert(false, "Tried using a non-integer number " + std::to_string(data) + " as a key in table " + GetRequestedPath());
+						validKey = false;
+					}
+					else
+					{
+						keyIndex = handleNum(data, numMap);
+						key = static_cast<uint32_t>(data);
+						m_savedVarPath.push_back(key);
+					}
+				}
 					break;
 				default:
-					ScriptAssert(false, "Tried saving an unsupported type as a key");
+					validKey = false;
+					ScriptAssert(false, "Tried using an unsupported type as a key in table " + GetRequestedPath());
 				}
+
+				if (!validKey)
+					continue;
 
 				auto putInVars = [&vars, id, keyIndex](uint32_t valIndex)
 				{
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 				};
 
-				uint32_t valIndex = 0;
 				switch (second.get_type())
 				{
 				case sol::type::table:
@@ -519,24 +595,30 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					putInVars(handleStr(second));
 					break;
 				case sol::type::number:
-					putInVars(handleNum(second.as<double>()));
+					putInVars(handleNum(second.as<double>(), numMap));
 					break;
 				case sol::type::boolean:
-					putInVars(handleBool(second.as<bool>()));
+					putInVars(handleNum(second.as<bool>(), boolMap));
 					break;
 				case sol::type::userdata:
 				{
 					if(second.is<Vec3>())
-						putInVars(handleVec3(second.as<Vec3>()));
+						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
+					else if(second.is<Rotation>())
+						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, nVars, vars));
+					else if(second.is<ScriptColor>())
+						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, nVars, vars));
 					else if(second.is<LevelFunc>())
 						putInVars(handleFuncName(second.as<LevelFunc>()));
 					else
-						ScriptAssert(false, "Tried saving an unsupported userdata as a value");
+						ScriptAssert(false, "Tried saving an unsupported userdata as a value; variable is " + GetRequestedPath());
 				}
-					break;
+				break;
 				default:
-					ScriptAssert(false, "Tried saving an unsupported type as a value");
+					ScriptAssert(false, "Tried saving an unsupported type as a value; variable is " + GetRequestedPath());
 				}
+
+				m_savedVarPath.pop_back();
 			}
 		}
 		return first->second;
@@ -796,10 +878,10 @@ __The order of loading is as follows:__
 5. The control loop, in which `OnControlPhase` will be called once per frame, begins.
 
 @tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
-@tfield function OnLoad Will be called when a saved game is loaded
+@tfield function OnLoad Will be called when a saved game is loaded, just *after* data is loaded
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
-@tfield function OnSave Will be called when the player saves the game
+@tfield function OnSave Will be called when the player saves the game, just *before* data is saved
 @tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
 @table LevelFuncs
 */
@@ -830,9 +912,9 @@ void LogicHandler::InitCallbacks()
 		}
 	};
 
-	assignCB(m_onStart, "OnStart");
-	assignCB(m_onLoad, "OnLoad");
-	assignCB(m_onControlPhase, "OnControlPhase");
-	assignCB(m_onSave, "OnSave");
-	assignCB(m_onEnd, "OnEnd");
+	assignCB(m_onStart, ScriptReserved_OnStart);
+	assignCB(m_onLoad, ScriptReserved_OnLoad);
+	assignCB(m_onControlPhase, ScriptReserved_OnControlPhase);
+	assignCB(m_onSave, ScriptReserved_OnSave);
+	assignCB(m_onEnd, ScriptReserved_OnEnd);
 }

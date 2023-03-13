@@ -847,7 +847,7 @@ namespace TEN::Entities::Vehicles
 	void SpawnSkidooSnow(ItemInfo& skidooItem)
 	{
 		auto material = GetCollision(&skidooItem).BottomBlock->Material;
-		if (material == FLOOR_MATERIAL::Ice || material == FLOOR_MATERIAL::Snow)
+		if (material == MaterialType::Ice || material == MaterialType::Snow)
 			TEN::Effects::TriggerSnowmobileSnow(&skidooItem);
 	}
 }

@@ -5,7 +5,8 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/Bubble.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -18,6 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -122,7 +124,6 @@ namespace TEN::Entities::Vehicles
 			return;
 
 		auto mountType = GetVehicleMountType(rBoatItem, *laraItem, *coll, RubberBoatMountTypes, RBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
-
 		if (mountType == VehicleMountType::None)
 		{
 			coll->Setup.EnableObjectPush = true;
@@ -282,17 +283,15 @@ namespace TEN::Entities::Vehicles
 			height != NO_HEIGHT)
 		{
 			SpawnRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem.Animation.Velocity.z), rBoatItem.Pose.Orientation.y + 0x8000, 0);
-			if ((GetRandomControl() & 1) == 0)
+			if (Random::TestProbability(1 / 2.0f))
 			{
-				auto pos = Vector3i(
+				auto pos = Vector3(
 					prop.x + (GetRandomControl() & 63) - 32,
 					prop.y + (GetRandomControl() & 15),
-					prop.z + (GetRandomControl() & 63) - 32
-				);
+					prop.z + (GetRandomControl() & 63) - 32);
 
-				short roomNumber = rBoatItem.RoomNumber;
-				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-				CreateBubble(&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				for (int i = 0; i < 5; i++)
+					SpawnBubble(pos, rBoatItem.RoomNumber);
 			}
 		}
 		else

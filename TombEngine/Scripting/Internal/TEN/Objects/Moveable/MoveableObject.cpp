@@ -114,7 +114,7 @@ static std::unique_ptr<Moveable> Create(
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
-			ptr->SetRoom(std::get<short>(room));
+			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
 			ptr->SetPos(pos, true);
@@ -146,17 +146,13 @@ void Moveable::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
-/// Enable the item, as if a trigger for it had been stepped on.
-// @function Moveable:Enable
 	ScriptReserved_Enable, &Moveable::EnableItem,
 
-/// Disable the item
-// @function Moveable:Disable
 	ScriptReserved_Disable, &Moveable::DisableItem,
 
-/// Make the item invisible. Use EnableItem to make it visible again.
-// @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
+
+	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
@@ -194,20 +190,14 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-/// Set the name of the function to be called when the moveable is shot by Lara
+/// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
 // @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-/// Set the function to be called called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
 /// Set the name of the function to be called when the moveable is destroyed/killed
@@ -307,15 +297,21 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// Get the value stored in ItemFlags[x] (x is the value of the parameter)
+/// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @treturn short id of the ItemFlags array
+// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @treturn int the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
-/// Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+/// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam short value to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+// @tparam short value to store in the moveable's ItemFlags[index]
+// @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
+
+	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
+
+	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -327,77 +323,20 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Color color the new color of the moveable 
 	ScriptReserved_SetColor, &Moveable::SetColor,
 
-/// Get AIBits of object
-// This will return a table with six values, each corresponding to
-// an active behaviour. If the object is in a certain AI mode, the table will
-// have a *1* in the corresponding cell. Otherwise, the cell will hold
-// a *0*.
-// 1 - guard
-// 2 - ambush
-// 3 - patrol 1
-// 4 - modify
-// 5 - follow
-// 6 - patrol 2
-// @function Moveable:GetAIBits
-// @treturn table a table of AI bits
 	ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
 			
-/// Set AIBits of object
-// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
-// (or more than one) had suddenly spawned beneath their feet.
-// @function Moveable:SetAIBits
-// @tparam table bits the table of AI bits
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-/// Get state of specified mesh visibility of object
-// Returns true if specified mesh is visible on an object, and false
-// if it is not visible.
-// @function Moveable:MeshIsVisible
-// @tparam int index of a mesh
-// @treturn bool visibility status
-	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
+	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
 			
-/// Makes specified mesh visible
-// Use this to show specified mesh of an object.
-// @function Moveable:ShowMesh
-// @tparam int index of a mesh
-	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
+	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
-/// Makes specified mesh invisible
-// Use this to hide specified mesh of an object.
-// @function Moveable:HideMesh
-// @tparam int index of a mesh
-	ScriptReserved_HideMesh, &Moveable::HideMesh,
-			
-/// Shatters specified mesh and makes it invisible
-// Note that you can re-enable mesh later by using ShowMesh().
-// @function Moveable:ShatterMesh
-// @tparam int index of a mesh
 	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
 
-/// Get state of specified mesh swap of object
-// Returns true if specified mesh is swapped on an object, and false
-// if it is not swapped.
-// @function Moveable:MeshIsSwapped
-// @tparam int index of a mesh
-// @treturn bool mesh swap status
-	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
+	ScriptReserved_GetMeshSwapped, &Moveable::GetMeshSwapped,
 			
-/// Set state of specified mesh swap of object
-// Use this to swap specified mesh of an object.
-// @function Moveable:SwapMesh
-// @tparam int index of a mesh
-// @tparam int index of a slot to get meshswap from
-// @tparam int (optional) index of a mesh from meshswap slot to use
 	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
 			
-/// Set state of specified mesh swap of object
-// Use this to bring back original unswapped mesh
-// @function Moveable:UnswapMesh
-// @tparam int index of a mesh to unswap
 	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 
 /// Get the hit status of the object
@@ -412,7 +351,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
+
+	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
@@ -473,7 +414,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
 
-
 void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
@@ -521,6 +461,11 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 }
 
+short Moveable::GetIndex() const
+{
+	return m_num;
+}
+
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
@@ -531,11 +476,27 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
@@ -612,7 +573,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
-				SetRoom(potentialNewRoom);
+				SetRoomNumber(potentialNewRoom);
 		}
 	}
 }
@@ -716,6 +677,10 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
 
+	case EffectType::Cadaver:
+		ItemSetAsCadaver(m_item, realTimeout);
+		break;
+
 	case EffectType::Custom:
 		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
 	}
@@ -744,17 +709,58 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn (short) the value contained in the LocationAI of the creature.
+short Moveable::GetLocationAI() const
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		return creature->LocationAI;
+	}
+	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	return 0;
+}
+
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam value: (short) value to store.
+void Moveable::SetLocationAI(short value)
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		creature->LocationAI = value;
+	}
+	else
+		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+}
 
 ScriptColor Moveable::GetColor() const
 {
-	return ScriptColor{ m_item->Color };
+	return ScriptColor{ m_item->Model.Color };
 }
 
-void Moveable::SetColor(ScriptColor const& col)
+void Moveable::SetColor(const ScriptColor& color)
 {
-	m_item->Color = col;
+	m_item->Model.Color = color;
 }
 
+/// Get AIBits of object
+// This will return a table with six values, each corresponding to
+// an active behaviour. If the object is in a certain AI mode, the table will
+// have a *1* in the corresponding cell. Otherwise, the cell will hold
+// a *0*.
+//
+// <br />1 - guard
+// <br />2 - ambush
+// <br />3 - patrol 1
+// <br />4 - modify
+// <br />5 - follow
+// <br />6 - patrol 2
+// @function Moveable:GetAIBits
+// @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
 {
 	static_assert(63 == ALL_AIOBJ);
@@ -768,6 +774,14 @@ aiBitsType Moveable::GetAIBits() const
 	return ret;
 }
 
+/// Set AIBits of object
+// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+// (or more than one) had suddenly spawned beneath their feet.
+// @function Moveable:SetAIBits
+// @tparam table bits the table of AI bits
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 void Moveable::SetAIBits(aiBitsType const & bits)
 {
 	for (size_t i = 0; i < bits.value().size(); ++i)
@@ -852,21 +866,29 @@ bool Moveable::GetHitStatus() const
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
+// @treturn Room current room of the object
+std::unique_ptr<Room> Moveable::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);
+}
+
+/// Get the current room number of the object
+// @function Moveable:GetRoomNumber
 // @treturn int number representing the current room of the object
-short Moveable::GetRoom() const
+int Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }
 
-/// Set room of object 
+/// Set room number of object 
 // Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
-// @function Moveable:SetRoom
+// @function Moveable:SetRoomNumber
 // @tparam int ID the ID of the new room 
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
+// sas:SetRoomNumber(destinationRoom)
 // sas:SetPosition(destinationPosition, false)
-void Moveable::SetRoom(short room)
+void Moveable::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)
@@ -895,7 +917,13 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
-bool Moveable::MeshIsVisible(int meshId) const
+/// Get state of specified mesh visibility of object
+// Returns true if specified mesh is visible on an object, and false
+// if it is not visible.
+// @function Moveable:GetMeshVisible
+// @int index index of a mesh
+// @treturn bool visibility status
+bool Moveable::GetMeshVisible(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
@@ -903,22 +931,26 @@ bool Moveable::MeshIsVisible(int meshId) const
 	return m_item->MeshBits.Test(meshId);
 }
 
-void Moveable::ShowMesh(int meshId)
+/// Makes specified mesh visible or invisible
+// Use this to show or hide a specified mesh of an object.
+// @function Moveable:SetMeshVisible
+// @int index index of a mesh
+// @bool visible true if you want the mesh to be visible, false otherwise
+void Moveable::SetMeshVisible(int meshId, bool visible)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->MeshBits.Set(meshId);
+	if (visible)
+		m_item->MeshBits.Set(meshId);
+	else
+		m_item->MeshBits.Clear(meshId);
 }
 
-void Moveable::HideMesh(int meshId)
-{
-	if (!MeshExists(meshId))
-		return;
-
-	m_item->MeshBits.Clear(meshId); 
-}
-
+/// Shatters specified mesh and makes it invisible
+// Note that you can re-enable mesh later by using SetMeshVisible().
+// @function Moveable:ShatterMesh
+// @int index index of a mesh
 void Moveable::ShatterMesh(int meshId)
 {
 	if (!MeshExists(meshId))
@@ -927,7 +959,13 @@ void Moveable::ShatterMesh(int meshId)
 	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
-bool Moveable::MeshIsSwapped(int meshId) const
+/// Get state of specified mesh swap of object
+// Returns true if specified mesh is swapped on an object, and false
+// if it is not swapped.
+// @function Moveable:GetMeshSwapped
+// @int index index of a mesh
+// @treturn bool mesh swap status
+bool Moveable::GetMeshSwapped(int meshId) const
 {
 	if (!MeshExists(meshId))
 		return false;
@@ -935,6 +973,12 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	return m_item->Model.MeshIndex[meshId] == m_item->Model.BaseMesh + meshId;
 }
 
+/// Set state of specified mesh swap of object
+// Use this to swap specified mesh of an object.
+// @function Moveable:SwapMesh
+// @int index index of a mesh
+// @int slotIndex index of a slot to get meshswap from
+// @int[opt] swapIndex index of a mesh from meshswap slot to use
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
 {
 	if (!MeshExists(meshId))
@@ -965,6 +1009,10 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 	m_item->Model.MeshIndex[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 }
 
+/// Set state of specified mesh swap of object
+// Use this to bring back original unswapped mesh
+// @function Moveable:UnswapMesh
+// @int index index of a mesh to unswap
 void Moveable::UnswapMesh(int meshId)
 {
 	if (!MeshExists(meshId))
@@ -973,68 +1021,37 @@ void Moveable::UnswapMesh(int meshId)
 	m_item->Model.MeshIndex[meshId] = m_item->Model.BaseMesh + meshId;
 }
 
+/// Enable the item, as if a trigger for it had been stepped on.
+// @function Moveable:Enable
 void Moveable::EnableItem()
 {
-	if (!m_item->Active)
-	{
-		m_item->Flags |= IFLAG_ACTIVATION_MASK;
-		if (Objects[m_item->ObjectNumber].intelligent)
-		{
-			if (m_item->Status == ITEM_DEACTIVATED)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				m_item->Status = ITEM_ACTIVE;
-				AddActiveItem(m_num);
-				EnableEntityAI(m_num, 1);
-			}
-			else if (m_item->Status == ITEM_INVISIBLE)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				if (EnableEntityAI(m_num, 0))
-					m_item->Status = ITEM_ACTIVE;
-				else
-					m_item->Status = ITEM_INVISIBLE;
-				AddActiveItem(m_num);
-			}
-		}
-		else
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			AddActiveItem(m_num);
-			m_item->Status = ITEM_ACTIVE;
-		}
-
-		// Try add colliding in case the item went from invisible -> activated
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
-	}
-}
-
-void Moveable::DisableItem()
-{
-	if (!m_item->Active)
+	if (m_num == NO_ITEM)
 		return;
 
-	m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
-	if (Objects[m_item->ObjectNumber].intelligent)
-	{
-		if (m_item->Status == ITEM_ACTIVE)
-		{
-			m_item->TouchBits = NO_JOINT_BITS;
-			m_item->Status = ITEM_DEACTIVATED;
-			RemoveActiveItem(m_num);
-			DisableEntityAI(m_num);
-		}
-	}
-	else
-	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
-		m_item->Status = ITEM_DEACTIVATED;
-	}
+	bool wasInvisible = false;
+	if (m_item->Status == ITEM_INVISIBLE)
+		wasInvisible = true;
 
-	// Try add colliding in case the item went from invisible -> deactivated
-	if (m_num > NO_ITEM)
+	m_item->Flags |= CODE_BITS;
+	Trigger(m_num);
+
+	// Try add colliding in case the item went from invisible -> activated
+	if (wasInvisible)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+}
+
+/// Disable the item, as if an antitrigger for it had been stepped on (i.e. it will close an open door or extinguish a flame emitter).
+// Note that this will not trigger an OnKilled callback.
+// @function Moveable:Disable
+void Moveable::DisableItem()
+{
+	if (m_num == NO_ITEM)
+		return;
+
+	Antitrigger(m_num);
+
+	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Explode()
@@ -1057,19 +1074,47 @@ void Moveable::Shatter()
 	CreatureDie(m_num, false);
 }
 
+/// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
+// @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
 {
-	m_item->Status = ITEM_INVISIBLE;
-	if (m_item->Active)
+	SetVisible(false);
+}
+/// Set the item's visibility. __An invisible item will have collision turned off, as if it no longer exists in the game world__.
+// @bool visible true if the caller should become visible, false if it should become invisible
+// @function Moveable:SetVisible
+void Moveable::SetVisible(bool visible)
+{
+	if (!visible)
 	{
-		m_item->TouchBits = NO_JOINT_BITS;
-		RemoveActiveItem(m_num);
+		if (Objects[m_item->ObjectNumber].intelligent)
+			DisableItem();
+		else
+			RemoveActiveItem(m_num, false);
+
+		m_item->Status = ITEM_INVISIBLE;
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	}
+	else
+	{
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			DisableEntityAI(m_num);
+			if(!(m_item->Flags & IFLAG_KILLED))
+				EnableItem();
+			else
+				m_item->Status = ITEM_ACTIVE;
 		}
+		else
+		{
+			AddActiveItem(m_num);
+			m_item->Status = ITEM_ACTIVE;
+		}
+
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
-	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Invalidate()

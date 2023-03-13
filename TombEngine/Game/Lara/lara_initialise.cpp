@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
@@ -9,6 +9,8 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Hud;
 
 void InitialiseLara(bool restore)
 {
@@ -52,15 +54,17 @@ void InitialiseLara(bool restore)
 
 	InitialiseLaraMeshes(LaraItem);
 	InitialiseLaraAnims(LaraItem);
+
+	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
 void InitialiseLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Override base mesh and mesh indices to Lara skin.
+	// Override base mesh and mesh indices to Lara skin, if it exists.
+	item->Model.BaseMesh = Objects[(Objects[ID_LARA_SKIN].loaded ? ID_LARA_SKIN : ID_LARA)].meshIndex;
 
-	item->Model.BaseMesh = Objects[ID_LARA_SKIN].meshIndex;
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
 

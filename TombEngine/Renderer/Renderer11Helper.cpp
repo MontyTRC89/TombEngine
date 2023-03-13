@@ -55,9 +55,19 @@ namespace TEN::Renderer
 		{
 			// Pop the last bone in the stack
 			RendererBone *bone = Bones[--nextBone];
-			if (!bone) return;//otherwise inventory crashes mm
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			if (!bone)
+			{
+				return; // Otherwise inventory crashes
+			}
 
+			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			{
+				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
+					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
+				return;
+			}
+
+			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
 				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
@@ -352,23 +362,17 @@ namespace TEN::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
-		Vector3 centre = (boxMin + boxMax) / 2.0f;
-		Vector3 extens = boxMax - centre;
-		BoundingBox box = BoundingBox(centre, extens);
-
 		if (sphereRadius == 0.0f)
+		{
 			return box.Contains(sphereCentre);
+		}
 		else
 		{
 			BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
 			return box.Intersects(sphere);
 		}
-	}
-
-	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone)
-	{
 	}
 
 	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
@@ -377,36 +381,28 @@ namespace TEN::Renderer
 
 		m_rooms[roomNumber1].RoomNumber = roomNumber1;
 		m_rooms[roomNumber2].RoomNumber = roomNumber2;
+
+		m_invalidateCache = true;
+	}
+
+	RendererObject& Renderer11::GetRendererObject(GAME_OBJECT_ID id)
+	{
+		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
+		{
+			if (m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			else
+				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+		}
+		else
+		{
+			return m_moveableObjects[id].value();
+		}
 	}
 
 	RendererMesh* Renderer11::GetMesh(int meshIndex)
 	{
 		return m_meshes[meshIndex];
-	}
-
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex)
-	{
-		auto* rendererItem = &m_items[itemNumber];
-		auto* nativeItem = &g_Level.Items[itemNumber];
-
-		rendererItem->ItemNumber = itemNumber;
-
-		if (!rendererItem)
-			return;
-
-		if (!rendererItem->DoneAnimations)
-		{
-			if (itemNumber == Lara.ItemNumber)
-				UpdateLaraAnimations(false);
-			else
-				UpdateItemAnimations(itemNumber, false);
-		}
-
-		if (jointIndex >= MAX_BONES)
-			jointIndex = 0;
-
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
-		pos = Vector3::Transform(pos, world);
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
@@ -436,10 +432,7 @@ namespace TEN::Renderer
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
-		short objNum = nativeItem->ObjectNumber;
-		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
-
-		auto& moveable = *m_moveableObjects[objNum];
+		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
 
 		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{
@@ -511,5 +504,64 @@ namespace TEN::Renderer
 			return vp;
 
 		return s;
+	}
+
+	Vector2i Renderer11::GetScreenResolution() const
+	{
+		return Vector2i(m_screenWidth, m_screenHeight);
+	}
+
+	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	{
+		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
+		auto cameraPos = Vector4(
+			gameCamera.camera.WorldPosition.x,
+			gameCamera.camera.WorldPosition.y,
+			gameCamera.camera.WorldPosition.z,
+			1.0f);
+		auto cameraDirection = Vector4(
+			gameCamera.camera.WorldDirection.x,
+			gameCamera.camera.WorldDirection.y,
+			gameCamera.camera.WorldDirection.z,
+			1.0f);
+		
+		// If point is behind camera, return invalid screen space position.
+		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
+			return INVALID_2D_POSITION;
+
+		// Calculate clip space coords.
+		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+
+		// Calculate normalized device coords.
+		point /= point.w;
+
+		// Calculate and return screen space position.
+		return Vector2(
+			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+	}
+
+	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
+	{
+		auto* rendererItem = &m_items[itemNumber];
+
+		rendererItem->ItemNumber = itemNumber;
+
+		if (!rendererItem)
+			return Vector3::Zero;
+
+		if (!rendererItem->DoneAnimations)
+		{
+			if (itemNumber == Lara.ItemNumber)
+				UpdateLaraAnimations(false);
+			else
+				UpdateItemAnimations(itemNumber, false);
+		}
+
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
+
+		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		return Vector3::Transform(relOffset, world);
 	}
 }

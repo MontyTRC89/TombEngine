@@ -1,0 +1,4293 @@
+
+<function>
+	<module>Color</module>
+	<name>Color</name>
+	<parameters>
+		<parameter>
+			<name>R</name>
+			<type>int</type>
+			<description>red component</description>
+		</parameter>
+		<parameter>
+			<name>G</name>
+			<type>int</type>
+			<description>green component</description>
+		</parameter>
+		<parameter>
+			<name>B</name>
+			<type>int</type>
+			<description>blue component</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>A new Color object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Color</module>
+	<name>Color</name>
+	<parameters>
+		<parameter>
+			<name>R</name>
+			<type>int</type>
+			<description>red component</description>
+		</parameter>
+		<parameter>
+			<name>G</name>
+			<type>int</type>
+			<description>green component</description>
+		</parameter>
+		<parameter>
+			<name>B</name>
+			<type>int</type>
+			<description>blue component</description>
+		</parameter>
+		<parameter>
+			<name>A</name>
+			<type>int</type>
+			<description>alpha component (255 is opaque, 0 is invisible)</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>A new Color object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Color</module>
+	<name>tostring</name>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>this color</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>A string showing the r, g, b, and a values of the color</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitLightningArc</name>
+	<summary>Emit a lightning arc.</summary>
+	<parameters>
+		<parameter>
+			<name>src</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>dest</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255))</description>
+		</parameter>
+		<parameter>
+			<name>lifetime</name>
+			<type>float</type>
+			<description>Lifetime in seconds. Clamped to [0, 4.233] for now because of strange internal maths. (default 1.0)</description>
+		</parameter>
+		<parameter>
+			<name>amplitude</name>
+			<type>int</type>
+			<description>"strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255]. (default 20)</description>
+		</parameter>
+		<parameter>
+			<name>beamWidth</name>
+			<type>int</type>
+			<description>Clamped to [1, 127]. (default 2)</description>
+		</parameter>
+		<parameter>
+			<name>detail</name>
+			<type>int</type>
+			<description>Higher numbers equal more segments, but it's not a 1:1 correlation. Clamped to [1, 127]. (default 10)</description>
+		</parameter>
+		<parameter>
+			<name>smooth</name>
+			<type>bool</type>
+			<description>If true, the arc will have large, smooth curves; if false, it will have small, jagged spikes. (default false)</description>
+		</parameter>
+		<parameter>
+			<name>endDrift</name>
+			<type>bool</type>
+			<description>If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitParticle</name>
+	<summary>Emit a particle.</summary>
+	<description>See the sprite editor in WadTool for DEFAULT_SPRITES to see a list of sprite indices.</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>velocity</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>spriteIndex</name>
+			<type>int</type>
+			<description>an index of a sprite in DEFAULT_SPRITES object.</description>
+		</parameter>
+		<parameter>
+			<name>gravity</name>
+			<type>int</type>
+			<description>(default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.</description>
+		</parameter>
+		<parameter>
+			<name>rot</name>
+			<type>float</type>
+			<description>(default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).</description>
+		</parameter>
+		<parameter>
+			<name>startColor</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255)) color at start of life</description>
+		</parameter>
+		<parameter>
+			<name>endColor</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths</description>
+		</parameter>
+		<parameter>
+			<name>blendMode</name>
+			<type>Effects.BlendID</type>
+			<description>(default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?</description>
+		</parameter>
+		<parameter>
+			<name>startSize</name>
+			<type>int</type>
+			<description>(default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.</description>
+		</parameter>
+		<parameter>
+			<name>endSize</name>
+			<type>int</type>
+			<description>(default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan</description>
+		</parameter>
+		<parameter>
+			<name>lifetime</name>
+			<type>float</type>
+			<description>(default 2) Lifespan in seconds</description>
+		</parameter>
+		<parameter>
+			<name>damage</name>
+			<type>bool</type>
+			<description>(default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)</description>
+		</parameter>
+		<parameter>
+			<name>poison</name>
+			<type>bool</type>
+			<description>(default false) specifies whether particle can poison Lara</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitShockwave</name>
+	<summary>Emit a shockwave, similar to that seen when a harpy projectile hits something.</summary>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+			<description>Origin position</description>
+		</parameter>
+		<parameter>
+			<name>innerRadius</name>
+			<type>int</type>
+			<description>(default 0) Initial inner radius of the shockwave circle - 128 will be approx a click, 512 approx a block</description>
+		</parameter>
+		<parameter>
+			<name>outerRadius</name>
+			<type>int</type>
+			<description>(default 128) Initial outer radius of the shockwave circle</description>
+		</parameter>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255))</description>
+		</parameter>
+		<parameter>
+			<name>lifetime</name>
+			<type>float</type>
+			<description>(default 1.0) Lifetime in seconds (max 8.5 because of inner maths weirdness)</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>int</type>
+			<description>(default 50) Initial speed of the shockwave's expansion (the shockwave will always slow as it goes)</description>
+		</parameter>
+		<parameter>
+			<name>angle</name>
+			<type>int</type>
+			<description>(default 0) Angle about the X axis - a value of 90 will cause the shockwave to be entirely vertical</description>
+		</parameter>
+		<parameter>
+			<name>hurtsLara</name>
+			<type>bool</type>
+			<description>(default false) If true, the shockwave will hurt Lara, with the damage being relative to the shockwave's current speed</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitLight</name>
+	<summary>Emit dynamic light that lasts for a single frame.</summary>
+	<description>If you want a light that sticks around, you must call this each frame.</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255))</description>
+		</parameter>
+		<parameter>
+			<name>radius</name>
+			<type>int</type>
+			<description>(default 20) corresponds loosely to both intensity and range</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitBlood</name>
+	<summary>Emit blood.</summary>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>(default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>EmitFire</name>
+	<summary>Emit fire for one frame.</summary>
+	<description>Will not hurt Lara. Call this each frame if you want a continuous fire.</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>size</name>
+			<type>float</type>
+			<description>(default 1.0)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>MakeExplosion</name>
+	<summary>Make an explosion.</summary>
+	<description>Does not hurt Lara</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+		</parameter>
+		<parameter>
+			<name>size</name>
+			<type>float</type>
+			<description>(default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites</description>
+		</parameter>
+		<parameter>
+			<name>shockwave</name>
+			<type>bool</type>
+			<description>(default false) if true, create a very faint white shockwave which will not hurt Lara</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>MakeEarthquake</name>
+	<summary>Make an earthquake</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>int</type>
+			<description>(default 100) How strong should the earthquake be? Increasing this value also increases the lifespan of the earthquake.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Effects</module>
+	<name>FlashScreen</name>
+	<summary>Flash screen.</summary>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255))</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>AddLevel</name>
+	<summary>Add a level to the Flow.</summary>
+	<parameters>
+		<parameter>
+			<name>level</name>
+			<type>Level</type>
+			<description>a level object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetLevel</name>
+	<summary>GetLevel.</summary>
+	<description>Returns the level indicated by the parameter id.</description>
+	<parameters>
+		<parameter>
+			<name>id</name>
+			<type>int</type>
+			<description>of the level</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Level</type>
+			<description>the level indicated by the id</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetCurrentLevel</name>
+	<summary>GetCurrentLevel.</summary>
+	<description>Returns the level that the game control is running in that moment.</description>
+	<returns>
+		<return>
+			<type>Level</type>
+			<description>the current level</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EndLevel</name>
+	<summary>EndLevel.</summary>
+	<description>Finish level, with optional level index provided. If level index is not provided or is zero, jumps
+to next level. If level index is more than level count, jumps to title.</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>(optional) level index.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetSecretCount</name>
+	<summary>GetSecretCount.</summary>
+	<description>Returns current game secret count.</description>
+	<returns>
+		<return>
+			<type>Current</type>
+			<description>game secret count.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetSecretCount</name>
+	<summary>SetSecretCount.</summary>
+	<description>Sets current secret count, overwriting existing one.</description>
+	<parameters>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>new secret count.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>AddSecret</name>
+	<summary>AddSecret.</summary>
+	<description>Adds one secret to game secret count and also plays secret music track.</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>an index of current level's secret (must be from 0 to 7).</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetIntroImagePath</name>
+	<summary>Image to show when loading the game.</summary>
+	<description>Must be a .jpg or .png image.</description>
+	<parameters>
+		<parameter>
+			<name>path</name>
+			<type>string</type>
+			<description>the path to the image, relative to the TombEngine exe</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetTitleScreenImagePath</name>
+	<summary>Image to show in the background of the title screen.</summary>
+	<description>Must be a .jpg or .png image.
+__(not yet implemented)__</description>
+	<parameters>
+		<parameter>
+			<name>path</name>
+			<type>string</type>
+			<description>the path to the image, relative to the TombEngine exe</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetTotalSecretCount</name>
+	<summary>Total number of secrets in game.</summary>
+	<description>Must be an integer value (0 means no secrets).</description>
+	<parameters>
+		<parameter>
+			<name>total</name>
+			<type>int</type>
+			<description>number of secrets</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableFlyCheat</name>
+	<summary>Enable or disable DOZY mode (fly cheat).</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>true</name>
+			<type>bool</type>
+			<description>or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableMassPickup</name>
+	<summary>Enable or disable mass pickup.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>true</name>
+			<type>bool</type>
+			<description>or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableLaraInTitle</name>
+	<summary>Enable or disable Lara drawing in title flyby.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>true</name>
+			<type>bool</type>
+			<description>or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableLevelSelect</name>
+	<summary>Enable or disable level selection in title flyby.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>true</name>
+			<type>bool</type>
+			<description>or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetSettings</name>
+	<parameters>
+		<parameter>
+			<name>settings</name>
+			<type>Settings</type>
+			<description>a settings object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetAnimations</name>
+	<parameters>
+		<parameter>
+			<name>animations</name>
+			<type>Animations</type>
+			<description>an animations object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetStrings</name>
+	<summary>Set string variable keys and their translations.</summary>
+	<parameters>
+		<parameter>
+			<name>table</name>
+			<type>tab</type>
+			<description>array-style table with strings</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetString</name>
+	<summary>Get translated string</summary>
+	<parameters>
+		<parameter>
+			<name>string</name>
+			<type>key</type>
+			<description>key for translated string</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetLanguageNames</name>
+	<summary>Set language names for translations.</summary>
+	<description>Specify which translations in the strings table correspond to which languages.</description>
+	<parameters>
+		<parameter>
+			<name>table</name>
+			<type>tab</type>
+			<description>array-style table with language names</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow.Fog</module>
+	<name>Fog</name>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>RGB color</description>
+		</parameter>
+		<parameter>
+			<name>Min</name>
+			<type>int</type>
+			<description>Distance fog starts (in Sectors)</description>
+		</parameter>
+		<parameter>
+			<name>Max</name>
+			<type>int</type>
+			<description>Distance fog ends (in Sectors)</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Fog</type>
+			<description>A fog object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow.InventoryItem</module>
+	<name>InventoryItem</name>
+	<summary>Create an InventoryItem.</summary>
+	<parameters>
+		<parameter>
+			<name>nameKey</name>
+			<type>string</type>
+			<description>key for the item's (localised) name.<br />
+Corresponds to an entry in strings.lua.</description>
+		</parameter>
+		<parameter>
+			<name>slot</name>
+			<type>Objects.ObjID</type>
+			<description>slot of inventory object to change</description>
+		</parameter>
+		<parameter>
+			<name>yOffset</name>
+			<type>int</type>
+			<description>y-axis offset (positive values move the item down).<br />
+A value of about 100 will cause the item to display directly below its usual position.</description>
+		</parameter>
+		<parameter>
+			<name>scale</name>
+			<type>float</type>
+			<description>item size (1 being standard size).<br />
+A value of 0.5 will cause the item to render at half the size,
+and a value of 2 will cause the item to render at twice the size.</description>
+		</parameter>
+		<parameter>
+			<name>rot</name>
+			<type>Rotation</type>
+			<description>rotation about x, y, and z axes</description>
+		</parameter>
+		<parameter>
+			<name>axis</name>
+			<type>RotationAxis</type>
+			<description>Axis to rotate about when the item is being looked at in the inventory.<br />
+Note that this is entirely separate from the `rot` field described above.
+Must one of the following:
+	X
+	Y
+	Z
+e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`</description>
+		</parameter>
+		<parameter>
+			<name>meshBits</name>
+			<type>int</type>
+			<description>__Not currently implemented__ (will have no effect regardless of what you set it to)</description>
+		</parameter>
+		<parameter>
+			<name>action</name>
+			<type>ItemAction</type>
+			<description>is this usable, equippable, combineable or examinable?<br/>
+Must be one of:
+	EQUIP
+	USE
+	COMBINE
+	EXAMINE
+e.g. `myItem.action = ItemAction.EXAMINE`</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>InventoryItem</type>
+			<description>an InventoryItem</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow.Level</module>
+	<name>Level</name>
+	<summary>Make a new Level object.</summary>
+	<returns>
+		<return>
+			<type>Level</type>
+			<description>a Level object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow.SkyLayer</module>
+	<name>SkyLayer</name>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>RGB color</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>int</type>
+			<description>cloud speed</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>SkyLayer</type>
+			<description>A SkyLayer object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Inventory</module>
+	<name>GiveItem</name>
+	<summary>Add x of an item to the inventory.</summary>
+	<description>Omitting the second argument will give the "default" amount of the item
+(i.e. the amount the player would get from a pickup of that type).
+For example, giving crossbow ammo without specifying the number would give the player
+10 instead.
+Has no effect if the player has an infinite number of that item.</description>
+	<parameters>
+		<parameter>
+			<name>item</name>
+			<type>Objects.ObjID</type>
+			<description>the item to be added</description>
+		</parameter>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>the number of items to add (default: the amount you would get from a pickup)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Inventory</module>
+	<name>TakeItem</name>
+	<summary>Remove x of a certain item from the inventory.</summary>
+	<description>As in @{GiveItem}, omitting the count will remove the "default" amount of that item.
+Has no effect if the player has an infinite number of the item.</description>
+	<parameters>
+		<parameter>
+			<name>item</name>
+			<type>Objects.ObjID</type>
+			<description>the item to be removed</description>
+		</parameter>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>the number of items to remove (default: the amount you would get from a pickup)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Inventory</module>
+	<name>GetItemCount</name>
+	<summary>Get the amount the player holds of an item.</summary>
+	<parameters>
+		<parameter>
+			<name>item</name>
+			<type>Objects.ObjID</type>
+			<description>the ID item to check</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Inventory</module>
+	<name>SetItemCount</name>
+	<summary>Set the amount of a certain item the player has in the inventory.</summary>
+	<description>Similar to @{GiveItem} but replaces with the new amount instead of adding it.</description>
+	<parameters>
+		<parameter>
+			<name>item</name>
+			<type>Objects.ObjID</type>
+			<description>the ID of the item to be set.</description>
+		</parameter>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>the number of items the player will have. A value of -1 will give an infinite amount of that item.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>AddCallback</name>
+	<summary>Register a function as a callback.</summary>
+	<parameters>
+		<parameter>
+			<name>CallbackPoint</name>
+			<type>point</type>
+			<description>When should the callback be called?</description>
+		</parameter>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>RemoveCallback</name>
+	<summary>Deregister a function as a callback.</summary>
+	<description>Will have no effect if the function was not registered as a callback</description>
+	<parameters>
+		<parameter>
+			<name>CallbackPoint</name>
+			<type>point</type>
+			<description>The callback point the function was registered with. See @{AddCallback}</description>
+		</parameter>
+		<parameter>
+			<name>LevelFunc</name>
+			<type>func</type>
+			<description>the function to remove; must be in the LevelFuncs hierarchy.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>HasLineOfSight</name>
+	<summary>Determine if there's a line of sight between two points.</summary>
+	<description>i.e. if we run a direct line from one position to another
+will any geometry get in the way?
+
+Note: if you use this with Moveable:GetPosition to test if (for example)
+two creatures can see one another, you might have to do some extra adjustments.
+
+This is because the "position" for most objects refers to its base, i.e., the floor.
+As a solution, you can increase the y-coordinate of this position to correspond to roughly where the
+eyes of the creatures would be.</description>
+	<parameters>
+		<parameter>
+			<name>room1</name>
+			<type>float</type>
+			<description>ID of the room where the first position is</description>
+		</parameter>
+		<parameter>
+			<name>pos1</name>
+			<type>Vec3</type>
+			<description>first position</description>
+		</parameter>
+		<parameter>
+			<name>pos2</name>
+			<type>Vec3</type>
+			<description>second position</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>is there a direct line of sight between the two positions?</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>Vibrate</name>
+	<summary>Vibrate game controller, if function is available and setting is on.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+			<description>Strength of the vibration</description>
+		</parameter>
+		<parameter>
+			<name>time</name>
+			<type>float</type>
+			<description>__(default 0.3)__ Time of the vibration, in seconds</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>FadeOut</name>
+	<summary>Do a full-screen fade-to-black.</summary>
+	<description>The screen will remain black until a call to FadeIn.</description>
+	<parameters>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>FadeIn</name>
+	<summary>Do a full-screen fade-in from black.</summary>
+	<parameters>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>SetCineBars</name>
+	<summary>Move black cinematic bars in from the top and bottom of the game window.</summary>
+	<parameters>
+		<parameter>
+			<name>height</name>
+			<type>float</type>
+			<description>__(default 30)__ Percentage of the screen to be covered</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>__(default 30)__ Coverage percent per second</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>SetFOV</name>
+	<summary>Set field of view.</summary>
+	<parameters>
+		<parameter>
+			<name>angle</name>
+			<type>float</type>
+			<description>in degrees (clamped to [10, 170])</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>GetCameraType</name>
+	<summary>Shows the mode of the game camera.</summary>
+	<returns>
+		<return>
+			<type>Misc.CameraType</type>
+			<description>value used by the Main Camera.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>PlayAudioTrack</name>
+	<summary>Play an audio track</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>of track (without file extension) to play</description>
+		</parameter>
+		<parameter>
+			<name>loop</name>
+			<type>bool</type>
+			<description>if true, the track will loop; if false, it won't (default: false)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>SetAmbientTrack</name>
+	<summary>Set and play an ambient track</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>of track (without file extension) to play</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>StopAudioTracks</name>
+	<summary>Stop any audio tracks currently playing</summary>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>StopAudioTrack</name>
+	<summary>Stop audio track that is currently playing</summary>
+	<parameters>
+		<parameter>
+			<name>looped</name>
+			<type>bool</type>
+			<description>if set, stop looped audio track, if not, stop one-shot audio track</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>PlaySound</name>
+	<summary>Play sound effect</summary>
+	<parameters>
+		<parameter>
+			<name>sound</name>
+			<type>int</type>
+			<description>ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>FlipMap</name>
+	<summary>Do FlipMap with specific ID</summary>
+	<parameters>
+		<parameter>
+			<name>flipmap</name>
+			<type>int</type>
+			<description>(ID of flipmap)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>PlayFlyBy</name>
+	<summary>Enable FlyBy with specific ID</summary>
+	<parameters>
+		<parameter>
+			<name>flyby</name>
+			<type>short</type>
+			<description>(ID of flyby)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>CalculateDistance</name>
+	<summary>Calculate the distance between two positions.</summary>
+	<parameters>
+		<parameter>
+			<name>posA</name>
+			<type>Vec3</type>
+			<description>first position</description>
+		</parameter>
+		<parameter>
+			<name>posB</name>
+			<type>Vec3</type>
+			<description>second position</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the direct distance from one position to the other</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>CalculateHorizontalDistance</name>
+	<summary>Calculate the horizontal distance between two positions.</summary>
+	<parameters>
+		<parameter>
+			<name>posA</name>
+			<type>Vec3</type>
+			<description>first position</description>
+		</parameter>
+		<parameter>
+			<name>posB</name>
+			<type>Vec3</type>
+			<description>second position</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the direct distance on the XZ plane from one position to the other</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>PercentToScreen</name>
+	<summary>Translate a pair of percentages to screen-space pixel coordinates.</summary>
+	<description>To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>float</type>
+			<description>percent value to translate to x-coordinate</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>float</type>
+			<description>percent value to translate to y-coordinate</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>x coordinate in pixels</description>
+		</return>
+		<return>
+			<type>int</type>
+			<description>y coordinate in pixels</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>ScreenToPercent</name>
+	<summary>Translate a pair of coordinates to percentages of window dimensions.</summary>
+	<description>To be used with @{Strings.DisplayString:GetPosition}.</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>int</type>
+			<description>pixel value to translate to a percentage of the window width</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>int</type>
+			<description>pixel value to translate to a percentage of the window height</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>x coordinate as percentage</description>
+		</return>
+		<return>
+			<type>float</type>
+			<description>y coordinate as percentage</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>ResetObjCamera</name>
+	<summary>Reset object camera back to Lara and deactivate object camera.</summary>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>Vibrate</name>
+	<summary>Vibrate gamepad, if possible.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+		</parameter>
+		<parameter>
+			<name>time</name>
+			<type>float</type>
+			<description>(in seconds, default: 0.3)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>KeyIsHeld</name>
+	<summary>Check if particular action key is held</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Misc.ActionID</type>
+			<description>action mapping index to check</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>KeyIsHit</name>
+	<summary>Check if particular action key was hit (once)</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Misc.ActionID</type>
+			<description>action mapping index to check</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>KeyPush</name>
+	<summary>Emulate pushing of a certain action key</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Misc.ActionID</type>
+			<description>action mapping index to push</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>KeyClear</name>
+	<summary>Clears particular input from action key</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Misc.ActionID</type>
+			<description>action mapping index to clear</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetPosition</name>
+	<summary>Get the object's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the object's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>SetPosition</name>
+	<summary>Set the object's position</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetRotationY</name>
+	<summary>Get the object's Y-axis rotation.</summary>
+	<description>To the best of my knowledge, the rotation of an AIObject has no effect.</description>
+	<returns>
+		<return>
+			<type>number</type>
+			<description>the object's Y-axis rotation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>SetRotationY</name>
+	<summary>Set the object's Y-axis rotation.</summary>
+	<description>To the best of my knowledge, the rotation of an AIObject has no effect.</description>
+	<parameters>
+		<parameter>
+			<name>rotation</name>
+			<type>number</type>
+			<description>The object's new Y-axis rotation</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetName</name>
+	<summary>Get the object's unique string identifier</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the object's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>SetName</name>
+	<summary>Set the object's name (its unique string identifier)</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The object's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetRoom</name>
+	<summary>Get the current room of the object</summary>
+	<returns>
+		<return>
+			<type>Room</type>
+			<description>current room of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetRoomNumber</name>
+	<summary>Get the current room number of the object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number representing the current room of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>SetRoomNumber</name>
+	<summary>Set room number of the object 
+ This is used in conjunction with SetPosition to teleport the object to a new room.</summary>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>int</type>
+			<description>the ID of the new room</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>GetObjectID</name>
+	<summary>Retrieve the object ID</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>a number representing the ID of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.AIObject</module>
+	<caller>AIObject</caller>
+	<name>SetObjectID</name>
+	<summary>Change the object's ID.</summary>
+	<description>This will change the type of AI object it is.
+ Note that a baddy will gain the behaviour of the tile it's on _before_ said baddy is triggered.
+ This means that changing the type of an AI object beneath a moveable will have no effect.
+ Instead, this function can be used to change an object that the baddy isn't standing on.
+ For example, you could have a pair of AI_GUARD objects, and change one or the other two
+ AI_PATROL_1 based on whether the player has a certain item or not.</description>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>Objects.ObjID</type>
+			<description>the new ID</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>GetPosition</name>
+	<summary>Get the camera's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the camera's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>SetPosition</name>
+	<summary>Set the camera's position</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the camera</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>GetName</name>
+	<summary>Get the camera's unique string identifier</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the camera's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>SetName</name>
+	<summary>Set the camera's name (its unique string identifier)</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The camera's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>CameraObject</caller>
+	<name>GetRoom</name>
+	<summary>Get the current room of the camera</summary>
+	<returns>
+		<return>
+			<type>Room</type>
+			<description>current room of the camera</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>GetRoomNumber</name>
+	<summary>Get the current room number of the camera</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number representing the current room of the camera</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>SetRoomNumber</name>
+	<summary>Set room of camera 
+ This is used in conjunction with SetPosition to teleport the camera to a new room.</summary>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>int</type>
+			<description>the ID of the new room</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Camera</module>
+	<caller>Camera</caller>
+	<name>PlayCamera</name>
+	<summary>Active the camera during that frame.</summary>
+	<parameters>
+		<parameter>
+			<name>Target</name>
+			<type>Moveable</type>
+			<description>If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetPoison</name>
+	<summary>Set Lara poison potency</summary>
+	<parameters>
+		<parameter>
+			<name>Potency</name>
+			<type>int</type>
+			<description>; maximum value is 64 (default 0)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetPoison</name>
+	<summary>Get poison potency of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>current poison potency</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetAir</name>
+	<summary>Set air value of Lara</summary>
+	<parameters>
+		<parameter>
+			<name>Air</name>
+			<type>int</type>
+			<description>value to give Lara. Maximum value is 1800.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetAir</name>
+	<summary>Get air value of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>current air value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetWet</name>
+	<summary>Set wetness value of Lara (causes dripping)</summary>
+	<parameters>
+		<parameter>
+			<name>Wetness</name>
+			<type>int</type>
+			<description>value. Maximum 255</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetWet</name>
+	<summary>Get wetness value of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>current wetness value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetSprintEnergy</name>
+	<summary>Set sprint energy value of Lara</summary>
+	<parameters>
+		<parameter>
+			<name>sprint</name>
+			<type>int</type>
+			<description>energy to give to Lara; maximum value is 120.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetSprintEnergy</name>
+	<summary>Get sprint energy value of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>current sprint value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>Moveable</caller>
+	<name>GetAirborne</name>
+	<summary>Get the moveable's airborne status</summary>
+	<returns>
+		<return>
+			<type>(bool)</type>
+			<description>true if Lara state must react to aerial forces.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>Moveable</caller>
+	<name>SetAirborne</name>
+	<summary>Set the moveable's airborne status</summary>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>(bool)</type>
+			<description>airborn status for Lara.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>UndrawWeapon</name>
+	<summary>Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.</summary>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>ThrowAwayTorch</name>
+	<summary>Lara will throw away the torch if she currently holds one in her hand.</summary>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetHandStatus</name>
+	<summary>Get actual hand status of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetWeaponType</name>
+	<summary>Get actual weapon type of Lara</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetWeaponType</name>
+	<summary>Set Lara weapon type</summary>
+	<parameters>
+		<parameter>
+			<name>weaponType</name>
+			<type>LaraWeaponType</type>
+			<description>Must be one of:
+	NONE
+	PISTOLS
+	REVOLVER
+	UZI
+	SHOTGUN
+	HK
+	CROSSBOW
+	FLARE
+	TORCH
+	GRENADELAUNCHER
+	HARPOONGUN
+	ROCKETLAUNCHER</description>
+		</parameter>
+		<parameter>
+			<name>activate</name>
+			<type>bool</type>
+			<description>true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetAmmoCount</name>
+	<summary>Get current weapon's ammo count</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>current ammo count (-1 if infinite)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetVehicle</name>
+	<summary>Get current vehicle, if it exists</summary>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>current vehicle (nil if no vehicle present)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetTarget</name>
+	<summary>Get current target enemy, if it exists</summary>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>current target enemy (nil if no target present)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>TorchIsLit</name>
+	<summary>Get current light state of the torch, if it exists</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>is torch currently lit or not? (false if no torch exists)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<name>Moveable</name>
+	<summary>For more information on each parameter, see the
+associated getters and setters.</summary>
+	<description>If you do not know what to set for these,
+most can just be ignored (see usage).</description>
+	<parameters>
+		<parameter>
+			<name>object</name>
+			<type>Objects.ObjID</type>
+			<description>ID</description>
+		</parameter>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>Lua name of the item</description>
+		</parameter>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>position in level</description>
+		</parameter>
+		<parameter>
+			<name>rotation</name>
+			<type>Rotation</type>
+			<description>rotation about x, y, and z axes (default Rotation(0, 0, 0))</description>
+		</parameter>
+		<parameter>
+			<name>room</name>
+			<type>int</type>
+			<description>room ID item is in (default: calculated automatically)</description>
+		</parameter>
+		<parameter>
+			<name>animNumber</name>
+			<type>int</type>
+			<description>anim number</description>
+		</parameter>
+		<parameter>
+			<name>frameNumber</name>
+			<type>int</type>
+			<description>frame number</description>
+		</parameter>
+		<parameter>
+			<name>hp</name>
+			<type>int</type>
+			<description>HP of item</description>
+		</parameter>
+		<parameter>
+			<name>OCB</name>
+			<type>int</type>
+			<description>ocb of item (default 0)</description>
+		</parameter>
+		<parameter>
+			<name>AIBits</name>
+			<type>table</type>
+			<description>table with AI bits (default {0,0,0,0,0,0})</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Moveable</type>
+			<description>A new Moveable object (a wrapper around the new object)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>Explode</name>
+	<summary>Explode item.</summary>
+	<description>This also kills and disables item.</description>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>Shatter</name>
+	<summary>Shatter item.</summary>
+	<description>This also kills and disables item.</description>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetEffect</name>
+	<summary>Set effect to moveable</summary>
+	<parameters>
+		<parameter>
+			<name>effect</name>
+			<type>Effects.EffectID</type>
+			<description>Type of effect to assign.</description>
+		</parameter>
+		<parameter>
+			<name>timeout</name>
+			<type>float</type>
+			<description>time (in seconds) after which effect turns off (optional).</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetCustomEffect</name>
+	<summary>Set custom colored burn effect to moveable</summary>
+	<parameters>
+		<parameter>
+			<name>Color1</name>
+			<type>Color</type>
+			<description>color the primary color of the effect (also used for lighting).</description>
+		</parameter>
+		<parameter>
+			<name>Color2</name>
+			<type>Color</type>
+			<description>color the secondary color of the effect.</description>
+		</parameter>
+		<parameter>
+			<name>timeout</name>
+			<type>float</type>
+			<description>time (in seconds) after which effect turns off (optional).</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetEffect</name>
+	<summary>Get current moveable effect</summary>
+	<returns>
+		<return>
+			<type>Effects.EffectID</type>
+			<description>effect type currently assigned to moveable.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetStatus</name>
+	<summary>Get the status of object.</summary>
+	<description>possible values:
+ <br />0 - not active 
+ <br />1 - active 
+ <br />2 - deactivated 
+ <br />3 - invisible</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>a number representing the status of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnHit</name>
+	<summary>Set the name of the function to be called when the moveable is shot by Lara.</summary>
+	<description>Note that this will be triggered twice when shot with both pistols at once.</description>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when moveable is shot</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnKilled</name>
+	<summary>Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</summary>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when enemy is killed</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetObjectID</name>
+	<summary>Retrieve the object ID</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>a number representing the ID of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetObjectID</name>
+	<summary>Change the object's ID.</summary>
+	<description>This will literally change the object.</description>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>ObjectID</type>
+			<description>the new ID</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetState</name>
+	<summary>Retrieve the index of the current state.</summary>
+	<description>This corresponds to the number shown in the item's state ID field in WadTool.</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the index of the active state</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetState</name>
+	<summary>Set the object's state to the one specified by the given index.</summary>
+	<description>Performs no bounds checking. *Ensure the number given is correct, else
+ object may end up in corrupted animation state.*</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>the index of the desired state</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetAnim</name>
+	<summary>Retrieve the index of the current animation.</summary>
+	<description>This corresponds to the number shown in the item's animation list in WadTool.</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the index of the active animation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetAnim</name>
+	<summary>Set the object's animation to the one specified by the given index.</summary>
+	<description>Performs no bounds checking. *Ensure the number given is correct, else
+ object may end up in corrupted animation state.*</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>the index of the desired anim</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetFrame</name>
+	<summary>Retrieve frame number.</summary>
+	<description>This is the current frame of the object's active animation.</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the current frame of the active animation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetVelocity</name>
+	<summary>Set the object's velocity to specified value.</summary>
+	<description>In most cases, only Z and Y components are used as forward and vertical velocity.
+ In some cases, primarily NPCs, X component is used as side velocity.</description>
+	<parameters>
+		<parameter>
+			<name>velocity</name>
+			<type>Vec3</type>
+			<description>velocity represented as vector</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetVelocity</name>
+	<summary>Get the object's velocity.</summary>
+	<description>In most cases, only Z and Y components are used as forward and vertical velocity.
+ In some cases, primarily NPCs, X component is used as side velocity.</description>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current object velocity</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetFrame</name>
+	<summary>Set frame number.</summary>
+	<description>This will move the animation to the given frame.
+ The number of frames in an animation can be seen under the heading "End frame" in
+ the WadTool animation editor. If the animation has no frames, the only valid argument
+ is -1.</description>
+	<parameters>
+		<parameter>
+			<name>frame</name>
+			<type>int</type>
+			<description>the new frame number</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetSlotHP</name>
+	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>int</type>
+			<description>of the moveable slot type.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetOCB</name>
+	<summary>Get OCB (object code bit) of the moveable</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the moveable's current OCB value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOCB</name>
+	<summary>Set OCB (object code bit) of the moveable</summary>
+	<parameters>
+		<parameter>
+			<name>OCB</name>
+			<type>int</type>
+			<description>the new value for the moveable's OCB</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetItemFlags</name>
+	<summary>Get the value stored in ItemFlags[index]</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>of the ItemFlags, can be between 0 and 7.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the value contained in the ItemFlags[index]</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetItemFlags</name>
+	<summary>Stores a value in ItemFlags[index]</summary>
+	<parameters>
+		<parameter>
+			<name>value</name>
+			<type>short</type>
+			<description>to store in the moveable's ItemFlags[index]</description>
+		</parameter>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>of the ItemFlags where store the value.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetColor</name>
+	<summary>Get the moveable's color</summary>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>a copy of the moveable's color</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetColor</name>
+	<summary>Set the moveable's color</summary>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>the new color of the moveable</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetHitStatus</name>
+	<summary>Get the hit status of the object</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the moveable was hit by something in the last gameplay frame, false otherwise</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetActive</name>
+	<summary>Determine whether the moveable is active or not</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the moveable is active</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetJointPosition</name>
+	<summary>Get the object's joint position</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>of a joint to get position</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the moveable's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetRotation</name>
+	<summary>Get the moveable's rotation</summary>
+	<returns>
+		<return>
+			<type>Rotation</type>
+			<description>a copy of the moveable's rotation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetRotation</name>
+	<summary>Set the moveable's rotation</summary>
+	<parameters>
+		<parameter>
+			<name>rotation</name>
+			<type>Rotation</type>
+			<description>The moveable's new rotation</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetName</name>
+	<summary>Get the moveable's name (its unique string identifier)
+ e.g.</summary>
+	<description>"door\_back\_room" or "cracked\_greek\_statue"
+ This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the moveable's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetName</name>
+	<summary>Set the moveable's name (its unique string identifier)
+ e.g.</summary>
+	<description>"door\_back\_room" or "cracked\_greek\_statue"
+ It cannot be blank and cannot share a name with any existing object.</description>
+	<parameters>
+		<parameter>
+			<name>string</name>
+			<type>name</type>
+			<description>the new moveable's name</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if we successfully set the name, false otherwise (e.g. if another object has the name already)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetValid</name>
+	<summary>Test if the object is in a valid state (i.e.</summary>
+	<description>has not been destroyed through Lua or killed by Lara).</description>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>valid true if the object is still not destroyed</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>Destroy</name>
+	<summary>Destroy the moveable.</summary>
+	<description>This will mean it can no longer be used, except to re-initialise it with another object.</description>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>AttachObjCamera</name>
+	<summary>Attach camera to an object.</summary>
+	<parameters>
+		<parameter>
+			<name>mesh</name>
+			<type>int</type>
+			<description>of a target moveable to use as a camera target</description>
+		</parameter>
+		<parameter>
+			<name>target</name>
+			<type>Moveable</type>
+			<description>moveable to attach camera to</description>
+		</parameter>
+		<parameter>
+			<name>mesh</name>
+			<type>int</type>
+			<description>of a target moveable to use as a camera target</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>AnimFromObject</name>
+	<summary>Borrow animation from an object</summary>
+	<parameters>
+		<parameter>
+			<name>ObjectID</name>
+			<type>Objects.ObjID</type>
+			<description>to take animation and stateID from,</description>
+		</parameter>
+		<parameter>
+			<name>animNumber</name>
+			<type>int</type>
+			<description>animation from object</description>
+		</parameter>
+		<parameter>
+			<name>stateID</name>
+			<type>int</type>
+			<description>state from object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnCollidedWithObject</name>
+	<summary>Set the function to be called when this moveable collides with another moveable</summary>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnCollidedWithRoom</name>
+	<summary>Set the function called when this moveable collides with room geometry (e.g.</summary>
+	<description>a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.</description>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetPosition</name>
+	<summary>Get the object's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the moveable's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetPosition</name>
+	<summary>Set the moveable's position
+ If you are moving a moveable whose behaviour involves knowledge of room geometry,
+ (e.g.</summary>
+	<description>a BADDY1, which uses it for pathfinding), then the second argument should
+ be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.</description>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the moveable</description>
+		</parameter>
+		<parameter>
+			<name>updateRoom</name>
+			<type>bool</type>
+			<description>Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the moveable currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
+	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
+	<parameters>
+		<parameter>
+			<name>HP</name>
+			<type>int</type>
+			<description>the amount of HP to give the moveable</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetLocationAI</name>
+	<summary>Get the location value stored in the Enemy AI</summary>
+	<returns>
+		<return>
+			<type>(short)</type>
+			<description>the value contained in the LocationAI of the creature.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetLocationAI</name>
+	<summary>Updates the location in the enemy AI with the given value.</summary>
+	<parameters>
+		<parameter>
+			<name>short</name>
+			<type>value:</type>
+			<description>) value to store.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetAIBits</name>
+	<summary>Get AIBits of object
+ This will return a table with six values, each corresponding to
+ an active behaviour.</summary>
+	<description>If the object is in a certain AI mode, the table will
+ have a *1* in the corresponding cell. Otherwise, the cell will hold
+ a *0*.
+
+ <br />1 - guard
+ <br />2 - ambush
+ <br />3 - patrol 1
+ <br />4 - modify
+ <br />5 - follow
+ <br />6 - patrol 2</description>
+	<returns>
+		<return>
+			<type>table</type>
+			<description>a table of AI bits</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetAIBits</name>
+	<summary>Set AIBits of object
+ Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+ (or more than one) had suddenly spawned beneath their feet.</summary>
+	<parameters>
+		<parameter>
+			<name>bits</name>
+			<type>table</type>
+			<description>the table of AI bits</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetRoom</name>
+	<summary>Get the current room of the object</summary>
+	<returns>
+		<return>
+			<type>Room</type>
+			<description>current room of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetRoomNumber</name>
+	<summary>Get the current room number of the object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number representing the current room of the object</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetRoomNumber</name>
+	<summary>Set room number of object 
+ Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</summary>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>int</type>
+			<description>the ID of the new room</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetMeshVisible</name>
+	<summary>Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>visibility status</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetMeshVisible</name>
+	<summary>Makes specified mesh visible or invisible
+ Use this to show or hide a specified mesh of an object.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh</description>
+		</parameter>
+		<parameter>
+			<name>visible</name>
+			<type>bool</type>
+			<description>true if you want the mesh to be visible, false otherwise</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>ShatterMesh</name>
+	<summary>Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using SetMeshVisible().</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetMeshSwapped</name>
+	<summary>Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>mesh swap status</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SwapMesh</name>
+	<summary>Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh</description>
+		</parameter>
+		<parameter>
+			<name>slotIndex</name>
+			<type>int</type>
+			<description>index of a slot to get meshswap from</description>
+		</parameter>
+		<parameter>
+			<name>swapIndex</name>
+			<type>int</type>
+			<description>index of a mesh from meshswap slot to use</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>UnswapMesh</name>
+	<summary>Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>index of a mesh to unswap</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>Enable</name>
+	<summary>Enable the item, as if a trigger for it had been stepped on.</summary>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>Disable</name>
+	<summary>Disable the item, as if an antitrigger for it had been stepped on (i.e.</summary>
+	<description>it will close an open door or extinguish a flame emitter).
+ Note that this will not trigger an OnKilled callback.</description>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>MakeInvisible</name>
+	<summary>Make the item invisible.</summary>
+	<description>Alias for `Moveable:SetVisible(false)`.</description>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetVisible</name>
+	<summary>Set the item's visibility.</summary>
+	<description>__An invisible item will have collision turned off, as if it no longer exists in the game world__.</description>
+	<parameters>
+		<parameter>
+			<name>visible</name>
+			<type>bool</type>
+			<description>true if the caller should become visible, false if it should become invisible</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetMoveableByName</name>
+	<summary>Get a moveable by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the Moveable as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Moveable</type>
+			<description>a non-owning Moveable referencing the item.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetStaticByName</name>
+	<summary>Get a Static by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the mesh as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Static</type>
+			<description>a non-owning Static referencing the mesh.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetMoveablesBySlot</name>
+	<summary>Get moveables by its slot.</summary>
+	<parameters>
+		<parameter>
+			<name>slot</name>
+			<type>Objects.ObjID</type>
+			<description>the unique slot of the Moveable, e.g. `Objects.ObjID.ANIMATING1`</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>table</type>
+			<description>table of Moveables referencing the given slot.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetStaticsBySlot</name>
+	<summary>Get statics by its slot.</summary>
+	<parameters>
+		<parameter>
+			<name>slot</name>
+			<type>int</type>
+			<description>the unique slot of the mesh like 10</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>table</type>
+			<description>table of Statics referencing the given slot ID.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetRoomsByTag</name>
+	<summary>Get rooms by tag.</summary>
+	<parameters>
+		<parameter>
+			<name>tag</name>
+			<type>string</type>
+			<description>to select rooms by</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>table</type>
+			<description>table of Rooms containing the given tag.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetCameraByName</name>
+	<summary>Get a Camera by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the camera as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Camera</type>
+			<description>a non-owning Camera referencing the camera.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetSinkByName</name>
+	<summary>Get a Sink by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the sink as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Sink</type>
+			<description>a non-owning Sink referencing the sink.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetSoundSourceByName</name>
+	<summary>Get a SoundSource by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the sound source as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>SoundSource</type>
+			<description>a non-owning SoundSource referencing the sound source.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetAIObjectByName</name>
+	<summary>Get an AIObject by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the AIObject as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>AIObject</type>
+			<description>a non-owning SoundSource referencing the AI moveable.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetVolumeByName</name>
+	<summary>Get a Volume by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the volume as set in, or generated by, Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Volume</type>
+			<description>a non-owning Volume referencing the room.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects</module>
+	<name>GetRoomByName</name>
+	<summary>Get a Room by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>the unique name of the room as set in Tomb Editor</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Room</type>
+			<description>a non-owning Room referencing the room.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetActive</name>
+	<summary>Determine whether the room is active or not</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the room is active</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetReverbType</name>
+	<summary>Get the room's reverb type.</summary>
+	<returns>
+		<return>
+			<type>Objects.RoomReverb</type>
+			<description>room's reverb type</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>SetReverbType</name>
+	<summary>Set the room's reverb type.</summary>
+	<parameters>
+		<parameter>
+			<name>new</name>
+			<type>Objects.RoomReverb</type>
+			<description>reverb type of the room</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetName</name>
+	<summary>Get the room's unique string identifier.</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the room's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>SetName</name>
+	<summary>Set the room's name (its unique string identifier).</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The room's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetFlag</name>
+	<summary>Get the room's specified flag value (true or false).</summary>
+	<parameters>
+		<parameter>
+			<name>flagID</name>
+			<type>Objects.RoomFlagID</type>
+			<description>The room's flag ID</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>the room's specified flag value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>SetFlag</name>
+	<summary>Set the room's specified flag value.</summary>
+	<parameters>
+		<parameter>
+			<name>flagID</name>
+			<type>Objects.RoomFlagID</type>
+			<description>The room's flag ID</description>
+		</parameter>
+		<parameter>
+			<name>the</name>
+			<type>bool</type>
+			<description>room's new flag value</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>IsTagPresent</name>
+	<summary>Checks if specified tag is set for this room.</summary>
+	<parameters>
+		<parameter>
+			<name>tag</name>
+			<type>string</type>
+			<description>A text tag to check (case sensitive)</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if tag is present, false if not</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>GetPosition</name>
+	<summary>Get the sink's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the sink's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>SetPosition</name>
+	<summary>Set the sink's position</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the sink</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>GetName</name>
+	<summary>Get the sink's unique string identifier
+ e.g.</summary>
+	<description>"strong\_river\_current" or "propeller\_death\_sink"</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the sink's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>SetName</name>
+	<summary>Set the sink's name (its unique string identifier)</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The sink's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>GetStrength</name>
+	<summary>Get the sink's strength</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the sink's current strength</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Sink</module>
+	<caller>Sink</caller>
+	<name>SetStrength</name>
+	<summary>Set the strength of the sink
+ Higher numbers provide stronger currents.</summary>
+	<description>Will be clamped to [1, 32].</description>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>int</type>
+			<description>The sink's new strength</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>GetPosition</name>
+	<summary>Get the sound source's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the sound source's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>SetPosition</name>
+	<summary>Set the sound source's position</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the sound source</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>GetName</name>
+	<summary>Get the sound source's unique string identifier</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the sound source's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>SetName</name>
+	<summary>Set the sound source's name (its unique string identifier)</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The sound source's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>GetSoundID</name>
+	<summary>Get the sound source's unique int identifier</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the ID of the sound</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.SoundSource</module>
+	<caller>SoundSource</caller>
+	<name>SetSoundID</name>
+	<summary>Set the sound source's ID 
+ __TODO__ this and getSoundID should use enums</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>int</type>
+			<description>The sound source's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>Enable</name>
+	<summary>Enable the static, for cases when it was shattered or manually disabled before.</summary>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>Disable</name>
+	<summary>Disable the static</summary>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetActive</name>
+	<summary>Get static mesh visibility</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>visibility state</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetSolid</name>
+	<summary>Get static mesh solid collision state</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>solid collision state (true if solid, false if soft)</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetSolid</name>
+	<summary>Set static mesh solid collision state</summary>
+	<parameters>
+		<parameter>
+			<name>solidState</name>
+			<type>bool</type>
+			<description>if set, collision will be solid, if not, will be soft</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetPosition</name>
+	<summary>Get the static's position</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the static's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetPosition</name>
+	<summary>Set the static's position</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the static</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetRotation</name>
+	<summary>Get the static's rotation</summary>
+	<returns>
+		<return>
+			<type>Rotation</type>
+			<description>a copy of the static's rotation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetRotation</name>
+	<summary>Set the static's rotation</summary>
+	<parameters>
+		<parameter>
+			<name>rotation</name>
+			<type>Rotation</type>
+			<description>the static's new rotation</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetScale</name>
+	<summary>Get the static's scale</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current static scale</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetScale</name>
+	<summary>Set the static's scale</summary>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>Scale</type>
+			<description>the static's new scale</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetName</name>
+	<summary>Get the static's unique string identifier</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the static's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetName</name>
+	<summary>Set the static's name (its unique string identifier)
+ e.g.</summary>
+	<description>"my\_vase" or "oldrubble"</description>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The static's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetSlot</name>
+	<summary>Get the static's slot number (as listed in Tomb Editor and WadTool)</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the static's slot number</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetSlot</name>
+	<summary>Set the static's slot number (as listed in Tomb Editor and WadTool)</summary>
+	<parameters>
+		<parameter>
+			<name>slot</name>
+			<type>int</type>
+			<description>The static's slot number</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetColor</name>
+	<summary>Get the static's color</summary>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>a copy of the static's color</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetColor</name>
+	<summary>Set the static's color</summary>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>the new color of the static</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>Shatter</name>
+	<summary>Shatter static mesh</summary>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Enable</name>
+	<summary>Enable the volume.</summary>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Disable</name>
+	<summary>Disable the volume.</summary>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetActive</name>
+	<summary>Determine whether the volume is active or not</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the volume is active</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetPosition</name>
+	<summary>Get the volume's position.</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>a copy of the volume's position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetPosition</name>
+	<summary>Set the volume's position.</summary>
+	<parameters>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>the new position of the volume</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetRotation</name>
+	<summary>Get the volume's rotation.</summary>
+	<returns>
+		<return>
+			<type>Rotation</type>
+			<description>a copy of the volume's rotation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetRotation</name>
+	<summary>Set the volume's rotation.</summary>
+	<parameters>
+		<parameter>
+			<name>rotation</name>
+			<type>Rotation</type>
+			<description>the volume's new rotation</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetScale</name>
+	<summary>Get the volume's scale (separately on all 3 axes).</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current volume scale</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetScale</name>
+	<summary>Set the volume's scale (separately on all 3 axes).</summary>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>Vec3</type>
+			<description>the volume's new scale</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetName</name>
+	<summary>Get the volume's unique string identifier.</summary>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>the volume's name</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetName</name>
+	<summary>Set the volume's name (its unique string identifier).</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The volume's new name</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>ClearActivators</name>
+	<summary>Clear activator list for volumes (makes volume trigger everything again)</summary>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>IsMoveableInside</name>
+	<summary>Check if specified moveable is inside the volume</summary>
+	<parameters>
+		<parameter>
+			<name>Moveable</name>
+			<type>Objects.Moveable</type>
+			<description>which should be checked for containment</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>state of the moveable, true if contained, false if not</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Rotation</module>
+	<name>Rotation</name>
+	<parameters>
+		<parameter>
+			<name>X</name>
+			<type>float</type>
+			<description>rotation about x axis</description>
+		</parameter>
+		<parameter>
+			<name>Y</name>
+			<type>float</type>
+			<description>rotation about y axis</description>
+		</parameter>
+		<parameter>
+			<name>Z</name>
+			<type>float</type>
+			<description>rotation about z axis</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Rotation</type>
+			<description>A Rotation object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Rotation</module>
+	<name>tostring</name>
+	<parameters>
+		<parameter>
+			<name>rotation</name>
+			<type>Rotation</type>
+			<description>this rotation</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>A string showing the x, y, and z values of the rotation</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<name>DisplayString</name>
+	<summary>Create a DisplayString.</summary>
+	<description>For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.</description>
+	<parameters>
+		<parameter>
+			<name>str</name>
+			<type>string</type>
+			<description>string to print or key of translated string</description>
+		</parameter>
+		<parameter>
+			<name>x</name>
+			<type>int</type>
+			<description>x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>int</type>
+			<description>y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)</description>
+		</parameter>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>the color of the text</description>
+		</parameter>
+		<parameter>
+			<name>translated</name>
+			<type>bool</type>
+			<description>if false or omitted, the str argument will be printed.
+If true, the str argument will be the key of a translated string specified in
+strings.lua. __Default: false__.</description>
+		</parameter>
+		<parameter>
+			<name>flags</name>
+			<type>table</type>
+			<description>a table of display options. Can be empty or omitted. The possible values and their effects are...
+	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
+	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+__Default: empty__</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>DisplayString</type>
+			<description>A new DisplayString object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>GetColor</name>
+	<summary>Get the display string's color</summary>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>a copy of the display string's color</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetColor</name>
+	<summary>Set the display string's color</summary>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>the new color of the display string</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>GetKey</name>
+	<summary>Get the string key to use.</summary>
+	<description>If `translated` is true when @{DisplayString}
+ is called, this will be the string key for the translation that will be displayed.
+ If false or omitted, this will be the string that's displayed.</description>
+	<returns>
+		<return>
+			<type>String</type>
+			<description>a string</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetKey</name>
+	<summary>Set the string key to use.</summary>
+	<description>If `translated` is true when @{DisplayString}
+ is called, this will be the string key for the translation that will be displayed.
+ If false or omitted, this will be the string that's displayed.</description>
+	<parameters>
+		<parameter>
+			<name>string</name>
+			<type>String</type>
+			<description>the new key for the display string</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetPosition</name>
+	<summary>Set the position of the string.</summary>
+	<description>Screen-space coordinates are expected.</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>int</type>
+			<description>x-coordinate of the string</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>int</type>
+			<description>y-coordinate of the string</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>GetPosition</name>
+	<summary>Get the position of the string.</summary>
+	<description>Screen-space coordinates are returned.</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>x x-coordinate of the string</description>
+		</return>
+		<return>
+			<type>int</type>
+			<description>y y-coordinate of the string</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Strings</module>
+	<name>ShowString</name>
+	<summary>Show some text on-screen.</summary>
+	<parameters>
+		<parameter>
+			<name>str</name>
+			<type>DisplayString</type>
+			<description>the string object to draw</description>
+		</parameter>
+		<parameter>
+			<name>time</name>
+			<type>float</type>
+			<description>the time in seconds for which to show the string.
+If not given, the string will have an "infinite" life, and will show
+until @{HideString} is called or until the level is finished.
+Default: nil (i.e. infinite)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings</module>
+	<name>HideString</name>
+	<summary>Hide some on-screen text.</summary>
+	<parameters>
+		<parameter>
+			<name>str</name>
+			<type>DisplayString</type>
+			<description>the string object to hide. Must previously have been shown
+with a call to @{ShowString}, or this function will have no effect.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>GetNormalised</name>
+	<summary>Modify this vector so that it becomes close to the requested length.</summary>
+	<description>Note that since the engine uses integers instead of floating-point
+numbers, this will be less accurate at smaller lengths.
+For example, if you have the vector (100, 600, 700) and set it to
+the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
+However, this function would return it as (0, 1, 1).</description>
+	<parameters>
+		<parameter>
+			<name>length</name>
+			<type>int</type>
+			<description>the new length to set the vector to.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<name>Vec3</name>
+	<parameters>
+		<parameter>
+			<name>X</name>
+			<type>int</type>
+			<description>x coordinate</description>
+		</parameter>
+		<parameter>
+			<name>Y</name>
+			<type>int</type>
+			<description>y coordinate</description>
+		</parameter>
+		<parameter>
+			<name>Z</name>
+			<type>int</type>
+			<description>z coordinate</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>A Vec3 object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<name>tostring</name>
+	<summary>Metafunction; use tostring(myVector)</summary>
+	<parameters>
+		<parameter>
+			<name>Vec3</name>
+			<type>Vec3</type>
+			<description>this Vec3</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>A string showing the x, y, and z values of the Vec3</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<name>Create</name>
+	<summary>Create (but do not start) a new event sequence.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>A label to give the sequence; used to retrieve the timer later as well as internally by TEN.</description>
+		</parameter>
+		<parameter>
+			<name>loop</name>
+			<type>bool</type>
+			<description>if true, the sequence will start again from its first timer once its final function has been called</description>
+		</parameter>
+		<parameter>
+			<name>timerFormat</name>
+			<type>?table|bool</type>
+			<description>same as in Timer. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__</description>
+		</parameter>
+		<parameter>
+			<name>...</name>
+			<type>...</type>
+			<description>a variable number of pairs of arguments - a time in seconds, followed by the function (must be defined in the LevelFuncs table) to call once the time has elapsed, followed by another duration in seconds, another function name, etc. You can specify a function either by its name as a string, or by a table with the function name as the first member, followed by its arguments (see above example).</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>EventSequence</type>
+			<description>The inactive sequence.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<name>Get</name>
+	<summary>Get an event sequence by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The label that was given to the sequence when it was created</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>EventSequence</type>
+			<description>The sequence</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<caller>mySequence</caller>
+	<name>SetPaused</name>
+	<summary>Pause or unpause the sequence.</summary>
+	<description>If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).</description>
+	<parameters>
+		<parameter>
+			<name>p</name>
+			<type>bool</type>
+			<description>if true, the sequence will be paused; if false, it will be unpaused</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<caller>mySequence</caller>
+	<name>IsPaused</name>
+	<summary>Get whether or not the sequence is paused</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the timer is paused, false if otherwise</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<caller>mySequence</caller>
+	<name>Start</name>
+	<summary>Begin or unpause a sequence.</summary>
+	<description>If showing the remaining time on-screen, its color will be set to white.</description>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<caller>mySequence</caller>
+	<name>Stop</name>
+	<summary>Stop the sequence.</summary>
+</function>
+
+<function>
+	<module>EventSequence</module>
+	<caller>mySequence</caller>
+	<name>IsActive</name>
+	<summary>Get whether or not the sequence is active</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the sequence is active, false if otherwise</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<name>Create</name>
+	<summary>Create (but do not start) a new timer.</summary>
+	<description>You have the option of displaying the remaining time on the clock. Timer format details:</description>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>A label to give this timer; used to retrieve the timer later. __Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.</description>
+		</parameter>
+		<parameter>
+			<name>totalTime</name>
+			<type>number</type>
+			<description>The duration of the timer, in seconds</description>
+		</parameter>
+		<parameter>
+			<name>loop</name>
+			<type>bool</type>
+			<description>if true, the timer will start again immediately after the time has elapsed</description>
+		</parameter>
+		<parameter>
+			<name>timerFormat</name>
+			<type>?table|bool</type>
+			<description>If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen.</description>
+		</parameter>
+		<parameter>
+			<name>func</name>
+			<type>func</type>
+			<description>The LevelFunc function to call when the time is up</description>
+		</parameter>
+		<parameter>
+			<name>...</name>
+			<type>...</type>
+			<description>a variable number of arguments with which the above function will be called</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Timer</type>
+			<description>The timer in its paused state</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<name>Get</name>
+	<summary>Get a timer by its name.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>The label that was given to the timer when it was created</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Timer</type>
+			<description>The timer</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>SetFunction</name>
+	<summary>Give the timer a new function and args</summary>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>The LevelFunc member to call when the time is up</description>
+		</parameter>
+		<parameter>
+			<name>...</name>
+			<type>...</type>
+			<description>a variable number of arguments with which the above function will be called</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>Start</name>
+	<summary>Begin or unpause a timer.</summary>
+	<description>If showing the remaining time on-screen, its color will be set to white.</description>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>Stop</name>
+	<summary>Stop the timer.</summary>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>IsActive</name>
+	<summary>Get whether or not the timer is active</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the timer is active, false if otherwise</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>SetPaused</name>
+	<summary>Pause or unpause the timer.</summary>
+	<description>If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).</description>
+	<parameters>
+		<parameter>
+			<name>p</name>
+			<type>bool</type>
+			<description>if true, the timer will be paused; if false, it would be unpaused</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>IsPaused</name>
+	<summary>Get whether or not the timer is paused</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the timer is paused, false if otherwise</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>GetRemainingTime</name>
+	<summary>Get the remaining time for a timer.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>the time in seconds remaining on the clock</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>SetRemainingTime</name>
+	<summary>Set the remaining time for a timer</summary>
+	<parameters>
+		<parameter>
+			<name>remainingTime</name>
+			<type>number</type>
+			<description>the new time remaining for the timer</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>GetRemainingTime</name>
+	<summary>Get the total time for a timer.</summary>
+	<description>This is the amount of time the timer will start with, as well as when starting a new loop</description>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>the timer's total time</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>SetTotalTime</name>
+	<summary>Set the total time for a timer</summary>
+	<parameters>
+		<parameter>
+			<name>totalTime</name>
+			<type>number</type>
+			<description>timer's new total time</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Timer</module>
+	<caller>myTimer</caller>
+	<name>SetLooping</name>
+	<summary>Set whether or not the timer loops</summary>
+	<parameters>
+		<parameter>
+			<name>looping</name>
+			<type>bool</type>
+			<description>whether or not the timer loops</description>
+		</parameter>
+	</parameters>
+</function>

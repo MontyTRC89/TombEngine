@@ -4,6 +4,11 @@
 
 using namespace TEN::Math;
 
+namespace TEN::Renderer
+{
+	struct RendererMesh;
+}
+
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
@@ -17,11 +22,6 @@ constexpr int NUM_PICKUPS		  = ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1;
 constexpr int NUM_PICKUPS_PIECES  = ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1;
 constexpr int NUM_EXAMINES		  = ID_EXAMINE8 - ID_EXAMINE1 + 1;
 constexpr int NUM_EXAMINES_PIECES = ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1;
-
-namespace TEN::Renderer
-{
-	struct RendererMesh;
-}
 
 #pragma region state_and_animation
 enum LaraState
@@ -823,6 +823,25 @@ enum LaraAnim
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
+
+enum LaraExtraAnim
+{
+	LEA_PULL_DAGGER_FROM_DRAGON = 0,
+	LEA_WAKE_UP = 1,
+	LEA_SPEAR_GUARDIAN_DEATH = 2,
+	LEA_TRAIN_DEATH_START = 3,
+	LEA_TREX_DEATH = 4,
+	LEA_SHARK_DEATH = 5,
+	LEA_GIANT_MUTANT_DEATH = 6,
+	LEA_SHIVA_DEATH = 7,
+	LEA_ACTIVATE_TNT_SWITCH = 8,
+	LEA_MIDAS_GOLD_SWITCH = 9,
+	LEA_MIDAS_DEATH = 10,
+	LEA_STRIKE_GONG = 11,
+	LEA_WILLARD_DEATH = 12,
+	LEA_TRAIN_DEATH_END = 13,
+	LEA_SETH_DEATH = 14
+};
 #pragma endregion
 
 enum LARA_MESHES
@@ -1244,15 +1263,23 @@ struct LaraControlData
 	TightropeControlData Tightrope;
 	SubsuitControlData Subsuit;
 
-	bool CanLook;
-	bool IsMoving;
-	bool KeepLow;
-	bool IsLow;
-	bool CanClimbLadder;
-	bool IsClimbingLadder;
-	bool CanMonkeySwing;
-	bool RunJumpQueued;
-	bool Locked;
+	bool IsClimbingLadder = false;
+	bool Locked			  = false;
+	bool IsLow			  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool RunJumpQueued	  = false;
+	bool KeepLow		  = false;
+
+	bool CanClimbLadder = false;
+	bool CanLook		= false;
+	bool CanMonkeySwing = false;
+};
+
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
 };
 
 struct LaraInfo
@@ -1283,7 +1310,7 @@ struct LaraInfo
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
-	FX_INFO* SpasmEffect;	// Not saved.
+	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
@@ -1291,7 +1318,8 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte Wet[NUM_LARA_MESHES];
+	PlayerEffectData Effect = {};
+
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

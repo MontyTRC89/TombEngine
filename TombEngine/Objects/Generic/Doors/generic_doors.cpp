@@ -28,7 +28,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	const auto CrowbarDoorPos = Vector3i(-412, 0, 256);
+	const auto CrowbarDoorPos = Vector3i(-412, 0, 112);
 	const ObjectCollisionBounds CrowbarDoorBounds =
 	{
 		GameBoundingBox(
@@ -401,11 +401,8 @@ namespace TEN::Entities::Doors
 			if (boxIndex != NO_BOX)
 			{
 				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
-
-				for (int i = 0; i < ActiveCreatures.size(); i++)
-				{
-					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
-				}
+				for (auto& currentCreature : ActiveCreatures)
+					currentCreature->LOT.TargetBox = NO_BOX;
 			}
 		}
 	}
@@ -437,8 +434,8 @@ namespace TEN::Entities::Doors
 			{
 				g_Level.Boxes[boxIndex].flags |= BLOCKED;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
-					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
+				for (auto& currentCreature : ActiveCreatures)
+					currentCreature->LOT.TargetBox = NO_BOX;
 			}
 		}
 	}

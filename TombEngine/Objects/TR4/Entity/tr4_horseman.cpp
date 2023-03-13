@@ -11,24 +11,22 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
 	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
 	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
-	const vector<unsigned int> HorsemanAxeAttackJoints = { 5, 6 };
-	const vector<unsigned int> HorsemanKickAttackJoints = { 14 };
-	const vector<unsigned int> HorsemanMountedAttackJoints = { 5, 6, 10 };
-	const vector<unsigned int> HorsemanShieldAttackJoints = { 10 };
+	const auto HorsemanAxeAttackJoints	   = std::vector<unsigned int>{ 5, 6 };
+	const auto HorsemanKickAttackJoints	   = std::vector<unsigned int>{ 14 };
+	const auto HorsemanMountedAttackJoints = std::vector<unsigned int>{ 5, 6, 10 };
+	const auto HorsemanShieldAttackJoints  = std::vector<unsigned int>{ 10 };
 
 	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
 	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
@@ -36,7 +34,7 @@ namespace TEN::Entities::TR4
 
 	enum HorsemanState
 	{
-		HORSEMAN_STATE_NONE = 0,
+		// No state 0.
 		HORSEMAN_STATE_MOUNTED_RUN_FORWARD = 1,
 		HORSEMAN_STATE_MOUNTED_WALK_FORWARD = 2,
 		HORSEMAN_STATE_MOUNTED_IDLE = 3,
@@ -95,7 +93,7 @@ namespace TEN::Entities::TR4
 
 	enum HorseState
 	{
-		HORSE_STATE_NONE = 0,
+		// No state 0.
 		HORSE_STATE_IDLE = 1,
 		HORSE_STATE_RUN_FORWARD = 2,
 		HORSE_STATE_WALK_FORWARD = 3,
@@ -121,7 +119,25 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	static void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
+	void InitialiseHorse(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		SetAnimation(item, HORSE_ANIM_IDLE);
+		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
+		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
+	}
+
+	void InitialiseHorseman(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, HORSEMAN_ANIM_IDLE);
+		item->ItemFlags[0] = NO_ITEM; // No horse yet.
+	}
+
+	void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
@@ -178,7 +194,7 @@ namespace TEN::Entities::TR4
 			spark->gravity = (random / 128) & 0x1F;
 			spark->rotAng = random / 8;
 
-			if (TestProbability(0.5f))
+			if (Random::TestProbability(1 / 2.0f))
 				spark->rotAdd = -16 - (random & 0xF);
 			else
 				spark->rotAdd = spark->sB;
@@ -192,26 +208,6 @@ namespace TEN::Entities::TR4
 			spark->xVel = -phd_sin((random & 0x7FF) + param1 - 1024) * 4096;
 			spark->zVel = phd_cos((random & 0x7FF) + param1 - 1024) * 4096;
 		}
-	}
-
-	void InitialiseHorse(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSE];
-
-		SetAnimation(item, HORSE_ANIM_IDLE);
-		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
-		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
-	}
-
-	void InitialiseHorseman(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[ID_HORSEMAN];
-
-		ClearItem(itemNumber);
-		SetAnimation(item, HORSEMAN_ANIM_IDLE);
-		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}
 
 	void HorsemanControl(short itemNumber)
@@ -361,7 +357,7 @@ namespace TEN::Entities::TR4
 								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
-							else if (TestProbability(0.125f))
+							else if (Random::TestProbability(1 / 8.0f))
 							{
 								if (item->Animation.ActiveState == HORSEMAN_STATE_SHIELD)
 									item->Animation.TargetState = HORSEMAN_STATE_IDLE;
@@ -385,7 +381,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 				horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_SPRINT;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNT_HORSE;
@@ -495,7 +491,7 @@ namespace TEN::Entities::TR4
 				else
 					creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
@@ -586,7 +582,7 @@ namespace TEN::Entities::TR4
 
 				if (!item->AIBits || item->ItemFlags[3])
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.bite && AI.distance < pow(682,2))
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE_ATTACK;

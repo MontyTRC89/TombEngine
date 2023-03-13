@@ -66,7 +66,6 @@ extern int BinocularRange;
 extern bool BinocularOn;
 extern CameraType BinocularOldCamera;
 extern bool LaserSight;
-extern int PhdPerspective;
 extern short CurrentFOV;
 extern short LastFOV;
 
@@ -104,6 +103,7 @@ void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
+void RefreshFixedCamera(short camNumber);
 
 void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);
@@ -111,5 +111,7 @@ void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
 void HandleOptics(ItemInfo* item);
+void UpdateMikePos(ItemInfo* item);
+void ClearObjCamera();
 
 float GetParticleDistanceFade(Vector3i position);

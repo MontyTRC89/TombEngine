@@ -6,9 +6,8 @@ struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 
-//////////
-// TODO: SAVEGAMES.
-//////////
+// TODO: Savegames.
+// TODO: Merge updates to every vehicle from develop.
 
 namespace TEN::Entities::Vehicles
 {

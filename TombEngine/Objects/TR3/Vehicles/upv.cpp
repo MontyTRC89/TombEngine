@@ -8,7 +8,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -26,6 +26,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -41,12 +42,12 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_HEIGHT = 400;
 	constexpr auto UPV_LENGTH = SECTOR(1);
 
-	constexpr auto UPV_MOUNT_DISTANCE		  = CLICK(2);
-	constexpr auto UPV_DISMOUNT_DISTANCE	  = SECTOR(1);
+	constexpr auto UPV_MOUNT_DISTANCE		  = BLOCK(0.5f);
+	constexpr auto UPV_DISMOUNT_DISTANCE	  = BLOCK(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 	constexpr auto UPV_SHIFT				  = 128;
 	constexpr auto UPV_HARPOON_RELOAD_TIME	  = 15;
-	constexpr auto UPV_HARPOON_VELOCITY		  = CLICK(1);
+	constexpr auto UPV_HARPOON_VELOCITY		  = BLOCK(0.25f);
 
 	constexpr auto UPV_VELOCITY_ACCEL		   = 4.0f;
 	constexpr auto UPV_VELOCITY_FRICTION_DECEL = 1.5f;
@@ -263,7 +264,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		TestTriggers(&upvItem, false);
-		TriggerUpvEffects(player.Vehicle);
+		UpvEffects(player.Vehicle);
 
 		if (!(upv.Flags & UPV_FLAG_DEAD) &&
 			player.Vehicle != NO_ITEM)
@@ -722,45 +723,16 @@ namespace TEN::Entities::Vehicles
 
 	void FireUpvHarpoon(ItemInfo& upvItem, ItemInfo& laraItem)
 	{
-		auto& upv = GetUpvInfo(upvItem);
-		auto& player = *GetLaraInfo(&laraItem);
-
-		auto& ammo = GetAmmo(player, LaraWeaponType::HarpoonGun);
-		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
+		auto* harpoon = FireHarpoon(&laraItem);
+		if (harpoon == nullptr)
 			return;
-		else if (!ammo.HasInfinite())
-			ammo--;
 
-		short itemNumber = CreateItem();
+		auto& upv = GetUpvInfo(upvItem);
 
-		if (itemNumber != NO_ITEM)
-		{
-			auto* harpoonItem = &g_Level.Items[itemNumber];
-			harpoonItem->ObjectNumber = ID_HARPOON;
-			harpoonItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-			harpoonItem->RoomNumber = upvItem.RoomNumber;
-
-			auto pos = GetJointPosition(&upvItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230));
-			harpoonItem->Pose.Position = pos;
-
-			InitialiseItem(itemNumber);
-
-			harpoonItem->Pose.Orientation = EulerAngles(upvItem.Pose.Orientation.x, upvItem.Pose.Orientation.y, 0);
-
-			// TODO: Merge fail.
-			// TODO: Huh?
-			harpoonItem->Animation.Velocity.y = -UPV_HARPOON_VELOCITY * phd_sin(harpoonItem->Pose.Orientation.x);
-			harpoonItem->Animation.Velocity.z = UPV_HARPOON_VELOCITY * phd_cos(harpoonItem->Pose.Orientation.x);
-			//harpoonItem->HitPoints = HARPOON_TIME;
-			harpoonItem->ItemFlags[0] = 1;
-
-			AddActiveItem(itemNumber);
-
-			SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &laraItem.Pose, SoundEnvironment::Always);
-
-			Statistics.Game.AmmoUsed++;
-			upv.HarpoonLeft = !upv.HarpoonLeft;
-		}
+		harpoon->Pose.Position = GetJointPosition(&upvItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230));
+		harpoon->Pose.Orientation = EulerAngles(upvItem.Pose.Orientation.x, upvItem.Pose.Orientation.y, 0);
+		harpoon->ItemFlags[0] = 1;
+		upv.HarpoonLeft = !upv.HarpoonLeft;
 	}
 
 	void UpvBackgroundCollision(ItemInfo& upvItem, ItemInfo& laraItem)
@@ -923,7 +895,7 @@ namespace TEN::Entities::Vehicles
 		upvItem.Pose.Position.z += player.WaterCurrentPull.z / CLICK(1);
 	}
 
-	void TriggerUpvEffects(short itemNumber)
+	void UpvEffects(short itemNumber)
 	{
 		if (itemNumber == NO_ITEM)
 			return;
@@ -943,20 +915,17 @@ namespace TEN::Entities::Vehicles
 
 			if (upv.Velocity)
 			{
-				pos = GetJointPosition(&upvItem, UpvBites[UPV_BITE_TURBINE].meshNum, UpvBites[UPV_BITE_TURBINE].Position);
+				auto pos = GetJointPosition(&upvItem, UpvBites[UPV_BITE_TURBINE].meshNum, Vector3i(UpvBites[UPV_BITE_TURBINE].Position)).ToVector3();
+				TriggerUpvMistEffect(pos.x, pos.y + UPV_SHIFT, pos.z, abs(upv.Velocity) / VEHICLE_VELOCITY_SCALE, upvItem.Pose.Orientation.y + ANGLE(180.0f));
 
-				TriggerUpvMistEffect(pos.x, pos.y + UPV_SHIFT, pos.z, abs((int)round(upv.Velocity)), upvItem.Pose.Orientation.y + ANGLE(180.0f));
-
-				if ((GetRandomControl() & 1) == 0)
+				auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
+				if (Random::TestProbability(1 / 2.0f))
 				{
-					auto pos2 = Vector3i(
-						pos.x + (GetRandomControl() & 63) - 32,
-						pos.y + UPV_SHIFT,
-						pos.z + (GetRandomControl() & 63) - 32
-					);
-					short probedRoomNumber = GetCollision(pos2.x, pos2.y, pos2.z, upvItem.RoomNumber).RoomNumber;
-				
-					CreateBubble(&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
+					auto bubblePos = Random::GeneratePointInSphere(sphere);
+					int roomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, upvItem.RoomNumber).RoomNumber;
+
+					for (int i = 0; i < 3; i++)
+						SpawnBubble(bubblePos, roomNumber, (int)BubbleFlags::HighAmplitude);
 				}
 			}
 		}

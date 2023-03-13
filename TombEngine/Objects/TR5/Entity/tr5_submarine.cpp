@@ -23,6 +23,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	void InitialiseSubmarine(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
+
+		if (!item->TriggerFlags)
+			item->TriggerFlags = 120;
+	}
+
 	void TriggerSubmarineSparks(short itemNumber)
 	{
 		auto* spark = GetFreeParticle();
@@ -131,23 +142,24 @@ namespace TEN::Entities::Creatures::TR5
 		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Pose, SoundEnvironment::Always);
 
 		torpedoItem->ObjectNumber = ID_TORPEDO;
-		torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		torpedoItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			auto pos1 = Vector3i::Zero;
-			auto pos2 = Vector3i::Zero;
-			for (int i = 0; i < 8; i++)
-			{
-				pos1 = GetJointPosition(item, 4, Vector3i(
+		auto pos1 = Vector3i::Zero;
+		auto pos2 = Vector3i::Zero;
+		for (int i = 0; i < 8; i++)
+		{
+			pos1 = GetJointPosition(
+				item, 4,
+				Vector3i(
 					(GetRandomControl() & 0x7F) - 414,
 					-320,
-					352
-				));
+					352));
 
-				pos2 = GetJointPosition(item, 4, Vector3i(
+			pos2 = GetJointPosition(
+				item, 4, Vector3i(
 					(GetRandomControl() & 0x3FF) - 862,
 					-320 - (GetRandomControl() & 0x3FF),
-					(GetRandomControl() & 0x3FF) - 160
-				));
+					(GetRandomControl() & 0x3FF) - 160));
 
 			TriggerTorpedoSparks2(&pos1, &pos2, 0);
 		}
@@ -167,17 +179,6 @@ namespace TEN::Entities::Creatures::TR5
 		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
-	}
-
-	void InitialiseSubmarine(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-		SetAnimation(item, 0);
-
-		if (!item->TriggerFlags)
-			item->TriggerFlags = 120;
 	}
 
 	void SubmarineControl(short itemNumber)
@@ -428,7 +429,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				pos.x = 4 * item->Animation.ActiveState;
 				pos.y = 4 * item->Animation.TargetState;
-				pos.z = 4 * item->Animation.RequiredState;
+				pos.z = 4 * (item->Animation.RequiredState == NO_STATE) ? 0 : item->Animation.RequiredState;
 			}
 		}
 

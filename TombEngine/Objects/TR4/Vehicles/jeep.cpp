@@ -980,7 +980,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - jeepItem.Pose.Position.y) > WALL_SIZE / 2)
+		if (abs(probe.Position.Floor - jeepItem.Pose.Position.y) > BLOCK(0.5f))
 			return false;
 
 		if ((probe.Position.Ceiling - jeepItem.Pose.Position.y) > -LARA_HEIGHT ||

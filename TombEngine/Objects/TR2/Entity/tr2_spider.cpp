@@ -11,42 +11,69 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
+	constexpr auto SMALL_SPIDER_ATTACK_DAMAGE = 25;
+	constexpr auto BIG_SPIDER_ATTACK_DAMAGE	  = 100;
+
+	constexpr auto SMALL_SPIDER_SHORT_JUMP_RANGE = SQUARE(BLOCK(0.2f));
+	constexpr auto SMALL_SPIDER_LONG_JUMP_RANGE	 = SQUARE(BLOCK(0.5f));
+	constexpr auto BIG_SPIDER_IDLE_RANGE		 = SQUARE(BLOCK(0.75f)) + 15;
+
+	constexpr auto SMALL_SPIDER_IDLE_CHANCE = 1 / 128.0f;
+	constexpr auto BIG_SPIDER_IDLE_CHANCE	= 1 / 64.0f;
+
+	constexpr auto SMALL_SPIDER_TURN_RATE_MAX = ANGLE(8.0f);
+	constexpr auto BIG_SPIDER_TURN_RATE_MAX	  = ANGLE(4.0f);
+
 	const auto SpiderBite = BiteInfo(Vector3(0.0f, 0.0f, 41.0f), 1);
 
-	void S_SpiderBite(ItemInfo* item)
+	enum SpiderState
 	{
-		auto pos = GetJointPosition(item, SpiderBite.meshNum, Vector3i(SpiderBite.Position));
-		DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
-	}
+		// No state 0.
+		SPIDER_STATE_IDLE = 1,
+		SPIDER_STATE_WALK_FORWARD = 2,
+		SPIDER_STATE_RUN_FORWARD = 3,
+		SPIDER_STATE_IDLE_ATTACK = 4,
+		SPIDER_STATE_LONG_JUMP_ATTACK = 5,	// Unused by big spider.
+		SPIDER_STATE_SHORT_JUMP_ATTACK = 6, // Unused by big spider.
+		SPIDER_STATE_DEATH = 7
+	};
 
-	void SpiderLeap(short itemNumber, ItemInfo* item, short angle)
+	enum SmallSpiderAnim
 	{
-		auto vec = GameVector(
-			item->Pose.Position.x,
-			item->Pose.Position.y,
-			item->Pose.Position.z,
-			item->RoomNumber
-		);
+		SMALL_SPIDER_ANIM_IDLE_ATTACK_END = 0,
+		SMALL_SPIDER_ANIM_IDLE_ATTACK_CONTINUE = 1,
+		SMALL_SPIDER_ANIM_SHORT_JUMP_ATTACK = 2,
+		SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK = 3,
+		SMALL_SPIDER_ANIM_DEATH = 4,
+		SMALL_SPIDER_ANIM_IDLE_ATTACK_START = 5,
+		SMALL_SPIDER_ANIM_IDLE = 6,
+		SMALL_SPIDER_ANIM_WALK_FORWARD = 7,
+		SMALL_SPIDER_ANIM_RUN_FORWARD = 8
+	};
 
-		CreatureAnimation(itemNumber, angle, 0);
+	enum BigSpiderAnim
+	{
+		BIG_SPIDER_ANIM_IDLE_ATTACK_END = 0,
+		BIG_SPIDER_ANIM_IDLE_ATTACK_CONTINUE = 1,
+		BIG_SPIDER_ANIM_DEATH = 2,
+		BIG_SPIDER_ANIM_IDLE_ATTACK_START = 3,
+		BIG_SPIDER_ANIM_IDLE = 4,
+		BIG_SPIDER_ANIM_WALK_FORWARD = 5,
+		BIG_SPIDER_ANIM_RUN_FORWARD = 6,
+		BIG_SPIDER_WALK_FORWARD_TO_IDLE = 7,
+		BIG_SPIDER_RUN_FORWARD_TO_IDLE = 8
+	};
 
-		if (item->Pose.Position.y > (vec.y - CLICK(1.5f)))
-			return;
-
-		item->Pose.Position = vec.ToVector3i();
-		if (item->RoomNumber != vec.RoomNumber)
-			ItemNewRoom(item->RoomNumber, vec.RoomNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = 5;
-
-		CreatureAnimation(itemNumber, angle, 0);
+	void DoSpiderBloodEffect(ItemInfo& item)
+	{
+		auto pos = GetJointPosition(&item, SpiderBite.meshNum, SpiderBite.Position);
+		DoBloodSplat(pos.x, pos.y, pos.z, 10, item.Pose.Position.y, item.RoomNumber);
 	}
 
 	void SmallSpiderControl(short itemNumber)
@@ -57,82 +84,103 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 7)
+			if (item->Animation.ActiveState != SPIDER_STATE_DEATH)
 			{
+				SoundEffect(SFX_TR2_SPIDER_EXPLODE, &item->Pose);
+				SetAnimation(item, SMALL_SPIDER_ANIM_DEATH);
 				ExplodingDeath(itemNumber, 0);
 				DisableEntityAI(itemNumber);
-				item->Animation.ActiveState = 7;
 				KillItem(itemNumber);
 			}
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
-			angle = CreatureTurn(item, ANGLE(8.0f));
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case SPIDER_STATE_IDLE:
+				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
-						item->Animation.TargetState = 2;
-					else
-						break;
+					if (Random::TestProbability(SMALL_SPIDER_IDLE_CHANCE))
+						item->Animation.TargetState = SPIDER_STATE_WALK_FORWARD;
 				}
-				else if (AI.ahead && item->TouchBits.TestAny())
-					item->Animation.TargetState = 4;
+				else if (ai.ahead && item->TouchBits.TestAny())
+				{
+					item->Animation.TargetState = SPIDER_STATE_IDLE_ATTACK;
+				}
 				else if (creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
+				{
+					item->Animation.TargetState = SPIDER_STATE_WALK_FORWARD;
+				}
 				else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = 3;
+				{
+					item->Animation.TargetState = SPIDER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
-			case 2:
+			case SPIDER_STATE_WALK_FORWARD:
+				creature->MaxTurn = SMALL_SPIDER_TURN_RATE_MAX;
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
-						item->Animation.TargetState = 1;
+					if (Random::TestProbability(SMALL_SPIDER_IDLE_CHANCE))
+						item->Animation.TargetState = SPIDER_STATE_IDLE;
 					else
 						break;
 				}
 				else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = 3;
+				{
+					item->Animation.TargetState = SPIDER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
-			case 3:
+			case SPIDER_STATE_RUN_FORWARD:
+				creature->MaxTurn = SMALL_SPIDER_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
-				else if (AI.ahead && item->TouchBits.TestAny())
-					item->Animation.TargetState = 1;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.2f), 2))
-					item->Animation.TargetState = 6;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
-					item->Animation.TargetState = 5;
+				{
+					item->Animation.TargetState = SPIDER_STATE_WALK_FORWARD;
+				}
+				else if (ai.ahead && item->TouchBits.TestAny())
+				{
+					item->Animation.TargetState = SPIDER_STATE_IDLE;
+				}
+				else if (ai.ahead && ai.distance < SMALL_SPIDER_SHORT_JUMP_RANGE)
+				{
+					item->Animation.TargetState = SPIDER_STATE_SHORT_JUMP_ATTACK;
+				}
+				else if (ai.ahead && ai.distance < SMALL_SPIDER_LONG_JUMP_RANGE)
+				{
+					item->Animation.TargetState = SPIDER_STATE_LONG_JUMP_ATTACK;
+				}
 
 				break;
 
-			case 4:
-			case 5:
-			case 6:
+			case SPIDER_STATE_IDLE_ATTACK:
+			case SPIDER_STATE_LONG_JUMP_ATTACK:
+			case SPIDER_STATE_SHORT_JUMP_ATTACK:
+				creature->MaxTurn = 0;
+
 				if (!creature->Flags && item->TouchBits.TestAny())
 				{
-					S_SpiderBite(item);
-					DoDamage(creature->Enemy, 25);
+					DoSpiderBloodEffect(*item);
+					DoDamage(creature->Enemy, SMALL_SPIDER_ATTACK_DAMAGE);
+					SoundEffect(SFX_TR2_SPIDER_BITE, &item->Pose);
 					creature->Flags = 1;
 				}
 
@@ -140,11 +188,22 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-
-		if (item->Animation.ActiveState == 5 || item->Animation.ActiveState == 4)
-			CreatureAnimation(itemNumber, angle, 0);
+		if (item->Animation.ActiveState == SPIDER_STATE_IDLE ||
+			item->Animation.ActiveState == SPIDER_STATE_WALK_FORWARD ||
+			item->Animation.ActiveState == SPIDER_STATE_RUN_FORWARD)
+		{
+			// Only 2 block climb.
+			if (CreatureVault(itemNumber, headingAngle, 2, 0) == 2)
+			{
+				creature->MaxTurn = 0;
+				SetAnimation(item, SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK); // HACK: Long jump serves as climb.
+				return;
+			}
+		}
 		else
-			SpiderLeap(itemNumber, item, angle);
+		{
+			CreatureAnimation(itemNumber, headingAngle, 0);
+		}
 	}
 
 	void BigSpiderControl(short itemNumber)
@@ -155,9 +214,9 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 
-		AI_INFO AI;
+		AI_INFO ai;
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 7)
@@ -169,62 +228,78 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			CreatureAIInfo(item, &AI);
-			GetCreatureMood(item, &AI, TRUE);
-			CreatureMood(item, &AI, TRUE);
-			angle = CreatureTurn(item, ANGLE(4.0f));
+			CreatureAIInfo(item, &ai);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case SPIDER_STATE_IDLE:
+				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x200)
-						item->Animation.TargetState = 2;
+					if (Random::TestProbability(BIG_SPIDER_IDLE_CHANCE))
+						item->Animation.TargetState = SPIDER_STATE_IDLE;
 					else
 						break;
 				}
-				else if (AI.ahead && AI.distance < (pow(CLICK(3), 2) + 15))
-					item->Animation.TargetState = 4;
+				else if (ai.ahead && ai.distance < BIG_SPIDER_IDLE_RANGE)
+				{
+					item->Animation.TargetState = SPIDER_STATE_IDLE_ATTACK;
+				}
 				else if (creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
+				{
+					item->Animation.TargetState = SPIDER_STATE_WALK_FORWARD;
+				}
 				else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = 3;
+				{
+					item->Animation.TargetState = SPIDER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
-			case 2:
+			case SPIDER_STATE_WALK_FORWARD:
+				creature->MaxTurn = BIG_SPIDER_TURN_RATE_MAX;
+
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x200)
-						item->Animation.TargetState = 1;
+					if (Random::TestProbability(BIG_SPIDER_IDLE_CHANCE))
+						item->Animation.TargetState = SPIDER_STATE_IDLE;
 					else
 						break;
 				}
 				else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = 3;
+				{
+					item->Animation.TargetState = SPIDER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
-			case 3:
+			case SPIDER_STATE_RUN_FORWARD:
+				creature->MaxTurn = BIG_SPIDER_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
-				else if (AI.ahead && item->TouchBits.TestAny())
-					item->Animation.TargetState = 1;
+				{
+					item->Animation.TargetState = SPIDER_STATE_WALK_FORWARD;
+				}
+				else if (ai.ahead && item->TouchBits.TestAny())
+				{
+					item->Animation.TargetState = SPIDER_STATE_IDLE;
+				}
 
 				break;
 
-			case 4:
-			case 5:
-			case 6:
+			case SPIDER_STATE_IDLE_ATTACK:
+				creature->MaxTurn = 0;
+
 				if (!creature->Flags && item->TouchBits.TestAny())
 				{
-					S_SpiderBite(item);
-					DoDamage(creature->Enemy, 100);
+					DoSpiderBloodEffect(*item);
+					DoDamage(creature->Enemy, BIG_SPIDER_ATTACK_DAMAGE);
 					creature->Flags = 1;
 				}
 
@@ -232,6 +307,6 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

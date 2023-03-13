@@ -29,6 +29,26 @@ namespace TEN::Renderer
 
 		m_meshes.clear();
 
+		TENLog("Allocated renderer object memory.", LogLevel::Info);
+
+		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
+		for (int i = 0; i < g_Level.AnimatedTextures.size(); i++)
+		{
+			TEXTURE* texture = &g_Level.AnimatedTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			}
+			else {
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_animatedTextures[i] = tex;
+		}
+
+		if (m_animatedTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_animatedTextures.size()) + " animated textures.", LogLevel::Info);
+
 		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(m_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
 			RendererAnimatedTextureSet set{};
 			set.NumTextures = sequence.numFrames;
@@ -47,6 +67,9 @@ namespace TEN::Renderer
 			set.Fps = sequence.Fps;
 			return set;
 		});
+
+		if (m_animatedTextureSets.size() > 0)
+			TENLog("Generated " + std::to_string(m_animatedTextureSets.size()) + " animated texture sets.", LogLevel::Info);
 
 		m_roomTextures.resize(g_Level.RoomTextures.size());
 		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
@@ -70,20 +93,8 @@ namespace TEN::Renderer
 #endif
 		}
 
-		m_animatedTextures.resize(g_Level.AnimatedTextures.size());
-		for (int i = 0; i < g_Level.AnimatedTextures.size(); i++)
-		{
-			TEXTURE *texture = &g_Level.AnimatedTextures[i];
-			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
-			}
-			else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
-			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
-			m_animatedTextures[i] = tex;
-		}
+		if (m_roomTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_roomTextures.size()) + " room texture atlases.", LogLevel::Info);
 
 		m_moveablesTextures.resize(g_Level.MoveablesTextures.size());
 		for (int i = 0; i < g_Level.MoveablesTextures.size(); i++)
@@ -107,6 +118,9 @@ namespace TEN::Renderer
 #endif
 		}
 
+		if (m_moveablesTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_moveablesTextures.size()) + " moveable texture atlases.", LogLevel::Info);
+
 		m_staticsTextures.resize(g_Level.StaticsTextures.size());
 		for (int i = 0; i < g_Level.StaticsTextures.size(); i++)
 		{
@@ -129,6 +143,9 @@ namespace TEN::Renderer
 #endif
 		}
 
+		if (m_staticsTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_staticsTextures.size()) + " static mesh texture atlases.", LogLevel::Info);
+
 		m_spritesTextures.resize(g_Level.SpritesTextures.size());
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
@@ -136,7 +153,12 @@ namespace TEN::Renderer
 			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size());
 		}
 
+		if (m_spritesTextures.size() > 0)
+			TENLog("Generated " + std::to_string(m_spritesTextures.size()) + " sprite atlases.", LogLevel::Info);
+
 		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), g_Level.SkyTexture.colorMapData.size());
+
+		TENLog("Loaded sky texture.", LogLevel::Info);
 
 		int totalVertices = 0;
 		int totalIndices = 0;
@@ -150,11 +172,15 @@ namespace TEN::Renderer
 		if (!totalVertices || !totalIndices)
 			throw std::exception("Level has no textured room geometry.");
 
-		roomsVertices.resize(totalVertices);
-		roomsIndices.resize(totalIndices);
+		m_roomsVertices.resize(totalVertices);
+		m_roomsIndices.resize(totalIndices);
+
+		TENLog("Loaded total " + std::to_string(totalVertices) + " room vertices.", LogLevel::Info);
 
 		int lastVertex = 0;
 		int lastIndex = 0;
+
+		TENLog("Preparing room data...", LogLevel::Info);
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
@@ -168,13 +194,63 @@ namespace TEN::Renderer
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
 			
+			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
+			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
+			Vector3 center = (boxMin + boxMax) / 2.0f;
+			Vector3 extents = boxMax - center;
+			r->BoundingBox = BoundingBox(center, extents);
+
 			r->Neighbors.clear();
 			for (int j : room.neighbors)
 				if (g_Level.Rooms[j].Active())
 					r->Neighbors.push_back(j);
 
-			if (room.mesh.size() > 0)
-				r->StaticsToDraw.reserve(room.mesh.size());
+			if (room.doors.size() != 0)
+			{
+				r->Doors.resize(room.doors.size());
+
+				for (int l = 0; l < room.doors.size(); l++)
+				{
+					RendererDoor* door = &r->Doors[l];
+					ROOM_DOOR* oldDoor = &room.doors[l];
+
+					door->RoomNumber = oldDoor->room;
+					door->Normal = oldDoor->normal;
+
+					for (int k = 0; k < 4; k++)
+					{
+						door->AbsoluteVertices[k] = Vector4(
+							room.x + oldDoor->vertices[k].x,
+							room.y + oldDoor->vertices[k].y,
+							room.z + oldDoor->vertices[k].z,
+							1.0f
+						);
+					}
+				}
+			}
+
+			if (room.mesh.size() != 0)
+			{
+				r->Statics.resize(room.mesh.size());
+
+				for (int l = 0; l < room.mesh.size(); l++)
+				{
+					RendererStatic* staticInfo = &r->Statics[l];
+					MESH_INFO* oldMesh = &room.mesh[l];
+
+					oldMesh->Dirty = true;
+
+					staticInfo->ObjectNumber = oldMesh->staticNumber;
+					staticInfo->RoomNumber = oldMesh->roomNumber;
+					staticInfo->Color = oldMesh->color;
+					staticInfo->AmbientLight = r->AmbientLight;
+					staticInfo->Pose = oldMesh->pos;
+					staticInfo->Scale = oldMesh->scale;
+					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+
+					staticInfo->Update();
+				}
+			}
 
 			if (room.positions.size() == 0)
 				continue;
@@ -214,7 +290,7 @@ namespace TEN::Renderer
 					int baseVertices = lastVertex;
 					for (int k = 0; k < poly.indices.size(); k++)
 					{
-						RendererVertex* vertex = &roomsVertices[lastVertex];
+						RendererVertex* vertex = &m_roomsVertices[lastVertex];
 						int index = poly.indices[k];
 
 						vertex->Position.x = room.x + room.positions[index].x;
@@ -241,12 +317,12 @@ namespace TEN::Renderer
 					{
 						newPoly.baseIndex = lastIndex;
 
-						roomsIndices[lastIndex + 0] = baseVertices + 0;
-						roomsIndices[lastIndex + 1] = baseVertices + 1;
-						roomsIndices[lastIndex + 2] = baseVertices + 3;
-						roomsIndices[lastIndex + 3] = baseVertices + 2;
-						roomsIndices[lastIndex + 4] = baseVertices + 3;
-						roomsIndices[lastIndex + 5] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
+						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 2] = baseVertices + 3;
+						m_roomsIndices[lastIndex + 3] = baseVertices + 2;
+						m_roomsIndices[lastIndex + 4] = baseVertices + 3;
+						m_roomsIndices[lastIndex + 5] = baseVertices + 1;
 
 						lastIndex += 6;
 					}
@@ -254,9 +330,9 @@ namespace TEN::Renderer
 					{
 						newPoly.baseIndex = lastIndex;
  
-						roomsIndices[lastIndex + 0] = baseVertices + 0;
-						roomsIndices[lastIndex + 1] = baseVertices + 1;
-						roomsIndices[lastIndex + 2] = baseVertices + 2;
+						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
+						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
+						m_roomsIndices[lastIndex + 2] = baseVertices + 2;
 
 						lastIndex += 3;
 					}
@@ -283,6 +359,7 @@ namespace TEN::Renderer
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_POINT)
 					{
@@ -293,6 +370,7 @@ namespace TEN::Renderer
 						light->Out = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_POINT;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_SHADOW)
 					{
@@ -303,6 +381,7 @@ namespace TEN::Renderer
 						light->Out = oldLight->out;
 						light->CastShadows = false;
 						light->Type = LIGHT_TYPE_SHADOW;
+						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_SPOT)
 					{
@@ -316,6 +395,7 @@ namespace TEN::Renderer
 						light->OutRange = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
+						light->Luma = Luma(light->Color);
 					}
 
 					// Monty's temp variables for sorting
@@ -328,8 +408,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomsVertices.size(), roomsVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomsIndices.size(), roomsIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), m_roomsVertices.size(), m_roomsVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), m_roomsIndices.size(), m_roomsIndices.data());
 
 		std::for_each(std::execution::par_unseq,
 			m_rooms.begin(),
@@ -349,6 +429,8 @@ namespace TEN::Renderer
 				);
 			}
 		);
+
+		TENLog("Preparing object data...", LogLevel::Info);
 
 		bool skinPresent = false;
 		bool hairsPresent = false;
@@ -371,8 +453,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		moveablesVertices.resize(totalVertices);
-		moveablesIndices.resize(totalIndices);
+		m_moveablesVertices.resize(totalVertices);
+		m_moveablesIndices.resize(totalIndices);
 
 		lastVertex = 0;
 		lastIndex = 0;
@@ -393,7 +475,7 @@ namespace TEN::Renderer
 				{
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
-					// and vertices have bone index 0 and not 10
+					// and vertices have bone index 0 and not 10.
 					RendererMesh *mesh = GetRendererMeshFromTrMesh(&moveable,
 																   &g_Level.Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
@@ -501,7 +583,7 @@ namespace TEN::Renderer
 						skinPresent = true;
 						int BonesToCheck[2] = {0, 0};
 
-						RendererObject &objSkin = *m_moveableObjects[ID_LARA_SKIN];
+						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
 						for (int j = 1; j < obj->nmeshes; j++)
 						{
@@ -517,7 +599,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									RendererVertex *jointVertex = &moveablesVertices[jointBucket->StartVertex + v1];
+									RendererVertex *jointVertex = &m_moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool done = false;
 
@@ -531,15 +613,15 @@ namespace TEN::Renderer
 											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												RendererVertex *skinVertex = &moveablesVertices[skinBucket->StartVertex + v2];
+												RendererVertex *skinVertex = &m_moveablesVertices[skinBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
+												int x1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
+												int y1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
+												int z1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
+												int x2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
+												int y2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
+												int z2 = m_moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
 
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
@@ -579,7 +661,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
-									RendererVertex* currentVertex = &moveablesVertices[currentBucket->StartVertex + v1];
+									RendererVertex* currentVertex = &m_moveablesVertices[currentBucket->StartVertex + v1];
 									currentVertex->Bone = j + 1;
 
 									if (j == 0)
@@ -587,7 +669,7 @@ namespace TEN::Renderer
 										// Mesh 0 must be linked with head
 										int parentVertices[] = { 37,39,40,38 };
 										
-										RendererObject& skinObj = *m_moveableObjects[ID_LARA_SKIN];
+										RendererObject& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 										RendererMesh* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										RendererBone* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
@@ -598,7 +680,7 @@ namespace TEN::Renderer
 												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
+													RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
 
 													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
 													{
@@ -621,15 +703,15 @@ namespace TEN::Renderer
 											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
+												RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
+												int x1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
+												int x2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
@@ -650,8 +732,10 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), moveablesVertices.size(), moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), moveablesIndices.size(), moveablesIndices.data());
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), m_moveablesVertices.size(), m_moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), m_moveablesIndices.size(), m_moveablesIndices.data());
+
+		TENLog("Preparing static mesh data...", LogLevel::Info);
 
 		totalVertices = 0;
 		totalIndices = 0;
@@ -667,8 +751,8 @@ namespace TEN::Renderer
 				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 			}
 		}
-		staticsVertices.resize(totalVertices);
-		staticsIndices.resize(totalIndices);
+		m_staticsVertices.resize(totalVertices);
+		m_staticsIndices.resize(totalIndices);
 
 		lastVertex = 0;
 		lastIndex = 0;
@@ -688,16 +772,18 @@ namespace TEN::Renderer
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 		}
 
-		if (staticsVertices.size() > 0)
+		if (m_staticsVertices.size() > 0)
 		{
-			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
-			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), m_staticsVertices.size(), m_staticsVertices.data());
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), m_staticsIndices.size(), m_staticsIndices.data());
 		}
 		else
 		{
 			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), 1);
 			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), 1);
 		}
+
+		TENLog("Preparing sprite data...", LogLevel::Info);
 		
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());
@@ -713,6 +799,8 @@ namespace TEN::Renderer
 			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
 			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
 			sprite.Texture = &m_spritesTextures[oldSprite->tile];
+			sprite.Width = (oldSprite->x2 - oldSprite->x1) * sprite.Texture->Width + 1;
+			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
 		}
 
 		for (int i = 0; i < MoveablesIds.size(); i++)
@@ -805,9 +893,9 @@ namespace TEN::Renderer
 					vertex.Hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
-						moveablesVertices[*lastVertex] = vertex;
+						m_moveablesVertices[*lastVertex] = vertex;
 					else
-						staticsVertices[*lastVertex] = vertex;
+						m_staticsVertices[*lastVertex] = vertex;
 
 					*lastVertex = *lastVertex + 1;
 				}
@@ -818,21 +906,21 @@ namespace TEN::Renderer
 
 					if (obj->Type == 0)
 					{
-						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						m_moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						m_moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						m_moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
 					}
 					else
 					{
-						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						m_staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						m_staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						m_staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
 					}
 
 					*lastIndex = *lastIndex + 6;
@@ -843,15 +931,15 @@ namespace TEN::Renderer
 
 					if (obj->Type == 0)
 					{
-						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
 					}
 					else
 					{
-						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
 					}
 
 					*lastIndex = *lastIndex + 3;

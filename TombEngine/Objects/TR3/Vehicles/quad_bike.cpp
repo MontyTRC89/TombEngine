@@ -1082,7 +1082,7 @@ namespace TEN::Entities::Vehicles
 		if (spark->sLife < 9)
 			spark->sLife = spark->life = 9;
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_SCREEN;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ALPHABLEND;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 4;
 		spark->extras = 0;

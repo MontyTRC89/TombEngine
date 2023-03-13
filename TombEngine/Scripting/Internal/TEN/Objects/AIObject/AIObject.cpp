@@ -36,16 +36,16 @@ void AIObject::Register(sol::table & parent)
 		// @tparam Vec3 position the new position of the object 
 		ScriptReserved_SetPosition, &AIObject::SetPos,
 
-		/// Get the object's Y-axis rotation
+		/// Get the object's Y-axis rotation.
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
 		// @function AIObject:GetRotationY
 		// @treturn number the object's Y-axis rotation 
 		ScriptReserved_GetRotationY, &AIObject::GetYRot,
 
-		/// Set the object's Y-axis rotation
+		/// Set the object's Y-axis rotation.
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
 		// @function AIObject:SetRotationY
-		// @tparam number The object's new Y-axis rotation
+		// @tparam number rotation The object's new Y-axis rotation
 		ScriptReserved_SetRotationY, &AIObject::SetYRot,
 
 		/// Get the object's unique string identifier
@@ -60,14 +60,19 @@ void AIObject::Register(sol::table & parent)
 
 		/// Get the current room of the object
 		// @function AIObject:GetRoom
-		// @treturn int number representing the current room of the object
+		// @treturn Room current room of the object
 		ScriptReserved_GetRoom, &AIObject::GetRoom,
 
-		/// Set room of object 
+		/// Get the current room number of the object
+		// @function AIObject:GetRoomNumber
+		// @treturn int number representing the current room of the object
+		ScriptReserved_GetRoomNumber, &AIObject::GetRoomNumber,
+
+		/// Set room number of the object 
 		// This is used in conjunction with SetPosition to teleport the object to a new room.
-		// @function AIObject:SetRoom
+		// @function AIObject:SetRoomNumber
 		// @tparam int ID the ID of the new room 
-		ScriptReserved_SetRoom, &AIObject::SetRoom,
+		ScriptReserved_SetRoomNumber, &AIObject::SetRoomNumber,
 
 		/// Retrieve the object ID
 		// @function AIObject:GetObjectID
@@ -146,12 +151,17 @@ void AIObject::SetName(std::string const & id)
 	}
 }
 
-short AIObject::GetRoom() const
+std::unique_ptr<Room> AIObject::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_aiObject.roomNumber]);
+}
+
+int AIObject::GetRoomNumber() const
 {
 	return m_aiObject.roomNumber;
 }
 
-void AIObject::SetRoom(short room)
+void AIObject::SetRoomNumber(short room)
 {
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)

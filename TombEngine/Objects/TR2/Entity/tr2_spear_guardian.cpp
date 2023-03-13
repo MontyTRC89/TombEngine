@@ -2,67 +2,208 @@
 #include "Objects/TR2/Entity/tr2_spear_guardian.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto SpearBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
-	const auto SpearBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
+	// TODO: Fix names.
+	constexpr auto SPEAR_GUARDIAN_BASIC_DAMAGE	  = 75;
+	constexpr auto SPEAR_GUARDIAN_POWERFUL_DAMAGE = 120;
 
-	// TODO
+	constexpr auto SPEAR_GUARDIAN_WALK_TURN_RATE_MAX = ANGLE(3.0f);
+	constexpr auto SPEAR_GUARDIAN_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
+
+	// TODO: Fix names.
+	constexpr auto SPEAR_GUARDIAN_SLASH_RANGE			   = SQUARE(BLOCK(1));
+	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto SPEAR_GUARDIAN_RUN_RANGE				   = SQUARE(BLOCK(3));
+	constexpr auto SPEAR_GUARDIAN_ATTACK_RANGE			   = SQUARE(BLOCK(2));
+
+	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
+
+	const auto SpearGuardianBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
+	const auto SpearGuardianBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
+
 	enum SpearGuardianState
 	{
-
+		// No state 0.
+		SPEAR_GUARDIAN_STATE_IDLE = 1,
+		SPEAR_GUARDIAN_STATE_SLASH_IDLE = 2,
+		SPEAR_GUARDIAN_STATE_WALK = 3,
+		SPEAR_GUARDIAN_STATE_RUN = 4,
+		SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT_AIM = 5,
+		SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT = 6,
+		SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT_AIM = 7,
+		SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT = 8,
+		SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR_AIM = 9,
+		SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR = 10,
+		SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR_AIM = 11,
+		SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR = 12,
+		SPEAR_GUARDIAN_STATE_SLASH_AIM = 13,
+		SPEAR_GUARDIAN_STATE_SLASH = 14,
+		SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT_AIM = 15,
+		SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT = 16,
+		SPEAR_GUARDIAN_STATE_DEATH = 17,
+		SPEAR_GUARDIAN_STATE_AWAKE = 18,
+		SPEAR_GUARDIAN_STATE_KILL = 19
 	};
 
-	// TODO
+	// TODO: Fix names.
 	enum SpearGuardianAnim
 	{
+		SPEAR_GUARDIAN_ANIM_DOUBLE_ATTACK_FRONT_CANCEL = 0,
+		SPEAR_GUARDIAN_ANIM_DOUBLE_ATTACK_FRONT_PREPARE = 1,
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT_CANCEL = 2,
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT_PREPARE = 3,
+		SPEAR_GUARDIAN_ANIM_WALK_LEFT_SPEAR_ATTACK_CANCEL = 4,
+		SPEAR_GUARDIAN_ANIM_WALK_LEFT_SPEAR_ATTACK_PREPARE = 5,
+		SPEAR_GUARDIAN_ANIM_WALK_RIGHT_SPEAR_ATTACK_CANCEL = 6,
+		SPEAR_GUARDIAN_ANIM_WALK_RIGHT_SPEAR_ATTACK_PREPARE = 7,
+		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE = 8,
+		SPEAR_GUARDIAN_ANIM_SLASH_CANCEL = 9,
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT_TO_IDLE_FAST = 10,
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT = 11, // Deal damage.
+		SPEAR_GUARDIAN_ANIM_UNKNOWN = 12,
 
+		SPEAR_GUARDIAN_ANIM_WALK_DOUBLE_ATTACK_FRONT_TO_SLASH_PREPARE = 15,
+
+		SPEAR_GUARDIAN_ANIM_SLASH = 24,
+
+		SPEAR_GUARDIAN_ANIM_RUN_TO_WALK = 27,
+		SPEAR_GUARDIAN_ANIM_RUN = 28,
+		SPEAR_GUARDIAN_ANIM_STAND_TO_SLASH_PREPARE = 29,
+		SPEAR_GUARDIAN_ANIM_STAND_TO_WALK = 30,
+		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_STAND = 31,
+		SPEAR_GUARDIAN_ANIM_SLASH_PREPARE_TO_WALK = 32,
+		SPEAR_GUARDIAN_ANIM_IDLE = 33,
+		SPEAR_GUARDIAN_ANIM_SLASH_IDLE = 34,
+		SPEAR_GUARDIAN_ANIM_WALK = 35,
+		SPEAR_GUARDIAN_ANIM_WALK_TO_RUN = 36,
+		SPEAR_GUARDIAN_ANIM_RUN_TO_STAND = 37,
+		SPEAR_GUARDIAN_ANIM_WALK_TO_STAND = 38,
+		SPEAR_GUARDIAN_ANIM_RUN_TO_IDLE = 39,
+		SPEAR_GUARDIAN_ANIM_RUN_TO_SLASH_IDLE = 40,
+		SPEAR_GUARDIAN_ANIM_RUN_TO_DOUBLE_ATTACK_FRONT = 41,
+		SPEAR_GUARDIAN_ANIM_RUN_DOUBLE_ATTACK_FRONT = 42,
+
+		SPEAR_GUARDIAN_ANIM_WALK_TO_SLASH_IDLE = 47,
+		SPEAR_GUARDIAN_ANIM_AWAKE = 48,
+		SPEAR_GUARDIAN_ANIM_KILL = 49,
 	};
 
-	void XianDamage(ItemInfo* item, int damage)
+	static void DoSpearGuardianAttack(ItemInfo& item, int damage)
 	{
-		auto* creature = GetCreatureInfo(item);
+		auto& creature = *GetCreatureInfo(&item);
 
-		if (!(creature->Flags & 1) && item->TouchBits & 0x40000)
+		if (!(creature.Flags & 1) && item.TouchBits.Test(SpearGuardianBiteRight.meshNum))
 		{
-			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, SpearBiteRight, DoBloodSplat);
-			creature->Flags |= 1;
-			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
+			DoDamage(creature.Enemy, damage);
+			CreatureEffect(&item, SpearGuardianBiteRight, DoBloodSplat);
+			creature.Flags |= 1;
+			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
 		}
 
-		if (!(creature->Flags & 2) && item->TouchBits & 0x800)
+		if (!(creature.Flags & 2) && item.TouchBits.Test(SpearGuardianBiteLeft.meshNum))
 		{
-			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, SpearBiteLeft, DoBloodSplat);
-			creature->Flags |= 2;
-			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
+			DoDamage(creature.Enemy, damage);
+			CreatureEffect(&item, SpearGuardianBiteLeft, DoBloodSplat);
+			creature.Flags |= 2;
+			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
 		}
+	}
+
+	static void MeshSwapNormalToJade(ItemInfo& item, int jointIndex, bool useEffect = true)
+	{
+		if (useEffect)
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN_STATUE].meshIndex + jointIndex;
+	}
+
+	static void MeshSwapJadeToNormal(ItemInfo& item, int jointIndex, bool useEffect = true)
+	{
+		if (useEffect)
+			SpawnSpearGuardianEffect(GetJointPosition(&item, jointIndex).ToVector3(), item.RoomNumber);
+
+		item.Model.MeshIndex[jointIndex] = Objects[ID_SPEAR_GUARDIAN].meshIndex + jointIndex;
+	}
+
+	static bool DoSpearGuardianMeshSwap(ItemInfo& item)
+	{
+		const auto& object = Objects[item.ObjectNumber];
+		auto& creature = *GetCreatureInfo(&item);
+
+		// Do mesh swaps.
+		if (creature.Flags == 0)
+		{
+			// Jade to normal.
+			if (item.ItemFlags[3] == 0)
+			{
+				MeshSwapJadeToNormal(item, item.ItemFlags[0]);
+				item.ItemFlags[0]++;
+
+				if (item.ItemFlags[0] >= object.nmeshes)
+				{
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 0;
+					item.ItemFlags[3] = 0;
+					return true;
+				}
+			}
+			// Normal to jade.
+			else
+			{
+				MeshSwapNormalToJade(item, item.ItemFlags[0]);
+				item.ItemFlags[0]--;
+
+				if (item.ItemFlags[0] < 0)
+				{
+					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 1;
+					item.ItemFlags[3] = 1;
+					return true;
+				}
+			}
+
+			creature.Flags = SPEAR_GUARDIAN_SWAPMESH_TIME;
+		}
+		else
+		{
+			creature.Flags--;
+		}
+
+		return false;
 	}
 
 	void InitialiseSpearGuardian(short itemNumber)
 	{
-		ClearItem(itemNumber);
+		auto& item = g_Level.Items[itemNumber];
 
-		auto* item = &g_Level.Items[itemNumber];
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
+		InitialiseCreature(itemNumber);
+		SetAnimation(&item, SPEAR_GUARDIAN_ANIM_AWAKE);
+		item.Status &= ~ITEM_INVISIBLE;
 
-		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+		item.ItemFlags[0] = 0; // Joint index for mesh swap.
+		item.ItemFlags[1] = 1; // Immune state (bool).
+		item.ItemFlags[2] = 1; // 1 = swap to jade. 2 = swap to normal.
+		item.ItemFlags[3] = 0; // Set to true if mesh is swapped to jade, otherwise false.
 
-		item->Animation.FrameNumber = anim->frameBase;
-		item->Animation.ActiveState = anim->ActiveState;
+		const auto& object = Objects[item.ObjectNumber];
+		for (int jointIndex = 0; jointIndex < object.nmeshes; jointIndex++)
+			MeshSwapNormalToJade(item, jointIndex, false);
 	}
 
 	void SpearGuardianControl(short itemNumber)
@@ -71,289 +212,405 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
-		short head = 0;
-		short neck = 0;
+		short headingAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
-		bool isLaraAlive = LaraItem->HitPoints > 0;
+		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 
 		if (item->HitPoints <= 0)
 		{
-			item->Animation.ActiveState = 17;
-			item->MeshBits = item->MeshBits.ToPackedBits() / 2;
-
-			if (!item->MeshBits.TestAny())
+			if (item->Animation.ActiveState != SPEAR_GUARDIAN_STATE_DEATH)
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
-				// TODO: exploding death
+				item->ItemFlags[3] = 1;
+				item->ItemFlags[0] = object->nmeshes - 1;
+				item->Animation.ActiveState = SPEAR_GUARDIAN_STATE_DEATH;
 			}
+
+			if (DoSpearGuardianMeshSwap(*item))
+				CreatureDie(itemNumber, true);
 
 			return;
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
-			if (item->Animation.ActiveState != 18)
-				item->MeshBits = 0xFFFFFFFF;
+			if (ai.ahead && item->Animation.ActiveState != SPEAR_GUARDIAN_STATE_AWAKE)
+			{
+				extraHeadRot.x = ai.xAngle / 2;
+				extraHeadRot.y = ai.angle / 2;
+			}
 
 			switch (item->Animation.ActiveState)
 			{
-			case 18:
-				if (!creature->Flags)
-				{
-					item->MeshBits = (item->MeshBits.ToPackedBits() << 1) + 1;
-					creature->Flags = 3;
-				}
-				else
-					creature->Flags--;
-
-				break;
-
-			case 1:
+			case SPEAR_GUARDIAN_STATE_AWAKE:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
-					neck = AI.angle;
+				DoSpearGuardianMeshSwap(*item);
+				break;
+
+			case SPEAR_GUARDIAN_STATE_IDLE:
+				creature->MaxTurn = 0;
+				item->ItemFlags[1] = 0; // Remove immunity.
 
 				if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
-						item->Animation.TargetState = 2;
-					else if (TestProbability(1.0f / 30))
-						item->Animation.TargetState = 3;
+					if (Random::TestProbability(1 / 64.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
+					else if (Random::TestProbability(1 / 30.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = 5;
+				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT_AIM;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 
 				break;
 
-			case 2:
+			case SPEAR_GUARDIAN_STATE_SLASH_IDLE:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
-					neck = AI.angle;
-
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
-						item->Animation.TargetState = 1;
-					else if (TestProbability(1.0f / 30))
-						item->Animation.TargetState = 3;
+					if (Random::TestProbability(1 / 64.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
+					else if (Random::TestProbability(1 / 30.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = 13;
+				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_AIM;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 
 				break;
 
-			case 3:
-				creature->MaxTurn = ANGLE(3.0f);
-
-				if (AI.ahead)
-					neck = AI.angle;
+			case SPEAR_GUARDIAN_STATE_WALK:
+				creature->MaxTurn = SPEAR_GUARDIAN_WALK_TURN_RATE_MAX;
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
-						item->Animation.TargetState = 1;
-					else if (TestProbability(1.0f / 30))
-						item->Animation.TargetState = 2;
+					if (Random::TestProbability(1 / 64.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
+					else if (Random::TestProbability(1 / 30.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_ATTACK_RANGE)
 				{
-					if (AI.distance < pow(SECTOR(1.5f), 2))
-						item->Animation.TargetState = 7;
-					else if (TestProbability(0.5f))
-						item->Animation.TargetState = 9;
+					if (ai.distance < SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE)
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT_AIM;
+					else if (Random::TestProbability(1 / 2.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR_AIM;
 					else
-						item->Animation.TargetState = 11;
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR_AIM;
 				}
-				else if (!AI.ahead || AI.distance > pow(SECTOR(3), 2))
-					item->Animation.TargetState = 4;
+				else if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
 
 				break;
 
-			case 4:
-				creature->MaxTurn = ANGLE(5.0f);
-
-				if (AI.ahead)
-					neck = AI.angle;
+			case SPEAR_GUARDIAN_STATE_RUN:
+				creature->MaxTurn = SPEAR_GUARDIAN_RUN_TURN_RATE_MAX;
 
 				if (creature->Mood == MoodType::Escape)
 					break;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.5f))
-						item->Animation.TargetState = 1;
+					if (Random::TestProbability(1 / 2.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-					item->Animation.TargetState = 15;
+				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT_AIM;
 
 				break;
 
-			case 5:
-				if (AI.ahead)
-					head = AI.angle;
-
-				creature->Flags = 0;
-				if (!AI.ahead || AI.distance > pow(SECTOR(1), 2))
-					item->Animation.TargetState = 1;
-				else
-					item->Animation.TargetState = 6;
-
-				break;
-
-			case 7:
+			case SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT_AIM:
 				creature->Flags = 0;
 
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
-					item->Animation.TargetState = 3;
-				else
-					item->Animation.TargetState = 8;
-
-				break;
-
-			case 9:
-				creature->Flags = 0;
-
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
-					item->Animation.TargetState = 3;
-				else
-					item->Animation.TargetState = 8;
-
-				break;
-
-			case 11:
-				if (AI.ahead)
-					head = AI.angle;
-
-				creature->Flags = 0;
-				if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
-					item->Animation.TargetState = 3;
-				else
-					item->Animation.TargetState = 8;
-
-				break;
-
-			case 13:
-				creature->Flags = 0;
-
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (!AI.ahead || AI.distance > pow(SECTOR(1), 2))
-					item->Animation.TargetState = 2;
-				else
-					item->Animation.TargetState = 14;
-
-				break;
-
-			case 15:
-				creature->Flags = 0;
-
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
-					item->Animation.TargetState = 4;
-				else
-					item->Animation.TargetState = 16;
-
-				break;
-
-			case 6:
-				XianDamage(item, 75);
-				break;
-
-			case 8:
-			case 10:
-			case 12:
-				XianDamage(item, 75);
-
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				if (ai.ahead)
 				{
-					if (TestProbability(0.5f))
-						item->Animation.TargetState = 1;
-					else
-						item->Animation.TargetState = 2;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_DOUBLE_ATTACK_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT;
 
 				break;
 
-			case 14:
-				XianDamage(item, 75);
+			case SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT_AIM:
+				creature->Flags = 0;
 
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = 1;
-				else
-					item->Animation.TargetState = 2;
-
-				break;
-
-			case 16:
-				XianDamage(item, 120);
-
-				if (AI.ahead)
-					head = AI.angle;
-
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				if (ai.ahead)
 				{
-					if (TestProbability(0.5f))
-						item->Animation.TargetState = 1;
-					else
-						item->Animation.TargetState = 2;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-					item->Animation.TargetState = 3;
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_DOUBLE_ATTACK_WALK_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 				else
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR_AIM:
+				creature->Flags = 0;
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR_AIM:
+				creature->Flags = 0;
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_SLASH_AIM:
+				creature->Flags = 0;
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_SLASH_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT_AIM:
+				creature->Flags = 0;
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (!ai.ahead || ai.distance > SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_DOUBLE_ATTACK_FRONT:
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				DoSpearGuardianAttack(*item, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
+				break;
+
+			case SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT:
+			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_LEFT_SPEAR:
+			case SPEAR_GUARDIAN_STATE_WALK_ATTACK_RIGHT_SPEAR:
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				DoSpearGuardianAttack(
+					*item,
+					item->Animation.ActiveState == SPEAR_GUARDIAN_STATE_WALK_DOUBLE_ATTACK_FRONT ?
+					SPEAR_GUARDIAN_POWERFUL_DAMAGE : SPEAR_GUARDIAN_BASIC_DAMAGE);
+
+				if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
+				{
+					if (Random::TestProbability(1 / 2.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
+					else
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
+				}
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_SLASH:
+				DoSpearGuardianAttack(*item, SPEAR_GUARDIAN_BASIC_DAMAGE);
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_RUN_DOUBLE_ATTACK_FRONT:
+				DoSpearGuardianAttack(*item, SPEAR_GUARDIAN_POWERFUL_DAMAGE);
+
+				if (ai.ahead)
+				{
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+				}
+
+				if (ai.ahead && ai.distance < SPEAR_GUARDIAN_SLASH_RANGE)
+				{
+					if (Random::TestProbability(1 / 2.0f))
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_IDLE;
+					else
+						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
+				}
+				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_RUN_RANGE)
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+				else
+					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
 
 				break;
 			}
 		}
 
-		if (isLaraAlive && LaraItem->HitPoints <= 0)
+		if (isPlayerAlive && creature->Enemy->HitPoints <= 0)
 		{
-			CreatureKill(item, 49, 19, 2);
+			creature->MaxTurn = 0;
+			CreatureKill(item, SPEAR_GUARDIAN_ANIM_KILL, LEA_SPEAR_GUARDIAN_DEATH, SPEAR_GUARDIAN_STATE_KILL, LS_DEATH);
 			return;
 		}
 
-		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, head);
-		CreatureJoint(item, 1, neck);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
+		CreatureAnimation(itemNumber, headingAngle, 0);
+	}
+
+	void SpearGuardianHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		if (target.ItemFlags[1] == 1)
+		{
+			if (pos.has_value())
+				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+
+			return;
+		}
+
+		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
+	}
+
+	void SpawnSpearGuardianEffect(const Vector3& pos, int roomNumber)
+	{
+		auto& particle = *GetFreeParticle();
+
+		bool isUnderwater = TestEnvironment(ENV_FLAG_WATER, pos, roomNumber);
+		auto sphere = BoundingSphere(pos, 16);
+		auto effectPos = Random::GeneratePointInSphere(sphere);
+
+		particle.on = true;
+		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+		particle.x = effectPos.x;
+		particle.y = effectPos.y;
+		particle.z = effectPos.z;
+		particle.xVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+		particle.yVel = Random::GenerateInt(-BLOCK(1 / 8.0f), BLOCK(1 / 8.0f));
+		particle.zVel = Random::GenerateInt(-BLOCK(0.5f), BLOCK(0.5f));
+
+		if (isUnderwater)
+		{
+			particle.sR = 0;
+			particle.sG = 255;
+			particle.sB = 0;
+			particle.dR = 0;
+			particle.dG = 0;
+			particle.dB = 0;
+		}
+		else
+		{
+			particle.sR = 0;
+			particle.sG = 0;
+			particle.sB = 0;
+			particle.dR = 0;
+			particle.dG = 255;
+			particle.dB = 0;
+		}
+
+		particle.colFadeSpeed = 8;
+		particle.fadeToBlack = 64;
+		particle.sLife = particle.life = Random::GenerateInt(72, 128);
+		particle.extras = 0;
+		particle.dynamic = -1;
+
+		if (isUnderwater)
+		{
+			particle.yVel /= 16;
+			particle.y += 32;
+			particle.friction = 4 | 16;
+		}
+		else
+		{
+			particle.friction = 6;
+		}
+
+		particle.rotAng = Random::GenerateAngle();
+		particle.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+		particle.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		particle.scalar = 3;
+
+		if (isUnderwater)
+		{
+			particle.gravity = 0;
+			particle.maxYvel = 0;
+		}
+		else
+		{
+			particle.gravity = Random::GenerateInt(-8, -4);
+			particle.maxYvel = Random::GenerateInt(-8, -4);
+		}
+
+		int scale = Random::GenerateInt(128, 172);
+		particle.size = particle.sSize = scale / 8;
+		particle.dSize = scale;
 	}
 }
