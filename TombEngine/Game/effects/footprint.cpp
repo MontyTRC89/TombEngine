@@ -62,91 +62,91 @@ namespace TEN::Effects::Footprints
 		// Choose material for footstep sound
 		switch (floor->Material)
 		{
-		case MaterialType::Concrete:
+		case FLOOR_MATERIAL::Concrete:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
-		case MaterialType::Grass:
+		case FLOOR_MATERIAL::Grass:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
 			break;
 
-		case MaterialType::Gravel:
+		case FLOOR_MATERIAL::Gravel:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
 			break;
 
-		case MaterialType::Ice:
+		case FLOOR_MATERIAL::Ice:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
 			break;
 
-		case MaterialType::Marble:
+		case FLOOR_MATERIAL::Marble:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
 			break;
 
-		case MaterialType::Metal:
+		case FLOOR_MATERIAL::Metal:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
 			break;
 
-		case MaterialType::Mud:
+		case FLOOR_MATERIAL::Mud:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
 			break;
 
-		case MaterialType::OldMetal:
+		case FLOOR_MATERIAL::OldMetal:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
 			break;
 
-		case MaterialType::OldWood:
+		case FLOOR_MATERIAL::OldWood:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 			break;
 
-		case MaterialType::Sand:
+		case FLOOR_MATERIAL::Sand:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
 			break;
 
-		case MaterialType::Snow:
+		case FLOOR_MATERIAL::Snow:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
 			break;
 
-		case MaterialType::Stone:
+		case FLOOR_MATERIAL::Stone:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
-		case MaterialType::Water:
+		case FLOOR_MATERIAL::Water:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 			break;
 
-		case MaterialType::Wood:
+		case FLOOR_MATERIAL::Wood:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 			break;
 
-		case MaterialType::Custom1:
+		case FLOOR_MATERIAL::Custom1:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
 		break;
 
-		case MaterialType::Custom2:
+		case FLOOR_MATERIAL::Custom2:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
 		break; 
 		
-		case MaterialType::Custom3:
+		case FLOOR_MATERIAL::Custom3:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
 		break;
 		
-		case MaterialType::Custom4:
+		case FLOOR_MATERIAL::Custom4:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
 		break; 
 		
-		case MaterialType::Custom5:
+		case FLOOR_MATERIAL::Custom5:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
 			break;
 
-		case MaterialType::Custom6:
+		case FLOOR_MATERIAL::Custom6:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
 			break;
 
-		case MaterialType::Custom7:
+		case FLOOR_MATERIAL::Custom7:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
 			break;
 
-		case MaterialType::Custom8:
+		case FLOOR_MATERIAL::Custom8:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
 			break;
 		}
@@ -155,20 +155,20 @@ namespace TEN::Effects::Footprints
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
-		if (floor->Material != MaterialType::Sand &&
-			floor->Material != MaterialType::Snow &&
-			floor->Material != MaterialType::Gravel &&
-			floor->Material != MaterialType::Mud &&
-			floor->Material != MaterialType::Custom2 &&
-			floor->Material != MaterialType::Custom1 &&
-			floor->Material != MaterialType::Custom3 &&
-			floor->Material != MaterialType::Custom4)
+		if (floor->Material != FLOOR_MATERIAL::Sand &&
+			floor->Material != FLOOR_MATERIAL::Snow &&
+			floor->Material != FLOOR_MATERIAL::Gravel &&
+			floor->Material != FLOOR_MATERIAL::Mud &&
+			floor->Material != FLOOR_MATERIAL::Custom2 &&
+			floor->Material != FLOOR_MATERIAL::Custom1 &&
+			floor->Material != FLOOR_MATERIAL::Custom3 &&
+			floor->Material != FLOOR_MATERIAL::Custom4)
 		{
 			return;
 		}
 
 		// Calculate footprint tilts.
-		auto plane = floor->FloorCollision.Planes[floor->GetSurfacePlaneIndex(footPos.x, footPos.z, true)];
+		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
 		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto yRot = TO_RAD(item->Pose.Orientation.y);

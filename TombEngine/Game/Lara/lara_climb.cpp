@@ -421,36 +421,36 @@ short GetClimbFlags(FloorInfo* floor)
 	short result = 0;
 
 	if (floor->Flags.ClimbEast)
-		result |= (short)ClimbDirectionFlags::East;
+		result |= (short)ClimbDirection::East;
 
 	if (floor->Flags.ClimbWest)
-		result |= (short)ClimbDirectionFlags::West;
+		result |= (short)ClimbDirection::West;
 
 	if (floor->Flags.ClimbNorth)
-		result |= (short)ClimbDirectionFlags::North;
+		result |= (short)ClimbDirection::North;
 
 	if (floor->Flags.ClimbSouth)
-		result |= (short)ClimbDirectionFlags::South;
+		result |= (short)ClimbDirection::South;
 
 	return result;
 }
 
-ClimbDirectionFlags GetClimbDirectionFlags(short angle)
+ClimbDirection GetClimbDirection(short angle)
 {
 	switch (GetQuadrant(angle))
 	{
 	default:
 	case NORTH:
-		return ClimbDirectionFlags::North;
+		return ClimbDirection::North;
 
 	case EAST:
-		return ClimbDirectionFlags::East;
+		return ClimbDirection::East;
 
 	case SOUTH:
-		return ClimbDirectionFlags::South;
+		return ClimbDirection::South;
 
 	case WEST:
-		return ClimbDirectionFlags::West;
+		return ClimbDirection::West;
 	}
 }
 

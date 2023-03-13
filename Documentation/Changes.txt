@@ -5,7 +5,6 @@ Version 1.0.8
 * Fix bubbles phasing through ceilings.
 * Fix TR5 imp collision handling and animations.
 * Fix object camera not clearing at level end.
-* Fix hardcoded double-breathing Lara sfx.
 * Add TR1 slamming doors.
 
 Version 1.0.7

@@ -3,14 +3,14 @@
 #include "Game/items.h"
 #include "Game/collision//floordata.h"
 
-static ClimbDirectionFlags LeftIntRightExtTab[4] =
+static ClimbDirection LeftIntRightExtTab[4] =
 {
-	ClimbDirectionFlags::West, ClimbDirectionFlags::North, ClimbDirectionFlags::East, ClimbDirectionFlags::South
+	ClimbDirection::West, ClimbDirection::North, ClimbDirection::East, ClimbDirection::South
 };
 
-static ClimbDirectionFlags LeftExtRightIntTab[4] =
+static ClimbDirection LeftExtRightIntTab[4] =
 {
-	ClimbDirectionFlags::East, ClimbDirectionFlags::South, ClimbDirectionFlags::West, ClimbDirectionFlags::North
+	ClimbDirection::East, ClimbDirection::South, ClimbDirection::West, ClimbDirection::North
 };
 
 // -----------------------------
@@ -35,7 +35,7 @@ void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll);
 
 short GetClimbFlags(int x, int y, int z, short roomNumber);
 short GetClimbFlags(FloorInfo* floor);
-ClimbDirectionFlags GetClimbDirectionFlags(short angle);
+ClimbDirection GetClimbDirection(short angle);
 
 int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int height, int* shift);
 void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int shift);

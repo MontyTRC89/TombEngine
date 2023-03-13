@@ -271,28 +271,28 @@ SlopeData GetSlopeData(ItemInfo* item)
 	case NORTH:
 		slopeData.Offset.z = CLICK(1);
 		slopeData.Goal.y = -4;
-		slopeData.ClimbOrient = (short)ClimbDirectionFlags::North;
+		slopeData.ClimbOrient = (short)ClimbDirection::North;
 		slopeData.GoalOrient = 0;
 		break;
 
 	case EAST:
 		slopeData.Offset.x = CLICK(1);
 		slopeData.Goal.x = -4;
-		slopeData.ClimbOrient = (short)ClimbDirectionFlags::East;
+		slopeData.ClimbOrient = (short)ClimbDirection::East;
 		slopeData.GoalOrient = ANGLE(90.0f);
 		break;
 
 	case SOUTH:
 		slopeData.Offset.z = -CLICK(1);
 		slopeData.Goal.y = 4;
-		slopeData.ClimbOrient = (short)ClimbDirectionFlags::South;
+		slopeData.ClimbOrient = (short)ClimbDirection::South;
 		slopeData.GoalOrient = ANGLE(180.0f);
 		break;
 
 	case WEST:
 		slopeData.Offset.x = -CLICK(1);
 		slopeData.Goal.x = 4;
-		slopeData.ClimbOrient = (short)ClimbDirectionFlags::West;
+		slopeData.ClimbOrient = (short)ClimbDirection::West;
 		slopeData.GoalOrient = ANGLE(270.0f);
 		break;
 	}
@@ -1117,7 +1117,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 			int y = item->Pose.Position.y - coll->Setup.Height;
 			auto probe = GetCollision(down.x, item->Pose.Position.y - coll->Setup.Height, down.z, item->RoomNumber);
 
-			if (probe.BottomBlock->Flags.IsWallClimbable(GetClimbDirectionFlags(item->Pose.Orientation.y + ANGLE(180.0f))) &&
+			if (probe.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Pose.Orientation.y + ANGLE(180.0f))) &&
 				probe.Position.Floor >= (item->Pose.Position.y - CLICK(1)) &&
 				probe.Position.Ceiling <= (y - CLICK(1)))
 			{
