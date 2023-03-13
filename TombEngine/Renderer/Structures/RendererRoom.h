@@ -18,7 +18,6 @@ namespace TEN::Renderer
 	struct RendererRoom
 	{
 		bool Visited;
-		int Distance;
 		short RoomNumber;
 		Vector4 AmbientLight;
 		Vector4 ViewPort;

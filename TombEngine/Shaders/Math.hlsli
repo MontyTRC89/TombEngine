@@ -24,4 +24,9 @@ float3 Screen(float3 ambient, float3 tint)
 	return float3(r, g, b);
 }
 
+float LinearizeDepth(float depth, float nearPlane, float farPlane)
+{
+	return (2.0f * nearPlane) / (farPlane + nearPlane - depth * (farPlane - nearPlane));
+}
+
 #endif // MATH

@@ -297,13 +297,13 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+	{
 		m_stItem.BoneLightModes[k] = GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
-
+	}
+	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-	BindLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{

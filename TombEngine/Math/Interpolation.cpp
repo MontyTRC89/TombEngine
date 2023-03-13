@@ -12,7 +12,7 @@ namespace TEN::Math
 
 	float InterpolateCos(float value0, float value1, float alpha)
 	{
-		return Lerp(value0, value1, (1.0f - cos(alpha * PI)) * 0.5f);
+		return Lerp(value0, value1, (1 - cos(alpha * PI)) * 0.5f);
 	}
 
 	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
@@ -35,7 +35,7 @@ namespace TEN::Math
 	{
 		alpha = std::clamp(alpha, value0, value1);
 
-		// Don't process if alpha is the same as one of the values.
+		// Don't process if input value is same as one of the values.
 		if (alpha == value0)
 		{
 			return value0;

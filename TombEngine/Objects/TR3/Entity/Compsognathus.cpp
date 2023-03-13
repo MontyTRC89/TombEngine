@@ -6,8 +6,8 @@
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
@@ -18,117 +18,119 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto COMPSOGNATHUS_ATTACK_DAMAGE = 90;
-	constexpr auto COMPSOGNATHUS_RUN_TURN = ANGLE(10);
-	constexpr auto COMPSOGNATHUS_STOP_TURN = ANGLE(3);
+	constexpr auto COMPY_ATTACK_DAMAGE = 90;
 
-	constexpr auto COMPSOGNATHUS_UPSET_SPEED = 15;
+	constexpr auto COMPY_ATTACK_RANGE = SQUARE(BLOCK(0.4f));
+	constexpr auto COMPY_ESCAPE_RANGE = SQUARE(BLOCK(5));
 
-	constexpr auto COMPSOGNATHUS_ATTACK_RANGE = SQUARE(BLOCK(0.4f));
-	constexpr auto COMPSOGNATHUS_SCARED_RANGE = SQUARE(BLOCK(5));
+	constexpr auto COMPY_JUMP_ATTACK_CHANCE = 1 / 8.0f;
+	constexpr auto COMPY_ATTACK_CHANCE		= 1 / 1024.0f;
 
-	constexpr auto COMPSOGNATHUS_ATTACK_ANGLE = 0x3000;
-	constexpr auto COMPSOGNATHUS_JUMP_ATTACK_CHANCE = 0x1000;
-	constexpr auto COMPSOGNATHUS_ATTACK_CHANCE = 31;
+	constexpr auto COMPY_IDLE_TURN_RATE_MAX	  = ANGLE(3.0f);
+	constexpr auto COMPY_RUN_TURN_RATE_MAX	  = ANGLE(10.0f);
+	constexpr auto COMPY_ATTACK_TURN_RATE_MAX = ANGLE(67.5f);
 
-	constexpr auto COMPSOGNATHUS_HIT_FLAG = 1;
+	constexpr auto COMPY_PLAYER_ALERT_VELOCITY = 15;
+	constexpr auto COMPY_HIT_FLAG = 1;
 
-	const auto CompyBite = BiteInfo(Vector3(0.0f, 0.0f, 0.0f), 2);
+	const auto CompyBite = BiteInfo(Vector3::Zero, 2);
 	const auto CompyAttackJoints = std::vector<unsigned int>{ 1, 2 };
 	
 	enum CompyState
 	{
-		COMPSOGNATHUS_STATE_IDLE = 0,
-		COMPSOGNATHUS_STATE_RUN = 1,
-		COMPSOGNATHUS_STATE_JUMP_ATTACK = 2,
-		COMPSOGNATHUS_STATE_ATTACK = 3,
+		COMPY_STATE_IDLE = 0,
+		COMPY_STATE_RUN_FORWARD = 1,
+		COMPY_STATE_JUMP_ATTACK = 2,
+		COMPY_STATE_ATTACK = 3
 	};
 
-	enum  CompyAnim
+	enum CompyAnim
 	{
-		COMPSOGNATHUS_ANIM_IDLE = 0,
-		COMPSOGNATHUS_ANIM_RUN = 1,
-		COMPSOGNATHUS_ANIM_PREPARE_JUMP_ATTACK = 2,
-		COMPSOGNATHUS_ANIM_JUMP_ATTACK = 3,
-		COMPSOGNATHUS_ANIM_JUMP_ATTACK_LAND = 4,
-		COMPSOGNATHUS_ANIM_ATTACK = 5,
-		COMPSOGNATHUS_ANIM_DIE = 6,
-		COMPSOGNATHUS_ANIM_IDLE_TO_RUN = 7,
-		COMPSOGNATHUS_ANIM_RUN_TO_IDLE = 8,
+		COMPY_ANIM_IDLE = 0,
+		COMPY_ANIM_RUN_FORWARD = 1,
+		COMPY_ANIM_JUMP_ATTACK_START = 2,
+		COMPY_ANIM_JUMP_ATTACK_CONTINUE = 3,
+		COMPY_ANIM_JUMP_ATTACK_END = 4,
+		COMPY_ANIM_ATTACK = 5,
+		COMPY_ANIM_DEATH = 6,
+		COMPY_ANIM_IDLE_TO_RUN_FORWARD = 7,
+		COMPY_ANIM_RUN_FORWARD_TO_IDLE = 8
 	};
 
 	enum CompyTarget
-	{	
+	{
 		ATTACK_CADAVER = 0,
-		ATTACK_LARA = 1
+		ATTACK_PLAYER = 1
 	};
 
 	void InitialiseCompsognathus(short itemNumber)
-	{	
+	{
 		auto& item = g_Level.Items[itemNumber];
 		InitialiseCreature(itemNumber);
 
-		//set friendly
+		// Set friendly.
 		item.ItemFlags[1] = ATTACK_CADAVER;		
 	}
 
 	void CompsognathusControl(short itemNumber)
 	{
+		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+
 		if (!CreatureActive(itemNumber))
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		int angle, head, neck, tilt, random, RoomNumber, target;
-		Vector3 cadaverCoordinates;
-		
-		head = neck = angle = tilt = 0;
 
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		short headAngle = 0;
+		short neckAngle = 0;
+
+		int random = 0;
+		int roomNumber = 0;
+		int target = 0;;
+
+		auto cadaverPos = INVALID_CADAVER_POSITION;
+		
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != COMPSOGNATHUS_STATE_IDLE)
-			{
-				SetAnimation(item, COMPSOGNATHUS_ANIM_DIE);
-			}
+			if (item->Animation.ActiveState != COMPY_STATE_IDLE)
+				SetAnimation(item, COMPY_ANIM_DEATH);
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			if (AI.ahead)
-				head = AI.angle;
+			if (ai.ahead)
+				headAngle = ai.angle;
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			if (cadaverCoordinates == Vector3::Zero)
+			if (cadaverPos == INVALID_CADAVER_POSITION)
 			{
-				float minDistance = INFINITY;
-
-				//int i;
-				//ItemInfo* targetItem;
+				float shortestDistance = INFINITY;
 				for (auto& targetItem : g_Level.Items)
 				{
 					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
 
-					if (SameZone(creature, &targetItem) )
+					if (SameZone(creature, &targetItem))
 					{
-						int distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-
-						if (distance < minDistance && targetItem.Effect.Type == EffectType::Cadaver)
+						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
+						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Cadaver)
 						{
-							cadaverCoordinates = Vector3(targetItem.Pose.Position.x, targetItem.Pose.Position.y, targetItem.Pose.Position.z);
-							minDistance = distance;
-							item->ItemFlags[1] = ATTACK_CADAVER;							
+							cadaverPos = targetItem.Pose.Position.ToVector3();
+							shortestDistance = distance;
+							item->ItemFlags[1] = ATTACK_CADAVER;
 						}
 					}
 				}
 			}
 
 			creature->Enemy = LaraItem;
-
 			target = item->ItemFlags[1];
 
 			if (creature->HurtByLara)
@@ -136,25 +138,27 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (creature->Mood == MoodType::Bored && item->ItemFlags[1] == ATTACK_CADAVER)
 			{
-				int dx = cadaverCoordinates.x - item->Pose.Position.x;
-				int dz = cadaverCoordinates.z - item->Pose.Position.z;
-				AI.distance = SQUARE(dx) + SQUARE(dz);
-				AI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				AI.ahead = (AI.angle > -FRONT_ARC && AI.angle < FRONT_ARC);
+				int dx = cadaverPos.x - item->Pose.Position.x;
+				int dz = cadaverPos.z - item->Pose.Position.z;
+				ai.distance = SQUARE(dx) + SQUARE(dz);
+				ai.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				ai.ahead = (ai.angle > -FRONT_ARC && ai.angle < FRONT_ARC);
 			}
 
 			random = ((itemNumber & 0x7) * 0x200) - 0x700;
 		
-			if (!item->ItemFlags[3] 
-				&& !item->ItemFlags[1] == ATTACK_LARA
-				&& ((AI.enemyFacing < COMPSOGNATHUS_ATTACK_ANGLE && AI.enemyFacing > -COMPSOGNATHUS_ATTACK_ANGLE && LaraItem->Animation.Velocity.z > COMPSOGNATHUS_UPSET_SPEED)
-				|| LaraItem->Animation.ActiveState == LS_ROLL_180_FORWARD 
-				|| item->HitStatus))
+			if (!item->ItemFlags[3] &&
+				!item->ItemFlags[1] == ATTACK_PLAYER &&
+				((ai.enemyFacing < COMPY_ATTACK_TURN_RATE_MAX && ai.enemyFacing > -COMPY_ATTACK_TURN_RATE_MAX && LaraItem->Animation.Velocity.z > COMPY_PLAYER_ALERT_VELOCITY) ||
+				LaraItem->Animation.ActiveState == LS_ROLL_180_FORWARD ||
+				item->HitStatus))
 			{
-				if (AI.distance > COMPSOGNATHUS_ATTACK_RANGE * 4)
+				if (ai.distance > (COMPY_ATTACK_RANGE * 4))
 				{
 					item->ItemFlags[0] = (random + 0x700) >> 7;
-					item->ItemFlags[3] = 2 * LaraItem->Animation.Velocity.z;		//Scared for less time the more Compys there are - adjust this when we've got lots of them
+
+					// Scared for less time the more compys there are - adjust this when we've got lots of them.
+					item->ItemFlags[3] = LaraItem->Animation.Velocity.z * 2;
 				}
 			}
 			else if (item->ItemFlags[3])
@@ -165,57 +169,54 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					creature->Mood = MoodType::Escape;					
+					creature->Mood = MoodType::Escape;		
 					item->ItemFlags[3]--;
 				}
 
-				if (GetRandomControl() < COMPSOGNATHUS_ATTACK_CHANCE && item->Timer > 180  )
-				{
-						item->ItemFlags[1] = ATTACK_LARA;
-				}
+				if (Random::TestProbability(COMPY_ATTACK_CHANCE) && item->Timer > 180)
+					item->ItemFlags[1] = ATTACK_PLAYER;
 			}
-			else if (AI.zoneNumber != AI.enemyZone)
+			else if (ai.zoneNumber != ai.enemyZone)
 			{
 				creature->Mood = MoodType::Bored;						
 			}
 			else
-				creature->Mood = MoodType::Attack;	
+			{
+				creature->Mood = MoodType::Attack;
+			}
 
 			switch (creature->Mood)
 			{
 			case MoodType::Attack:
-				
-				creature->Target.x = creature->Enemy->Pose.Position.x + (SECTOR(1) * phd_sin(item->Pose.Orientation.y + random)) ;
+				creature->Target.x = creature->Enemy->Pose.Position.x + (BLOCK(1) * phd_sin(item->Pose.Orientation.y + random));
 				creature->Target.y = creature->Enemy->Pose.Position.y;
-				creature->Target.z = creature->Enemy->Pose.Position.z +(SECTOR(1) * phd_cos(item->Pose.Orientation.y + random));
-
+				creature->Target.z = creature->Enemy->Pose.Position.z + (BLOCK(1) * phd_cos(item->Pose.Orientation.y + random));
 				break;
 
+			// Turn and run.
 			case MoodType::Stalk:
-			case MoodType::Escape:	//Turn & Run
+			case MoodType::Escape:
+				creature->Target.x = item->Pose.Position.x + (BLOCK(1) * phd_sin(ai.angle + ANGLE(180.0f) + random));
+				creature->Target.z = item->Pose.Position.z + (BLOCK(1) * phd_cos(ai.angle + ANGLE(180.0f) + random));
+				roomNumber = item->RoomNumber;
 
-				creature->Target.x = item->Pose.Position.x + (SECTOR(1) * phd_sin(AI.angle + 0x8000 + random));
-				creature->Target.z = item->Pose.Position.z + (SECTOR(1) * phd_cos(AI.angle + 0x8000 + random));
-				RoomNumber = item->RoomNumber;
-
-				if (AI.distance > COMPSOGNATHUS_SCARED_RANGE || !item->ItemFlags[3])
+				if (ai.distance > COMPY_ESCAPE_RANGE || !item->ItemFlags[3])
 				{
 					creature->Mood = MoodType::Bored;
-					item->ItemFlags[0] = item->ItemFlags[3];										
+					item->ItemFlags[0] = item->ItemFlags[3];
 				}
 
 				break;
 
 			case MoodType::Bored:
-				
-				if (cadaverCoordinates != Vector3::Zero && item->ItemFlags[1] == ATTACK_CADAVER)
+				if (cadaverPos != INVALID_CADAVER_POSITION && item->ItemFlags[1] == ATTACK_CADAVER)
 				{
-				creature->Target.x = cadaverCoordinates.x;
-				creature->Target.z = cadaverCoordinates.z;
+					creature->Target.x = cadaverPos.x;
+					creature->Target.z = cadaverPos.z;
 				}
 				else
 				{
-					cadaverCoordinates = Vector3::Zero;
+					cadaverPos = INVALID_CADAVER_POSITION;
 				}
 
 				break;
@@ -224,106 +225,108 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->AIBits)
 				GetAITarget(creature);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
-			if (AI.ahead)
-				head = AI.angle;
+			if (ai.ahead)
+				headAngle = ai.angle;
 
-			neck = -(AI.angle / 4);
+			neckAngle = -(ai.angle / 4);
 
 			if (item->Timer < 250)
-			item->Timer++;
+				item->Timer++;
 
-			if (item->HitStatus && item->Timer > 200 && GetRandomControl() < COMPSOGNATHUS_ATTACK_CHANCE * 100 || (creature->Alerted && AI.zoneNumber == AI.enemyZone))
+			if ((item->HitStatus && item->Timer > 200 && Random::TestProbability(COMPY_ATTACK_CHANCE * 100)) ||
+				(creature->Alerted && ai.zoneNumber == ai.enemyZone))
 			{
-					item->ItemFlags[1] = ATTACK_LARA;					
+				item->ItemFlags[1] = ATTACK_PLAYER;
 			}
 
 			switch (item->Animation.ActiveState)
 			{
-			case COMPSOGNATHUS_STATE_IDLE:
-				creature->MaxTurn = COMPSOGNATHUS_STOP_TURN;
-				creature->Flags &= ~COMPSOGNATHUS_HIT_FLAG;
+			case COMPY_STATE_IDLE:
+				creature->MaxTurn = COMPY_IDLE_TURN_RATE_MAX;
+				creature->Flags &= ~COMPY_HIT_FLAG;
+
 				if (creature->Mood == MoodType::Attack)
 				{					
-					if (AI.ahead && AI.distance < COMPSOGNATHUS_ATTACK_RANGE * 4)
+					if (ai.ahead && ai.distance < (COMPY_ATTACK_RANGE * 4))
 					{
-						if (item->ItemFlags[1] == ATTACK_LARA)
+						if (item->ItemFlags[1] == ATTACK_PLAYER)
 						{
-							if (GetRandomControl() < 0x4000)
-								item->Animation.TargetState = COMPSOGNATHUS_STATE_ATTACK;
+							if (Random::TestProbability(1 / 2.0f))
+								item->Animation.TargetState = COMPY_STATE_ATTACK;
 							else
-								item->Animation.TargetState = COMPSOGNATHUS_STATE_JUMP_ATTACK;
+								item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
 						}
 						else
-							item->Animation.TargetState = COMPSOGNATHUS_STATE_IDLE;
+						{
+							item->Animation.TargetState = COMPY_STATE_IDLE;
+						}
 					}
-					else if (AI.distance > COMPSOGNATHUS_ATTACK_RANGE * (9 - 4 * target))
-						item->Animation.TargetState = COMPSOGNATHUS_STATE_RUN;
+					else if (ai.distance > (COMPY_ATTACK_RANGE * (9 - (target * 4))))
+					{
+						item->Animation.TargetState = COMPY_STATE_RUN_FORWARD;
+					}
 				}
 				else if (creature->Mood == MoodType::Bored)
-				{					
-					if (AI.ahead && AI.distance < (COMPSOGNATHUS_ATTACK_RANGE * 3 ) && item->ItemFlags[1] == ATTACK_CADAVER)
+				{
+					if (ai.ahead && ai.distance < (COMPY_ATTACK_RANGE * 3) && item->ItemFlags[1] == ATTACK_CADAVER)
 					{
-						if (GetRandomControl() < 0x4000)
-							item->Animation.TargetState = COMPSOGNATHUS_STATE_ATTACK;
+						if (Random::TestProbability(1 / 2.0f))
+							item->Animation.TargetState = COMPY_STATE_ATTACK;
 						else
-							item->Animation.TargetState = COMPSOGNATHUS_STATE_JUMP_ATTACK;	
+							item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
 					}
-					else if (AI.distance > COMPSOGNATHUS_ATTACK_RANGE * 3)
+					else if (ai.distance > (COMPY_ATTACK_RANGE * 3))
 					{
-						item->Animation.TargetState = COMPSOGNATHUS_STATE_RUN;
+						item->Animation.TargetState = COMPY_STATE_RUN_FORWARD;
 					}
 				}
-				else 
+				else
 				{
-					if (GetRandomControl() < COMPSOGNATHUS_JUMP_ATTACK_CHANCE)
-						item->Animation.TargetState = COMPSOGNATHUS_STATE_JUMP_ATTACK;
+					if (Random::TestProbability(COMPY_JUMP_ATTACK_CHANCE))
+						item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
 					else
-						item->Animation.TargetState = COMPSOGNATHUS_STATE_RUN;
+						item->Animation.TargetState = COMPY_STATE_RUN_FORWARD;
 				}
 
 				break;
 
-			case COMPSOGNATHUS_STATE_RUN:
+			case COMPY_STATE_RUN_FORWARD:
+				creature->MaxTurn = COMPY_RUN_TURN_RATE_MAX;
+				creature->Flags &= ~COMPY_HIT_FLAG;
 
-				creature->Flags &= ~COMPSOGNATHUS_HIT_FLAG;
-				creature->MaxTurn = COMPSOGNATHUS_RUN_TURN;
-
-				if (AI.angle < COMPSOGNATHUS_ATTACK_ANGLE && AI.angle > -COMPSOGNATHUS_ATTACK_ANGLE && AI.distance < COMPSOGNATHUS_ATTACK_RANGE * (9 - 4 * target))
+				if (ai.angle < COMPY_ATTACK_TURN_RATE_MAX && ai.angle > -COMPY_ATTACK_TURN_RATE_MAX &&
+					ai.distance < (COMPY_ATTACK_RANGE * (9 - (target * 4))))
 				{
-					item->Animation.TargetState = COMPSOGNATHUS_STATE_IDLE;
-
+					item->Animation.TargetState = COMPY_STATE_IDLE;
 				}
 
 				break;
 
-			case COMPSOGNATHUS_STATE_ATTACK:
-			case COMPSOGNATHUS_STATE_JUMP_ATTACK:
+			case COMPY_STATE_ATTACK:
+			case COMPY_STATE_JUMP_ATTACK:
+				creature->MaxTurn = COMPY_RUN_TURN_RATE_MAX;
 
-				creature->MaxTurn = COMPSOGNATHUS_RUN_TURN;
-
-				if (!(creature->Flags & COMPSOGNATHUS_HIT_FLAG))
+				if (!(creature->Flags & COMPY_HIT_FLAG))
 				{
 					switch (item->ItemFlags[1])
 					{
-					case ATTACK_LARA:
-
+					case ATTACK_PLAYER:
 						if (item->TouchBits.Test(CompyAttackJoints))
 						{
-							creature->Flags |= COMPSOGNATHUS_HIT_FLAG;
+							creature->Flags |= COMPY_HIT_FLAG;
 
-							DoDamage(creature->Enemy, COMPSOGNATHUS_ATTACK_DAMAGE);
+							DoDamage(creature->Enemy, COMPY_ATTACK_DAMAGE);
 							CreatureEffect(item, CompyBite, DoBloodSplat);
 						}
 
 						break;
 
 					case ATTACK_CADAVER:
-
-						if (AI.distance < COMPSOGNATHUS_ATTACK_RANGE && AI.ahead)
+						if (ai.distance < COMPY_ATTACK_RANGE && ai.ahead)
 						{
-							creature->Flags |= COMPSOGNATHUS_HIT_FLAG;
+							creature->Flags |= COMPY_HIT_FLAG;
 							CreatureEffect(item, CompyBite, DoBloodSplat);
 						}
 
@@ -335,10 +338,9 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureTilt(item, angle >> 1);
-		CreatureJoint(item, 0, head);
-		CreatureJoint(item, 1, neck);
-
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureTilt(item, headingAngle >> 1);
+		CreatureJoint(item, 0, headAngle);
+		CreatureJoint(item, 1, neckAngle);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }

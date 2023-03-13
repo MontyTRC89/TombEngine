@@ -148,7 +148,8 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_REACH &&
-		laraItem->Animation.AnimNumber == LA_REACH)
+		laraItem->Animation.AnimNumber == LA_REACH &&
+		laraInfo->Control.HandStatus == HandStatus::Free)
 	{
 		int test1 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;

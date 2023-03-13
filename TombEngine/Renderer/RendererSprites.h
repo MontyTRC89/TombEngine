@@ -17,6 +17,10 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector3 vtx2;
 		DirectX::SimpleMath::Vector3 vtx3;
 		DirectX::SimpleMath::Vector3 vtx4;
+		DirectX::SimpleMath::Vector4 c1;
+		DirectX::SimpleMath::Vector4 c2;
+		DirectX::SimpleMath::Vector4 c3;
+		DirectX::SimpleMath::Vector4 c4;
 		DirectX::SimpleMath::Vector4 color;
 		float Rotation;
 		float Width;
