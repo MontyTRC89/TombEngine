@@ -304,74 +304,45 @@ namespace TEN::Entities::Vehicles
 			vehicleItem->Pose.Orientation.z = 0;
 	}
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, VehicleWakeType wakeType)
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight)
 	{
 		constexpr auto COLOR		 = Vector4(1.0f, 1.0f, 1.0f, 0.5f);
 		constexpr auto LIFE			 = 2.0f;
 		constexpr auto SCALE_RATE	 = 12.0f;
 		constexpr auto HEIGHT_OFFSET = 4.0f;
 
-		constexpr auto WIDTH_CENTER = BLOCK(0.25f);
-
 		// TODO: Consider general movement direction.
 
 		if (waterHeight == NO_HEIGHT)
 			return;
 
+		// Calculate relative offsets.
+		// NOTE: X and Z offsets are flipped accordingly.
 		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
+		auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+
+		// Calculate positions.
 		auto basePos = Vector3(item.Pose.Position.x, waterHeight - HEIGHT_OFFSET, item.Pose.Position.z);
-		auto directionCenter = -item.Pose.Orientation.ToDirection();
-
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+		auto posLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto posRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
 
-		switch (wakeType)
-		{
-		default:
-		case VehicleWakeType::LeftRight:
-		{
-			// Calculate relative offsets.
-			// NOTE: X and Z offsets are flipped accordingly.
-			auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
-			auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		// Calculate directions.
+		auto direction = -item.Pose.Orientation.ToDirection();
+		auto directionLeft = Geometry::RotatePoint(direction, EulerAngles(0, ANGLE(40.0f), 0));
+		auto directionRight = Geometry::RotatePoint(direction, EulerAngles(0, -ANGLE(40.0f), 0));
 
-			// Calculate positions.
-			auto posLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
-			auto posRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
+		// Spawn left wake.
+		StreamerEffect.Spawn(
+			item.Index, (int)VehicleWakeEffectTag::Left,
+			posLeft, directionLeft, 0, COLOR,
+			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeLeft);
 
-			// Calculate directions.
-			auto directionLeft = Geometry::RotatePoint(directionCenter, EulerAngles(0, ANGLE(40.0f), 0));
-			auto directionRight = Geometry::RotatePoint(directionCenter, EulerAngles(0, -ANGLE(40.0f), 0));
-
-			// Spawn left wake.
-			StreamerEffect.Spawn(
-				item.Index, (int)VehicleWakeEffectTag::Left,
-				posLeft, directionLeft, 0, COLOR,
-				0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeLeft);
-
-			// Spawn right wake.
-			StreamerEffect.Spawn(
-				item.Index, (int)VehicleWakeEffectTag::Right,
-				posRight, directionRight, 0, COLOR,
-				0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeRight);
-		}
-			break;
-
-		case VehicleWakeType::Center:
-		{
-			// Calculate relative offset.
-			// NOTE: Z offset is flipped accordingly.
-			auto relOffsetCenter = Vector3(0.0f, relOffset.y, isMovingForward ? -relOffset.z : relOffset.z);
-
-			// Calculate position.
-			auto posCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
-
-			// Spawn center wake.
-			StreamerEffect.Spawn(
-				item.Index, (int)VehicleWakeEffectTag::Right,
-				posCenter, directionCenter, 0, COLOR,
-				WIDTH_CENTER, LIFE, 0.0f, SCALE_RATE, 0);
-		}
-			break;
-		}
+		// Spawn right wake.
+		StreamerEffect.Spawn(
+			item.Index, (int)VehicleWakeEffectTag::Right,
+			posRight, directionRight, 0, COLOR,
+			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeRight);
 	}
 }

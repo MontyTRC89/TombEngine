@@ -29,17 +29,10 @@ namespace TEN::Entities::Vehicles
 		Jump
 	};
 
-	enum class VehicleWakeType
-	{
-		LeftRight,
-		Center
-	};
-
 	enum class VehicleWakeEffectTag
 	{
 		Left,
-		Right,
-		Center
+		Right
 	};
 
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, std::vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
@@ -56,5 +49,5 @@ namespace TEN::Entities::Vehicles
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight, VehicleWakeType wakeType);
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight);
 }
