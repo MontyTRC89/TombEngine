@@ -982,9 +982,6 @@ namespace TEN::Entities::Vehicles
 
 				int waterHeight = GetWaterHeight(speedboatItem);
 				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
-
-				//SpawnStreamer(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
-				//SpawnStreamer(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
 			}
 		}
 
