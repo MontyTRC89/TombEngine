@@ -92,6 +92,7 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
+	Cadaver,
 	Custom
 };
 
@@ -127,14 +128,14 @@ struct EntityCallbackData
 
 struct EntityEffectData
 {
-	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::Zero;
-	Vector3 PrimaryEffectColor = Vector3::Zero;
-	Vector3 SecondaryEffectColor = Vector3::Zero;
-	int Count = -1;
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= -1;
 };
 
-// TODO: We need to find good "default states" for a lot of these/ -- squidshire 25/05/2022
+// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -168,8 +169,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits	  = BitField();
-	BitField MeshBits	  = BitField();
+	BitField TouchBits = BitField();
+	BitField MeshBits  = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];
@@ -222,9 +223,10 @@ void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
-const std::string& GetObjectName(GAME_OBJECT_ID id);
-std::vector<int> FindAllItems(short objectNumber);
-ItemInfo* FindItem(int objectNumber);
+const std::string& GetObjectName(GAME_OBJECT_ID objectID);
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
+ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);

@@ -28,7 +28,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	const auto CrowbarDoorPos = Vector3i(-412, 0, 256);
+	const auto CrowbarDoorPos = Vector3i(-412, 0, 112);
 	const InteractionBasis CrowbarDoorBounds =
 	{
 		GameBoundingBox(

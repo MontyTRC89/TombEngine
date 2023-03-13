@@ -4,6 +4,6 @@
 
 struct alignas(16) CLightBuffer
 {
-	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
+	ShaderLight Lights[MAX_LIGHTS_PER_ITEM];
 	int NumLights;
 };

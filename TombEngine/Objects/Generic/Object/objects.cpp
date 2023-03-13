@@ -148,7 +148,8 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_REACH &&
-		laraItem->Animation.AnimNumber == LA_REACH)
+		laraItem->Animation.AnimNumber == LA_REACH &&
+		laraInfo->Control.HandStatus == HandStatus::Free)
 	{
 		int test1 = TestPlayerEntityInteract(barItem, laraItem, ParallelBarsBounds);
 		int test2 = 0;

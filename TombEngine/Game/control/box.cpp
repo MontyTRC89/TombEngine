@@ -573,7 +573,6 @@ void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 	Lara.HitDirection = -1;
-	Lara.Air = -1;
 
 	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;
@@ -2081,21 +2080,21 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
-void AdjustStopperFlag(ItemInfo* item, int direction, bool set)
+void AdjustStopperFlag(ItemInfo* item, int direction)
 {
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	auto* floor = GetSector(room, x - room->x, z - room->z);
-	floor->Stopper = set;
+	floor->Stopper = !floor->Stopper;
 
 	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
 	z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
 	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
 
 	floor = GetSector(room, x - room->x, z - room->z);
-	floor->Stopper = set;
+	floor->Stopper = !floor->Stopper;
 }
 
 void InitialiseItemBoxData()

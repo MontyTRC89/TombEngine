@@ -810,7 +810,7 @@ void ProcessSectorFlags(ItemInfo* item)
 				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
 			{
 				// To allow both lava and rapids in same level, also check floor material flag.
-				if (block->Material == FLOOR_MATERIAL::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				if (block->Material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
 					KayakLaraRapidsDrown(item);
 				else
 					LavaBurn(item);
@@ -818,7 +818,7 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (block->Material == FLOOR_MATERIAL::Water)
+			if (block->Material == MaterialType::Water)
 				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
 			else
 				ItemBurn(item);

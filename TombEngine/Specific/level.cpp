@@ -685,7 +685,7 @@ void ReadRooms()
 
 			floor.TriggerIndex = ReadInt32();
 			floor.Box = ReadInt32();
-			floor.Material = (FLOOR_MATERIAL)ReadInt32();
+			floor.Material = (MaterialType)ReadInt32();
 			floor.Stopper = (bool)ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
@@ -1038,7 +1038,7 @@ unsigned int _stdcall LoadLevel(void* data)
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::FromChar(level->LoadScreenFileName.c_str()));
+	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);

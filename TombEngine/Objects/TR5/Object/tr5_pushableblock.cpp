@@ -192,7 +192,7 @@ InteractionBasis PushableBlockBounds =
 				if (pushable->hasFloorCeiling)
 				{
 					//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-					AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
+					AdjustStopperFlag(item, item->ItemFlags[0] + ANGLE(180));
 				}
 			}
 
@@ -390,7 +390,7 @@ InteractionBasis PushableBlockBounds =
 				if (pushable->hasFloorCeiling)
 				{
 					//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
-					AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
+					AdjustStopperFlag(item, item->ItemFlags[0] + ANGLE(180));
 				}
 			}
 
@@ -498,8 +498,7 @@ InteractionBasis PushableBlockBounds =
 
 			if (pushable->hasFloorCeiling)
 			{
-				//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
-				AdjustStopperFlag(pushableItem, pushableItem->ItemFlags[0], false);
+				AdjustStopperFlag(pushableItem, pushableItem->ItemFlags[0]);
 			}
 		}
 		else
@@ -594,7 +593,7 @@ InteractionBasis PushableBlockBounds =
 		auto pointColl = GetCollision(item);
 		AddBridge(item->Index);
 
-		if (pointColl.Block->IsWall(pointColl.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
+		if (pointColl.Block->IsWall(pointColl.Block->GetSurfacePlaneIndex(item->Pose.Position.x, item->Pose.Position.z, true)))
 			return false;
 
 		if (pointColl.Position.Floor != item->Pose.Position.y)

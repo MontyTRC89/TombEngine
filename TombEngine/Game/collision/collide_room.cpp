@@ -168,6 +168,11 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+CollisionResult GetCollision(const GameVector& point)
+{
+	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
+}
+
 // A reworked legacy GetFloorHeight() function which writes data
 // into a special CollisionResult struct instead of global variables.
 // It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
@@ -197,19 +202,15 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.BottomBlock = floor;
 
 	// Get tilts.
-	result.FloorTilt = floor->TiltXZ(x, z, true);
-	result.CeilingTilt = floor->TiltXZ(x, z, false);
+	result.FloorTilt = floor->GetSurfaceTilt(x, z, true);
+	result.CeilingTilt = floor->GetSurfaceTilt(x, z, false);
 
-	// Split, bridge and slope data
-	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
+	// Split, bridge and slope data.
+	result.Position.DiagonalStep = floor->IsSurfaceDiagonalStep(true);
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
 	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4; // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
-
-	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
-	/*if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
-		result.FloorTilt = Vector2::Zero;*/
 
 	return result;
 }
@@ -830,7 +831,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, short constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
@@ -855,14 +856,14 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 	// Rotate X axis.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }
@@ -1072,7 +1073,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				};
 
 				// If split angle exists, take split plane into account too.
-				auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
+				auto useSplitAngle = (useCeilingLedge ? block->IsSurfaceSplit(false) : block->IsSurfaceSplit(true));
 
 				// Find closest block edge plane.
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
@@ -1099,7 +1100,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 						if (i == 4)
 						{
-							auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(eX, eZ) : block->SectorPlane(eX, eZ);
+							auto usedSectorPlane = useCeilingLedge ? block->GetSurfacePlaneIndex(eX, eZ, false) : block->GetSurfacePlaneIndex(eX, eZ, true);
 							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90.0f);
 						}
 						else

@@ -704,7 +704,7 @@ namespace TEN::Entities::Vehicles
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
 		auto material = GetCollision(skidooItem).BottomBlock->Material;
-		if (material != FLOOR_MATERIAL::Ice && material != FLOOR_MATERIAL::Snow)
+		if (material != MaterialType::Ice && material != MaterialType::Snow)
 			return;
 
 		TEN::Effects::TriggerSnowmobileSnow(skidooItem);

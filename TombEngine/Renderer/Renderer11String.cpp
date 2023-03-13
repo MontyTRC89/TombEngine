@@ -1,57 +1,54 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Specific/trutils.h"
 
-namespace TEN::Renderer 
+namespace TEN::Renderer
 {
 	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
+	{
+		AddString(std::string(string), Vector2(x, y), Color(color), 1.0f, flags);
+	}
+
+	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
 		if (m_Locked)
 			return;
 
-		if (string == NULL)
+		if (string.empty())
 			return;
 
 		try
 		{
-			float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
-			float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
-			float UIScale = m_screenWidth > m_screenHeight ? factorY : factorX;
+			auto screenRes = GetScreenResolution();
+			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
+			float UIScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
 			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
 
-			float currentY = 0;
-
-			auto lines = TEN::Utils::SplitString(string);
-
-			for (auto line : lines)
+			auto stringLines = SplitString(string);
+			float yOffset = 0.0f;
+			for (const auto& line : stringLines)
 			{
-				auto cLine = line.c_str();
+				// Prepare structure for renderer.
+				RendererStringToDraw rString;
+				rString.String = TEN::Utils::ToWString(line);
+				rString.Flags = flags;
+				rString.X = 0;
+				rString.Y = 0;
+				rString.Color = color.ToVector3() * UCHAR_MAX;
+				rString.Scale = (UIScale * fontScale) * scale;
 
-				// Convert the string to wstring
-				int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, cLine, line.size(), NULL, 0);
-				std::wstring wstr(sizeNeeded, 0);
-				MultiByteToWideChar(CP_UTF8, 0, cLine, strlen(cLine), &wstr[0], sizeNeeded);
+				// Measure string.
+				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str()));
+				float width = size.x * rString.Scale;
 
-				// Prepare the structure for the renderer
-				RendererStringToDraw str;
-				str.String = wstr;
-				str.Flags = flags;
-				str.X = 0;
-				str.Y = 0;
-				str.Color = Vector3((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
-				str.Scale = UIScale * fontScale;
-
-				// Measure the string
-				Vector2 size = m_gameFont->MeasureString(wstr.c_str());
-				float width = size.x * str.Scale;
-
-				str.X = (flags & PRINTSTRING_CENTER) ? (float)x * factorX - (width / 2.0f) : (float)x * factorX;
-				str.Y = y * UIScale + currentY;
+				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (width / 2.0f)) : (pos.x * factor.x);
+				rString.Y = (pos.y * UIScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
 				{
-					str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
+					rString.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
 
 					if (!m_blinkUpdated)
 					{
@@ -64,24 +61,23 @@ namespace TEN::Renderer
 							m_blinkColorDirection = 1;
 						}
 
-						if (m_blinkColorValue > 255)
+						if (m_blinkColorValue > UCHAR_MAX)
 						{
-							m_blinkColorValue = 255;
+							m_blinkColorValue = UCHAR_MAX;
 							m_blinkColorDirection = -1;
 						}
 					}
 				}
 
-				m_strings.push_back(str);
+				m_strings.push_back(rString);
 
-				currentY += fontSpacing * 1.1f;
+				yOffset += fontSpacing * 1.1f;
 			}
 
 		}
 		catch (std::exception& ex)
 		{
-			TENLog(std::string("Unable to process string: '") + string +
-				"'. Exception: " + std::string(ex.what()), LogLevel::Error);
+			TENLog(std::string("Unable to process string: '") + string + "'. Exception: " + std::string(ex.what()), LogLevel::Error);
 		}
 	}
 
@@ -91,20 +87,24 @@ namespace TEN::Renderer
 
 		m_spriteBatch->Begin();
 
-		for (int i = 0; i < m_strings.size(); i++)
+		for (const auto& rString : m_strings)
 		{
-			RendererStringToDraw* str = &m_strings[i];
-
-			// Draw shadow if needed
-			if (str->Flags & PRINTSTRING_OUTLINE)
-				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + shadeOffset * str->Scale, str->Y + shadeOffset * str->Scale),
+			// Draw shadow.
+			if (rString.Flags & PRINTSTRING_OUTLINE)
+			{
+				m_gameFont->DrawString(
+					m_spriteBatch.get(), rString.String.c_str(),
+					Vector2(rString.X + shadeOffset * rString.Scale, rString.Y + shadeOffset * rString.Scale),
 					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
-					0.0f, Vector4::Zero, str->Scale);
+					0.0f, Vector4::Zero, rString.Scale);
+			}
 
-			// Draw string
-			m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X, str->Y),
-				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f) * ScreenFadeCurrent,
-				0.0f, Vector4::Zero, str->Scale);
+			// Draw string.
+			m_gameFont->DrawString(
+				m_spriteBatch.get(), rString.String.c_str(),
+				Vector2(rString.X, rString.Y),
+				Vector4(rString.Color.x / UCHAR_MAX, rString.Color.y / UCHAR_MAX, rString.Color.z / UCHAR_MAX, 1.0f) * ScreenFadeCurrent,
+				0.0f, Vector4::Zero, rString.Scale);
 		}
 
 		m_spriteBatch->End();

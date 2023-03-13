@@ -5,6 +5,8 @@
 #include "Game/items.h"
 #include "Math/Objects/EulerAngles.h"
 #include "Math/Objects/Pose.h"
+#include "Objects/game_object_ids.h"
+#include "Specific/setup.h"
 
 //namespace TEN::Math
 //{
@@ -22,6 +24,11 @@
 		this->Y2 = (int)round(y2);
 		this->Z1 = (int)round(z1);
 		this->Z2 = (int)round(z2);
+	}
+
+	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+	{
+		*this = GetFrame(objectID, animNumber, frameNumber)->boundingBox;
 	}
 
 	GameBoundingBox::GameBoundingBox(ItemInfo* item)
@@ -53,12 +60,12 @@
 
 	Vector3 GameBoundingBox::GetCenter() const
 	{
-		return ((Vector3(this->X1, this->Y1, this->Z1) + Vector3(this->X2, this->Y2, this->Z2)) / 2.0f);
+		return ((Vector3(X1, Y1, Z1) + Vector3(X2, Y2, Z2)) / 2);
 	}
 
 	Vector3 GameBoundingBox::GetExtents() const
 	{
-		return ((Vector3(this->X2, this->Y2, this->Z2) - Vector3(this->X1, this->Y1, this->Z1)) / 2.0f);
+		return ((Vector3(X2, Y2, Z2) - Vector3(X1, Y1, Z1)) / 2);
 	}
 
 	void GameBoundingBox::Rotate(const EulerAngles& orient)
