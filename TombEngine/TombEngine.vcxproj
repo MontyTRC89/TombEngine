@@ -392,7 +392,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
-    <ClInclude Include="Objects\TR5\Light\tr5_light.h" />
+    <ClInclude Include="Objects\Effects\light.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_bodypart.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
@@ -802,7 +802,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_sarcophagus.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_scales.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Light\tr5_light.cpp" />
+    <ClCompile Include="Objects\Effects\light.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_bodypart.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />

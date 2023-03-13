@@ -15,9 +15,10 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "tr5_light.h"
+#include "Objects/Effects/light.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Effects::Light;
 
 static short WreckingBallData[2] = { 0, 0 };
 

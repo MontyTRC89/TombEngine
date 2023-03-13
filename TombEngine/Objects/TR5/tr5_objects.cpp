@@ -48,7 +48,6 @@
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
 #include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Object/tr5_expandingplatform.h"
-#include "Objects/TR5/Light/tr5_light.h"
 #include "Objects/TR5/Object/tr5_bodypart.h"
 #include "Objects/TR5/Object/tr5_teleporter.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
@@ -715,44 +714,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->floorBorder = ExpandingPlatformFloorBorder;
 		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
 		obj->SetupHitEffect(true);
-	}
-
-	obj = &Objects[ID_ELECTRICAL_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = ElectricalLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_PULSE_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = PulseLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_STROBE_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = StrobeLightControl;
-	}
-
-	obj = &Objects[ID_COLOR_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = ColorLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_BLINKING_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = BlinkingLightControl;
-		obj->drawRoutine = nullptr;
-		
 	}
 
 	obj = &Objects[ID_BODY_PART];
