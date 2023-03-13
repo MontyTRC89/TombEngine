@@ -6,6 +6,7 @@
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 #include "Specific/setup.h"
 #include "Specific/trutils.h"
 
@@ -356,10 +357,11 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawSpriteIn2DSpace(unsigned int spriteID, const Vector2& pos2D, short orient2D, const Vector4& color, const Vector2& size)
+	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
+										 const Vector4& color, const Vector2& size)
 	{
-		constexpr auto VERTEX_COUNT = 4;
-		constexpr auto UV_RANGE		= std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
+		constexpr auto VERTEX_COUNT	 = 4;
+		constexpr auto UV_CONSTRAINT = std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
 
 		// Calculate vertex base.
 		auto halfSize = size / 2;
@@ -372,7 +374,7 @@ namespace TEN::Renderer
 		};
 
 		// Transform vertices.
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D));
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D + ANGLE(180.0f))); // +180 deg because TEN world is upside-down.
 		for (auto& vertexPoint : vertexPoints)
 		{
 			// Rotate.
@@ -391,24 +393,24 @@ namespace TEN::Renderer
 
 		// Vertex 0
 		vertices[0].Position = Vector3(vertexPoints[0]);
-		vertices[0].UV = UV_RANGE.first;
+		vertices[0].UV = UV_CONSTRAINT.first;
 		vertices[0].Color = color;
 
 		// Vertex 1
 		vertices[1].Position = Vector3(vertexPoints[1]);
-		vertices[1].UV.x = UV_RANGE.second.x;
-		vertices[1].UV.y = UV_RANGE.first.y;
+		vertices[1].UV.x = UV_CONSTRAINT.second.x;
+		vertices[1].UV.y = UV_CONSTRAINT.first.y;
 		vertices[1].Color = color;
 
 		// Vertex 2
 		vertices[2].Position = Vector3(vertexPoints[2]);
-		vertices[2].UV = UV_RANGE.second;
+		vertices[2].UV = UV_CONSTRAINT.second;
 		vertices[2].Color = color;
 
 		// Vertex 3
 		vertices[3].Position = Vector3(vertexPoints[3]);
-		vertices[3].UV.x = UV_RANGE.first.x;
-		vertices[3].UV.y = UV_RANGE.second.y;
+		vertices[3].UV.x = UV_CONSTRAINT.first.x;
+		vertices[3].UV.y = UV_CONSTRAINT.second.y;
 		vertices[3].Color = color;
 
 		SetBlendMode(BLENDMODE_ALPHABLEND);
@@ -416,9 +418,10 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
-		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex];
+		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex + spriteIndex];
 		auto* texturePtr = spritePtr.Texture->ShaderResourceView.Get();
 		m_context->PSSetShaderResources(0, 1, &texturePtr);
+
 		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -490,6 +493,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 		m_context->PSSetShaderResources(0, 1, &texture);
+
 		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 

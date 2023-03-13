@@ -1038,10 +1038,8 @@ namespace TEN::Renderer
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
 
-		for (int i = 0; i < view.spritesToDraw.size(); i++)
+		for (auto& spr : view.spritesToDraw)
 		{
-			RendererSpriteToDraw& spr = view.spritesToDraw[i];
-
 			bool isBillboard = spr.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
 			if (spr.Sprite != currentSpriteBucket.Sprite || 
@@ -1062,7 +1060,7 @@ namespace TEN::Renderer
 			if (DoesBlendModeRequireSorting(spr.BlendMode))
 			{
 				// If the blend mode requires sorting, save the sprite for later
-				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				int distance = (spr.pos - Camera.pos.ToVector3()).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
 				face.info.sprite = &spr;

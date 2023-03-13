@@ -50,6 +50,7 @@
 #include "Renderer/RenderTarget2D/RenderTarget2D.h"
 #include "Renderer/Structures/RendererDoor.h"
 
+enum GAME_OBJECT_ID : short;
 class EulerAngles;
 struct CAMERA_INFO;
 struct RendererRectangle;
@@ -723,7 +724,8 @@ namespace TEN::Renderer
 		Vector2	 Get2DPosition(const Vector3& pos) const;
 		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
-		void DrawSpriteIn2DSpace(unsigned int spriteID, const Vector2& pos2D, short orient2D, const Vector4& color, const Vector2& size);
+		void DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
+								 const Vector4& color, const Vector2& size);
 	};
 
 	extern Renderer11 g_Renderer;
