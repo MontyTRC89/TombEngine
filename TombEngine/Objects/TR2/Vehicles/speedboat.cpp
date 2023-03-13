@@ -18,20 +18,11 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> SpeedboatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
 	constexpr auto SPEEDBOAT_RADIUS = 500;
 	constexpr auto SPEEDBOAT_FRONT = 750;
 	constexpr auto SPEEDBOAT_BACK = -700;
@@ -56,13 +47,19 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
-	constexpr auto SPEEDBOAT_WAKE_OFFSET		   = 344;
-	constexpr auto SPEEDBOAT_WAKE_SEGMENT_LIFE	   = 50;
-	constexpr auto SPEEDBOAT_WAKE_SEGMENT_FADE_OUT = 4.0f;
+	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(BLOCK(0.3f), 0.0f, SPEEDBOAT_FRONT / 2);
 
-	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
-	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	constexpr auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
+	constexpr auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
+
+	const std::vector<VehicleMountType> SpeedboatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
 
 	enum SpeedboatState
 	{
@@ -983,8 +980,11 @@ namespace TEN::Entities::Vehicles
 					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
 				}
 
-				SpawnStreamer(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
-				SpawnStreamer(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
+				int waterHeight = GetWaterHeight(speedboatItem);
+				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
+
+				//SpawnStreamer(speedboatItem, -SPEEDBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
+				//SpawnStreamer(speedboatItem, SPEEDBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, SPEEDBOAT_WAKE_SEGMENT_LIFE, SPEEDBOAT_WAKE_SEGMENT_FADE_OUT);
 			}
 		}
 

@@ -304,8 +304,44 @@ namespace TEN::Entities::Vehicles
 			vehicleItem->Pose.Orientation.z = 0;
 	}
 
-	void SpawnVehicleWake()
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight)
 	{
+		constexpr auto COLOR		 = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+		constexpr auto LIFE			 = 2.0f;
+		constexpr auto SCALE_RATE	 = 12.0f;
+		constexpr auto HEIGHT_OFFSET = 4.0f;
 
+		// TODO: Consider general movement direction.
+
+		if (waterHeight == NO_HEIGHT)
+			return;
+
+		auto basePos = Vector3(item.Pose.Position.x, waterHeight - HEIGHT_OFFSET, item.Pose.Position.z);
+		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+
+		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
+		auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+
+		// Calculate positions.
+		auto posLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto posRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
+
+		// Calculate directions.
+		auto directionCenter = -item.Pose.Orientation.ToDirection();
+		auto directionLeft = Geometry::RotatePoint(directionCenter, EulerAngles(0, ANGLE(40.0f), 0));
+		auto directionRight = Geometry::RotatePoint(directionCenter, EulerAngles(0, -ANGLE(40.0f), 0));
+
+		// Spawn left wake.
+		StreamerEffect.Spawn(
+			item.Index, (int)VehicleWakeEffectTag::Left,
+			posLeft, directionLeft, 0, COLOR,
+			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeLeft);
+
+		// Spawn right wake.
+		StreamerEffect.Spawn(
+			item.Index, (int)VehicleWakeEffectTag::Right,
+			posRight, directionRight, 0, COLOR,
+			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeRight);
 	}
 }
