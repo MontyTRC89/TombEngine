@@ -310,7 +310,7 @@ namespace TEN::Entities::Vehicles
 		constexpr auto LIFE			 = 2.0f;
 		constexpr auto SCALE_RATE	 = 12.0f;
 		constexpr auto HEIGHT_OFFSET = 4.0f;
-
+		
 		// TODO: Consider general movement direction.
 
 		if (waterHeight == NO_HEIGHT)
@@ -343,5 +343,7 @@ namespace TEN::Entities::Vehicles
 			item.Index, (int)VehicleWakeEffectTag::Right,
 			posRight, directionRight, 0, COLOR,
 			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeRight);
+
+		// TODO: Spawn center wake. Bool parameter?
 	}
 }
