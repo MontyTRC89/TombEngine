@@ -221,9 +221,8 @@ GameStatus ControlPhase(int numFrames)
 		UpdateUnderwaterBloodParticles();
 
 		// Update HUD.
-		UpdateBars(LaraItem);
+		g_Hud.Update(*LaraItem);
 		UpdateFadeScreenAndCinematicBars();
-		g_Hud.Update();
 
 		// Rumble screen (like in submarine level of TRC).
 		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
@@ -429,6 +428,9 @@ void CleanUp()
 
 	// Clear all remaining renderer data.
 	g_Renderer.ClearScene();
+
+	// Reset Itemcamera
+	ClearObjCamera();
 }
 
 void InitialiseScripting(int levelIndex, bool loadGame)

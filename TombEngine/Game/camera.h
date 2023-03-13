@@ -112,5 +112,6 @@ void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
 void HandleOptics(ItemInfo* item);
 void UpdateMikePos(ItemInfo* item);
+void ClearObjCamera();
 
 float GetParticleDistanceFade(Vector3i position);

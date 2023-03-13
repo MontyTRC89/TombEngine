@@ -28,7 +28,10 @@ void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DoLaraFallDamage(ItemInfo* item);
 
+LaraInfo& GetLaraInfo(ItemInfo& item);
+const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
+
 int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
 short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 

@@ -179,7 +179,6 @@ void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->HitPoints = -1;
-	lara->Air = -1;
 	lara->Control.HandStatus = HandStatus::Busy;
 
 	int waterHeight = GetWaterHeight(item);
