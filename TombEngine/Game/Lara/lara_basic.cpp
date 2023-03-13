@@ -1397,7 +1397,6 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->HitPoints = -1;
-	lara->Air = -1;
 
 	ShiftItem(item, coll);
 

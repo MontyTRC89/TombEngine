@@ -1,3 +1,13 @@
+Version 1.0.8
+=============
+
+* Fix Sophia's charge ring drawing below floor.
+* Fix bubbles phasing through ceilings.
+* Fix TR5 imp collision handling and animations.
+* Fix object camera not clearing at level end.
+* Fix hardcoded double-breathing Lara sfx.
+* Add TR1 slamming doors.
+
 Version 1.0.7
 =============
 
@@ -6,6 +16,7 @@ Version 1.0.7
 * Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
 * Fix valve switch unable to untrigger objects.
 * Fix valve and wall hole switches (OCB 5 and 6) not working as a timed switches.
+* Fix incorrect Lara alignment on monkeyswing autojump.
 * Fix silent crash if hair object or skin joints are missing.
 * Fix holster meshes not displaying for Lara's shadow.
 * Use Lara object's own meshes if Lara skin object does not exist in level file.
