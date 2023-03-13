@@ -29,6 +29,12 @@ namespace TEN::Entities::Vehicles
 		Jump
 	};
 
+	enum class VehicleWakeType
+	{
+		LeftRight,
+		Center
+	};
+
 	enum class VehicleWakeEffectTag
 	{
 		Left,
@@ -50,5 +56,5 @@ namespace TEN::Entities::Vehicles
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight);
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight, VehicleWakeType wakeType);
 }

@@ -981,7 +981,7 @@ namespace TEN::Entities::Vehicles
 				}
 
 				int waterHeight = GetWaterHeight(speedboatItem);
-				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
+				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight, VehicleWakeType::LeftRight);
 			}
 		}
 
