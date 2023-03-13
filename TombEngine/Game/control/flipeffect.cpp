@@ -35,7 +35,7 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	Turn180,					//0
 	FloorShake,					//1
 	PoseidonSFX,				//2
-	LaraBubbles,				//3
+	HandlePlayerAirBubbles,		//3
 	FinishLevel,				//4
 	ActivateCamera,				//5
 	ActivateKey,				//6

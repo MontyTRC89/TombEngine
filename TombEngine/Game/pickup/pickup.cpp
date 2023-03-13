@@ -325,11 +325,21 @@ void DoPickup(ItemInfo* laraItem)
 	}
 	else
 	{
-		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
+		// Dirty, but it uses the same state.
+		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP)
 		{
+			if (g_GameFlow->IsMassPickupEnabled())
+			{
+				CollectMultiplePickups(lara->InteractedItem);
+				lara->InteractedItem = NO_ITEM;
+				return;
+			}
+
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 			if (!(pickupItem->TriggerFlags & 0xC0))
+			{
 				KillItem(pickupItemNumber);
+			}
 			else
 			{
 				pickupItem->Status = ITEM_INVISIBLE;

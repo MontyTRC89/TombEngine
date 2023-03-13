@@ -67,7 +67,7 @@ void CameraObject::Register(sol::table & parent)
 
 		/// Active the camera during that frame.
 		// @function Camera:PlayCamera
-		// @tparam sol::optional<Moveable&> (optional) If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
+		// @tparam[opt] Moveable Target If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
 		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
 		);
 }

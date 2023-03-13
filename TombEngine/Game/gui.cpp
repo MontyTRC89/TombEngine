@@ -2486,13 +2486,13 @@ namespace TEN::Gui
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
-						g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 					else
-						g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 				}
 				else
 				{
-					g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+					g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 				}
 
 				xPos += OBJLIST_SPACING;
@@ -2832,7 +2832,7 @@ namespace TEN::Gui
 				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
 				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
 
-				g_Renderer.DrawObjectOn2DPosition(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
+				g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
@@ -3045,7 +3045,7 @@ namespace TEN::Gui
 		// TODO
 		return;
 
-		g_Renderer.DrawObjectOn2DPosition(ID_COMPASS_ITEM, Vector2(130, 480), EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
+		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, Vector2(130, 480), EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
 		short compassSpeed = phd_sin(CompassNeedleAngle - item->Pose.Orientation.y);
 		short compassAngle = (item->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
 		Matrix::CreateRotationY(compassAngle);

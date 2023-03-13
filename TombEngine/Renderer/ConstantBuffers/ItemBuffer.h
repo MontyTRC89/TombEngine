@@ -7,4 +7,6 @@ struct alignas(16) CItemBuffer
 	Vector4 Color;
 	Vector4 AmbientLight;
 	int BoneLightModes[MAX_BONES];
+	ShaderLight Lights[MAX_LIGHTS_PER_ITEM];
+	int NumLights;
 };
