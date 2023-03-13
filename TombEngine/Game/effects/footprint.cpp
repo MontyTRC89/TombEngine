@@ -19,91 +19,91 @@ namespace TEN::Effects::Footprint
 {
 	constexpr auto FOOTPRINT_COUNT_MAX = 32;
 
-	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
+	const auto FootprintMaterials = std::vector<MaterialType>
 	{
-		FLOOR_MATERIAL::Mud,
-		FLOOR_MATERIAL::Snow,
-		FLOOR_MATERIAL::Sand,
-		FLOOR_MATERIAL::Gravel,
-		FLOOR_MATERIAL::Custom1,
-		FLOOR_MATERIAL::Custom2,
-		FLOOR_MATERIAL::Custom3,
-		FLOOR_MATERIAL::Custom4
+		MaterialType::Mud,
+		MaterialType::Snow,
+		MaterialType::Sand,
+		MaterialType::Gravel,
+		MaterialType::Custom1,
+		MaterialType::Custom2,
+		MaterialType::Custom3,
+		MaterialType::Custom4
 	};
 
 	std::vector<Footprint> Footprints = {};
 
-	static SOUND_EFFECTS GetFootprintSfx(FLOOR_MATERIAL material)
+	static SOUND_EFFECTS GetFootprintSfx(MaterialType material)
 	{
 		switch (material)
 		{
 		default:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 
-		case FLOOR_MATERIAL::Mud:
+		case MaterialType::Mud:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
 
-		case FLOOR_MATERIAL::Snow:
+		case MaterialType::Snow:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
 
-		case FLOOR_MATERIAL::Sand:
+		case MaterialType::Sand:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
 
-		case FLOOR_MATERIAL::Gravel:
+		case MaterialType::Gravel:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
 
-		case FLOOR_MATERIAL::Ice:
+		case MaterialType::Ice:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
 
-		case FLOOR_MATERIAL::Water:
+		case MaterialType::Water:
 			return SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 
-		case FLOOR_MATERIAL::Stone:
+		case MaterialType::Stone:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 
-		case FLOOR_MATERIAL::Wood:
+		case MaterialType::Wood:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 
-		case FLOOR_MATERIAL::Metal:
+		case MaterialType::Metal:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
 
-		case FLOOR_MATERIAL::Marble:
+		case MaterialType::Marble:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
 
-		case FLOOR_MATERIAL::Grass:
+		case MaterialType::Grass:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
 
-		case FLOOR_MATERIAL::Concrete:
+		case MaterialType::Concrete:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 
-		case FLOOR_MATERIAL::OldWood:
+		case MaterialType::OldWood:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 
-		case FLOOR_MATERIAL::OldMetal:
+		case MaterialType::OldMetal:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
 
-		case FLOOR_MATERIAL::Custom1:
+		case MaterialType::Custom1:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
 
-		case FLOOR_MATERIAL::Custom2:
+		case MaterialType::Custom2:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
 
-		case FLOOR_MATERIAL::Custom3:
+		case MaterialType::Custom3:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
 
-		case FLOOR_MATERIAL::Custom4:
+		case MaterialType::Custom4:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
 
-		case FLOOR_MATERIAL::Custom5:
+		case MaterialType::Custom5:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
 
-		case FLOOR_MATERIAL::Custom6:
+		case MaterialType::Custom6:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
 
-		case FLOOR_MATERIAL::Custom7:
+		case MaterialType::Custom7:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
 
-		case FLOOR_MATERIAL::Custom8:
+		case MaterialType::Custom8:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
 		}
 	}
@@ -128,7 +128,7 @@ namespace TEN::Effects::Footprint
 		};
 	}
 
-	static bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList)
+	static bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList)
 	{
 		for (const auto& material : materialList)
 		{
@@ -200,7 +200,7 @@ namespace TEN::Effects::Footprint
 
 		int footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
 
-		// Don't process actual footprint placement if foot isn't on floor.
+		// Don't process footprint placement if foot isn't on floor.
 		auto footPos = Vector3::Zero;
 		if (!TestFootHeight(item, footJoint, footPos))
 			return;
@@ -211,6 +211,7 @@ namespace TEN::Effects::Footprint
 		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber);
 
 		// Don't process material if foot hit bridge object.
+		// TODO: Handle bridges once bridge collision is less stupid.
 		if (pointColl.Position.Bridge >= 0)
 			return;
 
