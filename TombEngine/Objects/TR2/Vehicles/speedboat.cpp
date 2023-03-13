@@ -354,7 +354,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void AnimateSpeedboat(ItemInfo& speedboatItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void AnimateSpeedboat(ItemInfo& speedboatItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		const auto& speedboat = GetSpeedboatInfo(speedboatItem);
 
@@ -376,7 +376,7 @@ namespace TEN::Entities::Vehicles
 				laraItem.Animation.ActiveState = laraItem.Animation.TargetState = SPEEDBOAT_STATE_FALL;
 			}
 		}
-		else if (impactDirection != VehicleImpactDirection::None)
+		else if (impactDirection != VehicleImpactType::None)
 		{
 			DoSpeedboatImpact(speedboatItem, laraItem, impactDirection);
 		}
@@ -570,7 +570,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void DoSpeedboatImpact(ItemInfo& speedboatItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void DoSpeedboatImpact(ItemInfo& speedboatItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		if (laraItem.Animation.ActiveState == SPEEDBOAT_STATE_IMPACT)
 			return;
@@ -578,19 +578,19 @@ namespace TEN::Entities::Vehicles
 		switch (impactDirection)
 		{
 		default:
-		case VehicleImpactDirection::Front:
+		case VehicleImpactType::Front:
 			laraItem.Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_FRONT;
 			break;
 
-		case VehicleImpactDirection::Back:
+		case VehicleImpactType::Back:
 			laraItem.Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_BACK;
 			break;
 
-		case VehicleImpactDirection::Left:
+		case VehicleImpactType::Left:
 			laraItem.Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_LEFT;
 			break;
 
-		case VehicleImpactDirection::Right:
+		case VehicleImpactType::Right:
 			laraItem.Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_RIGHT;
 			break;
 		}
@@ -601,7 +601,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: Impact sound?
 	}
 
-	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo& laraItem)
+	VehicleImpactType SpeedboatDynamics(short itemNumber, ItemInfo& laraItem)
 	{
 		auto& speedboatItem = g_Level.Items[itemNumber];
 		auto& speedboat = GetSpeedboatInfo(speedboatItem);
@@ -681,10 +681,10 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleCollision(speedboatItem, SPEEDBOAT_RADIUS);
 
-		auto impactDirection = GetVehicleImpactDirection(speedboatItem, moved);
+		auto impactDirection = GetVehicleImpactType(speedboatItem, moved);
 
 		int newVelocity = 0;
-		if (slip || impactDirection != VehicleImpactDirection::None)
+		if (slip || impactDirection != VehicleImpactType::None)
 		{
 			newVelocity = (speedboatItem.Pose.Position.z - prevPos.z) * phd_cos(speedboatItem.Pose.Orientation.y) + (speedboatItem.Pose.Position.x - prevPos.x) * phd_sin(speedboatItem.Pose.Orientation.y);
 

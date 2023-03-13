@@ -818,10 +818,10 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleCollision(kayakItem, KAYAK_Z); // FIXME: kayak is thin, what should we do about it?
 
-		auto impactDirection = GetVehicleImpactDirection(kayakItem, Vector3i(xOld, 0, zOld));
+		auto impactDirection = GetVehicleImpactType(kayakItem, Vector3i(xOld, 0, zOld));
 
 		int slip = 0; // Remnant?
-		if (slip || impactDirection != VehicleImpactDirection::None)
+		if (slip || impactDirection != VehicleImpactType::None)
 		{
 			int newVelocity = (kayakItem.Pose.Position.z - oldPos[8].z) * phd_cos(kayakItem.Pose.Orientation.y) + (kayakItem.Pose.Position.x - oldPos[8].x) * phd_sin(kayakItem.Pose.Orientation.y);
 			newVelocity *= VEHICLE_VELOCITY_SCALE;

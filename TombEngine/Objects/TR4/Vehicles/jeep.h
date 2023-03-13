@@ -13,14 +13,14 @@ namespace TEN::Entities::Vehicles
 	void JeepPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	int JeepControl(ItemInfo& laraItem);
 	int JeepUserControl(ItemInfo& jeepItem, ItemInfo& laraItem, int height, int* pitch);
-	void AnimateJeep(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool isDead);
+	void AnimateJeep(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactType impactDirection, bool isDead);
 
 	void DoJeepMount(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleMountType mountType);
 	bool TestJeepDismount(ItemInfo& jeepItem, ItemInfo& laraItem);
 	int DoJeepDismount(ItemInfo& laraItem);
-	void DoJeepImpact(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection);
+	void DoJeepImpact(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactType impactDirection);
 
-	VehicleImpactDirection JeepDynamics(ItemInfo& jeepItem, ItemInfo& laraItem);
+	VehicleImpactType JeepDynamics(ItemInfo& jeepItem, ItemInfo& laraItem);
 
 	void TriggerJeepExhaustSmokeEffect(int x, int y, int z, short angle, short speed, int moving);
 }

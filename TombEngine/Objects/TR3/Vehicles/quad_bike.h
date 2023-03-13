@@ -13,13 +13,13 @@ namespace TEN::Entities::Vehicles
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool QuadBikeControl(ItemInfo& laraItem, CollisionInfo& coll);
 	int QuadUserControl(ItemInfo& quadBikeItem, int height, int* pitch);
-	void AnimateQuadBike(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool dead);
+	void AnimateQuadBike(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactType impactDirection, bool dead);
 
 	void DoQuadBikeMount(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleMountType mountType);
 	int TestQuadBikeDismount(ItemInfo& laraItem, int direction);
 	bool DoQuadBikeDismount(ItemInfo& quadBikeItem, ItemInfo& laraItem);
-	void DoQuadBikeImpact(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection);
+	void DoQuadBikeImpact(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactType impactDirection);
 
-	VehicleImpactDirection QuadDynamics(ItemInfo& quadBikeItem, ItemInfo& laraItem);
+	VehicleImpactType QuadDynamics(ItemInfo& quadBikeItem, ItemInfo& laraItem);
 	void SpawnQuadBikeExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
 }

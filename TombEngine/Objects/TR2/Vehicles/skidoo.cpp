@@ -164,7 +164,7 @@ namespace TEN::Entities::Vehicles
 		else if (laraItem.Animation.ActiveState == SKIDOO_STATE_DISMOUNT_FALL)
 		{
 			isDead = true;
-			collide = VehicleImpactDirection::None;
+			collide = VehicleImpactType::None;
 		}
 
 		int height = probe.Position.Floor;
@@ -173,7 +173,7 @@ namespace TEN::Entities::Vehicles
 		if (skidooItem.Flags & IFLAG_INVISIBLE)
 		{
 			drive = 0;
-			collide = VehicleImpactDirection::None;
+			collide = VehicleImpactType::None;
 		}
 		else
 		{
@@ -185,7 +185,7 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_DISMOUNT_RIGHT:
 			case SKIDOO_STATE_DISMOUNT_FALL:
 				drive = -1;
-				collide = VehicleImpactDirection::None;
+				collide = VehicleImpactType::None;
 
 				break;
 
@@ -296,7 +296,7 @@ namespace TEN::Entities::Vehicles
 		return DoSkidooDismount(skidooItem, laraItem);
 	}
 
-	VehicleImpactDirection SkidooDynamics(ItemInfo& skidooItem, ItemInfo& laraItem)
+	VehicleImpactType SkidooDynamics(ItemInfo& skidooItem, ItemInfo& laraItem)
 	{
 		auto& skidoo = GetSkidooInfo(skidooItem);
 
@@ -405,8 +405,8 @@ namespace TEN::Entities::Vehicles
 		skidoo.ExtraRotation = extraRot;
 
 		// Determine whether wall impact occurred and affect vehicle accordingly.
-		auto impactDirection = GetVehicleImpactDirection(skidooItem, moved);
-		if (impactDirection != VehicleImpactDirection::None)
+		auto impactDirection = GetVehicleImpactType(skidooItem, moved);
+		if (impactDirection != VehicleImpactType::None)
 		{
 			skidooItem.Animation.Velocity.z = 0;
 
@@ -512,7 +512,7 @@ namespace TEN::Entities::Vehicles
 		return drive;
 	}
 
-	void AnimateSkidoo(ItemInfo& skidooItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool isDead)
+	void AnimateSkidoo(ItemInfo& skidooItem, ItemInfo& laraItem, VehicleImpactType impactDirection, bool isDead)
 	{
 		const auto& skidoo = GetSkidooInfo(skidooItem);
 
@@ -526,7 +526,7 @@ namespace TEN::Entities::Vehicles
 			laraItem.Animation.ActiveState = SKIDOO_STATE_FALL;
 			laraItem.Animation.TargetState = SKIDOO_STATE_FALL;
 		}
-		else if (!isDead && impactDirection != VehicleImpactDirection::None &&
+		else if (!isDead && impactDirection != VehicleImpactType::None &&
 			laraItem.Animation.ActiveState != SKIDOO_STATE_FALL &&
 			abs(skidooItem.Animation.Velocity.z) >= SKIDOO_REVERSE_VELOCITY_MAX)
 		{
@@ -783,7 +783,7 @@ namespace TEN::Entities::Vehicles
 			return true;
 	}
 
-	void DoSkidooImpact(ItemInfo& skidooItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void DoSkidooImpact(ItemInfo& skidooItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		if (laraItem.Animation.ActiveState == SKIDOO_STATE_IMPACT)
 			return;
@@ -791,19 +791,19 @@ namespace TEN::Entities::Vehicles
 		switch (impactDirection)
 		{
 		default:
-		case VehicleImpactDirection::Front:
+		case VehicleImpactType::Front:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IMPACT_FRONT;
 			break;
 
-		case VehicleImpactDirection::Back:
+		case VehicleImpactType::Back:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IMPACT_BACK;
 			break;
 
-		case VehicleImpactDirection::Left:
+		case VehicleImpactType::Left:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IMPACT_LEFT;
 			break;
 
-		case VehicleImpactDirection::Right:
+		case VehicleImpactType::Right:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IMPACT_RIGHT;
 			break;
 		}
@@ -811,7 +811,7 @@ namespace TEN::Entities::Vehicles
 		laraItem.Animation.ActiveState =
 		laraItem.Animation.TargetState = SKIDOO_STATE_IMPACT;
 
-		auto sfx = (impactDirection == VehicleImpactDirection::Front) ? SFX_TR2_VEHICLE_IMPACT1 : SFX_TR2_VEHICLE_IMPACT1;
+		auto sfx = (impactDirection == VehicleImpactType::Front) ? SFX_TR2_VEHICLE_IMPACT1 : SFX_TR2_VEHICLE_IMPACT1;
 		SoundEffect(sfx, &skidooItem.Pose);
 	}
 

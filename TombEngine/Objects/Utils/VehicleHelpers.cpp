@@ -67,7 +67,7 @@ namespace TEN::Entities::Vehicles
 		if (distance2D > maxDistance2D)
 			return VehicleMountType::None;
 
-		// Assess object collision.
+		// Test object collision.
 		if (!TestBoundsCollide(&vehicleItem, &laraItem, coll.Setup.Radius) || !TestCollision(&vehicleItem, &laraItem))
 			return VehicleMountType::None;
 
@@ -158,7 +158,7 @@ namespace TEN::Entities::Vehicles
 			switch (dismountType)
 			{
 			case VehicleDismountType::Front:
-				if (TrInput & IN_FORWARD)
+				if (IsHeld(In::Forward))
 				{
 					headingAngle = ANGLE(0.0f);
 					break;
@@ -166,7 +166,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleDismountType::Back:
-				if (TrInput & IN_BACK)
+				if (IsHeld(In::Back))
 				{
 					headingAngle = ANGLE(180.0f);
 					break;
@@ -174,7 +174,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleDismountType::Left:
-				if (TrInput & IN_LEFT)
+				if (IsHeld(In::Left))
 				{
 					headingAngle = ANGLE(-90.0f);
 					break;
@@ -182,7 +182,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleDismountType::Right:
-				if (TrInput & IN_RIGHT)
+				if (IsHeld(In::Right))
 				{
 					headingAngle = ANGLE(90.0f);
 					break;
@@ -204,7 +204,7 @@ namespace TEN::Entities::Vehicles
 
 		auto pointColl = GetCollision(&vehicleItem, headingAngle, distance, -CLICK(2));
 
-		// Check for wall. Check ceiling as well?
+		// Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
@@ -223,35 +223,35 @@ namespace TEN::Entities::Vehicles
 		return false;
 	}
 
-	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo& vehicleItem, const Vector3i& prevPos)
+	VehicleImpactType GetVehicleImpactType(ItemInfo& vehicleItem, const Vector3i& prevPos)
 	{
-		auto direction = vehicleItem.Pose.Position - prevPos;
+		auto posDelta = vehicleItem.Pose.Position - prevPos;
 
-		if (direction.x || direction.z)
+		if (posDelta.x || posDelta.z)
 		{
 			float sinY = phd_sin(vehicleItem.Pose.Orientation.y);
 			float cosY = phd_cos(vehicleItem.Pose.Orientation.y);
 
-			int front = (direction.x * sinY) + (direction.z * cosY);
-			int side = (direction.x * cosY) - (direction.z * sinY);
+			int front = (posDelta.x * sinY) + (posDelta.z * cosY);
+			int side = (posDelta.x * cosY) - (posDelta.z * sinY);
 
 			if (abs(front) > abs(side))
 			{
 				if (front > 0)
-					return VehicleImpactDirection::Back;
+					return VehicleImpactType::Back;
 				else
-					return VehicleImpactDirection::Front;
+					return VehicleImpactType::Front;
 			}
 			else
 			{
 				if (side > 0)
-					return VehicleImpactDirection::Left;
+					return VehicleImpactType::Left;
 				else
-					return VehicleImpactDirection::Right;
+					return VehicleImpactType::Right;
 			}
 		}
 
-		return VehicleImpactDirection::None;
+		return VehicleImpactType::None;
 	}
 
 	VehiclePointCollision GetVehicleCollision(ItemInfo& vehicleItem, int forward, int right, bool clamp)
@@ -280,18 +280,16 @@ namespace TEN::Entities::Vehicles
 	
 	int GetVehicleWaterHeight(ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
-		auto world =
-			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem.Pose.Orientation.y), TO_RAD(vehicleItem.Pose.Orientation.x), TO_RAD(vehicleItem.Pose.Orientation.z)) *
-			Matrix::CreateTranslation(vehicleItem.Pose.Position.x, vehicleItem.Pose.Position.y, vehicleItem.Pose.Position.z);
+		auto rotMatrix = vehicleItem.Pose.Orientation.ToRotationMatrix();
+		auto tMatrix = Matrix::CreateTranslation(vehicleItem.Pose.Position.ToVector3());
+		auto worldMatrix = rotMatrix * tMatrix;
 
-		auto vec = Vector3(right, 0, forward);
-		vec = Vector3::Transform(vec, world);
+		auto point = Vector3(right, 0, forward);
+		point = Vector3::Transform(point, worldMatrix);
+		pos = Vector3i(point);
 
-		pos = Vector3i(vec);
 		auto pointColl = GetCollision(pos.x, pos.y, pos.z, vehicleItem.RoomNumber);
-		int pointColldRoomNumber = pointColl.RoomNumber;
-
-		int height = GetWaterHeight(pos.x, pos.y, pos.z, pointColldRoomNumber);
+		int height = GetWaterHeight(pos.x, pos.y, pos.z, pointColl.RoomNumber);
 
 		if (height == NO_HEIGHT)
 		{
@@ -558,12 +556,15 @@ namespace TEN::Entities::Vehicles
 
 	short ResetVehicleTurnRate(short turnRate, short decelRate)
 	{
-		int sign = std::copysign(1, turnRate);
-
 		if (abs(turnRate) > decelRate)
+		{
+			int sign = std::copysign(1, turnRate);
 			return (turnRate - (decelRate * sign));
+		}
 		else
+		{
 			return 0;
+		}
 	}
 
 	void ResetVehicleTurnRateX(short& turnRate, short decelRate)
@@ -586,7 +587,9 @@ namespace TEN::Entities::Vehicles
 
 	void ResetVehicleLean(ItemInfo& vehicleItem, float alpha)
 	{
-		if (abs(vehicleItem.Pose.Orientation.z) > ANGLE(0.1f))
+		constexpr auto ANGLE_EPSILON = ANGLE(0.1f);
+
+		if (abs(vehicleItem.Pose.Orientation.z) > ANGLE_EPSILON)
 			vehicleItem.Pose.Orientation.z *= alpha;
 		else
 			vehicleItem.Pose.Orientation.z = 0;

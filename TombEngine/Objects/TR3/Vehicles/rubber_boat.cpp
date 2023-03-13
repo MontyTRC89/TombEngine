@@ -381,7 +381,7 @@ namespace TEN::Entities::Vehicles
 			rBoatItem.Animation.Velocity.z = 0;
 	}
 
-	void RubberBoatAnimation(ItemInfo& rBoatItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void RubberBoatAnimation(ItemInfo& rBoatItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 
@@ -406,7 +406,7 @@ namespace TEN::Entities::Vehicles
 				laraItem.Animation.TargetState = RBOAT_STATE_FALL;
 			}
 		}
-		else if (impactDirection != VehicleImpactDirection::None)
+		else if (impactDirection != VehicleImpactType::None)
 			DoRubberBoatImpact(rBoatItem, laraItem, impactDirection);
 		else
 		{
@@ -585,7 +585,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void DoRubberBoatImpact(ItemInfo& rBoatItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void DoRubberBoatImpact(ItemInfo& rBoatItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		if (laraItem.Animation.ActiveState == RBOAT_STATE_IMPACT)
 			return;
@@ -593,19 +593,19 @@ namespace TEN::Entities::Vehicles
 		switch (impactDirection)
 		{
 		default:
-		case VehicleImpactDirection::Front:
+		case VehicleImpactType::Front:
 			laraItem.Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_FRONT;
 			break;
 
-		case VehicleImpactDirection::Back:
+		case VehicleImpactType::Back:
 			laraItem.Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_BACK;
 			break;
 
-		case VehicleImpactDirection::Left:
+		case VehicleImpactType::Left:
 			laraItem.Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_LEFT;
 			break;
 
-		case VehicleImpactDirection::Right:
+		case VehicleImpactType::Right:
 			laraItem.Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_RIGHT;
 			break;
 		}
@@ -616,7 +616,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: Impact sound?
 	}
 
-	VehicleImpactDirection RubberBoatDynamics(short itemNumber, ItemInfo& laraItem)
+	VehicleImpactType RubberBoatDynamics(short itemNumber, ItemInfo& laraItem)
 	{
 		auto& rBoatItem = g_Level.Items[itemNumber];
 		auto& rBoat = GetRubberBoatInfo(rBoatItem);
@@ -703,9 +703,9 @@ namespace TEN::Entities::Vehicles
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
 		rBoat.ExtraRotation = extraRot;
-		auto impactDirection = GetVehicleImpactDirection(rBoatItem, moved);
+		auto impactDirection = GetVehicleImpactType(rBoatItem, moved);
 
-		if (slip || impactDirection != VehicleImpactDirection::None)
+		if (slip || impactDirection != VehicleImpactType::None)
 		{
 			int newVelocity = (rBoatItem.Pose.Position.z - prevPos.z) * phd_cos(rBoatItem.Pose.Orientation.y) + (rBoatItem.Pose.Position.x - prevPos.x) * phd_sin(rBoatItem.Pose.Orientation.y);
 

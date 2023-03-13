@@ -208,11 +208,11 @@ namespace TEN::Entities::Vehicles
 
 		int pitch = 0;
 		if (jeep.Flags)
-			impactDirection = VehicleImpactDirection::None;
+			impactDirection = VehicleImpactType::None;
 		else if (laraItem.Animation.ActiveState == JEEP_STATE_MOUNT)
 		{
 			drive = -1;
-			impactDirection = VehicleImpactDirection::None;
+			impactDirection = VehicleImpactType::None;
 		}
 		else
 			drive = JeepUserControl(jeepItem, laraItem, floorHeight, &pitch);
@@ -472,7 +472,7 @@ namespace TEN::Entities::Vehicles
 		return 1;
 	}
 
-	void AnimateJeep(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool isDead)
+	void AnimateJeep(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactType impactDirection, bool isDead)
 	{
 		auto& jeep = GetJeepInfo(jeepItem);
 
@@ -491,7 +491,7 @@ namespace TEN::Entities::Vehicles
 			laraItem.Animation.ActiveState = JEEP_STATE_LEAP;
 			laraItem.Animation.TargetState = JEEP_STATE_LEAP;
 		}
-		else if (impactDirection != VehicleImpactDirection::None && !jeep.Gear && !isDead &&
+		else if (impactDirection != VehicleImpactType::None && !jeep.Gear && !isDead &&
 			laraItem.Animation.ActiveState != JEEP_STATE_IMPACT_FRONT &&
 			laraItem.Animation.ActiveState != JEEP_STATE_IMPACT_BACK &&
 			laraItem.Animation.ActiveState != JEEP_STATE_IMPACT_LEFT &&
@@ -1014,30 +1014,30 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	void DoJeepImpact(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
+	void DoJeepImpact(ItemInfo& jeepItem, ItemInfo& laraItem, VehicleImpactType impactDirection)
 	{
 		switch (impactDirection)
 		{
 		default:
-		case VehicleImpactDirection::Front:
+		case VehicleImpactType::Front:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + JEEP_ANIM_IMPACT_FRONT;
 			laraItem.Animation.ActiveState = JEEP_STATE_IMPACT_FRONT;
 			laraItem.Animation.TargetState = JEEP_STATE_IMPACT_FRONT;
 			break;
 
-		case VehicleImpactDirection::Back:
+		case VehicleImpactType::Back:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + JEEP_ANIM_IMPACT_BACK;
 			laraItem.Animation.ActiveState = JEEP_STATE_IMPACT_BACK;
 			laraItem.Animation.TargetState = JEEP_STATE_IMPACT_BACK;
 			break;
 
-		case VehicleImpactDirection::Left:
+		case VehicleImpactType::Left:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + JEEP_ANIM_IMPACT_LEFT;
 			laraItem.Animation.ActiveState = JEEP_STATE_IMPACT_LEFT;
 			laraItem.Animation.TargetState = JEEP_STATE_IMPACT_LEFT;
 			break;
 
-		case VehicleImpactDirection::Right:
+		case VehicleImpactType::Right:
 			laraItem.Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + JEEP_ANIM_IMPACT_RIGHT;
 			laraItem.Animation.ActiveState = JEEP_STATE_IMPACT_RIGHT;
 			laraItem.Animation.TargetState = JEEP_STATE_IMPACT_RIGHT;
@@ -1046,7 +1046,7 @@ namespace TEN::Entities::Vehicles
 		laraItem.Animation.FrameNumber = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 	}
 
-	VehicleImpactDirection JeepDynamics(ItemInfo& jeepItem, ItemInfo& laraItem)
+	VehicleImpactType JeepDynamics(ItemInfo& jeepItem, ItemInfo& laraItem)
 	{
 		auto& jeep = GetJeepInfo(jeepItem);
 		auto& player = *GetLaraInfo(&laraItem);
@@ -1232,8 +1232,8 @@ namespace TEN::Entities::Vehicles
 		else
 			jeep.ExtraRotation += ((jeep.ExtraRotationDrift - jeep.ExtraRotation) / 4);
 
-		auto impactDirection = GetVehicleImpactDirection(jeepItem, moved);
-		if (impactDirection != VehicleImpactDirection::None)
+		auto impactDirection = GetVehicleImpactType(jeepItem, moved);
+		if (impactDirection != VehicleImpactType::None)
 		{
 			int newspeed = (jeepItem.Pose.Position.z - prevPos.z) * phd_cos(jeep.MomentumAngle) + (jeepItem.Pose.Position.x - prevPos.x) * phd_sin(jeep.MomentumAngle);
 			newspeed *= 256;
