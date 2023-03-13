@@ -11,13 +11,13 @@
 // Creatures
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
-#include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
-#include "Objects/TR1/Entity/tr1_natla.h" // OK
-#include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
-#include "Objects/TR1/Entity/tr1_wolf.h" // OK
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h"
+#include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
+#include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
+#include "Objects/TR1/Entity/tr1_natla.h" // OK
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
+#include "Objects/TR1/Entity/tr1_wolf.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps

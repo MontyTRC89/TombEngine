@@ -37,32 +37,32 @@
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
-#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
-#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 
 // Objects
-#include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "Objects/TR5/Object/tr5_twoblockplatform.h"
-#include "Objects/TR5/Switch/tr5_raisingcog.h"
-#include "Objects/TR5/Object/tr5_raisingblock.h"
-#include "Objects/TR5/Object/tr5_expandingplatform.h"
 #include "Objects/TR5/Object/tr5_bodypart.h"
-#include "Objects/TR5/Object/tr5_teleporter.h"
+#include "Objects/TR5/Object/tr5_expandingplatform.h"
+#include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_genslot.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/TR5/Object/tr5_raisingblock.h"
+#include "Objects/TR5/Object/tr5_teleporter.h"
+#include "Objects/TR5/Object/tr5_twoblockplatform.h"
+#include "Objects/TR5/Switch/tr5_raisingcog.h"
 
 // Traps
-#include "Objects/TR5/Trap/tr5_ventilator.h"
-#include "Objects/TR5/Trap/tr5_zip_line.h"
 #include "Objects/Effects/tr5_electricity.h"
-#include "Objects/TR5/Trap/tr5_romehammer.h"
-#include "Objects/TR5/Trap/tr5_fallingceiling.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_wreckingball.h"
+#include "Objects/TR5/Trap/tr5_zip_line.h"
 
 // Switches
 #include "tr5_crowdove_switch.h"

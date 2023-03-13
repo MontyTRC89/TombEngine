@@ -30,9 +30,9 @@
 #include "Objects/TR2/Entity/tr2_yeti.h" // OK
 
 // Traps
+#include "Objects/TR2/Trap/tr2_killerstatue.h"
 #include "Objects/TR2/Trap/tr2_spinningblade.h"
 #include "Objects/TR2/Trap/tr2_springboard.h"
-#include "Objects/TR2/Trap/tr2_killerstatue.h"
 
 // Vehicles
 #include "Objects/TR2/Vehicles/speedboat.h"

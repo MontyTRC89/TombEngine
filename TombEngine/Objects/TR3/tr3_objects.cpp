@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Objects/TR3/tr3_objects.h"
 
-#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Objects/TR3/tr3_objects.h"
+#include "Objects/TR5/Object/tr5_missile.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -14,7 +14,6 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
-#include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -25,6 +24,7 @@
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
+#include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 
@@ -40,8 +40,8 @@
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
-#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::Creatures::TR3;

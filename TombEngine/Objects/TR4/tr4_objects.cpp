@@ -11,45 +11,45 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
+#include "Objects/TR4/Entity/tr4_baboon.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
 #include "Objects/TR4/Entity/tr4_bat.h" // OK
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
+#include "Objects/TR4/Entity/tr4_big_beetle.h" // OFF
 #include "Objects/TR4/Entity/tr4_big_scorpion.h" // OK
 #include "Objects/TR4/Entity/tr4_crocodile.h" // OK
 #include "Objects/TR4/Entity/tr4_demigod.h" // OK
+#include "Objects/TR4/Entity/tr4_dog.h"
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_guide.h" // OK
+#include "Objects/TR4/Entity/tr4_hammerhead.h"
 #include "Objects/TR4/Entity/tr4_harpy.h" // OK
 #include "Objects/TR4/Entity/tr4_horseman.h" // OFF
 #include "Objects/TR4/Entity/tr4_jean_yves.h" // OK
 #include "Objects/TR4/Entity/tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_lara_double.h"
-#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR4/Entity/tr4_mummy.h" // OK
+#include "Objects/TR4/Entity/tr4_mutant.h" // OK
 #include "Objects/TR4/Entity/tr4_sas.h" // OK
 #include "Objects/TR4/Entity/tr4_sentry_gun.h" // OK
+#include "Objects/TR4/Entity/tr4_setha.h"
 #include "Objects/TR4/Entity/tr4_skeleton.h" // OK
 #include "Objects/TR4/Entity/tr4_small_scorpion.h" // OK
 #include "Objects/TR4/Entity/tr4_sphinx.h" // OK
 #include "Objects/TR4/Entity/tr4_troops.h" // OK
+#include "Objects/TR4/Entity/tr4_von_croy.h"
 #include "Objects/TR4/Entity/tr4_wild_boar.h" // OK
 #include "Objects/TR4/Entity/tr4_wraith.h" // OFF
-#include "Objects/TR4/Entity/tr4_baboon.h" // OK
-#include "Objects/TR4/Entity/tr4_mutant.h" // OK
-#include "Objects/TR4/Entity/tr4_big_beetle.h" // OFF
-#include "Objects/TR4/Entity/tr4_von_croy.h"
-#include "Objects/TR4/Entity/tr4_hammerhead.h"
-#include "Objects/TR4/Entity/tr4_dog.h"
-#include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
-#include "Objects/TR4/Object/tr4_sarcophagus.h"
-#include "Objects/TR4/Object/tr4_senet.h"
-#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
+#include "Objects/TR4/Object/tr4_sarcophagus.h"
 #include "Objects/TR4/Object/tr4_scales.h"
+#include "Objects/TR4/Object/tr4_senet.h"
 
 // Switches
 
@@ -58,6 +58,7 @@
 #include "Objects/TR4/Trap/tr4_blade.h"
 #include "Objects/TR4/Trap/tr4_catwalkblade.h"
 #include "Objects/TR4/Trap/tr4_chain.h"
+#include "Objects/TR4/Trap/tr4_cog.h"
 #include "Objects/TR4/Trap/tr4_fourblades.h"
 #include "Objects/TR4/Trap/tr4_hammer.h"
 #include "Objects/TR4/Trap/tr4_joby_spikes.h"
@@ -68,10 +69,9 @@
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
 #include "Objects/TR4/Trap/tr4_spikeball.h"
-#include "Objects/TR4/Trap/tr4_spikywall.h"
 #include "Objects/TR4/Trap/tr4_spikyceiling.h"
+#include "Objects/TR4/Trap/tr4_spikywall.h"
 #include "Objects/TR4/Trap/tr4_stargate.h"
-#include "Objects/TR4/Trap/tr4_cog.h"
 #include "Objects/TR4/Trap/tr4_teethspike.h"
 
 // Vehicles
