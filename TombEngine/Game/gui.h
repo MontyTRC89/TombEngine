@@ -120,7 +120,47 @@ namespace TEN::Gui
 		bool CanSelect() const;
 		bool CanDeselect() const;
 
+		// GUI variables
+		Menu MenuToDisplay = Menu::Title;
+		int SelectedOption;
+		int OptionCount;
+		int SelectedSaveSlot;
+
+		SettingsData CurrentSettings;
+
+		// Inventory variables
+		short CombineObject1;
+		short CombineObject2;
+		bool UseItem;
+		char SeperateTypeFlag;
+		char CombineTypeFlag;
+		InventoryRing PCRing1;
+		InventoryRing PCRing2;
+		InventoryRing* Rings[2];
+		int CurrentSelectedOption;
+		bool MenuActive;
+		char AmmoSelectorFlag;
+		char NumAmmoSlots;
+		char* CurrentAmmoType;
+		AmmoList AmmoObjectList[3];
+		short AmmoSelectorFadeVal;
+		short AmmoSelectorFadeDir;
+		short CombineRingFadeVal;
+		short CombineRingFadeDir;
+		short NormalRingFadeVal;
+		short NormalRingFadeDir;
+		unsigned char AmmoActive;
+		int OBJLIST_SPACING;
+		MenuOption CurrentOptions[3];
+		InventoryMode InvMode;
+		int InventoryItemChosen;
+		int EnterInventory;
+		int LastInvItem;
+		AmmoData Ammo;
+
 	public:
+		int CompassNeedleAngle;
+
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
@@ -153,45 +193,6 @@ namespace TEN::Gui
 		void SetInventoryItemChosen(int number);
 
 	private:
-		// GUI variables
-		Menu MenuToDisplay = Menu::Title;
-		int SelectedOption;
-		int OptionCount;
-		int SelectedSaveSlot;
-
-		SettingsData CurrentSettings;
-
-		// Inventory variables
-		short CombineObject1;
-		short CombineObject2;
-		bool UseItem;
-		char SeperateTypeFlag;
-		char CombineTypeFlag;
-		int CompassNeedleAngle;
-		InventoryRing PCRing1;
-		InventoryRing PCRing2;
-		InventoryRing* Rings[2];
-		int CurrentSelectedOption;
-		bool MenuActive;
-		char AmmoSelectorFlag;
-		char NumAmmoSlots;
-		char* CurrentAmmoType;
-		AmmoList AmmoObjectList[3];
-		short AmmoSelectorFadeVal;
-		short AmmoSelectorFadeDir;
-		short CombineRingFadeVal;
-		short CombineRingFadeDir;
-		short NormalRingFadeVal;
-		short NormalRingFadeDir;
-		unsigned char AmmoActive;
-		int OBJLIST_SPACING;
-		MenuOption CurrentOptions[3];
-		InventoryMode InvMode;
-		int InventoryItemChosen;
-		int EnterInventory;
-		int LastInvItem;
-		AmmoData Ammo;
-
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
 		void HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOtherSettingsInput(bool fromPauseMenu);

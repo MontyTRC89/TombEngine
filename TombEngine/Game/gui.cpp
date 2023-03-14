@@ -1597,7 +1597,6 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		CompassNeedleAngle = ANGLE(22.5f);
 		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
@@ -2932,9 +2931,6 @@ namespace TEN::Gui
 
 			OBJLIST_SPACING = PHD_CENTER_X / 2;
 
-			if (CompassNeedleAngle != 1024)
-				CompassNeedleAngle -= 32;
-
 			UpdateInputActions(item);
 			GameTimer++;
 
@@ -3044,13 +3040,15 @@ namespace TEN::Gui
 
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
-		// TODO
-		return;
+		constexpr auto POS_2D = Vector2(130.0f, 450.0f);
 
-		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, Vector2(130, 480), EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
-		short compassSpeed = phd_sin(CompassNeedleAngle - item->Pose.Orientation.y);
-		short compassAngle = (item->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
-		Matrix::CreateRotationY(compassAngle);
+		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
+		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), 0.05f);
+		CompassNeedleAngle = needleOrient.y;
+
+		// HACK: Needle is rotated in the draw function.
+		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
+		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Zero, invObject.Scale1 * 1.5f);
 	}
 
 	void GuiController::DoDiary(ItemInfo* item)
