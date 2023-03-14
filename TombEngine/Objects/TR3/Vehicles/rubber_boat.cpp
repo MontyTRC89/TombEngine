@@ -7,7 +7,6 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -20,21 +19,11 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> RubberBoatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
 	constexpr auto RBOAT_RADIUS = 500;
 	constexpr auto RBOAT_FRONT = 750;
 	constexpr auto RBOAT_SIDE = 300;
@@ -53,13 +42,19 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
-	constexpr auto RBOAT_WAKE_OFFSET		  = 344;
-	constexpr auto RBOAT_WAKE_SEGMENT_LIFE	  = 50;
-	constexpr auto RBOAT_WAKE_SEGMENT_FADEOUT = 4.0f;
+	constexpr auto RBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
+	constexpr auto RBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto RBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
 
-	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
-	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	constexpr auto RBOAT_WAKE_OFFSET = Vector3(RBOAT_SIDE, 0.0f, RBOAT_FRONT / 2);
+
+	const std::vector<VehicleMountType> RubberBoatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
 
 	enum RubberBoatState
 	{
@@ -985,8 +980,8 @@ namespace TEN::Entities::Vehicles
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
 			
-			SpawnStreamer(rBoatItem, -RBOAT_WAKE_OFFSET, 0, 0, 1, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
-			SpawnStreamer(rBoatItem,  RBOAT_WAKE_OFFSET, 0, 0, 2, true, 10.0f, RBOAT_WAKE_SEGMENT_LIFE, RBOAT_WAKE_SEGMENT_FADEOUT);
+			int waterHeight = GetWaterHeight(rBoatItem);
+			SpawnVehicleWake(*rBoatItem, RBOAT_WAKE_OFFSET, waterHeight);
 
 			if ((GetRandomControl() & 1) == 0)
 			{

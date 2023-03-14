@@ -20,6 +20,14 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
+	enum class VehicleWakeEffectTag
+	{
+		FrontLeft,
+		FrontRight,
+		BackLeft,
+		BackRight
+	};
+
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, std::vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -221,11 +229,11 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						auto front = Vector3i::Zero;
-						int height = GetVehicleHeight(vehicleItem, 0, 0, true, &front);
-						
-						SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
-						SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
+						int waterHeight = GetWaterHeight(vehicleItem);
+						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
+
+						//SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
+						//SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
 					}
 				}
 
@@ -304,12 +312,14 @@ namespace TEN::Entities::Vehicles
 			vehicleItem->Pose.Orientation.z = 0;
 	}
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight)
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, bool isUnderwater)
 	{
-		constexpr auto COLOR		 = Vector4(1.0f, 1.0f, 1.0f, 0.5f);
-		constexpr auto LIFE			 = 4.0f;
-		constexpr auto SCALE_RATE	 = 8.0f;
-		constexpr auto HEIGHT_OFFSET = 4.0f;
+		constexpr auto COLOR					= Vector4(0.8f);
+		constexpr auto LIFE						= 2.5f;
+		constexpr auto VEL						= 4.0f;
+		constexpr auto SCALE_RATE_WATER_SURFACE = 6.0f;
+		constexpr auto SCALE_RATE_UNDERWATER	= 1.5f;
+		constexpr auto HEIGHT_OFFSET			= 4;
 
 		// TODO: Consider general movement direction.
 
@@ -319,31 +329,43 @@ namespace TEN::Entities::Vehicles
 
 		// Calculate relative offsets.
 		// NOTE: X and Z offsets are flipped accordingly.
-		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
+		bool isMovingForward = (item.Animation.Velocity.z > 0.0f);
 		auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
 		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
 
-		// Calculate positions.
-		auto posBase = Vector3(item.Pose.Position.x, waterHeight - HEIGHT_OFFSET, item.Pose.Position.z);
+		int vPos = isUnderwater ? item.Pose.Position.y : (waterHeight - HEIGHT_OFFSET);
+		auto posBase = Vector3(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+
+		// Calculate positions.
 		auto posLeft = posBase + Vector3::Transform(relOffsetLeft, rotMatrix);
 		auto posRight = posBase + Vector3::Transform(relOffsetRight, rotMatrix);
 
-		// Calculate directions.
+		// Clamp vertical positions.
+		posLeft.y = (posLeft.y < waterHeight) ? waterHeight : posLeft.y;
+		posRight.y = (posRight.y < waterHeight) ? waterHeight : posRight.y;
+
+		// Calculate direction.
+		// TODO: Change according to vehicle speed.
 		auto direction = -item.Pose.Orientation.ToDirection();
-		auto directionLeft = Geometry::RotatePoint(direction, EulerAngles(0, ANGLE(20.0f), 0));
-		auto directionRight = Geometry::RotatePoint(direction, EulerAngles(0, -ANGLE(20.0f), 0));
+
+		// Determine scale rate.
+		auto scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_WATER_SURFACE;
+
+		// Determine tags.
+		auto tagLeft = isMovingForward ? VehicleWakeEffectTag::FrontLeft : VehicleWakeEffectTag::BackLeft;
+		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(
-			item.Index, (int)VehicleWakeEffectTag::Left,
-			posLeft, directionLeft, 0, COLOR,
-			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeLeft);
+			item.Index, (int)tagLeft,
+			posLeft, direction, 0, COLOR,
+			0.0f, LIFE, VEL, scaleRate, 0, (int)StreamerFlags::FadeLeft);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
-			item.Index, (int)VehicleWakeEffectTag::Right,
-			posRight, directionRight, 0, COLOR,
-			0.0f, LIFE, 0.0f, SCALE_RATE, 0, (int)StreamerFlags::FadeRight);
+			item.Index, (int)tagRight,
+			posRight, direction, 0, COLOR,
+			0.0f, LIFE, VEL, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
 }

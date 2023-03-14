@@ -29,7 +29,6 @@
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using std::vector;
 
 // TODO:
 // Redo water surface dismount.
@@ -39,21 +38,6 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	BiteInfo UPVBites[6] =
-	{
-		{ 0, 0, 0, 3 },
-		{ 0, 96, 256, 0 },
-		{ -128, 0, 64, 1 },
-		{ 0, 0, -64, 1 },
-		{ 128, 0, 64, 2 },
-		{ 0, 0, -64, 2 }
-	};
-	const vector<VehicleMountType> UPVMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Back
-	};
-
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
 	constexpr auto UPV_LENGTH = SECTOR(1);
@@ -68,9 +52,6 @@ namespace TEN::Entities::Vehicles
 	constexpr int UPV_HARPOON_RELOAD_TIME = 15;
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
 	constexpr int UPV_SHIFT = 128;
-
-	constexpr auto UPV_WAKE_SEGMENT_LIFE	= 40;
-	constexpr auto UPV_WAKE_SEGMENT_FADEOUT = 5.0f;
 
 	// TODO: These should probably be done in the wad. @Sezz 2022.06.24
 	constexpr auto UPV_DEATH_FRAME_1 = 16;
@@ -100,6 +81,21 @@ namespace TEN::Entities::Vehicles
 
 	#define UPV_LEAN_RATE ANGLE(0.6f)
 	#define UPV_LEAN_MAX  ANGLE(10.0f)
+
+	BiteInfo UPVBites[6] =
+	{
+		{ 0, 0, 0, 3 },
+		{ 0, 96, 256, 0 },
+		{ -128, 0, 64, 1 },
+		{ 0, 0, -64, 1 },
+		{ 128, 0, 64, 2 },
+		{ 0, 0, -64, 2 }
+	};
+	const std::vector<VehicleMountType> UPVMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Back
+	};
 
 	enum UPVState
 	{
@@ -144,9 +140,9 @@ namespace TEN::Entities::Vehicles
 	{
 		UPV_BITE_TURBINE			= 0,
 		UPV_BITE_FRONT_LIGHT		= 1,
-		UPV_BITE_LEFT_RUDDER_LEFT   = 2, // Unused. Perhaps something like a trailing stream effect behind rudders was intended?
+		UPV_BITE_LEFT_RUDDER_LEFT   = 2,
 		UPV_BITE_LEFT_RUDDER_RIGHT  = 3, // Unused.
-		UPV_BITE_RIGHT_RUDDER_RIGHT = 4, // Unused.
+		UPV_BITE_RIGHT_RUDDER_RIGHT = 4,
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
 	enum UPVFlags
@@ -948,8 +944,15 @@ namespace TEN::Entities::Vehicles
 		auto jointPosLeft = GetJointPosition(UPVItem, UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].meshNum, Vector3i(UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].Position));
 		auto jointPosRight = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
 
-		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))// && !(Wibble & 15))
+		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
+			int waterHeight = GetWaterHeight(UPVItem);
+			//SpawnVehicleWake(*UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position, true);
+
+			// TODO: Replace.
+			constexpr auto UPV_WAKE_SEGMENT_LIFE	= 40;
+			constexpr auto UPV_WAKE_SEGMENT_FADEOUT = 5.0f;
+
 			SpawnStreamer(UPVItem, jointPosLeft.x, jointPosLeft.y, jointPosLeft.z, 1, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
 			SpawnStreamer(UPVItem, jointPosRight.x, jointPosRight.y, jointPosRight.z, 2, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
 		}

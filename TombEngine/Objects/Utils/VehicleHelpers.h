@@ -29,12 +29,6 @@ namespace TEN::Entities::Vehicles
 		Jump
 	};
 
-	enum class VehicleWakeEffectTag
-	{
-		Left,
-		Right
-	};
-
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, std::vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
 	int				 GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos);
 	int				 GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos);
@@ -49,5 +43,5 @@ namespace TEN::Entities::Vehicles
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight);
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight, bool isUnderwater = false);
 }

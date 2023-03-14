@@ -54,7 +54,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_DAMAGE_START = 140;
 	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
 
-	constexpr auto SKIDOO_WAKE_OFFSET = Vector3(CLICK(1.1f), 0, CLICK(1.6f));
+	constexpr auto SKIDOO_WAKE_OFFSET = Vector3(SKIDOO_SIDE, 0, SKIDOO_FRONT / 2);
 
 	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
 	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
