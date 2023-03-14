@@ -1,5 +1,13 @@
 #pragma once
 
+struct MESH_INFO;
+struct LevelCameraInfo;
+struct SinkInfo;
+struct SoundSourceInfo;
+struct TriggerVolume;
+struct AI_OBJECT;
+struct ROOM_INFO;
+
 using VarMapVal = std::variant<
 	short,
 	std::reference_wrapper<MESH_INFO>,
