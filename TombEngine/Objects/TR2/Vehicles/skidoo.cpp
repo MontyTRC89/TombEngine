@@ -17,13 +17,12 @@
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -61,6 +60,13 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
+
+	const std::vector<VehicleMountType> SkidooMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
 	enum SkidooState
 	{
@@ -104,13 +110,6 @@ namespace TEN::Entities::Vehicles
 		SKIDOO_ANIM_FALL_OFF = 20,
 		SKIDOO_ANIM_IDLE_DEATH = 21,
 		SKIDOO_ANIM_FALL_DEATH = 22
-	};
-
-	const vector<VehicleMountType> SkidooMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
 	};
 
 	SkidooInfo* GetSkidooInfo(ItemInfo* skidooItem)

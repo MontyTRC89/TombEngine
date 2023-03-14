@@ -56,7 +56,7 @@ namespace TEN::Entities::Vehicles
 
 	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
 
-	constexpr auto MINECART_WAKE_OFFSET = Vector3(BLOCK(1 / 8.0f), 0.0f, CLICK(0.7f));
+	constexpr auto MINECART_WAKE_OFFSET = Vector3(BLOCK(1 / 8.0f), 0.0f, BLOCK(0.5f));
 
 	constexpr auto MINECART_IN_DUCK	 = IN_CROUCH;
 	constexpr auto MINECART_IN_SWIPE = IN_ACTION | IN_DRAW;

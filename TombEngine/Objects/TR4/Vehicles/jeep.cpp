@@ -1,38 +1,38 @@
 #include "framework.h"
 #include "Objects/TR4/Vehicles/jeep.h"
+
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Gui.h"
-#include "Game/effects/effects.h"
-#include "Game/collision/collide_item.h"
-#include "Game/Lara/lara_one_gun.h"
-#include "Game/items.h"
 #include "Game/camera.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara_flare.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
-#include "Specific/Input/Input.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Sound/sound.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Gui.h"
+#include "Game/items.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Math/Math.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Math/Random.h"
+#include "Specific/Input/Input.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
 
-	const vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
+	const std::vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const std::vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
 
-	const vector<VehicleMountType> JeepMountTypes =
+	const std::vector<VehicleMountType> JeepMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -52,7 +52,7 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto JEEP_CRASH_VELOCITY = 10922;
 
-	constexpr auto JEEP_WAKE_OFFSET = Vector3(CLICK(0.9f), 0, CLICK(1.3f));
+	constexpr auto JEEP_WAKE_OFFSET = Vector3(BLOCK(0.25f), 0.0f, BLOCK(0.3f));
 
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 

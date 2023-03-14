@@ -57,7 +57,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
 	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
 
-	constexpr auto MOTORBIKE_WAKE_OFFSET = Vector3(CLICK(0.3f), 0, -CLICK(0.5f));
+	constexpr auto MOTORBIKE_WAKE_OFFSET = Vector3(BLOCK(1 / 16.0f), 0, BLOCK(1 / 8.0f));
 
 	#define MOTORBIKE_FORWARD_TURN_ANGLE ANGLE(1.5f)
 	#define MOTORBIKE_BACK_TURN_ANGLE ANGLE(0.5f)
