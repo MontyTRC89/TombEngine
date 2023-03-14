@@ -3029,22 +3029,23 @@ namespace TEN::Gui
 
 	void GuiController::DoExamineMode()
 	{
-		InvMode = InventoryMode::Examine;
+		this->InvMode = InventoryMode::Examine;
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::None;
+			this->InvMode = InventoryMode::None;
 		}
 	}
 
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
-		constexpr auto POS_2D = Vector2(130.0f, 450.0f);
+		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);
+		constexpr auto LERP_ALPHA = 0.05f;
 
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
-		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), 0.05f);
-		CompassNeedleAngle = needleOrient.y;
+		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
+		this->CompassNeedleAngle = needleOrient.y;
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
@@ -3055,7 +3056,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		InvMode = InventoryMode::Diary;
+		this->InvMode = InventoryMode::Diary;
 
 		if (GuiIsPulsed(In::Right) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
