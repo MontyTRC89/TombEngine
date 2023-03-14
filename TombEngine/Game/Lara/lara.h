@@ -70,13 +70,15 @@ constexpr auto LARA_POSE_TIME				 = 20 * FPS; // 20 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
 constexpr auto LARA_SPRINT_JUMP_TIME		 = 46;		 // Frames to count before a sprint jump is possible.
 
-constexpr auto LARA_AIR_MAX				   = 1800.0f;
-constexpr auto LARA_AIR_CRITICAL		   = LARA_AIR_MAX / 4;
-constexpr auto LARA_HEALTH_MAX			   = 1000.0f;
-constexpr auto LARA_HEALTH_CRITICAL		   = LARA_HEALTH_MAX / 4;
-constexpr auto LARA_SPRINT_ENERGY_MAX	   = 120.0f;
-constexpr auto LARA_SPRINT_ENERGY_CRITICAL = LARA_SPRINT_ENERGY_MAX / 2;
-constexpr auto LARA_POISON_POTENCY_MAX	   = 64.0f;
+constexpr auto LARA_AIR_MAX			  = 1800.0f;
+constexpr auto LARA_AIR_CRITICAL	  = LARA_AIR_MAX / 4;
+constexpr auto LARA_EXPOSURE_MAX	  = 600.0f;
+constexpr auto LARA_EXPOSURE_CRITICAL = LARA_EXPOSURE_MAX / 4;
+constexpr auto LARA_HEALTH_MAX		  = 1000.0f;
+constexpr auto LARA_HEALTH_CRITICAL	  = LARA_HEALTH_MAX / 4;
+constexpr auto LARA_POISON_MAX		  = 128.0f;
+constexpr auto LARA_STAMINA_MAX		  = 120.0f;
+constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;

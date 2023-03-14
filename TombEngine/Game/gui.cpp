@@ -1861,7 +1861,8 @@ namespace TEN::Gui
 
 			case INV_OBJECT_SMALL_MEDIPACK:
 
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) && !lara->PoisonPotency)
+				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
+					lara->Status.Poison == 0)
 				{
 					SayNo();
 					return;
@@ -1872,7 +1873,7 @@ namespace TEN::Gui
 					if (lara->Inventory.TotalSmallMedipacks != -1)
 						lara->Inventory.TotalSmallMedipacks--;
 
-					lara->PoisonPotency = 0;
+					lara->Status.Poison = 0;
 					item->HitPoints += LARA_HEALTH_MAX / 2;
 
 					if (item->HitPoints > LARA_HEALTH_MAX)
@@ -1888,7 +1889,8 @@ namespace TEN::Gui
 
 			case INV_OBJECT_LARGE_MEDIPACK:
 
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) && !lara->PoisonPotency)
+				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
+					lara->Status.Poison == 0)
 				{
 					SayNo();
 					return;
@@ -1899,7 +1901,7 @@ namespace TEN::Gui
 					if (lara->Inventory.TotalLargeMedipacks != -1)
 						lara->Inventory.TotalLargeMedipacks--;
 
-					lara->PoisonPotency = 0;
+					lara->Status.Poison = 0;
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);

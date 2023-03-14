@@ -1565,7 +1565,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 						GetCreatureInfo(currentItem)->Poisoned = true;
 
 					if (currentItem->IsLara())
-						GetLaraInfo(currentItem)->PoisonPotency += 5;
+						GetLaraInfo(currentItem)->Status.Poison += 5;
 				}
 				else if (!currentObject.undead)
 				{
