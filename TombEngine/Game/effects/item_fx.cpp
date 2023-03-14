@@ -62,9 +62,9 @@ namespace TEN::Effects::Items
 		item->Effect.Count = timeout;
 	}
 
-	void ItemSetAsCadaver(ItemInfo* item, int timeout)
+	void ItemSetAsCorpse(ItemInfo* item, int timeout)
 	{
-		item->Effect.Type = EffectType::Cadaver;
+		item->Effect.Type = EffectType::Corpse;
 		item->Effect.Count = timeout;
 	}
 

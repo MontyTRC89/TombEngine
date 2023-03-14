@@ -50,7 +50,7 @@ namespace TEN::Entities
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.ItemFlags[2] = (int)EffectType::Cadaver;
+		item.ItemFlags[2] = (int)EffectType::Corpse;
 
 		if (item.TriggerFlags == 1)
 		{
@@ -75,7 +75,7 @@ namespace TEN::Entities
 	
 		if (TriggerActive(&item))
 		{
-			item.ItemFlags[2] = (int)EffectType::Cadaver;
+			item.ItemFlags[2] = (int)EffectType::Corpse;
 		}
 		else
 			item.ItemFlags[2] = (int)EffectType::None;

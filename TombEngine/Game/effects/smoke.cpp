@@ -235,7 +235,7 @@ namespace TEN::Effects::Smoke
 		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
 	}
 
-	void TriggerCadaverCloud(int x, int y, int z, int bodyPart)
+	void TriggerCorpseCloud(int x, int y, int z, int bodyPart)
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};

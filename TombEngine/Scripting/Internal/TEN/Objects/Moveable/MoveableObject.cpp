@@ -677,8 +677,8 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
 
-	case EffectType::Cadaver:
-		ItemSetAsCadaver(m_item, realTimeout);
+	case EffectType::Corpse:
+		ItemSetAsCorpse(m_item, realTimeout);
 		break;
 
 	case EffectType::Custom:

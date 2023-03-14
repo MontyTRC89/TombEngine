@@ -61,7 +61,7 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
-	Cadaver,
+	Corpse,
 	Custom
 };
 

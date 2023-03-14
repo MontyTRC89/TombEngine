@@ -244,7 +244,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
-void TriggerCadaverCloud(int x, int y, int z, int bodyPart);
+void TriggerCorpseCloud(int x, int y, int z, int bodyPart);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);

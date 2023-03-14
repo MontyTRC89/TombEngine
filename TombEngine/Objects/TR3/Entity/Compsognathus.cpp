@@ -125,7 +125,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (SameZone(creature, &targetItem))
 					{
 						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Cadaver && targetItem.Active)
+						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Corpse && targetItem.Active)
 						{
 							cadaverPos = targetItem.Pose.Position.ToVector3();
 							shortestDistance = distance;

@@ -1412,9 +1412,9 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
-void TriggerCadaverCloud(int x, int y, int z, int bodyPart)
+void TriggerCorpseCloud(int x, int y, int z, int bodyPart)
 {
-	TEN::Effects::Smoke::TriggerCadaverCloud(x, y, z, 0);
+	TEN::Effects::Smoke::TriggerCorpseCloud(x, y, z, 0);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
@@ -1856,14 +1856,14 @@ void ProcessEffects(ItemInfo* item)
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 
-		case EffectType::Cadaver:
+		case EffectType::Corpse:
 			if (TestProbability(1 / 72.0f))
-				TriggerCadaverCloud(pos.x, pos.y, pos.z, 0);
+				TriggerCorpseCloud(pos.x, pos.y, pos.z, 0);
 			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
+	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Corpse)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
@@ -1888,7 +1888,7 @@ void ProcessEffects(ItemInfo* item)
 		break;
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
+	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Corpse)
 	{
 		if (item->IsLara() ||
 			(item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))
