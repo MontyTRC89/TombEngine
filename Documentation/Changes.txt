@@ -7,6 +7,7 @@ Version 1.0.8
 * Fix object camera not clearing at level end.
 * Fix hardcoded double-breathing Lara sfx.
 * Add TR1 slamming doors.
+* Add the ability to set cold bar in rooms. (Achieved by setting cold flag to a room in Tomb Editor)
 
 Version 1.0.7
 =============
