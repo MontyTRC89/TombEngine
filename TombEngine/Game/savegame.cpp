@@ -1428,7 +1428,7 @@ bool SaveGame::Load(int slot)
 		
 		item->Name = savedItem->lua_name()->str();
 		if (!item->Name.empty())
-			g_GameScriptEntities->AddName(item->Name, static_cast<short>(i));
+			g_GameScriptEntities->AddName(item->Name, (short)i);
 
 		item->Callbacks.OnKilled = savedItem->lua_on_killed_name()->str();
 		item->Callbacks.OnHit = savedItem->lua_on_hit_name()->str();

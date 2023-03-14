@@ -2,11 +2,10 @@
 #include <functional>
 #include <string>
 
+#include "Scripting/Include/VarMapVal.h"
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
 #include "Specific/level.h"
-
-#include "VarMapVal.h"
 
 typedef DWORD D3DCOLOR;
 
@@ -70,8 +69,8 @@ public:
 	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;
 	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
 
-	virtual void GetCallbackStrings(std::vector<std::string> & preControl, std::vector<std::string> & postControl) const = 0;
-	virtual void SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl) = 0;
+	virtual void GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const = 0;
+	virtual void SetCallbackStrings(std::vector<std::string> const& preControl, std::vector<std::string> const& postControl) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

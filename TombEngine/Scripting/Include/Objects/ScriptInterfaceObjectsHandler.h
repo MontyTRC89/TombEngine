@@ -2,9 +2,8 @@
 #include <functional>
 #include <string>
 
+#include "Scripting/Include/VarMapVal.h"
 #include "Specific/level.h"
-
-#include "VarMapVal.h"
 
 typedef DWORD D3DCOLOR;
 

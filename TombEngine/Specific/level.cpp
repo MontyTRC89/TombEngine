@@ -185,8 +185,8 @@ void LoadItems()
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
 			
-			g_GameScriptEntities->AddName(item->Name, static_cast<short>(i));
-			g_GameScriptEntities->TryAddColliding(static_cast<short>(i));
+			g_GameScriptEntities->AddName(item->Name, short(i));
+			g_GameScriptEntities->TryAddColliding(short(i));
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
