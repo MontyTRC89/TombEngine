@@ -334,6 +334,7 @@ namespace TEN::Entities::Vehicles
 		posLeft.y = (posLeft.y < waterHeight) ? waterHeight : posLeft.y;
 		posRight.y = (posRight.y < waterHeight) ? waterHeight : posRight.y;
 
+		// Return left and right positions in pair.
 		return std::pair(posLeft, posRight);
 	}
 
