@@ -43,5 +43,5 @@ namespace TEN::Entities::Vehicles
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& offset, int waterHeight, bool isUnderwater = false);
+	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, bool isUnderwater = false);
 }

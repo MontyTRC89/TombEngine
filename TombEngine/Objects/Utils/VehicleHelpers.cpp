@@ -350,7 +350,7 @@ namespace TEN::Entities::Vehicles
 		if (waterHeight == NO_HEIGHT)
 			return;
 
-		bool isMovingForward = (item.Animation.Velocity.z > 0.0f);
+		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
 
 		// Determine key parameters.
 		auto positions = GetVehicleWakePositions(item, relOffset, waterHeight, isUnderwater, isMovingForward);
