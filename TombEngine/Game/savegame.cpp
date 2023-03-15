@@ -639,7 +639,7 @@ bool SaveGame::Save(int slot)
 			Save::PushableBuilder pushableBuilder{ fbb };
 
 			pushableBuilder.add_pushable_gravity(pushable->Gravity);
-			pushableBuilder.add_pushable_gravity_state(static_cast<int> (pushable->GravityState));
+			pushableBuilder.add_pushable_gravity_state((int)pushable->GravityState);
 			pushableBuilder.add_pushable_water_force(pushable->FloatingForce);
 			
 			pushableBuilder.add_pushable_stackLimit(pushable->StackLimit);

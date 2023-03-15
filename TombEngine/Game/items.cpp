@@ -878,8 +878,8 @@ void FloatItem(ItemInfo& item, float floatForce)
 	float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
 	boxScale *= floatForce;
 
-	float xOscillation = std::sin(time * 0.05f) * 0.5f * boxScale;
-	float zOscillation = std::sin(time * 0.1f) * 0.75f * boxScale;
+	float xOscillation = (std::sin(time * 0.05f) * 0.5f) * boxScale;
+	float zOscillation = (std::sin(time * 0.1f) * 0.75f) * boxScale;
 
 	short xAngle = ANGLE(xOscillation * 20.0f);
 	short zAngle = ANGLE(zOscillation * 20.0f);

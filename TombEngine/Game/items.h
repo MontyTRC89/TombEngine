@@ -198,4 +198,4 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos);
 bool CompareItem2DPositions(int itemNumber0, int itemNumber1);
-void FloatItem(ItemInfo& item, float floatingForce = 1.0f);
+void FloatItem(ItemInfo& item, float floatForce = 1.0f);
