@@ -135,41 +135,6 @@ namespace TEN::Renderer
 				}
 			}
 		}
-
-		for (const auto& streamer : Streamers)
-		{
-			for (int i = 0; i < streamer.size(); i++)
-			{
-				const auto& segment = streamer[i];
-				const auto& prevSegment = streamer[std::max(i - 1, 0)];
-
-				if (segment.Life <= 0.0f)
-					continue;
-
-				auto color = Vector4(segment.Opacity);
-				auto prevColor = Vector4(prevSegment.Opacity);
-
-				// If central, no vertex color.
-				if (segment.Type == StreamerType::Center)
-				{
-					AddColoredQuad(
-						segment.Vertices[0], segment.Vertices[1],
-						prevSegment.Vertices[1], prevSegment.Vertices[0],
-						color, color,
-						prevColor, prevColor,
-						BLENDMODE_ADDITIVE, view);
-				}
-				else
-				{
-					AddColoredQuad(
-						segment.Vertices[0], segment.Vertices[1],
-						prevSegment.Vertices[1], prevSegment.Vertices[0],
-						Vector4::Zero, color,
-						prevColor, Vector4::Zero,
-						BLENDMODE_ADDITIVE, view);
-				}
-			}
-		}
 	}
 
 	void Renderer11::DrawHelicalLasers(RenderView& view)

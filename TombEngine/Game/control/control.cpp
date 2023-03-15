@@ -197,7 +197,6 @@ GameStatus ControlPhase(int numFrames)
 
 		// Update effects.
 		StreamerEffect.Update();
-		UpdateStreamers();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
