@@ -60,7 +60,7 @@ namespace TEN::Effects::Streamer
 	{
 		auto& segment = this->GetNewSegment();
 
-		float lifeMax = round(life * FPS);
+		float lifeMax = std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX); // Clamp life to avoid "clipping" streamer early.
 		float opacityMax = InterpolateCos(0.0f, StreamerSegment::OPACITY_MAX, segmentCount / lifeMax);
 
 		segment.Orientation = AxisAngle(direction, orient2D);

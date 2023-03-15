@@ -429,7 +429,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto direction = -EulerAngles(0, item->Pose.Orientation.y, 0).ToDirection();
 		short orient2D = /*(item->Pose.Orientation.z + */ANGLE(90.0f);//)// *5;
 		float life = 1.0f;
-		float vel = 0.0f;
+		float vel = 8.0f;
 		float scaleRate = 0.0f;
 		short rot2D = ANGLE(3.0f);
 
