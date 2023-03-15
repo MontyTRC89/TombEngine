@@ -3041,7 +3041,7 @@ namespace TEN::Gui
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
 		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);
-		constexpr auto LERP_ALPHA = 0.05f;
+		constexpr auto LERP_ALPHA = 0.1f;
 
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
