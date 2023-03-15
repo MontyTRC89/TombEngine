@@ -340,7 +340,7 @@ namespace TEN::Entities::Vehicles
 
 	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, bool isUnderwater)
 	{
-		constexpr auto COLOR				 = Vector4(0.8f);
+		constexpr auto COLOR				 = Vector4(0.75f);
 		constexpr auto LIFE_MAX				 = 2.5f;
 		constexpr auto VEL_ABS				 = 4.0f;
 		constexpr auto SCALE_RATE_ON_WATER	 = 6.0f;
