@@ -24,10 +24,10 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Initialize bar values.
-		this->InitializeStatusBar(this->AirBar, player.Status.Air, LARA_AIR_MAX);
-		this->InitializeStatusBar(this->ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
-		this->InitializeStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
-		this->InitializeStatusBar(this->StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
+		InitializeStatusBar(AirBar, player.Status.Air, LARA_AIR_MAX);
+		InitializeStatusBar(ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
+		InitializeStatusBar(HealthBar, item.HitPoints, LARA_HEALTH_MAX);
+		InitializeStatusBar(StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
 	}
 
 	void StatusBarsController::Update(const ItemInfo& item)
@@ -36,13 +36,13 @@ namespace TEN::Hud
 
 		// Update flash.
 		if ((GameTimer % (int)round(FLASH_INTERVAL * FPS)) == 0)
-			this->DoFlash = !DoFlash;
+			DoFlash = !DoFlash;
 
 		// Update bars.
-		this->UpdateAirBar(item);
-		this->UpdateExposureBar(item);
-		this->UpdateHealthBar(item);
-		this->UpdateStaminaBar(item);
+		UpdateAirBar(item);
+		UpdateExposureBar(item);
+		UpdateHealthBar(item);
+		UpdateStaminaBar(item);
 	}
 
 	void StatusBarsController::Draw(const ItemInfo& item) const
@@ -55,10 +55,10 @@ namespace TEN::Hud
 		bool isPoisoned = (player.Status.Poison != 0);
 
 		// Draw bars.
-		this->DrawAirBar();
-		this->DrawExposureBar();
-		this->DrawHealthBar(isPoisoned);
-		this->DrawStaminaBar();
+		DrawAirBar();
+		DrawExposureBar();
+		DrawHealthBar(isPoisoned);
+		DrawStaminaBar();
 	}
 
 	void StatusBarsController::Clear()
@@ -97,13 +97,13 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->AirBar, player.Status.Air, LARA_AIR_MAX);
+		UpdateStatusBar(AirBar, player.Status.Air, LARA_AIR_MAX);
 		
 		// Update life.
 		if (AirBar.Value != AirBar.TargetValue ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
-			this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
@@ -111,7 +111,7 @@ namespace TEN::Hud
 		{
 			const auto& vehicleItem = g_Level.Items[player.Vehicle];
 			if (vehicleItem.ObjectNumber == ID_UPV)
-				this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+				AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
@@ -120,13 +120,13 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
+		UpdateStatusBar(ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
 
 		// Update life.
 		if (ExposureBar.Value != ExposureBar.TargetValue ||
 			(TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) && TestEnvironment(ENV_FLAG_COLD, item.RoomNumber)))
 		{
-			this->ExposureBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			ExposureBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
@@ -135,7 +135,7 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
+		UpdateStatusBar(HealthBar, item.HitPoints, LARA_HEALTH_MAX);
 
 		// Update life.
 		if (HealthBar.Value != HealthBar.TargetValue ||
@@ -145,7 +145,7 @@ namespace TEN::Hud
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
 				player.Control.Weapon.GunType != LaraWeaponType::Torch))   // HACK: Exclude torch.
 		{
-			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 
 		// Special case for weapon undraw.
@@ -153,7 +153,7 @@ namespace TEN::Hud
 			item.HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
 		{
-			this->HealthBar.Life = 0;// round(STATUS_BAR_LIFE_START_FADING * FPS);
+			HealthBar.Life = 0;// round(STATUS_BAR_LIFE_START_FADING * FPS);
 		}
 	}
 
@@ -162,13 +162,13 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
+		UpdateStatusBar(StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
 
 		// Update life.
 		if (StaminaBar.Value != StaminaBar.TargetValue ||
 			StaminaBar.Value != 1.0f)
 		{
-			this->StaminaBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			StaminaBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
 	}
 
@@ -188,7 +188,7 @@ namespace TEN::Hud
 		if (AirBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
+		DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
 	}
 	
 	void StatusBarsController::DrawExposureBar() const
@@ -199,7 +199,7 @@ namespace TEN::Hud
 		if (ExposureBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(ExposureBar.Value, CRITICAL_VALUE, *g_ExposureBar, TEXTURE_ID, 0, false);
+		DrawStatusBar(ExposureBar.Value, CRITICAL_VALUE, *g_ExposureBar, TEXTURE_ID, 0, false);
 	}
 
 	void StatusBarsController::DrawHealthBar(bool isPoisoned) const
@@ -210,7 +210,7 @@ namespace TEN::Hud
 		if (HealthBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
+		DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
 	void StatusBarsController::DrawStaminaBar() const
@@ -221,6 +221,6 @@ namespace TEN::Hud
 		if (StaminaBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(StaminaBar.Value, CRITICAL_VALUE, *g_StaminaBar, TEXTURE_ID, 0, false);
+		DrawStatusBar(StaminaBar.Value, CRITICAL_VALUE, *g_StaminaBar, TEXTURE_ID, 0, false);
 	}
 }
