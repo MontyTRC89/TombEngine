@@ -15,7 +15,7 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::StreamerSegment::InitializeVertices(const Vector3& pos, float width)
 	{
-		this->Vertices = { pos, pos };
+		Vertices = { pos, pos };
 		this->TransformVertices(0.0f, width / 2);
 	}
 
@@ -23,17 +23,17 @@ namespace TEN::Effects::Streamer
 	{
 		// Update opacity.
 		if (Color.w > 0.0f)
-			this->Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
+			Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
 
 		// TODO: Not working.
 		// Update orientation.
-		this->Orientation.SetAngle(Orientation.GetAngle() + Rotation);
+		Orientation.SetAngle(Orientation.GetAngle() + Rotation);
 		
 		// Update vertices.
-		this->TransformVertices(Velocity, ScaleRate);
+		TransformVertices(Velocity, ScaleRate);
 
 		// Update life.
-		this->Life -= 1.0f;
+		Life -= 1.0f;
 	}
 
 	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)
@@ -42,16 +42,16 @@ namespace TEN::Effects::Streamer
 		if (scaleRate != 0.0f)
 		{
 			auto direction = Orientation.ToDirection();
-			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], -direction, scaleRate);
-			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, scaleRate);
+			Vertices[0] = Geometry::TranslatePoint(Vertices[0], -direction, scaleRate);
+			Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, scaleRate);
 		}
 
 		// Apply directional velocity.
 		if (vel != 0.0f)
 		{
 			auto direction = Orientation.GetAxis();
-			this->Vertices[0] = Geometry::TranslatePoint(Vertices[0], direction, vel);
-			this->Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, vel);
+			Vertices[0] = Geometry::TranslatePoint(Vertices[0], direction, vel);
+			Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, vel);
 		}
 	}
 
@@ -83,13 +83,13 @@ namespace TEN::Effects::Streamer
 		// If streamer was broken, set bool flag to track it.
 		const auto& newestSegment = Segments.back();
 		if (newestSegment.Life != newestSegment.LifeMax)
-			this->IsBroken = true;
+			IsBroken = true;
 
 		// Update segments.
-		for (auto& segment : this->Segments)
+		for (auto& segment : Segments)
 			segment.Update();
 
-		ClearInactiveEffects(this->Segments);
+		ClearInactiveEffects(Segments);
 	}
 
 	Streamer::StreamerSegment& Streamer::GetNewSegment()
@@ -98,10 +98,10 @@ namespace TEN::Effects::Streamer
 
 		// Clear oldest segment if vector is full.
 		if (Segments.size() == SEGMENT_COUNT_MAX)
-			this->Segments.erase(Segments.begin());
+			Segments.erase(Segments.begin());
 
 		// Add and return new segment.
-		return this->Segments.emplace_back();
+		return Segments.emplace_back();
 	}
 
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
@@ -123,7 +123,7 @@ namespace TEN::Effects::Streamer
 		if (Pools.empty())
 			return;
 
-		for (auto& [tag, pool] : this->Pools)
+		for (auto& [tag, pool] : Pools)
 		{
 			for (auto& streamer : pool)
 				streamer.Update();
@@ -137,8 +137,8 @@ namespace TEN::Effects::Streamer
 	std::vector<Streamer>& StreamerModule::GetPool(int tag)
 	{
 		// Get pool at tag key.
-		this->Pools.insert({ tag, {} });
-		auto& pool = this->Pools.at(tag);
+		Pools.insert({ tag, {} });
+		auto& pool = Pools.at(tag);
 		return pool;
 	}
 
@@ -171,7 +171,7 @@ namespace TEN::Effects::Streamer
 			const auto& pool = it->second;
 			if (pool.empty())
 			{
-				it = this->Pools.erase(it);
+				it = Pools.erase(it);
 				continue;
 			}
 			
@@ -181,7 +181,7 @@ namespace TEN::Effects::Streamer
 
 	void StreamerModule::ClearInactiveStreamers(int tag)
 	{
-		auto& pool = this->Pools.at(tag);
+		auto& pool = Pools.at(tag);
 
 		pool.erase(
 			std::remove_if(
@@ -209,7 +209,7 @@ namespace TEN::Effects::Streamer
 		if (Modules.empty())
 			return;
 
-		for (auto& [entityNumber, module] : this->Modules)
+		for (auto& [entityNumber, module] : Modules)
 			module.Update();
 
 		this->ClearInactiveModules();
@@ -223,8 +223,8 @@ namespace TEN::Effects::Streamer
 	StreamerModule& StreamerEffectController::GetModule(int entityNumber)
 	{
 		// Get module at entityNumber key.
-		this->Modules.insert({ entityNumber, {} });
-		auto& module = this->Modules.at(entityNumber);
+		Modules.insert({ entityNumber, {} });
+		auto& module = Modules.at(entityNumber);
 		return module;
 	}
 
@@ -235,7 +235,7 @@ namespace TEN::Effects::Streamer
 			const auto& module = it->second;
 			if (module.Pools.empty())
 			{
-				it = this->Modules.erase(it);
+				it = Modules.erase(it);
 				continue;
 			}
 			
