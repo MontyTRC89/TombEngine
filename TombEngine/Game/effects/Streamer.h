@@ -25,7 +25,6 @@ namespace TEN::Effects::Streamer
 		struct StreamerSegment
 		{
 			static constexpr auto VERTEX_COUNT = 2;
-			static constexpr auto OPACITY_MAX  = 0.8f;
 
 			AxisAngle Orientation = AxisAngle::Identity;
 			Vector4	  Color		  = Vector4::Zero;
