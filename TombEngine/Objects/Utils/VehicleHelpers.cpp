@@ -312,14 +312,14 @@ namespace TEN::Entities::Vehicles
 			vehicleItem->Pose.Orientation.z = 0;
 	}
 
-	static std::pair<Vector3, Vector3> GetVehicleWakePositions(const ItemInfo& item, const Vector3& relOffset, int waterHeight,
+	static std::pair<Vector3, Vector3> GetVehicleWakePositions(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight,
 															   bool isUnderwater, bool isMovingForward)
 	{
 		constexpr auto HEIGHT_OFFSET = 4;
 
-		int vPos = isUnderwater ? item.Pose.Position.y : (waterHeight - HEIGHT_OFFSET);
-		auto posBase = Vector3(item.Pose.Position.x, vPos, item.Pose.Position.z);
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+		int vPos = isUnderwater ? vehicleItem.Pose.Position.y : (waterHeight - HEIGHT_OFFSET);
+		auto posBase = Vector3(vehicleItem.Pose.Position.x, vPos, vehicleItem.Pose.Position.z);
+		auto rotMatrix = vehicleItem.Pose.Orientation.ToRotationMatrix();
 
 		// Calculate relative offsets.
 		// NOTE: X and Z offsets are flipped accordingly.
@@ -338,7 +338,7 @@ namespace TEN::Entities::Vehicles
 		return std::pair(posLeft, posRight);
 	}
 
-	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, bool isUnderwater)
+	void SpawnVehicleWake(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight, bool isUnderwater)
 	{
 		constexpr auto COLOR				 = Vector4(0.75f);
 		constexpr auto LIFE_MAX				 = 2.5f;
@@ -350,28 +350,28 @@ namespace TEN::Entities::Vehicles
 		if (waterHeight == NO_HEIGHT)
 			return;
 
-		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
+		bool isMovingForward = (vehicleItem.Animation.Velocity.z >= 0.0f);
 
 		// Determine tags.
 		auto tagLeft = isMovingForward ? VehicleWakeEffectTag::FrontLeft : VehicleWakeEffectTag::BackLeft;
 		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
 
 		// Determine key parameters.
-		auto positions = GetVehicleWakePositions(item, relOffset, waterHeight, isUnderwater, isMovingForward);
-		auto direction = -item.Pose.Orientation.ToDirection();
+		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight, isUnderwater, isMovingForward);
+		auto direction = -vehicleItem.Pose.Orientation.ToDirection();
 		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
 		float vel = VEL_ABS * (isMovingForward ? 1 : -1);
 		float scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(
-			item.Index, (int)tagLeft,
+			vehicleItem.Index, (int)tagLeft,
 			positions.first, direction, 0, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
-			item.Index, (int)tagRight,
+			vehicleItem.Index, (int)tagRight,
 			positions.second, direction, 0, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
