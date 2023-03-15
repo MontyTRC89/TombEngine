@@ -16,7 +16,7 @@ namespace TEN::Effects::Streamer
 	void Streamer::StreamerSegment::InitializeVertices(const Vector3& pos, float width)
 	{
 		Vertices = { pos, pos };
-		this->TransformVertices(0.0f, width / 2);
+		TransformVertices(0.0f, width / 2);
 	}
 
 	void Streamer::StreamerSegment::Update()
@@ -58,13 +58,16 @@ namespace TEN::Effects::Streamer
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
 							  float width, float life, float vel, float scaleRate, short rot2D, int flags, unsigned int segmentCount)
 	{
-		auto& segment = this->GetNewSegment();
+		constexpr auto FADE_IN_COEFF = 3.0f;
 
-		// Clamp life according to max segment count to avoid "clipping" streamer early.
+		auto& segment = GetNewSegment();
+
+		// Avoid "clipped" streamers by clamping max life according to max segment count.
 		float lifeMax = std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
 		float opacity = std::min(color.w, StreamerSegment::OPACITY_MAX);
-		float opacityMax = InterpolateCos(0.0f, opacity, segmentCount / lifeMax);
+		float alpha = (segmentCount / lifeMax) * FADE_IN_COEFF;
+		float opacityMax = InterpolateCos(0.0f, opacity, alpha);
 
 		segment.Orientation = AxisAngle(direction, orient2D);
 		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
@@ -115,7 +118,7 @@ namespace TEN::Effects::Streamer
 			return;
 
 		// Get and extend streamer with new segment.
-		auto& streamer = this->GetStreamer(tag);
+		auto& streamer = GetStreamer(tag);
 		streamer.AddSegment(pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags, streamer.Segments.size());
 	}
 
@@ -129,10 +132,10 @@ namespace TEN::Effects::Streamer
 			for (auto& streamer : pool)
 				streamer.Update();
 
-			this->ClearInactiveStreamers(tag);
+			ClearInactiveStreamers(tag);
 		}
 
-		this->ClearInactivePools();
+		ClearInactivePools();
 	}
 
 	std::vector<Streamer>& StreamerModule::GetPool(int tag)
@@ -145,7 +148,7 @@ namespace TEN::Effects::Streamer
 
 	Streamer& StreamerModule::GetStreamer(int tag)
 	{
-		auto& pool = this->GetPool(tag);
+		auto& pool = GetPool(tag);
 		assert(pool.size() <= STREAMER_COUNT_MAX);
 
 		// Return most recent streamer iteration if it exists and is unbroken.
@@ -199,7 +202,7 @@ namespace TEN::Effects::Streamer
 			return;
 
 		// Get module and extend streamer within pool.
-		auto& module = this->GetModule(entityNumber);
+		auto& module = GetModule(entityNumber);
 		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags);
 	}
 
@@ -211,7 +214,7 @@ namespace TEN::Effects::Streamer
 		for (auto& [entityNumber, module] : Modules)
 			module.Update();
 
-		this->ClearInactiveModules();
+		ClearInactiveModules();
 	}
 
 	void StreamerEffectController::Clear()
