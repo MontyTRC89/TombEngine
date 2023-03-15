@@ -338,12 +338,11 @@ namespace TEN::Entities::Vehicles
 		return std::pair(posLeft, posRight);
 	}
 
-	// TODO: Doesn't work underwater.
 	void SpawnVehicleWake(const ItemInfo& item, const Vector3& relOffset, int waterHeight, bool isUnderwater)
 	{
 		constexpr auto COLOR				 = Vector4(0.8f);
-		constexpr auto LIFE					 = 2.5f;
-		constexpr auto VEL					 = 4.0f;
+		constexpr auto LIFE_MAX				 = 2.5f;
+		constexpr auto VEL_ABS				 = 4.0f;
 		constexpr auto SCALE_RATE_ON_WATER	 = 6.0f;
 		constexpr auto SCALE_RATE_UNDERWATER = 1.5f;
 
@@ -353,25 +352,27 @@ namespace TEN::Entities::Vehicles
 
 		bool isMovingForward = (item.Animation.Velocity.z >= 0.0f);
 
-		// Determine key parameters.
-		auto positions = GetVehicleWakePositions(item, relOffset, waterHeight, isUnderwater, isMovingForward);
-		auto direction = -item.Pose.Orientation.ToDirection();
-		auto scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
-
 		// Determine tags.
 		auto tagLeft = isMovingForward ? VehicleWakeEffectTag::FrontLeft : VehicleWakeEffectTag::BackLeft;
 		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
+
+		// Determine key parameters.
+		auto positions = GetVehicleWakePositions(item, relOffset, waterHeight, isUnderwater, isMovingForward);
+		auto direction = -item.Pose.Orientation.ToDirection();
+		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
+		float vel = VEL_ABS * (isMovingForward ? 1 : -1);
+		auto scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(
 			item.Index, (int)tagLeft,
 			positions.first, direction, 0, COLOR,
-			0.0f, LIFE, VEL, scaleRate, 0, (int)StreamerFlags::FadeLeft);
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
 			item.Index, (int)tagRight,
 			positions.second, direction, 0, COLOR,
-			0.0f, LIFE, VEL, scaleRate, 0, (int)StreamerFlags::FadeRight);
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
 }

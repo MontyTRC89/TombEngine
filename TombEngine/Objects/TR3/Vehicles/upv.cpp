@@ -63,6 +63,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
 
+	constexpr auto UPV_WAKE_OFFSET = Vector3(BLOCK(1 / 3.0f), -BLOCK(1 / 8.0f), BLOCK(1 / 10.0f));
+
 	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
 	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.6f)
 	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(0.3f)
@@ -941,20 +943,10 @@ namespace TEN::Entities::Vehicles
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Vehicle);
 
-		auto jointPosLeft = GetJointPosition(UPVItem, UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].meshNum, Vector3i(UPVBites[UPV_BITE_LEFT_RUDDER_LEFT].Position));
-		auto jointPosRight = GetJointPosition(UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].meshNum, Vector3i(UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position));
-
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
 			int waterHeight = GetWaterHeight(UPVItem);
-			//SpawnVehicleWake(*UPVItem, UPVBites[UPV_BITE_RIGHT_RUDDER_RIGHT].Position, true);
-
-			// TODO: Replace.
-			constexpr auto UPV_WAKE_SEGMENT_LIFE	= 40;
-			constexpr auto UPV_WAKE_SEGMENT_FADEOUT = 5.0f;
-
-			SpawnStreamer(UPVItem, jointPosLeft.x, jointPosLeft.y, jointPosLeft.z, 1, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
-			SpawnStreamer(UPVItem, jointPosRight.x, jointPosRight.y, jointPosRight.z, 2, false, 5.0f, UPV_WAKE_SEGMENT_LIFE, UPV_WAKE_SEGMENT_FADEOUT);
+			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
