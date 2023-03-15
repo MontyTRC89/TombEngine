@@ -53,7 +53,7 @@ namespace TEN::Effects::Streamer
 
 		// Utilities
 		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-						float width, float life, float vel, float scaleRate, float rot2D, int flags, unsigned int segmentCount);
+						float width, float life, float vel, float scaleRate, short rot2D, int flags, unsigned int segmentCount);
 		void Update();
 
 	private:
@@ -74,7 +74,7 @@ namespace TEN::Effects::Streamer
 
 		// Utilities
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-						 float width, float life, float vel, float scaleRate, float rot2D, int flags);
+						 float width, float life, float vel, float scaleRate, short rot2D, int flags);
 		void Update();
 
 	private:
@@ -97,7 +97,7 @@ namespace TEN::Effects::Streamer
 
 		// Utilities
 		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-				   float width, float life, float vel, float scaleRate, float rot2D, int flags = 0);
+				   float width, float life, float vel, float scaleRate, short rot2D, int flags = 0);
 		void Update();
 		void Clear();
 

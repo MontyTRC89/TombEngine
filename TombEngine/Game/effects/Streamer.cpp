@@ -56,7 +56,7 @@ namespace TEN::Effects::Streamer
 	}
 
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-							  float width, float life, float vel, float scaleRate, float rot2D, int flags, unsigned int segmentCount)
+							  float width, float life, float vel, float scaleRate, short rot2D, int flags, unsigned int segmentCount)
 	{
 		auto& segment = this->GetNewSegment();
 
@@ -105,7 +105,7 @@ namespace TEN::Effects::Streamer
 	}
 
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-									 float width, float life, float vel, float scaleRate, float rot2D, int flags)
+									 float width, float life, float vel, float scaleRate, short rot2D, int flags)
 	{
 		assert(Pools.size() <= POOL_COUNT_MAX);
 
@@ -191,7 +191,7 @@ namespace TEN::Effects::Streamer
 	}
 
 	void StreamerEffectController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-								   float width, float life, float vel, float scaleRate, float rot2D, int flags)
+								   float width, float life, float vel, float scaleRate, short rot2D, int flags)
 	{
 		assert(Modules.size() <= MODULE_COUNT_MAX);
 
