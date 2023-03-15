@@ -12,19 +12,19 @@ namespace TEN::Entities::Generic
 	enum class PushableGravityState
 	{
 		None,
-		Ground,
+		Grounded,
 		Falling,
 		Sinking,
 		Floating,
 		OnWater,
-		Sliding //TODO.
+		Sliding // TODO
 	};
 
 	struct PushableSidesAttributes
 	{
-		bool Pullable;
-		bool Pushable;
-		bool Climbable;
+		bool Pullable  = false;
+		bool Pushable  = false;
+		bool Climbable = false;
 
 		PushableSidesAttributes()
 		{
@@ -33,11 +33,11 @@ namespace TEN::Entities::Generic
 			Climbable = false;
 		}
 
-		PushableSidesAttributes(bool pullValue, bool pushValue, bool climbValue)
+		PushableSidesAttributes(bool isPullable, bool isPushable, bool isClimbable)
 		{
-			Pullable = pullValue;
-			Pushable = pushValue;
-			Climbable = climbValue;
+			Pullable = isPullable;
+			Pushable = isPushable;
+			Climbable = isClimbable;
 		}
 	};
 	
@@ -57,15 +57,15 @@ namespace TEN::Entities::Generic
 
 		GameVector StartPos;	// used for pushable movement code and to deactivate stopper flag
 		
-		std::map <int, PushableSidesAttributes> SidesMap;
+		std::map<int, PushableSidesAttributes> SidesMap;
 
-		//flags
+		// Flags
 		bool CanFall;							// OCB [0]. flag to indicate if item can fall or not.
 		bool DoAlignCenter;						// OCB [1]. flag to decide if Lara has to put in center of the pushable to can move it.
 		bool Buoyancy;							// OCB [2]. flag to indicate if float in water.
 		bool HasFloorColission;					// per Slot. flag to indicate if it uses floor data collision or object collision.
 		
-		//constructor
+		// Constructor
 		PushableInfo()
 		{
 			CurrentSoundState = PushableSoundState::None;
@@ -74,7 +74,7 @@ namespace TEN::Entities::Generic
 			AnimationSystemIndex = 0;
 
 			Gravity = 8.0f;
-			GravityState = PushableGravityState::Ground;
+			GravityState = PushableGravityState::Grounded;
 			FloatingForce = 0.75f;
 
 			StackLimit = 3;
@@ -88,10 +88,10 @@ namespace TEN::Entities::Generic
 			
 			SidesMap =
 			{
-				{0,	PushableSidesAttributes()},
-				{1,	PushableSidesAttributes()},
-				{2,	PushableSidesAttributes()},
-				{3,	PushableSidesAttributes()}
+				{ 0, PushableSidesAttributes() },
+				{ 1, PushableSidesAttributes() },
+				{ 2, PushableSidesAttributes() },
+				{ 3, PushableSidesAttributes() }
 			};
 		}
 	};

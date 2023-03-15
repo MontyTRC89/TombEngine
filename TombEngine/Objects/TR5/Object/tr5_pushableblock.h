@@ -3,17 +3,16 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound_effects.h"
 
-class Vector3i;
 class GameVector;
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
 	struct PushableInfo;
-	PushableInfo& GetPushableInfo(const ItemInfo& item);
 
-	enum PushableSoundsType
+	enum PushableSoundType
 	{
 		Loop = 0,
 		Stop = 1,
@@ -54,58 +53,58 @@ namespace TEN::Entities::Generic
 			AllowLoop = true;
 		}
 
-		PushableAnimationInfo(int pullAnim, int pushAnim, bool isLoop)
+		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, bool isLoop)
 		{
-			PullAnimIndex = pullAnim;
-			PushAnimIndex = pushAnim;
+			PullAnimIndex = pullAnimNumber;
+			PushAnimIndex = pushAnimNumber;
 			AllowLoop = isLoop;
 		}
 	};
 
 	// Main functions
-	void InitialisePushableBlock(const short itemNumber);
-	void PushableBlockControl(short itemNumber);
-	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void InitialisePushableBlock(int itemNumber);
+	void PushableBlockControl(int itemNumber);
+	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 	// Behaviour functions
-	bool PushableBlockManageGravity (const short itemNumber);
-	void PushableBlockManageIdle	(const short itemNumber);
-	void PushableBlockManageMoving	(const short itemNumber);
+	bool PushableBlockManageGravity(int itemNumber);
+	void PushableBlockManageIdle(int itemNumber);
+	void PushableBlockManageMoving(int itemNumber);
 
 	// Sounds functions
 	void InitializePushablesSoundsMap();
-	int GetPushableSound(const PushableSoundsType& type, const GameVector& detectionPoint);
-	void PushablesManageSounds(const short itemNumber);
+	int GetPushableSound(PushableSoundType soundType, const GameVector& pos);
+	void PushablesManageSounds(int itemNumber);
 	
-	//General functions
+	// General functions
 	void InitialisePushablesGeneral();
-	void DeactivationPushablesRoutine(const short itemNumber);
+	void DeactivationPushablesRoutine(int itemNumber);
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
 	int GetPushableHeight(ItemInfo& item);
-	void UpdatePushablesRoomNumbers(const short itemNumber);	
-	void ForcePushableActivation(const short itemNumber);
+	void UpdatePushablesRoomNumbers(int itemNumber);
+	void ForcePushableActivation(int itemNumber);
 
 	// Collision test functions
-	bool IsNextSectorValid(ItemInfo& item, const GameVector& targetPoint, const bool checkIfLaraFits);
-	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushableInfo, const GameVector& targetPoint);
+	bool IsNextSectorValid(ItemInfo& item, const GameVector& target, bool checkIfLaraFits);
+	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushable, const GameVector& target);
 	bool IsPushableOnValidSurface(ItemInfo& item);
 
 	// Stack utilities functions
 	void UpdateAllPushablesStackLinks();
 	
-	void MoveStack(const short itemNumber, const Vector3i& GoalPos);
-	void MoveStackXZ(const short itemNumber);
-	void MoveStackY(const short itemNumber, const int y);
+	void MoveStack(int itemNumber, const Vector3i& target);
+	void MoveStackXZ(int itemNumber);
+	void MoveStackY(int itemNumber, int y);
 
-	void ManageStackBridges(short itemNumber, bool addBridge);
-	void RemovePushableFromStack(short itemNumber);
+	void ManageStackBridges(int itemNumber, bool addBridge);
+	void RemovePushableFromStack(int itemNumber);
 	
 	int GetStackHeight(ItemInfo& item);
 	bool CheckStackLimit(ItemInfo& item);
 
 	// Floor data collision functions
-	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
-	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
-	int PushableBlockFloorBorder(short itemNumber);
-	int PushableBlockCeilingBorder(short itemNumber);
+	std::optional<int> PushableBlockFloor(int itemNumber, int x, int y, int z);
+	std::optional<int> PushableBlockCeiling(int itemNumber, int x, int y, int z);
+	int PushableBlockFloorBorder(int itemNumber);
+	int PushableBlockCeilingBorder(int itemNumber);
 }
