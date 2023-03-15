@@ -51,7 +51,7 @@ namespace TEN::Renderer
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)
 	{
-		RoomNumber = cam->pos.RoomNumber;
+		RoomNumber = cam->RoomNumber;
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 
 		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);

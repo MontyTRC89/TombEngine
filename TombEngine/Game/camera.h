@@ -14,8 +14,11 @@ enum class CameraType
 
 struct CAMERA_INFO
 {
-	GameVector pos;
-	GameVector target;
+	Vector3 pos				 = Vector3::Zero;
+	short	RoomNumber		 = 0;
+	Vector3 target			 = Vector3::Zero;
+	short	TargetRoomNumber = 0;
+
 	CameraType type;
 	CameraType oldType;
 	int shift;

@@ -574,7 +574,7 @@ void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 	Lara.HitDirection = -1;
 
-	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
+	Camera.RoomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
@@ -1043,7 +1043,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 CreatureAIPriority GetCreatureLOTPriority(ItemInfo* item)
 {
 	auto itemPos = item->Pose.Position.ToVector3();
-	auto cameraPos = Camera.pos.ToVector3();
+	auto cameraPos = Camera.pos;
 
 	float distance = Vector3::Distance(itemPos, cameraPos) / BLOCK(1);
 	if (distance <= HIGH_PRIO_RANGE)

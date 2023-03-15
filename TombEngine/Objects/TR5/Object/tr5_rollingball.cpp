@@ -71,7 +71,7 @@ void RollingBallControl(short itemNumber)
 	{
 		if (abs(item->Animation.Velocity.y) > 16.0f)
 		{
-			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), Camera.pos.ToVector3());
+			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), Camera.pos);
 			if (distance < BLOCK(16))
 			{
 				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.

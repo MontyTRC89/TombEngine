@@ -411,7 +411,7 @@ namespace TEN::Effects::Environment
 			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
 
 			// Use fast GetFloor instead of GetCollision as we spawn a lot of dust.
-			short roomNumber = Camera.pos.RoomNumber;
+			short roomNumber = Camera.RoomNumber;
 			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
 
 			// Check if water room.

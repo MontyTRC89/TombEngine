@@ -639,7 +639,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_ROOM, true, false, nullptr, &lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.RoomNumber, NO_ROOM, true, false, nullptr, &lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 		{

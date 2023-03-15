@@ -686,7 +686,7 @@ namespace TEN::Entities::TR4
 		lara.Control.HandStatus = HandStatus::Busy;
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 
-		Camera.pos.RoomNumber = laraItem->RoomNumber;
+		Camera.RoomNumber = laraItem->RoomNumber;
 		Camera.type = CameraType::Fixed;
 		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
 		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);

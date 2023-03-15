@@ -150,7 +150,7 @@ void InitialiseSpotCam(short Sequence)
 	InitialCameraTarget.z = Camera.target.z;
 
 	LaraHealth = LaraItem->HitPoints;
-	InitialCameraRoom = Camera.pos.RoomNumber;
+	InitialCameraRoom = Camera.RoomNumber;
 
 	LaraFixedPosition.x = LaraItem->Pose.Position.x;
 	LaraFixedPosition.y = LaraItem->Pose.Position.y;
@@ -486,11 +486,11 @@ void CalculateSpotCameras()
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_ROOM)
 		{
-			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
+			Camera.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
+			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.RoomNumber);
 		}
 		else
-			Camera.pos.RoomNumber = outsideRoom;
+			Camera.RoomNumber = outsideRoom;
 
 		AlterFOV(cfov, false);
 
@@ -512,13 +512,13 @@ void CalculateSpotCameras()
 			Camera.type = CameraType::Heavy;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, false);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 
@@ -648,13 +648,13 @@ void CalculateSpotCameras()
 						Camera.type = CameraType::Heavy;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, false);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 
@@ -679,7 +679,7 @@ void CalculateSpotCameras()
 						Camera.target.x = InitialCameraTarget.x;
 						Camera.target.y = InitialCameraTarget.y;
 						Camera.target.z = InitialCameraTarget.z;
-						Camera.pos.RoomNumber = InitialCameraRoom;
+						Camera.RoomNumber = InitialCameraRoom;
 					}
 
 					SpotcamOverlay = false;
