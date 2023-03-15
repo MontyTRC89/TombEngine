@@ -197,5 +197,5 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = 
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos);
-bool CompareItemByXZ(const int a, const int b);
-void FloatingSolidItem(ItemInfo& item, float floatingForce = 1.0f);
+bool CompareItem2DPositions(int itemNumber0, int itemNumber1);
+void FloatItem(ItemInfo& item, float floatingForce = 1.0f);

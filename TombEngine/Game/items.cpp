@@ -838,61 +838,56 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 	DoItemHit(&target, damage, isExplosive);
 }
 
-
-//TODO: Originally was using a ItemInfo, but has been simplified to use only vector3i. Is other .cpp more suitable to contain this function?
+// TODO: Originally took an ItemInfo argument, but has been simplified to use only Vector3i.
+// Is other .cpp more suitable to contain this function?
 Vector3i GetNearestSectorCenter(const Vector3i& pos)
 {
-	const unsigned int maskLower8Bits = 0xFFFFFE00;	// mask for the bits [0-8]
-	const unsigned int mask9Bit = 0x200;			// mask for the bit [9] (512)
+	constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
+	constexpr auto BIT_MASK_9		= 0x200;	  // 9
 
-	//Clears the 0-8 bits and set the bit 9 to put 512 at the end. (Placing the object in the sector center).
-	return Vector3i (
-					 pos.x & maskLower8Bits | mask9Bit,
-					 pos.y,
-					 pos.z & maskLower8Bits | mask9Bit
-					);
+	// Return collision block center.
+	// TODO: No bitwise operations.
+	return Vector3i(
+		pos.x & BIT_MASK_LOWER_8 | BIT_MASK_9,
+		pos.y,
+		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
 }
 
-bool CompareItemByXZ(const int itemNumberA, const int itemNumberB)
+bool CompareItem2DPositions(const int itemNumber0, const int itemNumber1)
 {
-	// Compare objects by their XZ position
-	auto& itemA = g_Level.Items[itemNumberA];
-	auto& itemB = g_Level.Items[itemNumberB];
+	const auto& item0 = g_Level.Items[itemNumber0];
+	const auto& item1 = g_Level.Items[itemNumber1];
 
-	if (itemA.Pose.Position.x == itemB.Pose.Position.x)
-	{
-		return itemA.Pose.Position.z < itemB.Pose.Position.z;
-	}
+	if (item0.Pose.Position.x == item1.Pose.Position.x)
+		return (item0.Pose.Position.z < item1.Pose.Position.z);
 	else 
-	{
-		return itemA.Pose.Position.x < itemB.Pose.Position.x;
-	}
+		return (item0.Pose.Position.x < item1.Pose.Position.x);
 }
 
-void FloatingSolidItem(ItemInfo& item, float floatingForce)
+// TODO: Convert magic numbers to constants.
+void FloatItem(ItemInfo& item, float floatForce)
 {
+	constexpr auto BOX_VOLUME_MIN = 512.0f;
+
 	auto& time = item.Animation.Velocity.y; 
 	time += 1.0f;
 
-	// Calculate the bounding box volume scaling factor
-	float bboxVolume = GameBoundingBox(&item).GetWidth() * GameBoundingBox(&item).GetDepth() * GameBoundingBox(&item).GetHeight();
-	float minVolume = 512.0f;
-	float bboxScale = std::sqrt(std::min(minVolume, bboxVolume)) / 32.0f;
+	// Calculate bounding box volume scaling factor.
+	auto bounds = GameBoundingBox(&item);
+	float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
+	float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
+	boxScale *= floatForce;
 
-	bboxScale *= floatingForce;
+	float xOscillation = std::sin(time * 0.05f) * 0.5f * boxScale;
+	float zOscillation = std::sin(time * 0.1f) * 0.75f * boxScale;
 
-	float tiltOscilation = std::sin(time * 0.05f) * 0.5f * bboxScale;
-	float rollOscilation = std::sin(time * 0.1f) * 0.75f * bboxScale;
+	short xAngle = ANGLE(xOscillation * 20.0f);
+	short zAngle = ANGLE(zOscillation * 20.0f);
+	item.Pose.Orientation = EulerAngles(xAngle, item.Pose.Orientation.y, zAngle);
 
-	float tilt = tiltOscilation * 20.0f;
-	float roll = rollOscilation * 20.0f;
-
-	item.Pose.Orientation = EulerAngles(ANGLE(tilt), item.Pose.Orientation.y, ANGLE(roll));
-
-	// Reset the time after a certain amount of time has passed
-	//125 is the lap of frames needed to finish the tilt sin cycle with these values.
-	//If frequency and amplitude changes, this value must be changed too.
+	// Reset the time after certain amount of time has passed.
+	// 125 is the lap of frames needed to finish the tilt sin cycle with these values.
+	// If frequency and amplitude changes, this value must be changed too.
 	if (time > 125.0f)
 		time = 0.0f;
 }
-

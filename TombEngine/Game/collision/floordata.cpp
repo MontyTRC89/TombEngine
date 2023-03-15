@@ -12,6 +12,7 @@
 
 using namespace TEN::Floordata;
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 int FloorInfo::SectorPlane(int x, int z) const
 {
@@ -843,83 +844,77 @@ namespace TEN::Floordata
 			}
 	}
 
+	// Draws color-coded spheres near the player describing collision block flags.
 	void DrawNearbyTileFlags(const ItemInfo& item)
 	{
-		//This functions, paint a sphere on the Lara's nearby tiles, depending if these have any tile flag.
-		//The color of the sphere is unique for each tile flag.
+		constexpr auto DRAW_RANGE	 = BLOCK(3);
+		constexpr auto SPHERE_RADIUS = 64.0f;
 
 		if (!DebugMode)
 			return;
 
-		const int range = 3 * BLOCK(1);
-
-		Vector4 color = Vector4::One;
-		Vector3 origin = Vector3::Zero;
-				
-		GameVector detectionPoint = item.Pose.Position;
-		detectionPoint.RoomNumber = item.RoomNumber;
+		auto point = GameVector(item.Pose.Position, item.RoomNumber);
+		auto pointColl = GetCollision(point);
+		const auto& room = g_Level.Rooms[point.RoomNumber];
 		
-		auto col = GetCollision(detectionPoint);
-		const auto& currentRoom = g_Level.Rooms[detectionPoint.RoomNumber];
-		
-		//To optimize the process, we only check the tiles that are in Lara's room, and are near of her (according to the range).
-		const int minX = std::max( item.Pose.Position.x - range, currentRoom.x) / BLOCK(1);
-		const int maxX = std::min( item.Pose.Position.x + range, currentRoom.x + (currentRoom.xSize * BLOCK(1))) / BLOCK(1);
-		const int minZ = std::max( item.Pose.Position.z - range, currentRoom.z) / BLOCK(1);
-		const int maxZ = std::min( item.Pose.Position.z + range, currentRoom.z + (currentRoom.zSize * BLOCK(1))) / BLOCK(1);
+		// To optimize the process, only check tiles in player room and within a certain range.
+		int minX = std::max( item.Pose.Position.x - DRAW_RANGE, room.x) / BLOCK(1);
+		int maxX = std::min( item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
+		int minZ = std::max( item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
+		int maxZ = std::min( item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
 
-		for (int x = minX; x < maxX; x ++)
+		for (int x = minX; x < maxX; x++)
 		{
-			for (int z = minZ; z < maxZ; z ++)
+			for (int z = minZ; z < maxZ; z++)
 			{
-				detectionPoint.x = x * BLOCK(1);
-				detectionPoint.z = z * BLOCK(1);
-				col = GetCollision(detectionPoint);
-				detectionPoint.y = col.Position.Floor;
+				point.x = BLOCK(x);
+				point.z = BLOCK(z);
 
-				if (col.Block->Stopper)
+				pointColl = GetCollision(point);
+				point.y = pointColl.Position.Floor;
+
+				if (pointColl.Block->Stopper)
 				{
-					color = Vector4(1, 0, 0, 1);
-					origin = detectionPoint.ToVector3() + Vector3(256, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.25f), -BLOCK(0.5f), BLOCK(0.75f));
+					auto color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
-				if (col.Block->Flags.Death)
+				if (pointColl.Block->Flags.Death)
 				{
-					color = Vector4(0, 1, 0, 1);
-					origin = detectionPoint.ToVector3() + Vector3(768, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.75f), -BLOCK(0.5f), BLOCK(0.75f));
+					auto color = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
-				if (col.Block->Flags.Monkeyswing)
+				if (pointColl.Block->Flags.Monkeyswing)
 				{
-					color = Vector4(1.0f, 0.5f, 0.5f, 1);
-					origin = detectionPoint.ToVector3() + Vector3(512, -512, 768);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.5f), -BLOCK(0.5f), BLOCK(0.75f));
+					auto color = Vector4(1.0f, 0.5f, 0.5f, 1.0f);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
-				if (col.Block->Flags.MinecartRight())
+				if (pointColl.Block->Flags.MinecartRight())
 				{
-					color = Vector4(0, 0, 1, 1);
-					origin = detectionPoint.ToVector3() + Vector3(256, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.25f), -BLOCK(0.5f), BLOCK(0.25f));
+					auto color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
-				if (col.Block->Flags.MinecartLeft())
+				if (pointColl.Block->Flags.MinecartLeft())
 				{
-					color = Vector4(1, 0, 1, 1);
-					origin = detectionPoint.ToVector3() + Vector3(768, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.75f), -BLOCK(0.5f), BLOCK(0.25f));
+					auto color = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 
-				if (col.Block->Flags.MinecartStop())
+				if (pointColl.Block->Flags.MinecartStop())
 				{
-					color = Vector4(0, 1, 1, 1);
-					origin = detectionPoint.ToVector3() + Vector3(512, -512, 256);
-					TEN::Renderer::g_Renderer.AddDebugSphere(origin, 64, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
+					auto pos = point.ToVector3() + Vector3(BLOCK(0.5f), -BLOCK(0.5f), BLOCK(0.25f));
+					auto color = Vector4(0, 1, 1, 1);
+					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, RENDERER_DEBUG_PAGE::FLOOR_DATA_STATS);
 				}
 			}
 		}
 	}
-
 }

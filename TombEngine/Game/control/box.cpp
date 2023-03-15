@@ -74,12 +74,13 @@ void DrawNearbyPathfinding(int boxIndex)
 	if (boxIndex == NO_BOX)
 		return;
 
-	auto& currBox = g_Level.Boxes[boxIndex];
-	auto index = currBox.overlapIndex;
+	auto& currentBox = g_Level.Boxes[boxIndex];
+	auto index = currentBox.overlapIndex;
 
-	Vector3 currentBoxColor = Vector3(0, 1, 1);
-	if (currBox.flags & BLOCKABLE) //Grey flag box
-		currentBoxColor = (currBox.flags & BLOCKED) ? Vector3(1, 0, 0) : Vector3(0, 1, 0);
+	// Grey flag box.
+	auto currentBoxColor = Vector3(0.0f, 1.0f, 1.0f);
+	if (currentBox.flags & BLOCKABLE)
+		currentBoxColor = (currentBox.flags & BLOCKED) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
 	
 	DrawBox(boxIndex, currentBoxColor);
 
@@ -2091,11 +2092,6 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 
 void InitialiseItemBoxData()
 {
-	for (int i = 0; i < g_Level.Items.size(); i++)
-	{
-		auto* currentItem = &g_Level.Items[i];
-	}
-
 	for (auto& room : g_Level.Rooms)
 	{
 		for (const auto& mesh : room.mesh)

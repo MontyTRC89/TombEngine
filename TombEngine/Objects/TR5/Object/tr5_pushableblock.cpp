@@ -519,7 +519,7 @@ namespace TEN::Entities::Generic
 				return true;
 			}
 
-			FloatingSolidItem(pushableItem, pushableInfo.FloatingForce);
+			FloatItem(pushableItem, pushableInfo.FloatingForce);
 
 			//TODO [Effects Requirement] Spawn circular water waves
 
@@ -1229,7 +1229,7 @@ namespace TEN::Entities::Generic
 		if (pushablesNumbersList.empty())
 			return;
 
-		std::sort(pushablesNumbersList.begin(), pushablesNumbersList.end(), CompareItemByXZ);
+		std::sort(pushablesNumbersList.begin(), pushablesNumbersList.end(), CompareItem2DPositions);
 
 		for (std::size_t i = 0; i < pushablesNumbersList.size() - 1; ++i) 
 		{
