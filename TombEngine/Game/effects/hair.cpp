@@ -32,20 +32,20 @@ namespace TEN::Effects::Hair
 		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
 
 		// Apply base offset to world matrix.
-		auto relOffset = this->GetRelBaseOffset(hairUnitIndex, isYoung);
+		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 
 		// Set position of base segment.
 		auto basePos = worldMatrix.Translation();
-		this->Segments[0].Position = basePos;
+		Segments[0].Position = basePos;
 
 		if (!IsInitialized)
 		{
 			// Update segment positions.
 			for (int i = 0; i < Segments.size() - 1; i++)
 			{
-				auto& segment = this->Segments[i];
-				auto& nextSegment = this->Segments[i + 1];
+				auto& segment = Segments[i];
+				auto& nextSegment = Segments[i + 1];
 
 				// NOTE: Joint offset determines segment length.
 				auto jointOffset = GetJointOffset(ID_HAIR, i);
@@ -57,11 +57,11 @@ namespace TEN::Effects::Hair
 				nextSegment.Position = worldMatrix.Translation();
 			}
 
-			this->IsInitialized = true;
+			IsInitialized = true;
 		}
 		else
 		{
-			auto* framePtr = this->GetFramePtr(item);
+			auto* framePtr = GetFramePtr(item);
 
 			// Get water height.
 			auto pos = item.Pose.Position + framePtr->boundingBox.GetCenter();
@@ -74,8 +74,8 @@ namespace TEN::Effects::Hair
 			// Update segments.
 			for (int i = 1; i < Segments.size(); i++)
 			{
-				auto& segment = this->Segments[i];
-				auto& prevSegment = this->Segments[i - 1];
+				auto& segment = Segments[i];
+				auto& prevSegment = Segments[i - 1];
 
 				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
@@ -83,13 +83,13 @@ namespace TEN::Effects::Hair
 								 (player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
 
 				// Handle segment room collision.
-				this->CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
+				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
 
 				// Handle segment sphere collision.
-				this->CollideSegmentWithSpheres(segment, spheres);
+				CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
-				prevSegment.Orientation = this->GetOrientation(prevSegment.Position, segment.Position);
+				prevSegment.Orientation = GetOrientation(prevSegment.Position, segment.Position);
 
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
@@ -101,7 +101,7 @@ namespace TEN::Effects::Hair
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
-				segment.Velocity = segment.Position - Segments[0].Velocity;
+				segment.Velocity = (segment.Position - Segments[0].Velocity) * 0.9f;
 			}
 		}
 	}
@@ -242,7 +242,7 @@ namespace TEN::Effects::Hair
 		auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, roomNumber);
 		int floorHeight = pointColl.Position.Floor;
 
-		this->Segments[0].Velocity = segment.Position;
+		Segments[0].Velocity = segment.Position;
 		segment.Position += segment.Velocity * VELOCITY_COEFF;
 
 		// Land collision.
@@ -331,10 +331,10 @@ namespace TEN::Effects::Hair
 	{
 		for (int i = 0; i < Units.size(); i++)
 		{
-			this->Units[i].Update(item, i);
+			Units[i].Update(item, i);
 
 			if (isYoung && i == 1)
-				this->Units[i].Update(item, i);
+				Units[i].Update(item, i);
 		}
 	}
 }
