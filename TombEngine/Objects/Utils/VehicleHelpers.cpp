@@ -361,7 +361,7 @@ namespace TEN::Entities::Vehicles
 		auto direction = -item.Pose.Orientation.ToDirection();
 		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
 		float vel = VEL_ABS * (isMovingForward ? 1 : -1);
-		auto scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
+		float scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(
