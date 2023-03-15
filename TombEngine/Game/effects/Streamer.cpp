@@ -94,9 +94,8 @@ namespace TEN::Effects::Streamer
 
 	Streamer::StreamerSegment& Streamer::GetNewSegment()
 	{
-		assert(Segments.size() <= SEGMENT_COUNT_MAX);
-
 		// Clear oldest segment if vector is full.
+		assert(Segments.size() <= SEGMENT_COUNT_MAX);
 		if (Segments.size() == SEGMENT_COUNT_MAX)
 			Segments.erase(Segments.begin());
 
@@ -107,9 +106,8 @@ namespace TEN::Effects::Streamer
 	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
 									 float width, float life, float vel, float scaleRate, short rot2D, int flags)
 	{
-		assert(Pools.size() <= POOL_COUNT_MAX);
-
 		// Return early if pool map is full and element with tag key doesn't already exist.
+		assert(Pools.size() <= POOL_COUNT_MAX);
 		if (Pools.size() == POOL_COUNT_MAX && !Pools.count(tag))
 			return;
 
@@ -145,7 +143,6 @@ namespace TEN::Effects::Streamer
 	Streamer& StreamerModule::GetStreamer(int tag)
 	{
 		auto& pool = this->GetPool(tag);
-
 		assert(pool.size() <= STREAMER_COUNT_MAX);
 
 		// Return most recent streamer iteration if it exists and is unbroken.
@@ -193,9 +190,8 @@ namespace TEN::Effects::Streamer
 	void StreamerEffectController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
 								   float width, float life, float vel, float scaleRate, short rot2D, int flags)
 	{
-		assert(Modules.size() <= MODULE_COUNT_MAX);
-
 		// Return early if module map is full and element with entityNumber key doesn't already exist.
+		assert(Modules.size() <= MODULE_COUNT_MAX);
 		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(entityNumber))
 			return;
 
