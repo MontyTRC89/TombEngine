@@ -13,32 +13,32 @@
 
 	GameVector::GameVector(const Vector3i& pos)
 	{
-		this->x = pos.x;
-		this->y = pos.y;
-		this->z = pos.z;
+		x = pos.x;
+		y = pos.y;
+		z = pos.z;
 	}
 	
 	GameVector::GameVector(const Vector3i& pos, short roomNumber)
 	{
-		this->x = pos.x;
-		this->y = pos.y;
-		this->z = pos.z;
-		this->RoomNumber = roomNumber;
+		x = pos.x;
+		y = pos.y;
+		z = pos.z;
+		RoomNumber = roomNumber;
 	}
 	
 	GameVector::GameVector(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
+		x = xPos;
+		y = yPos;
+		z = zPos;
 	}
 
 	GameVector::GameVector(int xPos, int yPos, int zPos, short roomNumber)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->RoomNumber = roomNumber;
+		x = xPos;
+		y = yPos;
+		z = zPos;
+		RoomNumber = roomNumber;
 	}
 
 	Vector3 GameVector::ToVector3() const
@@ -63,50 +63,50 @@
 
 	GameVector& GameVector::operator =(const GameVector& vector)
 	{
-		this->x = vector.x;
-		this->y = vector.y;
-		this->z = vector.z;
-		this->RoomNumber = vector.RoomNumber;
+		x = vector.x;
+		y = vector.y;
+		z = vector.z;
+		RoomNumber = vector.RoomNumber;
 		return *this;
 	}
 
 	GameVector& GameVector::operator +=(const GameVector& vector)
 	{
-		this->x += vector.x;
-		this->y += vector.y;
-		this->z += vector.z;
+		x += vector.x;
+		y += vector.y;
+		z += vector.z;
 		return *this;
 	}
 
 	GameVector& GameVector::operator -=(const GameVector& vector)
 	{
-		this->x -= vector.x;
-		this->y -= vector.y;
-		this->z -= vector.z;
+		x -= vector.x;
+		y -= vector.y;
+		z -= vector.z;
 		return *this;
 	}
 
 	GameVector& GameVector::operator *=(const GameVector& vector)
 	{
-		this->x *= vector.x;
-		this->y *= vector.y;
-		this->z *= vector.z;
+		x *= vector.x;
+		y *= vector.y;
+		z *= vector.z;
 		return *this;
 	}
 
 	GameVector& GameVector::operator *=(float scale)
 	{
-		this->x *= scale;
-		this->y *= scale;
-		this->z *= scale;
+		x *= scale;
+		y *= scale;
+		z *= scale;
 		return *this;
 	}
 
 	GameVector& GameVector::operator /=(float scale)
 	{
-		this->x /= scale;
-		this->y /= scale;
-		this->z /= scale;
+		x /= scale;
+		y /= scale;
+		z /= scale;
 		return *this;
 	}
 
