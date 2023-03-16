@@ -94,9 +94,10 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int y, int z) const
 	for (const int& i : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get bridge floor height.
-		auto bridgeFloorHeight = Objects[bridgeItem.ObjectNumber].floor(i, x, y, z);
+		auto bridgeFloorHeight = bridgeObject.floor(i, x, y, z);
 		if (!bridgeFloorHeight.has_value())
 			continue;
 
@@ -134,9 +135,10 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int y, int z) const
 	for (const int& i : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get bridge ceiling height.
-		auto bridgeCeilingHeight = Objects[bridgeItem.ObjectNumber].ceiling(i, x, y, z);
+		auto bridgeCeilingHeight = bridgeObject.ceiling(i, x, y, z);
 		if (!bridgeCeilingHeight.has_value())
 			continue;
 
@@ -281,11 +283,12 @@ int FloorInfo::GetInsideBridgeItemNumber(int x, int y, int z, bool testFloorBord
 {
 	for (const int& itemNumber : BridgeItemNumbers)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get surface heights.
-		auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		auto floorHeight = bridgeObject.floor(itemNumber, x, y, z);
+		auto ceilingHeight = bridgeObject.ceiling(itemNumber, x, y, z);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
