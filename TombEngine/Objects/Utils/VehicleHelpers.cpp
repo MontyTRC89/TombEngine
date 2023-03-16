@@ -345,6 +345,7 @@ namespace TEN::Entities::Vehicles
 		constexpr auto VEL_ABS				 = 4.0f;
 		constexpr auto SCALE_RATE_ON_WATER	 = 6.0f;
 		constexpr auto SCALE_RATE_UNDERWATER = 1.5f;
+		constexpr auto WATERHEIGHT_CORRECTION_RATE = 40.0f;
 
 		// Vehicle is out of water; return early.
 		if (waterHeight == NO_HEIGHT)
@@ -357,7 +358,7 @@ namespace TEN::Entities::Vehicles
 		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
 
 		// Determine key parameters.
-		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight, isUnderwater, isMovingForward);
+		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight - WATERHEIGHT_CORRECTION_RATE, isUnderwater, isMovingForward);
 		auto direction = -vehicleItem.Pose.Orientation.ToDirection();
 		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
 		float vel = VEL_ABS * (isMovingForward ? 1 : -1);
