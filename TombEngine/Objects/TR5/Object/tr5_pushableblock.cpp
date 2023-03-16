@@ -636,7 +636,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		if (pointColl.Position.FloorSlope || pointColl.Position.DiagonalStep ||
-			pointColl.Block->FloorSlope(0) != Vector2::Zero || pointColl.Block->FloorSlope(1) != Vector2::Zero)
+			pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero || pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero)
 			return false;
 
 		if (pushable->canFall)
@@ -725,7 +725,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		if (probe.Position.FloorSlope || probe.Position.DiagonalStep ||
-			probe.Block->FloorSlope(0) != Vector2::Zero || probe.Block->FloorSlope(1) != Vector2::Zero)
+			probe.Block->GetSurfaceSlope(0, true) != Vector2::Zero || probe.Block->GetSurfaceSlope(1, true) != Vector2::Zero)
 			return false;
 
 		int ceiling = pos.y - blockHeight + 100;

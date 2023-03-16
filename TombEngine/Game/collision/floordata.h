@@ -141,16 +141,14 @@ class FloorInfo
 		int CeilingHeight(int x, int y, int z) const;
 		int BridgeCeilingHeight(int x, int y, int z) const;
 
-		Vector2 FloorSlope(int plane) const;
-		Vector2 FloorSlope(int x, int z) const;
-		Vector2 CeilingSlope(int plane) const;
-		Vector2 CeilingSlope(int x, int z) const;
+		Vector2 GetSurfaceSlope(int planeIndex, bool checkFloor) const;
+		Vector2 GetSurfaceSlope(int x, int z, bool checkFloor) const;
 
 		// Inquirers
 		bool IsSurfaceSplit(bool checkFloor) const;
 		bool IsSurfaceDiagonalStep(bool checkFloor) const;
 		bool IsSurfaceSplitPortal(bool checkFloor) const;
-		bool IsWall(int plane) const;
+		bool IsWall(int planeIndex) const;
 		bool IsWall(int x, int z) const;
 
 		// Bridge methods

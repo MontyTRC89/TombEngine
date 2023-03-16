@@ -24,7 +24,7 @@ int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool checkFloor) const
 Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool checkFloor) const
 {
 	// Get surface plane.
-	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
 	int planeIndex = GetSurfacePlaneIndex(x, z, true); // TODO: Check why it only looks at floor planes.
 	auto plane = planes[planeIndex];
 
@@ -37,7 +37,7 @@ Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool checkFloor) const
 bool FloorInfo::IsSurfaceSplit(bool checkFloor) const
 {
 	// Check if surface planes are different.
-	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
 	bool arePlanesDifferent = (planes[0] != planes[1]);
 
 	return (arePlanesDifferent || IsSurfaceSplitPortal(checkFloor));
@@ -49,15 +49,15 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool checkFloor) const
 	if (!IsSurfaceSplit(checkFloor))
 		return false;
 
-	const auto& collData = checkFloor ? this->FloorCollision : this->CeilingCollision;
+	const auto& surfaceColl = checkFloor ? FloorCollision : CeilingCollision;
 	
 	// Check if ??
-	if (round(collData.Planes[0].z) == round(collData.Planes[1].z))
+	if (round(surfaceColl.Planes[0].z) == round(surfaceColl.Planes[1].z))
 		return false;
 
 	// Check if ??
-	if (collData.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_0 &&
-		collData.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_1)
+	if (surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_0 &&
+		surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_1)
 		{
 			return false;
 		}
@@ -68,7 +68,7 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool checkFloor) const
 bool FloorInfo::IsSurfaceSplitPortal(bool checkFloor) const
 {
 	// Check if surface planes are different.
-	const auto& planes = checkFloor ? this->FloorCollision.Planes : this->CeilingCollision.Planes;
+	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
 	return (planes[0] != planes[1]);
 }
 
@@ -228,34 +228,29 @@ int FloorInfo::BridgeCeilingHeight(int x, int y, int z) const
 	return CeilingHeight(x, y, z);
 }
 
-Vector2 FloorInfo::FloorSlope(int plane) const
+Vector2 FloorInfo::GetSurfaceSlope(int planeIndex, bool checkFloor) const
 {
-	return Vector2{FloorCollision.Planes[plane].x, FloorCollision.Planes[plane].y};
+	const auto& plane = checkFloor ? FloorCollision.Planes[planeIndex] : CeilingCollision.Planes[planeIndex];
+	return Vector2(plane.x, plane.y);
 }
 
-Vector2 FloorInfo::FloorSlope(int x, int z) const
+Vector2 FloorInfo::GetSurfaceSlope(int x, int z, bool checkFloor) const
 {
-	return FloorSlope(GetSurfacePlaneIndex(x, z, true));
+	int planeIndex = GetSurfacePlaneIndex(x, z, checkFloor);
+	return GetSurfaceSlope(planeIndex, checkFloor);
 }
 
-Vector2 FloorInfo::CeilingSlope(int plane) const
+bool FloorInfo::IsWall(int planeIndex) const
 {
-	return Vector2{CeilingCollision.Planes[plane].x, CeilingCollision.Planes[plane].y};
-}
-
-Vector2 FloorInfo::CeilingSlope(int x, int z) const
-{
-	return CeilingSlope(GetSurfacePlaneIndex(x, z, false));
-}
-
-bool FloorInfo::IsWall(int plane) const
-{
-	return FloorCollision.SplitAngle == CeilingCollision.SplitAngle && FloorCollision.Planes[plane] == CeilingCollision.Planes[plane];
+	bool areSplitAnglesEqual = (FloorCollision.SplitAngle == CeilingCollision.SplitAngle);
+	bool arePlanesEqual = (FloorCollision.Planes[planeIndex] == CeilingCollision.Planes[planeIndex]);
+	return (areSplitAnglesEqual && arePlanesEqual);
 }
 
 bool FloorInfo::IsWall(int x, int z) const
 {
-	return IsWall(GetSurfacePlaneIndex(x, z, true));
+	int planeIndex = GetSurfacePlaneIndex(x, z, true);
+	return IsWall(planeIndex);
 }
 
 int FloorInfo::GetInsideBridgeItemNumber(int x, int y, int z, bool testFloorBorder, bool testCeilingBorder) const

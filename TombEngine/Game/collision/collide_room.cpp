@@ -28,8 +28,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 	item->Pose.Orientation = EulerAngles(
 		0,
 		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
-		0
-	);
+		0);
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
