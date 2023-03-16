@@ -89,7 +89,7 @@ namespace TEN::Entities::Generic
 	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushable, const GameVector& target);
 	bool IsPushableOnValidSurface(ItemInfo& item);
 
-	// Stack utilities functions
+	// Stack utility functions
 	void UpdateAllPushablesStackLinks();
 	
 	void MoveStack(int itemNumber, const Vector3i& target);
@@ -102,7 +102,7 @@ namespace TEN::Entities::Generic
 	int GetStackHeight(ItemInfo& item);
 	bool CheckStackLimit(ItemInfo& item);
 
-	// Floor data collision functions
+	// Floordata collision functions
 	std::optional<int> PushableBlockFloor(int itemNumber, int x, int y, int z);
 	std::optional<int> PushableBlockCeiling(int itemNumber, int x, int y, int z);
 	int PushableBlockFloorBorder(int itemNumber);

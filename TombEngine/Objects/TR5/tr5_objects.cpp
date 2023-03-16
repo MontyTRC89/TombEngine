@@ -485,7 +485,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = ImpControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 12;
 		obj->pivotLength = 20;
 		obj->radius = 102;

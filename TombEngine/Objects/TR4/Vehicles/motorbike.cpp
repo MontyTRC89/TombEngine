@@ -443,7 +443,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.z = 0;
 				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -MOTORBIKE_DISMOUNT_DISTANCE);
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+				lara->Status.Stamina = LARA_STAMINA_MAX;
 				SetLaraVehicle(laraItem, nullptr);
 				return true;
 			}
@@ -988,15 +988,15 @@ namespace TEN::Entities::Vehicles
 			(TrInput & VEHICLE_IN_ACCELERATE) && 
 			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
 		{
-			if (lara->SprintEnergy > 10)
+			if (lara->Status.Stamina > 10)
 			{
 				motorbike->Flags |= MOTORBIKE_FLAG_BOOST;
-				lara->SprintEnergy -= 2;
+				lara->Status.Stamina -= 2;
 
-				if (lara->SprintEnergy <= 0)
+				if (lara->Status.Stamina <= 0)
 				{
 					motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
-					lara->SprintEnergy = 0;
+					lara->Status.Stamina = 0;
 				}
 			}
 		}

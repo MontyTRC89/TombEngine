@@ -62,23 +62,26 @@ namespace TEN::Renderer
 {
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
-	struct RendererHUDBar
+	struct RendererHudBar
 	{
-		VertexBuffer VertexBufferBorder;
-		IndexBuffer IndexBufferBorder;
-		VertexBuffer InnerVertexBuffer;
-		IndexBuffer InnerIndexBuffer;
+		static constexpr auto COLOR_COUNT  = 5;
+		static constexpr auto SIZE_DEFAULT = Vector2(150.0f, 10.0f);
+
+		VertexBuffer VertexBufferBorder = VertexBuffer();
+		IndexBuffer	 IndexBufferBorder	= IndexBuffer();
+		VertexBuffer InnerVertexBuffer	= VertexBuffer();
+		IndexBuffer	 InnerIndexBuffer	= IndexBuffer();
+
 		/*
-			Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
-			The colors are setup like this (4 triangles)
+			Initializes status bar for rendering. Coordinates are set in screen space.
+			Colors are set in 5 vertices as described in the diagram:
 			0-------1
 			| \   / |
 			|  >2<  |
 			| /   \ |
 			3-------4
 		*/
-		RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize,
-		               std::array<Vector4, 5> colors);
+		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
 	struct RendererAnimatedTexture
@@ -668,7 +671,7 @@ namespace TEN::Renderer
 		~Renderer11();
 
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
-		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
+		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Render();
@@ -684,7 +687,7 @@ namespace TEN::Renderer
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
-		void DrawPickup(const DisplayPickup& pickup);
+		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
@@ -710,7 +713,7 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(int itemNumber, bool force);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(int objectNumber, Vector2 pos, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
+		void DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

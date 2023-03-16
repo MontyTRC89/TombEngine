@@ -542,7 +542,7 @@ namespace TEN::Input
 		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara.PoisonPotency)
+				lara.Status.Poison)
 			{
 				bool hasUsedMedipack = false;
 
@@ -570,7 +570,7 @@ namespace TEN::Input
 
 				if (hasUsedMedipack)
 				{
-					lara.PoisonPotency = 0;
+					lara.Status.Poison = 0;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 					Statistics.Game.HealthUsed++;
 				}
@@ -593,6 +593,9 @@ namespace TEN::Input
 			g_Renderer.ToggleFullScreen();
 		}
 		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
+
+		if (!DebugMode)
+			return;
 
 		// Handle debug page switch.
 		static bool dbDebugPage = true;
