@@ -57,8 +57,8 @@ private:
 	static constexpr auto SURFACE_TRIANGLE_COUNT = 2;
 
 public:
-	static constexpr auto SPLIT_ANGLE_1 = 45.0f * RADIAN;
-	static constexpr auto SPLIT_ANGLE_2 = 135.0f * RADIAN;
+	static constexpr auto SPLIT_ANGLE_0 = 45.0f * RADIAN;
+	static constexpr auto SPLIT_ANGLE_1 = 135.0f * RADIAN;
 
 	float SplitAngle = 0.0f;
 
@@ -66,7 +66,7 @@ public:
 	std::array<Vector3, SURFACE_TRIANGLE_COUNT> Planes	= {};
 };
 
-struct SectorFlagData
+struct CollisionBlockFlagData
 {
 	bool Death		 = false;
 	bool Monkeyswing = false;
@@ -108,33 +108,31 @@ struct SectorFlagData
 class FloorInfo
 {
 	public:
-		int			  Room		 = 0;
-		int			  WallPortal = 0;
-		std::set<int> BridgeItem = {};
+		// Components
+		int			  Room				= 0;
+		int			  WallPortal		= 0;
+		std::set<int> BridgeItemNumbers = {};
 
-		int			   Box			= 0;
-		bool		   Stopper		= true;
-		int			   TriggerIndex = 0;
-		MaterialType   Material		= MaterialType::Stone;
-		SectorFlagData Flags		= {};
+		int			 Box		  = 0;
+		bool		 Stopper	  = true;
+		int			 TriggerIndex = 0;
+		MaterialType Material	  = MaterialType::Stone;
 
-		SurfaceCollisionData FloorCollision	  = {};
-		SurfaceCollisionData CeilingCollision = {};
+		SurfaceCollisionData   FloorCollision	= {};
+		SurfaceCollisionData   CeilingCollision = {};
+		CollisionBlockFlagData Flags			= {};
 
+		// Getters
 		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
 		Vector2 GetSurfaceTilt(int x, int z, bool checkFloor) const;
 
-		bool IsSurfaceSplit(bool checkFloor) const;
-		bool IsSurfaceDiagonalStep(bool checkFloor) const;
-		bool IsSurfaceSplitPortal(bool checkFloor) const;
-
-		std::optional<int> RoomBelow(int plane) const;
-		std::optional<int> RoomBelow(int x, int z) const;
-		std::optional<int> RoomBelow(int x, int y, int z) const;
-		std::optional<int> RoomAbove(int plane) const;
-		std::optional<int> RoomAbove(int x, int z) const;
-		std::optional<int> RoomAbove(int x, int y, int z) const;
-		std::optional<int> RoomSide() const;
+		std::optional<int> GetRoomNumberAbove(int planeIndex) const;
+		std::optional<int> GetRoomNumberAbove(int x, int z) const;
+		std::optional<int> GetRoomNumberAbove(int x, int y, int z) const;
+		std::optional<int> GetRoomNumberBelow(int planeIndex) const;
+		std::optional<int> GetRoomNumberBelow(int x, int z) const;
+		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
+		std::optional<int> GetRoomNumberAtSide() const;
 
 		int FloorHeight(int x, int z) const;
 		int FloorHeight(int x, int y, int z) const;
@@ -148,9 +146,14 @@ class FloorInfo
 		Vector2 CeilingSlope(int plane) const;
 		Vector2 CeilingSlope(int x, int z) const;
 
+		// Inquirers
+		bool IsSurfaceSplit(bool checkFloor) const;
+		bool IsSurfaceDiagonalStep(bool checkFloor) const;
+		bool IsSurfaceSplitPortal(bool checkFloor) const;
 		bool IsWall(int plane) const;
 		bool IsWall(int x, int z) const;
 
+		// Getters
 		int	 InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
 		void AddItem(int itemNumber);
 		void RemoveItem(int itemNumber);
