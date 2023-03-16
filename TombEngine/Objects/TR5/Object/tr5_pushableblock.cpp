@@ -800,7 +800,7 @@ namespace TEN::Entities::Generic
 		if (probe.Position.Floor != pos.y)
 			return false;
 
-		if (probe.Block->CeilingHeight(pos.x, pos.z) > pos.y - LARA_HEIGHT)
+		if (probe.Block->GetSurfaceHeight(pos.x, pos.z, false) > pos.y - LARA_HEIGHT)
 			return false;
 
 		oldX = LaraItem->Pose.Position.x;

@@ -134,12 +134,9 @@ class FloorInfo
 		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
 		std::optional<int> GetRoomNumberAtSide() const; // Through wall?
 
-		int FloorHeight(int x, int z) const;
-		int FloorHeight(int x, int y, int z) const;
-		int BridgeFloorHeight(int x, int y, int z) const;
-		int CeilingHeight(int x, int z) const;
-		int CeilingHeight(int x, int y, int z) const;
-		int BridgeCeilingHeight(int x, int y, int z) const;
+		int GetSurfaceHeight(int x, int z, bool checkFloor) const;
+		int GetSurfaceHeight(int x, int y, int z, bool checkFloor) const;
+		int GetBridgeSurfaceHeight(int x, int y, int z, bool checkFloor) const;
 
 		Vector2 GetSurfaceSlope(int planeIndex, bool checkFloor) const;
 		Vector2 GetSurfaceSlope(int x, int z, bool checkFloor) const;

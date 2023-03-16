@@ -2121,7 +2121,7 @@ void InitialiseItemBoxData()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
+				int floorHeight = floor->GetSurfaceHeight(mesh.pos.Position.x, mesh.pos.Position.z, true);
 				const auto& bBox = GetBoundsAccurate(mesh, false);
 
 				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&

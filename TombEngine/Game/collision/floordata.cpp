@@ -36,10 +36,10 @@ Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool checkFloor) const
 
 bool FloorInfo::IsSurfaceSplit(bool checkFloor) const
 {
-	// Check if surface planes are different.
 	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
 	bool arePlanesDifferent = (planes[0] != planes[1]);
 
+	// Check if surface planes are different and portal is split.
 	return (arePlanesDifferent || IsSurfaceSplitPortal(checkFloor));
 }
 
@@ -86,22 +86,24 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int z) const
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int y, int z) const
 {
-	int floorHeight = FloorHeight(x, z, true);
-	int ceilingHeight = CeilingHeight(x, z, false);
+	// Get surface heights.
+	int floorHeight = GetSurfaceHeight(x, z, true);
+	int ceilingHeight = GetSurfaceHeight(x, z, false);
 
-	// Loop through bridge objects.
-	for (const int& itemNumber : BridgeItemNumbers)
+	// Loop through bridges.
+	for (const int& i : BridgeItemNumbers)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[i];
 
-		auto itemHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		if (!itemHeight.has_value())
+		// Get bridge floor height.
+		auto bridgeFloorHeight = Objects[bridgeItem.ObjectNumber].floor(i, x, y, z);
+		if (!bridgeFloorHeight.has_value())
 			continue;
 
-		// Assess vertical bridge position.
-		if (itemHeight.value() >= y &&			 // Below passed height.
-			itemHeight.value() <= floorHeight && // Above floor.
-			itemHeight.value() >= ceilingHeight) // Below ceiling.
+		// Assess relation of bridge to collision block.
+		if (bridgeFloorHeight.value() >= y &&			// Below input height bound.
+			bridgeFloorHeight.value() <= floorHeight && // Within floor bound.
+			bridgeFloorHeight.value() >= ceilingHeight) // Within ceiling bound.
 		{
 			return std::nullopt;
 		}
@@ -124,21 +126,24 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int z) const
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int y, int z) const
 {
-	int floorHeight = FloorHeight(x, z, true);
-	int ceilingHeight = CeilingHeight(x, z, false);
+	// Get surface heights.
+	int floorHeight = GetSurfaceHeight(x, z, true);
+	int ceilingHeight = GetSurfaceHeight(x, z, false);
 
-	// Loop through bridge objects.
-	for (const int& itemNumber : BridgeItemNumbers)
+	// Loop through bridges.
+	for (const int& i : BridgeItemNumbers)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[i];
 
-		auto itemHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
-		if (!itemHeight.has_value())
+		// Get bridge ceiling height.
+		auto bridgeCeilingHeight = Objects[bridgeItem.ObjectNumber].ceiling(i, x, y, z);
+		if (!bridgeCeilingHeight.has_value())
 			continue;
 
-		if (itemHeight.value() <= y &&
-			itemHeight.value() <= floorHeight &&
-			itemHeight.value() >= ceilingHeight)
+		// Assess relation of bridge to collision block.
+		if (bridgeCeilingHeight.value() <= y &&			  // Above input height bound.
+			bridgeCeilingHeight.value() <= floorHeight && // Within floor bound.
+			bridgeCeilingHeight.value() >= ceilingHeight) // Within ceiling bound.
 		{
 			return std::nullopt;
 		}
@@ -152,80 +157,99 @@ std::optional<int> FloorInfo::GetRoomNumberAtSide() const
 	return ((WallPortal != NO_ROOM) ? std::optional(WallPortal) : std::nullopt);
 }
 
-int FloorInfo::FloorHeight(int x, int z) const
+int FloorInfo::GetSurfaceHeight(int x, int z, bool checkFloor) const
 {
-	const auto plane = GetSurfacePlaneIndex(x, z, true);
-	const auto vector = GetSectorPoint(x, z);
+	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
 
-	return FloorCollision.Planes[plane].x * vector.x + FloorCollision.Planes[plane].y * vector.y + FloorCollision.Planes[plane].z;
+	// Get surface plane.
+	int planeIndex = GetSurfacePlaneIndex(x, z, checkFloor);
+	const auto& plane = planes[planeIndex];
+
+	auto point = GetSectorPoint(x, z);
+
+	// Return surface height.
+	return ((plane.x * point.x) +
+			(plane.y * point.y) +
+			plane.z);
 }
 
-int FloorInfo::FloorHeight(int x, int y, int z) const
+int FloorInfo::GetSurfaceHeight(int x, int y, int z, bool checkFloor) const
 {
-	auto height = FloorHeight(x, z);
-	const auto ceilingHeight = CeilingHeight(x, z);
+	// Get surface heights.
+	int floorHeight = GetSurfaceHeight(x, z, true);
+	int ceilingHeight = GetSurfaceHeight(x, z, false);
 
-	for (const auto itemNumber : BridgeItemNumbers)
+	// Loop through bridges.
+	for (const int& i : BridgeItemNumbers)
 	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight >= y && *itemHeight < height && *itemHeight >= ceilingHeight)
-			height = *itemHeight;
+		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+
+		// Get bridge surface height.
+		auto bridgeSurfaceHeight = checkFloor ? bridgeObject.floor(i, x, y, z) : bridgeObject.ceiling(i, x, y, z);
+		if (!bridgeSurfaceHeight.has_value())
+			continue;
+
+		// Assess relation of bridge to collision block.
+		if (checkFloor)
+		{
+			if (bridgeSurfaceHeight.value() >= y &&			  // Below input height bound.
+				bridgeSurfaceHeight.value() < floorHeight &&  // Within floor bound.
+				bridgeSurfaceHeight.value() >= ceilingHeight) // Within ceiling bound.
+			{
+				floorHeight = bridgeSurfaceHeight.value();
+			}
+		}
+		else
+		{
+			if (bridgeSurfaceHeight.value() <= y &&			  // Above input height bound.
+				bridgeSurfaceHeight.value() <= floorHeight && // Within floor bound.
+				bridgeSurfaceHeight.value() > ceilingHeight)  // Within ceiling bound.
+			{
+				ceilingHeight = bridgeSurfaceHeight.value();
+			}
+		}
 	}
 
-	return height;
+	// Return surface height.
+	return (checkFloor ? floorHeight : ceilingHeight);
 }
 
-int FloorInfo::BridgeFloorHeight(int x, int y, int z) const
+int FloorInfo::GetBridgeSurfaceHeight(int x, int y, int z, bool checkFloor) const
 {
-	for (const auto itemNumber : BridgeItemNumbers)
+	// Loop through bridges.
+	for (const int& i : BridgeItemNumbers)
 	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
-		if (floorHeight && ceilingHeight && y > *floorHeight && y <= *ceilingHeight)
-			return *floorHeight;
+		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+
+		// Get surface heights.
+		auto floorHeight = bridgeObject.floor(i, x, y, z);
+		auto ceilingHeight = bridgeObject.ceiling(i, x, y, z);
+		if (!floorHeight.has_value() || !ceilingHeight.has_value())
+			continue;
+
+		// Assess relation of bridge to collision block.
+		if (checkFloor)
+		{
+			if (y > floorHeight.value() &&
+				y <= ceilingHeight.value())
+			{
+				return floorHeight.value();
+			}
+		}
+		else
+		{
+			if (y >= floorHeight.value() &&
+				y < ceilingHeight.value())
+			{
+				return ceilingHeight.value();
+			}
+		}
 	}
-
-	return FloorHeight(x, y, z);
-}
-
-int FloorInfo::CeilingHeight(int x, int z) const
-{
-	const auto plane = GetSurfacePlaneIndex(x, z, false);
-	const auto vector = GetSectorPoint(x, z);
-
-	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
-}
-
-int FloorInfo::CeilingHeight(int x, int y, int z) const
-{
-	auto height = CeilingHeight(x, z);
-	const auto floorHeight = FloorHeight(x, z);
-
-	for (const auto itemNumber : BridgeItemNumbers)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
-		if (itemHeight && *itemHeight <= y && *itemHeight > height && *itemHeight <= floorHeight)
-			height = *itemHeight;
-	}
-
-	return height;
-}
-
-int FloorInfo::BridgeCeilingHeight(int x, int y, int z) const
-{
-	for (const auto itemNumber : BridgeItemNumbers)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
-		if (floorHeight && ceilingHeight && y >= *floorHeight && y < *ceilingHeight)
-			return *ceilingHeight;
-	}
-
-	return CeilingHeight(x, y, z);
+	
+	// Return bridge surface height.
+	return GetSurfaceHeight(x, y, z, checkFloor);
 }
 
 Vector2 FloorInfo::GetSurfaceSlope(int planeIndex, bool checkFloor) const
@@ -396,8 +420,8 @@ namespace TEN::Floordata
 
 		do
 		{
-			y = floor->BridgeFloorHeight(x, y, z);
-			while (y <= floor->CeilingHeight(x, z))
+			y = floor->GetBridgeSurfaceHeight(x, y, z, true);
+			while (y <= floor->GetSurfaceHeight(x, z, false))
 			{
 				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
 				if (!roomAbove)
@@ -424,8 +448,8 @@ namespace TEN::Floordata
 
 		do
 		{
-			y = floor->BridgeCeilingHeight(x, y, z);
-			while (y >= floor->FloorHeight(x, z))
+			y = floor->GetBridgeSurfaceHeight(x, y, z, false);
+			while (y >= floor->GetSurfaceHeight(x, z, true))
 			{
 				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
 				if (!roomBelow)
@@ -455,7 +479,7 @@ namespace TEN::Floordata
 
 			if (!floor->IsWall(x, z))
 			{
-				y = floor->FloorHeight(x, z);
+				y = floor->GetSurfaceHeight(x, z, true);
 				direction = -1;
 			}
 			else
@@ -464,7 +488,7 @@ namespace TEN::Floordata
 
 				if (!floor->IsWall(x, z))
 				{
-					y = floor->CeilingHeight(x, z);
+					y = floor->GetSurfaceHeight(x, z, false);
 					direction = 1;
 				}
 				else
@@ -472,8 +496,8 @@ namespace TEN::Floordata
 			}
 		}
 
-		const auto floorHeight = floor->FloorHeight(x, y, z);
-		const auto ceilingHeight = floor->CeilingHeight(x, y, z);
+		const auto floorHeight = floor->GetSurfaceHeight(x, y, z, true);
+		const auto ceilingHeight = floor->GetSurfaceHeight(x, y, z, false);
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
@@ -506,7 +530,7 @@ namespace TEN::Floordata
 			}
 		}
 
-		return std::optional{floor->FloorHeight(x, y, z)};
+		return std::optional{floor->GetSurfaceHeight(x, y, z, true)};
 	}
 
 	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z)
@@ -521,7 +545,7 @@ namespace TEN::Floordata
 
 			if (!floor->IsWall(x, z))
 			{
-				y = floor->CeilingHeight(x, z);
+				y = floor->GetSurfaceHeight(x, z, false);
 				direction = 1;
 			}
 			else
@@ -530,7 +554,7 @@ namespace TEN::Floordata
 
 				if (!floor->IsWall(x, z))
 				{
-					y = floor->FloorHeight(x, z);
+					y = floor->GetSurfaceHeight(x, z, true);
 					direction = -1;
 				}
 				else
@@ -538,8 +562,8 @@ namespace TEN::Floordata
 			}
 		}
 
-		const auto floorHeight = floor->FloorHeight(x, y, z);
-		const auto ceilingHeight = floor->CeilingHeight(x, y, z);
+		const auto floorHeight = floor->GetSurfaceHeight(x, y, z, true);
+		const auto ceilingHeight = floor->GetSurfaceHeight(x, y, z, false);
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
@@ -572,7 +596,7 @@ namespace TEN::Floordata
 			}
 		}
 
-		return std::optional{floor->CeilingHeight(x, y, z)};
+		return std::optional{floor->GetSurfaceHeight(x, y, z, false)};
 	}
 
 	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z)
@@ -586,11 +610,11 @@ namespace TEN::Floordata
 			if (floor->IsWall(x, z))
 				return std::nullopt;
 
-			location.yNumber = floor->CeilingHeight(x, z);
+			location.yNumber = floor->GetSurfaceHeight(x, z, false);
 		}
 
-		auto floorHeight = floor->FloorHeight(x, location.yNumber, z);
-		auto ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+		auto floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+		auto ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
@@ -603,8 +627,8 @@ namespace TEN::Floordata
 			location.yNumber = *height;
 		}
 
-		floorHeight = floor->FloorHeight(x, location.yNumber, z);
-		ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+		floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+		ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 		if (y < ceilingHeight && floor->GetRoomNumberAbove(x, location.yNumber, z))
 			return std::nullopt;
@@ -618,10 +642,10 @@ namespace TEN::Floordata
 		while (roomBelow)
 		{
 			floor = &GetFloorSide(*roomBelow, x, z, &location.roomNumber);
-			location.yNumber = floor->CeilingHeight(x, z);
+			location.yNumber = floor->GetSurfaceHeight(x, z, false);
 
-			floorHeight = floor->FloorHeight(x, location.yNumber, z);
-			ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+			floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+			ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 			if (y < ceilingHeight && floor->GetRoomNumberAbove(x, location.yNumber, z))
 				return std::nullopt;
@@ -648,11 +672,11 @@ namespace TEN::Floordata
 			if (floor->IsWall(x, z))
 				return std::nullopt;
 
-			location.yNumber = floor->FloorHeight(x, z);
+			location.yNumber = floor->GetSurfaceHeight(x, z, true);
 		}
 
-		auto floorHeight = floor->FloorHeight(x, location.yNumber, z);
-		auto ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+		auto floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+		auto ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
@@ -665,8 +689,8 @@ namespace TEN::Floordata
 			location.yNumber = *height;
 		}
 
-		floorHeight = floor->FloorHeight(x, location.yNumber, z);
-		ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+		floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+		ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 		if (y > floorHeight && floor->GetRoomNumberBelow(x, location.yNumber, z))
 			return std::nullopt;
@@ -680,10 +704,10 @@ namespace TEN::Floordata
 		while (roomAbove)
 		{
 			floor = &GetFloorSide(*roomAbove, x, z, &location.roomNumber);
-			location.yNumber = floor->FloorHeight(x, z);
+			location.yNumber = floor->GetSurfaceHeight(x, z, true);
 
-			floorHeight = floor->FloorHeight(x, location.yNumber, z);
-			ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
+			floorHeight = floor->GetSurfaceHeight(x, location.yNumber, z, true);
+			ceilingHeight = floor->GetSurfaceHeight(x, location.yNumber, z, false);
 
 			if (y > floorHeight && floor->GetRoomNumberBelow(x, location.yNumber, z))
 				return std::nullopt;
@@ -722,7 +746,7 @@ namespace TEN::Floordata
 		floor->AddBridge(itemNumber);
 
 		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
-		while (floorBorder <= floor->CeilingHeight(x, z))
+		while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
 		{
 			const auto roomAbove = floor->GetRoomNumberAbove(x, z);
 			if (!roomAbove)
@@ -733,7 +757,7 @@ namespace TEN::Floordata
 		}
 
 		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
-		while (ceilingBorder >= floor->FloorHeight(x, z))
+		while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
 		{
 			const auto roomBelow = floor->GetRoomNumberBelow(x, z);
 			if (!roomBelow)
@@ -754,7 +778,7 @@ namespace TEN::Floordata
 		floor->RemoveBridge(itemNumber);
 
 		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
-		while (floorBorder <= floor->CeilingHeight(x, z))
+		while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
 		{
 			const auto roomAbove = floor->GetRoomNumberAbove(x, z);
 			if (!roomAbove)
@@ -765,7 +789,7 @@ namespace TEN::Floordata
 		}
 
 		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
-		while (ceilingBorder >= floor->FloorHeight(x, z))
+		while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
 		{
 			const auto roomBelow = floor->GetRoomNumberBelow(x, z);
 			if (!roomBelow)
