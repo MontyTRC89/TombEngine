@@ -290,8 +290,8 @@ namespace TEN::Floordata
 {
 	Vector2i GetSectorPoint(int x, int z)
 	{
-		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
-		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
+		const auto xPoint = x % BLOCK(1) - BLOCK(1) / 2;
+		const auto yPoint = z % BLOCK(1) - BLOCK(1) / 2;
 
 		return Vector2i{xPoint, yPoint};
 	}
@@ -299,8 +299,8 @@ namespace TEN::Floordata
 	Vector2i GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
-		const auto zRoom = (z - room.z) / SECTOR(1);
-		const auto xRoom = (x - room.x) / SECTOR(1);
+		const auto zRoom = (z - room.z) / BLOCK(1);
+		const auto xRoom = (x - room.x) / BLOCK(1);
 		auto pos = Vector2i{xRoom, zRoom};
 
 		if (pos.x < 0)
@@ -809,7 +809,6 @@ namespace TEN::Floordata
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-
 	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
 	{
 		auto item = &g_Level.Items[itemNumber];
@@ -829,17 +828,18 @@ namespace TEN::Floordata
 		auto room = &g_Level.Rooms[item->RoomNumber];
 
 		// Get min/max of a projected AABB
-		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
-		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
-		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
-		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
+		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
+		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
+		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
+		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
 
 		// Run through all blocks enclosed in AABB
 		for (int x = 0; x < room->xSize; x++)
+		{
 			for (int z = 0; z < room->zSize; z++)
 			{
-				auto pX = room->x + (x * BLOCK(1)) + BLOCK(1 / 2.0f);
-				auto pZ = room->z + (z * BLOCK(1)) + BLOCK(1 / 2.0f);
+				auto pX = room->x + (x * BLOCK(1)) + BLOCK(0.5f);
+				auto pZ = room->z + (z * BLOCK(1)) + BLOCK(0.5f);
 				auto offX = pX - item->Pose.Position.x;
 				auto offZ = pZ - item->Pose.Position.z;
 
@@ -860,5 +860,6 @@ namespace TEN::Floordata
 				if (dxBounds.Intersects(blockBox))
 					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
 			}
+		}
 	}
 }
