@@ -800,8 +800,8 @@ namespace TEN::Entities::Generic
 
 		PushableAnimationVector =
 		{
-			PushableAnimationInfo(LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true),				//TR4-TR5 animations
-			PushableAnimationInfo(LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false)	//TR1-TR3 animations
+			PushableAnimationInfo(LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true),			 //TR4-TR5 animations
+			PushableAnimationInfo(LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false) //TR1-TR3 animations
 		};
 
 		InitializePushablesSoundsMap();
@@ -813,20 +813,18 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//Re-apply the bridges colliders
+		// Re-apply the bridges colliders
 		ManageStackBridges(itemNumber, true);
 
-		//Check if it has fall over another pushable.
+		// Check if it has fall over another pushable.
 		UpdateAllPushablesStackLinks();
 
 		// If it has fallen on top of existing pushable
 		// Or it's floating in water, don't test triggers.
-		if ((pushable.StackLowerItem == NO_ITEM) || (pushable.GravityState == PushableGravityState::Floating))
-		{
+		if (pushable.StackLowerItem == NO_ITEM || pushable.GravityState == PushableGravityState::Floating)
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-		}
 
-		if (pushableItem.Status == ITEM_ACTIVE && (pushable.GravityState <= PushableGravityState::Falling))
+		if (pushableItem.Status == ITEM_ACTIVE && pushable.GravityState <= PushableGravityState::Falling)
 		{
 			RemoveActiveItem(itemNumber);
 			pushableItem.Status = ITEM_NOT_ACTIVE;
@@ -843,7 +841,9 @@ namespace TEN::Entities::Generic
 
 			if ((item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
 				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
+			{
 				pushables.push_back(i);
+			}
 		}
 
 		return pushables;
