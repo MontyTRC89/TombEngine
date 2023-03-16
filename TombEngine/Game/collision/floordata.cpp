@@ -258,26 +258,35 @@ bool FloorInfo::IsWall(int x, int z) const
 	return IsWall(GetSurfacePlaneIndex(x, z, true));
 }
 
-int FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const
+int FloorInfo::GetInsideBridgeItemNumber(int x, int y, int z, bool testFloorBorder, bool testCeilingBorder) const
 {
-	for (const auto itemNumber : BridgeItemNumbers)
+	for (const int& itemNumber : BridgeItemNumbers)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
-		if (floorHeight && ceilingHeight && (y > *floorHeight && y < *ceilingHeight || floorBorder && y == *floorHeight || ceilingBorder && y == *ceilingHeight))
+
+		// Get surface heights.
+		auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
+		auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		if (!floorHeight.has_value() || !ceilingHeight.has_value())
+			continue;
+
+		if ((y > floorHeight.value() && y < ceilingHeight.value()) ||
+			(testFloorBorder && y == floorHeight.value()) ||
+			(testCeilingBorder && y == ceilingHeight.value()))
+		{
 			return itemNumber;
+		}
 	}
 
 	return NO_ITEM;
 }
 
-void FloorInfo::AddItem(int itemNumber)
+void FloorInfo::AddBridge(int itemNumber)
 {
 	BridgeItemNumbers.insert(itemNumber);
 }
 
-void FloorInfo::RemoveItem(int itemNumber)
+void FloorInfo::RemoveBridge(int itemNumber)
 {
 	BridgeItemNumbers.erase(itemNumber);
 }
@@ -402,7 +411,7 @@ namespace TEN::Floordata
 				floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
 			}
 		}
-		while (floor->InsideBridge(x, y, z, false, true) >= 0);
+		while (floor->GetInsideBridgeItemNumber(x, y, z, false, true) >= 0);
 
 		if (topRoomNumber)
 			*topRoomNumber = roomNumber;
@@ -430,7 +439,7 @@ namespace TEN::Floordata
 				floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
 			}
 		}
-		while (floor->InsideBridge(x, y, z, true, false) >= 0);
+		while (floor->GetInsideBridgeItemNumber(x, y, z, true, false) >= 0);
 
 		if (bottomRoomNumber)
 			*bottomRoomNumber = roomNumber;
@@ -473,7 +482,7 @@ namespace TEN::Floordata
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->InsideBridge(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
+		if (floor->GetInsideBridgeItemNumber(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
 		{
 			if (direction <= 0)
 			{
@@ -539,7 +548,7 @@ namespace TEN::Floordata
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->InsideBridge(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
+		if (floor->GetInsideBridgeItemNumber(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
 		{
 			if (direction >= 0)
 			{
@@ -590,7 +599,7 @@ namespace TEN::Floordata
 
 		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->InsideBridge(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
+		if (floor->GetInsideBridgeItemNumber(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
 		{
 			const auto height = GetBottomHeight(*floor, x, location.yNumber, z, &location.roomNumber, &floor);
 			if (!height)
@@ -652,7 +661,7 @@ namespace TEN::Floordata
 
 		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->InsideBridge(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
+		if (floor->GetInsideBridgeItemNumber(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
 		{
 			const auto height = GetTopHeight(*floor, x, location.yNumber, z, &location.roomNumber, &floor);
 			if (!height)
@@ -715,7 +724,7 @@ namespace TEN::Floordata
 		z += item.Pose.Position.z;
 
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
-		floor->AddItem(itemNumber);
+		floor->AddBridge(itemNumber);
 
 		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
 		while (floorBorder <= floor->CeilingHeight(x, z))
@@ -725,7 +734,7 @@ namespace TEN::Floordata
 				break;
 
 			floor = &GetFloorSide(*roomAbove, x, z);
-			floor->AddItem(itemNumber);
+			floor->AddBridge(itemNumber);
 		}
 
 		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
@@ -736,7 +745,7 @@ namespace TEN::Floordata
 				break;
 
 			floor = &GetFloorSide(*roomBelow, x, z);
-			floor->AddItem(itemNumber);
+			floor->AddBridge(itemNumber);
 		}
 	}
 
@@ -747,7 +756,7 @@ namespace TEN::Floordata
 		z += item.Pose.Position.z;
 
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
-		floor->RemoveItem(itemNumber);
+		floor->RemoveBridge(itemNumber);
 
 		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
 		while (floorBorder <= floor->CeilingHeight(x, z))
@@ -757,7 +766,7 @@ namespace TEN::Floordata
 				break;
 
 			floor = &GetFloorSide(*roomAbove, x, z);
-			floor->RemoveItem(itemNumber);
+			floor->RemoveBridge(itemNumber);
 		}
 
 		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
@@ -768,7 +777,7 @@ namespace TEN::Floordata
 				break;
 
 			floor = &GetFloorSide(*roomBelow, x, z);
-			floor->RemoveItem(itemNumber);
+			floor->RemoveBridge(itemNumber);
 		}
 	}
 

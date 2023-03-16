@@ -109,18 +109,18 @@ class FloorInfo
 {
 	public:
 		// Components
-		int			  Room				= 0;
-		int			  WallPortal		= 0;
-		std::set<int> BridgeItemNumbers = {};
+		int					   Room				 = 0; // RoomNumber
+		int					   WallPortal		 = 0; // Number of room through wall portal (only one)?
+		SurfaceCollisionData   FloorCollision	 = {};
+		SurfaceCollisionData   CeilingCollision  = {};
+		CollisionBlockFlagData Flags			 = {};
+		std::set<int>		   BridgeItemNumbers = {};
 
-		int			 Box		  = 0;
-		bool		 Stopper	  = true;
-		int			 TriggerIndex = 0;
-		MaterialType Material	  = MaterialType::Stone;
+		MaterialType Material = MaterialType::Stone;
 
-		SurfaceCollisionData   FloorCollision	= {};
-		SurfaceCollisionData   CeilingCollision = {};
-		CollisionBlockFlagData Flags			= {};
+		int	 Box		  = 0;
+		int	 TriggerIndex = 0;
+		bool Stopper	  = true;
 
 		// Getters
 		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
@@ -132,7 +132,7 @@ class FloorInfo
 		std::optional<int> GetRoomNumberBelow(int planeIndex) const;
 		std::optional<int> GetRoomNumberBelow(int x, int z) const;
 		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
-		std::optional<int> GetRoomNumberAtSide() const;
+		std::optional<int> GetRoomNumberAtSide() const; // Through wall?
 
 		int FloorHeight(int x, int z) const;
 		int FloorHeight(int x, int y, int z) const;
@@ -153,10 +153,10 @@ class FloorInfo
 		bool IsWall(int plane) const;
 		bool IsWall(int x, int z) const;
 
-		// Getters
-		int	 InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
-		void AddItem(int itemNumber);
-		void RemoveItem(int itemNumber);
+		// Bridge methods
+		int	 GetInsideBridgeItemNumber(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
+		void AddBridge(int itemNumber);
+		void RemoveBridge(int itemNumber);
 };
 
 namespace TEN::Floordata
