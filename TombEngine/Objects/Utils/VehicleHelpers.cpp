@@ -360,20 +360,21 @@ namespace TEN::Entities::Vehicles
 		// Determine key parameters.
 		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight, isUnderwater, isMovingForward);
 		auto direction = -vehicleItem.Pose.Orientation.ToDirection();
+		short orient2D = isUnderwater ? vehicleItem.Pose.Orientation.z : 0;
 		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
-		float vel = VEL_ABS * (isMovingForward ? 1 : -1);
+		float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
 		float scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
 
 		// Spawn left wake.
 		StreamerEffect.Spawn(
 			vehicleItem.Index, (int)tagLeft,
-			positions.first, direction, 0, COLOR,
+			positions.first, direction, orient2D, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
 			vehicleItem.Index, (int)tagRight,
-			positions.second, direction, 0, COLOR,
+			positions.second, direction, orient2D, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
 }
