@@ -1,25 +1,26 @@
 #include "framework.h"
 #include "Specific/BitField.h"
 
-#include <limits>
-
 namespace TEN::Utils
 {
+	const BitField BitField::Empty	 = BitField(0);
+	const BitField BitField::Default = BitField(SIZE_DEFAULT);
+
 	BitField::BitField()
 	{
-		Bits.resize(BIT_FIELD_SIZE_MAX);
+		Bits.resize(SIZE_DEFAULT);
 	}
 
 	BitField::BitField(unsigned int size)
 	{
 		// NOTE: Bits initialize as unset.
-		size = std::min<unsigned int>(size, BIT_FIELD_SIZE_MAX);
+		size = std::min<unsigned int>(size, SIZE_DEFAULT);
 		Bits.resize(size);
 	}
 
 	BitField::BitField(unsigned int size, unsigned int packedBits)
 	{
-		size = std::min<unsigned int>(size, BIT_FIELD_SIZE_MAX);
+		size = std::min<unsigned int>(size, SIZE_DEFAULT);
 		Bits.reserve(size);
 
 		for (unsigned int i = 0; i < size; i++)

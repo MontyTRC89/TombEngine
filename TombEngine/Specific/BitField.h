@@ -3,18 +3,22 @@
 namespace TEN::Utils
 {
 	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
-	// TODO: Remove size cap when all conversions are complete and use unsigned long long for packedBits input.
+	// TODO: When all conversions are complete, remove the size cap and use unsigned long long for packedBits input.
 
 	class BitField
 	{
 	private:
 		// Constants
-		static constexpr auto BIT_FIELD_SIZE_MAX = std::numeric_limits<unsigned int>::digits;
+		static constexpr auto SIZE_DEFAULT = 32;
 
 		// Components
 		std::vector<bool> Bits = {};
 
 	public:
+		// Constants
+		static const BitField Empty;
+		static const BitField Default;
+
 		// Constructors
 		BitField();
 		BitField(unsigned int size);
