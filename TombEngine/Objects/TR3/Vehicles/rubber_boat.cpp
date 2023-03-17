@@ -46,7 +46,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
 	constexpr auto RBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
 
-	constexpr auto RBOAT_WAKE_OFFSET = Vector3(RBOAT_SIDE + 20, 0.0f, RBOAT_FRONT / 2);
+	constexpr auto RBOAT_WAKE_OFFSET = Vector3(RBOAT_SIDE * 1.1f, 0.0f, RBOAT_FRONT / 2);
 
 	const std::vector<VehicleMountType> RubberBoatMountTypes =
 	{
