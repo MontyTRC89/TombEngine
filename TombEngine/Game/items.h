@@ -73,8 +73,8 @@ struct EntityAnimationData
 	int TargetState	  = 0;
 	int RequiredState = NO_STATE;
 
-	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+	bool	IsAirborne = false;
+	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 };
 
 struct EntityModelData
@@ -84,7 +84,7 @@ struct EntityModelData
 	Vector4 Color = Vector4::Zero;
 
 	std::vector<int>		 MeshIndex = {};
-	std::vector<BoneMutator> Mutator   = {};
+	std::vector<BoneMutator> Mutators  = {};
 };
 
 struct EntityCallbackData

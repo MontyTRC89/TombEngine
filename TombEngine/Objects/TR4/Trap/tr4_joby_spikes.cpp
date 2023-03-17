@@ -15,9 +15,9 @@ namespace TEN::Entities::TR4
     {
         auto* item = &g_Level.Items[itemNumber];
 
-		// Set bone mutators to 0 by default.
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i].Scale.y = 0.0f;
+		// Set bone mutators to EulerAngles identity by default.
+		for (auto& mutator : item->Model.Mutators)
+            mutator.Scale.y = 0.0f;
 
         item->Pose.Orientation.y = GetRandomControl() * 1024;
         item->ItemFlags[2] = GetRandomControl() & 1;
@@ -81,8 +81,8 @@ namespace TEN::Entities::TR4
 		// Update bone mutators.
 		if (item->ItemFlags[1])
 		{
-			for (int i = 0; i < item->Model.Mutator.size(); i++)
-				item->Model.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+            for (auto& mutator : item->Model.Mutators)
+				mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 		}
     }
 }

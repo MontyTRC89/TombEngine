@@ -126,16 +126,16 @@ namespace TEN::Renderer
 		{
 			const auto& nativeItem = g_Level.Items[rItem->ItemNumber];
 
-			if (nativeItem.Model.Mutator.size() == boneIndices.size())
+			if (nativeItem.Model.Mutators.size() == boneIndices.size())
 			{
 				for (const int& i : boneIndices)
 				{
-					const auto& mutator = nativeItem.Model.Mutator[i];
+					const auto& mutator = nativeItem.Model.Mutators[i];
 
 					if (mutator.IsEmpty())
 						continue;
 
-					auto rotMatrix = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+					auto rotMatrix = mutator.Rotation.ToRotationMatrix();
 					auto scaleMatrix = Matrix::CreateScale(mutator.Scale);
 					auto tMatrix = Matrix::CreateTranslation(mutator.Offset);
 

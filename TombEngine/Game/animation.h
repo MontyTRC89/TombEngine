@@ -68,14 +68,14 @@ struct AnimData
 
 struct BoneMutator
 {
-	Vector3 Offset   = Vector3::Zero;
-	Vector3 Rotation = Vector3::Zero; // TODO: Use EulerAngles?
-	Vector3 Scale    = Vector3::One;
+	Vector3		Offset	 = Vector3::Zero;
+	EulerAngles Rotation = EulerAngles::Zero;
+	Vector3		Scale	 = Vector3::One;
 
 	bool IsEmpty() const
 	{
 		return (Offset == Vector3::Zero &&
-				Rotation == Vector3::Zero &&
+				Rotation == EulerAngles::Zero &&
 				Scale == Vector3::One);
 	};
 };
