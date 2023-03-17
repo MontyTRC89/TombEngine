@@ -918,10 +918,10 @@ namespace TEN::Entities::Vehicles
 			{
 				if (laraItem->HitPoints > 0)
 				{
-					lara->Air--;
-					if (lara->Air < 0)
+					lara->Status.Air--;
+					if (lara->Status.Air < 0)
 					{
-						lara->Air = -1;
+						lara->Status.Air = -1;
 						DoDamage(laraItem, 5);
 					}
 				}
@@ -930,9 +930,9 @@ namespace TEN::Entities::Vehicles
 			{
 				if (laraItem->HitPoints >= 0)
 				{
-					lara->Air += 10;
-					if (lara->Air > LARA_AIR_MAX)
-						lara->Air = LARA_AIR_MAX;
+					lara->Status.Air += 10;
+					if (lara->Status.Air > LARA_AIR_MAX)
+						lara->Status.Air = LARA_AIR_MAX;
 				}
 			}
 		}

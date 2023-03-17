@@ -9,17 +9,13 @@
 //{
 	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Zero, 0);
 
-	AxisAngle::AxisAngle()
-	{
-	}
-
 	AxisAngle::AxisAngle(const Vector3& axis, short angle)
 	{
 		auto axisNorm = axis;
 		axisNorm.Normalize();
 
-		this->Axis = axisNorm;
-		this->Angle = angle;
+		Axis = axisNorm;
+		Angle = angle;
 	}
 
 	AxisAngle::AxisAngle(const EulerAngles& eulers)
@@ -35,8 +31,8 @@
 		axis.Normalize();
 		float angle = 2.0f * acos(quat.w);
 
-		this->Axis = axis;
-		this->Angle = FROM_RAD(angle);
+		Axis = axis;
+		Angle = FROM_RAD(angle);
 	}
 
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
@@ -59,8 +55,8 @@
 		if (dot < 0.0f)
 		{
 			// Negate angle and unit axis to ensure the angle stays within [0, PI] range.
-			this->Angle = -Angle;
-			this->Axis = -Axis;
+			Angle = -Angle;
+			Axis = -Axis;
 		}
 	}
 
@@ -79,12 +75,12 @@
 		auto axisNorm = axis;
 		axisNorm.Normalize();
 		
-		this->Axis = axisNorm;
+		Axis = axisNorm;
 	}
 
 	void AxisAngle::SetAngle(short angle)
 	{
-		this->Angle = angle;
+		Angle = angle;
 	}
 
 	void AxisAngle::Slerp(const AxisAngle& axisAngleTo, float alpha)
@@ -140,8 +136,8 @@
 
 	AxisAngle& AxisAngle::operator =(const AxisAngle& axisAngle)
 	{
-		this->Axis = axisAngle.GetAxis();
-		this->Angle = axisAngle.GetAngle();
+		Axis = axisAngle.GetAxis();
+		Angle = axisAngle.GetAngle();
 		return *this;
 	}
 
@@ -153,7 +149,7 @@
 
 	AxisAngle AxisAngle::operator *(const AxisAngle& axisAngle) const
 	{
-		auto quat0 = this->ToQuaternion();
+		auto quat0 = ToQuaternion();
 		auto quat1 = axisAngle.ToQuaternion();
 		return AxisAngle(quat0 * quat1);
 	}

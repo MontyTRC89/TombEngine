@@ -81,7 +81,6 @@ namespace TEN::Renderer
 			| /   \ |
 			3-------4
 		*/
-
 		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
