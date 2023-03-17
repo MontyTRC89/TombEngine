@@ -15,7 +15,7 @@ constexpr auto NO_ANIM	= -1;
 enum class AnimCommandType
 {
 	None,
-	MoveOrigin,
+	MoveOrigin, // "Post-animation adjustment"
 	JumpVelocity,
 	AttackReady,
 	Deactivate,
@@ -25,11 +25,9 @@ enum class AnimCommandType
 
 struct AnimFrame
 {
-	GameBoundingBox boundingBox = GameBoundingBox::Zero;
-	short offsetX = 0;
-	short offsetY = 0;
-	short offsetZ = 0;
-	std::vector<Quaternion> angles = {};
+	GameBoundingBox			boundingBox		 = GameBoundingBox::Zero;
+	Vector3					Offset			 = Vector3::Zero;
+	std::vector<Quaternion> BoneOrientations = {};
 };
 
 struct StateDispatchData

@@ -743,8 +743,8 @@ namespace TEN::Entities::Generic
 		ropeY = Lara.Control.Rope.Y - ANGLE(90.0f);
 		rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->offsetY - 192, &pos2.x, &pos2.y, &pos2.z);
+		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->Offset.y, &pos.x, &pos.y, &pos.z);
+		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->Offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
 
 		diff.x = pos.x - pos2.x << 16;
 		diff.y = pos.y - pos2.y << 16;

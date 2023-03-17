@@ -60,7 +60,7 @@ namespace TEN::Renderer
 				return; // Otherwise inventory crashes
 			}
 
-			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			if (frmptr[0]->BoneOrientations.size() <= bone->Index || (frac && frmptr[1]->BoneOrientations.size() <= bone->Index))
 			{
 				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
 					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
@@ -70,16 +70,16 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
+				auto p = frmptr[0]->Offset;
 
-				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				rotation = Matrix::CreateFromQuaternion(frmptr[0]->BoneOrientations[bone->Index]);
 				
 				if (frac)
 				{
-					auto p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
+					auto p2 = frmptr[1]->Offset;
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
-					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->BoneOrientations[bone->Index]);
 
 					Quaternion q1, q2, q3;
 

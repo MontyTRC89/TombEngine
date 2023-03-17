@@ -46,7 +46,7 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.ActiveState = animPtr->ActiveState;
 	}
 
-	int frameCount = animPtr->frameEnd - animPtr->frameBase;
+	unsigned int frameCount = animPtr->frameEnd - animPtr->frameBase;
 	frameCount = (frameCount > 0) ? frameCount : 1;
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
@@ -268,7 +268,7 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = NO_STATE;
 	}
 
-	int frameCount = animPtr->frameEnd - animPtr->frameBase;
+	unsigned int frameCount = animPtr->frameEnd - animPtr->frameBase;
 	frameCount = (frameCount > 0) ? frameCount : 1;
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
@@ -279,21 +279,21 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
 		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
-	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.UpdateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(item->Index, true);
 }
 
 bool HasStateDispatch(ItemInfo* item, int targetState)
 {
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
+	// No dispatches; return early.
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
@@ -304,14 +304,20 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
+		
 		if (dispatch.TargetState == targetState)
 		{
 			// Iterate over frame range of state dispatch.
 			for (int j = 0; j < dispatch.NumberRanges; j++)
 			{
 				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
+
+				// Check if frame is within range.
+				if (item->Animation.FrameNumber >= range.StartFrame &&
+					item->Animation.FrameNumber <= range.EndFrame)
+				{
 					return true;
+				}
 			}
 		}
 	}
@@ -376,9 +382,9 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 		return;
 	}
 
-	item->Animation.AnimNumber = index;
 	const auto& anim = g_Level.Anims[index];
 
+	item->Animation.AnimNumber = index;
 	item->Animation.FrameNumber = anim.frameBase + frameToStart;
 	item->Animation.ActiveState = anim.ActiveState;
 	item->Animation.TargetState = anim.ActiveState;
@@ -386,9 +392,11 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 {
+	// Active and target states match; return early.
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
+	// No dispatches; return early.
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
@@ -404,7 +412,9 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 			{
 				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
 
-				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
+				// Check if frame is within range.
+				if (item->Animation.FrameNumber >= range.StartFrame &&
+					item->Animation.FrameNumber <= range.EndFrame)
 				{
 					item->Animation.AnimNumber = range.LinkAnimNum;
 					item->Animation.FrameNumber = range.LinkFrameNum;
@@ -422,8 +432,10 @@ int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate = outRate = anim.Interpolation & 0x00FF;
+	outFramePtr[0] =
+	outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
+	int rate =
+	outRate = anim.Interpolation & 0x00FF;
 	frame -= anim.frameBase;
 
 	int first = frame / rate;
