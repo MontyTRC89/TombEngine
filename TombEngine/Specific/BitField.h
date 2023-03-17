@@ -11,11 +11,11 @@ namespace TEN::Utils
 		// Constants
 		static constexpr auto SIZE_DEFAULT = 32;
 
-		// Components
+		// Variables
 		std::vector<bool> Bits = {};
 
 	public:
-		// Constants
+		// Presets
 		static const BitField Empty;
 		static const BitField Default;
 
@@ -51,7 +51,7 @@ namespace TEN::Utils
 		std::string	 ToString() const;
 
 		// Operators
-		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than BIT_FIELD_SIZE_MAX.
+		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than SIZE_DEFAULT.
 		bool		 operator ==(unsigned int packedBits) const;
 		bool		 operator !=(unsigned int packedBits) const;
 		BitField&	 operator =(unsigned int packedBits);
