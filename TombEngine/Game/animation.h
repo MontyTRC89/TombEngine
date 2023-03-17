@@ -69,10 +69,15 @@ struct AnimData
 struct BoneMutator
 {
 	Vector3 Offset   = Vector3::Zero;
-	Vector3 Rotation = Vector3::Zero;
+	Vector3 Rotation = Vector3::Zero; // TODO: Use EulerAngles?
 	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return ((Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One)); };
+	bool IsEmpty() const
+	{
+		return (Offset == Vector3::Zero &&
+				Rotation == Vector3::Zero &&
+				Scale == Vector3::One);
+	};
 };
 
 void AnimateLara(ItemInfo* item);
