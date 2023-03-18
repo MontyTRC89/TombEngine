@@ -317,7 +317,7 @@ namespace TEN::Entities::Vehicles
 	{
 		constexpr auto HEIGHT_OFFSET_ON_WATER = (int)BLOCK(1 / 32.0f);
 		
-		waterHeight -= HEIGHT_OFFSET_ON_WATER
+		waterHeight -= HEIGHT_OFFSET_ON_WATER;
 
 		int vPos = isUnderwater ? vehicleItem.Pose.Position.y : waterHeight;
 		auto posBase = Vector3(vehicleItem.Pose.Position.x, vPos, vehicleItem.Pose.Position.z);
