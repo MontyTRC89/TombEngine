@@ -186,7 +186,7 @@ namespace TEN::Renderer
 				{
 					if (j == 3 || j == 4)
 					{
-						currentBone->ExtraRotation =  EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
+						currentBone->ExtraRotation = EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
 					}
 					else if (j == 6 || j == 7)
 					{
