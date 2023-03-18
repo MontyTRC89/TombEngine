@@ -147,7 +147,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::RocketLauncher:
 		case LaraWeaponType::HarpoonGun:
 		{
-			AnimFrame* shotgunframePtr= nullptr;
+			AnimFrame* shotgunframePtr = nullptr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -171,7 +171,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 		case LaraWeaponType::Revolver:
 		{
-			AnimFrame* revolverframePtr= nullptr;
+			AnimFrame* revolverframePtr = nullptr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
