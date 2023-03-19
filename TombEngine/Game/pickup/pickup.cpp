@@ -1096,23 +1096,22 @@ void InitialisePickup(short itemNumber)
 
 			if (triggerFlags == 0)
 			{
-				// Automatically align pickups to the surface.
+				// Automatically align pickups to the floor surface.
+				auto pointColl = GetCollision(item);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
+					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					true, true);
 
-				auto coll = GetCollision(item);
-				int bridge = coll.Block->InsideBridge(item->Pose.Position.x, 
-					item->Pose.Position.y, item->Pose.Position.z, true, true);
-
-				if (bridge != NO_ITEM)
+				if (bridgeItemNumber != NO_ITEM)
 				{
 					// If pickup is within bridge item, most likely it means it is
-					// below pushable or raising block, therefore ignore its collision.
-
-					coll.Block->RemoveItem(bridge);
-					coll = GetCollision(item);
-					coll.Block->AddItem(bridge);
+					// below pushable or raising block, so ignore its collision.
+					pointColl.Block->RemoveBridge(bridgeItemNumber);
+					pointColl = GetCollision(item);
+					pointColl.Block->AddBridge(bridgeItemNumber);
 				}
 
-				item->Pose.Position.y = coll.Position.Floor - bounds.Y2;
+				item->Pose.Position.y = pointColl.Position.Floor - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}

@@ -353,7 +353,7 @@ void UpdateSparks()
 								DoDamage(LaraItem, 2);
 
 							if (spark->flags & SP_POISON)
-								Lara.PoisonPotency += 5;
+								Lara.Status.Poison += 5;
 						}
 					}
 				}

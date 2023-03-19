@@ -548,7 +548,7 @@ void InitialiseItem(short itemNumber)
 	room->itemNumber = itemNumber;
 
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
+	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->Box;
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)

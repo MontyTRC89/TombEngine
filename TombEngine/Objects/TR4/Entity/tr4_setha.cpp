@@ -682,7 +682,7 @@ namespace TEN::Entities::TR4
 		laraItem->HitPoints = -1;
 		lara.ExtraAnim = 1;
 		lara.HitDirection = -1;
-		lara.Air = -1;
+		lara.Status.Air = -1;
 		lara.Control.HandStatus = HandStatus::Busy;
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 
