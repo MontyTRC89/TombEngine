@@ -312,7 +312,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	if (targetState == NO_STATE)
 		targetState = item->Animation.TargetState;
 
-	// Iterate over possible state dispatches.
+	// Iterate over animation's state dispatches.
 	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
@@ -320,7 +320,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 		if (dispatch.TargetState != targetState)
 			continue;
 
-		// Iterate over frame range of state dispatch.
+		// Iterate over dispatch frame range.
 		for (int j = 0; j < dispatch.NumberRanges; j++)
 		{
 			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
@@ -351,7 +351,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	const auto& anim = GetAnimData(animNumber);
+	const auto& anim = GetAnimData(*item, animNumber);
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
@@ -390,8 +390,8 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 
 	const auto& object = Objects[item->ObjectNumber];
 
-	int index = object.animIndex + animNumber;
-	if (index < 0 || index >= g_Level.Anims.size())
+	int animIndex = object.animIndex + animNumber;
+	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
 		TENLog(
 			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
@@ -401,27 +401,36 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 		return;
 	}
 
-	const auto& anim = GetAnimData(index);
-
-	item->Animation.AnimNumber = index;
+	const auto& anim = GetAnimData(*item, animNumber);
+	
+	item->Animation.AnimNumber = animIndex;
 	item->Animation.FrameNumber = anim.frameBase + frameToStart;
 	item->Animation.ActiveState = anim.ActiveState;
 	item->Animation.TargetState = anim.ActiveState;
 }
 
-AnimData& GetAnimData(int animNumber)
+AnimData& GetAnimData(int animIndex)
 {
-	return g_Level.Anims[animNumber];
+	return g_Level.Anims[animIndex];
 }
 
-AnimData& GetAnimData(const ItemInfo& item)
+AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
-	return g_Level.Anims[item.Animation.AnimNumber];
+	return g_Level.Anims[object.animIndex + animNumber];
+}
+
+AnimData& GetAnimData(const ItemInfo& item, int animNumber)
+{
+	if (animNumber == NO_ANIM)
+		return g_Level.Anims[item.Animation.AnimNumber];
+
+	const auto& object = Objects[item.ObjectNumber];
+	return GetAnimData(object, animNumber);
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 {
-	// Active and target states match; return early.
+	// Active and target states already match; return early.
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
@@ -429,7 +438,7 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	// Iterate over possible state dispatches.
+	// Iterate over animation's state dispatches.
 	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
@@ -437,7 +446,7 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 		if (dispatch.TargetState != item->Animation.TargetState)
 			continue;
 
-		// Iterate over frame range of state dispatch.
+		// Iterate over dispatch frame range.
 		for (int j = 0; j < dispatch.NumberRanges; j++)
 		{
 			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
@@ -491,7 +500,7 @@ AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	int animIndex = object.animIndex + animNumber;
 	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
 
-	const auto& anim = GetAnimData(animIndex);
+	const auto& anim = GetAnimData(object, animNumber);
 
 	// Get and clamp frame count.
 	unsigned int frameCount = anim.frameEnd - anim.frameBase;
@@ -545,17 +554,17 @@ int GetFrameNumber(ItemInfo* item, int frameToStart)
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 {
 	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object.animIndex + animNumber);
+	const auto& anim = GetAnimData(object, animNumber);
 
 	return (anim.frameBase + frameToStart);
 }
 
-int GetFrameCount(int animNumber)
+int GetFrameCount(int animIndex)
 {
-	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
+	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
 		return 0;
 
-	const auto& anim = GetAnimData(animNumber);
+	const auto& anim = GetAnimData(animIndex);
 
 	int end = anim.frameEnd;
 	int base = anim.frameBase;
@@ -570,10 +579,11 @@ int GetNextAnimState(ItemInfo* item)
 int GetNextAnimState(int objectID, int animNumber)
 {
 	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object.animIndex + animNumber);
+	const auto& anim = GetAnimData(object, animNumber);
 
-	int nextAnimNumber = anim.JumpAnimNum;
-	const auto& nextAnim = GetAnimData(object.animIndex + nextAnimNumber);
+	// TODO: Check.
+	int nextAnimIndex = anim.JumpAnimNum;
+	const auto& nextAnim = GetAnimData(nextAnimIndex);
 	return nextAnim.ActiveState;
 }
 

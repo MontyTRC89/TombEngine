@@ -100,13 +100,14 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 void SetAnimation(ItemInfo* item, int animNumber, int frameToStart = 0);
 
 // Getters
-AnimData& GetAnimData(int animNumber);
-AnimData& GetAnimData(const ItemInfo& item);
+AnimData& GetAnimData(int animIndex);
+AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
+AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
 int		  GetAnimNumber(ItemInfo& item, int animID);
 int		  GetFrameNumber(ItemInfo* item, int frameToStart);
 int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
-int		  GetFrameCount(int animNumber);
+int		  GetFrameCount(int animIndex);
 int		  GetNextAnimState(ItemInfo* item);
 int		  GetNextAnimState(int objectID, int animNumber);
 bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);
