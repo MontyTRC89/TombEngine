@@ -5,6 +5,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -16,14 +17,20 @@
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Objects/Utils/VehicleHelpers.h"
+#include "Math/Geometry.h"
 
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Math;
+using namespace TEN::Math::Geometry;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto WRAITH_COUNT	   = 8;
 	constexpr auto WRAITH_VELOCITY = 64;
+
+	const auto WRAITH_TAIL_OFFSET = BiteInfo(Vector3(0.0f, 0.0f, -40.0f), 0);
 
 	void InitialiseWraith(short itemNumber)
 	{
@@ -344,6 +351,13 @@ namespace TEN::Entities::TR4
 			wraith[0].Velocity,
 			item->ObjectNumber);
 
+		//SpawnVehicleWake(*item, Vector3(0,0,0 ), 0, true);
+		auto pos = GetJointPosition(item, WRAITH_TAIL_OFFSET.meshNum, Vector3i(WRAITH_TAIL_OFFSET.Position));
+		auto pos1 = GetJointPosition(item, WRAITH_TAIL_OFFSET.meshNum, Vector3i(WRAITH_TAIL_OFFSET.Position.x, WRAITH_TAIL_OFFSET.Position.y * 2, WRAITH_TAIL_OFFSET.Position.z));
+		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
+
+		SpawnWraithTails(*item, Pose(pos1, orient), item->ObjectNumber);
+
 		// Lighting for WRAITH
 		byte r, g, b;
 		if (item->ObjectNumber == ID_WRAITH3)
@@ -441,7 +455,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(Vector3i pos, short yRot, short objectNumber)
+	void WraithWallsEffect(Vector3i pos, short yRot, int objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;
@@ -536,4 +550,78 @@ namespace TEN::Entities::TR4
 
 		FlipEffect = -1;
 	}
+
+
+	void SpawnWraithTails(const ItemInfo& wraithItem, const Pose& relOffset, int objectNumber)
+	{
+		auto COLOR = Vector4::Zero;
+		
+		switch (objectNumber)
+		{
+		case ID_WRAITH1:
+			COLOR = Vector4(1.0f, 0.6f, 0.0f, 1.0f);
+			break;
+		case ID_WRAITH2:
+			COLOR = Vector4(0.0f, 0.5f, 1.0f, 1.0f);
+			break;
+		case ID_WRAITH3:
+			COLOR = Vector4(1.0f);
+			break;
+		}
+
+		constexpr auto LIFE_MAX = 0.5f;
+		constexpr auto VEL_ABS = 8.0f;
+		constexpr auto SCALE_RATE = 1.0f;
+
+		bool isMovingForward = (wraithItem.Animation.Velocity.z >= 0.0f);
+
+		// Determine tags.
+		auto tagLeft = isMovingForward = 0;
+		auto tagRight = isMovingForward = 1;
+
+		// Determine key parameters.
+		//auto positions = GetWraithTailPositions(wraithItem, relOffset, isMovingForward);
+
+		int vPos = wraithItem.Pose.Position.y;
+		auto posBase = Vector3(wraithItem.Pose.Position.x, wraithItem.Pose.Position.y, wraithItem.Pose.Position.z);
+
+		auto orient = wraithItem.Pose.Orientation;
+
+		auto rotMatrix = orient.ToRotationMatrix();
+
+
+		auto startOffset = Vector3(relOffset.Position.x, relOffset.Position.y, relOffset.Position.z);// isMovingForward ? relOffset.z : -relOffset.z);
+
+		auto startPos = posBase + Vector3::Transform(startOffset, rotMatrix);
+
+
+		auto direction = -wraithItem.Pose.Orientation.ToDirection();
+		auto directionL = Geometry::RotatePoint(wraithItem.Pose.Position.ToVector3(), EulerAngles(wraithItem.Pose.Orientation.x + ANGLE(50.0f), wraithItem.Pose.Orientation.y, wraithItem.Pose.Orientation.z));;
+		auto directionR = Geometry::RotatePoint(wraithItem.Pose.Position.ToVector3(), EulerAngles(wraithItem.Pose.Orientation.x + ANGLE(-50.0f), wraithItem.Pose.Orientation.y, wraithItem.Pose.Orientation.z));
+		auto directionD = Geometry::RotatePoint(wraithItem.Pose.Position.ToVector3(), EulerAngles(wraithItem.Pose.Orientation.x, wraithItem.Pose.Orientation.y + ANGLE(50.0f), wraithItem.Pose.Orientation.z));
+		short orient2D = wraithItem.Pose.Orientation.z;
+
+		float life = LIFE_MAX;
+		float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
+
+		// Spawn left tail.
+		StreamerEffect.Spawn(
+			wraithItem.Index, 0,
+			startPos, directionL, orient2D, COLOR,
+			8.0f, life, vel, SCALE_RATE, 0, 2);
+
+		// Spawn right tail.
+		StreamerEffect.Spawn(
+			wraithItem.Index, 1,
+			startPos, directionR, orient2D, COLOR,
+			8.0f, life, vel, SCALE_RATE, 0, 2);
+
+		// Spawn third tail.
+		StreamerEffect.Spawn(
+			wraithItem.Index, 2,
+			startPos, directionD, orient2D, COLOR,
+			8.0f, life, vel, SCALE_RATE, 0, 2);
+	}
+
+
 }
