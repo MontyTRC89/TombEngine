@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto WRAITH_COUNT	   = 8;
 	constexpr auto WRAITH_VELOCITY = 64;
-	const auto WRAITH_TAIL_OFFSET = BiteInfo(Vector3(0.0f, 0.0f, -40.0f), 0);
+	constexpr auto WRAITH_TAIL_OFFSET = Vector3(0, -10, -50);
 
 	void InitialiseWraith(short itemNumber)
 	{
@@ -351,14 +351,7 @@ namespace TEN::Entities::TR4
 			wraith[0].Velocity,
 			item->ObjectNumber);
 
-		//SpawnVehicleWake(*item, Vector3(0,0,0 ), 0, true);
-
-		auto pos = GetJointPosition(item, WRAITH_TAIL_OFFSET.meshNum, Vector3i(WRAITH_TAIL_OFFSET.Position));
-		auto pos1 = GetJointPosition(item, WRAITH_TAIL_OFFSET.meshNum, Vector3i(WRAITH_TAIL_OFFSET.Position.x, WRAITH_TAIL_OFFSET.Position.y * 2, WRAITH_TAIL_OFFSET.Position.z));
-		auto orient = Geometry::GetOrientToPoint(pos.ToVector3(), pos1.ToVector3());
-		auto pose = Pose(pos.ToVector3(), orient);
-
-		SpawnWraithTails(*item, Vector3(0, -10, -50), pose, item->ObjectNumber);
+		SpawnWraithTails(*item, WRAITH_TAIL_OFFSET, item->ObjectNumber);
 
 		// Lighting for WRAITH
 		byte r, g, b;
@@ -556,7 +549,7 @@ namespace TEN::Entities::TR4
 	}
 
 
-	void SpawnWraithTails(const ItemInfo& wraithItem, const Vector3& relOffset, const Pose& pose, int objectNumber)
+	void SpawnWraithTails(const ItemInfo& wraithItem, const Vector3& relOffset, int objectNumber)
 	{
 		auto COLOR = Vector4::Zero;
 		

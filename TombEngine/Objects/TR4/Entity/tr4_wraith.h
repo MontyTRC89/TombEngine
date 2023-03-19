@@ -12,5 +12,5 @@ namespace TEN::Entities::TR4
 	void DrawWraith(Vector3i pos, Vector3i velocity, int objectNumber);
 	void KillWraith(ItemInfo* item);
 	void WraithExplosionEffect(ItemInfo* item, byte r, byte g, byte b, int velocity);
-	void SpawnWraithTails(const ItemInfo& wraithItem, const Vector3& relOffset, const Pose& pose, int objectNumber);
+	void SpawnWraithTails(const ItemInfo& wraithItem, const Vector3& relOffset, int objectNumber);
 }
