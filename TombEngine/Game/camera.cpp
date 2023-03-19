@@ -49,8 +49,8 @@ struct OLD_CAMERA
 	Vector3 target = Vector3::Zero;
 };
 
-Vector3 LastTarget;
-int LastTargetRoomNumber;
+Vector3 LastTarget			 = Vector3::Zero;
+int		LastTargetRoomNumber = 0;
 
 GameVector LastIdeal;
 GameVector Ideals[5];
@@ -135,7 +135,7 @@ void InitialiseCamera()
 
 	Camera.pos.x = LastTarget.x;
 	Camera.pos.y = Camera.shift;
-	Camera.pos.z = LastTarget.z - 100;
+	Camera.pos.z = LastTarget.z - 100.0f;
 	Camera.RoomNumber = LaraItem->RoomNumber;
 
 	Camera.targetDistance = SECTOR(1.5f);
@@ -412,9 +412,10 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 
 	if (ItemCamera.LastAngle != position)
 	{
-		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = angle.x, 
-										ItemCamera.LastAngle.y = angle.y, 
-										ItemCamera.LastAngle.z = angle.z);
+		ItemCamera.LastAngle = Vector3i(
+			ItemCamera.LastAngle.x = angle.x, 
+			ItemCamera.LastAngle.y = angle.y, 
+			ItemCamera.LastAngle.z = angle.z);
 	}
 }
 

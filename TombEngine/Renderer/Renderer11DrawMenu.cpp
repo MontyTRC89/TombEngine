@@ -907,44 +907,44 @@ namespace TEN::Renderer
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
-				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
-				PrintDebugMessage("Fps: %3.2f", m_fps);
+				PrintDebugMessage("Res: %d x %d", m_screenWidth, m_screenHeight);
+				PrintDebugMessage("FPS: %3.2f", m_fps);
 				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
 				PrintDebugMessage("Rooms collector time: %d", m_timeRoomsCollector);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
-				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
+				PrintDebugMessage("Total draw calls... %d", m_numDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
 				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
-				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
+				PrintDebugMessage("Transparent faces draw calls... %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
 				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
-				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("Rooms... %d", view.roomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
-				PrintDebugMessage("    dot products: %d", m_dotProducts);
+				PrintDebugMessage("    Dot products: %d", m_dotProducts);
 
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
 				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->BoxNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d", LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1), r->z + r->zSize * SECTOR(1));
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %.3f %.3f %.3f", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
+				PrintDebugMessage("Camera.target: %.3f %.3f %.3f", Camera.target.x, Camera.target.y, Camera.target.z);
 				PrintDebugMessage("Camera.roomNumber: %d", Camera.RoomNumber);
 				break;
 
@@ -953,9 +953,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocities: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
+				PrintDebugMessage("Lara Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
 				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
-				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
 				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara IsAirborne: %d", LaraItem->Animation.IsAirborne);
 				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
