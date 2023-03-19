@@ -8,7 +8,10 @@ Version 1.0.8
 * Fix hardcoded double-breathing Lara sfx.
 * Fix inventory compass.
 * Add TR1 slamming doors.
+* Add TR3 Wasp Mutant:
+	- AI_MODIFY: Don't allow to land, the wasp will always fly.
 * Add the ability to set cold bar in rooms. (Achieved by setting cold flag to a room in Tomb Editor)
+* Add water wakes for vehicles.
 
 Version 1.0.7
 =============
@@ -39,8 +42,6 @@ Version 1.0.7
 	- 0 – Normal mode. Sophia behaves like a regular enemy.
 	- 1 – Tower mode. Behaviour matched from Tomb Raider III.
 	- 2 – Tower mode with volumes. Same as tower mode, but Sophia's ascent can be controlled using volumes in Tomb Editor.
-* Add TR3 Wasp Mutant:
-	- AI_MODIFY: Don't allow to land, he will always fly (Should not be required, but useful for the spawner).
 * Add airlock switch object. Achieved by putting valve switch trigger and door trigger on the same sector (TR5 submarine door setup).
 * Add OCB 7 for switches to be used with SetItemFlags Lua commands for customizing on/off animations and reachable distance.
 * Add instant headshot to guards.
