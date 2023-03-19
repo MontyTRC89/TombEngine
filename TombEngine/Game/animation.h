@@ -58,8 +58,8 @@ struct AnimData
 	int frameBase = 0;
 	int frameEnd  = 0;
 
-	int JumpAnimNum		   = NO_ANIM; // Relative.
-	int JumpFrameNum	   = 0;		  // Relative.
+	int JumpAnimNum		   = NO_ANIM; // Absolute?
+	int JumpFrameNum	   = 0;		  // Absolute?
 	int NumStateDispatches = 0;
 	int StateDispatchIndex = 0;
 	int NumCommands		   = 0;
@@ -100,14 +100,14 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 void SetAnimation(ItemInfo* item, int animNumber, int frameToStart = 0);
 
 // Getters
-AnimData& GetAnimData(int animIndex);
+AnimData& GetAnimData(int absAnimNumber);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
 int		  GetAnimNumber(ItemInfo& item, int animID);
 int		  GetFrameNumber(ItemInfo* item, int frameToStart);
 int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
-int		  GetFrameCount(int animIndex);
+int		  GetFrameCount(int absAnimNumber);
 int		  GetNextAnimState(ItemInfo* item);
 int		  GetNextAnimState(int objectID, int animNumber);
 bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);

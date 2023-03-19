@@ -392,8 +392,8 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 
 	const auto& object = Objects[item->ObjectNumber];
 
-	int animIndex = object.animIndex + animNumber;
-	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
+	int absAnimNumber = object.animIndex + animNumber;
+	if (absAnimNumber < 0 || absAnimNumber >= g_Level.Anims.size())
 	{
 		TENLog(
 			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
@@ -405,15 +405,15 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 
 	const auto& anim = GetAnimData(*item, animNumber);
 	
-	item->Animation.AnimNumber = animIndex;
+	item->Animation.AnimNumber = absAnimNumber;
 	item->Animation.FrameNumber = anim.frameBase + frameToStart;
 	item->Animation.ActiveState = anim.ActiveState;
 	item->Animation.TargetState = anim.ActiveState;
 }
 
-AnimData& GetAnimData(int animIndex)
+AnimData& GetAnimData(int absAnimNumber)
 {
-	return g_Level.Anims[animIndex];
+	return g_Level.Anims[absAnimNumber];
 }
 
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
@@ -561,12 +561,12 @@ int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 	return (anim.frameBase + frameToStart);
 }
 
-int GetFrameCount(int animIndex)
+int GetFrameCount(int absAnimNumber)
 {
-	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
+	if (absAnimNumber < 0 || g_Level.Anims.size() <= absAnimNumber)
 		return 0;
 
-	const auto& anim = GetAnimData(animIndex);
+	const auto& anim = GetAnimData(absAnimNumber);
 
 	int end = anim.frameEnd;
 	int base = anim.frameBase;
@@ -583,8 +583,8 @@ int GetNextAnimState(int objectID, int animNumber)
 	const auto& object = Objects[objectID];
 	const auto& anim = GetAnimData(object, animNumber);
 
-	int nextAnimNumber = anim.JumpAnimNum;
-	const auto& nextAnim = GetAnimData(object, nextAnimNumber);
+	// TODO: Check. Is JumpAnimNum relative or absolute?
+	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
 	return nextAnim.ActiveState;
 }
 
