@@ -52,8 +52,11 @@ struct OLD_CAMERA
 Vector3 LastTarget			 = Vector3::Zero;
 int		LastTargetRoomNumber = 0;
 
-GameVector LastIdeal;
-GameVector Ideals[5];
+Vector3 LastIdeal;
+int		LastIdealRoomNumber;
+Vector3 Ideals[5];
+int		IdealRoomNumbers[5];
+
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
@@ -200,14 +203,14 @@ void MoveCamera(GameVector* ideal, int speed)
 		LastIdeal.x = ideal->x;
 		LastIdeal.y = ideal->y;
 		LastIdeal.z = ideal->z;
-		LastIdeal.RoomNumber = ideal->RoomNumber;
+		LastIdealRoomNumber = ideal->RoomNumber;
 	}
 	else
 	{
 		ideal->x = LastIdeal.x;
 		ideal->y = LastIdeal.y;
 		ideal->z = LastIdeal.z;
-		ideal->RoomNumber = LastIdeal.RoomNumber;
+		ideal->RoomNumber = LastIdealRoomNumber;
 	}
 
 	if (IsHeld(In::Action))
@@ -350,7 +353,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	int	speed = 1;
 	//Get mesh1 to attach camera to
 	//Vector3i pos = Vector3i::Zero;
-	auto pos = GetJointPosition(camSlotId, camMeshId, Vector3i::Zero);
+	auto pos = GetJointPosition(camSlotId, camMeshId).ToVector3();
 	//Get mesh2 to attach target to
 	//Vector3i pos2 = Vector3i::Zero;
 	auto pos2 = GetJointPosition(targetItem, targetMeshId).ToVector3();
@@ -371,14 +374,14 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 		OldCam.actualAngle = Camera.actualAngle;
 		OldCam.target = Camera.target;
 		LastIdeal = pos;
-		LastIdeal.RoomNumber = ideal->RoomNumber;
+		LastIdealRoomNumber = ideal->RoomNumber;
 		LastTarget = pos2;
 	}
 	else
 	{
-		pos  = LastIdeal.ToVector3i();
+		pos  = LastIdeal;
 		pos2 = LastTarget;
-		ideal->RoomNumber = LastIdeal.RoomNumber;
+		ideal->RoomNumber = LastIdealRoomNumber;
 	}
 
 	Camera.pos += (ideal->ToVector3() - Camera.pos) / speed;
@@ -482,15 +485,19 @@ void ChaseCamera(ItemInfo* item)
 
 		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
-		Ideals[i].RoomNumber = Camera.TargetRoomNumber;
+		IdealRoomNumbers[i] = Camera.TargetRoomNumber;
+
 
 		auto origin = GameVector(Camera.target, Camera.TargetRoomNumber);
-		if (LOSAndReturnTarget(&origin, &Ideals[i], 200))
+		auto target = GameVector(Ideals[i], IdealRoomNumbers[i]);
+		bool hasLos = LOSAndReturnTarget(&origin, &target, 200);
+		Ideals[i] = target.ToVector3();
+		if (hasLos)
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
 			temp[0].z = Ideals[i].z;
-			temp[0].RoomNumber = Ideals[i].RoomNumber;
+			temp[0].RoomNumber = IdealRoomNumbers[i];
 
 			temp[1].x = Camera.pos.x;
 			temp[1].y = Camera.pos.y;
@@ -519,7 +526,7 @@ void ChaseCamera(ItemInfo* item)
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
 			temp[0].z = Ideals[i].z;
-			temp[0].RoomNumber = Ideals[i].RoomNumber;
+			temp[0].RoomNumber = IdealRoomNumbers[i];
 
 			temp[1].x = Camera.pos.x;
 			temp[1].y = Camera.pos.y;
@@ -540,9 +547,7 @@ void ChaseCamera(ItemInfo* item)
 		}
 	}
 
-	GameVector ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
-	ideal.RoomNumber = Ideals[farthestnum].RoomNumber;
-
+	auto ideal = GameVector(Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z, IdealRoomNumbers[farthestnum]);
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 	MoveCamera(&ideal, Camera.speed);
 }
@@ -666,15 +671,18 @@ void CombatCamera(ItemInfo* item)
 
 		Ideals[i].x = Camera.target.x - distance * phd_sin(angle);
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
-		Ideals[i].RoomNumber = Camera.TargetRoomNumber;
+		IdealRoomNumbers[i] = Camera.TargetRoomNumber;
 
 		auto origin = GameVector(Camera.target, Camera.TargetRoomNumber);
-		if (LOSAndReturnTarget(&origin, &Ideals[i], 200))
+		auto target = GameVector(Ideals[i], IdealRoomNumbers[i]);
+		bool hasLos = LOSAndReturnTarget(&origin, &target, 200);
+		Ideals[i] = target.ToVector3();
+		if (hasLos)
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
 			temp[0].z = Ideals[i].z;
-			temp[0].RoomNumber = Ideals[i].RoomNumber;
+			temp[0].RoomNumber = IdealRoomNumbers[i];
 
 			temp[1].x = Camera.pos.x;
 			temp[1].y = Camera.pos.y;
@@ -704,7 +712,7 @@ void CombatCamera(ItemInfo* item)
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
 			temp[0].z = Ideals[i].z;
-			temp[0].RoomNumber = Ideals[i].RoomNumber;
+			temp[0].RoomNumber = IdealRoomNumbers[i];
 
 			temp[1].x = Camera.pos.x;
 			temp[1].y = Camera.pos.y;
@@ -726,8 +734,7 @@ void CombatCamera(ItemInfo* item)
 		}
 	}
 
-	GameVector ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
-	ideal.RoomNumber = Ideals[farthestnum].RoomNumber;
+	auto ideal = GameVector(Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z, IdealRoomNumbers[farthestnum]);
 
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 
