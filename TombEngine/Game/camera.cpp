@@ -49,7 +49,8 @@ struct OLD_CAMERA
 	Vector3 target = Vector3::Zero;
 };
 
-GameVector LastTarget;
+Vector3 LastTarget;
+int LastTargetRoomNumber;
 
 GameVector LastIdeal;
 GameVector Ideals[5];
@@ -58,7 +59,7 @@ int CameraSnaps = 0;
 int TargetSnaps = 0;
 GameVector LookCamPosition;
 GameVector LookCamTarget;
-Vector3i CamOldPos;
+Vector3 CamOldPos;
 CAMERA_INFO Camera;
 ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
@@ -125,7 +126,7 @@ void InitialiseCamera()
 	LastTarget.x = LaraItem->Pose.Position.x;
 	LastTarget.y = Camera.shift;
 	LastTarget.z = LaraItem->Pose.Position.z;
-	LastTarget.RoomNumber = LaraItem->RoomNumber;
+	LastTargetRoomNumber = LaraItem->RoomNumber;
 
 	Camera.target.x = LastTarget.x;
 	Camera.target.y = Camera.shift;
@@ -208,6 +209,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->z = LastIdeal.z;
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
+
+	if (IsHeld(In::Action))
+		LaraItem->Pose.Orientation.y += 1;
 
 	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
 	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
@@ -349,7 +353,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	auto pos = GetJointPosition(camSlotId, camMeshId, Vector3i::Zero);
 	//Get mesh2 to attach target to
 	//Vector3i pos2 = Vector3i::Zero;
-	auto pos2 = GetJointPosition(targetItem, targetMeshId, Vector3i::Zero);
+	auto pos2 = GetJointPosition(targetItem, targetMeshId).ToVector3();
 
 	if (OldCam.pos.Position != pos ||
 		OldCam.targetDistance  != Camera.targetDistance  ||
@@ -373,7 +377,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	else
 	{
 		pos  = LastIdeal.ToVector3i();
-		pos2 = LastTarget.ToVector3i();
+		pos2 = LastTarget;
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
@@ -454,7 +458,7 @@ void ChaseCamera(ItemInfo* item)
 		Camera.target.x = LastTarget.x;
 		Camera.target.y = LastTarget.y;
 		Camera.target.z = LastTarget.z;
-		Camera.TargetRoomNumber = LastTarget.RoomNumber;
+		Camera.TargetRoomNumber = LastTargetRoomNumber;
 	}
 	else
 		TargetSnaps = 0;
@@ -633,7 +637,7 @@ void CombatCamera(ItemInfo* item)
 		Camera.target.x = LastTarget.x;
 		Camera.target.y = LastTarget.y;
 		Camera.target.z = LastTarget.z;
-		Camera.TargetRoomNumber = LastTarget.RoomNumber;
+		Camera.TargetRoomNumber = LastTargetRoomNumber;
 	}
 	else
 		TargetSnaps = 0;
@@ -1332,9 +1336,7 @@ void ConfirmCameraTargetPos()
 
 void CalculateCamera()
 {
-	CamOldPos.x = Camera.pos.x;
-	CamOldPos.y = Camera.pos.y;
-	CamOldPos.z = Camera.pos.z;
+	CamOldPos = Camera.pos;
 
 	if (BinocularOn)
 	{
@@ -1434,7 +1436,7 @@ void CalculateCamera()
 			LastTarget.x = Camera.target.x;
 			LastTarget.y = Camera.target.y;
 			LastTarget.z = Camera.target.z;
-			LastTarget.RoomNumber = Camera.TargetRoomNumber;
+			LastTargetRoomNumber = Camera.TargetRoomNumber;
 		}
 
 		Camera.TargetRoomNumber = item->RoomNumber;
@@ -1461,7 +1463,7 @@ void CalculateCamera()
 		LastTarget.x = Camera.target.x;
 		LastTarget.y = Camera.target.y;
 		LastTarget.z = Camera.target.z;
-		LastTarget.RoomNumber = Camera.TargetRoomNumber;
+		LastTargetRoomNumber = Camera.TargetRoomNumber;
 
 		Camera.TargetRoomNumber = item->RoomNumber;
 		Camera.target.y = y;
@@ -1494,11 +1496,11 @@ void CalculateCamera()
 			{
 				if (TargetSnaps <= 8)
 				{
-					x = LastTarget.x + ((x - LastTarget.x) >> 2);
+					x = LastTarget.x + ((x - LastTarget.x) * 0.25f);
 					Camera.target.x = x;
-					y = LastTarget.y + ((y - LastTarget.y) >> 2);
+					y = LastTarget.y + ((y - LastTarget.y) * 0.25f);
 					Camera.target.y = y;
-					z = LastTarget.z + ((z - LastTarget.z) >> 2);
+					z = LastTarget.z + ((z - LastTarget.z) * 0.25f);
 					Camera.target.z = z;
 				}
 				else
@@ -1718,9 +1720,7 @@ void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 	auto coll = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.RoomNumber);
 	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
 	{
-		Camera.pos.x = CamOldPos.x;
-		Camera.pos.y = CamOldPos.y;
-		Camera.pos.z = CamOldPos.z;
+		Camera.pos = CamOldPos;
 		Camera.RoomNumber = coll.RoomNumber;
 	}
 }
