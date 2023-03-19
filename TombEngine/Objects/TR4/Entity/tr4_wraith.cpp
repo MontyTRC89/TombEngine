@@ -576,29 +576,22 @@ namespace TEN::Entities::TR4
 		constexpr auto LIFE_MAX = 0.5f;
 		constexpr auto VEL_ABS = 4.0f;
 		constexpr auto SCALE_RATE = 1.0f;
-
-		bool isMovingForward = (wraithItem.Animation.Velocity.z >= 0.0f);
-
-		// Determine tags.
-		auto tagLeft = isMovingForward = 0;
-		auto tagRight = isMovingForward = 1;
-
 		auto posBase = Vector3(wraithItem.Pose.Position.x, wraithItem.Pose.Position.y, wraithItem.Pose.Position.z);
-
 		auto orient = EulerAngles(wraithItem.Pose.Orientation.x, wraithItem.Pose.Orientation.y, wraithItem.Pose.Orientation.z);
 		auto rotMatrix = orient.ToRotationMatrix();
 
-		auto startOffset =  Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		auto startOffset =  Vector3(relOffset.x, relOffset.y, relOffset.z);
 		auto startPos = posBase + Vector3::Transform(startOffset, rotMatrix);
 
-		auto directionL = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));;
+		auto directionL = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));
 		auto directionR = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
 		auto directionD = Geometry::RotatePoint(posBase, EulerAngles(0, ANGLE(50.0f), 0));
 
 		short orient2D = wraithItem.Pose.Orientation.z;
 
 		float life = LIFE_MAX;
-		float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
+		//float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
+		float vel = VEL_ABS ;
 
 		// Spawn left tail.
 		StreamerEffect.Spawn(
