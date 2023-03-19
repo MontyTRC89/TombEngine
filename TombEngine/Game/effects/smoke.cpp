@@ -83,18 +83,16 @@ namespace TEN::Effects::Smoke
 		}
 	}
 
-	void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int life, int room)
+	void TriggerFlareSmoke(const Vector3& pos, const Vector3& direction, int life, int room)
 	{
-		using namespace DirectX::SimpleMath;
-
 		auto& s = GetFreeSmokeParticle();
 		s = {};
 		s.position = pos;
 		s.age = 0;
 		constexpr float d = 0.2f;
 
-		Vector3 randomDir = Vector3(Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d));
-		Vector3 direction2;
+		auto randomDir = Vector3(Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d), Random::GenerateFloat(-d, d));
+		auto direction2 = Vector3::Zero;
 		(direction + randomDir).Normalize(direction2);
 
 		s.velocity = direction2 * Random::GenerateFloat(7, 9);
@@ -216,7 +214,7 @@ namespace TEN::Effects::Smoke
 		s.angularDrag = Random::GenerateFloat(0.97f, 0.999f);
 	}
 
-	void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
+	void TriggerRocketSmoke(int x, int y, int z)
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
@@ -235,23 +233,27 @@ namespace TEN::Effects::Smoke
 		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
 	}
 
-	void TriggerCorpseCloud(int x, int y, int z, int bodyPart)
+	void SpawnCorpseEffect(const Vector3& pos)
 	{
-		auto& s = GetFreeSmokeParticle();
-		s = {};
-		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f));
-		s.sourceColor = Vector4(0.8f, 0.8f, 0, 1);
-		s.destinationColor = Vector4(0, 0, 0, 0);
-		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
-		s.active = true;
-		s.velocity = Random::GenerateDirection() * Random::GenerateFloat(0.1f, 0.2f);
-		s.affectedByWind = true;
-		s.friction = 0.979f;
-		s.gravity = 0;;
-		s.life = Random::GenerateFloat(100, 220);
-		s.destinationSize = Random::GenerateFloat(1024, 1152);
-		s.angularVelocity = Random::GenerateFloat(-0.1f, 0.1f);
-		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
+		auto& smoke = GetFreeSmokeParticle();
+		smoke = {};
+
+		auto sphere = BoundingSphere(pos, Random::GenerateFloat(8.0f, 16.0f));
+		auto spherePos = Random::GeneratePointInSphere(sphere);
+
+		smoke.position = spherePos;
+		smoke.sourceColor = Vector4(0.8f, 0.8f, 0.0f, 1.0f);
+		smoke.destinationColor = Vector4::Zero;
+		smoke.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
+		smoke.active = true;
+		smoke.velocity = Random::GenerateDirection() * Random::GenerateFloat(0.1f, 0.2f);
+		smoke.affectedByWind = true;
+		smoke.friction = 0.9f;
+		smoke.gravity = 0;;
+		smoke.life = Random::GenerateFloat(100.0f, 220.0f);
+		smoke.destinationSize = Random::GenerateFloat(BLOCK(1), BLOCK(1.1f));
+		smoke.angularVelocity = Random::GenerateFloat(-0.1f, 0.1f);
+		smoke.angularDrag = Random::GenerateFloat(0.8f, 0.9f);
 	}
 
 	void TriggerBreathSmoke(long x, long y, long z, short angle)

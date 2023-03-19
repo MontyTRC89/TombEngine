@@ -42,7 +42,7 @@ namespace TEN::Entities::Creatures::TR3
 		COMPY_STATE_RUN_FORWARD = 1,
 		COMPY_STATE_JUMP_ATTACK = 2,
 		COMPY_STATE_ATTACK = 3,
-		COMPY_STATE_DIE = 4
+		COMPY_STATE_DEATH = 4
 	};
 
 	enum CompyAnim
@@ -75,7 +75,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	void CompsognathusControl(short itemNumber)
 	{
-		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX);
 
 		if (!CreatureActive(itemNumber))
 			return;
@@ -96,9 +96,9 @@ namespace TEN::Entities::Creatures::TR3
 		
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != COMPY_STATE_DIE)
+			if (item->Animation.ActiveState != COMPY_STATE_DEATH)
 			{
-				item->Animation.TargetState = COMPY_STATE_DIE;
+				item->Animation.TargetState = COMPY_STATE_DEATH;
 				SetAnimation(item, COMPY_ANIM_DEATH);
 			}
 		}
@@ -120,7 +120,6 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
-					
 
 					if (SameZone(creature, &targetItem))
 					{

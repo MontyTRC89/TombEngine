@@ -32,7 +32,7 @@
 #include "Objects/Effects/Boss.h"
 
 // Objects
-#include "Objects/TR3/Object/corpse.h"
+#include "Objects/TR3/Object/Corpse.h"
 
 // Traps
 #include "Objects/TR3/Trap/ElectricCleaner.h"
@@ -50,7 +50,7 @@
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Effects::Boss;
-using namespace TEN::Entities;
+using namespace TEN::Entities::TR3;
 
 static void StartEntity(ObjectInfo* obj)
 {
