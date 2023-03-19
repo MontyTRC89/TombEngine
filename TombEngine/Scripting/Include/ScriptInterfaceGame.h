@@ -2,20 +2,12 @@
 #include <functional>
 #include <string>
 
+#include "Scripting/Include/VarMapVal.h"
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
-using VarMapVal = std::variant<
-	short,
-	std::reference_wrapper<MESH_INFO>,
-	std::reference_wrapper<LevelCameraInfo>,
-	std::reference_wrapper<SinkInfo>,
-	std::reference_wrapper<SoundSourceInfo>,
-	std::reference_wrapper<TriggerVolume>,
-	std::reference_wrapper<AI_OBJECT>,
-	std::reference_wrapper<ROOM_INFO>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;
@@ -77,8 +69,8 @@ public:
 	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;
 	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
 
-	virtual void GetCallbackStrings(std::vector<std::string> & preControl, std::vector<std::string> & postControl) const = 0;
-	virtual void SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl) = 0;
+	virtual void GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const = 0;
+	virtual void SetCallbackStrings(std::vector<std::string> const& preControl, std::vector<std::string> const& postControl) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

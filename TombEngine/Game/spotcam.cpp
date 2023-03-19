@@ -139,7 +139,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamLoopCnt = 0;
 	Lara.Control.Locked = false;
 
-	LaraAir = Lara.Air;
+	LaraAir = Lara.Status.Air;
 
 	InitialCameraPosition.x = Camera.pos.x;
 	InitialCameraPosition.y = Camera.pos.y;
@@ -362,7 +362,7 @@ void CalculateSpotCameras()
 	if (Lara.Control.Locked)
 	{
 		LaraItem->HitPoints = LaraHealth;
-		Lara.Air = LaraAir;
+		Lara.Status.Air = LaraAir;
 	}
 
 	s = &SpotCam[FirstCamera];

@@ -138,8 +138,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits = BitField();
-	BitField MeshBits  = BitField();
+	BitField TouchBits = BitField::Default;
+	BitField MeshBits  = BitField::Default;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];
@@ -188,9 +188,10 @@ void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
-const std::string& GetObjectName(GAME_OBJECT_ID id);
-std::vector<int> FindAllItems(short objectNumber);
-ItemInfo* FindItem(int objectNumber);
+const std::string& GetObjectName(GAME_OBJECT_ID objectID);
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
+ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);

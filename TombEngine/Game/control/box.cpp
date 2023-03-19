@@ -573,7 +573,6 @@ void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 	Lara.HitDirection = -1;
-	Lara.Air = -1;
 
 	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;
@@ -2122,7 +2121,7 @@ void InitialiseItemBoxData()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
+				int floorHeight = floor->GetSurfaceHeight(mesh.pos.Position.x, mesh.pos.Position.z, true);
 				const auto& bBox = GetBoundsAccurate(mesh, false);
 
 				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&

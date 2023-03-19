@@ -16,7 +16,7 @@ class EulerAngles;
 		static const AxisAngle Identity;
 
 		// Constructors
-		AxisAngle();
+		AxisAngle() {};
 		AxisAngle(const Vector3& axis, short angle);
 		AxisAngle(const EulerAngles& eulers);
 		AxisAngle(const Quaternion& quat);

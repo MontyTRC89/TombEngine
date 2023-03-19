@@ -325,11 +325,21 @@ void DoPickup(ItemInfo* laraItem)
 	}
 	else
 	{
-		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
+		// Dirty, but it uses the same state.
+		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP)
 		{
+			if (g_GameFlow->IsMassPickupEnabled())
+			{
+				CollectMultiplePickups(lara->InteractedItem);
+				lara->InteractedItem = NO_ITEM;
+				return;
+			}
+
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 			if (!(pickupItem->TriggerFlags & 0xC0))
+			{
 				KillItem(pickupItemNumber);
+			}
 			else
 			{
 				pickupItem->Status = ITEM_INVISIBLE;
@@ -1086,23 +1096,22 @@ void InitialisePickup(short itemNumber)
 
 			if (triggerFlags == 0)
 			{
-				// Automatically align pickups to the surface.
+				// Automatically align pickups to the floor surface.
+				auto pointColl = GetCollision(item);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
+					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					true, true);
 
-				auto coll = GetCollision(item);
-				int bridge = coll.Block->InsideBridge(item->Pose.Position.x, 
-					item->Pose.Position.y, item->Pose.Position.z, true, true);
-
-				if (bridge != NO_ITEM)
+				if (bridgeItemNumber != NO_ITEM)
 				{
 					// If pickup is within bridge item, most likely it means it is
-					// below pushable or raising block, therefore ignore its collision.
-
-					coll.Block->RemoveItem(bridge);
-					coll = GetCollision(item);
-					coll.Block->AddItem(bridge);
+					// below pushable or raising block, so ignore its collision.
+					pointColl.Block->RemoveBridge(bridgeItemNumber);
+					pointColl = GetCollision(item);
+					pointColl.Block->AddBridge(bridgeItemNumber);
 				}
 
-				item->Pose.Position.y = coll.Position.Floor - bounds.Y2;
+				item->Pose.Position.y = pointColl.Position.Floor - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}

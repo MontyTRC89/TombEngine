@@ -184,9 +184,9 @@ void LoadItems()
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
-
-			g_GameScriptEntities->AddName(item->Name, i);
-			g_GameScriptEntities->TryAddColliding(i);
+			
+			g_GameScriptEntities->AddName(item->Name, (short)i);
+			g_GameScriptEntities->TryAddColliding((short)i);
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
@@ -685,7 +685,7 @@ void ReadRooms()
 
 			floor.TriggerIndex = ReadInt32();
 			floor.Box = ReadInt32();
-			floor.Material = (FLOOR_MATERIAL)ReadInt32();
+			floor.Material = (MaterialType)ReadInt32();
 			floor.Stopper = (bool)ReadInt32();
 
 			floor.FloorCollision.SplitAngle = ReadFloat();
