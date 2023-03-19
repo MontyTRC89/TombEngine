@@ -12,6 +12,10 @@ struct ItemInfo;
 constexpr auto NO_STATE = -1;
 constexpr auto NO_ANIM	= -1;
 
+// NOTES:
+// An "absolute" anim number is the index at which it exists in the giant g_Level.Anims vector.
+// A "relative" anim number is its designation in an entity's animation list.
+
 enum class AnimCommandType
 {
 	None,
@@ -41,8 +45,8 @@ struct StateDispatchRangeData
 {
 	int StartFrame	 = 0;
 	int EndFrame	 = 0;
-	int LinkAnimNum	 = NO_ANIM; // Absolute.
-	int LinkFrameNum = NO_ANIM; // Absolute.
+	int LinkAnimNum	 = NO_ANIM;
+	int LinkFrameNum = NO_ANIM;
 };
 
 struct AnimData
@@ -58,8 +62,8 @@ struct AnimData
 	int frameBase = 0;
 	int frameEnd  = 0;
 
-	int JumpAnimNum		   = NO_ANIM; // Absolute?
-	int JumpFrameNum	   = 0;		  // Absolute?
+	int JumpAnimNum		   = NO_ANIM;
+	int JumpFrameNum	   = 0;
 	int NumStateDispatches = 0;
 	int StateDispatchIndex = 0;
 	int NumCommands		   = 0;
