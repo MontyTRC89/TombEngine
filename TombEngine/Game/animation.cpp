@@ -385,6 +385,8 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 
 void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 {
+	// TODO: This is wrong? Animation.AnimNumber stores the abs anim index, not the relative anim number.
+	// It will only work for the player.
 	if (item->Animation.AnimNumber == animNumber)
 		return;
 
@@ -581,9 +583,8 @@ int GetNextAnimState(int objectID, int animNumber)
 	const auto& object = Objects[objectID];
 	const auto& anim = GetAnimData(object, animNumber);
 
-	// TODO: Check.
-	int nextAnimIndex = anim.JumpAnimNum;
-	const auto& nextAnim = GetAnimData(nextAnimIndex);
+	int nextAnimNumber = anim.JumpAnimNum;
+	const auto& nextAnim = GetAnimData(object, nextAnimNumber);
 	return nextAnim.ActiveState;
 }
 

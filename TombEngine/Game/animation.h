@@ -41,8 +41,8 @@ struct StateDispatchRangeData
 {
 	int StartFrame	 = 0;
 	int EndFrame	 = 0;
-	int LinkAnimNum	 = NO_ANIM;
-	int LinkFrameNum = NO_ANIM;
+	int LinkAnimNum	 = NO_ANIM; // Absolute.
+	int LinkFrameNum = NO_ANIM; // Absolute.
 };
 
 struct AnimData
@@ -58,8 +58,8 @@ struct AnimData
 	int frameBase = 0;
 	int frameEnd  = 0;
 
-	int JumpAnimNum		   = NO_ANIM;
-	int JumpFrameNum	   = 0;
+	int JumpAnimNum		   = NO_ANIM; // Relative.
+	int JumpFrameNum	   = 0;		  // Relative.
 	int NumStateDispatches = 0;
 	int StateDispatchIndex = 0;
 	int NumCommands		   = 0;
