@@ -583,40 +583,13 @@ namespace TEN::Entities::TR4
 		auto tagLeft = isMovingForward = 0;
 		auto tagRight = isMovingForward = 1;
 
-		// Determine key parameters.
-		//auto positions = GetWraithTailPositions(wraithItem, relOffset, isMovingForward);
-
 		auto posBase = Vector3(wraithItem.Pose.Position.x, wraithItem.Pose.Position.y, wraithItem.Pose.Position.z);
-		//auto posBase = Vector3(pose.Position.x, abs(pose.Position.y), pose.Position.z);
 
-		auto orient = EulerAngles(wraithItem.Pose.Orientation.x, wraithItem.Pose.Orientation.y, wraithItem.Pose.Orientation.z);// wraithItem.Pose.Orientation;
-		//auto orient = EulerAngles(pose.Orientation.x, -pose.Orientation.y, pose.Orientation.z);// wraithItem.Pose.Orientation;
-
+		auto orient = EulerAngles(wraithItem.Pose.Orientation.x, wraithItem.Pose.Orientation.y, wraithItem.Pose.Orientation.z);
 		auto rotMatrix = orient.ToRotationMatrix();
 
-
-		auto startOffset =  Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);// isMovingForward ? relOffset.z : -relOffset.z);
-		//auto startOffset = Vector3(pose.Position.x, pose.Position.y, pose.Position.z);
-
+		auto startOffset =  Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
 		auto startPos = posBase + Vector3::Transform(startOffset, rotMatrix);
-		//auto startPos = posBase + Vector3::Transform(posBase, rotMatrix);
-
-		//auto dir = EulerAngles(wraithItem.Pose.Orientation.x, abs(wraithItem.Pose.Orientation.y), wraithItem.Pose.Orientation.z);
-		auto dir = EulerAngles(pose.Orientation.x, -pose.Orientation.y, pose.Orientation.z);
-		auto direction = -dir.ToDirection();
-		//auto directionL = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x + ANGLE(50.0f), wraithItem.Pose.Orientation.y + 0, wraithItem.Pose.Orientation.z + 0));;
-		//auto directionR = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x - ANGLE(50.0f), wraithItem.Pose.Orientation.y + 0, wraithItem.Pose.Orientation.z + 0));
-		//auto directionD = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x + 0, wraithItem.Pose.Orientation.y + ANGLE(50.0f), wraithItem.Pose.Orientation.z + 0));
-
-		//auto directionL = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x + ANGLE(50.0f), wraithItem.Pose.Orientation.y + 0, wraithItem.Pose.Orientation.z + 0));;
-		//auto directionR = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x - ANGLE(50.0f), wraithItem.Pose.Orientation.y + 0, wraithItem.Pose.Orientation.z + 0));
-		//auto directionD = Geometry::RotatePoint(posBase, EulerAngles(wraithItem.Pose.Orientation.x + 0, wraithItem.Pose.Orientation.y + ANGLE(50.0f), wraithItem.Pose.Orientation.z + 0));
-
-
-		//auto posBase2 = Vector3(pose.Position.x, pose.Position.y, pose.Position.z);
-		//auto directionL = Geometry::RotatePoint(posBase2, EulerAngles (ANGLE(50.0f), 0, 0));;
-		//auto directionR = Geometry::RotatePoint(posBase2, EulerAngles(ANGLE(-50.0f), 0, 0));
-		//auto directionD = Geometry::RotatePoint(posBase2, EulerAngles(0, ANGLE(50.0f), 0));
 
 		auto directionL = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));;
 		auto directionR = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
