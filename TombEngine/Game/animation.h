@@ -108,7 +108,7 @@ AnimData& GetAnimData(int absAnimNumber);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
-int		  GetAnimNumber(ItemInfo& item, int animID);
+int		  GetAnimNumber(ItemInfo& item, int animNumber);
 int		  GetFrameNumber(ItemInfo* item, int frameToStart);
 int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int		  GetFrameCount(int absAnimNumber);
