@@ -383,16 +383,16 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 {
-	// TODO: This is wrong? Animation.AnimNumber stores the abs anim index, not the relative anim number.
-	// It will only work for the player.
-	if (item->Animation.AnimNumber == animNumber)
+	const auto& object = Objects[item->ObjectNumber];
+	int absAnimNumber = object.animIndex + animNumber;
+
+	// Animation already set; return early.
+	if (item->Animation.AnimNumber == absAnimNumber)
 		return;
 
-	const auto& object = Objects[item->ObjectNumber];
-
-	int absAnimNumber = object.animIndex + animNumber;
+	// Animation doesn't exist; return early.
 	if (absAnimNumber < 0 || absAnimNumber >= g_Level.Anims.size())
 	{
 		TENLog(
@@ -406,7 +406,7 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameToStart)
 	const auto& anim = GetAnimData(*item, animNumber);
 	
 	item->Animation.AnimNumber = absAnimNumber;
-	item->Animation.FrameNumber = anim.frameBase + frameToStart;
+	item->Animation.FrameNumber = anim.frameBase + frameNumber;
 	item->Animation.ActiveState = anim.ActiveState;
 	item->Animation.TargetState = anim.ActiveState;
 }

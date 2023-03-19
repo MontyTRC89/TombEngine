@@ -101,7 +101,7 @@ void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 
 // Setters
-void SetAnimation(ItemInfo* item, int animNumber, int frameToStart = 0);
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0);
 
 // Getters
 AnimData& GetAnimData(int absAnimNumber);
