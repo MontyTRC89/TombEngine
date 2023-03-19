@@ -27,7 +27,7 @@ struct CAMERA_INFO
 	bool underwater;
 	int numberFrames;
 	int bounce;
-	int targetDistance;
+	float targetDistance;
 	short targetAngle;
 	short targetElevation;
 	short actualElevation;

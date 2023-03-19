@@ -39,7 +39,7 @@ struct OLD_CAMERA
 {
 	short ActiveState;
 	short TargetState;
-	int targetDistance;
+	float targetDistance;
 	short actualElevation;
 	short targetElevation;
 	short actualAngle;
@@ -141,7 +141,7 @@ void InitialiseCamera()
 	Camera.pos.z = LastTarget.z - 100.0f;
 	Camera.RoomNumber = LaraItem->RoomNumber;
 
-	Camera.targetDistance = SECTOR(1.5f);
+	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
@@ -446,7 +446,7 @@ void ChaseCamera(ItemInfo* item)
 	else if (Camera.actualElevation < -ANGLE(85.0f))
 		Camera.actualElevation = -ANGLE(85.0f);
 
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
+	float distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.TargetRoomNumber);
 
@@ -470,7 +470,7 @@ void ChaseCamera(ItemInfo* item)
 	for (int i = 0; i < 5; i++)
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 
-	int farthest = INT_MAX;
+	float farthest = INFINITY;
 	int farthestnum = 0;
 	GameVector temp[2];
 
@@ -512,7 +512,7 @@ void ChaseCamera(ItemInfo* item)
 					break;
 				}
 
-				int dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
+				float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
 				dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
 				if (dx < farthest)
 				{
@@ -650,13 +650,13 @@ void CombatCamera(ItemInfo* item)
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = SECTOR(1.5f);
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
+	Camera.targetDistance = BLOCK(1.5f);
+	float distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 
-	int farthest = INT_MAX;
+	float farthest = INFINITY;
 	int farthestnum = 0;
 	GameVector temp[2];
 
@@ -698,7 +698,7 @@ void CombatCamera(ItemInfo* item)
 					break;
 				}
 
-				int dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
+				float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
 				dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
 				if (dx < farthest)
 				{
@@ -1168,7 +1168,7 @@ void LookCamera(ItemInfo* item)
 
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 {
-	int distance = sqrt(
+	float distance = sqrt(
 		pow(item->Pose.Position.x - Camera.pos.x, 2) +
 		pow(item->Pose.Position.y - Camera.pos.y, 2) +
 		pow(item->Pose.Position.z - Camera.pos.z, 2));
