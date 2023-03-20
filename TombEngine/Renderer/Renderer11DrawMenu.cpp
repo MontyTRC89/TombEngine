@@ -565,8 +565,13 @@ namespace TEN::Renderer
 		const auto& object = Objects[objectNumber];
 		if (object.animIndex != -1)
 		{
-			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr] };
-			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
+			auto frameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				0.0f
+			};
+			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}
 
 		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);

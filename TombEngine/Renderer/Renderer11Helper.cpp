@@ -36,7 +36,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, AnimFrame** framePtr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation)
 	{
 		static auto boneIndices = std::vector<int>{};
 		boneIndices.clear();
@@ -58,8 +58,8 @@ namespace TEN::Renderer
 			if (bonePtr == nullptr)
 				return;
 
-			if (framePtr[0]->BoneOrientations.size() <= bonePtr->Index ||
-				(frac && framePtr[1]->BoneOrientations.size() <= bonePtr->Index))
+			if (frameData.Ptr0->BoneOrientations.size() <= bonePtr->Index ||
+				(frameData.Alpha != 0.0f && frameData.Ptr0->BoneOrientations.size() <= bonePtr->Index))
 			{
 				TENLog("Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
 					" using incorrect animation data. Bad animations set for slot?", LogLevel::Error);
@@ -70,19 +70,19 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto offset0 = framePtr[0]->Offset;
-				auto rotMatrix = Matrix::CreateFromQuaternion(framePtr[0]->BoneOrientations[bonePtr->Index]);
+				auto offset0 = frameData.Ptr0->Offset;
+				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.Ptr0->BoneOrientations[bonePtr->Index]);
 				
-				if (frac)
+				if (frameData.Alpha != 0.0f)
 				{
-					auto offset1 = framePtr[1]->Offset;
-					offset0 = Vector3::Lerp(offset0, offset1, frac / (float)rate);
+					auto offset1 = frameData.Ptr1->Offset;
+					offset0 = Vector3::Lerp(offset0, offset1, frameData.Alpha);
 
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(framePtr[1]->BoneOrientations[bonePtr->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameData.Ptr1->BoneOrientations[bonePtr->Index]);
 
 					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
 					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
-					auto quat3 = Quaternion::Slerp(quat1, quat2, frac / (float)rate);
+					auto quat3 = Quaternion::Slerp(quat1, quat2, frameData.Alpha);
 
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
@@ -296,11 +296,8 @@ namespace TEN::Renderer
 				});
 		}
 
-		AnimFrame* framePtr[2];
-		int rate;
-		int frac = GetFrame(nativeItem, framePtr, rate);
-
-		UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
+		auto frameData = GetFrameData(*nativeItem);
+		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];

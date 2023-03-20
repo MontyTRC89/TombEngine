@@ -467,7 +467,7 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
+AnimFrameInterpData GetFrameData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 
