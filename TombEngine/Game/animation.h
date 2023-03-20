@@ -70,6 +70,14 @@ struct AnimData
 	int CommandIndex	   = 0;
 };
 
+struct AnimFrameInterpData
+{
+	const AnimFrame* Ptr0  = nullptr;
+	const AnimFrame* Ptr1  = nullptr;
+
+	float Alpha = 0.0f;
+};
+
 struct BoneMutator
 {
 	Vector3		Offset	 = Vector3::Zero;
@@ -116,6 +124,7 @@ int		  GetNextAnimState(ItemInfo* item);
 int		  GetNextAnimState(int objectID, int animNumber);
 bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 int		   GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
 AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
 AnimFrame* GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);

@@ -29,14 +29,11 @@
 
 	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
-		int rate = 0;
-		AnimFrame* framePtr[2];
-
-		int frac = GetFrame(item, framePtr, rate);
-		if (frac == 0)
-			*this = framePtr[0]->boundingBox;
+		auto frameData = GetFrameInterpData(*item);
+		if (frameData.Alpha == 0.0f)
+			*this = frameData.Ptr0->boundingBox;
 		else
-			*this = framePtr[0]->boundingBox + (((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * frac) / rate);
+			*this = frameData.Ptr0->boundingBox + (((frameData.Ptr1->boundingBox - frameData.Ptr0->boundingBox) * frameData.Alpha));
 	}
 
 	int GameBoundingBox::GetWidth() const

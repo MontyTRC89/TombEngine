@@ -467,6 +467,30 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
+{
+	const auto& anim = GetAnimData(item);
+
+	// Get current anim's frame number and normalize into available range of keys.
+	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
+	float time = frameNumber / (float)anim.Interpolation;
+
+	// Calculate key frames defining interpolated frame.
+	int keyFrame0 = (int)floor(time);
+	int keyFrame1 = (int)ceil(time);
+
+	// Get key frame pointers.
+	auto* ptr0 = &g_Level.Frames[anim.FramePtr + keyFrame0];
+	auto* ptr1 = &g_Level.Frames[anim.FramePtr + keyFrame1];
+
+	// Calculate interpolation alpha between key frames.
+	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
+
+	// Return frame interpolation data.
+	return AnimFrameInterpData{ ptr0, ptr1, alpha };
+}
+
+// TODO: Replace with above.
 int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 {
 	const auto& anim = GetAnimData(*item);
@@ -474,6 +498,7 @@ int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 
 	outFramePtr[0] =
 	outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
+
 	int rate =
 	outRate = anim.Interpolation & 0x00FF;
 	frameNumber -= anim.frameBase;
@@ -531,7 +556,7 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 	AnimFrame* framePtr[2];
 	int frac = GetFrame(item, framePtr, rate);
 
-	if (frac <= (rate >> 1))
+	if (frac <= (rate / 2))
 		return framePtr[0];
 	else
 		return framePtr[1];
