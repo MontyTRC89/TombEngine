@@ -31,9 +31,9 @@
 	{
 		auto frameData = GetFrameData(*item);
 		if (frameData.Alpha == 0.0f)
-			*this = frameData.Ptr0->boundingBox;
+			*this = frameData.FramePtr0->boundingBox;
 		else
-			*this = frameData.Ptr0->boundingBox + (((frameData.Ptr1->boundingBox - frameData.Ptr0->boundingBox) * frameData.Alpha));
+			*this = frameData.FramePtr0->boundingBox + (((frameData.FramePtr1->boundingBox - frameData.FramePtr0->boundingBox) * frameData.Alpha));
 	}
 
 	int GameBoundingBox::GetWidth() const

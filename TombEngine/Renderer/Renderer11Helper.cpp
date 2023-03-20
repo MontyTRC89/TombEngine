@@ -58,8 +58,8 @@ namespace TEN::Renderer
 			if (bonePtr == nullptr)
 				return;
 
-			if (frameData.Ptr0->BoneOrientations.size() <= bonePtr->Index ||
-				(frameData.Alpha != 0.0f && frameData.Ptr0->BoneOrientations.size() <= bonePtr->Index))
+			if (frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index ||
+				(frameData.Alpha != 0.0f && frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index))
 			{
 				TENLog("Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
 					" using incorrect animation data. Bad animations set for slot?", LogLevel::Error);
@@ -70,15 +70,15 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto offset0 = frameData.Ptr0->Offset;
-				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.Ptr0->BoneOrientations[bonePtr->Index]);
+				auto offset0 = frameData.FramePtr0->Offset;
+				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.FramePtr0->BoneOrientations[bonePtr->Index]);
 				
 				if (frameData.Alpha != 0.0f)
 				{
-					auto offset1 = frameData.Ptr1->Offset;
+					auto offset1 = frameData.FramePtr1->Offset;
 					offset0 = Vector3::Lerp(offset0, offset1, frameData.Alpha);
 
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameData.Ptr1->BoneOrientations[bonePtr->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameData.FramePtr1->BoneOrientations[bonePtr->Index]);
 
 					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
 					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);

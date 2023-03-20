@@ -471,13 +471,13 @@ AnimFrameInterpData GetFrameData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 
-	// Get current anim's frame number and normalize into available range of keyframes.
+	// Get current anim's frame number and normalize into keyframe range.
 	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
-	float time = frameNumber / (float)anim.Interpolation;
+	float timeNorm = frameNumber / (float)anim.Interpolation;
 
 	// Calculate keyframes defining interpolated frame.
-	int frame0 = (int)floor(time);
-	int frame1 = (int)ceil(time);
+	int frame0 = (int)floor(timeNorm);
+	int frame1 = (int)ceil(timeNorm);
 
 	// Get keyframe pointers.
 	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
@@ -488,36 +488,6 @@ AnimFrameInterpData GetFrameData(const ItemInfo& item)
 
 	// Return frame interpolation data.
 	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
-}
-
-// TODO: Replace with above.
-int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
-{
-	const auto& anim = GetAnimData(*item);
-	int frameNumber = item->Animation.FrameNumber;
-
-	outFramePtr[0] =
-	outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
-
-	int rate =
-	outRate = anim.Interpolation & 0x00FF;
-	frameNumber -= anim.frameBase;
-
-	int first = frameNumber / rate;
-	int interpolation = frameNumber % rate;
-	outFramePtr[0] += first;			 // Get frame pointers...
-	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
-
-	// No interpolation; return early.
-	if (interpolation == 0)
-		return 0;
-
-	// Clamp key frame to end if necessary.
-	int second = (first * rate) + rate;
-	if (second > anim.frameEnd)
-		outRate = anim.frameEnd - (second - rate);
-
-	return interpolation;
 }
 
 AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
@@ -552,14 +522,11 @@ AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 
 AnimFrame* GetBestFrame(ItemInfo* item)
 {
-	int rate = 0;
-	AnimFrame* framePtr[2];
-	int frac = GetFrame(item, framePtr, rate);
-
-	if (frac <= (rate / 2))
-		return framePtr[0];
+	auto frameData = GetFrameData(*item);
+	if (frameData.Alpha <= 0.5f)
+		return frameData.FramePtr0;
 	else
-		return framePtr[1];
+		return frameData.FramePtr1;
 }
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item)
