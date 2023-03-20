@@ -9,12 +9,12 @@ class Pose;
 class Vector3i;
 struct ItemInfo;
 
-constexpr auto NO_STATE = -1;
-constexpr auto NO_ANIM	= -1;
-
 // NOTES:
 // animNumber: Designatied animation ID in an entity's animation list.
 // animIndex:  Index at which an animation exists in the giant g_Level.Anims vector.
+
+constexpr auto NO_STATE = -1;
+constexpr auto NO_ANIM	= -1;
 
 enum class AnimCommandType
 {
