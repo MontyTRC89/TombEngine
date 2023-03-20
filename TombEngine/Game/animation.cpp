@@ -174,7 +174,7 @@ void AnimateLara(ItemInfo* item)
 
 	item->Animation.FrameNumber++;
 
-	auto* animPtr = &GetAnimData(*item);
+	const auto* animPtr = &GetAnimData(*item);
 
 	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
 	{
@@ -252,7 +252,7 @@ void AnimateItem(ItemInfo* item)
 
 	item->Animation.FrameNumber++;
 
-	auto* animPtr = &GetAnimData(*item);
+	const auto* animPtr = &GetAnimData(*item);
 
 	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
 	{
@@ -386,14 +386,14 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 {
 	const auto& object = Objects[item->ObjectNumber];
-	int absAnimNumber = object.animIndex + animNumber;
+	int animIndex = object.animIndex + animNumber;
 
 	// Animation already set; return early.
-	if (item->Animation.AnimNumber == absAnimNumber)
+	if (item->Animation.AnimNumber == animIndex)
 		return;
 
 	// Animation doesn't exist; return early.
-	if (absAnimNumber < 0 || absAnimNumber >= g_Level.Anims.size())
+	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
 		TENLog(
 			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
@@ -405,15 +405,15 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 
 	const auto& anim = GetAnimData(*item, animNumber);
 	
-	item->Animation.AnimNumber = absAnimNumber;
+	item->Animation.AnimNumber = animIndex;
 	item->Animation.FrameNumber = anim.frameBase + frameNumber;
 	item->Animation.ActiveState = anim.ActiveState;
 	item->Animation.TargetState = anim.ActiveState;
 }
 
-AnimData& GetAnimData(int absAnimNumber)
+AnimData& GetAnimData(int animIndex)
 {
-	return g_Level.Anims[absAnimNumber];
+	return g_Level.Anims[animIndex];
 }
 
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
@@ -555,12 +555,12 @@ int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 	return (anim.frameBase + frameToStart);
 }
 
-int GetFrameCount(int absAnimNumber)
+int GetFrameCount(int animIndex)
 {
-	if (absAnimNumber < 0 || g_Level.Anims.size() <= absAnimNumber)
+	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
 		return 0;
 
-	const auto& anim = GetAnimData(absAnimNumber);
+	const auto& anim = GetAnimData(animIndex);
 
 	int end = anim.frameEnd;
 	int base = anim.frameBase;

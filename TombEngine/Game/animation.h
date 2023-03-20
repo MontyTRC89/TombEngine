@@ -13,8 +13,8 @@ constexpr auto NO_STATE = -1;
 constexpr auto NO_ANIM	= -1;
 
 // NOTES:
-// An "absolute" anim number is the index at which it exists in the giant g_Level.Anims vector.
-// A "relative" anim number is its designation in an entity's animation list.
+// animNumber: Designatied animation ID in an entity's animation list.
+// animIndex:  Index at which an animation exists in the giant g_Level.Anims vector.
 
 enum class AnimCommandType
 {
@@ -111,14 +111,14 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0);
 
 // Getters
-AnimData& GetAnimData(int absAnimNumber);
+AnimData& GetAnimData(int animIndex);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
 int		  GetAnimNumber(ItemInfo& item, int animNumber);
 int		  GetFrameNumber(ItemInfo* item, int frameToStart);
 int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
-int		  GetFrameCount(int absAnimNumber);
+int		  GetFrameCount(int animIndex);
 int		  GetNextAnimState(ItemInfo* item);
 int		  GetNextAnimState(int objectID, int animNumber);
 bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);
