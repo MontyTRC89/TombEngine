@@ -69,12 +69,12 @@ namespace TEN::Entities::TR4
 		int dy;
 		int distance;
 
-		if (target->IsLara() || target->ObjectNumber == ID_ANIMATING10)
+		if (target->IsLara() || target->ObjectNumber == ID_WRAITH_TRAP)
 		{
 			x = target->Pose.Position.x - item->Pose.Position.x;
 			y = target->Pose.Position.y;
 			z = target->Pose.Position.z - item->Pose.Position.z;
-			distance = pow(x, 2) + pow(z, 2);
+			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / SECTOR(8)) - SECTOR(0.5f));
 		}
 		else
@@ -84,7 +84,7 @@ namespace TEN::Entities::TR4
 			x = room->x + room->xSize * SECTOR(1) / 2 - item->Pose.Position.x;
 			z = room->z + room->zSize * SECTOR(1) / 2 - item->Pose.Position.z;
 
-			distance = pow(x, 2) + pow(z, 2);
+			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - CLICK(1));
 			y = room->y + ((room->minfloor - room->maxceiling) / 2);
 		}
@@ -99,32 +99,30 @@ namespace TEN::Entities::TR4
 			angleV = phd_atan(abs(z) + (abs(x) / 2), dy);
 
 		angleV -= item->Pose.Orientation.x;
-
 		int velocity = (WRAITH_VELOCITY / item->Animation.Velocity.z) * 8;
 
-		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
+		if (abs(angleH) < item->ItemFlags[2] && angleH > 0 == item->ItemFlags[2] > 0)
 		{
-			if (angleH >= 0)
-			{
-				if (item->ItemFlags[2] <= 0)
-					item->ItemFlags[2] = 1;
-				else
-				{
-					item->ItemFlags[2] += velocity;
-					item->Pose.Orientation.y += item->ItemFlags[2];
-				}
-			}
-			else if (item->ItemFlags[2] >= 0)
-				item->ItemFlags[2] = -1;
+			item->Pose.Orientation.y += angleH;
+		}
+		else if (angleH >= 0)
+		{
+			if (item->ItemFlags[2] <= 0)
+				item->ItemFlags[2] = 1;
 			else
 			{
-				item->ItemFlags[2] -= velocity;
+				item->ItemFlags[2] += velocity;
 				item->Pose.Orientation.y += item->ItemFlags[2];
 			}
 		}
+		else if (item->ItemFlags[2] >= 0)
+			item->ItemFlags[2] = -1;
 		else
-			item->Pose.Orientation.y += angleH;
-
+		{
+			item->ItemFlags[2] -= velocity;
+			item->Pose.Orientation.y += item->ItemFlags[2];
+		}
+	
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{
 			if (angleV >= 0)
@@ -174,7 +172,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->ObjectNumber == ID_WRAITH1 && target->ObjectNumber == ID_WRAITH2 ||
 						item->ObjectNumber == ID_WRAITH2 && target->ObjectNumber == ID_WRAITH1 ||
-						item->ObjectNumber == ID_WRAITH3 && target->ObjectNumber == ID_ANIMATING10)
+						item->ObjectNumber == ID_WRAITH3 && target->ObjectNumber == ID_WRAITH_TRAP)
 					{
 						break;
 					}
@@ -256,7 +254,7 @@ namespace TEN::Entities::TR4
 						ItemBurn(LaraItem);
 				}
 			}
-			else if (target->ObjectNumber == ID_ANIMATING10)
+			else if (target->ObjectNumber == ID_WRAITH_TRAP)
 			{
 				// ANIMATING10 is the sacred pedistal that can kill WRAITH
 				item->ItemFlags[7]++;
@@ -390,8 +388,6 @@ namespace TEN::Entities::TR4
 
 		item->Pose.Position.y += 384;
 	}
-
-
 
 	void DrawWraith(Vector3i pos, Vector3i velocity, int objectNumber)
 	{
@@ -548,7 +544,6 @@ namespace TEN::Entities::TR4
 		FlipEffect = -1;
 	}
 
-
 	void SpawnWraithTails(const ItemInfo& wraithItem, const Vector3& relOffset, int objectNumber)
 	{
 		auto COLOR = Vector4::Zero;
@@ -583,7 +578,6 @@ namespace TEN::Entities::TR4
 		short orient2D = wraithItem.Pose.Orientation.z;
 
 		float life = LIFE_MAX;
-		//float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
 		float vel = VEL_ABS ;
 
 		// Spawn left tail.
