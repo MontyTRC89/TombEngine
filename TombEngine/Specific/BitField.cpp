@@ -219,14 +219,7 @@ namespace TEN::Utils
 	
 	bool BitField::operator !=(unsigned int packedBits) const
 	{
-		for (unsigned int i = 0; i < Bits.size(); i++)
-		{
-			unsigned int bit = unsigned int(1 << i);
-			if (Bits[i] != ((packedBits & bit) == bit))
-				return true;
-		}
-
-		return false;
+		return !(*this == packedBits);
 	}
 
 	BitField& BitField::operator =(unsigned int packedBits)
