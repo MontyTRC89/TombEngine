@@ -471,23 +471,23 @@ AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 
-	// Get current anim's frame number and normalize into available range of keys.
+	// Get current anim's frame number and normalize into available range of keyframes.
 	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
 	float time = frameNumber / (float)anim.Interpolation;
 
-	// Calculate key frames defining interpolated frame.
-	int keyFrame0 = (int)floor(time);
-	int keyFrame1 = (int)ceil(time);
+	// Calculate keyframes defining interpolated frame.
+	int frame0 = (int)floor(time);
+	int frame1 = (int)ceil(time);
 
-	// Get key frame pointers.
-	auto* ptr0 = &g_Level.Frames[anim.FramePtr + keyFrame0];
-	auto* ptr1 = &g_Level.Frames[anim.FramePtr + keyFrame1];
+	// Get keyframe pointers.
+	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
+	auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
 
-	// Calculate interpolation alpha between key frames.
+	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
 
 	// Return frame interpolation data.
-	return AnimFrameInterpData{ ptr0, ptr1, alpha };
+	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
 }
 
 // TODO: Replace with above.
