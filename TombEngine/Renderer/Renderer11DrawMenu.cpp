@@ -597,7 +597,7 @@ namespace TEN::Renderer
 
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && n == 1)
-				(*moveableObject).LinearizedBones[n]->ExtraRotation.y = TO_RAD((g_Gui.CompassNeedleAngle) - ANGLE(180.0f));
+				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
 			// Construct world matrix.
 			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
