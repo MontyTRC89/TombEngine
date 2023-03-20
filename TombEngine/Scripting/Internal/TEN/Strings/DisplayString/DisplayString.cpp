@@ -132,7 +132,12 @@ void DisplayString::Register(sol::table & parent)
 		// @function DisplayString:GetPosition
 		// @treturn int x x-coordinate of the string
 		// @treturn int y y-coordinate of the string
-		ScriptReserved_GetPosition, &DisplayString::GetPos
+		ScriptReserved_GetPosition, &DisplayString::GetPos,
+
+		/// Set the display string's flags 
+		// @function DisplayString:SetFlags
+		// @tparam Table table the new table with display flags options
+		ScriptReserved_SetFlags, & DisplayString::SetFlags
 	);
 }
 
@@ -179,6 +184,16 @@ std::string DisplayString::GetKey() const
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return s.m_key;
+}
+
+void DisplayString::SetFlags(sol::table const& flags) {
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	FlagArray f{};
+	for (const auto& val : flags) {
+		auto i = val.second.as<size_t>();
+		f[i] = true;
+	}
+	s.m_flags = f;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)

@@ -67,6 +67,8 @@ public:
 	void SetKey(std::string const&);
 	std::string GetKey() const;
 
+	void SetFlags(sol::table const&);
+
 	static SetItemCallback s_setItemCallback;
 	static RemoveItemCallback s_removeItemCallback;
 	static GetItemCallback s_getItemCallback;
