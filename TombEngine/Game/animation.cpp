@@ -467,17 +467,17 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
-AnimFrameInterpData GetFrameData(const ItemInfo& item)
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 
-	// Get current anim's frame number and normalize into keyframe range.
+	// Normalize current animation's frame number into keyframe range.
 	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
-	float timeNorm = frameNumber / (float)anim.Interpolation;
+	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
 
 	// Calculate keyframes defining interpolated frame.
-	int frame0 = (int)floor(timeNorm);
-	int frame1 = (int)ceil(timeNorm);
+	int frame0 = (int)floor(frameNumberNorm);
+	int frame1 = (int)ceil(frameNumberNorm);
 
 	// Get keyframe pointers.
 	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
@@ -522,7 +522,7 @@ AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 
 AnimFrame* GetBestFrame(ItemInfo* item)
 {
-	auto frameData = GetFrameData(*item);
+	auto frameData = GetFrameInterpData(*item);
 	if (frameData.Alpha <= 0.5f)
 		return frameData.FramePtr0;
 	else

@@ -103,7 +103,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 	
-	auto frameData = GetFrameData(*LaraItem);
+	auto frameData = GetFrameInterpData(*LaraItem);
 	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
 	// Then the arms, based on current weapon status.
@@ -113,7 +113,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-		auto frameData = GetFrameData(*LaraItem);
+		auto frameData = GetFrameInterpData(*LaraItem);
 		UpdateAnimation(&rItem, playerObject, frameData, mask);
 	}
 	else
@@ -253,12 +253,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 
-			auto frameData = GetFrameData(tempItem);
+			auto frameData = GetFrameInterpData(tempItem);
 			UpdateAnimation(&rItem, playerObject, frameData, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frameData = GetFrameData(*LaraItem);
+			frameData = GetFrameInterpData(*LaraItem);
 			UpdateAnimation(&rItem, playerObject, frameData, mask);
 			break;
 		}

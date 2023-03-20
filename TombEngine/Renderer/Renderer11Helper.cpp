@@ -296,7 +296,7 @@ namespace TEN::Renderer
 				});
 		}
 
-		auto frameData = GetFrameData(*nativeItem);
+		auto frameData = GetFrameInterpData(*nativeItem);
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)

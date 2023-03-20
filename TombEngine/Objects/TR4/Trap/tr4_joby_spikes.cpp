@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
             return;
 
        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
-       auto frameData = GetFrameData(*LaraItem);
+       auto frameData = GetFrameInterpData(*LaraItem);
 
         int dy = LaraItem->Pose.Position.y + frameData.FramePtr0->boundingBox.Y1;
         int dl = 3328 * item->ItemFlags[1] / 4096;

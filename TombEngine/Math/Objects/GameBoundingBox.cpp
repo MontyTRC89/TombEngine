@@ -29,7 +29,7 @@
 
 	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
-		auto frameData = GetFrameData(*item);
+		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)
 			*this = frameData.FramePtr0->boundingBox;
 		else
