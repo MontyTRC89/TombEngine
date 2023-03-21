@@ -186,7 +186,8 @@ std::string DisplayString::GetKey() const
 	return s.m_key;
 }
 
-void DisplayString::SetFlags(sol::table const& flags) {
+void DisplayString::SetFlags(sol::table const& flags) 
+{
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	FlagArray f{};
 	for (const auto& val : flags) {
