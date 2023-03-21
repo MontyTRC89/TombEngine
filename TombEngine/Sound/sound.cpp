@@ -628,6 +628,15 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 	return -1;
 }
 
+bool Sound_EffectIsPlaying(int effectID)
+{
+	int id = Sound_EffectIsPlaying(effectID, nullptr);
+
+	if (id == effectID)
+		return true;
+
+}
+
 // Gets the distance to the source.
 
 float Sound_DistanceToListener(Pose *position)

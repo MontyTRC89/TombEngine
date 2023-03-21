@@ -176,6 +176,7 @@ static constexpr char ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
 static constexpr char ScriptReserved_StopAudioTrack[]				= "StopAudioTrack";
 static constexpr char ScriptReserved_StopAudioTracks[]				= "StopAudioTracks";
 static constexpr char ScriptReserved_PlaySound[]					= "PlaySound";
+static constexpr char ScriptReserved_IsSoundEffectPlaying[]			= "IsSoundEffectPlaying";
 static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
 static constexpr char ScriptReserved_TakeInvItem[]					= "TakeItem";
 static constexpr char ScriptReserved_GetInvItemCount[]				= "GetItemCount";
