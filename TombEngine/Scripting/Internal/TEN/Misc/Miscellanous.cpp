@@ -183,7 +183,7 @@ namespace Misc
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
-	// Check if the sound effect is playing
+	/// Check if the sound effect is playing
 	//@function IsSoundEffectPlaying
 	//@tparam int Sound ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 	static bool IsSoundEffectPlaying(int effectID)

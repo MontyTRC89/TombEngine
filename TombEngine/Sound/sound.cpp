@@ -630,11 +630,11 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 
 bool Sound_EffectIsPlaying(int effectID)
 {
-	int id = Sound_EffectIsPlaying(effectID, nullptr);
+	if (effectID == -1)
+		return;
 
-	if (id == effectID)
-		return true;
-
+	int channelIndex = Sound_EffectIsPlaying(effectID, nullptr);
+	return (SoundSlot[channelIndex].EffectID == effectID);
 }
 
 // Gets the distance to the source.
