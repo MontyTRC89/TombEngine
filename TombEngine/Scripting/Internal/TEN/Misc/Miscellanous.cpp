@@ -184,11 +184,11 @@ namespace Misc
 	}
 
 	/// Check if the sound effect is playing
-	//@function IsSoundEffectPlaying
+	//@function IsSoundPlaying
 	//@tparam int Sound ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
-	static bool IsSoundEffectPlaying(int effectID)
+	static bool IsSoundPlaying(int effectID)
 	{
-		return Sound_EffectIsPlaying(effectID);
+		return IsSoundEffectPlaying(effectID);
 	}
 
 	static bool CheckInput(int actionIndex)
@@ -359,7 +359,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
 		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
-		tableMisc.set_function(ScriptReserved_IsSoundEffectPlaying, &IsSoundEffectPlaying);
+		tableMisc.set_function(ScriptReserved_IsSoundPlaying, &IsSoundPlaying);
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld

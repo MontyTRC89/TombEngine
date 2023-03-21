@@ -628,12 +628,13 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 	return -1;
 }
 
-bool Sound_EffectIsPlaying(int effectID)
+bool IsSoundEffectPlaying(int effectID)
 {
-	if (effectID == -1)
-		return;
-
 	int channelIndex = Sound_EffectIsPlaying(effectID, nullptr);
+
+	if (channelIndex == -1)
+		return false;
+
 	return (SoundSlot[channelIndex].EffectID == effectID);
 }
 

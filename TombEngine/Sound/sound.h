@@ -179,9 +179,10 @@ void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
 int   Sound_EffectIsPlaying(int effectID, Pose *position);
-bool  Sound_EffectIsPlaying(int effectID);
 float Sound_DistanceToListener(Pose *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
 bool  Sound_UpdateEffectPosition(int index, Pose *position, bool force = false);
 bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain);
+
+bool  IsSoundEffectPlaying(int effectID);
