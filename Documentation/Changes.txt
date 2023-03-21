@@ -7,6 +7,7 @@ Version 1.0.8
 * Fix object camera not clearing at level end.
 * Fix hardcoded double-breathing Lara sfx.
 * Fix inventory compass.
+* Fix Harpoon gun triggering water and dry sounds when shooting and holstering.
 * Add TR1 slamming doors.
 * Add TR3 Wasp Mutant:
 	- AI_MODIFY: Don't allow to land, the wasp will always fly.
