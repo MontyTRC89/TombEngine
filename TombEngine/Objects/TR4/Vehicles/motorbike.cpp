@@ -57,6 +57,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
 	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
 
+	constexpr auto MOTORBIKE_WAKE_OFFSET = Vector3(BLOCK(1 / 16.0f), 0, BLOCK(1 / 8.0f));
+
 	#define MOTORBIKE_FORWARD_TURN_ANGLE ANGLE(1.5f)
 	#define MOTORBIKE_BACK_TURN_ANGLE ANGLE(0.5f)
 	#define MOTORBIKE_TURN_ANGLE_MAX ANGLE(5.0f)
@@ -1251,7 +1253,7 @@ namespace TEN::Entities::Vehicles
 
 		int newY = motorbikeItem->Pose.Position.y;
 		motorbikeItem->Animation.Velocity.y = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.Velocity.y, &motorbikeItem->Pose.Position.y, 0);
-		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
+		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate, MOTORBIKE_WAKE_OFFSET);
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;
 		int r2 = (frontRight.y + frontLeft.y) / 2;

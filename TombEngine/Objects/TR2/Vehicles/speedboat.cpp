@@ -17,19 +17,10 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> SpeedboatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
 	constexpr auto SPEEDBOAT_RADIUS = 500;
 	constexpr auto SPEEDBOAT_FRONT = 750;
 	constexpr auto SPEEDBOAT_BACK = -700;
@@ -54,9 +45,19 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
-	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
-	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE * 1.2f, 0.0f, SPEEDBOAT_FRONT / 8);
+
+	constexpr auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
+	constexpr auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
+
+	const std::vector<VehicleMountType> SpeedboatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
 
 	enum SpeedboatState
 	{
@@ -92,6 +93,60 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_LEAP_END = 17,
 		SPEEDBOAT_ANIM_DEATH = 18
 	};
+
+	static void SpawnSpeedboatBoatMist(const Vector3& pos, float velocity, short angle)
+	{
+		auto& mist = *GetFreeParticle();
+
+		mist.on = true;
+		mist.sR = 0;
+		mist.sG = 0;
+		mist.sB = 0;
+
+		mist.dR = 64;
+		mist.dG = 64;
+		mist.dB = 64;
+
+		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
+		mist.fadeToBlack = 12;
+		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
+		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.extras = 0;
+		mist.dynamic = -1;
+
+		mist.x = pos.x + ((GetRandomControl() & 15) - 8);
+		mist.y = pos.y + ((GetRandomControl() & 15) - 8);
+		mist.z = pos.z + ((GetRandomControl() & 15) - 8);
+		int zv = velocity * phd_cos(angle) / 4;
+		int xv = velocity * phd_sin(angle) / 4;
+		mist.xVel = xv + ((GetRandomControl() & 127) - 64);
+		mist.yVel = 0;
+		mist.zVel = zv + ((GetRandomControl() & 127) - 64);
+		mist.friction = 3;
+
+		if (GetRandomControl() & 1)
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			mist.rotAng = GetRandomControl() & 4095;
+
+			if (GetRandomControl() & 1)
+				mist.rotAdd = -(GetRandomControl() & 15) - 16;
+			else
+				mist.rotAdd = (GetRandomControl() & 15) + 16;
+		}
+		else
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+		}
+
+		mist.scalar = 3;
+		mist.gravity = mist.maxYvel = 0;
+
+		float size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+		mist.size =
+		mist.sSize = size / 4;
+		mist.dSize = size;
+	}
 
 	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem)
 	{
@@ -898,11 +953,34 @@ namespace TEN::Entities::Vehicles
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 		}
 
+		auto pos1 = GetJointPosition(speedboatItem, 0, Vector3i(-100, 130, -500));
+		auto pos2 = GetJointPosition(speedboatItem, 0, Vector3i(100, 130, -500));
+
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
 			auto room = probe.Block->GetRoomNumberBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
 			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-				TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+			{
+				if (speedboatItem->TriggerFlags == 1)
+				{
+					SpawnSpeedboatBoatMist(
+						pos1.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+
+					SpawnSpeedboatBoatMist(
+						pos2.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+				}
+				else
+				{
+					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+				}
+				
+				int waterHeight = GetWaterHeight(speedboatItem);
+				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
+			}
 		}
 
 		if (lara->Vehicle != itemNumber)

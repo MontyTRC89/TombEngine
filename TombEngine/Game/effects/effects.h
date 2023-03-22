@@ -7,7 +7,7 @@ enum GAME_OBJECT_ID : short;
 struct CollisionInfo;
 struct ItemInfo;
 
-constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_EXPLOSION	  = 1;
 constexpr auto SD_UWEXPLOSION = 2;
 
 constexpr auto MAX_NODE		= 23;
@@ -37,6 +37,31 @@ enum SpriteEnumFlag
 	SP_PLASMAEXP  = (1 << 13),
 	SP_POISON	  = (1 << 14),
 	SP_COLOR	  = (1 << 15),
+};
+
+// Used by Particle.nodeNumber.
+enum ParticleNodeOffsetIDs
+{
+	NodeUnknown0, // TR5
+	NodeUnknown1,
+	NodeUnknown2,
+	NodeUnknown3,
+	NodeUnknown4,
+	NodeUnknown5,
+	NodeUnknown6,
+	NodeUnknown7,
+	NodeUnknown8,
+	NodePilotFlame, // TR3-5
+	NodeWasp,
+	NodePunkFlame,
+	NodePendulumFlame,
+	NodeTonyHandLeftFlame,
+	NodeTonyHandRightFlame,
+	NodeClawMutantPlasma,
+	NodeWillardBossLeftPlasma,
+	NodeWillardBossRightPlasma,
+	NodeEmpty, // Empty node (mesh 0, position 0)
+	NodeMax
 };
 
 enum class FlameType
@@ -134,7 +159,7 @@ struct Particle
 	signed char dynamic;
 	unsigned char fxObj;
 	unsigned char roomNumber;
-	unsigned char nodeNumber;
+	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 };
 
 struct SPLASH_STRUCT
@@ -178,8 +203,8 @@ extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
-extern Vector3i NodeVectors[MAX_NODE];
-extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
+extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
+extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
@@ -187,7 +212,8 @@ template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
 	// Add and return new effect.
-	if (effects.size() < countMax)
+	assert(effects.size() <= countMax);
+	if (effects.size() != countMax)
 		return effects.emplace_back();
 
 	TEffect* effectPtr = nullptr;
@@ -214,7 +240,7 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const TEffect& effect) { return (effect.Life <= 0.0f); }),
+			[](const auto& effect) { return (effect.Life <= 0.0f); }),
 		effects.end());
 }
 

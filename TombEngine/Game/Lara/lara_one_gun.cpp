@@ -328,6 +328,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	item.Pose.Position = laraItem->Pose.Position;
+	item.RoomNumber = laraItem->RoomNumber;
+
 	AnimateItem(&item);
 
 	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
