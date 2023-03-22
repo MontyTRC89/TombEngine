@@ -61,10 +61,8 @@ namespace TEN::Effects::Hair
 		}
 		else
 		{
-			auto* framePtr = GetFramePtr(item);
-
 			// Get water height.
-			auto pos = item.Pose.Position + framePtr->boundingBox.GetCenter();
+			auto pos = item.Pose.Position + Vector3i(GetWaterProbeOffset(item));
 			int roomNumber = item.RoomNumber;
 			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
 
@@ -133,12 +131,11 @@ namespace TEN::Effects::Hair
 		return relOffset;
 	}
 
-	AnimFrame* HairUnit::GetFramePtr(const ItemInfo& item)
+	Vector3 HairUnit::GetWaterProbeOffset(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// TODO: Not needed?
-		AnimFrame* framePtr = nullptr;
 		if (player.HitDirection >= 0)
 		{
 			int spasm = 0;
@@ -161,14 +158,13 @@ namespace TEN::Effects::Hair
 				break;
 			}
 
-			framePtr = &g_Level.Frames[g_Level.Anims[spasm].FramePtr + player.HitFrame];
+			int frameIndex = g_Level.Anims[spasm].FramePtr;
+			const auto& frame = g_Level.Frames[frameIndex + player.HitFrame];
+			return frame.boundingBox.GetCenter();
 		}
-		else
-		{
-			framePtr = GetBestFrame(&item);
-		}
-
-		return framePtr;
+	
+		const auto& frame = *GetBestFrame(&item);
+		return frame.boundingBox.GetCenter();
 	}
 
 	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
