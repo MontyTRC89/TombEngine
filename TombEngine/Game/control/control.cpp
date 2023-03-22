@@ -23,6 +23,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
@@ -69,6 +70,7 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -195,6 +197,7 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		StreamerEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -410,6 +413,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
 	ClearDrips();

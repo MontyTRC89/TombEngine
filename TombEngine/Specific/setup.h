@@ -77,8 +77,8 @@ struct ObjectInfo
 
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
-	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> ceiling;
+	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
+	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;

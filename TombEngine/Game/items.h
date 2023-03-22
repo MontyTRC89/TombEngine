@@ -138,8 +138,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits = BitField();
-	BitField MeshBits  = BitField();
+	BitField TouchBits = BitField::Default;
+	BitField MeshBits  = BitField::Default;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];

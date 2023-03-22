@@ -14,9 +14,9 @@
 		static const Vector3i Zero;
 
 		// Constructors
-		Vector3i();
-		Vector3i(int x, int y, int z);
-		Vector3i(const Vector3& vector);
+		constexpr Vector3i() {};
+		constexpr Vector3i(int x, int y, int z) { this->x = x; this->y = y; this->z = z; };
+				  Vector3i(const Vector3& vector);
 
 		// Utilities
 		static float Distance(const Vector3i& origin, const Vector3i& target);
