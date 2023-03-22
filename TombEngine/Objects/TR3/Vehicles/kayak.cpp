@@ -20,10 +20,11 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto KAYAK_FRONT = SECTOR(1);
+	constexpr auto KAYAK_FRONT = BLOCK(1);
 	constexpr auto KAYAK_SIDE = CLICK(0.5f);
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
+	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
@@ -38,9 +39,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 
 	constexpr auto KAYAK_DRAW_SHIFT = 32;
-	constexpr auto NUM_WAKE_SPRITES = 32;
-	constexpr auto WAKE_SIZE = 32;
-	constexpr auto WAKE_VELOCITY = 4;
 	constexpr auto KAYAK_X = 128;
 	constexpr auto KAYAK_Z = 128;
 
@@ -67,26 +65,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_IN_HOLD	   = IN_WALK;
 	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
-
-	struct WAKE_PTS
-	{
-		int x[2];
-		int y;
-		int z[2];
-		short xvel[2];
-		short zvel[2];
-		byte life;
-		byte pad[3];
-	};
-
-	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
-	const std::vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	const std::vector<VehicleMountType> KayakMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
 
 	enum KayakState
 	{
@@ -156,12 +134,6 @@ namespace TEN::Entities::Vehicles
 		auto& kayak = GetKayakInfo(kayakItem);
 
 		kayak.OldPose = kayakItem.Pose;
-
-		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
-		{
-			WakePts[i][0].life = 0;
-			WakePts[i][1].life = 0;
-		}
 	}
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

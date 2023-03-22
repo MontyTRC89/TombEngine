@@ -46,12 +46,14 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN	   = 0x8000;
 	constexpr auto MOTORBIKE_PITCH_MAX		   = 0xA000;
 
-	const auto MOTORBIKE_FORWARD_TURN_ANGLE = ANGLE(1.5f);
-	const auto MOTORBIKE_BACK_TURN_ANGLE = ANGLE(0.5f);
-	const auto MOTORBIKE_TURN_ANGLE_MAX = ANGLE(5.0f);
-	const auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN = ANGLE(4.0f);
-	const auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX = ANGLE(1.5f);
-	const auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2 = ANGLE(150.0f);
+	constexpr auto MOTORBIKE_WAKE_OFFSET = Vector3(BLOCK(1 / 16.0f), 0, BLOCK(1 / 8.0f));
+
+	constexpr auto MOTORBIKE_FORWARD_TURN_ANGLE = ANGLE(1.5f);
+	constexpr auto MOTORBIKE_BACK_TURN_ANGLE = ANGLE(0.5f);
+	constexpr auto MOTORBIKE_TURN_ANGLE_MAX = ANGLE(5.0f);
+	constexpr auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN = ANGLE(4.0f);
+	constexpr auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX = ANGLE(1.5f);
+	constexpr auto MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2 = ANGLE(150.0f);
 
 	const auto MotorbikeJoints = std::vector<unsigned int>{ 0, 1, 2, 4, 5, 6, 7, 8, 9 };
 	const auto MotorbikeBrakeLightJoints = std::vector<unsigned int>{ 10 };

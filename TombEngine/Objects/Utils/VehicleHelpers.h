@@ -3,7 +3,6 @@
 #include "Math/Math.h"
 
 struct CollisionInfo;
-struct CollisionResult;
 struct ItemInfo;
 
 // TODO: Savegames.
@@ -15,9 +14,9 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto VEHICLE_SINK_VELOCITY		 = 15.0f;
 	constexpr auto VEHICLE_WATER_HEIGHT_MAX		 = CLICK(2.5f);
-	constexpr auto VEHICLE_WATER_VELOCITY_COEFF  = 16.0f;
+	constexpr auto VEHICLE_WATER_VELOCITY_COEFF	 = 16.0f;
 	constexpr auto VEHICLE_WATER_TURN_RATE_COEFF = 10.0f;
-	constexpr auto VEHICLE_SWAMP_VELOCITY_COEFF  = 8.0f;
+	constexpr auto VEHICLE_SWAMP_VELOCITY_COEFF	 = 8.0f;
 	constexpr auto VEHICLE_SWAMP_TURN_RATE_COEFF = 6.0f;
 
 	enum class VehicleMountType
@@ -88,4 +87,6 @@ namespace TEN::Entities::Vehicles
 	void  ResetVehicleTurnRateY(short& turnRate, short decelRate);
 	void  ModulateVehicleLean(ItemInfo& vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo& vehicleItem, float alpha = 0.5f);
+
+	void SpawnVehicleWake(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight, bool isUnderwater = false);
 }

@@ -48,6 +48,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_MOUNT_DISTANCE	   = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
 
+	constexpr auto QBIKE_WAKE_OFFSET = Vector3(CLICK(1.1f), 0, CLICK(1.2f));
+
 	const auto QBIKE_TURN_RATE_ACCEL		 = ANGLE(2.5f);
 	const auto QBIKE_TURN_RATE_DECEL		 = ANGLE(2.0f);
 	const auto QBIKE_TURN_RATE_MAX			 = ANGLE(5.0f);

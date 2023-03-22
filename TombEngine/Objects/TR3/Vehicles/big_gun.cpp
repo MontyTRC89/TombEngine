@@ -40,7 +40,7 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
 	constexpr auto BGUN_TURN_RATE_MAX	= ANGLE(4.0f);
-	constexpr auto BGUN_X_ORIENT_STEP	= (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES);
+	constexpr auto BGUN_X_ORIENT_STEP	= ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES;
 	constexpr auto BGUN_X_ORIENT_MAX	= ANGLE(40.0f);
 
 	const std::vector<VehicleMountType> BigGunMountTypes =

@@ -45,9 +45,11 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
-	const auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.5f);
-	const auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
-	const auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
+	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE * 1.2f, 0.0f, SPEEDBOAT_FRONT / 8);
+
+	constexpr auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.5f);
+	constexpr auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
 
 	const auto SpeedboatMountTypes = std::vector<VehicleMountType>
 	{

@@ -16,6 +16,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -593,6 +594,10 @@ namespace TEN::Renderer
 				continue;
 			
 			auto* mesh = (*moveableObject).ObjectMeshes[n];
+
+			// HACK: Rotate compass needle.
+			if (objectNumber == ID_COMPASS_ITEM && n == 1)
+				(*moveableObject).LinearizedBones[n]->ExtraRotation.y = TO_RAD((g_Gui.CompassNeedleAngle) - ANGLE(180.0f));
 
 			// Construct world matrix.
 			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));

@@ -4,6 +4,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/simple_particle.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
@@ -15,11 +16,20 @@
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
+	enum class VehicleWakeEffectTag
+	{
+		FrontLeft,
+		FrontRight,
+		BackLeft,
+		BackRight
+	};
+
 	// Deprecated.
 	int GetVehicleHeight(const ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
@@ -464,7 +474,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	float DoVehicleWaterMovement(ItemInfo& vehicleItem, ItemInfo& laraItem, float currentVelocity, int radius, short& turnRate)
+	float DoVehicleWaterMovement(ItemInfo& vehicleItem, ItemInfo& laraItem, float currentVelocity, int radius, short& turnRate, const Vector3& wakeOffset)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, &vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, &vehicleItem))
@@ -490,7 +500,10 @@ namespace TEN::Entities::Vehicles
 						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem.Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
-						TEN::Effects::TriggerSpeedboatFoam(&vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
+					{
+						int waterHeight = GetWaterHeight(vehicleItem);
+						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
+					}
 				}
 
 				if (turnRate)
@@ -508,6 +521,7 @@ namespace TEN::Entities::Vehicles
 				else if (Random::GenerateInt(0, 32) > 25)
 				{
 					Splash(&vehicleItem);
+				}
 				}
 			}
 		}
@@ -593,5 +607,73 @@ namespace TEN::Entities::Vehicles
 			vehicleItem.Pose.Orientation.z *= alpha;
 		else
 			vehicleItem.Pose.Orientation.z = 0;
+	}
+
+	static std::pair<Vector3, Vector3> GetVehicleWakePositions(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight,
+															   bool isUnderwater, bool isMovingForward)
+	{
+		constexpr auto HEIGHT_OFFSET_ON_WATER = (int)BLOCK(1 / 32.0f);
+		
+		waterHeight -= HEIGHT_OFFSET_ON_WATER;
+
+		int vPos = isUnderwater ? vehicleItem.Pose.Position.y : waterHeight;
+		auto posBase = Vector3(vehicleItem.Pose.Position.x, vPos, vehicleItem.Pose.Position.z);
+		auto orient = isUnderwater ? vehicleItem.Pose.Orientation : EulerAngles(0, vehicleItem.Pose.Orientation.y, 0);
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		// Calculate relative offsets.
+		// NOTE: X and Z offsets are flipped accordingly.
+		auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+
+		// Calculate positions.
+		auto posLeft = posBase + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto posRight = posBase + Vector3::Transform(relOffsetRight, rotMatrix);
+
+		// Clamp vertical positions to water surface.
+		posLeft.y = (posLeft.y < waterHeight) ? waterHeight : posLeft.y;
+		posRight.y = (posRight.y < waterHeight) ? waterHeight : posRight.y;
+
+		// Return left and right positions in pair.
+		return std::pair(posLeft, posRight);
+	}
+
+	void SpawnVehicleWake(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight, bool isUnderwater)
+	{
+		constexpr auto COLOR				 = Vector4(0.75f);
+		constexpr auto LIFE_MAX				 = 2.5f;
+		constexpr auto VEL_ABS				 = 4.0f;
+		constexpr auto SCALE_RATE_ON_WATER	 = 6.0f;
+		constexpr auto SCALE_RATE_UNDERWATER = 1.5f;
+
+		// Vehicle is out of water; return early.
+		if (waterHeight == NO_HEIGHT)
+			return;
+
+		bool isMovingForward = (vehicleItem.Animation.Velocity.z >= 0.0f);
+
+		// Determine tags.
+		auto tagLeft = isMovingForward ? VehicleWakeEffectTag::FrontLeft : VehicleWakeEffectTag::BackLeft;
+		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
+
+		// Determine key parameters.
+		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight, isUnderwater, isMovingForward);
+		auto direction = -vehicleItem.Pose.Orientation.ToDirection();
+		short orient2D = isUnderwater ? vehicleItem.Pose.Orientation.z : 0;
+		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
+		float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
+		float scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
+
+		// Spawn left wake.
+		StreamerEffect.Spawn(
+			vehicleItem.Index, (int)tagLeft,
+			positions.first, direction, orient2D, COLOR,
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
+
+		// Spawn right wake.
+		StreamerEffect.Spawn(
+			vehicleItem.Index, (int)tagRight,
+			positions.second, direction, orient2D, COLOR,
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
 }

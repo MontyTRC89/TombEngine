@@ -13,9 +13,9 @@ namespace TEN::Math
 		static const Vector2i Zero;
 
 		// Constructors
-		Vector2i();
-		Vector2i(int x, int y);
-		Vector2i(const Vector2& vector);
+		constexpr Vector2i() {};
+		constexpr Vector2i(int x, int y) { this->x = x; this->y = y; };
+				  Vector2i(const Vector2& vector);
 
 		// Utilities
 		static float Distance(const Vector2i& origin, const Vector2i& target);

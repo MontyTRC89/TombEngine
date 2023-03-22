@@ -10,6 +10,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -27,6 +28,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -63,6 +65,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_MOUNT_UNDERWATER_SOUND_FRAME = 30;
 	constexpr auto UPV_MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
+
+	constexpr auto UPV_WAKE_OFFSET = Vector3(BLOCK(1 / 3.0f), -BLOCK(1 / 8.0f), BLOCK(1 / 10.0f));
 
 	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
 	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.6f)
@@ -149,9 +153,9 @@ namespace TEN::Entities::Vehicles
 	{
 		UPV_BITE_TURBINE			= 0,
 		UPV_BITE_FRONT_LIGHT		= 1,
-		UPV_BITE_LEFT_RUDDER_LEFT   = 2, // Unused. Perhaps something like a trailing stream effect behind rudders was intended?
+		UPV_BITE_LEFT_RUDDER_LEFT   = 2,
 		UPV_BITE_LEFT_RUDDER_RIGHT  = 3, // Unused.
-		UPV_BITE_RIGHT_RUDDER_RIGHT = 4, // Unused.
+		UPV_BITE_RIGHT_RUDDER_RIGHT = 4,
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
 

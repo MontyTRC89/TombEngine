@@ -14,32 +14,32 @@ enum class CameraType
 
 struct CAMERA_INFO
 {
-	GameVector pos; // size=16, offset=0
-	GameVector target; // size=16, offset=16
-	CameraType type; // size=4, offset=32
-	CameraType oldType; // size=4, offset=36
-	int shift; // size=0, offset=40
-	int flags; // size=0, offset=44
-	bool fixedCamera; // size=0, offset=48
-	bool underwater; // size=0, offset=60
-	int numberFrames; // size=0, offset=52
-	int bounce; // size=0, offset=56
-	int targetDistance; // size=0, offset=64
-	short targetAngle; // size=0, offset=68
-	short targetElevation; // size=0, offset=70
-	short actualElevation; // size=0, offset=72
-	short actualAngle; // size=0, offset=74
-	short laraNode; // size=0, offset=76
-	short box; // size=0, offset=78
-	short number; // size=0, offset=80
-	short last; // size=0, offset=82
-	short timer; // size=0, offset=84
-	short speed; // size=0, offset=86
-	short targetspeed; // size=0, offset=88
-	ItemInfo* item; // size=144, offset=92
-	ItemInfo* lastItem; // size=144, offset=96
-	int mikeAtLara; // size=0, offset=104
-	Vector3i mikePos; // size=12, offset=108
+	GameVector pos;
+	GameVector target;
+	CameraType type;
+	CameraType oldType;
+	int shift;
+	int flags;
+	bool fixedCamera;
+	bool underwater;
+	int numberFrames;
+	int bounce;
+	int targetDistance;
+	short targetAngle;
+	short targetElevation;
+	short actualElevation;
+	short actualAngle;
+	short laraNode;
+	short box;
+	short number;
+	short last;
+	short timer;
+	short speed;
+	short targetspeed;
+	ItemInfo* item;
+	ItemInfo* lastItem;
+	int mikeAtLara;
+	Vector3i mikePos;
 };
 
 struct ObjectCameraInfo

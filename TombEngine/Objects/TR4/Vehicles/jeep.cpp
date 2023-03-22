@@ -40,6 +40,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_BOUNCE_MIN		  = 32;
 	constexpr auto JEEP_KICK_MAX		  = -80;
 
+	constexpr auto JEEP_WAKE_OFFSET = Vector3(BLOCK(0.25f), 0.0f, BLOCK(0.3f));
+
 	const auto JEEP_TURN_RATE_DECEL = ANGLE(0.5f);
 
 	// TODO: Simpler toggle.

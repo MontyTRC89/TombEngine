@@ -1512,6 +1512,7 @@ namespace TEN::Renderer
 		DrawElectricity(view);
 		DrawHelicalLasers(view);
 		DrawRopes(view);
+		DrawStreamers(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);

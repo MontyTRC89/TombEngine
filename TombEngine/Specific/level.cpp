@@ -184,9 +184,9 @@ void LoadItems()
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
-
-			g_GameScriptEntities->AddName(item->Name, i);
-			g_GameScriptEntities->TryAddColliding(i);
+			
+			g_GameScriptEntities->AddName(item->Name, (short)i);
+			g_GameScriptEntities->TryAddColliding((short)i);
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}

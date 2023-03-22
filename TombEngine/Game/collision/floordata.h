@@ -9,7 +9,7 @@ using namespace TEN::Math;
 // Ceiling:		Upper surface of a collision block.
 // Floor:		Lower surface of a collision block.
 // Floordata:	Name of the engine's level geometry collision system consisting of rooms and their divisions within a grid.
-// Plane:		One of two surface triangles.
+// Plane:		One of two surface triangles. CHECK: If it's a Vector3, isn't that simply the surface normal?
 // Portal:		Link from one room to another allowing traversal.
 // Room number: Unique numeric index of a room.
 // Surface:		Floor or ceiling.
@@ -57,8 +57,8 @@ private:
 	static constexpr auto SURFACE_TRIANGLE_COUNT = 2;
 
 public:
-	static constexpr auto SPLIT_ANGLE_1 = 45.0f * RADIAN;
-	static constexpr auto SPLIT_ANGLE_2 = 135.0f * RADIAN;
+	static constexpr auto SPLIT_ANGLE_0 = 45.0f * RADIAN;
+	static constexpr auto SPLIT_ANGLE_1 = 135.0f * RADIAN;
 
 	float SplitAngle = 0.0f;
 
@@ -66,7 +66,7 @@ public:
 	std::array<Vector3, SURFACE_TRIANGLE_COUNT> Planes	= {};
 };
 
-struct SectorFlagData
+struct CollisionBlockFlagData
 {
 	bool Death		 = false;
 	bool Monkeyswing = false;
@@ -108,52 +108,50 @@ struct SectorFlagData
 class FloorInfo
 {
 	public:
-		int			  Room		 = 0;
-		int			  WallPortal = 0;
-		std::set<int> BridgeItem = {};
+		// Components
+		int					   Room				 = 0; // RoomNumber
+		int					   WallPortal		 = 0; // Number of room through wall portal (only one)?
+		SurfaceCollisionData   FloorCollision	 = {};
+		SurfaceCollisionData   CeilingCollision  = {};
+		CollisionBlockFlagData Flags			 = {};
+		std::set<int>		   BridgeItemNumbers = {};
 
-		int			   Box			= 0;
-		bool		   Stopper		= true;
-		int			   TriggerIndex = 0;
-		MaterialType   Material		= MaterialType::Stone;
-		SectorFlagData Flags		= {};
+		MaterialType Material = MaterialType::Stone;
 
-		SurfaceCollisionData FloorCollision	  = {};
-		SurfaceCollisionData CeilingCollision = {};
+		int	 Box		  = 0;
+		int	 TriggerIndex = 0;
+		bool Stopper	  = true;
 
+		// Getters
 		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
 		Vector2 GetSurfaceTilt(int x, int z, bool checkFloor) const;
 
+		std::optional<int> GetRoomNumberAbove(int planeIndex) const;
+		std::optional<int> GetRoomNumberAbove(int x, int z) const;
+		std::optional<int> GetRoomNumberAbove(int x, int y, int z) const;
+		std::optional<int> GetRoomNumberBelow(int planeIndex) const;
+		std::optional<int> GetRoomNumberBelow(int x, int z) const;
+		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
+		std::optional<int> GetRoomNumberAtSide() const; // Through wall?
+
+		int GetSurfaceHeight(int x, int z, bool checkFloor) const;
+		int GetSurfaceHeight(int x, int y, int z, bool checkFloor) const;
+		int GetBridgeSurfaceHeight(int x, int y, int z, bool checkFloor) const;
+
+		Vector2 GetSurfaceSlope(int planeIndex, bool checkFloor) const;
+		Vector2 GetSurfaceSlope(int x, int z, bool checkFloor) const;
+
+		// Inquirers
 		bool IsSurfaceSplit(bool checkFloor) const;
 		bool IsSurfaceDiagonalStep(bool checkFloor) const;
 		bool IsSurfaceSplitPortal(bool checkFloor) const;
-
-		std::optional<int> RoomBelow(int plane) const;
-		std::optional<int> RoomBelow(int x, int z) const;
-		std::optional<int> RoomBelow(int x, int y, int z) const;
-		std::optional<int> RoomAbove(int plane) const;
-		std::optional<int> RoomAbove(int x, int z) const;
-		std::optional<int> RoomAbove(int x, int y, int z) const;
-		std::optional<int> RoomSide() const;
-
-		int FloorHeight(int x, int z) const;
-		int FloorHeight(int x, int y, int z) const;
-		int BridgeFloorHeight(int x, int y, int z) const;
-		int CeilingHeight(int x, int z) const;
-		int CeilingHeight(int x, int y, int z) const;
-		int BridgeCeilingHeight(int x, int y, int z) const;
-
-		Vector2 FloorSlope(int plane) const;
-		Vector2 FloorSlope(int x, int z) const;
-		Vector2 CeilingSlope(int plane) const;
-		Vector2 CeilingSlope(int x, int z) const;
-
-		bool IsWall(int plane) const;
+		bool IsWall(int planeIndex) const;
 		bool IsWall(int x, int z) const;
 
-		int	 InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
-		void AddItem(int itemNumber);
-		void RemoveItem(int itemNumber);
+		// Bridge methods
+		int	 GetInsideBridgeItemNumber(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
+		void AddBridge(int itemNumber);
+		void RemoveBridge(int itemNumber);
 };
 
 namespace TEN::Floordata

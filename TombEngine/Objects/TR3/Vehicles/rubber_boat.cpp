@@ -5,13 +5,14 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
@@ -41,6 +42,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_NORMAL_VELOCITY_MAX  = 110;
 	constexpr auto RBOAT_FAST_VELOCITY_MAX	  = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
+
+	constexpr auto RBOAT_WAKE_OFFSET = Vector3(RBOAT_SIDE * 1.1f, 0.0f, RBOAT_FRONT / 2);
 
 	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2.25f);
 	constexpr auto RBOAT_DISMOUNT_DISTANCE = SECTOR(1);

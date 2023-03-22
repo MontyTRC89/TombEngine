@@ -47,12 +47,13 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
 	constexpr auto SKIDOO_DAMAGE_START		= 140;
 	constexpr auto SKIDOO_DAMAGE_LENGTH		= 14;
+	constexpr auto SKIDOO_WAKE_OFFSET = Vector3(SKIDOO_SIDE, 0, SKIDOO_FRONT / 2);
 
-	const auto SKIDOO_TURN_RATE_ACCEL		   = ANGLE(2.5f);
-	const auto SKIDOO_TURN_RATE_DECEL		   = ANGLE(2.0f);
-	const auto SKIDOO_TURN_RATE_MAX			   = ANGLE(6.0f);
-	const auto SKIDOO_MOMENTUM_TURN_RATE_ACCEL = ANGLE(3.0f);
-	const auto SKIDOO_MOMENTUM_TURN_RATE_MAX   = ANGLE(150.0f);
+	constexpr auto SKIDOO_TURN_RATE_ACCEL		   = ANGLE(2.5f);
+	constexpr auto SKIDOO_TURN_RATE_DECEL		   = ANGLE(2.0f);
+	constexpr auto SKIDOO_TURN_RATE_MAX			   = ANGLE(6.0f);
+	constexpr auto SKIDOO_MOMENTUM_TURN_RATE_ACCEL = ANGLE(3.0f);
+	constexpr auto SKIDOO_MOMENTUM_TURN_RATE_MAX   = ANGLE(150.0f);
 
 	const auto SkidooMountTypes = std::vector<VehicleMountType>
 	{
@@ -65,6 +66,13 @@ namespace TEN::Entities::Vehicles
 		VehicleDismountType::Left,
 		VehicleDismountType::Right,
 		VehicleDismountType::Fall
+	};
+
+	const std::vector<VehicleMountType> SkidooMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
 	};
 
 	enum SkidooState
@@ -216,7 +224,7 @@ namespace TEN::Entities::Vehicles
 		skidoo.LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo.LeftVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, frontLeft.y);
 		skidoo.RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo.RightVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, frontRight.y);
 		skidooItem.Animation.Velocity.y = DoVehicleDynamics(height, skidooItem.Animation.Velocity.y, SKIDOO_BOUNCE, SKIDOO_KICK, skidooItem.Pose.Position.y);
-		skidooItem.Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem.Animation.Velocity.z, SKIDOO_RADIUS, skidoo.TurnRate);
+		skidooItem.Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem.Animation.Velocity.z, SKIDOO_RADIUS, skidoo.TurnRate, SKIDOO_WAKE_OFFSET);
 
 		height = (frontLeft.y + frontRight.y) / 2;
 		short xRot = phd_atan(SKIDOO_FRONT, skidooItem.Pose.Position.y - height);

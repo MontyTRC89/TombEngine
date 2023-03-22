@@ -245,10 +245,15 @@ bool SaveGame::Save(int slot)
 		examinesCombo.push_back(Lara.Inventory.ExaminesCombo[i]);
 	auto examinesComboOffset = fbb.CreateVector(examinesCombo);
 
-	std::vector<byte> wet;
-	for (int i = 0; i < 15; i++)
-		wet.push_back(Lara.Effect.DripNodes[i] == 1);
-	auto wetOffset = fbb.CreateVector(wet);
+	std::vector<float> bubbleNodes;
+	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
+		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i] == 1);
+	auto bubbleNodesOffset = fbb.CreateVector(bubbleNodes);
+	
+	std::vector<float> dripNodes;
+	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
+		dripNodes.push_back(Lara.Effect.DripNodes[i] == 1);
+	auto dripNodesOffset = fbb.CreateVector(dripNodes);
 
 	std::vector<int> laraTargetAngles{};
 	laraTargetAngles.push_back(Lara.TargetArmOrient.y);
@@ -404,6 +409,18 @@ bool SaveGame::Save(int slot)
 	control.add_weapon(weaponControlOffset);
 	auto controlOffset = control.Finish();
 
+	Save::PlayerEffectDataBuilder effect{ fbb };
+	effect.add_bubble_nodes(bubbleNodesOffset);
+	effect.add_drip_nodes(dripNodesOffset);
+	auto effectOffset = effect.Finish();
+
+	Save::PlayerStatusDataBuilder status{ fbb };
+	status.add_air(Lara.Status.Air);
+	status.add_exposure(Lara.Status.Exposure);
+	status.add_poison(Lara.Status.Poison);
+	status.add_stamina(Lara.Status.Stamina);
+	auto statusOffset = status.Finish();
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
@@ -434,10 +451,9 @@ bool SaveGame::Save(int slot)
 	auto carriedWeaponsOffset = fbb.CreateVector(carriedWeapons);
 
 	Save::LaraBuilder lara{ fbb };
-	lara.add_air(Lara.Air);
-
 	lara.add_control(controlOffset);
 	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
+	lara.add_effect(effectOffset);
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
 	lara.add_extra_torso_rot(&FromVector3(Lara.ExtraTorsoRot));
@@ -451,10 +467,9 @@ bool SaveGame::Save(int slot)
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_poison_potency(Lara.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_sprint_energy(Lara.SprintEnergy);
+	lara.add_status(statusOffset);
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
@@ -464,7 +479,6 @@ bool SaveGame::Save(int slot)
 	lara.add_water_current_pull(&FromVector3(Lara.WaterCurrentPull));
 	lara.add_water_surface_dist(Lara.WaterSurfaceDist);
 	lara.add_weapons(carriedWeaponsOffset);
-	lara.add_wet(wetOffset);
 	auto laraOffset = lara.Finish();
 
 	std::vector<flatbuffers::Offset<Save::Room>> rooms;
@@ -615,7 +629,6 @@ bool SaveGame::Save(int slot)
 
 			Save::KayakBuilder kayakBuilder{ fbb };
 
-			kayakBuilder.add_current_start_wake(kayak->CurrentStartWake);
 			kayakBuilder.add_flags(kayak->Flags);
 			kayakBuilder.add_forward(kayak->Forward);
 			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
@@ -627,7 +640,6 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_turn(kayak->Turn);
 			kayakBuilder.add_turn_rate(kayak->TurnRate);
 			kayakBuilder.add_velocity(kayak->Velocity);
-			kayakBuilder.add_wake_shade(kayak->WakeShade);
 			kayakBuilder.add_water_height(kayak->WaterHeight);
 			kayakOffset = kayakBuilder.Finish();
 		}
@@ -1428,7 +1440,7 @@ bool SaveGame::Load(int slot)
 		
 		item->Name = savedItem->lua_name()->str();
 		if (!item->Name.empty())
-			g_GameScriptEntities->AddName(item->Name, i);
+			g_GameScriptEntities->AddName(item->Name, (short)i);
 
 		item->Callbacks.OnKilled = savedItem->lua_on_killed_name()->str();
 		item->Callbacks.OnHit = savedItem->lua_on_hit_name()->str();
@@ -1612,7 +1624,6 @@ bool SaveGame::Load(int slot)
 			auto* kayak = (KayakInfo*)item->Data;
 			auto* savedKayak = (Save::Kayak*)savedItem->data();
 
-			kayak->CurrentStartWake = savedKayak->flags();
 			kayak->Flags = savedKayak->flags();
 			kayak->Forward = savedKayak->forward();
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
@@ -1624,7 +1635,6 @@ bool SaveGame::Load(int slot)
 			kayak->Turn = savedKayak->turn();
 			kayak->TurnRate = savedKayak->turn_rate();
 			kayak->Velocity = savedKayak->velocity();
-			kayak->WakeShade = savedKayak->wake_shade();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
@@ -1767,58 +1777,42 @@ bool SaveGame::Load(int slot)
 	// Lara
 	ZeroMemory(Lara.Inventory.Puzzles, NUM_PUZZLES * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->puzzles()->size(); i++)
-	{
 		Lara.Inventory.Puzzles[i] = s->lara()->inventory()->puzzles()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.PuzzlesCombo, NUM_PUZZLES * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->puzzles_combo()->size(); i++)
-	{
 		Lara.Inventory.PuzzlesCombo[i] = s->lara()->inventory()->puzzles_combo()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.Keys, NUM_KEYS * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->keys()->size(); i++)
-	{
 		Lara.Inventory.Keys[i] = s->lara()->inventory()->keys()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.KeysCombo, NUM_KEYS * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->keys_combo()->size(); i++)
-	{
 		Lara.Inventory.KeysCombo[i] = s->lara()->inventory()->keys_combo()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.Pickups, NUM_PICKUPS * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->pickups()->size(); i++)
-	{
 		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
-	{
 		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->examines()->size(); i++)
-	{
 		Lara.Inventory.Examines[i] = s->lara()->inventory()->examines()->Get(i);
-	}
 
 	ZeroMemory(Lara.Inventory.ExaminesCombo, NUM_EXAMINES * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->examines_combo()->size(); i++)
-	{
 		Lara.Inventory.ExaminesCombo[i] = s->lara()->inventory()->examines_combo()->Get(i);
-	}
 
-	for (int i = 0; i < NUM_LARA_MESHES; i++)
-	{
-		Lara.Effect.DripNodes[i] = s->lara()->wet()->Get(i);
-	}
+	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
+		Lara.Effect.BubbleNodes[i] = s->lara()->effect()->bubble_nodes()->Get(i);
+	
+	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
+		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
 
-	Lara.Air = s->lara()->air();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
@@ -1895,7 +1889,6 @@ bool SaveGame::Load(int slot)
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
-	Lara.PoisonPotency = s->lara()->poison_potency();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
@@ -1934,7 +1927,10 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
 	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.SprintEnergy = s->lara()->sprint_energy();
+	Lara.Status.Air = s->lara()->status()->air();
+	Lara.Status.Exposure = s->lara()->status()->exposure();
+	Lara.Status.Poison = s->lara()->status()->poison();
+	Lara.Status.Stamina = s->lara()->status()->stamina();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);
