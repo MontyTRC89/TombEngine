@@ -1,9 +1,5 @@
 #pragma once
-#include "Math/Math.h"
 
-using namespace TEN::Math;
-
-struct AnimFrame;
 struct ItemInfo;
 
 namespace TEN::Effects::Hair
@@ -16,9 +12,9 @@ namespace TEN::Effects::Hair
 
 		struct HairSegment
 		{
-			Vector3		Position	= Vector3::Zero;
-			EulerAngles Orientation = EulerAngles::Zero;
-			Vector3		Velocity	= Vector3::Zero;
+			Vector3	   Position	   = Vector3::Zero;
+			Vector3	   Velocity	   = Vector3::Zero;
+			Quaternion Orientation = Quaternion::Identity;
 		};
 
 	public:
@@ -34,7 +30,7 @@ namespace TEN::Effects::Hair
 		// Helpers
 		Vector3						GetRelBaseOffset(int hairUnitIndex, bool isYoung);
 		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);
-		EulerAngles					GetOrientation(const Vector3& origin, const Vector3& target);
+		Quaternion					GetOrientation(Vector3 origin, Vector3 target);
 		Vector3						GetWaterProbeOffset(const ItemInfo& item);
 
 		void CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand);

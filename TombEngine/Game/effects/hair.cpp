@@ -51,7 +51,7 @@ namespace TEN::Effects::Hair
 				auto jointOffset = GetJointOffset(ID_HAIR, i);
 
 				worldMatrix = Matrix::CreateTranslation(segment.Position);
-				worldMatrix = segment.Orientation.ToRotationMatrix() * worldMatrix;
+				worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * worldMatrix;
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				nextSegment.Position = worldMatrix.Translation();
@@ -91,7 +91,7 @@ namespace TEN::Effects::Hair
 
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
-				worldMatrix = prevSegment.Orientation.ToRotationMatrix() * worldMatrix;
+				worldMatrix = Matrix::CreateFromQuaternion(prevSegment.Orientation) * worldMatrix;
 
 				auto jointOffset = (i == (Segments.size() - 1)) ?
 					GetJointOffset(ID_HAIR, (i - 1) - 1) :
@@ -212,7 +212,7 @@ namespace TEN::Effects::Hair
 		return spheres;
 	}
 
-	EulerAngles HairUnit::GetOrientation(const Vector3& origin, const Vector3& target)
+	Quaternion HairUnit::GetOrientation(Vector3 origin, Vector3 target)
 	{
 		// Calculate 2D distance between segments.
 		float distance2D = Vector2::Distance(
@@ -220,7 +220,8 @@ namespace TEN::Effects::Hair
 			Vector2(origin.x, origin.z));
 
 		// Calculate segment orientation.
-		// BUG: Aggressive gimbal lock causes major twisting.
+		// BUG: Aggressive gimbal lock causes significant twisting.
+		// Need to somehow
 		return EulerAngles(
 			-(short)phd_atan(
 				distance2D,
@@ -228,7 +229,7 @@ namespace TEN::Effects::Hair
 			(short)phd_atan(
 				target.z - origin.z,
 				target.x - origin.x),
-			0);
+			0).ToQuaternion();
 	}
 
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
@@ -315,8 +316,8 @@ namespace TEN::Effects::Hair
 			for (auto& segment : unit.Segments)
 			{
 				segment.Position = GetJointOffset(ID_HAIR, 0);
-				segment.Orientation = ORIENT_DEFAULT;
 				segment.Velocity = Vector3::Zero;
+				segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
 			}
 
 			isHead = false;

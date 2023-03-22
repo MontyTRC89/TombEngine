@@ -339,7 +339,7 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
 			const auto& segment = unit.Segments[i];
-			auto worldMatrix = segment.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(segment.Position);
+			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
 
 			m_stItem.BonesMatrices[i + 1] = worldMatrix;
 			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
