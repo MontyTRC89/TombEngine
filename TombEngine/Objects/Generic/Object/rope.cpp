@@ -733,18 +733,17 @@ namespace TEN::Entities::Generic
 		Vector3i vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
 		int matrix[12];
 		short angle[3];
-		AnimFrame* frame;
 
 		vec.x = 4096;
 		vec.y = 0;
 		vec.z = 0;
 
-		frame = (AnimFrame*)GetBestFrame(item);
+		const auto& offset = GetBestFrame(*item).Offset;
 		ropeY = Lara.Control.Rope.Y - ANGLE(90.0f);
 		rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->Offset.y, &pos.x, &pos.y, &pos.z);
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->Offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
+		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + offset.y, &pos.x, &pos.y, &pos.z);
+		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
 
 		diff.x = pos.x - pos2.x << 16;
 		diff.y = pos.y - pos2.y << 16;

@@ -124,10 +124,11 @@ int		  GetNextAnimState(int objectID, int animNumber);
 bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
+AnimFrame&			GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
 AnimFrame*			GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
 AnimFrame*			GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 AnimFrame*			GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-AnimFrame*			GetBestFrame(ItemInfo* item);
+AnimFrame&			GetBestFrame(const ItemInfo& item);
 
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);

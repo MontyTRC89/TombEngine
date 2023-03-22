@@ -59,8 +59,8 @@ namespace TEN::Entities::TR4
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
 			// Get current item bounds and radius.
-			auto* bounds = (GameBoundingBox*)GetBestFrame(item);
-			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1)) / 2;
+			const auto& bounds = GetBestFrame(*item).boundingBox;
+			int radius = std::max(abs(bounds.X2 - bounds.X1), abs(bounds.Z2 - bounds.Z1)) / 2;
 
 			// Play sound only if spikes are just emerging.
 			if (item->ItemFlags[0] == 1024 && item->TriggerFlags != 1)
@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				auto* laraBounds = (GameBoundingBox*)GetBestFrame(LaraItem);
+				const auto& laraBounds = GetBestFrame(*LaraItem).boundingBox;
 
 				int bloodCount = 0;
 
@@ -111,20 +111,20 @@ namespace TEN::Entities::TR4
 					bloodCount = 0;
 
 				int y1, y2;
-				int yTop = laraBounds->Y1 + LaraItem->Pose.Position.y;
-				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
+				int yTop = laraBounds.Y1 + LaraItem->Pose.Position.y;
+				int yBottom = laraBounds.Y2 + LaraItem->Pose.Position.y;
 				
 				// Spikes are downward; move blood origin to top.
 				if (angle < PI * 0.125f || angle > PI * 0.825f)
 				{
-					y1 = -bounds->Y2;
-					y2 = -bounds->Y1;
+					y1 = -bounds.Y2;
+					y2 = -bounds.Y1;
 				}
 				// Spikes are upward; leave origin as is.
 				else
 				{
-					y1 = bounds->Y1;
-					y2 = bounds->Y2;
+					y1 = bounds.Y1;
+					y2 = bounds.Y2;
 				}
 
 				if (yTop < y1 + item->Pose.Position.y)

@@ -1373,15 +1373,15 @@ void UpdateShockwaves()
 
 		if (LaraItem->HitPoints > 0 && shockwave.damage)
 		{
-			auto* frame = GetBestFrame(LaraItem);
+			const auto& bounds = GetBestFrame(*LaraItem).boundingBox;
 			auto dx = LaraItem->Pose.Position.x - shockwave.x;
 			auto dz = LaraItem->Pose.Position.z - shockwave.z;
 			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));
 			auto angle = phd_atan(dz, dx);
 
 			// Damage player if inside shockwave.
-			if (shockwave.y > (LaraItem->Pose.Position.y + frame->boundingBox.Y1) &&
-				shockwave.y < (LaraItem->Pose.Position.y + (frame->boundingBox.Y2 + CLICK(1))) &&
+			if (shockwave.y > (LaraItem->Pose.Position.y + bounds.Y1) &&
+				shockwave.y < (LaraItem->Pose.Position.y + (bounds.Y2 + CLICK(1))) &&
 				distance > shockwave.innerRad &&
 				distance < shockwave.outerRad)
 			{

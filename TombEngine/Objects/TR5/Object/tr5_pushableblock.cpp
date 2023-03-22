@@ -768,27 +768,29 @@ namespace TEN::Entities::Generic
 			}
 		}
 
+		const auto& frameOffset = GetBestFrame(*LaraItem).Offset;
+
 		auto playerOffset = Vector3i::Zero;
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = GetBestFrame(LaraItem)->Offset.z;
+			playerOffset.z = frameOffset.z;
 			break;
 
 		case EAST:
-			playerOffset.x = GetBestFrame(LaraItem)->Offset.z;
+			playerOffset.x = frameOffset.z;
 			break;
 
 		case SOUTH:
-			playerOffset.z = -GetBestFrame(LaraItem)->Offset.z;
+			playerOffset.z = -frameOffset.z;
 			break;
 
 		case WEST:
-			playerOffset.x = -GetBestFrame(LaraItem)->Offset.z;
+			playerOffset.x = -frameOffset.z;
 			break;
 		}
 
-		pos = LaraItem->Pose.Position + offset + playerOffset;
+		pos = LaraItem->Pose.Position + Vector3i(frameOffset) + playerOffset;
 		roomNumber = LaraItem->RoomNumber;
 
 		probe = GetCollision(pos.x, pos.y - LARA_HEIGHT, pos.z, LaraItem->RoomNumber);

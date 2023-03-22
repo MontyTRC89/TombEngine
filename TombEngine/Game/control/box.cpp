@@ -1615,7 +1615,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 
 		if (LOT->Fly != NO_FLYING && Lara.Control.WaterStatus == WaterStatus::Dry)
 		{
-			auto& bounds = GetBestFrame(enemy)->boundingBox;
+			auto& bounds = GetBestFrame(*enemy).boundingBox;
 			LOT->Target.y += bounds.Y1;
 		}
 

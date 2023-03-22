@@ -188,13 +188,13 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
 					// TODO: Don't modify object animation data!!!
-					auto* framePtr = GetBestFrame(item);
+					auto& bounds = GetBestFrame(*item).boundingBox;
 
-					if (dx >= -SECTOR(2) && dx <= SECTOR(2) &&
-						dy >= -SECTOR(2) && dy <= SECTOR(2) &&
-						dz >= -SECTOR(2) && dz <= SECTOR(2) &&
-						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + framePtr->boundingBox.Y1) &&
-						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + framePtr->boundingBox.Y2))
+					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
+						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
+						dz >= -BLOCK(2) && dz <= BLOCK(2) &&
+						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
+						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
 					{
 						float sinY = phd_sin(item->Pose.Orientation.y);
 						float cosY = phd_cos(item->Pose.Orientation.y);
@@ -204,25 +204,25 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 						if (item->ObjectNumber == ID_TURN_SWITCH)
 						{
-							framePtr->boundingBox.X1 = -CLICK(1);
-							framePtr->boundingBox.X2 = CLICK(1);
-							framePtr->boundingBox.Z1 = -CLICK(1);
-							framePtr->boundingBox.Z1 = CLICK(1);
+							bounds.X1 = -CLICK(1);
+							bounds.X2 = CLICK(1);
+							bounds.Z1 = -CLICK(1);
+							bounds.Z1 = CLICK(1);
 						}
 
-						if ((radius + rx + CLICK(0.5f)) >= framePtr->boundingBox.X1 &&
-							(rx - radius - CLICK(0.5f)) <= framePtr->boundingBox.X2)
+						if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
+							(rx - radius - CLICK(0.5f)) <= bounds.X2)
 						{
-							if ((radius + rz + CLICK(0.5f)) >= framePtr->boundingBox.Z1 &&
-								(rz - radius - CLICK(0.5f)) <= framePtr->boundingBox.Z2)
+							if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
+								(rz - radius - CLICK(0.5f)) <= bounds.Z2)
 							{
 								collidedItems[numItems++] = item;
 							}
 						}
 						else
 						{
-							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + framePtr->boundingBox.Y1) &&
-								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + framePtr->boundingBox.Y2))
+							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
+								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
 							{
 								float sinY = phd_sin(item->Pose.Orientation.y);
 								float cosY = phd_cos(item->Pose.Orientation.y);
@@ -232,17 +232,17 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 								if (item->ObjectNumber == ID_TURN_SWITCH)
 								{
-									framePtr->boundingBox.X1 = -CLICK(1);
-									framePtr->boundingBox.X2 = CLICK(1);
-									framePtr->boundingBox.Z1 = -CLICK(1);
-									framePtr->boundingBox.Z1 = CLICK(1);
+									bounds.X1 = -CLICK(1);
+									bounds.X2 = CLICK(1);
+									bounds.Z1 = -CLICK(1);
+									bounds.Z1 = CLICK(1);
 								}
 
-								if ((radius + rx + CLICK(0.5f)) >= framePtr->boundingBox.X1 &&
-									(rx - radius - CLICK(0.5f)) <= framePtr->boundingBox.X2)
+								if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
+									(rx - radius - CLICK(0.5f)) <= bounds.X2)
 								{
-									if ((radius + rz + CLICK(0.5f)) >= framePtr->boundingBox.Z1 &&
-										(rz - radius - CLICK(0.5f)) <= framePtr->boundingBox.Z2)
+									if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
+										(rz - radius - CLICK(0.5f)) <= bounds.Z2)
 									{
 										collidedItems[numItems++] = item;
 
@@ -268,12 +268,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* FramePtr = GetBestFrame(laraItem);
+	const auto& bounds = GetBestFrame(*laraItem).boundingBox;
 
-	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + FramePtr->boundingBox.Y1))
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + bounds.Y1))
 		return false;
 
-	if ((item->Pose.Position.y + GlobalCollisionBounds.Y1) >= FramePtr->boundingBox.Y2)
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y1) >= bounds.Y2)
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
@@ -579,13 +579,13 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
-	auto* bounds = (GameBoundingBox*)GetBestFrame(item);
-	auto* laraBounds = (GameBoundingBox*)GetBestFrame(laraItem);
+	const auto& bounds = GetBestFrame(*item).boundingBox;
+	const auto& playerBounds = GetBestFrame(*laraItem).boundingBox;
 
-	if ((item->Pose.Position.y + bounds->Y2) <= (laraItem->Pose.Position.y + laraBounds->Y1))
+	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
 
-	if ((item->Pose.Position.y + bounds->Y1) >= (laraItem->Pose.Position.y + laraBounds->Y2))
+	if ((item->Pose.Position.y + bounds.Y1) >= (laraItem->Pose.Position.y + playerBounds.Y2))
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
@@ -596,10 +596,10 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	int dx = (x * cosY) - (z * sinY);
 	int dz = (z * cosY) + (x * sinY);
 
-	if (dx >= (bounds->X1 - radius) &&
-		dx <= (bounds->X2 + radius) &&
-		dz >= (bounds->Z1 - radius) &&
-		dz <= (bounds->Z2 + radius))
+	if (dx >= (bounds.X1 - radius) &&
+		dx <= (bounds.X2 + radius) &&
+		dz >= (bounds.Z1 - radius) &&
+		dz <= (bounds.Z2 + radius))
 	{
 		return true;
 	}
@@ -614,11 +614,11 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
-	auto* frame = GetBestFrame(item);
-	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + frame->boundingBox.Y1)
+	const auto& itemBounds = GetBestFrame(*item).boundingBox;
+	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + itemBounds.Y1)
 		return false;
 
-	if (mesh.pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
+	if (mesh.pos.Position.y + bounds.Y1 >= item->Pose.Position.y + itemBounds.Y2)
 		return false;
 
 	float sinY = phd_sin(mesh.pos.Orientation.y);
@@ -637,7 +637,9 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 		return true;
 	}
 	else
+	{
 		return false;
+	}
 }
 
 // NOTE: Previously ItemPushLara().
@@ -646,19 +648,19 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	float sinY = phd_sin(item->Pose.Orientation.y);
 	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	// Get vector from item to Lara.
+	// Get direction vector from item to player.
 	auto direction = item2->Pose.Position - item->Pose.Position;
 
 	// Rotate Lara vector into item frame.
 	int rx = (direction.x * cosY) - (direction.z * sinY);
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
-	auto* bounds = (bigPush & 2) ? &GlobalCollisionBounds : (GameBoundingBox*)GetBestFrame(item);
+	const auto& bounds = (bigPush & 2) ? GlobalCollisionBounds : GetBestFrame(*item).boundingBox;
 
-	int minX = bounds->X1;
-	int maxX = bounds->X2;
-	int minZ = bounds->Z1;
-	int maxZ = bounds->Z2;
+	int minX = bounds.X1;
+	int maxX = bounds.X2;
+	int minZ = bounds.Z1;
+	int maxZ = bounds.Z2;
 
 	if (bigPush & 1)
 	{
@@ -669,7 +671,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	}
 
 	// Big enemies
-	if (abs(direction.x) > SECTOR(4.5f) || abs(direction.z) > SECTOR(4.5f) ||
+	if (abs(direction.x) > BLOCK(4.5f) || abs(direction.z) > BLOCK(4.5f) ||
 		rx <= minX || rx >= maxX ||
 		rz <= minZ || rz >= maxZ)
 	{
@@ -695,10 +697,10 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 
 	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
-	if (lara != nullptr && enableSpasm && (bounds->Y2 - bounds->Y1) > CLICK(1))
+	if (lara != nullptr && enableSpasm && (bounds.Y2 - bounds.Y1) > CLICK(1))
 	{
-		rx = (bounds->X1 + bounds->X2) / 2;
-		rz = (bounds->Z1 + bounds->Z2) / 2;
+		rx = (bounds.X1 + bounds.X2) / 2;
+		rz = (bounds.Z1 + bounds.Z2) / 2;
 
 		direction.x -= (rx * cosY) + (rz * sinY);
 		direction.z -= (rz * cosY) - (rx * sinY);
@@ -764,7 +766,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	auto minZ = bounds.Z1 - coll->Setup.Radius;
 	auto maxZ = bounds.Z2 + coll->Setup.Radius;
 
-	if (abs(direction.x) > SECTOR(4.5f) || abs(direction.z) > SECTOR(4.5f) ||
+	if (abs(direction.x) > BLOCK(4.5f) || abs(direction.z) > BLOCK(4.5f) ||
 		rx <= minX || rx >= maxX ||
 		rz <= minZ || rz >= maxZ)
 	{
@@ -859,14 +861,14 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	auto itemBounds = itemBBox.ToBoundingOrientedBox(item->Pose);
 
 	// Extend bounds a bit for visual testing.
-	itemBounds.Extents = itemBounds.Extents + Vector3(SECTOR(1));
+	itemBounds.Extents = itemBounds.Extents + Vector3(BLOCK(1));
 
 	// Filter out any further checks if static isn't nearby.
 	if (!staticBounds.Intersects(itemBounds))
 		return false;
 
 	// Bring back extents.
-	itemBounds.Extents = itemBounds.Extents - Vector3(SECTOR(1));
+	itemBounds.Extents = itemBounds.Extents - Vector3(BLOCK(1));
 
 	// Draw static bounds.
 	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
@@ -1203,8 +1205,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		// If last position of item was also below this floor height, we've hit a wall, else we've hit a floor.
 
 		if (y > (pointProbe.Position.Floor + 32) && bs == 0 &&
-			(((x / SECTOR(1)) != (item->Pose.Position.x / SECTOR(1))) ||
-				((z / SECTOR(1)) != (item->Pose.Position.z / SECTOR(1)))))
+			(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
+				((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 		{
 			// Need to know which direction the wall is.
 
@@ -1623,8 +1625,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			if (item->Pose.Position.y < pointProbe.Position.Ceiling)
 			{
 				if (y < pointProbe.Position.Ceiling &&
-					(((x / SECTOR(1)) != (item->Pose.Position.x / SECTOR(1))) ||
-						((z / SECTOR(1)) != (item->Pose.Position.z / SECTOR(1)))))
+					(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
+						((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 				{
 					// Need to know which direction the wall is.
 
@@ -1860,11 +1862,11 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		float sinY = phd_sin(item->Pose.Orientation.y);
 		float cosY = phd_cos(item->Pose.Orientation.y);
 
-		auto* frame = GetBestFrame(item);
-		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+		const auto& bounds = GetBestFrame(*item).boundingBox;
+		int rx = (bounds.X1 + bounds.X2) / 2;
+		int rz = (bounds.X2 + bounds.Z2) / 2;
 
-		if (frame->boundingBox.GetHeight() > CLICK(1))
+		if (bounds.GetHeight() > CLICK(1))
 		{
 			auto* lara = GetLaraInfo(laraItem);
 

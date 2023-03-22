@@ -101,7 +101,7 @@ void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr)
 			frame = &g_Level.Frames[g_Level.Anims[spaz].FramePtr + lara->HitFrame];
 		}
 		else
-			frame = GetBestFrame(item);
+			frame = &GetBestFrame(*item);
 	}
 	else
 		frame = framePtr;
