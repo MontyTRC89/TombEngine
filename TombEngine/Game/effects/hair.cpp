@@ -221,7 +221,7 @@ namespace TEN::Effects::Hair
 
 		// Calculate segment orientation.
 		// BUG: Aggressive gimbal lock causes significant twisting.
-		// Need to somehow
+		// Need to calculate this a different way.
 		return EulerAngles(
 			-(short)phd_atan(
 				distance2D,
