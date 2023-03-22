@@ -790,7 +790,7 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		pos = LaraItem->Pose.Position + Vector3i(frameOffset) + playerOffset;
+		pos = LaraItem->Pose.Position + offset + playerOffset;
 		roomNumber = LaraItem->RoomNumber;
 
 		probe = GetCollision(pos.x, pos.y - LARA_HEIGHT, pos.z, LaraItem->RoomNumber);

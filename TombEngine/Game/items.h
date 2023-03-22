@@ -67,14 +67,14 @@ enum class EffectType
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = 0; // Absolute.
-	int FrameNumber	  = 0; // Absolute.
+	int AnimNumber	  = 0; // g_Level.Anims index.
+	int FrameNumber	  = 0; // g_Level.Frames index.
 	int ActiveState	  = 0;
 	int TargetState	  = 0;
 	int RequiredState = NO_STATE;
 
 	bool	IsAirborne = false;
-	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
 };
 
 struct EntityModelData

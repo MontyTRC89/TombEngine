@@ -537,7 +537,7 @@ int GetCurrentRelativeFrameNumber(ItemInfo* item)
 	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
 }
 
-// NOTE: Absolute anim number.
+// NOTE: Returns g_Level.Anims index.
 int GetAnimNumber(ItemInfo& item, int animNumber)
 {
 	const auto& object = Objects[item.ObjectNumber];
@@ -580,7 +580,6 @@ int GetNextAnimState(int objectID, int animNumber)
 	const auto& object = Objects[objectID];
 	const auto& anim = GetAnimData(object, animNumber);
 
-	// TODO: Check. Is JumpAnimNum relative or absolute? Assumed absolute.
 	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
 	return nextAnim.ActiveState;
 }

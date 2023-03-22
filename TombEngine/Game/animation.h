@@ -43,15 +43,15 @@ struct StateDispatchData
 
 struct StateDispatchRangeData
 {
-	int StartFrame	 = 0;
-	int EndFrame	 = 0;
-	int LinkAnimNum	 = NO_ANIM;
-	int LinkFrameNum = NO_ANIM;
+	int StartFrame	 = 0;		// g_Level.Frames base index.
+	int EndFrame	 = 0;		// g_Level.Frames end index.
+	int LinkAnimNum	 = NO_ANIM; // g_Level.Anims index.
+	int LinkFrameNum = NO_ANIM; // g_Level.Frames index.
 };
 
 struct AnimData
 {
-	int FramePtr	  = 0;
+	int FramePtr	  = 0; // g_Level.Frames base index.
 	int Interpolation = 0;
 	int ActiveState	  = 0;
 
@@ -59,11 +59,11 @@ struct AnimData
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
 
-	int frameBase = 0;
-	int frameEnd  = 0;
+	int frameBase = 0; // g_Level.Frames base index.
+	int frameEnd  = 0; // g_Level.Frames end index.
 
-	int JumpAnimNum		   = NO_ANIM;
-	int JumpFrameNum	   = 0;
+	int JumpAnimNum		   = NO_ANIM; // g_Level.Anims index.
+	int JumpFrameNum	   = 0;		  // g_Level.Frames index.
 	int NumStateDispatches = 0;
 	int StateDispatchIndex = 0;
 	int NumCommands		   = 0;
