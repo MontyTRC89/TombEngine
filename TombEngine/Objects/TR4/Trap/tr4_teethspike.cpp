@@ -59,7 +59,7 @@ namespace TEN::Entities::TR4
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
 			// Get current item bounds and radius.
-			const auto& bounds = GetBestFrame(*item).boundingBox;
+			const auto& bounds = GetBestFrame(*item).BoundingBox;
 			int radius = std::max(abs(bounds.X2 - bounds.X1), abs(bounds.Z2 - bounds.Z1)) / 2;
 
 			// Play sound only if spikes are just emerging.
@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				const auto& laraBounds = GetBestFrame(*LaraItem).boundingBox;
+				const auto& laraBounds = GetBestFrame(*LaraItem).BoundingBox;
 
 				int bloodCount = 0;
 

@@ -348,7 +348,7 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 
 GameVector GetTargetPoint(ItemInfo* targetEntity)
 {
-	const auto& bounds = GetBestFrame(*targetEntity).boundingBox;
+	const auto& bounds = GetBestFrame(*targetEntity).BoundingBox;
 
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,

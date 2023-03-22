@@ -118,8 +118,8 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
 		return false;
 
-	const auto& bounds = GetBestFrame(*item).boundingBox;
-	const auto& boundsTarget = GetBestFrame(*enemy).boundingBox;
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	const auto& boundsTarget = GetBestFrame(*enemy).BoundingBox;
 
 	auto origin = GameVector(
 		item->Pose.Position.x,
@@ -151,7 +151,7 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
 	short angle = AI->angle - creature->JointRotation[2];
 	if (angle > ANGLE(-maxAngleInDegrees) && angle < ANGLE(maxAngleInDegrees))
 	{
-		const auto& bounds = GetBestFrame(*enemy).boundingBox;
+		const auto& bounds = GetBestFrame(*enemy).BoundingBox;
 
 		auto origin = GameVector(
 			item->Pose.Position.x,

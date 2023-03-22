@@ -1246,7 +1246,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
 		return;
 
-	const auto& bounds = GetBestFrame(*item).boundingBox;
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
 	if (item->Pose.Position.y + bounds.Y1 > wh)
 		return;
 

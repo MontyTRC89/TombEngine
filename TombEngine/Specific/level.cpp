@@ -327,12 +327,12 @@ void LoadObjects()
 	{
 		auto* frame = &g_Level.Frames[i];
 
-		frame->boundingBox.X1 = ReadInt16();
-		frame->boundingBox.X2 = ReadInt16();
-		frame->boundingBox.Y1 = ReadInt16();
-		frame->boundingBox.Y2 = ReadInt16();
-		frame->boundingBox.Z1 = ReadInt16();
-		frame->boundingBox.Z2 = ReadInt16();
+		frame->BoundingBox.X1 = ReadInt16();
+		frame->BoundingBox.X2 = ReadInt16();
+		frame->BoundingBox.Y1 = ReadInt16();
+		frame->BoundingBox.Y2 = ReadInt16();
+		frame->BoundingBox.Z1 = ReadInt16();
+		frame->BoundingBox.Z2 = ReadInt16();
 
 		// NOTE: Braces are necessary to ensure correct value init order.
 		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };

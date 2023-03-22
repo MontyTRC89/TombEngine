@@ -10,8 +10,8 @@ class Vector3i;
 struct ItemInfo;
 
 // NOTES:
-// animNumber: Designatied animation ID in an entity's animation list.
-// animIndex:  Index at which an animation exists in the giant g_Level.Anims vector.
+// animNumber: Relative entity animation ID.
+// animIndex:  Index of animation in giant g_Level.Anims vector.
 
 constexpr auto NO_STATE = -1;
 constexpr auto NO_ANIM	= -1;
@@ -29,7 +29,7 @@ enum class AnimCommandType
 
 struct AnimFrame
 {
-	GameBoundingBox			boundingBox		 = GameBoundingBox::Zero;
+	GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;
 	Vector3					Offset			 = Vector3::Zero;
 	std::vector<Quaternion> BoneOrientations = {};
 };

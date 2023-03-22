@@ -1035,7 +1035,7 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
 			continue;
 
-		const auto& bounds = GetBestFrame(*item).boundingBox;
+		const auto& bounds = GetBestFrame(*item).BoundingBox;
 		auto& bBox = GetBoundsAccurate(*mesh, false);
 
 		if (bounds.X1 <= bBox.X2 && bounds.X2 >= bBox.X1 &&
@@ -1068,7 +1068,7 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 	if (itemNumber == NO_ITEM)
 		return nullptr;
 	else
-		return &GetBestFrame(g_Level.Items[itemNumber]).boundingBox;
+		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
 }
 
 void InitialisePickup(short itemNumber)

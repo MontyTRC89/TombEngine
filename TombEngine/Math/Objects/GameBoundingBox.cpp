@@ -24,16 +24,16 @@
 
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
-		*this = GetFrame(objectID, animNumber, frameNumber)->boundingBox;
+		*this = GetFrame(objectID, animNumber, frameNumber)->BoundingBox;
 	}
 
 	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)
-			*this = frameData.FramePtr0->boundingBox;
+			*this = frameData.FramePtr0->BoundingBox;
 		else
-			*this = frameData.FramePtr0->boundingBox + (((frameData.FramePtr1->boundingBox - frameData.FramePtr0->boundingBox) * frameData.Alpha));
+			*this = frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
 	}
 
 	int GameBoundingBox::GetWidth() const
