@@ -36,7 +36,7 @@ namespace TEN::Effects::Hair
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 		
 		// TODO: Combine with head's actual orientation!
-		auto baseOrient = item.Pose.Orientation.ToQuaternion();
+		auto baseOrient = EulerAngles(-item.Pose.Orientation.ToDirection()).ToQuaternion();
 
 		// Set position of base segment.
 		auto basePos = worldMatrix.Translation();
@@ -177,13 +177,13 @@ namespace TEN::Effects::Hair
 		absDirection.Normalize();
 		auto absOrient = Geometry::GetQuaternionFromDirection(absDirection);
 
-		// Calculate twist rotation.
+		// Calculate relative twist rotation.
 		auto twistAxis = Vector3::Transform(Vector3::UnitZ, absOrient);
 		float twistAngle = EulerAngles(baseOrient).y;
 		auto twistAxisAngle = AxisAngle(twistAxis, twistAngle);
 		auto twistRot = twistAxisAngle.ToQuaternion();
 
-		// Return perfect orientation.
+		// Return ideal orientation.
 		return (absOrient * twistRot);
 	}
 
