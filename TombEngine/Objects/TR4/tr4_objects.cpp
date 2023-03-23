@@ -50,6 +50,7 @@
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 #include "Objects/TR4/Object/tr4_scales.h"
+#include "Objects/TR4/Object/wraith_trap.h"
 
 // Switches
 
@@ -744,6 +745,15 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseObelisk;
 			obj->control = ObeliskControl;
+			obj->collision = ObjectCollision;
+			obj->SetupHitEffect(true);
+		}
+
+		obj = &Objects[ID_WRAITH_TRAP];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseWraithTrap;
+			obj->control = WraithTrapControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
 		}
