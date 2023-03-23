@@ -27,16 +27,6 @@ using namespace TEN::Math::Geometry;
 
 namespace TEN::Entities::TR4
 {
-
-	struct Wraith3Info
-	{
-		Vector3i Position = Vector3i::Zero;
-		Electricity* EnergyArc = {};
-		unsigned int Count = 0;
-	};
-
-	Wraith3Info Wraith3Data;
-
 	constexpr auto WRAITH_COUNT	   = 8;
 	constexpr auto WRAITH_VELOCITY = 64;
 	constexpr auto WRAITH_TAIL_OFFSET = Vector3(0, -10, -50);
