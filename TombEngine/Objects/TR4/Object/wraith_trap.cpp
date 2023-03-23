@@ -24,44 +24,23 @@ void InitialiseWraithTrap(short itemNumber)
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-	//AddActiveItem(itemNumber);
-	//item->Status = ITEM_ACTIVE;
-
-	if (item->TriggerFlags == 2)
-	{
-		for (int i = 0; i < g_Level.NumItems; i++)
-		{
-			auto* currentItem = &g_Level.Items[i];
-
-			if (currentItem->ObjectNumber == ID_OBELISK)
-				item->ItemFlags[0]++;
-
-			if (currentItem->ObjectNumber == ID_ANIMATING3)
-				item->ItemFlags[2] = i;
-		}
-	}
-
+	item->ItemFlags[6] = 0;
 }
 
 void WraithTrapControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short someNumber = 0;
-	auto pos = Vector3::Zero;
-	auto pos2 = Vector3::Zero;
-
 	if (TriggerActive(item))
 	{
-
-		if (item->ItemFlags[6] = 1)
+		if (item->ItemFlags[6] && item->TriggerFlags > 0)
 		{
-
 			GameVector pos1 = GetJointPosition(item, 0, Vector3i::Zero);
+
+			SoundEffect(SFX_TR4_LIGHT_BEAM_LOOP, &Pose(pos1.ToVector3i()));
+
 			auto sparkColor = Vector3(255, 255, 255);
 			TriggerAttackSpark(pos1.ToVector3(), sparkColor);
-
-
 		}
 
 		AnimateItem(item);

@@ -40,6 +40,7 @@ namespace TEN::Entities::TR4
 	constexpr auto WRAITH_COUNT	   = 8;
 	constexpr auto WRAITH_VELOCITY = 64;
 	constexpr auto WRAITH_TAIL_OFFSET = Vector3(0, -10, -50);
+	constexpr auto MAX_DISTANCE_TO_WRAITH_TRAP = SQUARE(BLOCK(2));
 
 	void InitialiseWraith(short itemNumber)
 	{
@@ -71,9 +72,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Pose);
-		
-		Vector3i pos00, pos11, pos22;
+		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Pose);		
 		
 		// HACK: HitPoints stores the wraith's target.	
 		auto* target = item->ItemFlags[6] ? &g_Level.Items[item->ItemFlags[6]] : LaraItem;
@@ -109,9 +108,9 @@ namespace TEN::Entities::TR4
 
 		short angleV = 0;
 		if (abs(x) <= abs(z))
-			angleV = phd_atan(abs(x) + (abs(z) / 2), dy);
+			angleV = phd_atan(abs(x) + (abs(z)), dy);
 		else
-			angleV = phd_atan(abs(z) + (abs(x) / 2), dy);
+			angleV = phd_atan(abs(z) + (abs(x)), dy);
 
 		angleV -= item->Pose.Orientation.x;
 		int velocity = (WRAITH_VELOCITY / item->Animation.Velocity.z) * 8;
@@ -199,7 +198,7 @@ namespace TEN::Entities::TR4
 							distanceLara = SQUARE(xl) + SQUARE(zl);
 
 							//Wraith 3 attacks the wraith trap only if it is close to the trap and if lara is 1 Block close to the trap too
-							if (distance < SQUARE(BLOCK(2)) && distanceLara < SQUARE(BLOCK(1)))
+							if (distance < MAX_DISTANCE_TO_WRAITH_TRAP && distanceLara < MAX_DISTANCE_TO_WRAITH_TRAP)
 							{
 								item->ItemFlags[6] = linkNumber;
 								targetItem->ItemFlags[6] = 1;
@@ -265,34 +264,30 @@ namespace TEN::Entities::TR4
 				distanceLara = SQUARE(xl) + SQUARE(zl);
 
 				//Wraith3 can escape from the trap if it is not close to the trap and if lara is 2 Block away from the trap
-				if (distance < SQUARE(BLOCK(2)) && distanceLara < SQUARE(BLOCK(2)))
+				if (distance < MAX_DISTANCE_TO_WRAITH_TRAP && distanceLara < MAX_DISTANCE_TO_WRAITH_TRAP)
 				{
-					pos00 = item->Pose.Position;
+					if (target->TriggerFlags > 0)
+					{
+						Vector3i lightningStart = item->Pose.Position;
+						GameVector lightningEnd = GetJointPosition(target, 0, Vector3i::Zero);
 
-					GameVector pos11 = GetJointPosition(target, 0, Vector3i(0, 0, 0));
+						int amplitude = (GetRandomControl() & 1) + 15;
 
-					pos22.x = target->Pose.Position.x;
-					pos22.y = target->Pose.Position.y;
-					pos22.z = target->Pose.Position.z;
+						SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &Pose(Vector3i(lightningStart)));
 
-					int amplitude = (GetRandomControl() & 1) + 15;
+						SpawnElectricity(lightningStart.ToVector3(), lightningEnd.ToVector3(), amplitude, 255, 255, 255, 10, (int)ElectricityFlags::ThinIn, 12, 10);
+						SpawnElectricity(lightningStart.ToVector3(), lightningEnd.ToVector3(), amplitude, 255, 255, 255, 10, (int)ElectricityFlags::ThinIn, 4, 10);
+						SpawnElectricity(lightningStart.ToVector3(), lightningEnd.ToVector3(), amplitude, 255, 100, 0, 10, (int)ElectricityFlags::ThinIn, 3, 10);
 
-					SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &Pose(Vector3i(pos00)));
-
-					SpawnElectricity(pos00.ToVector3(), pos11.ToVector3(), amplitude, 255, 255, 255, 10, (int)ElectricityFlags::ThinIn, 12, 10);
-					SpawnElectricity(pos00.ToVector3(), pos11.ToVector3(), amplitude, 255, 255, 255, 10, (int)ElectricityFlags::ThinIn, 4, 10);
-					SpawnElectricity(pos00.ToVector3(), pos11.ToVector3(), amplitude, 255, 100, 0, 10, (int)ElectricityFlags::ThinIn, 3, 10);
-
-					//Trigger attack sparks on WraithTrap
-					target->ItemFlags[6] = 1;
-
+						//Trigger attack sparks on WraithTrap
+						target->ItemFlags[6] = 1;
+					}
 				}
 				else
 				{
 					item->ItemFlags[6] = 0;
 					target->ItemFlags[6] = 0;
 					target = LaraItem;
-
 				}		
 			}
 		}
@@ -328,7 +323,7 @@ namespace TEN::Entities::TR4
 					WraithExplosionEffect(item, 96, 96, 96, -32);
 					WraithExplosionEffect(item, 48, 48, 48, 48);
 
-					target->TriggerFlags--;
+					//target->TriggerFlags--;
 
 					if (target->TriggerFlags > 0)
 						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
@@ -346,6 +341,11 @@ namespace TEN::Entities::TR4
 
 				if (item->ItemFlags[7])
 				{
+					if (item->ObjectNumber == ID_WRAITH1)
+						WraithExplosionEffect(item, 1.0f * UCHAR_MAX, 0.6f * UCHAR_MAX, 0.0f * UCHAR_MAX, 48);					
+					else
+						WraithExplosionEffect(item, 0.0f * UCHAR_MAX, 0.5f * UCHAR_MAX, 1.0f * UCHAR_MAX, 48);					
+
 					TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
 					DoDamage(item, INT_MAX);
 					item->ItemFlags[6] = 0;
@@ -459,14 +459,10 @@ namespace TEN::Entities::TR4
 		short inner = speed >= 0 ? 32 : 640;
 		short outer = speed >= 0 ? 160 : 512;
 
-		item->Pose.Position.y -= 384;
-
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-
-		item->Pose.Position.y += 384;
 	}
 
 	void DrawWraith(Vector3i pos, Vector3i velocity, int objectNumber)
