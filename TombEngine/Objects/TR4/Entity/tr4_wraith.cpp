@@ -53,9 +53,6 @@ namespace TEN::Entities::TR4
 
 			wraith++;
 		}
-
-		ZeroMemory(&Wraith3Data, sizeof(Wraith3Info));
-
 	}
 
 	void WraithControl(short itemNumber)
