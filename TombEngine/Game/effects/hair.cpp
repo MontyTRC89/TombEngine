@@ -175,15 +175,15 @@ namespace TEN::Effects::Hair
 		// Calculate absolute orientation.
 		auto absDirection = target - origin;
 		absDirection.Normalize();
-		auto absQuat = Geometry::GetQuaternionFromDirection(absDirection, Vector3::UnitZ);
+		auto absOrient = Geometry::GetQuaternionFromDirection(absDirection, Vector3::UnitZ);
 
 		// Calculate twist rotation.
-		auto twistAxis = Vector3::Transform(Vector3::UnitZ, absQuat);
+		auto twistAxis = Vector3::Transform(Vector3::UnitZ, absOrient);
 		auto twistAxisAngle = AxisAngle(twistAxis, EulerAngles(baseOrient).y);
-		auto twistQuat = twistAxisAngle.ToQuaternion();
+		auto twistRot = twistAxisAngle.ToQuaternion();
 
-		// Rotate absolute orientation by twist quaternion and return.
-		return (absQuat * twistQuat);
+		// Return perfect orientation.
+		return (absOrient * twistRot);
 	}
 
 	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
