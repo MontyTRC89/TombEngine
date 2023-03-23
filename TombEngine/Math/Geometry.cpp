@@ -88,15 +88,15 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
-	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot)
 	{
-		auto rotMatrix = rotation.ToRotationMatrix();
+		auto rotMatrix = rot.ToRotationMatrix();
 		return Vector3::Transform(point, rotMatrix);
 	}
 
-	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation)
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rot)
 	{
-		auto rotMatrix = rotation.ToRotationMatrix();
+		auto rotMatrix = rot.ToRotationMatrix();
 		return Vector3::Transform(point, rotMatrix);
 	}
 
@@ -122,20 +122,20 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& gravity)
 	{
-		if (normal == -force)
+		if (normal == -gravity)
 			return 0;
 
-		return FROM_RAD(acos(normal.Dot(-force)));
+		return FROM_RAD(acos(normal.Dot(-gravity)));
 	}
 
-	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force)
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& gravity)
 	{
-		if (normal == -force)
+		if (normal == -gravity)
 			return 0;
 
-		// TODO: Consider normal of downward force.
+		// TODO: Consider gravity direction.
 		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 
@@ -189,9 +189,9 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
-	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& gravity)
 	{
-		// TODO: Consider normal of downward force.
+		// TODO: Consider gravity direction.
 
 		// Determine relative angle properties of normal.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
