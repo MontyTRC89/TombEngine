@@ -34,6 +34,9 @@ namespace TEN::Effects::Hair
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
+		
+		// TODO: Get head's actual orientation!
+		auto headOrient = EulerAngles(-item.Pose.Orientation.ToDirection()).ToQuaternion();
 
 		// Set position of base segment.
 		auto basePos = worldMatrix.Translation();
@@ -87,8 +90,6 @@ namespace TEN::Effects::Hair
 				CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
-				// TODO: Get head's actual orientation!
-				auto headOrient = EulerAngles(-item.Pose.Orientation.ToDirection()).ToQuaternion();
 				prevSegment.Orientation = GetSegmentOrientation(prevSegment.Position, segment.Position, headOrient);
 
 				// Calculate world matrix.
@@ -169,13 +170,20 @@ namespace TEN::Effects::Hair
 		return frame.boundingBox.GetCenter();
 	}
 	
-	// TODO: Segments are much more stable, but orientations are absolute and don't flow from the head's orientation.
-	// Need to somehow define a twist axis and use it for correction.
 	Quaternion HairUnit::GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient)
 	{
+		// Calculate absolute orientation.
 		auto absDirection = target - origin;
 		absDirection.Normalize();
-		return Geometry::GetQuaternionFromDirection(absDirection, Vector3::UnitZ);
+		auto absQuat = Geometry::GetQuaternionFromDirection(absDirection, Vector3::UnitZ);
+
+		// Calculate twist rotation.
+		auto twistAxis = Vector3::Transform(Vector3::UnitZ, absQuat);
+		auto twistAxisAngle = AxisAngle(twistAxis, EulerAngles(baseOrient).y);
+		auto twistQuat = twistAxisAngle.ToQuaternion();
+
+		// Rotate absolute orientation by twist quaternion and return.
+		return (absQuat * twistQuat);
 	}
 
 	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
