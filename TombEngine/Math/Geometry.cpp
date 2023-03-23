@@ -163,9 +163,11 @@ namespace TEN::Math::Geometry
 
 	Quaternion GetQuaternionFromDirection(const Vector3& direction, const Vector3& refDirection)
 	{
+		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
+
 		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
 		float dot = refDirection.Dot(direction);
-		if (dot < -(1.0f - EPSILON))
+		if (dot < -SINGULARITY_THRESHOLD)
 		{
 			auto axis = Vector3::UnitX.Cross(refDirection);
 			if (axis.LengthSquared() < EPSILON)
