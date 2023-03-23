@@ -154,9 +154,13 @@ namespace TEN::Math::Geometry
 		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
 
 		if (distanceAlpha < 0.0f)
+		{
 			return linePoint0;
+		}
 		else if (distanceAlpha > 1.0f)
+		{
 			return linePoint1;
+		}
 
 		return (linePoint0 + (direction * distanceAlpha));
 	}
