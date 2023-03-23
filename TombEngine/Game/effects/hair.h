@@ -18,7 +18,7 @@ namespace TEN::Effects::Hair
 		};
 
 	public:
-		// Components
+		// Members
 		bool IsEnabled	   = false;
 		bool IsInitialized = false;
 		std::vector<HairSegment> Segments = {};
@@ -29,9 +29,9 @@ namespace TEN::Effects::Hair
 	private:
 		// Helpers
 		Vector3						GetRelBaseOffset(int hairUnitIndex, bool isYoung);
-		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);
-		Quaternion					GetOrientation(Vector3 origin, Vector3 target);
 		Vector3						GetWaterProbeOffset(const ItemInfo& item);
+		Quaternion					GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient);
+		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);
 
 		void CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand);
 		void CollideSegmentWithSpheres(HairSegment& segment, const std::vector<BoundingSphere>& spheres);
@@ -44,7 +44,7 @@ namespace TEN::Effects::Hair
 		static constexpr auto UNIT_COUNT_MAX = 2;
 
 	public:
-		// Components
+		// Members
 		std::array<HairUnit, UNIT_COUNT_MAX> Units = {};
 
 		// Utilities

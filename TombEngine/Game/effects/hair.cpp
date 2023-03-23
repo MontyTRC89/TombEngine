@@ -87,7 +87,9 @@ namespace TEN::Effects::Hair
 				CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
-				prevSegment.Orientation = GetOrientation(prevSegment.Position, segment.Position);
+				// TODO: Get head's actual orientation!
+				auto headOrient = EulerAngles(-item.Pose.Orientation.ToDirection()).ToQuaternion();
+				prevSegment.Orientation = GetSegmentOrientation(prevSegment.Position, segment.Position, headOrient);
 
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
@@ -166,6 +168,15 @@ namespace TEN::Effects::Hair
 		const auto& frame = *GetBestFrame(&item);
 		return frame.boundingBox.GetCenter();
 	}
+	
+	// TODO: Segments are much more stable, but orientations are absolute and don't flow from the head's orientation.
+	// Need to somehow define a twist axis and use it for correction.
+	Quaternion HairUnit::GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient)
+	{
+		auto absDirection = target - origin;
+		absDirection.Normalize();
+		return Geometry::GetQuaternionFromDirection(absDirection, Vector3::UnitZ);
+	}
 
 	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
 	{
@@ -210,26 +221,6 @@ namespace TEN::Effects::Hair
 			isYoung ? 0 : int(float(spheres[2].Radius * 3) / 4)));
 
 		return spheres;
-	}
-
-	Quaternion HairUnit::GetOrientation(Vector3 origin, Vector3 target)
-	{
-		// Calculate 2D distance between segments.
-		float distance2D = Vector2::Distance(
-			Vector2(target.x, target.z),
-			Vector2(origin.x, origin.z));
-
-		// Calculate segment orientation.
-		// BUG: Aggressive gimbal lock causes significant twisting.
-		// Need to calculate this a different way.
-		return EulerAngles(
-			-(short)phd_atan(
-				distance2D,
-				target.y - origin.y),
-			(short)phd_atan(
-				target.z - origin.z,
-				target.x - origin.x),
-			0).ToQuaternion();
 	}
 
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)

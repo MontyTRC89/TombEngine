@@ -161,6 +161,26 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (direction * distanceAlpha));
 	}
 
+	Quaternion GetQuaternionFromDirection(const Vector3& direction, const Vector3& refDirection)
+	{
+		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
+		float dot = refDirection.Dot(direction);
+		if (dot < -(1.0f - EPSILON))
+		{
+			auto axis = Vector3::UnitX.Cross(refDirection);
+			if (axis.LengthSquared() < EPSILON)
+				axis = Vector3::UnitY.Cross(refDirection);
+			axis.Normalize();
+
+			auto axisAngle = AxisAngle(axis, FROM_RAD(PI));
+			return axisAngle.ToQuaternion();
+		}
+
+		// Calculate axis-angle and return converted quaternion.
+		auto axisAngle = AxisAngle(refDirection.Cross(direction), FROM_RAD(acos(dot)));
+		return axisAngle.ToQuaternion();
+	}
+
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)
