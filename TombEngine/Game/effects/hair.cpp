@@ -210,23 +210,39 @@ namespace TEN::Effects::Hair
 		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + Vector3i(-2, 0, 0)).ToVector3();
 		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 
-		// Right arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
-		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
-
-		// Left arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
-		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3.0f) * 4));
-
-		if (isYoung)
-			spheres[1].Center = (spheres[1].Center + spheres[2].Center) / 2;
-
 		// Neck sphere.
 		spheres.push_back(BoundingSphere(
 			(spheres[1].Center + (spheres[2].Center * 2)) / 3,
 			isYoung ? 0 : int(float(spheres[2].Radius * 3) / 4)));
+
+		// Right arm sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
+		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+
+		// Left arm sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
+		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+		
+		// Left holster sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LTHIGH]];
+		pos = GetJointPosition(item, LM_LTHIGH, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(
+			BoundingSphere(
+				pos + ((spheres[0].Center - pos) / 2),
+				meshPtr->sphere.Radius));
+		
+		// Right holster sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RTHIGH]];
+		pos = GetJointPosition(item, LM_RTHIGH, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(
+			BoundingSphere(
+				pos + ((spheres[0].Center - pos) / 2),
+				meshPtr->sphere.Radius));
+
+		if (isYoung)
+			spheres[1].Center = (spheres[1].Center + spheres[2].Center) / 2;
 
 		return spheres;
 	}
