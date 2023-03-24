@@ -394,7 +394,7 @@ void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRigh
 	auto& holster = isRightWeapon ? player.Control.Weapon.HolsterInfo.RightHolster : player.Control.Weapon.HolsterInfo.LeftHolster;
 
 	// HACK: Special case for revolver.
-	if (isRightWeapon)
+	if (!isRightWeapon)
 	{
 		if (weaponType == LaraWeaponType::Revolver)
 			return;
