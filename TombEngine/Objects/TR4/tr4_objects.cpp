@@ -43,6 +43,7 @@
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/WraithTrap.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Objects/TR4/Object/tr4_sarcophagus.h"
@@ -50,7 +51,6 @@
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 #include "Objects/TR4/Object/tr4_scales.h"
-#include "Objects/TR4/Object/wraith_trap.h"
 
 // Switches
 
@@ -82,6 +82,7 @@
 // Effects
 #include "Objects/Effects/tr4_locusts.h" // OK
 
+using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities
