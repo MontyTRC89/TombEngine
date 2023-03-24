@@ -132,7 +132,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 			if (IsHeld(In::Action))
 			{
 				// HACK: Special case for revolver.
-				bool canShoot = (weaponType == LaraWeaponType::Revolver) ? isRightWeapon : true;
+				bool canShoot = (weaponType == LaraWeaponType::Revolver) ? !isRightWeapon : true;
 
 				if (canShoot)
 				{
