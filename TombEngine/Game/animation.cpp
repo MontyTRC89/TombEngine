@@ -20,7 +20,7 @@ using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // NOTE: 0 frames counts as 1.
-static unsigned int GetFrameCount(const AnimData& anim)
+static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 {
 	unsigned int frameCount = anim.frameEnd - anim.frameBase;
 	return ((frameCount > 0) ? frameCount : 1);
@@ -193,7 +193,7 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.ActiveState = animPtr->ActiveState;
 	}
 
-	unsigned int frameCount = GetFrameCount(*animPtr);
+	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
 	if (item->Animation.IsAirborne)
@@ -281,7 +281,7 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = NO_STATE;
 	}
 
-	unsigned int frameCount = GetFrameCount(*animPtr);
+	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
 	if (item->Animation.IsAirborne)
