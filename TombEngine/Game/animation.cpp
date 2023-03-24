@@ -320,12 +320,12 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 		if (dispatch.TargetState != targetState)
 			continue;
 
-		// Iterate over dispatch frame range.
+		// Iterate over dispatch frame ranges.
 		for (int j = 0; j < dispatch.NumberRanges; j++)
 		{
 			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
 
-			// Check if frame is within range.
+			// Check if current frame is within dispatch range.
 			if (item->Animation.FrameNumber >= range.StartFrame &&
 				item->Animation.FrameNumber <= range.EndFrame)
 			{
@@ -407,7 +407,7 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 	
 	item->Animation.AnimNumber = animIndex;
 	item->Animation.FrameNumber = anim.frameBase + frameNumber;
-	item->Animation.ActiveState = anim.ActiveState;
+	item->Animation.ActiveState =
 	item->Animation.TargetState = anim.ActiveState;
 }
 
@@ -448,12 +448,12 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 		if (dispatch.TargetState != item->Animation.TargetState)
 			continue;
 
-		// Iterate over dispatch frame range.
+		// Iterate over dispatch frame ranges.
 		for (int j = 0; j < dispatch.NumberRanges; j++)
 		{
 			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
 
-			// Check if frame is within range.
+			// Set new animation if current frame is within dispatch range.
 			if (item->Animation.FrameNumber >= range.StartFrame &&
 				item->Animation.FrameNumber <= range.EndFrame)
 			{
@@ -475,7 +475,7 @@ AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
 	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
 
-	// Calculate keyframes defining interpolated frame and get pointers to them.
+	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
 	int frame0 = (int)floor(frameNumberNorm);
 	int frame1 = (int)ceil(frameNumberNorm);
 	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
@@ -613,7 +613,7 @@ Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& 
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
 {
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item->Index, jointIndex, relOffset.ToVector3()));
+	return GetJointPosition(*item, jointIndex, relOffset);
 }
 
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
@@ -632,7 +632,6 @@ float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
 	if (object.nmeshes == boneIndex)
 		return 0.0f;
 
-	int* bonePtr = &g_Level.Bones[object.boneIndex + ((boneIndex + 1) * 4)];
-	auto nextBoneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
-	return (nextBoneOffset).Length();
+	auto nextBoneOffset = GetJointOffset(objectID, boneIndex + 1);
+	return nextBoneOffset.Length();
 }
