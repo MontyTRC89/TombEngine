@@ -1879,15 +1879,10 @@ void ProcessEffects(ItemInfo* item)
 			
 			break;
 
-		case EffectType::Corpse:
-			if (TestProbability(1 / 72.0f))
-				SpawnCorpseEffect(pos.ToVector3());
-
-			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Corpse)
+	if (item->Effect.Type != EffectType::Smoke)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
@@ -1913,7 +1908,7 @@ void ProcessEffects(ItemInfo* item)
 		break;
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Corpse)
+	if (item->Effect.Type != EffectType::Smoke)
 	{
 		if (item->IsLara() ||
 			(item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))

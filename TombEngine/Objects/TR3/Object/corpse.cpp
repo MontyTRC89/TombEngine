@@ -19,6 +19,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR3
 {
@@ -49,8 +50,6 @@ namespace TEN::Entities::TR3
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.ItemFlags[2] = (int)EffectType::Corpse;
-
 		if (item.TriggerFlags == 1)
 		{
 			item.ItemFlags[1] = (int)CorpseFlags::Hanging;
@@ -72,14 +71,8 @@ namespace TEN::Entities::TR3
 	{
 		auto& item = g_Level.Items[itemNumber];
 	
-		if (TriggerActive(&item))
-		{
-			item.ItemFlags[2] = (int)EffectType::Corpse;
-		}
-		else
-		{
-			item.ItemFlags[2] = (int)EffectType::None;
-		}
+		if (!TriggerActive(&item))
+			return;
 
 		item.Effect.Type = (EffectType)item.ItemFlags[2];
 
@@ -148,6 +141,15 @@ namespace TEN::Entities::TR3
 		}
 
 		AnimateItem(&item);
+
+		int numMeshes = Objects[item.ObjectNumber].nmeshes;
+		for (int i = 0; i < numMeshes; i++)
+		{
+			auto pos = GetJointPosition(&item, i);
+
+			if (TestProbability(1 / 72.0f))
+				SpawnCorpseEffect(pos.ToVector3());
+		}
 	}
 
 	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
