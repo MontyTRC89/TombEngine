@@ -11,10 +11,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
+#include "Objects/TR3/Object/Corpse.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
+using namespace TEN::Entities::TR3;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -35,7 +37,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	const auto CompyBite = BiteInfo(Vector3::Zero, 2);
 	const auto CompyAttackJoints = std::vector<unsigned int>{ 1, 2 };
-	
+
 	enum CompyState
 	{
 		COMPY_STATE_IDLE = 0,
@@ -124,7 +126,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (SameZone(creature, &targetItem))
 					{
 						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-						if (distance < shortestDistance && targetItem.ObjectNumber == ID_CORPSE && targetItem.Active && TriggerActive(&targetItem))
+						if (distance < shortestDistance && targetItem.ObjectNumber == ID_CORPSE && targetItem.Active && TriggerActive(&targetItem) && targetItem.ItemFlags[1] == (int)CorpseFlags::Lying)
 						{
 							cadaverPos = targetItem.Pose.Position.ToVector3();
 							shortestDistance = distance;

@@ -39,13 +39,6 @@ namespace TEN::Entities::TR3
 		CORPSE_ANIM_LANDING = 3
 	};
 
-	enum class CorpseFlags
-	{
-		Lying	= (1 << 0),
-		Hanging = (1 << 1),
-		Falling = (1 << 2)
-	};
-
 	void InitialiseCorpse(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
