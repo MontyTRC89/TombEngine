@@ -211,6 +211,10 @@ namespace TEN::Math::Geometry
 			return axisAngle.ToQuaternion();
 		}
 
+		// If vectors are nearly identical, return identity quaternion.
+		if (dot > SINGULARITY_THRESHOLD)
+			return Quaternion::Identity;
+
 		// Calculate axis-angle and return converted quaternion.
 		auto axisAngle = AxisAngle(refDirection.Cross(direction), FROM_RAD(acos(dot)));
 		return axisAngle.ToQuaternion();

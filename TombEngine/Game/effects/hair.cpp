@@ -178,6 +178,7 @@ namespace TEN::Effects::Hair
 		auto absOrient = Geometry::ConvertDirectionToQuat(absDirection);
 
 		// Calculate relative twist rotation.
+		// TODO: Find accurate twist angle based on relation between absOrient and baseOrient.
 		auto twistAxisAngle = AxisAngle(absDirection, EulerAngles(baseOrient).y);
 		auto twistRot = twistAxisAngle.ToQuaternion();
 
