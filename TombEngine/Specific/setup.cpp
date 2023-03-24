@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
@@ -27,6 +28,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
+using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
@@ -369,7 +371,7 @@ void InitialiseObjects()
 	// User defined objects
 	CustomObjects();
 
-	InitialiseHair();
+	HairEffect.Initialize();
 	InitialiseSpecialEffects();
 
 	NumRPickups = 0;
