@@ -64,11 +64,6 @@ namespace TEN::Entities::TR3
 	{
 		auto& item = g_Level.Items[itemNumber];
 	
-		if (!TriggerActive(&item))
-			return;
-
-		item.Effect.Type = (EffectType)item.ItemFlags[2];
-
 		if (item.ItemFlags[1] == (int)CorpseFlags::Falling)
 		{
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
@@ -103,7 +98,6 @@ namespace TEN::Entities::TR3
 				{
 					item.Pose.Position.y = item.Pose.Position.y - item.Animation.Velocity.y;
 					SoundEffect(SFX_TR4_CROCGOD_LAND, &item.Pose);
-					item.Effect.Type = EffectType::Smoke;
 				}
 				else
 				{
@@ -134,6 +128,9 @@ namespace TEN::Entities::TR3
 		}
 
 		AnimateItem(&item);
+
+		if (!TriggerActive(&item))
+			return;
 
 		int numMeshes = Objects[item.ObjectNumber].nmeshes;
 		for (int i = 0; i < numMeshes; i++)
