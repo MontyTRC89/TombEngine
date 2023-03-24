@@ -29,12 +29,12 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
-	const auto DragonBackSpineJoints = std::vector<unsigned int>{ 21, 22, 23 };
+	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
-	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
-	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
+	#define DRAGON_CLOSE_RANGE pow(BLOCK(3), 2)
+	#define DRAGON_STATE_IDLE_RANGE pow(BLOCK(6), 2)
 	#define DRAGON_FLAME_SPEED 200
 
 	#define DRAGON_ALMOST_LIVE 100
@@ -42,7 +42,7 @@ namespace TEN::Entities::Creatures::TR2
 	#define BOOM_TIME_MIDDLE 140
 	#define BOOM_TIME_END 150
 
-	#define BARTOLI_RANGE SECTOR(9)
+	#define BARTOLI_RANGE BLOCK(9)
 	#define DRAGON_CLOSE 900
 	#define DRAGON_FAR 2300
 	#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
@@ -90,20 +90,22 @@ namespace TEN::Entities::Creatures::TR2
 
 	static void createExplosion(ItemInfo* item)
 	{
-		short ExplosionIndex = CreateItem();
+		short explosionIndex = CreateItem();
 
-		if (ExplosionIndex != NO_ITEM)
+		if (explosionIndex != NO_ITEM)
 		{
-			auto* explosionItem = &g_Level.Items[ExplosionIndex];
+			auto* explosionItem = &g_Level.Items[explosionIndex];
 
 			switch (item->Timer)
 			{
 			case BOOM_TIME:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM;
 				break;
+
 			case BOOM_TIME + 10:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM2;
 				break;
+
 			case BOOM_TIME + 20:
 				explosionItem->ObjectNumber = ID_SPHERE_OF_DOOM3;
 				break;
@@ -117,8 +119,8 @@ namespace TEN::Entities::Creatures::TR2
 			explosionItem->Animation.Velocity.y = 0.0f;
 			explosionItem->Animation.Velocity.z = 0.0f;
 
-			InitialiseItem(ExplosionIndex);
-			AddActiveItem(ExplosionIndex);
+			InitialiseItem(explosionIndex);
+			AddActiveItem(explosionIndex);
 
 			explosionItem->Status = ITEM_ACTIVE;
 		}
@@ -162,6 +164,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 			return;
+
 		if (!TestCollision(item, laraItem))
 			return;
 
@@ -169,13 +172,13 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			int rx = laraItem->Pose.Position.x - item->Pose.Position.x;
 			int rz = laraItem->Pose.Position.z - item->Pose.Position.z;
-			float s = phd_sin(item->Pose.Orientation.y);
-			float c = phd_cos(item->Pose.Orientation.y);
+			float sinY = phd_sin(item->Pose.Orientation.y);
+			float cosY = phd_cos(item->Pose.Orientation.y);
 
-			int sideShift = rx * s + rz * c;
+			int sideShift = rx * sinY + rz * cosY;
 			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
 			{
-				int shift = rx * c - rz * s;
+				int shift = rx * cosY - rz * sinY;
 				if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 					return;
 
@@ -226,8 +229,8 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					shift = DRAGON_FAR - shift;
 
-				laraItem->Pose.Position.x += shift * c;
-				laraItem->Pose.Position.z -= shift * s;
+				laraItem->Pose.Position.x += shift * cosY;
+				laraItem->Pose.Position.z -= shift * sinY;
 
 				return;
 			}
@@ -236,13 +239,13 @@ namespace TEN::Entities::Creatures::TR2
 		ItemPushItem(item, laraItem, coll, 1, 0);
 	}
 
-
 	static void TriggerFireBreath(ItemInfo* item, const BiteInfo& bite, const Vector3i& speed, ItemInfo* enemy)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			auto* spark = GetFreeParticle();
 
+			spark->on = true;
 			spark->sR = (GetRandomControl() & 0x1F) + 48;
 			spark->sG = 38;
 			spark->sB = 255;
@@ -278,11 +281,8 @@ namespace TEN::Entities::Creatures::TR2
 			spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
 			spark->sSize = spark->dSize / 4;
 			spark->size = spark->dSize / 2;
-
-			spark->on = 1;
 		}
 	}
-
 
 	void DragonControl(short backItemNumber)
 	{
@@ -297,10 +297,10 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 		short head = 0;
 
-		bool ahead;
+		bool isAhead;
 
 		if (item->HitPoints <= 0)
 		{
@@ -316,6 +316,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Flags == DRAGON_LIVE_TIME)
 					item->Animation.TargetState = DRAGON_STATE_IDLE;
+
 				if (creature->Flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 					item->HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 			}
@@ -325,7 +326,9 @@ namespace TEN::Entities::Creatures::TR2
 					CreateBartoliLight(itemNumber, 2);
 
 				if (creature->Flags == -100)
+				{
 					createDragonBone(itemNumber);
+				}
 				else if (creature->Flags == -200)
 				{
 					DisableEntityAI(itemNumber);
@@ -347,14 +350,14 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
-			angle = CreatureTurn(item, DRAGON_STATE_WALK_TURN);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
+			headingAngle = CreatureTurn(item, DRAGON_STATE_WALK_TURN);
 
-			ahead = (AI.ahead && AI.distance > DRAGON_CLOSE_RANGE && AI.distance < DRAGON_STATE_IDLE_RANGE);
+			isAhead = (ai.ahead && ai.distance > DRAGON_CLOSE_RANGE && ai.distance < DRAGON_STATE_IDLE_RANGE);
 
 			if (item->TouchBits.TestAny())
 				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
@@ -362,27 +365,35 @@ namespace TEN::Entities::Creatures::TR2
 			switch (item->Animation.ActiveState)
 			{
 			case DRAGON_STATE_IDLE:
-				item->Pose.Orientation.y -= angle;
+				item->Pose.Orientation.y -= headingAngle;
 
-				if (!ahead)
+				if (!isAhead)
 				{
-					if (AI.distance > DRAGON_STATE_IDLE_RANGE || !AI.ahead)
+					if (ai.distance > DRAGON_STATE_IDLE_RANGE || !ai.ahead)
+					{
 						item->Animation.TargetState = DRAGON_STATE_WALK;
-					else if (AI.ahead && AI.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
+					}
+					else if (ai.ahead && ai.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
 					{
 						creature->Flags = 1;
-						if (AI.angle < 0)
+						if (ai.angle < 0)
 							item->Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
 						else
 							item->Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
 					}
-					else if (AI.angle < 0)
+					else if (ai.angle < 0)
+					{
 						item->Animation.TargetState = DRAGON_STATE_TURN_LEFT;
+					}
 					else
+					{
 						item->Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
+					}
 				}
 				else
+				{
 					item->Animation.TargetState = DRAGON_STATE_AIM_1;
+				}
 
 				break;
 
@@ -407,18 +418,18 @@ namespace TEN::Entities::Creatures::TR2
 			case DRAGON_STATE_WALK:
 				creature->Flags = 0;
 
-				if (ahead)
+				if (isAhead)
 					item->Animation.TargetState = DRAGON_STATE_IDLE;
-				else if (angle < -DRAGON_NEED_TURN)
+				else if (headingAngle < -DRAGON_NEED_TURN)
 				{
-					if (AI.distance < DRAGON_STATE_IDLE_RANGE && AI.ahead)
+					if (ai.distance < DRAGON_STATE_IDLE_RANGE && ai.ahead)
 						item->Animation.TargetState = DRAGON_STATE_IDLE;
 					else
 						item->Animation.TargetState = DRAGON_STATE_LEFT;
 				}
-				else if (angle > DRAGON_NEED_TURN)
+				else if (headingAngle > DRAGON_NEED_TURN)
 				{
-					if (AI.distance < DRAGON_STATE_IDLE_RANGE && AI.ahead)
+					if (ai.distance < DRAGON_STATE_IDLE_RANGE && ai.ahead)
 						item->Animation.TargetState = DRAGON_STATE_IDLE;
 					else
 						item->Animation.TargetState = DRAGON_STATE_RIGHT;
@@ -427,34 +438,34 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_LEFT:
-				if (angle > -DRAGON_NEED_TURN || ahead)
+				if (headingAngle > -DRAGON_NEED_TURN || isAhead)
 					item->Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
 
 			case DRAGON_STATE_RIGHT:
-				if (angle < DRAGON_NEED_TURN || ahead)
+				if (headingAngle < DRAGON_NEED_TURN || isAhead)
 					item->Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
 
 			case DRAGON_STATE_TURN_LEFT:
-				item->Pose.Orientation.y += -(ANGLE(1.0f) - angle);
+				item->Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
 				creature->Flags = 0;
 				break;
 
 			case DRAGON_STATE_TURN_RIGHT:
-				item->Pose.Orientation.y += (ANGLE(1.0f) - angle);
+				item->Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
 				creature->Flags = 0;
 				break;
 
 			case DRAGON_STATE_AIM_1:
-				item->Pose.Orientation.y -= angle;
+				item->Pose.Orientation.y -= headingAngle;
 
-				if (AI.ahead)
-					head = -AI.angle;
+				if (ai.ahead)
+					head = -ai.angle;
 
-				if (ahead)
+				if (isAhead)
 				{
 					item->Animation.TargetState = DRAGON_STATE_FIRE_1;
 					creature->Flags = 30;
@@ -468,28 +479,30 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_FIRE_1:
-				item->Pose.Orientation.y -= angle;
+				item->Pose.Orientation.y -= headingAngle;
 				SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
-				if (AI.ahead)
-					head = -AI.angle;
+				if (ai.ahead)
+					head = -ai.angle;
+
 				if (creature->Flags)
 				{
-					if (AI.ahead)
-					{
+					if (ai.ahead)
 						TriggerFireBreath(item, DragonMouthBite, Vector3i(0, 0, 300), creature->Enemy);
-					}
+					
 					creature->Flags--;
 				}
 				else
+				{
 					item->Animation.TargetState = DRAGON_STATE_IDLE;
+				}
 
 				break;
 			}
 		}
 
 		CreatureJoint(item, 0, head);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 
 		back->Animation.ActiveState = item->Animation.ActiveState;
 		back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
@@ -503,6 +516,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void CreateDragonFront(ItemInfo* bartoliItem, ItemInfo* dragonBackItem)
 	{
 		short frontItemNumber = CreateItem();
+
 		if (frontItemNumber != NO_ITEM && dragonBackItem != nullptr)
 		{
 			auto* dragonFrontItem = &g_Level.Items[frontItemNumber];
@@ -517,7 +531,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			TENLog("Failed to create the dragon front item from marco bartoli item !", LogLevel::Warning);
+			TENLog("Failed to create the dragon front from Marco Bartoli.", LogLevel::Warning);
 		}
 	}
 
@@ -533,7 +547,9 @@ namespace TEN::Entities::Creatures::TR2
 			dragonBackItem->ObjectNumber = ID_DRAGON_BACK;
 			dragonBackItem->Model.Color = bartoliItem->Model.Color;
 			InitialiseItem(backItemNumber);
-			dragonBackItem->MeshBits.Clear(DragonBackSpineJoints); // No need to draw it if it's alive.
+
+			// No need to draw it if alive.
+			dragonBackItem->MeshBits.Clear(DragonBackSpineJoints);
 			bartoliItem->Data = backItemNumber;
 			g_Level.NumItems++;
 
@@ -541,7 +557,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			TENLog("Failed to create the dragon back item from marco bartoli item !", LogLevel::Warning);
+			TENLog("Failed to create dragon back from Marco Bartoli.", LogLevel::Warning);
 		}
 	}
 
@@ -570,11 +586,17 @@ namespace TEN::Entities::Creatures::TR2
 					front = &g_Level.Items[frontItem];
 
 					if (item->Timer == BOOM_TIME)
+					{
 						front->ObjectNumber = ID_SPHERE_OF_DOOM;
+					}
 					else if (item->Timer == BOOM_TIME + 10)
+					{
 						front->ObjectNumber = ID_SPHERE_OF_DOOM2;
+					}
 					else
+					{
 						front->ObjectNumber = ID_SPHERE_OF_DOOM3;
+					}
 
 					front->Pose.Position.x = item->Pose.Position.x;
 					front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
@@ -585,7 +607,8 @@ namespace TEN::Entities::Creatures::TR2
 					InitialiseItem(frontItem);
 					AddActiveItem(frontItem);
 
-					front->Timer = 100; // Time before it fade away.
+					// Time before fading away.
+					front->Timer = 100;
 					front->Status = ITEM_ACTIVE;
 				}
 			}
@@ -609,7 +632,7 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 		else if (abs(LaraItem->Pose.Position.x - item->Pose.Position.x) < BARTOLI_RANGE &&
-			     abs(LaraItem->Pose.Position.z - item->Pose.Position.z) < BARTOLI_RANGE)
+			abs(LaraItem->Pose.Position.z - item->Pose.Position.z) < BARTOLI_RANGE)
 		{
 			item->Timer = 1;
 		}
@@ -622,7 +645,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->Timer > 0)
 		{
 			item->Timer--;
-			if (item->Model.Mutator.size() >= 1)
+			if (!item->Model.Mutator.empty())
 				item->Model.Mutator[0].Scale += Vector3(0.5f);
 		}
 		else
