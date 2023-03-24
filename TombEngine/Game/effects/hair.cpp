@@ -175,12 +175,10 @@ namespace TEN::Effects::Hair
 		// Calculate absolute orientation.
 		auto absDirection = target - origin;
 		absDirection.Normalize();
-		auto absOrient = Geometry::GetQuaternionFromDirection(absDirection);
+		auto absOrient = Geometry::ConvertDirectionToQuat(absDirection);
 
 		// Calculate relative twist rotation.
-		auto twistAxis = Vector3::Transform(Vector3::UnitZ, absOrient);
-		float twistAngle = EulerAngles(baseOrient).y;
-		auto twistAxisAngle = AxisAngle(twistAxis, twistAngle);
+		auto twistAxisAngle = AxisAngle(absDirection, EulerAngles(baseOrient).y);
 		auto twistRot = twistAxisAngle.ToQuaternion();
 
 		// Return ideal orientation.

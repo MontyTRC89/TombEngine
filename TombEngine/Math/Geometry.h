@@ -42,9 +42,12 @@ namespace TEN::Math::Geometry
 	// Misc. getters
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
-	Quaternion	GetQuaternionFromDirection(const Vector3& direction, const Vector3& refDirection = Vector3::UnitZ);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& gravity = Vector3::UnitY);
+
+	// Converters
+	Quaternion ConvertDirectionToQuat(const Vector3& direction);
+	Vector3	   ConvertQuatToDirection(const Quaternion& quat);
 
 	// Point relation inquirers
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
