@@ -495,15 +495,15 @@ static void StartObject(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SPHERE_OF_DOOM];
 	if (obj->loaded)
-		obj->control = SphereOfDoomControl;
+		obj->control = ControlDragonTransformationSphere;
 
 	obj = &Objects[ID_SPHERE_OF_DOOM2];
 	if (obj->loaded)
-		obj->control = SphereOfDoomControl;
+		obj->control = ControlDragonTransformationSphere;
 
 	obj = &Objects[ID_SPHERE_OF_DOOM3];
 	if (obj->loaded)
-		obj->control = SphereOfDoomControl;
+		obj->control = ControlDragonTransformationSphere;
 }
 
 static void StartTrap(ObjectInfo* obj)

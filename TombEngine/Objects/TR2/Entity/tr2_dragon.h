@@ -9,5 +9,5 @@ namespace TEN::Entities::Creatures::TR2
 	void DragonControl(short backNumber);
 	void BartoliControl(short itemNumber);
 
-	void SphereOfDoomControl(short itemNumber);
+	void ControlDragonTransformationSphere(short itemNumber);
 }
