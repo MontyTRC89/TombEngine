@@ -26,9 +26,9 @@ static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 	return ((frameCount > 0) ? frameCount : 1);
 }
 
-static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
+static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 {
-	const auto& anim = GetAnimData(*item);
+	const auto& anim = GetAnimData(item);
 
 	// No commands; return early.
 	if (anim.NumCommands == 0)
@@ -47,16 +47,16 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 		case AnimCommandType::MoveOrigin:
 			if (!isFrameBased)
 			{
-				TranslateItem(item, item->Pose.Orientation.y, commandDataPtr[2], commandDataPtr[1], commandDataPtr[0]);
+				TranslateItem(&item, item.Pose.Orientation.y, commandDataPtr[2], commandDataPtr[1], commandDataPtr[0]);
 
-				if (item->IsLara())
+				if (item.IsLara())
 				{
-					auto bounds = GameBoundingBox(item);
-					UpdateLaraRoom(item, -bounds.GetHeight() / 2, -commandDataPtr[0], -commandDataPtr[2]);
+					auto bounds = GameBoundingBox(&item);
+					UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -commandDataPtr[0], -commandDataPtr[2]);
 				}
 				else
 				{
-					UpdateItemRoom(item->Index);
+					UpdateItemRoom(item.Index);
 				}
 			}
 
@@ -66,17 +66,17 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 		case AnimCommandType::JumpVelocity:
 			if (!isFrameBased)
 			{
-				item->Animation.Velocity.y = commandDataPtr[0];
-				item->Animation.Velocity.z = commandDataPtr[1];
-				item->Animation.IsAirborne = true;
+				item.Animation.Velocity.y = commandDataPtr[0];
+				item.Animation.Velocity.z = commandDataPtr[1];
+				item.Animation.IsAirborne = true;
 
-				if (item->IsLara())
+				if (item.IsLara())
 				{
-					auto& player = *GetLaraInfo(item);
+					auto& player = GetLaraInfo(item);
 
 					if (player.Control.CalculatedJumpVelocity != 0)
 					{
-						item->Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
+						item.Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
 						player.Control.CalculatedJumpVelocity = 0;
 					}
 				}
@@ -88,18 +88,18 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 		case AnimCommandType::Deactivate:
 			if (!isFrameBased)
 			{
-				if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
-					item->AfterDeath = 1;
+				if (Objects[item.ObjectNumber].intelligent && !item.AfterDeath)
+					item.AfterDeath = 1;
 
-				item->Status = ITEM_DEACTIVATED;
+				item.Status = ITEM_DEACTIVATED;
 			}
 
 			break;
 
 		case AnimCommandType::AttackReady:
-			if (!isFrameBased && item->IsLara())
+			if (!isFrameBased && item.IsLara())
 			{
-				auto& player = *GetLaraInfo(item);
+				auto& player = GetLaraInfo(item);
 
 				if (player.Control.HandStatus != HandStatus::Special)
 					player.Control.HandStatus = HandStatus::Free;
@@ -108,45 +108,45 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item->Animation.FrameNumber == commandDataPtr[0])
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
 			{
-				if (!Objects[item->ObjectNumber].waterCreature)
+				if (!Objects[item.ObjectNumber].waterCreature)
 				{
 					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
 					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
 					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
 
-					if (item->IsLara())
+					if (item.IsLara())
 					{
-						auto& player = *GetLaraInfo(item);
+						auto& player = GetLaraInfo(item);
 
 						if (playAlways ||
 							(playOnLand && (player.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+							(playInWater && player.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
 					}
 					else
 					{
-						if (item->RoomNumber == NO_ROOM)
+						if (item.RoomNumber == NO_ROOM)
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
-						else if (TestEnvironment(ENV_FLAG_WATER, item))
+						else if (TestEnvironment(ENV_FLAG_WATER, &item))
 						{
 							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
 						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
 					}
 				}
 				else
 				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				}
 			}
 
@@ -154,8 +154,8 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::Flipeffect:
-			if (isFrameBased && item->Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), item);
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
 
 			commandDataPtr += 2;
 			break;
@@ -168,9 +168,9 @@ static void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 
 void AnimateLara(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	PerformAnimCommands(item, true);
+	PerformAnimCommands(*item, true);
 
 	item->Animation.FrameNumber++;
 
@@ -184,7 +184,7 @@ void AnimateLara(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
 	{
-		PerformAnimCommands(item, false);
+		PerformAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->JumpAnimNum;
 		item->Animation.FrameNumber = animPtr->JumpFrameNum;
@@ -225,7 +225,7 @@ void AnimateLara(ItemInfo* item)
 	}
 	else
 	{
-		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 			item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
 		else
 			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
@@ -233,11 +233,11 @@ void AnimateLara(ItemInfo* item)
 
 	item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
 
-	if (lara->Control.Rope.Ptr != -1)
+	if (player.Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!lara->Control.IsMoving)
-		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+	if (!player.Control.IsMoving)
+		TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
 	g_Renderer.UpdateLaraAnimations(true);
@@ -248,7 +248,7 @@ void AnimateItem(ItemInfo* item)
 	item->TouchBits.ClearAll();
 	item->HitStatus = false;
 
-	PerformAnimCommands(item, true);
+	PerformAnimCommands(*item, true);
 
 	item->Animation.FrameNumber++;
 
@@ -265,7 +265,7 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
 	{
-		PerformAnimCommands(item, false);
+		PerformAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->JumpAnimNum;
 		item->Animation.FrameNumber = animPtr->JumpFrameNum;
