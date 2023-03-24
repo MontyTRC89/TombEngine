@@ -13,6 +13,9 @@ Version 1.0.8
 * Add the ability to set cold bar in rooms (achieved by setting cold flag to a room in Tomb Editor).
 * Add water wakes for vehicles.
 
+Lua API changes:
+* Add new function Misc::IsSoundPlaying() 
+
 Version 1.0.7
 =============
 
