@@ -133,4 +133,9 @@ AnimFrame&			GetBestFrame(const ItemInfo& item);
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
+void PerformAnimCommands(ItemInfo* item, bool isFrameBased);
+
+Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3	 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
+float	 GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);

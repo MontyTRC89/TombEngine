@@ -534,7 +534,7 @@ AnimFrame& GetBestFrame(const ItemInfo& item)
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item)
 {
-	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
+	return (item->Animation.FrameNumber - GetFrameNumber(item, 0));
 }
 
 // NOTE: Returns g_Level.Anims index.
@@ -605,8 +605,34 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 	}
 }
 
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
+Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
+	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+}
+
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
+{
 	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item->Index, jointIndex, relOffset.ToVector3()));
+}
+
+Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
+{
+	const auto& object = Objects[objectID];
+
+	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
+	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+}
+
+// NOTE: Will not work for bones at ends of hierarchies.
+float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
+{
+	const auto& object = Objects[objectID];
+
+	if (object.nmeshes == boneIndex)
+		return 0.0f;
+
+	int* bonePtr = &g_Level.Bones[object.boneIndex + ((boneIndex + 1) * 4)];
+	auto nextBoneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+	return (nextBoneOffset).Length();
 }
