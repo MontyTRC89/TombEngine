@@ -19,35 +19,181 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+// NOTE: 0 frames counts as 1.
+static unsigned int GetNonZeroFrameCount(const AnimData& anim)
+{
+	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	return ((frameCount > 0) ? frameCount : 1);
+}
+
+static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
+{
+	const auto& anim = GetAnimData(item);
+
+	// No commands; return early.
+	if (anim.NumCommands == 0)
+		return;
+
+	// Get command data pointer.
+	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
+
+	for (int i = anim.NumCommands; i > 0; i--)
+	{
+		auto animCommand = (AnimCommandType)commandDataPtr[0];
+		commandDataPtr++;
+
+		switch (animCommand)
+		{
+		case AnimCommandType::MoveOrigin:
+			if (!isFrameBased)
+			{
+				TranslateItem(&item, item.Pose.Orientation.y, commandDataPtr[2], commandDataPtr[1], commandDataPtr[0]);
+
+				if (item.IsLara())
+				{
+					auto bounds = GameBoundingBox(&item);
+					UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -commandDataPtr[0], -commandDataPtr[2]);
+				}
+				else
+				{
+					UpdateItemRoom(item.Index);
+				}
+			}
+
+			commandDataPtr += 3;
+			break;
+
+		case AnimCommandType::JumpVelocity:
+			if (!isFrameBased)
+			{
+				item.Animation.Velocity.y = commandDataPtr[0];
+				item.Animation.Velocity.z = commandDataPtr[1];
+				item.Animation.IsAirborne = true;
+
+				if (item.IsLara())
+				{
+					auto& player = GetLaraInfo(item);
+
+					if (player.Control.CalculatedJumpVelocity != 0)
+					{
+						item.Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
+						player.Control.CalculatedJumpVelocity = 0;
+					}
+				}
+			}
+
+			commandDataPtr += 2;
+			break;
+
+		case AnimCommandType::Deactivate:
+			if (!isFrameBased)
+			{
+				if (Objects[item.ObjectNumber].intelligent && !item.AfterDeath)
+					item.AfterDeath = 1;
+
+				item.Status = ITEM_DEACTIVATED;
+			}
+
+			break;
+
+		case AnimCommandType::AttackReady:
+			if (!isFrameBased && item.IsLara())
+			{
+				auto& player = GetLaraInfo(item);
+
+				if (player.Control.HandStatus != HandStatus::Special)
+					player.Control.HandStatus = HandStatus::Free;
+			}
+
+			break;
+
+		case AnimCommandType::SoundEffect:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+			{
+				if (!Objects[item.ObjectNumber].waterCreature)
+				{
+					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
+					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
+					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
+
+					if (item.IsLara())
+					{
+						auto& player = GetLaraInfo(item);
+
+						if (playAlways ||
+							(playOnLand && (player.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.WaterSurfaceDist == NO_HEIGHT)) ||
+							(playInWater && player.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
+						{
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+						}
+					}
+					else
+					{
+						if (item.RoomNumber == NO_ROOM)
+						{
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+						}
+						else if (TestEnvironment(ENV_FLAG_WATER, &item))
+						{
+							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
+								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+						}
+						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
+						{
+							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+						}
+					}
+				}
+				else
+				{
+					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+				}
+			}
+
+			commandDataPtr += 2;
+			break;
+
+		case AnimCommandType::Flipeffect:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
+
+			commandDataPtr += 2;
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
 void AnimateLara(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	PerformAnimCommands(item, true);
+	PerformAnimCommands(*item, true);
 
 	item->Animation.FrameNumber++;
 
-	auto* animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+	const auto* animPtr = &GetAnimData(*item);
 
 	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
 	{
-		animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+		animPtr = &GetAnimData(*item);
 		item->Animation.ActiveState = animPtr->ActiveState;
 	}
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
 	{
-		PerformAnimCommands(item, false);
+		PerformAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->JumpAnimNum;
 		item->Animation.FrameNumber = animPtr->JumpFrameNum;
 
-		animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+		animPtr = &GetAnimData(*item);
 		item->Animation.ActiveState = animPtr->ActiveState;
 	}
 
-	int frameCount = animPtr->frameEnd - animPtr->frameBase;
-	frameCount = (frameCount > 0) ? frameCount : 1;
+	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
 	if (item->Animation.IsAirborne)
@@ -71,14 +217,15 @@ void AnimateLara(ItemInfo* item)
 		}
 		else
 		{
-			item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
 			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+			item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
+
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
 	else
 	{
-		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 			item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
 		else
 			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
@@ -86,164 +233,30 @@ void AnimateLara(ItemInfo* item)
 
 	item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
 
-	if (lara->Control.Rope.Ptr != -1)
+	if (player.Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!lara->Control.IsMoving)
-		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+	if (!player.Control.IsMoving)
+		TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
 	g_Renderer.UpdateLaraAnimations(true);
 }
 
-void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
-{
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
-
-	if (anim.NumCommands == 0)
-		return;
-
-	short* commandPtr = &g_Level.Commands[anim.CommandIndex];
-
-	for (int i = anim.NumCommands; i > 0; i--)
-	{
-		auto animCommand = (AnimCommandType)commandPtr[0];
-		commandPtr++;
-
-		switch (animCommand)
-		{
-		case AnimCommandType::MoveOrigin:
-			if (!isFrameBased)
-			{
-				TranslateItem(item, item->Pose.Orientation.y, commandPtr[2], commandPtr[1], commandPtr[0]);
-
-				if (item->IsLara())
-				{
-					auto bounds = GameBoundingBox(item);
-					UpdateLaraRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
-				}
-				else
-				{
-					UpdateItemRoom(item->Index);
-				}
-			}
-
-			commandPtr += 3;
-			break;
-
-		case AnimCommandType::JumpVelocity:
-			if (!isFrameBased)
-			{
-				item->Animation.Velocity.y = commandPtr[0];
-				item->Animation.Velocity.z = commandPtr[1];
-				item->Animation.IsAirborne = true;
-
-				if (item->IsLara())
-				{
-					auto& lara = *GetLaraInfo(item);
-
-					if (lara.Control.CalculatedJumpVelocity)
-					{
-						item->Animation.Velocity.y = lara.Control.CalculatedJumpVelocity;
-						lara.Control.CalculatedJumpVelocity = 0;
-					}
-				}
-			}
-
-			commandPtr += 2;
-			break;
-
-		case AnimCommandType::Deactivate:
-			if (!isFrameBased)
-			{
-				if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
-					item->AfterDeath = 1;
-
-				item->Status = ITEM_DEACTIVATED;
-			}
-
-			break;
-
-		case AnimCommandType::AttackReady:
-			if (!isFrameBased && item->IsLara())
-			{
-				auto& lara = *GetLaraInfo(item);
-
-				if (lara.Control.HandStatus != HandStatus::Special)
-					lara.Control.HandStatus = HandStatus::Free;
-			}
-
-			break;
-
-		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item->Animation.FrameNumber == commandPtr[0])
-			{
-				if (!Objects[item->ObjectNumber].waterCreature)
-				{
-					bool inWater = (commandPtr[1] & 0x8000) != 0;
-					bool onDry   = (commandPtr[1] & 0x4000) != 0;
-					bool always  = (inWater && onDry) || (!inWater && !onDry);
-
-					if (item->IsLara())
-					{
-						auto* lara = GetLaraInfo(item);
-
-						if (always ||
-						   (onDry && (lara->WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-						   (inWater && lara->WaterSurfaceDist < -SHALLOW_WATER_DEPTH && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
-						{
-							SoundEffect(commandPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item->RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, item))
-						{
-							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-						}
-						else if (always || (onDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-							SoundEffect(commandPtr[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-					}
-				}
-				else
-					SoundEffect(commandPtr[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-			}
-
-			commandPtr += 2;
-			break;
-
-		case AnimCommandType::Flipeffect:
-			if (isFrameBased && item->Animation.FrameNumber == commandPtr[0])
-				DoFlipEffect((commandPtr[1] & 0x3FFF), item);
-
-			commandPtr += 2;
-			break;
-
-		default:
-			break;
-		}
-	}
-}
-
 void AnimateItem(ItemInfo* item)
 {
-	item->TouchBits = NO_JOINT_BITS;
+	item->TouchBits.ClearAll();
 	item->HitStatus = false;
 
-	PerformAnimCommands(item, true);
+	PerformAnimCommands(*item, true);
 
 	item->Animation.FrameNumber++;
 
-	auto* animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+	const auto* animPtr = &GetAnimData(*item);
 
 	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
 	{
-		animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+		animPtr = &GetAnimData(*item);
 
 		item->Animation.ActiveState = animPtr->ActiveState;
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
@@ -252,12 +265,12 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
 	{
-		PerformAnimCommands(item, false);
+		PerformAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->JumpAnimNum;
 		item->Animation.FrameNumber = animPtr->JumpFrameNum;
 
-		animPtr = &g_Level.Anims[item->Animation.AnimNumber];
+		animPtr = &GetAnimData(*item);
 		if (item->Animation.ActiveState != animPtr->ActiveState)
 		{
 			item->Animation.ActiveState = animPtr->ActiveState;
@@ -268,8 +281,7 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = NO_STATE;
 	}
 
-	int frameCount = animPtr->frameEnd - animPtr->frameBase;
-	frameCount = (frameCount > 0) ? frameCount : 1;
+	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
 	if (item->Animation.IsAirborne)
@@ -279,39 +291,45 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
 		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
-	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.UpdateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(item->Index, true);
 }
 
 bool HasStateDispatch(ItemInfo* item, int targetState)
 {
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+	const auto& anim = GetAnimData(*item);
 
+	// No dispatches; return early.
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
 	if (targetState == NO_STATE)
 		targetState = item->Animation.TargetState;
 
-	// Iterate over possible state dispatches.
+	// Iterate over animation's state dispatches.
 	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
-		if (dispatch.TargetState == targetState)
+		
+		if (dispatch.TargetState != targetState)
+			continue;
+
+		// Iterate over dispatch frame ranges.
+		for (int j = 0; j < dispatch.NumberRanges; j++)
 		{
-			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch.NumberRanges; j++)
+			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
+
+			// Check if current frame is within dispatch range.
+			if (item->Animation.FrameNumber >= range.StartFrame &&
+				item->Animation.FrameNumber <= range.EndFrame)
 			{
-				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
-					return true;
+				return true;
 			}
 		}
 	}
@@ -321,7 +339,8 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 
 bool TestAnimNumber(const ItemInfo& item, int animNumber)
 {
-	return (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + animNumber));
+	const auto& object = Objects[item.ObjectNumber];
+	return (item.Animation.AnimNumber == (object.animIndex + animNumber));
 }
 
 bool TestLastFrame(ItemInfo* item, int animNumber)
@@ -332,19 +351,19 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	const auto& anim = g_Level.Anims[animNumber];
+	const auto& anim = GetAnimData(*item, animNumber);
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
 bool TestAnimFrame(const ItemInfo& item, int frameStart)
 {
-	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
+	const auto& anim = GetAnimData(item);
 	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
 }
 
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
 {
-	const auto& anim = g_Level.Anims[item.Animation.AnimNumber];
+	const auto& anim = GetAnimData(item);
 	return (item.Animation.FrameNumber >= (anim.frameBase + frameStart) &&
 			item.Animation.FrameNumber <= (anim.frameBase + frameEnd));
 }
@@ -364,52 +383,83 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 {
+	const auto& object = Objects[item->ObjectNumber];
+	int animIndex = object.animIndex + animNumber;
+
+	// Animation already set; return early.
 	if (item->Animation.AnimNumber == animIndex)
 		return;
 
-	int index = Objects[item->ObjectNumber].animIndex + animIndex;
-	if (index < 0 || index >= g_Level.Anims.size())
+	// Animation doesn't exist; return early.
+	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
-		TENLog(std::string("Attempted to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		TENLog(
+			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
+			std::string(" for object ") + std::to_string(item->ObjectNumber),
+			LogLevel::Warning);
+
 		return;
 	}
 
-	item->Animation.AnimNumber = index;
-	const auto& anim = g_Level.Anims[index];
-
-	item->Animation.FrameNumber = anim.frameBase + frameToStart;
-	item->Animation.ActiveState = anim.ActiveState;
+	const auto& anim = GetAnimData(*item, animNumber);
+	
+	item->Animation.AnimNumber = animIndex;
+	item->Animation.FrameNumber = anim.frameBase + frameNumber;
+	item->Animation.ActiveState =
 	item->Animation.TargetState = anim.ActiveState;
+}
+
+AnimData& GetAnimData(int animIndex)
+{
+	return g_Level.Anims[animIndex];
+}
+
+AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
+{
+	return g_Level.Anims[object.animIndex + animNumber];
+}
+
+AnimData& GetAnimData(const ItemInfo& item, int animNumber)
+{
+	if (animNumber == NO_ANIM)
+		return g_Level.Anims[item.Animation.AnimNumber];
+
+	const auto& object = Objects[item.ObjectNumber];
+	return GetAnimData(object, animNumber);
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 {
+	// Active and target states already match; return early.
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
+	// No dispatches; return early.
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	// Iterate over possible state dispatches.
+	// Iterate over animation's state dispatches.
 	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
 
-		if (dispatch.TargetState == item->Animation.TargetState)
-		{
-			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch.NumberRanges; j++)
-			{
-				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
+		if (dispatch.TargetState != item->Animation.TargetState)
+			continue;
 
-				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
-				{
-					item->Animation.AnimNumber = range.LinkAnimNum;
-					item->Animation.FrameNumber = range.LinkFrameNum;
-					return true;
-				}
+		// Iterate over dispatch frame ranges.
+		for (int j = 0; j < dispatch.NumberRanges; j++)
+		{
+			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
+
+			// Set new animation if current frame is within dispatch range.
+			if (item->Animation.FrameNumber >= range.StartFrame &&
+				item->Animation.FrameNumber <= range.EndFrame)
+			{
+				item->Animation.AnimNumber = range.LinkAnimNum;
+				item->Animation.FrameNumber = range.LinkFrameNum;
+				return true;
 			}
 		}
 	}
@@ -417,77 +467,81 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
-int GetFrame(const ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
-	int frame = item->Animation.FrameNumber;
-	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+	const auto& anim = GetAnimData(item);
 
-	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate = outRate = anim.Interpolation & 0x00FF;
-	frame -= anim.frameBase;
+	// Normalize animation's current frame number into keyframe range.
+	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
+	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
 
-	int first = frame / rate;
-	int interpolation = frame % rate;
-	outFramePtr[0] += first;			 // Get frame pointers...
-	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
+	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
+	int frame0 = (int)floor(frameNumberNorm);
+	int frame1 = (int)ceil(frameNumberNorm);
+	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
+	auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
 
-	if (interpolation == 0)
-		return 0;
+	// Calculate interpolation alpha between keyframes.
+	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
 
-	// Clamp key frame to end if need be.
-	int second = first * rate + rate;
-	if (second > anim.frameEnd)
-		outRate = anim.frameEnd - (second - rate);
-
-	return interpolation;
+	// Return frame interpolation data.
+	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
 }
 
-AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber)
+AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber)
 {
-	int animIndex = Objects[slot].animIndex + animNumber;
+	return *GetFrame(item.ObjectNumber, animNumber, frameNumber);
+}
+
+AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+{
+	const auto& object = Objects[objectID];
+
+	int animIndex = object.animIndex + animNumber;
 	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
 
-	const auto& anim = g_Level.Anims[animIndex];
+	const auto& anim = GetAnimData(object, animNumber);
 
-	int frameCount = anim.frameEnd - anim.frameBase;
+	// Get and clamp frame count.
+	unsigned int frameCount = anim.frameEnd - anim.frameBase;
 	if (frameNumber > frameCount)
 		frameNumber = frameCount;
 
-	auto* result = &g_Level.Frames[anim.FramePtr];
-	result += frameNumber / anim.Interpolation;
-	return result;
+	// Interpolate and return frame pointer.
+	auto* framePtr = &g_Level.Frames[anim.FramePtr];
+	framePtr += frameNumber / anim.Interpolation;
+	return framePtr;
 }
 
-AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber)
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber)
 {
-	return GetFrame(slot, animNumber, 0);
+	return GetFrame(objectID, animNumber, 0);
 }
 
-AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber)
+AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 {
-	return GetFrame(slot, animNumber, INT_MAX);
+	return GetFrame(objectID, animNumber, INT_MAX);
 }
 
-AnimFrame* GetBestFrame(const ItemInfo* item)
+AnimFrame& GetBestFrame(const ItemInfo& item)
 {
-	int rate = 0;
-	AnimFrame* framePtr[2];
-	int frac = GetFrame(item, framePtr, rate);
-
-	if (frac <= (rate >> 1))
-		return framePtr[0];
+	auto frameData = GetFrameInterpData(item);
+	if (frameData.Alpha <= 0.5f)
+		return *frameData.FramePtr0;
 	else
-		return framePtr[1];
+		return *frameData.FramePtr1;
 }
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item)
 {
-	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
+	return (item->Animation.FrameNumber - GetFrameNumber(item, 0));
 }
 
-int GetAnimNumber(ItemInfo& item, int animID)
+// NOTE: Returns g_Level.Anims index.
+int GetAnimNumber(ItemInfo& item, int animNumber)
 {
-	return Objects[item.ObjectNumber].animIndex + animID;
+	const auto& object = Objects[item.ObjectNumber];
+	return (object.animIndex + animNumber);
 }
 
 int GetFrameNumber(ItemInfo* item, int frameToStart)
@@ -498,16 +552,21 @@ int GetFrameNumber(ItemInfo* item, int frameToStart)
 
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 {
-	return (g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart);
+	const auto& object = Objects[objectID];
+	const auto& anim = GetAnimData(object, animNumber);
+
+	return (anim.frameBase + frameToStart);
 }
 
-int GetFrameCount(int animNumber)
+int GetFrameCount(int animIndex)
 {
-	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
+	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
 		return 0;
 
-	int end = g_Level.Anims[animNumber].frameEnd;
-	int base = g_Level.Anims[animNumber].frameBase;
+	const auto& anim = GetAnimData(animIndex);
+
+	int end = anim.frameEnd;
+	int base = anim.frameBase;
 	return (end - base);
 }
 
@@ -518,8 +577,11 @@ int GetNextAnimState(ItemInfo* item)
 
 int GetNextAnimState(int objectID, int animNumber)
 {
-	int nextAnimNumber = g_Level.Anims[Objects[objectID].animIndex + animNumber].JumpAnimNum;
-	return g_Level.Anims[Objects[objectID].animIndex + nextAnimNumber].ActiveState;
+	const auto& object = Objects[objectID];
+	const auto& anim = GetAnimData(object, animNumber);
+
+	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
+	return nextAnim.ActiveState;
 }
 
 void DrawAnimatingItem(ItemInfo* item)
@@ -551,7 +613,7 @@ Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& 
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
 {
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item->Index, jointIndex, relOffset.ToVector3()));
+	return GetJointPosition(*item, jointIndex, relOffset);
 }
 
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
@@ -570,7 +632,6 @@ float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
 	if (object.nmeshes == boneIndex)
 		return 0.0f;
 
-	int* bonePtr = &g_Level.Bones[object.boneIndex + ((boneIndex + 1) * 4)];
-	auto nextBoneOffset = Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
-	return (nextBoneOffset).Length();
+	auto nextBoneOffset = GetJointOffset(objectID, boneIndex + 1);
+	return nextBoneOffset.Length();
 }

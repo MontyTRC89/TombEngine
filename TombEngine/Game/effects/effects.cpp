@@ -1246,11 +1246,11 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
 		return;
 
-	auto* frame = GetBestFrame(item);
-	if (item->Pose.Position.y + frame->boundingBox.Y1 > wh)
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	if (item->Pose.Position.y + bounds.Y1 > wh)
 		return;
 
-	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
+	if (item->Pose.Position.y + bounds.Y2 < wh)
 		return;
 
 	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)

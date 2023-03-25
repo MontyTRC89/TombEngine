@@ -550,13 +550,13 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
 		item->ResetModelToDefault();
 
-		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i] = {};
+		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
+		for (auto& mutator : item->Model.Mutators)
+			mutator = {};
 	}
 	else
 	{
-		item->Model.Mutator.clear();
+		item->Model.Mutators.clear();
 		item->Model.MeshIndex.clear();
 	}
 

@@ -163,11 +163,11 @@ namespace TEN::Effects::Hair
 
 			int frameIndex = g_Level.Anims[spasm].FramePtr;
 			const auto& frame = g_Level.Frames[frameIndex + player.HitFrame];
-			return frame.boundingBox.GetCenter();
+			return frame.BoundingBox.GetCenter();
 		}
-	
-		const auto& frame = *GetBestFrame(&item);
-		return frame.boundingBox.GetCenter();
+
+		const auto& frame = GetBestFrame(item);
+		return frame.BoundingBox.GetCenter();
 	}
 	
 	Quaternion HairUnit::GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient)

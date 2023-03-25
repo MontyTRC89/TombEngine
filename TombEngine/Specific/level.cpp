@@ -30,8 +30,6 @@
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
-using std::string;
-using std::vector;
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
@@ -39,8 +37,8 @@ using namespace TEN::Input;
 char* LevelDataPtr;
 bool IsLevelLoading;
 bool LoadedSuccessfully;
-vector<int> MoveablesIds;
-vector<int> StaticObjectsIds;
+std::vector<int> MoveablesIds;
+std::vector<int> StaticObjectsIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -329,21 +327,21 @@ void LoadObjects()
 	{
 		auto* frame = &g_Level.Frames[i];
 
-		frame->boundingBox.X1 = ReadInt16();
-		frame->boundingBox.X2 = ReadInt16();
-		frame->boundingBox.Y1 = ReadInt16();
-		frame->boundingBox.Y2 = ReadInt16();
-		frame->boundingBox.Z1 = ReadInt16();
-		frame->boundingBox.Z2 = ReadInt16();
-		frame->offsetX = ReadInt16();
-		frame->offsetY = ReadInt16();
-		frame->offsetZ = ReadInt16();
+		frame->BoundingBox.X1 = ReadInt16();
+		frame->BoundingBox.X2 = ReadInt16();
+		frame->BoundingBox.Y1 = ReadInt16();
+		frame->BoundingBox.Y2 = ReadInt16();
+		frame->BoundingBox.Z1 = ReadInt16();
+		frame->BoundingBox.Z2 = ReadInt16();
+
+		// NOTE: Braces are necessary to ensure correct value init order.
+		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };
 
 		int numAngles = ReadInt16();
-		frame->angles.resize(numAngles);
+		frame->BoneOrientations.resize(numAngles);
 		for (int j = 0; j < numAngles; j++)
 		{
-			auto* q = &frame->angles[j];
+			auto* q = &frame->BoneOrientations[j];
 			q->x = ReadFloat();
 			q->y = ReadFloat();
 			q->z = ReadFloat();
@@ -787,14 +785,15 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
+			// NOTE: Braces are necessary to ensure correct value init order.
 			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Box    = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);

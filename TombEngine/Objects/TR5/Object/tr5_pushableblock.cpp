@@ -207,7 +207,7 @@ namespace TEN::Entities::Generic
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PUSH:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
@@ -298,7 +298,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case LA_PUSHABLE_PULL:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
@@ -768,23 +768,25 @@ namespace TEN::Entities::Generic
 			}
 		}
 
+		const auto& frameOffset = GetBestFrame(*LaraItem).Offset;
+
 		auto playerOffset = Vector3i::Zero;
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = frameOffset.z;
 			break;
 
 		case EAST:
-			playerOffset.x = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = frameOffset.z;
 			break;
 
 		case SOUTH:
-			playerOffset.z = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = -frameOffset.z;
 			break;
 
 		case WEST:
-			playerOffset.x = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = -frameOffset.z;
 			break;
 		}
 
