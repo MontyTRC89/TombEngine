@@ -40,21 +40,22 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-  float3 normal = normalize(input.Normal);
-  float3 pos = normalize(input.WorldPosition);
 
 	DoAlphaTest(output);
-    ShaderLight l;
-    l.Color = float3(1.0f, 1.0f, 0.5f);
-    l.Intensity = 0.3f;
-    l.Type = LT_SUN;
-    l.Direction = normalize(float3(-1.0f, -0.707f, -0.5f));
+    ShaderLight l[2];
+    l[0].Color = float3(1.0f, 1.0f, 0.5f) * 0.6f;
+    l[0].Type = LT_SUN;
+    l[0].Direction = normalize(float3(-1.0f, -0.707f, -0.5f));
+    l[1].Color = float3(0.5f, 0.5f, 1.0f) * 0.2f;
+    l[1].Type = LT_SUN;
+    l[1].Direction = normalize(float3(1.0f, 0.707f, -0.5f));
+    for (int i = 0; i < 2; i++)
+    {
+        output.xyz += DoDirectionalLight(input.WorldPosition, input.Normal, l[i]);
 
-		output.xyz += DoDirectionalLight(pos, normal, l);
-		output.xyz += DoSpecularSun(input.Normal, l, input.Sheen);
+		// TODO: fix it, it causes noise
+        // output.xyz += DoSpecularSun(input.Normal, l[i], input.Sheen);
+    }
 
-		//adding some pertubations to the lighting to add a cool effect
-			float3 nos = snoise(output.xyz);
-		output.xyz = normalNoise(output, nos, normal);
 	return output;
 }
