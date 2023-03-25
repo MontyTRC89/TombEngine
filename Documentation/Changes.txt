@@ -12,6 +12,7 @@ Version 1.0.8
 	- OCB 2 - Starts of playfully rolling on the floor when triggered.
 	- OCB 3 - Will throw stones at Lara.
 	- Imp is also scared of Lara if she has a lit torch in her hand.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
 * Add TR1 slamming doors.
 * Add TR3 wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
 * Add TR3 Corpse
