@@ -91,8 +91,7 @@ struct BoneMutator
 	};
 };
 
-// Animation controllers
-void AnimateLara(ItemInfo* item);
+// Animation controller
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
