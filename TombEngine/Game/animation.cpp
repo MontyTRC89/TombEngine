@@ -621,6 +621,18 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+{
+	static const auto REF_DIRECTION = Vector3::UnitZ;
+
+	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
+	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
+
+	auto direction = target - origin;
+	direction.Normalize();
+	return Geometry::ConvertDirectionToQuat(direction);
+}
+
 // NOTE: Will not work for bones at ends of hierarchies.
 float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
 {

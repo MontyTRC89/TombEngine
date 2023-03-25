@@ -35,8 +35,8 @@ namespace TEN::Effects::Hair
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 		
-		// TODO: Use actual orientation of player's head.
-		auto baseOrient = Geometry::ConvertDirectionToQuat(-item.Pose.Orientation.ToDirection());
+		// Use player's head bone orientation as base.
+		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
 
 		// Set position of base segment.
 		auto basePos = worldMatrix.Translation();
