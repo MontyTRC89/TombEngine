@@ -328,6 +328,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	item.Pose.Position = laraItem->Pose.Position;
+	item.RoomNumber = laraItem->RoomNumber;
+
 	AnimateItem(&item);
 
 	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
@@ -1565,7 +1567,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 						GetCreatureInfo(currentItem)->Poisoned = true;
 
 					if (currentItem->IsLara())
-						GetLaraInfo(currentItem)->PoisonPotency += 5;
+						GetLaraInfo(currentItem)->Status.Poison += 5;
 				}
 				else if (!currentObject.undead)
 				{

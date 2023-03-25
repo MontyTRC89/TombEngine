@@ -14,12 +14,14 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
+
 #include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
@@ -348,7 +350,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetupHitEffect();
 	}
-
+	
+	obj = &Objects[ID_WASP_MUTANT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWaspMutant;
+		obj->control = WaspMutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->intelligent = true;
+		obj->HitPoints = 24;
+		obj->radius = 102;
+		obj->pivotLength = 0;
+		obj->LotType = LotType::Flyer;
+		obj->SetupHitEffect();
+	}
+	
 	obj = &Objects[ID_COMPSOGNATHUS];
 	if (obj->loaded)
 	{

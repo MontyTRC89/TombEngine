@@ -1,12 +1,23 @@
 Version 1.0.8
 =============
 
-* Fix Sophia's charge ring drawing below floor.
 * Fix bubbles phasing through ceilings.
-* Fix TR5 imp collision handling and animations.
 * Fix object camera not clearing at level end.
-* Fix hardcoded double-breathing Lara sfx.
+* Fix hardcoded double-breathing Lara sound effect.
+* Fix inventory compass.
+* Fix Lara's hair twist and rotation.
+* Fix harpoon gun triggering water and dry sounds when shooting and holstering.
+* Fix TR3 Sophia's charge ring drawing below floor.
+* Fix TR5 imp collision handling and animations.
 * Add TR1 slamming doors.
+* Add TR3 wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
+* Add the ability to set cold bar in rooms (achieved by setting cold flag to a room in Tomb Editor).
+* Add water wakes for vehicles.
+* Allow the hair object to have as many or as few hair segments as desired (dynamically adapts by the engine).
+
+
+Lua API changes:
+* Add new function Misc::IsSoundPlaying() 
 
 Version 1.0.7
 =============

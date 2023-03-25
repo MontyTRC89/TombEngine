@@ -49,32 +49,28 @@ SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 int SplashCount = 0;
 
-Vector3i NodeVectors[MAX_NODE];
-NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
+Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
+NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
 {
-	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0
-	{ -16, -8, 160, 0, false }, // TR5 offset 1
-	{ 0, 0, 256, 8, false }, // TR5 offset 2
-	{ 0, 0, 256, 17, false }, // TR5 offset 3
-	{ 0, 0, 256, 26, false }, // TR5 offset 4
-	{ 0, 144, 40, 10, false }, // TR5 offset 5
-	{ -40, 64, 360, 14, false }, // TR5 offset 6
-	{ 0, -600, -40, 0, false }, // TR5 offset 7
-	{ 0, 32, 16, 9, false }, // TR5 offset 8
-	{ 0, 340, 0, 7, false }, // TR3 offset 0
-	{ 0, 0, -96, 10, false }, // TR3 offset 1
-	{ 13, 48, 320, 13, false }, // TR3 offset 2
-	{ 0, -256, 0, 5, false }, // TR3 offset 3
-	{ 0, 64, 0, 10, false }, // TR3 offset 4 // tony left
-	{ 0, 64, 0, 13, false }, // TR3 offset 5 // tony right
-	{ -32, -16, -192, 13, false }, // TR3 offset 6
-	{ -64, 410, 0, 20, false }, // TR3 offset 7
-	{ 64, 410, 0, 23, false }, // TR3 offset 8
-	{ -160, -8, 16, 5, false }, // TR3 offset 9
-	{ -160, -8, 16, 9, false }, // TR3 offset 10
-	{ -160, -8, 16, 13, false }, // TR3 offset 11
-	{ 0, 0, 0, 0, false }, // TR3 offset 12
-	{ 0, 0, 0, 0, false }, // Empty
+	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0, TODO: This mesh is invalid as it can't be negative. -- TokyoSU 23.02.20
+	{ -16, -8, 160, 0, false },			// TR5 offset 1
+	{ 0, 0, 256, 8, false },			// TR5 offset 2
+	{ 0, 0, 256, 17, false },			// TR5 offset 3
+	{ 0, 0, 256, 26, false },			// TR5 offset 4
+	{ 0, 144, 40, 10, false },			// TR5 offset 5
+	{ -40, 64, 360, 14, false },		// TR5 offset 6
+	{ 0, -600, -40, 0, false },			// TR5 offset 7
+	{ 0, 32, 16, 9, false },			// TR5 offset 8
+	{ 0, 340, 64, 7, false },			// TR3 offset 9
+	{ 0, 0, -96, 10, false },			// TR3 offset 10
+	{ 16, 48, 320, 13, false },			// TR3 offset 11
+	{ 0, -256, 0, 5, false },			// TR3 offset 12
+	{ 0, 64, 0, 10, false },			// TR3 offset 13
+	{ 0, 64, 0, 13, false },			// TR3 offset 14
+	{ -32, -16, -192, 13, false },		// TR3 offset 15
+	{ -64, 410, 0, 20, false },			// TR3 offset 16
+	{ 64, 410, 0, 23, false },			// TR3 offset 17
+	{ 0, 0, 0, 0, false }				// Empty offset 18
 };
 
 void DetatchSpark(int number, SpriteEnumFlag type)
@@ -353,7 +349,7 @@ void UpdateSparks()
 								DoDamage(LaraItem, 2);
 
 							if (spark->flags & SP_POISON)
-								Lara.PoisonPotency += 5;
+								Lara.Status.Poison += 5;
 						}
 					}
 				}
@@ -1250,11 +1246,11 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
 		return;
 
-	auto* frame = GetBestFrame(item);
-	if (item->Pose.Position.y + frame->boundingBox.Y1 > wh)
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	if (item->Pose.Position.y + bounds.Y1 > wh)
 		return;
 
-	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
+	if (item->Pose.Position.y + bounds.Y2 < wh)
 		return;
 
 	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)

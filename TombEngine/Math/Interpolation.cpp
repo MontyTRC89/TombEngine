@@ -7,16 +7,20 @@ namespace TEN::Math
 {
 	float Lerp(float value0, float value1, float alpha)
 	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
 	float InterpolateCos(float value0, float value1, float alpha)
 	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
 		return Lerp(value0, value1, (1 - cos(alpha * PI)) * 0.5f);
 	}
 
 	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
 	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+
 		float p = (value3 - value2) - (value0 - value1);
 		float q = (value0 - value1) - p;
 		float r = value2 - value0;

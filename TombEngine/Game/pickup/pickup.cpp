@@ -1035,11 +1035,11 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
 			continue;
 
-		auto* frame = (GameBoundingBox*)GetBestFrame(item);
+		const auto& bounds = GetBestFrame(*item).BoundingBox;
 		auto& bBox = GetBoundsAccurate(*mesh, false);
 
-		if (frame->X1 <= bBox.X2 && frame->X2 >= bBox.X1 &&
-			frame->Z1 <= bBox.Z2 && frame->Z2 >= bBox.Z1 &&
+		if (bounds.X1 <= bBox.X2 && bounds.X2 >= bBox.X1 &&
+			bounds.Z1 <= bBox.Z2 && bounds.Z2 >= bBox.Z1 &&
 			(bBox.X1 || bBox.X2))
 		{
 			return &bBox;
@@ -1068,7 +1068,7 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 	if (itemNumber == NO_ITEM)
 		return nullptr;
 	else
-		return (GameBoundingBox*)GetBestFrame(&g_Level.Items[itemNumber]);
+		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
 }
 
 void InitialisePickup(short itemNumber)
@@ -1096,23 +1096,22 @@ void InitialisePickup(short itemNumber)
 
 			if (triggerFlags == 0)
 			{
-				// Automatically align pickups to the surface.
+				// Automatically align pickups to the floor surface.
+				auto pointColl = GetCollision(item);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
+					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					true, true);
 
-				auto coll = GetCollision(item);
-				int bridge = coll.Block->InsideBridge(item->Pose.Position.x, 
-					item->Pose.Position.y, item->Pose.Position.z, true, true);
-
-				if (bridge != NO_ITEM)
+				if (bridgeItemNumber != NO_ITEM)
 				{
 					// If pickup is within bridge item, most likely it means it is
-					// below pushable or raising block, therefore ignore its collision.
-
-					coll.Block->RemoveItem(bridge);
-					coll = GetCollision(item);
-					coll.Block->AddItem(bridge);
+					// below pushable or raising block, so ignore its collision.
+					pointColl.Block->RemoveBridge(bridgeItemNumber);
+					pointColl = GetCollision(item);
+					pointColl.Block->AddBridge(bridgeItemNumber);
 				}
 
-				item->Pose.Position.y = coll.Position.Floor - bounds.Y2;
+				item->Pose.Position.y = pointColl.Position.Floor - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}
