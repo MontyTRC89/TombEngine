@@ -142,32 +142,23 @@ namespace TEN::Entities::Vehicles
 
 		switch (mountType)
 		{
+		default:
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE;
-			laraItem->Animation.ActiveState = RBOAT_STATE_IDLE;
-			laraItem->Animation.TargetState = RBOAT_STATE_IDLE;
+			SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_IDLE);
 			break;
 
 		case VehicleMountType::Left:
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_LEFT;
-			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_MOUNT_LEFT);
 			break;
 
 		case VehicleMountType::Right:
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_RIGHT;
-			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_MOUNT_RIGHT);
 			break;
 
-		default:
 		case VehicleMountType::Jump:
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_JUMP;
-			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_MOUNT_JUMP);
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		if (laraItem->RoomNumber != rBoatItem->RoomNumber)
 			ItemNewRoom(lara->ItemNumber, rBoatItem->RoomNumber);
@@ -636,34 +627,19 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->HitPoints <= 0)
 		{
-			if (laraItem->Animation.ActiveState!= RBOAT_STATE_DEATH)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.TargetState = RBOAT_STATE_DEATH;
-				laraItem->Animation.ActiveState = RBOAT_STATE_DEATH;
-			}
+			if (laraItem->Animation.ActiveState != RBOAT_STATE_DEATH)
+				SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_IDLE_DEATH);
 		}
 		else if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) &&
 			rBoatItem->Animation.Velocity.y > 0)
 		{
 			if (laraItem->Animation.ActiveState != RBOAT_STATE_FALL)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_LEAP_START;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = RBOAT_STATE_FALL;
-				laraItem->Animation.TargetState = RBOAT_STATE_FALL;
-			}
+				SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, RBOAT_ANIM_LEAP_START);
 		}
 		else if (collide)
 		{
 			if (laraItem->Animation.ActiveState != RBOAT_STATE_HIT)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = RBOAT_STATE_HIT;
-				laraItem->Animation.TargetState = RBOAT_STATE_HIT;
-			}
+				SetAnimation(*laraItem, ID_RUBBER_BOAT_LARA_ANIMS, collide);
 		}
 		else
 		{
@@ -798,10 +774,7 @@ namespace TEN::Entities::Vehicles
 			else
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 
-			laraItem->Animation.AnimNumber = LA_JUMP_FORWARD;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = LS_JUMP_FORWARD;
-			laraItem->Animation.TargetState = LS_JUMP_FORWARD;
+			SetAnimation(*laraItem, LA_JUMP_FORWARD);
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 			laraItem->Animation.IsAirborne = true;

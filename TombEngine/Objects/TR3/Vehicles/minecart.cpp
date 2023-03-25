@@ -203,25 +203,18 @@ namespace TEN::Entities::Vehicles
 		switch (mountType)
 		{
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_IDLE;
-			laraItem->Animation.ActiveState = MINECART_STATE_IDLE;
-			laraItem->Animation.TargetState = MINECART_STATE_IDLE;
+			SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_IDLE);
 			break;
 
 		case VehicleMountType::Left:
-			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_LEFT;
-			laraItem->Animation.ActiveState = MINECART_STATE_MOUNT;
-			laraItem->Animation.TargetState = MINECART_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_MOUNT_LEFT);
 			break;
 
 		default:
 		case VehicleMountType::Right:
-			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_RIGHT;
-			laraItem->Animation.ActiveState = MINECART_STATE_MOUNT;
-			laraItem->Animation.TargetState = MINECART_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_MOUNT_RIGHT);
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose = minecartItem->Pose;
@@ -888,10 +881,7 @@ namespace TEN::Entities::Vehicles
 			if (minecartItem->Pose.Orientation.z > MINECART_TERMINAL_ANGLE ||
 				minecartItem->Pose.Orientation.z < -MINECART_TERMINAL_ANGLE)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_TURN_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = MINECART_STATE_TURN_DEATH;
-				laraItem->Animation.TargetState = MINECART_STATE_TURN_DEATH;
+				SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_TURN_DEATH);
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD;
@@ -907,10 +897,7 @@ namespace TEN::Entities::Vehicles
 
 			if (floorHeight < -CLICK(2) || coll.HitStatic)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_WALL_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = MINECART_STATE_WALL_DEATH;
-				laraItem->Animation.TargetState = MINECART_STATE_WALL_DEATH;
+				SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_WALL_DEATH);
 				laraItem->HitPoints = -1;
 				minecartItem->Animation.Velocity.z = 0;
 				minecart->Velocity = 0;
@@ -926,10 +913,7 @@ namespace TEN::Entities::Vehicles
 
 				if (coll.HitStatic)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_BONK_HEAD;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MINECART_STATE_HIT;
-					laraItem->Animation.TargetState = MINECART_STATE_HIT;
+					SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_BONK_HEAD);
 
 					DoLotsOfBlood(
 						laraItem->Pose.Position.x,
@@ -959,10 +943,7 @@ namespace TEN::Entities::Vehicles
 				 laraItem->Animation.ActiveState != MINECART_STATE_TURN_DEATH &&
 				 laraItem->Animation.ActiveState != MINECART_STATE_WALL_DEATH)
 		{
-			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DEATH;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = MINECART_STATE_DEATH;
-			laraItem->Animation.TargetState = MINECART_STATE_DEATH;
+			SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_DEATH);
 			laraItem->HitPoints = -1;
 			minecartItem->Animation.Velocity.z = 0;
 			minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | (MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD);

@@ -486,13 +486,12 @@ void InitialiseItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
+	item->Animation.AnimObjectID = item->ObjectNumber;
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-
-	item->Animation.RequiredState = NO_STATE;
-	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-
+	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+	item->Animation.RequiredState = NO_STATE;
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;
 

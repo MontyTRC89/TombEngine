@@ -5,13 +5,12 @@
 
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
+#include "Objects/game_object_ids.h"
 #include "Math/Math.h"
 #include "Specific/newtypes.h"
 #include "Specific/BitField.h"
 
 using namespace TEN::Utils;
-
-enum GAME_OBJECT_ID : short;
 
 constexpr auto NO_ITEM		  = -1;
 constexpr auto NOT_TARGETABLE = -16384;
@@ -67,6 +66,8 @@ enum class EffectType
 
 struct EntityAnimationData
 {
+	GAME_OBJECT_ID AnimObjectID = ID_NO_OBJECT;
+
 	int AnimNumber	  = 0; // g_Level.Anims index.
 	int FrameNumber	  = 0; // g_Level.Frames index.
 	int ActiveState	  = 0;
@@ -107,8 +108,8 @@ struct EntityEffectData
 // TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
-	GAME_OBJECT_ID ObjectNumber;
-	std::string Name;
+	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
+	std::string	   Name			= {};
 
 	int Status;	// ItemStatus enum.
 	bool Active;

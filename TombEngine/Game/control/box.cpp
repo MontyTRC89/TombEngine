@@ -548,46 +548,33 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 	return true;
 }
 
-void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int entityKillState, int laraKillState)
+void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnimNumber, int creatureState, int playerState)
 {
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + entityKillAnim;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = entityKillState;
+	auto& playerItem = *LaraItem;
+	auto& player = GetLaraInfo(playerItem);
 
-	LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + laraExtraKillAnim;
-	LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-	LaraItem->Animation.ActiveState = 0;
-	LaraItem->Animation.TargetState = laraKillState;
+	SetAnimation(*creatureItem, creatureAnimNumber);
+	SetAnimation(playerItem, ID_LARA_EXTRA_ANIMS, playerAnimNumber);
 
-	LaraItem->Pose = item->Pose;
-	LaraItem->Animation.IsAirborne = false;
-	LaraItem->Animation.Velocity.z = 0;
-	LaraItem->Animation.Velocity.y = 0;
+	playerItem.Pose = creatureItem->Pose;
+	playerItem.Animation.IsAirborne = false;
+	playerItem.Animation.Velocity = Vector3::Zero;
 
-	if (item->RoomNumber != LaraItem->RoomNumber)
-		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
+	if (creatureItem->RoomNumber != playerItem.RoomNumber)
+		ItemNewRoom(player.ItemNumber, creatureItem->RoomNumber);
 
-	AnimateItem(LaraItem);
+	AnimateItem(&playerItem);
 
-	Lara.ExtraAnim = 1;
-	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.Weapon.GunType = LaraWeaponType::None;
-	Lara.HitDirection = -1;
+	player.ExtraAnim = 1;
+	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.Weapon.GunType = LaraWeaponType::None;
+	player.HitDirection = -1;
 
-	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
+	Camera.pos.RoomNumber = playerItem.RoomNumber; 
 	Camera.type = CameraType::Chase;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-
-	// TODO: exist in TR5 but just commented in case.
-	/*
-	ForcedFixedCamera.x = item->pos.Position.x + (phd_sin(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
-	ForcedFixedCamera.y = item->pos.Position.y - WALL_SIZE;
-	ForcedFixedCamera.z = item->pos.Position.z + (phd_cos(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
-	ForcedFixedCamera.roomNumber = item->roomNumber;
-	UseForcedFixedCamera = true;
-	*/
 }
 
 short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)

@@ -4,6 +4,7 @@
 
 using namespace TEN::Math;
 
+enum GAME_OBJECT_ID : short;
 class EulerAngles;
 class Pose;
 class Vector3i;
@@ -108,7 +109,9 @@ void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 
 // Setters
-void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
 AnimData& GetAnimData(int animIndex);

@@ -954,16 +954,17 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara AnimNumber: %d", LaraItem->Animation.AnimNumber);
-				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
-				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
-				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocities: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
-				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
-				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
-				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
-				PrintDebugMessage("Lara IsAirborne: %d", LaraItem->Animation.IsAirborne);
-				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
+				PrintDebugMessage("PLAYER STATS");
+				PrintDebugMessage("Anim ObjectID: %d", LaraItem->Animation.AnimObjectID);
+				PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber);
+				PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
+				PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
+				PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
+				PrintDebugMessage("Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
+				PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
+				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
+				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:

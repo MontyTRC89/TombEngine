@@ -853,6 +853,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = true;
 
 	coll->Setup.OldPosition = item->Pose.Position;
+	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.OldState = item->Animation.ActiveState;
