@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
@@ -35,8 +35,8 @@ namespace TEN::Effects::Hair
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 		
-		// TODO: Combine with head's actual orientation!
-		auto baseOrient = EulerAngles(-item.Pose.Orientation.ToDirection()).ToQuaternion();
+		// TODO: Use actual orientation of player's head.
+		auto baseOrient = Geometry::ConvertDirectionToQuat(-item.Pose.Orientation.ToDirection());
 
 		// Set position of base segment.
 		auto basePos = worldMatrix.Translation();
@@ -188,7 +188,9 @@ namespace TEN::Effects::Hair
 
 	std::vector<BoundingSphere> HairUnit::GetSpheres(const ItemInfo& item, bool isYoung)
 	{
-		constexpr auto SPHERE_COUNT = 6;
+		constexpr auto SPHERE_COUNT		   = 8;
+		constexpr auto TORSO_SPHERE_OFFSET = Vector3i(-10, 0, 25);
+		constexpr auto HEAD_SPHERE_OFFSET  = Vector3i(-2, 0, 0);
 
 		auto spheres = std::vector<BoundingSphere>{};
 		spheres.reserve(SPHERE_COUNT);
@@ -200,31 +202,31 @@ namespace TEN::Effects::Hair
 
 		// Torso sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + Vector3i(-10, 0, 25)).ToVector3();
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + TORSO_SPHERE_OFFSET).ToVector3();
 		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 		if (isYoung)
 			spheres.back().Radius = spheres.back().Radius - ((spheres.back().Radius / 4) + (spheres.back().Radius / 8));
 
 		// Head sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + Vector3i(-2, 0, 0)).ToVector3();
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + HEAD_SPHERE_OFFSET).ToVector3();
 		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
 
 		// Neck sphere.
 		spheres.push_back(BoundingSphere(
 			(spheres[1].Center + (spheres[2].Center * 2)) / 3,
-			isYoung ? 0 : int(float(spheres[2].Radius * 3) / 4)));
-
-		// Right arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
-		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+			isYoung ? 0.0f : (spheres[2].Radius * 0.75f)));
 
 		// Left arm sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
 		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
 		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
 		
+		// Right arm sphere.
+		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
+		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+
 		// Left holster sphere.
 		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LTHIGH]];
 		pos = GetJointPosition(item, LM_LTHIGH, Vector3i(meshPtr->sphere.Center)).ToVector3();
@@ -246,7 +248,7 @@ namespace TEN::Effects::Hair
 
 		return spheres;
 	}
-
+	
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
 	{
 		constexpr auto VELOCITY_COEFF = 0.75f;

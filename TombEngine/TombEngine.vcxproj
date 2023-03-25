@@ -593,7 +593,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\control\flipeffect.h" />
-    <ClInclude Include="Game\effects\hair.h" />
+    <ClInclude Include="Game\effects\Hair.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\Lara\lara.h" />
@@ -965,7 +965,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\control\flipeffect.cpp" />
-    <ClCompile Include="Game\effects\hair.cpp" />
+    <ClCompile Include="Game\effects\Hair.cpp" />
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />

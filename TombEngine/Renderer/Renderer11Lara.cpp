@@ -2,7 +2,7 @@
 #include "Renderer/Renderer11.h"
 
 #include "Game/animation.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
