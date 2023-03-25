@@ -11,10 +11,11 @@ Version 1.0.8
 * Fix TR5 imp collision handling and animations.
 * Add TR1 slamming doors.
 * Add TR3 wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
+* Add TR3 Corpse (OCB 0 is a lying carcass like in TR3 "Crash Side" level in T-Rex hideout. 
+With OCB 1 it hangs in the air like the raptor carcass in TR3 level "Crash Side". If Lara shoots it, it will fall down.)
 * Add the ability to set cold bar in rooms (achieved by setting cold flag to a room in Tomb Editor).
 * Add water wakes for vehicles.
 * Allow the hair object to have as many or as few hair segments as desired (dynamically adapts by the engine).
-
 
 Lua API changes:
 * Add new function Misc::IsSoundPlaying() 

@@ -1403,9 +1403,14 @@ void TriggerRocketFire(int x, int y, int z)
 }
 
 
-void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
+void TriggerRocketSmoke(int x, int y, int z)
 {
-	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
+	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z);
+}
+
+void SpawnCorpseEffect(const Vector3& pos)
+{
+	TEN::Effects::Smoke::SpawnCorpseEffect(pos);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
@@ -1811,55 +1816,76 @@ void ProcessEffects(ItemInfo* item)
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
+			
 			break;
 
 		case EffectType::Custom:
 			if (TestProbability(1 / 8.0f))			
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium,
 					item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
+			}
+
 			break;
 
 		case EffectType::Sparks:
 			if (TestProbability(1 / 10.0f))
-				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
-					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			{
+				TriggerElectricSpark(
+					GameVector(pos, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
+			}
+
 			if (TestProbability(1 / 64.0f))
-				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+				TriggerRocketSmoke(pos.x, pos.y, pos.z);
+
 			break;
 
 		case EffectType::ElectricIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
-					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			{
+				TriggerElectricSpark(
+					GameVector(pos, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
+			}
+
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
+			}
+
 			break;
 
 		case EffectType::RedIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
+			}
+
 			break;
 
 		case EffectType::Smoke:
 			if (TestProbability(1 / 32.0f))
-				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+				TriggerRocketSmoke(pos.x, pos.y, pos.z);
+			
 			break;
 
-		case EffectType::Cadaver:
-			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
-			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
+	if (item->Effect.Type != EffectType::Smoke)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
 
 		auto pos = GetJointPosition(item, 0);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, falloff,
+		TriggerDynamicLight(
+			pos.x, pos.y, pos.z, falloff,
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));
