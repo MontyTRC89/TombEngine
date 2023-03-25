@@ -4,18 +4,24 @@ Version 1.0.8
 * Fix bubbles phasing through ceilings.
 * Fix object camera not clearing at level end.
 * Fix hardcoded double-breathing Lara sound effect.
-* Fix inventory compass.
 * Fix Lara's hair twist and rotation.
 * Fix harpoon gun triggering water and dry sounds when shooting and holstering.
 * Fix TR3 Sophia's charge ring drawing below floor.
 * Fix TR5 imp collision handling and animations.
+	- OCB 1 - Climbs up to Lara when triggered.
+	- OCB 2 - Starts of playfully rolling on the floor when triggered.
+	- OCB 3 - Will throw stones at Lara.
+	- Imp is also scared of Lara if she has a lit torch in her hand.
 * Add TR1 slamming doors.
 * Add TR3 wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
-* Add TR3 Corpse (OCB 0 is a lying carcass like in TR3 "Crash Side" level in T-Rex hideout. 
-With OCB 1 it hangs in the air like the raptor carcass in TR3 level "Crash Side". If Lara shoots it, it will fall down.)
+* Add TR3 Corpse
+	- OCB 0 for a carcass that is eaten by the Compsaganathos dinosaur. 
+	- OCB 1: Hangs in the air as if used as bait and will fall if shot.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr3_Compsognathus_Cadavar.wad2
 * Add the ability to set cold bar in rooms (achieved by setting cold flag to a room in Tomb Editor).
 * Add water wakes for vehicles.
 * Allow the hair object to have as many or as few hair segments as desired (dynamically adapted by the engine).
+* Restored inventory compass.
 
 Lua API changes:
 * Add new function Misc::IsSoundPlaying() 
