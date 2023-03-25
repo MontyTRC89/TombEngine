@@ -7,6 +7,7 @@ Version 1.0.8
 * Fix Lara's hair twist and rotation.
 * Fix harpoon gun triggering water and dry sounds when shooting and holstering.
 * Fix Z-fighting in inventory rendering.
+* Fix dozy cheat always giving uzi weapons even if not present in wad.
 * Fix TR3 Sophia's charge ring drawing below floor.
 * Fix TR5 imp collision handling and animations.
 	- OCB 1 - Climbs up to Lara when triggered.
