@@ -454,7 +454,7 @@ namespace TEN::Entities::TR4
 				DoDamage(target, distance / BLOCK(1));
 
 				// WRAITH1 can burn player.
-				if (item.ObjectNumber == ID_WRAITH1)
+				if (item.ObjectNumber == ID_WRAITH1 && !TestEnvironment(ENV_FLAG_WATER, target->RoomNumber))
 				{
 					item.ItemFlags[1] += 400;
 					if (item.ItemFlags[1] > 8000)
