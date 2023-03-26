@@ -300,37 +300,47 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	auto pole = Geometry::TranslatePoint(middle, item.Pose.Orientation.y + pivotAngle, std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
-	auto ikSolution3D = Solvers::SolveIK3D(base, end, pole, length0, length1);
+	auto ik3DSolution = Solvers::SolveIK3D(base, end, pole, length0, length1);
 
-	// ------------Debug
-	g_Renderer.AddDebugSphere(pole, 25, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddDebugSphere(ikSolution3D.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-	g_Renderer.AddLine3D(ikSolution3D.Base, ikSolution3D.Middle, Vector4::One);
-	g_Renderer.AddLine3D(ikSolution3D.Middle, ikSolution3D.End, Vector4::One);
-
-	// ------------
+	// Debug
+	if (true)
+	{
+		g_Renderer.AddDebugSphere(pole, 25, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugSphere(ik3DSolution.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugSphere(ik3DSolution.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugSphere(ik3DSolution.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddLine3D(ik3DSolution.Base, ik3DSolution.Middle, Vector4::One);
+		g_Renderer.AddLine3D(ik3DSolution.Middle, ik3DSolution.End, Vector4::One);
+	}
 
 	// TODO: Apply the solved IK to leg joints. Everything is wrong.
 
-	const auto& frame = GetBestFrame(item);
+	// Get frame interpolation data.
+	const auto& frameData = GetFrameInterpData(item);
+	const auto* framePtr0 = frameData.FramePtr0;
+	const auto* framePtr1 = frameData.FramePtr1;
+
+	auto bone0RelOrient = Quaternion::Lerp(framePtr0->BoneOrientations[joint0], framePtr0->BoneOrientations[joint0], frameData.Alpha) * item.Pose.Orientation.ToQuaternion();
+	auto bone1RelOrient = Quaternion::Lerp(framePtr0->BoneOrientations[joint1], framePtr0->BoneOrientations[joint1], frameData.Alpha) * item.Pose.Orientation.ToQuaternion();
+
+	// Just to see...
+	//Lara.ExtraHeadRot = EulerAngles(bone0RelOrient);
 
 	// Determine conjugates.
-	auto joint0OrientConjugate = frame.BoneOrientations[joint0];
-	joint0OrientConjugate.Conjugate();
-	auto joint1OrientConjugate = frame.BoneOrientations[joint1];
-	joint1OrientConjugate.Conjugate();
-	auto playerOrientConjugate = item.Pose.Orientation.ToQuaternion();
-	playerOrientConjugate.Conjugate();
+	//auto joint0OrientConjugate = frame.BoneOrientations[joint0];
+	//joint0OrientConjugate.Conjugate();
+	//auto joint1OrientConjugate = frame.BoneOrientations[joint1];
+	//joint1OrientConjugate.Conjugate();
+	//auto playerOrientConjugate = item.Pose.Orientation.ToQuaternion();
+	//playerOrientConjugate.Conjugate();
 
-	// Negate orientations of joints from current animation and player.
-	auto baseRot = joint0OrientConjugate * Geometry::ConvertDirectionToQuat(ikSolution3D.Middle - ikSolution3D.Base);
-	baseRot = playerOrientConjugate * baseRot;
-	auto middleRot = joint1OrientConjugate * Geometry::ConvertDirectionToQuat(ikSolution3D.End - ikSolution3D.Middle);
-	middleRot = playerOrientConjugate * middleRot;
+	//// Negate orientations of joints from current animation and player.
+	//auto baseRot = joint0OrientConjugate * Geometry::ConvertDirectionToQuat(ik3DSolution.Middle - ik3DSolution.Base);
+	//baseRot = playerOrientConjugate * baseRot;
+	//auto middleRot = joint1OrientConjugate * Geometry::ConvertDirectionToQuat(ik3DSolution.End - ik3DSolution.Middle);
+	//middleRot = playerOrientConjugate * middleRot;
 
-	// Store required joint rotations in limb rotation data.
+	//// Store required joint rotations in limb rotation data.
 	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
 	//limbRot.Middle = Quaternion::Slerp(limbRot.Middle, middleRot, alpha);
 
@@ -367,22 +377,23 @@ void DoPlayerLegIK(ItemInfo& item)
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
-	// Check if floor is level.
+	// If floor isn't level, perform IK on one leg.
 	if (lFloorHeight != rFloorHeight)
 	{
-		// Allow IK for only one leg.
+		// Left leg.
 		if (lFloorHeight < rFloorHeight)
 		{
-			// Solve IK chain for left leg.
+			// Solve IK chain.
 			if (abs(vPosVisual - lFloorHeight) <= HEIGHT_TOLERANCE &&
 				isUpright && isLeftFloorSteppable)
 			{
 				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -PIVOT_ANGLE_OFFSET, HEEL_HEIGHT, ALPHA);
 			}
 		}
+		// Right leg.
 		else
 		{
-			// Solve IK chain for right leg.
+			// Solve IK chain.
 			if (abs(vPosVisual - rFloorHeight) <= HEIGHT_TOLERANCE &&
 				isUpright && isRightFloorSteppable)
 			{
