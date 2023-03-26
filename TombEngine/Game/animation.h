@@ -92,8 +92,7 @@ struct BoneMutator
 	};
 };
 
-// Animation controllers
-void AnimateLara(ItemInfo* item);
+// Animation controller
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
@@ -136,7 +135,8 @@ AnimFrame&			GetBestFrame(const ItemInfo& item);
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
-Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3	 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
-float	 GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);
+Vector3i   GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i   GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);
+float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);

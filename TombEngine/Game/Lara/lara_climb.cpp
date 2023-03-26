@@ -83,7 +83,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 			if (shiftRight < 0 != shiftLeft < 0)
 			{
 				item->Animation.TargetState = LS_LADDER_IDLE;
-				AnimateLara(item);
+				AnimateItem(item);
 				return;
 			}
 
@@ -99,7 +99,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_LADDER_IDLE);
 			item->Animation.TargetState = LS_HANG;
 
-			AnimateLara(item);
+			AnimateItem(item);
 		}
 		else
 		{
@@ -113,7 +113,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_LADDER_IDLE;
 
 	if (yShift != 0)
-		AnimateLara(item);
+		AnimateItem(item);
 }
 
 void lara_as_climb_down(ItemInfo* item, CollisionInfo* coll)
@@ -158,7 +158,7 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.TargetState = LS_LADDER_IDLE;
 
-				AnimateLara(item);
+				AnimateItem(item);
 
 				if (abs(ledgeRight - ledgeLeft) <= LADDER_TEST_DISTANCE)
 				{
@@ -185,7 +185,7 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_LADDER_IDLE;
 
 			if (yShift != 0)
-				AnimateLara(item);
+				AnimateItem(item);
 		}
 	}
 }
@@ -594,7 +594,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 	item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 	item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
 
-	AnimateLara(item);
+	AnimateItem(item);
 }
 
 int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)

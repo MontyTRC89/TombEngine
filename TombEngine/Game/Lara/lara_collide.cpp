@@ -268,7 +268,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 
 		break;
 
@@ -301,7 +301,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 		break;
 
 	default:
@@ -337,7 +337,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_MONKEY_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 		break;
 
 	default:

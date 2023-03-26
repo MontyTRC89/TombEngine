@@ -30,10 +30,6 @@ namespace TEN::Math::Geometry
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot);
 	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rot);
 
-	// Surface normal getters
-	Vector3 GetFloorNormal(const Vector2& tilt);
-	Vector3 GetCeilingNormal(const Vector2& tilt);
-
 	// Angle getters
 	short GetShortestAngle(short fromAngle, short toAngle);
 	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& gravity = Vector3::UnitY);

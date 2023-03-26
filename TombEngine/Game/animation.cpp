@@ -66,9 +66,9 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		case AnimCommandType::JumpVelocity:
 			if (!isFrameBased)
 			{
+				item.Animation.IsAirborne = true;
 				item.Animation.Velocity.y = commandDataPtr[0];
 				item.Animation.Velocity.z = commandDataPtr[1];
-				item.Animation.IsAirborne = true;
 
 				if (item.IsLara())
 				{
@@ -166,12 +166,15 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 	}
 }
 
-void AnimateLara(ItemInfo* item)
+void AnimateItem(ItemInfo* item)
 {
-	auto& player = GetLaraInfo(*item);
+	if (!item->IsLara())
+	{
+		item->TouchBits.ClearAll();
+		item->HitStatus = false;
+	}
 
 	PerformAnimCommands(*item, true);
-
 	item->Animation.FrameNumber++;
 
 	const auto* animPtr = &GetAnimData(*item);
@@ -179,7 +182,14 @@ void AnimateLara(ItemInfo* item)
 	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
 	{
 		animPtr = &GetAnimData(*item);
+
 		item->Animation.ActiveState = animPtr->ActiveState;
+
+		if (!item->IsLara())
+		{
+			if (item->Animation.RequiredState == item->Animation.ActiveState)
+				item->Animation.RequiredState = NO_STATE;
+		}
 	}
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
@@ -190,7 +200,22 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.FrameNumber = animPtr->JumpFrameNum;
 
 		animPtr = &GetAnimData(*item);
-		item->Animation.ActiveState = animPtr->ActiveState;
+
+		if (!item->IsLara())
+		{
+			if (item->Animation.ActiveState != animPtr->ActiveState)
+			{
+				item->Animation.ActiveState = animPtr->ActiveState;
+				item->Animation.TargetState = animPtr->ActiveState;
+			}
+
+			if (item->Animation.RequiredState == item->Animation.ActiveState)
+				item->Animation.RequiredState = NO_STATE;
+		}
+		else
+		{
+			item->Animation.ActiveState = animPtr->ActiveState;
+		}
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
@@ -198,107 +223,79 @@ void AnimateLara(ItemInfo* item)
 
 	if (item->Animation.IsAirborne)
 	{
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (item->IsLara())
 		{
-			item->Animation.Velocity.z -= item->Animation.Velocity.z / 8;
-			if (abs(item->Animation.Velocity.z) < 8.0f)
+			if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			{
-				item->Animation.IsAirborne = false;
-				item->Animation.Velocity.z = 0.0f;
+				item->Animation.Velocity.z -= item->Animation.Velocity.z / 8;
+				if (abs(item->Animation.Velocity.z) < 8.0f)
+				{
+					item->Animation.IsAirborne = false;
+					item->Animation.Velocity.z = 0.0f;
+				}
+
+				if (item->Animation.Velocity.y > 128.0f)
+					item->Animation.Velocity.y /= 2;
+				item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
+
+				if (item->Animation.Velocity.y < 4.0f)
+					item->Animation.Velocity.y = 4.0f;
+				item->Pose.Position.y += item->Animation.Velocity.y;
 			}
+			else
+			{
+				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+				item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
 
-			if (item->Animation.Velocity.y > 128.0f)
-				item->Animation.Velocity.y /= 2;
-			item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
-
-			if (item->Animation.Velocity.y < 4.0f)
-				item->Animation.Velocity.y = 4.0f;
-			item->Pose.Position.y += item->Animation.Velocity.y;
+				item->Pose.Position.y += item->Animation.Velocity.y;
+			}
 		}
 		else
 		{
 			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
-			item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
-
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
 	else
 	{
-		if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
-		else
-			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
-	}
-
-	item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-
-	if (player.Control.Rope.Ptr != -1)
-		DelAlignLaraToRope(item);
-
-	if (!player.Control.IsMoving)
-		TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
-
-	// Update matrices.
-	g_Renderer.UpdateLaraAnimations(true);
-}
-
-void AnimateItem(ItemInfo* item)
-{
-	item->TouchBits.ClearAll();
-	item->HitStatus = false;
-
-	PerformAnimCommands(*item, true);
-
-	item->Animation.FrameNumber++;
-
-	const auto* animPtr = &GetAnimData(*item);
-
-	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
-	{
-		animPtr = &GetAnimData(*item);
-
-		item->Animation.ActiveState = animPtr->ActiveState;
-		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = NO_STATE;
-	}
-
-	if (item->Animation.FrameNumber > animPtr->frameEnd)
-	{
-		PerformAnimCommands(*item, false);
-
-		item->Animation.AnimNumber = animPtr->JumpAnimNum;
-		item->Animation.FrameNumber = animPtr->JumpFrameNum;
-
-		animPtr = &GetAnimData(*item);
-		if (item->Animation.ActiveState != animPtr->ActiveState)
+		if (item->IsLara())
 		{
-			item->Animation.ActiveState = animPtr->ActiveState;
-			item->Animation.TargetState = animPtr->ActiveState;
+			const auto& player = *GetLaraInfo(item);
+
+			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
+			else
+				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
 		}
-
-		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = NO_STATE;
+		else
+		{
+			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+		}
 	}
-
-	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
-	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
-
-	if (item->Animation.IsAirborne)
+	
+	if (item->IsLara())
 	{
-		item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
-		item->Pose.Position.y += item->Animation.Velocity.y;
+		const auto& player = *GetLaraInfo(item);
+
+		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+
+		if (player.Control.Rope.Ptr != -1)
+			DelAlignLaraToRope(item);
+
+		if (!player.Control.IsMoving)
+			TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+
+		// Update matrices.
+		g_Renderer.UpdateLaraAnimations(true);
 	}
 	else
 	{
-		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-		item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
-	}
-	
-	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+		TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
-	// Update matrices.
-	g_Renderer.UpdateItemAnimations(item->Index, true);
+		// Update matrices.
+		g_Renderer.UpdateItemAnimations(item->Index, true);
+	}
 }
 
 bool HasStateDispatch(ItemInfo* item, int targetState)
@@ -641,6 +638,18 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 
 	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
+}
+
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+{
+	static const auto REF_DIRECTION = Vector3::UnitZ;
+
+	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
+	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
+
+	auto direction = target - origin;
+	direction.Normalize();
+	return Geometry::ConvertDirectionToQuat(direction);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

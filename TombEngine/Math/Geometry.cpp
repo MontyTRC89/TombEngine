@@ -100,20 +100,6 @@ namespace TEN::Math::Geometry
 		return Vector3::Transform(point, rotMatrix);
 	}
 
-	Vector3 GetFloorNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
-		normal.Normalize();
-		return normal;
-	}
-
-	Vector3 GetCeilingNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4);
-		normal.Normalize();
-		return normal;
-	}
-
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
@@ -196,15 +182,15 @@ namespace TEN::Math::Geometry
 	{
 		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
 
-		static const auto refDirection = Vector3::UnitZ;
+		static const auto REF_DIRECTION = Vector3::UnitZ;
 
 		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
-		float dot = refDirection.Dot(direction);
+		float dot = REF_DIRECTION.Dot(direction);
 		if (dot < -SINGULARITY_THRESHOLD)
 		{
-			auto axis = Vector3::UnitX.Cross(refDirection);
+			auto axis = Vector3::UnitX.Cross(REF_DIRECTION);
 			if (axis.LengthSquared() < EPSILON)
-				axis = Vector3::UnitY.Cross(refDirection);
+				axis = Vector3::UnitY.Cross(REF_DIRECTION);
 			axis.Normalize();
 
 			auto axisAngle = AxisAngle(axis, FROM_RAD(PI));
@@ -216,7 +202,7 @@ namespace TEN::Math::Geometry
 			return Quaternion::Identity;
 
 		// Calculate axis-angle and return converted quaternion.
-		auto axisAngle = AxisAngle(refDirection.Cross(direction), FROM_RAD(acos(dot)));
+		auto axisAngle = AxisAngle(REF_DIRECTION.Cross(direction), FROM_RAD(acos(dot)));
 		return axisAngle.ToQuaternion();
 	}
 

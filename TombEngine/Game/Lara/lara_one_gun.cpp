@@ -790,7 +790,7 @@ void GrenadeControl(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 		TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	}
 
@@ -926,7 +926,7 @@ void RocketControl(short itemNumber)
 	int wz = world.Translation().z;
 
 	// Trigger fire, smoke, and light.
-	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerDynamicLight(
 		wx + item.Pose.Position.x + (GetRandomControl() & 15) - 8, 

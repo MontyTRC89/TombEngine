@@ -127,7 +127,7 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 
 void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
