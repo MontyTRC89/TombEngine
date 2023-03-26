@@ -193,11 +193,7 @@ namespace TEN::Entities::Creatures::TR2
 					angle >(ANGLE(45.0f) - ANGLE(30.0f)) &&
 					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = 0;
-					laraItem->Animation.TargetState = 7;
-
+					SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					laraItem->Pose = item->Pose;
 					laraItem->Animation.IsAirborne = false;
 					laraItem->Animation.Velocity.y = 0.0f;
