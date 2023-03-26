@@ -473,7 +473,7 @@ namespace TEN::Entities::Creatures::TR5
 						item.Pose.Orientation.y -= HEAVY_GUARD_IDLE_TURN_RATE_MAX;
 				}
 
-				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 17))
+				if (TestAnimFrame(item, 17))
 				{
 					FireHeavyGuardRaygun(item, false, false);
 					FireHeavyGuardRaygun(item, true, false);
@@ -500,7 +500,7 @@ namespace TEN::Entities::Creatures::TR5
 				torsoOrient.x = ai.xAngle / 2;
 				torsoOrient.y = laraAI.angle / 2;
 
-				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 18))
+				if (TestAnimFrame(item, 18))
 				{
 					FireHeavyGuardRaygun(item, false, false);
 					item.ItemFlags[1] = -16;
