@@ -2,44 +2,46 @@
 #include "Math/Solvers.h"
 
 #include "Math/Constants.h"
-#include "Math/Legacy.h"
 
 namespace TEN::Math::Solvers
 {
-	std::pair<float, float> SolveQuadratic(float a, float b, float c)
+	QuadraticSolution SolveQuadratic(float a, float b, float c)
 	{
-		auto solution = INVALID_QUADRATIC_SOLUTION;
+		constexpr auto INVALID_SOLUTION = QuadraticSolution{ false, 0.0f, 0.0f };
 
 		if (abs(a) < EPSILON)
 		{
+			// Zero solutions.
 			if (abs(b) < EPSILON)
-				return solution; // Zero solutions.
+				return INVALID_SOLUTION;
 
-			solution.first = -c / b;
-			solution.second = solution.first;
-			return solution; // One solution.
+			// One solution.
+			float root = -c / b;
+			return QuadraticSolution{ true, root, root };
 		}
 
+		// Zero solutions.
 		float discriminant = SQUARE(b) - (4.0f * a * c);
 		if (discriminant < 0.0f)
-			return solution; // Zero solutions.
+			return INVALID_SOLUTION;
 
 		float inv2a = 1.0f / (2.0f * a);
 
+		// One solution.
 		if (discriminant < EPSILON)
 		{
-			solution.first = -b * inv2a;
-			solution.second = solution.first;
-			return solution; // One solution.
+			float root = -b * inv2a;
+			return QuadraticSolution{ true, root, root };
 		}
 
+		// Two solutions.
 		discriminant = sqrt(discriminant);
-		solution.first = (-b - discriminant) * inv2a;
-		solution.second = (-b + discriminant) * inv2a;
-		return solution; // Two solutions.
+		float root0 = (-b - discriminant) * inv2a;
+		float root1 = (-b + discriminant) * inv2a;
+		return QuadraticSolution{ true, root0, root1 };
 	}
 
-	IKSolution2D SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
+	IK2DSolution SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
 	{
 		auto scaledTarget = target;
 		auto maxLength = length0 + length1;
@@ -56,7 +58,7 @@ namespace TEN::Math::Solvers
 
 		float a = flipXY ? (scaledTarget.y - origin.y) : (scaledTarget.x - origin.x);
 		float b = flipXY ? (scaledTarget.x - origin.x) : (scaledTarget.y - origin.y);
-		assert(abs(a) >= EPSILON);
+		assertion(abs(a) >= EPSILON, "SolveIK2D() failed.");
 
 		float m = ((SQUARE(length0) - SQUARE(length1)) + (SQUARE(a) + SQUARE(b))) / (2.0f * a);
 		float n = b / a;
@@ -65,11 +67,11 @@ namespace TEN::Math::Solvers
 		auto middle = Vector2::Zero;
 
 		// Solution is valid; define middle accurately.
-		if (quadratic != INVALID_QUADRATIC_SOLUTION)
+		if (quadratic.IsValid)
 		{
 			middle = origin + (flipXY ?
-				Vector2(quadratic.second, (m - (n * quadratic.second))) :
-				Vector2(quadratic.first, (m - (n * quadratic.first))));
+				Vector2(quadratic.Root1, (m - (n * quadratic.Root1))) :
+				Vector2(quadratic.Root0, (m - (n * quadratic.Root0))));
 		}
 		// Solution is invalid: define middle as point on line segment between origin and target.
 		else
@@ -77,10 +79,10 @@ namespace TEN::Math::Solvers
 			middle = origin + (direction * length0);
 		}
 
-		return IKSolution2D{ origin, middle, scaledTarget };
+		return IK2DSolution{ origin, middle, scaledTarget };
 	}
 
-	IKSolution3D SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1)
+	IK3DSolution SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1)
 	{
 		auto direction = (target - origin);
 		direction.Normalize();
@@ -107,6 +109,6 @@ namespace TEN::Math::Solvers
 		auto localEnd = Vector3(ikSolution2D.End.x, ikSolution2D.End.y, 0.0f);
 		auto end = Vector3::Transform(localEnd, tMatrix);
 
-		return IKSolution3D{ origin, middle, end };
+		return IK3DSolution{ origin, middle, end };
 	}
 }

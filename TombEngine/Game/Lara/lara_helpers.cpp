@@ -325,9 +325,9 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	playerOrientConjugate.Conjugate();
 
 	// Negate orientations of joints from current animation and player.
-	auto baseRot = joint0OrientConjugate * Geometry::DirectionToQuaternion(ikSolution3D.Middle - ikSolution3D.Base);
+	auto baseRot = joint0OrientConjugate * Geometry::ConvertDirectionToQuat(ikSolution3D.Middle - ikSolution3D.Base);
 	baseRot = playerOrientConjugate * baseRot;
-	auto middleRot = joint1OrientConjugate * Geometry::DirectionToQuaternion(ikSolution3D.End - ikSolution3D.Middle);
+	auto middleRot = joint1OrientConjugate * Geometry::ConvertDirectionToQuat(ikSolution3D.End - ikSolution3D.Middle);
 	middleRot = playerOrientConjugate * middleRot;
 
 	// Store required joint rotations in limb rotation data.

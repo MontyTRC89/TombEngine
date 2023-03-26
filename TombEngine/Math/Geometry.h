@@ -45,8 +45,6 @@ namespace TEN::Math::Geometry
 	Quaternion ConvertDirectionToQuat(const Vector3& direction);
 	Vector3	   ConvertQuatToDirection(const Quaternion& quat);
 
-	Quaternion DirectionToQuaternion(const Vector3& direction);
-
 	// Point relation inquirers
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
