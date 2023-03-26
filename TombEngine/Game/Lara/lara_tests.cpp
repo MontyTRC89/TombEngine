@@ -2478,7 +2478,7 @@ bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
 		auto pointColl = GetCollision(item);
 
 		short directionAngle = GetLaraSlideDirection(item, coll);
-		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetSurfaceNormal(pointColl.FloorTilt, true));
 		return (abs(short(coll->Setup.ForwardAngle - directionAngle)) <= abs(slopeAngle));
 	}
 

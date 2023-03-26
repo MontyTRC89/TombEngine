@@ -100,20 +100,6 @@ namespace TEN::Math::Geometry
 		return Vector3::Transform(point, rotMatrix);
 	}
 
-	Vector3 GetFloorNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
-		normal.Normalize();
-		return normal;
-	}
-
-	Vector3 GetCeilingNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4);
-		normal.Normalize();
-		return normal;
-	}
-
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
