@@ -314,12 +314,12 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	// TODO: Apply the solved IK to leg joints. Everything is wrong.
 
-	const auto& frame = *GetBestFrame(&item);
+	const auto& frame = GetBestFrame(item);
 
 	// Determine conjugates.
-	auto joint0OrientConjugate = frame.angles[joint0];
+	auto joint0OrientConjugate = frame.BoneOrientations[joint0];
 	joint0OrientConjugate.Conjugate();
-	auto joint1OrientConjugate = frame.angles[joint1];
+	auto joint1OrientConjugate = frame.BoneOrientations[joint1];
 	joint1OrientConjugate.Conjugate();
 	auto playerOrientConjugate = item.Pose.Orientation.ToQuaternion();
 	playerOrientConjugate.Conjugate();
@@ -607,7 +607,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(probe.FloorTilt));
+	headingAngle = Geometry::GetSurfaceAspectAngle(GetSurfaceNormal(probe.FloorTilt, true));
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -833,7 +833,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	auto floorNormal = GetSurfaceNormal(GetCollision(item).FloorTilt, true);
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.

@@ -1,9 +1,8 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -12,9 +11,12 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Hair;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -110,12 +112,9 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
-	AnimFrame* framePtr[2];
 	
-	int rate = 0;
-	int frac = GetFrame(LaraItem, framePtr, rate);
-
-	UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
+	auto frameData = GetFrameInterpData(*LaraItem);
+	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
 	// Then the arms, based on current weapon status.
 	if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
@@ -124,8 +123,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-		frac = GetFrame(LaraItem, framePtr, rate);
-		UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
+		auto frameData = GetFrameInterpData(*LaraItem);
+		UpdateAnimation(&rItem, playerObject, frameData, mask);
 	}
 	else
 	{
@@ -155,41 +154,61 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::RocketLauncher:
 		case LaraWeaponType::HarpoonGun:
 		{
-			AnimFrame* shotgunframePtr;
-
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
-			UpdateAnimation(&rItem, playerObject, &shotgunframePtr, 0, 1, mask);
+			auto shotgunFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber],
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber],
+				0.0f
+			};
+
+			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
-			UpdateAnimation(&rItem, playerObject, &shotgunframePtr, 0, 1, mask);
+			shotgunFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber],
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber],
+				0.0f
+			};
+
+			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
 		}
 
 		break;
 
 		case LaraWeaponType::Revolver:
 		{
-			AnimFrame* revolverframePtr;
-
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			revolverframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(&rItem, playerObject, &revolverframePtr, 0, 1, mask);
+			auto revolverFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase],
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase],
+				0.0f
+			};
+
+			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(&rItem, playerObject, &revolverframePtr, 0, 1, mask);
+			revolverFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase],
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase],
+				0.0f
+			};
+
+			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
 		}
 
 		break;
@@ -198,21 +217,31 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Uzi:
 		default:
 		{
-			AnimFrame* pistolframePtr;
-
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, mask);
+			auto pistolFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase],
+				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase],
+				0.0f
+			};
+
+			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, &pistolframePtr, 0, 1, mask);
+			pistolFrameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase],
+				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase],
+				0.0f
+			};
+			
+			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);
 		}
 
 		break;
@@ -226,27 +255,27 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
-			// HACK: Mask head and torso only when pulling out the flare.
+			// HACK: Mask head and torso when taking out a flare.
 			if (!Lara.Control.IsLow &&
-				tempItem.Animation.AnimNumber > Objects[ID_FLARE_ANIM].animIndex + 1 &&
-				tempItem.Animation.AnimNumber < Objects[ID_FLARE_ANIM].animIndex + 4)
+				tempItem.Animation.AnimNumber > (Objects[ID_FLARE_ANIM].animIndex + 1) &&
+				tempItem.Animation.AnimNumber < (Objects[ID_FLARE_ANIM].animIndex + 4))
 			{
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 
-			frac = GetFrame(&tempItem, framePtr, rate);
-			UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
+			auto frameData = GetFrameInterpData(tempItem);
+			UpdateAnimation(&rItem, playerObject, frameData, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frac = GetFrame(LaraItem, framePtr, rate);
-			UpdateAnimation(&rItem, playerObject, framePtr, frac, rate, mask);
+			frameData = GetFrameInterpData(*LaraItem);
+			UpdateAnimation(&rItem, playerObject, frameData, mask);
 			break;
 		}
 	}
 
 	// Copy matrices in player object.
-	for (int m = 0; m < 15; m++)
+	for (int m = 0; m < NUM_LARA_MESHES; m++)
 		playerObject.AnimationTransforms[m] = rItem.AnimationTransforms[m];
 
 	// Copy meshswap indices.
@@ -320,26 +349,31 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent)
 {
-	if (!m_moveableObjects[ID_HAIR].has_value())
+	if (!Objects[ID_HAIR].loaded)
 		return;
 
-	RendererObject& hairsObj = *m_moveableObjects[ID_HAIR];
+	const auto& hairObject = *m_moveableObjects[ID_HAIR];
 
-	for (int h = 0; h < HAIR_MAX; h++)
+	// TODO
+	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+
+	bool isHead = true;
+	for (const auto& unit : HairEffect.Units)
 	{
-		if (!Hairs[h][0].enabled)
+		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+		// First matrix is Lara's head matrix, then all hair unit segment matrices.
+		// Bones are adjusted at load time to account for this.
 		m_stItem.World = Matrix::Identity;
 		m_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+		for (int i = 0; i < unit.Segments.size(); i++)
 		{
-			auto* hairs = &Hairs[h][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			m_stItem.BonesMatrices[i + 1] = world;
+			const auto& segment = unit.Segments[i];
+			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
+
+			m_stItem.BonesMatrices[i + 1] = worldMatrix;
 			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		}
 
@@ -347,11 +381,13 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-			DrawMoveableMesh(itemToDraw, mesh, room, k, transparent);
+			auto& rMesh = *hairObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rMesh, room, i, transparent);
 		}
+
+		isHead = false;
 	}
 }
 

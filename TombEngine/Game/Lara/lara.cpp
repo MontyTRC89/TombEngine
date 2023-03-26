@@ -27,7 +27,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
@@ -40,6 +40,7 @@
 #include "Sound/sound.h"
 
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -883,7 +884,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Handle current Lara status.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 	HandleLaraMovementParameters(item, coll);
-	AnimateLara(item);
+	AnimateItem(item);
 
 	if (lara->ExtraAnim == NO_ITEM)
 	{
@@ -964,7 +965,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
-	AnimateLara(item);
+	AnimateItem(item);
 	TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
@@ -1053,7 +1054,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
-	AnimateLara(item);
+	AnimateItem(item);
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
@@ -1144,9 +1145,9 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update player effects.
+	HairEffect.Update(*item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	HandlePlayerWetnessDrips(*item);
 	HandlePlayerDiveBubbles(*item);
-	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);
 }
 

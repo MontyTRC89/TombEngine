@@ -22,6 +22,6 @@ namespace TEN::Entities::Vehicles
 		short TrackMesh = 0;
 
 		short Gear = 0;
-		short Flags = NULL;
+		short Flags = 0;
 	};
 }

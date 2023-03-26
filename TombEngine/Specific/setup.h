@@ -155,5 +155,4 @@ extern STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags();
 void InitialiseSpecialEffects();
-void InitialiseHair();
 void InitialiseObjects();

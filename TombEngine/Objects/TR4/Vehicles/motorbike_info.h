@@ -22,6 +22,6 @@ namespace TEN::Entities::Vehicles
 		char ExhaustStart = 0;
 		bool DisableDismount = false;
 
-		short Flags = NULL;
+		short Flags = 0;
 	};
 }

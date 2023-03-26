@@ -36,10 +36,10 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, AnimFrame** framePtr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation)
 	{
-		static auto boneIndexList = std::vector<int>{};
-		boneIndexList.clear();
+		static auto boneIndices = std::vector<int>{};
+		boneIndices.clear();
 		
 		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
@@ -52,50 +52,53 @@ namespace TEN::Renderer
 		while (nextBone != 0)
 		{
 			// Pop last bone in stack.
-			auto* bone = bones[--nextBone];
+			auto* bonePtr = bones[--nextBone];
 
 			// Check nullptr, otherwise inventory crashes.
-			if (bone == nullptr)
+			if (bonePtr == nullptr)
 				return;
 
-			if (framePtr[0]->angles.size() <= bone->Index || (frac && framePtr[1]->angles.size() <= bone->Index))
+			if (frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index ||
+				(frameData.Alpha != 0.0f && frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index))
 			{
-				TENLog("Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
-					" using incorrect animation data. Bad animations set for slot?", LogLevel::Error);
+				TENLog(
+					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
+					" using incorrect animation data. Bad animations set for slot?",
+					LogLevel::Error);
 
 				return;
 			}
 
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto offset = Vector3(framePtr[0]->offsetX, framePtr[0]->offsetY, framePtr[0]->offsetZ);
-				auto rotMatrix = Matrix::CreateFromQuaternion(framePtr[0]->angles[bone->Index]);
+				auto offset0 = frameData.FramePtr0->Offset;
+				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.FramePtr0->BoneOrientations[bonePtr->Index]);
 				
-				if (frac)
+				if (frameData.Alpha != 0.0f)
 				{
-					auto offset2 = Vector3(framePtr[1]->offsetX, framePtr[1]->offsetY, framePtr[1]->offsetZ);
-					offset = Vector3::Lerp(offset, offset2, frac / (float)rate);
+					auto offset1 = frameData.FramePtr1->Offset;
+					offset0 = Vector3::Lerp(offset0, offset1, frameData.Alpha);
 
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(framePtr[1]->angles[bone->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameData.FramePtr1->BoneOrientations[bonePtr->Index]);
 
 					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
 					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
-					auto quat3 = Quaternion::Slerp(quat1, quat2, frac / (float)rate);
+					auto quat3 = Quaternion::Slerp(quat1, quat2, frameData.Alpha);
 
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
-				auto tMatrix = (bone == rObject.Skeleton) ? Matrix::CreateTranslation(offset) : Matrix::Identity;
+				auto tMatrix = (bonePtr == rObject.Skeleton) ? Matrix::CreateTranslation(offset0) : Matrix::Identity;
 
-				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
+				auto extraRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraRotation);
 
 				if (useObjectWorldRotation)
 				{
 					auto scale = Vector3::Zero;
 					auto inverseQuat = Quaternion::Identity;
 					auto translation = Vector3::Zero;
-					transforms[bone->Parent->Index].Invert().Decompose(scale, inverseQuat, translation);
+					transforms[bonePtr->Parent->Index].Invert().Decompose(scale, inverseQuat, translation);
 
 					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(inverseQuat);
 				}
@@ -104,19 +107,19 @@ namespace TEN::Renderer
 					rotMatrix = extraRotMatrix * rotMatrix;
 				}
 
-				if (bone != rObject.Skeleton)
-					transforms[bone->Index] = rotMatrix * bone->Transform;
+				if (bonePtr != rObject.Skeleton)
+					transforms[bonePtr->Index] = rotMatrix * bonePtr->Transform;
 				else
-					transforms[bone->Index] = rotMatrix * tMatrix;
+					transforms[bonePtr->Index] = rotMatrix * tMatrix;
 
-				if (bone != rObject.Skeleton)
-					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
+				if (bonePtr != rObject.Skeleton)
+					transforms[bonePtr->Index] = transforms[bonePtr->Index] * transforms[bonePtr->Parent->Index];
 			}
 
-			boneIndexList.push_back(bone->Index);
+			boneIndices.push_back(bonePtr->Index);
 
 			// Push.
-			for (auto*& child : bone->Children)
+			for (auto*& child : bonePtr->Children)
 				bones[nextBone++] = child;
 		}
 
@@ -125,16 +128,16 @@ namespace TEN::Renderer
 		{
 			const auto& nativeItem = g_Level.Items[rItem->ItemNumber];
 
-			if (nativeItem.Model.Mutator.size() == boneIndexList.size())
+			if (nativeItem.Model.Mutators.size() == boneIndices.size())
 			{
-				for (int i : boneIndexList)
+				for (const int& i : boneIndices)
 				{
-					const auto& mutator = nativeItem.Model.Mutator[i];
+					const auto& mutator = nativeItem.Model.Mutators[i];
 
 					if (mutator.IsEmpty())
 						continue;
 
-					auto rotMatrix = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+					auto rotMatrix = mutator.Rotation.ToRotationMatrix();
 					auto scaleMatrix = Matrix::CreateScale(mutator.Scale);
 					auto tMatrix = Matrix::CreateTranslation(mutator.Offset);
 
@@ -185,7 +188,7 @@ namespace TEN::Renderer
 				{
 					if (j == 3 || j == 4)
 					{
-						currentBone->ExtraRotation =  EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
+						currentBone->ExtraRotation = EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
 					}
 					else if (j == 6 || j == 7)
 					{
@@ -295,11 +298,8 @@ namespace TEN::Renderer
 				});
 		}
 
-		AnimFrame* framePtr[2];
-		int rate;
-		int frac = GetFrame(nativeItem, framePtr, rate);
-
-		UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
+		auto frameData = GetFrameInterpData(*nativeItem);
+		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];

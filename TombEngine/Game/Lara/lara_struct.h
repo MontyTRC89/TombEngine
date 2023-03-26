@@ -1317,7 +1317,8 @@ struct LaraInfo
 
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has this.
 
-	LaraControlData Control;
+	PlayerStatusData Status = {};
+	LaraControlData Control = {};
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare = {};

@@ -8,7 +8,7 @@ class EulerAngles;
 	{
 	private:
 		// Components
-		Vector3 Axis  = Vector3::Zero;
+		Vector3 Axis  = Vector3::Backward;
 		short	Angle = 0;
 
 	public:
@@ -35,6 +35,8 @@ class EulerAngles;
 		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha = 1.0f);
 
 		// Converters
+		Vector3		ToDirection() const;
+		EulerAngles ToEulerAngles() const;
 		Quaternion	ToQuaternion() const;
 		Matrix		ToRotationMatrix() const;
 
