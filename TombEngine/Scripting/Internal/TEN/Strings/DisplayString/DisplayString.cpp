@@ -139,6 +139,7 @@ void DisplayString::Register(sol::table & parent)
 		// @tparam Table table the new table with display flags options
 		// Example with possible values:
 		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
+		// varDisplayString:SetFlags({})
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.CENTER })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.DisplayStringOption.CENTER })
