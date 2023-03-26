@@ -123,8 +123,8 @@ class FloorInfo
 		bool Stopper	  = true;
 
 		// Getters
-		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
-		Vector2 GetSurfaceTilt(int x, int z, bool checkFloor) const;
+		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
+		Vector2 GetSurfaceTilt(int x, int z, bool isFloor) const;
 
 		std::optional<int> GetRoomNumberAbove(int planeIndex) const;
 		std::optional<int> GetRoomNumberAbove(int x, int z) const;
@@ -134,17 +134,17 @@ class FloorInfo
 		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
 		std::optional<int> GetRoomNumberAtSide() const; // Through wall?
 
-		int GetSurfaceHeight(int x, int z, bool checkFloor) const;
-		int GetSurfaceHeight(int x, int y, int z, bool checkFloor) const;
-		int GetBridgeSurfaceHeight(int x, int y, int z, bool checkFloor) const;
+		int GetSurfaceHeight(int x, int z, bool isFloor) const;
+		int GetSurfaceHeight(int x, int y, int z, bool isFloor) const;
+		int GetBridgeSurfaceHeight(int x, int y, int z, bool isFloor) const;
 
-		Vector2 GetSurfaceSlope(int planeIndex, bool checkFloor) const;
-		Vector2 GetSurfaceSlope(int x, int z, bool checkFloor) const;
+		Vector2 GetSurfaceSlope(int planeIndex, bool isFloor) const;
+		Vector2 GetSurfaceSlope(int x, int z, bool isFloor) const;
 
 		// Inquirers
-		bool IsSurfaceSplit(bool checkFloor) const;
-		bool IsSurfaceDiagonalStep(bool checkFloor) const;
-		bool IsSurfaceSplitPortal(bool checkFloor) const;
+		bool IsSurfaceSplit(bool isFloor) const;
+		bool IsSurfaceDiagonalStep(bool isFloor) const;
+		bool IsSurfaceSplitPortal(bool isFloor) const;
 		bool IsWall(int planeIndex) const;
 		bool IsWall(int x, int z) const;
 
@@ -156,6 +156,9 @@ class FloorInfo
 
 namespace TEN::Floordata
 {
+	// TODO: Use normals natively.
+	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);
+
 	Vector2i GetSectorPoint(int x, int z);
 	Vector2i GetRoomPosition(int roomNumber, int x, int z);
 	

@@ -565,8 +565,13 @@ namespace TEN::Renderer
 		const auto& object = Objects[objectNumber];
 		if (object.animIndex != -1)
 		{
-			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr] };
-			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
+			auto frameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				0.0f
+			};
+			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}
 
 		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
@@ -597,7 +602,7 @@ namespace TEN::Renderer
 
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && n == 1)
-				(*moveableObject).LinearizedBones[n]->ExtraRotation.y = TO_RAD((g_Gui.CompassNeedleAngle) - ANGLE(180.0f));
+				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
 			// Construct world matrix.
 			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));

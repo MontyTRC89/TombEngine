@@ -4,7 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/lot.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/effects/footprint.h"
@@ -24,13 +24,13 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Objects/Effects/tr4_locusts.h"
 
-using std::function;
-using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Hair;
 
 int FlipEffect;
 
-function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
+std::function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 {
 	Turn180,					//0
 	FloorShake,					//1
@@ -131,7 +131,7 @@ void AddRightFootprint(ItemInfo* item)
 
 void ResetHair(ItemInfo* item)
 {
-	InitialiseHair();
+	HairEffect.Initialize();
 }
 
 void InvisibilityOff(ItemInfo* item)
