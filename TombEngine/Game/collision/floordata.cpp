@@ -67,9 +67,9 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool checkFloor) const
 
 bool FloorInfo::IsSurfaceSplitPortal(bool checkFloor) const
 {
-	// Check if surface planes are different.
-	const auto& planes = checkFloor ? FloorCollision.Planes : CeilingCollision.Planes;
-	return (planes[0] != planes[1]);
+	// Check if surface portals are different.
+	const auto& portals = checkFloor ? FloorCollision.Portals : CeilingCollision.Portals;
+	return (portals[0] != portals[1]);
 }
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(int planeIndex) const
