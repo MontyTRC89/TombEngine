@@ -796,14 +796,14 @@ void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0.0f;
+	//item->Animation.Velocity.y = 0.0f; // NOTE: May have been interfering on slides. -- Sezz 2022.03.27
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0.0f;
+	//item->Animation.Velocity.y = 0.0f; // NOTE: May have been interfering on slides. -- Sezz 2022.03.27
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
