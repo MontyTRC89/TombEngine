@@ -14,14 +14,14 @@ namespace TEN::Entities::Player::Context
 		bool TestDeathFloor			= true;
 	};
 
-	struct MonkeySwingSetup
+	struct MonkeySwingSetupData
 	{
 		short HeadingAngle		= 0;
 		float LowerCeilingBound = 0.0f;
 		float UpperCeilingBound = 0.0f;
 	};
 
-	struct LedgeClimbSetup
+	struct LedgeClimbSetupData
 	{
 		short HeadingAngle = 0;
 		float SpaceMin	   = 0.0f;
@@ -31,7 +31,7 @@ namespace TEN::Entities::Player::Context
 		bool CheckSlope = false;
 	};
 
-	struct JumpSetup
+	struct JumpSetupData
 	{
 		short HeadingAngle = 0;
 		float Distance	   = 0.0f;
@@ -39,7 +39,7 @@ namespace TEN::Entities::Player::Context
 		bool TestWadeStatus = true;
 	};
 
-	struct VaultSetup
+	struct VaultSetupData
 	{
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
@@ -50,7 +50,7 @@ namespace TEN::Entities::Player::Context
 		bool TestSwampDepth = true;
 	};
 
-	struct Vault
+	struct VaultData
 	{
 		bool Success	 = false;
 		int	 Height		 = 0;
@@ -61,7 +61,7 @@ namespace TEN::Entities::Player::Context
 		bool SetJumpVelocity = false;
 	};
 
-	struct CrawlVaultSetup
+	struct CrawlVaultSetupData
 	{
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
@@ -75,13 +75,13 @@ namespace TEN::Entities::Player::Context
 		bool TestDeath = true;
 	};
 
-	struct CrawlVault
+	struct CrawlVaultData
 	{
 		bool Success	 = false;
 		int	 TargetState = NO_STATE;
 	};
 
-	struct WaterClimbOutSetup
+	struct WaterClimbOutSetupData
 	{
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
@@ -90,20 +90,20 @@ namespace TEN::Entities::Player::Context
 		float GapMin		  = 0.0f;
 	};
 
-	struct WaterClimbOut
+	struct WaterClimbOutData
 	{
 		bool Success	 = false;
 		int	 Height		 = 0;
 		int	 TargetState = NO_STATE;
 	};
 
-	struct LedgeHang
+	struct LedgeHangData
 	{
 		bool Success = false;
 		int	 Height	 = 0;
 	};
 
-	struct CornerShimmy
+	struct CornerShimmyData
 	{
 		bool Success;
 		Pose ProbeResult;

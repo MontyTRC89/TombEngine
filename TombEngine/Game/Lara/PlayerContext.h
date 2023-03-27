@@ -76,18 +76,18 @@ namespace TEN::Entities::Player::Context
 	bool CanDismountTightrope(ItemInfo* item, CollisionInfo* coll);
 
 	// Vault contexts
-	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll);
+	Context::VaultData GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll);
 
 	// Crawl vault contexts
 
 	// Water climb out contexts
-	Context::WaterClimbOut GetWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOutFlatStep(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOutFlatStepToCrouch(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOutUpStep(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOutUpStepToCrouch(ItemInfo* item, CollisionInfo* coll);
-	Context::WaterClimbOut GetWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutFlatStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutFlatStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutUpStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOutUpStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOutData GetWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 
 	// -------------------------------------------------------------------------------------------------
 	
@@ -97,14 +97,14 @@ namespace TEN::Entities::Player::Context
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle);
 
 	// Context setup inquirers
-	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& contextSetup, bool useCrawlSetup = false);
-	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetup& contextSetup);
-	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetup& contextSetup);
-	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
+	bool TestLandMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& setupData, bool isCrawling = false);
+	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetupData& setupData);
+	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetupData& setupData);
+	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetupData& setupData);
 
 	// Context getters
 	// NOTE: These are used by higher-level functions to partially fill specialized context structs.
 	// TODO: Make these into classes?
-	Context::Vault		   GetVaultBase(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup);
-	Context::WaterClimbOut GetWaterClimbOutBase(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetup contextSetup);
+	Context::VaultData		   GetVaultContextData(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetupData& setupData);
+	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetupData setupData);
 }

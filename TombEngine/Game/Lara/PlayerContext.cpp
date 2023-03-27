@@ -159,7 +159,7 @@ namespace TEN::Entities::Player::Context
 			false, true, false
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanRunBackward(ItemInfo* item, CollisionInfo* coll)
@@ -171,7 +171,7 @@ namespace TEN::Entities::Player::Context
 			false, false, false
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanWalkForward(ItemInfo* item, CollisionInfo* coll)
@@ -182,7 +182,7 @@ namespace TEN::Entities::Player::Context
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // NOTE: Defined by walk forward state.
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanWalkBackward(ItemInfo* item, CollisionInfo* coll)
@@ -193,7 +193,7 @@ namespace TEN::Entities::Player::Context
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // NOTE: Defined by walk backward state.
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanSidestepLeft(ItemInfo* item, CollisionInfo* coll)
@@ -222,7 +222,7 @@ namespace TEN::Entities::Player::Context
 		};
 
 		// 2. Assess context.
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll)
@@ -233,7 +233,7 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		auto contextSetup = Context::LandMovementSetupData
+		auto setupData = Context::LandMovementSetupData
 		{
 			short(item->Pose.Orientation.y + ANGLE(180.0f)),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Defined by walk backward state.
@@ -241,7 +241,7 @@ namespace TEN::Entities::Player::Context
 		};
 
 		// 2. Assess context.
-		return Context::TestGroundSetup(item, coll, contextSetup);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanSlide(ItemInfo* item, CollisionInfo* coll)
@@ -404,7 +404,7 @@ namespace TEN::Entities::Player::Context
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Defined by crawl forward state.
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData, true);
+		return Context::TestLandMovementSetup(item, coll, setupData, true);
 	}
 
 	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll)
@@ -415,7 +415,7 @@ namespace TEN::Entities::Player::Context
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Defined by crawl backward state.
 		};
 
-		return Context::TestGroundSetup(item, coll, setupData, true);
+		return Context::TestLandMovementSetup(item, coll, setupData, true);
 	}
 
 	bool CanPerformMonkeyStep(ItemInfo* item, CollisionInfo* coll)
@@ -503,7 +503,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto setupData = Context::MonkeySwingSetup
+		auto setupData = Context::MonkeySwingSetupData
 		{
 			item->Pose.Orientation.y,
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Defined by monkey forward state.
@@ -514,7 +514,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto setupData = Context::MonkeySwingSetup
+		auto setupData = Context::MonkeySwingSetupData
 		{
 			short(item->Pose.Orientation.y + ANGLE(180.0f)),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Defined by monkey backward state.
@@ -595,7 +595,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanClimbLedgeToCrouch(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto contextSetup = Context::LedgeClimbSetup
+		auto setupData = Context::LedgeClimbSetupData
 		{
 			item->Pose.Orientation.y,
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Space range.
@@ -603,12 +603,12 @@ namespace TEN::Entities::Player::Context
 			true
 		};
 
-		return Context::TestLedgeClimbSetup(item, coll, contextSetup);
+		return Context::TestLedgeClimbSetup(item, coll, setupData);
 	}
 
 	bool CanClimbLedgeToStand(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto contextSetup = Context::LedgeClimbSetup
+		auto setupData = Context::LedgeClimbSetupData
 		{
 			item->Pose.Orientation.y,
 			LARA_HEIGHT, -INFINITY, // Space range.
@@ -616,7 +616,7 @@ namespace TEN::Entities::Player::Context
 			false
 		};
 
-		return Context::TestLedgeClimbSetup(item, coll, contextSetup);
+		return Context::TestLedgeClimbSetup(item, coll, setupData);
 	}
 
 	bool CanLedgeShimmyLeft(ItemInfo* item, CollisionInfo* coll)
@@ -724,13 +724,13 @@ namespace TEN::Entities::Player::Context
 
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const auto contextSetup = Context::JumpSetup
+		static const auto setupData = Context::JumpSetupData
 		{
 			0,
 			0.0f,
 			false
 		};
-		return Context::TestJumpSetup(item, coll, contextSetup);
+		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
 	bool CanJumpForward(ItemInfo* item, CollisionInfo* coll)
@@ -761,12 +761,12 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.Count.Run < LARA_RUN_JUMP_TIME)
 			return false;
 
-		auto contextSetup = Context::JumpSetup
+		auto setupData = Context::JumpSetupData
 		{
 			item->Pose.Orientation.y,
 			CLICK(3 / 2.0f)
 		};
-		return Context::TestJumpSetup(item, coll, contextSetup);
+		return Context::TestJumpSetup(item, coll, setupData);
 	}
 	
 	bool CanSprintJumpForward(ItemInfo* item, CollisionInfo* coll)
@@ -786,12 +786,12 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4. Assess context.
-		auto contextSetup = Context::JumpSetup
+		auto setupData = Context::JumpSetupData
 		{
 			item->Pose.Orientation.y,
 			CLICK(1.8f)
 		};
-		return Context::TestJumpSetup(item, coll, contextSetup);
+		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
 	bool CanPerformSlideJump(ItemInfo* item, CollisionInfo* coll)
@@ -833,15 +833,15 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll)
+	Context::VaultData GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const auto contextSetup = Context::VaultSetup
+		static const auto setupData = Context::VaultSetupData
 		{
-			-STEPUP_HEIGHT, -CLICK(5 / 2.0f), // Floor range.
+			-STEPUP_HEIGHT, -CLICK(2.5f), // Floor range.
 			LARA_HEIGHT, INFINITY,			  // Space range.
 			CLICK(1)
 		};
-		auto context = GetVaultBase(item, coll, contextSetup);
+		auto context = GetVaultContextData(item, coll, setupData);
 		context.TargetState = LS_VAULT_2_STEPS;
 
 		if (!context.Success)
@@ -855,16 +855,16 @@ namespace TEN::Entities::Player::Context
 		return context;
 	}
 
-	Context::WaterClimbOut GetWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll)
+	Context::WaterClimbOutData GetWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto contextSetup = Context::WaterClimbOutSetup
+		auto setupData = Context::WaterClimbOutSetupData
 		{
 			CLICK(5 / 4.0f) - 4, CLICK(1 / 2.0f),
 			LARA_HEIGHT, -INFINITY,
 			CLICK(1),
 		};
 
-		auto context = Context::GetWaterClimbOutBase(item, coll, contextSetup);
+		auto context = Context::GetWaterClimbOutData(item, coll, setupData);
 		context.Height -= CLICK(1);
 		return context;
 	}
@@ -883,7 +883,7 @@ namespace TEN::Entities::Player::Context
 				false, false, false
 			};
 
-			return Context::TestGroundSetup(item, coll, setupData);
+			return Context::TestLandMovementSetup(item, coll, setupData);
 		}
 		
 		auto setupData = Context::LandMovementSetupData
@@ -893,12 +893,12 @@ namespace TEN::Entities::Player::Context
 		};
 
 		// 1b. Assess context in regular case.
-		return Context::TestGroundSetup(item, coll, setupData);
+		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
-		auto setupData = Context::MonkeySwingSetup
+		auto setupData = Context::MonkeySwingSetupData
 		{
 			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			CLICK(0.5f), -CLICK(0.5f) // NOTE: Defined by monkey shimmy left/right states.
@@ -913,7 +913,7 @@ namespace TEN::Entities::Player::Context
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			return false;
 
-		auto setupData = Context::JumpSetup
+		auto setupData = Context::JumpSetupData
 		{
 			short(item->Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
@@ -922,15 +922,15 @@ namespace TEN::Entities::Player::Context
 		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
-	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& contextSetup, bool useCrawlSetup)
+	bool TestLandMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& setupData, bool isCrawling)
 	{
-		// HACK: coll->Setup.Radius and coll->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
-		// This means they will store the wrong values for any move context assessments conducted in crouch/crawl lara_as functions.
-		// When states become objects, a dedicated state init function should eliminate the need for the useCrawlSetup parameter. -- Sezz 2022.03.16
-		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
-		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
+		// HACK: coll->Setup.Radius and coll->Setup.Height are set only in lara_col functions and then reset by LaraAboveWater() to defaults.
+		// This means they will store the wrong values for any context assessment functions called in crouch/crawl lara_as routines.
+		// If states become objects, a dedicated state init function should eliminate the need for the isCrawling parameter. -- Sezz 2022.03.16
+		int playerRadius = isCrawling ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
+		int playerHeight = isCrawling ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
 
-		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
+		auto pointColl = GetCollision(item, setupData.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
 		int vPos = item->Pose.Position.y;
 		int vPosTop = vPos - playerHeight;
 
@@ -942,9 +942,9 @@ namespace TEN::Entities::Player::Context
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		bool isSlipperySlopeDown = contextSetup.TestSlipperySlopeBelow ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor > vPos)) : false;
-		bool isSlipperySlopeUp	 = contextSetup.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
-		bool isDeathFloor		 = contextSetup.TestDeathFloor		   ? pointColl.Block->Flags.Death										  : false;
+		bool isSlipperySlopeDown = setupData.TestSlipperySlopeBelow ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor > vPos)) : false;
+		bool isSlipperySlopeUp	 = setupData.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
+		bool isDeathFloor		 = setupData.TestDeathFloor		   ? pointColl.Block->Flags.Death										  : false;
 
 		// 2. Check for slippery floor slope or death floor (if applicable).
 		if (isSlipperySlopeDown || isSlipperySlopeUp || isDeathFloor)
@@ -953,12 +953,12 @@ namespace TEN::Entities::Player::Context
 		// Raycast setup at upper floor bound.
 		auto originA = GameVector(
 			item->Pose.Position.x,
-			(vPos + contextSetup.UpperFloorBound) - 1,
+			(vPos + setupData.UpperFloorBound) - 1,
 			item->Pose.Position.z,
 			item->RoomNumber);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
-			(vPos + contextSetup.UpperFloorBound) - 1,
+			(vPos + setupData.UpperFloorBound) - 1,
 			pointColl.Coordinates.z,
 			item->RoomNumber);
 
@@ -981,9 +981,9 @@ namespace TEN::Entities::Player::Context
 		// TODO: Assess static object geometry ray collision.
 
 		// 4. Assess point collision.
-		if (relFloorHeight <= contextSetup.LowerFloorBound && // Floor height is within lower floor bound.
-			relFloorHeight >= contextSetup.UpperFloorBound && // Floor height is within upper floor bound.
-			relCeilingHeight < -playerHeight &&				  // Ceiling height is lower than player height.
+		if (relFloorHeight <= setupData.LowerFloorBound && // Floor height is above lower floor bound.
+			relFloorHeight >= setupData.UpperFloorBound && // Floor height is below upper floor bound.
+			relCeilingHeight < -playerHeight &&				  // Ceiling height is above player height.
 			floorToCeilHeight > playerHeight)				  // Space is not too narrow.
 		{
 			return true;
@@ -992,14 +992,14 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetup& contextSetup)
+	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetupData& setupData)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
 		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
 
 		int vPos = item->Pose.Position.y;
 		int vPosTop = vPos - PLAYER_HEIGHT;
-		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, OFFSET_RADIUS(coll->Setup.Radius));
+		auto pointColl = GetCollision(item, setupData.HeadingAngle, OFFSET_RADIUS(coll->Setup.Radius));
 
 		// 1. Test for wall.
 		if (pointColl.Position.Ceiling == NO_HEIGHT)
@@ -1024,12 +1024,12 @@ namespace TEN::Entities::Player::Context
 		// Raycast setup at lower ceiling bound.
 		auto origin1 = GameVector(
 			item->Pose.Position.x,
-			(vPosTop + contextSetup.LowerCeilingBound) + 1,
+			(vPosTop + setupData.LowerCeilingBound) + 1,
 			item->Pose.Position.z,
 			item->RoomNumber);
 		auto target1 = GameVector(
 			pointColl.Coordinates.x,
-			(vPosTop + contextSetup.LowerCeilingBound) + 1,
+			(vPosTop + setupData.LowerCeilingBound) + 1,
 			pointColl.Coordinates.z,
 			item->RoomNumber);
 
@@ -1041,8 +1041,8 @@ namespace TEN::Entities::Player::Context
 		
 		// 4. Assess point collision.
 		if (pointColl.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is a monkey swing.
-			(pointColl.Position.Ceiling - vPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
-			(pointColl.Position.Ceiling - vPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
+			(pointColl.Position.Ceiling - vPosTop) <= setupData.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
+			(pointColl.Position.Ceiling - vPosTop) >= setupData.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
 			(pointColl.Position.Floor - vPos) > 0 &&									// Floor is within highest floor bound (player base).
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > PLAYER_HEIGHT)	// Space is not too narrow.
 		{
@@ -1052,16 +1052,16 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetup& contextSetup)
+	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetupData& setupData)
 	{
 		constexpr auto climbHeightTolerance = CLICK(1);
 		
 		int vPosTop = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
 		auto pointCollCenter = GetCollision(item);
-		auto pointCollFront = GetCollision(item, contextSetup.HeadingAngle, coll->Setup.Radius, -(LARA_HEIGHT_STRETCH + CLICK(1 / 2.0f)));
+		auto pointCollFront = GetCollision(item, setupData.HeadingAngle, coll->Setup.Radius, -(LARA_HEIGHT_STRETCH + CLICK(1 / 2.0f)));
 
 		// 1. Check for slope (if applicable).
-		bool isSlope = contextSetup.CheckSlope ? pointCollFront.Position.FloorSlope : false;
+		bool isSlope = setupData.CheckSlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlope)
 			return false;
 
@@ -1076,9 +1076,9 @@ namespace TEN::Entities::Player::Context
 
 		// 4. Assess point collision.
 		if (abs(pointCollFront.Position.Floor - vPosTop) <= climbHeightTolerance &&							 // Ledge height is climbable.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > contextSetup.SpaceMin &&  // Space isn't too narrow.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= contextSetup.SpaceMax && // Space isn't too wide.
-			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= contextSetup.GapMin)	 // Gap is visually permissive.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.SpaceMin &&  // Space isn't too narrow.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.SpaceMax && // Space isn't too wide.
+			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= setupData.GapMin)	 // Gap is visually permissive.
 		{
 			return true;
 		}
@@ -1086,26 +1086,26 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup)
+	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetupData& setupData)
 	{
 		const auto& player = *GetLaraInfo(item);
 
 		int vPos = item->Pose.Position.y;
-		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, contextSetup.Distance, -coll->Setup.Height);
+		auto pointColl = GetCollision(item, setupData.HeadingAngle, setupData.Distance, -coll->Setup.Height);
 
 		// 1. Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-		bool isWading = contextSetup.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
+		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 
 		// 2. Check for swamp or wade status (if applicable).
 		if (isSwamp || isWading)
 			return false;
 
 		// 3. Check for corner.
-		if (TestLaraFacingCorner(item, contextSetup.HeadingAngle, contextSetup.Distance))
+		if (TestLaraFacingCorner(item, setupData.HeadingAngle, setupData.Distance))
 			return false;
 
 		// 4. Assess point collision.
@@ -1120,7 +1120,7 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	Context::Vault GetVaultBase(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup)
+	Context::VaultData GetVaultContextData(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetupData& setupData)
 	{
 		const auto& player = *GetLaraInfo(item);
 
@@ -1128,13 +1128,13 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
 
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-		bool isSwampTooDeep = contextSetup.TestSwampDepth ? (isSwamp && player.WaterSurfaceDist < -CLICK(3)) : isSwamp;
+		bool isSwampTooDeep = setupData.TestSwampDepth ? (isSwamp && player.WaterSurfaceDist < -CLICK(3)) : isSwamp;
 		
 		int vPos = isSwamp ? item->Pose.Position.y : pointCollCenter.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
 		// 1. Check swamp depth (if applicable).
 		if (isSwampTooDeep)
-			return Context::Vault{ false };
+			return Context::VaultData{ false };
 
 		// NOTE: Where the point collision probe finds that
 		// a) the "wall" in front is formed by a ceiling, or
@@ -1142,49 +1142,49 @@ namespace TEN::Entities::Player::Context
 		// any potentially climbable floor in a room above will be missed. The following loop hacks around this floordata limitation.
 
 		// 2. Raise vertical position of point collision probe by increments of 1/8th blocks to find potential vault ledge.
-		int vOffset = contextSetup.LowerFloorBound;
+		int vOffset = setupData.LowerFloorBound;
 		while (((pointCollFront.Position.Ceiling - vPos) > -coll->Setup.Height ||					 // Ceiling is below Lara's height...
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= contextSetup.SpaceMin/* ||	// OR space is too small...
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > contextSetup.ClampMax*/) &&	// OR space is too large (future-proofing; not possible right now).
-			vOffset > (contextSetup.UpperFloorBound - coll->Setup.Height))							 // Offset is not too high.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.SpaceMin/* ||	// OR space is too small...
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.ClampMax*/) &&	// OR space is too large (future-proofing; not possible right now).
+			vOffset > (setupData.UpperFloorBound - coll->Setup.Height))							 // Offset is not too high.
 		{
 			pointCollFront = GetCollision(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), vOffset);
-			vOffset -= std::max(CLICK(1 / 2.0f), contextSetup.SpaceMin);
+			vOffset -= std::max(CLICK(1 / 2.0f), setupData.SpaceMin);
 		}
 
 		// 3. Check for wall.
 		if (pointCollFront.Position.Floor == NO_HEIGHT)
-			return Context::Vault{ false };
+			return Context::VaultData{ false };
 
 		// 4. Assess point collision.
-		if ((pointCollFront.Position.Floor - vPos) < contextSetup.LowerFloorBound &&						 // Floor is within lower floor bound.
-			(pointCollFront.Position.Floor - vPos) >= contextSetup.UpperFloorBound &&						 // Floor is within upper floor bound.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > contextSetup.SpaceMin &&	 // Space is not too narrow.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= contextSetup.SpaceMax && // Space is not too wide.
-			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= contextSetup.GapMin)	 // Gap is visually permissive.
+		if ((pointCollFront.Position.Floor - vPos) < setupData.LowerFloorBound &&						 // Floor is within lower floor bound.
+			(pointCollFront.Position.Floor - vPos) >= setupData.UpperFloorBound &&						 // Floor is within upper floor bound.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.SpaceMin &&	 // Space is not too narrow.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.SpaceMax && // Space is not too wide.
+			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= setupData.GapMin)	 // Gap is visually permissive.
 		{
-			return Context::Vault{ true, pointCollFront.Position.Floor };
+			return Context::VaultData{ true, pointCollFront.Position.Floor };
 		}
 
-		return Context::Vault{ false };
+		return Context::VaultData{ false };
 	}
 
-	Context::WaterClimbOut GetWaterClimbOutBase(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetup contextSetup)
+	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetupData setupData)
 	{
 		int vPos = item->Pose.Position.y;
 		auto pointCollCenter = GetCollision(item);
 		auto pointCollFront = GetCollision(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), -(coll->Setup.Height + CLICK(1)));
 
 		// Assess point collision.
-		if ((pointCollFront.Position.Floor - vPos) <= contextSetup.LowerFloorBound &&						 // Floor is within lower floor bound.
-			(pointCollFront.Position.Floor - vPos) > contextSetup.UpperFloorBound &&	//check				 // Floor is within upper floor bound.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > contextSetup.ClampMin &&	 // Space is not too narrow.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= contextSetup.ClampMax && // Space is not to wide.
-			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= contextSetup.GapMin)	 // Gap is visually permissive.
+		if ((pointCollFront.Position.Floor - vPos) <= setupData.LowerFloorBound &&						 // Floor is within lower floor bound.
+			(pointCollFront.Position.Floor - vPos) > setupData.UpperFloorBound &&	//check				 // Floor is within upper floor bound.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.ClampMin &&	 // Space is not too narrow.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.ClampMax && // Space is not to wide.
+			abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor) >= setupData.GapMin)	 // Gap is visually permissive.
 		{
-			return Context::WaterClimbOut{ true, pointCollFront.Position.Floor };
+			return Context::WaterClimbOutData{ true, pointCollFront.Position.Floor };
 		}
 
-		return Context::WaterClimbOut{ false };
+		return Context::WaterClimbOutData{ false };
 	}
 }
