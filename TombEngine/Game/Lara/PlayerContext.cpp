@@ -214,21 +214,15 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		// 2a. Assess context in swamp case.
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		auto setupData = Context::LandMovementSetupData
 		{
-			auto contextSetup = Context::LandMovementSetupData
-			{
-				item->Pose.Orientation.y,
-				-MAX_HEIGHT, -STEPUP_HEIGHT, // Defined by wade forward state.
-				false, false, false
-			};
+			item->Pose.Orientation.y,
+			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Defined by wade forward state.
+			false, false, false
+		};
 
-			return Context::TestGroundSetup(item, coll, contextSetup);
-		}
-
-		// 2b. Assess context in regular case.
-		return CanRunForward(item, coll); // TODO: More specific test for wading in water.
+		// 2. Assess context.
+		return Context::TestGroundSetup(item, coll, setupData);
 	}
 
 	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll)
@@ -239,29 +233,25 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		// 2a. Assess context in swamp case.
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		auto contextSetup = Context::LandMovementSetupData
 		{
-			auto contextSetup = Context::LandMovementSetupData
-			{
-				short(item->Pose.Orientation.y + ANGLE(180.0f)),
-				-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Defined by walk backward state.
-				false, false, false
-			};
+			short(item->Pose.Orientation.y + ANGLE(180.0f)),
+			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Defined by walk backward state.
+			false, false, false
+		};
 
-			return Context::TestGroundSetup(item, coll, contextSetup);
-		}
-
-		// 2b. Assess context in regular case.
-		return CanWalkBackward(item, coll); // TODO: More specific test for wading in water.
+		// 2. Assess context.
+		return Context::TestGroundSetup(item, coll, contextSetup);
 	}
 
 	bool CanSlide(ItemInfo* item, CollisionInfo* coll)
 	{
 		constexpr auto ABS_FLOOR_BOUND = STEPUP_HEIGHT;
 
-		// 1. Check if player is in swamp.
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		const auto& player = GetLaraInfo(*item);
+
+		// 1. Test player water status.
+		if (player.Control.WaterStatus == WaterStatus::Wade)
 			return false;
 
 		// Get point collision.
@@ -881,38 +871,40 @@ namespace TEN::Entities::Player::Context
 
 	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
-		const auto& player = *GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
-		// TODO: Make specific condition for wading in water.
-		if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+		// 1a. Assess context in wade case.
+		if (player.Control.WaterStatus == WaterStatus::Wade)
 		{
-			auto contextSetup = Context::LandMovementSetupData
+			auto setupData = Context::LandMovementSetupData
 			{
 				short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-				-MAX_HEIGHT, -(int)CLICK(1.25f), // Upper bound defined by sidestep left/right states.
+				-MAX_HEIGHT, -(int)CLICK(1.25f), // NOTE: Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
-			return Context::TestGroundSetup(item, coll, contextSetup);
+
+			return Context::TestGroundSetup(item, coll, setupData);
 		}
-		else
+		
+		auto setupData = Context::LandMovementSetupData
 		{
-			auto contextSetup = Context::LandMovementSetupData
-			{
-				short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-				(int)CLICK(1.25f), -(int)CLICK(1.25f) // Defined by sidestep left/right states.
-			};
-			return Context::TestGroundSetup(item, coll, contextSetup);
-		}
+			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			(int)CLICK(1.25f), -(int)CLICK(1.25f) // NOTE: Defined by sidestep left/right states.
+		};
+
+		// 1b. Assess context in regular case.
+		return Context::TestGroundSetup(item, coll, setupData);
 	}
 
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
-		auto contextSetup = Context::MonkeySwingSetup
+		auto setupData = Context::MonkeySwingSetup
 		{
 			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-			CLICK(0.5f), -CLICK(0.5f) // Defined by monkey shimmy left/right states.
+			CLICK(0.5f), -CLICK(0.5f) // NOTE: Defined by monkey shimmy left/right states.
 		};
-		return Context::TestMonkeySwingSetup(item, coll, contextSetup);
+
+		return Context::TestMonkeySwingSetup(item, coll, setupData);
 	}
 
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle)
@@ -921,12 +913,13 @@ namespace TEN::Entities::Player::Context
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			return false;
 
-		auto contextSetup = Context::JumpSetup
+		auto setupData = Context::JumpSetup
 		{
 			short(item->Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
 		};
-		return Context::TestJumpSetup(item, coll, contextSetup);
+
+		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
 	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& contextSetup, bool useCrawlSetup)
@@ -1002,10 +995,10 @@ namespace TEN::Entities::Player::Context
 	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetup& contextSetup)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
-		static const int playerHeight = LARA_HEIGHT_MONKEY;
+		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
 
 		int vPos = item->Pose.Position.y;
-		int vPosTop = vPos - playerHeight;
+		int vPosTop = vPos - PLAYER_HEIGHT;
 		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, OFFSET_RADIUS(coll->Setup.Radius));
 
 		// 1. Test for wall.
@@ -1051,7 +1044,7 @@ namespace TEN::Entities::Player::Context
 			(pointColl.Position.Ceiling - vPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(pointColl.Position.Ceiling - vPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
 			(pointColl.Position.Floor - vPos) > 0 &&									// Floor is within highest floor bound (player base).
-			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight)	// Space is not too narrow.
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > PLAYER_HEIGHT)	// Space is not too narrow.
 		{
 			return true;
 		}

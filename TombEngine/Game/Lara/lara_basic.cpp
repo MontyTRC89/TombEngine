@@ -434,7 +434,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			ResetLaraTurnRateY(item);
 		}
 		else if (IsHeld(In::Left) || IsHeld(In::Right))
+		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		}
 	}
 
 	if (IsHeld(In::Jump) && Context::CanPerformJump(item, coll))
@@ -464,12 +466,15 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Forward))
 	{
-		auto vaultContext = TestLaraVault(item, coll);
-		if (IsHeld(In::Action) && vaultContext.Success)
+		if (IsHeld(In::Action))
 		{
-			item->Animation.TargetState = vaultContext.TargetState;
-			SetLaraVault(item, coll, vaultContext);
-			return;
+			auto vaultContext = TestLaraVault(item, coll);
+			if (vaultContext.Success)
+			{
+				item->Animation.TargetState = vaultContext.TargetState;
+				SetLaraVault(item, coll, vaultContext);
+				return;
+			}
 		}
 
 		if (Context::CanWadeForward(item, coll))
@@ -578,16 +583,16 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWading = (lara.Control.WaterStatus == WaterStatus::Wade);
 
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	lara.Control.MoveAngle = (item->Animation.Velocity.z >= 0) ? item->Pose.Orientation.y : (item->Pose.Orientation.y + ANGLE(180.0f));
-	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = !isSwamp;
-	coll->Setup.BlockFloorSlopeUp = !isSwamp;
+	coll->Setup.BlockFloorSlopeDown = !isWading;
+	coll->Setup.BlockFloorSlopeUp = !isWading;
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1016,16 +1021,16 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWading = (lara.Control.WaterStatus == WaterStatus::Wade);
 
 	lara.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	coll->Setup.LowerFloorBound = (lara.Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = !isSwamp;
-	coll->Setup.BlockFloorSlopeUp = !isSwamp;
+	coll->Setup.BlockFloorSlopeDown = !isWading;
+	coll->Setup.BlockFloorSlopeUp = !isWading;
 	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1230,16 +1235,16 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWading = (lara.Control.WaterStatus == WaterStatus::Wade);
 
 	lara.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	coll->Setup.LowerFloorBound = (lara.Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = !isSwamp;
-	coll->Setup.BlockFloorSlopeUp = !isSwamp;
+	coll->Setup.BlockFloorSlopeDown = !isWading;
+	coll->Setup.BlockFloorSlopeUp = !isWading;
 	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1274,7 +1279,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1326,7 +1331,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWading = (lara.Control.WaterStatus == WaterStatus::Wade);
 
 	lara.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
@@ -1334,8 +1339,8 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = (lara.Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = !isSwamp;
-	coll->Setup.BlockFloorSlopeUp = !isSwamp;
+	coll->Setup.BlockFloorSlopeDown = !isWading;
+	coll->Setup.BlockFloorSlopeUp = !isWading;
 	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1370,7 +1375,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1567,13 +1572,13 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWading = (lara.Control.WaterStatus == WaterStatus::Wade);
 
 	lara.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeUp = !isSwamp;
+	coll->Setup.BlockFloorSlopeUp = !isWading;
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1600,7 +1605,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
