@@ -3,15 +3,15 @@
 
 namespace TEN::Entities::Player::Context
 {
-	struct GroundSetup
+	struct LandMovementSetupData
 	{
 		short HeadingAngle	  = 0;
-		float LowerFloorBound = 0.0f;
-		float UpperFloorBound = 0.0f;
+		int	  LowerFloorBound = 0;
+		int	  UpperFloorBound = 0;
 
-		bool TestSlopeDown  = true;
-		bool TestSlopeUp	= true;
-		bool TestDeathFloor = true;
+		bool TestSlipperySlopeBelow = true;
+		bool TestSlipperySlopeAbove = true;
+		bool TestDeathFloor			= true;
 	};
 
 	struct MonkeySwingSetup

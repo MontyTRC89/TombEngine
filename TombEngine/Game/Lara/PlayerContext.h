@@ -97,7 +97,7 @@ namespace TEN::Entities::Player::Context
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle);
 
 	// Context setup inquirers
-	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundSetup& contextSetup, bool useCrawlSetup = false);
+	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::LandMovementSetupData& contextSetup, bool useCrawlSetup = false);
 	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetup& contextSetup);
 	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetup& contextSetup);
 	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
