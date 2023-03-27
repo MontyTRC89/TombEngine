@@ -1169,7 +1169,7 @@ namespace TEN::Entities::Player::Context
 		return Context::VaultData{ false };
 	}
 
-	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetupData setupData)
+	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, const Context::WaterClimbOutSetupData& setupData)
 	{
 		int vPos = item->Pose.Position.y;
 		auto pointCollCenter = GetCollision(item);

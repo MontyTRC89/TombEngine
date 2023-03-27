@@ -106,5 +106,5 @@ namespace TEN::Entities::Player::Context
 	// NOTE: These are used by higher-level functions to partially fill specialized context structs.
 	// TODO: Make these into classes?
 	Context::VaultData		   GetVaultContextData(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetupData& setupData);
-	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetupData setupData);
+	Context::WaterClimbOutData GetWaterClimbOutData(ItemInfo* item, CollisionInfo* coll, const Context::WaterClimbOutSetupData& setupData);
 }
