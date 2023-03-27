@@ -303,7 +303,8 @@ namespace TEN::Math::Geometry
 
 		if (deltaAngle0 > 0 && deltaAngle1 < 0)
 			return true;
-		else if (deltaAngle0 < 0 && deltaAngle1 > 0)
+		
+		if (deltaAngle0 < 0 && deltaAngle1 > 0)
 			return true;
 
 		return false;
