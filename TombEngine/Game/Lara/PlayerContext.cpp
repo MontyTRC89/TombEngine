@@ -362,37 +362,45 @@ namespace TEN::Entities::Player::Context
 
 	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	{
-		static constexpr auto maxWaterHeight = -CLICK(1);
-		static constexpr auto maxProbeDist	 = BLOCK(1);
-		static constexpr auto stepDist		 = BLOCK(1 / 4.0f);
+		constexpr auto FLOOR_BOUND					  = CRAWL_STEPUP_HEIGHT;
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_DELTA_MAX = LARA_HEIGHT_CRAWL;
+		constexpr auto WATER_HEIGHT_MAX				  = -CLICK(1);
+		constexpr auto PROBE_DIST_MAX				  = BLOCK(1);
+		constexpr auto STEP_DIST					  = BLOCK(0.25f);
 
-		const auto& player = *GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
-		// 1. Check whether crouch roll is enabled.
+		// 1. Check if crouch roll is enabled.
 		if (!g_GameFlow->HasCrouchRoll())
 			return false;
 
-		// 2. Check water depth.
-		if (player.WaterSurfaceDist < maxWaterHeight)
+		// 2. Test water depth.
+		if (player.WaterSurfaceDist < WATER_HEIGHT_MAX)
 			return false;
 
 		// TODO: Extend point collision struct to also find water depths.
-		// 3. Assess continuity of path.
 		float distance = 0.0f;
-		auto pointCollA = GetCollision(item);
-		while (distance < maxProbeDist)
-		{
-			distance += stepDist;
-			auto pointCollB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
+		auto pointColl0 = GetCollision(item);
 
-			if (abs(pointCollA.Position.Floor - pointCollB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor height differences beyond crawl stepup threshold.
-				abs(pointCollB.Position.Ceiling - pointCollB.Position.Floor) <= LARA_HEIGHT_CRAWL || // Avoid narrow spaces.
-				pointCollB.Position.FloorSlope)														 // Avoid slopes.
+		// 3. Test continuity of path.
+		while (distance < PROBE_DIST_MAX)
+		{
+			// Get point collision.
+			distance += STEP_DIST;
+			auto pointColl1 = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
+
+			int floorHeightDelta = abs(pointColl0.Position.Floor - pointColl1.Position.Floor);
+			int floorToCeilHeight = abs(pointColl1.Position.Ceiling - pointColl1.Position.Floor);
+
+			// Assess point collision.
+			if (floorHeightDelta > FLOOR_BOUND ||					   // Avoid floor height delta beyond crawl stepup threshold.
+				floorToCeilHeight <= FLOOR_TO_CEIL_HEIGHT_DELTA_MAX || // Avoid narrow spaces.
+				pointColl1.Position.FloorSlope)						   // Avoid slippery floor slopes.
 			{
 				return false;
 			}
 
-			pointCollA = pointCollB;
+			pointColl0 = std::move(pointColl1);
 		}
 
 		return true;
