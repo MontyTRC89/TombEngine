@@ -1073,6 +1073,19 @@ eyes of the creatures would be.</description>
 
 <function>
 	<module>Misc</module>
+	<name>IsSoundPlaying</name>
+	<summary>Check if the sound effect is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Sound</name>
+			<type>int</type>
+			<description>ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
 	<name>FlipMap</name>
 	<summary>Do FlipMap with specific ID</summary>
 	<parameters>
@@ -1548,12 +1561,12 @@ eyes of the creatures would be.</description>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
 	<name>SetPoison</name>
-	<summary>Set Lara poison potency</summary>
+	<summary>Set Lara poison</summary>
 	<parameters>
 		<parameter>
-			<name>Potency</name>
+			<name>Poison</name>
 			<type>int</type>
-			<description>; maximum value is 64 (default 0)</description>
+			<description>; maximum value is 128 (default 0)</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1628,13 +1641,13 @@ eyes of the creatures would be.</description>
 <function>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
-	<name>SetSprintEnergy</name>
+	<name>SetStamina</name>
 	<summary>Set sprint energy value of Lara</summary>
 	<parameters>
 		<parameter>
-			<name>sprint</name>
+			<name>stamina</name>
 			<type>int</type>
-			<description>energy to give to Lara; maximum value is 120.</description>
+			<description>to give to Lara; maximum value is 120.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1642,8 +1655,8 @@ eyes of the creatures would be.</description>
 <function>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
-	<name>GetSprintEnergy</name>
-	<summary>Get sprint energy value of Lara</summary>
+	<name>GetStamina</name>
+	<summary>Get stamina value of Lara</summary>
 	<returns>
 		<return>
 			<type>int</type>

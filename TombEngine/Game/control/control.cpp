@@ -18,11 +18,12 @@
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
@@ -65,9 +66,11 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -194,6 +197,7 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		StreamerEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -291,10 +295,10 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots, and cameras.
+	HairEffect.Initialize();
 	InitialiseFXArray(true);
 	InitialiseCamera();
 	InitialiseSpotCamSequences(isTitle);
-	InitialiseHair();
 	InitialiseItemBoxData();
 
 	// Initialize scripting.
@@ -409,6 +413,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
 	ClearDrips();

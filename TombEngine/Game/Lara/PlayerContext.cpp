@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -11,6 +12,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Player::Context
@@ -764,7 +766,7 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item);
 
 		short aspectAngle = GetLaraSlideHeadingAngle(item, coll);
-		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetSurfaceNormal(pointColl.FloorTilt, true));
 		return (abs(short(coll->Setup.ForwardAngle - aspectAngle)) <= abs(slopeAngle));
 	}
 

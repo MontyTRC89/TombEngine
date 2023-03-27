@@ -857,7 +857,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 
 	SetAnimation(item, LA_ONWATER_IDLE);
 	item->Animation.TargetState = LS_LADDER_IDLE;
-	AnimateLara(item);
+	AnimateItem(item);
 
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.z = 0;
@@ -1344,7 +1344,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
-		AnimateLara(item);
+		AnimateItem(item);
 
 		return true;
 	}
@@ -1363,7 +1363,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		AnimateLara(item);
+		AnimateItem(item);
 
 		return true;
 	}

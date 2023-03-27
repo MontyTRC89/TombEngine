@@ -508,10 +508,10 @@ int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 
 short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto surfaceNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	auto surfaceNormal = GetSurfaceNormal(GetCollision(item).FloorTilt, true);
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(surfaceNormal);
 
-	auto projSurfaceNormal = Geometry::GetFloorNormal(GetCollision(item, aspectAngle, item->Animation.Velocity.z).FloorTilt);
+	auto projSurfaceNormal = GetSurfaceNormal(GetCollision(item, aspectAngle, item->Animation.Velocity.z).FloorTilt, true);
 	short projAspectAngle = Geometry::GetSurfaceAspectAngle(projSurfaceNormal);
 
 	// Handle crease in slope.
@@ -774,8 +774,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto pointColl = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
-		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(GetSurfaceNormal(pointColl.FloorTilt, true));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetSurfaceNormal(pointColl.FloorTilt, true));
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (slopeAngle * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -793,7 +793,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	auto floorNormal = GetSurfaceNormal(GetCollision(item).FloorTilt, true);
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
@@ -899,6 +899,10 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
+	// Avoid clearing forward velocity when hitting the ground running.
+	if (item->Animation.TargetState != LS_RUN_FORWARD)
+		item->Animation.Velocity.z = 0.0f;
+
 	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
 	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
@@ -1222,7 +1226,7 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	if (item->HitPoints > LARA_HEALTH_CRITICAL && !lara.PoisonPotency)
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && lara.Status.Poison == 0)
 		return;
 
 	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;

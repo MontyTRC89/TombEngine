@@ -2,24 +2,23 @@
 #include "Math/Objects/AxisAngle.h"
 
 #include "Math/Constants.h"
+#include "Math/Geometry.h"
 #include "Math/Legacy.h"
 #include "Math/Objects/EulerAngles.h"
 
+using namespace TEN::Math;
+
 //namespace TEN::Math
 //{
-	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Zero, 0);
-
-	AxisAngle::AxisAngle()
-	{
-	}
+	const AxisAngle AxisAngle::Identity = AxisAngle(Vector3::Backward, 0);
 
 	AxisAngle::AxisAngle(const Vector3& axis, short angle)
 	{
 		auto axisNorm = axis;
 		axisNorm.Normalize();
 
-		this->Axis = axisNorm;
-		this->Angle = angle;
+		Axis = axisNorm;
+		Angle = angle;
 	}
 
 	AxisAngle::AxisAngle(const EulerAngles& eulers)
@@ -35,8 +34,8 @@
 		axis.Normalize();
 		float angle = 2.0f * acos(quat.w);
 
-		this->Axis = axis;
-		this->Angle = FROM_RAD(angle);
+		Axis = axis;
+		Angle = FROM_RAD(angle);
 	}
 
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
@@ -59,8 +58,8 @@
 		if (dot < 0.0f)
 		{
 			// Negate angle and unit axis to ensure the angle stays within [0, PI] range.
-			this->Angle = -Angle;
-			this->Axis = -Axis;
+			Angle = -Angle;
+			Axis = -Axis;
 		}
 	}
 
@@ -79,12 +78,12 @@
 		auto axisNorm = axis;
 		axisNorm.Normalize();
 		
-		this->Axis = axisNorm;
+		Axis = axisNorm;
 	}
 
 	void AxisAngle::SetAngle(short angle)
 	{
-		this->Angle = angle;
+		Angle = angle;
 	}
 
 	void AxisAngle::Slerp(const AxisAngle& axisAngleTo, float alpha)
@@ -97,10 +96,8 @@
 		auto axis = Vector3::Zero;
 		float angle = 0.0f;
 
-		// Find angle between the two axes.
+		// If angle between axes is close to 0, do simple interpolation of angle values.
 		float angleBetweenAxes = acos(axisAngleFrom.GetAxis().Dot(axisAngleTo.GetAxis()));
-
-		// If angle between the axes is close to 0, do simple interpolation of angle values.
 		if (abs(angleBetweenAxes) <= EPSILON)
 		{
 			axis = axisAngleFrom.GetAxis();
@@ -116,6 +113,18 @@
 		axis = (axisAngleFrom.GetAxis() * weight0) + (axisAngleTo.GetAxis() * weight1);
 		angle = (TO_RAD(axisAngleFrom.GetAngle()) * weight0) + (TO_RAD(axisAngleTo.GetAngle()) * weight1);
 		return AxisAngle(axis, FROM_RAD(angle));
+	}
+
+	Vector3 AxisAngle::ToDirection() const
+	{
+		// TODO: Works, but need to find a way without EulerAngles. -- Sezz 2023.03.08
+		auto refDirection = Geometry::RotatePoint(Vector3::Right, EulerAngles(Axis));
+		return Geometry::RotatePoint(refDirection, *this);
+	}
+
+	EulerAngles AxisAngle::ToEulerAngles() const
+	{
+		return EulerAngles(*this);
 	}
 
 	Quaternion AxisAngle::ToQuaternion() const
@@ -140,8 +149,8 @@
 
 	AxisAngle& AxisAngle::operator =(const AxisAngle& axisAngle)
 	{
-		this->Axis = axisAngle.GetAxis();
-		this->Angle = axisAngle.GetAngle();
+		Axis = axisAngle.GetAxis();
+		Angle = axisAngle.GetAngle();
 		return *this;
 	}
 
@@ -153,7 +162,7 @@
 
 	AxisAngle AxisAngle::operator *(const AxisAngle& axisAngle) const
 	{
-		auto quat0 = this->ToQuaternion();
+		auto quat0 = ToQuaternion();
 		auto quat1 = axisAngle.ToQuaternion();
 		return AxisAngle(quat0 * quat1);
 	}

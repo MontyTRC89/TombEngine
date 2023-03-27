@@ -18,29 +18,10 @@
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	struct WAKE_PTS
-	{
-		int x[2];
-		int y;
-		int z[2];
-		short xvel[2];
-		short zvel[2];
-		byte life;
-		byte pad[3];
-	};
-	const vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	const vector<VehicleMountType> KayakMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
-
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
@@ -52,6 +33,8 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
+
+	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	// TODO: Very confusing.
 	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
@@ -74,9 +57,6 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 	constexpr auto KAYAK_DRAW_SHIFT = 32;
-	constexpr auto NUM_WAKE_SPRITES = 32;
-	constexpr auto WAKE_SIZE = 32;
-	constexpr auto WAKE_VELOCITY = 4;
 	constexpr auto KAYAK_X = 128;
 	constexpr auto KAYAK_Z = 128;
 	constexpr auto KAYAK_MAX_KICK = -80;
@@ -91,7 +71,13 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
 
-	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
+	const std::vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const std::vector<VehicleMountType> KayakMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
 	enum KayakState
 	{
@@ -161,12 +147,6 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 
 		kayak->OldPose = kayakItem->Pose;
-
-		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
-		{
-			WakePts[i][0].life = 0;
-			WakePts[i][1].life = 0;
-		}
 	}
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -240,77 +220,6 @@ namespace TEN::Entities::Vehicles
 		DrawAnimatingItem(kayakItem);
 	}
 
-	void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate)
-	{
-		auto* kayak = GetKayakInfo(kayakItem);
-
-		if (WakePts[kayak->CurrentStartWake][rotate].life)
-			return;
-
-		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
-		float cosY = phd_cos(kayakItem->Pose.Orientation.y);
-
-		int x = kayakItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
-		int z = kayakItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
-
-		int probedRoomNumber = GetCollision(x, kayakItem->Pose.Position.y, z, kayakItem->RoomNumber).RoomNumber;
-		int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNumber);
-
-		if (waterHeight != NO_HEIGHT)
-		{
-			short angle1, angle2;
-			if (kayakItem->Animation.Velocity.z < 0)
-			{
-				if (!rotate)
-				{
-					angle1 = kayakItem->Pose.Orientation.y - ANGLE(10.0f);
-					angle2 = kayakItem->Pose.Orientation.y - ANGLE(30.0f);
-				}
-				else
-				{
-					angle1 = kayakItem->Pose.Orientation.y + ANGLE(10.0f);
-					angle2 = kayakItem->Pose.Orientation.y + ANGLE(30.0f);
-				}
-			}
-			else
-			{
-				if (!rotate)
-				{
-					angle1 = kayakItem->Pose.Orientation.y - ANGLE(170.0f);
-					angle2 = kayakItem->Pose.Orientation.y - ANGLE(150.0f);
-				}
-				else
-				{
-					angle1 = kayakItem->Pose.Orientation.y + ANGLE(170.0f);
-					angle2 = kayakItem->Pose.Orientation.y + ANGLE(150.0f);
-				}
-			}
-
-			int xv[2], zv[2];
-			xv[0] = WAKE_VELOCITY * phd_sin(angle1);
-			zv[0] = WAKE_VELOCITY * phd_cos(angle1);
-			xv[1] = (WAKE_VELOCITY + 2) * phd_sin(angle2);
-			zv[1] = (WAKE_VELOCITY + 2) * phd_cos(angle2);
-
-			WakePts[kayak->CurrentStartWake][rotate].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
-			WakePts[kayak->CurrentStartWake][rotate].life = 0x40;
-
-			for (int i = 0; i < 2; i++)
-			{
-				WakePts[kayak->CurrentStartWake][rotate].x[i] = x;
-				WakePts[kayak->CurrentStartWake][rotate].z[i] = z;
-				WakePts[kayak->CurrentStartWake][rotate].xvel[i] = xv[i];
-				WakePts[kayak->CurrentStartWake][rotate].zvel[i] = zv[i];
-			}
-
-			if (rotate == 1)
-			{
-				kayak->CurrentStartWake++;
-				kayak->CurrentStartWake &= (NUM_WAKE_SPRITES - 1);
-			}
-		}
-	}
-
 	void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset)
 	{
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);
@@ -324,24 +233,6 @@ namespace TEN::Entities::Vehicles
 
 		//if (waterHeight != NO_HEIGHT)
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
-	}
-
-	void KayakUpdateWakeFX()
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			for (int j = 0; j < NUM_WAKE_SPRITES; j++)
-			{
-				if (WakePts[j][i].life)
-				{
-					WakePts[j][i].life--;
-					WakePts[j][i].x[0] += WakePts[j][i].xvel[0];
-					WakePts[j][i].z[0] += WakePts[j][i].zvel[0];
-					WakePts[j][i].x[1] += WakePts[j][i].xvel[1];
-					WakePts[j][i].z[1] += WakePts[j][i].zvel[1];
-				}
-			}
-		}
 	}
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
@@ -1253,10 +1144,11 @@ namespace TEN::Entities::Vehicles
 			Camera.targetDistance = CLICK(8);
 		}
 
-		if (!(Wibble & 15) && kayak->TrueWater)
+		if (kayak->TrueWater &&
+			(kayakItem->Animation.Velocity.z != 0.0f || lara->WaterCurrentPull != Vector3i::Zero))
 		{
-			KayakDoWake(kayakItem, -CLICK(0.5f), 0, 0);
-			KayakDoWake(kayakItem, CLICK(0.5f), 0, 1);
+			int waterHeight = GetWaterHeight(kayakItem);
+			SpawnVehicleWake(*kayakItem, KAYAK_WAKE_OFFSET, waterHeight);
 		}
 
 		if (Wibble & 7)
@@ -1282,20 +1174,6 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (!kayakItem->Animation.Velocity.z &&
-			!lara->WaterCurrentPull.x &&
-			!lara->WaterCurrentPull.z)
-		{
-			if (kayak->WakeShade)
-				kayak->WakeShade--;
-		}
-		else
-		{
-			if (kayak->WakeShade < 16)
-				kayak->WakeShade++;
-		}
-
-		KayakUpdateWakeFX();
 		KayakToItemCollision(kayakItem, laraItem);
 
 		return (lara->Vehicle != NO_ITEM) ? true : false;

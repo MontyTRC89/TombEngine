@@ -90,7 +90,7 @@ namespace TEN::Entities::Switches
 
 						do
 						{
-							AnimateLara(laraItem);
+							AnimateItem(laraItem);
 						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;

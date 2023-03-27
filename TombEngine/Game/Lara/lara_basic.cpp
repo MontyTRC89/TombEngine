@@ -305,7 +305,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		}
-		else if (IsHeld(In::Sprint) && lara.SprintEnergy)
+		else if (IsHeld(In::Sprint) && lara.Status.Stamina)
 		{
 			item->Animation.TargetState = LS_SPRINT;
 		}
@@ -1613,9 +1613,9 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	lara.SprintEnergy--;
-	if (lara.SprintEnergy < 0)
-		lara.SprintEnergy = 0;
+	lara.Status.Stamina--;
+	if (lara.Status.Stamina < 0)
+		lara.Status.Stamina = 0;
 
 	lara.Control.Count.Run++;
 	if (lara.Control.Count.Run > LARA_SPRINT_JUMP_TIME)
@@ -1674,7 +1674,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 		}
-		else if (IsHeld(In::Sprint) && lara.SprintEnergy > 0)
+		else if (IsHeld(In::Sprint) && lara.Status.Stamina > 0)
 		{
 			item->Animation.TargetState = LS_SPRINT;
 		}
