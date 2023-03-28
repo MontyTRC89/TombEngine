@@ -474,8 +474,6 @@ namespace TEN::Entities::TR4
 					SpawnWraithExplosion(item, Vector3(96.0f), -32.0f);
 					SpawnWraithExplosion(item, Vector3(48.0f), 48.0f);
 
-					//target->TriggerFlags--;
-
 					if (target->TriggerFlags > 0)
 						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
 
