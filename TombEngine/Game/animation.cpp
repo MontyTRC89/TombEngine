@@ -400,7 +400,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
 		TENLog(
-			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
+			std::string("Attempted to set missing animation ") + std::to_string(animNumber) +
 			std::string(" from object ") + std::to_string(animObjectID) +
 			std::string(" for object ") + std::to_string(item.ObjectNumber),
 			LogLevel::Warning);

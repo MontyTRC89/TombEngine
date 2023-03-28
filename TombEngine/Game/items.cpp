@@ -144,10 +144,10 @@ bool ItemInfo::IsCreature() const
 
 void ItemInfo::ResetModelToDefault()
 {
-	this->Model.BaseMesh = Objects[this->ObjectNumber].meshIndex;
+	Model.BaseMesh = Objects[ObjectNumber].meshIndex;
 
-	for (int i = 0; i < this->Model.MeshIndex.size(); i++)
-		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
+		Model.MeshIndex[i] = Model.BaseMesh + i;
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -486,14 +486,9 @@ void InitialiseItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->Animation.AnimObjectID = item->ObjectNumber;
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+	SetAnimation(item, 0);
 	item->Animation.RequiredState = NO_STATE;
-	item->Animation.Velocity.y = 0;
-	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity = Vector3::Zero;
 
 	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
 		item->ItemFlags[i] = 0;
@@ -515,7 +510,9 @@ void InitialiseItem(short itemNumber)
 		item->MeshBits = 1;
 	}
 	else
+	{
 		item->MeshBits = ALL_JOINT_BITS;
+	}
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
@@ -526,7 +523,9 @@ void InitialiseItem(short itemNumber)
 		item->Status = ITEM_INVISIBLE;
 	}
 	else if (Objects[item->ObjectNumber].intelligent)
+	{
 		item->Status = ITEM_INVISIBLE;
+	}
 
 	if ((item->Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
 	{

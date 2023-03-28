@@ -71,7 +71,7 @@ namespace TEN::Entities::Vehicles
 	enum SkidooState
 	{
 		SKIDOO_STATE_DRIVE = 0,
-		SKIDOO_STATE_MOUNT = 1,
+		SKIDOO_STATE_MOUNT_RIGHT = 1,
 		SKIDOO_STATE_LEFT = 2,
 		SKIDOO_STATE_RIGHT = 3,
 		SKIDOO_STATE_FALL = 4,
@@ -120,7 +120,7 @@ namespace TEN::Entities::Vehicles
 	void InitialiseSkidoo(short itemNumber)
 	{
 		auto* skidooItem = &g_Level.Items[itemNumber];
-		skidooItem->Data = SkidooInfo();
+		skidooItem->Data = SkidooInfo{};
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
 		if (skidooItem->Status != ITEM_ACTIVE)
@@ -305,7 +305,8 @@ namespace TEN::Entities::Vehicles
 		{
 			switch (laraItem->Animation.ActiveState)
 			{
-			case SKIDOO_STATE_MOUNT:
+			case SKIDOO_STATE_MOUNT_RIGHT:
+			case SKIDOO_STATE_MOUNT_LEFT:
 			case SKIDOO_STATE_DISMOUNT_RIGHT:
 			case SKIDOO_STATE_DISMOUNT_LEFT:
 			case SKIDOO_STATE_JUMP_OFF:
