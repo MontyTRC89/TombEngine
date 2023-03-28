@@ -52,38 +52,45 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	int nmeshes;
+	bool loaded = false;
+
+	int nmeshes; // MeshCount
 	int meshIndex;
 	int boneIndex;
-	int frameBase;
-	LotType LotType;
 	int animIndex;
-	short HitPoints;
+	int frameBase;
+
+	LotType LotType;
+	HitEffect hitEffect;
+	ShadowMode shadowType;
+
 	short pivotLength;
 	short radius;
-	ShadowMode shadowType;
 	short biteOffset;
-	bool loaded;
+
+	int HitPoints;
 	bool intelligent;
-	bool nonLot;
 	bool waterCreature;
-	bool usingDrawAnimatingItem;
-	HitEffect hitEffect;
 	bool undead;
+	bool nonLot;
 	bool isPickup;
 	bool isPuzzleHole;
+	bool usingDrawAnimatingItem;
+
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)> initialise;
-	std::function<void(short itemNumber)> control;
+	std::function<void(short itemNumber)>										   initialise;
+	std::function<void(short itemNumber)>										   control;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
+	std::function<void(ItemInfo* item)>																									 drawRoutine;
+
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
-	std::function<void(ItemInfo* item)> drawRoutine;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
+	std::function<int(short itemNumber)>								   floorBorder;
+	std::function<int(short itemNumber)>								   ceilingBorder;
 
 	/// <summary>
 	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
