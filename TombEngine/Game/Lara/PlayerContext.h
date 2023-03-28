@@ -92,8 +92,8 @@ namespace TEN::Entities::Player::Context
 	// -------------------------------------------------------------------------------------------------
 	
 	// Context assessment helpers
-	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
-	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
+	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isRight);
+	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isRight);
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle);
 
 	// Context setup inquirers

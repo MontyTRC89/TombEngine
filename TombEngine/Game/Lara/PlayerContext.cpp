@@ -352,11 +352,11 @@ namespace TEN::Entities::Player::Context
 
 	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	{
-		constexpr auto FLOOR_BOUND					  = CRAWL_STEPUP_HEIGHT;
-		constexpr auto FLOOR_TO_CEIL_HEIGHT_DELTA_MAX = LARA_HEIGHT_CRAWL;
-		constexpr auto WATER_HEIGHT_MAX				  = -CLICK(1);
-		constexpr auto PROBE_DIST_MAX				  = BLOCK(1);
-		constexpr auto STEP_DIST					  = BLOCK(0.25f);
+		constexpr auto FLOOR_BOUND				= CRAWL_STEPUP_HEIGHT;
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_CRAWL;
+		constexpr auto WATER_HEIGHT_MAX			= -CLICK(1);
+		constexpr auto PROBE_DIST_MAX			= BLOCK(1);
+		constexpr auto STEP_DIST				= BLOCK(0.25f);
 
 		const auto& player = GetLaraInfo(*item);
 
@@ -383,9 +383,9 @@ namespace TEN::Entities::Player::Context
 			int floorToCeilHeight = abs(pointColl1.Position.Ceiling - pointColl1.Position.Floor);
 
 			// Assess point collision.
-			if (floorHeightDelta > FLOOR_BOUND ||					   // Avoid floor height delta beyond crawl stepup threshold.
-				floorToCeilHeight <= FLOOR_TO_CEIL_HEIGHT_DELTA_MAX || // Avoid narrow spaces.
-				pointColl1.Position.FloorSlope)						   // Avoid slippery floor slopes.
+			if (floorHeightDelta > FLOOR_BOUND ||				 // Avoid floor height delta beyond crawl stepup threshold.
+				floorToCeilHeight <= FLOOR_TO_CEIL_HEIGHT_MAX || // Avoid narrow spaces.
+				pointColl1.Position.FloorSlope)					 // Avoid slippery floor slopes.
 			{
 				return false;
 			}
@@ -472,7 +472,8 @@ namespace TEN::Entities::Player::Context
 
 	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll)
 	{
-		constexpr auto GRAB_HEIGHT_TOLERANCE = CLICK(0.5f);
+		constexpr auto LOWER_CEIL_BOUND			= CLICK(0.5f);
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
 
 		const auto& player = GetLaraInfo(*item);
 
@@ -480,8 +481,10 @@ namespace TEN::Entities::Player::Context
 		if (!player.Control.CanMonkeySwing)
 			return false;
 
+		// Get point collision.
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_MONKEY);
+		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 2. Assess collision with ceiling.
 		if (relCeilHeight < 0 &&
@@ -492,8 +495,8 @@ namespace TEN::Entities::Player::Context
 		}
 
 		// 3. Assess point collision.
-		if (relCeilHeight <= GRAB_HEIGHT_TOLERANCE &&
-			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT_MONKEY)
+		if (relCeilHeight <= LOWER_CEIL_BOUND &&		  // Ceiling height is above lower ceiling bound.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling space isn't too narrow.
 		{
 			return true;
 		}
@@ -598,7 +601,7 @@ namespace TEN::Entities::Player::Context
 		auto setupData = Context::LedgeClimbSetupData
 		{
 			item->Pose.Orientation.y,
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Space range.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
 			CLICK(1),
 			true
 		};
@@ -611,7 +614,7 @@ namespace TEN::Entities::Player::Context
 		auto setupData = Context::LedgeClimbSetupData
 		{
 			item->Pose.Orientation.y,
-			LARA_HEIGHT, -INFINITY, // Space range.
+			LARA_HEIGHT, -INFINITY,
 			CLICK(1),
 			false
 		};
@@ -631,23 +634,28 @@ namespace TEN::Entities::Player::Context
 
 	bool CanWallShimmyUp(ItemInfo* item, CollisionInfo* coll)
 	{
-		constexpr auto wallStepHeight = CLICK(1);
+		constexpr auto WALL_STEP_HEIGHT = -CLICK(1);
 
 		auto& player = *GetLaraInfo(item);
 
-		int vPosTop = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
+		// Get point collision.
 		auto pointCollCenter = GetCollision(item);
 		auto pointCollLeft = GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), coll->Setup.Radius);
 		auto pointCollRight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), coll->Setup.Radius);
 
-		// 1. Check whether wall is climbable.
+		int vPosTop = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
+		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPosTop;
+		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPosTop;
+		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPosTop;
+
+		// 1. Test if wall is climbable.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
 		// 2. Assess point collision.
-		if ((pointCollCenter.Position.Ceiling - vPosTop) <= -wallStepHeight &&
-			(pointCollLeft.Position.Ceiling - vPosTop) <= -wallStepHeight &&
-			(pointCollRight.Position.Ceiling - vPosTop) <= -wallStepHeight)
+		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&
+			relCeilHeightLeft <= WALL_STEP_HEIGHT &&
+			relCeilHeightRight <= WALL_STEP_HEIGHT)
 		{
 			return true;
 		}
@@ -679,22 +687,23 @@ namespace TEN::Entities::Player::Context
 
 	bool CanFall(ItemInfo* item, CollisionInfo* coll)
 	{
-		static constexpr auto lowerFloorBound = STEPUP_HEIGHT;
+		constexpr auto UPPER_FLOOR_BOUND = STEPUP_HEIGHT;
 
 		const auto& player = *GetLaraInfo(item);
 
-		// 1. Check wade status.
+		// 1. Test player water status.
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 			return false;
 
-		int vPos = item->Pose.Position.y;
+		// Get point collision.
 		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
+		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
 
 		// 2. Assess point collision.
-		if ((pointColl.Position.Floor - vPos) <= lowerFloorBound)
-			return false;
+		if (relFloorHeight > UPPER_FLOOR_BOUND) // Floor height is below upper floor bound.
+			return true;
 
-		return true;
+		return false;
 	}
 
 	bool CanLand(ItemInfo* item, CollisionInfo* coll)
@@ -730,6 +739,7 @@ namespace TEN::Entities::Player::Context
 			0.0f,
 			false
 		};
+
 		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
@@ -766,6 +776,7 @@ namespace TEN::Entities::Player::Context
 			item->Pose.Orientation.y,
 			CLICK(3 / 2.0f)
 		};
+
 		return Context::TestJumpSetup(item, coll, setupData);
 	}
 	
@@ -785,12 +796,13 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
 			return false;
 
-		// 4. Assess context.
 		auto setupData = Context::JumpSetupData
 		{
 			item->Pose.Orientation.y,
 			CLICK(1.8f)
 		};
+
+		// 4. Assess context.
 		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
@@ -869,7 +881,7 @@ namespace TEN::Entities::Player::Context
 		return context;
 	}
 
-	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
+	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isRight)
 	{
 		const auto& player = GetLaraInfo(*item);
 
@@ -878,7 +890,7 @@ namespace TEN::Entities::Player::Context
 		{
 			auto setupData = Context::LandMovementSetupData
 			{
-				short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				short(item->Pose.Orientation.y + (isRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 				-MAX_HEIGHT, -(int)CLICK(1.25f), // NOTE: Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
@@ -888,7 +900,7 @@ namespace TEN::Entities::Player::Context
 		
 		auto setupData = Context::LandMovementSetupData
 		{
-			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			short(item->Pose.Orientation.y + (isRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			(int)CLICK(1.25f), -(int)CLICK(1.25f) // NOTE: Defined by sidestep left/right states.
 		};
 
@@ -896,11 +908,11 @@ namespace TEN::Entities::Player::Context
 		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
-	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
+	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isRight)
 	{
 		auto setupData = Context::MonkeySwingSetupData
 		{
-			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			short(item->Pose.Orientation.y + (isRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			CLICK(0.5f), -CLICK(0.5f) // NOTE: Defined by monkey shimmy left/right states.
 		};
 
