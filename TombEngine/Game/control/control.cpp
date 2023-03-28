@@ -18,7 +18,7 @@
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
@@ -66,6 +66,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
@@ -294,10 +295,10 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots, and cameras.
+	HairEffect.Initialize();
 	InitialiseFXArray(true);
 	InitialiseCamera();
 	InitialiseSpotCamSequences(isTitle);
-	InitialiseHair();
 	InitialiseItemBoxData();
 
 	// Initialize scripting.

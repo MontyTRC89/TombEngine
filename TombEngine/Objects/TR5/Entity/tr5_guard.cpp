@@ -440,7 +440,7 @@ namespace TEN::Entities::Creatures::TR5
 				item->RoomNumber);
 			
 			// TODO: Deal with LaraItem global.
-			auto& bounds = GetBestFrame(LaraItem)->boundingBox;
+			auto& bounds = GetBestFrame(*LaraItem).BoundingBox;
 			auto target = GameVector(
 				LaraItem->Pose.Position.x,
 				LaraItem->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4),

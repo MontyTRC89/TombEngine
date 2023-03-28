@@ -31,7 +31,8 @@ namespace TEN::Hud
 		constexpr auto HIDE_VELOCITY_ACCEL = HIDE_VELOCITY_MAX / 4;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
-		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
+		constexpr auto ROTATION_RATE	   = ANGLE(360.0f / (LIFE_MAX * FPS));
+		constexpr auto ROTATION			   = EulerAngles(0, ROTATION_RATE, 0);
 
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
@@ -76,11 +77,12 @@ namespace TEN::Hud
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
-		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
 		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
 		PickedUpObject(objectID);
+
+		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
 		// Increment count of existing display pickup if it exists.
 		for (auto& pickup : DisplayPickups)
@@ -92,7 +94,7 @@ namespace TEN::Hud
 			if (pickup.ObjectID == objectID)
 			{
 				pickup.Count++;
-				pickup.Life = round(LIFE_MAX * FPS);
+				pickup.Life = life;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
 			}
@@ -110,7 +112,7 @@ namespace TEN::Hud
 		pickup.Position2D =
 		pickup.Origin2D = origin2D;
 		pickup.Target2D = Vector2::Zero;
-		pickup.Life = round(LIFE_MAX * FPS);
+		pickup.Life = life;
 		pickup.Scale = 0.0f;
 		pickup.Opacity = 0.0f;
 		pickup.HideVelocity = 0.0f;
