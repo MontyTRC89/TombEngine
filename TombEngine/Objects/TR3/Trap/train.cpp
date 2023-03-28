@@ -16,8 +16,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#define TRAIN_VEL	260
-#define LARA_TRAIN_DEATH_ANIM 3;
+constexpr auto TRAIN_VEL = 260;
 
 long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 {
@@ -110,10 +109,7 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-	// laraItem->Animation.ActiveState = EXTRA_TRAINKILL;
-	// laraItem->Animation.TargetState = EXTRA_TRAINKILL;
+	SetAnimation(*item, ID_LARA_EXTRA_ANIMS, LEA_TRAIN_DEATH_START);
 	laraItem->Animation.IsAirborne = false;
 	laraItem->Animation.Velocity.y = 0.0f;
 	laraItem->Animation.Velocity.z = 0.0f;
