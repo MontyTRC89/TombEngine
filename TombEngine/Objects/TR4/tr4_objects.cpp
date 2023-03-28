@@ -43,6 +43,7 @@
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/WraithTrap.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Objects/TR4/Object/tr4_sarcophagus.h"
@@ -81,6 +82,7 @@
 // Effects
 #include "Objects/Effects/tr4_locusts.h" // OK
 
+using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities
@@ -744,6 +746,15 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseObelisk;
 			obj->control = ObeliskControl;
+			obj->collision = ObjectCollision;
+			obj->SetupHitEffect(true);
+		}
+
+		obj = &Objects[ID_WRAITH_TRAP];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseWraithTrap;
+			obj->control = WraithTrapControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
 		}
