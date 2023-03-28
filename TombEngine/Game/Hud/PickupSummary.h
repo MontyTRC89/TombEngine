@@ -35,7 +35,7 @@ namespace TEN::Hud
 		// Constants
 		static constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
 
-		// Components
+		// Members
 		std::vector<DisplayPickup> DisplayPickups = {};
 
 	public:
