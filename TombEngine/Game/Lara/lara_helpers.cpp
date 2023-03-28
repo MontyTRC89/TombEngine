@@ -783,6 +783,10 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
+	// Avoid clearing forward velocity when hitting the ground running.
+	if (item->Animation.TargetState != LS_RUN_FORWARD)
+		item->Animation.Velocity.z = 0.0f;
+
 	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
 	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
