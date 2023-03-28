@@ -11,6 +11,7 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR4/Entity/Wraith.h" // OFF
 #include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
@@ -33,7 +34,6 @@
 #include "Objects/TR4/Entity/tr4_sphinx.h" // OK
 #include "Objects/TR4/Entity/tr4_troops.h" // OK
 #include "Objects/TR4/Entity/tr4_wild_boar.h" // OK
-#include "Objects/TR4/Entity/tr4_wraith.h" // OFF
 #include "Objects/TR4/Entity/tr4_baboon.h" // OK
 #include "Objects/TR4/Entity/tr4_mutant.h" // OK
 #include "Objects/TR4/Entity/tr4_big_beetle.h" // OFF

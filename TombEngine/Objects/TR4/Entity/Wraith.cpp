@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR4/Entity/tr4_wraith.h"
+#include "Objects/TR4/Entity/Wraith.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
@@ -12,7 +12,7 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Traps/traps.h"
-#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Objects/TR4/Entity/WraithInfo.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
