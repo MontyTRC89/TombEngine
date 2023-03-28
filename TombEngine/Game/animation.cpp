@@ -396,7 +396,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		return;
 	}
 
-	// Animation doesn't exist; return early.
+	// Animation is missing; return early.
 	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
 		TENLog(
@@ -413,7 +413,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	item.Animation.AnimObjectID = animObjectID;
 	item.Animation.AnimNumber = animIndex;
 	item.Animation.FrameNumber = anim.frameBase + frameNumber;
-	item.Animation.ActiveState = anim.ActiveState;
+	item.Animation.ActiveState =
 	item.Animation.TargetState = anim.ActiveState;
 }
 

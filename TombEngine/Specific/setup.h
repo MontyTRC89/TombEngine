@@ -52,32 +52,32 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	bool loaded = false;
+	bool loaded = false; // IsLoaded
 
-	int nmeshes; // MeshCount
-	int meshIndex;
-	int boneIndex;
-	int animIndex;
-	int frameBase;
+	int nmeshes; // BoneCount
+	int meshIndex; // Base index in g_Level.Meshes.
+	int boneIndex; // Base index in g_Level.Bones.
+	int animIndex; // Base index in g_Level.Anims.
+	int frameBase; // Base index in g_Level.Frames.
 
 	LotType LotType;
 	HitEffect hitEffect;
 	ShadowMode shadowType;
 
-	short pivotLength;
-	short radius;
-	short biteOffset;
+	int meshSwapSlot;
+	int pivotLength;
+	int radius;
+	int biteOffset;
 
 	int HitPoints;
-	bool intelligent;
-	bool waterCreature;
-	bool undead;
-	bool nonLot;
-	bool isPickup;
-	bool isPuzzleHole;
+	bool intelligent;	// IsIntelligent
+	bool waterCreature; // IsWaterCreature
+	bool undead;		// IsUndead
+	bool nonLot;		// IsNonLot
+	bool isPickup;		// IsPickup
+	bool isPuzzleHole;	// IsReceptacle
 	bool usingDrawAnimatingItem;
 
-	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
 	std::function<void(short itemNumber)>										   initialise;
@@ -93,19 +93,19 @@ struct ObjectInfo
 	std::function<int(short itemNumber)>								   ceilingBorder;
 
 	/// <summary>
-	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
+	/// ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
 	/// </summary>
-	/// <param name="boneID">the mesh id - 1</param>
-	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
-	void SetBoneRotationFlags(int boneID, int flags)
+	/// <param name="boneNumber:">Mesh number - 1.</param>
+	/// <param name="flags:">JointRotationFlags enum.</param>
+	void SetBoneRotationFlags(int boneNumber, int flags)
 	{
-		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
 	}
 
 	/// <summary>
-	/// Use this to set up a hit effect for the slot based on its value.
+	/// Set up hit effect for object based on its value.
 	/// </summary>
-	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
+	/// <param name="isAlive:">Use if object is alive but not intelligent to set up blood effects.</param>
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
 		// Avoid some objects such as ID_SAS_DYING having None.
