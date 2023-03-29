@@ -432,7 +432,7 @@ namespace TEN::Entities::Vehicles
 			auto* item = &g_Level.Items[lara->Vehicle];
 
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_DISMOUNT &&
-				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+				TestLastFrame(laraItem))
 			{
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				laraItem->Pose.Orientation.x = 0;
@@ -445,7 +445,7 @@ namespace TEN::Entities::Vehicles
 				return true;
 			}
 
-			if (laraItem->Animation.FrameNumber != g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+			if (!TestLastFrame(laraItem))
 				return true;
 
 			// exit when falling
