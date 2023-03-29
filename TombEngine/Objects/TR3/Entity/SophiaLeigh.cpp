@@ -218,11 +218,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerSophiaLeightLight(ItemInfo& item, const Vector3& pos)
 	{
-		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
+		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameIndex(&item, 6)) ||
 			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
+			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameIndex(&item, 3)) ||
+			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
+			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
 				item.ItemFlags[1]++;
 		}
-		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
+		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -410,7 +410,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
 			{
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -470,7 +470,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 36))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -489,7 +489,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
@@ -602,7 +602,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
 			{
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -663,7 +663,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 36))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -682,7 +682,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);

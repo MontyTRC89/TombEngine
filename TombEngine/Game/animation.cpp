@@ -548,25 +548,25 @@ AnimFrame& GetBestFrame(const ItemInfo& item)
 		return *frameData.FramePtr1;
 }
 
-int GetCurrentRelativeFrameNumber(ItemInfo* item)
+int GetFrameNumber(ItemInfo* item)
 {
-	return (item->Animation.FrameNumber - GetFrameNumber(item, 0));
+	return (item->Animation.FrameNumber - GetFrameIndex(item, 0));
 }
 
 // NOTE: Returns g_Level.Anims index.
-int GetAnimNumber(ItemInfo& item, int animNumber)
+int GetAnimNumber(const ItemInfo& item, int animNumber)
 {
 	const auto& object = Objects[item.Animation.AnimObjectID];
 	return (object.animIndex + animNumber);
 }
 
-int GetFrameNumber(ItemInfo* item, int frameToStart)
+int GetFrameIndex(ItemInfo* item, int frameToStart)
 {
 	int animNumber = item->Animation.AnimNumber - Objects[item->Animation.AnimObjectID].animIndex;
-	return GetFrameNumber(item->Animation.AnimObjectID, animNumber, frameToStart);
+	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameToStart);
 }
 
-int GetFrameNumber(int objectID, int animNumber, int frameToStart)
+int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameToStart)
 {
 	const auto& object = Objects[objectID];
 	const auto& anim = GetAnimData(object, animNumber);

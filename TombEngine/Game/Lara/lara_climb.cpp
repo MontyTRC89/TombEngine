@@ -43,7 +43,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_LADDER_DOWN)
 		return;
 
-	GetCurrentRelativeFrameNumber(item);
+	GetFrameNumber(item);
 	int frame = item->Animation.FrameNumber - GetAnimData(LA_LADDER_DOWN).frameBase;
 	int yShift = 0;
 

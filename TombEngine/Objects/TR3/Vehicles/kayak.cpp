@@ -52,9 +52,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto HIT_LEFT = 3;
 	constexpr auto HIT_RIGHT = 4;
 
-	#define KAYAK_MOUNT_LEFT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_RIGHT, 0)
-	#define KAYAK_IDLE_FRAME		GetFrameNumber(KAYAK_ANIM_IDLE, 0)
-	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
+	#define KAYAK_MOUNT_LEFT_FRAME	GetFrameIndex(KAYAK_ANIM_MOUNT_RIGHT, 0)
+	#define KAYAK_IDLE_FRAME		GetFrameIndex(KAYAK_ANIM_IDLE, 0)
+	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameIndex(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 	constexpr auto KAYAK_DRAW_SHIFT = 32;
 	constexpr auto KAYAK_X = 128;

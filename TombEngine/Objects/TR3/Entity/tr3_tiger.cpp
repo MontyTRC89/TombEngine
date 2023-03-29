@@ -211,9 +211,9 @@ namespace TEN::Entities::Creatures::TR3
 				if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
 				{
 					if ((item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_BITE_ATTACK) &&
-							item->Animation.FrameNumber > GetFrameNumber(item,  4)) ||
+							item->Animation.FrameNumber > GetFrameIndex(item, 4)) ||
 						(item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_POUNCE_ATTACK_START) &&
-							item->Animation.FrameNumber > GetFrameNumber(item, 12)))
+							item->Animation.FrameNumber > GetFrameIndex(item, 12)))
 					{
 						DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
 						CreatureEffect(item, TigerBite, DoBloodSplat);
@@ -226,9 +226,8 @@ namespace TEN::Entities::Creatures::TR3
 			case TIGER_STATE_RUN_SWIPE_ATTACK:
 				if (!creature->Flags && item->TouchBits.Test(TigerSwipeAttackJoints))
 				{
-					if (item->Animation.AnimNumber == GetAnimNumber(*item, TIGER_ANIM_RUN_SWIPE_ATTACK) &&
-						item->Animation.FrameNumber >= GetFrameNumber(item, 6) &&
-						item->Animation.FrameNumber < GetFrameNumber(item, 16))
+					if (TestAnimNumber(*item, TIGER_ANIM_RUN_SWIPE_ATTACK) &&
+						TestAnimFrameRange(*item, 6, 15))
 					{
 						DoDamage(creature->Enemy, TIGER_SWIPE_ATTACK_DAMAGE);
 						CreatureEffect(item, TigerBite, DoBloodSplat);

@@ -458,7 +458,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 					SpawnPunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, false);
 
 				break;
@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 30))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 30))
 				{
 					if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) &&
 						item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) &&

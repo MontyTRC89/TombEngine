@@ -383,7 +383,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature.Flags = 4;
 
 				if (ai.bite && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE ||
-				   (item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags) ||
+				   (item->Animation.FrameNumber == GetFrameIndex(item, 0) && !creature.Flags) ||
 				   !ai.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
@@ -394,7 +394,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 0) && creature.Flags > 1)
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0) && creature.Flags > 1)
 					creature.Flags -= 2;
 
 				break;
@@ -436,7 +436,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature.Flags = 4;
 
 				if ((ai.bite && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
-					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags))
+					(item->Animation.FrameNumber == GetFrameIndex(item, 0) && !creature.Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 					creature.Flags = 0;
@@ -446,7 +446,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 0))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
 					creature.Flags = 0;
 
 				break;
@@ -458,7 +458,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraHeadRot.y = ai.angle;
 
 				if ((ai.ahead && ai.distance < SHIVA_DOWNWARD_ATTACK_RANGE) ||
-					(item->Animation.FrameNumber == GetFrameNumber(item, 0) && !creature.Flags))
+					(item->Animation.FrameNumber == GetFrameIndex(item, 0) && !creature.Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
@@ -498,9 +498,9 @@ namespace TEN::Entities::Creatures::TR3
 				extraHeadRot = EulerAngles::Zero;
 				extraTorsoRot = EulerAngles::Zero;
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 10) ||
-					item->Animation.FrameNumber == GetFrameNumber(item, 21) ||
-					item->Animation.FrameNumber == GetFrameNumber(item, 33))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 10) ||
+					item->Animation.FrameNumber == GetFrameIndex(item, 21) ||
+					item->Animation.FrameNumber == GetFrameIndex(item, 33))
 				{
 					CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
 					CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);

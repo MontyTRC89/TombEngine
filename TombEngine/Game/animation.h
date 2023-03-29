@@ -11,7 +11,7 @@ class Vector3i;
 struct ItemInfo;
 
 // NOTES:
-// animNumber: Relative entity animation ID.
+// animNumber: Relative animation number.
 // animIndex:  Index of animation in giant g_Level.Anims vector.
 
 constexpr auto NO_STATE = -1;
@@ -116,10 +116,10 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 AnimData& GetAnimData(int animIndex); // Deprecated.
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
-int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
-int		  GetAnimNumber(ItemInfo& item, int animNumber);
-int		  GetFrameNumber(ItemInfo* item, int frameToStart);
-int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
+int		  GetFrameNumber(ItemInfo* item);
+int		  GetAnimNumber(const ItemInfo& item, int animNumber);
+int		  GetFrameIndex(ItemInfo* item, int frameToStart);
+int		  GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameToStart);
 int		  GetFrameCount(int animIndex);
 int		  GetNextAnimState(ItemInfo* item);
 int		  GetNextAnimState(int objectID, int animNumber);

@@ -311,7 +311,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_CRAWL_IDLE)
 		{
 			item->Animation.AnimNumber = LA_CRAWL_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;
@@ -347,7 +347,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_MONKEY_IDLE)
 		{
 			item->Animation.AnimNumber = LA_MONKEY_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;

@@ -170,7 +170,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
+				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameIndex(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
 					TestLaraClimbIdle(item, coll))
 				{
 					item->Animation.TargetState = LS_LADDER_IDLE;
@@ -2164,7 +2164,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		// TODO: Somehow harmonise CalculatedJumpVelocity to work for both ledge and ladder auto jumps, because otherwise there will be a need for an odd workaround in the future.
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult.Height - item->Pose.Position.y + CLICK(0.2f)), -CLICK(7.1f)));
 		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		item->Animation.TargetState = LS_JUMP_UP;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.TurnRate = 0;
@@ -2183,7 +2183,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		TestLaraClimbIdle(item, coll))
 	{
 		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		item->Animation.TargetState = LS_LADDER_IDLE;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;

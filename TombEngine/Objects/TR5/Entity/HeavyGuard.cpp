@@ -248,7 +248,7 @@ namespace TEN::Entities::Creatures::TR5
 					int frame = item.Animation.FrameNumber;
 					int frameStart = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 
-					if (frame == GetFrameNumber(&item, 48) || frame == GetFrameNumber(&item, 15))
+					if (frame == GetFrameIndex(&item, 48) || frame == GetFrameIndex(&item, 15))
 					{
 						short roomNumber = item.RoomNumber;
 						GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber),
@@ -387,7 +387,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (Targetable(&item, &ai) &&
 					laraAI.angle < ANGLE(33.0f) && laraAI.angle > ANGLE(-33.0f))
 				{
-					if (item.Animation.FrameNumber >= GetFrameNumber(&item, 29))
+					if (item.Animation.FrameNumber >= GetFrameIndex(&item, 29))
 						item.Animation.TargetState = HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_RIGHT;
 					else
 						item.Animation.TargetState = HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT;
