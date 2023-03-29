@@ -647,7 +647,7 @@ void CreatureFloat(short itemNumber)
 
 	if (item->Pose.Position.y <= waterLevel)
 	{
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
 		{
 			item->Pose.Position.y = waterLevel;
 			item->Collidable = false;

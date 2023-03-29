@@ -113,7 +113,7 @@ void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
-AnimData& GetAnimData(int animIndex);
+AnimData& GetAnimData(int animIndex); // Deprecated.
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
