@@ -18,6 +18,8 @@ Version 1.0.8
 	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
 * Fix and improve wraith tails.
 * Add dedicated WRAITH_TRAP object with enhanced effects.
+	- OCB 0: Effect disabled.
+	- OCB 1: Effect enabled.
 * Add TR1 slamming doors.
 * Add TR3 mutant wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
 * Add TR3 Corpse
