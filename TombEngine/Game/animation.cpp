@@ -560,18 +560,18 @@ int GetAnimNumber(const ItemInfo& item, int animNumber)
 	return (object.animIndex + animNumber);
 }
 
-int GetFrameIndex(ItemInfo* item, int frameToStart)
+int GetFrameIndex(ItemInfo* item, int frameNumber)
 {
 	int animNumber = item->Animation.AnimNumber - Objects[item->Animation.AnimObjectID].animIndex;
-	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameToStart);
+	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
 }
 
-int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameToStart)
+int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
 	const auto& object = Objects[objectID];
 	const auto& anim = GetAnimData(object, animNumber);
 
-	return (anim.frameBase + frameToStart);
+	return (anim.frameBase + frameNumber);
 }
 
 int GetFrameCount(int animIndex)
