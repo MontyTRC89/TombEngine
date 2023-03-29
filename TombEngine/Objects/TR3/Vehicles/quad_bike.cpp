@@ -680,13 +680,9 @@ namespace TEN::Entities::Vehicles
 			!dead)
 		{
 			if (quadBike->Velocity < 0)
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_LEAP_START);
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START2;
-
-			laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-			laraItem->Animation.ActiveState = QBIKE_STATE_FALL;
-			laraItem->Animation.TargetState = QBIKE_STATE_FALL;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_LEAP_START2);
 		}
 		else if (collide &&
 			laraItem->Animation.ActiveState != QBIKE_STATE_HIT_FRONT &&
@@ -699,30 +695,21 @@ namespace TEN::Entities::Vehicles
 		{
 			if (collide == QBIKE_HIT_FRONT)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_HIT_BACK;
-				laraItem->Animation.ActiveState = QBIKE_STATE_HIT_FRONT;
-				laraItem->Animation.TargetState = QBIKE_STATE_HIT_FRONT;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_HIT_BACK);
 			}
 			else if (collide == QBIKE_HIT_BACK)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_HIT_FRONT;
-				laraItem->Animation.ActiveState = QBIKE_STATE_HIT_BACK;
-				laraItem->Animation.TargetState = QBIKE_STATE_HIT_BACK;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_HIT_FRONT);
 			}
 			else if (collide == QBIKE_HIT_LEFT)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_HIT_RIGHT;
-				laraItem->Animation.ActiveState = QBIKE_STATE_HIT_LEFT;
-				laraItem->Animation.TargetState = QBIKE_STATE_HIT_LEFT;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_HIT_RIGHT);
 			}
 			else
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_HIT_LEFT;
-				laraItem->Animation.ActiveState = QBIKE_STATE_HIT_RIGHT;
-				laraItem->Animation.TargetState = QBIKE_STATE_HIT_RIGHT;
+				SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_HIT_LEFT);
 			}
 
-			laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
 			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &quadBikeItem->Pose);
 		}
 		else
@@ -796,10 +783,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+					SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_TURN_RIGHT_START);
 				}
 				else if (!(TrInput & VEHICLE_IN_LEFT))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
@@ -811,10 +795,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+					SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_TURN_LEFT_START);
 				}
 				else if (!(TrInput & VEHICLE_IN_RIGHT))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
