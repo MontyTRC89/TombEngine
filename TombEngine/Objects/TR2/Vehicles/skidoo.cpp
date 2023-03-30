@@ -397,15 +397,9 @@ namespace TEN::Entities::Vehicles
 			SkidooGuns(skidooItem, laraItem);
 
 		if (!dead)
-		{
-			skidooItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex);
-			skidooItem->Animation.FrameNumber = g_Level.Anims[skidooItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
-		}
+			SetAnimation(*skidooItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 		else
-		{
-			skidooItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE].animIndex + SKIDOO_ANIM_IDLE;
-			skidooItem->Animation.FrameNumber = g_Level.Anims[skidooItem->Animation.AnimNumber].frameBase;
-		}
+			SetAnimation(*skidooItem, SKIDOO_ANIM_IDLE);
 
 		if (skidooItem->Animation.Velocity.z && skidooItem->Floor == skidooItem->Pose.Position.y)
 		{

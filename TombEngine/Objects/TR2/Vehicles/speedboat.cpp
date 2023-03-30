@@ -293,8 +293,7 @@ namespace TEN::Entities::Vehicles
 			}
 			laraItem->Pose.Position.y = y;
 
-			speedboatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex;
-			speedboatItem->Animation.FrameNumber = g_Level.Anims[speedboatItem->Animation.AnimNumber].frameBase;
+			SetAnimation(*speedboatItem, SPEEDBOAT_ANIM_MOUNT_LEFT);
 		}
 	}
 
@@ -910,11 +909,9 @@ namespace TEN::Entities::Vehicles
 
 			AnimateItem(laraItem);
 
+			// Sync vehicle with player animation.
 			if (laraItem->HitPoints > 0)
-			{
-				speedboatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
-				speedboatItem->Animation.FrameNumber = g_Level.Anims[speedboatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
-			}
+				SetAnimation(*speedboatItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 			Camera.targetElevation = -ANGLE(20.0f);
 			Camera.targetDistance = SECTOR(2);

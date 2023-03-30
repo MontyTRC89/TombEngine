@@ -284,8 +284,7 @@ namespace TEN::Entities::Vehicles
 		case BGUN_STATE_MOUNT:
 		case BGUN_STATE_DISMOUNT:
 			AnimateItem(laraItem);
-			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
-			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			SetAnimation(bigGunItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
 			{
@@ -298,9 +297,8 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case BGUN_STATE_ROTATE_VERTICALLY:
-			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
-			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
-			
+			SetAnimation(bigGunItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+
 			if (bigGun->FireCount > 0)
 				bigGun->FireCount--;
 			else
@@ -308,8 +306,7 @@ namespace TEN::Entities::Vehicles
 
 			bigGun->Flags = BGUN_FLAG_UP_DOWN;
 
-			laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_ROTATE_VERTICALLY;
-			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_ROTATE_VERTICALLY].frameBase + bigGun->XOrientFrame;
+			SetAnimation(*laraItem, ID_LARA_BIGGUN_ANIM, BGUN_ANIM_ROTATE_VERTICALLY, bigGun->XOrientFrame);
 			break;
 		}
 

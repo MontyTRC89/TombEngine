@@ -916,7 +916,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT:
-			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_START &&
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) &&
 				frame == 27 &&
 				kayak->Flags & 0x80)
 			{
@@ -929,7 +929,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:
-			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_LEFT) &&
 				frame == 83)
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
@@ -950,7 +950,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_RIGHT:
-			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_RIGHT) &&
 				frame == 83)
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
@@ -1129,8 +1129,8 @@ namespace TEN::Entities::Vehicles
 
 			AnimateItem(laraItem);
 
-			kayakItem->Animation.AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
-			kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			// Sync vehicle with player animation.
+			SetAnimation(*kayakItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 			Camera.targetElevation = -ANGLE(30.0f);
 			Camera.targetDistance = CLICK(8);

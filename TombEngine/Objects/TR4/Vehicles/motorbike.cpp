@@ -186,12 +186,14 @@ namespace TEN::Entities::Vehicles
 			// HACK: Hardcoded Nitro item check.
 			/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_UNLOCK);
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;*/
+			{
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_MOUNT);
+			}*/
 
 			SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_MOUNT);
 			break;
@@ -1137,8 +1139,9 @@ namespace TEN::Entities::Vehicles
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->HitDirection = -1;
 
-		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
+		// Sync vehicle with player animation.
+		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+
 		motorbikeItem->HitPoints = 1;
 		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
 		motorbike->Revs = 0;
@@ -1273,8 +1276,8 @@ namespace TEN::Entities::Vehicles
 		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
 		AnimateItem(laraItem);
 
-		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[motorbikeItem->Animation.AnimNumber].frameBase - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		// Sync vehicle with player animation.
+		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 		Camera.targetElevation = -ANGLE(30.0f);
 
