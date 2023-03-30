@@ -387,11 +387,15 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
 	const auto& animObject = Objects[animObjectID];
+	const auto& anim = GetAnimData(animObject, animNumber);
+
 	int animIndex = animObject.animIndex + animNumber;
+	int frameIndex = anim.frameBase + frameNumber;
 
 	// Animation already set; return early.
 	if (item.Animation.AnimObjectID == animObjectID &&
-		item.Animation.AnimNumber == animIndex)
+		item.Animation.AnimNumber == animIndex &&
+		item.Animation.FrameNumber == frameIndex)
 	{
 		return;
 	}
@@ -408,18 +412,16 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		return;
 	}
 
-	const auto& anim = GetAnimData(animObject, animNumber);
-
 	item.Animation.AnimObjectID = animObjectID;
 	item.Animation.AnimNumber = animIndex;
-	item.Animation.FrameNumber = anim.frameBase + frameNumber;
+	item.Animation.FrameNumber = frameIndex;
 	item.Animation.ActiveState =
 	item.Animation.TargetState = anim.ActiveState;
 }
 
 void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
 {
-	SetAnimation(&item, animNumber, frameNumber);
+	SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
 }
 
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)

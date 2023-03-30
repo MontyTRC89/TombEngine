@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -13,17 +14,16 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Specific/setup.h"
-#include "Math/Random.h"
-#include "Game/effects/simple_particle.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -1180,12 +1180,12 @@ namespace TEN::Entities::Vehicles
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;
-
+				
 			AnimateQuadBike(quadBikeItem, laraItem, collide, dead);
 			AnimateItem(laraItem);
 
-			quadBikeItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
-			quadBikeItem->Animation.FrameNumber = g_Level.Anims[quadBikeItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			// Sync vehicle with player animation.
+			SetAnimation(*quadBikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 			Camera.targetElevation = -ANGLE(30.0f);
 
