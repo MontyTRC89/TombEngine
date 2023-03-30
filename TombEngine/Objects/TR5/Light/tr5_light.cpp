@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr5_light.h"
+#include "tr5_light_info.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
@@ -8,6 +9,9 @@
 #include "Math/Math.h"
 #include "Game/animation.h"
 #include "Game/items.h"
+
+
+
 
 void PulseLightControl(short itemNumber)
 {
@@ -27,9 +31,9 @@ void PulseLightControl(short itemNumber)
 			item->Pose.Position.y,
 			item->Pose.Position.z,
 			24,
-			(pulse * 8 * (item->TriggerFlags & 0x1F)) / 512,
-			(pulse * ((item->TriggerFlags / 4) & 0xF8)) / 512,
-			(pulse * ((item->TriggerFlags / 128) & 0xF8)) / 512);
+			(pulse * item->Model.Color.x * UCHAR_MAX) / 512,
+			(pulse * item->Model.Color.y * UCHAR_MAX) / 512,
+			(pulse * item->Model.Color.z * UCHAR_MAX) / 512);
 	}
 }
 
@@ -59,9 +63,9 @@ void StrobeLightControl(short itemNumber)
 	{
 		item->Pose.Orientation.y += ANGLE(16.0f);
 
-		byte r = 8 * (item->TriggerFlags & 0x1F);
-		byte g = (item->TriggerFlags / 4) & 0xF8;
-		byte b = (item->TriggerFlags / 128) & 0xF8;
+		byte r = item->Model.Color.x * UCHAR_MAX;
+		byte g = item->Model.Color.y * UCHAR_MAX;
+		byte b = item->Model.Color.z * UCHAR_MAX;
 
 		TriggerAlertLight(
 			item->Pose.Position.x,
@@ -92,26 +96,53 @@ void ColorLightControl(short itemNumber)
 			item->Pose.Position.y,
 			item->Pose.Position.z,
 			24,
-			8 * (item->TriggerFlags & 0x1F),
-			(item->TriggerFlags / 4) & 0xF8,
-			(item->TriggerFlags / 128) & 0xF8);
+			item->Model.Color.x * UCHAR_MAX,
+			item->Model.Color.y * UCHAR_MAX,
+			item->Model.Color.z * UCHAR_MAX);
 	}
+}
+
+static ElectricalLightInfo& GetElectricalLightInfo(ItemInfo& item)
+{
+	return *(ElectricalLightInfo*)item.Data;
+}
+
+void InitialiseElectricalLight(short itemNumber)
+{
+	auto& item = g_Level.Items[itemNumber];
+
+	item.Data = ElectricalLightInfo();
+	auto* lightPtr = &GetElectricalLightInfo(item);
+
+	lightPtr->Color = item.Model.Color;
+
+      //NOTE: clear all meshes at start.
+		for (int i = 0; i < item.Model.MeshIndex.size(); i++)
+		{
+			item.MeshBits.Clear(i);
+		}
 }
 
 void ElectricalLightControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
+	auto* lightPtr = &GetElectricalLightInfo(*item);
+
 	if (!TriggerActive(item))
 	{
 		item->ItemFlags[0] = 0;
+		item->MeshBits.Clear(abs(item->TriggerFlags));
 		return;
 	}
 
 	int intensity = 0;
-
+	
+	//NOTE: positive TriggerFlags let the light switch on like a neon light, negative OCB let the light flicker.
 	if (item->TriggerFlags > 0)
 	{
+		item->MeshBits.Set(item->TriggerFlags);
+
 		if (item->ItemFlags[0] < 16)
 		{
 			intensity = 4 * (GetRandomControl() & 0x3F);
@@ -120,7 +151,9 @@ void ElectricalLightControl(short itemNumber)
 		else if (item->ItemFlags[0] >= 96)
 		{
 			if (item->ItemFlags[0] >= 160)
-				intensity = 255 - (GetRandomControl() & 0x1F);
+			{
+				intensity = 255 - (GetRandomControl() & 0x1F);				
+			}
 			else
 			{
 				intensity = 96 - (GetRandomControl() & 0x1F);
@@ -146,11 +179,13 @@ void ElectricalLightControl(short itemNumber)
 	}
 	else
 	{
+		item->MeshBits.Set(abs(item->TriggerFlags));
+
 		if (item->ItemFlags[0] <= 0)
 		{
 			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
 			item->ItemFlags[1] = (GetRandomControl() & 0x7F) + 128;
-			item->ItemFlags[2] = GetRandomControl() & 1;
+			item->ItemFlags[2] = GetRandomControl() & 1;			
 		}
 
 		item->ItemFlags[0]--;
@@ -161,10 +196,16 @@ void ElectricalLightControl(short itemNumber)
 
 			intensity = item->ItemFlags[1] - (GetRandomControl() & 0x7F);
 			if (intensity > 64)
+			{
 				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, SoundEnvironment::Land, 1.0f, (float)intensity / 192.0f);
+			}
 		}
 		else
+		{
+			intensity = 0;
+			item->Model.Color = Vector4::Zero;
 			return;
+		}
 	}
 
 	TriggerDynamicLight(
@@ -172,9 +213,16 @@ void ElectricalLightControl(short itemNumber)
 		item->Pose.Position.y,
 		item->Pose.Position.z,
 		24,
-		(intensity * 8 * (item->TriggerFlags & 0x1F)) / 256,
-		(intensity * ((item->TriggerFlags / 4) & 0xF8)) / 256,
-		(intensity * ((item->TriggerFlags / 128) & 0xF8)) / 256);
+		(intensity * (lightPtr->Color.x / 2)),
+		(intensity * (lightPtr->Color.y / 2)) ,
+		(intensity * (lightPtr->Color.z / 2)));
+
+	//NOTE: paint light mesh color. Model.Color max color value is 2.0f.
+	item->Model.Color = Vector4(
+		((intensity / 2) * lightPtr->Color.x) / 96,
+		((intensity / 2) * lightPtr->Color.y) / 96,
+		((intensity / 2) * lightPtr->Color.z) / 96,
+		1.0f);
 }
 
 void BlinkingLightControl(short itemNumber)
@@ -194,9 +242,9 @@ void BlinkingLightControl(short itemNumber)
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
 				16,
-				8 * (item->TriggerFlags & 0x1F),
-				(item->TriggerFlags / 4) & 0xF8,
-				(item->TriggerFlags / 128) & 0xF8);
+				item->Model.Color.x * UCHAR_MAX,
+				item->Model.Color.y * UCHAR_MAX,
+				item->Model.Color.z * UCHAR_MAX);
 
 			item->MeshBits = 2;
 
