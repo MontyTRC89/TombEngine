@@ -446,43 +446,6 @@ AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 	return GetAnimData(object, animNumber);
 }
 
-bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
-{
-	// Active and target states already match; return early.
-	if (item->Animation.ActiveState == item->Animation.TargetState)
-		return false;
-
-	// No dispatches; return early.
-	if (anim.NumStateDispatches <= 0)
-		return false;
-
-	// Iterate over animation's state dispatches.
-	for (int i = 0; i < anim.NumStateDispatches; i++)
-	{
-		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
-
-		if (dispatch.TargetState != item->Animation.TargetState)
-			continue;
-
-		// Iterate over dispatch frame ranges.
-		for (int j = 0; j < dispatch.NumberRanges; j++)
-		{
-			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-
-			// Set new animation if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.StartFrame &&
-				item->Animation.FrameNumber <= range.EndFrame)
-			{
-				item->Animation.AnimNumber = range.LinkAnimNum;
-				item->Animation.FrameNumber = range.LinkFrameNum;
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
@@ -514,7 +477,7 @@ AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
+	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 
@@ -550,11 +513,17 @@ AnimFrame& GetBestFrame(const ItemInfo& item)
 
 int GetFrameNumber(ItemInfo* item)
 {
-	return (item->Animation.FrameNumber - GetFrameIndex(item, 0));
+	const auto& anim = GetAnimData(*item);
+	return (item->Animation.FrameNumber - anim.frameBase);
 }
 
-// NOTE: Returns g_Level.Anims index.
-int GetAnimNumber(const ItemInfo& item, int animNumber)
+int GetAnimNumber(const ItemInfo& item)
+{
+	const auto& object = Objects[item.Animation.AnimObjectID];
+	return (item.Animation.AnimNumber - object.animIndex);
+}
+
+int GetAnimIndex(const ItemInfo& item, int animNumber)
 {
 	const auto& object = Objects[item.Animation.AnimObjectID];
 	return (object.animIndex + animNumber);
@@ -598,6 +567,43 @@ int GetNextAnimState(int objectID, int animNumber)
 
 	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
 	return nextAnim.ActiveState;
+}
+
+bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
+{
+	// Active and target states already match; return early.
+	if (item->Animation.ActiveState == item->Animation.TargetState)
+		return false;
+
+	// No dispatches; return early.
+	if (anim.NumStateDispatches <= 0)
+		return false;
+
+	// Iterate over animation's state dispatches.
+	for (int i = 0; i < anim.NumStateDispatches; i++)
+	{
+		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
+
+		if (dispatch.TargetState != item->Animation.TargetState)
+			continue;
+
+		// Iterate over dispatch frame ranges.
+		for (int j = 0; j < dispatch.NumberRanges; j++)
+		{
+			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
+
+			// Set new animation if current frame is within dispatch range.
+			if (item->Animation.FrameNumber >= range.StartFrame &&
+				item->Animation.FrameNumber <= range.EndFrame)
+			{
+				item->Animation.AnimNumber = range.LinkAnimNum;
+				item->Animation.FrameNumber = range.LinkFrameNum;
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void DrawAnimatingItem(ItemInfo* item)

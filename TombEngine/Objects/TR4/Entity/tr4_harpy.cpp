@@ -446,7 +446,7 @@ namespace TEN::Entities::TR4
 						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
 						AI.distance < SQUARE(BLOCK(2)) &&
-						item->Animation.AnimNumber == GetAnimNumber(*item, HARPY_ANIM_STINGER_ATTACK) &&
+						item->Animation.AnimNumber == GetAnimIndex(*item, HARPY_ANIM_STINGER_ATTACK) &&
 						item->Animation.FrameNumber > GetFrameIndex(item, 17))
 					)
 				{

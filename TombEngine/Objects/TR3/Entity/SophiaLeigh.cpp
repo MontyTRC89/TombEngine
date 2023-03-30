@@ -218,11 +218,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerSophiaLeightLight(ItemInfo& item, const Vector3& pos)
 	{
-		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameIndex(&item, 6)) ||
-			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameIndex(&item, 3)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
+		if ((item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameIndex(&item, 6)) ||
+			 item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameIndex(&item, 3)) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
 				item.ItemFlags[1]++;
 		}
-		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
+		else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -425,7 +425,7 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
+			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
 				// Charged state.
@@ -619,7 +619,7 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
+			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
 				// Charged state.
