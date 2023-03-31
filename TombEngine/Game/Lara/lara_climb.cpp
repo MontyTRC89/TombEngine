@@ -40,10 +40,10 @@ void lara_as_climb_end(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 {
-	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_LADDER_DOWN)
+	if (LaraCheckForLetGo(item, coll) || !TestAnimNumber(*item, LA_LADDER_DOWN))
 		return;
 
-	int frame = item->Animation.FrameNumber - GetAnimData(LA_LADDER_DOWN).frameBase;
+	int frame = item->Animation.FrameNumber - GetAnimData(item->ObjectNumber, LA_LADDER_DOWN).frameBase;
 	int yShift = 0;
 
 	switch (frame)
@@ -128,9 +128,9 @@ void lara_as_climb_down(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!LaraCheckForLetGo(item, coll) && item->Animation.AnimNumber == LA_LADDER_UP)
+	if (!LaraCheckForLetGo(item, coll) && TestAnimNumber(*item, LA_LADDER_UP))
 	{
-		int frame = item->Animation.FrameNumber - GetAnimData(LA_LADDER_UP).frameBase;
+		int frame = item->Animation.FrameNumber - GetAnimData(item->ObjectNumber, LA_LADDER_UP).frameBase;
 		int yShift;
 		int resultRight, resultLeft;
 		int shiftRight, shiftLeft;

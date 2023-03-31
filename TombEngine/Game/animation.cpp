@@ -434,6 +434,12 @@ AnimData& GetAnimData(int animIndex)
 	return g_Level.Anims[animIndex];
 }
 
+AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
+{
+	const auto& object = Objects[objectID];
+	return GetAnimData(object, animNumber);
+}
+
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
 	return g_Level.Anims[object.animIndex + animNumber];
@@ -453,7 +459,7 @@ AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 	const auto& anim = GetAnimData(item);
 
 	// Normalize animation's current frame number into keyframe range.
-	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
+	int frameNumber = GetFrameNumber(item);
 	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
 
 	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
@@ -513,10 +519,15 @@ AnimFrame& GetBestFrame(const ItemInfo& item)
 		return *frameData.FramePtr1;
 }
 
+int GetFrameNumber(const ItemInfo& item)
+{
+	const auto& anim = GetAnimData(item);
+	return (item.Animation.FrameNumber - anim.frameBase);
+}
+
 int GetFrameNumber(ItemInfo* item)
 {
-	const auto& anim = GetAnimData(*item);
-	return (item->Animation.FrameNumber - anim.frameBase);
+	return GetFrameNumber(*item);
 }
 
 int GetAnimNumber(const ItemInfo& item)

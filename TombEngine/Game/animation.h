@@ -9,6 +9,7 @@ class EulerAngles;
 class Pose;
 class Vector3i;
 struct ItemInfo;
+struct ObjectInfo;
 
 // NOTES:
 // animNumber: Relative animation number.
@@ -114,13 +115,15 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 
 // Getters
 AnimData& GetAnimData(int animIndex); // Deprecated.
+AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 
 int GetAnimNumber(const ItemInfo& item);
 int GetAnimIndex(const ItemInfo& item, int animNumber);
 
-int GetFrameNumber(ItemInfo* item);
+int GetFrameNumber(const ItemInfo& item);
+int GetFrameNumber(ItemInfo* item); // Deprecated.
 int GetFrameIndex(ItemInfo* item, int frameNumber);
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
 
