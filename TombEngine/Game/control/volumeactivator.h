@@ -42,7 +42,7 @@ namespace TEN::Control::Volumes
 
 	struct VolumeEventSet
 	{
-		std::string Name = {};
+		std::string			 Name		= {};
 		VolumeActivatorFlags Activators = VolumeActivatorFlags::None;
 
 		VolumeEvent OnEnter	 = {};
