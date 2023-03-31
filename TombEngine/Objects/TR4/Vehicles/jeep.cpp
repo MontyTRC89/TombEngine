@@ -1402,9 +1402,7 @@ namespace TEN::Entities::Vehicles
 
 			AnimateJeep(jeepItem, laraItem, collide, dead);
 			AnimateItem(laraItem);
-
-			// Sync vehicle with player animation.
-			SetAnimation(*jeepItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+			SyncVehicleAnimation(*jeepItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);
 			Camera.targetDistance = SECTOR(2);

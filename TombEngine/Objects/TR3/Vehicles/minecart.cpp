@@ -869,9 +869,7 @@ namespace TEN::Entities::Vehicles
 			!(minecart->Flags & MINECART_FLAG_NO_ANIM))
 		{
 			AnimateItem(laraItem);
-
-			// Sync vehicle with player animation.
-			SetAnimation(*minecartItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+			SyncVehicleAnimation(*minecartItem, *laraItem);
 		}
 
 		if (laraItem->Animation.ActiveState != MINECART_STATE_TURN_DEATH &&

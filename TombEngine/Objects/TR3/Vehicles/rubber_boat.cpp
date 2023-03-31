@@ -906,9 +906,8 @@ namespace TEN::Entities::Vehicles
 
 			AnimateItem(laraItem);
 
-			// Sync vehicle with player animation.
 			if (laraItem->HitPoints > 0)
-				SetAnimation(*rBoatItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+				SyncVehicleAnimation(*rBoatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
 			Camera.targetDistance = SECTOR(2);

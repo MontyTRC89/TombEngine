@@ -1275,9 +1275,7 @@ namespace TEN::Entities::Vehicles
 
 		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
 		AnimateItem(laraItem);
-
-		// Sync vehicle with player animation.
-		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+		SyncVehicleAnimation(*motorbikeItem, *laraItem);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 

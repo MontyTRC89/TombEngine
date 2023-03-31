@@ -1183,9 +1183,7 @@ namespace TEN::Entities::Vehicles
 				
 			AnimateQuadBike(quadBikeItem, laraItem, collide, dead);
 			AnimateItem(laraItem);
-
-			// Sync vehicle with player animation.
-			SetAnimation(*quadBikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+			SyncVehicleAnimation(*quadBikeItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);
 

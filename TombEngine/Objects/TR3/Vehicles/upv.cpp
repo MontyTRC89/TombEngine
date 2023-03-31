@@ -978,8 +978,7 @@ namespace TEN::Entities::Vehicles
 			if (UPV->Flags & UPV_FLAG_CONTROL)
 				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity.z / 96.0f);
 
-			// Sync vehicle with player animation.
-			SetAnimation(*UPVItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+			SyncVehicleAnimation(*UPVItem, *laraItem);
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 				Camera.targetElevation = -ANGLE(60.0f);
