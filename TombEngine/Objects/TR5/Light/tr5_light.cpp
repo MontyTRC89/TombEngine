@@ -1,17 +1,22 @@
 #include "framework.h"
-#include "tr5_light.h"
-#include "tr5_light_info.h"
-#include "Specific/level.h"
+#include "Objects/TR5/Light/tr5_light.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
-#include "Sound/sound.h"
-#include "Math/Math.h"
-#include "Game/animation.h"
 #include "Game/items.h"
+#include "Math/Math.h"
+#include "Objects/TR5/Light/tr5_light_info.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
+using namespace TEN::Math;
 
-
+static ElectricalLightInfo& GetElectricalLightInfo(ItemInfo& item)
+{
+	return *(ElectricalLightInfo*)item.Data;
+}
 
 void PulseLightControl(short itemNumber)
 {
@@ -102,31 +107,19 @@ void ColorLightControl(short itemNumber)
 	}
 }
 
-static ElectricalLightInfo& GetElectricalLightInfo(ItemInfo& item)
-{
-	return *(ElectricalLightInfo*)item.Data;
-}
-
 void InitialiseElectricalLight(short itemNumber)
 {
 	auto& item = g_Level.Items[itemNumber];
-
 	item.Data = ElectricalLightInfo();
-	auto* lightPtr = &GetElectricalLightInfo(item);
+	auto& lightPtr = GetElectricalLightInfo(item);
 
-	lightPtr->Color = item.Model.Color;
-
-      //NOTE: clear all meshes at start.
-		for (int i = 0; i < item.Model.MeshIndex.size(); i++)
-		{
-			item.MeshBits.Clear(i);
-		}
+	lightPtr.Color = item.Model.Color;
+	item.MeshBits.ClearAll();
 }
 
 void ElectricalLightControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
 	auto* lightPtr = &GetElectricalLightInfo(*item);
 
 	if (!TriggerActive(item))
@@ -138,14 +131,14 @@ void ElectricalLightControl(short itemNumber)
 
 	int intensity = 0;
 	
-	//NOTE: positive TriggerFlags let the light switch on like a neon light, negative OCB let the light flicker.
+	// NOTE: Positive TriggerFlags allows light to behave like a neon light. Negative OCB makes the light flicker.
 	if (item->TriggerFlags > 0)
 	{
 		item->MeshBits.Set(item->TriggerFlags);
 
 		if (item->ItemFlags[0] < 16)
 		{
-			intensity = 4 * (GetRandomControl() & 0x3F);
+			intensity = (GetRandomControl() & 0x3F) * 4;
 			item->ItemFlags[0]++;
 		}
 		else if (item->ItemFlags[0] >= 96)
@@ -183,9 +176,9 @@ void ElectricalLightControl(short itemNumber)
 
 		if (item->ItemFlags[0] <= 0)
 		{
-			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
-			item->ItemFlags[1] = (GetRandomControl() & 0x7F) + 128;
-			item->ItemFlags[2] = GetRandomControl() & 1;			
+			item->ItemFlags[0] = Random::GenerateInt(4, 8);
+			item->ItemFlags[1] = Random::GenerateInt(128, 256);
+			item->ItemFlags[2] = Random::GenerateInt(0, 1);
 		}
 
 		item->ItemFlags[0]--;
@@ -194,11 +187,9 @@ void ElectricalLightControl(short itemNumber)
 		{
 			item->ItemFlags[0]--;
 
-			intensity = item->ItemFlags[1] - (GetRandomControl() & 0x7F);
+			intensity = item->ItemFlags[1] - Random::GenerateInt(0, 128);
 			if (intensity > 64)
-			{
-				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, SoundEnvironment::Land, 1.0f, (float)intensity / 192.0f);
-			}
+				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, SoundEnvironment::Land, 1.0f, intensity / 192.0f);
 		}
 		else
 		{
@@ -217,7 +208,7 @@ void ElectricalLightControl(short itemNumber)
 		(intensity * (lightPtr->Color.y / 2)) ,
 		(intensity * (lightPtr->Color.z / 2)));
 
-	//NOTE: paint light mesh color. Model.Color max color value is 2.0f.
+	// Set light mesh color. Model.Color max value is 2.0f.
 	item->Model.Color = Vector4(
 		((intensity / 2) * lightPtr->Color.x) / 96,
 		((intensity / 2) * lightPtr->Color.y) / 96,
@@ -234,7 +225,9 @@ void BlinkingLightControl(short itemNumber)
 		item->ItemFlags[0]--;
 
 		if (item->ItemFlags[0] >= 3)
+		{
 			item->MeshBits = 1;
+		}
 		else
 		{
 			auto pos = GetJointPosition(item, 0);
