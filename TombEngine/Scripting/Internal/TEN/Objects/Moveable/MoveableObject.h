@@ -3,6 +3,7 @@
 #include "ScriptUtil.h"
 #include "Objects/Room/RoomObject.h"
 #include "Objects/NamedBase.h"
+#include "Game/control/box.h"
 
 class LevelFunc;
 
@@ -117,13 +118,17 @@ public:
 	void SetVisible(bool visible);
 	void Explode();
 	void Shatter();
+	void SetTurnSpeed(short speed);
 
+	void SetOnInitialised(TypeOrNil<LevelFunc> const& cb);
 	void SetOnHit(TypeOrNil<LevelFunc> const& cb);
 	void SetOnKilled(TypeOrNil<LevelFunc> const& cb);
 	void SetOnCollidedWithObject(TypeOrNil<LevelFunc> const& cb);
 	void SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const& cb);
+	void SetOnUpdate(TypeOrNil<LevelFunc> const& cb);
 
 	[[nodiscard]] short GetStatus() const;
+	[[nodiscard]] bool IsRoomHasFlags(RoomEnvFlags flags);
 
 	void Init();
 
@@ -132,9 +137,21 @@ public:
 
 	short GetIndex() const;
 
+	void InitialiseCreature();
+	[[nodiscard]] bool IsCreatureActive();
+	void GetCreatureInfo();
+	void CreatureAIInfo();
+	void GetCreatureMood(const bool isViolent);
+	void CreatureMood(const bool isViolent);
+	[[nodiscard]] bool CreatureAnimation(const short angle, const short tilt);
+	[[nodiscard]] short CreatureTurn();
+	/// Distance is 0 or 1, 0 is 1 block, 1 is 2 block
+	[[nodiscard]] bool CanCreatureJump(const int distance);
+
 protected:
 	ItemInfo* m_item;
-
+	CreatureInfo* m_creature;
+	AI_INFO m_ai_info;
 private:
 	short m_num;
 	bool m_initialised;

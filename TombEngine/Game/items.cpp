@@ -172,11 +172,14 @@ static void GameScriptHandleKilled(short itemNumber, bool destroyed)
 	if (destroyed)
 	{
 		g_GameScriptEntities->NotifyKilled(item);
+
 		item->Name.clear();
+		item->Callbacks.OnInitialised.clear();
 		item->Callbacks.OnKilled.clear();
 		item->Callbacks.OnHit.clear();
 		item->Callbacks.OnObjectCollided.clear();
 		item->Callbacks.OnRoomCollided.clear();
+		item->Callbacks.OnUpdate.clear();
 	}
 }
 

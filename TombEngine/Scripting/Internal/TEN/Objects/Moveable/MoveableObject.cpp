@@ -6,6 +6,7 @@
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -200,6 +201,10 @@ void Moveable::Register(sol::table & parent)
 
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
+	ScriptReserved_SetOnUpdate, & Moveable::SetOnUpdate,
+
+	ScriptReserved_SetOnInitialised, & Moveable::SetOnInitialised,
+
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // Note that enemy death often occurs at the end of an animation, and not at the exact moment
 // the enemy's HP becomes zero.
@@ -331,87 +336,131 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
-	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
+	ScriptReserved_ShatterMesh, & Moveable::ShatterMesh,
 
-	ScriptReserved_GetMeshSwapped, &Moveable::GetMeshSwapped,
-			
-	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
-			
-	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
+	ScriptReserved_GetMeshSwapped, & Moveable::GetMeshSwapped,
 
-/// Get the hit status of the object
-// @function Moveable:GetHitStatus
-// @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
-	ScriptReserved_GetHitStatus, &Moveable::GetHitStatus,
+	ScriptReserved_SwapMesh, & Moveable::SwapMesh,
 
-/// Determine whether the moveable is active or not 
-// @function Moveable:GetActive
-// @treturn bool true if the moveable is active
-	ScriptReserved_GetActive, &Moveable::GetActive,
+	ScriptReserved_UnswapMesh, & Moveable::UnswapMesh,
 
-	ScriptReserved_GetRoom, &Moveable::GetRoom,
+	/// Get the hit status of the object
+	// @function Moveable:GetHitStatus
+	// @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
+	ScriptReserved_GetHitStatus, & Moveable::GetHitStatus,
 
-	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
+		/// Determine whether the moveable is active or not 
+		// @function Moveable:GetActive
+		// @treturn bool true if the moveable is active
+		ScriptReserved_GetActive, & Moveable::GetActive,
 
-	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
+		ScriptReserved_GetRoom, & Moveable::GetRoom,
 
-	ScriptReserved_GetPosition, & Moveable::GetPos,
+		ScriptReserved_GetRoomNumber, & Moveable::GetRoomNumber,
 
-/// Get the object's joint position
-// @function Moveable:GetJointPosition
-// @tparam int index of a joint to get position
-// @treturn Vec3 a copy of the moveable's position
-	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+		ScriptReserved_SetRoomNumber, & Moveable::SetRoomNumber,
 
-	ScriptReserved_SetPosition, & Moveable::SetPos,
+		ScriptReserved_GetPosition, & Moveable::GetPos,
 
-/// Get the moveable's rotation
-// @function Moveable:GetRotation
-// @treturn Rotation a copy of the moveable's rotation
-	ScriptReserved_GetRotation, &Moveable::GetRot,
+		/// Get the object's joint position
+		// @function Moveable:GetJointPosition
+		// @tparam int index of a joint to get position
+		// @treturn Vec3 a copy of the moveable's position
+		ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
-/// Set the moveable's rotation
-// @function Moveable:SetRotation
-// @tparam Rotation rotation The moveable's new rotation
-	ScriptReserved_SetRotation, &Moveable::SetRot,
+		ScriptReserved_SetPosition, & Moveable::SetPos,
 
-/// Get the moveable's name (its unique string identifier)
-// e.g. "door\_back\_room" or "cracked\_greek\_statue"
-// This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
-// @function Moveable:GetName
-// @treturn string the moveable's name
-	ScriptReserved_GetName, &Moveable::GetName,
+		/// Get the moveable's rotation
+		// @function Moveable:GetRotation
+		// @treturn Rotation a copy of the moveable's rotation
+		ScriptReserved_GetRotation, & Moveable::GetRot,
 
-/// Set the moveable's name (its unique string identifier)
-// e.g. "door\_back\_room" or "cracked\_greek\_statue"
-// It cannot be blank and cannot share a name with any existing object.
-// @function Moveable:SetName
-// @tparam name string the new moveable's name
-// @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
-	ScriptReserved_SetName, &Moveable::SetName, 
+		/// Set the moveable's rotation
+		// @function Moveable:SetRotation
+		// @tparam Rotation rotation The moveable's new rotation
+		ScriptReserved_SetRotation, & Moveable::SetRot,
 
-/// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
-// @function Moveable:GetValid
-// @treturn bool valid true if the object is still not destroyed
-	ScriptReserved_GetValid, &Moveable::GetValid,
+		/// Get the moveable's name (its unique string identifier)
+		// e.g. "door\_back\_room" or "cracked\_greek\_statue"
+		// This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
+		// @function Moveable:GetName
+		// @treturn string the moveable's name
+		ScriptReserved_GetName, & Moveable::GetName,
 
-/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
-// @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy,
+		/// Set the moveable's name (its unique string identifier)
+		// e.g. "door\_back\_room" or "cracked\_greek\_statue"
+		// It cannot be blank and cannot share a name with any existing object.
+		// @function Moveable:SetName
+		// @tparam name string the new moveable's name
+		// @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
+		ScriptReserved_SetName, & Moveable::SetName,
 
-/// Attach camera to an object.
-// @function Moveable:AttachObjCamera
-// @tparam int mesh of a moveable to use as a camera position
-// @tparam Moveable target moveable to attach camera to
-// @tparam int mesh of a target moveable to use as a camera target
-	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
+		/// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
+		// @function Moveable:GetValid
+		// @treturn bool valid true if the object is still not destroyed
+		ScriptReserved_GetValid, & Moveable::GetValid,
 
-/// Borrow animation from an object
-// @function Moveable:AnimFromObject
-// @tparam Objects.ObjID ObjectID to take animation and stateID from,
-// @tparam int animNumber animation from object
-// @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+		/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
+		// @function Moveable:Destroy
+		ScriptReserved_Destroy, & Moveable::Destroy,
+
+		/// Attach camera to an object.
+		// @function Moveable:AttachObjCamera
+		// @tparam int mesh of a moveable to use as a camera position
+		// @tparam Moveable target moveable to attach camera to
+		// @tparam int mesh of a target moveable to use as a camera target
+		ScriptReserved_AttachObjCamera, & Moveable::AttachObjCamera,
+
+		/// Borrow animation from an object
+		// @function Moveable:AnimFromObject
+		// @tparam Objects.ObjID ObjectID to take animation and stateID from,
+		// @tparam int animNumber animation from object
+		// @tparam int stateID state from object
+		ScriptReserved_AnimFromObject, & Moveable::AnimFromObject,
+
+		/// Setup the creature mood based on current ai
+		// @function Moveable:GetCreatureMood
+		// @tparam AI_INFO& ai used to store the mood (and potentialy new value),
+		// @tparam bool isViolent do the creature is violent (will always attack)
+		ScriptReserved_GetCreatureMood, & Moveable::GetCreatureMood,
+
+		/// Update the creature mood based on current ai
+		// @function Moveable:CreatureMood
+		// @tparam AI_INFO& ai used to store the mood (and potentialy new value),
+		// @tparam bool isViolent do the creature is violent (will always attack)
+		ScriptReserved_CreatureMood, & Moveable::CreatureMood,
+
+		/// Setup the creature ai.
+		// @function Moveable:CreatureAIInfo
+		// @tparam AI_INFO& ai used to store ai information,
+		ScriptReserved_CreatureAIInfo, & Moveable::CreatureAIInfo,
+
+		/// Update the creature based on current ai and item state.
+		// @function Moveable:CreatureMood
+		// @tparam angle current angle of the creature.
+		// @tparam tilt current tilt of the creature (Make sure to call CreatureTilt() before assigning value on it).
+		ScriptReserved_CreatureAnimation, & Moveable::CreatureAnimation,
+
+		/// Update the creature angle based on target position and angle.
+		// @function Moveable:CreatureTurn
+		// @tparam maximumTurn usually creature->MaxTurn,
+		ScriptReserved_CreatureTurn, & Moveable::CreatureTurn,
+
+		/// Update the creature angle based on target position and angle.
+		// @function Moveable:CreatureTurn
+		// @tparam AI_INFO& ai used to store the mood (and potentialy new value),
+		// @tparam bool isViolent do the creature is violent (will always attack)
+		ScriptReserved_CanCreatureJump, & Moveable::CanCreatureJump,
+		
+		ScriptReserved_SetTurnSpeed, & Moveable::SetTurnSpeed,
+		
+		ScriptReserved_IsCreatureActive, & Moveable::IsCreatureActive,
+		
+		ScriptReserved_GetCreatureInfo, & Moveable::GetCreatureInfo,
+		
+		ScriptReserved_IsRoomHasFlags, & Moveable::IsRoomHasFlags,
+		
+		ScriptReserved_InitialiseCreature, & Moveable::InitialiseCreature);
 }
 
 void Moveable::Init()
@@ -466,6 +515,54 @@ short Moveable::GetIndex() const
 	return m_num;
 }
 
+void Moveable::InitialiseCreature()
+{
+	::InitialiseCreature(m_num);
+}
+
+bool Moveable::IsCreatureActive()
+{
+	return ::CreatureActive(m_num);
+}
+
+void Moveable::GetCreatureInfo()
+{
+	if (m_item->IsCreature())
+	{
+		m_creature = ::GetCreatureInfo(m_item);
+	}
+}
+
+void Moveable::CreatureAIInfo()
+{
+	::CreatureAIInfo(m_item, &m_ai_info);
+}
+
+void Moveable::GetCreatureMood(const bool isViolent)
+{
+	::GetCreatureMood(m_item, &m_ai_info, isViolent);
+}
+
+void Moveable::CreatureMood(const bool isViolent)
+{
+	::CreatureMood(m_item, &m_ai_info, isViolent);
+}
+
+bool Moveable::CreatureAnimation(const short angle, const short tilt)
+{
+	return ::CreatureAnimation(m_num, angle, tilt);
+}
+
+short Moveable::CreatureTurn()
+{
+	return ::CreatureTurn(m_item, m_creature->MaxTurn);
+}
+
+bool Moveable::CanCreatureJump(const int distance)
+{
+	return ::CanCreatureJump(*m_item, (JumpDistance)distance);
+}
+
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
@@ -500,6 +597,16 @@ void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
+}
+
+void Moveable::SetOnUpdate(TypeOrNil<LevelFunc> const& cb)
+{
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnUpdate, *this, m_item->Callbacks.OnUpdate);
+}
+
+void Moveable::SetOnInitialised(TypeOrNil<LevelFunc> const& cb)
+{
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnInitialised, *this, m_item->Callbacks.OnInitialised);
 }
 
 std::string Moveable::GetName() const
@@ -913,6 +1020,11 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
+bool Moveable::IsRoomHasFlags(RoomEnvFlags flags)
+{
+	return ::TestEnvironment(flags, m_item);
+}
+
 /// Get state of specified mesh visibility of object
 // Returns true if specified mesh is visible on an object, and false
 // if it is not visible.
@@ -1068,6 +1180,13 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
+}
+
+void Moveable::SetTurnSpeed(short speed)
+{
+	if (m_creature == nullptr)
+		return;
+	m_creature->MaxTurn = speed;
 }
 
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.

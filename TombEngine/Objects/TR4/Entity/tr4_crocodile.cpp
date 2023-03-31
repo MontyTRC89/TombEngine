@@ -14,6 +14,8 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 
 using namespace TEN::Math;
 
@@ -77,16 +79,21 @@ namespace TEN::Entities::TR4
 	void InitialiseCrocodile(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
+		if (!item->Callbacks.OnInitialised.empty())
+		{
+			short index = g_GameScriptEntities->GetIndexByName(item->Name);
+			g_GameScript->ExecuteFunction(item->Callbacks.OnInitialised, index);
+		}
+		/*
 		InitialiseCreature(itemNumber);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
 			SetAnimation(item, CROC_ANIM_SWIM_FORWARD);
 		else
-			SetAnimation(item, CROC_ANIM_IDLE);
+			SetAnimation(item, CROC_ANIM_IDLE);*/
 	}
 
-	bool IsCrocodileInWater(ItemInfo* item)
+	/*bool IsCrocodileInWater(ItemInfo* item)
 	{
 		auto* creature = GetCreatureInfo(item);
 
@@ -105,15 +112,18 @@ namespace TEN::Entities::TR4
 		}
 
 		return waterDepth != NO_HEIGHT;
-	}
+	}*/
 
 	void CrocodileControl(short itemNumber)
 	{
-		if (!CreatureActive(itemNumber))
-			return;
-
 		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[item->ObjectNumber];
+		if (!item->Callbacks.OnUpdate.empty() && item->IsCreature() && item->HitPoints > 0)
+		{
+			short index = g_GameScriptEntities->GetIndexByName(item->Name);
+			g_GameScript->ExecuteFunction(item->Callbacks.OnUpdate, index);
+			AnimateItem(item);
+		}
+		/*auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
@@ -331,6 +341,6 @@ namespace TEN::Entities::TR4
 		if (item->Animation.ActiveState >= CROC_STATE_SWIM_FORWARD && item->Animation.ActiveState <= CROC_STATE_WATER_DEATH)
 			CreatureUnderwater(item, CLICK(1));
 		else
-			CreatureUnderwater(item, 0);
+			CreatureUnderwater(item, 0);*/
 	}
 }

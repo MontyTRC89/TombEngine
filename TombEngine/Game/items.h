@@ -88,10 +88,12 @@ struct EntityModelData
 
 struct EntityCallbackData
 {
+	std::string OnInitialised;
 	std::string OnKilled;
 	std::string OnHit;
 	std::string OnObjectCollided;
 	std::string OnRoomCollided;
+	std::string OnUpdate;
 };
 
 struct EntityEffectData

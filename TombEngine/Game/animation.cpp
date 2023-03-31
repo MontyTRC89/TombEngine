@@ -382,8 +382,7 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 {
-	const auto& object = Objects[item->ObjectNumber];
-	int animIndex = object.animIndex + animNumber;
+	int animIndex = GetAnimNumber(*item, animNumber);
 
 	// Animation already set; return early.
 	if (item->Animation.AnimNumber == animIndex)
