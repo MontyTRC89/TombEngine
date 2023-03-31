@@ -24,16 +24,16 @@
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
-template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
+template<class... Ts> visitor(Ts...)->visitor<Ts...>; // TODO: Line not needed in C++20.
 
-using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
 
-class ITEM_DATA
+class ItemData
 {
 	std::variant<
 		std::nullptr_t,
@@ -72,13 +72,13 @@ class ITEM_DATA
 		ElectricalLightInfo
 	> data;
 	public:
-	ITEM_DATA();
+	ItemData();
 
 	template<typename D>
-	ITEM_DATA(D&& type) : data(std::move(type)) {}
+	ItemData(D&& type) : data(std::move(type)) {}
 
-	// conversion operators to keep original syntax!
-	// TODO: should be removed later and
+	// Conversion operators to keep original syntax.
+	// TODO: Should be removed later and use polymorphism instead.
 	template<typename T>
 	operator T* ()
 	{
@@ -88,7 +88,7 @@ class ITEM_DATA
 			return &ref;
 		}
 
-		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
+		throw std::runtime_error("Attempted to read ItemData as wrong type.");
 	}
 
 	template<typename T>
@@ -100,33 +100,33 @@ class ITEM_DATA
 			return ref;
 		}
 
-		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
+		throw std::runtime_error("Attempted to read ItemData as wrong type.");
 	}
 
-	/* Uncommented, we want to store pointers to global data, too (LaraInfo for example)
+	/* Uncommented, we want to store pointers to global data too (LaraInfo for example).
 	template<typename T>
-	ITEM_DATA& operator=(T* newData)
+	ItemData& operator =(T* newData)
 	{
 		data = *newData;
 		return *this;
 	}
 	*/
 
-	ITEM_DATA& operator=(std::nullptr_t null)
+	ItemData& operator =(std::nullptr_t null)
 	{
 		data = nullptr;
 		return *this;
 	}
 
 	template<typename T>
-	ITEM_DATA& operator=(T& newData)
+	ItemData& operator =(T& newData)
 	{
 		data = newData;
 		return *this;
 	}
 
 	template<typename T>
-	ITEM_DATA& operator=(T&& newData)
+	ItemData& operator =(T&& newData)
 	{
 		data = std::move(newData);
 		return *this;
@@ -141,12 +141,12 @@ class ITEM_DATA
 	void apply(Funcs&&... funcs)
 	{
 		std::visit(
-		visitor
+			visitor
 			{
 				[](auto const&) {},
 				std::forward<Funcs>(funcs)...
 			},
-		data);
+			data);
 	}
 
 	template<typename T>

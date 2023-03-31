@@ -116,7 +116,7 @@ struct ItemInfo
 	short NextItem;
 	short NextActive;
 
-	ITEM_DATA Data;
+	ItemData Data;
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;

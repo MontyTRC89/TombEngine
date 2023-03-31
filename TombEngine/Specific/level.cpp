@@ -169,7 +169,7 @@ void LoadItems()
 		{
 			auto* item = &g_Level.Items[i];
 
-			item->Data = ITEM_DATA{};
+			item->Data = ItemData{};
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();
 			item->Pose.Position.x = ReadInt32();
