@@ -26,7 +26,7 @@ namespace TEN::Hud
 		static constexpr auto STATUS_BAR_LIFE_START_FADING = 0.2f;
 		static constexpr auto STATUS_BAR_VALUE_LERP_ALPHA  = 0.3f;
 
-		// Components
+		// Members
 		StatusBar AirBar	  = {};
 		StatusBar ExposureBar = {};
 		StatusBar HealthBar	  = {};

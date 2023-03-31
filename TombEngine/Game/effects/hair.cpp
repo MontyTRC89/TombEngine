@@ -141,28 +141,28 @@ namespace TEN::Effects::Hair
 		// TODO: Not needed?
 		if (player.HitDirection >= 0)
 		{
-			int spasm = 0;
+			int animNumber = 0;
 			switch (player.HitDirection)
 			{
 			case NORTH:
-				spasm = (player.Control.IsLow) ? 294 : 125;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_FRONT : LA_STAND_HIT_FRONT;
 				break;
 
 			case SOUTH:
-				spasm = (player.Control.IsLow) ? 293 : 126;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_BACK : LA_STAND_HIT_BACK;
 				break;
 
 			case EAST:
-				spasm = (player.Control.IsLow) ? 295 : 127;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_LEFT : LA_STAND_HIT_LEFT;
 				break;
 
 			default:
-				spasm = (player.Control.IsLow) ? 296 : 128;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_RIGHT : LA_STAND_HIT_RIGHT;
 				break;
 			}
 
-			int frameIndex = GetAnimData(spasm).FramePtr;
-			const auto& frame = g_Level.Frames[frameIndex + player.HitFrame];
+			int frameBaseIndex = GetAnimData(item.ObjectNumber, animNumber).FramePtr;
+			const auto& frame = g_Level.Frames[frameBaseIndex + player.HitFrame];
 			return frame.BoundingBox.GetCenter();
 		}
 
