@@ -216,6 +216,19 @@ void AnimateItem(ItemInfo* item)
 		{
 			item->Animation.ActiveState = animPtr->ActiveState;
 		}
+
+		// TODO: Theoretically this is better than above block, but it must be checked. -- Sezz 2023.03.31
+		/*if (item->Animation.ActiveState != animPtr->ActiveState)
+		{
+			item->Animation.ActiveState =
+			item->Animation.TargetState = animPtr->ActiveState;
+		}
+
+		if (!item->IsLara())
+		{
+			if (item->Animation.RequiredState == item->Animation.ActiveState)
+				item->Animation.RequiredState = NO_STATE;
+		}*/
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
