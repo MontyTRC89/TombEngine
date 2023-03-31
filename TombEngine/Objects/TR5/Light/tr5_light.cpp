@@ -26,7 +26,7 @@ void PulseLightControl(short itemNumber)
 	{
 		item->ItemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Pose.Position.y & 0x3FFF));
+		long pulse = 256 * phd_sin(item->ItemFlags[0] + ((item->Pose.Position.y & 0x3FFF) * 4));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
@@ -42,22 +42,15 @@ void PulseLightControl(short itemNumber)
 	}
 }
 
-void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, short angle, short roomNumber, int falloff)
 {
-	GameVector start;
-	start.x = x;
-	start.y = y;
-	start.z = z;
-	GetFloor(x, y, z, &room);
-	start.RoomNumber = room;
+	GetFloor(x, y, z, &roomNumber);
 
-	GameVector end;
-	end.x = x + 16384 * phd_sin(16 * angle);
-	end.y = y;
-	end.z = z + 16384 * phd_cos(16 * angle);
+	auto origin = GameVector(x, y, z, roomNumber);
+	auto target =  GameVector(Geometry::TranslatePoint(origin.ToVector3(), angle * 16, BLOCK(16)));
 
-	if (!LOS(&start, &end))
-		TriggerDynamicLight(end.x, end.y, end.z, falloff, r, g, b);
+	if (!LOS(&origin, &target))
+		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
 
 void StrobeLightControl(short itemNumber)
@@ -74,7 +67,7 @@ void StrobeLightControl(short itemNumber)
 
 		TriggerAlertLight(
 			item->Pose.Position.x,
-			item->Pose.Position.y - 512,
+			item->Pose.Position.y - CLICK(2),
 			item->Pose.Position.z,
 			r, g, b,
 			((item->Pose.Orientation.y + 22528) / 16) & 0xFFF,
