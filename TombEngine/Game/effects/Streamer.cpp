@@ -120,7 +120,7 @@ namespace TEN::Effects::Streamer
 
 		// Get and extend streamer with new segment.
 		auto& streamer = GetStreamer(tag);
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags, streamer.Segments.size());
+		streamer.AddSegment(pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags, (unsigned int)streamer.Segments.size());
 	}
 
 	void StreamerModule::Update()

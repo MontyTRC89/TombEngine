@@ -233,8 +233,8 @@ namespace TEN::Renderer
 			vertices[i].Bone = 0.0f;
 		}
 
-		this->InnerVertexBuffer = VertexBuffer(devicePtr, vertices.size(), vertices.data());
-		this->InnerIndexBuffer = IndexBuffer(devicePtr, barIndices.size(), barIndices.data());
+		this->InnerVertexBuffer = VertexBuffer(devicePtr, (int)vertices.size(), vertices.data());
+		this->InnerIndexBuffer = IndexBuffer(devicePtr, (int)barIndices.size(), barIndices.data());
 
 		auto borderVertices = std::array<RendererVertex, barBorderVertices.size()>{};
 		for (int i = 0; i < barBorderVertices.size(); i++)
@@ -246,8 +246,8 @@ namespace TEN::Renderer
 			borderVertices[i].Bone = 0.0f;
 		}
 
-		this->VertexBufferBorder = VertexBuffer(devicePtr, borderVertices.size(), borderVertices.data());
-		this->IndexBufferBorder = IndexBuffer(devicePtr, barBorderIndices.size(), barBorderIndices.data());
+		this->VertexBufferBorder = VertexBuffer(devicePtr, (int)borderVertices.size(), borderVertices.data());
+		this->IndexBufferBorder = IndexBuffer(devicePtr, (int)barBorderIndices.size(), barBorderIndices.data());
 	}
 
 	float Renderer11::CalculateFrameRate()
