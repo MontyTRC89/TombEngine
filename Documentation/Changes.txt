@@ -1,14 +1,45 @@
 Version 1.0.8
 =============
 
-* Fix Sophia's charge ring drawing below floor.
 * Fix bubbles phasing through ceilings.
-* Fix TR5 imp collision handling and animations.
 * Fix object camera not clearing at level end.
-* Fix hardcoded double-breathing Lara sfx.
-* Fix inventory compass.
+* Fix double breathing sound effect when coming up for air.
+* Fix twisting hair bug.
+* Fix harpoon gun triggering water and dry sounds when shooting and reholstering.
+* Fix Z-fighting in inventory rendering.
+* Fix transparent objects not displaying correctly in the Inventory.
+* Fix dozy cheat always giving uzi weapons even if not present in WAD.
+* Fix player getting launched when landing close to an edge.
+* Fix TR3 Sophia's charge ring drawing below floor.
+* Fix TR5 imp collision handling and animations.
+	- OCB 1 - Climbs up to Lara when triggered.
+	- OCB 2 - Starts of playfully rolling on the floor when triggered.
+	- OCB 3 - Will throw stones at Lara.
+	- Imp is also scared of Lara if she has a lit torch in her hand.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
+* Fix and improve wraith tails.
+* Add dedicated WRAITH_TRAP object with enhanced effects.
+	- OCB 0: Effect disabled.
+	- OCB 1: Effect enabled.
 * Add TR1 slamming doors.
-* Add the ability to set cold bar in rooms. (Achieved by setting cold flag to a room in Tomb Editor)
+* Add TR3 mutant wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
+* Add TR3 Corpse
+	- OCB 0: used for coprses targeted by the compsoganathus dinosaur. 
+	- OCB 1: used for corpses hung in the air to be used as piranha bait. Will fall when shot.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr3_Compsognathus_Cadavar.wad2
+* Add cold exposure bar (employed by setting the "cold" flag in water rooms in Tomb Editor).
+* Add water wakes for vehicles.
+* Allow dynamic segment count of hair object.
+* Restored light effect nullmeshes (color, electrical, pulse and strobe):
+	- Select the color the light should emit as object tint in OCB menu in Tomb editor.
+	- ELECTRICAL_LIGHT:
+		- OCB 1: Displays mesh of object.
+		- OCB -1: Hides mesh of object (used for a neon light effect)
+
+* Restored inventory compass.
+
+Lua API changes:
+* Add new function Misc::IsSoundPlaying() 
 
 Version 1.0.7
 =============

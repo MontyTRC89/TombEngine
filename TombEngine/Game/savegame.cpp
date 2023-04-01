@@ -630,7 +630,6 @@ bool SaveGame::Save(int slot)
 
 			Save::KayakBuilder kayakBuilder{ fbb };
 
-			kayakBuilder.add_current_start_wake(kayak->CurrentStartWake);
 			kayakBuilder.add_flags(kayak->Flags);
 			kayakBuilder.add_forward(kayak->Forward);
 			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
@@ -642,7 +641,6 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_turn(kayak->Turn);
 			kayakBuilder.add_turn_rate(kayak->TurnRate);
 			kayakBuilder.add_velocity(kayak->Velocity);
-			kayakBuilder.add_wake_shade(kayak->WakeShade);
 			kayakBuilder.add_water_height(kayak->WaterHeight);
 			kayakOffset = kayakBuilder.Finish();
 		}
@@ -1668,7 +1666,6 @@ bool SaveGame::Load(int slot)
 			auto* kayak = (KayakInfo*)item->Data;
 			auto* savedKayak = (Save::Kayak*)savedItem->data();
 
-			kayak->CurrentStartWake = savedKayak->flags();
 			kayak->Flags = savedKayak->flags();
 			kayak->Forward = savedKayak->forward();
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
@@ -1680,7 +1677,6 @@ bool SaveGame::Load(int slot)
 			kayak->Turn = savedKayak->turn();
 			kayak->TurnRate = savedKayak->turn_rate();
 			kayak->Velocity = savedKayak->velocity();
-			kayak->WakeShade = savedKayak->wake_shade();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
 		else if (item->Data.is <PushableInfo>())

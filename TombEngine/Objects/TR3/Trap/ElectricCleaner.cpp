@@ -177,7 +177,7 @@ namespace TEN::Entities::Traps
 				// Is not in the center of a tile; keep moving forward. 
 				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
 
-				auto slope = pointColl.Block->FloorSlope(0);
+				auto slope = pointColl.Block->GetSurfaceSlope(0, true);
 
 				// If slope, don't turn.
 				if (slope.LengthSquared() > 0)

@@ -562,7 +562,7 @@ namespace TEN::Entities::Generic
 		if (pushable.CurrentSoundState == PushableSoundState::Moving)
 			pushable.CurrentSoundState = PushableSoundState::Stopping;
 
-		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 
 		displaceBox -= isLaraPulling ? BLOCK(1) + displaceDepth : displaceDepth - BLOCK(1);
 		
@@ -957,7 +957,7 @@ namespace TEN::Entities::Generic
 		if (pointColl.Position.DiagonalStep)
 			return false;
 
-		if ((pointColl.Block->FloorSlope(0) != Vector2::Zero) || (pointColl.Block->FloorSlope(1) != Vector2::Zero))
+		if ((pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero) || (pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero))
 			return false;
 
 		// Check for stopper flag.
@@ -1041,19 +1041,19 @@ namespace TEN::Entities::Generic
 		
 		if (dirVector.z > 0)
 		{
-			playerOffset.z = GetBestFrame(LaraItem)->offsetZ + BLOCK(1);
+			playerOffset.z = GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
 		}
 		else if (dirVector.x > 0)
 		{
-			playerOffset.x = GetBestFrame(LaraItem)->offsetZ + BLOCK(1);
+			playerOffset.x = GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
 		}
 		else if (dirVector.z < 0)
 		{
-			playerOffset.z = -GetBestFrame(LaraItem)->offsetZ - BLOCK(1);
+			playerOffset.z = -GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
 		}
 		else
 		{
-			playerOffset.x = -GetBestFrame(LaraItem)->offsetZ - BLOCK(1);
+			playerOffset.x = -GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
 		}
 		
 		GameVector laraDetectionPoint = LaraItem->Pose.Position + playerOffset;

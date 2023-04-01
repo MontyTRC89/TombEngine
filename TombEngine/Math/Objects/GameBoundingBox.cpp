@@ -24,19 +24,17 @@
 
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
-		*this = GetFrame(objectID, animNumber, frameNumber)->boundingBox;
+		*this = GetFrame(objectID, animNumber, frameNumber)->BoundingBox;
 	}
 
+	// TODO: This shouldn't be a method. Make it a function in animation.cpp.
 	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
-		int rate = 0;
-		AnimFrame* framePtr[2];
-
-		int frac = GetFrame(item, framePtr, rate);
-		if (frac == 0)
-			*this = framePtr[0]->boundingBox;
+		auto frameData = GetFrameInterpData(*item);
+		if (frameData.Alpha == 0.0f)
+			*this = frameData.FramePtr0->BoundingBox;
 		else
-			*this = framePtr[0]->boundingBox + (((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * frac) / rate);
+			*this = frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
 	}
 
 	int GameBoundingBox::GetWidth() const

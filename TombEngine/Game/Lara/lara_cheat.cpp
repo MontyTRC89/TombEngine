@@ -117,7 +117,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Pistol];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
