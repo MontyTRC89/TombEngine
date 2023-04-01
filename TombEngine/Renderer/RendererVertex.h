@@ -1,20 +1,20 @@
 #pragma once
-#include <SimpleMath.h>
 
 namespace TEN::Renderer 
 {
 	struct RendererVertex 
 	{
-		Vector3 Position;
-		Vector3 Normal;
-		Vector2 UV;
-		Vector4 Color;
-		Vector3 Tangent;
-		unsigned int AnimationFrameOffset;
-		Vector4 Effects;
-		float Bone;
-		unsigned int IndexInPoly;
-		unsigned int OriginalIndex;
-		unsigned int Hash;
+		Vector3 Position = Vector3::Zero;
+		Vector3 Normal	 = Vector3::Zero;
+		Vector2 UV		 = Vector2::Zero;
+		Vector4 Color	 = Vector4::Zero;
+		Vector3 Tangent	 = Vector3::Zero;
+
+		unsigned int AnimationFrameOffset = 0;
+		Vector4		 Effects			  = Vector4::Zero;
+		float		 Bone				  = 0.0f;
+		unsigned int IndexInPoly		  = 0;
+		unsigned int OriginalIndex		  = 0;
+		unsigned int Hash				  = 0;
 	};
 }

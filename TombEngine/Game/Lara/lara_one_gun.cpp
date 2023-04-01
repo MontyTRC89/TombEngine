@@ -328,6 +328,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	item.Pose.Position = laraItem->Pose.Position;
+	item.RoomNumber = laraItem->RoomNumber;
+
 	AnimateItem(&item);
 
 	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
@@ -788,7 +790,7 @@ void GrenadeControl(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 		TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	}
 
@@ -924,7 +926,7 @@ void RocketControl(short itemNumber)
 	int wz = world.Translation().z;
 
 	// Trigger fire, smoke, and light.
-	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerDynamicLight(
 		wx + item.Pose.Position.x + (GetRandomControl() & 15) - 8, 
@@ -1565,7 +1567,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 						GetCreatureInfo(currentItem)->Poisoned = true;
 
 					if (currentItem->IsLara())
-						GetLaraInfo(currentItem)->PoisonPotency += 5;
+						GetLaraInfo(currentItem)->Status.Poison += 5;
 				}
 				else if (!currentObject.undead)
 				{

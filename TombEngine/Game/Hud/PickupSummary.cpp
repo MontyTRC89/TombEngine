@@ -31,13 +31,14 @@ namespace TEN::Hud
 		constexpr auto HIDE_VELOCITY_ACCEL = HIDE_VELOCITY_MAX / 4;
 		constexpr auto POSITION_LERP_ALPHA = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
-		constexpr auto ROTATION			   = EulerAngles(0, ANGLE(3.0f), 0);
+		constexpr auto ROTATION_RATE	   = ANGLE(360.0f / (LIFE_MAX * FPS));
+		constexpr auto ROTATION			   = EulerAngles(0, ROTATION_RATE, 0);
 
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
 		{
-			this->HideVelocity = std::clamp(HideVelocity + HIDE_VELOCITY_ACCEL, 0.0f, HIDE_VELOCITY_MAX);
-			this->Position2D.x += HideVelocity;
+			HideVelocity = std::clamp(HideVelocity + HIDE_VELOCITY_ACCEL, 0.0f, HIDE_VELOCITY_MAX);
+			Position2D.x += HideVelocity;
 		}
 		// Update position, scale, and opacity.
 		else if (Life > 0.0f)
@@ -48,42 +49,43 @@ namespace TEN::Hud
 			// Handle edge case when stack shifts.
 			if (coveredDist > totalDist)
 			{
-				this->Origin2D = Position2D;
+				Origin2D = Position2D;
 				totalDist = Vector2::Distance(Origin2D, Target2D);
 				coveredDist = Vector2::Distance(Origin2D, Position2D);
 			}
 
 			float alpha = coveredDist / totalDist;
 
-			this->Position2D = Vector2::Lerp(Position2D, Target2D, POSITION_LERP_ALPHA);
-			this->Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
-			this->Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
+			Position2D = Vector2::Lerp(Position2D, Target2D, POSITION_LERP_ALPHA);
+			Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
+			Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
 		}
 
 		// Update orientation.
-		this->Orientation += ROTATION;
+		Orientation += ROTATION;
 
 		// Update string scale.
 		float alpha = Scale / SCALE_MAX;
-		this->StringScale = Lerp(0.0f, 1.0f, alpha) * (1.0f + StringScalar);
-		this->StringScalar = Lerp(StringScalar, 0.0f, STRING_SCALAR_ALPHA);
+		StringScale = Lerp(0.0f, 1.0f, alpha) * (1.0f + StringScalar);
+		StringScalar = Lerp(StringScalar, 0.0f, STRING_SCALAR_ALPHA);
 
 		// Update life.
-		this->Life -= 1.0f;
+		Life -= 1.0f;
 		if (!isHead)
-			this->Life = std::max(Life, round(LIFE_BUFFER * FPS));
+			Life = std::max(Life, round(LIFE_BUFFER * FPS));
 	}
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
 	{
-		constexpr auto LIFE_MAX			 = 2.5f;
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
 		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
 		PickedUpObject(objectID);
 
+		float life = round(DisplayPickup::LIFE_MAX * FPS);
+
 		// Increment count of existing display pickup if it exists.
-		for (auto& pickup : this->DisplayPickups)
+		for (auto& pickup : DisplayPickups)
 		{
 			// Ignore already disappearing display pickups.
 			if (pickup.Life <= 0.0f)
@@ -92,14 +94,14 @@ namespace TEN::Hud
 			if (pickup.ObjectID == objectID)
 			{
 				pickup.Count++;
-				pickup.Life = round(LIFE_MAX * FPS);
+				pickup.Life = life;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
 			}
 		}
 
 		// Create new display pickup.
-		auto& pickup = this->GetNewDisplayPickup();
+		auto& pickup = GetNewDisplayPickup();
 
 		auto origin2D = g_Renderer.Get2DPosition(pos);
 		if (origin2D == INVALID_2D_POSITION)
@@ -110,7 +112,7 @@ namespace TEN::Hud
 		pickup.Position2D =
 		pickup.Origin2D = origin2D;
 		pickup.Target2D = Vector2::Zero;
-		pickup.Life = round(LIFE_MAX * FPS);
+		pickup.Life = life;
 		pickup.Scale = 0.0f;
 		pickup.Opacity = 0.0f;
 		pickup.HideVelocity = 0.0f;
@@ -123,31 +125,31 @@ namespace TEN::Hud
 		if (DisplayPickups.empty())
 			return;
 
-		// Get and apply stack screen positions as targets.
-		auto stack2DPositions = this->GetStack2DPositions();
+		// Get and apply 2D stack positions as targets.
+		auto stack2DPositions = GetStack2DPositions();
 		for (int i = 0; i < stack2DPositions.size(); i++)
-			this->DisplayPickups[i].Target2D = stack2DPositions[i];
+			DisplayPickups[i].Target2D = std::move(stack2DPositions[i]);
 
 		// Update display pickups.
 		bool isHead = true;
-		for (auto& pickup : this->DisplayPickups)
+		for (auto& pickup : DisplayPickups)
 		{
 			pickup.Update(isHead);
 			isHead = false;
 		}
 
-		this->ClearInactiveDisplayPickups();
+		ClearInactiveDisplayPickups();
 	}
 
 	void PickupSummaryController::Draw() const
 	{
-		//this->DrawDebug();
+		//DrawDebug();
 
 		if (DisplayPickups.empty())
 			return;
 
 		// Draw display pickups.
-		for (const auto& pickup : this->DisplayPickups)
+		for (const auto& pickup : DisplayPickups)
 		{
 			if (pickup.IsOffscreen())
 				continue;
@@ -158,7 +160,7 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Clear()
 	{
-		this->DisplayPickups.clear();
+		DisplayPickups.clear();
 	}
 
 	std::vector<Vector2> PickupSummaryController::GetStack2DPositions() const
@@ -171,11 +173,12 @@ namespace TEN::Hud
 
 		// Calculate 2D positions. 
 		auto stack2DPositions = std::vector<Vector2>{};
+		stack2DPositions.resize(DisplayPickups.size());
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_SPACE_RES.y);
 			auto pos = (SCREEN_SPACE_RES - relPos) - SCREEN_OFFSET;
-			stack2DPositions.push_back(pos);
+			stack2DPositions[i] = (pos);
 		}
 
 		return stack2DPositions;
@@ -185,21 +188,21 @@ namespace TEN::Hud
 	{
 		// Add and return new display pickup.
 		if (DisplayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
-			return this->DisplayPickups.emplace_back();
+			return DisplayPickups.emplace_back();
 
 		// Clear and return most recent display pickup.
-		auto& pickup = this->DisplayPickups.back();
+		auto& pickup = DisplayPickups.back();
 		pickup = {};
 		return pickup;
 	}
 
 	void PickupSummaryController::ClearInactiveDisplayPickups()
 	{
-		this->DisplayPickups.erase(
+		DisplayPickups.erase(
 			std::remove_if(
-				this->DisplayPickups.begin(), this->DisplayPickups.end(),
+				DisplayPickups.begin(), DisplayPickups.end(),
 				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
-			this->DisplayPickups.end());
+			DisplayPickups.end());
 	}
 
 	void PickupSummaryController::DrawDebug() const

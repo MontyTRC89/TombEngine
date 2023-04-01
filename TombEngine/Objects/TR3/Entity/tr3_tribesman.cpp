@@ -433,7 +433,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			GetCreatureMood(item, &AI, (AI.zoneNumber == AI.enemyZone ? true : false));
 
-			if (item->HitStatus && Lara.PoisonPotency && creature->Mood == MoodType::Bored)
+			if (item->HitStatus && Lara.Status.Poison && creature->Mood == MoodType::Bored)
 				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, false);
