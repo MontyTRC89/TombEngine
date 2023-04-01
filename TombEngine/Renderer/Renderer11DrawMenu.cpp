@@ -634,7 +634,10 @@ namespace TEN::Renderer
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
-
+				
+				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
+					Renderer11::SetBlendMode(bucket.BlendMode, true);
+				
 				SetAlphaTest(
 					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
 					ALPHA_TEST_THRESHOLD);

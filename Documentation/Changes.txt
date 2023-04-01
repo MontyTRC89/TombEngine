@@ -7,6 +7,7 @@ Version 1.0.8
 * Fix twisting hair bug.
 * Fix harpoon gun triggering water and dry sounds when shooting and reholstering.
 * Fix Z-fighting in inventory rendering.
+* Fix transparent objects not displaying correctly in the Inventory.
 * Fix dozy cheat always giving uzi weapons even if not present in WAD.
 * Fix player getting launched when landing close to an edge.
 * Fix TR3 Sophia's charge ring drawing below floor.
@@ -18,6 +19,8 @@ Version 1.0.8
 	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
 * Fix and improve wraith tails.
 * Add dedicated WRAITH_TRAP object with enhanced effects.
+	- OCB 0: Effect disabled.
+	- OCB 1: Effect enabled.
 * Add TR1 slamming doors.
 * Add TR3 mutant wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
 * Add TR3 Corpse
@@ -27,6 +30,12 @@ Version 1.0.8
 * Add cold exposure bar (employed by setting the "cold" flag in water rooms in Tomb Editor).
 * Add water wakes for vehicles.
 * Allow dynamic segment count of hair object.
+* Restored light effect nullmeshes (color, electrical, pulse and strobe):
+	- Select the color the light should emit as object tint in OCB menu in Tomb editor.
+	- ELECTRICAL_LIGHT:
+		- OCB 1: Displays mesh of object.
+		- OCB -1: Hides mesh of object (used for a neon light effect)
+
 * Restored inventory compass.
 
 Lua API changes:
