@@ -207,7 +207,7 @@ namespace TEN::Entities::Generic
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PUSH:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
@@ -298,7 +298,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case LA_PUSHABLE_PULL:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
@@ -636,7 +636,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		if (pointColl.Position.FloorSlope || pointColl.Position.DiagonalStep ||
-			pointColl.Block->FloorSlope(0) != Vector2::Zero || pointColl.Block->FloorSlope(1) != Vector2::Zero)
+			pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero || pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero)
 			return false;
 
 		if (pushable->canFall)
@@ -725,7 +725,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		if (probe.Position.FloorSlope || probe.Position.DiagonalStep ||
-			probe.Block->FloorSlope(0) != Vector2::Zero || probe.Block->FloorSlope(1) != Vector2::Zero)
+			probe.Block->GetSurfaceSlope(0, true) != Vector2::Zero || probe.Block->GetSurfaceSlope(1, true) != Vector2::Zero)
 			return false;
 
 		int ceiling = pos.y - blockHeight + 100;
@@ -768,23 +768,25 @@ namespace TEN::Entities::Generic
 			}
 		}
 
+		const auto& frameOffset = GetBestFrame(*LaraItem).Offset;
+
 		auto playerOffset = Vector3i::Zero;
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = frameOffset.z;
 			break;
 
 		case EAST:
-			playerOffset.x = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = frameOffset.z;
 			break;
 
 		case SOUTH:
-			playerOffset.z = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = -frameOffset.z;
 			break;
 
 		case WEST:
-			playerOffset.x = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = -frameOffset.z;
 			break;
 		}
 
@@ -800,7 +802,7 @@ namespace TEN::Entities::Generic
 		if (probe.Position.Floor != pos.y)
 			return false;
 
-		if (probe.Block->CeilingHeight(pos.x, pos.z) > pos.y - LARA_HEIGHT)
+		if (probe.Block->GetSurfaceHeight(pos.x, pos.z, false) > pos.y - LARA_HEIGHT)
 			return false;
 
 		oldX = LaraItem->Pose.Position.x;

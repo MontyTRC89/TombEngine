@@ -8,10 +8,20 @@
 
 struct SPHERE
 {
-	int x;
-	int y;
-	int z;
-	int r;
+	int x = 0;
+	int y = 0;
+	int z = 0;
+	int r = 0;
+
+	SPHERE() {};
+
+	SPHERE(const Vector3& pos, float radius)
+	{
+		this->x = (int)round(pos.x);
+		this->y = (int)round(pos.y);
+		this->z = (int)round(pos.z);
+		this->r = (int)round(radius);
+	}
 };
 
 extern SPHERE LaraSpheres[MAX_SPHERES];

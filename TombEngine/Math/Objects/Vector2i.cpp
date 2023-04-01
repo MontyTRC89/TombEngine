@@ -5,20 +5,10 @@ namespace TEN::Math
 {
 	const Vector2i Vector2i::Zero = Vector2i(0, 0);
 
-	Vector2i::Vector2i()
-	{
-	}
-
-	Vector2i::Vector2i(int x, int y)
-	{
-		this->x = x;
-		this->y = y;
-	}
-
 	Vector2i::Vector2i(const Vector2& vector)
 	{
-		this->x = (int)round(vector.x);
-		this->y = (int)round(vector.y);
+		x = (int)round(vector.x);
+		y = (int)round(vector.y);
 	}
 
 	float Vector2i::Distance(const Vector2i& origin, const Vector2i& target)
@@ -48,43 +38,43 @@ namespace TEN::Math
 
 	Vector2i& Vector2i::operator =(const Vector2i& vector)
 	{
-		this->x = vector.x;
-		this->y = vector.y;
+		x = vector.x;
+		y = vector.y;
 		return *this;
 	}
 
 	Vector2i& Vector2i::operator +=(const Vector2i& vector)
 	{
-		this->x += vector.x;
-		this->y += vector.y;
+		x += vector.x;
+		y += vector.y;
 		return *this;
 	}
 
 	Vector2i& Vector2i::operator -=(const Vector2i& vector)
 	{
-		this->x -= vector.x;
-		this->y -= vector.y;
+		x -= vector.x;
+		y -= vector.y;
 		return *this;
 	}
 
 	Vector2i& Vector2i::operator *=(const Vector2i& vector)
 	{
-		this->x *= vector.x;
-		this->y *= vector.y;
+		x *= vector.x;
+		y *= vector.y;
 		return *this;
 	}
 
 	Vector2i& Vector2i::operator *=(float scale)
 	{
-		this->x *= scale;
-		this->y *= scale;
+		x *= scale;
+		y *= scale;
 		return *this;
 	}
 
 	Vector2i& Vector2i::operator /=(float scale)
 	{
-		this->x /= scale;
-		this->y /= scale;
+		x /= scale;
+		y /= scale;
 		return *this;
 	}
 

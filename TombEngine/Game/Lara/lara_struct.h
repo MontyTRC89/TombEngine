@@ -1105,15 +1105,15 @@ struct ArmInfo
 
 struct FlareData
 {
-	int Frame;
-	unsigned int Life;
-	bool ControlLeft;
+	int			 Frame		 = 0;
+	unsigned int Life		 = 0;
+	bool		 ControlLeft = false;
 };
 
 struct TorchData
 {
-	TorchState State;
-	bool IsLit;
+	TorchState State = TorchState::Holding;
+	bool	   IsLit = false;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1250,18 +1250,19 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle;
-	short TurnRate;
-	int CalculatedJumpVelocity;
-	JumpDirection JumpDirection;
-	HandStatus HandStatus;
-	WaterStatus WaterStatus;
-	LaraCountData Count;
+	short MoveAngle = 0;
+	short TurnRate	= 0;
+	int	  CalculatedJumpVelocity = 0;
 
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
+	JumpDirection JumpDirection = {};
+	HandStatus	  HandStatus	= {};
+	WaterStatus	  WaterStatus	= {};
+	LaraCountData Count			= {};
+
+	RopeControlData		 Rope	   = {};
+	SubsuitControlData	 Subsuit   = {};
+	TightropeControlData Tightrope = {};
+	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
 	bool Locked			  = false;
@@ -1279,34 +1280,40 @@ struct LaraControlData
 struct PlayerEffectData
 {
 	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
-	std::array<float, NUM_LARA_MESHES> BubbleNodes = {}; // TODO: Savegame
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
+// TODO: Make these floats.
+struct PlayerStatusData
+{
+	int Air		 = 0;
+	int Exposure = 0;
+	int Poison	 = 0;
+	int Stamina	 = 0;
 };
 
 struct LaraInfo
 {
-	short ItemNumber;
-	LaraControlData Control;
+	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has this.
+
+	PlayerStatusData Status = {};
+	LaraControlData Control = {};
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
-	FlareData Flare;
-	TorchData Torch;
+	FlareData Flare = {};
+	TorchData Torch = {};
 
-	EulerAngles ExtraHeadRot;
-	EulerAngles ExtraTorsoRot;
-	short WaterCurrentActive;
-	Vector3i WaterCurrentPull;
+	EulerAngles ExtraHeadRot = {};
+	EulerAngles ExtraTorsoRot = {};
+	short WaterCurrentActive = 0;
+	Vector3i WaterCurrentPull = Vector3i::Zero;
 
-	ArmInfo LeftArm;
-	ArmInfo RightArm;
-	EulerAngles TargetArmOrient;
-	ItemInfo* TargetEntity;
-	CreatureInfo* Creature;	// Not saved. Unused?
+	ArmInfo		LeftArm			= {};
+	ArmInfo		RightArm		= {};
+	EulerAngles TargetArmOrient = EulerAngles::Zero;
+	ItemInfo*	TargetEntity	= nullptr;
 
-	int Air;
-	int SprintEnergy;
-	int PoisonPotency;
-
-	short Vehicle;
+	int Vehicle;
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
@@ -1320,7 +1327,7 @@ struct LaraInfo
 
 	PlayerEffectData Effect = {};
 
-	signed char Location;
-	signed char HighestLocation;
-	signed char LocationPad;
+	signed char Location		= 0;
+	signed char HighestLocation = 0;
+	signed char LocationPad		= 0;
 };

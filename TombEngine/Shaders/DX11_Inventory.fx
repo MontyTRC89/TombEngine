@@ -18,7 +18,7 @@ struct PixelShaderInput
 	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
-    float Sheen : SHEEN;
+	float Sheen : SHEEN;
 };
 
 Texture2D Texture : register(t0);
@@ -33,29 +33,28 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = (mul(float4(input.Position, 1.0f), World).xyz);
-    output.Sheen = input.Effects.w;
+	output.Sheen = input.Effects.w;
 	return output;
 }
 
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
+  float3 normal = normalize(input.Normal);
+  float3 pos = normalize(input.WorldPosition);
 
 	DoAlphaTest(output);
-    ShaderLight l[2];
-    l[0].Color = float3(1.0f, 1.0f, 0.5f) * 0.6f;
-    l[0].Type = LT_SUN;
-    l[0].Direction = normalize(float3(-1.0f, -0.707f, -0.5f));
-    l[1].Color = float3(0.5f, 0.5f, 1.0f) * 0.2f;
-    l[1].Type = LT_SUN;
-    l[1].Direction = normalize(float3(1.0f, 0.707f, -0.5f));
-    for (int i = 0; i < 2; i++)
-    {
-        output.xyz += DoDirectionalLight(input.WorldPosition, input.Normal, l[i]);
+	ShaderLight l;
+	l.Color = float3(1.0f, 1.0f, 0.5f);
+	l.Intensity = 0.3f;
+	l.Type = LT_SUN;
+	l.Direction = normalize(float3(-1.0f, -0.707f, -0.5f));
 
-		// TODO: fix it, it causes noise
-        // output.xyz += DoSpecularSun(input.Normal, l[i], input.Sheen);
-    }
+		output.xyz += DoDirectionalLight(pos, normal, l);
+		output.xyz += DoSpecularSun(input.Normal, l, input.Sheen);
 
+		//adding some pertubations to the lighting to add a cool effect
+		float3 noise = SimplexNoise(output.xyz);
+		output.xyz = NormalNoise(output, noise, normal);
 	return output;
 }
