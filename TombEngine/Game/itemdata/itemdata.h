@@ -16,7 +16,7 @@
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
-#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Objects/TR4/Entity/WraithInfo.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
