@@ -2,6 +2,7 @@
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
@@ -10,6 +11,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -168,7 +170,7 @@ namespace TEN::Effects::Blood
 			return;
 
 		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, drip.Position.z);
-		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
+		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
 		float scale = drip.Scale * 4;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
@@ -182,7 +184,7 @@ namespace TEN::Effects::Blood
 
 		auto pointColl = GetCollision(&item);
 		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, item.Pose.Position.z);
-		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
+		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
 
 		auto bounds = GameBoundingBox(&item);
 		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;

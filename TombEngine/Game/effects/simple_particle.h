@@ -1,10 +1,7 @@
 #pragma once
-#include <array>
-#include <unordered_map>
-#include <d3d11.h>
-#include <SimpleMath.h>
 #include "Objects\objectslist.h"
 
+enum BLEND_MODES;
 struct ItemInfo;
 
 namespace TEN::Effects
@@ -22,6 +19,7 @@ namespace TEN::Effects
 		unsigned int sprite;
 		GAME_OBJECT_ID sequence;
 		bool active;
+		BLEND_MODES blendMode;
 	};
 
 	extern std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;

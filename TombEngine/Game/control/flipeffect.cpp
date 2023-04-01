@@ -6,7 +6,7 @@
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/Footprint.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -26,6 +26,7 @@
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
+using namespace TEN::Effects::Hair;
 
 int FlipEffect;
 
@@ -130,7 +131,7 @@ void AddRightFootprint(ItemInfo* item)
 
 void ResetHair(ItemInfo* item)
 {
-	InitialiseHair();
+	HairEffect.Initialize();
 }
 
 void InvisibilityOff(ItemInfo* item)

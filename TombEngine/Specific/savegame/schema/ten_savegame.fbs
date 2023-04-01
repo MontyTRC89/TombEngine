@@ -241,7 +241,21 @@ table LaraControlData {
 	subsuit: SubsuitControlData;
 }
 
+table PlayerEffectData {
+	bubble_nodes: [float];
+	drip_nodes: [float];
+}
+
+table PlayerStatusData {
+	air: int32;
+	exposure: int32;
+	poison: int32;
+	stamina: int32;
+}
+
 table Lara {
+	effect: PlayerEffectData;
+	status: PlayerStatusData;
 	item_number: int32;
 	control: LaraControlData;
 	inventory: LaraInventoryData;
@@ -256,9 +270,6 @@ table Lara {
 	right_arm: ArmInfo;
 	target_arm_angles: [int32];
 	target_entity_number: int32;
-	air: int32;
-	sprint_energy: int32;
-	poison_potency: int32;
 	vehicle: int32;
 	extra_anim: int32;
 	hit_frame: int32;
@@ -273,7 +284,6 @@ table Lara {
 	burn: bool;
 	burn_blue: int32;
 	burn_smoke: bool;
-	wet: [bool];
 	location: int32;
 	highest_location: int32;
 	location_pad: int32;

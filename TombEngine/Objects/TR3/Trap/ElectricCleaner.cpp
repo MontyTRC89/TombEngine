@@ -165,7 +165,7 @@ namespace TEN::Entities::Traps
 				//Is not in the center of a tile, keep moving forward. 
 				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
 
-				auto slope = col.Block->FloorSlope(0);
+				auto slope = col.Block->GetSurfaceSlope(0, true);
 
 				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
 					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
