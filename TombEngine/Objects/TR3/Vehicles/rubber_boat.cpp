@@ -5,33 +5,25 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
-using std::vector;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> RubberBoatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
 	constexpr auto RBOAT_RADIUS = 500;
 	constexpr auto RBOAT_FRONT = 750;
 	constexpr auto RBOAT_SIDE = 300;
@@ -50,9 +42,19 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
-	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
-	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	constexpr auto RBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
+	constexpr auto RBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto RBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
+
+	constexpr auto RBOAT_WAKE_OFFSET = Vector3(RBOAT_SIDE * 1.1f, 0.0f, RBOAT_FRONT / 2);
+
+	const std::vector<VehicleMountType> RubberBoatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
 
 	enum RubberBoatState
 	{
@@ -750,13 +752,13 @@ namespace TEN::Entities::Vehicles
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 
-		sptr->x = x * ((GetRandomControl() & 15) - 8);
-		sptr->y = y * ((GetRandomControl() & 15) - 8);
-		sptr->z = z * ((GetRandomControl() & 15) - 8);
+		sptr->x = x + ((GetRandomControl() & 15) - 8);
+		sptr->y = y + ((GetRandomControl() & 15) - 8);
+		sptr->z = z + ((GetRandomControl() & 15) - 8);
 		long zv = velocity * phd_cos(angle) / 4;
 		long xv = velocity * phd_sin(angle) / 4;
 		sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
-		sptr->yVel = (velocity * 8) + (velocity * 4);
+		sptr->yVel = 0;
 		sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
 		sptr->friction = 3;
 
@@ -771,16 +773,19 @@ namespace TEN::Entities::Vehicles
 				sptr->rotAdd = (GetRandomControl() & 15) + 16;
 		}
 		else
+		{
 			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-
-		sptr->spriteIndex = Objects[ID_EXPLOSION_SPRITES].meshIndex;
+		}
 
 		if (!snow)
 		{
 			sptr->scalar = 4;
-			sptr->gravity = 0;
-			sptr->maxYvel = 0;
-			long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+			sptr->gravity = sptr->maxYvel = 0;
+
+			float size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+			sptr->size =
+			sptr->sSize = size / 4;
+			sptr->dSize = size;
 		}
 	}
 
@@ -976,7 +981,11 @@ namespace TEN::Entities::Vehicles
 			height < prop.y &&
 			height != NO_HEIGHT)
 		{
-			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
+			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
+			
+			int waterHeight = GetWaterHeight(rBoatItem);
+			SpawnVehicleWake(*rBoatItem, RBOAT_WAKE_OFFSET, waterHeight);
+
 			if ((GetRandomControl() & 1) == 0)
 			{
 				auto pos = Vector3(

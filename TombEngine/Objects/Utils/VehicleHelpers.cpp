@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
-#include "Game/effects/simple_particle.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/simple_particle.h"
+#include "Game/effects/Streamer.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
@@ -13,12 +14,21 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
+	enum class VehicleWakeEffectTag
+	{
+		FrontLeft,
+		FrontRight,
+		BackLeft,
+		BackRight
+	};
+
+	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, std::vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -155,25 +165,20 @@ namespace TEN::Entities::Vehicles
 
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
 	{
-		Matrix world =
-			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *
-			Matrix::CreateTranslation(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.y, vehicleItem->Pose.Position.z);
+		auto rotMatrix = vehicleItem->Pose.Orientation.ToRotationMatrix();
+		auto tMatrix = Matrix::CreateTranslation(vehicleItem->Pose.Position.ToVector3());
+		auto world = rotMatrix * tMatrix;
 
-		Vector3 vec = Vector3(right, 0, forward);
-		vec = Vector3::Transform(vec, world);
+		auto point = Vector3(right, 0, forward);
+		point = Vector3::Transform(point, world);
+		*pos = Vector3i(point);
 
-		pos->x = vec.x;
-		pos->y = vec.y;
-		pos->z = vec.z;
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, vehicleItem->RoomNumber);
-		int probedRoomNumber = probe.RoomNumber;
-
-		int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNumber);
+		auto pointColl = GetCollision(pos->x, pos->y, pos->z, vehicleItem->RoomNumber);
+		int height = GetWaterHeight(pos->x, pos->y, pos->z, pointColl.RoomNumber);
 
 		if (height == NO_HEIGHT)
 		{
-			height = probe.Position.Floor;
+			height = pointColl.Position.Floor;
 			if (height == NO_HEIGHT)
 				return height;
 		}
@@ -197,7 +202,7 @@ namespace TEN::Entities::Vehicles
 		DoObjectCollision(vehicleItem, &coll);
 	}
 
-	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)
+	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate, const Vector3& wakeOffset)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -223,7 +228,13 @@ namespace TEN::Entities::Vehicles
 						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
-						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
+					{
+						int waterHeight = GetWaterHeight(vehicleItem);
+						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
+
+						//SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
+						//SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
+					}
 				}
 
 				if (*turnRate)
@@ -235,9 +246,13 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
+				{
 					ExplodeVehicle(laraItem, vehicleItem);
+				}
 				else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
+				{
 					Splash(vehicleItem);
+				}
 			}
 		}
 
@@ -295,5 +310,73 @@ namespace TEN::Entities::Vehicles
 			vehicleItem->Pose.Orientation.z += vehicleItem->Pose.Orientation.z / -rate;
 		else
 			vehicleItem->Pose.Orientation.z = 0;
+	}
+
+	static std::pair<Vector3, Vector3> GetVehicleWakePositions(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight,
+															   bool isUnderwater, bool isMovingForward)
+	{
+		constexpr auto HEIGHT_OFFSET_ON_WATER = (int)BLOCK(1 / 32.0f);
+		
+		waterHeight -= HEIGHT_OFFSET_ON_WATER;
+
+		int vPos = isUnderwater ? vehicleItem.Pose.Position.y : waterHeight;
+		auto posBase = Vector3(vehicleItem.Pose.Position.x, vPos, vehicleItem.Pose.Position.z);
+		auto orient = isUnderwater ? vehicleItem.Pose.Orientation : EulerAngles(0, vehicleItem.Pose.Orientation.y, 0);
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		// Calculate relative offsets.
+		// NOTE: X and Z offsets are flipped accordingly.
+		auto relOffsetLeft = Vector3(-relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+		auto relOffsetRight = Vector3(relOffset.x, relOffset.y, isMovingForward ? relOffset.z : -relOffset.z);
+
+		// Calculate positions.
+		auto posLeft = posBase + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto posRight = posBase + Vector3::Transform(relOffsetRight, rotMatrix);
+
+		// Clamp vertical positions to water surface.
+		posLeft.y = (posLeft.y < waterHeight) ? waterHeight : posLeft.y;
+		posRight.y = (posRight.y < waterHeight) ? waterHeight : posRight.y;
+
+		// Return left and right positions in pair.
+		return std::pair(posLeft, posRight);
+	}
+
+	void SpawnVehicleWake(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight, bool isUnderwater)
+	{
+		constexpr auto COLOR				 = Vector4(0.75f);
+		constexpr auto LIFE_MAX				 = 2.5f;
+		constexpr auto VEL_ABS				 = 4.0f;
+		constexpr auto SCALE_RATE_ON_WATER	 = 6.0f;
+		constexpr auto SCALE_RATE_UNDERWATER = 1.5f;
+
+		// Vehicle is out of water; return early.
+		if (waterHeight == NO_HEIGHT)
+			return;
+
+		bool isMovingForward = (vehicleItem.Animation.Velocity.z >= 0.0f);
+
+		// Determine tags.
+		auto tagLeft = isMovingForward ? VehicleWakeEffectTag::FrontLeft : VehicleWakeEffectTag::BackLeft;
+		auto tagRight = isMovingForward ? VehicleWakeEffectTag::FrontRight : VehicleWakeEffectTag::BackRight;
+
+		// Determine key parameters.
+		auto positions = GetVehicleWakePositions(vehicleItem, relOffset, waterHeight, isUnderwater, isMovingForward);
+		auto direction = -vehicleItem.Pose.Orientation.ToDirection();
+		short orient2D = isUnderwater ? vehicleItem.Pose.Orientation.z : 0;
+		float life = isUnderwater ? (LIFE_MAX / 2) : LIFE_MAX;
+		float vel = isMovingForward ? VEL_ABS : -VEL_ABS;
+		float scaleRate = isUnderwater ? SCALE_RATE_UNDERWATER : SCALE_RATE_ON_WATER;
+
+		// Spawn left wake.
+		StreamerEffect.Spawn(
+			vehicleItem.Index, (int)tagLeft,
+			positions.first, direction, orient2D, COLOR,
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
+
+		// Spawn right wake.
+		StreamerEffect.Spawn(
+			vehicleItem.Index, (int)tagRight,
+			positions.second, direction, orient2D, COLOR,
+			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
 	}
 }

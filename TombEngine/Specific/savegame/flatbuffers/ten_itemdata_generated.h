@@ -1527,8 +1527,6 @@ struct KayakT : public flatbuffers::NativeTable {
   bool turn = false;
   bool forward = false;
   bool true_water = false;
-  int32_t current_start_wake = 0;
-  int32_t wake_shade = 0;
   int32_t flags = 0;
 };
 
@@ -1548,9 +1546,7 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TURN = 20,
     VT_FORWARD = 22,
     VT_TRUE_WATER = 24,
-    VT_CURRENT_START_WAKE = 26,
-    VT_WAKE_SHADE = 28,
-    VT_FLAGS = 30
+    VT_FLAGS = 26
   };
   int32_t turn_rate() const {
     return GetField<int32_t>(VT_TURN_RATE, 0);
@@ -1585,12 +1581,6 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool true_water() const {
     return GetField<uint8_t>(VT_TRUE_WATER, 0) != 0;
   }
-  int32_t current_start_wake() const {
-    return GetField<int32_t>(VT_CURRENT_START_WAKE, 0);
-  }
-  int32_t wake_shade() const {
-    return GetField<int32_t>(VT_WAKE_SHADE, 0);
-  }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
   }
@@ -1607,8 +1597,6 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TURN) &&
            VerifyField<uint8_t>(verifier, VT_FORWARD) &&
            VerifyField<uint8_t>(verifier, VT_TRUE_WATER) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_START_WAKE) &&
-           VerifyField<int32_t>(verifier, VT_WAKE_SHADE) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
@@ -1654,12 +1642,6 @@ struct KayakBuilder {
   void add_true_water(bool true_water) {
     fbb_.AddElement<uint8_t>(Kayak::VT_TRUE_WATER, static_cast<uint8_t>(true_water), 0);
   }
-  void add_current_start_wake(int32_t current_start_wake) {
-    fbb_.AddElement<int32_t>(Kayak::VT_CURRENT_START_WAKE, current_start_wake, 0);
-  }
-  void add_wake_shade(int32_t wake_shade) {
-    fbb_.AddElement<int32_t>(Kayak::VT_WAKE_SHADE, wake_shade, 0);
-  }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(Kayak::VT_FLAGS, flags, 0);
   }
@@ -1687,13 +1669,9 @@ inline flatbuffers::Offset<Kayak> CreateKayak(
     bool turn = false,
     bool forward = false,
     bool true_water = false,
-    int32_t current_start_wake = 0,
-    int32_t wake_shade = 0,
     int32_t flags = 0) {
   KayakBuilder builder_(_fbb);
   builder_.add_flags(flags);
-  builder_.add_wake_shade(wake_shade);
-  builder_.add_current_start_wake(current_start_wake);
   builder_.add_old_pos(old_pos);
   builder_.add_water_height(water_height);
   builder_.add_left_right_count(left_right_count);
@@ -2986,8 +2964,6 @@ inline void Kayak::UnPackTo(KayakT *_o, const flatbuffers::resolver_function_t *
   { auto _e = turn(); _o->turn = _e; }
   { auto _e = forward(); _o->forward = _e; }
   { auto _e = true_water(); _o->true_water = _e; }
-  { auto _e = current_start_wake(); _o->current_start_wake = _e; }
-  { auto _e = wake_shade(); _o->wake_shade = _e; }
   { auto _e = flags(); _o->flags = _e; }
 }
 
@@ -3010,8 +2986,6 @@ inline flatbuffers::Offset<Kayak> CreateKayak(flatbuffers::FlatBufferBuilder &_f
   auto _turn = _o->turn;
   auto _forward = _o->forward;
   auto _true_water = _o->true_water;
-  auto _current_start_wake = _o->current_start_wake;
-  auto _wake_shade = _o->wake_shade;
   auto _flags = _o->flags;
   return TEN::Save::CreateKayak(
       _fbb,
@@ -3026,8 +3000,6 @@ inline flatbuffers::Offset<Kayak> CreateKayak(flatbuffers::FlatBufferBuilder &_f
       _turn,
       _forward,
       _true_water,
-      _current_start_wake,
-      _wake_shade,
       _flags);
 }
 

@@ -30,13 +30,15 @@ void InitialiseLara(bool restore)
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
+	Lara.Status.Air = LARA_AIR_MAX;
+	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
+	Lara.Status.Poison = 0;
+	Lara.Status.Stamina = LARA_STAMINA_MAX;
+
 	Lara.Control.Look.Mode = LookMode::None;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
-	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
-	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
 	Lara.ExtraAnim = NO_ITEM;

@@ -73,6 +73,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_HIT_FRONT = 13;
 	constexpr auto QBIKE_HIT_BACK = 14;
 
+	constexpr auto QBIKE_WAKE_OFFSET = Vector3(CLICK(1.1f), 0, CLICK(1.2f));
+
 	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
 	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)
 	#define QBIKE_TURN_RATE_MAX			  ANGLE(5.0f)
@@ -1189,7 +1191,7 @@ namespace TEN::Entities::Vehicles
 		quadBike->LeftVerticalVelocity = DoQuadDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, (int*)&frontLeft.y);
 		quadBike->RightVerticalVelocity = DoQuadDynamics(floorHeightRight, quadBike->RightVerticalVelocity, (int*)&frontRight.y);
 		quadBikeItem->Animation.Velocity.y = DoQuadDynamics(probe.Position.Floor, quadBikeItem->Animation.Velocity.y, (int*)&quadBikeItem->Pose.Position.y);
-		quadBike->Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike->Velocity, QBIKE_RADIUS, &quadBike->TurnRate);
+		quadBike->Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike->Velocity, QBIKE_RADIUS, &quadBike->TurnRate, QBIKE_WAKE_OFFSET);
 
 		probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
 		short xRot = phd_atan(QBIKE_FRONT, quadBikeItem->Pose.Position.y - probe.Position.Floor);

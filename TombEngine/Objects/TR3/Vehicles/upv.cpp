@@ -10,6 +10,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Streamer.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -26,8 +27,8 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
-using std::vector;
 
 // TODO:
 // Redo water surface dismount.
@@ -37,21 +38,6 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	BiteInfo UPVBites[6] =
-	{
-		{ 0, 0, 0, 3 },
-		{ 0, 96, 256, 0 },
-		{ -128, 0, -64, 1 },
-		{ 0, 0, -64, 1 },
-		{ 128, 0, -64, 2 },
-		{ 0, 0, -64, 2 }
-	};
-	const vector<VehicleMountType> UPVMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Back
-	};
-
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
 	constexpr auto UPV_LENGTH = SECTOR(1);
@@ -77,6 +63,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
 
+	constexpr auto UPV_WAKE_OFFSET = Vector3(BLOCK(1 / 3.0f), -BLOCK(1 / 8.0f), BLOCK(1 / 10.0f));
+
 	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
 	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.6f)
 	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(0.3f)
@@ -95,6 +83,21 @@ namespace TEN::Entities::Vehicles
 
 	#define UPV_LEAN_RATE ANGLE(0.6f)
 	#define UPV_LEAN_MAX  ANGLE(10.0f)
+
+	BiteInfo UPVBites[6] =
+	{
+		{ 0, 0, 0, 3 },
+		{ 0, 96, 256, 0 },
+		{ -128, 0, 64, 1 },
+		{ 0, 0, -64, 1 },
+		{ 128, 0, 64, 2 },
+		{ 0, 0, -64, 2 }
+	};
+	const std::vector<VehicleMountType> UPVMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Back
+	};
 
 	enum UPVState
 	{
@@ -139,9 +142,9 @@ namespace TEN::Entities::Vehicles
 	{
 		UPV_BITE_TURBINE			= 0,
 		UPV_BITE_FRONT_LIGHT		= 1,
-		UPV_BITE_LEFT_RUDDER_LEFT   = 2, // Unused. Perhaps something like a trailing stream effect behind rudders was intended?
+		UPV_BITE_LEFT_RUDDER_LEFT   = 2,
 		UPV_BITE_LEFT_RUDDER_RIGHT  = 3, // Unused.
-		UPV_BITE_RIGHT_RUDDER_RIGHT = 4, // Unused.
+		UPV_BITE_RIGHT_RUDDER_RIGHT = 4,
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
 	enum UPVFlags
@@ -918,10 +921,10 @@ namespace TEN::Entities::Vehicles
 			{
 				if (laraItem->HitPoints > 0)
 				{
-					lara->Air--;
-					if (lara->Air < 0)
+					lara->Status.Air--;
+					if (lara->Status.Air < 0)
 					{
-						lara->Air = -1;
+						lara->Status.Air = -1;
 						DoDamage(laraItem, 5);
 					}
 				}
@@ -930,15 +933,21 @@ namespace TEN::Entities::Vehicles
 			{
 				if (laraItem->HitPoints >= 0)
 				{
-					lara->Air += 10;
-					if (lara->Air > LARA_AIR_MAX)
-						lara->Air = LARA_AIR_MAX;
+					lara->Status.Air += 10;
+					if (lara->Status.Air > LARA_AIR_MAX)
+						lara->Status.Air = LARA_AIR_MAX;
 				}
 			}
 		}
 
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Vehicle);
+
+		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+		{
+			int waterHeight = GetWaterHeight(UPVItem);
+			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
+		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
 			lara->Vehicle != NO_ITEM)

@@ -127,7 +127,7 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 
 void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
@@ -542,7 +542,7 @@ void InitialiseItem(short itemNumber)
 	room->itemNumber = itemNumber;
 
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
+	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->Box;
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
@@ -550,13 +550,13 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
 		item->ResetModelToDefault();
 
-		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i] = {};
+		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
+		for (auto& mutator : item->Model.Mutators)
+			mutator = {};
 	}
 	else
 	{
-		item->Model.Mutator.clear();
+		item->Model.Mutators.clear();
 		item->Model.MeshIndex.clear();
 	}
 

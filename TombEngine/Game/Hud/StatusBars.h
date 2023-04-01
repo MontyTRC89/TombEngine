@@ -26,11 +26,13 @@ namespace TEN::Hud
 		static constexpr auto STATUS_BAR_LIFE_START_FADING = 0.2f;
 		static constexpr auto STATUS_BAR_VALUE_LERP_ALPHA  = 0.3f;
 
-		// Components
-		StatusBar AirBar	= {};
-		StatusBar HealthBar = {};
-		StatusBar SprintBar = {};
-		bool	  DoFlash	= false;
+		// Members
+		StatusBar AirBar	  = {};
+		StatusBar ExposureBar = {};
+		StatusBar HealthBar	  = {};
+		StatusBar StaminaBar  = {};
+
+		bool DoFlash = false;
 
 	public:
 		// Utilities
@@ -46,13 +48,15 @@ namespace TEN::Hud
 		// Update helpers
 		void UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax);
 		void UpdateAirBar(const ItemInfo& item);
+		void UpdateExposureBar(const ItemInfo& item);
 		void UpdateHealthBar(const ItemInfo& item);
-		void UpdateSprintBar(const ItemInfo& item);
+		void UpdateStaminaBar(const ItemInfo& item);
 
 		// Draw helpers
 		void DrawStatusBar(float value, float criticalValue, const TEN::Renderer::RendererHudBar& rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
 		void DrawAirBar() const;
+		void DrawExposureBar() const;
 		void DrawHealthBar(bool isPoisoned) const;
-		void DrawSprintBar() const;
+		void DrawStaminaBar() const;
 	};
 }
