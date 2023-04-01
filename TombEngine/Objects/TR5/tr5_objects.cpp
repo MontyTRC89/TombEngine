@@ -722,8 +722,10 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->control = ElectricalLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
+		obj->initialise = InitialiseElectricalLight;
+		obj->meshSwapSlot = ID_ELECTRICAL_LIGHT;
+		//obj->drawRoutine = nullptr;
+		//obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];
