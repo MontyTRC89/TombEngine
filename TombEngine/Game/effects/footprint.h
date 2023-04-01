@@ -22,8 +22,8 @@ namespace TEN::Effects::Footprint
 
 	extern std::vector<Footprint> Footprints;
 
-	void SpawnFootprint(const ItemInfo& item, bool isRight);
 	void SpawnFootprint(bool isRight, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints);
+	void SpawnFootprint(const ItemInfo& item, bool isRight);
 
 	void UpdateFootprints();
 	void ClearFootprints();
