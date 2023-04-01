@@ -31,7 +31,7 @@ namespace TEN::Effects::Footprint
 		MaterialType::Custom4
 	};
 
-	struct FootprintCollisionData
+	struct FootprintPositionData
 	{
 		bool	CanSpawn = false;
 		Vector3 Position = Vector3::Zero;
@@ -134,7 +134,7 @@ namespace TEN::Effects::Footprint
 		};
 	}
 
-	static FootprintCollisionData GetFootprintCollision(const ItemInfo& item, int jointIndex)
+	static FootprintPositionData GetFootprintPositionData(const ItemInfo& item, int jointIndex)
 	{
 		constexpr auto SURFACE_OFFSET  = 4;
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.25f);
@@ -146,7 +146,7 @@ namespace TEN::Effects::Footprint
 
 		bool canSpawn = (abs(footPos.y - floorHeight) < ABS_FLOOR_BOUND);
 		auto pos = Vector3(footPos.x, floorHeight - SURFACE_OFFSET, footPos.z);
-		return FootprintCollisionData{ canSpawn, pos };
+		return FootprintPositionData{ canSpawn, pos };
 	}
 
 	static bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints)
@@ -195,14 +195,14 @@ namespace TEN::Effects::Footprint
 
 		// Don't spawn footprint if foot isn't on floor.
 		int jointIndex = isRight ? LM_RFOOT : LM_LFOOT;
-		auto footprintColl = GetFootprintCollision(item, jointIndex);
-		if (!footprintColl.CanSpawn)
+		auto posData = GetFootprintPositionData(item, jointIndex);
+		if (!posData.CanSpawn)
 			return;
 
 		// Slightly randomize 2D position.
-		footprintColl.Position += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
+		posData.Position += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
-		auto pointColl = GetCollision(footprintColl.Position.x, footprintColl.Position.y - CLICK(1), footprintColl.Position.z, item.RoomNumber);
+		auto pointColl = GetCollision(posData.Position.x, posData.Position.y - CLICK(1), posData.Position.z, item.RoomNumber);
 
 		// Don't process material if foot hit bridge object.
 		// TODO: Handle bridges once bridge collision is less stupid.
@@ -221,10 +221,10 @@ namespace TEN::Effects::Footprint
 		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
 			return;
 
-		auto vertexPoints = GetFootprintVertexPoints(item, footprintColl.Position, GetSurfaceNormal(pointColl.FloorTilt, true));
+		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, GetSurfaceNormal(pointColl.FloorTilt, true));
 
 		// Test floor continuity.
-		if (!TestFootprintFloor(item, footprintColl.Position, vertexPoints))
+		if (!TestFootprintFloor(item, posData.Position, vertexPoints))
 			return;
 
 		SpawnFootprint(isRight, vertexPoints);
