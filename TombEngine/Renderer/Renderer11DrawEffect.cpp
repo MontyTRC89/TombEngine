@@ -81,6 +81,11 @@ namespace TEN::Renderer
 		bool IsSoftParticle;
 	};
 
+	void Renderer11::DrawLasers(RenderView& view)
+	{
+
+	}
+
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
 		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ADDITIVE;

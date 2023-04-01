@@ -1615,6 +1615,9 @@ namespace TEN::Renderer
 					DrawLara(view, transparent);
 					break;
 
+				case ID_LASERS:
+					DrawLasers(view);
+
 				case ID_WATERFALL1:
 				case ID_WATERFALL2:
 				case ID_WATERFALL3:

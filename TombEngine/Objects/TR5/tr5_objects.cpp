@@ -64,6 +64,7 @@
 #include "tr5_rollingball.h"
 #include "tr5_explosion.h"
 #include "tr5_wreckingball.h"
+#include "tr5_laser.h"
 
 // Switches
 #include "tr5_crowdove_switch.h"
@@ -922,6 +923,15 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseExplosion;
 		obj->control = ExplosionControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASERS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLasers;
+		obj->control = ControlLasers;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
