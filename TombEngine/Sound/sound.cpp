@@ -642,8 +642,11 @@ bool IsSoundEffectPlaying(int effectID)
 
 float Sound_DistanceToListener(Pose *position)
 {
-	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
+	// Assume sound is 2D menu sound.
+	if (!position)
+		return 0.0f;
+
+	return Sound_DistanceToListener(position->Position.ToVector3());
 }
 float Sound_DistanceToListener(Vector3 position)
 {
