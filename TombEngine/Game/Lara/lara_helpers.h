@@ -13,6 +13,10 @@ struct VaultTestResult;
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerWetnessDrips(ItemInfo& item);
+void HandlePlayerDiveBubbles(ItemInfo& item);
+void HandlePlayerAirBubbles(ItemInfo* item);
+
 void EaseOutLaraHeight(ItemInfo* item, int height);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
@@ -22,7 +26,10 @@ void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DoLaraFallDamage(ItemInfo* item);
 
+LaraInfo& GetLaraInfo(ItemInfo& item);
+const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

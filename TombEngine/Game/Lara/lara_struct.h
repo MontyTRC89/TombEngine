@@ -823,6 +823,25 @@ enum LaraAnim
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
+
+enum LaraExtraAnim
+{
+	LEA_PULL_DAGGER_FROM_DRAGON = 0,
+	LEA_WAKE_UP = 1,
+	LEA_SPEAR_GUARDIAN_DEATH = 2,
+	LEA_TRAIN_DEATH_START = 3,
+	LEA_TREX_DEATH = 4,
+	LEA_SHARK_DEATH = 5,
+	LEA_GIANT_MUTANT_DEATH = 6,
+	LEA_SHIVA_DEATH = 7,
+	LEA_ACTIVATE_TNT_SWITCH = 8,
+	LEA_MIDAS_GOLD_SWITCH = 9,
+	LEA_MIDAS_DEATH = 10,
+	LEA_STRIKE_GONG = 11,
+	LEA_WILLARD_DEATH = 12,
+	LEA_TRAIN_DEATH_END = 13,
+	LEA_SETH_DEATH = 14
+};
 #pragma endregion
 
 enum LARA_MESHES
@@ -1086,15 +1105,15 @@ struct ArmInfo
 
 struct FlareData
 {
-	int Frame;
-	unsigned int Life;
-	bool ControlLeft;
+	int			 Frame		 = 0;
+	unsigned int Life		 = 0;
+	bool		 ControlLeft = false;
 };
 
 struct TorchData
 {
-	TorchState State;
-	bool IsLit;
+	TorchState State = TorchState::Holding;
+	bool	   IsLit = false;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1231,18 +1250,19 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle;
-	short TurnRate;
-	int CalculatedJumpVelocity;
-	JumpDirection JumpDirection;
-	HandStatus HandStatus;
-	WaterStatus WaterStatus;
-	LaraCountData Count;
+	short MoveAngle = 0;
+	short TurnRate	= 0;
+	int	  CalculatedJumpVelocity = 0;
 
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
+	JumpDirection JumpDirection = {};
+	HandStatus	  HandStatus	= {};
+	WaterStatus	  WaterStatus	= {};
+	LaraCountData Count			= {};
+
+	RopeControlData		 Rope	   = {};
+	SubsuitControlData	 Subsuit   = {};
+	TightropeControlData Tightrope = {};
+	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
 	bool Locked			  = false;
@@ -1257,35 +1277,47 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
+// TODO: Make these floats.
+struct PlayerStatusData
+{
+	int Air		 = 0;
+	int Exposure = 0;
+	int Poison	 = 0;
+	int Stamina	 = 0;
+};
+
 struct LaraInfo
 {
-	short ItemNumber;
-	LaraControlData Control;
+	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has this.
+
+	PlayerStatusData Status = {};
+	LaraControlData Control = {};
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
-	FlareData Flare;
-	TorchData Torch;
+	FlareData Flare = {};
+	TorchData Torch = {};
 
-	EulerAngles ExtraHeadRot;
-	EulerAngles ExtraTorsoRot;
-	short WaterCurrentActive;
-	Vector3i WaterCurrentPull;
+	EulerAngles ExtraHeadRot = {};
+	EulerAngles ExtraTorsoRot = {};
+	short WaterCurrentActive = 0;
+	Vector3i WaterCurrentPull = Vector3i::Zero;
 
-	ArmInfo LeftArm;
-	ArmInfo RightArm;
-	EulerAngles TargetArmOrient;
-	ItemInfo* TargetEntity;
-	CreatureInfo* Creature;	// Not saved. Unused?
+	ArmInfo		LeftArm			= {};
+	ArmInfo		RightArm		= {};
+	EulerAngles TargetArmOrient = EulerAngles::Zero;
+	ItemInfo*	TargetEntity	= nullptr;
 
-	int Air;
-	int SprintEnergy;
-	int PoisonPotency;
-
-	short Vehicle;
+	int Vehicle;
 	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
-	FX_INFO* SpasmEffect;	// Not saved.
+	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
@@ -1293,8 +1325,9 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	byte Wet[NUM_LARA_MESHES];
-	signed char Location;
-	signed char HighestLocation;
-	signed char LocationPad;
+	PlayerEffectData Effect = {};
+
+	signed char Location		= 0;
+	signed char HighestLocation = 0;
+	signed char LocationPad		= 0;
 };

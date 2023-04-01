@@ -264,12 +264,15 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_JUMP)
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
 
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
+		lara->Control.HandStatus = HandStatus::Busy;
 		return;
 	}
 
@@ -292,6 +295,8 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 			distance = (barItem.TriggerFlags / 100) - 2;
 		else
 			distance = (barItem.TriggerFlags % 100) - 2;
+
+		lara->Control.HandStatus = HandStatus::Free;
 
 		item->Animation.Velocity.z = (20 * distance) + 58;
 		item->Animation.Velocity.y = -(20 * distance + 64);
@@ -1061,7 +1066,7 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
-		AnimateLara(item);
+		AnimateItem(item);
 
 		item->Animation.Velocity.z = 100;
 		item->Animation.Velocity.y = 40;

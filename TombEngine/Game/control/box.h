@@ -110,7 +110,7 @@ struct BiteInfo
 		this->meshNum = 0;
 	}
 
-	BiteInfo(Vector3 pos, int meshNumber)
+	BiteInfo(const Vector3& pos, int meshNumber)
 	{
 		this->Position = pos;
 		this->meshNum = meshNumber;
@@ -127,7 +127,6 @@ struct BiteInfo
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
-
 
 constexpr auto REVERSE = 0x4000;
 constexpr auto BLOCKABLE = 0x8000;
@@ -187,7 +186,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
 bool CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureHealth(ItemInfo* item);
-void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
+void AdjustStopperFlag(ItemInfo* item, int direction);
 void InitialiseItemBoxData();
 
 bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType);

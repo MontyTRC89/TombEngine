@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
@@ -298,7 +298,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && lara->SprintEnergy)
+		else if (TrInput & IN_SPRINT && lara->Status.Stamina)
 			item->Animation.TargetState = LS_SPRINT;
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_RUN_FORWARD;
@@ -1393,7 +1393,6 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->HitPoints = -1;
-	lara->Air = -1;
 
 	ShiftItem(item, coll);
 
@@ -2253,7 +2252,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->SprintEnergy--;
+	lara->Status.Stamina--;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_SPRINT_JUMP_TIME)
@@ -2311,7 +2310,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_RUN_FORWARD;
-		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) USE_FEATURE_IF_CPP20([[likely]])
+		else if (TrInput & IN_SPRINT && lara->Status.Stamina > 0) USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_SPRINT;
 		else
 			item->Animation.TargetState = LS_RUN_FORWARD;

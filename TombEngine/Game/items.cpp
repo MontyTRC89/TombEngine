@@ -127,7 +127,7 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 
 void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
@@ -542,7 +542,7 @@ void InitialiseItem(short itemNumber)
 	room->itemNumber = itemNumber;
 
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
+	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->Box;
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
@@ -550,13 +550,13 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
 		item->ResetModelToDefault();
 
-		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i] = {};
+		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
+		for (auto& mutator : item->Model.Mutators)
+			mutator = {};
 	}
 	else
 	{
-		item->Model.Mutator.clear();
+		item->Model.Mutators.clear();
 		item->Model.MeshIndex.clear();
 	}
 
@@ -641,11 +641,11 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-const std::string& GetObjectName(GAME_OBJECT_ID id)
+const std::string& GetObjectName(GAME_OBJECT_ID objectID)
 {
 	for (auto it = kObjIDs.begin(); it != kObjIDs.end(); ++it)
 	{
-		if (it->second == id)
+		if (it->second == objectID)
 			return it->first;
 	}
 
@@ -653,26 +653,46 @@ const std::string& GetObjectName(GAME_OBJECT_ID id)
 	return unknownSlot;
 }
 
-std::vector<int> FindAllItems(short objectNumber)
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID)
 {
-	std::vector<int> itemList;
+	auto itemNumbers = std::vector<int>{};
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		if (g_Level.Items[i].ObjectNumber == objectNumber)
-			itemList.push_back(i);
+		if (g_Level.Items[i].ObjectNumber == objectID)
+			itemNumbers.push_back(i);
 	}
 
-	return itemList;
+	return itemNumbers;
 }
 
-ItemInfo* FindItem(int objectNumber)
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID)
+{
+	auto itemNumbers = std::vector<int>{};
+
+	if (NextItemActive == NO_ITEM)
+		return itemNumbers;
+
+	const auto* itemPtr = &g_Level.Items[NextItemActive];
+
+	for (int nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = itemPtr->NextActive)
+	{
+		itemPtr = &g_Level.Items[nextActive];
+
+		if (itemPtr->ObjectNumber == objectID)
+			itemNumbers.push_back(nextActive);
+	}
+
+	return itemNumbers;
+}
+
+ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		auto* item = &g_Level.Items[i];
 
-		if (item->ObjectNumber == objectNumber)
+		if (item->ObjectNumber == objectID)
 			return item;
 	}
 
@@ -826,11 +846,11 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, -5);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
 			break;
 		}
 	}

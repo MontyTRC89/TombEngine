@@ -12,25 +12,14 @@ using namespace TEN::Math;
 //{
 	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
 
-	EulerAngles::EulerAngles()
-	{
-	}
-
-	EulerAngles::EulerAngles(short x, short y, short z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
 	EulerAngles::EulerAngles(const Vector3& direction)
 	{
 		auto directionNorm = direction;
 		directionNorm.Normalize();
 
-		this->x = FROM_RAD(-asin(directionNorm.y));
-		this->y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
-		this->z = 0;
+		x = FROM_RAD(-asin(directionNorm.y));
+		y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
+		z = 0;
 	}
 
 	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
@@ -40,11 +29,11 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
-		static constexpr auto singularityThreshold = 1.0f - EPSILON;
+		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
 
 		// Handle singularity case.
 		float sinP = ((quat.w * quat.x) - (quat.y * quat.z)) * 2;
-		if (abs(sinP) > singularityThreshold)
+		if (abs(sinP) > SINGULARITY_THRESHOLD)
 		{
 			if (sinP > 0.0f)
 				*this = EulerAngles(FROM_RAD(PI_DIV_2), 0, FROM_RAD(atan2(quat.z, quat.w) * 2.0f));
@@ -74,9 +63,9 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const Matrix& rotMatrix)
 	{
-		this->x = FROM_RAD(asin(-rotMatrix._32));
-		this->y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
-		this->z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
+		x = FROM_RAD(asin(-rotMatrix._32));
+		y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
+		z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
 	}
 
 	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
@@ -172,49 +161,49 @@ using namespace TEN::Math;
 
 	EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)
 	{
-		this->x = eulers.x;
-		this->y = eulers.y;
-		this->z = eulers.z;
+		x = eulers.x;
+		y = eulers.y;
+		z = eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator +=(const EulerAngles& eulers)
 	{
-		this->x += eulers.x;
-		this->y += eulers.y;
-		this->z += eulers.z;
+		x += eulers.x;
+		y += eulers.y;
+		z += eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator -=(const EulerAngles& eulers)
 	{
-		this->x -= eulers.x;
-		this->y -= eulers.y;
-		this->z -= eulers.z;
+		x -= eulers.x;
+		y -= eulers.y;
+		z -= eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(const EulerAngles& eulers)
 	{
-		this->x *= eulers.x;
-		this->y *= eulers.y;
-		this->z *= eulers.z;
+		x *= eulers.x;
+		y *= eulers.y;
+		z *= eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(float scale)
 	{
-		this->x *= scale;
-		this->y *= scale;
-		this->z *= scale;
+		x *= scale;
+		y *= scale;
+		z *= scale;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator /=(float scale)
 	{
-		this->x /= scale;
-		this->y /= scale;
-		this->z /= scale;
+		x /= scale;
+		y /= scale;
+		z /= scale;
 		return *this;
 	}
 

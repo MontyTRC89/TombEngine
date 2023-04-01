@@ -30,7 +30,7 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 		{ ID_GRENADE_AMMO1_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo1, 10 },
 		{ ID_GRENADE_AMMO2_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo2, 10 },
 		{ ID_GRENADE_AMMO3_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo3, 10 },
-		{ ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher, WeaponAmmoType::Ammo1, 10 },
+		{ ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher, WeaponAmmoType::Ammo1, 1 },
 		{ ID_HARPOON_AMMO_ITEM, LaraWeaponType::HarpoonGun, WeaponAmmoType::Ammo1, 10 }
 	}
 };
