@@ -897,4 +897,15 @@ namespace TEN::Floordata
 			}
 		}
 	}
+
+	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList)
+	{
+		for (const auto& material : materialList)
+		{
+			if (material == refMaterial)
+				return true;
+		}
+
+		return false;
+	}
 }

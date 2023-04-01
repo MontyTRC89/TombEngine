@@ -1033,9 +1033,6 @@ namespace TEN::Renderer
 	{
 		for (const auto& footprint : Footprints)
 		{
-			if (footprint.SpriteIndex >= g_Level.Sprites.size())
-				continue;
-
 			AddQuad(
 				&m_sprites[footprint.SpriteIndex],
 				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],

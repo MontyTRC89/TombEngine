@@ -1,29 +1,29 @@
 #pragma once
-#include "Math/Math.h"
 
-enum SOUND_EFFECTS;
-enum class FLOOR_MATERIAL : unsigned char;
 struct ItemInfo;
 
 namespace TEN::Effects::Footprint
 {
 	struct Footprint
 	{
-		unsigned int SpriteIndex = 0;
-		bool		 IsRightFoot = false;
+		static constexpr auto COUNT_MAX	   = 64;
+		static constexpr auto VERTEX_COUNT = 4;
 
-		std::array<Vector3, 4> VertexPoints = {};
+		unsigned int SpriteIndex = 0;
+		bool		 IsRight	 = false;
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
 		float Opacity		  = 0.0f;
 		float OpacityStart	  = 0.0f;
+
+		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
 	};
 
 	extern std::vector<Footprint> Footprints;
 
-	void SpawnFootprint(const ItemInfo& item, bool isRightFoot);
-	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints);
+	void SpawnFootprint(bool isRight, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints);
+	void SpawnFootprint(const ItemInfo& item, bool isRight);
 
 	void UpdateFootprints();
 	void ClearFootprints();
