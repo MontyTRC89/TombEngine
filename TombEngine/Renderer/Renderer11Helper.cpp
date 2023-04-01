@@ -274,7 +274,7 @@ namespace TEN::Renderer
 				[&j, &currentBone](BigGunInfo& bigGun)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation.z = bigGun.BarrelRotation;
+						currentBone->ExtraRotation = EulerAngles(0, 0, bigGun.BarrelRotation).ToQuaternion();
 				},
 				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{

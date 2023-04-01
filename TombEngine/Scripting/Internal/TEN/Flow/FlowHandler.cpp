@@ -14,7 +14,9 @@
 #include "Specific/trutils.h"
 
 /***
-Functions for use in Flow.lua, settings.lua and strings.lua
+Functions that (mostly) don't directly impact in-game mechanics. Used for setup
+in gameflow.lua, settings.lua and strings.lua; some can be used in level
+scripts too.
 @tentable Flow 
 @pragma nostrip
 */
@@ -43,53 +45,9 @@ ambient tracks.
 /***
 Add a level to the Flow.
 @function AddLevel
-@tparam Level level a level object
+@tparam Flow.Level level a level object
 */
 	table_flow.set_function(ScriptReserved_AddLevel, &FlowHandler::AddLevel, this);
-
-/*** GetLevel.
-Returns the level indicated by the parameter id.
-@function GetLevel
-@tparam int id of the level
-@treturn Level the level indicated by the id
-*/
-	table_flow.set_function(ScriptReserved_GetLevel, &FlowHandler::GetLevel, this);
-
-/*** GetCurrentLevel.
-Returns the level that the game control is running in that moment.
-@function GetCurrentLevel
-@treturn Level the current level
-*/
-	table_flow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
-
-/*** EndLevel.
-Finish level, with optional level index provided. If level index is not provided or is zero, jumps
-to next level. If level index is more than level count, jumps to title.
-@function EndLevel
-@tparam int index (optional) level index.
-*/
-	table_flow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
-
-/*** GetSecretCount.
-Returns current game secret count.
-@function GetSecretCount
-@treturn Current game secret count.
-*/
-	table_flow.set_function(ScriptReserved_GetSecretCount, &FlowHandler::GetSecretCount, this);
-
-/*** SetSecretCount.
-Sets current secret count, overwriting existing one.
-@function SetSecretCount
-@tparam int count new secret count.
-*/
-	table_flow.set_function(ScriptReserved_SetSecretCount, &FlowHandler::SetSecretCount, this);
-
-/*** AddSecret.
-Adds one secret to game secret count and also plays secret music track.
-@function AddSecret
-@tparam int index an index of current level's secret (must be from 0 to 7).
-*/
-	table_flow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
 
 /*** Image to show when loading the game.
 Must be a .jpg or .png image.
@@ -106,6 +64,84 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
+/*** Enable or disable Lara drawing in title flyby.
+Must be true or false
+@function EnableLaraInTitle
+@tparam bool enabled true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
+
+/*** Enable or disable level selection in title flyby.
+Must be true or false
+@function EnableLevelSelect
+@tparam bool enabled true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
+
+/*** gameflow.lua or level scripts.
+@section FlowluaOrScripts
+*/
+
+/*** Enable or disable DOZY mode (fly cheat).
+Must be true or false
+@function EnableFlyCheat
+@tparam bool enabled true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
+/*** Enable or disable mass pickup.
+Must be true or false
+@function EnableMassPickup
+@tparam bool enabled true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
+
+/*** Returns the level by index.
+Indices depend on the order in which AddLevel was called; the first added will
+have an ID of 0, the second an ID of 1, and so on.
+@function GetLevel
+@tparam int index of the level
+@treturn Flow.Level the level indicated by the id
+*/
+	table_flow.set_function(ScriptReserved_GetLevel, &FlowHandler::GetLevel, this);
+
+/*** Returns the level that the game control is running in that moment.
+@function GetCurrentLevel
+@treturn Flow.Level the current level
+*/
+	table_flow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
+
+/***
+Finishes the current level, with optional level index provided. If level index
+is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title.
+@function EndLevel
+@int[opt] index level index (default 0)
+*/
+	table_flow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+
+/***
+Returns the player's current per-game secret count.
+@function GetSecretCount
+@treturn int Current game secret count.
+*/
+	table_flow.set_function(ScriptReserved_GetSecretCount, &FlowHandler::GetSecretCount, this);
+
+/*** 
+Sets the player's current per-game secret count.
+@function SetSecretCount
+@tparam int count new secret count.
+*/
+	table_flow.set_function(ScriptReserved_SetSecretCount, &FlowHandler::SetSecretCount, this);
+
+/***
+Adds one secret to current level secret count and also plays secret music track.
+The index argument corresponds to the secret's unique ID, the same that would go in a secret trigger's Param.
+@function AddSecret
+@tparam int index an index of current level's secret (must be from 0 to 31).
+*/
+	table_flow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
+
 /*** Total number of secrets in game.
 Must be an integer value (0 means no secrets).
 @function SetTotalSecretCount
@@ -113,33 +149,7 @@ Must be an integer value (0 means no secrets).
 */
 	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
-/*** Enable or disable DOZY mode (fly cheat).
-Must be true or false
-@function EnableFlyCheat
-@tparam bool true or false
-*/
-	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
-/*** Enable or disable mass pickup.
-Must be true or false
-@function EnableMassPickup
-@tparam bool true or false
-*/
-	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
-
-/*** Enable or disable Lara drawing in title flyby.
-Must be true or false
-@function EnableLaraInTitle
-@tparam bool true or false
-*/
-	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
-
-/*** Enable or disable level selection in title flyby.
-Must be true or false
-@function EnableLevelSelect
-@tparam bool true or false
-*/
-	table_flow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -148,13 +158,13 @@ settings.lua shouldn't be bundled with any finished levels/games.
 */
 /***
 @function SetSettings
-@tparam Settings settings a settings object 
+@tparam Flow.Settings settings a settings object 
 */
 	table_flow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
 
 /***
 @function SetAnimations
-@tparam Animations animations an animations object 
+@tparam Flow.Animations animations an animations object 
 */
 	table_flow.set_function(ScriptReserved_SetAnimations, &FlowHandler::SetAnimations, this);
 
@@ -322,15 +332,15 @@ void FlowHandler::SetSecretCount(int secretsNum)
 
 void FlowHandler::AddSecret(int levelSecretIndex)
 {
-	static const unsigned int maxSecretIndex = CHAR_BIT * sizeof(unsigned int);
+	static constexpr unsigned int maxSecretIndex = CHAR_BIT * sizeof(unsigned int);
 
 	if (levelSecretIndex >= maxSecretIndex)
 	{
-		TENLog("Current maximum amount of secrets per level is" + std::to_string(maxSecretIndex) + ".", LogLevel::Warning);
+		TENLog("Current maximum amount of secrets per level is " + std::to_string(maxSecretIndex) + ".", LogLevel::Warning);
 		return;
 	}
 
-	if ((Statistics.Level.Secrets & (1 << levelSecretIndex)))
+	if (Statistics.Level.Secrets & (1 << levelSecretIndex))
 		return;
 
 	if (Statistics.Game.Secrets >= UINT_MAX)

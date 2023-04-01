@@ -11,7 +11,7 @@ namespace TEN::Utils
 		// Constants
 		static constexpr auto SIZE_DEFAULT = 32;
 
-		// Variables
+		// Members
 		std::vector<bool> Bits = {};
 
 	public:
