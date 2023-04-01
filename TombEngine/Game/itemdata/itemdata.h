@@ -71,7 +71,7 @@ class ItemData
 		RubberBoatInfo,
 		MinecartInfo,
 		ElectricalLightInfo,
-		LaserStruct
+		LaserStructInfo
 	> data;
 	public:
 	ItemData();

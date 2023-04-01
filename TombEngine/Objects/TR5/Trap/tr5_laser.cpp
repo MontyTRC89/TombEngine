@@ -4,9 +4,9 @@
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
 
-static LaserStruct& GetLaserInfo(ItemInfo& item)
+static LaserStructInfo& GetLaserInfo(ItemInfo& item)
 {
-	return (LaserStruct&)item.Data;
+	return (LaserStructInfo&)item.Data;
 }
 
 void InitialiseLasers(short itemNumber)
