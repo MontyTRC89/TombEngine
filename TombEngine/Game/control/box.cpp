@@ -1615,7 +1615,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 
 		if (LOT->Fly != NO_FLYING && Lara.Control.WaterStatus == WaterStatus::Dry)
 		{
-			auto& bounds = GetBestFrame(enemy)->boundingBox;
+			auto& bounds = GetBestFrame(*enemy).BoundingBox;
 			LOT->Target.y += bounds.Y1;
 		}
 
@@ -2121,7 +2121,7 @@ void InitialiseItemBoxData()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
+				int floorHeight = floor->GetSurfaceHeight(mesh.pos.Position.x, mesh.pos.Position.z, true);
 				const auto& bBox = GetBoundsAccurate(mesh, false);
 
 				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&
