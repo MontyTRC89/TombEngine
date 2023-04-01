@@ -159,7 +159,7 @@ namespace TEN::Effects::Footprint
 		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
-		// Don't spawn footprint if floor heights at vertex points are outside upper/lower floor height bound.
+		// Don't spawn footprint if floor heights at vertex points are outside lower/upper floor height bound.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > ABS_FLOOR_BOUND) ||
 			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > ABS_FLOOR_BOUND) ||
 			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > ABS_FLOOR_BOUND) ||

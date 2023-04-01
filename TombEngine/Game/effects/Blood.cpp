@@ -61,7 +61,7 @@ namespace TEN::Effects::Blood
 
 	static bool TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints)
 	{
-		static constexpr auto heightRange = CLICK(0.5f);
+		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, roomNumber);
@@ -69,11 +69,11 @@ namespace TEN::Effects::Blood
 		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, roomNumber);
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, roomNumber);
 
-		// Stop scaling blood stain if floor heights at vertex points are outside relative range.
-		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
-			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
-			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
-			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > heightRange))
+		// Stop scaling blood stain if floor heights at vertex points are beyond lower/upper floor height bound.
+		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > ABS_FLOOR_BOUND))
 		{
 			return false;
 		}
@@ -115,11 +115,11 @@ namespace TEN::Effects::Blood
 		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
 
 		// Spawn decorative drips.
-		for (int i = 0; i < count * 12; i++)
+		for (int i = 0; i < count * 6; i++)
 		{
 			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
 			auto velocity = Random::GenerateDirectionInCone(-direction, SPRAY_SEMIANGLE) * length;
-			float scale = length * 0.25f;
+			float scale = length * 0.1f;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_START_FADING, scale, false);
 		}
@@ -361,10 +361,14 @@ namespace TEN::Effects::Blood
 
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)
-				stain.Opacity = Lerp(stain.OpacityMax, 0.0f, 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_START_FADING * FPS)));
+			{
+				float alpha = 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_START_FADING * FPS));
+				stain.Opacity = Lerp(stain.OpacityMax, 0.0f, alpha);
+			}
 
 			// Update color.
-			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_MAX * FPS)));
+			float alpha = 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_MAX * FPS));
+			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, alpha);
 			stain.Color.w = stain.Opacity;
 
 			// Update life.
