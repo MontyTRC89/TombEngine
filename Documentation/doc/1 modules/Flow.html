@@ -87,10 +87,10 @@
 <div id="content">
 
 <h1>Table <code>Flow</code></h1>
-<p>Functions for use in Flow.lua, settings.lua and strings.lua</p>
-<p>
-
-</p>
+<p>Functions that (mostly) don't directly impact in-game mechanics.</p>
+<p> Used for setup
+in gameflow.lua, settings.lua and strings.lua; some can be used in level
+scripts too.</p>
 
 
 <h2><a href="#gameflow_lua">gameflow.lua </a></h2>
@@ -98,30 +98,6 @@
 	<tr>
 	<td class="name" ><a href="#AddLevel">AddLevel(level)</a></td>
 	<td class="summary">Add a level to the Flow.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetLevel">GetLevel(id)</a></td>
-	<td class="summary">GetLevel.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetCurrentLevel">GetCurrentLevel()</a></td>
-	<td class="summary">GetCurrentLevel.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#EndLevel">EndLevel(index)</a></td>
-	<td class="summary">EndLevel.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetSecretCount">GetSecretCount()</a></td>
-	<td class="summary">GetSecretCount.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetSecretCount">SetSecretCount(count)</a></td>
-	<td class="summary">SetSecretCount.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#AddSecret">AddSecret(index)</a></td>
-	<td class="summary">AddSecret.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetIntroImagePath">SetIntroImagePath(path)</a></td>
@@ -132,24 +108,51 @@
 	<td class="summary">Image to show in the background of the title screen.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(total)</a></td>
-	<td class="summary">Total number of secrets in game.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#EnableFlyCheat">EnableFlyCheat(true)</a></td>
-	<td class="summary">Enable or disable DOZY mode (fly cheat).</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#EnableMassPickup">EnableMassPickup(true)</a></td>
-	<td class="summary">Enable or disable mass pickup.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#EnableLaraInTitle">EnableLaraInTitle(true)</a></td>
+	<td class="name" ><a href="#EnableLaraInTitle">EnableLaraInTitle(enabled)</a></td>
 	<td class="summary">Enable or disable Lara drawing in title flyby.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EnableLevelSelect">EnableLevelSelect(true)</a></td>
+	<td class="name" ><a href="#EnableLevelSelect">EnableLevelSelect(enabled)</a></td>
 	<td class="summary">Enable or disable level selection in title flyby.</td>
+	</tr>
+</table>
+<h2><a href="#gameflow_lua_or_level_scripts">gameflow.lua or level scripts </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#EnableFlyCheat">EnableFlyCheat(enabled)</a></td>
+	<td class="summary">Enable or disable DOZY mode (fly cheat).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#EnableMassPickup">EnableMassPickup(enabled)</a></td>
+	<td class="summary">Enable or disable mass pickup.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetLevel">GetLevel(index)</a></td>
+	<td class="summary">Returns the level by index.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCurrentLevel">GetCurrentLevel()</a></td>
+	<td class="summary">Returns the level that the game control is running in that moment.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#EndLevel">EndLevel([index])</a></td>
+	<td class="summary">Finishes the current level, with optional level index provided.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetSecretCount">GetSecretCount()</a></td>
+	<td class="summary">Returns the player's current per-game secret count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetSecretCount">SetSecretCount(count)</a></td>
+	<td class="summary">Sets the player's current per-game secret count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddSecret">AddSecret(index)</a></td>
+	<td class="summary">Adds one secret to current level secret count and also plays secret music track.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(total)</a></td>
+	<td class="summary">Total number of secrets in game.</td>
 	</tr>
 </table>
 <h2><a href="#settings_lua">settings.lua </a></h2>
@@ -207,151 +210,8 @@ ambient tracks.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">level</span>
-            <span class="types"><span class="type">Level</span></span>
+            <span class="types"><a class="type" href="../2 classes/Flow.Level.html#">Level</a></span>
          a level object
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetLevel"></a>
-    <strong>GetLevel(id)</strong>
-    </dt>
-    <dd>
-    GetLevel.
-Returns the level indicated by the parameter id.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">id</span>
-            <span class="types"><span class="type">int</span></span>
-         of the level
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Level</span></span>
-        the level indicated by the id
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetCurrentLevel"></a>
-    <strong>GetCurrentLevel()</strong>
-    </dt>
-    <dd>
-    GetCurrentLevel.
-Returns the level that the game control is running in that moment.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Level</span></span>
-        the current level
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "EndLevel"></a>
-    <strong>EndLevel(index)</strong>
-    </dt>
-    <dd>
-    EndLevel.
-Finish level, with optional level index provided. If level index is not provided or is zero, jumps
-to next level. If level index is more than level count, jumps to title.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         (optional) level index.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetSecretCount"></a>
-    <strong>GetSecretCount()</strong>
-    </dt>
-    <dd>
-    GetSecretCount.
-Returns current game secret count.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Current</span></span>
-        game secret count.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetSecretCount"></a>
-    <strong>SetSecretCount(count)</strong>
-    </dt>
-    <dd>
-    SetSecretCount.
-Sets current secret count, overwriting existing one.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">count</span>
-            <span class="types"><span class="type">int</span></span>
-         new secret count.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "AddSecret"></a>
-    <strong>AddSecret(index)</strong>
-    </dt>
-    <dd>
-    AddSecret.
-Adds one secret to game secret count and also plays secret music track.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">index</span>
-            <span class="types"><span class="type">int</span></span>
-         an index of current level's secret (must be from 0 to 7).
         </li>
     </ul>
 
@@ -408,6 +268,244 @@ Must be a .jpg or .png image.
 
 </dd>
     <dt>
+    <a name = "EnableLaraInTitle"></a>
+    <strong>EnableLaraInTitle(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable Lara drawing in title flyby.
+Must be true or false
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnableLevelSelect"></a>
+    <strong>EnableLevelSelect(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable level selection in title flyby.
+Must be true or false
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="gameflow_lua_or_level_scripts"></a>gameflow.lua or level scripts </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "EnableFlyCheat"></a>
+    <strong>EnableFlyCheat(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable DOZY mode (fly cheat).
+Must be true or false
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnableMassPickup"></a>
+    <strong>EnableMassPickup(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable mass pickup.
+Must be true or false
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetLevel"></a>
+    <strong>GetLevel(index)</strong>
+    </dt>
+    <dd>
+    Returns the level by index.
+Indices depend on the order in which AddLevel was called; the first added will
+have an ID of 0, the second an ID of 1, and so on.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of the level
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Flow.Level.html#">Level</a></span>
+        the level indicated by the id
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCurrentLevel"></a>
+    <strong>GetCurrentLevel()</strong>
+    </dt>
+    <dd>
+    Returns the level that the game control is running in that moment.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Flow.Level.html#">Level</a></span>
+        the current level
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EndLevel"></a>
+    <strong>EndLevel([index])</strong>
+    </dt>
+    <dd>
+    Finishes the current level, with optional level index provided.  If level index
+is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         level index (default 0)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetSecretCount"></a>
+    <strong>GetSecretCount()</strong>
+    </dt>
+    <dd>
+    Returns the player's current per-game secret count.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        Current game secret count.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetSecretCount"></a>
+    <strong>SetSecretCount(count)</strong>
+    </dt>
+    <dd>
+    Sets the player's current per-game secret count.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">count</span>
+            <span class="types"><span class="type">int</span></span>
+         new secret count.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddSecret"></a>
+    <strong>AddSecret(index)</strong>
+    </dt>
+    <dd>
+    Adds one secret to current level secret count and also plays secret music track.
+The index argument corresponds to the secret's unique ID, the same that would go in a secret trigger's Param.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         an index of current level's secret (must be from 0 to 31).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "SetTotalSecretCount"></a>
     <strong>SetTotalSecretCount(total)</strong>
     </dt>
@@ -422,98 +520,6 @@ Must be an integer value (0 means no secrets).
         <li><span class="parameter">total</span>
             <span class="types"><span class="type">int</span></span>
          number of secrets
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "EnableFlyCheat"></a>
-    <strong>EnableFlyCheat(true)</strong>
-    </dt>
-    <dd>
-    Enable or disable DOZY mode (fly cheat).
-Must be true or false
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">true</span>
-            <span class="types"><span class="type">bool</span></span>
-         or false
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "EnableMassPickup"></a>
-    <strong>EnableMassPickup(true)</strong>
-    </dt>
-    <dd>
-    Enable or disable mass pickup.
-Must be true or false
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">true</span>
-            <span class="types"><span class="type">bool</span></span>
-         or false
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "EnableLaraInTitle"></a>
-    <strong>EnableLaraInTitle(true)</strong>
-    </dt>
-    <dd>
-    Enable or disable Lara drawing in title flyby.
-Must be true or false
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">true</span>
-            <span class="types"><span class="type">bool</span></span>
-         or false
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "EnableLevelSelect"></a>
-    <strong>EnableLevelSelect(true)</strong>
-    </dt>
-    <dd>
-    Enable or disable level selection in title flyby.
-Must be true or false
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">true</span>
-            <span class="types"><span class="type">bool</span></span>
-         or false
         </li>
     </ul>
 
@@ -544,7 +550,7 @@ settings.lua shouldn't be bundled with any finished levels/games.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">settings</span>
-            <span class="types"><span class="type">Settings</span></span>
+            <span class="types"><a class="type" href="../2 classes/Flow.Settings.html#">Settings</a></span>
          a settings object
         </li>
     </ul>
@@ -568,7 +574,7 @@ settings.lua shouldn't be bundled with any finished levels/games.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">animations</span>
-            <span class="types"><span class="type">Animations</span></span>
+            <span class="types"><a class="type" href="../2 classes/Flow.Animations.html#">Animations</a></span>
          an animations object
         </li>
     </ul>
@@ -660,8 +666,8 @@ Specify which translations in the strings table correspond to which languages.
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-03-24 18:25:34 </i>
+<i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
+<i style="float:right;">Last updated 2023-03-31 20:44:31 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
