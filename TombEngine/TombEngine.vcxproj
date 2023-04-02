@@ -186,7 +186,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Objects\TR5\Light\tr5_light_info.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_laser.h" />
-    <ClInclude Include="Objects\TR5\Trap\tr5_laser_info.h" />
     <ClInclude Include="Renderer\ConstantBuffers\InstancedStaticBuffer.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Scripting\Include\VarMapVal.h" />

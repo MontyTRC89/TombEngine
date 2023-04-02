@@ -1513,6 +1513,7 @@ namespace TEN::Renderer
 		DrawHelicalLasers(view);
 		DrawRopes(view);
 		DrawStreamers(view);
+		DrawLasers(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);
@@ -1614,9 +1615,6 @@ namespace TEN::Renderer
 				case ID_LARA:
 					DrawLara(view, transparent);
 					break;
-
-				case ID_LASERS:
-					DrawLasers(view);
 
 				case ID_WATERFALL1:
 				case ID_WATERFALL2:

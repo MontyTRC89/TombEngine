@@ -22,7 +22,6 @@
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Objects/TR5/Light/tr5_light_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
-#include "Objects/TR5/Trap/tr5_laser_info.h"
 
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // TODO: Line not needed in C++20.
@@ -70,8 +69,7 @@ class ItemData
 		SpeedboatInfo,
 		RubberBoatInfo,
 		MinecartInfo,
-		ElectricalLightInfo,
-		LaserStructInfo
+		ElectricalLightInfo
 	> data;
 	public:
 	ItemData();

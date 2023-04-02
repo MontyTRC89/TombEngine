@@ -29,6 +29,7 @@
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Objects/TR5/Trap/tr5_laser.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -83,7 +84,21 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLasers(RenderView& view)
 	{
+		if (Lasers.empty())
+		return;
 
+		for (const auto& laser : Lasers)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				AddColoredQuad(
+					laser.vert1[i], laser.vert2[i],
+					laser.vert3[i], laser.vert4[i],
+					laser.Color, laser.Color,
+					laser.Color, laser.Color,
+					BLENDMODE_ADDITIVE, view);
+			}
+		}
 	}
 
 	void Renderer11::DrawStreamers(RenderView& view)
