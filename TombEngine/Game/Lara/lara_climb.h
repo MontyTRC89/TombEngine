@@ -14,7 +14,7 @@ static ClimbDirectionFlags LeftExtRightIntTab[4] =
 };
 
 // -----------------------------
-// LADDER CLIMB
+// WALL CLIMB
 // Control & Collision Functions
 // -----------------------------
 
