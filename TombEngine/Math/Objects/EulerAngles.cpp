@@ -17,9 +17,9 @@ using namespace TEN::Math;
 		auto directionNorm = direction;
 		directionNorm.Normalize();
 
-		this->x = FROM_RAD(-asin(directionNorm.y));
-		this->y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
-		this->z = 0;
+		x = FROM_RAD(-asin(directionNorm.y));
+		y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
+		z = 0;
 	}
 
 	EulerAngles::EulerAngles(const AxisAngle& axisAngle)
@@ -63,9 +63,9 @@ using namespace TEN::Math;
 
 	EulerAngles::EulerAngles(const Matrix& rotMatrix)
 	{
-		this->x = FROM_RAD(asin(-rotMatrix._32));
-		this->y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
-		this->z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
+		x = FROM_RAD(asin(-rotMatrix._32));
+		y = FROM_RAD(atan2(rotMatrix._31, rotMatrix._33));
+		z = FROM_RAD(atan2(rotMatrix._12, rotMatrix._22));
 	}
 
 	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
@@ -161,49 +161,49 @@ using namespace TEN::Math;
 
 	EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)
 	{
-		this->x = eulers.x;
-		this->y = eulers.y;
-		this->z = eulers.z;
+		x = eulers.x;
+		y = eulers.y;
+		z = eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator +=(const EulerAngles& eulers)
 	{
-		this->x += eulers.x;
-		this->y += eulers.y;
-		this->z += eulers.z;
+		x += eulers.x;
+		y += eulers.y;
+		z += eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator -=(const EulerAngles& eulers)
 	{
-		this->x -= eulers.x;
-		this->y -= eulers.y;
-		this->z -= eulers.z;
+		x -= eulers.x;
+		y -= eulers.y;
+		z -= eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(const EulerAngles& eulers)
 	{
-		this->x *= eulers.x;
-		this->y *= eulers.y;
-		this->z *= eulers.z;
+		x *= eulers.x;
+		y *= eulers.y;
+		z *= eulers.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(float scale)
 	{
-		this->x *= scale;
-		this->y *= scale;
-		this->z *= scale;
+		x *= scale;
+		y *= scale;
+		z *= scale;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator /=(float scale)
 	{
-		this->x /= scale;
-		this->y /= scale;
-		this->z /= scale;
+		x /= scale;
+		y /= scale;
+		z /= scale;
 		return *this;
 	}
 

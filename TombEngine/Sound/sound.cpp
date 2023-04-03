@@ -628,12 +628,25 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 	return -1;
 }
 
+bool IsSoundEffectPlaying(int effectID)
+{
+	int channelIndex = Sound_EffectIsPlaying(effectID, nullptr);
+
+	if (channelIndex == -1)
+		return false;
+
+	return (SoundSlot[channelIndex].EffectID == effectID);
+}
+
 // Gets the distance to the source.
 
 float Sound_DistanceToListener(Pose *position)
 {
-	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
+	// Assume sound is 2D menu sound.
+	if (!position)
+		return 0.0f;
+
+	return Sound_DistanceToListener(position->Position.ToVector3());
 }
 float Sound_DistanceToListener(Vector3 position)
 {
@@ -882,7 +895,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, NULL, SoundEnvironment::Always);
+	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 }
 
 void PlaySecretTrack()

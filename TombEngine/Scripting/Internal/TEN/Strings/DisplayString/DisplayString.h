@@ -1,7 +1,8 @@
 #pragma once
-#include "Color/Color.h"
-#include <functional>
 #include <array>
+#include <functional>
+
+#include "Scripting/Internal/TEN/Color/Color.h"
 
 enum class DisplayStringOptions : size_t
 {
@@ -18,12 +19,12 @@ static const std::unordered_map<std::string, DisplayStringOptions> kDisplayStrin
 
 using FlagArray = std::array<bool, static_cast<size_t>(DisplayStringOptions::NUM_OPTIONS)>;
 // Used to store data used to render the string.
-// This is separate from DisplayString because the lifetimes
-// of the classes differ slightly.
+// This is separate from DisplayString because the lifetimes of the classes differ slightly.
+
 class UserDisplayString
 {
 public:
-	UserDisplayString(std::string const& key, int x, int y, D3DCOLOR col, FlagArray const & flags, bool translated);
+	UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated);
 
 private:
 	UserDisplayString() = default;
@@ -34,7 +35,7 @@ private:
 	int m_y{ 0 };
 	bool m_deleteWhenZero{ false };
 
-	//seconds
+	// Seconds
 	float m_timeRemaining{ 0.0f };
 	bool m_isInfinite{ false };
 	bool m_isTranslated{ false };
@@ -43,31 +44,31 @@ private:
 };
 
 using DisplayStringIDType = uintptr_t;
-using SetItemCallback = std::function<bool(DisplayStringIDType, UserDisplayString const&)>;
+using SetItemCallback = std::function<bool(DisplayStringIDType, const UserDisplayString&)>;
 using RemoveItemCallback = std::function<bool(DisplayStringIDType)>;
 using GetItemCallback = std::function<std::optional<std::reference_wrapper<UserDisplayString>>(DisplayStringIDType)>;
-
 
 class DisplayString
 {
 private:
 	DisplayStringIDType m_id{ 0 };
+
 public:
 	DisplayString();
 	~DisplayString();
 	DisplayStringIDType GetID() const;
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 
 	void SetPos(int x, int y);
 	std::tuple<int, int> GetPos() const;
 
-	void SetCol(ScriptColor const&);
+	void SetCol(const ScriptColor&);
 	ScriptColor GetCol();
 
-	void SetKey(std::string const&);
+	void SetKey(const std::string&);
 	std::string GetKey() const;
 
-	void SetFlags(sol::table const&);
+	void SetFlags(const sol::table&);
 
 	static SetItemCallback s_setItemCallback;
 	static RemoveItemCallback s_removeItemCallback;
@@ -82,5 +83,4 @@ public:
 		s_removeItemCallback = cbr;
 		s_getItemCallback = cbg;
 	}
-
 };
