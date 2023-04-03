@@ -56,6 +56,8 @@ namespace TEN::Entities::Vehicles
 
 	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
 
+	constexpr auto MINECART_WAKE_OFFSET = Vector3(BLOCK(1 / 6.0f), 0.0f, BLOCK(0.5f));
+
 	constexpr auto MINECART_IN_DUCK	 = IN_CROUCH;
 	constexpr auto MINECART_IN_SWIPE = IN_ACTION | IN_DRAW;
 
@@ -304,7 +306,7 @@ namespace TEN::Entities::Vehicles
 				{
 					auto* object = &Objects[item->ObjectNumber];
 					if (object->collision &&
-						(object->intelligent || item->ObjectNumber == ID_ROLLINGBALL || item->ObjectNumber == ID_ANIMATING2))
+						(object->intelligent || item->ObjectNumber == ID_ROLLINGBALL || item->ObjectNumber == ID_MINECART_SWITCH))
 					{
 						auto direction = minecartItem->Pose.Position - item->Pose.Position;
 						if (direction.x > -BLOCK(2) && direction.x < BLOCK(2) &&
@@ -313,7 +315,7 @@ namespace TEN::Entities::Vehicles
 						{
 							if (TestBoundsCollide(item, laraItem, MINECART_ENTITY_RADIUS))
 							{
-								if (item->ObjectNumber == ID_ANIMATING2)
+								if (item->ObjectNumber == ID_MINECART_SWITCH)
 								{
 									if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 										(laraItem->Animation.ActiveState == MINECART_STATE_SWIPE &&
@@ -585,7 +587,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		minecart->Velocity = DoVehicleWaterMovement(minecartItem, laraItem, minecart->Velocity, CLICK(1), &minecart->TurnRot);
+		minecart->Velocity = DoVehicleWaterMovement(minecartItem, laraItem, minecart->Velocity, CLICK(1), &minecart->TurnRot, MINECART_WAKE_OFFSET);
 		minecartItem->Pose.Orientation.x = minecart->Gradient * 32;
 
 		if (minecart->Flags & (MINECART_FLAG_TURNING_LEFT | MINECART_FLAG_TURNING_RIGHT))

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
@@ -9,6 +9,8 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Hud;
 
 void InitialiseLara(bool restore)
 {
@@ -28,13 +30,15 @@ void InitialiseLara(bool restore)
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
+	Lara.Status.Air = LARA_AIR_MAX;
+	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
+	Lara.Status.Poison = 0;
+	Lara.Status.Stamina = LARA_STAMINA_MAX;
+
 	Lara.Control.CanLook = true;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
-	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
-	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
 	Lara.ExtraAnim = NO_ITEM;
@@ -52,6 +56,8 @@ void InitialiseLara(bool restore)
 
 	InitialiseLaraMeshes(LaraItem);
 	InitialiseLaraAnims(LaraItem);
+
+	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
 void InitialiseLaraMeshes(ItemInfo* item)

@@ -36,16 +36,16 @@ void AIObject::Register(sol::table & parent)
 		// @tparam Vec3 position the new position of the object 
 		ScriptReserved_SetPosition, &AIObject::SetPos,
 
-		/// Get the object's Y-axis rotation
+		/// Get the object's Y-axis rotation.
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
 		// @function AIObject:GetRotationY
 		// @treturn number the object's Y-axis rotation 
 		ScriptReserved_GetRotationY, &AIObject::GetYRot,
 
-		/// Set the object's Y-axis rotation
+		/// Set the object's Y-axis rotation.
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
 		// @function AIObject:SetRotationY
-		// @tparam number The object's new Y-axis rotation
+		// @tparam number rotation The object's new Y-axis rotation
 		ScriptReserved_SetRotationY, &AIObject::SetYRot,
 
 		/// Get the object's unique string identifier

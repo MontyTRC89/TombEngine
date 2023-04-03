@@ -19,7 +19,8 @@ enum class LaraType
 	Invisible = 7
 };
 
-class ScriptInterfaceLevel {
+class ScriptInterfaceLevel
+{
 public:
 	bool Horizon{ false };
 	bool Rumble{ false };

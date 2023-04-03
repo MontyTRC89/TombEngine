@@ -30,6 +30,11 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const AxisAngle& orient, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
@@ -67,6 +72,12 @@ namespace TEN::Math::Geometry
 		return TranslatePoint(point, direction, distance);
 	}
 
+	Vector3 TranslatePoint(const Vector3& point, const AxisAngle& orient, float distance)
+	{
+		auto direction = orient.ToDirection();
+		return TranslatePoint(point, direction, distance);
+	}
+
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
 	{
 		if (distance == 0.0f)
@@ -77,30 +88,16 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
-	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rotation)
+	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot)
 	{
-		auto rotMatrix = rotation.ToRotationMatrix();
+		auto rotMatrix = rot.ToRotationMatrix();
 		return Vector3::Transform(point, rotMatrix);
 	}
 
-	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rotation)
+	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rot)
 	{
-		auto rotMatrix = rotation.ToRotationMatrix();
+		auto rotMatrix = rot.ToRotationMatrix();
 		return Vector3::Transform(point, rotMatrix);
-	}
-
-	Vector3 GetFloorNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
-		normal.Normalize();
-		return normal;
-	}
-
-	Vector3 GetCeilingNormal(const Vector2& tilt)
-	{
-		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4);
-		normal.Normalize();
-		return normal;
 	}
 
 	short GetShortestAngle(short fromAngle, short toAngle)
@@ -111,20 +108,20 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& gravity)
 	{
-		if (normal == -force)
+		if (normal == -gravity)
 			return 0;
 
-		return FROM_RAD(acos(normal.Dot(-force)));
+		return FROM_RAD(acos(normal.Dot(-gravity)));
 	}
 
-	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force)
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& gravity)
 	{
-		if (normal == -force)
+		if (normal == -gravity)
 			return 0;
 
-		// TODO: Consider normal of downward force.
+		// TODO: Consider gravity direction.
 		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 
@@ -143,9 +140,13 @@ namespace TEN::Math::Geometry
 		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
 
 		if (distanceAlpha < 0.0f)
+		{
 			return linePoint0;
+		}
 		else if (distanceAlpha > 1.0f)
+		{
 			return linePoint1;
+		}
 
 		return (linePoint0 + (direction * distanceAlpha));
 	}
@@ -158,9 +159,9 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
-	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& gravity)
 	{
-		// TODO: Consider normal of downward force.
+		// TODO: Consider gravity direction.
 
 		// Determine relative angle properties of normal.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
@@ -175,6 +176,40 @@ namespace TEN::Math::Geometry
 			-slopeAngle * cosDeltaAngle,
 			orient2D,
 			slopeAngle * sinDeltaAngle);
+	}
+
+	Quaternion ConvertDirectionToQuat(const Vector3& direction)
+	{
+		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
+
+		static const auto REF_DIRECTION = Vector3::UnitZ;
+
+		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
+		float dot = REF_DIRECTION.Dot(direction);
+		if (dot < -SINGULARITY_THRESHOLD)
+		{
+			auto axis = Vector3::UnitX.Cross(REF_DIRECTION);
+			if (axis.LengthSquared() < EPSILON)
+				axis = Vector3::UnitY.Cross(REF_DIRECTION);
+			axis.Normalize();
+
+			auto axisAngle = AxisAngle(axis, FROM_RAD(PI));
+			return axisAngle.ToQuaternion();
+		}
+
+		// If vectors are nearly identical, return identity quaternion.
+		if (dot > SINGULARITY_THRESHOLD)
+			return Quaternion::Identity;
+
+		// Calculate axis-angle and return converted quaternion.
+		auto axisAngle = AxisAngle(REF_DIRECTION.Cross(direction), FROM_RAD(acos(dot)));
+		return axisAngle.ToQuaternion();
+	}
+
+	Vector3 ConvertQuatToDirection(const Quaternion& quat)
+	{
+		static const auto refDirection = Vector3::UnitZ;
+		return Vector3::Transform(refDirection, quat);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)

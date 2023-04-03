@@ -5,7 +5,7 @@
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/Gui.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
@@ -16,11 +16,13 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Gui;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
-extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_SFXVolumeBar;
+extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
 
 namespace TEN::Renderer
 {
@@ -68,29 +70,31 @@ namespace TEN::Renderer
 	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
 	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
 
-	// These bars are only used in menus
-	TEN::Renderer::RendererHUDBar* g_MusicVolumeBar = nullptr;
-	TEN::Renderer::RendererHUDBar* g_SFXVolumeBar = nullptr;
+	// These bars are only used in menus.
+	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
+	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
 	void Renderer11::InitialiseMenuBars(int y)
 	{
-		std::array<Vector4, 5> soundSettingColors =
+		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
-			//top
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-			//center
-			Vector4(0.18f,0.3f,0.72f,1),
-			//bottom
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
+			// Top
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Center
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+
+			// Bottom
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f),
+			Vector4(0.18f, 0.3f, 0.72f, 1.0f)
 		};
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), MenuRightSideEntry, y + shift, 150, 8, 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 	}
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
@@ -207,12 +211,12 @@ namespace TEN::Renderer
 
 			// Music volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, *g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
-			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, *g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
 			// Auto targeting
@@ -515,61 +519,72 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawPickup(short objectNum)
+	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
-		// Clear just the Z-buffer so we can start drawing on top of the scene
+		static const auto COUNT_STRING_PREFIX = std::string("  ");
+
+		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
 		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, EulerAngles(0, m_pickupRotation, 0), 0.5f); // TODO: + PickupY
-		m_pickupRotation += 45 * 360 / 30;
+		// Draw display pickup.
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
+
+		// Draw count string.
+		if (pickup.Count > 1)
+		{
+			AddString(
+				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
+				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+		}
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits)
+	// TODO: Handle opacity
+	void Renderer11::DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
-		Matrix translation;
-		Matrix rotation;
-		Matrix world;
-		Matrix view;
-		Matrix projection;
-		Matrix scale;
+		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
-		float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
+		auto screenRes = GetScreenResolution();
+		auto factor = Vector2(
+			screenRes.x / SCREEN_SPACE_RES.x,
+			screenRes.y / SCREEN_SPACE_RES.y);
 
-		x *= factorX;
-		y *= factorY;
-		scale1 *= factorX > factorY ? factorY : factorX;
+		pos2D *= factor;
+		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
-		auto index = g_Gui.ConvertObjectToInventoryItem(objectNum);
-
+		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (index != -1)
 		{
-			auto& invObject = InventoryObjectTable[index];
-			y += invObject.YOffset;
+			const auto& invObject = InventoryObjectTable[index];
+
+			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
 
-		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
-		projection = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -1024.0f, 1024.0f);
+		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(2)), Vector3::Zero, Vector3::Down);
+		auto projMatrix = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -BLOCK(1), BLOCK(1));
 
-		auto& moveableObj = m_moveableObjects[objectNum];
-		if (!moveableObj)
+		auto& moveableObject = m_moveableObjects[objectNumber];
+		if (!moveableObject)
 			return;
 
-		auto* obj = &Objects[objectNum];
-
-		if (obj->animIndex != -1)
+		const auto& object = Objects[objectNumber];
+		if (object.animIndex != -1)
 		{
-			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].FramePtr] };
-			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
+			auto frameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				0.0f
+			};
+			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}
 
-		auto pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
 
 		// Set vertex buffer.
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -582,41 +597,43 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
 		// Set matrices.
-		CCameraMatrixBuffer HudCamera;
-		HudCamera.CamDirectionWS = -Vector4::UnitZ;
-		HudCamera.ViewProjection = view * projection;
-		m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
+		CCameraMatrixBuffer hudCamera;
+		hudCamera.CamDirectionWS = -Vector4::UnitZ;
+		hudCamera.ViewProjection = viewMatrix * projMatrix;
+		m_cbCameraMatrices.updateData(hudCamera, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 
-		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
+		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
 		{
 			if (meshBits && !(meshBits & (1 << n)))
 				continue;
+			
+			auto* mesh = (*moveableObject).ObjectMeshes[n];
 
-			auto* mesh = (*moveableObj).ObjectMeshes[n];
+			// HACK: Rotate compass needle.
+			if (objectNumber == ID_COMPASS_ITEM && n == 1)
+				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
-			// Finish the world matrix
-			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-			rotation = orient.ToRotationMatrix();
-			scale = Matrix::CreateScale(scale1);
+			// Construct world matrix.
+			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
+			auto rotMatrix = orient.ToRotationMatrix();
+			auto scaleMatrix = Matrix::CreateScale(scale);
+			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
 
-			world = scale * rotation;
-			world = world * translation;
-
-			if (obj->animIndex != -1)
-				m_stItem.World = ((*moveableObj).AnimationTransforms[n] * world);
+			if (object.animIndex != -1)
+				m_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
 			else
-				m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
+				m_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
 
 			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.Color = Vector4::One;
-			m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+			m_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-			for (auto& bucket : mesh->Buckets)
+			
+			for (const auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
@@ -627,14 +644,15 @@ namespace TEN::Renderer
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
-
+				
+				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
+					Renderer11::SetBlendMode(bucket.BlendMode, true);
+				
 				SetAlphaTest(
-					bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-					ALPHA_TEST_THRESHOLD
-				);
+					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
 				m_numMoveablesDrawCalls++;
 			}
 		}
@@ -643,7 +661,7 @@ namespace TEN::Renderer
 	void Renderer11::RenderTitleImage()
 	{
 		Texture2D texture;
-		SetTextureOrDefault(texture, TEN::Utils::FromChar(g_GameFlow->IntroImagePath.c_str()));
+		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->IntroImagePath.c_str()));
 
 		if (!texture.Texture)
 			return;
@@ -661,7 +679,9 @@ namespace TEN::Renderer
 					timeout--;
 			}
 			else
+			{
 				currentFade = std::clamp(currentFade -= FADE_FACTOR, 0.0f, 1.0f);
+			}
 
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), m_backBufferRTV, m_depthStencilView);
 			Synchronize();
@@ -672,6 +692,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawExamines()
 	{
+		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
+
 		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
 
@@ -705,23 +727,26 @@ namespace TEN::Renderer
 
 		float savedScale = object.Scale1;
 		object.Scale1 = scaler;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(invItem), orient, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
 		object.Scale1 = savedScale;
 	}
 
 	void Renderer11::DrawDiary()
 	{
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
+		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
 		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
+		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), object.Orientation, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
 
-		for (size_t i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
+		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
 			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
 				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
+			{
 				break;
+			}
 
 			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
 		}
@@ -729,8 +754,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		ID3D11ShaderResourceView* background)
+	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
 	{
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE, true);
@@ -771,12 +795,12 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)m_screenWidth / REFERENCE_RES_WIDTH;
-				float factorY = (float)m_screenHeight / REFERENCE_RES_HEIGHT;
+				float factorX = (float)m_screenWidth / SCREEN_SPACE_RES.x;
+				float factorY = (float)m_screenHeight / SCREEN_SPACE_RES.y;
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
-				int logoLeft   = (REFERENCE_RES_WIDTH / 2) - (LogoWidth / 2);
-				int logoRight  = (REFERENCE_RES_WIDTH / 2) + (LogoWidth / 2);
+				int logoLeft   = (SCREEN_SPACE_RES.x / 2) - (LogoWidth / 2);
+				int logoRight  = (SCREEN_SPACE_RES.x / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;
@@ -911,7 +935,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d (%d instanced)", m_numSpritesDrawCalls, m_numInstancedSpritesDrawCalls);
+				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
@@ -924,18 +948,18 @@ namespace TEN::Renderer
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
+				PrintDebugMessage("    dot products: %d", m_dotProducts);
+
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
 				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-					LaraItem->BoxNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
-					r->z + r->zSize * SECTOR(1));
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1), r->z + r->zSize * SECTOR(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);

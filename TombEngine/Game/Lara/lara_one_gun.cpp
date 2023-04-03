@@ -11,6 +11,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -32,6 +33,7 @@
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -326,6 +328,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	item.Pose.Position = laraItem->Pose.Position;
+	item.RoomNumber = laraItem->RoomNumber;
+
 	AnimateItem(&item);
 
 	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
@@ -786,7 +790,7 @@ void GrenadeControl(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 		TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	}
 
@@ -922,7 +926,7 @@ void RocketControl(short itemNumber)
 	int wz = world.Translation().z;
 
 	// Trigger fire, smoke, and light.
-	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerDynamicLight(
 		wx + item.Pose.Position.x + (GetRandomControl() & 15) - 8, 
@@ -1378,7 +1382,7 @@ bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
 		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
 		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
 
-		SetupRipple(item.Pose.Position.x, yPoint, item.Pose.Position.z, Random::GenerateInt(8, 16), 0);
+		SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
 	}
 
 	ItemNewRoom(item.Index, coll.RoomNumber);
@@ -1563,7 +1567,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 						GetCreatureInfo(currentItem)->Poisoned = true;
 
 					if (currentItem->IsLara())
-						GetLaraInfo(currentItem)->PoisonPotency += 5;
+						GetLaraInfo(currentItem)->Status.Poison += 5;
 				}
 				else if (!currentObject.undead)
 				{

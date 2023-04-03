@@ -48,9 +48,9 @@ enum ItemFlags
 	IFLAG_TRIGGERED       = (1 << 5),
 	IFLAG_CLEAR_BODY	  = (1 << 7),
 	IFLAG_INVISIBLE		  = (1 << 8),
+	IFLAG_ACTIVATION_MASK = 0x3E00, // Bits 9-13 (IFLAG_CODEBITS)
 	IFLAG_REVERSE		  = (1 << 14),
-	IFLAG_KILLED		  = (1 << 15),
-	IFLAG_ACTIVATION_MASK = 0x3E00 // Bits 9-13 (IFLAG_CODEBITS)
+	IFLAG_KILLED		  = (1 << 15)
 };
 
 enum class EffectType
@@ -66,14 +66,14 @@ enum class EffectType
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = 0;
-	int FrameNumber	  = 0;
+	int AnimNumber	  = 0; // g_Level.Anims index.
+	int FrameNumber	  = 0; // g_Level.Frames index.
 	int ActiveState	  = 0;
 	int TargetState	  = 0;
 	int RequiredState = NO_STATE;
 
-	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+	bool	IsAirborne = false;
+	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
 };
 
 struct EntityModelData
@@ -83,7 +83,7 @@ struct EntityModelData
 	Vector4 Color = Vector4::Zero;
 
 	std::vector<int>		 MeshIndex = {};
-	std::vector<BoneMutator> Mutator   = {};
+	std::vector<BoneMutator> Mutators  = {};
 };
 
 struct EntityCallbackData
@@ -96,14 +96,14 @@ struct EntityCallbackData
 
 struct EntityEffectData
 {
-	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::Zero;
-	Vector3 PrimaryEffectColor = Vector3::Zero;
-	Vector3 SecondaryEffectColor = Vector3::Zero;
-	int Count = -1;
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= -1;
 };
 
-// TODO: We need to find good "default states" for a lot of these/ -- squidshire 25/05/2022
+// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
@@ -137,8 +137,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits	  = BitField();
-	BitField MeshBits	  = BitField();
+	BitField TouchBits = BitField::Default;
+	BitField MeshBits  = BitField::Default;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];
@@ -187,9 +187,10 @@ void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
-const std::string& GetObjectName(GAME_OBJECT_ID id);
-std::vector<int> FindAllItems(short objectNumber);
-ItemInfo* FindItem(int objectNumber);
+const std::string& GetObjectName(GAME_OBJECT_ID objectID);
+std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
+std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
+ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);

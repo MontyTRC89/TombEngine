@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
@@ -27,6 +28,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
+using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
@@ -299,8 +301,6 @@ void InitialiseSpecialEffects()
 	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
-	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
-	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
@@ -313,7 +313,6 @@ void InitialiseSpecialEffects()
 	NextFireSpark = 1;
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
-	NextDrip = 0;
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
@@ -372,7 +371,7 @@ void InitialiseObjects()
 	// User defined objects
 	CustomObjects();
 
-	InitialiseHair();
+	HairEffect.Initialize();
 	InitialiseSpecialEffects();
 
 	NumRPickups = 0;

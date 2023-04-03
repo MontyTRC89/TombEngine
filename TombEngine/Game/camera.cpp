@@ -331,6 +331,10 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 	Camera.timer = -1;
 }
 
+void ClearObjCamera()
+{
+	ItemCamera.ItemCameraOn = false;
+}
 
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
 {

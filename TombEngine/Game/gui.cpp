@@ -33,8 +33,8 @@ using namespace TEN::Utils;
 namespace TEN::Gui
 {
 	constexpr auto LINE_HEIGHT = 25;
-	constexpr auto PHD_CENTER_X = REFERENCE_RES_WIDTH / 2;
-	constexpr auto PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
+	constexpr auto PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
+	constexpr auto PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
 
 	constexpr auto VOLUME_MAX = 100;
 	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
@@ -1651,7 +1651,6 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		CompassNeedleAngle = ANGLE(22.5f);
 		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
@@ -1915,7 +1914,8 @@ namespace TEN::Gui
 
 			case INV_OBJECT_SMALL_MEDIPACK:
 
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) && !lara->PoisonPotency)
+				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
+					lara->Status.Poison == 0)
 				{
 					SayNo();
 					return;
@@ -1926,7 +1926,7 @@ namespace TEN::Gui
 					if (lara->Inventory.TotalSmallMedipacks != -1)
 						lara->Inventory.TotalSmallMedipacks--;
 
-					lara->PoisonPotency = 0;
+					lara->Status.Poison = 0;
 					item->HitPoints += LARA_HEALTH_MAX / 2;
 
 					if (item->HitPoints > LARA_HEALTH_MAX)
@@ -1942,7 +1942,8 @@ namespace TEN::Gui
 
 			case INV_OBJECT_LARGE_MEDIPACK:
 
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) && !lara->PoisonPotency)
+				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
+					lara->Status.Poison == 0)
 				{
 					SayNo();
 					return;
@@ -1953,7 +1954,7 @@ namespace TEN::Gui
 					if (lara->Inventory.TotalLargeMedipacks != -1)
 						lara->Inventory.TotalLargeMedipacks--;
 
-					lara->PoisonPotency = 0;
+					lara->Status.Poison = 0;
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
@@ -2540,12 +2541,14 @@ namespace TEN::Gui
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 					else
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 				}
 				else
-					g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
+				{
+					g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+				}
 
 				xPos += OBJLIST_SPACING;
 			}
@@ -2829,9 +2832,9 @@ namespace TEN::Gui
 
 					int objectNumber;
 					if (ringIndex == (int)RingTypes::Inventory)
-						objectNumber = int(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
+						objectNumber = int(PHD_CENTER_Y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
 					else
-						objectNumber = int(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
+						objectNumber = int(PHD_CENTER_Y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
 
 					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
@@ -2884,7 +2887,7 @@ namespace TEN::Gui
 				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
 				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
 
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, orientation, scaler, bits);
+				g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
@@ -2981,9 +2984,6 @@ namespace TEN::Gui
 				return false;
 
 			OBJLIST_SPACING = PHD_CENTER_X / 2;
-
-			if (CompassNeedleAngle != 1024)
-				CompassNeedleAngle -= 32;
 
 			UpdateInputActions(item);
 			GameTimer++;
@@ -3083,31 +3083,34 @@ namespace TEN::Gui
 
 	void GuiController::DoExamineMode()
 	{
-		InvMode = InventoryMode::Examine;
+		this->InvMode = InventoryMode::Examine;
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::None;
+			this->InvMode = InventoryMode::None;
 		}
 	}
 
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
-		// TODO
-		return;
+		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);
+		constexpr auto LERP_ALPHA = 0.1f;
 
-		g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
-		short compassSpeed = phd_sin(CompassNeedleAngle - item->Pose.Orientation.y);
-		short compassAngle = (item->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
-		Matrix::CreateRotationY(compassAngle);
+		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
+		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
+		this->CompassNeedleAngle = needleOrient.y;
+
+		// HACK: Needle is rotated in the draw function.
+		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
+		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Zero, invObject.Scale1 * 1.5f);
 	}
 
 	void GuiController::DoDiary(ItemInfo* item)
 	{
 		auto* lara = GetLaraInfo(item);
 
-		InvMode = InventoryMode::Diary;
+		this->InvMode = InventoryMode::Diary;
 
 		if (GuiIsPulsed(In::Right) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)

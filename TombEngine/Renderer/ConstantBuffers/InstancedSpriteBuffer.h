@@ -9,10 +9,10 @@ namespace TEN::Renderer
 	struct alignas(16) InstancedSprite
 	{
 		Matrix World;
+		Vector4 UV[2];
 		Vector4 Color;
 		float IsBillboard;
 		float IsSoftParticle;
-		Vector2 SpritesPadding;
 	};
 
 	struct alignas(16) CInstancedSpriteBuffer

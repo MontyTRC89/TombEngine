@@ -75,7 +75,7 @@ namespace TEN::Entities::Creatures::TR3
 		laraItem->Animation.TargetState = LS_DEATH;
 
 		laraItem->HitPoints = NOT_TARGETABLE;
-		Lara.Air = -1;
+		Lara.Status.Air = -1;
 		Lara.Control.HandStatus = HandStatus::Busy;
 		Lara.Control.Weapon.GunType = LaraWeaponType::None;
 
