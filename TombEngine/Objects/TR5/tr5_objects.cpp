@@ -934,8 +934,8 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseLasers;
 		obj->control = ControlLasers;
-		//obj->drawRoutine = nullptr;
-		//obj->usingDrawAnimatingItem = false;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
 	}
 }
 
