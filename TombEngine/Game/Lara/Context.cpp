@@ -23,7 +23,7 @@ namespace TEN::Entities::Player::Context
 
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
-		int floorToCeilingHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
+		int floorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
 
 		// 1. Test for slippery slope (if applicable).
 		bool isSlipperySlope = setupData.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
@@ -40,10 +40,10 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4. Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&		  // Ledge height is climbable.
-			floorToCeilingHeight > setupData.SpaceMin &&  // Space isn't too narrow.
-			floorToCeilingHeight <= setupData.SpaceMax && // Space isn't too wide.
-			floorToCeilingHeight >= setupData.GapMin)	  // Gap is permissive.
+		if (relFloorHeight <= ABS_FLOOR_BOUND &&	   // Ledge height is climbable.
+			floorToCeilHeight > setupData.SpaceMin &&  // Space isn't too narrow.
+			floorToCeilHeight <= setupData.SpaceMax && // Space isn't too wide.
+			floorToCeilHeight >= setupData.GapMin)	   // Gap is permissive.
 		{
 			return true;
 		}
