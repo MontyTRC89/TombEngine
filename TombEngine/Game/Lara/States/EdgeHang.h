@@ -1,13 +1,8 @@
 #pragma once
 #include "Game/Lara/lara_struct.h"
 
-struct ItemInfo;
 struct CollisionInfo;
-
-// -----------------------------------
-// EDGE HANG
-// State Control & Collision Functions
-// -----------------------------------
+struct ItemInfo;
 
 void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll);

@@ -16,11 +16,6 @@
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
-// -----------------------------
-// EDGE HANG
-// Control & Collision Functions
-// -----------------------------
-
 void SetPlayerHangRelease(ItemInfo& item)
 {
 	constexpr auto FORWARD_VEL	= 2.0f;
