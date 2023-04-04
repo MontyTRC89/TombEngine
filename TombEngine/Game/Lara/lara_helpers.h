@@ -11,6 +11,7 @@ struct VaultTestResult;
 // For State Control & Collision
 // -----------------------------
 
+// Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerWetnessDrips(ItemInfo& item);
@@ -26,6 +27,7 @@ void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DoLaraFallDamage(ItemInfo* item);
 
+// Getters
 LaraInfo& GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
@@ -33,6 +35,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
+// Modulators
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
@@ -44,6 +47,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 
+// Setters
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult);
@@ -53,6 +57,7 @@ void SetLaraFallBackAnimation(ItemInfo* item);
 void SetLaraMonkeyFallAnimation(ItemInfo* item);
 void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
+void SetPlayerHangRelease(ItemInfo& item);
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
 void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);

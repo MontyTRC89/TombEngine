@@ -958,6 +958,30 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+void SetPlayerHangRelease(ItemInfo& item)
+{
+	constexpr auto FORWARD_VEL	= 2.0f;
+	constexpr auto VERTICAL_VEL = 1.0f;
+
+	auto& player = GetLaraInfo(item);
+
+	if (player.Control.IsClimbingLadder)
+	{
+		SetAnimation(&item, LA_FALL_START);
+		item.Pose.Position.y += CLICK(1);
+	}
+	else
+	{
+		SetAnimation(&item, LA_JUMP_UP, 9);
+		item.Pose.Position.y += GameBoundingBox(&item).Y2 * 1.8f;
+	}
+
+	item.Animation.IsAirborne = true;
+	item.Animation.Velocity.y = VERTICAL_VEL;
+	item.Animation.Velocity.z = FORWARD_VEL;
+	player.Control.HandStatus = HandStatus::Free;
+}
+
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 {
 	auto* lara = GetLaraInfo(item);
