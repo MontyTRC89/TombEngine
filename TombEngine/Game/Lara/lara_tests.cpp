@@ -114,7 +114,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const EdgeCa
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity.y = 0.0f;
 	item.Animation.Velocity.z = 0.0f;
-	item.Pose.Position.y = edgeCatchData.Height + LARA_HEIGHT/* - CLICK(0.6f)*/;
+	item.Pose.Position.y = edgeCatchData.Height + coll.Setup.Height;// LARA_HEIGHT;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
 }
@@ -371,7 +371,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	// Ladder case.
 	if (lara->Control.CanClimbLadder)
 	{
-		if (TrInput & IN_ACTION && item->HitPoints > 0)
+		if (IsHeld(In::Action) && item->HitPoints > 0)
 		{
 			lara->Control.MoveAngle = angle;
 
@@ -410,7 +410,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	// Regular case.
 	else
 	{
-		if ((TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
+		if ((IsHeld(In::Action) && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
 			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
 		{
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
@@ -424,9 +424,9 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 			if (climbDirection != 0)
 			{
-				auto s = phd_sin(lara->Control.MoveAngle);
-				auto c = phd_cos(lara->Control.MoveAngle);
-				auto testShift = Vector2(s * coll->Setup.Radius, c * coll->Setup.Radius);
+				auto sinMoveAngle = phd_sin(lara->Control.MoveAngle);
+				auto cosMoveAngle = phd_cos(lara->Control.MoveAngle);
+				auto testShift = Vector2(sinMoveAngle * coll->Setup.Radius, cosMoveAngle * coll->Setup.Radius);
 
 				x += testShift.x;
 				z += testShift.y;
