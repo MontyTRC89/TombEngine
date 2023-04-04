@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
@@ -13,199 +14,180 @@
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // LEDGE HANG
 // Control & Collision Functions
 // -----------------------------
 
-// State:		LS_HANG (10)
-// Collision:	lara_col_hang()
-void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
+void SetPlayerHangRelease(ItemInfo& item)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto FORWARD_VEL	= 2.0f;
+	constexpr auto VERTICAL_VEL = 1.0f;
 
-	lara->Control.IsClimbingLadder = false;
+	auto& player = GetLaraInfo(item);
+
+	if (player.Control.IsClimbingLadder)
+	{
+		SetAnimation(&item, LA_FALL_START);
+		item.Pose.Position.y += CLICK(1);
+	}
+	else
+	{
+		SetAnimation(&item, LA_JUMP_UP, 9);
+		item.Pose.Position.y += GameBoundingBox(&item).Y2 * 1.8f;
+	}
+
+	item.Animation.IsAirborne = true;
+	item.Animation.Velocity.y = VERTICAL_VEL;
+	item.Animation.Velocity.z = FORWARD_VEL;
+	player.Control.HandStatus = HandStatus::Free;
+}
+
+// State:	  LS_HANG_IDLE (10)
+// Collision: lara_col_hang_idle()
+void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.IsClimbingLadder = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = ANGLE(-45.0f);
 
 	if (item->HitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_IDLE;
+		SetPlayerHangRelease(*item);
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
-	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
-}
-
-// State:		LS_HANG (10)
-// Control:		lara_as_hang()
-void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	item->Animation.IsAirborne = false;
-	item->Animation.Velocity.y = 0;
-
-	if (item->Animation.AnimNumber == LA_REACH_TO_HANG ||
-		item->Animation.AnimNumber == LA_HANG_IDLE)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
+		if (IsHeld(In::Jump) && Context::CanPerformJump(*item, *coll))
 		{
-			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
+			if (IsHeld(In::Back))
 			{
-				item->Animation.TargetState = LS_SHIMMY_LEFT;
-				return;
-			}
-
-			switch (TestLaraHangCorner(item, coll, -90.0f))
-			{
-			case CornerType::Inner:
-				item->Animation.TargetState = LS_SHIMMY_INNER_LEFT;
-				return;
-			
-			case CornerType::Outer:
-				item->Animation.TargetState = LS_SHIMMY_OUTER_LEFT;
-				return;
-			
-			default:
-				break;
-			}
-
-			switch (TestLaraHangCorner(item, coll, -45.0f))
-			{
-			case CornerType::Inner:
-				item->Animation.TargetState = LS_SHIMMY_45_INNER_LEFT;
-				return;
-
-			case CornerType::Outer:
-				item->Animation.TargetState = LS_SHIMMY_45_OUTER_LEFT;
-				return;
-
-			default:
-				break;
-			}
-		}
-
-		if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
-		{
-			if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
-			{
-				item->Animation.TargetState = LS_SHIMMY_RIGHT;
-				return;
-			}
-
-			switch (TestLaraHangCorner(item, coll, 90.0f))
-			{
-			case CornerType::Inner:
-				item->Animation.TargetState = LS_SHIMMY_INNER_RIGHT;
-				return;
-
-			case CornerType::Outer:
-				item->Animation.TargetState = LS_SHIMMY_OUTER_RIGHT;
-				return;
-
-			default:
-				break;
-			}
-
-			switch (TestLaraHangCorner(item, coll, 45.0f))
-			{
-			case CornerType::Inner:
-				item->Animation.TargetState = LS_SHIMMY_45_INNER_RIGHT;
-				return;
-
-			case CornerType::Outer:
-				item->Animation.TargetState = LS_SHIMMY_45_OUTER_RIGHT;
-				return;
-
-			default:
-				break;
-			}
-		}
-
-		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
-		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
-		{
-			if (TrInput & IN_BACK)
 				item->Animation.TargetState = LS_JUMP_FORWARD;
-			else
-				item->Animation.TargetState = LS_JUMP_UP;
-		}
-	}
-
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-
-	TestLaraHang(item, coll);
-
-	if (item->Animation.AnimNumber == LA_REACH_TO_HANG ||
-		item->Animation.AnimNumber == LA_HANG_IDLE)
-	{
-		TestForObjectOnLedge(item, coll);
-
-		if (TrInput & IN_FORWARD)
-		{
-			if (coll->Front.Floor > -(CLICK(3.5f) - 46) &&
-				TestValidLedge(item, coll) && !coll->HitStatic)
-			{
-				if (coll->Front.Floor < -(CLICK(2.5f) + 10) &&
-					coll->Front.Floor >= coll->Front.Ceiling &&
-					coll->FrontLeft.Floor >= coll->FrontLeft.Ceiling &&
-					coll->FrontRight.Floor >= coll->FrontRight.Ceiling)
-				{
-					if (TrInput & IN_WALK)
-						item->Animation.TargetState = LS_HANDSTAND;
-					else if (TrInput & IN_CROUCH)
-					{
-						item->Animation.TargetState = LS_HANG_TO_CRAWL;
-						item->Animation.RequiredState = LS_CROUCH_IDLE;
-					}
-					else
-						item->Animation.TargetState = LS_GRABBING;
-
-					return;
-				}
-
-				if (coll->Front.Floor < -(CLICK(2.5f) + 10) &&
-					coll->Front.Floor - coll->Front.Ceiling >= -CLICK(1) &&
-					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -CLICK(1) &&
-					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -CLICK(1))
-				{
-					item->Animation.TargetState = LS_HANG_TO_CRAWL;
-					item->Animation.RequiredState = LS_CROUCH_IDLE;
-					return;
-				}
 			}
-
-			if (lara->Control.CanClimbLadder &&
-				coll->Middle.Ceiling <= -CLICK(1) &&
-				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
+			else
 			{
-				if (TestLaraClimbIdle(item, coll))
-					item->Animation.TargetState = LS_LADDER_IDLE;
-				else if (TestLastFrame(item))
-					SetAnimation(item, LA_LADDER_SHIMMY_UP);
+				item->Animation.TargetState = LS_JUMP_UP;
 			}
 
 			return;
 		}
 
-		if (TrInput & IN_BACK && lara->Control.CanClimbLadder &&
-			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
-			(item->Animation.AnimNumber == LA_REACH_TO_HANG ||
-				item->Animation.AnimNumber == LA_HANG_IDLE))
+		if (IsHeld(In::Forward))
 		{
-			if (TestLaraClimbIdle(item, coll))
-				item->Animation.TargetState = LS_LADDER_IDLE;
-			else if (TestLastFrame(item))
-				SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
+			if (Context::CanClimbLedgeToCrouch(*item, *coll))
+			{
+				item->Animation.TargetState = LS_HANG_TO_CROUCH;
+				return;
+			}
+			else if (Context::CanClimbLedgeToStand(*item, *coll))
+			{
+				if (IsHeld(In::Crouch))
+				{
+					item->Animation.TargetState = LS_HANG_TO_CROUCH;
+				}
+				else if (IsHeld(In::Walk))
+				{
+					item->Animation.TargetState = LS_HANDSTAND;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_GRABBING;
+				}
+
+				return;
+			}
+
+			if (Context::CanWallShimmyUp(*item, *coll))
+			{
+				if (!IsHeld(In::Crouch) && TestLaraClimbIdle(item, coll))
+				{
+					item->Animation.TargetState = LS_LADDER_IDLE;
+				}
+				else if (TestLastFrame(item))
+				{
+					SetAnimation(item, LA_LADDER_SHIMMY_UP);
+				}
+
+				return;
+			}
 		}
+		else if (IsHeld(In::Back))
+		{
+			if (Context::CanWallShimmyDown(*item, *coll))
+			{
+				if (!IsHeld(In::Crouch) && TestLaraClimbIdle(item, coll))
+				{
+					item->Animation.TargetState = LS_LADDER_IDLE;
+				}
+				else if (TestLastFrame(item))
+				{
+					SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
+				}
+
+				return;
+			}
+		}
+
+		if (IsHeld(In::Left) || IsHeld(In::LeftStep))
+		{
+			if (Context::CanLedgeShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
+			{
+				item->Animation.TargetState = LS_SHIMMY_LEFT;
+				return;
+			}
+
+			auto cornerShimmyState = GetLaraCornerShimmyState(*item, *coll);
+			if (cornerShimmyState.has_value())
+			{
+				item->Animation.TargetState = cornerShimmyState.value();
+				return;
+			}
+		}
+		else if (IsHeld(In::Right) || IsHeld(In::RightStep))
+		{
+			if (Context::CanLedgeShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
+			{
+				item->Animation.TargetState = LS_SHIMMY_RIGHT;
+				return;
+			}
+
+			auto cornerShimmyState = GetLaraCornerShimmyState(*item, *coll);
+			if (cornerShimmyState.has_value())
+			{
+				item->Animation.TargetState = cornerShimmyState.value();
+				return;
+			}
+		}
+
+		item->Animation.TargetState = LS_HANG_IDLE;
+		return;
 	}
+
+	SetPlayerHangRelease(*item);
+}
+
+// State:	LS_HANG_IDLE (10)
+// Control: lara_as_hang_idle()
+void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& lara = *GetLaraInfo(item);
+
+	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.y = 0;
+	lara.Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
+
+	TestLaraHang(item, coll);
 }
 
 // State:		LS_SHIMMY_LEFT (30)
@@ -219,7 +201,7 @@ void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(45.0f);
 
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
-		item->Animation.TargetState = LS_HANG;
+		item->Animation.TargetState = LS_HANG_IDLE;
 }
 
 // State:		LS_SHIMMY_LEFT (30)
@@ -246,7 +228,7 @@ void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(45.0f);
 
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
-		item->Animation.TargetState = LS_HANG;
+		item->Animation.TargetState = LS_HANG_IDLE;
 }
 
 // State:		LS_SHIMMY_RIGHT (31)

@@ -64,7 +64,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_left_slow,//7
 	lara_as_death,//8
 	lara_as_freefall,//9
-	lara_as_hang,
+	lara_as_hang_idle,
 	lara_as_reach,
 	lara_as_splat,
 	lara_as_underwater_idle,//13
@@ -246,7 +246,7 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_left_slow,
 	lara_col_death,
 	lara_col_freefall,//9
-	lara_col_hang,
+	lara_col_hang_idle,
 	lara_col_reach,
 	lara_col_splat,
 	lara_col_underwater_idle,

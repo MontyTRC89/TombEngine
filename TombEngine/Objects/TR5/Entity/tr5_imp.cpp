@@ -230,7 +230,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (creature->Enemy->Animation.ActiveState == LS_CROUCH_IDLE ||
 					creature->Enemy->Animation.ActiveState == LS_CROUCH_ROLL ||
 					creature->Enemy->Animation.ActiveState > LS_MONKEY_TURN_180 &&
-					creature->Enemy->Animation.ActiveState < LS_HANG_TO_CRAWL ||
+					creature->Enemy->Animation.ActiveState < LS_HANG_TO_CROUCH ||
 					creature->Enemy->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 					creature->Enemy->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 				{

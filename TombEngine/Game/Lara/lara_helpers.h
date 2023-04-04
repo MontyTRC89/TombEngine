@@ -30,6 +30,7 @@ LaraInfo& GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 
+std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

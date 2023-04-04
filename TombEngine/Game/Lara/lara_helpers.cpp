@@ -454,6 +454,53 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
+std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
+{
+	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
+	{
+		switch (TestLaraHangCorner(&item, &coll, -90.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_INNER_LEFT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_OUTER_LEFT;
+		}
+
+		switch (TestLaraHangCorner(&item, &coll, -45.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_45_INNER_LEFT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_45_OUTER_LEFT;
+		}
+	}
+	
+	if (IsHeld(In::Right) || IsHeld(In::RightStep))
+	{
+		switch (TestLaraHangCorner(&item, &coll, 90.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_INNER_RIGHT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_OUTER_RIGHT;
+		}
+
+		switch (TestLaraHangCorner(&item, &coll, 45.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_45_INNER_RIGHT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_45_OUTER_RIGHT;
+		}
+	}
+
+	return std::nullopt;
+}
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;

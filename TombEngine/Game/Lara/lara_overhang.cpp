@@ -840,7 +840,7 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 			if ((probeDown.CeilingTilt.x / 3) == (slopeData.Goal.x / 3) ||
 				(probeDown.CeilingTilt.y / 3) == (slopeData.Goal.y / 3))
 			{
-				item->Animation.TargetState = LS_HANG;
+				item->Animation.TargetState = LS_HANG_IDLE;
 				if (TrInput & IN_FORWARD)
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 				/*else if (TrInput & IN_BACK)
