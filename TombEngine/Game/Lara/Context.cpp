@@ -13,13 +13,13 @@
 
 namespace TEN::Entities::Player::Context
 {
-	static bool TestLedgeClimbSetup(ItemInfo& item, CollisionInfo& coll, const Context::LedgeClimbSetupData& setupData)
+	static bool TestLedgeClimbSetup(ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(1);
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, setupData.HeadingAngle, coll.Setup.Radius, -(LARA_HEIGHT_STRETCH + CLICK(0.5f)));
+		auto pointCollFront = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -(LARA_HEIGHT_STRETCH + CLICK(0.5f)));
 
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
@@ -118,7 +118,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanClimbLedgeToCrouch(ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setupData = Context::LedgeClimbSetupData
+		auto setupData = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
@@ -126,12 +126,12 @@ namespace TEN::Entities::Player::Context
 			true
 		};
 
-		return Context::TestLedgeClimbSetup(item, coll, setupData);
+		return TestLedgeClimbSetup(item, coll, setupData);
 	}
 
 	bool CanClimbLedgeToStand(ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setupData = Context::LedgeClimbSetupData
+		auto setupData = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
@@ -139,7 +139,7 @@ namespace TEN::Entities::Player::Context
 			false
 		};
 
-		return Context::TestLedgeClimbSetup(item, coll, setupData);
+		return TestLedgeClimbSetup(item, coll, setupData);
 	}
 
 	bool CanLedgeShimmyLeft(ItemInfo& item, CollisionInfo& coll)
