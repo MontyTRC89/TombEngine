@@ -476,8 +476,7 @@ std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
 			return LS_SHIMMY_45_OUTER_LEFT;
 		}
 	}
-	
-	if (IsHeld(In::Right) || IsHeld(In::RightStep))
+	else if (IsHeld(In::Right) || IsHeld(In::RightStep))
 	{
 		switch (TestLaraHangCorner(&item, &coll, 90.0f))
 		{

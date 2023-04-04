@@ -5,7 +5,7 @@ struct ItemInfo;
 struct CollisionInfo;
 
 // -----------------------------------
-// LEDGE HANG
+// EDGE HANG
 // State Control & Collision Functions
 // -----------------------------------
 
