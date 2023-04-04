@@ -68,7 +68,7 @@ void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action))
 	{
-		if (IsHeld(In::Jump) && Context::CanPerformJump(*item, *coll))
+		if (IsHeld(In::Jump) && Context::CanPerformLedgeJump(*item, *coll))
 		{
 			if (IsHeld(In::Back))
 			{
