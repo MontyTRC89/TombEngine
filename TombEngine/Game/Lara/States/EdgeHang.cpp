@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/Lara/lara_hang.h"
+#include "Game/Lara/States/EdgeHang.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -13,8 +13,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Player;
+using namespace TEN::Input;
 
 // -----------------------------
 // EDGE HANG

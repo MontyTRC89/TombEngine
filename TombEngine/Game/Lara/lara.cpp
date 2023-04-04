@@ -7,7 +7,6 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_crawl.h"
 #include "Game/Lara/lara_fire.h"
-#include "Game/Lara/lara_hang.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_initialise.h"
@@ -20,6 +19,7 @@
 #include "Game/Lara/lara_surface.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Lara/States/EdgeHang.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"

@@ -238,7 +238,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_cheat.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
     <ClInclude Include="Game\Lara\lara_crawl.h" />
-    <ClInclude Include="Game\Lara\lara_hang.h" />
+    <ClInclude Include="Game\Lara\States\EdgeHang.h" />
     <ClInclude Include="Game\Lara\lara_info.h" />
     <ClInclude Include="Game\Lara\lara_initialise.h" />
     <ClInclude Include="Game\Lara\lara_monkey.h" />
@@ -689,7 +689,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
-    <ClCompile Include="Game\Lara\lara_hang.cpp" />
+    <ClCompile Include="Game\Lara\States\EdgeHang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
