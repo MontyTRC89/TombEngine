@@ -11,12 +11,13 @@ struct ItemInfo;
 // For State Control & Collision
 // -----------------------------
 
+bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll);
+
 bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);

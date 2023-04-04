@@ -223,12 +223,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.IsAirborne = true;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-
-	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
-	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
-	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
-
-	coll->Setup.Height = item->Animation.Velocity.y > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
+	coll->Setup.Height = LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
