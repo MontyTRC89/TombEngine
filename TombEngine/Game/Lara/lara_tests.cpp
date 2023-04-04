@@ -23,12 +23,101 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
-using std::vector;
 
 // -----------------------------
 // TEST FUNCTIONS
 // For State Control & Collision
 // -----------------------------
+
+enum class EdgeType
+{
+	None,
+	Ledge,
+	ClimbableWall
+};
+
+struct EdgeCatchData
+{
+	EdgeType Type	= EdgeType::None;
+	int		 Height = 0;
+};
+
+static EdgeCatchData GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
+{
+	constexpr auto INVALID_EDGE_CATCH_DATA = EdgeCatchData{ EdgeType::None, 0 };
+
+	// Test for valid ledge.
+	if (!TestValidLedge(&item, &coll, true))
+		return INVALID_EDGE_CATCH_DATA;
+
+	// Get point collision.
+	float probeDist = OFFSET_RADIUS(coll.Setup.Radius);
+	float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
+	auto pointColl = GetCollision(&item, item.Pose.Orientation.y, probeDist, probeHeight);
+
+	// TODO: Edges of room boundaries.
+
+	g_Renderer.AddSphere(pointColl.Coordinates.ToVector3(), 50, Vector4::One);
+
+	int vPos = item.Pose.Position.y - coll.Setup.Height;
+	int relFloorHeight = pointColl.Position.Floor - vPos;
+
+	// Test relative height to ledge.
+	bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
+	if ((isMovingUp &&
+			relFloorHeight >= item.Animation.Velocity.y &&
+			relFloorHeight <= 0) ||
+		(!isMovingUp &&
+			relFloorHeight <= item.Animation.Velocity.y &&
+			relFloorHeight >= 0))
+	{
+		return EdgeCatchData{ EdgeType::Ledge, pointColl.Position.Floor };
+	}
+
+	return INVALID_EDGE_CATCH_DATA;
+
+	// TODO: Ladders.
+
+	//----------------
+
+	/*if ((heightDif < 0 && isMovingUp) || (heightDif > 0 && isMovingDown))
+	{
+		// Set new height to nearest 1-step boundary.
+		int playerHeight = item->Pose.Position.y + bounds.Y1;
+		int newHeight = ((heightDif + (int)round(item->Animation.Velocity.y)) / CLICK(1)) * CLICK(1);
+		outEdgeHeight = newHeight;
+		return -1;
+	}
+
+	return 1;*/
+}
+
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const EdgeCatchData& edgeCatchData)
+{
+	auto& player = GetLaraInfo(item);
+
+	if (item.Animation.ActiveState == LS_JUMP_UP)
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG, 12);
+	}
+	else if (TestHangSwingIn(&item, &coll))
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
+	}
+	else
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG);
+	}
+
+	SnapItemToLedge(&item, &coll);
+	ResetLaraFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity.y = 0.0f;
+	item.Animation.Velocity.z = 0.0f;
+	item.Pose.Position.y = edgeCatchData.Height + LARA_HEIGHT/* - CLICK(0.6f)*/;
+	player.Control.HandStatus = HandStatus::Busy;
+	player.ExtraTorsoRot = EulerAngles::Zero;
+}
 
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
@@ -150,7 +239,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	bool result = false;
 
-	if (lara->Control.CanClimbLadder) // Ladder case
+	// Ladder case.
+	if (lara->Control.CanClimbLadder)
 	{
 		if (TrInput & IN_ACTION && item->HitPoints > 0)
 		{
@@ -177,7 +267,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 		}
-		else // Death or action release
+		// Death or Action release.
+		else
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->Pose.Position.y += CLICK(1);
@@ -187,7 +278,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			lara->Control.HandStatus = HandStatus::Free;
 		}
 	}
-	else // Normal case
+	// Regular case.
+	else
 	{
 		if ((TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
 			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
@@ -247,7 +339,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				result = true;
 			}
 		}
-		else // Death, incorrect ledge or ACTION release
+		// Death, incorrect ledge, or Action release.
+		else
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.x;
@@ -265,12 +358,22 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
+	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
-	if (TestLaraMonkeyGrab(item, coll))
+	// Grab edge.
+	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
+	if (edgeCatchData.Type != EdgeType::None)
+	{
+		SetPlayerEdgeCatch(*item, *coll, edgeCatchData);
+		return true;
+	}
+
+	return false;
+
+	/*if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEY);
 		ResetLaraFlex(item);
@@ -280,19 +383,19 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
-	}
+	}*/
 
-	if (coll->Middle.Floor < 200 || coll->CollisionType != CT_FRONT)
+	/*if (coll->Middle.Floor < 200 || coll->CollisionType != CT_FRONT)
+		return false;*/
+
+	/*int edgeHeight = 0;
+	int hasCaughtEdge = TestLaraEdgeCatch(item, coll, edgeHeight);
+	if (!hasCaughtEdge)
 		return false;
 
-	int edge;
-	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
-	if (!edgeCatch)
-		return false;
-
-	bool ladder = TestLaraHangOnClimbableWall(item, coll);
-	if (!(ladder && edgeCatch) &&
-		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
+	bool isLadder = TestLaraHangOnClimbableWall(item, coll);
+	if (!(isLadder && hasCaughtEdge) &&
+		!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
 	{
 		return false;
 	}
@@ -306,35 +409,37 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		SetAnimation(item, LA_REACH_TO_HANG);
 
 	auto bounds = GameBoundingBox(item);
-	if (edgeCatch <= 0)
+	if (hasCaughtEdge <= 0)
 	{
-		item->Pose.Position.y = edge - bounds.Y1 - 20;
+		item->Pose.Position.y = edgeHeight - bounds.Y1 - 20;
 		item->Pose.Orientation.y = coll->NearestLedgeAngle;
 	}
 	else
-		item->Pose.Position.y += coll->Front.Floor - bounds.Y1 - 20;
+		item->Pose.Position.y += coll->Front.Floor - bounds.Y1 - 20;*/
 
-	if (ladder)
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-	else
-		SnapItemToLedge(item, coll, 0.2f);
-
-	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
-	lara->Control.TurnRate = 0;
-	lara->Control.HandStatus = HandStatus::Busy;
-	return true;
+	//if (isLadder)
+	//	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	//else
+	//	SnapItemToLedge(item, coll, 0.2f);
 }
 
 bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
+	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
-	if (TestLaraMonkeyGrab(item, coll))
+	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
+	if (edgeCatchData.Type != EdgeType::None)
+	{
+		SetPlayerEdgeCatch(*item, *coll, edgeCatchData);
+		return true;
+	}
+
+	return false;
+
+	/*if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
 		item->Animation.Velocity.z = 0;
@@ -343,70 +448,23 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
-	}
+	}*/
 
-	if (coll->CollisionType != CT_FRONT)
-		return false;
+	//if (coll->CollisionType != CT_FRONT)
+	//	return false;
 
-	int edge;
-	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
-	if (!edgeCatch)
-		return false;
+	//bool isLadder = TestLaraHangOnClimbableWall(item, coll);
+	//if (!(isLadder && hasCaughtEdge) &&
+	//	!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
+	//{
+	//	return false;
+	//}
 
-	bool ladder = TestLaraHangOnClimbableWall(item, coll);
-	if (!(ladder && edgeCatch) &&
-		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
-	{
-		return false;
-	}
-
-	SetAnimation(item, LA_REACH_TO_HANG, 12);
-
-	auto bounds = GameBoundingBox(item);
-	if (edgeCatch <= 0)
-		item->Pose.Position.y = edge - bounds.Y1 + 4;
-	else
-		item->Pose.Position.y += coll->Front.Floor - bounds.Y1;
-
-	if (ladder)
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-	else
-		SnapItemToLedge(item, coll);
-
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-	item->Animation.IsAirborne = false;
-	lara->Control.HandStatus = HandStatus::Busy;
-	lara->ExtraTorsoRot = EulerAngles::Zero;
-	return true;
-}
-
-int TestLaraEdgeCatch(ItemInfo* item, CollisionInfo* coll, int* edge)
-{
-	auto bounds = GameBoundingBox(item);
-	int heightDif = coll->Front.Floor - bounds.Y1;
-
-	if (heightDif < 0 == heightDif + item->Animation.Velocity.y < 0)
-	{
-		heightDif = item->Pose.Position.y + bounds.Y1;
-
-		if ((heightDif + (int)round(item->Animation.Velocity.y) & 0xFFFFFF00) != (heightDif & 0xFFFFFF00))
-		{
-			if (item->Animation.Velocity.y > 0)
-				*edge = (int)round(heightDif + item->Animation.Velocity.y) & 0xFFFFFF00;
-			else
-				*edge = heightDif & 0xFFFFFF00;
-
-			return -1;
-		}
-
-		return 0;
-	}
-
-	if (!TestValidLedge(item, coll, true))
-		return 0;
-
-	return 1;
+	//if (isLadder)
+	//	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	//else
+	//	SnapItemToLedge(item, coll);
+	// Grab edge.
 }
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
@@ -1112,7 +1170,7 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
 	for (const auto& weaponType : weaponTypeList)
 	{
@@ -1142,7 +1200,7 @@ bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 
 bool IsVaultState(int state)
 {
-	static const vector<int> vaultStates
+	static const std::vector<int> vaultStates
 	{
 		LS_VAULT,
 		LS_VAULT_2_STEPS,
@@ -1157,7 +1215,7 @@ bool IsVaultState(int state)
 
 bool IsJumpState(int state)
 {
-	static const vector<int> jumpStates
+	static const std::vector<int> jumpStates
 	{
 		LS_JUMP_FORWARD,
 		LS_JUMP_BACK,
@@ -1175,7 +1233,7 @@ bool IsJumpState(int state)
 
 bool IsRunJumpQueueableState(int state)
 {
-	static const vector<int> runningJumpQueuableStates
+	static const std::vector<int> runningJumpQueuableStates
 	{
 		LS_RUN_FORWARD,
 		LS_SPRINT,
@@ -1187,7 +1245,7 @@ bool IsRunJumpQueueableState(int state)
 
 bool IsRunJumpCountableState(int state)
 {
-	static const vector<int> runningJumpTimerStates
+	static const std::vector<int> runningJumpTimerStates
 	{
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD,

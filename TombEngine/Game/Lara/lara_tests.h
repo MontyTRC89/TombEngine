@@ -17,7 +17,6 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll);
-int  TestLaraEdgeCatch(ItemInfo* item, CollisionInfo* coll, int* edge);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
