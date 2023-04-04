@@ -343,9 +343,11 @@ bool TestAnimNumber(const ItemInfo& item, int animNumber)
 bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	if (animNumber == NO_ANIM)
-		animNumber = item->Animation.AnimNumber;
+		animNumber = 0;
 
-	if (item->Animation.AnimNumber != animNumber)
+	const auto& object = Objects[item->ObjectNumber];
+
+	if (item->Animation.AnimNumber != (object.animIndex + animNumber))
 		return false;
 
 	const auto& anim = GetAnimData(*item, animNumber);
