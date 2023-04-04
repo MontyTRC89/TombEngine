@@ -63,6 +63,7 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(item);
 
+		// Get point collision.
 		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, BLOCK(0.25f));
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_REACH);
@@ -160,8 +161,8 @@ namespace TEN::Entities::Player::Context
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollLeft = GetCollision(&item, item.Pose.Orientation.y - ANGLE(90.0f), coll.Setup.Radius);
-		auto pointCollRight = GetCollision(&item, item.Pose.Orientation.y + ANGLE(90.0f), coll.Setup.Radius);
+		auto pointCollLeft = GetCollision(&item, item.Pose.Orientation.y - ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
+		auto pointCollRight = GetCollision(&item, item.Pose.Orientation.y + ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
 
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPosTop;

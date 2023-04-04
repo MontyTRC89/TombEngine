@@ -320,64 +320,61 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	auto angle = lara->Control.MoveAngle;
+	auto angle = player.Control.MoveAngle;
 
 	// Determine direction of player's shimmy. 0 if hanging still.
 	int climbDirection = 0;
-	if (lara->Control.MoveAngle == short(item->Pose.Orientation.y - ANGLE(90.0f)))
+	if (player.Control.MoveAngle == short(item->Pose.Orientation.y - ANGLE(90.0f)))
 	{
 		climbDirection = -1;
 	}
-	else if (lara->Control.MoveAngle == short(item->Pose.Orientation.y + ANGLE(90.0f)))
+	else if (player.Control.MoveAngle == short(item->Pose.Orientation.y + ANGLE(90.0f)))
 	{
 		climbDirection = 1;
 	}
 
-	// Temporarily move item slightly closer to wall for more precise collision results.
+	// Temporarily move player slightly closer to wall for more precise collision results.
 	auto prevPose = item->Pose;
-	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * coll->Setup.Radius * 0.5f;
-	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * coll->Setup.Radius * 0.5f;
+	TranslateItem(item, item->Pose.Orientation.y, coll->Setup.Radius * 0.5f);
 
 	// Get height difference with side spaces (left or right, depending on movement direction)
-	int hdif = LaraFloorFront(item, lara->Control.MoveAngle, coll->Setup.Radius * 1.4f);
+	int heightDelta = LaraFloorFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.4f);
 
 	// Set stopped flag if floor height is above footspace, which is step size.
-	bool isStopped = hdif < CLICK(0.5f);
+	bool isStopped = heightDelta < CLICK(0.5f);
 
 	// Set stopped flag if ceiling height is below headspace, which is step size.
-	if (LaraCeilingFront(item, lara->Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
+	if (LaraCeilingFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
 		isStopped = true;
 
 	// Restore backup pose after collision tests.
 	item->Pose = prevPose;
 
 	// Player collision setup.
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 
 	// When player is about to move, use larger embed offset to stabilize diagonal shimmy.
 	int embedOffset = 4;
 	if (TrInput & (IN_LEFT | IN_RIGHT))
-		embedOffset = 16;
+		embedOffset = 32;
 
-	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * embedOffset;
-	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * embedOffset;
-
+	TranslateItem(item, item->Pose.Orientation.y, embedOffset);
 	GetCollisionInfo(coll, item);
 
 	bool result = false;
 
 	// Ladder case.
-	if (lara->Control.CanClimbLadder)
+	if (player.Control.CanClimbLadder)
 	{
 		if (IsHeld(In::Action) && item->HitPoints > 0)
 		{
-			lara->Control.MoveAngle = angle;
+			player.Control.MoveAngle = angle;
 
 			if (!TestLaraHangOnClimbableWall(item, coll))
 			{
@@ -408,7 +405,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.y = 1.0f;
 			item->Animation.Velocity.z = 2.0f;
-			lara->Control.HandStatus = HandStatus::Free;
+			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
 	// Regular case.
@@ -420,7 +417,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		if ((IsHeld(In::Action) && item->HitPoints > 0 && relFloorHeight >= 0) ||
 			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
 		{
-			if (isStopped && hdif > 0 && climbDirection != 0 &&
+			if (isStopped && heightDelta > 0 && climbDirection != 0 &&
 				((climbDirection > 0) == (coll->MiddleLeft.Floor > coll->MiddleRight.Floor)))
 			{
 				isStopped = false;
@@ -430,12 +427,12 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			auto x = item->Pose.Position.x;
 			auto z = item->Pose.Position.z;
 
-			lara->Control.MoveAngle = angle;
+			player.Control.MoveAngle = angle;
 
 			if (climbDirection != 0)
 			{
-				short sinMoveAngle = phd_sin(lara->Control.MoveAngle);
-				short cosMoveAngle = phd_cos(lara->Control.MoveAngle);
+				short sinMoveAngle = phd_sin(player.Control.MoveAngle);
+				short cosMoveAngle = phd_cos(player.Control.MoveAngle);
 				auto testShift = Vector2(sinMoveAngle * coll->Setup.Radius, cosMoveAngle * coll->Setup.Radius);
 
 				x += testShift.x;
@@ -488,7 +485,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
 			item->Animation.Velocity.y = 1;
-			lara->Control.HandStatus = HandStatus::Free;
+			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
 
@@ -839,16 +836,13 @@ bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 {
+	constexpr auto SIDEWAY_SHIMMY_TEST_DIST = 16;
+
 	auto* lara = GetLaraInfo(item);
 
 	auto prevPose = item->Pose;
-
 	lara->Control.MoveAngle = item->Pose.Orientation.y + angle;
-
-	static constexpr auto sidewayTestDistance = 16;
-	item->Pose.Position.x += phd_sin(lara->Control.MoveAngle) * sidewayTestDistance;
-	item->Pose.Position.z += phd_cos(lara->Control.MoveAngle) * sidewayTestDistance;
-
+	TranslateItem(item, lara->Control.MoveAngle, SIDEWAY_SHIMMY_TEST_DIST);
 	coll->Setup.OldPosition.y = item->Pose.Position.y;
 
 	bool res = TestLaraHang(item, coll);
