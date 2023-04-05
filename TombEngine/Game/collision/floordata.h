@@ -183,4 +183,6 @@ namespace TEN::Floordata
 	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
 	int				   GetBridgeBorder(int itemNumber, bool bottom);
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
+
+	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList);
 }
