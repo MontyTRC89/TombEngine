@@ -42,7 +42,7 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4. Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&				// Ledge height is within upper/lower floor height bounds.
+		if (relFloorHeight <= ABS_FLOOR_BOUND &&				// Floor height is within lower/upper floor bounds.
 			floorToCeilHeight > setupData.FloorToCeilingMin &&	// Floor-to-ceiling height isn't too narrow.
 			floorToCeilHeight <= setupData.FloorToCeilingMax && // Floor-to-ceiling height isn't too wide.
 			gapHeight >= setupData.GapHeightMin)				// Gap height is permissive.
@@ -70,7 +70,7 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 2. Assess point collision.
-		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is lower than upper floor bound.
+		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
 			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
 		{
 			return true;
@@ -108,7 +108,7 @@ namespace TEN::Entities::Player::Context
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_STRETCH);
 
 		// 3. Assess point collision.
-		if (relCeilHeight >= -coll.Setup.Height) // Ceiling isn't too low.
+		if (relCeilHeight >= -coll.Setup.Height) // Ceiling height is below upper ceiling bound.
 			return false;
 
 		return true;
@@ -169,6 +169,10 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(item);
 
+		// 1. Test if wall is climbable.
+		if (!player.Control.CanClimbLadder)
+			return false;
+
 		// Get point collision.
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollLeft = GetCollision(&item, item.Pose.Orientation.y - ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
@@ -178,10 +182,6 @@ namespace TEN::Entities::Player::Context
 		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPosTop;
 		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPosTop;
 		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPosTop;
-
-		// 1. Test if wall is climbable.
-		if (!player.Control.CanClimbLadder)
-			return false;
 
 		// 2. Assess point collision.
 		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&

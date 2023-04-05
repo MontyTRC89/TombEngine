@@ -454,7 +454,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
-std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
+std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
 {
 	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
 	{
@@ -958,7 +958,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-void SetPlayerHangRelease(ItemInfo& item)
+void SetPlayerEdgeHangRelease(ItemInfo& item)
 {
 	constexpr auto FORWARD_VEL	= 2.0f;
 	constexpr auto VERTICAL_VEL = 1.0f;

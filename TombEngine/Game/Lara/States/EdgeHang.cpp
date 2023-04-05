@@ -31,7 +31,7 @@ namespace TEN::Entities::Player
 
 		if (item->HitPoints <= 0)
 		{
-			SetPlayerHangRelease(*item);
+			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
 
@@ -118,7 +118,7 @@ namespace TEN::Entities::Player
 					return;
 				}
 
-				auto cornerShimmyState = GetLaraCornerShimmyState(*item, *coll);
+				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
 				if (cornerShimmyState.has_value())
 				{
 					item->Animation.TargetState = cornerShimmyState.value();
@@ -133,7 +133,7 @@ namespace TEN::Entities::Player
 					return;
 				}
 
-				auto cornerShimmyState = GetLaraCornerShimmyState(*item, *coll);
+				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
 				if (cornerShimmyState.has_value())
 				{
 					item->Animation.TargetState = cornerShimmyState.value();
@@ -145,7 +145,7 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		SetPlayerHangRelease(*item);
+		SetPlayerEdgeHangRelease(*item);
 	}
 
 	// State:	LS_HANG_IDLE (10)
@@ -174,7 +174,7 @@ namespace TEN::Entities::Player
 
 		if (item->HitPoints <= 0)
 		{
-			SetPlayerHangRelease(*item);
+			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
 
@@ -190,7 +190,7 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		SetPlayerHangRelease(*item);
+		SetPlayerEdgeHangRelease(*item);
 	}
 
 	// State:	LS_SHIMMY_LEFT (30)
@@ -218,7 +218,7 @@ namespace TEN::Entities::Player
 
 		if (item->HitPoints <= 0)
 		{
-			SetPlayerHangRelease(*item);
+			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
 
@@ -234,7 +234,7 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		SetPlayerHangRelease(*item);
+		SetPlayerEdgeHangRelease(*item);
 	}
 
 	// State:	LS_SHIMMY_RIGHT (31)

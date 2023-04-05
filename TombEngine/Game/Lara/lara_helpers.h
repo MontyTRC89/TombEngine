@@ -32,8 +32,8 @@ LaraInfo& GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 
-std::optional<int> GetLaraCornerShimmyState(ItemInfo& item, CollisionInfo& coll);
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
+std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll);
+short			   GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 // Modulators
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
@@ -57,7 +57,7 @@ void SetLaraFallBackAnimation(ItemInfo* item);
 void SetLaraMonkeyFallAnimation(ItemInfo* item);
 void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
-void SetPlayerHangRelease(ItemInfo& item);
+void SetPlayerEdgeHangRelease(ItemInfo& item);
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
 void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
