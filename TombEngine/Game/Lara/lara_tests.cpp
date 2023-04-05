@@ -60,8 +60,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	SnapItemToLedge(&item, &coll);
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
-	item.Animation.Velocity.y = 0.0f;
-	item.Animation.Velocity.z = 0.0f;
+	item.Animation.Velocity = Vector3::Zero;
 	item.Pose.Position.y = edgeCatchData.Height + (LARA_HEIGHT - CLICK(0.25f));
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
@@ -99,117 +98,22 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	return false;
 }
 
-// legacy grab for reach state
+// legacy grab sample
 bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
-
-	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll->HitStatic)
-		return false;
-
-	// Grab edge.
-	auto edgeCatchData = Context::GetEdgeCatchData(*item, *coll);
-	if (edgeCatchData.has_value())
-	{
-		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
-		return true;
-	}
-
 	return false;
 
-	/*if (TestLaraMonkeyGrab(item, coll))
-	{
-	SetAnimation(item, LA_REACH_TO_MONKEY);
-	ResetLaraFlex(item);
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-	item->Animation.IsAirborne = false;
-	item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
-	lara->Control.HandStatus = HandStatus::Busy;
-	return true;
-	}*/
-
-	/*if (coll->Middle.Floor < 200 || coll->CollisionType != CT_FRONT)
-	return false;*/
-
-	/*int edgeHeight = 0;
-	int hasCaughtEdge = TestLaraEdgeCatch(item, coll, edgeHeight);
-	if (!hasCaughtEdge)
-	return false;
-
+	/*
 	bool isLadder = TestLaraHangOnClimbableWall(item, coll);
 	if (!(isLadder && hasCaughtEdge) &&
 	!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
 	{
-	return false;
-	}
-
-	if (TestHangSwingIn(item, coll))
-	{
-	SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
-	ResetLaraFlex(item);
-	}
-	else
-	SetAnimation(item, LA_REACH_TO_HANG);
-
-	auto bounds = GameBoundingBox(item);
-	if (hasCaughtEdge <= 0)
-	{
-	item->Pose.Position.y = edgeHeight - bounds.Y1 - 20;
-	item->Pose.Orientation.y = coll->NearestLedgeAngle;
-	}
-	else
-	item->Pose.Position.y += coll->Front.Floor - bounds.Y1 - 20;*/
-
-	//if (isLadder)
-	//	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-	//else
-	//	SnapItemToLedge(item, coll, 0.2f);
-}
-
-// legacy grab for jump up
-bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
-
-	auto edgeCatchData = Context::GetEdgeCatchData(*item, *coll);
-	if (edgeCatchData.has_value())
-	{
-		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
-		return true;
 	}
 
-	return false;
-
-	/*if (TestLaraMonkeyGrab(item, coll))
-	{
-	SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-	item->Animation.IsAirborne = false;
-	item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
-	lara->Control.HandStatus = HandStatus::Busy;
-	return true;
-	}*/
-
-	//if (coll->CollisionType != CT_FRONT)
-	//	return false;
-
-	//bool isLadder = TestLaraHangOnClimbableWall(item, coll);
-	//if (!(isLadder && hasCaughtEdge) &&
-	//	!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
-	//{
-	//	return false;
-	//}
-
-	//if (isLadder)
-	//	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-	//else
-	//	SnapItemToLedge(item, coll);
-	// Grab edge.
+	if (isLadder)
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	*/
 }
 
 // Test if a ledge in front of item is valid to climb.
