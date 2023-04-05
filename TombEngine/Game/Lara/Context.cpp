@@ -222,18 +222,18 @@ namespace TEN::Entities::Player::Context
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
+		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
+
 		const auto& player = GetLaraInfo(item);
 
 		// 1. Test for valid ledge.
 		if (!TestValidLedge(&item, &coll, true))
 			return std::nullopt;
 
-		float probeDist = OFFSET_RADIUS(coll.Setup.Radius);
-		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
-
 		// Get point collision.
+		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, probeDist, probeHeight);
+		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
 		// TODO: Fails in edge case?
 
@@ -244,15 +244,15 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
 
 		// 2. Test ledge height.
-		int edgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
-		if (edgeHeight <= LARA_HEIGHT_STRETCH)
+		int ledgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
+		if (ledgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
 		// 3. Test relative height to ledge.
 		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 		if ((isMovingUp &&
-			relFloorHeightFront >= item.Animation.Velocity.y &&
-			relFloorHeightFront <= 0) ||
+				relFloorHeightFront >= item.Animation.Velocity.y &&
+				relFloorHeightFront <= 0) ||
 			(!isMovingUp &&
 				relFloorHeightFront <= item.Animation.Velocity.y &&
 				relFloorHeightFront >= 0))
@@ -266,21 +266,9 @@ namespace TEN::Entities::Player::Context
 		// 4. Test for climbable wall step.
 		if (player.Control.CanClimbLadder)
 		{
-			int wallHeight = 0;
+			// Snap to height of nearest wall step.
+			int wallHeight = (int)round((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 			return EdgeCatchData{ EdgeType::ClimbableWall, wallHeight };
 		}
-
-		//----------------
-
-		/*if ((heightDif < 0 && isMovingUp) || (heightDif > 0 && isMovingDown))
-		{
-		// Set new height to nearest 1-step boundary.
-		int playerHeight = item->Pose.Position.y + bounds.Y1;
-		int newHeight = ((heightDif + (int)round(item->Animation.Velocity.y)) / CLICK(1)) * CLICK(1);
-		outEdgeHeight = newHeight;
-		return -1;
-		}
-
-		return 1;*/
 	}
 }
