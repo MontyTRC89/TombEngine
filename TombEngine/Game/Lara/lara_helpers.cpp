@@ -982,32 +982,40 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	player.Control.HandStatus = HandStatus::Free;
 }
 
-void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
+void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto WALL_STEP_HEIGHT = CLICK(1);
+	constexpr auto FORWARD_VEL		= 2.0f;
+	constexpr auto VERTICAL_VEL		= 1.0f;
 
-	if (item->HitPoints <= 0)
+	auto& player = GetLaraInfo(item);
+
+	if (item.HitPoints <= 0)
 	{
-		SetAnimation(item, LA_FALL_START);
-		item->Animation.IsAirborne = true;
-		item->Animation.Velocity.z = 2;
-		item->Animation.Velocity.y = 1;
-		item->Pose.Position.y += CLICK(1);
-		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
-		lara->Control.HandStatus = HandStatus::Free;
+		SetAnimation(&item, LA_FALL_START);
+		item.Animation.IsAirborne = true;
+		item.Animation.Velocity.y = VERTICAL_VEL;
+		item.Animation.Velocity.z = FORWARD_VEL;
+		item.Pose.Position.y += WALL_STEP_HEIGHT;
+		item.Pose.Orientation.y += player.NextCornerPos.Orientation.y / 2;
+		player.Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
 	if (flip)
 	{
-		if (lara->Control.IsClimbingLadder)
-			SetAnimation(item, LA_LADDER_IDLE);
+		if (player.Control.IsClimbingLadder)
+		{
+			SetAnimation(&item, LA_LADDER_IDLE);
+		}
 		else
-			SetAnimation(item, LA_HANG_IDLE);
+		{
+			SetAnimation(&item, LA_HANG_IDLE);
+		}
 
-		item->Pose.Position = lara->NextCornerPos.Position;
-		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
-		coll->Setup.OldPosition = lara->NextCornerPos.Position;
+		item.Pose.Position = player.NextCornerPos.Position;
+		item.Pose.Orientation.y = player.NextCornerPos.Orientation.y;
+		coll.Setup.OldPosition = player.NextCornerPos.Position;
 	}
 }
 

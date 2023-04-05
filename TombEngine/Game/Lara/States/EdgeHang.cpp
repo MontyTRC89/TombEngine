@@ -258,7 +258,7 @@ namespace TEN::Entities::Player
 		Camera.targetElevation = ANGLE(-33.0f);
 		Camera.laraNode = LM_TORSO;
 
-		SetLaraCornerAnimation(item, coll, TestLastFrame(item));
+		SetPlayerCornerShimmyEnd(*item, *coll, TestLastFrame(item));
 	}
 
 	// State:	  LS_HANDSTAND (54)
