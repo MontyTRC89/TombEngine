@@ -19,7 +19,7 @@ constexpr auto LARA_CRAWL_MOVE_TURN_RATE_ACCEL = ANGLE(0.15f);
 constexpr auto LARA_POLE_TURN_RATE_ACCEL	   = ANGLE(0.25f);
 constexpr auto LARA_SUBSUIT_TURN_RATE_ACCEL	   = ANGLE(0.25f);
 
-// Turn rate maxes
+// Max turn rates
 constexpr auto LARA_SLOW_TURN_RATE_MAX		  = ANGLE(2.0f);
 constexpr auto LARA_SLOW_MED_TURN_RATE_MAX	  = ANGLE(3.0f);
 constexpr auto LARA_MED_TURN_RATE_MAX		  = ANGLE(4.0f);
@@ -39,37 +39,43 @@ constexpr auto LARA_POLE_TURN_RATE_MAX		  = ANGLE(2.5f);
 constexpr auto LARA_CRAWL_FLEX_RATE = ANGLE(2.25f);
 constexpr auto LARA_CRAWL_FLEX_MAX	= ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
 
-constexpr auto LARA_HEIGHT			  = CLICK(3) - 1; // Height in basic states.
-constexpr auto LARA_HEIGHT_CRAWL	  = 350;		  // Height in crawl states.
-constexpr auto LARA_HEIGHT_MONKEY	  = 850;		  // Height in monkey swing states.
-constexpr auto LARA_HEIGHT_TREAD	  = 700;		  // Height in water tread states.
-constexpr auto LARA_HEIGHT_STRETCH	  = 870;		  // Height in jump up and ledge hang states.
-constexpr auto LARA_HEIGHT_REACH	  = 820;		  // Height in reach state.
-constexpr auto LARA_HEIGHT_SURFACE	  = 800;		  // Height when resurfacing water.
-constexpr auto LARA_HEADROOM		  = 160;		  // Reasonable space above head.
+// Heights
+constexpr auto LARA_HEIGHT		   = CLICK(3) - 1; // Height in regular states.
+constexpr auto LARA_HEIGHT_CRAWL   = 350;		   // Height in crawl and crouch states.
+constexpr auto LARA_HEIGHT_MONKEY  = 850;		   // Height in monkey swing states.
+constexpr auto LARA_HEIGHT_TREAD   = 700;		   // Height in water surface tread states.
+constexpr auto LARA_HEIGHT_STRETCH = 870;		   // Height in jump up and edge hang states.
+constexpr auto LARA_HEIGHT_SURFACE = 800;		   // Height when resurfacing water.
+constexpr auto LARA_HEADROOM	   = 160;
+
+// Radii
 constexpr auto LARA_RADIUS			  = 100;
 constexpr auto LARA_RADIUS_CRAWL	  = 200;
 constexpr auto LARA_RADIUS_UNDERWATER = 300;
 constexpr auto LARA_RADIUS_DEATH	  = 400;
 constexpr auto LARA_ALIGN_VELOCITY	  = 12; // TODO: Float.
 
+// Fall velocities
 constexpr auto LARA_FREEFALL_VELOCITY   = 131.0f;
 constexpr auto LARA_DAMAGE_VELOCITY		= 141.0f;
 constexpr auto LARA_DEATH_VELOCITY		= 155.0f;
 constexpr auto LARA_DIVE_DEATH_VELOCITY = 134.0f;
 constexpr auto LARA_TERMINAL_VELOCITY	= CLICK(10);
 
+// Swim velocities
 constexpr auto LARA_SWIM_VELOCITY_ACCEL		   = 2.0f;
 constexpr auto LARA_SWIM_VELOCITY_DECEL		   = 1.5f;
 constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
 constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
 constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 
+// Timer values
 constexpr auto LARA_POSITION_ADJUST_MAX_TIME = 3 * FPS;	 // 3 seconds allowed for position adjustment.
 constexpr auto LARA_POSE_TIME				 = 20 * FPS; // 20 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
 constexpr auto LARA_SPRINT_JUMP_TIME		 = 46;		 // Frames to count before a sprint jump is possible.
 
+// Status values
 constexpr auto LARA_AIR_MAX			  = 1800.0f;
 constexpr auto LARA_AIR_CRITICAL	  = LARA_AIR_MAX / 4;
 constexpr auto LARA_EXPOSURE_MAX	  = 600.0f;
@@ -80,9 +86,11 @@ constexpr auto LARA_POISON_MAX		  = 128.0f;
 constexpr auto LARA_STAMINA_MAX		  = 120.0f;
 constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
+// Effect node values
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
 
+// Collision heights
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);
 constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);
@@ -90,14 +98,11 @@ constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
 constexpr auto SWIM_DEPTH		   = CLICK(3) - 38;
 constexpr auto SLOPE_DIFFERENCE	   = 60;
 
-extern LaraInfo Lara;
-extern ItemInfo* LaraItem;
+extern LaraInfo		 Lara;
+extern ItemInfo*	 LaraItem;
 extern CollisionInfo LaraCollision;
 
-#define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
-#define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
-#define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)
-
+// State machine
 #define LaraRoutineFunction void(ItemInfo* item, CollisionInfo* coll)
 extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
 extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];

@@ -223,7 +223,6 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.IsAirborne = true;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;

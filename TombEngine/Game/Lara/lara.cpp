@@ -49,8 +49,8 @@ using namespace TEN::Math;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+ItemInfo*	  LaraItem		= {};
 CollisionInfo LaraCollision = {};
 
 std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =

@@ -66,7 +66,7 @@ namespace TEN::Entities::Player::Context
 		// Get point collision.
 		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, BLOCK(0.25f));
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_REACH);
+		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
 
 		// 1. Test for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
@@ -234,8 +234,6 @@ namespace TEN::Entities::Player::Context
 		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
-
-		// TODO: Fails in edge case?
 
 		g_Renderer.AddSphere(pointCollFront.Coordinates.ToVector3(), 50, Vector4::One);
 

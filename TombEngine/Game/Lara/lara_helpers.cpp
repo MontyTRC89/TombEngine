@@ -860,8 +860,8 @@ void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll)
 
 	SetAnimation(&item, animNumber);
 	ResetLaraFlex(&item);
-	item.Animation.Velocity = Vector3::Zero;
 	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
 	item.Pose.Position.y += coll.Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll.Setup.Height);
 	player.Control.HandStatus = HandStatus::Busy;
 }
