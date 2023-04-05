@@ -31,26 +31,23 @@ using namespace TEN::Renderer;
 
 enum class EdgeType
 {
-	None,
 	Ledge,
 	ClimbableWall
 };
 
 struct EdgeCatchData
 {
-	EdgeType Type	= EdgeType::None;
+	EdgeType Type	= EdgeType::Ledge;
 	int		 Height = 0;
 };
 
-static EdgeCatchData GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
+static std::optional<EdgeCatchData> GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 {
 	const auto& player = GetLaraInfo(item);
 
-	constexpr auto INVALID_EDGE_CATCH_DATA = EdgeCatchData{ EdgeType::None, 0 };
-
 	// 1. Test for valid ledge.
 	if (!TestValidLedge(&item, &coll, true))
-		return INVALID_EDGE_CATCH_DATA;
+		return std::nullopt;
 
 	float probeDist = OFFSET_RADIUS(coll.Setup.Radius);
 	float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
@@ -70,7 +67,7 @@ static EdgeCatchData GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	// 2. Test ledge height.
 	int edgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
 	if (edgeHeight <= LARA_HEIGHT_STRETCH)
-		return INVALID_EDGE_CATCH_DATA;
+		return std::nullopt;
 
 	// 3. Test relative height to ledge.
 	bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
@@ -84,7 +81,7 @@ static EdgeCatchData GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 		return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
 	}
 
-	return INVALID_EDGE_CATCH_DATA;
+	return std::nullopt;
 
 	// TODO
 	// 4. Test for climbable wall step.
@@ -144,9 +141,9 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 
 	// Grab edge.
 	auto edgeCatchData = GetPlayerEdgeCatchData(item, coll);
-	if (edgeCatchData.Type != EdgeType::None)
+	if (edgeCatchData.has_value())
 	{
-		SetPlayerEdgeCatch(item, coll, edgeCatchData);
+		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
 		return true;
 	}
 
@@ -162,9 +159,9 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	// Grab edge.
 	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
-	if (edgeCatchData.Type != EdgeType::None)
+	if (edgeCatchData.has_value())
 	{
-		SetPlayerEdgeCatch(*item, *coll, edgeCatchData);
+		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
 		return true;
 	}
 
@@ -228,9 +225,9 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
-	if (edgeCatchData.Type != EdgeType::None)
+	if (edgeCatchData.has_value())
 	{
-		SetPlayerEdgeCatch(*item, *coll, edgeCatchData);
+		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
 		return true;
 	}
 
