@@ -4,10 +4,10 @@ namespace TEN::Entities::Player::Context
 {
 	struct LedgeClimbSetupData
 	{
-		short HeadingAngle = 0;
-		int	  SpaceMin	   = 0;
-		int	  SpaceMax	   = 0;
-		int	  GapMin	   = 0;
+		short HeadingAngle		= 0;
+		int	  FloorToCeilingMin = 0;
+		int	  FloorToCeilingMax = 0;
+		int	  GapHeightMin		= 0;
 
 		bool TestSlipperySlope = false;
 	};

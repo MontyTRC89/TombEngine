@@ -24,8 +24,10 @@ namespace TEN::Entities::Player::Context
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
 		int floorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
+		int gapHeight = abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor);
 
 		// 1. Test for slippery slope (if applicable).
+		// TODO: This check fails for no reason.
 		bool isSlipperySlope = setupData.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlipperySlope)
 			return false;
@@ -40,10 +42,10 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4. Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&	   // Ledge height is climbable.
-			floorToCeilHeight > setupData.SpaceMin &&  // Space isn't too narrow.
-			floorToCeilHeight <= setupData.SpaceMax && // Space isn't too wide.
-			floorToCeilHeight >= setupData.GapMin)	   // Gap is permissive.
+		if (relFloorHeight <= ABS_FLOOR_BOUND &&				// Ledge height is within upper/lower floor height bounds.
+			floorToCeilHeight > setupData.FloorToCeilingMin &&	// Floor-to-ceiling height isn't too narrow.
+			floorToCeilHeight <= setupData.FloorToCeilingMax && // Floor-to-ceiling height isn't too wide.
+			gapHeight >= setupData.GapHeightMin)				// Gap height is permissive.
 		{
 			return true;
 		}
@@ -119,7 +121,7 @@ namespace TEN::Entities::Player::Context
 			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
 			CLICK(3),
-			true
+			false
 		};
 
 		return TestLedgeClimbSetup(item, coll, setupData);
