@@ -67,7 +67,7 @@ namespace TEN::Entities::Player
 					{
 						item->Animation.TargetState = LS_HANG_TO_CROUCH;
 					}
-					else if (IsHeld(In::Walk))
+					else if (IsHeld(In::Walk) && Context::CanPerformLedgeHandstand(*item, *coll))
 					{
 						item->Animation.TargetState = LS_HANDSTAND;
 					}

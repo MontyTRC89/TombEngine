@@ -51,11 +51,6 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool CanPerformJump(ItemInfo& item, CollisionInfo& coll)
-	{
-		return !TestEnvironment(ENV_FLAG_SWAMP, &item);
-	}
-
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto UPPER_FLOOR_BOUND = 0;
@@ -117,13 +112,26 @@ namespace TEN::Entities::Player::Context
 		return true;
 	}
 
+	bool CanPerformLedgeHandstand(ItemInfo& item, CollisionInfo& coll)
+	{
+		auto setupData = LedgeClimbSetupData
+		{
+			item.Pose.Orientation.y,
+			LARA_HEIGHT, -MAX_HEIGHT,
+			CLICK(3),
+			true
+		};
+
+		return TestLedgeClimbSetup(item, coll, setupData);
+	}
+
 	bool CanClimbLedgeToCrouch(ItemInfo& item, CollisionInfo& coll)
 	{
 		auto setupData = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
-			CLICK(1),
+			(int)CLICK(0.6f),
 			true
 		};
 
@@ -191,8 +199,9 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(item);
 
-		int vPos = item.Pose.Position.y;
 		auto pointCollCenter = GetCollision(&item);
+
+		int relFloorHeight = pointCollCenter.Position.Floor - item.Pose.Position.y;
 		// Left and right.
 
 		// 1. Check if wall is climbable.
@@ -200,7 +209,7 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 2. Assess point collision.
-		if ((pointCollCenter.Position.Floor - vPos) >= WALL_STEP_HEIGHT)
+		if (relFloorHeight >= WALL_STEP_HEIGHT)
 			return true;
 
 		return false;

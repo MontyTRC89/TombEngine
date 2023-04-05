@@ -5,10 +5,10 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player::Context
 {
-	bool CanPerformJump(ItemInfo& item, CollisionInfo& coll);
-
+	// Ledge contexts
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll);
 	bool CanPerformLedgeJump(ItemInfo& item, CollisionInfo& coll);
+	bool CanPerformLedgeHandstand(ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToCrouch(ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToStand(ItemInfo& item, CollisionInfo& coll);
 	bool CanLedgeShimmyLeft(ItemInfo& item, CollisionInfo& coll);
