@@ -10,6 +10,7 @@ Version 1.0.8
 * Fix transparent objects not displaying correctly in the Inventory.
 * Fix dozy cheat always giving uzi weapons even if not present in WAD.
 * Fix player getting launched when landing close to an edge.
+* Fix Lara going through trapdoor/bridge whilst climbing up on ladder.
 * Fix TR3 Sophia's charge ring drawing below floor.
 * Fix TR5 imp collision handling and animations.
 	- OCB 1 - Climbs up to Lara when triggered.
@@ -24,7 +25,7 @@ Version 1.0.8
 * Add TR1 slamming doors.
 * Add TR3 mutant wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
 * Add TR3 Corpse
-	- OCB 0: used for coprses targeted by the compsoganathus dinosaur. 
+	- OCB 0: used for coprses targeted by the compsognathus dinosaur. 
 	- OCB 1: used for corpses hung in the air to be used as piranha bait. Will fall when shot.
 	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr3_Compsognathus_Cadavar.wad2
 * Add cold exposure bar (employed by setting the "cold" flag in water rooms in Tomb Editor).
@@ -35,7 +36,6 @@ Version 1.0.8
 	- ELECTRICAL_LIGHT:
 		- OCB 1: Displays mesh of object.
 		- OCB -1: Hides mesh of object (used for a neon light effect)
-
 * Restored inventory compass.
 
 Lua API changes:
