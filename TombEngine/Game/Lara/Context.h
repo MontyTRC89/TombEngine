@@ -5,6 +5,8 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player::Context
 {
+	struct EdgeCatchData;
+
 	// Ledge contexts
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll);
 	bool CanPerformLedgeJump(ItemInfo& item, CollisionInfo& coll);
@@ -15,4 +17,6 @@ namespace TEN::Entities::Player::Context
 	bool CanLedgeShimmyRight(ItemInfo& item, CollisionInfo& coll);
 	bool CanWallShimmyUp(ItemInfo& item, CollisionInfo& coll);
 	bool CanWallShimmyDown(ItemInfo& item, CollisionInfo& coll);
+
+	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
 }

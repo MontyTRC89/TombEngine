@@ -2,6 +2,18 @@
 
 namespace TEN::Entities::Player::Context
 {
+	enum class EdgeType
+	{
+		Ledge,
+		ClimbableWall
+	};
+
+	struct EdgeCatchData
+	{
+		EdgeType Type	= EdgeType::Ledge;
+		int		 Height = 0;
+	};
+
 	struct LedgeClimbSetupData
 	{
 		short HeadingAngle		= 0;

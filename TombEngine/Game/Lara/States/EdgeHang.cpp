@@ -87,6 +87,7 @@ namespace TEN::Entities::Player
 					}
 					else if (TestLastFrame(item))
 					{
+						// TODO: State dispatch.
 						SetAnimation(item, LA_LADDER_SHIMMY_UP);
 					}
 
@@ -103,6 +104,7 @@ namespace TEN::Entities::Player
 					}
 					else if (TestLastFrame(item))
 					{
+						// TODO: State dispatch.
 						SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
 					}
 

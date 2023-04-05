@@ -11,14 +11,17 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
+#include "Game/Lara/ContextData.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/Context.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities::Player;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -29,83 +32,7 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
-enum class EdgeType
-{
-	Ledge,
-	ClimbableWall
-};
-
-struct EdgeCatchData
-{
-	EdgeType Type	= EdgeType::Ledge;
-	int		 Height = 0;
-};
-
-static std::optional<EdgeCatchData> GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
-{
-	const auto& player = GetLaraInfo(item);
-
-	// 1. Test for valid ledge.
-	if (!TestValidLedge(&item, &coll, true))
-		return std::nullopt;
-
-	float probeDist = OFFSET_RADIUS(coll.Setup.Radius);
-	float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
-
-	// Get point collision.
-	auto pointCollCenter = GetCollision(&item);
-	auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, probeDist, probeHeight);
-
-	// TODO: Fails in edge case?
-
-	g_Renderer.AddSphere(pointCollFront.Coordinates.ToVector3(), 50, Vector4::One);
-
-	int vPos = item.Pose.Position.y - coll.Setup.Height;
-	int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;
-	int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
-
-	// 2. Test ledge height.
-	int edgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
-	if (edgeHeight <= LARA_HEIGHT_STRETCH)
-		return std::nullopt;
-
-	// 3. Test relative height to ledge.
-	bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
-	if ((isMovingUp &&
-			relFloorHeightFront >= item.Animation.Velocity.y &&
-			relFloorHeightFront <= 0) ||
-		(!isMovingUp &&
-			relFloorHeightFront <= item.Animation.Velocity.y &&
-			relFloorHeightFront >= 0))
-	{
-		return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
-	}
-
-	return std::nullopt;
-
-	// TODO
-	// 4. Test for climbable wall step.
-	if (player.Control.CanClimbLadder)
-	{
-		int wallHeight = 0;
-		return EdgeCatchData{ EdgeType::ClimbableWall, wallHeight };
-	}
-
-	//----------------
-
-	/*if ((heightDif < 0 && isMovingUp) || (heightDif > 0 && isMovingDown))
-	{
-		// Set new height to nearest 1-step boundary.
-		int playerHeight = item->Pose.Position.y + bounds.Y1;
-		int newHeight = ((heightDif + (int)round(item->Animation.Velocity.y)) / CLICK(1)) * CLICK(1);
-		outEdgeHeight = newHeight;
-		return -1;
-	}
-
-	return 1;*/
-}
-
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const EdgeCatchData& edgeCatchData)
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& edgeCatchData)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -140,7 +67,7 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 		return false;
 
 	// Grab edge.
-	auto edgeCatchData = GetPlayerEdgeCatchData(item, coll);
+	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
 	if (edgeCatchData.has_value())
 	{
 		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
@@ -158,7 +85,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	// Grab edge.
-	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
+	auto edgeCatchData = Context::GetEdgeCatchData(*item, *coll);
 	if (edgeCatchData.has_value())
 	{
 		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
@@ -224,7 +151,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
-	auto edgeCatchData = GetPlayerEdgeCatchData(*item, *coll);
+	auto edgeCatchData = Context::GetEdgeCatchData(*item, *coll);
 	if (edgeCatchData.has_value())
 	{
 		SetPlayerEdgeCatch(*item, *coll, edgeCatchData.value());
