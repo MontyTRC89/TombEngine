@@ -235,7 +235,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	// Overhang hook.
 	SlopeReachExtra(item, coll);
 
-	if (TestLaraHangJump(item, coll))
+	if (HandlePlayerEdgeCatch(*item, *coll))
 		return;
 
 	LaraSlideEdgeJump(item, coll);
@@ -617,7 +617,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraHangJumpUp(item, coll))
+	if (HandlePlayerEdgeCatch(*item, *coll))
 		return;
 
 	LaraDeflectTopSide(item, coll);

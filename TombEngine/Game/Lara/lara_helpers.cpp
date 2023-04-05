@@ -856,7 +856,9 @@ void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
-	SetAnimation(&item, LA_REACH_TO_MONKEY);
+	int animNumber = (item.Animation.ActiveState == LS_REACH) ? LA_REACH_TO_MONKEY : LA_JUMP_UP_TO_MONKEY;
+
+	SetAnimation(&item, animNumber);
 	ResetLaraFlex(&item);
 	item.Animation.Velocity = Vector3::Zero;
 	item.Animation.IsAirborne = false;

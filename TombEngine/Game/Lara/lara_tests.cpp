@@ -67,6 +67,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.ExtraTorsoRot = EulerAngles::Zero;
 }
 
+// TODO
+// combined grab. will probably revise this into something else.
 bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
@@ -97,6 +99,7 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	return false;
 }
 
+// legacy grab for reach state
 bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -164,6 +167,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	//	SnapItemToLedge(item, coll, 0.2f);
 }
 
+// legacy grab for jump up
 bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
