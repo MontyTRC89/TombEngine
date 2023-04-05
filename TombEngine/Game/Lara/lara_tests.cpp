@@ -19,10 +19,10 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Floordata;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -44,39 +44,55 @@ struct EdgeCatchData
 
 static EdgeCatchData GetPlayerEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 {
+	const auto& player = GetLaraInfo(item);
+
 	constexpr auto INVALID_EDGE_CATCH_DATA = EdgeCatchData{ EdgeType::None, 0 };
 
-	// Test for valid ledge.
+	// 1. Test for valid ledge.
 	if (!TestValidLedge(&item, &coll, true))
 		return INVALID_EDGE_CATCH_DATA;
 
-	// Get point collision.
 	float probeDist = OFFSET_RADIUS(coll.Setup.Radius);
 	float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
-	auto pointColl = GetCollision(&item, item.Pose.Orientation.y, probeDist, probeHeight);
 
-	// TODO: Edges of room boundaries.
+	// Get point collision.
+	auto pointCollCenter = GetCollision(&item);
+	auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, probeDist, probeHeight);
 
-	g_Renderer.AddSphere(pointColl.Coordinates.ToVector3(), 50, Vector4::One);
+	// TODO: Fails in edge case?
+
+	g_Renderer.AddSphere(pointCollFront.Coordinates.ToVector3(), 50, Vector4::One);
 
 	int vPos = item.Pose.Position.y - coll.Setup.Height;
-	int relFloorHeight = pointColl.Position.Floor - vPos;
+	int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;
+	int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
 
-	// Test relative height to ledge.
+	// 2. Test ledge height.
+	int edgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
+	if (edgeHeight <= LARA_HEIGHT_STRETCH)
+		return INVALID_EDGE_CATCH_DATA;
+
+	// 3. Test relative height to ledge.
 	bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 	if ((isMovingUp &&
-			relFloorHeight >= item.Animation.Velocity.y &&
-			relFloorHeight <= 0) ||
+			relFloorHeightFront >= item.Animation.Velocity.y &&
+			relFloorHeightFront <= 0) ||
 		(!isMovingUp &&
-			relFloorHeight <= item.Animation.Velocity.y &&
-			relFloorHeight >= 0))
+			relFloorHeightFront <= item.Animation.Velocity.y &&
+			relFloorHeightFront >= 0))
 	{
-		return EdgeCatchData{ EdgeType::Ledge, pointColl.Position.Floor };
+		return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
 	}
 
 	return INVALID_EDGE_CATCH_DATA;
 
-	// TODO: Ladders.
+	// TODO
+	// 4. Test for climbable wall step.
+	if (player.Control.CanClimbLadder)
+	{
+		int wallHeight = 0;
+		return EdgeCatchData{ EdgeType::ClimbableWall, wallHeight };
+	}
 
 	//----------------
 
