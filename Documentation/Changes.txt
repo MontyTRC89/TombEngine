@@ -30,13 +30,14 @@ Version 1.0.8
 	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr3_Compsognathus_Cadavar.wad2
 * Add cold exposure bar (employed by setting the "cold" flag in water rooms in Tomb Editor).
 * Add water wakes for vehicles.
-* Allow dynamic segment count of hair object.
-* Restored light effect nullmeshes (color, electrical, pulse and strobe):
+* Restored light effect nullmeshes (color, electrical, pulse, and strobe):
 	- Select the color the light should emit as object tint in OCB menu in Tomb editor.
 	- ELECTRICAL_LIGHT:
-		- OCB 1: Displays mesh of object.
-		- OCB -1: Hides mesh of object (used for a neon light effect)
+		- Electrical light can have multiple, different meshes now. put the meshnumber into the ocb you want to render with the light
+		- OCB + (mesh number) allows light to behave like a neon light.
+		- OCB – (mesh number) makes the light flicker
 * Restored inventory compass.
+* Allow dynamic segment count of hair object.
 
 Lua API changes:
 * Add new function Misc::IsSoundPlaying() 
