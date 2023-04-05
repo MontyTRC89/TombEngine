@@ -249,7 +249,7 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// 3. Test relative height to ledge.
-		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
+		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
 		if ((isMovingUp &&
 				relFloorHeightFront >= item.Animation.Velocity.y &&
 				relFloorHeightFront <= 0) ||
@@ -267,8 +267,10 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.CanClimbLadder)
 		{
 			// Snap to height of nearest wall step.
-			int wallHeight = (int)round((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
+			int wallHeight = (int)round(((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT);
 			return EdgeCatchData{ EdgeType::ClimbableWall, wallHeight };
 		}
+
+		return std::nullopt;
 	}
 }

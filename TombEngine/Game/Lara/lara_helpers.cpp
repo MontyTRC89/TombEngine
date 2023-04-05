@@ -852,6 +852,18 @@ void SetLaraFallBackAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = 0.0f;
 }
 
+void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll)
+{
+	auto& player = GetLaraInfo(item);
+
+	SetAnimation(&item, LA_REACH_TO_MONKEY);
+	ResetLaraFlex(&item);
+	item.Animation.Velocity = Vector3::Zero;
+	item.Animation.IsAirborne = false;
+	item.Pose.Position.y += coll.Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll.Setup.Height);
+	player.Control.HandStatus = HandStatus::Busy;
+}
+
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
 {
 	// HACK: Disallow release during 180 turn action.
@@ -960,8 +972,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 void SetPlayerEdgeHangRelease(ItemInfo& item)
 {
-	constexpr auto FORWARD_VEL	= 2.0f;
-	constexpr auto VERTICAL_VEL = 1.0f;
+	constexpr auto VEL = Vector3(0.0f, 1.0f, 2.0f);
 
 	auto& player = GetLaraInfo(item);
 
@@ -977,16 +988,14 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	}
 
 	item.Animation.IsAirborne = true;
-	item.Animation.Velocity.y = VERTICAL_VEL;
-	item.Animation.Velocity.z = FORWARD_VEL;
+	item.Animation.Velocity = VEL;
 	player.Control.HandStatus = HandStatus::Free;
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 {
 	constexpr auto WALL_STEP_HEIGHT = CLICK(1);
-	constexpr auto FORWARD_VEL		= 2.0f;
-	constexpr auto VERTICAL_VEL		= 1.0f;
+	constexpr auto VEL				= Vector3(0.0f, 1.0f, 2.0f);
 
 	auto& player = GetLaraInfo(item);
 
@@ -994,8 +1003,7 @@ void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 	{
 		SetAnimation(&item, LA_FALL_START);
 		item.Animation.IsAirborne = true;
-		item.Animation.Velocity.y = VERTICAL_VEL;
-		item.Animation.Velocity.z = FORWARD_VEL;
+		item.Animation.Velocity = VEL;
 		item.Pose.Position.y += WALL_STEP_HEIGHT;
 		item.Pose.Orientation.y += player.NextCornerPos.Orientation.y / 2;
 		player.Control.HandStatus = HandStatus::Free;

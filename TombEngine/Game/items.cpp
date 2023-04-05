@@ -150,7 +150,7 @@ void ItemInfo::ResetModelToDefault()
 		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
 }
 
-bool TestState(int refState, const vector<int>& stateList)
+bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)
 	{

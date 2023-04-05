@@ -36,9 +36,17 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 {
 	auto& player = GetLaraInfo(item);
 
+	// TODO
+	if (edgeCatchData.Type == Context::EdgeType::ClimbableWall)
+	{
+		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
+		if (isMovingUp)
+			return;
+	}
+
 	if (item.Animation.ActiveState == LS_JUMP_UP)
 	{
-		SetAnimation(&item, LA_REACH_TO_HANG, 12);
+		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
 	}
 	else if (TestHangSwingIn(&item, &coll))
 	{
@@ -63,10 +71,22 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
-	if (!IsHeld(In::Action) || player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
+	// Check for Action input.
+	if (!IsHeld(In::Action))
 		return false;
 
-	// Grab edge.
+	// Check player status.
+	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
+		return false;
+
+	// Grab monkey swing.
+	if (TestLaraMonkeyGrab(&item, &coll))
+	{
+		SetPlayerMonkeySwingGrab(item, coll);
+		return true;
+	}
+
+	// Grab edge (ledge or climbable wall).
 	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
 	if (edgeCatchData.has_value())
 	{
