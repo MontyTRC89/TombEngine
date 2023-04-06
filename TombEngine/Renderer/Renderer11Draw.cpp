@@ -773,18 +773,41 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
+	void Renderer11::AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
 
 		RendererLine3D line;
 
-		line.Start = start;
-		line.End = end;
+		line.Start = origin;
+		line.End = target;
 		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
+	}
+
+	void Renderer11::AddReticle(const Vector3& center, const Vector4& color, float radius)
+	{
+		auto origin0 = center + Vector3(radius, 0.0f, 0.0f);
+		auto target0 = center + Vector3(-radius, 0.0f, 0.0f);
+		AddLine3D(origin0, target0, color);
+
+		auto origin1 = center + Vector3(0.0f, radius, 0.0f);
+		auto target1 = center + Vector3(0.0f, -radius, 0.0f);
+		AddLine3D(origin1, target1, color);
+
+		auto origin2 = center + Vector3(0.0f, 0.0f, radius);
+		auto target2 = center + Vector3(0.0f, 0.0f, -radius);
+		AddLine3D(origin2, target2, color);
+	}
+
+	void Renderer11::AddDebugReticle(const Vector3& center, const Vector4& color, float radius, RENDERER_DEBUG_PAGE page)
+	{
+		if (!DebugMode || m_numDebugPage != page)
+			return;
+
+		AddReticle(center, color, radius);
 	}
 
 	void Renderer11::AddSphere(Vector3 center, float radius, Vector4 color)
@@ -901,12 +924,15 @@ namespace TEN::Renderer
 			case 0: line.Start = Vector3(min.x, min.y, min.z);
 				line.End = Vector3(min.x, min.y, max.z);
 				break;
+
 			case 1: line.Start = Vector3(min.x, min.y, max.z);
 				line.End = Vector3(max.x, min.y, max.z);
 				break;
+
 			case 2: line.Start = Vector3(max.x, min.y, max.z);
 				line.End = Vector3(max.x, min.y, min.z);
 				break;
+
 			case 3: line.Start = Vector3(max.x, min.y, min.z);
 				line.End = Vector3(min.x, min.y, min.z);
 				break;
@@ -914,12 +940,15 @@ namespace TEN::Renderer
 			case 4: line.Start = Vector3(min.x, max.y, min.z);
 				line.End = Vector3(min.x, max.y, max.z);
 				break;
+
 			case 5: line.Start = Vector3(min.x, max.y, max.z);
 				line.End = Vector3(max.x, max.y, max.z);
 				break;
+
 			case 6: line.Start = Vector3(max.x, max.y, max.z);
 				line.End = Vector3(max.x, max.y, min.z);
 				break;
+
 			case 7: line.Start = Vector3(max.x, max.y, min.z);
 				line.End = Vector3(min.x, max.y, min.z);
 				break;
@@ -927,12 +956,15 @@ namespace TEN::Renderer
 			case 8: line.Start = Vector3(min.x, min.y, min.z);
 				line.End = Vector3(min.x, max.y, min.z);
 				break;
+
 			case 9: line.Start = Vector3(min.x, min.y, max.z);
 				line.End = Vector3(min.x, max.y, max.z);
 				break;
+
 			case 10: line.Start = Vector3(max.x, min.y, max.z);
 				line.End = Vector3(max.x, max.y, max.z);
 				break;
+
 			case 11: line.Start = Vector3(max.x, min.y, min.z);
 				line.End = Vector3(max.x, max.y, min.z);
 				break;

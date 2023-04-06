@@ -705,13 +705,15 @@ namespace TEN::Renderer
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color);
-		void AddLine3D(Vector3 start, Vector3 end, Vector4 color);
+		void AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color);
+		void AddReticle(const Vector3& center, const Vector4& color, float radius);
+		void AddDebugReticle(const Vector3& center, const Vector4& color, float radius, RENDERER_DEBUG_PAGE page);
+		void AddSphere(Vector3 center, float radius, Vector4 color);
+		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void AddBox(Vector3 min, Vector3 max, Vector4 color);
 		void AddBox(Vector3* corners, Vector4 color);
 		void AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
-		void AddSphere(Vector3 center, float radius, Vector4 color);
-		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);

@@ -7,7 +7,7 @@ namespace TEN::Entities::Player::Context
 {
 	struct EdgeCatchData;
 
-	// Ledge contexts
+	// Ledge context inquirers
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll);
 	bool CanPerformLedgeJump(ItemInfo& item, CollisionInfo& coll);
 	bool CanPerformLedgeHandstand(ItemInfo& item, CollisionInfo& coll);

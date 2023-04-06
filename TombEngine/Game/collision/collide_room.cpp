@@ -353,7 +353,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xFront;
 	probePos.z = entityPos.z + zFront;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+	g_Renderer.AddDebugReticle(probePos.ToVector3(), Vector4(1, 0, 0, 1), 42, RENDERER_DEBUG_PAGE::LARA_STATS);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, topRoomNumber);
 
@@ -436,7 +436,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xLeft;
 	probePos.z = entityPos.z + zLeft;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugReticle(probePos.ToVector3(), Vector4(0, 0, 1, 1), 42, RENDERER_DEBUG_PAGE::LARA_STATS);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
 
@@ -555,7 +555,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xRight;
 	probePos.z = entityPos.z + zRight;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+	g_Renderer.AddDebugReticle(probePos.ToVector3(), Vector4(0, 1, 0, 1), 42, RENDERER_DEBUG_PAGE::LARA_STATS);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
 

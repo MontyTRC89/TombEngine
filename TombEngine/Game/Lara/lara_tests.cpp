@@ -32,6 +32,7 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
+// TODO: Move to lara_helpers.cpp
 static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& edgeCatchData)
 {
 	auto& player = GetLaraInfo(item);
@@ -95,28 +96,24 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 		return true;
 	}
 
-	return false;
-}
-
-// legacy grab sample
-bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
-{
-	return false;
-
+	// TODO: Climbable wall.
+	// Legacy sample.
 	/*
 	bool isLadder = TestLaraHangOnClimbableWall(item, coll);
 	if (!(isLadder && hasCaughtEdge) &&
 	!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
 	{
-		return false;
+	return false;
 	}
 
 	if (isLadder)
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 	*/
+
+	return false;
 }
 
-// Test if a ledge in front of item is valid to climb.
+// Test if a ledge in front of entity is valid to climb.
 bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	// Determine probe base left/right points
@@ -188,9 +185,11 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto RELEASE_VEL = Vector3(0.0f, 1.0f, 2.0f);
+
 	auto& player = GetLaraInfo(*item);
 
-	auto angle = player.Control.MoveAngle;
+	short angle = player.Control.MoveAngle;
 
 	// Determine direction of player's shimmy. 0 if hanging still.
 	int climbDirection = 0;
@@ -211,7 +210,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	int heightDelta = LaraFloorFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.4f);
 
 	// Set stopped flag if floor height is above footspace, which is step size.
-	bool isStopped = heightDelta < CLICK(0.5f);
+	bool isStopped = (heightDelta < CLICK(0.5f));
 
 	// Set stopped flag if ceiling height is below headspace, which is step size.
 	if (LaraCeilingFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
@@ -229,13 +228,13 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	// When player is about to move, use larger embed offset to stabilize diagonal shimmy.
 	int embedOffset = 4;
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		embedOffset = 32;
 
 	TranslateItem(item, item->Pose.Orientation.y, embedOffset);
 	GetCollisionInfo(coll, item);
 
-	bool result = false;
+	bool canHang = false;
 
 	// Ladder case.
 	if (player.Control.CanClimbLadder)
@@ -251,15 +250,17 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
 					item->Pose.Position.y = coll->Setup.OldPosition.y;
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(item, LA_HANG_IDLE);
+					//SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 
-				result = true;
+				canHang = true;
 			}
 			else
 			{
-				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE) &&
-					TestLaraClimbIdle(item, coll))
+				if (item->Animation.ActiveState == LS_HANG_IDLE)
+				//if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE) &&
+				//	TestLaraClimbIdle(item, coll))
 				{
 					item->Animation.TargetState = LS_LADDER_IDLE;
 				}
@@ -269,10 +270,9 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		else
 		{
 			SetAnimation(item, LA_FALL_START);
-			item->Pose.Position.y += CLICK(1);
 			item->Animation.IsAirborne = true;
-			item->Animation.Velocity.y = 1.0f;
-			item->Animation.Velocity.z = 2.0f;
+			item->Animation.Velocity = RELEASE_VEL;
+			item->Pose.Position.y += CLICK(1);
 			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
@@ -301,7 +301,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			{
 				short sinMoveAngle = phd_sin(player.Control.MoveAngle);
 				short cosMoveAngle = phd_cos(player.Control.MoveAngle);
-				auto testShift = Vector2(sinMoveAngle * coll->Setup.Radius, cosMoveAngle * coll->Setup.Radius);
+				auto testShift = Vector2(sinMoveAngle, cosMoveAngle) * coll->Setup.Radius;
 
 				x += testShift.x;
 				z += testShift.y;
@@ -325,7 +325,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic &&
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
-				if (item->Animation.Velocity.z != 0)
+				if (item->Animation.Velocity.z != 0.0f)
 					SnapItemToLedge(item, coll);
 
 				item->Pose.Position.y += verticalShift;
@@ -334,30 +334,31 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Pose.Position = coll->Setup.OldPosition;
 
+				// Stop shimmying.
 				if (item->Animation.ActiveState == LS_SHIMMY_LEFT ||
 					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(item, LA_HANG_IDLE);
 				}
 
-				result = true;
+				canHang = true;
 			}
 		}
 		// Death, incorrect ledge, or Action release.
 		else
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
-			item->Pose.Position.x += coll->Shift.x;
-			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
-			item->Pose.Position.z += coll->Shift.z;
 			item->Animation.IsAirborne = true;
-			item->Animation.Velocity.z = 2;
-			item->Animation.Velocity.y = 1;
+			item->Animation.Velocity = RELEASE_VEL;
+			item->Pose.Position += Vector3i(
+				coll->Shift.x,
+				GameBoundingBox(item).Y2 * 1.8f,
+				coll->Shift.z);
 			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
 
-	return result;
+	return canHang;
 }
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
