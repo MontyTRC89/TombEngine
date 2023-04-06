@@ -21,8 +21,9 @@ namespace TEN::Entities::Player::Context
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
 
 		// Get point collision.
+		int probeHeight = -(LARA_HEIGHT_STRETCH + ABS_FLOOR_BOUND);
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -(LARA_HEIGHT_STRETCH + CLICK(0.5f)));
+		auto pointCollFront = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
@@ -181,10 +182,10 @@ namespace TEN::Entities::Player::Context
 		auto pointCollLeft = GetCollision(&item, item.Pose.Orientation.y - ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
 		auto pointCollRight = GetCollision(&item, item.Pose.Orientation.y + ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
 
-		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
-		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPosTop;
-		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPosTop;
-		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPosTop;
+		int vPos = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
+		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPos;
+		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPos;
+		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPos;
 
 		// 2) Assess point collision.
 		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&
@@ -234,7 +235,6 @@ namespace TEN::Entities::Player::Context
 		// Get point collision.
 		auto pointColl = GetCollision(&item);
 
-		// Calculate key heights.
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int relCeilHeight = pointColl.Position.Ceiling - vPos;
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
@@ -251,7 +251,8 @@ namespace TEN::Entities::Player::Context
 			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height isn't too narrow.
 		{
 			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
-			return MonkeySwingCatchData{ animNumber, pointColl.Position.Ceiling };
+			int monkeyHeight = pointColl.Position.Ceiling;
+			return MonkeySwingCatchData{ animNumber, monkeyHeight };
 		}
 
 		return std::nullopt;

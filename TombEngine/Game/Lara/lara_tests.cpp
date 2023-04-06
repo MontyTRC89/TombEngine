@@ -97,7 +97,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
 		return false;
 
-	// Grab monkey swing.
+	// Catch monkey swing.
 	auto monkeyCatchData = Context::GetMonkeySwingCatchData(item, coll);
 	if (monkeyCatchData.has_value())
 	{
@@ -105,7 +105,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 		return true;
 	}
 
-	// Grab edge (ledge or climbable wall step).
+	// Catch edge (ledge or climbable wall edge).
 	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
 	if (edgeCatchData.has_value())
 	{
