@@ -60,7 +60,17 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	int height = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
-	SnapItemToLedge(&item, &coll);
+	// TODO
+	bool isLadder = TestLaraHangOnClimbableWall(&item, &coll);
+	if (isLadder)
+	{
+		SnapItemToGrid(&item, &coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+	}
+	else
+	{
+		SnapItemToLedge(&item, &coll);
+	}
+
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;

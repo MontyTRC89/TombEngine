@@ -235,8 +235,10 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
+		// DEBUG: Show point collision probe point.
 		g_Renderer.AddReticle(pointCollFront.Coordinates.ToVector3(), Vector4::One, 64.0f);
 
+		// Calculate key heights.
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;
 		int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
@@ -246,8 +248,9 @@ namespace TEN::Entities::Player::Context
 		if (ledgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
-		// 3. Test relative height to ledge.
 		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
+
+		// 3. Test relative height to ledge.
 		if ((isMovingUp &&
 				relFloorHeightFront >= item.Animation.Velocity.y &&
 				relFloorHeightFront <= 0) ||
@@ -258,15 +261,19 @@ namespace TEN::Entities::Player::Context
 			return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
 		}
 
-		return std::nullopt;
-
-		// TODO
 		// 4. Test for climbable wall step.
 		if (player.Control.CanClimbLadder)
 		{
-			// Snap to height of nearest wall step.
-			int wallHeight = (int)round(((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT);
-			return EdgeCatchData{ EdgeType::ClimbableWall, wallHeight };
+			// Calculate height of nearest wall step.
+			int wallEdgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
+			int relWallEdgeHeight = wallEdgeHeight - vPos;
+
+			if (!isMovingUp &&
+				relWallEdgeHeight <= item.Animation.Velocity.y &&
+				relWallEdgeHeight >= 0)
+			{
+				return EdgeCatchData{ EdgeType::ClimbableWall, wallEdgeHeight };
+			}
 		}
 
 		return std::nullopt;
