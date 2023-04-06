@@ -18,7 +18,7 @@ namespace TEN::Entities::Player::Context
 {
 	static bool TestLedgeClimbSetup(ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{
-		constexpr auto ABS_FLOOR_BOUND = CLICK(1);
+		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(&item);
@@ -257,6 +257,49 @@ namespace TEN::Entities::Player::Context
 		return std::nullopt;
 	}
 
+	static bool TestLedgeCatch(int verticalPos, float verticalVel, int edgeHeight)
+	{
+		bool isMovingUp = (verticalVel < 0.0f);
+
+		int relLedgeHeight = edgeHeight - verticalPos;
+		int lowerBound = isMovingUp ? 0 : verticalVel;
+		int upperBound = isMovingUp ? verticalVel : 0;
+
+		// Assess point collision to ledge moving up.
+		if (relLedgeHeight <= lowerBound && // Ledge height is above lower height bound.
+			relLedgeHeight >= upperBound)	// Ledge height is below upper height bound.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	static bool TestClimbableWallCatch(int verticalPos, float verticalVel, int edgeHeight, int floorHeight, int ceilHeight)
+	{
+		// 1) Check movement direction.
+		bool isMovingUp = (verticalVel < 0.0f);
+		if (isMovingUp)
+			return false;
+
+		// 2) Test for wall.
+		if (edgeHeight < floorHeight && // Edge is above floor.
+			edgeHeight > ceilHeight)	// Edge is below ceiling.
+		{
+			return false;
+		}
+
+		// 3) Assess point collision to climbable wall edge.
+		int relWallEdgeHeight = edgeHeight - verticalPos;
+		if (relWallEdgeHeight <= verticalVel && // Edge height is above lower height bound.
+			relWallEdgeHeight >= 0)				// Edge height is below upper height bound.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
@@ -272,31 +315,19 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
-		// DEBUG: Show point collision probe point.
-		g_Renderer.AddReticle(pointCollFront.Coordinates.ToVector3(), Vector4::One, 64.0f);
-
-		// Calculate key heights.
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;
 		int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
 
-		// 2) Test ledge height.
-		int ledgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
-		if (ledgeHeight <= LARA_HEIGHT_STRETCH)
+		// 2) Test if ledge height is too low to the ground.
+		int relLedgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
+		if (relLedgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
-		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
-
-		// 3) Test relative height to ledge.
-		if ((isMovingUp &&
-				relFloorHeightFront >= item.Animation.Velocity.y &&
-				relFloorHeightFront <= 0) ||
-			(!isMovingUp &&
-				relFloorHeightFront <= item.Animation.Velocity.y &&
-				relFloorHeightFront >= 0))
-		{
-			return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
-		}
+		// 3) Test ledge catch.
+		int ledgeHeight = pointCollFront.Position.Floor;
+		if (TestLedgeCatch(vPos, item.Animation.Velocity.y, ledgeHeight))
+			return EdgeCatchData{ EdgeType::Ledge, ledgeHeight };
 
 		// TODO: Still buggy!
 		// 4) Test for climbable wall edge.
@@ -307,14 +338,11 @@ namespace TEN::Entities::Player::Context
 			if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
 				return std::nullopt;
 
-			// Calculate height of nearest wall step.
+			// 4.2) Test wall edge catch.
 			int wallEdgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
-			int relWallEdgeHeight = wallEdgeHeight - vPos;
-
-			// 4.2) Test relative height to climbable wall edge.
-			if (!isMovingUp &&
-				relWallEdgeHeight <= item.Animation.Velocity.y &&
-				relWallEdgeHeight >= 0)
+			if (TestClimbableWallCatch(
+				vPos, item.Animation.Velocity.y, wallEdgeHeight,
+				pointCollFront.Position.Floor, pointCollFront.Position.Ceiling))
 			{
 				return EdgeCatchData{ EdgeType::ClimbableWall, wallEdgeHeight };
 			}

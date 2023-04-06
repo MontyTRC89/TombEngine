@@ -119,25 +119,25 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 // Test if a ledge in front of entity is valid to climb.
 bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
-	// Determine probe base left/right points
-	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
-	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
-	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
-	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+	int vPos = item->Pose.Position.y - coll->Setup.Height;
 
-	// Determine probe top point
-	int y = item->Pose.Position.y - coll->Setup.Height;
-
-	// Get frontal collision data
-	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
-	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
+	// Get point collision.
+	auto pointCollLeft  = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
+	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 
 	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
 	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
-	if (frontLeft.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)) || frontRight.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)))
+	if (pointCollLeft.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)) ||
+		pointCollRight.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)))
+	{
 		return false;
-	if (frontLeft.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height) || frontRight.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height))
+	}
+
+	if (pointCollLeft.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height) ||
+		pointCollRight.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height))
+	{
 		return false;
+	}
 
 	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
@@ -148,12 +148,17 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 
+	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+
 	// Get floor heights at both points
-	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
-	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
+	auto left = GetCollision(item->Pose.Position.x + xf + xl, vPos, item->Pose.Position.z + zf + zl, GetRoom(item->Location, item->Pose.Position.x, vPos, item->Pose.Position.z).roomNumber).Position.Floor;
+	auto right = GetCollision(item->Pose.Position.x + xf + xr, vPos, item->Pose.Position.z + zf + zr, GetRoom(item->Location, item->Pose.Position.x, vPos, item->Pose.Position.z).roomNumber).Position.Floor;
 
 	// If specified, limit vertical search zone only to nearest height
-	if (heightLimit && (abs(left - y) > CLICK(0.5f) || abs(right - y) > CLICK(0.5f)))
+	if (heightLimit && (abs(left - vPos) > CLICK(0.5f) || abs(right - vPos) > CLICK(0.5f)))
 		return false;
 
 	// Determine allowed slope difference for a given collision radius
