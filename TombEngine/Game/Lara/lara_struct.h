@@ -519,7 +519,7 @@ enum LaraAnim
 	LA_MONKEY_TURN_LEFT_TO_IDLE_LATE = 284,							// Turn left on monkey swing > monkey swing idle, 2nd opportunity
 	LA_MONKEY_TURN_RIGHT_TO_IDLE_EARLY = 285,						// Turn right on monkey swing > monkey swing idle, 1st opportunity
 	LA_MONKEY_TURN_RIGHT_TO_IDLE_LATE = 286,						// Turn right on monkey swing > monkey swing idle, 2nd opportunity
-	LA_HANG_TO_CROUCH_START = 287,									// Pull up from hang > crouch (1/2)
+	LA_HANG_TO_CROUCH = 287,										// Pull up from hang > crouch
 	LA_HANG_TO_CROUCH_END = 288,									// Pull up from hang > crouch (2/2)
 	LA_CRAWL_TO_HANG_START = 289,									// Crawl > hang (1/3)
 	LA_CRAWL_TO_HANG_CONTINUE = 290,								// Crawl > hang (2/3)
@@ -823,7 +823,7 @@ enum LaraAnim
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102,
-	// 278, 280,
+	// 278, 280, 288,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
