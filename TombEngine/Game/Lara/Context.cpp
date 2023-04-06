@@ -261,13 +261,19 @@ namespace TEN::Entities::Player::Context
 			return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
 		}
 
-		// 4. Test for climbable wall step.
+		// 4. Test for climbable wall edge.
 		if (player.Control.CanClimbLadder)
 		{
+			// 4.1. Ensure climbable wall is valid.
+			bool isClimbableWall = TestLaraHangOnClimbableWall(&item, &coll);
+			if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
+				return std::nullopt;
+
 			// Calculate height of nearest wall step.
 			int wallEdgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 			int relWallEdgeHeight = wallEdgeHeight - vPos;
 
+			// 4.2. Test relative height to climbable wall edge.
 			if (!isMovingUp &&
 				relWallEdgeHeight <= item.Animation.Velocity.y &&
 				relWallEdgeHeight >= 0)

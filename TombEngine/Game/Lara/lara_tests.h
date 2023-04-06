@@ -11,7 +11,7 @@ struct ItemInfo;
 // For State Control & Collision
 // -----------------------------
 
-bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll);
+bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
 bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll);
 

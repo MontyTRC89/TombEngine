@@ -37,14 +37,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 {
 	auto& player = GetLaraInfo(item);
 
-	// TODO
-	if (edgeCatchData.Type == Context::EdgeType::ClimbableWall)
-	{
-		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
-		if (isMovingUp)
-			return;
-	}
-
+	// Set catch animation.
 	if (item.Animation.ActiveState == LS_JUMP_UP)
 	{
 		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
@@ -58,18 +51,18 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		SetAnimation(&item, LA_REACH_TO_HANG);
 	}
 
-	int height = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
-
-	// TODO
-	bool isLadder = TestLaraHangOnClimbableWall(&item, &coll);
-	if (isLadder)
+	// Snap player to edge.
+	if (edgeCatchData.Type == Context::EdgeType::ClimbableWall)
 	{
-		SnapItemToGrid(&item, &coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		// HACK: Until fragile ladder code is refactored, snap must be exactly aligned to the grid.
+		SnapItemToGrid(&item, &coll);
 	}
 	else
 	{
 		SnapItemToLedge(&item, &coll);
 	}
+
+	int height = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
@@ -79,9 +72,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.ExtraTorsoRot = EulerAngles::Zero;
 }
 
-// TODO
-// combined grab. will probably revise this into something else.
-bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
+bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -100,27 +91,13 @@ bool HandlePlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 		return true;
 	}
 
-	// Grab edge (ledge or climbable wall).
+	// Grab edge (ledge or climbable wall step).
 	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
 	if (edgeCatchData.has_value())
 	{
 		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
 		return true;
 	}
-
-	// TODO: Climbable wall.
-	// Legacy sample.
-	/*
-	bool isLadder = TestLaraHangOnClimbableWall(item, coll);
-	if (!(isLadder && hasCaughtEdge) &&
-	!(TestValidLedge(item, coll, true, true) && hasCaughtEdge > 0))
-	{
-	return false;
-	}
-
-	if (isLadder)
-	SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-	*/
 
 	return false;
 }
