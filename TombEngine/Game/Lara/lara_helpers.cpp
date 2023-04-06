@@ -852,20 +852,6 @@ void SetLaraFallBackAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = 0.0f;
 }
 
-void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll)
-{
-	auto& player = GetLaraInfo(item);
-
-	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
-
-	SetAnimation(&item, animNumber);
-	ResetLaraFlex(&item);
-	item.Animation.IsAirborne = false;
-	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y += coll.Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll.Setup.Height);
-	player.Control.HandStatus = HandStatus::Busy;
-}
-
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
 {
 	// HACK: Disallow release during 180 turn.

@@ -33,7 +33,7 @@ using namespace TEN::Renderer;
 // -----------------------------
 
 // TODO: Move to lara_helpers.cpp
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& edgeCatchData)
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& catchData)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -52,7 +52,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	}
 
 	// Snap to edge.
-	if (edgeCatchData.Type == Context::EdgeType::ClimbableWall)
+	if (catchData.Type == Context::EdgeType::ClimbableWall)
 	{
 		// HACK: Until fragile ladder code is refactored, snap must be exactly aligned to the grid.
 		SnapItemToGrid(&item, &coll);
@@ -67,9 +67,22 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = edgeCatchData.Height + height;
+	item.Pose.Position.y = catchData.Height + height;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
+}
+
+// TODO: Move to lara_helpers.cpp
+static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)
+{
+	auto& player = GetLaraInfo(item);
+
+	SetAnimation(&item, catchData.AnimNumber);
+	ResetLaraFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Pose.Position.y = catchData.Height + LARA_HEIGHT_MONKEY;
+	player.Control.HandStatus = HandStatus::Busy;
 }
 
 bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
@@ -85,9 +98,10 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 		return false;
 
 	// Grab monkey swing.
-	if (Context::CanCatchMonkeySwing(item, coll))
+	auto monkeyCatchData = Context::GetMonkeySwingCatchData(item, coll);
+	if (monkeyCatchData.has_value())
 	{
-		SetPlayerMonkeySwingCatch(item, coll);
+		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchData.value());
 		return true;
 	}
 

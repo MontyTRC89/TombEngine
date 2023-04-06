@@ -23,4 +23,10 @@ namespace TEN::Entities::Player::Context
 
 		bool TestSlipperySlope = false;
 	};
+
+	struct MonkeySwingCatchData
+	{
+		int AnimNumber = 0; // TODO: State dispatch.
+		int Height	   = 0;
+	};
 }

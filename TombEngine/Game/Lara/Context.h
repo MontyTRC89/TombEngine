@@ -6,6 +6,7 @@ struct ItemInfo;
 namespace TEN::Entities::Player::Context
 {
 	struct EdgeCatchData;
+	struct MonkeySwingCatchData;
 
 	// Ledge context inquirers
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll);
@@ -18,8 +19,7 @@ namespace TEN::Entities::Player::Context
 	bool CanWallShimmyUp(ItemInfo& item, CollisionInfo& coll);
 	bool CanWallShimmyDown(ItemInfo& item, CollisionInfo& coll);
 
-	// Monkey swing
-	bool CanCatchMonkeySwing(ItemInfo& item, CollisionInfo& coll);
-
-	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
+	// Context data getters
+	std::optional<EdgeCatchData>		GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, CollisionInfo& coll);
 }

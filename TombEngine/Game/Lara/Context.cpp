@@ -220,7 +220,7 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool CanCatchMonkeySwing(ItemInfo& item, CollisionInfo& coll)
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto LOWER_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -229,11 +229,14 @@ namespace TEN::Entities::Player::Context
 
 		// 1) Check for monkey swing ceiling.
 		if (!player.Control.CanMonkeySwing)
-			return false;
+			return std::nullopt;
 
 		// Get point collision.
 		auto pointColl = GetCollision(&item);
-		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_MONKEY);
+
+		// Calculate key heights.
+		int vPos = item.Pose.Position.y - LARA_HEIGHT_MONKEY;
+		int relCeilHeight = pointColl.Position.Ceiling - vPos;
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 2) Assess collision with ceiling.
@@ -241,17 +244,18 @@ namespace TEN::Entities::Player::Context
 			coll.CollisionType != CollisionType::CT_TOP &&
 			coll.CollisionType != CollisionType::CT_TOP_FRONT)
 		{
-			return false;
+			return std::nullopt;
 		}
 
 		// 3) Assess point collision.
 		if (relCeilHeight <= LOWER_CEIL_BOUND &&		  // Ceiling height is above lower ceiling bound.
-			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling space isn't too narrow.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height isn't too narrow.
 		{
-			return true;
+			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+			return MonkeySwingCatchData{ animNumber, pointColl.Position.Ceiling };
 		}
 
-		return false;
+		return std::nullopt;
 	}
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
