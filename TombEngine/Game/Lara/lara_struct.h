@@ -325,7 +325,7 @@ enum LaraAnim
 	LA_UNDERWATER_USE_KEY = 99,								// Use key underwater
 	LA_JUMP_FORWARD_TO_REACH_4 = 100,						// Jump forward > reach, 4th opportunity
 	LA_JUMP_FORWARD_TO_REACH_ALTERNATE_UNUSED = 101,		// Jump forward (from jump forward anim) > reach
-	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2) TODO: remove, not used anymore
+	LA_EDGE_HANG_RELEASE_TO_JUMP_UP = 102,					// Edge hang > jump up
 	LA_STAND_IDLE = 103,									// Stand idle (looped)
 	LA_SLIDE_BACK_START = 104,								// Land on slope > slide back
 	LA_SLIDE_BACK = 105,									// Slide back (looped) 
@@ -822,7 +822,6 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 102,
 	// 278, 280, 288,
 	// 343, 345,
 	// 364, 366, 368, 370,

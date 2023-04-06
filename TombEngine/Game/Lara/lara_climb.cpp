@@ -978,21 +978,16 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 
 bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.y = 0.0f;
 
-	if (TrInput & IN_ACTION && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
+	if ((IsHeld(In::Action) && item->HitPoints > 0) ||
+		item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // HACK: Can't release on this anim.
+	{
 		return false;
+	}
 
+	SetPlayerEdgeHangRelease(*item);
 	ResetLaraFlex(item);
-
-	SetAnimation(item, LA_FALL_START);
-
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
-	item->Animation.IsAirborne = true;
-	lara->Control.HandStatus = HandStatus::Free;
 	return true;
 }

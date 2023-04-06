@@ -62,12 +62,12 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		SnapItemToLedge(&item, &coll);
 	}
 
-	int height = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
+	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = catchData.Height + height;
+	item.Pose.Position.y = catchData.Height + playerHeight;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
 }
@@ -267,14 +267,10 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.TargetState = LS_LADDER_IDLE;
 			}
 		}
-		// Death or Action release.
+		// Death or Action release. Unused block?
 		else
 		{
-			SetAnimation(item, LA_FALL_START);
-			item->Animation.IsAirborne = true;
-			item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
-			item->Pose.Position.y += CLICK(1);
-			player.Control.HandStatus = HandStatus::Free;
+			SetPlayerEdgeHangRelease(*item);
 		}
 	}
 	// Regular case.

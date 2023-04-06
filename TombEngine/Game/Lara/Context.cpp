@@ -261,13 +261,13 @@ namespace TEN::Entities::Player::Context
 	{
 		bool isMovingUp = (verticalVel < 0.0f);
 
-		int relLedgeHeight = edgeHeight - verticalPos;
+		int relEdgeHeight = edgeHeight - verticalPos;
 		int lowerBound = isMovingUp ? 0 : verticalVel;
 		int upperBound = isMovingUp ? verticalVel : 0;
 
 		// Assess point collision to ledge moving up.
-		if (relLedgeHeight <= lowerBound && // Ledge height is above lower height bound.
-			relLedgeHeight >= upperBound)	// Ledge height is below upper height bound.
+		if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
+			relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 		{
 			return true;
 		}
@@ -290,9 +290,9 @@ namespace TEN::Entities::Player::Context
 		}
 
 		// 3) Assess point collision to climbable wall edge.
-		int relWallEdgeHeight = edgeHeight - verticalPos;
-		if (relWallEdgeHeight <= verticalVel && // Edge height is above lower height bound.
-			relWallEdgeHeight >= 0)				// Edge height is below upper height bound.
+		int relEdgeHeight = edgeHeight - verticalPos;
+		if (relEdgeHeight <= verticalVel && // Edge height is above lower height bound.
+			relEdgeHeight >= 0)				// Edge height is below upper height bound.
 		{
 			return true;
 		}
@@ -320,7 +320,7 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
 
 		// 2) Test if ledge height is too low to the ground.
-		int relLedgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
+		int relLedgeHeight = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
 		if (relLedgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
@@ -329,7 +329,7 @@ namespace TEN::Entities::Player::Context
 		if (TestLedgeCatch(vPos, item.Animation.Velocity.y, ledgeHeight))
 			return EdgeCatchData{ EdgeType::Ledge, ledgeHeight };
 
-		// TODO: Still buggy!
+		// TODO: Can't catch walls formed by ceilings?
 		// 4) Test for climbable wall edge.
 		if (player.Control.CanClimbLadder)
 		{
@@ -338,8 +338,14 @@ namespace TEN::Entities::Player::Context
 			if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
 				return std::nullopt;
 
-			// 4.2) Test wall edge catch.
 			int wallEdgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
+
+			// 4.2) Test if wall eedge height is too low to the ground.
+			int relWallEdgeHeight = abs(wallEdgeHeight - pointCollCenter.Position.Floor);
+			if (relWallEdgeHeight <= LARA_HEIGHT_STRETCH)
+				return std::nullopt;
+
+			// 4.3) Test wall edge catch.
 			if (TestClimbableWallCatch(
 				vPos, item.Animation.Velocity.y, wallEdgeHeight,
 				pointCollFront.Position.Floor, pointCollFront.Position.Ceiling))

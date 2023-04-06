@@ -969,8 +969,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	}
 	else
 	{
-		// TODO: Transitional animation.
-		SetAnimation(&item, LA_JUMP_UP);
+		SetAnimation(&item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
 	}
 
 	item.Animation.IsAirborne = true;

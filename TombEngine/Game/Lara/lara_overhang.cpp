@@ -797,9 +797,9 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 		SetAnimation(item, LA_LADDER_IDLE);
 		break;
 
-	case LA_OVERHANG_EXIT_VAULT:
+	/*case LA_OVERHANG_EXIT_VAULT:
 		SetAnimation(item, LA_HANG_TO_STAND_END);
-		break;
+		break;*/
 
 	case LA_OVERHANG_EXIT_DROP:
 		SetAnimation(item, LA_FALL);
