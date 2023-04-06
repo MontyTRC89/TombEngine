@@ -18,5 +18,8 @@ namespace TEN::Entities::Player::Context
 	bool CanWallShimmyUp(ItemInfo& item, CollisionInfo& coll);
 	bool CanWallShimmyDown(ItemInfo& item, CollisionInfo& coll);
 
+	// Monkey swing
+	bool CanCatchMonkeySwing(ItemInfo& item, CollisionInfo& coll);
+
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
 }

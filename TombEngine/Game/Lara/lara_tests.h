@@ -24,7 +24,6 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
 CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
 CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer);
-bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
@@ -57,7 +56,6 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLand(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraFall(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);

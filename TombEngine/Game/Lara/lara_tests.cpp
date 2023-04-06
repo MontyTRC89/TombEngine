@@ -42,7 +42,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	{
 		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
 	}
-	else if (TestHangSwingIn(&item, &coll))
+	else if (Context::CanSwingOnLedge(item, coll))
 	{
 		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
 	}
@@ -51,7 +51,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		SetAnimation(&item, LA_REACH_TO_HANG);
 	}
 
-	// Snap player to edge.
+	// Snap to edge.
 	if (edgeCatchData.Type == Context::EdgeType::ClimbableWall)
 	{
 		// HACK: Until fragile ladder code is refactored, snap must be exactly aligned to the grid.
@@ -85,9 +85,9 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 		return false;
 
 	// Grab monkey swing.
-	if (TestLaraMonkeyGrab(&item, &coll))
+	if (Context::CanCatchMonkeySwing(item, coll))
 	{
-		SetPlayerMonkeySwingGrab(item, coll);
+		SetPlayerMonkeySwingCatch(item, coll);
 		return true;
 	}
 
@@ -238,19 +238,14 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
 					item->Pose.Position.y = coll->Setup.OldPosition.y;
 					SetAnimation(item, LA_HANG_IDLE);
-					//SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
 
 				canHang = true;
 			}
 			else
 			{
-				if (item->Animation.ActiveState == LS_HANG_IDLE)
-				//if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE) &&
-				//	TestLaraClimbIdle(item, coll))
-				{
+				if (item->Animation.ActiveState == LS_HANG_IDLE && TestLaraClimbIdle(item, coll))
 					item->Animation.TargetState = LS_LADDER_IDLE;
-				}
 			}
 		}
 		// Death or Action release.
@@ -296,8 +291,9 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 			if (TestLaraNearClimbableWall(item, GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock))
 			{
+				// Ignore vertical shift if climbable wall is encountered in next block.
 				if (!TestLaraHangOnClimbableWall(item, coll))
-					verticalShift = 0; // Ignore vertical shift if ladder is encountered next block
+					verticalShift = 0;
 			}
 			else if (!TestValidLedge(item, coll, true))
 			{
@@ -678,23 +674,6 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 	}
 
 	return result;
-}
-
-bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
-
-	if ((probe.Position.Floor - y) > 0 &&
-		(probe.Position.Ceiling - y) < -CLICK(1.6f) &&
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
@@ -1256,23 +1235,6 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return true;
-}
-
-bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollision(item);
-
-	if (lara->Control.CanMonkeySwing && (probe.Position.Ceiling - y) <= CLICK(0.5f) &&
-		((probe.Position.Ceiling - y) >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll)

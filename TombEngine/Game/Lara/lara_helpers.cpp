@@ -852,11 +852,11 @@ void SetLaraFallBackAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = 0.0f;
 }
 
-void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll)
+void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
-	int animNumber = (item.Animation.ActiveState == LS_REACH) ? LA_REACH_TO_MONKEY : LA_JUMP_UP_TO_MONKEY;
+	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
 
 	SetAnimation(&item, animNumber);
 	ResetLaraFlex(&item);
@@ -868,7 +868,7 @@ void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll)
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
 {
-	// HACK: Disallow release during 180 turn action.
+	// HACK: Disallow release during 180 turn.
 	if (item->Animation.ActiveState == LS_MONKEY_TURN_180)
 		return;
 

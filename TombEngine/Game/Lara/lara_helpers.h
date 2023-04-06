@@ -55,7 +55,7 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);
 void SetLaraMonkeyFallAnimation(ItemInfo* item);
-void SetPlayerMonkeySwingGrab(ItemInfo& item, CollisionInfo& coll);
+void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll);
 void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
 void SetPlayerEdgeHangRelease(ItemInfo& item);

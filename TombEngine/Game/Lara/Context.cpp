@@ -29,22 +29,22 @@ namespace TEN::Entities::Player::Context
 		int floorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
 		int gapHeight = abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor);
 
-		// 1. Test for slippery slope (if applicable).
+		// 1) Test for slippery slope (if applicable).
 		// TODO: This check fails for no reason.
 		bool isSlipperySlope = setupData.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlipperySlope)
 			return false;
 
-		// 2. Test for object blocking ledge.
+		// 2) Test for object blocking ledge.
 		TestForObjectOnLedge(&item, &coll);
 		if (coll.HitStatic)
 			return false;
 
-		// 3. Test for valid ledge.
+		// 3) Test for valid ledge.
 		if (!TestValidLedge(&item, &coll))
 			return false;
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if (relFloorHeight <= ABS_FLOOR_BOUND &&				// Floor height is within lower/upper floor bounds.
 			floorToCeilHeight > setupData.FloorToCeilingMin &&	// Floor-to-ceiling height isn't too narrow.
 			floorToCeilHeight <= setupData.FloorToCeilingMax && // Floor-to-ceiling height isn't too wide.
@@ -68,11 +68,11 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
 			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
 		{
@@ -86,7 +86,7 @@ namespace TEN::Entities::Player::Context
 	{
 		constexpr auto LEDGE_HEIGHT_MIN = CLICK(2);
 
-		// 1. Check if ledge jumps are enabled.
+		// 1) Check if ledge jumps are enabled.
 		if (!g_GameFlow->HasLedgeJumps())
 			return false;
 
@@ -100,7 +100,7 @@ namespace TEN::Entities::Player::Context
 			Geometry::TranslatePoint(origin.ToVector3i(), item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius)),
 			item.RoomNumber);
 
-		// 2. Assess level geometry ray collision.
+		// 2) Assess level geometry ray collision.
 		if (LOS(&origin, &target))
 			return false;
 
@@ -110,7 +110,7 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(&item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_STRETCH);
 
-		// 3. Assess point collision.
+		// 3) Assess point collision.
 		if (relCeilHeight >= -coll.Setup.Height) // Ceiling height is below upper ceiling bound.
 			return false;
 
@@ -172,7 +172,7 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(item);
 
-		// 1. Test if wall is climbable.
+		// 1) Test if wall is climbable.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
@@ -186,7 +186,7 @@ namespace TEN::Entities::Player::Context
 		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPosTop;
 		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPosTop;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&
 			relCeilHeightLeft <= WALL_STEP_HEIGHT &&
 			relCeilHeightRight <= WALL_STEP_HEIGHT)
@@ -209,13 +209,47 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeight = pointCollCenter.Position.Floor - item.Pose.Position.y;
 		// Left and right.
 
-		// 1. Check if wall is climbable.
+		// 1) Check if wall is climbable.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relFloorHeight >= WALL_STEP_HEIGHT)
 			return true;
+
+		return false;
+	}
+
+	bool CanCatchMonkeySwing(ItemInfo& item, CollisionInfo& coll)
+	{
+		constexpr auto LOWER_CEIL_BOUND			= CLICK(0.5f);
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
+
+		const auto& player = GetLaraInfo(item);
+
+		// 1) Check for monkey swing ceiling.
+		if (!player.Control.CanMonkeySwing)
+			return false;
+
+		// Get point collision.
+		auto pointColl = GetCollision(&item);
+		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_MONKEY);
+		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+
+		// 2) Assess collision with ceiling.
+		if (relCeilHeight < 0 &&
+			coll.CollisionType != CollisionType::CT_TOP &&
+			coll.CollisionType != CollisionType::CT_TOP_FRONT)
+		{
+			return false;
+		}
+
+		// 3) Assess point collision.
+		if (relCeilHeight <= LOWER_CEIL_BOUND &&		  // Ceiling height is above lower ceiling bound.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling space isn't too narrow.
+		{
+			return true;
+		}
 
 		return false;
 	}
@@ -226,7 +260,7 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(item);
 
-		// 1. Test for valid ledge.
+		// 1) Test for valid ledge.
 		if (!TestValidLedge(&item, &coll, true))
 			return std::nullopt;
 
@@ -243,14 +277,14 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;
 		int relFloorHeightFront = pointCollFront.Position.Floor - vPos;
 
-		// 2. Test ledge height.
+		// 2) Test ledge height.
 		int ledgeHeight = abs(relFloorHeightCenter - relFloorHeightFront);
 		if (ledgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
 		bool isMovingUp = (item.Animation.Velocity.y < 0.0f);
 
-		// 3. Test relative height to ledge.
+		// 3) Test relative height to ledge.
 		if ((isMovingUp &&
 				relFloorHeightFront >= item.Animation.Velocity.y &&
 				relFloorHeightFront <= 0) ||
@@ -261,10 +295,11 @@ namespace TEN::Entities::Player::Context
 			return EdgeCatchData{ EdgeType::Ledge, pointCollFront.Position.Floor };
 		}
 
-		// 4. Test for climbable wall edge.
+		// TODO: Still buggy!
+		// 4) Test for climbable wall edge.
 		if (player.Control.CanClimbLadder)
 		{
-			// 4.1. Ensure climbable wall is valid.
+			// 4.1) Ensure climbable wall is valid.
 			bool isClimbableWall = TestLaraHangOnClimbableWall(&item, &coll);
 			if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
 				return std::nullopt;
@@ -273,7 +308,7 @@ namespace TEN::Entities::Player::Context
 			int wallEdgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 			int relWallEdgeHeight = wallEdgeHeight - vPos;
 
-			// 4.2. Test relative height to climbable wall edge.
+			// 4.2) Test relative height to climbable wall edge.
 			if (!isMovingUp &&
 				relWallEdgeHeight <= item.Animation.Velocity.y &&
 				relWallEdgeHeight >= 0)
