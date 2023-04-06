@@ -235,7 +235,7 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
-		g_Renderer.AddSphere(pointCollFront.Coordinates.ToVector3(), 50, Vector4::One);
+		g_Renderer.AddReticle(pointCollFront.Coordinates.ToVector3(), Vector4::One, 64.0f);
 
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int relFloorHeightCenter = pointCollCenter.Position.Floor - vPos;

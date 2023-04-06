@@ -61,6 +61,7 @@ constexpr auto LARA_DAMAGE_VELOCITY		= 141.0f;
 constexpr auto LARA_DEATH_VELOCITY		= 155.0f;
 constexpr auto LARA_DIVE_DEATH_VELOCITY = 134.0f;
 constexpr auto LARA_TERMINAL_VELOCITY	= CLICK(10);
+constexpr auto PLAYER_RELEASE_VELOCITY	= Vector3(0.0f, 1.0f, 2.0f);
 
 // Swim velocities
 constexpr auto LARA_SWIM_VELOCITY_ACCEL		   = 2.0f;

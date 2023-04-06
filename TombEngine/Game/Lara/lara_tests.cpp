@@ -58,11 +58,13 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		SetAnimation(&item, LA_REACH_TO_HANG);
 	}
 
+	int height = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
+
 	SnapItemToLedge(&item, &coll);
 	ResetLaraFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = edgeCatchData.Height + (LARA_HEIGHT - CLICK(0.25f));
+	item.Pose.Position.y = edgeCatchData.Height + height;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
 }
@@ -185,8 +187,6 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto RELEASE_VEL = Vector3(0.0f, 1.0f, 2.0f);
-
 	auto& player = GetLaraInfo(*item);
 
 	short angle = player.Control.MoveAngle;
@@ -271,7 +271,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->Animation.IsAirborne = true;
-			item->Animation.Velocity = RELEASE_VEL;
+			item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 			item->Pose.Position.y += CLICK(1);
 			player.Control.HandStatus = HandStatus::Free;
 		}
@@ -341,19 +341,26 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 					SetAnimation(item, LA_HANG_IDLE);
 				}
 
+				// TODO
+				/*if (item->Animation.ActiveState == LS_SHIMMY_LEFT)
+				{
+					SetAnimation(item, LA_SHIMMY_LEFT_TO_IDLE);
+				}
+				else if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
+				{
+					SetAnimation(item, LA_SHIMMY_RIGHT_TO_IDLE);
+				}*/
+
 				canHang = true;
 			}
 		}
 		// Death, incorrect ledge, or Action release.
 		else
 		{
-			SetAnimation(item, LA_JUMP_UP, 9);
+			SetAnimation(item, LA_JUMP_UP);
 			item->Animation.IsAirborne = true;
-			item->Animation.Velocity = RELEASE_VEL;
-			item->Pose.Position += Vector3i(
-				coll->Shift.x,
-				GameBoundingBox(item).Y2 * 1.8f,
-				coll->Shift.z);
+			item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
+			item->Pose.Position += coll->Shift;
 			player.Control.HandStatus = HandStatus::Free;
 		}
 	}

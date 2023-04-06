@@ -974,8 +974,6 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 void SetPlayerEdgeHangRelease(ItemInfo& item)
 {
-	constexpr auto VEL = Vector3(0.0f, 1.0f, 2.0f);
-
 	auto& player = GetLaraInfo(item);
 
 	if (player.Control.IsClimbingLadder)
@@ -985,19 +983,18 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	}
 	else
 	{
-		SetAnimation(&item, LA_JUMP_UP, 9);
-		item.Pose.Position.y += GameBoundingBox(&item).Y2 * 1.8f;
+		// TODO: Transitional animation.
+		SetAnimation(&item, LA_JUMP_UP);
 	}
 
 	item.Animation.IsAirborne = true;
-	item.Animation.Velocity = VEL;
+	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 {
 	constexpr auto WALL_STEP_HEIGHT = CLICK(1);
-	constexpr auto VEL				= Vector3(0.0f, 1.0f, 2.0f);
 
 	auto& player = GetLaraInfo(item);
 
@@ -1005,7 +1002,7 @@ void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 	{
 		SetAnimation(&item, LA_FALL_START);
 		item.Animation.IsAirborne = true;
-		item.Animation.Velocity = VEL;
+		item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 		item.Pose.Position.y += WALL_STEP_HEIGHT;
 		item.Pose.Orientation.y += player.NextCornerPos.Orientation.y / 2;
 		player.Control.HandStatus = HandStatus::Free;

@@ -212,6 +212,8 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
+	// 174-188 reserved for true ladders. -- Sezz 2023.04.06
+
 	NUM_LARA_STATES
 };
 
@@ -503,8 +505,8 @@ enum LaraAnim
 	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
 	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
 	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
-	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
-	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crawl > crouch (2/3)
+	LA_SHIMMY_LEFT_TO_IDLE = 273,									// Shimmy left > hang idle
+	LA_SHIMMY_RIGHT_TO_IDLE = 274,									// Shimmy right > hang idle
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
@@ -815,11 +817,13 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
+	// 569-598 reserved for true ladders. -- Sezz 2023.04.06
+
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 102
-	// 273, 274, 278, 280,
+	// 102,
+	// 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
