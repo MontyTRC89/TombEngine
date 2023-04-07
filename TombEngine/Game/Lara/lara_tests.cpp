@@ -79,6 +79,7 @@ static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const
 	player.Control.HandStatus = HandStatus::Busy;
 }
 
+// TODO: Move to lara_helpers.cpp
 bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
@@ -109,8 +110,6 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 // Test if ledge in front of entity is valid to climb.
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
-	int vPos = item->Pose.Position.y - coll->Setup.Height;
-
 	// Get point collision.
 	auto pointCollLeft  = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
@@ -132,37 +131,34 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 	
-	// Determine ledge probe embed offset.
+	// Determine ledge probe offset.
 	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
-	// and misfire may occur. Second - it guarantees that Lara won't land on a very thin edge of diagonal geometry.
-	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
-	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
+	// and misfire may occur. Second - it guarantees the player won't land on a very thin edge of diagonal geometry.
 
-	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
-	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
-	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
-	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+	// Get floor heights at both points.
+	int vPos = item->Pose.Position.y - coll->Setup.Height;
+	auto leftHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
+	auto rightHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
 
-	// Get floor heights at both points
-	auto left = GetCollision(item->Pose.Position.x + xf + xl, vPos, item->Pose.Position.z + zf + zl, GetRoom(item->Location, item->Pose.Position.x, vPos, item->Pose.Position.z).roomNumber).Position.Floor;
-	auto right = GetCollision(item->Pose.Position.x + xf + xr, vPos, item->Pose.Position.z + zf + zr, GetRoom(item->Location, item->Pose.Position.x, vPos, item->Pose.Position.z).roomNumber).Position.Floor;
+	// If specified, limit vertical search zone only to nearest height.
+	if (heightLimit &&
+		(abs(leftHeight - vPos) > CLICK(0.5f) ||
+		abs(rightHeight - vPos) > CLICK(0.5f)))
+	{
+		return false;
+	}
 
-	// If specified, limit vertical search zone only to nearest height
-	if (heightLimit && (abs(left - vPos) > CLICK(0.5f) || abs(right - vPos) > CLICK(0.5f)))
+	// Discard if there is a slope beyond tolerance delta.
+	// TODO: Compare slope, aspect, and player angles instead.
+	float slopeDelta = ((float)STEPUP_HEIGHT / (float)BLOCK(1)) * (coll->Setup.Radius * 2);
+	if (abs(leftHeight - rightHeight) >= slopeDelta)
 		return false;
 
-	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
-
-	// Discard if there is a slope beyond tolerance delta
-	if (abs(left - right) >= slopeDelta)
-		return false;
-
-	// Discard if ledge is not within distance threshold
+	// Discard if ledge is not within distance threshold.
 	if (abs(coll->NearestLedgeDistance) > OFFSET_RADIUS(coll->Setup.Radius))
 		return false;
 
-	// Discard if ledge is not within angle threshold
+	// Discard if ledge is not within angle threshold.
 	if (!TestValidLedgeAngle(item, coll))
 		return false;
 	

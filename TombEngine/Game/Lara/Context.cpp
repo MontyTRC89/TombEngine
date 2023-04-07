@@ -226,9 +226,9 @@ namespace TEN::Entities::Player::Context
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
-		// 1) Test if ledge height is too low to the ground.
-		int ledgeHeight = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
-		if (ledgeHeight <= LARA_HEIGHT_STRETCH)
+		// 1) Test if ledge is too low to the ground.
+		int floorToEdgeHeight = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
+		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
@@ -269,9 +269,9 @@ namespace TEN::Entities::Player::Context
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int edgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 
-		// 3) Test if wall edge height is too low to the ground.
-		int wallEdgeHeight = abs(edgeHeight - pointCollCenter.Position.Floor);
-		if (wallEdgeHeight <= LARA_HEIGHT_STRETCH)
+		// 3) Test if wall edge is too low to the ground.
+		int floorToEdgeHeight = abs(edgeHeight - pointCollCenter.Position.Floor);
+		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
 		// 4) Test if edge isn't within a wall.
@@ -304,7 +304,7 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Get point collision.
-		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
+		float probeHeight = -(coll.Setup.Height);// +abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
