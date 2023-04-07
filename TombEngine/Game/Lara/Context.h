@@ -17,7 +17,7 @@ namespace TEN::Entities::Player::Context
 	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanShimmyDown(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll);
-	bool CanShimmyRight(ItemInfo& item,CollisionInfo& coll);
+	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll);
 
 	// Context data getters
 	std::optional<EdgeCatchData>		GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
