@@ -111,7 +111,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 }
 
 // Test if a ledge in front of entity is valid to climb.
-bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
+bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	int vPos = item->Pose.Position.y - coll->Setup.Height;
 
@@ -180,7 +180,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	return true;
 }
 
-bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
+bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll)
 {
 	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }

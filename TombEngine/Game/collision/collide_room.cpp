@@ -116,7 +116,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 }
 
 // Overload used to quickly get point/room collision parameters at a given item's position.
-CollisionResult GetCollision(ItemInfo* item)
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	auto newRoomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
@@ -127,7 +127,7 @@ CollisionResult GetCollision(ItemInfo* item)
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
 
@@ -142,7 +142,7 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 }
 
 // Overload used to probe point/room collision parameters from a given position.
-CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
@@ -169,9 +169,9 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
-CollisionResult GetCollision(const GameVector& point)
+CollisionResult GetCollision(const GameVector& pos)
 {
-	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
+	return GetCollision(pos.x, pos.y, pos.z, pos.RoomNumber);
 }
 
 // A reworked legacy GetFloorHeight() function which writes data

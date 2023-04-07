@@ -296,7 +296,7 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	return true;
 }
 
-void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
+void TestForObjectOnLedge(const ItemInfo* item, CollisionInfo* coll)
 {
 	int height = GameBoundingBox(item).GetHeight();
 
@@ -308,8 +308,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
 			item->Pose.Position.y - (height + CLICK(1)),
-			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius))
-		);
+			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius))	);
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 

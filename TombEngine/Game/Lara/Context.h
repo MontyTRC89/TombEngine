@@ -9,17 +9,17 @@ namespace TEN::Entities::Player::Context
 	struct MonkeySwingCatchData;
 
 	// Ledge context inquirers
-	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll);
-	bool CanPerformLedgeJump(ItemInfo& item, CollisionInfo& coll);
-	bool CanPerformLedgeHandstand(ItemInfo& item, CollisionInfo& coll);
-	bool CanClimbLedgeToCrouch(ItemInfo& item, CollisionInfo& coll);
-	bool CanClimbLedgeToStand(ItemInfo& item, CollisionInfo& coll);
-	bool CanLedgeShimmyLeft(ItemInfo& item, CollisionInfo& coll);
-	bool CanLedgeShimmyRight(ItemInfo& item, CollisionInfo& coll);
-	bool CanWallShimmyUp(ItemInfo& item, CollisionInfo& coll);
-	bool CanWallShimmyDown(ItemInfo& item, CollisionInfo& coll);
+	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
+	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll);
+	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll);
+	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanShimmyDown(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll);
+	bool CanShimmyRight(ItemInfo& item,CollisionInfo& coll);
 
 	// Context data getters
 	std::optional<EdgeCatchData>		GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(const ItemInfo& item, const CollisionInfo& coll);
 }

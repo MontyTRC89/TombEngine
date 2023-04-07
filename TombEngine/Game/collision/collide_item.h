@@ -26,7 +26,7 @@ struct ObjectCollisionBounds
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
-void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
+void TestForObjectOnLedge(const ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
 bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);

@@ -28,7 +28,7 @@
 	}
 
 	// TODO: This shouldn't be a method. Make it a function in animation.cpp.
-	GameBoundingBox::GameBoundingBox(ItemInfo* item)
+	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)

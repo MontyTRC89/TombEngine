@@ -12,8 +12,8 @@ struct ItemInfo;
 // -----------------------------
 
 bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
-bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
-bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll);
+bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
+bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll);
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll);
 

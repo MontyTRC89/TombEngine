@@ -85,7 +85,7 @@ namespace TEN::Entities::Player
 					return;
 				}
 
-				if (Context::CanWallShimmyUp(*item, *coll))
+				if (Context::CanShimmyUp(*item, *coll))
 				{
 					// TODO: State dispatch.
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
@@ -94,7 +94,7 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Back))
 			{
-				if (Context::CanWallShimmyDown(*item, *coll))
+				if (Context::CanShimmyDown(*item, *coll))
 				{
 					// TODO: State dispatch.
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
@@ -104,7 +104,7 @@ namespace TEN::Entities::Player
 
 			if (IsHeld(In::Left) || IsHeld(In::LeftStep))
 			{
-				if (Context::CanLedgeShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
+				if (Context::CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
 				{
 					item->Animation.TargetState = LS_SHIMMY_LEFT;
 					return;
@@ -119,7 +119,7 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Right) || IsHeld(In::RightStep))
 			{
-				if (Context::CanLedgeShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
+				if (Context::CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
 				{
 					item->Animation.TargetState = LS_SHIMMY_RIGHT;
 					return;

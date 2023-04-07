@@ -16,7 +16,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Entities::Player::Context
 {
-	static bool TestLedgeClimbSetup(ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
+	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
 
@@ -57,7 +57,7 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}	
 
-	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll)
+	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto UPPER_FLOOR_BOUND = 0;
 		constexpr auto LOWER_CEIL_BOUND	 = CLICK(1.5f);
@@ -83,7 +83,7 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool CanPerformLedgeJump(ItemInfo& item, CollisionInfo& coll)
+	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LEDGE_HEIGHT_MIN = CLICK(2);
 
@@ -118,7 +118,7 @@ namespace TEN::Entities::Player::Context
 		return true;
 	}
 
-	bool CanPerformLedgeHandstand(ItemInfo& item, CollisionInfo& coll)
+	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll)
 	{
 		auto setupData = LedgeClimbSetupData
 		{
@@ -131,7 +131,7 @@ namespace TEN::Entities::Player::Context
 		return TestLedgeClimbSetup(item, coll, setupData);
 	}
 
-	bool CanClimbLedgeToCrouch(ItemInfo& item, CollisionInfo& coll)
+	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll)
 	{
 		auto setupData = LedgeClimbSetupData
 		{
@@ -144,7 +144,7 @@ namespace TEN::Entities::Player::Context
 		return TestLedgeClimbSetup(item, coll, setupData);
 	}
 
-	bool CanClimbLedgeToStand(ItemInfo& item, CollisionInfo& coll)
+	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll)
 	{
 		auto setupData = LedgeClimbSetupData
 		{
@@ -157,17 +157,7 @@ namespace TEN::Entities::Player::Context
 		return TestLedgeClimbSetup(item, coll, setupData);
 	}
 
-	bool CanLedgeShimmyLeft(ItemInfo& item, CollisionInfo& coll)
-	{
-		return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
-	}
-
-	bool CanLedgeShimmyRight(ItemInfo& item, CollisionInfo& coll)
-	{
-		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
-	}
-
-	bool CanWallShimmyUp(ItemInfo& item, CollisionInfo& coll)
+	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto WALL_STEP_HEIGHT = -CLICK(1);
 
@@ -199,7 +189,7 @@ namespace TEN::Entities::Player::Context
 	}
 
 	// TODO!!
-	bool CanWallShimmyDown(ItemInfo& item, CollisionInfo& coll)
+	bool CanShimmyDown(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
 
@@ -219,6 +209,16 @@ namespace TEN::Entities::Player::Context
 			return true;
 
 		return false;
+	}
+
+	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
+	{
+		return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
+	}
+
+	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll)
+	{
+		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(
@@ -321,7 +321,7 @@ namespace TEN::Entities::Player::Context
 		return std::nullopt;
 	}
 
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, const CollisionInfo& coll)
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
