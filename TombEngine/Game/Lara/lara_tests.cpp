@@ -52,15 +52,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	}
 
 	// Snap to edge.
-	if (catchData.Type == Context::EdgeType::ClimbableWall)
-	{
-		// HACK: Until fragile ladder code is refactored, snap must be exactly aligned to the grid.
-		SnapItemToGrid(&item, &coll);
-	}
-	else
-	{
-		SnapItemToLedge(&item, &coll);
-	}
+	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
+	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapItemToGrid(&item, &coll) : SnapItemToLedge(&item, &coll);
 
 	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
@@ -178,7 +171,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	
 	if (!ignoreHeadroom)
 	{
-		auto headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+		int headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
 		if (headroom < CLICK(1))
 			return false;
 	}
@@ -188,7 +181,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs((short)(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)

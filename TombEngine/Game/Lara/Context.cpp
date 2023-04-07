@@ -46,16 +46,16 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4) Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&				// Floor height is within lower/upper floor bounds.
-			floorToCeilHeight > setupData.FloorToCeilingMin &&	// Floor-to-ceiling height isn't too narrow.
-			floorToCeilHeight <= setupData.FloorToCeilingMax && // Floor-to-ceiling height isn't too wide.
-			gapHeight >= setupData.GapHeightMin)				// Gap height is permissive.
+		if (relFloorHeight <= ABS_FLOOR_BOUND &&				   // Floor height is within lower/upper floor bounds.
+			floorToCeilHeight > setupData.FloorToCeilHeightMin &&  // Floor-to-ceiling height isn't too narrow.
+			floorToCeilHeight <= setupData.FloorToCeilHeightMax && // Floor-to-ceiling height isn't too wide.
+			gapHeight >= setupData.GapHeightMin)				   // Gap height is permissive.
 		{
 			return true;
 		}
 
 		return false;
-	}
+	}	
 
 	bool CanSwingOnLedge(ItemInfo& item, CollisionInfo& coll)
 	{
@@ -173,7 +173,7 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(item);
 
-		// 1) Test if wall is climbable.
+		// 1) Check for climbable wall flag.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
@@ -221,45 +221,8 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, CollisionInfo& coll)
-	{
-		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
-		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
-
-		const auto& player = GetLaraInfo(item);
-
-		// 1) Check for monkey swing ceiling.
-		if (!player.Control.CanMonkeySwing)
-			return std::nullopt;
-
-		// Get point collision.
-		auto pointColl = GetCollision(&item);
-
-		int vPos = item.Pose.Position.y - coll.Setup.Height;
-		int relCeilHeight = pointColl.Position.Ceiling - vPos;
-		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-
-		// 2) Check collision type.
-		if (coll.CollisionType != CollisionType::CT_TOP &&
-			coll.CollisionType != CollisionType::CT_TOP_FRONT)
-		{
-			return std::nullopt;
-		}
-		
-		// 3) Assess point collision.
-		if (abs(relCeilHeight) <= ABS_CEIL_BOUND &&		  // Ceiling height is within lower/upper ceiling bounds.
-			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height isn't too narrow.
-		{
-			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
-			int monkeyHeight = pointColl.Position.Ceiling;
-			return MonkeySwingCatchData{ animNumber, monkeyHeight };
-		}
-
-		return std::nullopt;
-	}
-
 	static std::optional<EdgeCatchData> GetLedgeCatchData(
-		ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointCollCenter, const CollisionResult& pointCollFront)
+		const ItemInfo& item, const CollisionInfo& coll, const CollisionResult& pointCollCenter, const CollisionResult& pointCollFront)
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
@@ -354,6 +317,43 @@ namespace TEN::Entities::Player::Context
 		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll, pointCollCenter, pointCollFront);
 		if (wallEdgeCatchData.has_value())
 			return wallEdgeCatchData;
+
+		return std::nullopt;
+	}
+
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
+
+		const auto& player = GetLaraInfo(item);
+
+		// 1) Check for monkey swing ceiling.
+		if (!player.Control.CanMonkeySwing)
+			return std::nullopt;
+
+		// Get point collision.
+		auto pointColl = GetCollision(&item);
+
+		int vPos = item.Pose.Position.y - coll.Setup.Height;
+		int relCeilHeight = pointColl.Position.Ceiling - vPos;
+		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+
+		// 2) Check collision type.
+		if (coll.CollisionType != CollisionType::CT_TOP &&
+			coll.CollisionType != CollisionType::CT_TOP_FRONT)
+		{
+			return std::nullopt;
+		}
+
+		// 3) Assess point collision.
+		if (abs(relCeilHeight) <= ABS_CEIL_BOUND &&		  // Ceiling height is within lower/upper ceiling bounds.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height isn't too narrow.
+		{
+			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+			int monkeyHeight = pointColl.Position.Ceiling;
+			return MonkeySwingCatchData{ animNumber, monkeyHeight };
+		}
 
 		return std::nullopt;
 	}

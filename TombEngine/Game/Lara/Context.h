@@ -21,5 +21,5 @@ namespace TEN::Entities::Player::Context
 
 	// Context data getters
 	std::optional<EdgeCatchData>		GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll);
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, CollisionInfo& coll);
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(ItemInfo& item, const CollisionInfo& coll);
 }
