@@ -191,7 +191,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
 
-	short angle = player.Control.MoveAngle;
+	short moveAngle = player.Control.MoveAngle;
 
 	// Determine direction of player's shimmy. 0 if hanging still.
 	int climbDirection = 0;
@@ -243,7 +243,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action) && item->HitPoints > 0)
 		{
-			player.Control.MoveAngle = angle;
+			player.Control.MoveAngle = moveAngle;
 
 			if (!TestLaraHangOnClimbableWall(item, coll))
 			{
@@ -285,15 +285,15 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			auto verticalShift = coll->Front.Floor - GameBoundingBox(item).Y1;
-			auto x = item->Pose.Position.x;
-			auto z = item->Pose.Position.z;
+			int x = item->Pose.Position.x;
+			int z = item->Pose.Position.z;
 
-			player.Control.MoveAngle = angle;
+			player.Control.MoveAngle = moveAngle;
 
 			if (climbDirection != 0)
 			{
-				short sinMoveAngle = phd_sin(player.Control.MoveAngle);
-				short cosMoveAngle = phd_cos(player.Control.MoveAngle);
+				float sinMoveAngle = phd_sin(player.Control.MoveAngle);
+				float cosMoveAngle = phd_cos(player.Control.MoveAngle);
 				auto testShift = Vector2(sinMoveAngle, cosMoveAngle) * coll->Setup.Radius;
 
 				x += testShift.x;
@@ -2060,7 +2060,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 	return VaultTestResult{ false };
 }
 
-// Temporary solution to ladder mounts until ladders stop breaking whenever anyone tries to do anything with them. @Sezz 2022.02.05
+// Temporary solution to ladder mounts until ladders stop breaking whenever anyone tries to do anything with them. -- Sezz 2022.02.05
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -2077,10 +2077,8 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 	{
 		// TODO: Somehow harmonise CalculatedJumpVelocity to work for both ledge and ladder auto jumps, because otherwise there will be a need for an odd workaround in the future.
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult.Height - item->Pose.Position.y + CLICK(0.2f)), -CLICK(7.1f)));
-		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		SetAnimation(item, LA_STAND_SOLID);
 		item->Animation.TargetState = LS_JUMP_UP;
-		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);
@@ -2096,10 +2094,8 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 	if (vaultResult.Success &&
 		TestLaraClimbIdle(item, coll))
 	{
-		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		SetAnimation(item, LA_STAND_SOLID);
 		item->Animation.TargetState = LS_LADDER_IDLE;
-		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.TurnRate = 0;
 
