@@ -1,17 +1,19 @@
 #pragma once
 #include "Game/collision/collide_room.h"
+#include "Game/Lara/ContextData.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_test_structs.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 
+using namespace TEN::Entities::Player;
+
 // -----------------------------
 // TEST FUNCTIONS
 // For State Control & Collision
 // -----------------------------
 
-bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll);
 
@@ -21,10 +23,10 @@ bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 
-bool			 TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
-CornerType		 TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
-CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer);
-bool			 TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
+bool					  TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
+Context::CornerType		  TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
+Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer);
+bool					  TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);

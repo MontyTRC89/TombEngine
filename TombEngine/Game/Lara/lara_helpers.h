@@ -14,6 +14,7 @@ struct VaultTestResult;
 // Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
+bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);

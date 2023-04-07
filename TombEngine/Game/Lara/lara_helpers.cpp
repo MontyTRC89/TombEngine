@@ -9,6 +9,8 @@
 #include "Game/items.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
+#include "Game/Lara/Context.h"
+#include "Game/Lara/ContextData.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
@@ -33,6 +35,7 @@
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Entities::Player;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -147,6 +150,78 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return true;
+}
+
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& catchData)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Set catch animation.
+	if (item.Animation.ActiveState == LS_JUMP_UP)
+	{
+		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
+	}
+	else if (Context::CanSwingOnLedge(item, coll))
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
+	}
+	else
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG);
+	}
+
+	// Snap to edge.
+	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
+	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapItemToGrid(&item, &coll) : SnapItemToLedge(&item, &coll);
+
+	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
+
+	ResetLaraFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Pose.Position.y = catchData.Height + playerHeight;
+	player.Control.HandStatus = HandStatus::Busy;
+	player.ExtraTorsoRot = EulerAngles::Zero;
+	player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
+}
+
+static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)
+{
+	auto& player = GetLaraInfo(item);
+
+	SetAnimation(&item, catchData.AnimNumber);
+	ResetLaraFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Pose.Position.y = catchData.Height + LARA_HEIGHT_MONKEY;
+	player.Control.HandStatus = HandStatus::Busy;
+}
+
+bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Check player status.
+	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
+		return false;
+
+	// Catch monkey swing.
+	auto monkeyCatchData = Context::GetMonkeySwingCatchData(item, coll);
+	if (monkeyCatchData.has_value())
+	{
+		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchData.value());
+		return true;
+	}
+
+	// Catch edge (ledge or climbable wall edge).
+	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
+	if (edgeCatchData.has_value())
+	{
+		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
+		return true;
+	}
+
+	return false;
 }
 
 void HandlePlayerWetnessDrips(ItemInfo& item)
@@ -460,19 +535,19 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 	{
 		switch (TestLaraHangCorner(&item, &coll, -90.0f))
 		{
-		case CornerType::Inner:
+		case Context::CornerType::Inner:
 			return LS_SHIMMY_INNER_LEFT;
 
-		case CornerType::Outer:
+		case Context::CornerType::Outer:
 			return LS_SHIMMY_OUTER_LEFT;
 		}
 
 		switch (TestLaraHangCorner(&item, &coll, -45.0f))
 		{
-		case CornerType::Inner:
+		case Context::CornerType::Inner:
 			return LS_SHIMMY_45_INNER_LEFT;
 
-		case CornerType::Outer:
+		case Context::CornerType::Outer:
 			return LS_SHIMMY_45_OUTER_LEFT;
 		}
 	}
@@ -480,19 +555,19 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 	{
 		switch (TestLaraHangCorner(&item, &coll, 90.0f))
 		{
-		case CornerType::Inner:
+		case Context::CornerType::Inner:
 			return LS_SHIMMY_INNER_RIGHT;
 
-		case CornerType::Outer:
+		case Context::CornerType::Outer:
 			return LS_SHIMMY_OUTER_RIGHT;
 		}
 
 		switch (TestLaraHangCorner(&item, &coll, 45.0f))
 		{
-		case CornerType::Inner:
+		case Context::CornerType::Inner:
 			return LS_SHIMMY_45_INNER_RIGHT;
 
-		case CornerType::Outer:
+		case Context::CornerType::Outer:
 			return LS_SHIMMY_45_OUTER_RIGHT;
 		}
 	}

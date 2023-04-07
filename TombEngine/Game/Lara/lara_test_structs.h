@@ -62,10 +62,3 @@ struct JumpTestSetup
 	int Distance = int(CLICK(0.85f));
 	bool CheckWadeStatus = true;
 };
-
-struct CornerTestResult
-{
-	bool Success;
-	Pose ProbeResult;
-	Pose RealPositionResult;
-};

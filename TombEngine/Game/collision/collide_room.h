@@ -31,13 +31,6 @@ enum class CollisionProbeMode
 	FreeFlat
 };
 
-enum class CornerType
-{
-	None,
-	Inner,
-	Outer
-};
-
 struct CollisionPosition
 {
 	int Floor;

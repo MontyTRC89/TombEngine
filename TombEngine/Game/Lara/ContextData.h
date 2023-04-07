@@ -1,5 +1,7 @@
 #pragma once
 
+class Pose;
+
 namespace TEN::Entities::Player::Context
 {
 	enum class EdgeType
@@ -8,10 +10,30 @@ namespace TEN::Entities::Player::Context
 		ClimbableWall
 	};
 
+	enum class CornerType
+	{
+		None,
+		Inner,
+		Outer
+	};
+
 	struct EdgeCatchData
 	{
 		EdgeType Type	= EdgeType::Ledge;
 		int		 Height = 0;
+	};
+
+	struct MonkeySwingCatchData
+	{
+		int AnimNumber = 0; // TODO: State dispatch.
+		int Height	   = 0;
+	};
+
+	struct CornerShimmyData
+	{
+		bool Success;
+		Pose ProbeResult;
+		Pose RealPositionResult;
 	};
 
 	struct LedgeClimbSetupData
@@ -22,11 +44,5 @@ namespace TEN::Entities::Player::Context
 		int	  GapHeightMin		   = 0;
 
 		bool TestSlipperySlope = false;
-	};
-
-	struct MonkeySwingCatchData
-	{
-		int AnimNumber = 0; // TODO: State dispatch.
-		int Height	   = 0;
 	};
 }

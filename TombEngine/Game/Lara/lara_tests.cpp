@@ -7,8 +7,6 @@
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
-#include "Game/Lara/Context.h"
-#include "Game/Lara/ContextData.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
@@ -21,7 +19,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Entities::Player;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -32,98 +29,26 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
-// TODO: Move to lara_helpers.cpp
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& catchData)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Set catch animation.
-	if (item.Animation.ActiveState == LS_JUMP_UP)
-	{
-		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
-	}
-	else if (Context::CanSwingOnLedge(item, coll))
-	{
-		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
-	}
-	else
-	{
-		SetAnimation(&item, LA_REACH_TO_HANG);
-	}
-
-	// Snap to edge.
-	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
-	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapItemToGrid(&item, &coll) : SnapItemToLedge(&item, &coll);
-
-	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
-
-	ResetLaraFlex(&item);
-	item.Animation.IsAirborne = false;
-	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = catchData.Height + playerHeight;
-	player.Control.HandStatus = HandStatus::Busy;
-	player.ExtraTorsoRot = EulerAngles::Zero;
-	player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
-}
-
-// TODO: Move to lara_helpers.cpp
-static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)
-{
-	auto& player = GetLaraInfo(item);
-
-	SetAnimation(&item, catchData.AnimNumber);
-	ResetLaraFlex(&item);
-	item.Animation.IsAirborne = false;
-	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = catchData.Height + LARA_HEIGHT_MONKEY;
-	player.Control.HandStatus = HandStatus::Busy;
-}
-
-// TODO: Move to lara_helpers.cpp
-bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Check player status.
-	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
-		return false;
-
-	// Catch monkey swing.
-	auto monkeyCatchData = Context::GetMonkeySwingCatchData(item, coll);
-	if (monkeyCatchData.has_value())
-	{
-		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchData.value());
-		return true;
-	}
-
-	// Catch edge (ledge or climbable wall edge).
-	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
-	if (edgeCatchData.has_value())
-	{
-		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
-		return true;
-	}
-
-	return false;
-}
-
 // Test if ledge in front of entity is valid to climb.
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	// Get point collision.
-	auto pointCollLeft  = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
+	auto pointCollLeft = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 
-	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
-	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
-	if (pointCollLeft.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)) ||
-		pointCollRight.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)))
+	// If any front point collision intersects entity bounds, return false, because there is a material intersection.
+	// This check helps to filter out cases when the player is formally facing corner but ledge check returns true
+	// because probe distance is fixed.
+	int vTestPos = item->Pose.Position.y - CLICK(0.5f);
+	if (pointCollLeft.Position.Floor < vTestPos ||
+		pointCollRight.Position.Floor < vTestPos)
 	{
 		return false;
 	}
 
-	if (pointCollLeft.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height) ||
-		pointCollRight.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height))
+	int vPos = item->Pose.Position.y - coll->Setup.Height;
+	if (pointCollLeft.Position.Ceiling > vPos ||
+		pointCollRight.Position.Ceiling > vPos)
 	{
 		return false;
 	}
@@ -136,29 +61,30 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 	// and misfire may occur. Second - it guarantees the player won't land on a very thin edge of diagonal geometry.
 
 	// Get floor heights at both points.
-	int vPos = item->Pose.Position.y - coll->Setup.Height;
-	auto leftHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
-	auto rightHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
+	int leftHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
+	int rightHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, coll->Setup.Radius).Position.Floor;
 
-	// If specified, limit vertical search zone only to nearest height.
-	if (heightLimit &&
-		(abs(leftHeight - vPos) > CLICK(0.5f) ||
-		abs(rightHeight - vPos) > CLICK(0.5f)))
+	// limit vertical search range only to nearest height (if specified).
+	if (heightLimit)
 	{
-		return false;
+		if (abs(leftHeight - vPos) > CLICK(0.5f) ||
+			abs(rightHeight - vPos) > CLICK(0.5f))
+		{
+			return false;
+		}
 	}
 
-	// Discard if there is a slope beyond tolerance delta.
+	// Test if slope angle is beyond threshold.
 	// TODO: Compare slope, aspect, and player angles instead.
 	float slopeDelta = ((float)STEPUP_HEIGHT / (float)BLOCK(1)) * (coll->Setup.Radius * 2);
 	if (abs(leftHeight - rightHeight) >= slopeDelta)
 		return false;
 
-	// Discard if ledge is not within distance threshold.
+	// Test if ledge is outside distance threshold.
 	if (abs(coll->NearestLedgeDistance) > OFFSET_RADIUS(coll->Setup.Radius))
 		return false;
 
-	// Discard if ledge is not within angle threshold.
+	// Test if ledge is within angle threshold.
 	if (!TestValidLedgeAngle(item, coll))
 		return false;
 	
@@ -494,17 +420,17 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 	return TestValidLedge(item, coll);
 }
 
-CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle)
+Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Check if player isn't in idle state yet.
-	if (item->Animation.AnimNumber != LA_REACH_TO_HANG && item->Animation.AnimNumber != LA_HANG_IDLE)
-		return CornerType::None;
+	// Check for idle state.
+	if (item->Animation.ActiveState != LS_HANG_IDLE)
+		return Context::CornerType::None;
 
 	// Check if static is in the way.
 	if (coll->HitStatic)
-		return CornerType::None;
+		return Context::CornerType::None;
 
 	// INNER CORNER TESTS
 
@@ -534,7 +460,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 		lara->Control.MoveAngle = prevMoveAngle;
 
 		if (result)
-			return CornerType::Inner;
+			return Context::CornerType::Inner;
 
 		if (lara->Control.CanClimbLadder)
 		{
@@ -544,7 +470,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 				// Restore original vertical position for climbable wall tests because
 				// there's no need to snap to ledge height in such cases.
 				lara->NextCornerPos.Position.y = item->Pose.Position.y;
-				return CornerType::Inner;
+				return Context::CornerType::Inner;
 			}
 		}
 	}
@@ -559,13 +485,13 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	if ((LaraFloorFront(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)) < 0) ||
 		(LaraCeilingFront(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1), coll->Setup.Height) > 0))
 	{
-		return CornerType::None;
+		return Context::CornerType::None;
 	}
 
 	// Conduct ray test to check for last chance of ppossible diagonal vs. non-diagonal cases.
 	if (!LaraPositionOnLOS(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
 	{
-		return CornerType::None;
+		return Context::CornerType::None;
 	}
 
 	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
@@ -596,7 +522,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 		lara->Control.MoveAngle = prevMoveAngle;
 
 		if (result)
-			return CornerType::Outer;
+			return Context::CornerType::Outer;
 
 		if (lara->Control.CanClimbLadder)
 		{
@@ -606,7 +532,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 				// Restore original vertical position for climbable wall tests because
 				// there's no need to snap to ledge height in such cases.
 				lara->NextCornerPos.Position.y = item->Pose.Position.y;
-				return CornerType::Outer;
+				return Context::CornerType::Outer;
 			}
 		}
 	}
@@ -615,20 +541,20 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	item->Pose = prevPose;
 	lara->Control.MoveAngle = prevMoveAngle;
 
-	return CornerType::None;
+	return Context::CornerType::None;
 }
 
-CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer)
+Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto result = CornerTestResult{};
+	auto shimmyData = Context::CornerShimmyData{};
 
 	// Determine real turning angle.
 	float turnAngle = outer ? angle : -angle;
 
 	// Backup previous pose into array.
-	Pose pos[3] = { item->Pose, item->Pose, item->Pose };
+	Pose poses[3] = { item->Pose, item->Pose, item->Pose };
 
 	// Do a two-step rotation check. First step is real resulting position, and second step is probing
 	// position. We need this because checking at exact ending position does not always return
@@ -640,50 +566,50 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 		// Then determine new test position from centerpoint of new collision box position.
 
 		// Push entity back slightly to compensate for possible edge ledge cases.
-		pos[i].Position.x -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_sin(pos[i].Orientation.y));
-		pos[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(pos[i].Orientation.y));
+		poses[i].Position.x -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_sin(poses[i].Orientation.y));
+		poses[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(poses[i].Orientation.y));
 
 		// Move item at distance of full collision diameter plus half-radius margin to movement direction.
-		pos[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(lara->Control.MoveAngle));
-		pos[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(lara->Control.MoveAngle));
+		poses[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(lara->Control.MoveAngle));
+		poses[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(lara->Control.MoveAngle));
 
 		// Determine anchor point.
-		auto cX = pos[i].Position.x + round(coll->Setup.Radius * phd_sin(pos[i].Orientation.y));
-		auto cZ = pos[i].Position.z + round(coll->Setup.Radius * phd_cos(pos[i].Orientation.y));
-		cX += (coll->Setup.Radius * phd_sin(pos[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
-		cZ += (coll->Setup.Radius * phd_cos(pos[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
+		auto cX = poses[i].Position.x + round(coll->Setup.Radius * phd_sin(poses[i].Orientation.y));
+		auto cZ = poses[i].Position.z + round(coll->Setup.Radius * phd_cos(poses[i].Orientation.y));
+		cX += (coll->Setup.Radius * phd_sin(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
+		cZ += (coll->Setup.Radius * phd_cos(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
 
 		// Determine distance from anchor point to new entity position.
-		auto dist = Vector2(pos[i].Position.x, pos[i].Position.z) - Vector2(cX, cZ);
+		auto dist = Vector2(poses[i].Position.x, poses[i].Position.z) - Vector2(cX, cZ);
 		float sinTurnAngle = phd_sin(ANGLE(turnAngle));
 		float cosTurnAngle = phd_cos(ANGLE(turnAngle));
 
 		// Shift item to new anchor point.
-		pos[i].Position.x = dist.x * cosTurnAngle - dist.y * sinTurnAngle + cX;
-		pos[i].Position.z = dist.x * sinTurnAngle + dist.y * cosTurnAngle + cZ;
+		poses[i].Position.x = dist.x * cosTurnAngle - dist.y * sinTurnAngle + cX;
+		poses[i].Position.z = dist.x * sinTurnAngle + dist.y * cosTurnAngle + cZ;
 
 		// Virtually rotate entity to new angle.
-		short newAngle = pos[i].Orientation.y - ANGLE(turnAngle);
-		pos[i].Orientation.y = newAngle;
+		short newAngle = poses[i].Orientation.y - ANGLE(turnAngle);
+		poses[i].Orientation.y = newAngle;
 
 		// Snap to nearest ledge, if any.
-		item->Pose = pos[i];
+		item->Pose = poses[i];
 		SnapItemToLedge(item, coll, item->Pose.Orientation.y);
 
 		// Copy resulting position to array and restore original entity position.
-		pos[i] = item->Pose;
-		item->Pose = pos[2];
+		poses[i] = item->Pose;
+		item->Pose = poses[2];
 
 		// Both passes finished; construct result data.
 		if (i == 1)
 		{
-			result.RealPositionResult = pos[0];
-			result.ProbeResult = pos[1];
-			result.Success = newAngle == pos[i].Orientation.y;
+			shimmyData.RealPositionResult = poses[0];
+			shimmyData.ProbeResult = poses[1];
+			shimmyData.Success = newAngle == poses[i].Orientation.y;
 		}
 	}
 
-	return result;
+	return shimmyData;
 }
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
