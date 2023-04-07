@@ -83,10 +83,6 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
-	// Check for Action input.
-	if (!IsHeld(In::Action))
-		return false;
-
 	// Check player status.
 	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
 		return false;
@@ -110,7 +106,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 	return false;
 }
 
-// Test if a ledge in front of entity is valid to climb.
+// Test if ledge in front of entity is valid to climb.
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	int vPos = item->Pose.Position.y - coll->Setup.Height;
@@ -443,8 +439,8 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->Control.MoveAngle != item->Pose.Orientation.y)
 	{
-		short l = LaraCeilingFront(item, item->Pose.Orientation.y, 0, 0);
-		short r = LaraCeilingFront(item, lara->Control.MoveAngle, CLICK(0.5f), 0);
+		int l = LaraCeilingFront(item, item->Pose.Orientation.y, 0, 0);
+		int r = LaraCeilingFront(item, lara->Control.MoveAngle, CLICK(0.5f), 0);
 
 		if (abs(l - r) > SLOPE_DIFFERENCE)
 			return false;
@@ -737,59 +733,56 @@ bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance)
 	short angleLeft = angle - ANGLE(15.0f);
 	short angleRight = angle + ANGLE(15.0f);
 
-	auto start = GameVector(
+	auto origin = GameVector(
 		item->Pose.Position.x,
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z,
 		item->RoomNumber);
 
-	auto end1 = GameVector(
+	auto target0 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angleLeft),
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z + distance * phd_cos(angleLeft),
 		item->RoomNumber);
 
-	auto end2 = GameVector(
+	auto target1 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angleRight),
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z + distance * phd_cos(angleRight),
 		item->RoomNumber);
 
-	bool result1 = LOS(&start, &end1);
-	bool result2 = LOS(&start, &end2);
-	return (!result1 && !result2);
+	bool result0 = LOS(&origin, &target0);
+	bool result1 = LOS(&origin, &target1);
+	return (!result0 && !result1);
 }
 
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance)
 {
-	auto start1 = GameVector(
+	auto origin0 = GameVector(
 		item->Pose.Position.x,
 		item->Pose.Position.y - LARA_HEADROOM,
 		item->Pose.Position.z,
 		item->RoomNumber);
-
-	auto start2 = GameVector(
-		item->Pose.Position.x,
-		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
-		item->Pose.Position.z,
-		item->RoomNumber);
-	
-	auto end1 = GameVector(
+	auto target0 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angle),
 		item->Pose.Position.y - LARA_HEADROOM,
 		item->Pose.Position.z + distance * phd_cos(angle),
 		item->RoomNumber);
 
-	auto end2 = GameVector(
+	auto origin2 = GameVector(
+		item->Pose.Position.x,
+		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
+		item->Pose.Position.z,
+		item->RoomNumber);
+	auto target1 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angle),
 		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
 		item->Pose.Position.z + distance * phd_cos(angle),
 		item->RoomNumber);
 
-	auto result1 = LOS(&start1, &end1);
-	auto result2 = LOS(&start2, &end2);
-
-	return (result1 && result2);
+	bool result0 = LOS(&origin0, &target0);
+	bool result1 = LOS(&origin2, &target1);
+	return (result0 && result1);
 }
 
 int LaraFloorFront(ItemInfo* item, short angle, int distance)
@@ -998,12 +991,9 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	AnimateItem(item);
 
 	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.y = facing;
-	item->Pose.Orientation.z = 0;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
+	item->Pose.Orientation = EulerAngles(0, facing, 0);
 	item->Animation.IsAirborne = false;
+	item->Animation.Velocity = Vector3::Zero;
 	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
@@ -1022,9 +1012,9 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Velocity.y = 0;
 		item->Pose.Position = coll->Setup.OldPosition;
 	}
-	// Height check was at CLICK(2) before but changed to this 
-	// because now Lara surfaces on a head level, not mid-body level.
-	else if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
+	// Height check was at CLICK(2) before, but changed to this 
+	// because now player surfaces at head level, not mid-body level.
+	else if (waterDepth <= (LARA_HEIGHT - LARA_HEADROOM / 2))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		item->Animation.TargetState = LS_IDLE;
@@ -1032,8 +1022,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
 		item->Animation.IsAirborne = false;
-		item->Animation.Velocity.z = 0;
-		item->Animation.Velocity.y = 0;
+		item->Animation.Velocity = Vector3::Zero;
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }

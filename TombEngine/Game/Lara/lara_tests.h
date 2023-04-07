@@ -21,16 +21,17 @@ bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 
-bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
-CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
+bool			 TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
+CornerType		 TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
 CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer);
-bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
+bool			 TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
-int LaraFloorFront(ItemInfo* item, short angle, int distance);
-int LaraCeilingFront(ItemInfo* item, short angle, int distance, int height);
+int	 LaraFloorFront(ItemInfo* item, short angle, int distance);
+int	 LaraCeilingFront(ItemInfo* item, short angle, int distance, int height);
+
 CollisionResult LaraCollisionFront(ItemInfo* item, short angle, int distance);
 CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int distance, int height);
 
