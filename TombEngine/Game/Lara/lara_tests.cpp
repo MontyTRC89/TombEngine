@@ -581,14 +581,11 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	// Do further testing only if test angle is equal to resulting edge angle
 	if (cornerResult.Success)
 	{
-		// Get bounding box height for further ledge height calculations
-		auto bounds = GameBoundingBox(item);
-
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
 		lara->NextCornerPos.Position = Vector3i(
 			item->Pose.Position.x,
-			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(abs(bounds.Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds.Y1),
+			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(LARA_HEIGHT_STRETCH + LARA_HEADROOM)).Position.Floor + LARA_HEIGHT_STRETCH,
 			item->Pose.Position.z);
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
