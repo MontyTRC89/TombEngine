@@ -364,11 +364,11 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
 {
-	int shiftRight, shiftLeft;
-
+	int shiftRight = 0;
 	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shiftRight) != 1)
 		return false;
 
+	int shiftLeft = 0;
 	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, CLICK(2), &shiftLeft) != 1)
 		return false;
 
@@ -390,7 +390,9 @@ bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += shiftRight;
 	}
 	else if (shiftLeft)
+	{
 		item->Pose.Position.y += shiftLeft;
+	}
 
 	return true;
 }

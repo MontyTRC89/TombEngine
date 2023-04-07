@@ -40,6 +40,12 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action))
 		{
+			if (TestLaraClimbIdle(item, coll))
+			{
+				item->Animation.TargetState = LS_LADDER_IDLE;
+				return;
+			}
+
 			if (IsHeld(In::Jump) && Context::CanPerformLedgeJump(*item, *coll))
 			{
 				if (IsHeld(In::Back))
@@ -81,16 +87,8 @@ namespace TEN::Entities::Player
 
 				if (Context::CanWallShimmyUp(*item, *coll))
 				{
-					if (!IsHeld(In::Crouch) && TestLaraClimbIdle(item, coll))
-					{
-						item->Animation.TargetState = LS_LADDER_IDLE;
-					}
-					else if (TestLastFrame(item))
-					{
-						// TODO: State dispatch.
-						SetAnimation(item, LA_LADDER_SHIMMY_UP);
-					}
-
+					// TODO: State dispatch.
+					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 					return;
 				}
 			}
@@ -98,16 +96,8 @@ namespace TEN::Entities::Player
 			{
 				if (Context::CanWallShimmyDown(*item, *coll))
 				{
-					if (!IsHeld(In::Crouch) && TestLaraClimbIdle(item, coll))
-					{
-						item->Animation.TargetState = LS_LADDER_IDLE;
-					}
-					else if (TestLastFrame(item))
-					{
-						// TODO: State dispatch.
-						SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
-					}
-
+					// TODO: State dispatch.
+					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 					return;
 				}
 			}

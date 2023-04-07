@@ -31,7 +31,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetCoeff, boo
 	player.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 
 	if (doSnap)
-		item->Pose.Orientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		item->Pose.Orientation = player.TargetOrientation;
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetCoeff)
