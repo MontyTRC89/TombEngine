@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Math/Math.h"
@@ -22,16 +23,18 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3i::Zero;
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetCoeff, bool doSnap)
 {
-	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
-	item->Pose.Orientation = EulerAngles(
-		0,
-		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
-		0);
+	auto& player = GetLaraInfo(*item);
+
+	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetCoeff));
+	player.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+
+	if (doSnap)
+		item->Pose.Orientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetCoeff)
 {
 	short backup = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = angle;
@@ -41,16 +44,15 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 
 	coll->Setup.ForwardAngle = backup;
 
-	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
+	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetCoeff));
 	item->Pose.Orientation = EulerAngles(0, ledgeAngle, 0);
 }
 
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 {
-	SnapItemToLedge(item, coll);
+	SnapItemToLedge(item, coll, 0.0f, true);
 
-	int direction = (unsigned short)(item->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
-
+	int direction = unsigned short(item->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 	switch (direction)
 	{
 	case NORTH:

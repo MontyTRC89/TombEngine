@@ -63,6 +63,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	item.Pose.Position.y = catchData.Height + playerHeight;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.ExtraTorsoRot = EulerAngles::Zero;
+	player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
 }
 
 // TODO: Move to lara_helpers.cpp
@@ -187,6 +188,8 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
 
 	short angle = player.Control.MoveAngle;
 
@@ -583,11 +586,13 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
-		lara->NextCornerPos.Position.x = item->Pose.Position.x;
-		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(abs(bounds.Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds.Y1);
-		lara->NextCornerPos.Position.z = item->Pose.Position.z;
+		lara->NextCornerPos.Position = Vector3i(
+			item->Pose.Position.x,
+			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(abs(bounds.Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds.Y1),
+			item->Pose.Position.z);
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->TargetOrientation = lara->NextCornerPos.Orientation;
 
 		item->Pose = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPosition(item, coll);
