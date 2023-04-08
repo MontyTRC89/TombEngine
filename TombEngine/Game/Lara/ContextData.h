@@ -1,6 +1,7 @@
 #pragma once
+#include "Math/Math.h"
 
-class Pose;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Player::Context
 {
@@ -31,9 +32,9 @@ namespace TEN::Entities::Player::Context
 
 	struct CornerShimmyData
 	{
-		bool Success;
-		Pose ProbeResult;
-		Pose RealPositionResult;
+		bool Success			= false;
+		Pose RealPositionResult = Pose::Zero;
+		Pose ProbeResult		= Pose::Zero;
 	};
 
 	struct LedgeClimbSetupData

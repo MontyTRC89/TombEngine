@@ -152,7 +152,7 @@ namespace TEN::Entities::Player
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 
-		TestLaraHang(item, coll);
+		HandlePlayerEdgeHang(item, coll);
 	}
 
 	// State:	  LS_SHIMMY_LEFT (30)
@@ -196,7 +196,7 @@ namespace TEN::Entities::Player
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 		coll->Setup.Radius = LARA_RADIUS;
 
-		TestLaraHang(item, coll);
+		HandlePlayerEdgeHang(item, coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
 
@@ -241,7 +241,7 @@ namespace TEN::Entities::Player
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 		coll->Setup.Radius = LARA_RADIUS;
 
-		TestLaraHang(item, coll);
+		HandlePlayerEdgeHang(item, coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 

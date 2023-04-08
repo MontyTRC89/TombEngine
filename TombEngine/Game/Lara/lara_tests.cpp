@@ -103,7 +103,7 @@ bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll)
 	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
-bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
+bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
@@ -269,7 +269,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		// Death, incorrect ledge, or Action release.
 		else
 		{
-			SetAnimation(item, LA_JUMP_UP);
+			SetAnimation(item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 			item->Pose.Position += coll->Shift;
@@ -499,7 +499,9 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, floa
 	// Additional test for material obstacles blocking outer corner pathway.
 	if ((LaraFloorFront(item, item->Pose.Orientation.y, 0) < 0) ||
 		(LaraCeilingFront(item, item->Pose.Orientation.y, 0, coll->Setup.Height) > 0))
+	{
 		cornerResult.Success = false;
+	}
 
 	// Do further tests only if test angle is equal to resulting edge angle.
 	if (cornerResult.Success)
@@ -544,14 +546,12 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, floa
 	return Context::CornerType::None;
 }
 
-Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer)
+Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool isOuter)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto shimmyData = Context::CornerShimmyData{};
-
 	// Determine real turning angle.
-	float turnAngle = outer ? angle : -angle;
+	float turnAngle = isOuter ? angle : -angle;
 
 	// Backup previous pose into array.
 	Pose poses[3] = { item->Pose, item->Pose, item->Pose };
@@ -565,28 +565,36 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		// Determine collision box anchor point and rotate collision box around this anchor point.
 		// Then determine new test position from centerpoint of new collision box position.
 
+		float radiusCoeff = isOuter ? -0.2f : 0.2f;
+		float sinY = phd_sin(poses[i].Orientation.y);
+		float cosY = phd_cos(poses[i].Orientation.y);
+
 		// Push entity back slightly to compensate for possible edge ledge cases.
-		poses[i].Position.x -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_sin(poses[i].Orientation.y));
-		poses[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(poses[i].Orientation.y));
+		poses[i].Position.x -= (int)round((coll->Setup.Radius * radiusCoeff) * sinY);
+		poses[i].Position.z -= (int)round((coll->Setup.Radius * radiusCoeff) * cosY);
+
+		radiusCoeff = (i == 0) ? 2.0f : 2.5f;
+		float sinMoveAngle = phd_sin(lara->Control.MoveAngle);
+		float cosMoveAngle = phd_cos(lara->Control.MoveAngle);
 
 		// Move item at distance of full collision diameter plus half-radius margin to movement direction.
-		poses[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(lara->Control.MoveAngle));
-		poses[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(lara->Control.MoveAngle));
+		poses[i].Position.x += (int)round((coll->Setup.Radius * radiusCoeff) * sinMoveAngle);
+		poses[i].Position.z += (int)round((coll->Setup.Radius * radiusCoeff) * cosMoveAngle);
 
 		// Determine anchor point.
-		auto cX = poses[i].Position.x + round(coll->Setup.Radius * phd_sin(poses[i].Orientation.y));
-		auto cZ = poses[i].Position.z + round(coll->Setup.Radius * phd_cos(poses[i].Orientation.y));
-		cX += (coll->Setup.Radius * phd_sin(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
-		cZ += (coll->Setup.Radius * phd_cos(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1.0f, angle))));
+		int cX = poses[i].Position.x + (int)round(coll->Setup.Radius * sinY);
+		int cZ = poses[i].Position.z + (int)round(coll->Setup.Radius * cosY);
+		cX += coll->Setup.Radius * phd_sin(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1, angle)));
+		cZ += coll->Setup.Radius * phd_cos(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1, angle)));
 
 		// Determine distance from anchor point to new entity position.
 		auto dist = Vector2(poses[i].Position.x, poses[i].Position.z) - Vector2(cX, cZ);
 		float sinTurnAngle = phd_sin(ANGLE(turnAngle));
 		float cosTurnAngle = phd_cos(ANGLE(turnAngle));
 
-		// Shift item to new anchor point.
-		poses[i].Position.x = dist.x * cosTurnAngle - dist.y * sinTurnAngle + cX;
-		poses[i].Position.z = dist.x * sinTurnAngle + dist.y * cosTurnAngle + cZ;
+		// Move entity to new anchor point.
+		poses[i].Position.x = (dist.x * cosTurnAngle) - (dist.y * sinTurnAngle) + cX;
+		poses[i].Position.z = (dist.x * sinTurnAngle) + (dist.y * cosTurnAngle) + cZ;
 
 		// Virtually rotate entity to new angle.
 		short newAngle = poses[i].Orientation.y - ANGLE(turnAngle);
@@ -603,13 +611,12 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		// Both passes finished; construct result data.
 		if (i == 1)
 		{
-			shimmyData.RealPositionResult = poses[0];
-			shimmyData.ProbeResult = poses[1];
-			shimmyData.Success = newAngle == poses[i].Orientation.y;
+			bool success = (newAngle == poses[i].Orientation.y);
+			return Context::CornerShimmyData{ success, poses[0], poses[1] };
 		}
 	}
 
-	return shimmyData;
+	return Context::CornerShimmyData{};
 }
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
@@ -623,11 +630,9 @@ bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 	TranslateItem(item, lara->Control.MoveAngle, SIDEWAY_SHIMMY_TEST_DIST);
 	coll->Setup.OldPosition.y = item->Pose.Position.y;
 
-	bool res = TestLaraHang(item, coll);
-
+	bool canHang = HandlePlayerEdgeHang(item, coll);
 	item->Pose = prevPose;
-
-	return !res;
+	return !canHang;
 }
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side)

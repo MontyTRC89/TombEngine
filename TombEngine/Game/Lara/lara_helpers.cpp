@@ -181,7 +181,6 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	item.Animation.Velocity = Vector3::Zero;
 	item.Pose.Position.y = catchData.Height + playerHeight;
 	player.Control.HandStatus = HandStatus::Busy;
-	player.ExtraTorsoRot = EulerAngles::Zero;
 	player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
 }
 
