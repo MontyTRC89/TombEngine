@@ -565,36 +565,27 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		// Determine collision box anchor point and rotate collision box around this anchor point.
 		// Then determine new test position from centerpoint of new collision box position.
 
+		// Move entity back slightly to compensate for possible edge ledge cases.
 		float radiusCoeff = isOuter ? -0.2f : 0.2f;
-		float sinY = phd_sin(poses[i].Orientation.y);
-		float cosY = phd_cos(poses[i].Orientation.y);
-
-		// Push entity back slightly to compensate for possible edge ledge cases.
-		poses[i].Position.x -= (int)round((coll->Setup.Radius * radiusCoeff) * sinY);
-		poses[i].Position.z -= (int)round((coll->Setup.Radius * radiusCoeff) * cosY);
-
-		radiusCoeff = (i == 0) ? 2.0f : 2.5f;
-		float sinMoveAngle = phd_sin(lara->Control.MoveAngle);
-		float cosMoveAngle = phd_cos(lara->Control.MoveAngle);
+		poses[i].Translate(poses[i].Orientation.y, -(coll->Setup.Radius * radiusCoeff));
 
 		// Move item at distance of full collision diameter plus half-radius margin to movement direction.
-		poses[i].Position.x += (int)round((coll->Setup.Radius * radiusCoeff) * sinMoveAngle);
-		poses[i].Position.z += (int)round((coll->Setup.Radius * radiusCoeff) * cosMoveAngle);
+		radiusCoeff = (i == 0) ? 2.0f : 2.5f;
+		poses[i].Translate(lara->Control.MoveAngle, coll->Setup.Radius * radiusCoeff);
 
 		// Determine anchor point.
-		int cX = poses[i].Position.x + (int)round(coll->Setup.Radius * sinY);
-		int cZ = poses[i].Position.z + (int)round(coll->Setup.Radius * cosY);
-		cX += coll->Setup.Radius * phd_sin(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1, angle)));
-		cZ += coll->Setup.Radius * phd_cos(poses[i].Orientation.y + ANGLE(90.0f * -std::copysign(1, angle)));
+		short someAngle = ANGLE(90.0f * -std::copysign(1, angle));
+		auto anchor = Geometry::TranslatePoint(poses[i].Position, poses[i].Orientation.y, coll->Setup.Radius);
+		anchor = Geometry::TranslatePoint(anchor, poses[i].Orientation.y + someAngle, coll->Setup.Radius);
 
 		// Determine distance from anchor point to new entity position.
-		auto dist = Vector2(poses[i].Position.x, poses[i].Position.z) - Vector2(cX, cZ);
+		auto dist = Vector2(poses[i].Position.x, poses[i].Position.z) - Vector2(anchor.x, anchor.z);
 		float sinTurnAngle = phd_sin(ANGLE(turnAngle));
 		float cosTurnAngle = phd_cos(ANGLE(turnAngle));
 
 		// Move entity to new anchor point.
-		poses[i].Position.x = (dist.x * cosTurnAngle) - (dist.y * sinTurnAngle) + cX;
-		poses[i].Position.z = (dist.x * sinTurnAngle) + (dist.y * cosTurnAngle) + cZ;
+		poses[i].Position.x = (dist.x * cosTurnAngle) - (dist.y * sinTurnAngle) + anchor.x;
+		poses[i].Position.z = (dist.x * sinTurnAngle) + (dist.y * cosTurnAngle) + anchor.z;
 
 		// Virtually rotate entity to new angle.
 		short newAngle = poses[i].Orientation.y - ANGLE(turnAngle);
