@@ -506,7 +506,7 @@ namespace TEN::Input
 		if (IsClicked(In::Flare))
 		{
 			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
-				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
+				SayNo();
 		}
 
 		// Handle weapon hotkeys.
