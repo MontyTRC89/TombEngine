@@ -65,15 +65,11 @@ namespace TEN::Entities::Player::Context
 		auto& player = GetLaraInfo(item);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, BLOCK(0.25f));
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
 
-		// 1) Test for wall.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return false;
-
-		// 2) Assess point collision.
+		// Assess point collision.
 		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
 			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
 		{
@@ -261,7 +257,7 @@ namespace TEN::Entities::Player::Context
 		if (!player.Control.CanClimbLadder)
 			return std::nullopt;
 
-		// 2) Check movement direction.
+		// 2) Test movement direction.
 		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 		if (isMovingUp)
 			return std::nullopt;
@@ -328,16 +324,9 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(item);
 
-		// 1) Check for monkey swing ceiling.
+		// 1) Check for monkey swing flag.
 		if (!player.Control.CanMonkeySwing)
 			return std::nullopt;
-
-		// Get point collision.
-		auto pointColl = GetCollision(&item);
-
-		int vPos = item.Pose.Position.y - coll.Setup.Height;
-		int relCeilHeight = pointColl.Position.Ceiling - vPos;
-		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 2) Check collision type.
 		if (coll.CollisionType != CollisionType::CT_TOP &&
@@ -345,6 +334,13 @@ namespace TEN::Entities::Player::Context
 		{
 			return std::nullopt;
 		}
+
+		// Get point collision.
+		auto pointColl = GetCollision(&item);
+
+		int vPos = item.Pose.Position.y - coll.Setup.Height;
+		int relCeilHeight = pointColl.Position.Ceiling - vPos;
+		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 3) Assess point collision.
 		if (abs(relCeilHeight) <= ABS_CEIL_BOUND &&		  // Ceiling height is within lower/upper ceiling bounds.
