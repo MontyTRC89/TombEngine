@@ -127,9 +127,9 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& pos);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
-void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
-void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
-int	  GetQuadrant(short angle);
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
+int	GetQuadrant(short angle);
 
 LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll);
 
