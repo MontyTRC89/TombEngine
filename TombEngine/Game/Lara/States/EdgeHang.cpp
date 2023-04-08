@@ -2,8 +2,8 @@
 #include "Game/Lara/States/EdgeHang.h"
 
 #include "Game/camera.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"

@@ -420,11 +420,11 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 	return TestValidLedge(item, coll);
 }
 
-Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle)
+Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, short testAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Check for idle state.
+	// Check for hang idle state.
 	if (item->Animation.ActiveState != LS_HANG_IDLE)
 		return Context::CornerType::None;
 
@@ -482,14 +482,14 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, floa
 	// OUTER CORNER TESTS
 
 	// Test for material obstacles blocking outer corner pathway.
-	if ((LaraFloorFront(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)) < 0) ||
-		(LaraCeilingFront(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1), coll->Setup.Height) > 0))
+	if ((LaraFloorFront(item, item->Pose.Orientation.y + testAngle, coll->Setup.Radius + CLICK(1)) < 0) ||
+		(LaraCeilingFront(item, item->Pose.Orientation.y + testAngle, coll->Setup.Radius + CLICK(1), coll->Setup.Height) > 0))
 	{
 		return Context::CornerType::None;
 	}
 
 	// Conduct ray test to check for last chance of ppossible diagonal vs. non-diagonal cases.
-	if (!LaraPositionOnLOS(item, item->Pose.Orientation.y + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
+	if (!LaraPositionOnLOS(item, item->Pose.Orientation.y + testAngle, coll->Setup.Radius + CLICK(1)))
 	{
 		return Context::CornerType::None;
 	}
@@ -546,12 +546,12 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, floa
 	return Context::CornerType::None;
 }
 
-Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool isOuter)
+Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, short testAngle, bool isOuter)
 {
 	auto* lara = GetLaraInfo(item);
 
 	// Determine real turning angle.
-	float turnAngle = isOuter ? angle : -angle;
+	short turnAngle = isOuter ? testAngle : -testAngle;
 
 	// Backup previous pose into array.
 	Pose poses[3] = { item->Pose, item->Pose, item->Pose };
@@ -574,21 +574,21 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		poses[i].Translate(lara->Control.MoveAngle, coll->Setup.Radius * radiusCoeff);
 
 		// Determine anchor point.
-		short someAngle = ANGLE(90.0f * -std::copysign(1, angle));
+		short someAngle = ANGLE(90.0f * -std::copysign(1, testAngle));
 		auto anchor = Geometry::TranslatePoint(poses[i].Position, poses[i].Orientation.y, coll->Setup.Radius);
 		anchor = Geometry::TranslatePoint(anchor, poses[i].Orientation.y + someAngle, coll->Setup.Radius);
 
 		// Determine distance from anchor point to new entity position.
 		auto dist = Vector2(poses[i].Position.x, poses[i].Position.z) - Vector2(anchor.x, anchor.z);
-		float sinTurnAngle = phd_sin(ANGLE(turnAngle));
-		float cosTurnAngle = phd_cos(ANGLE(turnAngle));
+		float sinTurnAngle = phd_sin(turnAngle);
+		float cosTurnAngle = phd_cos(turnAngle);
 
 		// Move entity to new anchor point.
 		poses[i].Position.x = (dist.x * cosTurnAngle) - (dist.y * sinTurnAngle) + anchor.x;
 		poses[i].Position.z = (dist.x * sinTurnAngle) + (dist.y * cosTurnAngle) + anchor.z;
 
 		// Virtually rotate entity to new angle.
-		short newAngle = poses[i].Orientation.y - ANGLE(turnAngle);
+		short newAngle = poses[i].Orientation.y - turnAngle;
 		poses[i].Orientation.y = newAngle;
 
 		// Snap to nearest ledge, if any.

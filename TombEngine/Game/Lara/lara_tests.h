@@ -24,8 +24,8 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 
 bool					  TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
-Context::CornerType		  TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
-Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool isOuter);
+Context::CornerType		  TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, short testAngle);
+Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, short testAngle, bool isOuter);
 bool					  TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);

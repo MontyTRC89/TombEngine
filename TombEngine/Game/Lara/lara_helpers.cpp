@@ -532,7 +532,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 {
 	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
 	{
-		switch (TestLaraHangCorner(&item, &coll, -90.0f))
+		switch (TestLaraHangCorner(&item, &coll, ANGLE(-90.0f)))
 		{
 		case Context::CornerType::Inner:
 			return LS_SHIMMY_INNER_LEFT;
@@ -541,7 +541,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 			return LS_SHIMMY_OUTER_LEFT;
 		}
 
-		switch (TestLaraHangCorner(&item, &coll, -45.0f))
+		switch (TestLaraHangCorner(&item, &coll, ANGLE(-45.0f)))
 		{
 		case Context::CornerType::Inner:
 			return LS_SHIMMY_45_INNER_LEFT;
@@ -552,7 +552,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 	}
 	else if (IsHeld(In::Right) || IsHeld(In::RightStep))
 	{
-		switch (TestLaraHangCorner(&item, &coll, 90.0f))
+		switch (TestLaraHangCorner(&item, &coll, ANGLE(90.0f)))
 		{
 		case Context::CornerType::Inner:
 			return LS_SHIMMY_INNER_RIGHT;
@@ -561,7 +561,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 			return LS_SHIMMY_OUTER_RIGHT;
 		}
 
-		switch (TestLaraHangCorner(&item, &coll, 45.0f))
+		switch (TestLaraHangCorner(&item, &coll, ANGLE(45.0f)))
 		{
 		case Context::CornerType::Inner:
 			return LS_SHIMMY_45_INNER_RIGHT;
