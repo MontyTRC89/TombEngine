@@ -58,7 +58,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_walk_forward,
 	lara_as_run_forward,
 	lara_as_idle,
-	lara_as_jump_forward,//33
+	lara_as_jump_forward,//3
 	lara_as_pose,//4
 	lara_as_run_back,//5
 	lara_as_turn_right_slow,//6
@@ -142,7 +142,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crawl_turn_left,//84
 	lara_as_crawl_turn_right,//85
 	lara_as_crawl_back,//86
-	lara_as_controlled_no_look,
+	lara_as_controlled_no_look,//87
 	lara_as_controlled_no_look,
 	lara_as_controlled,
 	lara_as_rope_turn_clockwise,
@@ -324,7 +324,7 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_crawl_turn_left,
 	lara_col_crawl_turn_right,
 	lara_col_crawl_back,
-	lara_void_func,
+	lara_void_func,//87
 	lara_col_crawl_to_hang,
 	lara_default_col,
 	lara_void_func,

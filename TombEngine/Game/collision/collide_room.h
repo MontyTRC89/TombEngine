@@ -142,8 +142,8 @@ int GetWaterHeight(ItemInfo* item);
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
 void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff = 0.0f, bool doSnap = false);
-void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short angle, float radiusCoeff = 0.0f);
-void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
+void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short headingAngle, float radiusCoeff = 0.0f);
+void SnapEntityToGrid(ItemInfo* item, CollisionInfo* coll);
 
 void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
 

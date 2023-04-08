@@ -89,6 +89,13 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+
+	// HACK: Continue aligning to edge while pulling up.
+	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
+		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
+	{
+		item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
+	}
 }
 
 // State:		LS_VAULT (164),

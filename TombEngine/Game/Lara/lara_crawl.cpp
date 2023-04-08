@@ -862,7 +862,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	ResetLaraLean(item, 6.0f);
 
@@ -877,11 +877,12 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 		TranslateItem(item, item->Pose.Orientation.y, -CLICK(1));
 		GetCollisionInfo(coll, item);
-		AlignPlayerToEdge(item, coll);
+		AlignEntityToEdge(item, coll);
 		SetAnimation(item, LA_HANG_IDLE);
 
+		// TODO: Snap properly.
 		GetCollisionInfo(coll, item);
-		item->Pose.Position.y += coll->Front.Floor - GameBoundingBox(item).Y1 - 20;
+		//item->Pose.Position.y += coll->Front.Floor - GameBoundingBox(item).Y1 - 20;
 		lara->Control.HandStatus = HandStatus::Busy;
 	}
 }

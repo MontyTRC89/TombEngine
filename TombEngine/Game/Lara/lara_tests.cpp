@@ -238,7 +238,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
 				if (item->Animation.Velocity.z != 0.0f)
-					AlignPlayerToEdge(item, coll);
+					AlignEntityToEdge(item, coll);
 
 				item->Pose.Position.y += verticalShift;
 			}
@@ -593,7 +593,7 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 
 		// Snap to nearest ledge, if any.
 		item->Pose = poses[i];
-		AlignPlayerToEdge(item, coll, item->Pose.Orientation.y);
+		AlignEntityToEdge(item, coll, item->Pose.Orientation.y);
 
 		// Copy resulting position to array and restore original entity position.
 		poses[i] = item->Pose;
@@ -837,7 +837,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-	AlignPlayerToEdge(item, coll, 1.7f);
+	AlignEntityToEdge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
@@ -1997,7 +1997,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		SnapEntityToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 		AnimateItem(item);
 
@@ -2015,7 +2015,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		SnapEntityToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		AnimateItem(item);
 
 		return true;
