@@ -39,8 +39,9 @@ void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short headingAngle, 
 	short backupHeadingAngle = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = headingAngle;
 
-	float distance;
-	auto ledgeAngle = GetNearestLedgeAngle(item, coll, distance);
+	auto ledgeData = GetNearestLedgeData(*item, *coll);
+	short ledgeAngle = ledgeData.Angle;
+	float distance = ledgeData.Distance;
 
 	coll->Setup.ForwardAngle = backupHeadingAngle;
 
@@ -323,7 +324,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
-	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
+
+	auto ledgeData = GetNearestLedgeData(*item, *coll);
+	coll->NearestLedgeAngle = ledgeData.Angle;
+	coll->NearestLedgeDistance = ledgeData.Distance;
 
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
@@ -900,33 +904,36 @@ int GetQuadrant(short angle)
 	return (unsigned short(angle + ANGLE(45.0f)) / ANGLE(90.0f));
 }
 
-// Determines vertical surfaces and gets nearest ledge angle.
-// Allows unconstrained vaults and shimmying.
-short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
+LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 {
-	if (!item->IsLara())
-		return 0; 
+	constexpr auto EMPTY_LEDGE_DATA = LedgeData{};
 
-	// Get entity bounds and current rotation.
-	auto bounds = GameBoundingBox(item);
-	float sinForwardAngle = phd_sin(coll->Setup.ForwardAngle);
-	float cosForwardAngle = phd_cos(coll->Setup.ForwardAngle);
+	if (!item.IsLara())
+		return EMPTY_LEDGE_DATA; 
+
+	// Get entity bounds and current heading angle.
+	auto bounds = GameBoundingBox(&item);
+	float sinForwardAngle = phd_sin(coll.Setup.ForwardAngle);
+	float cosForwardAngle = phd_cos(coll.Setup.ForwardAngle);
 
 	// Origin test position should be slightly in front of origin, otherwise misfire may occur near block corners for split angles.
-	float frontalOffset = coll->Setup.Radius * 0.3f;
-	float x = item->Pose.Position.x + (frontalOffset * sinForwardAngle);
-	float z = item->Pose.Position.z + (frontalOffset * cosForwardAngle);
+	float frontOffset = coll.Setup.Radius * 0.3f;
+	float x = item.Pose.Position.x + (frontOffset * sinForwardAngle);
+	float z = item.Pose.Position.z + (frontOffset * cosForwardAngle);
 
-	// Determine two Y points to test (lower and higher).
+	// Determine test points at lower and upper bounds.
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
 	int headroom = bounds.GetHeight() / 20.0f;
-	int vPoints[2] = { item->Pose.Position.y + bounds.Y1 + headroom,
-		item->Pose.Position.y + bounds.Y2 - headroom };
+	int vPoints[2] =
+	{
+		item.Pose.Position.y + bounds.Y1 + headroom,
+		item.Pose.Position.y + bounds.Y2 - headroom
+	};
 
 	// Prepare test data.
 	float finalDistance[2] = { FLT_MAX, FLT_MAX };
 	short finalResult[2] = { 0 };
-	bool  hitBridge = false;
+	bool  hasHitBridge = false;
 
 	// Do a two-pass surface test for all possible planes in a block.
 	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
@@ -943,7 +950,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		short result[3] = {};
 
 		// If bridge was hit on the first pass, stop checking.
-		if (h == 1 && hitBridge)
+		if (h == 1 && hasHitBridge)
 			break;
 
 		for (int p = 0; p < 3; p++)
@@ -958,12 +965,12 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// Determine if probe must be shifted (if left or right probe).
 			if (p > 0)
 			{
-				float s2 = phd_sin(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
-				float c2 = phd_cos(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
+				float s2 = phd_sin(coll.Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
+				float c2 = phd_cos(coll.Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
 
 				// Slightly extend width beyond coll radius to hit adjacent blocks for sure.
-				eX += s2 * (coll->Setup.Radius * 2);
-				eZ += c2 * (coll->Setup.Radius * 2);
+				eX += s2 * (coll.Setup.Radius * 2);
+				eZ += c2 * (coll.Setup.Radius * 2);
 			}
 
 			// Debug probe point
@@ -971,7 +978,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
-			float frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
+			float frontFloorProbeOffset = coll.Setup.Radius * 1.5f;
 			float ffpX = eX + frontFloorProbeOffset * sinForwardAngle;
 			float ffpZ = eZ + frontFloorProbeOffset * cosForwardAngle;
 
@@ -982,7 +989,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
-			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
+			auto room = GetRoom(item.Location, ffpX, y, ffpZ).roomNumber;
 			auto block = GetCollision(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
@@ -1004,7 +1011,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
-			float floorProbeOffset = coll->Setup.Radius * 0.3f;
+			float floorProbeOffset = coll.Setup.Radius * 0.3f;
 			float fpX = eX + floorProbeOffset * sinForwardAngle;
 			float fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
@@ -1012,7 +1019,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
 
 			// Get true room number and block, based on derived height
-			room = GetRoom(item->Location, fpX, height, fpZ).roomNumber;
+			room = GetRoom(item.Location, fpX, height, fpZ).roomNumber;
 			block = GetCollision(fpX, height, fpZ, room).Block;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here.
@@ -1020,8 +1027,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			int cY = height + 1;
 
 			// Calculate ray
-			auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
-			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
+			auto rotMatrix = EulerAngles(0, coll.Setup.ForwardAngle, 0).ToRotationMatrix();
+			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * rotMatrix).Translation();
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
 			// Debug ray direction.
@@ -1063,7 +1070,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 						closestDistance[p] = distance;
 						auto normal = closestPlane[p].Normal();
 						result[p] = FROM_RAD(atan2(normal.x, normal.z));
-						hitBridge = true;
+						hasHitBridge = true;
 					}
 				}
 			}
@@ -1085,8 +1092,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				// Get split angle coordinates.
 				float sX = fX + 1 + BLOCK(0.5f);
 				float sZ = fZ + 1 + BLOCK(0.5f);
-				float sShiftX = coll->Setup.Radius * sin(splitAngle);
-				float sShiftZ = coll->Setup.Radius * cos(splitAngle);
+				float sShiftX = coll.Setup.Radius * sin(splitAngle);
+				float sShiftZ = coll.Setup.Radius * cos(splitAngle);
 
 				// Get block edge planes and split angle plane.
 				Plane plane[5] =
@@ -1184,7 +1191,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// when centerpoint probe lands exactly on a block which has no 
 			// diagonal split. If no angle similarity exists, just use centerpoint angle.
 
-			short* itr = std::find(result, result + 3, coll->Setup.ForwardAngle);
+			short* itr = std::find(result, result + 3, coll.Setup.ForwardAngle);
 			int prioritizedAngle = (itr != std::end(result)) ? std::distance(result, itr) : 0;
 
 			finalDistance[h] = closestDistance[prioritizedAngle];
@@ -1199,11 +1206,11 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 	// For unique case when both distances are equal, again make a comparison to current
 	// forward angle and return prioritized result.
 
-	if (!hitBridge)
+	if (!hasHitBridge)
 	{
 		if (floor(finalDistance[0]) == floor(finalDistance[1]))
 		{
-			float* itr = std::find(finalDistance, finalDistance + 2, coll->Setup.ForwardAngle);
+			float* itr = std::find(finalDistance, finalDistance + 2, coll.Setup.ForwardAngle);
 			usedProbe = (itr != std::end(finalDistance)) ? std::distance(finalDistance, itr) : 0;
 		}
 		else if (finalDistance[1] < finalDistance[0])
@@ -1212,8 +1219,9 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		}
 	}
 
-	distance = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
-	return finalResult[usedProbe];
+	short ledgeAngle = finalResult[usedProbe];
+	float ledgeDistance = finalDistance[usedProbe] - (coll.Setup.Radius - frontOffset);
+	return LedgeData{ ledgeAngle, ledgeDistance };
 }
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)

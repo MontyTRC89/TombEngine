@@ -30,6 +30,12 @@ enum class CollisionProbeMode
 	FreeFlat
 };
 
+struct LedgeData
+{
+	short Angle	   = 0;
+	float Distance = 0.0f;
+};
+
 struct CollisionPosition
 {
 	int Floor;
@@ -124,7 +130,8 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
 int	  GetQuadrant(short angle);
-short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
+
+LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll);
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
