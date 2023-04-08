@@ -1131,7 +1131,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 				{
 					if (item->Animation.TargetState != LS_LADDER_IDLE)
 					{
-						SnapItemToLedge(item, coll);
+						AlignPlayerToEdge(item, coll);
 						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}

@@ -1,17 +1,16 @@
 #pragma once
 #include "Math/Math.h"
-#include "Math/Math.h"
 
-struct ItemInfo;
-struct CollisionInfo;
+enum RoomEnvFlags;
 class FloorInfo;
+struct CollisionInfo;
+struct ItemInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
-enum RoomEnvFlags;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
-constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
 enum CollisionType
 {
@@ -142,8 +141,8 @@ int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetCoeff = 0.0f, bool doSnap = false);
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetCoeff = 0.0f);
+void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff = 0.0f, bool doSnap = false);
+void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short angle, float radiusCoeff = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
 void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));

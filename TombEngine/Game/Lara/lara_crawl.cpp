@@ -877,7 +877,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 		TranslateItem(item, item->Pose.Orientation.y, -CLICK(1));
 		GetCollisionInfo(coll, item);
-		SnapItemToLedge(item, coll);
+		AlignPlayerToEdge(item, coll);
 		SetAnimation(item, LA_HANG_IDLE);
 
 		GetCollisionInfo(coll, item);

@@ -23,34 +23,34 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3i::Zero;
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetCoeff, bool doSnap)
+void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff, bool doSnap)
 {
 	auto& player = GetLaraInfo(*item);
 
-	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetCoeff));
+	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * radiusCoeff));
 	player.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 
 	if (doSnap)
 		item->Pose.Orientation = player.TargetOrientation;
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetCoeff)
+void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short headingAngle, float radiusCoeff)
 {
-	short backup = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = angle;
+	short backupHeadingAngle = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = headingAngle;
 
 	float distance;
 	auto ledgeAngle = GetNearestLedgeAngle(item, coll, distance);
 
-	coll->Setup.ForwardAngle = backup;
+	coll->Setup.ForwardAngle = backupHeadingAngle;
 
-	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetCoeff));
+	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * radiusCoeff));
 	item->Pose.Orientation = EulerAngles(0, ledgeAngle, 0);
 }
 
-void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
+void SnapEntityToGrid(ItemInfo* item, CollisionInfo* coll)
 {
-	SnapItemToLedge(item, coll, 0.0f, true);
+	AlignEntityToEdge(item, coll, 0.0f, true);
 
 	int direction = unsigned short(item->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 	switch (direction)
@@ -75,13 +75,17 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 
 int FindGridShift(int x, int z)
 {
-	if ((x / SECTOR(1)) == (z / SECTOR(1)))
+	if ((x / BLOCK(1)) == (z / BLOCK(1)))
 		return 0;
 
-	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
+	if ((z / BLOCK(1)) <= (x / BLOCK(1)))
+	{
 		return (-1 - (x & WALL_MASK));
+	}
 	else
-		return ((SECTOR(1) + 1) - (x & WALL_MASK));
+	{
+		return ((BLOCK(1) + 1) - (x & WALL_MASK));
+	}
 }
 
 // Test if the axis-aligned bounding box collides with geometry at all.

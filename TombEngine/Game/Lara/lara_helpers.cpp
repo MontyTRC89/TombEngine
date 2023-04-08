@@ -172,7 +172,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// Snap to edge.
 	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
-	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapItemToGrid(&item, &coll) : SnapItemToLedge(&item, &coll);
+	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapItemToGrid(&item, &coll) : AlignPlayerToEdge(&item, &coll);
 
 	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
@@ -393,7 +393,7 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
 
-	SnapItemToLedge(item, coll);
+	AlignPlayerToEdge(item, coll);
 	LaraResetGravityStatus(item, coll);
 
 	// Bridges behave differently.
@@ -881,7 +881,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 	if (vaultResult.SnapToLedge)
 	{
-		SnapItemToLedge(item, coll, 0.2f, false);
+		AlignPlayerToEdge(item, coll, 0.2f, false);
 		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else

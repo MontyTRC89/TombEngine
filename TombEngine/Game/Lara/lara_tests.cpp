@@ -238,7 +238,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
 				if (item->Animation.Velocity.z != 0.0f)
-					SnapItemToLedge(item, coll);
+					AlignPlayerToEdge(item, coll);
 
 				item->Pose.Position.y += verticalShift;
 			}
@@ -569,7 +569,7 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		float radiusCoeff = isOuter ? -0.2f : 0.2f;
 		poses[i].Translate(poses[i].Orientation.y, -(coll->Setup.Radius * radiusCoeff));
 
-		// Move item at distance of full collision diameter plus half-radius margin to movement direction.
+		// Move entity at distance of full collision diameter + half radius margin to movement direction.
 		radiusCoeff = (i == 0) ? 2.0f : 2.5f;
 		poses[i].Translate(lara->Control.MoveAngle, coll->Setup.Radius * radiusCoeff);
 
@@ -593,7 +593,7 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 
 		// Snap to nearest ledge, if any.
 		item->Pose = poses[i];
-		SnapItemToLedge(item, coll, item->Pose.Orientation.y);
+		AlignPlayerToEdge(item, coll, item->Pose.Orientation.y);
 
 		// Copy resulting position to array and restore original entity position.
 		poses[i] = item->Pose;
@@ -837,7 +837,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-	SnapItemToLedge(item, coll, 1.7f);
+	AlignPlayerToEdge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
