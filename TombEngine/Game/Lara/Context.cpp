@@ -300,7 +300,7 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Get point collision.
-		float probeHeight = -(coll.Setup.Height);// +abs(item.Animation.Velocity.y));
+		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
