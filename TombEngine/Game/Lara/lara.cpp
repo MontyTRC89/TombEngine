@@ -413,20 +413,11 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
-void GenerateBridgeAttractors(ItemInfo& item)
+std::array<Attractor, 4> GetBridgeAttractors(const ItemInfo& item)
 {
-	auto& player = GetLaraInfo(item);
+	// Get box.
+	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-	auto pointColl = GetCollision(&item);
-
-	// No bridge; return early.
-	if (pointColl.Position.Bridge < 0)
-		return;
-
-	// Get bridge item and its box.
-	auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-	auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
-	
 	// Determine relative corner points.
 	auto point0 = Vector3(box.Extents.x, -box.Extents.y, box.Extents.z);
 	auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
@@ -441,16 +432,19 @@ void GenerateBridgeAttractors(ItemInfo& item)
 	point3 = box.Center + Vector3::Transform(point3, rotMatrix);
 
 	// Generate attractors.
-	auto attractor0 = Attractor(AttractorType::Edge, point0, point1, bridgeItem.RoomNumber);
-	auto attractor1 = Attractor(AttractorType::Edge, point1, point2, bridgeItem.RoomNumber);
-	auto attractor2 = Attractor(AttractorType::Edge, point2, point3, bridgeItem.RoomNumber);
-	auto attractor3 = Attractor(AttractorType::Edge, point3, point0, bridgeItem.RoomNumber);
+	auto attractor0 = Attractor(AttractorType::Edge, point0, point1, item.RoomNumber);
+	auto attractor1 = Attractor(AttractorType::Edge, point1, point2, item.RoomNumber);
+	auto attractor2 = Attractor(AttractorType::Edge, point2, point3, item.RoomNumber);
+	auto attractor3 = Attractor(AttractorType::Edge, point3, point0, item.RoomNumber);
 
-	// Store attractors.
-	player.Attractor.BridgeAttractors[0] = attractor0;
-	player.Attractor.BridgeAttractors[1] = attractor1;
-	player.Attractor.BridgeAttractors[2] = attractor2;
-	player.Attractor.BridgeAttractors[3] = attractor3;
+	// Create and return array.
+	return std::array<Attractor, 4>
+	{
+		attractor0,
+		attractor1,
+		attractor2,
+		attractor3
+	};
 }
 
 void DrawBridgeAttractors(const ItemInfo& item)
@@ -461,14 +455,32 @@ void DrawBridgeAttractors(const ItemInfo& item)
 		g_Renderer.AddLine3D(attractor.GetPoint0(), attractor.GetPoint1(), Vector4::One);
 }
 
+void HandleAttractorDebug(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Attractor.DebugAttractor.DrawDebug(item);
+
+	auto pointColl = GetCollision(&item);
+	if (pointColl.Position.Bridge >= 0)
+	{
+		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
+
+		player.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
+		DrawBridgeAttractors(item);
+	}
+
+	// No bridge; return early.
+	if (pointColl.Position.Bridge < 0)
+		return;
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	// Debug
-	lara->Attractor.DebugAttractor.DrawDebug(*item);
-	GenerateBridgeAttractors(*item);
-	DrawBridgeAttractors(*item);
+	HandleAttractorDebug(*item);
 
 	if (lara->Control.Weapon.HasFired)
 	{
