@@ -1289,8 +1289,24 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
+// Debug
+#include "Game/collision/Attractors.h"
+using namespace TEN::Collision;
+// ---
+
+struct PlayerAttractorData
+{
+	std::vector<AttractorData> Data = {};
+
+	Attractor DebugAttractor = {};
+};
+
 struct LaraInfo
 {
+	// Debug
+	PlayerAttractorData Attractor = {};
+	// ---
+
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};

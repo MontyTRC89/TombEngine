@@ -183,6 +183,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\States\EdgeHang.h" />
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\camera.h" />
+    <ClInclude Include="Game\collision\Attractors.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Game\collision\floordata.h" />
@@ -599,6 +600,8 @@ CALL gen.bat</Command>
     </ClCompile>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
+    <ClInclude Include="Game\collision\Attractors.cpp" />
+    <ClCompile Include="Game\collision\Attractor.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />

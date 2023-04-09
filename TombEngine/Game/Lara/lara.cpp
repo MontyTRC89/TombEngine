@@ -417,6 +417,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Attractor.DebugAttractor.DrawDebug(*item);
+
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);
