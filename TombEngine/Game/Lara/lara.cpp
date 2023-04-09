@@ -413,11 +413,62 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
+void GenerateBridgeAttractors(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	auto pointColl = GetCollision(&item);
+
+	// No bridge; return early.
+	if (pointColl.Position.Bridge < 0)
+		return;
+
+	// Get bridge item and its box.
+	auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
+	auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
+	
+	// Determine relative corner points.
+	auto point0 = Vector3(box.Extents.x, -box.Extents.y, box.Extents.z);
+	auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
+	auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
+	auto point3 = Vector3(box.Extents.x, -box.Extents.y, -box.Extents.z);
+
+	// Calculate absolute corner points.
+	auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+	point0 = box.Center + Vector3::Transform(point0, rotMatrix);
+	point1 = box.Center + Vector3::Transform(point1, rotMatrix);
+	point2 = box.Center + Vector3::Transform(point2, rotMatrix);
+	point3 = box.Center + Vector3::Transform(point3, rotMatrix);
+
+	// Generate attractors.
+	auto attractor0 = Attractor(AttractorType::Edge, point0, point1, bridgeItem.RoomNumber);
+	auto attractor1 = Attractor(AttractorType::Edge, point1, point2, bridgeItem.RoomNumber);
+	auto attractor2 = Attractor(AttractorType::Edge, point2, point3, bridgeItem.RoomNumber);
+	auto attractor3 = Attractor(AttractorType::Edge, point3, point0, bridgeItem.RoomNumber);
+
+	// Store attractors.
+	player.Attractor.BridgeAttractors[0] = attractor0;
+	player.Attractor.BridgeAttractors[1] = attractor1;
+	player.Attractor.BridgeAttractors[2] = attractor2;
+	player.Attractor.BridgeAttractors[3] = attractor3;
+}
+
+void DrawBridgeAttractors(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	for (const auto& attractor : player.Attractor.BridgeAttractors)
+		g_Renderer.AddLine3D(attractor.GetPoint0(), attractor.GetPoint1(), Vector4::One);
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// Debug
 	lara->Attractor.DebugAttractor.DrawDebug(*item);
+	GenerateBridgeAttractors(*item);
+	DrawBridgeAttractors(*item);
 
 	if (lara->Control.Weapon.HasFired)
 	{

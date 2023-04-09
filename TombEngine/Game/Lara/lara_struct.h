@@ -1298,7 +1298,8 @@ struct PlayerAttractorData
 {
 	std::vector<AttractorData> Data = {};
 
-	Attractor DebugAttractor = {};
+	Attractor				 DebugAttractor	  = {};
+	std::array<Attractor, 4> BridgeAttractors = {};
 };
 
 struct LaraInfo
