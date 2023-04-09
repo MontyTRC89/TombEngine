@@ -220,7 +220,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Pose.Position = quadBikeItem->Pose.Position;
 		laraItem->Pose.Orientation = EulerAngles(0, quadBikeItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;

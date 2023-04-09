@@ -81,7 +81,7 @@ namespace TEN::Entities::Switches
 					switchItem->Status = ITEM_ACTIVE;
 
 					laraInfo->Control.IsMoving = false;
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					laraInfo->InteractedItem = itemNumber;
 				}

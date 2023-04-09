@@ -203,7 +203,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Pose.Position = motorbikeItem->Pose.Position;
 		laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
 		lara->Control.HandStatus = HandStatus::Free;

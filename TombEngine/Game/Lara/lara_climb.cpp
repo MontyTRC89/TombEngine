@@ -988,6 +988,6 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	SetPlayerEdgeHangRelease(*item);
-	ResetLaraFlex(item);
+	ResetPlayerFlex(item);
 	return true;
 }

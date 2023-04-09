@@ -77,7 +77,7 @@ void LaraCheatyBits(ItemInfo* item)
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
-					ResetLaraFlex(item);
+					ResetPlayerFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
 					lara->Control.Count.Death = 0;
 					lara->Status.Air = LARA_AIR_MAX;

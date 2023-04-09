@@ -491,7 +491,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 		
 			pushable->moveX = pushableItem->Pose.Position.x;
 			pushable->moveZ = pushableItem->Pose.Position.z;

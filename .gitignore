@@ -8,6 +8,7 @@ TombEngine/Legacy Engine Objects
 x64/
 packages/
 .vs/
+.vsconfig
 *.dll
 *.dmp
 *.id0
