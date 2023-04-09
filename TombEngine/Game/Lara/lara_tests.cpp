@@ -110,6 +110,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Align orientation to edge.
 	item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
 
 	short moveAngle = player.Control.MoveAngle;
@@ -615,14 +616,14 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 	return Context::CornerShimmyData{};
 }
 
-bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
+bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short testAngle)
 {
 	constexpr auto SIDEWAY_SHIMMY_TEST_DIST = 16;
 
 	auto& player = GetLaraInfo(*item);
 
 	auto prevPose = item->Pose;
-	player.Control.MoveAngle = item->Pose.Orientation.y + angle;
+	player.Control.MoveAngle = item->Pose.Orientation.y + testAngle;
 	TranslateItem(item, player.Control.MoveAngle, SIDEWAY_SHIMMY_TEST_DIST);
 	coll->Setup.OldPosition.y = item->Pose.Position.y;
 

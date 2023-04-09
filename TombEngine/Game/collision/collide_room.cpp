@@ -909,7 +909,6 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 		return EMPTY_LEDGE_DATA; 
 
 	// Get entity bounds and current heading angle.
-	auto bounds = GameBoundingBox(&item);
 	float sinForwardAngle = phd_sin(coll.Setup.ForwardAngle);
 	float cosForwardAngle = phd_cos(coll.Setup.ForwardAngle);
 
@@ -918,13 +917,16 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 	float x = item.Pose.Position.x + (frontOffset * sinForwardAngle);
 	float z = item.Pose.Position.z + (frontOffset * cosForwardAngle);
 
+	// 1/20th headroom is required to avoid possible issues with tight diagonal headrooms.
+	int headroom = coll.Setup.Height / 20.0f;
+
 	// Determine test points at lower and upper bounds.
-	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
-	int headroom = bounds.GetHeight() / 20.0f;
+	int lowerBound = headroom;
+	int upperBound = coll.Setup.Height - headroom;
 	int vPoints[2] =
 	{
-		item.Pose.Position.y + bounds.Y1 + headroom,
-		item.Pose.Position.y + bounds.Y2 - headroom
+		item.Pose.Position.y + lowerBound,
+		item.Pose.Position.y + upperBound
 	};
 
 	// Prepare test data.
