@@ -2074,7 +2074,7 @@ void HandleOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 
 	Lara.Inventory.IsBusy = false;
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	TrInput &= ~IN_LOOK;
 }

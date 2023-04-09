@@ -614,7 +614,7 @@ namespace TEN::Entities::TR4
 				if (MoveLaraPosition(SasDragBodyPosition, &item, laraItem))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Control.IsMoving = false;

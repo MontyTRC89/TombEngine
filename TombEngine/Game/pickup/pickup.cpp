@@ -776,7 +776,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (flag)
 	{
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
 	}
@@ -1205,7 +1205,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		{
 			if (MoveLaraPosition(SOPos, item, laraItem))
 			{
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;

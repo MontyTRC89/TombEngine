@@ -208,7 +208,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Pose.Position = jeepItem->Pose.Position;
 		laraItem->Pose.Orientation.y = jeepItem->Pose.Orientation.y;
 		lara->Control.HandStatus = HandStatus::Busy;

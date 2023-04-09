@@ -273,7 +273,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEY);
-		ResetLaraFlex(item);
+		ResetPlayerFlex(item);
 		item->Animation.Velocity.z = 0;
 		item->Animation.Velocity.y = 0;
 		item->Animation.IsAirborne = false;
@@ -300,7 +300,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	if (TestHangSwingIn(item, coll))
 	{
 		SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
-		ResetLaraFlex(item);
+		ResetPlayerFlex(item);
 	}
 	else
 		SetAnimation(item, LA_REACH_TO_HANG);
