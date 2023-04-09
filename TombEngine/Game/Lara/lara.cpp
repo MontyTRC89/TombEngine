@@ -413,40 +413,6 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
-std::array<Attractor, 4> GetBridgeAttractors(const ItemInfo& item)
-{
-	// Get box.
-	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-
-	// Determine relative corner points.
-	auto point0 = Vector3(box.Extents.x, -box.Extents.y, box.Extents.z);
-	auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
-	auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
-	auto point3 = Vector3(box.Extents.x, -box.Extents.y, -box.Extents.z);
-
-	// Calculate absolute corner points.
-	auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
-	point0 = box.Center + Vector3::Transform(point0, rotMatrix);
-	point1 = box.Center + Vector3::Transform(point1, rotMatrix);
-	point2 = box.Center + Vector3::Transform(point2, rotMatrix);
-	point3 = box.Center + Vector3::Transform(point3, rotMatrix);
-
-	// Generate attractors.
-	auto attractor0 = Attractor(AttractorType::Edge, point0, point1, item.RoomNumber);
-	auto attractor1 = Attractor(AttractorType::Edge, point1, point2, item.RoomNumber);
-	auto attractor2 = Attractor(AttractorType::Edge, point2, point3, item.RoomNumber);
-	auto attractor3 = Attractor(AttractorType::Edge, point3, point0, item.RoomNumber);
-
-	// Create and return array.
-	return std::array<Attractor, 4>
-	{
-		attractor0,
-		attractor1,
-		attractor2,
-		attractor3
-	};
-}
-
 void DrawBridgeAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);

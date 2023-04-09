@@ -172,7 +172,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// Snap to edge.
 	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
-	(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapEntityToGrid(&item, &coll) : AlignEntityToEdge(&item, &coll);
+	if (catchData.Type != Context::EdgeType::Attractor)
+		(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapEntityToGrid(&item, &coll) : AlignEntityToEdge(&item, &coll);
 
 	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 
@@ -181,7 +182,15 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	item.Animation.Velocity = Vector3::Zero;
 	item.Pose.Position.y = catchData.Height + playerHeight;
 	player.Control.HandStatus = HandStatus::Busy;
-	player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
+
+	if (catchData.Type != Context::EdgeType::Attractor)
+	{
+		player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
+	}
+	else
+	{
+		player.TargetOrientation = item.Pose.Orientation;
+	}
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)

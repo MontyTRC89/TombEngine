@@ -18,6 +18,8 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision
 {
+	std::vector<Attractor> GeneratedAttractors = {};
+
 	Attractor::Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber)
 	{
 		Type = type;
@@ -73,11 +75,25 @@ namespace TEN::Collision
 	{
 		auto& player = GetLaraInfo(item);
 
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+
 		// Set points.
 		if (KeyMap[OIS::KeyCode::KC_Q])
-			player.Attractor.DebugAttractor.SetPoint0(LaraItem->Pose.Position.ToVector3());
+		{
+			auto pos = LaraItem->Pose.Position.ToVector3() +
+				Vector3(0.0f, -LaraCollision.Setup.Height, 0.0f) +
+				Vector3::Transform(Vector3(0.0f, box.Extents.z, 0.0f), rotMatrix);
+			player.Attractor.DebugAttractor.SetPoint0(pos);
+		}
+
 		if (KeyMap[OIS::KeyCode::KC_W])
-			player.Attractor.DebugAttractor.SetPoint1(LaraItem->Pose.Position.ToVector3());
+		{
+			auto pos = LaraItem->Pose.Position.ToVector3() +
+				Vector3(0.0f, -LaraCollision.Setup.Height, 0.0f) +
+				Vector3::Transform(Vector3(0.0f, box.Extents.z, 0.0f), rotMatrix);
+			player.Attractor.DebugAttractor.SetPoint1(pos);
+		}
 
 		// Show attractor as white line.
 		g_Renderer.AddLine3D(player.Attractor.DebugAttractor.GetPoint0(), player.Attractor.DebugAttractor.GetPoint1(), Vector4::One);
@@ -100,13 +116,45 @@ namespace TEN::Collision
 		}
 	}
 
-	std::vector<Attractor> ConstructedAttractors = {};
+	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
+	{
+		// Get bridge box.
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+
+		// Determine relative corner points.
+		auto point0 = Vector3(box.Extents.x, -box.Extents.y, box.Extents.z);
+		auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
+		auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
+		auto point3 = Vector3(box.Extents.x, -box.Extents.y, -box.Extents.z);
+
+		// Calculate absolute corner points.
+		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+		point0 = box.Center + Vector3::Transform(point0, rotMatrix);
+		point1 = box.Center + Vector3::Transform(point1, rotMatrix);
+		point2 = box.Center + Vector3::Transform(point2, rotMatrix);
+		point3 = box.Center + Vector3::Transform(point3, rotMatrix);
+
+		// Generate attractors.
+		auto attractor0 = Attractor(AttractorType::Edge, point0, point1, item.RoomNumber);
+		auto attractor1 = Attractor(AttractorType::Edge, point1, point2, item.RoomNumber);
+		auto attractor2 = Attractor(AttractorType::Edge, point2, point3, item.RoomNumber);
+		auto attractor3 = Attractor(AttractorType::Edge, point3, point0, item.RoomNumber);
+
+		// Create and return vector of attractors.
+		return std::vector<Attractor>
+		{
+			attractor0,
+			attractor1,
+			attractor2,
+			attractor3
+		};
+	}
 
 	void GetNearbyAttractorData(std::vector<AttractorData>& attractors, const Vector3& pos, const EulerAngles& orient, float range)
 	{
 		attractors.clear();
 
-		for (const auto& attractor : ConstructedAttractors)
+		for (const auto& attractor : GeneratedAttractors)
 		{
 			// Get attractor point data.
 			auto point0 = attractor.GetPoint0();

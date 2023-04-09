@@ -222,6 +222,46 @@ namespace TEN::Entities::Player::Context
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
+		const auto& player = GetLaraInfo(item);
+
+		// Get box and rotation matrix for front offset.
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+
+		// Calculate catch point.
+		auto frontOffset = Vector3::Transform(Vector3(0.0f, 0.0f, box.Extents.z), rotMatrix);
+		auto playerHeightOffset = Vector3(0.0f, -coll.Setup.Height, 0.0f);
+		auto catchPoint = item.Pose.Position.ToVector3() + playerHeightOffset + frontOffset;
+
+		// Calculate attractor point.
+		auto point0 = player.Attractor.DebugAttractor.GetPoint0();
+		auto point1 = player.Attractor.DebugAttractor.GetPoint1();
+		auto attracPoint = Geometry::GetClosestPointOnLine(catchPoint, point0, point1);
+
+		// Test if attractor is within range.
+		if (Vector3::Distance(catchPoint, attracPoint) <= BLOCK(0.25f))
+		{
+			// Test if attractor is too low to the ground.
+			int floorToAttracHeight = abs(pointCollFront.Position.Floor - attracPoint.y);
+			if (floorToAttracHeight > LARA_HEIGHT_STRETCH)
+			{
+				bool isMovingUp2 = (item.Animation.Velocity.y <= 0.0f);
+				int lowerBound2 = isMovingUp2 ? 0 : item.Animation.Velocity.y;
+				int upperBound2 = isMovingUp2 ? item.Animation.Velocity.y : 0;
+
+				int vPos2 = item.Pose.Position.y - coll.Setup.Height;
+				int attracHeight = attracPoint.y;
+				int relAttracHeight = attracHeight - vPos2;
+
+				// 2) Assess point collision to attractor.
+				if (relAttracHeight <= lowerBound2 && // Edge height is above lower height bound.
+					relAttracHeight >= upperBound2)   // Edge height is below upper height bound.
+				{
+					return EdgeCatchData{ EdgeType::Attractor, attracHeight };
+				}
+			}
+		}
+
 		// 1) Test if ledge is too low to the ground.
 		int floorToEdgeHeight = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
 		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
@@ -296,8 +336,8 @@ namespace TEN::Entities::Player::Context
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
 		// 1) Test for valid ledge.
-		if (!TestValidLedge(&item, &coll, true))
-			return std::nullopt;
+		/*if (!TestValidLedge(&item, &coll, true))
+			return std::nullopt;*/
 
 		// Get point collision.
 		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));

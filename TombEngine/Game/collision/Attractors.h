@@ -59,4 +59,6 @@ namespace TEN::Collision
 		bool  IsIntersected = false;
 		bool  IsInFront		= false;
 	};
+
+	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item);
 }
