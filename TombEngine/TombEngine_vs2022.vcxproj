@@ -172,12 +172,12 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\effects\debris.h" />
-    <ClInclude Include="Game\effects\drip.h" />
+    <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\effects.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\footprint.h" />
-    <ClInclude Include="Game\effects\hair.h" />
+    <ClInclude Include="Game\effects\Hair.h" />
     <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\Ripple.h" />
     <ClInclude Include="Game\effects\simple_particle.h" />
