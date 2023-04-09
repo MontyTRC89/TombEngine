@@ -71,7 +71,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
-		ResetLaraLean(item, 6.0f);
+		ResetPlayerLean(item, 1 / 6.0f);
 	}
 
 	// Reset crawl flex.
@@ -970,31 +970,13 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 	}
 }
 
-void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
+void ResetPlayerLean(ItemInfo* item, float alpha, bool resetRoll, bool resetPitch)
 {
-	if (!rate)
-	{
-		TENLog(std::string("ResetLaraLean() attempted division by zero!"), LogLevel::Warning);
-		return;
-	}
-
-	rate = abs(rate);
+	if (resetRoll)
+		item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0), alpha);
 
 	if (resetPitch)
-	{
-		if (abs(item->Pose.Orientation.x) > ANGLE(0.1f))
-			item->Pose.Orientation.x += item->Pose.Orientation.x / -rate;
-		else
-			item->Pose.Orientation.x = 0;
-	}
-
-	if (resetRoll)
-	{
-		if (abs(item->Pose.Orientation.z) > ANGLE(0.1f))
-			item->Pose.Orientation.z += item->Pose.Orientation.z / -rate;
-		else
-			item->Pose.Orientation.z = 0;
-	}
+		item->Pose.Orientation.Lerp(EulerAngles(0, item->Pose.Orientation.y, item->Pose.Orientation.z), alpha);
 }
 
 void ResetPlayerFlex(ItemInfo* item, float alpha)

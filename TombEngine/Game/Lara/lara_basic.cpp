@@ -349,7 +349,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		ResetLaraLean(item);
+		ResetPlayerLean(item);
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
@@ -2227,7 +2227,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		ResetLaraLean(item);
+		ResetPlayerLean(item);
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
 		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
@@ -2355,7 +2355,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		ResetLaraLean(item);
+		ResetPlayerLean(item);
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
