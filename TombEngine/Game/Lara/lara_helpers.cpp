@@ -78,7 +78,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
 		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
-		ResetLaraFlex(item, 12.0f);
+		ResetPlayerFlex(item, 0.1f);
 	}
 
 	// Apply and reset turn rate.
@@ -997,59 +997,25 @@ void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
 	}
 }
 
-void ResetLaraFlex(ItemInfo* item, float rate)
+void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (!rate)
-	{
-		TENLog(std::string("ResetLaraFlex() attempted division by zero."), LogLevel::Warning);
-		return;
-	}
-
-	rate = abs(rate);
-
-	// Reset head.
-	if (abs(lara->ExtraHeadRot.x) > ANGLE(0.1f))
-		lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -rate;
-	else
-		lara->ExtraHeadRot.x = 0;
-
-	if (abs(lara->ExtraHeadRot.y) > ANGLE(0.1f))
-		lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -rate;
-	else
-		lara->ExtraHeadRot.y = 0;
-
-	if (abs(lara->ExtraHeadRot.z) > ANGLE(0.1f))
-		lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -rate;
-	else
-		lara->ExtraHeadRot.z = 0;
-
-	// Reset torso.
-	if (abs(lara->ExtraTorsoRot.x) > ANGLE(0.1f))
-		lara->ExtraTorsoRot.x += lara->ExtraTorsoRot.x / -rate;
-	else
-		lara->ExtraTorsoRot.x = 0;
-
-	if (abs(lara->ExtraTorsoRot.y) > ANGLE(0.1f))
-		lara->ExtraTorsoRot.y += lara->ExtraTorsoRot.y / -rate;
-	else
-		lara->ExtraTorsoRot.y = 0;
-
-	if (abs(lara->ExtraTorsoRot.z) > ANGLE(0.1f))
-		lara->ExtraTorsoRot.z += lara->ExtraTorsoRot.z / -rate;
-	else
-		lara->ExtraTorsoRot.z = 0;
+	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
 }
 
 void RumbleLaraHealthCondition(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto POWER = 0.2f;
+	constexpr auto DELAY = 0.1f;
 
-	if (item->HitPoints > LARA_HEALTH_CRITICAL && lara->Status.Poison == 0)
+	const auto& player = GetLaraInfo(*item);
+
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0)
 		return;
 
-	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;
+	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
-		Rumble(0.2f, 0.1f);
+		Rumble(POWER, DELAY);
 }

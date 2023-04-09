@@ -434,7 +434,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
 				lara->Control.TurnRate = 0;
-				ResetLaraFlex(item);
+				ResetPlayerFlex(item);
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])

@@ -138,7 +138,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				ResetLaraFlex(laraitem);
+				ResetPlayerFlex(laraitem);
 				laraitem->Animation.TargetState = LS_SWITCH_DOWN;
 				laraitem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraInfo->Control.IsMoving = false;

@@ -51,7 +51,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				sarcItem->Status = ITEM_ACTIVE;
 
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else

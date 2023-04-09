@@ -756,7 +756,7 @@ namespace TEN::Entities::Vehicles
 
 				UpdateLaraRoom(laraItem, -LARA_HEIGHT / 2);
 
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 				lara->WaterSurfaceDist = -heightFromWater;

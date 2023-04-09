@@ -86,7 +86,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Animation.Velocity.y = 0;
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
@@ -132,7 +132,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			if (MoveLaraPosition(FloorTrapDoorPos, trapDoorItem, laraItem))
 			{
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_TRAPDOOR_FLOOR_OPEN;

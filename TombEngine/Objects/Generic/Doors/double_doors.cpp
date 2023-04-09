@@ -61,7 +61,7 @@ namespace TEN::Entities::Doors
 
 					AddActiveItem(itemNumber);
 
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					doorItem->Status = ITEM_ACTIVE;

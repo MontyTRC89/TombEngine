@@ -69,7 +69,7 @@ namespace TEN::Entities::Switches
 				AddActiveItem(itemNumber);
 				AnimateItem(switchItem);
 
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}

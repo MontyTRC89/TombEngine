@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 
 				if (flag)
 				{
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;
@@ -106,7 +106,7 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(RailSwitchPos, switchItem, laraItem))
 				{
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;

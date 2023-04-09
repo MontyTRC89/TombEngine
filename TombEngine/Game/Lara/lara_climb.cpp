@@ -986,7 +986,7 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
 		return false;
 
-	ResetLaraFlex(item);
+	ResetPlayerFlex(item);
 
 	SetAnimation(item, LA_FALL_START);
 
