@@ -198,7 +198,7 @@ static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const
 
 bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 {
-	auto& player = GetLaraInfo(item);
+	const auto& player = GetLaraInfo(item);
 
 	// Check player status.
 	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)

@@ -127,12 +127,12 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload used to quickly get point/room collision parameters at a given item's position.
 CollisionResult GetCollision(const ItemInfo* item)
 {
-	auto newRoomNumber = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
-	auto probe = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	short newRoomNumber = item->RoomNumber;
+	auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
+	auto pointColl = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-	probe.RoomNumber = newRoomNumber;
-	return probe;
+	pointColl.RoomNumber = newRoomNumber;
+	return pointColl;
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
@@ -159,23 +159,20 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingA
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
-
-	Random::TestProbability(1 / 2.0f);
 }
 
-// Overload used as a universal wrapper across collisional code to replace
-// triads of roomNumber-GetFloor()-GetFloorHeight() operations.
-// The advantage is that it does NOT modify the incoming roomNumber argument,
+// Overload used as universal wrapper across collisional code to replace triads of roomNumber-GetFloor()-GetFloorHeight() calls.
+// Advantage is that it doesn't modify incoming roomNumber argument,
 // instead storing one modified by GetFloor() within the returned CollisionResult struct.
 // This way, no external variables are modified as output arguments.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
-	auto room = roomNumber;
-	auto floor = GetFloor(x, y, z, &room);
-	auto result = GetCollision(floor, x, y, z);
+	short room = roomNumber;
+	auto* floor = GetFloor(x, y, z, &room);
+	auto pointColl = GetCollision(floor, x, y, z);
 
-	result.RoomNumber = room;
-	return result;
+	pointColl.RoomNumber = room;
+	return pointColl;
 }
 
 CollisionResult GetCollision(const GameVector& pos)
