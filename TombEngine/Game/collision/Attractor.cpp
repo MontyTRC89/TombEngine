@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "Game/collision/Attractors.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
-#include "Specific/Input/Input.h"
 
 using namespace TEN::Math;
 
@@ -12,6 +12,7 @@ using namespace TEN::Math;
 #include <ois/OISKeyboard.h>
 #include "Renderer/Renderer11.h"
 #include "lara_helpers.h"
+#include "Specific/Input/Input.h"
 using namespace TEN::Input;
 using TEN::Renderer::g_Renderer;
 // ---
@@ -136,9 +137,9 @@ namespace TEN::Collision
 		return attracs;
 	}
 
-	std::vector<Vector3> GetTopBridgeCornerPoints(const ItemInfo& item)
+	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
 	{
-		// Get bridge box.
+		// Get bridge bounding box.
 		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		// Determine relative corner points.
@@ -149,29 +150,27 @@ namespace TEN::Collision
 
 		// Calculate absolute corner points.
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
-		point0 = box.Center + Vector3::Transform(point0, rotMatrix);
-		point1 = box.Center + Vector3::Transform(point1, rotMatrix);
-		point2 = box.Center + Vector3::Transform(point2, rotMatrix);
-		point3 = box.Center + Vector3::Transform(point3, rotMatrix);
-
-		// Return points.
-		return std::vector<Vector3>
+		auto points = std::vector<Vector3>
 		{
-			point0,
-			point1,
-			point2,
-			point3
+			box.Center + Vector3::Transform(point0, rotMatrix),
+			box.Center + Vector3::Transform(point1, rotMatrix),
+			box.Center + Vector3::Transform(point2, rotMatrix),
+			box.Center + Vector3::Transform(point3, rotMatrix)
 		};
+
+		// Return attractors generated from points.
+		return GetAttractorsFromPoints(points, item.RoomNumber);
 	}
 
-	/*std::vector<Attractor> GetSectorAttractors(const ItemInfo& item, const Plane& plane)
+	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
 	{
+		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		return GetAttractorsFromPoints(points, pointColl.RoomNumber);
+	}
 
-	}*/
-
-	void GetNearbyAttractorData(std::vector<AttractorData>& attractors, const Vector3& pos, const EulerAngles& orient, float range)
+	void GetNearbyAttractorData(std::vector<AttractorData>& attracs, const Vector3& pos, const EulerAngles& orient, float range)
 	{
-		attractors.clear();
+		attracs.clear();
 
 		for (const auto& attractor : GeneratedAttractors)
 		{
@@ -194,9 +193,9 @@ namespace TEN::Collision
 			data.Distance = distance;
 			data.SlopeAngle = Geometry::GetOrientToPoint(point0, point1).x;
 			data.IsInFront = Geometry::IsPointInFront(pos, closestPoint, orient);
-			data.IsIntersected = false; // How?
+			data.IsIntersected = false; // How? Check range distance?
 
-			attractors.push_back(data);
+			attracs.push_back(data);
 		}
 	}
 }

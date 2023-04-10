@@ -413,12 +413,19 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
-void DrawBridgeAttractors(const ItemInfo& item)
+void DrawRoomAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	for (const auto& attractor : player.Attractor.BridgeAttractors)
-		g_Renderer.AddLine3D(attractor.GetPoint0(), attractor.GetPoint1(), Vector4::One);
+	for (const auto& attrac : player.Attractor.BridgeAttractors)
+		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
+
+	for (const auto& attrac : player.Attractor.SectorAttractors)
+	{
+		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
+		g_Renderer.AddLine3D(attrac.GetPoint0(), item.Pose.Position.ToVector3(), Vector4(0, 1, 1, 1));
+		g_Renderer.PrintDebugMessage("%.3f, %.3f, %.3f", attrac.GetPoint0().x, attrac.GetPoint0().y, attrac.GetPoint0().z);
+	}
 }
 
 void HandleAttractorDebug(ItemInfo& item)
@@ -430,14 +437,16 @@ void HandleAttractorDebug(ItemInfo& item)
 	// Point collision.
 	auto pointColl = GetCollision(&item);
 
-	// Bridge attractors.
+	// Sector and bridge attractors.
 	if (pointColl.Position.Bridge >= 0)
 	{
 		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
 
-		player.Attractor.BridgeAttractors = GetAttractorsFromPoints(GetTopBridgeCornerPoints(bridgeItem), item.RoomNumber);
-		DrawBridgeAttractors(item);
+		player.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
 	}
+	player.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
+	DrawRoomAttractors(item);
+	
 
 	// Floor plane.
 	auto plane = pointColl.BottomBlock->GetSurfacePlane(item.Pose.Position.x, item.Pose.Position.z, true);

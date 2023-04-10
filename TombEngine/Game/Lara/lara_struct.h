@@ -1300,6 +1300,7 @@ struct PlayerAttractorData
 
 	Attractor			   DebugAttractor	= {};
 	std::vector<Attractor> BridgeAttractors = {};
+	std::vector<Attractor> SectorAttractors = {};
 };
 
 struct LaraInfo

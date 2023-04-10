@@ -1,5 +1,7 @@
 #pragma once
 
+class EulerAngles;
+struct CollisionResult;
 struct ItemInfo;
 
 namespace TEN::Collision
@@ -54,6 +56,7 @@ namespace TEN::Collision
 
 		Vector3 ClosestPoint = Vector3::Zero;
 
+		//float Range			= 0.0f;
 		float Distance		= 0.0f;
 		short SlopeAngle	= 0;
 		bool  IsIntersected = false;
@@ -61,5 +64,9 @@ namespace TEN::Collision
 	};
 
 	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber);
-	std::vector<Vector3> GetTopBridgeCornerPoints(const ItemInfo& item);
+	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
+	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item);
+
+	void GetNearbyAttractorData(std::vector<AttractorData>& attracs, const Vector3& pos, const EulerAngles& orient, float range);
+
 }

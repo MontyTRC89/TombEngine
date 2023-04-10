@@ -40,7 +40,7 @@ static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 	return Plane(normal, distance);
 }
 
-// TODO: Check.
+// TODO: Doesn't work.
 std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int y, bool isFloor)
 {
 	auto plane = GetSurfacePlane(x, y, isFloor);
