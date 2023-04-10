@@ -46,23 +46,11 @@ static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 	return Plane(normal, distance);
 }
 
-Vector3 GetSectorCenter(const Vector3i& pos)
-{
-	constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
-	constexpr auto BIT_MASK_9		= 0x200;	  // 9
-
-	// Return collision block center.
-	// TODO: No bitwise operations.
-	return Vector3(
-		pos.x & BIT_MASK_LOWER_8 | BIT_MASK_9,
-		pos.y,
-		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
-}
-
 // Doesn't work.
 std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
-	auto sectorCenter = GetSectorCenter(Vector3(x, 0, z));
+	auto sectorCenter2D = GetSectorCenter(x, z);
+	auto sectorCenter = Vector3(sectorCenter2D.x, 0, sectorCenter2D.y);
 	auto plane = GetSurfacePlane(x, z, isFloor);
 	float halfBlock = BLOCK(0.5f);
 
@@ -411,6 +399,16 @@ namespace TEN::Floordata
 		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4) * sign;
 		normal.Normalize();
 		return normal;
+	}
+
+	Vector2i GetSectorCenter(int x, int z)
+	{
+		constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
+		constexpr auto BIT_MASK_9		= 0x200;	  // 9
+
+		return Vector2i(
+			(x / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f),
+			(z / BLOCK(1)) * BLOCK(1)+ BLOCK(0.5f));
 	}
 
 	Vector2i GetSectorPoint(int x, int z)

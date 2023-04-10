@@ -166,6 +166,7 @@ namespace TEN::Floordata
 	// TODO: Use normals natively.
 	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);
 
+	Vector2i GetSectorCenter(int x, int z);
 	Vector2i GetSectorPoint(int x, int z);
 	Vector2i GetRoomPosition(int roomNumber, int x, int z);
 	
