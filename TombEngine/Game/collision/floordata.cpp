@@ -10,7 +10,7 @@
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 
-const Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
+static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 {
 	// Get plane distance.
 	auto direction2D = Vector2(planeVector.x, planeVector.y);
@@ -38,6 +38,35 @@ const Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 
 	// Return plane.
 	return Plane(normal, distance);
+}
+
+// TODO: Check.
+std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int y, bool isFloor)
+{
+	auto plane = GetSurfacePlane(x, y, isFloor);
+
+	// Compute four corner points of the square
+	float halfSize = BLOCK(0.5f);
+	auto bottomLeft = Vector3(-halfSize, 0.0f, halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
+	auto bottomRight = Vector3(halfSize, 0.0f, halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
+	auto topLeft = Vector3(-halfSize, 0.0f, -halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
+	auto topRight = Vector3(halfSize, 0.0f, -halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
+
+	// Compute the height of each corner point using the plane equation
+	float bottomLeftHeight = -(plane.Normal().x * bottomLeft.x + plane.Normal().z * bottomLeft.z + plane.D()) / plane.Normal().y;
+	float bottomRightHeight = -(plane.Normal().x * bottomRight.x + plane.Normal().z * bottomRight.z + plane.D()) / plane.Normal().y;
+	float topLeftHeight = -(plane.Normal().x * topLeft.x + plane.Normal().z * topLeft.z + plane.D()) / plane.Normal().y;
+	float topRightHeight = -(plane.Normal().x * topRight.x + plane.Normal().z * topRight.z + plane.D()) / plane.Normal().y;
+
+	auto vertices = std::vector<Vector3>{};
+
+	// Add the corner points with their respective heights to the output vector
+	vertices.push_back(Vector3(bottomLeft.x, bottomLeftHeight, bottomLeft.z));
+	vertices.push_back(Vector3(bottomRight.x, bottomRightHeight, bottomRight.z));
+	vertices.push_back(Vector3(topLeft.x, topLeftHeight, topLeft.z));
+	vertices.push_back(Vector3(topRight.x, topRightHeight, topRight.z));
+
+	return vertices;
 }
 
 Plane FloorInfo::GetSurfacePlane(int x, int z, bool isFloor) const

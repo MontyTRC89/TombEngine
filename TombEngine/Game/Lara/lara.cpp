@@ -435,7 +435,7 @@ void HandleAttractorDebug(ItemInfo& item)
 	{
 		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
 
-		player.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
+		player.Attractor.BridgeAttractors = GetAttractorsFromPoints(GetTopBridgeCornerPoints(bridgeItem), item.RoomNumber);
 		DrawBridgeAttractors(item);
 	}
 

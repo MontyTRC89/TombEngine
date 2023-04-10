@@ -116,7 +116,27 @@ namespace TEN::Collision
 		}
 	}
 
-	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
+	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber)
+	{
+		// Prepare container.
+		auto attracs = std::vector<Attractor>{};
+		attracs.resize(points.size());
+
+		// Generate attractors between points.
+		for (int i = 0; i < points.size(); i++)
+		{
+			auto point0 = points[i];
+			auto point1 = points[(i < (points.size() - 1)) ? (i + 1) : 0];
+			auto attrac = Attractor(AttractorType::Edge, point0, point1, roomNumber);
+
+			attracs.push_back(attrac);
+		}
+
+		// Return attractors.
+		return attracs;
+	}
+
+	std::vector<Vector3> GetTopBridgeCornerPoints(const ItemInfo& item)
 	{
 		// Get bridge box.
 		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -134,19 +154,13 @@ namespace TEN::Collision
 		point2 = box.Center + Vector3::Transform(point2, rotMatrix);
 		point3 = box.Center + Vector3::Transform(point3, rotMatrix);
 
-		// Generate attractors.
-		auto attractor0 = Attractor(AttractorType::Edge, point0, point1, item.RoomNumber);
-		auto attractor1 = Attractor(AttractorType::Edge, point1, point2, item.RoomNumber);
-		auto attractor2 = Attractor(AttractorType::Edge, point2, point3, item.RoomNumber);
-		auto attractor3 = Attractor(AttractorType::Edge, point3, point0, item.RoomNumber);
-
-		// Create and return vector of attractors.
-		return std::vector<Attractor>
+		// Return points.
+		return std::vector<Vector3>
 		{
-			attractor0,
-			attractor1,
-			attractor2,
-			attractor3
+			point0,
+			point1,
+			point2,
+			point3
 		};
 	}
 

@@ -60,5 +60,6 @@ namespace TEN::Collision
 		bool  IsInFront		= false;
 	};
 
-	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item);
+	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber);
+	std::vector<Vector3> GetTopBridgeCornerPoints(const ItemInfo& item);
 }
