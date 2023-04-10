@@ -15,6 +15,10 @@ using namespace TEN::Math;
 // Surface:		Floor or ceiling.
 // Wall:		Inferred from a floor or ceiling with max height. Note that true "walls" do not exist.
 
+// Planes are non-standard. Instead of 4 components storing a normal and a distance, floordata uses a Vector3:
+// x and y store the 2D direction vector in the xz plane (not normalized).
+// z stores the distance.
+
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
 enum class MaterialType
