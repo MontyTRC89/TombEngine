@@ -243,6 +243,12 @@ namespace TEN::Entities::Effects
 				TriggerShockwave(&fx.pos, 48, 240, 48, 128, 112, 0, 16, EulerAngles::Zero, 15, true, false, (int)ShockwaveStyle::Normal);
 				break;
 			case MissileType::ClawMutantPlasma:
+				for (int i = 0; i < 6; i++)
+				{
+					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+				}
 				break;
 			default:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 0, 128, 64, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
@@ -283,6 +289,12 @@ namespace TEN::Entities::Effects
 				break;
 			case MissileType::ClawMutantPlasma:
 				DoDamage(LaraItem, fx.flag2);
+				for (int i = 0; i < 3; i++)
+				{
+					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+				}
 				break;
 			case MissileType::Harpy:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 128, 128, 0, 16, EulerAngles::Zero, 3, true, false, (int)ShockwaveStyle::Normal);
@@ -328,7 +340,7 @@ namespace TEN::Entities::Effects
 					break;
 				case MissileType::ClawMutantPlasma:
 					for (int i = 0; i < 3; i++)
-						TriggerPlasmaBallFlame(fxNumber, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
+						TriggerPlasmaBallFlame(fxNumber,  deltaPos.x, 16 * deltaPos.y,  deltaPos.z, Vector3::Zero, 10);
 					break;
 				case MissileType::CrocgodMutant:
 					TriggerCrocgodMissileFlame(fxNumber, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);

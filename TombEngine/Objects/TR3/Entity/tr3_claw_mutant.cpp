@@ -123,7 +123,7 @@ namespace TEN::Entities::Creatures::TR3
         sptr->dSize = size >> 2;
     }
 
-    void TriggerPlasmaBallFlame(short fxNumber, int xv, int yv, int zv)
+    void TriggerPlasmaBallFlame(short fxNumber, int xv, int yv, int zv, Vector3 offset, int life)
     {
         auto* sptr = GetFreeParticle();
 
@@ -138,20 +138,20 @@ namespace TEN::Entities::Creatures::TR3
 
         sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
         sptr->fadeToBlack = 8;
-        sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
+        sptr->sLife = sptr->life = (GetRandomControl() & 7) + life;
 
         sptr->blendMode = BLENDMODE_ADDITIVE;
 
         sptr->extras = 0;
         sptr->dynamic = -1;
 
-        sptr->x = ((GetRandomControl() & 15) - 8);
+        sptr->x = offset.x + ((GetRandomControl() & 15) - 8);
         sptr->y = 0;
-        sptr->z = ((GetRandomControl() & 15) - 8);
+        sptr->z = offset.z + ((GetRandomControl() & 15) - 8);
 
-        sptr->xVel = xv + (GetRandomControl() & 255) - 128;
+        sptr->xVel = xv;
         sptr->yVel = yv;
-        sptr->zVel = zv + (GetRandomControl() & 255) - 128;
+        sptr->zVel = zv;
         sptr->friction = 5;
 
         if (GetRandomControl() & 1)
@@ -182,6 +182,7 @@ namespace TEN::Entities::Creatures::TR3
         sptr->zVel <<= 1;
         sptr->scalar = 2;
         sptr->friction = 85;
+        sptr->gravity = 22;
     }
 
     static void TriggerMutantPlasmaBall(ItemInfo* item, CreatureInfo* creature, short yangle, short xangle)
@@ -189,7 +190,7 @@ namespace TEN::Entities::Creatures::TR3
         short fx_number = CreateNewEffect(item->RoomNumber);
         if (fx_number != NO_ITEM)
         {
-            auto jointPos = GetJointPosition(item, 13, Vector3i(-32, -16, -192));
+            auto jointPos = GetJointPosition(item, 13, Vector3i(-32, -16, -119));
             auto enemyPos = creature->Enemy->Pose.Position;
             if (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Control.IsLow)
                 enemyPos.y += CLICK(1);
