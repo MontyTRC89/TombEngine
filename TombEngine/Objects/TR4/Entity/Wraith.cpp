@@ -26,8 +26,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto WRAITH_COUNT = 8;
-	constexpr auto WRAITH_VELOCITY = 64.0f;
+	constexpr auto WRAITH_COUNT				= 8;
+	constexpr auto WRAITH_VELOCITY			= 64.0f;
 	constexpr auto WRAITH_TRAP_DISTANCE_MAX = SQUARE(BLOCK(2));
 
 	static WraithInfo& GetWraithInfo(ItemInfo& item)
@@ -37,12 +37,12 @@ namespace TEN::Entities::TR4
 
 	static void SpawnWraithTails(const ItemInfo& item)
 	{
-		constexpr auto OFFSET = Vector3(0.0f, -10.0f, -50.0f);
-		constexpr auto WIDTH = 8.0f;
-		constexpr auto LIFE_MAX = 0.5f;
-		constexpr auto VEL = 4.0f;
+		constexpr auto OFFSET	  = Vector3(0.0f, -10.0f, -50.0f);
+		constexpr auto WIDTH	  = 8.0f;
+		constexpr auto LIFE_MAX	  = 0.5f;
+		constexpr auto VEL		  = 4.0f;
 		constexpr auto SCALE_RATE = 1.0f;
-		constexpr auto FLAGS = (int)StreamerFlags::FadeRight;
+		constexpr auto FLAGS	  = (int)StreamerFlags::FadeRight;
 
 		enum class TailTag
 		{
@@ -319,9 +319,7 @@ namespace TEN::Entities::TR4
 		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
 
 		if (pointColl.RoomNumber != item.RoomNumber)
-		{
 			ItemNewRoom(itemNumber, pointColl.RoomNumber);
-		}
 
 		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_ITEM; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
 		{
