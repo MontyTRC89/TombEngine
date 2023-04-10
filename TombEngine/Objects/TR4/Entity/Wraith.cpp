@@ -363,18 +363,36 @@ namespace TEN::Entities::TR4
 						distance = SQUARE(x) + SQUARE(z);
 					}
 
-					break;
+					continue;
+				}
+				else if ((item.ObjectNumber == ID_WRAITH1 && targetItem.ObjectNumber == ID_WRAITH2) ||
+					(item.ObjectNumber == ID_WRAITH2 && targetItem.ObjectNumber == ID_WRAITH1))
+				{
+					item.ItemFlags[6] = linkItemNumber;
+					x = target->Pose.Position.x - item.Pose.Position.x;
+					y = target->Pose.Position.y;
+					z = target->Pose.Position.z - item.Pose.Position.z;
+					distance = SQUARE(x) + SQUARE(z);
 				}
 				else
 				{
-
-						item.ItemFlags[6] = linkItemNumber;
-						x = targetItem.Pose.Position.x - item.Pose.Position.x;
-						y = targetItem.Pose.Position.y;
-						z = targetItem.Pose.Position.z - item.Pose.Position.z;
-						distance = SQUARE(x) + SQUARE(z);					
+					item.ItemFlags[6] = 0;
+					x = target->Pose.Position.x - item.Pose.Position.x;
+					y = target->Pose.Position.y;
+					z = target->Pose.Position.z - item.Pose.Position.z;
+					distance = SQUARE(x) + SQUARE(z);
 				}
 			}
+		}
+		
+		if ((target->ObjectNumber == ID_WRAITH1 && !target->Active) ||
+			(target->ObjectNumber == ID_WRAITH2 && !target->Active))
+		{
+			item.ItemFlags[6] = 0;
+			x = target->Pose.Position.x - item.Pose.Position.x;
+			y = target->Pose.Position.y;
+			z = target->Pose.Position.z - item.Pose.Position.z;
+			distance = SQUARE(x) + SQUARE(z);
 		}
 
 		if (item.ObjectNumber != ID_WRAITH3)
@@ -510,8 +528,11 @@ namespace TEN::Entities::TR4
 
 					TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 2, -2, 1, item.RoomNumber);
 
-					item.ItemFlags[6] = 0;
 					target->ItemFlags[6] = 0;
+					target->ItemFlags[7] = 0;
+					item.ItemFlags[6] = 0;
+					target = LaraItem;
+					item.ItemFlags[7] = 0;
 					DoDamage(&item, INT_MAX);
 					KillItem(itemNumber);
 				}
