@@ -168,8 +168,7 @@ enum CONSTANT_BUFFERS
 {
 	CB_CAMERA = 0,
 	CB_ITEM = 1,
-	CB_LIGHTS = 2,
-	CB_MISC = 3,
+	CB_INSTANCED_STATICS = 3,
 	CB_SHADOW_LIGHT = 4,
 	CB_ROOM = 5,
 	CB_ANIMATED_TEXTURES = 6,
@@ -240,12 +239,10 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 
 constexpr auto MAX_BONES = 32;
 
+constexpr auto SCREEN_SPACE_RES	   = Vector2(800.0f, 600.0f);
+constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
 constexpr auto REFERENCE_FONT_SIZE = 35.0f;
-constexpr auto REFERENCE_RES_WIDTH = 800.0f;
-constexpr auto REFERENCE_RES_HEIGHT = 600.0f;
-constexpr auto HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
-constexpr auto HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
-constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
+constexpr auto HUD_ZERO_Y		   = -SCREEN_SPACE_RES.y;
 
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
@@ -254,4 +251,27 @@ constexpr auto MAX_ROOM_BOUNDS = 256;
 constexpr auto MIN_FAR_VIEW = 3200.0f;
 constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
 
-constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 128;
+constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 512;
+
+// FUTURE
+/*
+#define CBUFFER_CAMERA 0
+#define CBUFFER_BLENDING 1
+#define CBUFFER_ANIMATED_TEXTURES 2
+
+#define CBUFFER_LIGHTS 7
+#define CBUFFER_ITEM 8
+#define CBUFFER_STATIC 8
+#define CBUFFER_INSTANCED_STATICS 8
+
+#define CBUFFER_ROOM 7
+#define CBUFFER_SHADOW_LIGHT 8
+
+#define CBUFFER_SPRITE 7
+#define CBUFFER_INSTANCED_SPRITES 8
+
+#define CBUFFER_HUD 7
+#define CBUFFER_HUD_BAR 8
+
+#define CBUFFER_POSTPROCESS 7
+*/

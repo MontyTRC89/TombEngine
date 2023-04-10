@@ -16,6 +16,8 @@ cbuffer ItemBuffer : register(b1)
 	float4 Color;
 	float4 AmbientLight;
 	int4 BoneLightModes[MAX_BONES / 4];
+	ShaderLight ItemLights[MAX_LIGHTS_PER_ITEM];
+	int NumItemLights;
 };
 
 struct PixelShaderInput
@@ -101,7 +103,15 @@ PixelShaderOutput PS(PixelShaderInput input)
 	normal = normalize(mul(input.TBN, normal));
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
-		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
+		CombineLights(
+			AmbientLight.xyz,
+			input.Color.xyz,
+			tex.xyz, 
+			input.WorldPosition,
+			normal, 
+			input.Sheen,
+			ItemLights, 
+			NumItemLights) :
 		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = saturate(float4(color, tex.w));

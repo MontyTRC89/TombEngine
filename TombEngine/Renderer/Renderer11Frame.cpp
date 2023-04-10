@@ -22,7 +22,7 @@ namespace TEN::Renderer
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 
-	void Renderer11::CollectRooms(RenderView &renderView, bool onlyRooms)
+	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
@@ -39,6 +39,8 @@ namespace TEN::Renderer
 			for (int j = 0; j < room->Doors.size(); j++)
 			{
 				room->Doors[j].Visited = false;
+				room->Doors[j].InvisibleFromCamera = false;
+				room->Doors[j].DotProduct = FLT_MAX;
 			}
 		}
 
@@ -46,6 +48,7 @@ namespace TEN::Renderer
 
 		m_invalidateCache = false;
 
+		// Prepae the real DX scissor test rectangle
 		for (auto room : renderView.roomsToDraw)
 		{
 			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
@@ -53,6 +56,12 @@ namespace TEN::Renderer
 			room->ClipBounds.right = (room->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		}
+
+		// Sort statics for doing instancing later
+		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
+			{
+				return a->ObjectNumber < b->ObjectNumber;
+			});
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -169,6 +178,7 @@ namespace TEN::Renderer
 	{
 		// FIXME: This is an urgent hack to fix stack overflow crashes.
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
+		// NOTE by MontyTRC: I'd keep this as a failsafe solution for 0.00000001% of cases we could have problems
 
 		static constexpr int MAX_SEARCH_DEPTH = 64;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
@@ -183,19 +193,10 @@ namespace TEN::Renderer
 		RendererRoom* room = &m_rooms[to];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[to];
 
-		auto cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-		float xRad = nativeRoom->xSize * SECTOR(1) / 2.0f;
-		float yRad = (nativeRoom->minfloor - nativeRoom->maxceiling) / 2.0f;
-		float zRad = nativeRoom->zSize * SECTOR(1) / 2.0f;
-
-		auto roomCentre = Vector3(nativeRoom->x + xRad, nativeRoom->minfloor - yRad, nativeRoom->z + zRad);
-
-		float roomRad = std::max(std::max(xRad, yRad), zRad);
-		float distance = std::max((roomCentre - cameraPosition).Length() - (roomRad * 1.5f), 0.0f);
-
-		if (!m_rooms[to].Visited)
+		if (!room->Visited)
 		{
+			room->Visited = true;
+
 			renderView.roomsToDraw.push_back(room);
 
 			CollectLightsForRoom(to, renderView);
@@ -208,8 +209,6 @@ namespace TEN::Renderer
 			}
 		}
 
-		room->Distance = distance;
-		room->Visited = true;
 		room->ViewPort.x = std::min(room->ViewPort.x, viewPort.x);
 		room->ViewPort.y = std::min(room->ViewPort.y, viewPort.y);
 		room->ViewPort.z = std::max(room->ViewPort.z, viewPort.z);
@@ -220,6 +219,11 @@ namespace TEN::Renderer
 		{
 			RendererDoor* door = &room->Doors[i];
 
+			if (door->InvisibleFromCamera)
+			{
+				continue;
+			}
+
 			if (!door->Visited)
 			{
 				door->CameraToDoor = Vector3(
@@ -229,10 +233,21 @@ namespace TEN::Renderer
 				door->CameraToDoor.Normalize();
 			}
 
-			if (door->Normal.x * door->CameraToDoor.x +
-				door->Normal.y * door->CameraToDoor.y +
-				door->Normal.z * door->CameraToDoor.z <= 0)
+			// IMPORTANT: dot = 0 would generate ambiguity becase door could be traversed in both directions, potentially 
+			// generating endless loops. We need to exclude this.
+
+			if (door->DotProduct == FLT_MAX)
 			{
+				door->DotProduct = 
+					door->Normal.x * door->CameraToDoor.x +
+					door->Normal.y * door->CameraToDoor.y +
+					door->Normal.z * door->CameraToDoor.z;
+				m_dotProducts++;
+			}
+
+			if (door->DotProduct <= 0)
+			{
+				door->InvisibleFromCamera = true;
 				continue;
 			}
 
@@ -381,7 +396,7 @@ namespace TEN::Renderer
 			{
 				continue;
 			}
-
+			 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
 			std::vector<RendererLight*> cachedRoomLights;
@@ -404,6 +419,13 @@ namespace TEN::Renderer
 
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
+
+			if (renderView.SortedStatics.find(mesh->ObjectNumber) == renderView.SortedStatics.end())
+			{
+				std::vector<RendererStatic*> vec;
+				renderView.SortedStatics.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+			}
+			renderView.SortedStatics[mesh->ObjectNumber].push_back(mesh);
 		}
 	}
 
@@ -425,7 +447,7 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (auto& light : dynamicLights)
+		for (auto& light : m_dynamicLights)
 		{
 			float distanceSquared =
 				SQUARE(position.x - light.Position.x) +
@@ -621,11 +643,11 @@ namespace TEN::Renderer
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 		{
-			shadowLight = lightsToDraw.front();
+			m_shadowLight = lightsToDraw.front();
 		}
 		else
 		{
-			shadowLight = nullptr;
+			m_shadowLight = nullptr;
 		}
 	}	
 	
@@ -689,9 +711,9 @@ namespace TEN::Renderer
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		
 		// Collect dynamic lights for rooms
-		for (int i = 0; i < dynamicLights.size(); i++)
+		for (int i = 0; i < m_dynamicLights.size(); i++)
 		{
-			RendererLight* light = &dynamicLights[i];
+			RendererLight* light = &m_dynamicLights[i];
 
 			// If no radius, ignore
 			if (light->Out == 0.0f)
@@ -764,5 +786,6 @@ namespace TEN::Renderer
 		for (int i = 0; i < NUM_ITEMS; i++)
 			m_items[i].DoneAnimations = false;
 	}
+
 } // namespace TEN::Renderer
 

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.6 Lua API</title>
+    <title>TombEngine 1.0.8 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -186,11 +186,11 @@ associated getters and setters.</td>
 	<td class="summary">Set OCB (object code bit) of the moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetItemFlags">Moveable:GetItemFlags(short)</a></td>
+	<td class="name" ><a href="#Moveable:GetItemFlags">Moveable:GetItemFlags(index)</a></td>
 	<td class="summary">Get the value stored in ItemFlags[index]</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetItemFlags">Moveable:SetItemFlags(short, short)</a></td>
+	<td class="name" ><a href="#Moveable:SetItemFlags">Moveable:SetItemFlags(value, index)</a></td>
 	<td class="summary">Stores a value in ItemFlags[index]</td>
 	</tr>
 	<tr>
@@ -227,7 +227,7 @@ associated getters and setters.</td>
  e.g.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetName">Moveable:SetName(string)</a></td>
+	<td class="name" ><a href="#Moveable:SetName">Moveable:SetName(name)</a></td>
 	<td class="summary">Set the moveable's name (its unique string identifier)
  e.g.</td>
 	</tr>
@@ -273,6 +273,14 @@ associated getters and setters.</td>
 	<td class="name" ><a href="#Moveable:SetHP">Moveable:SetHP(HP)</a></td>
 	<td class="summary">Set current HP (hit points/health points)
  Clamped to [0, 32767] for "intelligent" entities (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetLocationAI">Moveable:GetLocationAI()</a></td>
+	<td class="summary">Get the location value stored in the Enemy AI</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetLocationAI">Moveable:SetLocationAI(value)</a></td>
+	<td class="summary">Updates the location in the enemy AI with the given value.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetAIBits">Moveable:GetAIBits()</a></td>
@@ -655,7 +663,7 @@ baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">ObjectID</span></span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          the new ID
         </li>
     </ul>
@@ -924,7 +932,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetItemFlags"></a>
-    <strong>Moveable:GetItemFlags(short)</strong>
+    <strong>Moveable:GetItemFlags(index)</strong>
     </dt>
     <dd>
     Get the value stored in ItemFlags[index]
@@ -933,16 +941,16 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">short</span>
-            <span class="types"><span class="type">index:</span></span>
-        ) index the ItemFlags, can be between 0 and 7.
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of the ItemFlags, can be between 0 and 7.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">(short)</span></span>
+           <span class="types"><span class="type">int</span></span>
         the value contained in the ItemFlags[index]
     </ol>
 
@@ -952,7 +960,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetItemFlags"></a>
-    <strong>Moveable:SetItemFlags(short, short)</strong>
+    <strong>Moveable:SetItemFlags(value, index)</strong>
     </dt>
     <dd>
     Stores a value in ItemFlags[index]
@@ -961,13 +969,13 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">short</span>
-            <span class="types"><span class="type">index:</span></span>
-        ) index of the ItemFlags where store the value.
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">short</span></span>
+         to store in the moveable's ItemFlags[index]
         </li>
-        <li><span class="parameter">short</span>
-            <span class="types"><span class="type">index:</span></span>
-        ) index of the ItemFlags where store the value.
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of the ItemFlags where store the value.
         </li>
     </ul>
 
@@ -1157,7 +1165,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetName"></a>
-    <strong>Moveable:SetName(string)</strong>
+    <strong>Moveable:SetName(name)</strong>
     </dt>
     <dd>
     Set the moveable's name (its unique string identifier)
@@ -1168,8 +1176,8 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">string</span>
-            <span class="types"><span class="type">name</span></span>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          the new moveable's name
         </li>
     </ul>
@@ -1294,7 +1302,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <ul>
         <li><span class="parameter">func</span>
             <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> taking part in the collision.
+         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a>s taking part in the collision.
         </li>
     </ul>
 
@@ -1435,6 +1443,49 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:GetLocationAI"></a>
+    <strong>Moveable:GetLocationAI()</strong>
+    </dt>
+    <dd>
+    Get the location value stored in the Enemy AI
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">short</span></span>
+        the value contained in the LocationAI of the creature.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetLocationAI"></a>
+    <strong>Moveable:SetLocationAI(value)</strong>
+    </dt>
+    <dd>
+    Updates the location in the enemy AI with the given value.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">short</span></span>
+         to store.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:GetAIBits"></a>
     <strong>Moveable:GetAIBits()</strong>
     </dt>
@@ -1508,7 +1559,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Room</span></span>
+           <span class="types"><a class="type" href="../2 classes/Objects.Room.html#">Room</a></span>
         current room of the object
     </ol>
 
@@ -1805,8 +1856,8 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-01-29 18:57:43 </i>
+<i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
+<i style="float:right;">Last updated 2023-03-31 20:44:31 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

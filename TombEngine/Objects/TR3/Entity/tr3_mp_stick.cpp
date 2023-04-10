@@ -20,8 +20,8 @@ namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const std::vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
-	const std::vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
+	const auto MPStickPunchAttackJoints = std::vector<unsigned int>{ 10, 13 };
+	const auto MPStickKickAttackJoints  = std::vector<unsigned int>{ 5, 6 };
 
 	constexpr auto MPSTICK_VAULT_SHIFT = 260;
 
@@ -207,7 +207,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Mood == MoodType::Bored ||
 					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MPSTICK_STATE_STOP;

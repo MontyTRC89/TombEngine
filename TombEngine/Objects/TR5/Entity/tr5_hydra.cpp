@@ -15,7 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (TestProbability(0.5f))
+		if (Random::TestProbability(1 / 2.0f))
 			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
 			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -230,11 +230,11 @@ namespace TEN::Entities::Creatures::TR5
 				else if (item->TriggerFlags == 2)
 					tilt = ANGLE(2.8f);
 
-				if (AI.distance >= pow(CLICK(7), 2) && TestProbability(0.97f))
+				if (AI.distance >= pow(CLICK(7), 2) && Random::TestProbability(0.97f))
 				{
-					if (AI.distance >= pow(SECTOR(2), 2) && TestProbability(0.97f))
+					if (AI.distance >= pow(SECTOR(2), 2) && Random::TestProbability(0.97f))
 					{
-						if (TestProbability(0.06f))
+						if (Random::TestProbability(0.06f))
 							item->Animation.TargetState = HYDRA_STATE_AIM;
 					}
 					else

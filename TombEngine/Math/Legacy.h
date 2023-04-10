@@ -13,22 +13,30 @@ struct ColorData
 
 constexpr short ANGLE(float degrees)
 {
-	return short(degrees * (65536.0f / 360.0f));
+	constexpr auto SHORTS_TO_ONE_DEGREE = 65536.0f / 360.0f;
+
+	return short(degrees * SHORTS_TO_ONE_DEGREE);
 }
 
 constexpr short FROM_RAD(float radians)
 {
-	return short((radians / RADIAN) * (65536.0f / 360.0f));
+	constexpr auto SHORTS_TO_ONE_DEGREE = 65536.0f / 360.0f;
+
+	return short((radians / RADIAN) * SHORTS_TO_ONE_DEGREE);
 }
 
 constexpr float TO_DEGREES(short shortAngle)
 {
-	return (shortAngle * (360.0f / 65536.0f));
+	constexpr auto DEGREES_TO_ONE_SHORT = 360.0f / 65536.0f;
+
+	return (shortAngle * DEGREES_TO_ONE_SHORT);
 }
 
 constexpr float TO_RAD(short shortAngle)
 {
-	return ((shortAngle * (360.0f / 65536.0f)) * RADIAN);
+	constexpr auto DEGREES_TO_ONE_SHORT = 360.0f / 65536.0f;
+
+	return ((shortAngle * DEGREES_TO_ONE_SHORT) * RADIAN);
 }
 
 float phd_sin(short x);

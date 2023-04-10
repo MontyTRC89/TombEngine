@@ -20,7 +20,7 @@ void FallingCeilingControl(short itemNumber)
 	else
 	{
 		item->Animation.TargetState = 1;
-		item->Animation.IsAirborne = true;;
+		item->Animation.IsAirborne = true;
 	}
 
 	AnimateItem(item);

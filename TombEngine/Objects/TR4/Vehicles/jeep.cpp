@@ -1,38 +1,38 @@
 #include "framework.h"
 #include "Objects/TR4/Vehicles/jeep.h"
+
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Gui.h"
-#include "Game/effects/effects.h"
-#include "Game/collision/collide_item.h"
-#include "Game/Lara/lara_one_gun.h"
-#include "Game/items.h"
 #include "Game/camera.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara_flare.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
-#include "Specific/Input/Input.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Sound/sound.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Gui.h"
+#include "Game/items.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Math/Math.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Math/Random.h"
+#include "Specific/Input/Input.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
 
-	const vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
+	const std::vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const std::vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
 
-	const vector<VehicleMountType> JeepMountTypes =
+	const std::vector<VehicleMountType> JeepMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -51,6 +51,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto JEEP_CRASH_VELOCITY = 10922;
+
+	constexpr auto JEEP_WAKE_OFFSET = Vector3(BLOCK(0.25f), 0.0f, BLOCK(0.3f));
 
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
@@ -213,7 +215,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Pose.Position = jeepItem->Pose.Position;
 		laraItem->Pose.Orientation.y = jeepItem->Pose.Orientation.y;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -232,8 +234,8 @@ namespace TEN::Entities::Vehicles
 		int z = pos->z / SECTOR(1);
 		int oldX = old->x / SECTOR(1);
 		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (WALL_SIZE - 1);
-		int shiftZ = pos->z & (WALL_SIZE - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == oldX)
 		{
@@ -249,7 +251,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.z += WALL_SIZE - 1 - shiftZ;
+				jeepItem->Pose.Position.z += WALL_MASK - shiftZ;
 				return (jeepItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -263,7 +265,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.x += WALL_SIZE - 1 - shiftX;
+				jeepItem->Pose.Position.x += WALL_MASK - shiftX;
 				return (pos->z - jeepItem->Pose.Position.z);
 			}
 		}
@@ -280,7 +282,7 @@ namespace TEN::Entities::Vehicles
 			if (pos->z > old->z)
 				z = -1 - shiftZ;
 			else
-				z = WALL_SIZE + 1 - shiftZ;
+				z = BLOCK(1) + 1 - shiftZ;
 		}
 
 		roomNumber = jeepItem->RoomNumber;
@@ -292,7 +294,7 @@ namespace TEN::Entities::Vehicles
 			if (pos->x > old->x)
 				x = -1 - shiftX;
 			else
-				x = WALL_SIZE + 1 - shiftX;
+				x = BLOCK(1) + 1 - shiftX;
 		}
 
 		if (x && z)
@@ -386,7 +388,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - jeepItem->Pose.Position.y) > WALL_SIZE / 2)
+		if (abs(probe.Position.Floor - jeepItem->Pose.Position.y) > BLOCK(1 / 2.0f))
 			return false;
 
 		if ((probe.Position.Ceiling - jeepItem->Pose.Position.y) > -LARA_HEIGHT ||
@@ -419,7 +421,7 @@ namespace TEN::Entities::Vehicles
 
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 4;
-		spark->life = spark->sLife = (GetRandomControl() & 3) - (speed / 4096) + 20;;
+		spark->life = spark->sLife = (GetRandomControl() & 3) - (speed / 4096) + 20;
 
 		if (spark->life < 9)
 		{
@@ -1416,7 +1418,7 @@ namespace TEN::Entities::Vehicles
 
 		int oldY = jeepItem->Pose.Position.y;
 		jeepItem->Animation.Velocity.y = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.Velocity.y, &jeepItem->Pose.Position.y, 0);
-		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
+		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate, JEEP_WAKE_OFFSET);
 
 		short xRot;
 		floorHeight = (fl.y + fr.y) / 2;

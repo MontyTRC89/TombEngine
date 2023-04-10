@@ -88,6 +88,9 @@ public:
 	[[nodiscard]] short GetItemFlags(int index = 0) const;
 	void SetItemFlags(short value, int index = 0);
 
+	[[nodiscard]] short GetLocationAI() const;
+	void SetLocationAI(short value);
+
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
 	void SetMeshVisible(int meshId, bool visible);
 	void ShatterMesh(int meshId);

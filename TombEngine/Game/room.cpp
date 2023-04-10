@@ -188,8 +188,8 @@ bool IsPointInRoom(Vector3i pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	if (pos.z >= (room->z + WALL_SIZE) && pos.z <= (room->z + ((room->zSize - 1) * BLOCK(1))) &&
-		pos.x >= (room->x + WALL_SIZE) && pos.x <= (room->x + ((room->xSize - 1) * BLOCK(1))) &&
+	if (pos.z >= (room->z + BLOCK(1)) && pos.z <= (room->z + ((room->zSize - 1) * BLOCK(1))) &&
+		pos.x >= (room->x + BLOCK(1)) && pos.x <= (room->x + ((room->xSize - 1) * BLOCK(1))) &&
 		pos.y <= room->minfloor && pos.y > room->maxceiling) // Up is -Y, hence Y should be "less" than floor.
 	{
 		return true;

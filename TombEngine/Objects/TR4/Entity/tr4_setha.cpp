@@ -15,9 +15,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
@@ -184,7 +184,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -682,7 +682,7 @@ namespace TEN::Entities::TR4
 		laraItem->HitPoints = -1;
 		lara.ExtraAnim = 1;
 		lara.HitDirection = -1;
-		lara.Air = -1;
+		lara.Status.Air = -1;
 		lara.Control.HandStatus = HandStatus::Busy;
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 

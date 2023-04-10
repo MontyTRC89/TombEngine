@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/control/control.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;

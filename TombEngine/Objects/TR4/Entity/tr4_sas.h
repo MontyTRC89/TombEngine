@@ -2,6 +2,9 @@
 
 struct CollisionInfo;
 struct ItemInfo;
+
+struct CollisionInfo;
+struct ItemInfo;
 struct ObjectInfo;
 
 namespace TEN::Entities::TR4

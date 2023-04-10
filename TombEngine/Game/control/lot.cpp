@@ -177,6 +177,8 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 			break;
 
 		case LotType::Blockable:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
 			creature->LOT.BlockMask = BLOCKABLE;
 			creature->LOT.Zone = ZoneType::Basic;
 			break;

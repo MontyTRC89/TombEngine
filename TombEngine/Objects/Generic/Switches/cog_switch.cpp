@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(CogSwitchPos, switchItem, laraItem))
 					{
-						ResetLaraFlex(laraItem);
+						ResetPlayerFlex(laraItem);
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;

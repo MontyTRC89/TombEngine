@@ -2,6 +2,7 @@
 #include "Texture2D.h"
 #include "Utils.h"
 #include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
 namespace TEN::Renderer
 {
@@ -9,6 +10,9 @@ namespace TEN::Renderer
 
 	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data)
 	{
+		Width = w;
+		Height = h;
+
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = w;
 		desc.Height = h;
@@ -44,6 +48,11 @@ namespace TEN::Renderer
 
 		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0), L"Opening Texture file '" + fileName + L"': ");
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+
+		D3D11_TEXTURE2D_DESC desc;
+		Texture->GetDesc(&desc);
+		Width = desc.Width;
+		Height = desc.Height;
 	}
 
 	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length)
@@ -51,22 +60,37 @@ namespace TEN::Renderer
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
-		throwIfFailed(CreateWICTextureFromMemoryEx(
-			device,
-			context,
-			data,
-			length, 
-			(size_t)0,
-			D3D11_USAGE_DEFAULT,
-			D3D11_BIND_SHADER_RESOURCE,
-			0,
-			D3D11_RESOURCE_MISC_GENERATE_MIPS,
-			WIC_LOADER_DEFAULT,
-			resource.GetAddressOf(), 
-			ShaderResourceView.GetAddressOf()));
+
+		if (data[0] == 0x44 && data[1] == 0x44 && data[2] == 0x53)
+		{
+			// DDS texture
+			throwIfFailed(CreateDDSTextureFromMemory(
+				device,
+				context,
+				data,
+				length,
+				resource.GetAddressOf(),
+				ShaderResourceView.GetAddressOf()));
+		}
+		else
+		{
+			// PNG legacy texture
+			throwIfFailed(CreateWICTextureFromMemory(
+				device,
+				context,
+				data,
+				length,
+				resource.GetAddressOf(),
+				ShaderResourceView.GetAddressOf()));
+		}
 
 		context->GenerateMips(ShaderResourceView.Get());
 
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+
+		D3D11_TEXTURE2D_DESC desc;
+		Texture->GetDesc(&desc);
+		Width = desc.Width;
+		Height = desc.Height;
 	}
 }

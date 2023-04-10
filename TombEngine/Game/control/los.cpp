@@ -149,7 +149,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
-								if (object->intelligent)
+								if (object->intelligent || object->HitRoutine)
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 
@@ -183,32 +183,16 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 							else
 							{
 								if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
+								{
 									SmashObject(itemNumber);
+								}
 								else
 								{
-									switch (object->hitEffect)
-									{
-									case HitEffect::Blood:
-										DoBloodSplat(target2.x, target2.y, target2.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
-										break;
-
-									case HitEffect::Smoke:
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
-										break;
-
-									case HitEffect::Richochet:
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-										break;
-									}
-
-									if (!Objects[item->ObjectNumber].undead)
-										DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
-
-									if (!item->Callbacks.OnHit.empty())
-									{
-										short index = g_GameScriptEntities->GetIndexByName(item->Name);
-										g_GameScript->ExecuteFunction(item->Callbacks.OnHit, index);
-									}
+									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
+									if (object->HitRoutine != nullptr)
+										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
+									else
+										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
 								}
 							}
 						}

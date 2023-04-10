@@ -94,8 +94,8 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		auto bounds = GameBoundingBox(receptableItem);
 		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
 		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);
 
 		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
 		{
@@ -147,7 +147,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			}
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Busy;
@@ -207,7 +207,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.RequiredState = 0;
+	item->Animation.RequiredState = NO_STATE;
 	item->ResetModelToDefault();
 
 	AddActiveItem(itemNumber);
@@ -318,7 +318,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				keyHoleItem->Flags |= TRIGGERED;
 				keyHoleItem->Status = ITEM_ACTIVE;

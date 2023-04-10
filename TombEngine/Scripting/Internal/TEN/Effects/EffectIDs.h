@@ -14,11 +14,13 @@ Constants for effect IDs.
 
 The following constants are inside EffectID.
 
+	NONE
 	FIRE
 	SPARKS
 	SMOKE
-	ELECTRICDEATH
-	LASERDEATH
+	ELECTRICIGNITE
+	REDIGNITE
+	CADAVER
 	CUSTOM
 
 @section Effects.EffectID

@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/Generic/generic_objects.h"
+#include "Objects/Generic/Object/objects.h"
 
 #include "Game/pickup/pickup.h"
 #include "Game/collision/collide_item.h"
@@ -21,6 +22,7 @@
 #include "Objects/Generic/Switches/pulley_switch.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/turn_switch.h"
+#include "Objects/Generic/Switches/AirlockSwitch.h"
 
 // Doors
 #include "Objects/Generic/Doors/generic_doors.h"
@@ -179,12 +181,30 @@ void StartSwitches(ObjectInfo* object)
 		}
 	}
 
+	object = &Objects[ID_AIRLOCK_SWITCH];
+	if (object->loaded)
+	{
+		object->collision = AirlockSwitchCollision;
+		object->control = SwitchControl;
+		object->SetupHitEffect(true);
+	}
+
 	object = &Objects[ID_CROWBAR_SWITCH];
 	if (object->loaded)
 	{
 		object->collision = CrowbarSwitchCollision;
 		object->control = SwitchControl;
 		object->SetupHitEffect(true);
+	}
+
+	object = &Objects[ID_MINECART_SWITCH];
+	if (object->loaded)
+	{
+		object->initialise = InitialiseAnimating;
+		object->control = AnimatingControl;
+		object->collision = ObjectCollision;
+		object->SetupHitEffect(true);
+		object->shadowType = ShadowMode::All;
 	}
 
 	for (int objectNumber = ID_UNDERWATER_SWITCH1; objectNumber <= ID_UNDERWATER_SWITCH4; objectNumber++)

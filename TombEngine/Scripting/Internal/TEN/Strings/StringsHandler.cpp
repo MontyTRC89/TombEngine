@@ -82,7 +82,7 @@ void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> 
 	it->second.m_isInfinite = !nSeconds.has_value();
 }
 
-void StringsHandler::ProcessDisplayStrings(float dt)
+void StringsHandler::ProcessDisplayStrings(float deltaTime)
 {
 	auto it = std::begin(m_userDisplayStrings);
 	while (it != std::end(m_userDisplayStrings))
@@ -109,8 +109,9 @@ void StringsHandler::ProcessDisplayStrings(float dt)
 
 				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
 
-				str.m_timeRemaining -= dt;
+				str.m_timeRemaining -= deltaTime;
 			}
+
 			++it;
 		}
 	}

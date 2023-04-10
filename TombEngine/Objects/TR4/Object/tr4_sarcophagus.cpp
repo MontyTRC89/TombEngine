@@ -7,7 +7,7 @@
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
-#include "Game/health.h"
+#include "Game/Hud/Hud.h"
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Input;
@@ -51,7 +51,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				sarcItem->Status = ITEM_ACTIVE;
 
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else

@@ -555,7 +555,9 @@ namespace TEN::Entities::TR4
 		else
 		{
 			if (item.Animation.ActiveState != SAS_STATE_DEATH)
+			{
 				SetAnimation(&item, SAS_ANIM_DEATH);
+			}
 		}
 
 		CreatureTilt(&item, tilt);
@@ -612,7 +614,7 @@ namespace TEN::Entities::TR4
 				if (MoveLaraPosition(SasDragBodyPosition, &item, laraItem))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Control.IsMoving = false;
@@ -680,7 +682,7 @@ namespace TEN::Entities::TR4
 		grenadeItem->Animation.Velocity.z = 128;
 		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-		grenadeItem->Animation.RequiredState = 0;
+		grenadeItem->Animation.RequiredState = NO_STATE;
 
 		if (Random::TestProbability(3 / 4.0f))
 			grenadeItem->ItemFlags[0] = (int)ProjectileType::Grenade;

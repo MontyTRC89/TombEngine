@@ -60,7 +60,7 @@ namespace TEN::Renderer
 		dxgiAdapter->GetDesc(&adapterDesc);
 		dxgiFactory->Release();
 		
-		return TEN::Utils::FromWchar(adapterDesc.Description);
+		return TEN::Utils::ToString(adapterDesc.Description);
 	}
 
 	void Renderer11::SetTextureOrDefault(Texture2D& texture, std::wstring path)

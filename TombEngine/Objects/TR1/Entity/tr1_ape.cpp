@@ -18,13 +18,13 @@ namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto APE_ATTACK_DAMAGE = 200;
 
-	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
-	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
+	constexpr auto APE_ATTACK_RANGE = SQUARE(BLOCK(0.42f));
+	constexpr auto APE_PANIC_RANGE	= SQUARE(BLOCK(2));
 
-	constexpr auto APE_IDLE_JUMP_CHANCE			= 1.0f / 6;
-	constexpr auto APE_IDLE_POUND_CHEST_CHANCE  = 1.0f / 3;
-	constexpr auto APE_IDLE_POUND_GROUND_CHANCE = 1.0f / 2;
-	constexpr auto APE_IDLE_RUN_LEFT_CHANCE		= 1.0f / 2;
+	constexpr auto APE_IDLE_JUMP_CHANCE			= 1 / 6.0f;
+	constexpr auto APE_IDLE_POUND_CHEST_CHANCE  = 1 / 3.0f;
+	constexpr auto APE_IDLE_POUND_GROUND_CHANCE = 1 / 2.0f;
+	constexpr auto APE_IDLE_RUN_LEFT_CHANCE		= 1 / 2.0f;
 	constexpr auto APE_RUN_JUMP_CHANCE			= APE_IDLE_JUMP_CHANCE / 32;
 	constexpr auto APE_RUN_POUND_CHEST_CHANCE	= APE_IDLE_POUND_CHEST_CHANCE / 32;
 	constexpr auto APE_RUN_POUND_GROUND_CHANCE	= APE_IDLE_POUND_GROUND_CHANCE / 32;
@@ -32,8 +32,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto APE_SHIFT = 75;
 
-	const auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
-	const auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
+	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
 	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < APE_ATTACK_RANGE)
 					item->Animation.TargetState = APE_STATE_ATTACK;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case APE_STATE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_IDLE;

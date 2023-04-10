@@ -114,7 +114,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 #ifdef NEW_TIGHTROPE
 				laraInfo->Control.Tightrope.Balance = 0;
 				laraInfo->Control.Tightrope.CanDismount = false;
@@ -148,7 +148,8 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_REACH &&
-		laraItem->Animation.AnimNumber == LA_REACH)
+		laraItem->Animation.AnimNumber == LA_REACH &&
+		laraInfo->Control.HandStatus == HandStatus::Free)
 	{
 		int test1 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;
@@ -167,7 +168,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			laraItem->Animation.Velocity.y = false;
 			laraItem->Animation.IsAirborne = false;
 
-			ResetLaraFlex(barItem);
+			ResetPlayerFlex(barItem);
 
 			if (test1)
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;

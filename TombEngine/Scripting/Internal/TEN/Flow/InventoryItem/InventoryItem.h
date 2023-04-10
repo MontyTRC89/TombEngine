@@ -19,7 +19,8 @@ static const std::unordered_map<std::string, ItemOptions> kItemActions
 {
 	{"USE", ItemOptions::OPT_USE},
 	{"EQUIP", ItemOptions::OPT_EQUIP},
-	{"EXAMINE", ItemOptions::OPT_EXAMINABLE}
+	{"EXAMINE", ItemOptions::OPT_EXAMINABLE},
+	{"COMBINE", ItemOptions::OPT_COMBINABLE}
 };
 
 namespace sol

@@ -115,7 +115,7 @@ namespace TEN::Entities::Switches
 			short ItemNos[8];
 
 			laraInfo->Control.IsMoving = false;
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraItem->Animation.ActiveState = LA_REACH;
 

@@ -18,7 +18,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
+using namespace TEN::Math;
 
 /*
 ID_BADDY1
@@ -52,11 +52,11 @@ ID_BADDY2
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto BADDY_UZI_AMMO = 24;
+
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
-	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
-
-	constexpr auto BADDY_UZI_AMMO = 24;
+	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
 	{
@@ -645,7 +645,8 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_SWORD_NINJA) &&
+				if (item->ObjectNumber == ID_BADDY2 &&
+					item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_SWORD_NINJA) &&
 					item == Lara.TargetEntity &&
 					laraAI.ahead &&
 					laraAI.distance > pow(682, 2))
@@ -1215,7 +1216,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_BLIND:
 				if (!FlashGrenadeAftershockTimer)
 				{
-					if (Random::TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 

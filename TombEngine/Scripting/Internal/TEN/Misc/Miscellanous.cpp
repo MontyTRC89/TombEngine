@@ -14,6 +14,7 @@
 #include "LuaHandler.h"
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
@@ -180,6 +181,14 @@ namespace Misc
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+	}
+
+	/// Check if the sound effect is playing
+	//@function IsSoundPlaying
+	//@tparam int Sound ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+	static bool IsSoundPlaying(int effectID)
+	{
+		return IsSoundEffectPlaying(effectID);
 	}
 
 	static bool CheckInput(int actionIndex)
@@ -350,6 +359,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
 		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+		tableMisc.set_function(ScriptReserved_IsSoundPlaying, &IsSoundPlaying);
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld

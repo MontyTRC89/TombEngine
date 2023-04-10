@@ -69,7 +69,7 @@ namespace TEN::Effects::Electricity
 	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 
-	void UpdateElectricitys();
+	void UpdateElectricityArcs();
 	void UpdateHelicalLasers();
 
 	void CalculateElectricitySpline(const Electricity& arc, const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer);

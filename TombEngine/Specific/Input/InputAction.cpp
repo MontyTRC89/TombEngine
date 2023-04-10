@@ -10,7 +10,7 @@ namespace TEN::Input
 {
 	InputAction::InputAction(ActionID actionID)
 	{
-		this->ID = actionID;
+		ID = actionID;
 	}
 
 	ActionID InputAction::GetID() const
@@ -47,10 +47,10 @@ namespace TEN::Input
 	// NOTE: To avoid a stutter on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
 	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
-		if (this->IsClicked())
+		if (IsClicked())
 			return true;
 
-		if (!this->IsHeld() || PrevTimeActive == 0.0f || TimeActive == PrevTimeActive)
+		if (!IsHeld() || PrevTimeActive == 0.0f || TimeActive == PrevTimeActive)
 			return false;
 
 		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSec / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
@@ -77,60 +77,60 @@ namespace TEN::Input
 
 	void InputAction::Update(bool value)
 	{
-		value ? this->Update(1.0f) : this->Update(0.0f);
+		value ? Update(1.0f) : Update(0.0f);
 	}
 
 	void InputAction::Update(float value)
 	{
-		this->UpdateValue(value);
+		UpdateValue(value);
 
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
 		// count whole frames instead of actual time passed for now to avoid occasional stutter.
 		// Inquiry methods take this into account. -- Sezz 2022.10.01
 		static constexpr float frameTime = 1.0f;
 
-		if (this->IsClicked())
+		if (IsClicked())
 		{
-			this->PrevTimeActive = 0.0f;
-			this->TimeActive = 0.0f;
-			this->TimeInactive += frameTime;// DELTA_TIME;
+			PrevTimeActive = 0.0f;
+			TimeActive = 0.0f;
+			TimeInactive += frameTime;// DELTA_TIME;
 		}
-		else if (this->IsReleased())
+		else if (IsReleased())
 		{
-			this->PrevTimeActive = TimeActive;
-			this->TimeActive += frameTime;// DELTA_TIME;
-			this->TimeInactive = 0.0f;
+			PrevTimeActive = TimeActive;
+			TimeActive += frameTime;// DELTA_TIME;
+			TimeInactive = 0.0f;
 		}
-		else if (this->IsHeld())
+		else if (IsHeld())
 		{
-			this->PrevTimeActive = TimeActive;
-			this->TimeActive += frameTime;// DELTA_TIME;
-			this->TimeInactive = 0.0f;
+			PrevTimeActive = TimeActive;
+			TimeActive += frameTime;// DELTA_TIME;
+			TimeInactive = 0.0f;
 		}
 		else
 		{
-			this->PrevTimeActive = 0.0f;
-			this->TimeActive = 0.0f;
-			this->TimeInactive += frameTime;// DELTA_TIME;
+			PrevTimeActive = 0.0f;
+			TimeActive = 0.0f;
+			TimeInactive += frameTime;// DELTA_TIME;
 		}
 	}
 
 	void InputAction::Clear()
 	{
-		this->Value = 0.0f;
-		this->PrevValue = 0.0f;
-		this->TimeActive = 0.0f;
-		this->PrevTimeActive = 0.0f;
-		this->TimeInactive = 0.0f;
+		Value = 0.0f;
+		PrevValue = 0.0f;
+		TimeActive = 0.0f;
+		PrevTimeActive = 0.0f;
+		TimeInactive = 0.0f;
 	}
 
 	void InputAction::PrintDebugInfo() const
 	{
 		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
-		g_Renderer.PrintDebugMessage("IsClicked: %d", this->IsClicked());
-		g_Renderer.PrintDebugMessage("IsHeld: %d", this->IsHeld());
-		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", this->IsPulsed(0.2f, 0.6f));
-		g_Renderer.PrintDebugMessage("IsReleased: %d", this->IsReleased());
+		g_Renderer.PrintDebugMessage("IsClicked: %d", IsClicked());
+		g_Renderer.PrintDebugMessage("IsHeld: %d", IsHeld());
+		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", IsPulsed(0.2f, 0.6f));
+		g_Renderer.PrintDebugMessage("IsReleased: %d", IsReleased());
 		g_Renderer.PrintDebugMessage("");
 		g_Renderer.PrintDebugMessage("Value: %.3f", Value);
 		g_Renderer.PrintDebugMessage("PrevValue: %.3f", PrevValue);
@@ -141,7 +141,7 @@ namespace TEN::Input
 
 	void InputAction::UpdateValue(float value)
 	{
-		this->PrevValue = Value;
-		this->Value = value;
+		PrevValue = Value;
+		Value = value;
 	}
 }

@@ -23,9 +23,9 @@ void InitialiseRaisingBlock(short itemNumber)
 	if(floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
-	// Set mutators to 0 by default
-	for (int i = 0; i < item->Model.Mutator.size(); i++)
-		item->Model.Mutator[i].Scale.y = 0;
+	// Set mutators to EulerAngles identity by default.
+	for (auto& mutator : item->Model.Mutators)
+		mutator.Scale.y = 0;
 
 	if (item->TriggerFlags < 0)
 	{
@@ -141,11 +141,11 @@ void ControlRaisingBlock(short itemNumber)
 		item->ItemFlags[1] -= 64;
 	}
 
-	// Update bone mutators
+	// Update bone mutators.
 	if (item->TriggerFlags > -1)
 	{
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+		for (auto& mutator : item->Model.Mutators)
+			mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 

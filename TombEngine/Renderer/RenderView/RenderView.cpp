@@ -46,6 +46,7 @@ namespace TEN::Renderer
 		roomsToDraw.clear();
 		lightsToDraw.clear();
 		spritesToDraw.clear();
+		StaticsToDraw.clear();
 	}
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)
