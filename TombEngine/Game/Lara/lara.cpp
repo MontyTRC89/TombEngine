@@ -423,8 +423,8 @@ void DrawRoomAttractors(const ItemInfo& item)
 	for (const auto& attrac : player.Attractor.SectorAttractors)
 	{
 		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
-		g_Renderer.AddLine3D(attrac.GetPoint0(), item.Pose.Position.ToVector3(), Vector4(0, 1, 1, 1));
-		g_Renderer.PrintDebugMessage("%.3f, %.3f, %.3f", attrac.GetPoint0().x, attrac.GetPoint0().y, attrac.GetPoint0().z);
+
+		g_Renderer.AddLine3D(attrac.GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
 	}
 }
 
@@ -447,7 +447,6 @@ void HandleAttractorDebug(ItemInfo& item)
 	player.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
 	DrawRoomAttractors(item);
 	
-
 	// Floor plane.
 	auto plane = pointColl.BottomBlock->GetSurfacePlane(item.Pose.Position.x, item.Pose.Position.z, true);
 	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().x);

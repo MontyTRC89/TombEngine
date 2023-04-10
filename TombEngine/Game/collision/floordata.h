@@ -127,7 +127,7 @@ class FloorInfo
 		bool Stopper	  = true;
 
 		// Getters
-		std::vector<Vector3> GetSurfaceVertices(int x, int y, bool isFloor);
+		std::vector<Vector3> GetSurfaceVertices(int x, int z, bool isFloor);
 		Plane				 GetSurfacePlane(int x, int z, bool isFloor) const;
 
 		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;

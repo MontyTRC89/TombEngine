@@ -10,12 +10,18 @@
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 
+// debug
+#include "Renderer11.h"
+using TEN::Renderer::g_Renderer;
+
 static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 {
 	// Get plane distance.
 	auto direction2D = Vector2(planeVector.x, planeVector.y);
 	float length = direction2D.Length();
-	float distance = planeVector.z / length;
+	float distance = /*planeVector.z /*/ length;
+
+	g_Renderer.PrintDebugMessage("%.3f", distance);
 
 	// If surface is flat, generate and return flat plane.
 	if (planeVector == Vector3::Zero)
@@ -40,33 +46,49 @@ static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
 	return Plane(normal, distance);
 }
 
-// TODO: Doesn't work.
-std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int y, bool isFloor)
+Vector3 GetSectorCenter(const Vector3i& pos)
 {
-	auto plane = GetSurfacePlane(x, y, isFloor);
+	constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
+	constexpr auto BIT_MASK_9		= 0x200;	  // 9
 
-	// Compute four corner points of the square
-	float halfSize = BLOCK(0.5f);
-	auto bottomLeft = Vector3(-halfSize, 0.0f, halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
-	auto bottomRight = Vector3(halfSize, 0.0f, halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
-	auto topLeft = Vector3(-halfSize, 0.0f, -halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
-	auto topRight = Vector3(halfSize, 0.0f, -halfSize) + Vector3(x * BLOCK(1), 0.0f, y * BLOCK(1));
+	// Return collision block center.
+	// TODO: No bitwise operations.
+	return Vector3(
+		pos.x & BIT_MASK_LOWER_8 | BIT_MASK_9,
+		pos.y,
+		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
+}
 
-	// Compute the height of each corner point using the plane equation
-	float bottomLeftHeight = -(plane.Normal().x * bottomLeft.x + plane.Normal().z * bottomLeft.z + plane.D()) / plane.Normal().y;
-	float bottomRightHeight = -(plane.Normal().x * bottomRight.x + plane.Normal().z * bottomRight.z + plane.D()) / plane.Normal().y;
-	float topLeftHeight = -(plane.Normal().x * topLeft.x + plane.Normal().z * topLeft.z + plane.D()) / plane.Normal().y;
-	float topRightHeight = -(plane.Normal().x * topRight.x + plane.Normal().z * topRight.z + plane.D()) / plane.Normal().y;
+// Doesn't work.
+std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
+{
+	auto sectorCenter = GetSectorCenter(Vector3(x, 0, z));
+	auto plane = GetSurfacePlane(x, z, isFloor);
+	float halfBlock = BLOCK(0.5f);
 
-	auto vertices = std::vector<Vector3>{};
+	// Calculate corner vertices.
+	auto vertex0 = sectorCenter + Vector3(halfBlock, 0.0f, halfBlock);
+	auto vertex1 = sectorCenter + Vector3(-halfBlock, 0.0f, halfBlock);
+	auto vertex2 = sectorCenter + Vector3(-halfBlock, 0.0f, -halfBlock);
+	auto vertex3 = sectorCenter + Vector3(halfBlock, 0.0f, -halfBlock);
 
-	// Add the corner points with their respective heights to the output vector
-	vertices.push_back(Vector3(bottomLeft.x, bottomLeftHeight, bottomLeft.z));
-	vertices.push_back(Vector3(bottomRight.x, bottomRightHeight, bottomRight.z));
-	vertices.push_back(Vector3(topLeft.x, topLeftHeight, topLeft.z));
-	vertices.push_back(Vector3(topRight.x, topRightHeight, topRight.z));
+	auto normal = plane.Normal();
+	float distance = plane.D();
 
-	return vertices;
+	// Calculate corner heights using plane equation.
+	float vertex0Height = -((normal.x * vertex0.x) + (normal.z * vertex0.z) + distance) / normal.y;
+	float vertex1Height = -((normal.x * vertex1.x) + (normal.z * vertex1.z) + distance) / normal.y;
+	float vertex2Height = -((normal.x * vertex2.x) + (normal.z * vertex2.z) + distance) / normal.y;
+	float vertex3Height = -((normal.x * vertex3.x) + (normal.z * vertex3.z) + distance) / normal.y;
+
+	// Return vertices.
+	return std::vector<Vector3>
+	{
+		Vector3(vertex0.x, vertex0Height, vertex0.z),
+		Vector3(vertex1.x, vertex1Height, vertex1.z),
+		Vector3(vertex2.x, vertex2Height, vertex2.z),
+		Vector3(vertex3.x, vertex3Height, vertex3.z)
+	};
 }
 
 Plane FloorInfo::GetSurfacePlane(int x, int z, bool isFloor) const
