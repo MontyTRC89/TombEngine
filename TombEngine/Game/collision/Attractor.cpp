@@ -137,6 +137,12 @@ namespace TEN::Collision
 		return attracs;
 	}
 
+	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
+	{
+		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		return GetAttractorsFromPoints(points, pointColl.RoomNumber);
+	}
+
 	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
 	{
 		// Get bridge bounding box.
@@ -160,12 +166,6 @@ namespace TEN::Collision
 
 		// Return attractors generated from points.
 		return GetAttractorsFromPoints(points, item.RoomNumber);
-	}
-
-	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
-	{
-		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		return GetAttractorsFromPoints(points, pointColl.RoomNumber);
 	}
 
 	void GetNearbyAttractorData(std::vector<AttractorData>& attracs, const Vector3& pos, const EulerAngles& orient, float range)

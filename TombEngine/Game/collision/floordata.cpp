@@ -14,60 +14,30 @@ using namespace TEN::Math;
 #include "Renderer11.h"
 using TEN::Renderer::g_Renderer;
 
-static Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
-{
-	// Get plane distance.
-	auto direction2D = Vector2(planeVector.x, planeVector.y);
-	float length = direction2D.Length();
-	float distance = /*planeVector.z /*/ length;
-
-	g_Renderer.PrintDebugMessage("%.3f", distance);
-
-	// If surface is flat, generate and return flat plane.
-	if (planeVector == Vector3::Zero)
-	{
-		if (isFloor)
-		{
-			return Plane(-Vector3::UnitY, distance);
-		}
-		else
-		{
-			return Plane(Vector3::UnitY, distance);
-		}
-	}
-
-	// Get plane normal.
-	auto tilt = Vector2(
-		-int((planeVector.x * BLOCK(1)) / CLICK(1)),
-		-int((planeVector.y/*z*/ * BLOCK(1)) / CLICK(1)));
-	auto normal = GetSurfaceNormal(tilt, isFloor);
-
-	// Return plane.
-	return Plane(normal, distance);
-}
-
-// Doesn't work.
+// TODO: Split surfaces.
 std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
 	auto sectorCenter2D = GetSectorCenter(x, z);
-	auto sectorCenter = Vector3(sectorCenter2D.x, 0, sectorCenter2D.y);
-	auto plane = GetSurfacePlane(x, z, isFloor);
+	auto tilt = GetSurfaceTilt(x, z, isFloor) * CLICK(1);
+	int surfaceHeight = GetSurfaceHeight(sectorCenter2D.x, sectorCenter2D.y, isFloor);
+
+	auto sectorCenter = Vector3(sectorCenter2D.x, 0.0f, sectorCenter2D.y);
 	float halfBlock = BLOCK(0.5f);
 
-	// Calculate corner vertices.
+	// Calculate base corner vertices.
 	auto vertex0 = sectorCenter + Vector3(halfBlock, 0.0f, halfBlock);
 	auto vertex1 = sectorCenter + Vector3(-halfBlock, 0.0f, halfBlock);
 	auto vertex2 = sectorCenter + Vector3(-halfBlock, 0.0f, -halfBlock);
 	auto vertex3 = sectorCenter + Vector3(halfBlock, 0.0f, -halfBlock);
 
-	auto normal = plane.Normal();
-	float distance = plane.D();
+	//g_Renderer.PrintDebugMessage("%.3f", tilt.x);
+	//g_Renderer.PrintDebugMessage("%.3f", tilt.y);
 
-	// Calculate corner heights using plane equation.
-	float vertex0Height = -((normal.x * vertex0.x) + (normal.z * vertex0.z) + distance) / normal.y;
-	float vertex1Height = -((normal.x * vertex1.x) + (normal.z * vertex1.z) + distance) / normal.y;
-	float vertex2Height = -((normal.x * vertex2.x) + (normal.z * vertex2.z) + distance) / normal.y;
-	float vertex3Height = -((normal.x * vertex3.x) + (normal.z * vertex3.z) + distance) / normal.y;
+	// Calculate corner heights.
+	float vertex0Height = surfaceHeight - (tilt.x + tilt.y) + (tilt.x + tilt.y) / 2;
+	float vertex1Height = surfaceHeight - tilt.y + (tilt.x + tilt.y) / 2;
+	float vertex2Height = surfaceHeight + (tilt.x + tilt.y) / 2;
+	float vertex3Height = surfaceHeight - tilt.x + (tilt.x + tilt.y) / 2;
 
 	// Return vertices.
 	return std::vector<Vector3>
@@ -77,15 +47,6 @@ std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 		Vector3(vertex2.x, vertex2Height, vertex2.z),
 		Vector3(vertex3.x, vertex3Height, vertex3.z)
 	};
-}
-
-Plane FloorInfo::GetSurfacePlane(int x, int z, bool isFloor) const
-{
-	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
-
-	// Get surface plane.
-	int planeIndex = GetSurfacePlaneIndex(x, z, isFloor);
-	return ConvertPlaneVectorToPlane(planes[planeIndex], isFloor);
 }
 
 int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool isFloor) const
@@ -403,12 +364,9 @@ namespace TEN::Floordata
 
 	Vector2i GetSectorCenter(int x, int z)
 	{
-		constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
-		constexpr auto BIT_MASK_9		= 0x200;	  // 9
-
 		return Vector2i(
-			(x / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f),
-			(z / BLOCK(1)) * BLOCK(1)+ BLOCK(0.5f));
+			((x / BLOCK(1)) * BLOCK(1)) + BLOCK(0.5f),
+			((z / BLOCK(1)) * BLOCK(1)) + BLOCK(0.5f));
 	}
 
 	Vector2i GetSectorPoint(int x, int z)

@@ -441,21 +441,10 @@ void HandleAttractorDebug(ItemInfo& item)
 	if (pointColl.Position.Bridge >= 0)
 	{
 		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-
 		player.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
 	}
 	player.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
 	DrawRoomAttractors(item);
-	
-	// Floor plane.
-	auto plane = pointColl.BottomBlock->GetSurfacePlane(item.Pose.Position.x, item.Pose.Position.z, true);
-	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().x);
-	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().y);
-	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().z);
-	g_Renderer.PrintDebugMessage("%.3f", plane.D());
-
-	auto basePos = item.Pose.Position.ToVector3();
-	g_Renderer.AddLine3D(basePos, Geometry::TranslatePoint(basePos, plane.Normal(), 500), Vector4::One);
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
