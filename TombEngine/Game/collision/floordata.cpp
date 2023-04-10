@@ -14,12 +14,21 @@ using namespace TEN::Math;
 #include "Renderer11.h"
 using TEN::Renderer::g_Renderer;
 
-// TODO: Split surfaces.
 std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
+	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
+
 	auto sectorCenter2D = GetSectorCenter(x, z);
-	auto tilt = GetSurfaceTilt(x, z, isFloor) * CLICK(1);
-	int surfaceHeight = GetSurfaceHeight(sectorCenter2D.x, sectorCenter2D.y, isFloor);
+
+	int surfaceHeight = IsSurfaceSplit(isFloor) ? GetSurfaceHeight(x, z, isFloor) : GetSurfaceHeight(sectorCenter2D.x, sectorCenter2D.y, isFloor);
+	auto tiltOffset = GetSurfaceTilt(x, z, isFloor) * CLICK(1);
+	int offset = (tiltOffset.x + tiltOffset.y) / 2;
+
+	// Calculate corner heights.
+	float vertex0Height = surfaceHeight - (tiltOffset.x + tiltOffset.y) + offset;
+	float vertex1Height = surfaceHeight - tiltOffset.y + offset;
+	float vertex2Height = surfaceHeight + offset;
+	float vertex3Height = surfaceHeight - tiltOffset.x + offset;
 
 	auto sectorCenter = Vector3(sectorCenter2D.x, 0.0f, sectorCenter2D.y);
 	float halfBlock = BLOCK(0.5f);
@@ -30,14 +39,56 @@ std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 	auto vertex2 = sectorCenter + Vector3(-halfBlock, 0.0f, -halfBlock);
 	auto vertex3 = sectorCenter + Vector3(halfBlock, 0.0f, -halfBlock);
 
-	//g_Renderer.PrintDebugMessage("%.3f", tilt.x);
-	//g_Renderer.PrintDebugMessage("%.3f", tilt.y);
+	// Handle split sector.
+	// TODO: Bugged. Range isn't always right.
+	if (IsSurfaceSplit(isFloor))
+	{
+		if (surfaceColl.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
+		{
+			g_Renderer.PrintDebugMessage("%.3f", Vector2i::Distance(Vector2i(vertex1.x, vertex1.z), Vector2i(x, z)));
+			g_Renderer.PrintDebugMessage("%.3f", (BLOCK(0.5f) * SQRT_2));
 
-	// Calculate corner heights.
-	float vertex0Height = surfaceHeight - (tilt.x + tilt.y) + (tilt.x + tilt.y) / 2;
-	float vertex1Height = surfaceHeight - tilt.y + (tilt.x + tilt.y) / 2;
-	float vertex2Height = surfaceHeight + (tilt.x + tilt.y) / 2;
-	float vertex3Height = surfaceHeight - tilt.x + (tilt.x + tilt.y) / 2;
+			if (Vector2i::Distance(Vector2i(vertex1.x, vertex1.z), Vector2i(x, z)) <= (BLOCK(0.5f) * SQRT_2))
+			{
+				return std::vector<Vector3>
+				{
+					Vector3(vertex0.x, vertex0Height, vertex0.z),
+					Vector3(vertex1.x, vertex1Height, vertex1.z),
+					Vector3(vertex2.x, vertex2Height, vertex2.z),
+				};
+			}
+			else
+			{
+				return std::vector<Vector3>
+				{
+					Vector3(vertex0.x, vertex0Height, vertex0.z),
+					Vector3(vertex2.x, vertex2Height, vertex2.z),
+					Vector3(vertex3.x, vertex3Height, vertex3.z)
+				};
+			}
+		}
+		else
+		{
+			if (Vector2i::Distance(Vector2i(vertex0.x, vertex0.z), Vector2i(x, z)) <= (BLOCK(0.5f) * SQRT_2))
+			{
+				return std::vector<Vector3>
+				{
+					Vector3(vertex0.x, vertex0Height, vertex0.z),
+					Vector3(vertex1.x, vertex1Height, vertex1.z),
+					Vector3(vertex3.x, vertex3Height, vertex3.z)
+				};
+			}
+			else
+			{
+				return std::vector<Vector3>
+				{
+					Vector3(vertex1.x, vertex1Height, vertex1.z),
+					Vector3(vertex2.x, vertex2Height, vertex2.z),
+					Vector3(vertex3.x, vertex3Height, vertex3.z)
+				};
+			}
+		}
+	}
 
 	// Return vertices.
 	return std::vector<Vector3>
