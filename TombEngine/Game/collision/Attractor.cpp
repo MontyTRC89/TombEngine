@@ -150,6 +150,11 @@ namespace TEN::Collision
 		};
 	}
 
+	/*std::vector<Attractor> GetSectorAttractors(const ItemInfo& item, const Plane& plane)
+	{
+
+	}*/
+
 	void GetNearbyAttractorData(std::vector<AttractorData>& attractors, const Vector3& pos, const EulerAngles& orient, float range)
 	{
 		attractors.clear();

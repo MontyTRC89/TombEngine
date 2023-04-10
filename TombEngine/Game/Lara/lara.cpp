@@ -427,7 +427,10 @@ void HandleAttractorDebug(ItemInfo& item)
 
 	player.Attractor.DebugAttractor.DrawDebug(item);
 
+	// Point collision.
 	auto pointColl = GetCollision(&item);
+
+	// Bridge attractors.
 	if (pointColl.Position.Bridge >= 0)
 	{
 		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
@@ -436,9 +439,15 @@ void HandleAttractorDebug(ItemInfo& item)
 		DrawBridgeAttractors(item);
 	}
 
-	// No bridge; return early.
-	if (pointColl.Position.Bridge < 0)
-		return;
+	// Floor plane.
+	auto plane = pointColl.BottomBlock->GetSurfacePlane(item.Pose.Position.x, item.Pose.Position.z, true);
+	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().x);
+	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().y);
+	g_Renderer.PrintDebugMessage("%.3f", plane.Normal().z);
+	g_Renderer.PrintDebugMessage("%.3f", plane.D());
+
+	auto basePos = item.Pose.Position.ToVector3();
+	g_Renderer.AddLine3D(basePos, Geometry::TranslatePoint(basePos, plane.Normal(), 500), Vector4::One);
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -447,6 +456,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// Debug
 	HandleAttractorDebug(*item);
+
+	// ---
 
 	if (lara->Control.Weapon.HasFired)
 	{

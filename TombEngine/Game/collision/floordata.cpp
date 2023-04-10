@@ -10,6 +10,45 @@
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 
+const Plane ConvertPlaneVectorToPlane(const Vector3& planeVector, bool isFloor)
+{
+	// Get plane distance.
+	auto direction2D = Vector2(planeVector.x, planeVector.y);
+	float length = direction2D.Length();
+	float distance = planeVector.z / length;
+
+	// If surface is flat, generate and return flat plane.
+	if (planeVector == Vector3::Zero)
+	{
+		if (isFloor)
+		{
+			return Plane(-Vector3::UnitY, distance);
+		}
+		else
+		{
+			return Plane(Vector3::UnitY, distance);
+		}
+	}
+
+	// Get plane normal.
+	auto tilt = Vector2(
+		-int((planeVector.x * BLOCK(1)) / CLICK(1)),
+		-int((planeVector.y/*z*/ * BLOCK(1)) / CLICK(1)));
+	auto normal = GetSurfaceNormal(tilt, isFloor);
+
+	// Return plane.
+	return Plane(normal, distance);
+}
+
+Plane FloorInfo::GetSurfacePlane(int x, int z, bool isFloor) const
+{
+	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
+
+	// Get surface plane.
+	int planeIndex = GetSurfacePlaneIndex(x, z, isFloor);
+	return ConvertPlaneVectorToPlane(planes[planeIndex], isFloor);
+}
+
 int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool isFloor) const
 {
 	// Calculate bias.
@@ -31,7 +70,7 @@ Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool isFloor) const
 	// Calculate and return plane tilt.
 	return Vector2(
 		-int((plane.x * BLOCK(1)) / CLICK(1)),
-		-int((plane.y * BLOCK(1)) / CLICK(1)));
+		-int((plane.y/*z*/ * BLOCK(1)) / CLICK(1)));
 }
 
 bool FloorInfo::IsSurfaceSplit(bool isFloor) const
@@ -171,7 +210,7 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 
 	// Return surface height.
 	return ((plane.x * point.x) +
-			(plane.y * point.y) +
+			(plane.y * point.y/*z*/) +
 			plane.z);
 }
 

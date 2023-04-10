@@ -127,6 +127,7 @@ class FloorInfo
 		bool Stopper	  = true;
 
 		// Getters
+		Plane	GetSurfacePlane(int x, int z, bool isFloor) const;
 		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
 		Vector2 GetSurfaceTilt(int x, int z, bool isFloor) const;
 
