@@ -19,8 +19,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision
 {
-	constexpr auto NEARBY_ATTRACTOR_COUNT_MAX = 32;
-
 	Attractor::Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber)
 	{
 		Type = type;
@@ -49,7 +47,7 @@ namespace TEN::Collision
 		return RoomNumber;
 	}
 
-	bool Attractor::IsEdge()
+	bool Attractor::IsEdge() const
 	{
 		return (Type == AttractorType::Edge);
 	}
@@ -197,6 +195,8 @@ namespace TEN::Collision
 	// TODO: Actually probe for attractors.
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
 	{
+		constexpr auto COUNT_MAX = 32;
+
 		auto& player = GetLaraInfo(item);
 
 		auto attracPtrs = std::vector<const Attractor*>{};
@@ -205,7 +205,7 @@ namespace TEN::Collision
 
 		for (auto& attrac : player.Context.Attractor.SectorAttractors)
 		{
-			if (attracPtrs.size() >= NEARBY_ATTRACTOR_COUNT_MAX)
+			if (attracPtrs.size() >= COUNT_MAX)
 				return attracPtrs;
 
 			attracPtrs.push_back(&attrac);

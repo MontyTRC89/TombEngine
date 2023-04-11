@@ -45,7 +45,7 @@ namespace TEN::Collision
 		int			  GetRoomNumber() const;
 
 		// Inquirers
-		bool IsEdge();
+		bool IsEdge() const;
 
 		// Helpers
 		void DrawDebug(ItemInfo& item);

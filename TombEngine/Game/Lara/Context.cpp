@@ -235,8 +235,8 @@ namespace TEN::Entities::Player::Context
 		const AttractorCollision* closestAttracCollPtr = nullptr;
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Ensure attractor is of right type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+			// 1) Check if attractor is an edge.
+			if (!attracColl.AttractorPtr->IsEdge())
 				continue;
 
 			// 2) Check if edge is within range and in front.
