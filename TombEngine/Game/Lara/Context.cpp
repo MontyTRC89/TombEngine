@@ -245,17 +245,17 @@ namespace TEN::Entities::Player::Context
 				continue;
 
 			// 3) Test catch angle.
-			if (!TestPlayerInteractAngle(item, attracColl.FacingAngle))
+			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 				continue;
 
 			// 4) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
-			// Get point collision off side of edge.
+			// Get point collision off edge side.
 			auto pointCollOffEdge = GetCollision(
 				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.FacingAngle, -coll.Setup.Radius);
+				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// TODO: Manual probe from attractor point.
 			// 5) Test if edge is too low to the ground.
@@ -290,7 +290,7 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Return edge catch data.
-		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->FacingAngle };
+		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->HeadingAngle };
 	}
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)

@@ -151,7 +151,7 @@ namespace TEN::Collision
 		attracColl.IsInFront = isInFront;
 		attracColl.Distance = dist;
 		attracColl.DistanceFromEnd = distFromEnd;
-		attracColl.FacingAngle = facingAngle;
+		attracColl.HeadingAngle = facingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.PointOnLeft = pointOnLeft;
 		return attracColl;

@@ -61,7 +61,7 @@ namespace TEN::Collision
 		bool  IsInFront		  = false;
 		float Distance		  = 0.0f;
 		float DistanceFromEnd = 0.0f;
-		short FacingAngle	  = 0;
+		short HeadingAngle	  = 0;
 		short SlopeAngle	  = 0;
 
 		AttractorPoint PointOnLeft = AttractorPoint::Point0;

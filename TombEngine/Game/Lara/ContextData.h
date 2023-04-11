@@ -20,9 +20,9 @@ namespace TEN::Entities::Player::Context
 
 	struct EdgeCatchData
 	{
-		EdgeType Type		 = EdgeType::Ledge;
-		Vector3	 Position	 = Vector3::Zero;
-		short	 FacingAngle = 0;
+		EdgeType Type		  = EdgeType::Ledge;
+		Vector3	 Position	  = Vector3::Zero;
+		short	 HeadingAngle = 0;
 	};
 
 	struct MonkeySwingCatchData

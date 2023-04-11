@@ -180,7 +180,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		Vector3(item.Pose.Position.x, catchData.Position.y, item.Pose.Position.z) :
 		catchData.Position;
 	auto pos = catchPos + Vector3(0.0f, playerHeight, 0.0f);
-	pos = Geometry::TranslatePoint(pos, catchData.FacingAngle, -coll.Setup.Radius);
+	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
 	ResetPlayerFlex(&item);
 	item.Animation.IsAirborne = false;
@@ -188,7 +188,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	item.Pose.Position = pos;
 	player.Control.HandStatus = HandStatus::Busy;
 
-	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.FacingAngle;
+	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 }
 
