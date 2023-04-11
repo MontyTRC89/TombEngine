@@ -208,13 +208,57 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
+	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, short testAngle)
+	{
+		// Get attractor pointers.
+		auto attracPtrs = GetNearbyAttractorPtrs(item);
+
+		// Get attractor collisions.
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(testAngle));
+		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius), rotMatrix);
+		float range = OFFSET_RADIUS(coll.Setup.Radius);
+		auto attracColls = GetAttractorCollisions(item, coll, attracPtrs, refPoint, range);
+
+		// Find closest edge attractor.
+		for (const auto& attracColl : attracColls)
+		{
+			// 1) Check if attractor is edge type.
+			if (!attracColl.AttractorPtr->IsEdge())
+				continue;
+
+			// 2) Check if edge is within range.
+			if (!attracColl.IsIntersected)
+				continue;
+
+			// 3) Test if edge slope is slippery.
+			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
+				continue;
+
+			// Get point collision off edge side.
+			auto pointCollOffEdge = GetCollision(
+				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// 4) Test if edge is too low to the ground.
+			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffEdge.Position.Floor);
+			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
+				continue;
+
+			return true;
+		}
+
+		return false;
+	}
+
 	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
 	{
+		//return TestLateralShimmy(item, coll, ANGLE(-90.0f));
 		return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
 	}
 
 	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll)
 	{
+		//return TestLateralShimmy(item, coll, ANGLE(90.0f));
 		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
@@ -257,7 +301,6 @@ namespace TEN::Entities::Player::Context
 				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// TODO: Manual probe from attractor point.
 			// 5) Test if edge is too low to the ground.
 			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffEdge.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
