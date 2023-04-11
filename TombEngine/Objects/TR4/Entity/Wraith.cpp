@@ -208,7 +208,7 @@ namespace TEN::Entities::TR4
 		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item.Pose);
 
 		// HACK: HitPoints stores the wraith's target.
-		auto* target = item.ItemFlags[6] ? &g_Level.Items[item.ItemFlags[6]] : LaraItem;
+		auto target = item.ItemFlags[6] ? &g_Level.Items[item.ItemFlags[6]] : LaraItem;
 
 		auto prevPos = item.Pose.Position;
 		int x, y, z, xl, yl, zl;
