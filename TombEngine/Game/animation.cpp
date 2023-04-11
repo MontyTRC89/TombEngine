@@ -74,10 +74,10 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					auto& player = GetLaraInfo(item);
 
-					if (player.Control.CalculatedJumpVelocity != 0)
+					if (player.Context.CalcJumpVelocity != 0)
 					{
-						item.Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
-						player.Control.CalculatedJumpVelocity = 0;
+						item.Animation.Velocity.y = player.Context.CalcJumpVelocity;
+						player.Context.CalcJumpVelocity = 0;
 					}
 				}
 			}

@@ -389,7 +389,7 @@ bool SaveGame::Save(int slot)
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
-	control.add_calculated_jump_velocity(Lara.Control.CalculatedJumpVelocity);
+	control.add_calculated_jump_velocity(Lara.Context.CalcJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_moving(Lara.Control.IsMoving);
@@ -467,7 +467,7 @@ bool SaveGame::Save(int slot)
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
+	lara.add_projected_floor_height(Lara.Context.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
 	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
@@ -1813,7 +1813,7 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
 		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
 
-	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
+	Lara.Context.CalcJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
@@ -1889,7 +1889,7 @@ bool SaveGame::Load(int slot)
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.Context.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
-	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
+	Lara.Context.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
 	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();

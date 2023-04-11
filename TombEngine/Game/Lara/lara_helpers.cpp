@@ -883,7 +883,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ProjectedFloorHeight = vaultResult.Height;
+	lara->Context.ProjectedFloorHeight = vaultResult.Height;
 	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
 	lara->Control.TurnRate = 0;
 
@@ -899,13 +899,13 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara->ProjectedFloorHeight - item->Pose.Position.y;
+		int height = lara->Context.ProjectedFloorHeight - item->Pose.Position.y;
 		if (height > -CLICK(3.5f))
 			height = -CLICK(3.5f);
 		else if (height < -CLICK(7.5f))
 			height = -CLICK(7.5f);
 
-		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
+		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
 	}
 }
 

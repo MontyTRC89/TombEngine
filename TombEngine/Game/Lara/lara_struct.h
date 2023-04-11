@@ -1249,9 +1249,8 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle				 = 0;
-	short TurnRate				 = 0;
-	int	  CalculatedJumpVelocity = 0;
+	short MoveAngle = 0;
+	short TurnRate	= 0;
 
 	HandStatus	  HandStatus	= {};
 	WaterStatus	  WaterStatus	= {};
@@ -1293,9 +1292,9 @@ struct PlayerStatusData
 
 struct PlayerAttractorData
 {
-	AttractorData HandCenter = {};
-	AttractorData HandLeft	 = {};
-	AttractorData HandRight	 = {};
+	std::vector<Attractor> HandCenter = {};
+	std::vector<Attractor> HandLeft	  = {};
+	std::vector<Attractor> HandRight  = {};
 
 	std::vector<AttractorData> NearbyData = {};
 
@@ -1311,17 +1310,17 @@ struct PlayerContextData
 {
 	PlayerAttractorData Attractor = {};
 
-	int			CalculatedJumpVelocity = 0;
-	int			ProjectedFloorHeight   = 0;
-	Pose		NextCornerPos		   = Pose::Zero;
-	EulerAngles TargetOrientation	   = EulerAngles::Zero;
+	int			CalcJumpVelocity	 = 0;
+	int			ProjectedFloorHeight = 0;
+	Pose		NextCornerPos		 = Pose::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero;
 
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
+	int		 WaterSurfaceDist	= 0;//
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.//
+	Vector3i WaterCurrentPull	= Vector3i::Zero;//
 
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
+	int InteractedItem = 0; // Item number.//
+	int Vehicle		   = 0; // Item number.//
 };
 
 struct LaraInfo
@@ -1330,11 +1329,12 @@ struct LaraInfo
 
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};
+	PlayerEffectData  Effect	= {};
 	PlayerStatusData  Status	= {};
 	LaraInventoryData Inventory = {};
-	FlareData		  Flare		= {};
-	TorchData		  Torch		= {};
 
+	FlareData		  Flare = {};
+	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
 	EulerAngles ExtraHeadRot	= {};
@@ -1344,17 +1344,6 @@ struct LaraInfo
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
 
-	int		 ProjectedFloorHeight = 0;//
-	int		 WaterSurfaceDist	  = 0;//
-	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.//
-	Vector3i WaterCurrentPull	  = Vector3i::Zero;//
-
-	int InteractedItem = 0; // Item number.//
-	int Vehicle		   = 0; // Item number.//
-	int ExtraAnim	   = 0; // Item number? Only ever set to NO_ITEM or 1.
-
-	PlayerEffectData Effect = {};
-
 	// TODO: Rewrite and restore spasm effect.
 	int		 HitFrame	  = 0;		 // Frame index.
 	int		 HitDirection = 0;		 // Cardinal direction.
@@ -1363,4 +1352,12 @@ struct LaraInfo
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
 	signed char LocationPad		= 0;
+
+	// TODO: Moved to PlayerContextData. Remove from this struct.
+	int		 WaterSurfaceDist	  = 0;//
+	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.//
+	Vector3i WaterCurrentPull	  = Vector3i::Zero;//
+	int InteractedItem = 0; // Item number.//
+	int Vehicle		   = 0; // Item number.//
+	int ExtraAnim	   = 0; // Item number? Only ever set to NO_ITEM or 1.
 };
