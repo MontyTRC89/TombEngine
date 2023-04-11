@@ -217,7 +217,7 @@ namespace TEN::Entities::Player::Context
 		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
-	static bool TestPlayerCatchAngle(const ItemInfo& item, short testAngle)
+	static bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	{
 		return (abs(short(testAngle - item.Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 	}
@@ -226,16 +226,17 @@ namespace TEN::Entities::Player::Context
 														  const CollisionResult& pointCollCenter,
 														  const std::vector<AttractorCollision>& attracColls)
 	{
-		constexpr auto EDGE_TYPE = EdgeType::Attractor;
+		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
 		const auto& player = GetLaraInfo(item);
 
-		// Test collision.
-		float closestDistance = INFINITY;
-		const AttractorCollision* closestAttracCollPtr = nullptr;
+		const AttractorCollision* attracCollPtr = nullptr;
+		float closestDist = INFINITY;
+
+		// Find closest edge attractor.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is an edge.
+			// 1) Check if attractor is edge type.
 			if (!attracColl.AttractorPtr->IsEdge())
 				continue;
 
@@ -244,15 +245,15 @@ namespace TEN::Entities::Player::Context
 				continue;
 
 			// 3) Test catch angle.
-			if (!TestPlayerCatchAngle(item, attracColl.FacingAngle))
+			if (!TestPlayerInteractAngle(item, attracColl.FacingAngle))
 				continue;
 
 			// 4) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
-			// 5) Test if edge is too low to the ground.
 			// TODO: Manual probe from attractor point.
+			// 5) Test if edge is too low to the ground.
 			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollCenter.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
@@ -269,10 +270,10 @@ namespace TEN::Entities::Player::Context
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
-				if (attracColl.Distance < closestDistance)
+				if (attracColl.Distance < closestDist)
 				{
-					closestDistance = attracColl.Distance;
-					closestAttracCollPtr = &attracColl;
+					attracCollPtr = &attracColl;
+					closestDist = attracColl.Distance;
 				}
 
 				continue;
@@ -280,11 +281,11 @@ namespace TEN::Entities::Player::Context
 		}
 
 		// No edge found; return nullopt.
-		if (closestAttracCollPtr == nullptr)
+		if (attracCollPtr == nullptr)
 			return std::nullopt;
 
 		// Return edge catch data.
-		return EdgeCatchData{ EDGE_TYPE, closestAttracCollPtr->ClosestPoint, closestAttracCollPtr->FacingAngle };
+		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->FacingAngle };
 	}
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(

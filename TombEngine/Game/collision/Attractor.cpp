@@ -52,42 +52,9 @@ namespace TEN::Collision
 		return (Type == AttractorType::Edge);
 	}
 
-	void Attractor::DrawDebug(ItemInfo& item)
+	void Attractor::DrawDebug() const
 	{
-		auto& player = GetLaraInfo(item);
-
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-
-		// Set points.
-		if (KeyMap[OIS::KeyCode::KC_Q])
-		{
-			auto pos = LaraItem->Pose.Position.ToVector3() +
-				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-			player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, pos, player.Context.Attractor.DebugAttractor.GetPoint0(), 0);
-		}
-		if (KeyMap[OIS::KeyCode::KC_W])
-		{
-			auto pos = LaraItem->Pose.Position.ToVector3() +
-				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-			player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, player.Context.Attractor.DebugAttractor.GetPoint0(), pos, 0);
-		}
-
-		// Show tether line. 
-		auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
-		auto closestPoint = Geometry::GetPerpendicularPointOnLine(
-			LaraItem->Pose.Position.ToVector3(),
-			player.Context.Attractor.DebugAttractor.GetPoint0(),
-			player.Context.Attractor.DebugAttractor.GetPoint1());
-
-		// Draw tether line. Magenta when in front, white behind.
-		if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
-		{
-			g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
-		}
-		else
-		{
-			g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4::One);
-		}
+		g_Renderer.AddLine3D(GetPoint0(), GetPoint1(), Vector4::One);
 	}
 
 	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, bool isClosedLoop = true)
@@ -207,6 +174,8 @@ namespace TEN::Collision
 		{
 			if (attracPtrs.size() >= COUNT_MAX)
 				return attracPtrs;
+
+			attrac.Dra
 
 			attracPtrs.push_back(&attrac);
 		}

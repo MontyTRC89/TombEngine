@@ -8,8 +8,7 @@ namespace TEN::Entities::Player::Context
 	enum class EdgeType
 	{
 		Ledge,
-		ClimbableWall,
-		Attractor
+		ClimbableWall
 	};
 
 	enum class CornerType

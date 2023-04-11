@@ -432,11 +432,48 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 }
 
 // Debug
+#include <ois/OISKeyboard.h>
+#include "Specific/Input/Input.h"
+using namespace TEN::Input;
+// ---
+
+// Debug
 void HandleAttractorDebug(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
-	player.Context.Attractor.DebugAttractor.DrawDebug(item);
+	auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+
+	// Set points for debug attractor.
+	if (KeyMap[OIS::KeyCode::KC_Q])
+	{
+		auto pos = LaraItem->Pose.Position.ToVector3() +
+			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, pos, player.Context.Attractor.DebugAttractor.GetPoint0(), 0);
+	}
+	if (KeyMap[OIS::KeyCode::KC_W])
+	{
+		auto pos = LaraItem->Pose.Position.ToVector3() +
+			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, player.Context.Attractor.DebugAttractor.GetPoint0(), pos, 0);
+	}
+
+	// Show tether line. 
+	auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
+	auto closestPoint = Geometry::GetPerpendicularPointOnLine(
+		LaraItem->Pose.Position.ToVector3(),
+		player.Context.Attractor.DebugAttractor.GetPoint0(),
+		player.Context.Attractor.DebugAttractor.GetPoint1());
+
+	// Draw tether line. Magenta when in front, white behind.
+	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
+	{
+		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
+	}
+	else
+	{
+		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4::One);
+	}
 
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);

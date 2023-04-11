@@ -48,7 +48,7 @@ namespace TEN::Collision
 		bool IsEdge() const;
 
 		// Helpers
-		void DrawDebug(ItemInfo& item);
+		void DrawDebug() const;
 	};
 
 	struct AttractorCollision
