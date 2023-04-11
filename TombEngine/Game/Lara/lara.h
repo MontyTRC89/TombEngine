@@ -91,8 +91,6 @@ constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
 
-constexpr auto PLAYER_NEARBY_ATTRACTOR_COUNT_MAX = 32;
-
 // Collision heights
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);

@@ -413,38 +413,36 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_turn_180,//173
 };
 
-void DrawRoomAttractors(const ItemInfo& item)
+// Debug
+static void DrawPlayerAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	for (const auto& attrac : player.Context.Attractor.BridgeAttractors)
-		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
+	// Show attractor as white line.
+	g_Renderer.AddLine3D(
+		player.Context.Attractor.DebugAttractor.GetPoint0(),
+		player.Context.Attractor.DebugAttractor.GetPoint1(),
+		Vector4::One);
 
 	for (const auto& attrac : player.Context.Attractor.SectorAttractors)
 	{
 		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
-
 		g_Renderer.AddLine3D(attrac.GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
 	}
 }
 
+// Debug
 void HandleAttractorDebug(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
 	player.Context.Attractor.DebugAttractor.DrawDebug(item);
 
-	// Point collision.
+	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);
-
-	// Sector and bridge attractors.
-	if (pointColl.Position.Bridge >= 0)
-	{
-		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-		player.Context.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
-	}
 	player.Context.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
-	DrawRoomAttractors(item);
+
+	DrawPlayerAttractors(item);
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -453,8 +451,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// Debug
 	HandleAttractorDebug(*item);
-
-	// ---
 
 	if (lara->Control.Weapon.HasFired)
 	{

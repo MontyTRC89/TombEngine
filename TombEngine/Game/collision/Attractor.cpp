@@ -19,12 +19,13 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision
 {
+	constexpr auto NEARBY_ATTRACTOR_COUNT_MAX = 32;
+
 	Attractor::Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber)
 	{
 		Type = type;
 		Point0 = point0;
 		Point1 = point1;
-		Length = Vector3::Distance(Point0, Point1);
 		RoomNumber = roomNumber;
 	}
 	
@@ -43,26 +44,9 @@ namespace TEN::Collision
 		return Point1;
 	}
 
-	float Attractor::GetLength() const
-	{
-		return Length;
-	}
-
 	int Attractor::GetRoomNumber() const
 	{
 		return RoomNumber;
-	}
-
-	void Attractor::SetPoint0(const Vector3& point)
-	{
-		Point0 = point;
-		Length = Vector3::Distance(Point0, Point1);
-	}
-
-	void Attractor::SetPoint1(const Vector3& point)
-	{
-		Point1 = point;
-		Length = Vector3::Distance(Point0, Point1);
 	}
 
 	bool Attractor::IsEdge()
@@ -81,49 +65,46 @@ namespace TEN::Collision
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() +
 				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-			player.Context.Attractor.DebugAttractor.SetPoint0(pos);
+			player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, pos, player.Context.Attractor.DebugAttractor.GetPoint0(), 0);
 		}
-
 		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() +
 				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-			player.Context.Attractor.DebugAttractor.SetPoint1(pos);
+			player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, player.Context.Attractor.DebugAttractor.GetPoint0(), pos, 0);
 		}
 
-		// Show attractor as white line.
-		g_Renderer.AddLine3D(player.Context.Attractor.DebugAttractor.GetPoint0(), player.Context.Attractor.DebugAttractor.GetPoint1(), Vector4::One);
-
 		// Show tether line. 
-		auto frontPos = Geometry::TranslatePoint(LaraItem->Pose.Position, LaraItem->Pose.Orientation.y, LARA_RADIUS, -LARA_HEIGHT);
+		auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
 		auto closestPoint = Geometry::GetPerpendicularPointOnLine(
 			LaraItem->Pose.Position.ToVector3(),
 			player.Context.Attractor.DebugAttractor.GetPoint0(),
 			player.Context.Attractor.DebugAttractor.GetPoint1());
 
-		// Draw tether lines. Magenta when in front, white when behind.
+		// Draw tether line. Magenta when in front, white behind.
 		if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
 		{
-			g_Renderer.AddLine3D(frontPos.ToVector3(), closestPoint, Vector4(1, 0, 1, 1));
+			g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
 		}
 		else
 		{
-			g_Renderer.AddLine3D(frontPos.ToVector3(), closestPoint, Vector4::One);
+			g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4::One);
 		}
 	}
 
-	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber)
+	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, bool isClosedLoop = true)
 	{
 		// Prepare container.
 		auto attracs = std::vector<Attractor>{};
 		attracs.resize(points.size());
 
 		// Generate attractors between points.
-		for (int i = 0; i < points.size(); i++)
+		unsigned int count = isClosedLoop ? points.size() : (points.size() - 1);
+		for (int i = 0; i < count; i++)
 		{
-			auto point0 = points[i];
-			auto point1 = points[(i < (points.size() - 1)) ? (i + 1) : 0];
-			auto attrac = Attractor(AttractorType::Edge, point0, point1, roomNumber);
+			auto linePoint0 = points[i];
+			auto linePoint1 = points[(i < (points.size() - 1)) ? (i + 1) : 0];
+			auto attrac = Attractor(AttractorType::Edge, linePoint0, linePoint1, roomNumber);
 
 			attracs.push_back(attrac);
 		}
@@ -132,13 +113,8 @@ namespace TEN::Collision
 		return attracs;
 	}
 
-	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
-	{
-		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		return GetAttractorsFromPoints(points, pointColl.RoomNumber);
-	}
-
-	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
+	// TODO: Bridge tilts.
+	static std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
 	{
 		// Get bridge bounding box.
 		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -160,23 +136,32 @@ namespace TEN::Collision
 		};
 
 		// Return attractors generated from points.
-		return GetAttractorsFromPoints(points, item.RoomNumber);
+		return GenerateAttractorsFromPoints(points, item.RoomNumber);
 	}
 
-	Vector3 ProjectOnPlane(const Vector3& vector, const Vector3& planeNormal)
+	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
 	{
-		float dot = vector.Dot(planeNormal);
-		return vector - planeNormal * dot;
+		// Get bridge attractors.
+		if (pointColl.Position.Bridge >= 0)
+		{
+			const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
+			return GetBridgeAttractors(bridgeItem);
+		}
+
+		// Get room attractors.
+		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber);
 	}
 
-	AttractorData GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac, const Vector3& refPoint)
+	static AttractorCollision GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac,
+											   const Vector3& refPoint, float range)
 	{
-		bool getPerpPoint = (attrac.GetType() == AttractorType::Edge);
+		bool isPerpPoint = (attrac.GetType() == AttractorType::Edge);
 
-		// Get attractor point data.
+		// Get points.
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
-		auto closestPoint = getPerpPoint ?
+		auto closestPoint = isPerpPoint ?
 			Geometry::GetPerpendicularPointOnLine(refPoint, point0, point1) :
 			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
@@ -185,7 +170,6 @@ namespace TEN::Collision
 		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));
 
 		// Determine enquiries.
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
 		bool isIntersected = (dist <= range);
 		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
 		auto pointOnLeft = Geometry::IsPointOnLeft(item.Pose, point0) ? AttractorPoint::Point0 : AttractorPoint::Point1;
@@ -195,53 +179,52 @@ namespace TEN::Collision
 		short facingAngle = orient.y - ANGLE(90.0f);
 		short slopeAngle = orient.x;
 
-		// Create new attractor data.
-		auto attracData = AttractorData{};
+		// Create new attractor collision.
+		auto attracColl = AttractorCollision{};
 
-		attracData.AttractorPtr = &attrac;
-		attracData.ClosestPoint = closestPoint;
-		attracData.IsIntersected = isIntersected;
-		attracData.IsInFront = isInFront;
-		attracData.Distance = dist;
-		attracData.DistanceFromEnd = distFromEnd;
-		attracData.FacingAngle = facingAngle;
-		attracData.SlopeAngle = slopeAngle;
-		attracData.PointOnLeft = pointOnLeft;
-		return attracData;
+		attracColl.AttractorPtr = &attrac;
+		attracColl.ClosestPoint = closestPoint;
+		attracColl.IsIntersected = isIntersected;
+		attracColl.IsInFront = isInFront;
+		attracColl.Distance = dist;
+		attracColl.DistanceFromEnd = distFromEnd;
+		attracColl.FacingAngle = facingAngle;
+		attracColl.SlopeAngle = slopeAngle;
+		attracColl.PointOnLeft = pointOnLeft;
+		return attracColl;
 	}
 
-	// TODO
-	// Store nearby Attractor object pointers.
-	// Then, store vectors of AttractorData objects for all three player points.
-	void GetPlayerNearbyAttractorData(ItemInfo& item, const CollisionInfo& coll)
+	// TODO: Actually probe for attractors.
+	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
 	{
 		auto& player = GetLaraInfo(item);
 
-		player.Context.Attractor.NearbyData.clear();
-		player.Context.Attractor.NearbyData = std::vector<AttractorData>{};
+		auto attracPtrs = std::vector<const Attractor*>{};
 
-		// TODO: Need different positions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
-
-		auto attracData = GetAttractorData(item, coll, player.Context.Attractor.DebugAttractor, refPoint);
-		Lara.Context.Attractor.NearbyData.push_back(attracData);
-
-		for (auto& attrac : player.Context.Attractor.BridgeAttractors)
-		{
-			if (player.Context.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
-				return;
-
-			attracData = GetAttractorData(item, coll, attrac, refPoint);
-			player.Context.Attractor.NearbyData.emplace_back(attracData);
-		}
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
 
 		for (auto& attrac : player.Context.Attractor.SectorAttractors)
 		{
-			if (player.Context.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
-				return;
+			if (attracPtrs.size() >= NEARBY_ATTRACTOR_COUNT_MAX)
+				return attracPtrs;
 
-			attracData = GetAttractorData(item, coll, attrac, refPoint);
-			player.Context.Attractor.NearbyData.emplace_back(attracData);
+			attracPtrs.push_back(&attrac);
 		}
+
+		return attracPtrs;
+	}
+
+	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll,
+														   const std::vector<const Attractor*>& attracPtrs,
+														   const Vector3& refPoint, float range)
+	{
+		auto attracColls = std::vector<AttractorCollision>{};
+		for (const auto* attrac : attracPtrs)
+		{
+			auto attracColl = GetAttractorData(item, coll, *attrac, refPoint, range);
+			attracColls.push_back(attracColl);
+		}
+
+		return attracColls;
 	}
 }

@@ -1290,17 +1290,11 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
+// TODO: Maybe not necessary after all?
 struct PlayerAttractorData
 {
-	std::vector<Attractor> HandCenter = {};
-	std::vector<Attractor> HandLeft	  = {};
-	std::vector<Attractor> HandRight  = {};
-
-	std::vector<AttractorData> NearbyData = {};
-
 	// Debug
 	Attractor			   DebugAttractor	= {};
-	std::vector<Attractor> BridgeAttractors = {};
 	std::vector<Attractor> SectorAttractors = {};
 };
 

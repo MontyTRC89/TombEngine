@@ -29,7 +29,6 @@ namespace TEN::Collision
 	private:
 		// Members
 		AttractorType Type		 = AttractorType::Edge;
-		float		  Length	 = 0.0f;
 		Vector3		  Point0	 = Vector3::Zero;
 		Vector3		  Point1	 = Vector3::Zero;
 		int			  RoomNumber = 0;
@@ -41,14 +40,9 @@ namespace TEN::Collision
 
 		// Getters
 		AttractorType GetType() const;
-		float		  GetLength() const;
 		Vector3		  GetPoint0() const;
 		Vector3		  GetPoint1() const;
 		int			  GetRoomNumber() const;
-
-		// Setters
-		void SetPoint0(const Vector3& point);
-		void SetPoint1(const Vector3& point);
 
 		// Inquirers
 		bool IsEdge();
@@ -57,7 +51,7 @@ namespace TEN::Collision
 		void DrawDebug(ItemInfo& item);
 	};
 
-	struct AttractorData
+	struct AttractorCollision
 	{
 		const Attractor* AttractorPtr = nullptr;
 
@@ -73,10 +67,9 @@ namespace TEN::Collision
 		AttractorPoint PointOnLeft = AttractorPoint::Point0;
 	};
 
-	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber);
-	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
-	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item);
-
-	AttractorData GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac, const Vector3& refPoint);
-	void		  GetPlayerNearbyAttractorData(ItemInfo& item, const CollisionInfo& coll);
+	std::vector<Attractor>			GetSectorAttractors(const CollisionResult& pointColl);
+	std::vector<const Attractor*>	GetNearbyAttractorPtrs(const ItemInfo& item);
+	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll,
+														   const std::vector<const Attractor*>& attracPtrs,
+														   const Vector3& refPoint, float range);
 }
