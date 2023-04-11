@@ -289,8 +289,7 @@ namespace TEN::Entities::Player::Context
 	}
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll,
-																	  const CollisionResult& pointCollCenter,
-																	  const CollisionResult& pointCollFront)
+																	  const CollisionResult& pointCollCenter)
 	{
 		constexpr auto EDGE_TYPE		= EdgeType::ClimbableWall;
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
@@ -301,7 +300,11 @@ namespace TEN::Entities::Player::Context
 		if (!player.Control.CanClimbLadder)
 			return std::nullopt;
 
-		// 2) Test movement direction.
+		// 2) Test for valid ledge at climbable wall.
+		if (!TestValidLedge(&item, &coll, true))
+			return std::nullopt;
+
+		// 3) Test movement direction.
 		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 		if (isMovingUp)
 			return std::nullopt;
@@ -309,29 +312,34 @@ namespace TEN::Entities::Player::Context
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int edgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 
-		// 3) Test if wall edge is too low to the ground.
+		// 4) Test if wall edge is too low to the ground.
 		int floorToEdgeHeight = abs(edgeHeight - pointCollCenter.Position.Floor);
 		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
 
-		// 4) Test if edge isn't within a wall.
+		// Get point collision.
+		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
+		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
+
+		// 5) Test if edge isn't within a wall.
 		if (edgeHeight < pointCollFront.Position.Floor && // Edge is above floor.
 			edgeHeight > pointCollFront.Position.Ceiling) // Edge is below ceiling.
 		{
 			return std::nullopt;
 		}
 
-		// 5) Test if climbable wall is valid.
+		// 6) Test if climbable wall is valid.
 		bool isClimbableWall = TestLaraHangOnClimbableWall(&item, &coll);
 		if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
 			return std::nullopt;
 
-		// 6) Assess point collision to wall edge.
+		// 7) Assess point collision to wall edge.
 		int relEdgeHeight = edgeHeight - vPos;
 		if (relEdgeHeight <= item.Animation.Velocity.y && // Edge height is above lower height bound.
 			relEdgeHeight >= 0)							  // Edge height is below upper height bound.
 		{
-			return EdgeCatchData{ EDGE_TYPE, Vector3(0.0f, edgeHeight, 0.0f) };
+			auto offset = Vector3(0.0f, edgeHeight, 0.0f);
+			return EdgeCatchData{ EDGE_TYPE, offset };
 		}
 		
 		return std::nullopt;
@@ -347,23 +355,16 @@ namespace TEN::Entities::Player::Context
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
 		auto attracColls = GetAttractorCollisions(item, coll, attracPtrs, refPoint, range);
 
-		// 1) Test for valid ledge.
-		/*if (!TestValidLedge(&item, &coll, true))
-			return std::nullopt;*/
-
 		// Get point collision.
-		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
 
-		// 2) Get and return ledge catch data (if valid).
+		// 1) Get and return ledge catch data (if valid).
 		auto ledgeCatchData = GetLedgeCatchData(item, coll, pointCollCenter, attracColls);
 		if (ledgeCatchData.has_value())
 			return ledgeCatchData;
 
-		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
-
-		// 3) Get and return climbable wall edge catch data (if valid).
-		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll, pointCollCenter, pointCollFront);
+		// 2) Get and return climbable wall edge catch data (if valid).
+		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll, pointCollCenter);
 		if (wallEdgeCatchData.has_value())
 			return wallEdgeCatchData;
 
