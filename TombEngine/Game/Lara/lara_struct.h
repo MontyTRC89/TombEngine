@@ -1247,20 +1247,6 @@ struct SubsuitControlData
 	unsigned short HitCount = 0;
 };
 
-struct PlayerAttractorData
-{
-	AttractorData HandCenter = {};
-	AttractorData HandLeft	 = {};
-	AttractorData HandRight	 = {};
-
-	std::vector<AttractorData> NearbyData = {};
-
-	// Debug
-	Attractor			   DebugAttractor	= {};
-	std::vector<Attractor> BridgeAttractors = {};
-	std::vector<Attractor> SectorAttractors = {};
-};
-
 struct LaraControlData
 {
 	short MoveAngle				 = 0;
@@ -1272,7 +1258,6 @@ struct LaraControlData
 	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
-	PlayerAttractorData	 Attractor = {};//
 	RopeControlData		 Rope	   = {};
 	SubsuitControlData	 Subsuit   = {};
 	TightropeControlData Tightrope = {};
@@ -1304,6 +1289,20 @@ struct PlayerStatusData
 	int Exposure = 0;
 	int Poison	 = 0;
 	int Stamina	 = 0;
+};
+
+struct PlayerAttractorData
+{
+	AttractorData HandCenter = {};
+	AttractorData HandLeft	 = {};
+	AttractorData HandRight	 = {};
+
+	std::vector<AttractorData> NearbyData = {};
+
+	// Debug
+	Attractor			   DebugAttractor	= {};
+	std::vector<Attractor> BridgeAttractors = {};
+	std::vector<Attractor> SectorAttractors = {};
 };
 
 // TODO: Use this struct for all collision context stuff.

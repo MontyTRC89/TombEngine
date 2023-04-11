@@ -36,8 +36,8 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 	auto pointCollLeft = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
 
-	g_Renderer.AddSphere(pointCollLeft.Coordinates.ToVector3(), 20, Vector4::One);
-	g_Renderer.AddSphere(pointCollRight.Coordinates.ToVector3(), 20, Vector4::One);
+	//g_Renderer.AddSphere(pointCollLeft.Coordinates.ToVector3(), 20, Vector4::One);
+	//g_Renderer.AddSphere(pointCollRight.Coordinates.ToVector3(), 20, Vector4::One);
 
 	// If any front point collision intersects entity bounds, return false, because there is a material intersection.
 	// This check helps to filter out cases when the player is formally facing corner but ledge check returns true
@@ -603,7 +603,7 @@ Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, Collision
 		poses[i] = item->Pose;
 		item->Pose = poses[2];
 
-		g_Renderer.AddSphere(poses[i].Position.ToVector3(), 20, Vector4::One);
+		//g_Renderer.AddSphere(poses[i].Position.ToVector3(), 20, Vector4::One);
 
 		// Both passes finished; construct result data.
 		if (i == 1)

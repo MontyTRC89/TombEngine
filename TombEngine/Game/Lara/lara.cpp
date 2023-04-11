@@ -417,10 +417,10 @@ void DrawRoomAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	for (const auto& attrac : player.Control.Attractor.BridgeAttractors)
+	for (const auto& attrac : player.Context.Attractor.BridgeAttractors)
 		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
 
-	for (const auto& attrac : player.Control.Attractor.SectorAttractors)
+	for (const auto& attrac : player.Context.Attractor.SectorAttractors)
 	{
 		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
 
@@ -432,7 +432,7 @@ void HandleAttractorDebug(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
-	player.Control.Attractor.DebugAttractor.DrawDebug(item);
+	player.Context.Attractor.DebugAttractor.DrawDebug(item);
 
 	// Point collision.
 	auto pointColl = GetCollision(&item);
@@ -441,9 +441,9 @@ void HandleAttractorDebug(ItemInfo& item)
 	if (pointColl.Position.Bridge >= 0)
 	{
 		const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-		player.Control.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
+		player.Context.Attractor.BridgeAttractors = GetBridgeAttractors(bridgeItem);
 	}
-	player.Control.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
+	player.Context.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
 	DrawRoomAttractors(item);
 }
 

@@ -233,7 +233,7 @@ namespace TEN::Entities::Player::Context
 		auto playerHeightOffset = Vector3(0.0f, -coll.Setup.Height, 0.0f);
 		auto catchPoint = item.Pose.Position.ToVector3() + playerHeightOffset;
 
-		for (const auto& attracData : player.Control.Attractor.NearbyData)
+		for (const auto& attracData : player.Context.Attractor.NearbyData)
 		{
 			if (attracData.AttractorPtr == nullptr)
 				continue;
@@ -242,9 +242,11 @@ namespace TEN::Entities::Player::Context
 			if (attracData.AttractorPtr->GetType() != AttractorType::Edge)
 				continue;
 
+			g_Renderer.PrintDebugMessage("%d", attracData.IsIntersected);
+			//g_Renderer.PrintDebugMessage("%d", attracData.IsInFront);
 			// 2) Check if edge is within range and in front.
-			//if (!attracData.IsIntersected || !attracData.IsInFront)
-				//continue;
+			if (!attracData.IsIntersected || !attracData.IsInFront)
+				continue;
 
 			// 3) Test catch angle.
 			if (!TestPlayerCatchAngle(item, attracData.FacingAngle))
@@ -261,8 +263,8 @@ namespace TEN::Entities::Player::Context
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int attracHeight = attracData.ClosestPoint.y;
-			int relEdgeHeight = attracHeight - vPos;
+			int edgeHeight = attracData.ClosestPoint.y;
+			int relEdgeHeight = edgeHeight - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 			int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;

@@ -74,35 +74,32 @@ namespace TEN::Collision
 	{
 		auto& player = GetLaraInfo(item);
 
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 
 		// Set points.
 		if (KeyMap[OIS::KeyCode::KC_Q])
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() +
-				Vector3(0.0f, -LaraCollision.Setup.Height, 0.0f) +
-				Vector3::Transform(Vector3(0.0f, box.Extents.z, 0.0f), rotMatrix);
-			player.Control.Attractor.DebugAttractor.SetPoint0(pos);
+				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+			player.Context.Attractor.DebugAttractor.SetPoint0(pos);
 		}
 
 		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() +
-				Vector3(0.0f, -LaraCollision.Setup.Height, 0.0f) +
-				Vector3::Transform(Vector3(0.0f, box.Extents.z, 0.0f), rotMatrix);
-			player.Control.Attractor.DebugAttractor.SetPoint1(pos);
+				Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+			player.Context.Attractor.DebugAttractor.SetPoint1(pos);
 		}
 
 		// Show attractor as white line.
-		g_Renderer.AddLine3D(player.Control.Attractor.DebugAttractor.GetPoint0(), player.Control.Attractor.DebugAttractor.GetPoint1(), Vector4::One);
+		g_Renderer.AddLine3D(player.Context.Attractor.DebugAttractor.GetPoint0(), player.Context.Attractor.DebugAttractor.GetPoint1(), Vector4::One);
 
 		// Show tether line. 
 		auto frontPos = Geometry::TranslatePoint(LaraItem->Pose.Position, LaraItem->Pose.Orientation.y, LARA_RADIUS, -LARA_HEIGHT);
-		auto closestPoint = Geometry::GetClosestPointOnLine(
+		auto closestPoint = Geometry::GetPerpendicularPointOnLine(
 			LaraItem->Pose.Position.ToVector3(),
-			player.Control.Attractor.DebugAttractor.GetPoint0(),
-			player.Control.Attractor.DebugAttractor.GetPoint1());
+			player.Context.Attractor.DebugAttractor.GetPoint0(),
+			player.Context.Attractor.DebugAttractor.GetPoint1());
 
 		// Draw tether lines. Magenta when in front, white when behind.
 		if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
@@ -187,7 +184,7 @@ namespace TEN::Collision
 		g_Renderer.AddLine3D(refPoint, closestPoint, Vector4(1, 0, 1, 1));
 
 		// Calculate distances.
-		float dist = Geometry::GetDistanceToLine(refPoint, point0, point1);
+		float dist = Vector3::Distance(refPoint, closestPoint);
 		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));
 
 		// Determine enquiries.
@@ -223,31 +220,31 @@ namespace TEN::Collision
 	{
 		auto& player = GetLaraInfo(item);
 
-		player.Control.Attractor.NearbyData.clear();
-		player.Control.Attractor.NearbyData = std::vector<AttractorData>{};
+		player.Context.Attractor.NearbyData.clear();
+		player.Context.Attractor.NearbyData = std::vector<AttractorData>{};
 
 		// TODO: Need different positions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, coll.Setup.Height, 0.0f);
+		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
 
-		auto attracData = GetAttractorData(item, coll, player.Control.Attractor.DebugAttractor, refPoint);
-		Lara.Control.Attractor.NearbyData.push_back(attracData);
+		auto attracData = GetAttractorData(item, coll, player.Context.Attractor.DebugAttractor, refPoint);
+		Lara.Context.Attractor.NearbyData.push_back(attracData);
 
-		for (auto& attrac : player.Control.Attractor.BridgeAttractors)
+		for (auto& attrac : player.Context.Attractor.BridgeAttractors)
 		{
-			if (player.Control.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
+			if (player.Context.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
 				return;
 
 			attracData = GetAttractorData(item, coll, attrac, refPoint);
-			player.Control.Attractor.NearbyData.emplace_back(attracData);
+			player.Context.Attractor.NearbyData.emplace_back(attracData);
 		}
 
-		for (auto& attrac : player.Control.Attractor.SectorAttractors)
+		for (auto& attrac : player.Context.Attractor.SectorAttractors)
 		{
-			if (player.Control.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
+			if (player.Context.Attractor.NearbyData.size() >= PLAYER_NEARBY_ATTRACTOR_COUNT_MAX)
 				return;
 
 			attracData = GetAttractorData(item, coll, attrac, refPoint);
-			player.Control.Attractor.NearbyData.emplace_back(attracData);
+			player.Context.Attractor.NearbyData.emplace_back(attracData);
 		}
 	}
 }
