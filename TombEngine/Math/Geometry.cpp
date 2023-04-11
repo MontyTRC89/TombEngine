@@ -151,6 +151,44 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (lineVector * distanceAlpha));
 	}
 
+	Vector3 GetPerpendicularPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
+	{
+		if (linePoint0 == linePoint1)
+			return linePoint0;
+
+		// Determine top-down 2D projection.
+		auto origin2D = Vector2(origin.x, origin.z);
+		auto linePoint02D = Vector2(linePoint0.x, linePoint0.z);
+		auto linePoint12D = Vector2(linePoint1.x, linePoint1.z);
+
+		float slope = (linePoint12D.y - linePoint02D.y) / (linePoint12D.x - linePoint02D.x);
+		float yIntercept = linePoint02D.y - (slope * linePoint02D.x);
+
+		// Calculate slope and Y-intercept of perpendicular line.
+		float perpSlope = -1.0f / slope;
+		float perpYIntercept = origin2D.y - (perpSlope * origin2D.x);
+
+		// Calculate 2D intersection point between two lines.
+		float intersectionX = (yIntercept - perpYIntercept) / (perpSlope - slope);
+		float intersectionY = (perpSlope * intersectionX) + perpYIntercept;
+		auto perpPoint2D = Vector2(intersectionX, intersectionY);
+
+		// Calculate distance alpha.
+		float distanceAlpha = Vector2::Distance(linePoint02D, perpPoint2D) / Vector2::Distance(linePoint02D, linePoint12D);
+		if (distanceAlpha < 0.0f)
+		{
+			return linePoint0;
+		}
+		else if (distanceAlpha > 1.0f)
+		{
+			return linePoint1;
+		}
+
+		// Return perpendicular intersection point.
+		auto lineVector = linePoint1 - linePoint0;
+		return (linePoint0 + (lineVector * distanceAlpha));
+	}
+
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)

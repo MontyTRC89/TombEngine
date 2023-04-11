@@ -174,18 +174,20 @@ namespace TEN::Collision
 
 	AttractorData GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac, const Vector3& refPoint)
 	{
+		bool getPerpPoint = (attrac.GetType() == AttractorType::Edge);
+
 		// Get attractor point data.
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
-		auto closestPoint = Geometry::GetClosestPointOnLine(refPoint, point0, point1);
+		auto closestPoint = getPerpPoint ?
+			Geometry::GetPerpendicularPointOnLine(refPoint, point0, point1) :
+			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
-		// TODO: Get perpendicular point directly above player.
-		auto closestPointPerp = closestPoint;
-
+		// debug
 		g_Renderer.AddLine3D(refPoint, closestPoint, Vector4(1, 0, 1, 1));
 
 		// Calculate distances.
-		float dist = Vector3::Distance(refPoint, closestPoint);
+		float dist = Geometry::GetDistanceToLine(refPoint, point0, point1);
 		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));
 
 		// Determine enquiries.
@@ -204,7 +206,6 @@ namespace TEN::Collision
 
 		attracData.AttractorPtr = &attrac;
 		attracData.ClosestPoint = closestPoint;
-		attracData.ClosestPointPerp = closestPointPerp;
 		attracData.IsIntersected = isIntersected;
 		attracData.IsInFront = isInFront;
 		attracData.Distance = dist;

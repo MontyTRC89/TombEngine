@@ -61,8 +61,7 @@ namespace TEN::Collision
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		Vector3 ClosestPoint	 = Vector3::Zero;
-		Vector3 ClosestPointPerp = Vector3::Zero;
+		Vector3 ClosestPoint = Vector3::Zero;
 
 		bool  IsIntersected	  = false;
 		bool  IsInFront		  = false;

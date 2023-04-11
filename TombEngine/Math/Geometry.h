@@ -38,6 +38,7 @@ namespace TEN::Math::Geometry
 	// Misc. getters
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
+	Vector3		GetPerpendicularPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& gravity = Vector3::UnitY);
 
