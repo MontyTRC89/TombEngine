@@ -118,15 +118,13 @@ namespace TEN::Collision
 		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber);
 	}
 
-	static AttractorCollision GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac,
-											   const Vector3& refPoint, float range)
+	static AttractorCollision GetAttractorCollision(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac,
+													const Vector3& refPoint, float range)
 	{
-		bool isPerpPoint = (attrac.GetType() == AttractorType::Edge);
-
 		// Get points.
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
-		auto closestPoint = isPerpPoint ?
+		auto closestPoint = attrac.IsEdge() ?
 			Geometry::GetPerpendicularPointOnLine(refPoint, point0, point1) :
 			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
@@ -168,18 +166,17 @@ namespace TEN::Collision
 
 		auto attracPtrs = std::vector<const Attractor*>{};
 
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
-
 		for (auto& attrac : player.Context.Attractor.SectorAttractors)
 		{
 			if (attracPtrs.size() >= COUNT_MAX)
 				return attracPtrs;
 
-			attrac.Dra
-
 			attracPtrs.push_back(&attrac);
+
+			attrac.DrawDebug();
 		}
 
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
 		return attracPtrs;
 	}
 
@@ -190,7 +187,7 @@ namespace TEN::Collision
 		auto attracColls = std::vector<AttractorCollision>{};
 		for (const auto* attrac : attracPtrs)
 		{
-			auto attracColl = GetAttractorData(item, coll, *attrac, refPoint, range);
+			auto attracColl = GetAttractorCollision(item, coll, *attrac, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 

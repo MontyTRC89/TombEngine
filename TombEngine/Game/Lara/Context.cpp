@@ -288,8 +288,9 @@ namespace TEN::Entities::Player::Context
 		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->FacingAngle };
 	}
 
-	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(
-		ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointCollCenter, const CollisionResult& pointCollFront)
+	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll,
+																	  const CollisionResult& pointCollCenter,
+																	  const CollisionResult& pointCollFront)
 	{
 		constexpr auto EDGE_TYPE		= EdgeType::ClimbableWall;
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
