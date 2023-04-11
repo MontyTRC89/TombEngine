@@ -1344,20 +1344,21 @@ struct LaraInfo
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
 
-	// TODO: Rewrite and restore spasm effect.
+	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
 	int		 HitFrame	  = 0;		 // Frame index.
 	int		 HitDirection = 0;		 // Cardinal direction.
 	FX_INFO* SpasmEffect  = nullptr; // Not saved.
+
+	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
 	signed char LocationPad		= 0;
 
 	// TODO: Moved to PlayerContextData. Remove from this struct.
-	int		 WaterSurfaceDist	  = 0;//
-	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.//
-	Vector3i WaterCurrentPull	  = Vector3i::Zero;//
-	int InteractedItem = 0; // Item number.//
-	int Vehicle		   = 0; // Item number.//
-	int ExtraAnim	   = 0; // Item number? Only ever set to NO_ITEM or 1.
+	int		 WaterSurfaceDist	  = 0;
+	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	  = Vector3i::Zero;
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
 };
