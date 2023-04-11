@@ -9,9 +9,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
-#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 
+// Debug
+#include "Renderer/Renderer11.h"
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Entities::Player::Context
@@ -223,7 +224,6 @@ namespace TEN::Entities::Player::Context
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
-														  const CollisionResult& pointCollCenter,
 														  const std::vector<AttractorCollision>& attracColls)
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
@@ -252,9 +252,14 @@ namespace TEN::Entities::Player::Context
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
+			// Get point collision off side of edge.
+			auto pointCollOffEdge = GetCollision(
+				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.FacingAngle, -coll.Setup.Radius);
+
 			// TODO: Manual probe from attractor point.
 			// 5) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollCenter.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffEdge.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
 
@@ -288,8 +293,7 @@ namespace TEN::Entities::Player::Context
 		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->FacingAngle };
 	}
 
-	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll,
-																	  const CollisionResult& pointCollCenter)
+	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto EDGE_TYPE		= EdgeType::ClimbableWall;
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
@@ -308,6 +312,9 @@ namespace TEN::Entities::Player::Context
 		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 		if (isMovingUp)
 			return std::nullopt;
+
+		// Get point collision.
+		auto pointCollCenter = GetCollision(&item);
 
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int edgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
@@ -355,16 +362,13 @@ namespace TEN::Entities::Player::Context
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
 		auto attracColls = GetAttractorCollisions(item, coll, attracPtrs, refPoint, range);
 
-		// Get point collision.
-		auto pointCollCenter = GetCollision(&item);
-
 		// 1) Get and return ledge catch data (if valid).
-		auto ledgeCatchData = GetLedgeCatchData(item, coll, pointCollCenter, attracColls);
+		auto ledgeCatchData = GetLedgeCatchData(item, coll, attracColls);
 		if (ledgeCatchData.has_value())
 			return ledgeCatchData;
 
 		// 2) Get and return climbable wall edge catch data (if valid).
-		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll, pointCollCenter);
+		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll);
 		if (wallEdgeCatchData.has_value())
 			return wallEdgeCatchData;
 

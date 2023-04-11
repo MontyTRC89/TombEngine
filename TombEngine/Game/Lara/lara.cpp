@@ -418,7 +418,6 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// Show attractor as white line.
 	g_Renderer.AddLine3D(
 		player.Context.Attractor.DebugAttractor.GetPoint0(),
 		player.Context.Attractor.DebugAttractor.GetPoint1(),
@@ -449,16 +448,20 @@ void HandleAttractorDebug(ItemInfo& item)
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, pos, player.Context.Attractor.DebugAttractor.GetPoint0(), 0);
+		player.Context.Attractor.DebugAttractor = Attractor(
+			AttractorType::Edge,
+			pos, player.Context.Attractor.DebugAttractor.GetPoint1(), item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_W])
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor = Attractor(AttractorType::Edge, player.Context.Attractor.DebugAttractor.GetPoint0(), pos, 0);
+		player.Context.Attractor.DebugAttractor = Attractor(
+			AttractorType::Edge,
+			player.Context.Attractor.DebugAttractor.GetPoint0(), pos, item.RoomNumber);
 	}
 
-	// Show tether line. 
+	// Show tether line.
 	auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
 	auto closestPoint = Geometry::GetPerpendicularPointOnLine(
 		LaraItem->Pose.Position.ToVector3(),
