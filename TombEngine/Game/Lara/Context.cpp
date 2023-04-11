@@ -217,69 +217,63 @@ namespace TEN::Entities::Player::Context
 		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
-	static std::optional<EdgeCatchData> GetLedgeCatchData(
-		const ItemInfo& item, const CollisionInfo& coll, const CollisionResult& pointCollCenter, const CollisionResult& pointCollFront)
+	static bool TestPlayerCatchAngle(const ItemInfo& item, short testAngle)
 	{
-		constexpr auto EDGE_TYPE = EdgeType::Ledge;
+		return (abs(short(testAngle - item.Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	}
+
+	static std::optional<EdgeCatchData> GetLedgeCatchData(
+		const ItemInfo& item, const CollisionInfo& coll, const CollisionResult& pointCollCenter)
+	{
+		constexpr auto EDGE_TYPE = EdgeType::Attractor;
 
 		const auto& player = GetLaraInfo(item);
 
-		// Get box and rotation matrix for front offset.
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-
 		// Calculate catch point.
-		auto frontOffset = Vector3::Transform(Vector3(0.0f, 0.0f, box.Extents.z), rotMatrix);
 		auto playerHeightOffset = Vector3(0.0f, -coll.Setup.Height, 0.0f);
-		auto catchPoint = item.Pose.Position.ToVector3() + playerHeightOffset + frontOffset;
+		auto catchPoint = item.Pose.Position.ToVector3() + playerHeightOffset;
 
-		// Calculate attractor point.
-		auto point0 = player.Attractor.DebugAttractor.GetPoint0();
-		auto point1 = player.Attractor.DebugAttractor.GetPoint1();
-		auto attracPoint = Geometry::GetClosestPointOnLine(catchPoint, point0, point1);
-
-		// Test if attractor is within range.
-		if (Vector3::Distance(catchPoint, attracPoint) <= BLOCK(0.25f))
+		for (const auto& attracData : player.Control.Attractor.NearbyData)
 		{
-			// Test if attractor is too low to the ground.
-			int floorToAttracHeight = abs(pointCollFront.Position.Floor - attracPoint.y);
-			if (floorToAttracHeight > LARA_HEIGHT_STRETCH)
+			if (attracData.AttractorPtr == nullptr)
+				continue;
+
+			// 1) Ensure attractor is of right type.
+			if (attracData.AttractorPtr->GetType() != AttractorType::Edge)
+				continue;
+
+			// 2) Check if edge is within range and in front.
+			//if (!attracData.IsIntersected || !attracData.IsInFront)
+				//continue;
+
+			// 3) Test catch angle.
+			if (!TestPlayerCatchAngle(item, attracData.FacingAngle))
+				continue;
+
+			// 4) Test if edge slope angle is within player threshold.
+			if (abs(attracData.SlopeAngle) > SLIPPERY_SLOPE_ANGLE)
+				continue;
+
+			// 5) Test if edge is too low to the ground.
+			// TODO: Manual probe from attractor point.
+			int floorToEdgeHeight = abs(attracData.ClosestPoint.y - pointCollCenter.Position.Floor);
+			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
+				continue;
+
+			int vPos = item.Pose.Position.y - coll.Setup.Height;
+			int attracHeight = attracData.ClosestPoint.y;
+			int relEdgeHeight = attracHeight - vPos;
+
+			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
+			int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;
+			int upperBound = isMovingUp ? item.Animation.Velocity.y : 0;
+
+			// 6) Assess point collision to edge.
+			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
+				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
-				bool isMovingUp2 = (item.Animation.Velocity.y <= 0.0f);
-				int lowerBound2 = isMovingUp2 ? 0 : item.Animation.Velocity.y;
-				int upperBound2 = isMovingUp2 ? item.Animation.Velocity.y : 0;
-
-				int vPos2 = item.Pose.Position.y - coll.Setup.Height;
-				int attracHeight = attracPoint.y;
-				int relAttracHeight = attracHeight - vPos2;
-
-				// 2) Assess point collision to attractor.
-				if (relAttracHeight <= lowerBound2 && // Edge height is above lower height bound.
-					relAttracHeight >= upperBound2)   // Edge height is below upper height bound.
-				{
-					return EdgeCatchData{ EdgeType::Attractor, attracHeight };
-				}
+				return EdgeCatchData{ EDGE_TYPE, attracData.ClosestPoint, attracData.FacingAngle };
 			}
-		}
-
-		// 1) Test if ledge is too low to the ground.
-		int floorToEdgeHeight = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
-		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
-			return std::nullopt;
-
-		int vPos = item.Pose.Position.y - coll.Setup.Height;
-		int edgeHeight = pointCollFront.Position.Floor;
-		int relEdgeHeight = edgeHeight - vPos;
-
-		bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
-		int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;
-		int upperBound = isMovingUp ? item.Animation.Velocity.y : 0;
-
-		// 2) Assess point collision to ledge.
-		if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
-			relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
-		{
-			return EdgeCatchData{ EDGE_TYPE, edgeHeight };
 		}
 
 		return std::nullopt;
@@ -327,7 +321,7 @@ namespace TEN::Entities::Player::Context
 		if (relEdgeHeight <= item.Animation.Velocity.y && // Edge height is above lower height bound.
 			relEdgeHeight >= 0)							  // Edge height is below upper height bound.
 		{
-			return EdgeCatchData{ EDGE_TYPE, edgeHeight };
+			return EdgeCatchData{ EDGE_TYPE, Vector3(0.0f, edgeHeight, 0.0f) };
 		}
 		
 		return std::nullopt;
@@ -335,6 +329,8 @@ namespace TEN::Entities::Player::Context
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
+		GetPlayerNearbyAttractorData(item, coll);
+
 		// 1) Test for valid ledge.
 		/*if (!TestValidLedge(&item, &coll, true))
 			return std::nullopt;*/
@@ -342,13 +338,14 @@ namespace TEN::Entities::Player::Context
 		// Get point collision.
 		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
 		// 2) Get and return ledge catch data (if valid).
-		auto ledgeCatchData = GetLedgeCatchData(item, coll, pointCollCenter, pointCollFront);
+		auto ledgeCatchData = GetLedgeCatchData(item, coll, pointCollCenter);
 		if (ledgeCatchData.has_value())
 			return ledgeCatchData;
-		
+
+		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
+
 		// 3) Get and return climbable wall edge catch data (if valid).
 		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll, pointCollCenter, pointCollFront);
 		if (wallEdgeCatchData.has_value())

@@ -136,8 +136,8 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto direction = linePoint1 - linePoint0;
-		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
+		auto lineVector = linePoint1 - linePoint0;
+		float distanceAlpha = lineVector.Dot(origin - linePoint0) / lineVector.Dot(lineVector);
 
 		if (distanceAlpha < 0.0f)
 		{
@@ -148,7 +148,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		return (linePoint0 + (direction * distanceAlpha));
+		return (linePoint0 + (lineVector * distanceAlpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)

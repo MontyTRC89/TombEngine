@@ -1,6 +1,7 @@
 #pragma once
 
 class EulerAngles;
+struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 
@@ -15,6 +16,12 @@ namespace TEN::Collision
 		ZipLine,
 		Tightrope,
 		Pinnacle*/
+	};
+
+	enum class AttractorPoint
+	{
+		Point0,
+		Point1
 	};
 
 	class Attractor
@@ -54,19 +61,23 @@ namespace TEN::Collision
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		Vector3 ClosestPoint = Vector3::Zero;
+		Vector3 ClosestPoint	 = Vector3::Zero;
+		Vector3 ClosestPointPerp = Vector3::Zero;
 
-		//float Range			= 0.0f;
-		float Distance		= 0.0f;
-		short SlopeAngle	= 0;
-		bool  IsIntersected = false;
-		bool  IsInFront		= false;
+		bool  IsIntersected	  = false;
+		bool  IsInFront		  = false;
+		float Distance		  = 0.0f;
+		float DistanceFromEnd = 0.0f;
+		short FacingAngle	  = 0;
+		short SlopeAngle	  = 0;
+
+		AttractorPoint PointOnLeft = AttractorPoint::Point0;
 	};
 
 	std::vector<Attractor> GetAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber);
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
 	std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item);
 
-	void GetNearbyAttractorData(std::vector<AttractorData>& attracs, const Vector3& pos, const EulerAngles& orient, float range);
-
+	AttractorData GetAttractorData(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac, const Vector3& refPoint);
+	void		  GetPlayerNearbyAttractorData(ItemInfo& item, const CollisionInfo& coll);
 }

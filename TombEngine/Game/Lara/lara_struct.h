@@ -1,13 +1,15 @@
 #pragma once
+#include "Game/collision/Attractors.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
+using namespace TEN::Collision;
 using namespace TEN::Math;
 
+namespace TEN::Renderer { struct RendererMesh; };
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -1245,6 +1247,20 @@ struct SubsuitControlData
 	unsigned short HitCount = 0;
 };
 
+struct PlayerAttractorData
+{
+	AttractorData HandCenter = {};
+	AttractorData HandLeft	 = {};
+	AttractorData HandRight	 = {};
+
+	std::vector<AttractorData> NearbyData = {};
+
+	// Debug
+	Attractor			   DebugAttractor	= {};
+	std::vector<Attractor> BridgeAttractors = {};
+	std::vector<Attractor> SectorAttractors = {};
+};
+
 struct LaraControlData
 {
 	short MoveAngle				 = 0;
@@ -1256,6 +1272,7 @@ struct LaraControlData
 	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
+	PlayerAttractorData	 Attractor = {};//
 	RopeControlData		 Rope	   = {};
 	SubsuitControlData	 Subsuit   = {};
 	TightropeControlData Tightrope = {};
@@ -1289,29 +1306,30 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
-// Debug
-#include "Game/collision/Attractors.h"
-using namespace TEN::Collision;
-// ---
-
-struct PlayerAttractorData
+// TODO: Use this struct for all collision context stuff.
+struct PlayerContextData
 {
-	std::vector<AttractorData> Data = {};
+	PlayerAttractorData Attractor = {};
 
-	Attractor			   DebugAttractor	= {};
-	std::vector<Attractor> BridgeAttractors = {};
-	std::vector<Attractor> SectorAttractors = {};
+	int			CalculatedJumpVelocity = 0;
+	int			ProjectedFloorHeight   = 0;
+	Pose		NextCornerPos		   = Pose::Zero;
+	EulerAngles TargetOrientation	   = EulerAngles::Zero;
+
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
 };
 
 struct LaraInfo
 {
-	// Debug
-	PlayerAttractorData Attractor = {};
-	// ---
-
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};
+	PlayerContextData Context	= {};
 	PlayerStatusData  Status	= {};
 	LaraInventoryData Inventory = {};
 	FlareData		  Flare		= {};
@@ -1326,16 +1344,16 @@ struct LaraInfo
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
 
-	EulerAngles TargetOrientation = EulerAngles::Zero;
-	Pose		NextCornerPos	  = Pose::Zero;
+	EulerAngles TargetOrientation = EulerAngles::Zero;//
+	Pose		NextCornerPos	  = Pose::Zero;//
 
-	int		 ProjectedFloorHeight = 0;
-	int		 WaterSurfaceDist	  = 0;
-	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	  = Vector3i::Zero;
+	int		 ProjectedFloorHeight = 0;//
+	int		 WaterSurfaceDist	  = 0;//
+	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.//
+	Vector3i WaterCurrentPull	  = Vector3i::Zero;//
 
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
+	int InteractedItem = 0; // Item number.//
+	int Vehicle		   = 0; // Item number.//
 	int ExtraAnim	   = 0; // Item number? Only ever set to NO_ITEM or 1.
 
 	PlayerEffectData Effect = {};

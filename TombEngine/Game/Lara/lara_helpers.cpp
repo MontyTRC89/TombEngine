@@ -170,27 +170,26 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 		SetAnimation(&item, LA_REACH_TO_HANG);
 	}
 
-	// Snap to edge.
 	// HACK: Until fragile climbable wall code is refactored, snap must be exactly aligned to grid.
-	if (catchData.Type != Context::EdgeType::Attractor)
-		(catchData.Type == Context::EdgeType::ClimbableWall) ? SnapEntityToGrid(&item, &coll) : AlignEntityToEdge(&item, &coll);
+	if (catchData.Type == Context::EdgeType::ClimbableWall)
+		SnapEntityToGrid(&item, &coll);
 
+	// Calculate position.
 	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
+	auto catchPos = (catchData.Type == Context::EdgeType::ClimbableWall) ?
+		Vector3(item.Pose.Position.x, catchData.Position.y, item.Pose.Position.z) :
+		catchData.Position;
+	auto pos = catchPos + Vector3(0.0f, playerHeight, 0.0f);
+	pos = Geometry::TranslatePoint(pos, catchData.FacingAngle, -coll.Setup.Radius);
 
 	ResetPlayerFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = catchData.Height + playerHeight;
+	item.Pose.Position = pos;
 	player.Control.HandStatus = HandStatus::Busy;
 
-	if (catchData.Type != Context::EdgeType::Attractor)
-	{
-		player.TargetOrientation = EulerAngles(0, coll.NearestLedgeAngle, 0);
-	}
-	else
-	{
-		player.TargetOrientation = item.Pose.Orientation;
-	}
+	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.FacingAngle;
+	player.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)

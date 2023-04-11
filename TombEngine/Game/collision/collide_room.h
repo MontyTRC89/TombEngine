@@ -12,6 +12,8 @@ constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBou
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
+constexpr auto SLIPPERY_SLOPE_ANGLE = short((ANGLE(45.0f) / 4) * 3);
+
 enum CollisionType
 {
 	CT_NONE		 = 0,
