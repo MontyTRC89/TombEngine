@@ -42,7 +42,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			ApproachLaraTargetOrientation(item, direction, 12);
+			ApproachPlayerTargetOrientation(item, direction, 12);
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
@@ -64,7 +64,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 		else
-			ApproachLaraTargetOrientation(item, direction);*/
+			ApproachPlayerTargetOrientation(item, direction);*/
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
@@ -151,7 +151,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			ApproachLaraTargetOrientation(item, direction, 12);
+			ApproachPlayerTargetOrientation(item, direction, 12);
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
@@ -173,7 +173,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 		else
-			ApproachLaraTargetOrientation(item, direction);*/
+			ApproachPlayerTargetOrientation(item, direction);*/
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{

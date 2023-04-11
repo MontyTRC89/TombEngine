@@ -1306,6 +1306,7 @@ struct PlayerAttractorData
 };
 
 // TODO: Use this struct for all collision context stuff.
+// TODO: Savegame.
 struct PlayerContextData
 {
 	PlayerAttractorData Attractor = {};
@@ -1342,9 +1343,6 @@ struct LaraInfo
 	ArmInfo		RightArm		= {};
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
-
-	EulerAngles TargetOrientation = EulerAngles::Zero;//
-	Pose		NextCornerPos	  = Pose::Zero;//
 
 	int		 ProjectedFloorHeight = 0;//
 	int		 WaterSurfaceDist	  = 0;//

@@ -28,10 +28,10 @@ void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff, b
 	auto& player = GetLaraInfo(*item);
 
 	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * radiusCoeff));
-	player.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+	player.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 
 	if (doSnap)
-		item->Pose.Orientation = player.TargetOrientation;
+		item->Pose.Orientation = player.Context.TargetOrientation;
 }
 
 void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short headingAngle, float radiusCoeff)

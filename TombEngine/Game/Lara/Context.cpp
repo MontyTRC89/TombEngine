@@ -242,8 +242,6 @@ namespace TEN::Entities::Player::Context
 			if (attracData.AttractorPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			g_Renderer.PrintDebugMessage("%d", attracData.IsIntersected);
-			//g_Renderer.PrintDebugMessage("%d", attracData.IsInFront);
 			// 2) Check if edge is within range and in front.
 			if (!attracData.IsIntersected || !attracData.IsInFront)
 				continue;

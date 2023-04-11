@@ -111,7 +111,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	// Align orientation to edge.
-	item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
+	item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.4f);
 
 	short moveAngle = player.Control.MoveAngle;
 
@@ -449,11 +449,11 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, shor
 	{
 		// Store next position.
 		item->Pose = cornerResult.RealPositionResult;
-		lara->NextCornerPos.Position = Vector3i(
+		lara->Context.NextCornerPos.Position = Vector3i(
 			item->Pose.Position.x,
 			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + LARA_HEIGHT_STRETCH,
 			item->Pose.Position.z);
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
+		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
 
 		item->Pose = cornerResult.ProbeResult;
@@ -469,11 +469,11 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, shor
 		if (lara->Control.CanClimbLadder)
 		{
 			auto& angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
-			if (GetClimbFlags(lara->NextCornerPos.Position.x, item->Pose.Position.y, lara->NextCornerPos.Position.z, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Pose.Orientation.y)])
+			if (GetClimbFlags(lara->Context.NextCornerPos.Position.x, item->Pose.Position.y, lara->Context.NextCornerPos.Position.z, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Pose.Orientation.y)])
 			{
 				// Restore original vertical position for climbable wall tests because
 				// there's no need to snap to ledge height in such cases.
-				lara->NextCornerPos.Position.y = item->Pose.Position.y;
+				lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
 				return Context::CornerType::Inner;
 			}
 		}
@@ -512,13 +512,13 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, shor
 	{
 		// Store next position.
 		item->Pose = cornerResult.RealPositionResult;
-		lara->NextCornerPos.Position = Vector3i(
+		lara->Context.NextCornerPos.Position = Vector3i(
 			item->Pose.Position.x,
 			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(LARA_HEIGHT_STRETCH + LARA_HEADROOM)).Position.Floor + LARA_HEIGHT_STRETCH,
 			item->Pose.Position.z);
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
+		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
-		lara->TargetOrientation = lara->NextCornerPos.Orientation;
+		lara->Context.TargetOrientation = lara->Context.NextCornerPos.Orientation;
 
 		item->Pose = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPosition(item, coll);
@@ -533,11 +533,11 @@ Context::CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, shor
 		if (lara->Control.CanClimbLadder)
 		{
 			auto& angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
-			if (GetClimbFlags(lara->NextCornerPos.Position.x, item->Pose.Position.y, lara->NextCornerPos.Position.z, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Pose.Orientation.y)])
+			if (GetClimbFlags(lara->Context.NextCornerPos.Position.x, item->Pose.Position.y, lara->Context.NextCornerPos.Position.z, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Pose.Orientation.y)])
 			{
 				// Restore original vertical position for climbable wall tests because
 				// there's no need to snap to ledge height in such cases.
-				lara->NextCornerPos.Position.y = item->Pose.Position.y;
+				lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
 				return Context::CornerType::Outer;
 			}
 		}
@@ -2004,7 +2004,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapEntityToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 		AnimateItem(item);
 
 		return true;

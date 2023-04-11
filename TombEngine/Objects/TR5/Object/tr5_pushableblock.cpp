@@ -435,7 +435,7 @@ namespace TEN::Entities::Generic
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
-				lara->NextCornerPos.Position.x != itemNumber)
+				lara->Context.NextCornerPos.Position.x != itemNumber)
 			{
 				if (!pushable->hasFloorCeiling)
 					ObjectCollision(itemNumber, laraItem, coll);
@@ -539,7 +539,7 @@ namespace TEN::Entities::Generic
 					laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Busy;
-					lara->NextCornerPos.Position.x = itemNumber;
+					lara->Context.NextCornerPos.Position.x = itemNumber;
 					pushableItem->Pose.Orientation.y = yOrient;
 				}
 				else
@@ -549,7 +549,7 @@ namespace TEN::Entities::Generic
 						SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
-						lara->NextCornerPos.Position.x = itemNumber;
+						lara->Context.NextCornerPos.Position.x = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 					else

@@ -94,7 +94,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
-		item->Pose.Orientation.Lerp(Lara.TargetOrientation, 0.4f);
+		item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.4f);
 	}
 }
 
@@ -111,7 +111,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
+	item->Pose.Orientation.Lerp(lara->Context.TargetOrientation, 0.4f);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -126,7 +126,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
+	item->Pose.Orientation.Lerp(lara->Context.TargetOrientation, 0.4f);
 }
 
 // ---------------

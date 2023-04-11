@@ -137,18 +137,18 @@ namespace TEN::Math::Geometry
 			return linePoint0;
 
 		auto lineVector = linePoint1 - linePoint0;
-		float distanceAlpha = lineVector.Dot(origin - linePoint0) / lineVector.Dot(lineVector);
+		float alpha = lineVector.Dot(origin - linePoint0) / lineVector.Dot(lineVector);
 
-		if (distanceAlpha < 0.0f)
+		if (alpha < 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (distanceAlpha > 1.0f)
+		else if (alpha > 1.0f)
 		{
 			return linePoint1;
 		}
 
-		return (linePoint0 + (lineVector * distanceAlpha));
+		return (linePoint0 + (lineVector * alpha));
 	}
 
 	Vector3 GetPerpendicularPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -173,20 +173,20 @@ namespace TEN::Math::Geometry
 		float intersectionY = (perpSlope * intersectionX) + perpYIntercept;
 		auto perpPoint2D = Vector2(intersectionX, intersectionY);
 
-		// Calculate distance alpha.
-		float distanceAlpha = Vector2::Distance(linePoint02D, perpPoint2D) / Vector2::Distance(linePoint02D, linePoint12D);
-		if (distanceAlpha < 0.0f)
+		// Clamp point along line according to distance alpha.
+		float alpha = Vector2::Distance(linePoint02D, perpPoint2D) / Vector2::Distance(linePoint02D, linePoint12D);
+		if (alpha < 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (distanceAlpha > 1.0f)
+		else if (alpha > 1.0f)
 		{
 			return linePoint1;
 		}
 
 		// Return perpendicular intersection point.
 		auto lineVector = linePoint1 - linePoint0;
-		return (linePoint0 + (lineVector * distanceAlpha));
+		return (linePoint0 + (lineVector * alpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)

@@ -452,7 +452,7 @@ bool SaveGame::Save(int slot)
 
 	Save::LaraBuilder lara{ fbb };
 	lara.add_control(controlOffset);
-	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
+	lara.add_next_corner_pose(&FromPHD(Lara.Context.NextCornerPos));
 	lara.add_effect(effectOffset);
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
@@ -470,7 +470,7 @@ bool SaveGame::Save(int slot)
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
-	lara.add_target_facing_angle(Lara.TargetOrientation.y);
+	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
 	lara.add_torch(torchOffset);
@@ -1888,7 +1888,7 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
-	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
+	Lara.Context.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
@@ -1934,7 +1934,7 @@ bool SaveGame::Load(int slot)
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);
-	Lara.TargetOrientation.y = s->lara()->target_facing_angle();
+	Lara.Context.TargetOrientation.y = s->lara()->target_facing_angle();
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();
 

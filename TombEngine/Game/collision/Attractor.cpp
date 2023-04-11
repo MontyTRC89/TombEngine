@@ -180,9 +180,6 @@ namespace TEN::Collision
 			Geometry::GetPerpendicularPointOnLine(refPoint, point0, point1) :
 			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
-		// debug
-		g_Renderer.AddLine3D(refPoint, closestPoint, Vector4(1, 0, 1, 1));
-
 		// Calculate distances.
 		float dist = Vector3::Distance(refPoint, closestPoint);
 		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));

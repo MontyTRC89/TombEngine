@@ -189,7 +189,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.Control.HandStatus = HandStatus::Busy;
 
 	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.FacingAngle;
-	player.TargetOrientation = EulerAngles(0, targetYOrient, 0);
+	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)
@@ -890,11 +890,11 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 	if (vaultResult.SnapToLedge)
 	{
 		AlignEntityToEdge(item, coll, 0.2f, false);
-		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		lara->Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else
 	{
-		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
@@ -1071,7 +1071,7 @@ void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 		item.Animation.IsAirborne = true;
 		item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 		item.Pose.Position.y += WALL_STEP_HEIGHT;
-		item.Pose.Orientation.y += player.NextCornerPos.Orientation.y / 2;
+		item.Pose.Orientation.y += player.Context.NextCornerPos.Orientation.y / 2;
 		player.Control.HandStatus = HandStatus::Free;
 		return;
 	}
@@ -1087,9 +1087,9 @@ void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 			SetAnimation(&item, LA_HANG_IDLE);
 		}
 
-		item.Pose.Position = player.NextCornerPos.Position;
-		item.Pose.Orientation.y = player.NextCornerPos.Orientation.y;
-		coll.Setup.OldPosition = player.NextCornerPos.Position;
+		item.Pose.Position = player.Context.NextCornerPos.Position;
+		item.Pose.Orientation.y = player.Context.NextCornerPos.Orientation.y;
+		coll.Setup.OldPosition = player.Context.NextCornerPos.Position;
 	}
 }
 
