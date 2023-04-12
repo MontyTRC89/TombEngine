@@ -465,12 +465,8 @@ void HandleAttractorDebug(ItemInfo& item)
 		player.Context.Attractor.DebugAttractor.GetPoint0(),
 		player.Context.Attractor.DebugAttractor.GetPoint1());
 
-	g_Renderer.PrintDebugMessage("%.3f", closestPoint.x);
-	g_Renderer.PrintDebugMessage("%.3f", closestPoint.y);
-	g_Renderer.PrintDebugMessage("%.3f", closestPoint.z);
-
 	// Draw tether line.
-	//if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
+	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
 		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
 
 	// Generate sector attractors.

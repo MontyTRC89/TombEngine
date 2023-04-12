@@ -136,8 +136,8 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto lineVector = linePoint1 - linePoint0;
-		float alpha = lineVector.Dot(origin - linePoint0) / lineVector.Dot(lineVector);
+		auto lineDirection = linePoint1 - linePoint0;
+		float alpha = lineDirection.Dot(origin - linePoint0) / lineDirection.Dot(lineDirection);
 
 		if (alpha <= 0.0f)
 		{
@@ -148,7 +148,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		return (linePoint0 + (lineVector * alpha));
+		return (linePoint0 + (lineDirection * alpha));
 	}
 
 	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -156,39 +156,27 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		// Determine top-down 2D projection.
-		auto origin2D = Vector2(origin.x, origin.z);
-		auto linePoint02D = Vector2(linePoint0.x, linePoint0.z);
-		auto linePoint12D = Vector2(linePoint1.x, linePoint1.z);
+		auto lineDirection = linePoint1 - linePoint0;
 
-		// Line is vertical; return line point 0.
-		if (linePoint02D == linePoint12D)
-			linePoint0;
+		float lineLengthSqr = lineDirection.LengthSquared();
+		if (lineLengthSqr == 0.0f)
+			return linePoint0;
 
-		// TODO: Awful miscalculation when axis-aligned.
-		// Calculate slope.
-		float slope = ((linePoint02D.x == linePoint12D.x) || (linePoint02D.y == linePoint12D.y)) ?
-			EPSILON :
-			(linePoint12D.y - linePoint02D.y) / (linePoint12D.x - linePoint02D.x);
+		// Calculate alpha from 2D projection.
+		auto lineDirection2D = Vector3(lineDirection.x, 0.0f, lineDirection.z);
+		float alpha = lineDirection2D.Dot(origin - linePoint0) / lineDirection2D.Dot(lineDirection2D);
+		// float alpha = (origin - linePoint0).Dot(lineDirection2D) / lineDirection2D.LengthSquared(); // Alternative.
 
-		float yIntercept = linePoint02D.y - (slope * linePoint02D.x);
+		if (alpha <= 0.0f)
+		{
+			return linePoint0;
+		}
+		else if (alpha >= 1.0f)
+		{
+			return linePoint1;
+		}
 
-		// Calculate slope and Y-intercept of perpendicular line.
-		float perpSlope = -1.0f / slope;
-		float perpYIntercept = origin2D.y - (perpSlope * origin2D.x);
-
-		// Calculate 2D intersection point between two lines.
-		float intersectionX = (yIntercept - perpYIntercept) / (perpSlope - slope);
-		float intersectionY = (perpSlope * intersectionX) + perpYIntercept;
-		auto perpPoint2D = Vector2(intersectionX, intersectionY);
-
-		// Calculate distance alpha.
-		float alpha = (perpPoint2D - linePoint02D).Dot(linePoint12D - linePoint02D) / (linePoint12D - linePoint02D).LengthSquared();
-		alpha = std::max(0.0f, std::min(alpha, 1.0f));
-
-		// Return perpendicular intersection point.
-		auto lineVector = linePoint1 - linePoint0;
-		return (linePoint0 + (lineVector * alpha));
+		return (linePoint0 + (lineDirection * alpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
