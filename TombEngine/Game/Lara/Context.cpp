@@ -328,7 +328,7 @@ namespace TEN::Entities::Player::Context
 			}
 		}
 
-		// No edge found; return nullopt.
+		// Check if edge was found.
 		if (attracCollPtr == nullptr)
 			return std::nullopt;
 

@@ -160,10 +160,9 @@ namespace TEN::Math::Geometry
 
 		auto lineDirection = linePoint1 - linePoint0;
 
-		// Calculate alpha from 2D projection.
+		// Calculate alpha from 2D projection of line.
 		auto lineDirection2D = Vector3(lineDirection.x, 0.0f, lineDirection.z);
 		float alpha = lineDirection2D.Dot(origin - linePoint0) / lineDirection2D.Dot(lineDirection2D);
-		// float alpha = (origin - linePoint0).Dot(lineDirection2D) / lineDirection2D.LengthSquared(); // Alternative.
 
 		// Clamp distance alpha.
 		if (alpha <= 0.0f)
@@ -208,9 +207,8 @@ namespace TEN::Math::Geometry
 
 	Quaternion ConvertDirectionToQuat(const Vector3& direction)
 	{
-		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
-
-		static const auto REF_DIRECTION = Vector3::UnitZ;
+		constexpr auto	  SINGULARITY_THRESHOLD = 1.0f - EPSILON;
+		static const auto REF_DIRECTION			= Vector3::UnitZ;
 
 		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
 		float dot = REF_DIRECTION.Dot(direction);
@@ -236,8 +234,8 @@ namespace TEN::Math::Geometry
 
 	Vector3 ConvertQuatToDirection(const Quaternion& quat)
 	{
-		static const auto refDirection = Vector3::UnitZ;
-		return Vector3::Transform(refDirection, quat);
+		static const auto REF_DIRECTION = Vector3::UnitZ;
+		return Vector3::Transform(REF_DIRECTION, quat);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
