@@ -103,7 +103,7 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 
 bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll)
 {
-	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= PLAYER_INTERACT_CONSTRAINT_ANGLE);
 }
 
 bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)

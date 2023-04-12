@@ -46,7 +46,7 @@ namespace TEN::Collision
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		Vector3 ClosestPoint = Vector3::Zero;
+		Vector3 TargetPoint = Vector3::Zero;
 
 		float Distance		  = 0.0f;
 		float DistanceFromEnd = 0.0f;
@@ -55,6 +55,17 @@ namespace TEN::Collision
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;
+	};
+
+	// TODO: Probably overkill but keeping ready if needed.
+	// Purpose of this struct would be to preserve probe setup data
+	// without having a copy for every attractor collision data object.
+	struct AttractorCollisions
+	{
+		const std::vector<AttractorCollisionData> Collisions = {};
+
+		Vector3 RefPoint = Vector3::Zero;
+		float	Range	 = 0.0f;
 	};
 
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);

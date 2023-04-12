@@ -236,11 +236,11 @@ namespace TEN::Entities::Player::Context
 
 			// Get point collision off edge side.
 			auto pointCollOffEdge = GetCollision(
-				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 4) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffEdge.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffEdge.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
 
@@ -264,7 +264,7 @@ namespace TEN::Entities::Player::Context
 
 	static bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	{
-		return (abs(short(testAngle - item.Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+		return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_CONSTRAINT_ANGLE);
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
@@ -276,6 +276,7 @@ namespace TEN::Entities::Player::Context
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
+		bool hasFoundCorner = false;
 
 		// Find closest edge attractor.
 		for (const auto& attracColl : attracColls)
@@ -288,33 +289,41 @@ namespace TEN::Entities::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
-			// 3) Test catch angle.
+			// TODO: Test if this works.
+			// 3) Test if target point is lone corner.
+			if (attracColl.DistanceFromEnd <= EPSILON && !hasFoundCorner)
+			{
+				hasFoundCorner = true;
+				continue;
+			}
+
+			// 4) Test catch angle.
 			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 				continue;
 
-			// 4) Test if edge slope is slippery.
+			// 5) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
 			// Get point collision off edge's side.
 			auto pointCollOffSide = GetCollision(
-				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 5) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffSide.Position.Floor);
+			// 6) Test if edge is too low to the ground.
+			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int edgeHeight = attracColl.ClosestPoint.y;
+			int edgeHeight = attracColl.TargetPoint.y;
 			int relEdgeHeight = edgeHeight - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 			int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;
 			int upperBound = isMovingUp ? item.Animation.Velocity.y : 0;
 
-			// 6) Assess point collision to edge.
+			// 7) Assess point collision to edge.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
@@ -333,7 +342,7 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Return edge catch data.
-		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->ClosestPoint, attracCollPtr->HeadingAngle };
+		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->TargetPoint, attracCollPtr->HeadingAngle };
 	}
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)

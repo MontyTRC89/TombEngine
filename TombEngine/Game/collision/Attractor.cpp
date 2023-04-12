@@ -137,13 +137,13 @@ namespace TEN::Collision
 		// Get points.
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
-		auto closestPoint = attrac.IsEdge() ?
+		auto targetPoint = attrac.IsEdge() ?
 			Geometry::GetClosestPointOnLinePerp(refPoint, point0, point1) :
 			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
 		// Calculate distances.
-		float dist = Vector3::Distance(refPoint, closestPoint);
-		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));
+		float dist = Vector3::Distance(refPoint, targetPoint);
+		float distFromEnd = std::min(Vector3::Distance(targetPoint, point0), Vector3::Distance(targetPoint, point1));
 
 		// Calculate angles.
 		auto orient = Geometry::GetOrientToPoint(point0, point1);
@@ -152,22 +152,24 @@ namespace TEN::Collision
 
 		// Determine enquiries.
 		bool isIntersected = (dist <= range);
-		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
+		bool isInFront = Geometry::IsPointInFront(item.Pose, targetPoint);
 
 		// Create new attractor collision.
 		auto attracColl = AttractorCollisionData{};
 
 		attracColl.AttractorPtr = &attrac;
-		attracColl.ClosestPoint = closestPoint;
+		attracColl.TargetPoint = targetPoint;
 		attracColl.Distance = dist;
 		attracColl.DistanceFromEnd = distFromEnd;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
 		attracColl.IsInFront = isInFront;
+		
 		return attracColl;
 	}
 
+	// TODO: Maybe return struct with this vector and the refPoint + range, just in case.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& refPoint, float range)
 	{
