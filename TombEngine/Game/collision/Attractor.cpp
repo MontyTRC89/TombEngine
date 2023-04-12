@@ -118,8 +118,7 @@ namespace TEN::Collision
 		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber);
 	}
 
-	static AttractorCollision GetAttractorCollision(const ItemInfo& item, const CollisionInfo& coll, const Attractor& attrac,
-													const Vector3& refPoint, float range)
+	static AttractorCollision GetAttractorCollision(const ItemInfo& item, const Attractor& attrac, const Vector3& refPoint, float range)
 	{
 		// Get points.
 		auto point0 = attrac.GetPoint0();
@@ -180,14 +179,13 @@ namespace TEN::Collision
 		return attracPtrs;
 	}
 
-	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll,
-														   const std::vector<const Attractor*>& attracPtrs,
+	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 														   const Vector3& refPoint, float range)
 	{
 		auto attracColls = std::vector<AttractorCollision>{};
 		for (const auto* attrac : attracPtrs)
 		{
-			auto attracColl = GetAttractorCollision(item, coll, *attrac, refPoint, range);
+			auto attracColl = GetAttractorCollision(item, *attrac, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 

@@ -210,14 +210,14 @@ namespace TEN::Entities::Player::Context
 
 	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, short testAngle)
 	{
-		// Get attractor pointers.
+		// Get nearby attractor pointers.
 		auto attracPtrs = GetNearbyAttractorPtrs(item);
 
 		// Get attractor collisions.
 		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(testAngle));
 		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius), rotMatrix);
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, coll, attracPtrs, refPoint, range);
+		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
 
 		// Find closest edge attractor.
 		for (const auto& attracColl : attracColls)
@@ -397,13 +397,13 @@ namespace TEN::Entities::Player::Context
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
-		// Get attractor pointers.
+		// Get nearby attractor pointers.
 		auto attracPtrs = GetNearbyAttractorPtrs(item);
 
 		// Get attractor collisions.
 		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, coll, attracPtrs, refPoint, range);
+		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
 
 		// 1) Get and return ledge catch data (if valid).
 		auto ledgeCatchData = GetLedgeCatchData(item, coll, attracColls);
