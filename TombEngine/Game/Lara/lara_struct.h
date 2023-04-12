@@ -1294,7 +1294,8 @@ struct PlayerStatusData
 struct PlayerAttractorData
 {
 	// Debug
-	Attractor			   DebugAttractor	= {};
+	Attractor			   DebugAttractor0	= {};
+	Attractor			   DebugAttractor1	= {};
 	std::vector<Attractor> SectorAttractors = {};
 };
 

@@ -208,19 +208,34 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, short testAngle)
+	// TODO: use as base for orientation aligment.
+	/*static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isRight)
 	{
 		// Get nearby attractor pointers.
 		auto attracPtrs = GetNearbyAttractorPtrs(item);
 
-		// Get attractor collisions.
-		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(testAngle));
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius), rotMatrix);
+		auto rotMatrix = Matrix::CreateRotationY(item.Pose.Orientation.y);
+		auto relOffset = Vector3(coll.Setup.Radius * (isRight ? 1 : -1), -coll.Setup.Height, coll.Setup.Radius);
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
 
-		// Find closest edge attractor.
-		for (const auto& attracColl : attracColls)
+		// Determine relative offsets.
+		auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
+		auto relOffsetLeft = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+		auto relOffsetRight = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+
+		// Calculate reference points.
+		auto basePos = item.Pose.Position.ToVector3();
+		auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
+		auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
+		auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
+
+		// Get attractor collisions.
+		auto attracCollsCenter = GetAttractorCollisions(item, attracPtrs, refPointCenter, range);
+		auto attracCollsLeft = GetAttractorCollisions(item, attracPtrs, refPointLeft, range);
+		auto attracCollsRight = GetAttractorCollisions(item, attracPtrs, refPointRight, range);
+
+		// Assess center attractor collision.
+		for (const auto& attracColl : attracCollsCenter)
 		{
 			// 1) Check if attractor is edge type.
 			if (!attracColl.AttractorPtr->IsEdge())
@@ -247,19 +262,78 @@ namespace TEN::Entities::Player::Context
 			return true;
 		}
 
+		// TODO: Point collision assessment.
+
 		return false;
+	}*/
+
+	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isRight)
+	{
+		// Get nearby attractor pointers.
+		auto attracPtrs = GetNearbyAttractorPtrs(item);
+
+		auto rotMatrix = Matrix::CreateRotationY(item.Pose.Orientation.y);
+		auto relOffset = Vector3(coll.Setup.Radius * (isRight ? 1 : -1), -coll.Setup.Height, coll.Setup.Radius);
+		float range = OFFSET_RADIUS(coll.Setup.Radius);
+
+		// Calculate reference points.
+		auto basePos = item.Pose.Position.ToVector3();
+		auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
+
+		// Assess center attractor collision.
+		bool hasFoundCorner = false;
+		for (const auto& attracColl : attracColls)
+		{
+			// 1) Check if attractor is edge type.
+			if (!attracColl.AttractorPtr->IsEdge())
+				continue;
+
+			// 2) Check if edge is within range.
+			if (!attracColl.IsIntersected)
+				continue;
+
+			// 3) Test if edge slope is slippery.
+			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
+				continue;
+
+			// Get point collision off edge side.
+			auto pointCollOffEdge = GetCollision(
+				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// 4) Test if edge is too low to the ground.
+			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffEdge.Position.Floor);
+			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
+				continue;
+			
+			if (attracColl.DistanceFromEnd <= EPSILON && !hasFoundCorner)
+			{
+				hasFoundCorner = true;
+				continue;
+			}
+
+			if (attracColl.DistanceFromEnd <= EPSILON)
+				return false;
+		}
+
+		// TODO: Point collision assessment.
+
+		return true;
 	}
 
 	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
 	{
-		//return TestLateralShimmy(item, coll, ANGLE(-90.0f));
-		return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
+		return TestLateralShimmy(item, coll, false);
+		//return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
 	}
 
 	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll)
 	{
-		//return TestLateralShimmy(item, coll, ANGLE(90.0f));
-		return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
+		return TestLateralShimmy(item, coll, true);
+		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
 	static bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)

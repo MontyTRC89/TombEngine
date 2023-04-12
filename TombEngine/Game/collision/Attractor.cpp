@@ -128,7 +128,8 @@ namespace TEN::Collision
 			attrac.DrawDebug();
 		}
 
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
 		return attracPtrs;
 	}
 

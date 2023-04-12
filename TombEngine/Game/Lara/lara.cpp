@@ -434,40 +434,66 @@ using namespace TEN::Input;
 // ---
 
 // Debug
-void HandleAttractorDebug(ItemInfo& item)
+static void SetDebugAttractors(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
 	auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 
-	// Set points for debug attractor.
+	// Set points for debug attractor 0.
 	if (KeyMap[OIS::KeyCode::KC_Q])
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor = Attractor(
+		player.Context.Attractor.DebugAttractor0 = Attractor(
 			AttractorType::Edge,
-			pos, player.Context.Attractor.DebugAttractor.GetPoint1(), item.RoomNumber);
+			pos, player.Context.Attractor.DebugAttractor0.GetPoint1(), item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_W])
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor = Attractor(
+		player.Context.Attractor.DebugAttractor0 = Attractor(
 			AttractorType::Edge,
-			player.Context.Attractor.DebugAttractor.GetPoint0(), pos, item.RoomNumber);
+			player.Context.Attractor.DebugAttractor0.GetPoint0(), pos, item.RoomNumber);
 	}
+	
+	// Set points for debug attractor 1.
+	if (KeyMap[OIS::KeyCode::KC_A])
+	{
+		auto pos = LaraItem->Pose.Position.ToVector3() +
+			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor1 = Attractor(
+			AttractorType::Edge,
+			pos, player.Context.Attractor.DebugAttractor1.GetPoint1(), item.RoomNumber);
+	}
+	if (KeyMap[OIS::KeyCode::KC_S])
+	{
+		auto pos = LaraItem->Pose.Position.ToVector3() +
+			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor1 = Attractor(
+			AttractorType::Edge,
+			player.Context.Attractor.DebugAttractor1.GetPoint0(), pos, item.RoomNumber);
+	}
+}
 
-	// Show tether line.
+// Debug
+void HandleAttractorDebug(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	SetDebugAttractors(item);
+
+	// Show tether lines.
 	auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
-	auto closestPoint = Geometry::GetClosestPointOnLinePerp(
+	auto closestPoint0 = Geometry::GetClosestPointOnLinePerp(
 		LaraItem->Pose.Position.ToVector3(),
-		player.Context.Attractor.DebugAttractor.GetPoint0(),
-		player.Context.Attractor.DebugAttractor.GetPoint1());
+		player.Context.Attractor.DebugAttractor0.GetPoint0(),
+		player.Context.Attractor.DebugAttractor0.GetPoint1());
 
 	// Draw tether line.
-	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
-		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
+	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint0))
+		g_Renderer.AddLine3D(lineOrigin, closestPoint0, Vector4(1, 0, 1, 1));
 
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);

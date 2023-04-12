@@ -113,6 +113,8 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// Align orientation to edge.
 	item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.4f);
 
+	return true;
+
 	short moveAngle = player.Control.MoveAngle;
 
 	// Determine direction of player's shimmy. 0 if hanging still.
