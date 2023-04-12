@@ -194,7 +194,10 @@ namespace TEN::Entities::Creatures::TR3
             auto jointPos = GetJointPosition(item, ClawMutantTailBite.meshNum, ClawMutantTailBite.Position);
 
             auto enemyPos = creature->Enemy->Pose.Position;
-            enemyPos.y -= CLICK(1);
+            if (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Control.IsLow)
+                enemyPos.y -= CLICK(1);
+            else
+                enemyPos.y -= CLICK(2);
             auto angle = Math::Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
             
             auto* fx = &EffectList[fx_number];
