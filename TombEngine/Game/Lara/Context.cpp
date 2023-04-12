@@ -320,8 +320,8 @@ namespace TEN::Entities::Player::Context
 			int relEdgeHeight = edgeHeight - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
-			int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;
-			int upperBound = isMovingUp ? item.Animation.Velocity.y : 0;
+			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
+			int upperBound = isMovingUp ? (int)round(item.Animation.Velocity.y) : 0;
 
 			// 7) Assess catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
