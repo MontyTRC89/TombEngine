@@ -653,7 +653,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			break;
 
 		case TO_SINK:
-			Lara.WaterCurrentActive = value + 1;
+			Lara.Context.WaterCurrentActive = value + 1;
 			break;
 
 		case TO_FLIPMAP:

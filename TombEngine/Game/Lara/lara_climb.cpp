@@ -632,10 +632,10 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 	if (GetClimbFlags(x, item->Pose.Position.y, z, item->RoomNumber) & (short)LeftExtRightIntTab[angle])
 	{
-		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
-		lara->NextCornerPos.Position.y = item->Pose.Position.y;
-		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90);
+		lara->Context.NextCornerPos.Position.x = item->Pose.Position.x = x;
+		lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
+		lara->Context.NextCornerPos.Position.z = item->Pose.Position.z = z;
+		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -673,10 +673,10 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 		if (GetClimbFlags(x, item->Pose.Position.y, z, item->RoomNumber) & (short)LeftIntRightExtTab[angle])
 		{
-			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
-			lara->NextCornerPos.Position.y = item->Pose.Position.y;
-			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+			lara->Context.NextCornerPos.Position.x = item->Pose.Position.x = x;
+			lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
+			lara->Context.NextCornerPos.Position.z = item->Pose.Position.z = z;
+			lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
@@ -721,10 +721,10 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 	if (GetClimbFlags(x, item->Pose.Position.y, z, item->RoomNumber) & (short)LeftIntRightExtTab[angle])
 	{
-		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
-		lara->NextCornerPos.Position.y = item->Pose.Position.y;
-		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+		lara->Context.NextCornerPos.Position.x = item->Pose.Position.x = x;
+		lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
+		lara->Context.NextCornerPos.Position.z = item->Pose.Position.z = z;
+		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -761,10 +761,10 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 		if (GetClimbFlags(x, item->Pose.Position.y, z, item->RoomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
-			lara->NextCornerPos.Position.y = item->Pose.Position.y;
-			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+			lara->Context.NextCornerPos.Position.x = item->Pose.Position.x = x;
+			lara->Context.NextCornerPos.Position.y = item->Pose.Position.y;
+			lara->Context.NextCornerPos.Position.z = item->Pose.Position.z = z;
+			lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 
 			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;

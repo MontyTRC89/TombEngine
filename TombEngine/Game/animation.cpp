@@ -74,10 +74,10 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					auto& player = GetLaraInfo(item);
 
-					if (player.Control.CalculatedJumpVelocity != 0)
+					if (player.Context.CalcJumpVelocity != 0)
 					{
-						item.Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
-						player.Control.CalculatedJumpVelocity = 0;
+						item.Animation.Velocity.y = player.Context.CalcJumpVelocity;
+						player.Context.CalcJumpVelocity = 0;
 					}
 				}
 			}
@@ -121,8 +121,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 						auto& player = GetLaraInfo(item);
 
 						if (playAlways ||
-							(playOnLand && (player.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
+							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
+							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
 						{
 							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
