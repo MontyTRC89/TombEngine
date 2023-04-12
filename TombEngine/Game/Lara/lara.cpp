@@ -418,15 +418,12 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	g_Renderer.AddLine3D(
-		player.Context.Attractor.DebugAttractor.GetPoint0(),
-		player.Context.Attractor.DebugAttractor.GetPoint1(),
-		Vector4::One);
+	auto attracPtrs = GetNearbyAttractorPtrs(item);
 
-	for (const auto& attrac : player.Context.Attractor.SectorAttractors)
+	for (const auto* attrac : attracPtrs)
 	{
-		g_Renderer.AddLine3D(attrac.GetPoint0(), attrac.GetPoint1(), Vector4::One);
-		g_Renderer.AddLine3D(attrac.GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
+		attrac->DrawDebug();
+		g_Renderer.AddLine3D(attrac->GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
 	}
 }
 

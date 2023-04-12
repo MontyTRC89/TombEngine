@@ -4,18 +4,12 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "lara_helpers.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Math;
-
-// Debug
-#include <ois/OISKeyboard.h>
-#include "Renderer/Renderer11.h"
-#include "lara_helpers.h"
-#include "Specific/Input/Input.h"
-using namespace TEN::Input;
 using TEN::Renderer::g_Renderer;
-// ---
 
 namespace TEN::Collision
 {
@@ -54,10 +48,13 @@ namespace TEN::Collision
 
 	void Attractor::DrawDebug() const
 	{
-		g_Renderer.AddLine3D(GetPoint0(), GetPoint1(), Vector4::One);
+		constexpr auto COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+
+		g_Renderer.AddLine3D(GetPoint0(), GetPoint1(), COLOR);
 	}
 
-	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, bool isClosedLoop = true)
+	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
+															   bool isClosedLoop = true)
 	{
 		// Prepare container.
 		auto attracs = std::vector<Attractor>{};
@@ -69,7 +66,7 @@ namespace TEN::Collision
 		{
 			auto linePoint0 = points[i];
 			auto linePoint1 = points[(i < (points.size() - 1)) ? (i + 1) : 0];
-			auto attrac = Attractor(AttractorType::Edge, linePoint0, linePoint1, roomNumber);
+			auto attrac = Attractor(type, linePoint0, linePoint1, roomNumber);
 
 			attracs.push_back(attrac);
 		}
@@ -101,7 +98,7 @@ namespace TEN::Collision
 		};
 
 		// Return attractors generated from points.
-		return GenerateAttractorsFromPoints(points, item.RoomNumber);
+		return GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
 	}
 
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
@@ -115,7 +112,29 @@ namespace TEN::Collision
 
 		// Get room attractors.
 		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber);
+		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber, AttractorType::Edge);
+	}
+
+	// TODO: Actually probe for attractors.
+	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
+	{
+		constexpr auto COUNT_MAX = 32;
+
+		auto& player = GetLaraInfo(item);
+
+		auto attracPtrs = std::vector<const Attractor*>{};
+		for (auto& attrac : player.Context.Attractor.SectorAttractors)
+		{
+			assertion(attracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
+			if (attracPtrs.size() == COUNT_MAX)
+				return attracPtrs;
+
+			attracPtrs.push_back(&attrac);
+			attrac.DrawDebug();
+		}
+
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
+		return attracPtrs;
 	}
 
 	static AttractorCollision GetAttractorCollision(const ItemInfo& item, const Attractor& attrac, const Vector3& refPoint, float range)
@@ -154,29 +173,6 @@ namespace TEN::Collision
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		return attracColl;
-	}
-
-	// TODO: Actually probe for attractors.
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
-	{
-		constexpr auto COUNT_MAX = 32;
-
-		auto& player = GetLaraInfo(item);
-
-		auto attracPtrs = std::vector<const Attractor*>{};
-
-		for (auto& attrac : player.Context.Attractor.SectorAttractors)
-		{
-			if (attracPtrs.size() >= COUNT_MAX)
-				return attracPtrs;
-
-			attracPtrs.push_back(&attrac);
-
-			attrac.DrawDebug();
-		}
-
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor);
-		return attracPtrs;
 	}
 
 	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,

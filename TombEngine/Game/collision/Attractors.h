@@ -61,7 +61,8 @@ namespace TEN::Collision
 		short SlopeAngle	  = 0;
 	};
 
-	std::vector<Attractor>			GetSectorAttractors(const CollisionResult& pointColl);
+	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
+
 	std::vector<const Attractor*>	GetNearbyAttractorPtrs(const ItemInfo& item);
 	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 														   const Vector3& refPoint, float range);

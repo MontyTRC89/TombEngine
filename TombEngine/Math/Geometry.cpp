@@ -139,11 +139,11 @@ namespace TEN::Math::Geometry
 		auto lineVector = linePoint1 - linePoint0;
 		float alpha = lineVector.Dot(origin - linePoint0) / lineVector.Dot(lineVector);
 
-		if (alpha < 0.0f)
+		if (alpha <= 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (alpha > 1.0f)
+		else if (alpha >= 1.0f)
 		{
 			return linePoint1;
 		}
@@ -173,13 +173,14 @@ namespace TEN::Math::Geometry
 		float intersectionY = (perpSlope * intersectionX) + perpYIntercept;
 		auto perpPoint2D = Vector2(intersectionX, intersectionY);
 
-		// Clamp point along line according to distance alpha.
-		float alpha = Vector2::Distance(linePoint02D, perpPoint2D) / Vector2::Distance(linePoint02D, linePoint12D);
-		if (alpha < 0.0f)
+		// Calculate distance alpha.
+		float alpha = (perpPoint2D - linePoint02D).Dot(linePoint12D - linePoint02D) / (linePoint12D - linePoint02D).LengthSquared();
+
+		if (alpha <= 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (alpha > 1.0f)
+		else if (alpha >= 1.0f)
 		{
 			return linePoint1;
 		}
