@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				SetAnimation(item, AHMET_ANIM_DEATH);
-				Lara.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
+				Lara.Context.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
 			}
 			
 			TriggerAhmetDeathEffect(item);

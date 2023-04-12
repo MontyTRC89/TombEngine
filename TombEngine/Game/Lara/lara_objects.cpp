@@ -208,7 +208,7 @@ void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* pulleyItem = &g_Level.Items[lara->InteractedItem];
+	auto* pulleyItem = &g_Level.Items[lara->Context.InteractedItem];
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableSpasm = false;
@@ -284,7 +284,7 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	const auto& barItem = g_Level.Items[lara->InteractedItem];
+	const auto& barItem = g_Level.Items[lara->Context.InteractedItem];
 
 	item->Animation.IsAirborne = true;
 

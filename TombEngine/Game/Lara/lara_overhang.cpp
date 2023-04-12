@@ -336,7 +336,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
-		lara->NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
+		lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -500,7 +500,7 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Return to climbing mode.
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
-			SetAnimation(item, lara->NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
+			SetAnimation(item, lara->Context.NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
 
 		// Shimmy control.
 		if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
@@ -810,7 +810,7 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	GetLaraInfo(item)->NextCornerPos.Orientation.z = 0;
+	GetLaraInfo(item)->Context.NextCornerPos.Orientation.z = 0;
 	item->Pose.Orientation.x = 0;
 }
 
@@ -1064,7 +1064,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 
 			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				lara->NextCornerPos.Orientation.z = AlignToGrab(item);
+				lara->Context.NextCornerPos.Orientation.z = AlignToGrab(item);
 
 				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
 				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
