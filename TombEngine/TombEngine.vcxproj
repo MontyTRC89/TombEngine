@@ -601,7 +601,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
     <ClInclude Include="Game\collision\Attractors.cpp" />
-    <ClCompile Include="Game\collision\Attractor.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
