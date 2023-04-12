@@ -296,13 +296,13 @@ namespace TEN::Entities::Player::Context
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
-			// Get point collision off edge side.
-			auto pointCollOffEdge = GetCollision(
+			// Get point collision off edge's side.
+			auto pointCollOffSide = GetCollision(
 				Vector3i(attracColl.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 5) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffEdge.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.ClosestPoint.y - pointCollOffSide.Position.Floor);
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
 
