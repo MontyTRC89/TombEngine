@@ -45,25 +45,25 @@ namespace TEN::Collision
 		void DrawDebug() const;
 	};
 
-	struct AttractorCollision
+	struct AttractorCollisionData
 	{
 		const Attractor* AttractorPtr = nullptr;
 
 		Vector3 ClosestPoint = Vector3::Zero;
 
-		bool IsIntersected = false;
-		bool IsInFront	   = false;
-		bool IsFacingFront = false;
-
 		float Distance		  = 0.0f;
 		float DistanceFromEnd = 0.0f;
 		short HeadingAngle	  = 0;
 		short SlopeAngle	  = 0;
+
+		bool IsIntersected = false;
+		bool IsInFront	   = false;
+		bool IsFacingFront = false;
 	};
 
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
 
-	std::vector<const Attractor*>	GetNearbyAttractorPtrs(const ItemInfo& item);
-	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
-														   const Vector3& refPoint, float range);
+	std::vector<const Attractor*>		GetNearbyAttractorPtrs(const ItemInfo& item);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
+															   const Vector3& refPoint, float range);
 }

@@ -137,7 +137,7 @@ namespace TEN::Collision
 		return attracPtrs;
 	}
 
-	static AttractorCollision GetAttractorCollision(const ItemInfo& item, const Attractor& attrac, const Vector3& refPoint, float range)
+	static AttractorCollisionData GetAttractorCollision(const ItemInfo& item, const Attractor& attrac, const Vector3& refPoint, float range)
 	{
 		// Get points.
 		auto point0 = attrac.GetPoint0();
@@ -150,35 +150,35 @@ namespace TEN::Collision
 		float dist = Vector3::Distance(refPoint, closestPoint);
 		float distFromEnd = std::min(Vector3::Distance(closestPoint, point0), Vector3::Distance(closestPoint, point1));
 
-		// Determine enquiries.
-		bool isIntersected = (dist <= range);
-		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
-		bool isFacingFront = Geometry::IsPointOnLeft(item.Pose, point0);
-
 		// Calculate angles.
 		auto orient = Geometry::GetOrientToPoint(point0, point1);
 		short headingAngle = orient.y - ANGLE(90.0f);
 		short slopeAngle = orient.x;
 
+		// Determine enquiries.
+		bool isIntersected = (dist <= range);
+		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
+		bool isFacingFront = Geometry::IsPointOnLeft(item.Pose, point0);
+
 		// Create new attractor collision.
-		auto attracColl = AttractorCollision{};
+		auto attracColl = AttractorCollisionData{};
 
 		attracColl.AttractorPtr = &attrac;
 		attracColl.ClosestPoint = closestPoint;
-		attracColl.IsIntersected = isIntersected;
-		attracColl.IsInFront = isInFront;
-		attracColl.IsFacingFront = isFacingFront;
 		attracColl.Distance = dist;
 		attracColl.DistanceFromEnd = distFromEnd;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
+		attracColl.IsIntersected = isIntersected;
+		attracColl.IsInFront = isInFront;
+		attracColl.IsFacingFront = isFacingFront;
 		return attracColl;
 	}
 
-	std::vector<AttractorCollision> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
-														   const Vector3& refPoint, float range)
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
+															   const Vector3& refPoint, float range)
 	{
-		auto attracColls = std::vector<AttractorCollision>{};
+		auto attracColls = std::vector<AttractorCollisionData>{};
 		for (const auto* attrac : attracPtrs)
 		{
 			auto attracColl = GetAttractorCollision(item, *attrac, refPoint, range);

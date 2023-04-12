@@ -268,13 +268,13 @@ namespace TEN::Entities::Player::Context
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
-														  const std::vector<AttractorCollision>& attracColls)
+														  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
 		const auto& player = GetLaraInfo(item);
 
-		const AttractorCollision* attracCollPtr = nullptr;
+		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
 
 		// Find closest edge attractor.
