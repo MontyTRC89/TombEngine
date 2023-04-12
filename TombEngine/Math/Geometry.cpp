@@ -139,6 +139,7 @@ namespace TEN::Math::Geometry
 		auto lineDirection = linePoint1 - linePoint0;
 		float alpha = lineDirection.Dot(origin - linePoint0) / lineDirection.Dot(lineDirection);
 
+		// Clamp distance alpha.
 		if (alpha <= 0.0f)
 		{
 			return linePoint0;
@@ -148,6 +149,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
+		// Return closes point on line.
 		return (linePoint0 + (lineDirection * alpha));
 	}
 
@@ -158,15 +160,12 @@ namespace TEN::Math::Geometry
 
 		auto lineDirection = linePoint1 - linePoint0;
 
-		float lineLengthSqr = lineDirection.LengthSquared();
-		if (lineLengthSqr == 0.0f)
-			return linePoint0;
-
 		// Calculate alpha from 2D projection.
 		auto lineDirection2D = Vector3(lineDirection.x, 0.0f, lineDirection.z);
 		float alpha = lineDirection2D.Dot(origin - linePoint0) / lineDirection2D.Dot(lineDirection2D);
 		// float alpha = (origin - linePoint0).Dot(lineDirection2D) / lineDirection2D.LengthSquared(); // Alternative.
 
+		// Clamp distance alpha.
 		if (alpha <= 0.0f)
 		{
 			return linePoint0;
@@ -176,6 +175,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
+		// Return point on line perpendicular to vertical axis.
 		return (linePoint0 + (lineDirection * alpha));
 	}
 
