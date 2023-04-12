@@ -18,12 +18,6 @@ namespace TEN::Collision
 		Pinnacle*/
 	};
 
-	enum class AttractorPoint
-	{
-		Point0,
-		Point1
-	};
-
 	class Attractor
 	{
 	private:
@@ -57,14 +51,14 @@ namespace TEN::Collision
 
 		Vector3 ClosestPoint = Vector3::Zero;
 
-		bool  IsIntersected	  = false;
-		bool  IsInFront		  = false;
+		bool IsIntersected = false;
+		bool IsInFront	   = false;
+		bool IsFacingFront = false;
+
 		float Distance		  = 0.0f;
 		float DistanceFromEnd = 0.0f;
 		short HeadingAngle	  = 0;
 		short SlopeAngle	  = 0;
-
-		AttractorPoint PointOnLeft = AttractorPoint::Point0;
 	};
 
 	std::vector<Attractor>			GetSectorAttractors(const CollisionResult& pointColl);

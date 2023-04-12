@@ -134,11 +134,11 @@ namespace TEN::Collision
 		// Determine enquiries.
 		bool isIntersected = (dist <= range);
 		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
-		auto pointOnLeft = Geometry::IsPointOnLeft(item.Pose, point0) ? AttractorPoint::Point0 : AttractorPoint::Point1;
+		bool isFacingFront = Geometry::IsPointOnLeft(item.Pose, point0);
 
 		// Calculate angles.
 		auto orient = Geometry::GetOrientToPoint(point0, point1);
-		short facingAngle = orient.y - ANGLE(90.0f);
+		short headingAngle = orient.y - ANGLE(90.0f);
 		short slopeAngle = orient.x;
 
 		// Create new attractor collision.
@@ -148,11 +148,11 @@ namespace TEN::Collision
 		attracColl.ClosestPoint = closestPoint;
 		attracColl.IsIntersected = isIntersected;
 		attracColl.IsInFront = isInFront;
+		attracColl.IsFacingFront = isFacingFront;
 		attracColl.Distance = dist;
 		attracColl.DistanceFromEnd = distFromEnd;
-		attracColl.HeadingAngle = facingAngle;
+		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
-		attracColl.PointOnLeft = pointOnLeft;
 		return attracColl;
 	}
 
