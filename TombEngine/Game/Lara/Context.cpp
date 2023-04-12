@@ -278,7 +278,7 @@ namespace TEN::Entities::Player::Context
 		float closestDist = INFINITY;
 		bool hasFoundCorner = false;
 
-		// Find closest edge attractor.
+		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
@@ -323,10 +323,11 @@ namespace TEN::Entities::Player::Context
 			int lowerBound = isMovingUp ? 0 : item.Animation.Velocity.y;
 			int upperBound = isMovingUp ? item.Animation.Velocity.y : 0;
 
-			// 7) Assess point collision to edge.
+			// 7) Assess catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
+				// Track closest attractor.
 				if (attracColl.Distance < closestDist)
 				{
 					attracCollPtr = &attracColl;
