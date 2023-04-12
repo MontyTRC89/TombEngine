@@ -56,16 +56,17 @@ namespace TEN::Entities::Creatures::TR3
     constexpr auto CLAWMUTANT_RUN_TURN_RATE_MAX = ANGLE(4.0f);
     constexpr auto CLAWMUTANT_SLASH_RANGE = SQUARE(BLOCK(1));
     constexpr auto CLAWMUTANT_RUN_ATTACK_RANGE = SQUARE(BLOCK(2));
-    constexpr auto CLAWMUTANT_CLAW_RANGE = SQUARE(BLOCK(1.25f));
-    constexpr auto CLAWMUTANT_SHOOT_RANGE = SQUARE(BLOCK(4));
+    constexpr auto CLAWMUTANT_CLAW_RANGE = SQUARE(BLOCK(1));
+    constexpr auto CLAWMUTANT_SHOOT_RANGE = SQUARE(BLOCK(3));
     constexpr auto CLAWMUTANT_DAMAGE = 100;
     constexpr auto CLAWMUTANT_PLASMA_DAMAGE = 200;
     constexpr auto CLAWMUTANT_PLASMA_SPEED = 250;
     constexpr auto CLAWMUTANT_ROAR_CHANCE = 0x60;
     constexpr auto CLAWMUTANT_WALK_CHANCE = CLAWMUTANT_ROAR_CHANCE + 0x400;
 
-    const auto ClawMutantLeftBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 4);
-    const auto ClawMutantRightBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 7);
+    const auto ClawMutantLeftBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 7);
+    const auto ClawMutantRightBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 4);
+    const auto ClawMutantTailBite = BiteInfo(Vector3(-32.0f, -16.0f, -119.0f), 13);
 
     static void TriggerMutantPlasma(short itemNumber)
     {
@@ -185,21 +186,21 @@ namespace TEN::Entities::Creatures::TR3
         sptr->gravity = 22;
     }
 
-    static void TriggerMutantPlasmaBall(ItemInfo* item, CreatureInfo* creature, short yangle, short xangle)
+    static void TriggerMutantPlasmaBall(ItemInfo* item, CreatureInfo* creature)
     {
         short fx_number = CreateNewEffect(item->RoomNumber);
         if (fx_number != NO_ITEM)
         {
-            auto jointPos = GetJointPosition(item, 13, Vector3i(-32, -16, -119));
+            auto jointPos = GetJointPosition(item, ClawMutantTailBite.meshNum, ClawMutantTailBite.Position);
+
             auto enemyPos = creature->Enemy->Pose.Position;
-            if (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Control.IsLow)
-                enemyPos.y += CLICK(1);
-            auto angles = Math::Geometry::GetOrientToPoint(enemyPos.ToVector3(), jointPos.ToVector3());
+            enemyPos.y -= CLICK(1);
+            auto angle = Math::Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
             
             auto* fx = &EffectList[fx_number];
             fx->pos.Position = jointPos;
-            fx->pos.Orientation.y = item->Pose.Orientation.y + yangle;
-            fx->pos.Orientation.x = (-angles.x) + ANGLE(4.0f);
+            fx->pos.Orientation.y = angle.y;
+            fx->pos.Orientation.x = angle.x;
             fx->objectNumber = ID_ENERGY_BUBBLES;
             fx->color = Vector4::Zero;
             fx->speed = CLAWMUTANT_PLASMA_SPEED;
@@ -235,6 +236,25 @@ namespace TEN::Entities::Creatures::TR3
             TriggerDynamicLight(pos.x, pos.y, pos.z, bright, r, g, b);
         }
     }
+
+    static void DamageTargetWithClaw(ItemInfo* source, ItemInfo* target)
+    {
+        if (source->ItemFlags[5] == 0 && source->TouchBits.Test(ClawMutantLeftBite.meshNum))
+        {
+            DoDamage(target, CLAWMUTANT_DAMAGE / 2);
+            CreatureEffect2(source, ClawMutantLeftBite, 10, source->Pose.Orientation.y, DoBloodSplat);
+            source->ItemFlags[5] = 1;
+        }
+        if (source->ItemFlags[6] == 0 && source->TouchBits.Test(ClawMutantRightBite.meshNum))
+        {
+            DoDamage(target, CLAWMUTANT_DAMAGE / 2);
+            CreatureEffect2(source, ClawMutantRightBite, 10, source->Pose.Orientation.y, DoBloodSplat);
+            source->ItemFlags[6] = 1;
+        }
+    }
+
+    // source->ItemFlags[5] is flag to enable damage left (0 is enabled, 1 is disabled)
+    // source->ItemFlags[6] is flag to enable damage right (0 is enabled, 1 is disabled)
 
     void ClawMutantControl(short itemNumber)
     {
@@ -275,7 +295,8 @@ namespace TEN::Entities::Creatures::TR3
             switch (item->Animation.ActiveState)
             {
             case CLAWMUTANT_STATE_STOP:
-                creature->Flags = 0;
+                item->ItemFlags[5] = 0;
+                item->ItemFlags[6] = 0;
                 creature->MaxTurn = 0;
 
                 if (item->AIBits & GUARD)
@@ -327,7 +348,8 @@ namespace TEN::Entities::Creatures::TR3
                 }
                 break;
             case CLAWMUTANT_STATE_WALK:
-                creature->Flags = 0;
+                item->ItemFlags[5] = 0;
+                item->ItemFlags[6] = 0;
                 creature->MaxTurn = CLAWMUTANT_WALK_TURN_RATE_MAX;
 
                 if (ai.ahead)
@@ -355,7 +377,8 @@ namespace TEN::Entities::Creatures::TR3
                 }
                 break;
             case CLAWMUTANT_STATE_RUN:
-                creature->Flags = 0;
+                item->ItemFlags[5] = 0;
+                item->ItemFlags[6] = 0;
                 creature->MaxTurn = CLAWMUTANT_RUN_TURN_RATE_MAX;
 
                 if (ai.ahead)
@@ -391,20 +414,8 @@ namespace TEN::Entities::Creatures::TR3
                     torso_x = ai.xAngle;
                 }
 
-                if (!(creature->Flags & 0x1) && item->TouchBits.Test(ClawMutantLeftBite.meshNum))
-                {
-                    DoDamage(creature->Enemy, CLAWMUTANT_DAMAGE);
-                    CreatureEffect(item, ClawMutantLeftBite, DoBloodSplat);
-                    creature->Flags |= 0x1;
-                }
-
-                if (!(creature->Flags & 0x2) && item->TouchBits.Test(ClawMutantRightBite.meshNum))
-                {
-                    DoDamage(creature->Enemy, CLAWMUTANT_DAMAGE);
-                    CreatureEffect(item, ClawMutantRightBite, DoBloodSplat);
-                    creature->Flags |= 0x2;
-                }
-
+                DamageTargetWithClaw(item, creature->Enemy);
+ 
                 break;
             case CLAWMUTANT_STATE_PLASMA_ATTACK:
                 if (ai.ahead)
@@ -419,7 +430,7 @@ namespace TEN::Entities::Creatures::TR3
                 if (item->Animation.FrameNumber < GetFrameNumber(item, 28))
                     TriggerMutantPlasma(itemNumber);
                 else if (item->Animation.FrameNumber == GetFrameNumber(item, 28))
-                    TriggerMutantPlasmaBall(item, creature, torso_y, torso_x);
+                    TriggerMutantPlasmaBall(item, creature);
 
                 TriggerMutantPlasmaLight(item);
                 break;
