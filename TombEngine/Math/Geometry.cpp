@@ -151,7 +151,7 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (lineVector * alpha));
 	}
 
-	Vector3 GetPerpendicularPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
+	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
 	{
 		if (linePoint0 == linePoint1)
 			return linePoint0;
@@ -161,7 +161,16 @@ namespace TEN::Math::Geometry
 		auto linePoint02D = Vector2(linePoint0.x, linePoint0.z);
 		auto linePoint12D = Vector2(linePoint1.x, linePoint1.z);
 
-		float slope = (linePoint12D.y - linePoint02D.y) / (linePoint12D.x - linePoint02D.x);
+		// Line is vertical; return line point 0.
+		if (linePoint02D == linePoint12D)
+			linePoint0;
+
+		// TODO: Awful miscalculation when axis-aligned.
+		// Calculate slope.
+		float slope = ((linePoint02D.x == linePoint12D.x) || (linePoint02D.y == linePoint12D.y)) ?
+			EPSILON :
+			(linePoint12D.y - linePoint02D.y) / (linePoint12D.x - linePoint02D.x);
+
 		float yIntercept = linePoint02D.y - (slope * linePoint02D.x);
 
 		// Calculate slope and Y-intercept of perpendicular line.
@@ -175,15 +184,7 @@ namespace TEN::Math::Geometry
 
 		// Calculate distance alpha.
 		float alpha = (perpPoint2D - linePoint02D).Dot(linePoint12D - linePoint02D) / (linePoint12D - linePoint02D).LengthSquared();
-
-		if (alpha <= 0.0f)
-		{
-			return linePoint0;
-		}
-		else if (alpha >= 1.0f)
-		{
-			return linePoint1;
-		}
+		alpha = std::max(0.0f, std::min(alpha, 1.0f));
 
 		// Return perpendicular intersection point.
 		auto lineVector = linePoint1 - linePoint0;

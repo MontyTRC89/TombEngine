@@ -460,20 +460,18 @@ void HandleAttractorDebug(ItemInfo& item)
 
 	// Show tether line.
 	auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
-	auto closestPoint = Geometry::GetPerpendicularPointOnLine(
+	auto closestPoint = Geometry::GetClosestPointOnLinePerp(
 		LaraItem->Pose.Position.ToVector3(),
 		player.Context.Attractor.DebugAttractor.GetPoint0(),
 		player.Context.Attractor.DebugAttractor.GetPoint1());
 
-	// Draw tether line. Magenta when in front, white behind.
-	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
-	{
+	g_Renderer.PrintDebugMessage("%.3f", closestPoint.x);
+	g_Renderer.PrintDebugMessage("%.3f", closestPoint.y);
+	g_Renderer.PrintDebugMessage("%.3f", closestPoint.z);
+
+	// Draw tether line.
+	//if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint))
 		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4(1, 0, 1, 1));
-	}
-	else
-	{
-		g_Renderer.AddLine3D(lineOrigin, closestPoint, Vector4::One);
-	}
 
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);

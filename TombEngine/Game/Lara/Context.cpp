@@ -289,7 +289,7 @@ namespace TEN::Entities::Player::Context
 				continue;
 
 			// 3) Test catch angle.
-			if (!attracColl.IsFacingFront || !TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 				continue;
 
 			// 4) Test if edge slope is slippery.

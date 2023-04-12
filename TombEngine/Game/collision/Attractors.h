@@ -1,7 +1,5 @@
 #pragma once
 
-class EulerAngles;
-struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 
@@ -33,10 +31,9 @@ namespace TEN::Collision
 		Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber);
 
 		// Getters
-		AttractorType GetType() const;
-		Vector3		  GetPoint0() const;
-		Vector3		  GetPoint1() const;
-		int			  GetRoomNumber() const;
+		Vector3 GetPoint0() const;
+		Vector3 GetPoint1() const;
+		int		GetRoomNumber() const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -58,7 +55,6 @@ namespace TEN::Collision
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;
-		bool IsFacingFront = false;
 	};
 
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);

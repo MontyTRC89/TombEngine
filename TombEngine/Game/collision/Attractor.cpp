@@ -20,11 +20,6 @@ namespace TEN::Collision
 		Point1 = point1;
 		RoomNumber = roomNumber;
 	}
-	
-	AttractorType Attractor::GetType() const
-	{
-		return Type;
-	}
 
 	Vector3 Attractor::GetPoint0() const
 	{
@@ -143,7 +138,7 @@ namespace TEN::Collision
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
 		auto closestPoint = attrac.IsEdge() ?
-			Geometry::GetPerpendicularPointOnLine(refPoint, point0, point1) :
+			Geometry::GetClosestPointOnLinePerp(refPoint, point0, point1) :
 			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
 
 		// Calculate distances.
@@ -158,7 +153,6 @@ namespace TEN::Collision
 		// Determine enquiries.
 		bool isIntersected = (dist <= range);
 		bool isInFront = Geometry::IsPointInFront(item.Pose, closestPoint);
-		bool isFacingFront = Geometry::IsPointOnLeft(item.Pose, point0);
 
 		// Create new attractor collision.
 		auto attracColl = AttractorCollisionData{};
@@ -171,7 +165,6 @@ namespace TEN::Collision
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
 		attracColl.IsInFront = isInFront;
-		attracColl.IsFacingFront = isFacingFront;
 		return attracColl;
 	}
 
