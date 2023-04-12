@@ -306,8 +306,8 @@ namespace TEN::Math::Geometry
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D normal vector to the 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
-		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
+		// The 2D normal vector to the 2D heading direction vector: X = -cosY, Y = 0, Z = +sinY
+		auto headingNormal = Vector3(-cosY, 0.0f, sinY);
 		auto targetDirection = target - origin;
 
 		float dot = headingNormal.Dot(targetDirection);
