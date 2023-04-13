@@ -72,8 +72,7 @@ namespace TEN::Entities::Generic
 	void PushableBlockManageMoving(int itemNumber);
 
 	// Sounds functions
-	void InitializePushablesSoundsMap();
-	int GetPushableSound(PushableSoundType soundType, const GameVector& pos);
+	int	 GetPushableSound(PushableSoundType soundType, const GameVector& pos);
 	void PushablesManageSounds(int itemNumber);
 	
 	// General functions
