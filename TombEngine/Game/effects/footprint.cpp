@@ -41,7 +41,7 @@ namespace TEN::Effects::Footprint
 
 	static SOUND_EFFECTS GetFootprintSfx(MaterialType material)
 	{
-		static const std::unordered_map<MaterialType, SOUND_EFFECTS> SOUND_MAP =
+		static const auto SOUND_MAP = std::unordered_map<MaterialType, SOUND_EFFECTS>
 		{
 			{ MaterialType::Mud, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD },
 			{ MaterialType::Snow, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW },
