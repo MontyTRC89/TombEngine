@@ -876,7 +876,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	ItemInfo* closestEntityPtr = nullptr;
 
 	float closestDistance = INFINITY;
-	short closestYOrient = MAXSHORT;
+	short closestHeadingAngle = MAXSHORT;
 	unsigned int targetCount = 0;
 	float maxDistance = weaponInfo.TargetDist;
 
@@ -913,11 +913,11 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			++targetCount;
 
 			if (distance < closestDistance &&
-				abs(orient.y) < (closestYOrient + ANGLE(15.0f)))
+				abs(orient.y) < (closestHeadingAngle + ANGLE(15.0f)))
 			{
 				closestEntityPtr = &item;
 				closestDistance = distance;
-				closestYOrient = abs(orient.y);
+				closestHeadingAngle = abs(orient.y);
 			}
 		}
 	}
