@@ -79,10 +79,14 @@ void ItemInfo::HandleOffsetBlend()
 	OffsetBlend.PosOffsetDelta += posOffsetStep - Vector3i(posOffsetStep).ToVector3();
 	auto posOffsetDeltaRounded = Vector3i(OffsetBlend.PosOffsetDelta).ToVector3();
 
-	// Blend position.
-	OffsetBlend.PosOffsetDelta -= posOffsetDeltaRounded - OffsetBlend.PosOffsetDelta;
-	Pose.Position += Vector3i(posOffsetDeltaRounded);
-	OffsetBlend.PosOffset -= posOffsetDeltaRounded;
+	// Round accumulated delta value to nearest integer and add to position.
+	auto posOffsetDeltaInt = Vector3i(OffsetBlend.PosOffsetDelta);
+	OffsetBlend.PosOffsetDelta -= posOffsetDeltaInt.ToVector3() - OffsetBlend.PosOffsetDelta;
+	Pose.Position += posOffsetDeltaInt;
+
+	// Subtract rounded delta from offset step and apply to position.
+	OffsetBlend.PosOffset -= posOffsetDeltaInt.ToVector3();
+	Pose.Position += Vector3i(posOffsetStep) - posOffsetDeltaInt.ToVector3();
 
 	// Blend orientation.
 	auto orientOffsetStep = EulerAngles::Lerp(OffsetBlend.OrientOffset, EulerAngles::Zero, OffsetBlend.Alpha);
