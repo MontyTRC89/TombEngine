@@ -94,20 +94,20 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		return false;
 
-	if (!g_Level.Items[lara->Vehicle].Active)
+	if (!g_Level.Items[lara->Context.Vehicle].Active)
 	{
-		lara->Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_ITEM;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
 		return false;
 	}
 
-	TestVolumes(lara->Vehicle);
+	TestVolumes(lara->Context.Vehicle);
 
-	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
+	switch (g_Level.Items[lara->Context.Vehicle].ObjectNumber)
 	{
 	case ID_QUAD:
 		QuadBikeControl(item, coll);
@@ -289,7 +289,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraStepUp(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -298,7 +298,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraStepDown(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -755,29 +755,30 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ProjectedFloorHeight = vaultResult.Height;
+	lara->Context.ProjectedFloorHeight = vaultResult.Height;
 	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
 	lara->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		lara->Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else
 	{
-		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara->ProjectedFloorHeight - item->Pose.Position.y;
+		int height = lara->Context.ProjectedFloorHeight - item->Pose.Position.y;
 		if (height > -CLICK(3.5f))
 			height = -CLICK(3.5f);
 		else if (height < -CLICK(7.5f))
 			height = -CLICK(7.5f);
 
-		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
+		// TODO: Find a better formula for this that won't require the above block.
+		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * (height));
 	}
 }
 
@@ -923,7 +924,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 		item->Animation.Velocity.z = 2;
 		item->Animation.Velocity.y = 1;
 		item->Pose.Position.y += CLICK(1);
-		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
+		item->Pose.Orientation.y += lara->Context.NextCornerPos.Orientation.y / 2;
 		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}
@@ -935,9 +936,9 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 		else
 			SetAnimation(item, LA_HANG_IDLE);
 
-		item->Pose.Position = lara->NextCornerPos.Position;
-		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
-		coll->Setup.OldPosition = lara->NextCornerPos.Position;
+		item->Pose.Position = lara->Context.NextCornerPos.Position;
+		item->Pose.Orientation.y = lara->Context.NextCornerPos.Orientation.y;
+		coll->Setup.OldPosition = lara->Context.NextCornerPos.Position;
 	}
 }
 
@@ -958,15 +959,15 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Vehicle != NO_ITEM)
-			g_Level.Items[lara->Vehicle].Active = false;
+		if (lara->Context.Vehicle != NO_ITEM)
+			g_Level.Items[lara->Context.Vehicle].Active = false;
 
-		lara->Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_ITEM;
 	}
 	else
 	{
 		g_Level.Items[vehicle->Index].Active = true;
-		lara->Vehicle = vehicle->Index;
+		lara->Context.Vehicle = vehicle->Index;
 	}
 }
 

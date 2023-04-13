@@ -241,7 +241,7 @@ namespace TEN::Renderer
 					case 2:
 					case 3:
 					case 4:
-						short zRot = (short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(EulerAngles(prevRotation).z);
+						short zRot = (short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + EulerAngles(prevRotation).z;
 						currentBone->ExtraRotation = EulerAngles(0, 0, zRot).ToQuaternion();
 						break;
 					}

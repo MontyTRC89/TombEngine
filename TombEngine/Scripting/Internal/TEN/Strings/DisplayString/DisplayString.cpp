@@ -114,14 +114,14 @@ void DisplayString::Register(sol::table& parent)
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey
-		// @treturn String a string
+		// @treturn string a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
 		/// Set the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:SetKey
-		// @tparam String string the new key for the display string 
+		// @tparam string string the new key for the display string 
 		ScriptReserved_SetKey, &DisplayString::SetKey, 
 
 
@@ -141,13 +141,15 @@ void DisplayString::Register(sol::table& parent)
 
 		/// Set the display string's flags 
 		// @function DisplayString:SetFlags
-		// @tparam Table table the new table with display flags options
-		// Example with possible values:
+		// @tparam table table the new table with display flags options
+		// @usage
 		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
 		// varDisplayString:SetFlags({})
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.CENTER })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.DisplayStringOption.CENTER })
+		// -- When passing a table to a function, you can omit the parentheses
+		// varDisplayString:SetFlags{ TEN.Strings.DisplayStringOption.CENTER }
 		ScriptReserved_SetFlags, &DisplayString::SetFlags
 	);
 }

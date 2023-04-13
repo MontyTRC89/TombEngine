@@ -479,12 +479,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		heightFromWater = item->Pose.Position.y - waterHeight;
 	else
 		heightFromWater = NO_HEIGHT;
-	lara->WaterSurfaceDist = -heightFromWater;
+	lara->Context.WaterSurfaceDist = -heightFromWater;
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
 
-	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM && lara->ExtraAnim == NO_ITEM)
 	{
 		switch (lara->Control.WaterStatus)
 		{
@@ -702,7 +702,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	{
 	case WaterStatus::Dry:
 	case WaterStatus::Wade:
-		if (isSwamp	&& lara->WaterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
+		if (isSwamp	&& lara->Context.WaterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
 			if (item->HitPoints >= 0)
 			{
@@ -717,7 +717,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		else if (lara->Status.Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
 			// HACK: Special case for UPV.
-			if (lara->Vehicle == NO_ITEM)
+			if (lara->Context.Vehicle == NO_ITEM)
 			{
 				lara->Status.Air += 10;
 				if (lara->Status.Air > LARA_AIR_MAX)
@@ -730,9 +730,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			if (lara->Control.WaterStatus == WaterStatus::Dry)
 			{
 				// HACK: Special case for UPV.
-				if (lara->Vehicle != NO_ITEM)
+				if (lara->Context.Vehicle != NO_ITEM)
 				{
-					auto& vehicleItem = g_Level.Items[lara->Vehicle];
+					auto& vehicleItem = g_Level.Items[lara->Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
 						auto pointColl = GetCollision(item, 0, 0, CLICK(1));
@@ -853,6 +853,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = true;
 
 	coll->Setup.OldPosition = item->Pose.Position;
+	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.OldState = item->Animation.ActiveState;
@@ -889,7 +890,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		DoObjectCollision(item, coll);
 
 		// Handle Lara collision.
-		if (lara->Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
 	}
 
@@ -959,7 +960,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetPlayerLean(item, 1 / 8.0f);
 
-	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->Context.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateItem(item);
@@ -967,7 +968,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
@@ -1048,7 +1049,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 			item->Pose.Orientation.z = -ANGLE(22.0f);
 	}
 
-	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->Context.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateItem(item);
@@ -1056,7 +1057,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (/*lara->ExtraAnim == -1 &&*/ lara->Vehicle == NO_ITEM)
+	if (/*lara->ExtraAnim == -1 &&*/ lara->Context.Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
 	UpdateLaraRoom(item, 0);
@@ -1082,7 +1083,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->WaterSurfaceDist > 0 && lara->WaterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->Context.WaterSurfaceDist > 0 && lara->Context.WaterSurfaceDist != NO_HEIGHT))
 		{
 			SetAnimation(item, LA_UNDERWATER_IDLE);
 			ResetPlayerFlex(item);
