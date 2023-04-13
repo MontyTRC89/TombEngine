@@ -14,17 +14,21 @@
 using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 
+// ItemFlags[5] flag enables damage left (0 = enabled, 1 = disabled).
+// ItemFlags[6] flag enables damage right (0 = enabled, 1 = disabled).
+
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto CLAW_MUTANT_ATTACK_DAMAGE		= 100;
+	constexpr auto CLAW_MUTANT_CLAW_ATTACK_DAMAGE	= 100;
 	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_DAMAGE = 200;
 
 	constexpr auto CLAW_MUTANT_WALK_CHANCE = 1 / 64.0f;
 
-	constexpr auto CLAW_MUTANT_SWIPE_ATTACK_RANGE  = SQUARE(BLOCK(1));
-	constexpr auto CLAW_MUTANT_CLAW_ATTACK_RANGE   = SQUARE(BLOCK(1));
-	constexpr auto CLAW_MUTANT_RUN_ATTACK_RANGE	   = SQUARE(BLOCK(2));
-	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_RANGE = SQUARE(BLOCK(3));
+	constexpr auto CLAW_MUTANT_IDLE_CLAW_ATTACK_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto CLAW_MUTANT_IDLE_DUAL_CLAW_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto CLAW_MUTANT_WALK_CLAW_ATTACK_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto CLAW_MUTANT_RUN_CLAW_ATTACK_RANGE	   = SQUARE(BLOCK(2));
+	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_RANGE		   = SQUARE(BLOCK(3));
 
 	constexpr auto CLAW_MUTANT_PLASMA_VELOCITY = 250;
 
@@ -40,13 +44,13 @@ namespace TEN::Entities::Creatures::TR3
 		CLAW_MUTANT_STATE_IDLE = 0,
 		CLAW_MUTANT_STATE_WALK = 1,
 		CLAW_MUTANT_STATE_RUN = 2,
-		CLAW_MUTANT_STATE_RUN_ATTACK = 3,
-		CLAW_MUTANT_STATE_WALK_ATTACK_LEFT = 4,
-		CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT = 5,
-		CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT = 6,
-		CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT = 7,
+		CLAW_MUTANT_STATE_RUN_CLAW_ATTACK = 3,
+		CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_LEFT = 4,
+		CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_RIGHT = 5,
+		CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_LEFT = 6,
+		CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_RIGHT = 7,
 		CLAW_MUTANT_STATE_DEATH = 8,
-		CLAW_MUTANT_STATE_CLAW_ATTACK = 9,
+		CLAW_MUTANT_STATE_IDLE_DUAL_CLAW_ATTACK = 9,
 		CLAW_MUTANT_STATE_PLASMA_ATTACK = 10
 	};
 
@@ -60,17 +64,17 @@ namespace TEN::Entities::Creatures::TR3
 		CLAW_MUTANT_ANIM_RUN_TO_IDLE_RIGHT = 5,
 		CLAW_MUTANT_ANIM_RUN_TO_IDLE_LEFT = 6,
 		CLAW_MUTANT_ANIM_WALK = 7,
-		CLAW_MUTANT_ANIM_UNKNOWN = 8,
+		CLAW_MUTANT_ANIM_WALK_TO_RUN = 8,
 		CLAW_MUTANT_ANIM_RUN = 9,
 		CLAW_MUTANT_ANIM_RUN_TO_WALK_LEFT = 10,
 		CLAW_MUTANT_ANIM_RUN_TO_WALK_RIGHT = 11,
-		CLAW_MUTANT_ANIM_RUN_ATTACK = 12,
-		CLAW_MUTANT_ANIM_RUN_ATTACK_CANCEL = 13,
-		CLAW_MUTANT_ANIM_IDLE_ATTACK_LEFT = 14,
-		CLAW_MUTANT_ANIM_IDLE_ATTACK_RIGHT = 15,
-		CLAW_MUTANT_ANIM_IDLE_DOUBLE_ATTACK = 16,
-		CLAW_MUTANT_ANIM_WALK_ATTACK_LEFT = 17,
-		CLAW_MUTANT_ANIM_WALK_ATTACK_RIGHT = 18,
+		CLAW_MUTANT_ANIM_RUN_CLAW_ATTACK = 12,
+		CLAW_MUTANT_ANIM_RUN_CLAW_ATTACK_CANCEL = 13,
+		CLAW_MUTANT_ANIM_IDLE_CLAW_ATTACK_LEFT = 14,
+		CLAW_MUTANT_ANIM_IDLE_CLAW_ATTACK_RIGHT = 15,
+		CLAW_MUTANT_ANIM_IDLE_DUAL_CLAW_ATTACK = 16,
+		CLAW_MUTANT_ANIM_WALK_CLAW_ATTACK_LEFT = 17,
+		CLAW_MUTANT_ANIM_WALK_CLAW_ATTACK_RIGHT = 18,
 		CLAW_MUTANT_ANIM_PLASMA_ATTACK = 19,
 		CLAW_MUTANT_ANIM_DEATH = 20
 	};
@@ -107,12 +111,12 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.zVel = ((GetRandomControl() & 31) - 16);
 		plasma.friction = 3;
 
-		if (GetRandomControl() & 1)
+		if (Random::TestProbability(1 / 2.0f))
 		{
 			plasma.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 			plasma.rotAng = GetRandomControl() & 4095;
 
-			if (GetRandomControl() & 1)
+			if (Random::TestProbability(1 / 2.0f))
 			{
 				plasma.rotAdd = -(GetRandomControl() & 15) - 16;
 			}
@@ -201,20 +205,20 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	static void DamageTargetWithClaw(ItemInfo* source, ItemInfo* target)
+	static void DamageTargetWithClaw(ItemInfo& source, ItemInfo& target)
 	{
-		if (source->ItemFlags[5] == 0 && source->TouchBits.Test(ClawMutantLeftBite.meshNum))
+		if (source.ItemFlags[5] == 0 && source.TouchBits.Test(ClawMutantLeftBite.meshNum))
 		{
-			DoDamage(target, CLAW_MUTANT_ATTACK_DAMAGE / 2);
-			CreatureEffect2(source, ClawMutantLeftBite, 10, source->Pose.Orientation.y, DoBloodSplat);
-			source->ItemFlags[5] = 1;
+			DoDamage(&target, CLAW_MUTANT_CLAW_ATTACK_DAMAGE / 2);
+			CreatureEffect2(&source, ClawMutantLeftBite, 10, source.Pose.Orientation.y, DoBloodSplat);
+			source.ItemFlags[5] = 1;
 		}
 
-		if (source->ItemFlags[6] == 0 && source->TouchBits.Test(ClawMutantRightBite.meshNum))
+		if (source.ItemFlags[6] == 0 && source.TouchBits.Test(ClawMutantRightBite.meshNum))
 		{
-			DoDamage(target, CLAW_MUTANT_ATTACK_DAMAGE / 2);
-			CreatureEffect2(source, ClawMutantRightBite, 10, source->Pose.Orientation.y, DoBloodSplat);
-			source->ItemFlags[6] = 1;
+			DoDamage(&target, CLAW_MUTANT_CLAW_ATTACK_DAMAGE / 2);
+			CreatureEffect2(&source, ClawMutantRightBite, 10, source.Pose.Orientation.y, DoBloodSplat);
+			source.ItemFlags[6] = 1;
 		}
 	}
 
@@ -288,8 +292,6 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.gravity = 22;
 	}
 
-	// source->ItemFlags[5] flag enables damage left (0 = enabled, 1 = disabled).
-	// source->ItemFlags[6] flag enables damage right (0 = enabled, 1 = disabled).
 	void ClawMutantControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -348,25 +350,25 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = CLAW_MUTANT_STATE_RUN;
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_SWIPE_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_IDLE_CLAW_ATTACK_RANGE)
 				{
 					extraTorsoRot.x = ai.xAngle;
 					extraTorsoRot.y = ai.angle;
 
 					if (ai.angle < 0)
 					{
-						item.Animation.TargetState = CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_LEFT;
 					}
 					else
 					{
-						item.Animation.TargetState = CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_RIGHT;
 					}
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_IDLE_DUAL_CLAW_ATTACK_RANGE)
 				{
 					extraTorsoRot.x = ai.xAngle;
 					extraTorsoRot.y = ai.angle;
-					item.Animation.TargetState = CLAW_MUTANT_STATE_CLAW_ATTACK;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE_DUAL_CLAW_ATTACK;
 				}
 				else if (canShoot)
 				{
@@ -401,15 +403,15 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
 					extraHeadRot.y = 0;
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_WALK_CLAW_ATTACK_RANGE)
 				{
 					if (ai.angle < 0)
 					{
-						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_LEFT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_LEFT;
 					}
 					else
 					{
-						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_RIGHT;
 					}
 				}
 				else if (canShoot)
@@ -443,7 +445,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_RUN_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_RUN_CLAW_ATTACK_RANGE)
 				{
 					if (creature.Enemy != nullptr && creature.Enemy->Animation.Velocity.z == 0.0f)
 					{
@@ -451,7 +453,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 					else
 					{
-						item.Animation.TargetState = CLAW_MUTANT_STATE_RUN_ATTACK;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_RUN_CLAW_ATTACK;
 					}
 				}
 				else if (canShoot)
@@ -461,19 +463,19 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case CLAW_MUTANT_STATE_WALK_ATTACK_LEFT:
-			case CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT:
-			case CLAW_MUTANT_STATE_RUN_ATTACK:
-			case CLAW_MUTANT_STATE_CLAW_ATTACK:
-			case CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT:
-			case CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT:
+			case CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_LEFT:
+			case CLAW_MUTANT_STATE_WALK_CLAW_ATTACK_RIGHT:
+			case CLAW_MUTANT_STATE_RUN_CLAW_ATTACK:
+			case CLAW_MUTANT_STATE_IDLE_DUAL_CLAW_ATTACK:
+			case CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_LEFT:
+			case CLAW_MUTANT_STATE_IDLE_CLAW_ATTACK_RIGHT:
 				if (ai.ahead)
 				{
 					extraTorsoRot.x = ai.xAngle;
 					extraTorsoRot.y = ai.angle;
 				}
 
-				DamageTargetWithClaw(&item, creature.Enemy);
+				DamageTargetWithClaw(item, *creature.Enemy);
 				break;
 
 			case CLAW_MUTANT_STATE_PLASMA_ATTACK:
