@@ -951,7 +951,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
 				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1), r->z + r->zSize * SECTOR(1));
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
