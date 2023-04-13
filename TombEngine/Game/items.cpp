@@ -28,48 +28,77 @@ using namespace TEN::Input;
 using namespace TEN::Math;;
 using namespace TEN::Renderer;
 
-void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
-{
-	this->Type = BlendType::Linear;
-	this->IsActive = true;
-	this->PosOffset = posOffset;
-	this->OrientOffset = orientOffset;
-	this->Alpha = alpha;
-	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
-}
+constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
-void OffsetBlendData::SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
+void OffsetBlendData::Set(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
 {
-	this->Type = BlendType::Constant;
-	this->IsActive = true;
-	this->PosOffset = posOffset;
-	this->OrientOffset = orientOffset;
-	this->Velocity = velocity;
-	this->TurnRate = turnRate;
-	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
-}
-
-void OffsetBlendData::SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec)
-{
-
+	IsActive = true;
+	DelayTime = std::round(delayInSec / DELTA_TIME);
+	PosOffset = posOffset;
+	OrientOffset = orientOffset;
+	Alpha = alpha;
 }
 
 void OffsetBlendData::Clear()
 {
-	*this = OffsetBlendData();
+	*this = OffsetBlendData{};
 }
 
-void OffsetBlendData::DisplayDebug()
+void OffsetBlendData::DrawDebug() const
 {
-	g_Renderer.PrintDebugMessage("Type: %d", (int)Type);
 	g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
 	g_Renderer.PrintDebugMessage("TimeAcive: %.3f", TimeActive);
 	g_Renderer.PrintDebugMessage("DelayTime: %.3f", DelayTime);
-	g_Renderer.PrintDebugMessage("Pos: %.3f, %.3f, %.3f", PosOffset.x, PosOffset.y, PosOffset.z);
-	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OrientOffset.x, OrientOffset.y, OrientOffset.z);
+	g_Renderer.PrintDebugMessage("PosOffset: %.3f, %.3f, %.3f", PosOffset.x, PosOffset.y, PosOffset.z);
+	g_Renderer.PrintDebugMessage("OrientOffset: %.3f, %.3f, %.3f", TO_DEGREES(OrientOffset.x), TO_DEGREES(OrientOffset.y), TO_DEGREES(OrientOffset.z));
 }
 
-constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+void ItemInfo::HandleOffsetBlend()
+{
+	// TODO: Using frame time for now, but delta time should be used in the future.
+	constexpr auto DELTA_FRAME_TIME = 1.0f;
+
+	OffsetBlend.DrawDebug();
+
+	// Blending is inactive; return early.
+	if (!OffsetBlend.IsActive)
+		return;
+
+	// Handle delay.
+	if (OffsetBlend.DelayTime != 0.0f)
+	{
+		OffsetBlend.DelayTime -= DELTA_FRAME_TIME;
+		if (OffsetBlend.DelayTime < 0.0f)
+			OffsetBlend.DelayTime = 0.0f;
+
+		return;
+	}
+
+	// Calculate position blend step.
+	auto posOffsetStep = Vector3::Lerp(OffsetBlend.PosOffset, Vector3::Zero, OffsetBlend.Alpha);
+	OffsetBlend.PosOffsetDelta += posOffsetStep - Vector3i(posOffsetStep).ToVector3();
+	auto posOffsetDeltaRounded = Vector3i(OffsetBlend.PosOffsetDelta).ToVector3();
+
+	// Blend position.
+	OffsetBlend.PosOffsetDelta -= posOffsetDeltaRounded - OffsetBlend.PosOffsetDelta;
+	Pose.Position += Vector3i(posOffsetDeltaRounded);
+	OffsetBlend.PosOffset -= posOffsetDeltaRounded;
+
+	// Blend orientation.
+	auto orientOffsetStep = EulerAngles::Lerp(OffsetBlend.OrientOffset, EulerAngles::Zero, OffsetBlend.Alpha);
+	Pose.Orientation += orientOffsetStep;
+	OffsetBlend.OrientOffset -= orientOffsetStep;
+
+	// Track time active.
+	OffsetBlend.TimeActive += DELTA_FRAME_TIME;
+
+	// If blending is complete, clear data.
+	if (OffsetBlend.PosOffset.Length() <= EPSILON &&
+		OffsetBlend.OrientOffset == EulerAngles::Zero)
+	{
+		OffsetBlend.Clear();
+	}
+}
 
 bool ItemInfo::TestOcb(short ocbFlags) const
 {
@@ -115,7 +144,7 @@ void ItemInfo::SetFlagField(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] = flags;
+	ItemFlags[id] = flags;
 }
 
 void ItemInfo::ClearFlags(int id, short flags)
@@ -123,7 +152,7 @@ void ItemInfo::ClearFlags(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] &= ~flags;
+	ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
@@ -177,71 +206,12 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 
 bool ItemInfo::IsLara() const
 {
-	return this->Data.is<LaraInfo*>();
+	return Data.is<LaraInfo*>();
 }
 
 bool ItemInfo::IsCreature() const
 {
-	return this->Data.is<CreatureInfo>();
-}
-
-void ItemInfo::DoOffsetBlend()
-{
-	// TODO: Using frame time for now, but delta time should be used in the future.
-	static constexpr auto deltaFrameTime = 1.0f;
-
-	this->OffsetBlend.DisplayDebug();
-
-	// Blending is inactive; exit early.
-	if (!OffsetBlend.IsActive)
-		return;
-
-	// Handle delay.
-	if (OffsetBlend.DelayTime != 0.0f)
-	{
-		this->OffsetBlend.DelayTime -= deltaFrameTime;
-		if (OffsetBlend.DelayTime < 0.0f)
-			this->OffsetBlend.DelayTime = 0.0f;
-
-		return;
-	}
-
-	// Perform blending according to type.
-	switch (OffsetBlend.Type)
-	{
-	case BlendType::Linear:
-	{
-		this->Pose.Position += Vector3i(OffsetBlend.PosOffset * OffsetBlend.Alpha);
-		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.OrientOffset, OffsetBlend.Alpha);
-
-		// Reduce offsets.
-		// TODO: Normalise alpha instead. Currently, final positions can be slightly off.
-		OffsetBlend.PosOffset *= 1.0f - OffsetBlend.Alpha;
-		OffsetBlend.OrientOffset *= 1.0f - OffsetBlend.Alpha;
-		break;
-	}
-
-	case BlendType::Constant:
-	{
-		// TODO: I'm an idiot.
-		this->Pose.InterpolateConstant({ Pose.Position + OffsetBlend.PosOffset, Pose.Orientation + OffsetBlend.OrientOffset }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
-
-		// Reduce offsets... how?
-		break;
-	}
-
-	default:
-		return;
-	}
-
-	this->OffsetBlend.TimeActive += deltaFrameTime;
-
-	// Blending is complete.
-	if (OffsetBlend.PosOffset.Length() < (0.5f - FLT_EPSILON) &&
-		OffsetBlend.OrientOffset == EulerAngles::Zero)
-	{
-		this->OffsetBlend.Clear();
-	}
+	return Data.is<CreatureInfo>();
 }
 
 void ItemInfo::ResetModelToDefault()

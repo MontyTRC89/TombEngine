@@ -12,7 +12,8 @@ using namespace TEN::Math;
 
 //namespace TEN::Collision
 //{
-	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset,
+									   const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
 		PosOffset = posOffset;
 		OrientOffset = orientOffset;
@@ -20,14 +21,16 @@ using namespace TEN::Math;
 		OrientConstraint = orientConstraint;
 	}
 	
-	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds,
+									   const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
 		PosOffset = posOffset;
 		Bounds = bounds;
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds,
+									   const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
 		OrientOffset = orientOffset;
 		Bounds = bounds;
@@ -40,7 +43,8 @@ using namespace TEN::Math;
 		OrientConstraint = orientConstraint;
 	};
 
-	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension)
+	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
+							   const GameBoundingBox& boundsExtension)
 	{
 		// Avoid overriding active interactions. NOTE: For now, can only check offset blending status.
 		if (entityFrom.OffsetBlend.IsActive)
@@ -79,8 +83,11 @@ using namespace TEN::Math;
 		return true;
 	}
 
-	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
+	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
+							  const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
 	{
+		constexpr auto OFFSET_BLEND_ALPHA = 0.4f;
+
 		auto relPosOffset = basis.PosOffset + extraPosOffset;
 		auto relOrientOffset = basis.OrientOffset + extraOrientOffset;
 
@@ -89,7 +96,7 @@ using namespace TEN::Math;
 
 		auto absPosOffset = (targetPos - entityFrom.Pose.Position).ToVector3();
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
-		entityFrom.OffsetBlend.SetLinear(absPosOffset, absOrientOffset, 0.4f);
+		entityFrom.OffsetBlend.Set(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
 	}
 
 	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity)

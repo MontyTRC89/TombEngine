@@ -16,14 +16,19 @@ struct ItemInfo;
 		GameBoundingBox						Bounds			 = GameBoundingBox::Zero;
 		std::pair<EulerAngles, EulerAngles> OrientConstraint = std::pair(EulerAngles::Zero, EulerAngles::Zero);
 
-		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
-		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
-		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
+		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds,
+						 const std::pair<EulerAngles, EulerAngles>& orientConstraint);
+		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds,
+						 const std::pair<EulerAngles, EulerAngles>& orientConstraint);
+		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds,
+						 const std::pair<EulerAngles, EulerAngles>& orientConstraint);
 		InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
 	};
 
-	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension = GameBoundingBox::Zero);
-	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
+	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
+							   const GameBoundingBox& boundsExtension = GameBoundingBox::Zero);
+	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
+							  const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
 	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity);
 
 	//bool AlignPlayerToEntity(ItemInfo& playerEntity, const ItemInfo& entity, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);

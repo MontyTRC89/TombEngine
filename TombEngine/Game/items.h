@@ -52,37 +52,6 @@ enum ItemFlags
 	IFLAG_KILLED		  = (1 << 15)
 };
 
-enum class BlendType
-{
-	None,
-	Linear,
-	Constant,
-	TimedConstant
-};
-
-struct OffsetBlendData
-{
-	BlendType Type		 = BlendType::None;
-	bool	  IsActive	 = false;
-	float	  TimeActive = 0.0f;
-	float	  DelayTime	 = 0.0f;
-
-	Vector3		PosOffset	 = Vector3::Zero;
-	EulerAngles OrientOffset = EulerAngles::Zero;
-
-	float Alpha	   = 0.0f;
-	float Velocity = 0.0f;
-	short TurnRate = 0;
-	float Time	   = 0.0f;
-
-	void SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
-	void SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec = 0.0f);
-	void SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec = 0.0f);
-
-	void Clear();
-	void DisplayDebug();
-};
-
 enum class EffectType
 {
 	None,
@@ -92,6 +61,23 @@ enum class EffectType
 	ElectricIgnite,
 	RedIgnite,
 	Custom
+};
+
+struct OffsetBlendData
+{
+	bool  IsActive	 = false;
+	float TimeActive = 0.0f;
+	float DelayTime	 = 0.0f;
+
+	Vector3		PosOffset	 = Vector3::Zero;
+	EulerAngles OrientOffset = EulerAngles::Zero;
+	float		Alpha		 = 0.0f;
+
+	Vector3 PosOffsetDelta = Vector3::Zero;
+
+	void Set(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
+	void Clear();
+	void DrawDebug() const;
 };
 
 struct EntityAnimationData
@@ -154,6 +140,8 @@ struct ItemInfo
 	EntityModelData Model;
 	EntityEffectData Effect;
 	
+	OffsetBlendData OffsetBlend = {};
+
 	Pose StartPose;
 	Pose Pose;
 	ROOM_VECTOR Location;
@@ -181,7 +169,7 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	OffsetBlendData OffsetBlend = {};
+	void HandleOffsetBlend();
 
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
@@ -200,8 +188,6 @@ struct ItemInfo
 
 	bool IsLara() const;
 	bool IsCreature() const;
-
-	void DoOffsetBlend();
 
 	void ResetModelToDefault();
 };

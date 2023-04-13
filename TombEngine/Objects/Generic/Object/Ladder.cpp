@@ -111,6 +111,19 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
 
+	static void DrawLadderDebug(ItemInfo& ladderItem)
+	{
+		// Render collision bounds.
+		auto ladderBounds = GameBoundingBox(&ladderItem);
+		auto collBox = ladderBounds.ToBoundingOrientedBox(ladderItem.Pose);
+		g_Renderer.AddDebugBox(collBox, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+
+		// Render interaction bounds.
+		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
+		auto interactBox = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
+		g_Renderer.AddDebugBox(interactBox, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+	}
+
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& ladderItem = g_Level.Items[itemNumber];
@@ -333,18 +346,5 @@ namespace TEN::Entities::Generic
 
 		player.Control.IsMoving = false;
 		player.Control.HandStatus = HandStatus::Busy;
-	}
-
-	void DrawLadderDebug(ItemInfo& ladderItem)
-	{
-		// Render collision bounds.
-		auto ladderBounds = GameBoundingBox(&ladderItem);
-		auto collBox = ladderBounds.ToBoundingOrientedBox(ladderItem.Pose);
-		g_Renderer.AddDebugBox(collBox, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-
-		// Render interaction bounds.
-		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
-		auto interactBox = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
-		g_Renderer.AddDebugBox(interactBox, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
 	}
 }
