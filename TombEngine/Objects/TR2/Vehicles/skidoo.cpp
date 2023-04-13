@@ -140,7 +140,7 @@ namespace TEN::Entities::Vehicles
 		auto* skidooItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
@@ -205,7 +205,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_ITEM)
 		{
 			if ((laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT) &&
 				TestLastFrame(laraItem))
@@ -263,7 +263,7 @@ namespace TEN::Entities::Vehicles
 	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* skidooItem = &g_Level.Items[lara->Vehicle];
+		auto* skidooItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
 		Vector3i frontLeft, frontRight;
@@ -355,7 +355,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (probe.RoomNumber != skidooItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
@@ -371,7 +371,7 @@ namespace TEN::Entities::Vehicles
 
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 

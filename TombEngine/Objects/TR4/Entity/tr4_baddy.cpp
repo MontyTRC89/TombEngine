@@ -544,7 +544,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, true);
 
 			// Vehicle handling
-			if (Lara.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
 				currentCreature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, true);

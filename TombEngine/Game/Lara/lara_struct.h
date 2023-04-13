@@ -1244,9 +1244,8 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle				 = 0;
-	short TurnRate				 = 0;
-	int	  CalculatedJumpVelocity = 0;
+	short MoveAngle = 0;
+	short TurnRate	= 0;
 
 	HandStatus	  HandStatus	= {};
 	WaterStatus	  WaterStatus	= {};
@@ -1271,12 +1270,6 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
-struct PlayerEffectData
-{
-	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
-	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
-};
-
 // TODO: Refactor status handling to use floats.
 struct PlayerStatusData
 {
@@ -1286,16 +1279,39 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
+struct PlayerContextData
+{
+	int			ProjectedFloorHeight = 0;
+	float		CalcJumpVelocity	 = 0;
+	Pose		NextCornerPos		 = Pose::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
+};
+
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
 struct LaraInfo
 {
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};
+	PlayerContextData Context	= {};
 	PlayerStatusData  Status	= {};
+	PlayerEffectData  Effect	= {};
 	LaraInventoryData Inventory = {};
-	FlareData		  Flare		= {};
-	TorchData		  Torch		= {};
 
+	FlareData		  Flare = {};
+	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
 	EulerAngles ExtraHeadRot	= {};
@@ -1305,24 +1321,12 @@ struct LaraInfo
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
 
-	EulerAngles TargetOrientation = EulerAngles::Zero;
-	Pose		NextCornerPos	  = Pose::Zero;
-
-	int		 ProjectedFloorHeight = 0;
-	int		 WaterSurfaceDist	  = 0;
-	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	  = Vector3i::Zero;
-
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
-	int ExtraAnim	   = 0; // Item number? Only ever set to NO_ITEM or 1.
-
-	PlayerEffectData Effect = {};
-
-	// TODO: Rewrite and restore spasm effect.
+	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
 	int		 HitFrame	  = 0;		 // Frame index.
 	int		 HitDirection = 0;		 // Cardinal direction.
 	FX_INFO* SpasmEffect  = nullptr; // Not saved.
+
+	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;

@@ -165,7 +165,7 @@ namespace TEN::Entities::Vehicles
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			lara->Context.Vehicle = itemNumber;
 			DoSpeedboatMount(speedboatItem, laraItem, mountType);
 
 			if (g_Level.Items[itemNumber].Status != ITEM_ACTIVE)
@@ -276,7 +276,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.Velocity.y = -50;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			lara->Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
+			lara->Context.Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -304,7 +304,7 @@ namespace TEN::Entities::Vehicles
 		{
 			auto* item = &g_Level.Items[itemNumber2];
 
-			if (item->ObjectNumber == ID_SPEEDBOAT && itemNumber2 != itemNumber && Lara.Vehicle != itemNumber2)
+			if (item->ObjectNumber == ID_SPEEDBOAT && itemNumber2 != itemNumber && Lara.Context.Vehicle != itemNumber2)
 			{
 				int x = item->Pose.Position.x - speedboatItem->Pose.Position.x;
 				int z = item->Pose.Position.z - speedboatItem->Pose.Position.z;
@@ -567,7 +567,7 @@ namespace TEN::Entities::Vehicles
 		{
 			newVelocity = (speedboatItem->Pose.Position.z - old.z) * phd_cos(speedboatItem->Pose.Orientation.y) + (speedboatItem->Pose.Position.x - old.x) * phd_sin(speedboatItem->Pose.Orientation.y);
 
-			if (lara->Vehicle == itemNumber && speedboatItem->Animation.Velocity.z > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity.z - 10)
+			if (lara->Context.Vehicle == itemNumber && speedboatItem->Animation.Velocity.z > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity.z - 10)
 			{
 				DoDamage(laraItem, speedboatItem->Animation.Velocity.z);
 				SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
@@ -817,7 +817,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(speedboatItem);
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			TestTriggers(speedboatItem, true);
 			TestTriggers(speedboatItem, false);
@@ -830,7 +830,7 @@ namespace TEN::Entities::Vehicles
 		bool drive = false;
 		bool idle = !speedboatItem->Animation.Velocity.z;
 
-		if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
+		if (lara->Context.Vehicle == itemNumber && laraItem->HitPoints > 0)
 		{
 			switch (laraItem->Animation.ActiveState)
 			{
@@ -894,13 +894,13 @@ namespace TEN::Entities::Vehicles
 		if (!zRot && abs(speedboatItem->Pose.Orientation.z) < 4)
 			speedboatItem->Pose.Orientation.z = 0;
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			SpeedboatAnimation(speedboatItem, laraItem, collide);
 
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
@@ -965,7 +965,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (lara->Vehicle != itemNumber)
+		if (lara->Context.Vehicle != itemNumber)
 			return;
 
 		DoSpeedboatDismount(speedboatItem, laraItem);

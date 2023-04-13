@@ -154,7 +154,7 @@ namespace TEN::Entities::Vehicles
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		if (BigGunTestMount(laraItem, bigGunItem))
@@ -177,7 +177,7 @@ namespace TEN::Entities::Vehicles
 	bool BigGunControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* bigGunItem = &g_Level.Items[lara->Vehicle];
+		auto* bigGunItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 
 		if (bigGun->Flags & BGUN_FLAG_UP_DOWN)

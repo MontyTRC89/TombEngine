@@ -178,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
@@ -227,7 +227,7 @@ namespace TEN::Entities::Vehicles
 	static int CanQuadbikeGetOff(ItemInfo* laraItem, int direction)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* quadBikeItem = &g_Level.Items[lara->Vehicle];
+		auto* quadBikeItem = &g_Level.Items[lara->Context.Vehicle];
 
 		short angle = quadBikeItem->Pose.Orientation.y;
 		angle += (direction < 0) ? -ANGLE(90.0f) : ANGLE(90.0f);
@@ -261,7 +261,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_ITEM)
 			return true;
 
 		if ((laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&
@@ -649,7 +649,7 @@ namespace TEN::Entities::Vehicles
 			newVelocity = (quadBikeItem->Pose.Position.z - old.z) * phd_cos(quadBike->MomentumAngle) + (quadBikeItem->Pose.Position.x - old.x) * phd_sin(quadBike->MomentumAngle);
 			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
-			if (&g_Level.Items[lara->Vehicle] == quadBikeItem &&
+			if (&g_Level.Items[lara->Context.Vehicle] == quadBikeItem &&
 				quadBike->Velocity == MAX_VELOCITY &&
 				newVelocity < (quadBike->Velocity - 10))
 			{
@@ -1083,7 +1083,7 @@ namespace TEN::Entities::Vehicles
 	bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* quadBikeItem = &g_Level.Items[lara->Vehicle];
+		auto* quadBikeItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 
 		GameVector	oldPos;
@@ -1175,7 +1175,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (probe.RoomNumber != quadBikeItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 

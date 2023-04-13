@@ -159,7 +159,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 && lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 && lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE);
@@ -703,7 +703,7 @@ namespace TEN::Entities::Vehicles
 			int newspeed = (jeepItem->Pose.Position.z - oldPos.z) * phd_cos(jeep->MomentumAngle) + (jeepItem->Pose.Position.x - oldPos.x) * phd_sin(jeep->MomentumAngle);
 			newspeed *= 256;
 
-			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->Velocity == JEEP_VELOCITY_MAX) && (newspeed < (JEEP_VELOCITY_MAX - 10)))
+			if ((&g_Level.Items[lara->Context.Vehicle] == jeepItem) && (jeep->Velocity == JEEP_VELOCITY_MAX) && (newspeed < (JEEP_VELOCITY_MAX - 10)))
 			{
 				DoDamage(laraItem, (JEEP_VELOCITY_MAX - newspeed) / 128);
 			}
@@ -1287,7 +1287,7 @@ namespace TEN::Entities::Vehicles
 	int JeepControl(ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* jeepItem = &g_Level.Items[lara->Vehicle];
+		auto* jeepItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		int drive = -1;
@@ -1394,7 +1394,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (roomNumber != jeepItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, roomNumber);
+				ItemNewRoom(lara->Context.Vehicle, roomNumber);
 				ItemNewRoom(lara->ItemNumber, roomNumber);
 			}
 

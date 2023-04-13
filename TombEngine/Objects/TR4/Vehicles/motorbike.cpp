@@ -157,7 +157,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE);
@@ -397,7 +397,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_ITEM)
 			return;
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
@@ -429,9 +429,9 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_ITEM)
 		{
-			auto* item = &g_Level.Items[lara->Vehicle];
+			auto* item = &g_Level.Items[lara->Context.Vehicle];
 
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_DISMOUNT &&
 				TestLastFrame(laraItem))
@@ -721,7 +721,7 @@ namespace TEN::Entities::Vehicles
 		if (collide)
 		{
 			newSpeed = ((motorbikeItem->Pose.Position.z - oldPos.z) * phd_cos(motorbike->MomentumAngle) + (motorbikeItem->Pose.Position.x - oldPos.x) * phd_sin(motorbike->MomentumAngle)) * 256;
-			if (&g_Level.Items[lara->Vehicle] == motorbikeItem &&
+			if (&g_Level.Items[lara->Context.Vehicle] == motorbikeItem &&
 				motorbike->Velocity >= MOTORBIKE_ACCEL && newSpeed < (motorbike->Velocity - 10))
 			{
 				DoDamage(laraItem, (motorbike->Velocity - newSpeed) / 128);
@@ -1150,7 +1150,7 @@ namespace TEN::Entities::Vehicles
 	bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* motorbikeItem = &g_Level.Items[lara->Vehicle];
+		auto* motorbikeItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		int collide = MotorBikeDynamics(motorbikeItem, laraItem);
@@ -1267,7 +1267,7 @@ namespace TEN::Entities::Vehicles
 
 		if (probe.RoomNumber != motorbikeItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 

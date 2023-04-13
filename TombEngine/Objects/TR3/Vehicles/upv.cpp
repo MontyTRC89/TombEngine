@@ -175,7 +175,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(UPVItem, laraItem, coll, UPVMountTypes, UPV_MOUNT_DISTANCE);
@@ -296,7 +296,7 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			UPV->TurbineRotation += UPV->Velocity ? (UPV->Velocity / 8) : ANGLE(2.0f);
 			UPV->LeftRudderRotation = (UPV->TurnRate.x + UPV->TurnRate.y) * 8;
@@ -349,7 +349,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->WaterCurrentPull.x || lara->WaterCurrentPull.z)
+		if (lara->Context.WaterCurrentPull.x || lara->Context.WaterCurrentPull.z)
 			return false;
 
 		short moveAngle = UPVItem->Pose.Orientation.y + ANGLE(180.0f);
@@ -377,9 +377,9 @@ namespace TEN::Entities::Vehicles
 
 		Vector3i target;
 
-		if (!lara->WaterCurrentActive)
+		if (!lara->Context.WaterCurrentActive)
 		{
-			int absVel = abs(lara->WaterCurrentPull.x);
+			int absVel = abs(lara->Context.WaterCurrentPull.x);
 			int shift;
 			if (absVel > 16)
 				shift = 4;
@@ -388,12 +388,12 @@ namespace TEN::Entities::Vehicles
 			else
 				shift = 2;
 
-			lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
+			lara->Context.WaterCurrentPull.x -= lara->Context.WaterCurrentPull.x >> shift;
 
-			if (abs(lara->WaterCurrentPull.x) < 4)
-				lara->WaterCurrentPull.x = 0;
+			if (abs(lara->Context.WaterCurrentPull.x) < 4)
+				lara->Context.WaterCurrentPull.x = 0;
 
-			absVel = abs(lara->WaterCurrentPull.z);
+			absVel = abs(lara->Context.WaterCurrentPull.z);
 			if (absVel > 16)
 				shift = 4;
 			else if (absVel > 8)
@@ -401,16 +401,16 @@ namespace TEN::Entities::Vehicles
 			else
 				shift = 2;
 
-			lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
-			if (abs(lara->WaterCurrentPull.z) < 4)
-				lara->WaterCurrentPull.z = 0;
+			lara->Context.WaterCurrentPull.z -= lara->Context.WaterCurrentPull.z >> shift;
+			if (abs(lara->Context.WaterCurrentPull.z) < 4)
+				lara->Context.WaterCurrentPull.z = 0;
 
-			if (lara->WaterCurrentPull.x == 0 && lara->WaterCurrentPull.z == 0)
+			if (lara->Context.WaterCurrentPull.x == 0 && lara->Context.WaterCurrentPull.z == 0)
 				return;
 		}
 		else
 		{
-			int sinkVal = lara->WaterCurrentActive - 1;
+			int sinkVal = lara->Context.WaterCurrentActive - 1;
 			target = g_Level.Sinks[sinkVal].Position;
 		
 			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target.ToVector3()).y) / 16) & 4095;
@@ -422,13 +422,13 @@ namespace TEN::Entities::Vehicles
 			dx = phd_sin(angle * 16) * velocity * SECTOR(1);
 			dz = phd_cos(angle * 16) * velocity * SECTOR(1);
 
-			lara->WaterCurrentPull.x += ((dx - lara->WaterCurrentPull.x) / 16);
-			lara->WaterCurrentPull.z += ((dz - lara->WaterCurrentPull.z) / 16);
+			lara->Context.WaterCurrentPull.x += ((dx - lara->Context.WaterCurrentPull.x) / 16);
+			lara->Context.WaterCurrentPull.z += ((dz - lara->Context.WaterCurrentPull.z) / 16);
 		}
 
-		lara->WaterCurrentActive = 0;
-		UPVItem->Pose.Position.x += lara->WaterCurrentPull.x / CLICK(1);
-		UPVItem->Pose.Position.z += lara->WaterCurrentPull.z / CLICK(1);
+		lara->Context.WaterCurrentActive = 0;
+		UPVItem->Pose.Position.x += lara->Context.WaterCurrentPull.x / CLICK(1);
+		UPVItem->Pose.Position.z += lara->Context.WaterCurrentPull.z / CLICK(1);
 	}
 
 	static void BackgroundCollision(ItemInfo* UPVItem, ItemInfo* laraItem)
@@ -755,7 +755,7 @@ namespace TEN::Entities::Vehicles
 				ResetPlayerFlex(laraItem);
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
-				lara->WaterSurfaceDist = -heightFromWater;
+				lara->Context.WaterSurfaceDist = -heightFromWater;
 				SetLaraVehicle(laraItem, nullptr);
 
 				UPVItem->HitPoints = 0;
@@ -845,7 +845,7 @@ namespace TEN::Entities::Vehicles
 	bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* UPVItem = &g_Level.Items[lara->Vehicle];
+		auto* UPVItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* UPV = GetUPVInfo(UPVItem);
 	
 		auto oldPos = UPVItem->Pose;
@@ -937,7 +937,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		TestTriggers(UPVItem, false);
-		UPVEffects(lara->Vehicle);
+		UPVEffects(lara->Context.Vehicle);
 
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
@@ -946,7 +946,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
-			lara->Vehicle != NO_ITEM)
+			lara->Context.Vehicle != NO_ITEM)
 		{
 			DoCurrent(UPVItem, laraItem);
 
@@ -965,7 +965,7 @@ namespace TEN::Entities::Vehicles
 
 			if (probe.RoomNumber != UPVItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
@@ -992,7 +992,7 @@ namespace TEN::Entities::Vehicles
 			AnimateItem(laraItem);
 
 			if (probe.RoomNumber != UPVItem->RoomNumber)
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 
 			BackgroundCollision(UPVItem, laraItem);
 

@@ -155,7 +155,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(kayakItem, laraItem, coll, KayakMountTypes, KAYAK_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -295,9 +295,9 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 		auto* room = &g_Level.Rooms[kayakItem->RoomNumber]; // Unused.
 
-		if (!lara->WaterCurrentActive)
+		if (!lara->Context.WaterCurrentActive)
 		{
-			int absVelocity = abs(lara->WaterCurrentPull.x);
+			int absVelocity = abs(lara->Context.WaterCurrentPull.x);
 			int shift;
 
 			if (absVelocity > 16)
@@ -307,12 +307,12 @@ namespace TEN::Entities::Vehicles
 			else
 				shift = 2;
 
-			lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
+			lara->Context.WaterCurrentPull.x -= lara->Context.WaterCurrentPull.x >> shift;
 
-			if (abs(lara->WaterCurrentPull.x) < 4)
-				lara->WaterCurrentPull.x = 0;
+			if (abs(lara->Context.WaterCurrentPull.x) < 4)
+				lara->Context.WaterCurrentPull.x = 0;
 
-			absVelocity = abs(lara->WaterCurrentPull.z);
+			absVelocity = abs(lara->Context.WaterCurrentPull.z);
 			if (absVelocity > 16)
 				shift = 4;
 			else if (absVelocity > 8)
@@ -320,16 +320,16 @@ namespace TEN::Entities::Vehicles
 			else
 				shift = 2;
 
-			lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
-			if (abs(lara->WaterCurrentPull.z) < 4)
-				lara->WaterCurrentPull.z = 0;
+			lara->Context.WaterCurrentPull.z -= lara->Context.WaterCurrentPull.z >> shift;
+			if (abs(lara->Context.WaterCurrentPull.z) < 4)
+				lara->Context.WaterCurrentPull.z = 0;
 
-			if (lara->WaterCurrentPull.x == 0 && lara->WaterCurrentPull.z == 0)
+			if (lara->Context.WaterCurrentPull.x == 0 && lara->Context.WaterCurrentPull.z == 0)
 				return;
 		}
 		else
 		{
-			int sinkval = lara->WaterCurrentActive - 1;
+			int sinkval = lara->Context.WaterCurrentActive - 1;
 		
 			auto target = g_Level.Sinks[sinkval].Position;
 			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target).y) / 16) & 4095;
@@ -341,14 +341,14 @@ namespace TEN::Entities::Vehicles
 			dx = phd_sin(angle * 16) * velocity * 1024;
 			dz = phd_cos(angle * 16) * velocity * 1024;
 
-			lara->WaterCurrentPull.x += (dx - lara->WaterCurrentPull.x) / 16;
-			lara->WaterCurrentPull.z += (dz - lara->WaterCurrentPull.z) / 16;
+			lara->Context.WaterCurrentPull.x += (dx - lara->Context.WaterCurrentPull.x) / 16;
+			lara->Context.WaterCurrentPull.z += (dz - lara->Context.WaterCurrentPull.z) / 16;
 		}
 
-		kayakItem->Pose.Position.x += lara->WaterCurrentPull.x / 256;
-		kayakItem->Pose.Position.z += lara->WaterCurrentPull.z / 256;
+		kayakItem->Pose.Position.x += lara->Context.WaterCurrentPull.x / 256;
+		kayakItem->Pose.Position.z += lara->Context.WaterCurrentPull.z / 256;
 
-		lara->WaterCurrentActive = 0;
+		lara->Context.WaterCurrentActive = 0;
 	}
 
 	bool KayakCanGetOut(ItemInfo* kayakItem, int direction)
@@ -624,8 +624,8 @@ namespace TEN::Entities::Vehicles
 		{
 		case KAYAK_STATE_IDLE:
 			if (TrInput & VEHICLE_IN_DISMOUNT &&
-				!lara->WaterCurrentActive &&
-				!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
+				!lara->Context.WaterCurrentActive &&
+				!lara->Context.WaterCurrentPull.x && !lara->Context.WaterCurrentPull.z)
 			{
 				if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD) && KayakCanGetOut(kayakItem, -1))
 				{
@@ -671,13 +671,13 @@ namespace TEN::Entities::Vehicles
 			}
 			else if ((TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) &&
 				(kayak->Velocity ||
-					lara->WaterCurrentPull.x || lara->WaterCurrentPull.z))
+					lara->Context.WaterCurrentPull.x || lara->Context.WaterCurrentPull.z))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_HOLD_LEFT;
 			}
 			else if ((TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) &&
 				(kayak->Velocity ||
-					lara->WaterCurrentPull.x || lara->WaterCurrentPull.z))
+					lara->Context.WaterCurrentPull.x || lara->Context.WaterCurrentPull.z))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_HOLD_RIGHT;
 			}
@@ -834,8 +834,8 @@ namespace TEN::Entities::Vehicles
 		case KAYAK_STATE_HOLD_LEFT:
 			if (!(TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) ||
 				(!kayak->Velocity &&
-					!lara->WaterCurrentPull.x &&
-					!lara->WaterCurrentPull.z))
+					!lara->Context.WaterCurrentPull.x &&
+					!lara->Context.WaterCurrentPull.z))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
@@ -870,8 +870,8 @@ namespace TEN::Entities::Vehicles
 		case KAYAK_STATE_HOLD_RIGHT:
 			if (!(TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) ||
 				(!kayak->Velocity &&
-					!lara->WaterCurrentPull.x &&
-					!lara->WaterCurrentPull.z))
+					!lara->Context.WaterCurrentPull.x &&
+					!lara->Context.WaterCurrentPull.z))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
@@ -1077,7 +1077,7 @@ namespace TEN::Entities::Vehicles
 	bool KayakControl(ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* kayakItem = &g_Level.Items[lara->Vehicle];
+		auto* kayakItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* kayak = GetKayakInfo(kayakItem);
 
 		if (TrInput & IN_LOOK)
@@ -1114,11 +1114,11 @@ namespace TEN::Entities::Vehicles
 				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
-		if (lara->Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_ITEM)
 		{
 			if (kayakItem->RoomNumber != probe.RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
@@ -1135,7 +1135,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (kayak->TrueWater &&
-			(kayakItem->Animation.Velocity.z != 0.0f || lara->WaterCurrentPull != Vector3i::Zero))
+			(kayakItem->Animation.Velocity.z != 0.0f || lara->Context.WaterCurrentPull != Vector3i::Zero))
 		{
 			int waterHeight = GetWaterHeight(kayakItem);
 			SpawnVehicleWake(*kayakItem, KAYAK_WAKE_OFFSET, waterHeight);
@@ -1166,6 +1166,6 @@ namespace TEN::Entities::Vehicles
 
 		KayakToItemCollision(kayakItem, laraItem);
 
-		return (lara->Vehicle != NO_ITEM) ? true : false;
+		return (lara->Context.Vehicle != NO_ITEM) ? true : false;
 	}
 }

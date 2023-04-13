@@ -114,7 +114,7 @@ namespace TEN::Entities::Vehicles
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(rBoatItem, laraItem, coll, RubberBoatMountTypes, RBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -125,7 +125,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			lara->Context.Vehicle = itemNumber;
 			DoRubberBoatMount(rBoatItem, laraItem, mountType);
 
 			if (g_Level.Items[itemNumber].Status != ITEM_ACTIVE)
@@ -196,7 +196,7 @@ namespace TEN::Entities::Vehicles
 		{
 			auto* item = &g_Level.Items[itemNumber2];
 
-			if (item->ObjectNumber == ID_RUBBER_BOAT && itemNumber2 != itemNumber && lara->Vehicle != itemNumber2)
+			if (item->ObjectNumber == ID_RUBBER_BOAT && itemNumber2 != itemNumber && lara->Context.Vehicle != itemNumber2)
 			{
 				int x = item->Pose.Position.x - boatItem->Pose.Position.x;
 				int z = item->Pose.Position.z - boatItem->Pose.Position.z;
@@ -438,7 +438,7 @@ namespace TEN::Entities::Vehicles
 		{
 			int newVelocity = (rBoatItem->Pose.Position.z - old.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - old.x) * phd_sin(rBoatItem->Pose.Orientation.y);
 
-			if (lara->Vehicle == itemNumber &&
+			if (lara->Context.Vehicle == itemNumber &&
 				rBoatItem->Animation.Velocity.z > (RBOAT_NORMAL_VELOCITY_MAX + RBOAT_VELOCITY_ACCEL) &&
 				newVelocity < rBoatItem->Animation.Velocity.z - 10)
 			{
@@ -592,7 +592,7 @@ namespace TEN::Entities::Vehicles
 	static bool TestRubberBoatDismount(ItemInfo* laraItem, int direction)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* sBoatItem = &g_Level.Items[lara->Vehicle];
+		auto* sBoatItem = &g_Level.Items[lara->Context.Vehicle];
 
 		short angle;
 		if (direction < 0)
@@ -780,7 +780,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity.z = 20;
 			laraItem->Animation.Velocity.y = -40;
-			lara->Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
+			lara->Context.Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -818,7 +818,7 @@ namespace TEN::Entities::Vehicles
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			TestTriggers(rBoatItem, false);
 			TestTriggers(rBoatItem, true);
@@ -828,7 +828,7 @@ namespace TEN::Entities::Vehicles
 		int water = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, probe.RoomNumber);
 		rBoat->Water = water;
 
-		if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
+		if (lara->Context.Vehicle == itemNumber && laraItem->HitPoints > 0)
 		{
 			switch (laraItem->Animation.ActiveState)
 			{
@@ -891,7 +891,7 @@ namespace TEN::Entities::Vehicles
 		if (!rRot && abs(rBoatItem->Pose.Orientation.z) < 4)
 			rBoatItem->Pose.Orientation.z = 0;
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			RubberBoatAnimation(rBoatItem, laraItem, collide);
 
@@ -928,7 +928,7 @@ namespace TEN::Entities::Vehicles
 		else if (drive)
 			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 
-		if (lara->Vehicle != itemNumber)
+		if (lara->Context.Vehicle != itemNumber)
 			return;
 
 		DoRubberBoatDismount(rBoatItem, laraItem);
