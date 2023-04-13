@@ -641,7 +641,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetCurrentRelativeFrameNumber(item);
+		int frame = GetFrameNumber(item);
 		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
@@ -671,7 +671,7 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetCurrentRelativeFrameNumber(item);
+		int frame = GetFrameNumber(item);
 		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = frame * CLICK(1) / length;
 
@@ -688,7 +688,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during monkey to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
 	{
-		int frame = GetCurrentRelativeFrameNumber(item);
+		int frame = GetFrameNumber(item);
 		int numFrames = GetFrameCount(item->Animation.AnimNumber);
 
 		float frac = (frame * 1.5f) / (float)(numFrames);
@@ -744,7 +744,7 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during concave slope to monkey transition.
 	else if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
 	{
-		int frame = GetCurrentRelativeFrameNumber(item);
+		int frame = GetFrameNumber(item);
 		int numFrames = GetFrameCount(item->Animation.AnimNumber);
 
 		float frac = (frame * 1.25f) / (float)(numFrames);
@@ -1050,7 +1050,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
-	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameNumber(item, 0)) // Manage proper grabbing of monkey slope on forward jump.
+	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameIndex(item, 0)) // Manage proper grabbing of monkey slope on forward jump.
 	{
 		int ceilDist = item->Pose.Position.y - probeNow.Position.Ceiling;
 
@@ -1077,7 +1077,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_FORWARD) // Monkey to slope transitions.
 	{
 		if (probeNow.BottomBlock->Flags.Monkeyswing &&
-			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
+			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameIndex(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
 			if (abs(OrientDelta(slopeData.GoalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
 				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))

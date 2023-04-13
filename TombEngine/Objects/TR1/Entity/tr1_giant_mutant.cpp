@@ -32,8 +32,6 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto MUTANT_NEED_TURN = ANGLE(45.0f);
 	constexpr auto MUTANT_TURN	    = ANGLE(3.0f);
 
-	constexpr auto LARA_GIANT_MUTANT_DEATH = 6;
-
 	const auto MutantAttackJoints	   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 	const auto MutantAttackLeftJoint   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 	const auto MutantAttackRightJoints = std::vector<unsigned int>{ 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
@@ -193,13 +191,10 @@ namespace TEN::Entities::Creatures::TR1
 				if (item->TouchBits.Test(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
 					item->Animation.TargetState = MUTANT_STATE_KILL;
-					Camera.targetDistance = SECTOR(2);
+					Camera.targetDistance = BLOCK(2);
 					Camera.flags = CF_FOLLOW_CENTER;
 
-					LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_GIANT_MUTANT_DEATH;
-					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-					LaraItem->Animation.ActiveState = 46;
-					LaraItem->Animation.TargetState = 46;
+					SetAnimation(*LaraItem, ID_LARA_EXTRA_ANIMS, LEA_GIANT_MUTANT_DEATH);
 					LaraItem->Animation.IsAirborne = false;
 					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
@@ -212,7 +207,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case MUTANT_STATE_KILL:
-				Camera.targetDistance = SECTOR(2);
+				Camera.targetDistance = BLOCK(2);
 				Camera.flags = CF_FOLLOW_CENTER;
 				break;
 			}

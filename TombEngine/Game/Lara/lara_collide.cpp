@@ -239,9 +239,10 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	case LS_TURN_LEFT_SLOW:
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 		{
@@ -288,9 +289,10 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 	case LS_CRAWL_IDLE:
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
@@ -309,7 +311,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_CRAWL_IDLE)
 		{
 			item->Animation.AnimNumber = LA_CRAWL_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;
@@ -323,9 +325,10 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 	case LS_MONKEY_IDLE:
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
@@ -344,7 +347,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_MONKEY_IDLE)
 		{
 			item->Animation.AnimNumber = LA_MONKEY_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;

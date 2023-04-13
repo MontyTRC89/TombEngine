@@ -198,24 +198,19 @@ namespace TEN::Entities::Vehicles
 
 		switch (mountType)
 		{
+		default:
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_IDLE;
-			laraItem->Animation.ActiveState = UPV_STATE_IDLE;
-			laraItem->Animation.TargetState = UPV_STATE_IDLE;
+			SetAnimation(*laraItem, ID_UPV_LARA_ANIMS, UPV_ANIM_IDLE);
 			break;
 
-		default:
 		case VehicleMountType::Back:
 			if (lara->Control.WaterStatus == WaterStatus::TreadWater)
-				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
+				SetAnimation(*laraItem, ID_UPV_LARA_ANIMS, UPV_ANIM_MOUNT_SURFACE_START);
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
+				SetAnimation(*laraItem, ID_UPV_LARA_ANIMS, UPV_ANIM_MOUNT_UNDERWATER);
 
-			laraItem->Animation.ActiveState = UPV_STATE_MOUNT;
-			laraItem->Animation.TargetState = UPV_STATE_MOUNT;
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose = UPVItem->Pose;
@@ -531,7 +526,6 @@ namespace TEN::Entities::Vehicles
 
 		TestUPVDismount(UPVItem, laraItem);
 
-		int anim = laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
 		int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		switch (laraItem->Animation.ActiveState)
@@ -664,7 +658,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_MOUNT:
-			if (anim == UPV_ANIM_MOUNT_SURFACE_END)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_MOUNT_SURFACE_END))
 			{
 				UPVItem->Pose.Position.y += 4;
 				UPVItem->Pose.Orientation.x += ANGLE(1.0f);
@@ -676,7 +670,7 @@ namespace TEN::Entities::Vehicles
 					UPV->Flags |= UPV_FLAG_CONTROL;
 			}
 
-			else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
+			else if (TestAnimNumber(*laraItem, UPV_ANIM_MOUNT_UNDERWATER))
 			{
 				if (frame == UPV_MOUNT_UNDERWATER_SOUND_FRAME)
 					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
@@ -688,7 +682,8 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_UNDERWATER:
-			if (anim == UPV_ANIM_DISMOUNT_UNDERWATER && frame == UPV_DISMOUNT_UNDERWATER_FRAME)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_UNDERWATER) &&
+				frame == UPV_DISMOUNT_UNDERWATER_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 
@@ -728,7 +723,8 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_WATER_SURFACE:
-			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_END && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_WATER_SURFACE_END) &&
+				frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;
@@ -774,7 +770,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DEATH:
-			if ((anim == UPV_ANIM_IDLE_DEATH || anim == UPV_ANIM_MOVING_DEATH) &&
+			if ((TestAnimNumber(*laraItem, UPV_ANIM_IDLE_DEATH) || TestAnimNumber(*laraItem, UPV_ANIM_MOVING_DEATH)) &&
 				(frame == UPV_DEATH_FRAME_1 || frame == UPV_DEATH_FRAME_2))
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS);
@@ -982,8 +978,7 @@ namespace TEN::Entities::Vehicles
 			if (UPV->Flags & UPV_FLAG_CONTROL)
 				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity.z / 96.0f);
 
-			UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
-			UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			SyncVehicleAnimation(*UPVItem, *laraItem);
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 				Camera.targetElevation = -ANGLE(60.0f);

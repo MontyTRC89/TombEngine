@@ -161,7 +161,7 @@ namespace TEN::Effects::Hair
 				break;
 			}
 
-			int frameBaseIndex = GetAnimData(animNumber).FramePtr;
+			int frameBaseIndex = GetAnimData(item.ObjectNumber, animNumber).FramePtr;
 			const auto& frame = g_Level.Frames[frameBaseIndex + player.HitFrame];
 			return frame.BoundingBox.GetCenter();
 		}

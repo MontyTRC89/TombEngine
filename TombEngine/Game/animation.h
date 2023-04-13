@@ -4,13 +4,15 @@
 
 using namespace TEN::Math;
 
+enum GAME_OBJECT_ID : short;
 class EulerAngles;
 class Pose;
 class Vector3i;
 struct ItemInfo;
+struct ObjectInfo;
 
 // NOTES:
-// animNumber: Relative entity animation ID.
+// animNumber: Relative animation number.
 // animIndex:  Index of animation in giant g_Level.Anims vector.
 
 constexpr auto NO_STATE = -1;
@@ -107,20 +109,29 @@ void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 
 // Setters
-void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
-AnimData& GetAnimData(int animIndex);
+AnimData& GetAnimData(int animIndex); // Deprecated.
+AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
-int		  GetCurrentRelativeFrameNumber(ItemInfo* item);
-int		  GetAnimNumber(ItemInfo& item, int animNumber);
-int		  GetFrameNumber(ItemInfo* item, int frameToStart);
-int		  GetFrameNumber(int objectID, int animNumber, int frameToStart);
-int		  GetFrameCount(int animIndex);
-int		  GetNextAnimState(ItemInfo* item);
-int		  GetNextAnimState(int objectID, int animNumber);
-bool	  GetStateDispatch(ItemInfo* item, const AnimData& anim);
+
+int GetAnimNumber(const ItemInfo& item);
+int GetAnimIndex(const ItemInfo& item, int animNumber);
+
+int GetFrameNumber(const ItemInfo& item);
+int GetFrameNumber(ItemInfo* item); // Deprecated.
+int GetFrameIndex(ItemInfo* item, int frameNumber);
+int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
+
+int GetFrameCount(int animIndex);
+
+int	 GetNextAnimState(ItemInfo* item);
+int	 GetNextAnimState(int objectID, int animNumber);
+bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 AnimFrame&			GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
