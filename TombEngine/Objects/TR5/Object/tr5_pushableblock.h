@@ -14,16 +14,16 @@ namespace TEN::Entities::Generic
 
 	enum PushableSoundType
 	{
-		Loop = 0,
-		Stop = 1,
-		Fall = 2
+		Loop,
+		Stop,
+		Fall
 	};
 
 	struct PushablesSounds
 	{
-		int LoopSound; // Looped sound index for movement.
-		int StopSound; // Ending sound index.
-		int FallSound; // Sound upon hitting floor (when dropped).
+		int LoopSound = 0; // Looped sound index for movement.
+		int StopSound = 0; // Ending sound index.
+		int FallSound = 0; // Sound upon hitting floor (when dropped).
 
 		PushablesSounds()
 		{
@@ -42,9 +42,9 @@ namespace TEN::Entities::Generic
 
 	struct PushableAnimationInfo
 	{
-		int PullAnimIndex;
-		int PushAnimIndex;
-		bool AllowLoop;
+		int	 PullAnimIndex = 0;
+		int	 PushAnimIndex = 0;
+		bool AllowLoop	   = 0;
 
 		PushableAnimationInfo()
 		{

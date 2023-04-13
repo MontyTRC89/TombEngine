@@ -42,7 +42,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))};
 	
 	std::unordered_map <MaterialType, PushablesSounds> PushablesSoundsMap		 = {};
-	std::vector<PushableAnimationInfo>					 PushableAnimationVector = {};
+	std::vector<PushableAnimationInfo>				   PushableAnimationVector = {};
 
 	static PushableInfo& GetPushableInfo(const ItemInfo& item)
 	{
@@ -62,12 +62,12 @@ namespace TEN::Entities::Generic
 
 		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
-			pushable.HasFloorColission = true;
+			pushable.UsesRoomCollision = true;
 			TEN::Floordata::AddBridge(itemNumber);
 		}
 		else
 		{
-			pushable.HasFloorColission = false;			
+			pushable.UsesRoomCollision = false;			
 		}
 
 		pushable.Height = GetPushableHeight(item);
@@ -78,7 +78,7 @@ namespace TEN::Entities::Generic
 
 		pushable.CanFall = (ocb & 0x01) != 0;						 // Check if bit 0 is set.
 		pushable.DoAlignCenter = (ocb & 0x02) != 0;					 // Check if bit 1 is set.
-		pushable.Buoyancy = (ocb & 0x04) != 0;						 // Check if bit 2 is set.
+		pushable.IsBuoyant = (ocb & 0x04) != 0;						 // Check if bit 2 is set.
 		pushable.AnimationSystemIndex = ((ocb & 0x08) != 0) ? 1 : 0; // Check if bit 3 is set.
 		
 		SetStopperFlag(pushable.StartPos, true);
@@ -202,7 +202,7 @@ namespace TEN::Entities::Generic
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
-				if (!pushable.HasFloorColission)
+				if (!pushable.UsesRoomCollision)
 					ObjectCollision(itemNumber, laraItem, coll);
 
 				return;
@@ -336,7 +336,6 @@ namespace TEN::Entities::Generic
 			return false;
 
 		case PushableGravityState::Grounded:
-
 			if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
 				pushable.GravityState = PushableGravityState::Sinking;
@@ -360,7 +359,6 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableGravityState::Falling:
-						
 			if (currentY < (pointColl.Position.Floor - velocityY))
 			{
 				// Is in air.
@@ -404,7 +402,6 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableGravityState::Sinking:
-
 			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
 				pushable.GravityState = PushableGravityState::Falling;
@@ -414,7 +411,7 @@ namespace TEN::Entities::Generic
 
 			// TODO: [Effects Requirement] Add bubbles during this phase.
 
-			if (pushable.Buoyancy)
+			if (pushable.IsBuoyant)
 			{
 				// Slowly reverses gravity direction. If gravity is 0, then it floats.
 				pushable.Gravity = pushable.Gravity - GRAVITY_CHANGE_SPEED;
@@ -444,7 +441,7 @@ namespace TEN::Entities::Generic
 			else
 			{
 				// Hit water bed.
-				if (pushable.Buoyancy)
+				if (pushable.IsBuoyant)
 				{
 					pushable.Gravity = 0.0f;
 					pushable.GravityState = PushableGravityState::Floating;
@@ -464,7 +461,6 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableGravityState::Floating:
-
 			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
 				pushable.GravityState = PushableGravityState::Falling;
@@ -503,7 +499,6 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableGravityState::OnWater:
-
 			if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
 				pushable.GravityState = PushableGravityState::Falling;
@@ -716,32 +711,33 @@ namespace TEN::Entities::Generic
 
 	// Sound functions
 
+	// TODO: Can simply define this when declaring.
 	void InitializePushablesSoundsMap()
 	{
 		PushablesSoundsMap =
 		{
-			{ MaterialType::Mud,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_MUD, SFX_TEN_PUSHABLES_STOP_MUD, SFX_TEN_PUSHABLES_COLLIDE_MUD) },
-			{ MaterialType::Snow,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_SNOW, SFX_TEN_PUSHABLES_STOP_SNOW, SFX_TEN_PUSHABLES_COLLIDE_SNOW) },
-			{ MaterialType::Sand,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_SAND, SFX_TEN_PUSHABLES_STOP_SAND, SFX_TEN_PUSHABLES_COLLIDE_SAND) },
-			{ MaterialType::Gravel,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_GRAVEL, SFX_TEN_PUSHABLES_STOP_GRAVEL, SFX_TEN_PUSHABLES_COLLIDE_GRAVEL) },
-			{ MaterialType::Ice,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_ICE, SFX_TEN_PUSHABLES_STOP_ICE, SFX_TEN_PUSHABLES_COLLIDE_ICE) },
-			{ MaterialType::Water,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_WATER, SFX_TEN_PUSHABLES_STOP_WATER, SFX_TEN_PUSHABLES_COLLIDE_WATER) },
-			{ MaterialType::Stone,		PushablesSounds(SFX_TEN_PUSHABLES_STOP_MOVE_STONE, SFX_TEN_PUSHABLES_STOP_STONE, SFX_TEN_PUSHABLES_COLLIDE_STONE) },
-			{ MaterialType::Wood,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_WOOD, SFX_TEN_PUSHABLES_STOP_WOOD, SFX_TEN_PUSHABLES_COLLIDE_WOOD) },
-			{ MaterialType::Metal,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_METAL, SFX_TEN_PUSHABLES_STOP_METAL, SFX_TEN_PUSHABLES_COLLIDE_METAL) },
-			{ MaterialType::Marble,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_MARBLE, SFX_TEN_PUSHABLES_STOP_MARBLE, SFX_TEN_PUSHABLES_COLLIDE_MARBLE) },
-			{ MaterialType::Grass,		PushablesSounds(SFX_TEN_PUSHABLES_MOVE_GRASS, SFX_TEN_PUSHABLES_STOP_GRASS, SFX_TEN_PUSHABLES_COLLIDE_GRASS) },
-			{ MaterialType::Concrete,	PushablesSounds(SFX_TEN_PUSHABLES_MOVE_CONCRETE, SFX_TEN_PUSHABLES_STOP_CONCRETE, SFX_TEN_PUSHABLES_COLLIDE_CONCRETE) },
-			{ MaterialType::OldWood,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::OldMetal,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom1,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom2,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom3,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom4,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom5,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom6,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom7,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
-			{ MaterialType::Custom8,	PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) }
+			{ MaterialType::Mud, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_MUD, SFX_TEN_PUSHABLES_STOP_MUD, SFX_TEN_PUSHABLES_COLLIDE_MUD) },
+			{ MaterialType::Snow, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_SNOW, SFX_TEN_PUSHABLES_STOP_SNOW, SFX_TEN_PUSHABLES_COLLIDE_SNOW) },
+			{ MaterialType::Sand, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_SAND, SFX_TEN_PUSHABLES_STOP_SAND, SFX_TEN_PUSHABLES_COLLIDE_SAND) },
+			{ MaterialType::Gravel, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_GRAVEL, SFX_TEN_PUSHABLES_STOP_GRAVEL, SFX_TEN_PUSHABLES_COLLIDE_GRAVEL) },
+			{ MaterialType::Ice, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_ICE, SFX_TEN_PUSHABLES_STOP_ICE, SFX_TEN_PUSHABLES_COLLIDE_ICE) },
+			{ MaterialType::Water, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_WATER, SFX_TEN_PUSHABLES_STOP_WATER, SFX_TEN_PUSHABLES_COLLIDE_WATER) },
+			{ MaterialType::Stone, PushablesSounds(SFX_TEN_PUSHABLES_STOP_MOVE_STONE, SFX_TEN_PUSHABLES_STOP_STONE, SFX_TEN_PUSHABLES_COLLIDE_STONE) },
+			{ MaterialType::Wood, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_WOOD, SFX_TEN_PUSHABLES_STOP_WOOD, SFX_TEN_PUSHABLES_COLLIDE_WOOD) },
+			{ MaterialType::Metal, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_METAL, SFX_TEN_PUSHABLES_STOP_METAL, SFX_TEN_PUSHABLES_COLLIDE_METAL) },
+			{ MaterialType::Marble, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_MARBLE, SFX_TEN_PUSHABLES_STOP_MARBLE, SFX_TEN_PUSHABLES_COLLIDE_MARBLE) },
+			{ MaterialType::Grass, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_GRASS, SFX_TEN_PUSHABLES_STOP_GRASS, SFX_TEN_PUSHABLES_COLLIDE_GRASS) },
+			{ MaterialType::Concrete, PushablesSounds(SFX_TEN_PUSHABLES_MOVE_CONCRETE, SFX_TEN_PUSHABLES_STOP_CONCRETE, SFX_TEN_PUSHABLES_COLLIDE_CONCRETE) },
+			{ MaterialType::OldWood, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::OldMetal, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom1, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom2, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom3, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom4, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom5, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom6, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom7, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) },
+			{ MaterialType::Custom8, PushablesSounds(SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL) }
 		};
 	}
 
@@ -754,7 +750,6 @@ namespace TEN::Entities::Generic
 		switch (soundType)
 		{ 
 		case PushableSoundType::Loop:
-			
 			resultSound = PushablesSoundsMap[material].LoopSound;
 			break;
 
@@ -767,7 +762,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		default:
-			TENLog("Error, requesting an inexistent pushable sound type", LogLevel::Error, LogConfig::All, true);
+			TENLog("Requested missing pushable sound.", LogLevel::Error, LogConfig::All, true);
 			break;
 		}
 
@@ -800,8 +795,8 @@ namespace TEN::Entities::Generic
 
 		PushableAnimationVector =
 		{
-			PushableAnimationInfo(LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true),			 //TR4-TR5 animations
-			PushableAnimationInfo(LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false) //TR1-TR3 animations
+			PushableAnimationInfo(LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true),			 // TR4-TR5 animations
+			PushableAnimationInfo(LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false) // TR1-TR3 animations
 		};
 
 		InitializePushablesSoundsMap();
@@ -894,7 +889,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.HasFloorColission)
+		if (pushable.UsesRoomCollision)
 		{
 			RemovePushableFromStack(itemNumber);
 			ManageStackBridges(itemNumber, false);
@@ -911,7 +906,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		auto pointColl = CollisionResult{};
-		if (pushable.HasFloorColission)
+		if (pushable.UsesRoomCollision)
 		{
 			RemoveBridge(pushableItem.Index);
 			pointColl = GetCollision(&pushableItem);
@@ -1060,7 +1055,7 @@ namespace TEN::Entities::Generic
 		laraDetectionPoint.RoomNumber = LaraItem->RoomNumber;
 
 		CollisionResult pointColl; 
-		if (pushable.HasFloorColission)
+		if (pushable.UsesRoomCollision)
 		{
 			RemoveBridge(pushableItem.Index);
 			pointColl = GetCollision(laraDetectionPoint);
@@ -1168,7 +1163,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.HasFloorColission)
+		if (pushable.UsesRoomCollision)
 		{
 			if (addBridge)
 				TEN::Floordata::AddBridge(itemNumber);
@@ -1184,7 +1179,7 @@ namespace TEN::Entities::Generic
 
 		while (pushableLinked.StackUpperItem != NO_ITEM)
 		{
-			if (pushableLinked.HasFloorColission)
+			if (pushableLinked.UsesRoomCollision)
 			{
 				if (addBridge)
 					TEN::Floordata::AddBridge(pushableLinkedItem.Index);
@@ -1291,7 +1286,7 @@ namespace TEN::Entities::Generic
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-		if (pushableItem.Status != ITEM_INVISIBLE && pushable.HasFloorColission && boxHeight.has_value())
+		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value())
 		{
 			int height = pushableItem.Pose.Position.y - GetPushableHeight(pushableItem);
 			return std::optional{ height };
@@ -1307,7 +1302,7 @@ namespace TEN::Entities::Generic
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-		if (pushableItem.Status != ITEM_INVISIBLE && pushable.HasFloorColission && boxHeight.has_value())
+		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value())
 			return std::optional{ pushableItem.Pose.Position.y};
 
 		return std::nullopt;
