@@ -143,7 +143,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 		// Boats are processed like normal items in loop.
 	default:
-		HandleWeapon(item);
+		HandleWeapon(*item);
 	}
 
 	return true;

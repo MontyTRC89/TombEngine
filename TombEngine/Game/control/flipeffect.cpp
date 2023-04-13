@@ -155,7 +155,7 @@ void DrawLeftPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
-		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
+		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
@@ -171,7 +171,7 @@ void DrawRightPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
-		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
 		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
