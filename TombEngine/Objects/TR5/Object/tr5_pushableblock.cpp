@@ -694,7 +694,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Check if is using block animation which can't loop (affects stopper flag).
-			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableLoop)
+			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop)
 				return;
 
 			// Otherwise, just check if action key is still pressed.
