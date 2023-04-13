@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_claw_mutant.h"
 
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_helpers.h"
@@ -15,20 +16,19 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto CLAW_MUTANT_SWIPE_ATTACK_RANGE  = SQUARE(BLOCK(1));
+	constexpr auto CLAW_MUTANT_CLAW_ATTACK_RANGE   = SQUARE(BLOCK(1));
+	constexpr auto CLAW_MUTANT_RUN_ATTACK_RANGE	   = SQUARE(BLOCK(2));
+	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_RANGE = SQUARE(BLOCK(3));
+
+	constexpr auto CLAW_MUTANT_ATTACK_DAMAGE		= 100;
+	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_DAMAGE = 200;
+	constexpr auto CLAW_MUTANT_PLASMA_VELOCITY		= 250;
+
+	constexpr auto CLAW_MUTANT_WALK_CHANCE = 1 / 64.0f;
+
 	constexpr auto CLAW_MUTANT_WALK_TURN_RATE_MAX = ANGLE(3.0f);
-	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX = ANGLE(4.0f);
-
-	constexpr auto CLAW_MUTANT_SLASH_RANGE = SQUARE(BLOCK(1));
-	constexpr auto CLAW_MUTANT_RUN_ATTACK_RANGE = SQUARE(BLOCK(2));
-	constexpr auto CLAW_MUTANT_CLAW_RANGE = SQUARE(BLOCK(1));
-	constexpr auto CLAW_MUTANT_SHOOT_RANGE = SQUARE(BLOCK(3));
-
-	constexpr auto CLAW_MUTANT_DAMAGE = 100;
-	constexpr auto CLAW_MUTANT_PLASMA_DAMAGE = 200;
-	constexpr auto CLAW_MUTANT_PLASMA_SPEED = 250;
-
-	constexpr auto CLAW_MUTANT_ROAR_CHANCE = 0x60;
-	constexpr auto CLAW_MUTANT_WALK_CHANCE = CLAW_MUTANT_ROAR_CHANCE + 0x400;
+	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
 
 	const auto ClawMutantLeftBite  = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 7);
 	const auto ClawMutantRightBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 4);
@@ -36,207 +36,149 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum ClawMutantState
 	{
-		CLAW_MUTANT_STATE_IDLE,
-		CLAW_MUTANT_STATE_WALK,
-		CLAW_MUTANT_STATE_RUN,
-		CLAW_MUTANT_STATE_RUN_ATTACK,
-		CLAW_MUTANT_STATE_WALK_ATTACK_LEFT,
-		CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT,
-		CLAW_MUTANT_STATE_SLASH_LEFT,
-		CLAW_MUTANT_STATE_SLASH_RIGHT,
-		CLAW_MUTANT_STATE_DEATH,
-		CLAW_MUTANT_STATE_CLAW_ATTACK,
-		CLAW_MUTANT_STATE_PLASMA_ATTACK
+		CLAW_MUTANT_STATE_IDLE = 0,
+		CLAW_MUTANT_STATE_WALK = 1,
+		CLAW_MUTANT_STATE_RUN = 2,
+		CLAW_MUTANT_STATE_RUN_ATTACK = 3,
+		CLAW_MUTANT_STATE_WALK_ATTACK_LEFT = 4,
+		CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT = 5,
+		CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT = 6,
+		CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT = 7,
+		CLAW_MUTANT_STATE_DEATH = 8,
+		CLAW_MUTANT_STATE_CLAW_ATTACK = 9,
+		CLAW_MUTANT_STATE_PLASMA_ATTACK = 10
 	};
 
 	enum ClawMutantAnim
 	{
-		CLAW_MUTANT_ANIM_IDLE,
-		CLAW_MUTANT_ANIM_START_WALK_LEFT,
-		CLAW_MUTANT_ANIM_START_RUN_LEFT,
-		CLAW_MUTANT_ANIM_STOP_WALK_RIGHT,
-		CLAW_MUTANT_ANIM_STOP_WALK_LEFT,
-		CLAW_MUTANT_ANIM_STOP_RUN_RIGHT,
-		CLAW_MUTANT_ANIM_STOP_RUN_LEFT,
-		CLAW_MUTANT_ANIM_WALK,
-		CLAW_MUTANT_ANIM_UNKNOWN,
-		CLAW_MUTANT_ANIM_RUN,
-		CLAW_MUTANT_ANIM_RUN_TO_WALK_LEFT,
-		CLAW_MUTANT_ANIM_RUN_TO_WALK_RIGHT,
-		CLAW_MUTANT_ANIM_RUN_ATTACK,
-		CLAW_MUTANT_ANIM_RUN_ATTACK_CANCEL,
-		CLAW_MUTANT_ANIM_IDLE_ATTACK_LEFT,
-		CLAW_MUTANT_ANIM_IDLE_ATTACK_RIGHT,
-		CLAW_MUTANT_ANIM_IDLE_DOUBLE_ATTACK,
-		CLAW_MUTANT_ANIM_WALK_ATTACK_LEFT,
-		CLAW_MUTANT_ANIM_WALK_ATTACK_RIGHT,
-		CLAW_MUTANT_ANIM_SHOOT,
-		CLAW_MUTANT_ANIM_DEATH
+		CLAW_MUTANT_ANIM_IDLE = 0,
+		CLAW_MUTANT_ANIM_IDLE_TO_WALK_LEFT = 1,
+		CLAW_MUTANT_ANIM_IDLE_TO_RUN_LEFT = 2,
+		CLAW_MUTANT_ANIM_WALK_TO_IDLE_RIGHT = 3,
+		CLAW_MUTANT_ANIM_WALK_TO_IDLE_LEFT = 4,
+		CLAW_MUTANT_ANIM_RUN_TO_IDLE_RIGHT = 5,
+		CLAW_MUTANT_ANIM_RUN_TO_IDLE_LEFT = 6,
+		CLAW_MUTANT_ANIM_WALK = 7,
+		CLAW_MUTANT_ANIM_UNKNOWN = 8,
+		CLAW_MUTANT_ANIM_RUN = 9,
+		CLAW_MUTANT_ANIM_RUN_TO_WALK_LEFT = 10,
+		CLAW_MUTANT_ANIM_RUN_TO_WALK_RIGHT = 11,
+		CLAW_MUTANT_ANIM_RUN_ATTACK = 12,
+		CLAW_MUTANT_ANIM_RUN_ATTACK_CANCEL = 13,
+		CLAW_MUTANT_ANIM_IDLE_ATTACK_LEFT = 14,
+		CLAW_MUTANT_ANIM_IDLE_ATTACK_RIGHT = 15,
+		CLAW_MUTANT_ANIM_IDLE_DOUBLE_ATTACK = 16,
+		CLAW_MUTANT_ANIM_WALK_ATTACK_LEFT = 17,
+		CLAW_MUTANT_ANIM_WALK_ATTACK_RIGHT = 18,
+		CLAW_MUTANT_ANIM_PLASMA_ATTACK = 19,
+		CLAW_MUTANT_ANIM_DEATH = 20
 	};
 
-	static void SpawnMutantPlasma(int itemNumber)
+	static void SpawnClawMutantPlasma(int itemNumber)
 	{
-		auto* sptr = GetFreeParticle();
+		auto& plasma = *GetFreeParticle();
 
-		sptr->on = 1;
-		sptr->sB = 255;
-		sptr->sG = 48 + (GetRandomControl() & 31);
-		sptr->sR = 48;
+		plasma.on = true;
+		plasma.sB = 255;
+		plasma.sG = 48 + (GetRandomControl() & 31);
+		plasma.sR = 48;
 
-		sptr->dB = 192 + (GetRandomControl() & 63);
-		sptr->dG = 128 + (GetRandomControl() & 63);
-		sptr->dR = 32;
+		plasma.dB = 192 + (GetRandomControl() & 63);
+		plasma.dG = 128 + (GetRandomControl() & 63);
+		plasma.dR = 32;
 
-		sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
+		plasma.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		plasma.fadeToBlack = 8;
+		plasma.sLife =
+		plasma.life = (GetRandomControl() & 7) + 24;
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		plasma.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		sptr->extras = 0;
-		sptr->dynamic = -1;
+		plasma.extras = 0;
+		plasma.dynamic = -1;
 
-		sptr->x = ((GetRandomControl() & 15) - 8);
-		sptr->y = 0;
-		sptr->z = ((GetRandomControl() & 15) - 8);
+		plasma.x = ((GetRandomControl() & 15) - 8);
+		plasma.y = 0;
+		plasma.z = ((GetRandomControl() & 15) - 8);
 
-		sptr->xVel = ((GetRandomControl() & 31) - 16);
-		sptr->yVel = (GetRandomControl() & 15) + 16;
-		sptr->zVel = ((GetRandomControl() & 31) - 16);
-		sptr->friction = 3;
+		plasma.xVel = ((GetRandomControl() & 31) - 16);
+		plasma.yVel = (GetRandomControl() & 15) + 16;
+		plasma.zVel = ((GetRandomControl() & 31) - 16);
+		plasma.friction = 3;
 
 		if (GetRandomControl() & 1)
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-			sptr->rotAng = GetRandomControl() & 4095;
-			if (GetRandomControl() & 1)
-				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
-			else
-				sptr->rotAdd = (GetRandomControl() & 15) + 16;
-		}
-		else
-		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-		}
-
-		sptr->gravity = (GetRandomControl() & 31) + 16;
-		sptr->maxYvel = (GetRandomControl() & 7) + 16;
-
-		sptr->fxObj = itemNumber;
-		sptr->nodeNumber = ParticleNodeOffsetIDs::NodeClawMutantPlasma;
-
-		sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		sptr->scalar = 1;
-		int size = (GetRandomControl() & 31) + 64;
-		sptr->size = sptr->sSize = size;
-		sptr->dSize = size >> 2;
-	}
-
-	void SpawnPlasmaBallFlame(int fxNumber, const Vector3& vel, const Vector3& offset, float life)
-	{
-		auto* sptr = GetFreeParticle();
-
-		sptr->on = 1;
-		sptr->sB = 255;
-		sptr->sG = 48 + (GetRandomControl() & 31);
-		sptr->sR = 48;
-
-		sptr->dB = 192 + (GetRandomControl() & 63);
-		sptr->dG = 128 + (GetRandomControl() & 63);
-		sptr->dR = 32;
-
-		sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
-		sptr->fadeToBlack = 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 7) + life;
-
-		sptr->blendMode = BLENDMODE_ADDITIVE;
-
-		sptr->extras = 0;
-		sptr->dynamic = -1;
-
-		sptr->x = offset.x + ((GetRandomControl() & 15) - 8);
-		sptr->y = 0;
-		sptr->z = offset.z + ((GetRandomControl() & 15) - 8);
-
-		sptr->xVel = vel.x;
-		sptr->yVel = vel.y;
-		sptr->zVel = vel.z;
-		sptr->friction = 5;
-
-		if (GetRandomControl() & 1)
-		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
-			sptr->rotAng = GetRandomControl() & 4095;
+			plasma.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+			plasma.rotAng = GetRandomControl() & 4095;
 
 			if (GetRandomControl() & 1)
 			{
-				sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+				plasma.rotAdd = -(GetRandomControl() & 15) - 16;
 			}
 			else
 			{
-				sptr->rotAdd = (GetRandomControl() & 15) + 16;
+				plasma.rotAdd = (GetRandomControl() & 15) + 16;
 			}
 		}
 		else
 		{
-			sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
+			plasma.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 		}
 
-		sptr->fxObj = fxNumber;
-		sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		sptr->scalar = 1;
-		sptr->gravity = sptr->maxYvel = 0;
+		plasma.gravity = (GetRandomControl() & 31) + 16;
+		plasma.maxYvel = (GetRandomControl() & 7) + 16;
 
+		plasma.fxObj = itemNumber;
+		plasma.nodeNumber = ParticleNodeOffsetIDs::NodeClawMutantPlasma;
+
+		plasma.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		plasma.scalar = 1;
 		int size = (GetRandomControl() & 31) + 64;
-		sptr->size = sptr->sSize = size;
-		sptr->dSize = size >> 4;
-
-		sptr->yVel = (GetRandomControl() & 511) - 256;
-		sptr->xVel <<= 1;
-		sptr->zVel <<= 1;
-		sptr->scalar = 2;
-		sptr->friction = 85;
-		sptr->gravity = 22;
+		plasma.size =
+		plasma.sSize = size;
+		plasma.dSize = size / 4;
 	}
 
-	static void SpawnMutantPlasmaBall(ItemInfo* item, CreatureInfo* creature)
+	static void SpawnClawMutantPlasmaBall(ItemInfo& item)
 	{
-		short fxNumber = CreateNewEffect(item->RoomNumber);
-		if (fxNumber != NO_ITEM)
+		const auto& creature = *GetCreatureInfo(&item);
+
+		int plasmaBall = CreateNewEffect(item.RoomNumber);
+		if (plasmaBall == NO_ITEM)
+			return;
+
+		auto enemyPos = creature.Enemy->Pose.Position;
+		if (creature.Enemy->IsLara() && GetLaraInfo(creature.Enemy)->Control.IsLow)
 		{
-			auto jointPos = GetJointPosition(item, ClawMutantTailBite.meshNum, ClawMutantTailBite.Position);
-
-			auto enemyPos = creature->Enemy->Pose.Position;
-			if (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Control.IsLow)
-			{
-				enemyPos.y -= CLICK(1);
-			}
-			else
-			{
-				enemyPos.y -= CLICK(2);
-			}
-
-			auto angle = Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
-			
-			auto* fx = &EffectList[fxNumber];
-			fx->pos.Position = jointPos;
-			fx->pos.Orientation.y = angle.y;
-			fx->pos.Orientation.x = angle.x;
-			fx->objectNumber = ID_ENERGY_BUBBLES;
-			fx->color = Vector4::Zero;
-			fx->speed = CLAW_MUTANT_PLASMA_SPEED;
-			fx->flag2 = CLAW_MUTANT_PLASMA_DAMAGE;
-			fx->flag1 = (int)MissileType::ClawMutantPlasma;
-			fx->fallspeed = 0;
+			enemyPos.y -= CLICK(1);
 		}
+		else
+		{
+			enemyPos.y -= CLICK(2);
+		}
+
+		auto& fx = EffectList[plasmaBall];
+
+		auto jointPos = GetJointPosition(item, ClawMutantTailBite.meshNum, ClawMutantTailBite.Position);
+		auto orient = Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
+
+		fx.pos.Position = jointPos;
+		fx.pos.Orientation.x = orient.x;
+		fx.pos.Orientation.y = orient.y;
+		fx.objectNumber = ID_ENERGY_BUBBLES;
+		fx.color = Vector4::Zero;
+		fx.speed = CLAW_MUTANT_PLASMA_VELOCITY;
+		fx.flag2 = CLAW_MUTANT_PLASMA_ATTACK_DAMAGE;
+		fx.flag1 = (int)MissileType::ClawMutantPlasma;
+		fx.fallspeed = 0;
 	}
 
-	static void SpawnMutantPlasmaLight(ItemInfo* item)
+	static void SpawnMutantPlasmaLight(ItemInfo& item)
 	{
-		int bright = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		int bright = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 		if (bright > 16)
 		{
-			bright = g_Level.Anims[item->Animation.AnimNumber].frameBase + 28 + 16 - item->Animation.FrameNumber;
+			bright = GetAnimData(item).frameBase + 28 + 16 - item.Animation.FrameNumber;
 			if (bright > 16)
 				bright = 16;
 		}
@@ -247,13 +189,13 @@ namespace TEN::Entities::Creatures::TR3
 			int rnd = GetRandomControl();
 			byte r, g, b;
 
-			b = 31 - ((rnd >> 4) & 3);
-			g = 24 - ((rnd >> 6) & 3);
+			b = 31 - ((rnd / 16) & 3);
+			g = 24 - ((rnd / 64) & 3);
 			r = rnd & 7;
 
-			r = (r * bright) >> 4;
-			g = (g * bright) >> 4;
-			b = (b * bright) >> 4;
+			r = (r * bright) / 16;
+			g = (g * bright) / 16;
+			b = (b * bright) / 16;
 			TriggerDynamicLight(pos.x, pos.y, pos.z, bright, r, g, b);
 		}
 	}
@@ -262,188 +204,258 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		if (source->ItemFlags[5] == 0 && source->TouchBits.Test(ClawMutantLeftBite.meshNum))
 		{
-			DoDamage(target, CLAW_MUTANT_DAMAGE / 2);
+			DoDamage(target, CLAW_MUTANT_ATTACK_DAMAGE / 2);
 			CreatureEffect2(source, ClawMutantLeftBite, 10, source->Pose.Orientation.y, DoBloodSplat);
 			source->ItemFlags[5] = 1;
 		}
 
 		if (source->ItemFlags[6] == 0 && source->TouchBits.Test(ClawMutantRightBite.meshNum))
 		{
-			DoDamage(target, CLAW_MUTANT_DAMAGE / 2);
+			DoDamage(target, CLAW_MUTANT_ATTACK_DAMAGE / 2);
 			CreatureEffect2(source, ClawMutantRightBite, 10, source->Pose.Orientation.y, DoBloodSplat);
 			source->ItemFlags[6] = 1;
 		}
 	}
 
-	// source->ItemFlags[5] is flag to enable damage left (0 is enabled, 1 is disabled)
-	// source->ItemFlags[6] is flag to enable damage right (0 is enabled, 1 is disabled)
+	void SpawnClawMutantPlasmaFlameBall(int fxNumber, const Vector3& vel, const Vector3& offset, float life)
+	{
+		auto& plasma = *GetFreeParticle();
+
+		plasma.on = true;
+		plasma.sB = 255;
+		plasma.sG = 48 + (GetRandomControl() & 31);
+		plasma.sR = 48;
+
+		plasma.dB = 192 + (GetRandomControl() & 63);
+		plasma.dG = 128 + (GetRandomControl() & 63);
+		plasma.dR = 32;
+
+		plasma.colFadeSpeed = 12 + (GetRandomControl() & 3);
+		plasma.fadeToBlack = 8;
+		plasma.sLife =
+		plasma.life = (GetRandomControl() & 7) + life;
+
+		plasma.blendMode = BLENDMODE_ADDITIVE;
+
+		plasma.extras = 0;
+		plasma.dynamic = -1;
+
+		plasma.x = offset.x + ((GetRandomControl() & 15) - 8);
+		plasma.y = 0;
+		plasma.z = offset.z + ((GetRandomControl() & 15) - 8);
+
+		plasma.xVel = vel.x;
+		plasma.yVel = vel.y;
+		plasma.zVel = vel.z;
+		plasma.friction = 5;
+
+		if (Random::TestProbability(1 / 2.0f))
+		{
+			plasma.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
+			plasma.rotAng = GetRandomControl() & 4095;
+
+			if (Random::TestProbability(1 / 2.0f))
+			{
+				plasma.rotAdd = -(GetRandomControl() & 15) - 16;
+			}
+			else
+			{
+				plasma.rotAdd = (GetRandomControl() & 15) + 16;
+			}
+		}
+		else
+		{
+			plasma.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
+		}
+
+		plasma.fxObj = fxNumber;
+		plasma.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		plasma.scalar = 1;
+		plasma.gravity =
+		plasma.maxYvel = 0;
+
+		int size = (GetRandomControl() & 31) + 64;
+		plasma.size =
+		plasma.sSize = size;
+		plasma.dSize /= 16;
+
+		plasma.yVel = (GetRandomControl() & 511) - 256;
+		plasma.xVel *= 2;
+		plasma.zVel *= 2;
+		plasma.scalar = 2;
+		plasma.friction = 85;
+		plasma.gravity = 22;
+	}
+
+	// source->ItemFlags[5] flag enables damage left (0 = enabled, 1 = disabled).
+	// source->ItemFlags[6] flag enables damage right (0 = enabled, 1 = disabled).
 	void ClawMutantControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
 
-		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[item->ObjectNumber];
-		auto* creature = GetCreatureInfo(item);
+		auto& item = g_Level.Items[itemNumber];
+		auto& object = Objects[item.ObjectNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
-		short head = 0;
-		short torsoX = 0;
-		short torsoY = 0;
 		short headingAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
-		if (item->HitPoints <= 0)
+		if (item.HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != CLAW_MUTANT_STATE_DEATH)
-				SetAnimation(item, CLAW_MUTANT_ANIM_DEATH);
+			if (item.Animation.ActiveState != CLAW_MUTANT_STATE_DEATH)
+				SetAnimation(&item, CLAW_MUTANT_ANIM_DEATH);
 
-			int frameEnd = g_Level.Anims[object->animIndex + CLAW_MUTANT_ANIM_DEATH].frameEnd;
-			if (item->Animation.FrameNumber >= frameEnd)
+			int frameEnd = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).frameEnd;
+			if (item.Animation.FrameNumber >= frameEnd)
 				CreatureDie(itemNumber, true);
 		}
 		else
 		{
-			if (item->AIBits)
-				GetAITarget(creature);
+			if (item.AIBits)
+				GetAITarget(&creature);
 
 			AI_INFO ai;
-			CreatureAIInfo(item, &ai);
-			GetCreatureMood(item, &ai, ai.zoneNumber == ai.enemyZone ? true : false);
-			CreatureMood(item, &ai, ai.zoneNumber == ai.enemyZone ? true : false);
+			CreatureAIInfo(&item, &ai);
+			GetCreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone ? true : false);
+			CreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone ? true : false);
 
-			headingAngle = CreatureTurn(item, creature->MaxTurn);
-			bool canShoot = Targetable(item, &ai) && ((ai.distance > CLAW_MUTANT_SHOOT_RANGE && !item->ItemFlags[0]) || ai.zoneNumber != ai.enemyZone);
+			headingAngle = CreatureTurn(&item, creature.MaxTurn);
+			bool canShoot = (Targetable(&item, &ai) &&
+				((ai.distance > CLAW_MUTANT_PLASMA_ATTACK_RANGE && !item.ItemFlags[0]) || ai.zoneNumber != ai.enemyZone));
 
-			switch (item->Animation.ActiveState)
+			switch (item.Animation.ActiveState)
 			{
 			case CLAW_MUTANT_STATE_IDLE:
-				item->ItemFlags[5] = 0;
-				item->ItemFlags[6] = 0;
-				creature->MaxTurn = 0;
+				item.ItemFlags[5] = 0;
+				item.ItemFlags[6] = 0;
+				creature.MaxTurn = 0;
 
-				if (item->AIBits & GUARD)
+				if (item.AIBits & GUARD)
 				{
-					head = AIGuard(creature);
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					extraHeadRot.y = AIGuard(&creature);
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 					break;
 				}
-				else if (item->AIBits & PATROL1)
+				else if (item.AIBits & PATROL1)
 				{
-					head = 0;
-					item->Animation.TargetState = CLAW_MUTANT_STATE_WALK;
+					extraHeadRot.y = 0;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
 				}
-				else if (creature->Mood == MoodType::Escape)
+				else if (creature.Mood == MoodType::Escape)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_RUN;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_RUN;
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_SLASH_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_SWIPE_ATTACK_RANGE)
 				{
-					torsoY = ai.angle;
-					torsoX = ai.xAngle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 
 					if (ai.angle < 0)
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_SLASH_LEFT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT;
 					}
 					else
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_SLASH_RIGHT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT;
 					}
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_ATTACK_RANGE)
 				{
-					torsoY = ai.angle;
-					torsoX = ai.xAngle;
-					item->Animation.TargetState = CLAW_MUTANT_STATE_CLAW_ATTACK;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_CLAW_ATTACK;
 				}
 				else if (canShoot)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_PLASMA_ATTACK;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_PLASMA_ATTACK;
 				}
-				else if (creature->Mood == MoodType::Bored)
+				else if (creature.Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < CLAW_MUTANT_WALK_CHANCE)
-						item->Animation.TargetState = CLAW_MUTANT_STATE_WALK;
+					if (Random::TestProbability(CLAW_MUTANT_WALK_CHANCE))
+						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
 				}
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item.Animation.RequiredState != NO_STATE)
 				{
-					item->Animation.TargetState = item->Animation.RequiredState;
+					item.Animation.TargetState = item.Animation.RequiredState;
 				}
 				else
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_RUN;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_RUN;
 				}
 
 				break;
 
 			case CLAW_MUTANT_STATE_WALK:
-				item->ItemFlags[5] = 0;
-				item->ItemFlags[6] = 0;
-				creature->MaxTurn = CLAW_MUTANT_WALK_TURN_RATE_MAX;
+				item.ItemFlags[5] = 0;
+				item.ItemFlags[6] = 0;
+				creature.MaxTurn = CLAW_MUTANT_WALK_TURN_RATE_MAX;
 
 				if (ai.ahead)
-					head = ai.angle;
+					extraHeadRot.y = ai.angle;
 
-				if (item->AIBits & PATROL1)
+				if (item.AIBits & PATROL1)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_WALK;
-					head = 0;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
+					extraHeadRot.y = 0;
 				}
-				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_RANGE)
+				else if (ai.bite && ai.distance < CLAW_MUTANT_CLAW_ATTACK_RANGE)
 				{
 					if (ai.angle < 0)
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_LEFT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_LEFT;
 					}
 					else
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT;
 					}
 				}
 				else if (canShoot)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
-				else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
+				else if (creature.Mood == MoodType::Escape || creature.Mood == MoodType::Attack)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_RUN;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_RUN;
 				}
 
 				break;
 
 			case CLAW_MUTANT_STATE_RUN:
-				item->ItemFlags[5] = 0;
-				item->ItemFlags[6] = 0;
-				creature->MaxTurn = CLAW_MUTANT_RUN_TURN_RATE_MAX;
+				item.ItemFlags[5] = 0;
+				item.ItemFlags[6] = 0;
+				creature.MaxTurn = CLAW_MUTANT_RUN_TURN_RATE_MAX;
 
 				if (ai.ahead)
-					head = ai.angle;
+					extraHeadRot.y = ai.angle;
 
-				if (item->AIBits & GUARD)
+				if (item.AIBits & GUARD)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored)
+				else if (creature.Mood == MoodType::Bored)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
-				else if (creature->Flags != 0 && ai.ahead)
+				else if (creature.Flags != 0 && ai.ahead)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
 				else if (ai.bite && ai.distance < CLAW_MUTANT_RUN_ATTACK_RANGE)
 				{
-					if (creature->Enemy != nullptr && creature->Enemy->Animation.Velocity.z == 0.0f)
+					if (creature.Enemy != nullptr && creature.Enemy->Animation.Velocity.z == 0.0f)
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 					}
 					else
 					{
-						item->Animation.TargetState = CLAW_MUTANT_STATE_RUN_ATTACK;
+						item.Animation.TargetState = CLAW_MUTANT_STATE_RUN_ATTACK;
 					}
 				}
 				else if (canShoot)
 				{
-					item->Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
+					item.Animation.TargetState = CLAW_MUTANT_STATE_IDLE;
 				}
 
 				break;
@@ -452,34 +464,34 @@ namespace TEN::Entities::Creatures::TR3
 			case CLAW_MUTANT_STATE_WALK_ATTACK_RIGHT:
 			case CLAW_MUTANT_STATE_RUN_ATTACK:
 			case CLAW_MUTANT_STATE_CLAW_ATTACK:
-			case CLAW_MUTANT_STATE_SLASH_LEFT:
-			case CLAW_MUTANT_STATE_SLASH_RIGHT:
+			case CLAW_MUTANT_STATE_SWIPE_ATTACK_LEFT:
+			case CLAW_MUTANT_STATE_SWIPE_ATTACK_RIGHT:
 				if (ai.ahead)
 				{
-					torsoY = ai.angle;
-					torsoX = ai.xAngle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				DamageTargetWithClaw(item, creature->Enemy);
+				DamageTargetWithClaw(&item, creature.Enemy);
 				break;
 
 			case CLAW_MUTANT_STATE_PLASMA_ATTACK:
 				if (ai.ahead)
 				{
-					torsoY = ai.angle;
-					torsoX = ai.xAngle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 0) && Random::TestProbability(1 / 4.0f) == 0)
-					item->ItemFlags[0] = 1;
+				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0) && Random::TestProbability(1 / 4.0f) == 0)
+					item.ItemFlags[0] = 1;
 
-				if (item->Animation.FrameNumber < GetFrameNumber(item, 28))
+				if (item.Animation.FrameNumber < GetFrameNumber(&item, 28))
 				{
-					SpawnMutantPlasma(itemNumber);
+					SpawnClawMutantPlasma(itemNumber);
 				}
-				else if (item->Animation.FrameNumber == GetFrameNumber(item, 28))
+				else if (item.Animation.FrameNumber == GetFrameNumber(&item, 28))
 				{
-					SpawnMutantPlasmaBall(item, creature);
+					SpawnClawMutantPlasmaBall(item);
 				}
 
 				SpawnMutantPlasmaLight(item);
@@ -487,9 +499,9 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureJoint(item, 0, torsoX);
-		CreatureJoint(item, 1, torsoY);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(&item, 0, extraTorsoRot.x);
+		CreatureJoint(&item, 1, extraTorsoRot.y);
+		CreatureJoint(&item, 2, extraHeadRot.y);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

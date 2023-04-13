@@ -275,9 +275,9 @@ namespace TEN::Entities::Effects
 			case MissileType::ClawMutantPlasma:
 				for (int i = 0; i < 6; i++)
 				{
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
 				}
 
 				break;
@@ -328,9 +328,9 @@ namespace TEN::Entities::Effects
 				DoDamage(LaraItem, fx.flag2);
 				for (int i = 0; i < 3; i++)
 				{
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
-					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
 				}
 
 				break;
@@ -387,7 +387,7 @@ namespace TEN::Entities::Effects
 
 				case MissileType::ClawMutantPlasma:
 					for (int i = 0; i < 3; i++)
-						SpawnPlasmaBallFlame(fxNumber, Vector3(deltaPos.x, deltaPos.y * 16, deltaPos.z), Vector3::Zero, 10.0f);
+						SpawnClawMutantPlasmaFlameBall(fxNumber, Vector3(deltaPos.x, deltaPos.y * 16, deltaPos.z), Vector3::Zero, 10.0f);
 
 					break;
 
