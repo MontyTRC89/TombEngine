@@ -48,12 +48,34 @@ namespace TEN::Collision
 		g_Renderer.AddLine3D(GetPoint0(), GetPoint1(), COLOR);
 	}
 
+	bool Attractor::operator ==(const Attractor& attrac) const
+	{
+		if (Type == attrac.Type &&
+			Point0 == attrac.GetPoint0() &&
+			Point1 == attrac.GetPoint1() &&
+			RoomNumber == attrac.GetRoomNumber())
+		{
+			return true;
+		}
+
+		return false;
+	}
+	
+	bool Attractor::operator !=(const Attractor& attrac) const
+	{
+		return !(*this == attrac);
+	}
+
 	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
 															   bool isClosedLoop = true)
 	{
+		// No points; return empty collection.
+		if (points.empty())
+			return {};
+
 		// Prepare container.
 		auto attracs = std::vector<Attractor>{};
-		attracs.resize(points.size());
+		attracs.reserve(points.size());
 
 		// Generate attractors between points.
 		unsigned int count = isClosedLoop ? points.size() : (points.size() - 1);
@@ -98,6 +120,10 @@ namespace TEN::Collision
 
 	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl)
 	{
+		// Invalid sector; return empty collection.
+		if (pointColl.Position.Floor == NO_HEIGHT)
+			return {};
+
 		// Get bridge attractors.
 		if (pointColl.Position.Bridge >= 0)
 		{
@@ -113,7 +139,7 @@ namespace TEN::Collision
 	// TODO: Actually probe for attractors.
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
 	{
-		constexpr auto COUNT_MAX = 32;
+		constexpr auto COUNT_MAX = 64;
 
 		auto& player = GetLaraInfo(item);
 
@@ -151,7 +177,7 @@ namespace TEN::Collision
 		short headingAngle = orient.y - ANGLE(90.0f);
 		short slopeAngle = orient.x;
 
-		// Determine enquiries.
+		// Determine inquiries.
 		bool isIntersected = (dist <= range);
 		bool isInFront = Geometry::IsPointInFront(item.Pose, targetPoint);
 
@@ -170,7 +196,7 @@ namespace TEN::Collision
 		return attracColl;
 	}
 
-	// TODO: Maybe return struct with this vector and the refPoint + range, just in case.
+	// TODO: Maybe return struct with this vector and the refPoint + range just in case.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& refPoint, float range)
 	{

@@ -379,7 +379,7 @@ namespace TEN::Entities::Player::Context
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
-			// Get point collision off edge's side.
+			// Get point collision off side of edge.
 			auto pointCollOffSide = GetCollision(
 				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);

@@ -40,6 +40,10 @@ namespace TEN::Collision
 
 		// Helpers
 		void DrawDebug() const;
+
+		// Operators
+		bool operator ==(const Attractor& attrac) const;
+		bool operator !=(const Attractor& attrac) const;
 	};
 
 	struct AttractorCollisionData
@@ -73,4 +77,24 @@ namespace TEN::Collision
 	std::vector<const Attractor*>		GetNearbyAttractorPtrs(const ItemInfo& item);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& refPoint, float range);
+
+	template<typename T>
+	std::vector<T> RemoveDuplicates(const std::vector<T>& vector)
+	{
+		auto seen = std::unordered_set<T>{};
+
+		auto result = std::vector<T>{};
+		result.reserve(vector.size());
+
+		for (const auto& item : vector)
+		{
+			if (seen.find(item) == seen.end())
+			{
+				seen.insert(item);
+				result.push_back(item);
+			}
+		}
+
+		return result;
+	}
 }
