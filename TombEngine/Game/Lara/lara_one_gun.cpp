@@ -377,17 +377,11 @@ void FireShotgun(ItemInfo& laraItem)
 		0);
 
 	if (!player.LeftArm.Locked)
-	{
-		armOrient = EulerAngles(
-			player.ExtraTorsoRot.x + player.LeftArm.Orientation.x,
-			player.ExtraTorsoRot.y + player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
-			0);
-	}
+		armOrient += EulerAngles(player.ExtraTorsoRot.x, player.ExtraTorsoRot.y, 0);
 
 	bool hasFired = false;
 	int scatter = ((player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1) ? 
-				  ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
-
+		ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
 
 	for (int i = 0; i < SHOTGUN_PELLET_COUNT; i++)
 	{
@@ -553,9 +547,13 @@ void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
 	laraItem.Model.MeshIndex[LM_RHAND] = laraItem.Model.BaseMesh + LM_RHAND;
 
 	if (player.Weapons[(int)weaponType].Present)
+	{
 		player.Control.Weapon.HolsterInfo.BackHolster = GetWeaponHolsterSlot(weaponType);
+	}
 	else
+	{
 		player.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
+	}
 }
 
 ItemInfo* FireHarpoon(ItemInfo& laraItem)
@@ -776,9 +774,13 @@ void GrenadeControl(short itemNumber)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
 			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
+			}
 			else
+			{
 				grenadeItem.Pose.Orientation.x += (short((grenadeItem.Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
+			}
 		}
 	}
 	else
@@ -790,9 +792,13 @@ void GrenadeControl(short itemNumber)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
 			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
+			}
 			else
+			{
 				grenadeItem.Pose.Orientation.x += (short((grenadeItem.Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
+			}
 		}
 	}
 
@@ -1266,9 +1272,13 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)
+	{
 		AnimatePistols(laraItem, LaraWeaponType::Revolver);
+	}
 	else
+	{
 		AnimateShotgun(laraItem, weaponType);
+	}
 
 	if (player.RightArm.GunFlash)
 	{

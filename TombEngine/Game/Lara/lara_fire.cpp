@@ -568,9 +568,13 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Control.Weapon.LastGunType = player.Control.Weapon.RequestGunType;
 
 				if (player.Control.Weapon.GunType != LaraWeaponType::Flare)
+				{
 					player.Control.Weapon.GunType = player.Control.Weapon.RequestGunType;
+				}
 				else
+				{
 					player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+				}
 			}
 		}
 	}
@@ -676,9 +680,13 @@ void HandleWeapon(ItemInfo& laraItem)
 
 	case HandStatus::WeaponReady:
 		if (!IsHeld(In::Action))
+		{
 			laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
+		}
 		else
+		{
 			laraItem.Model.MeshIndex[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
+		}
 
 		if (Camera.type != CameraType::Look &&
 			Camera.type != CameraType::Heavy)
@@ -865,10 +873,10 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		laraItem.Pose.Position.z,
 		laraItem.RoomNumber);
 
-	ItemInfo* nearestEntityPtr = nullptr;
+	ItemInfo* closestEntityPtr = nullptr;
 
-	float nearestDistance = INFINITY;
-	short nearestYOrient = MAXSHORT;
+	float closestDistance = INFINITY;
+	short closestYOrient = MAXSHORT;
 	unsigned int targetCount = 0;
 	float maxDistance = weaponInfo.TargetDist;
 
@@ -904,12 +912,12 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			TargetList[targetCount] = &item;
 			++targetCount;
 
-			if (distance < nearestDistance &&
-				abs(orient.y) < (nearestYOrient + ANGLE(15.0f)))
+			if (distance < closestDistance &&
+				abs(orient.y) < (closestYOrient + ANGLE(15.0f)))
 			{
-				nearestEntityPtr = &item;
-				nearestDistance = distance;
-				nearestYOrient = abs(orient.y);
+				closestEntityPtr = &item;
+				closestDistance = distance;
+				closestYOrient = abs(orient.y);
 			}
 		}
 	}
@@ -934,7 +942,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		{
 			if (player.TargetEntity == nullptr)
 			{
-				player.TargetEntity = nearestEntityPtr;
+				player.TargetEntity = closestEntityPtr;
 				LastTargets[0] = nullptr;
 			}
 			else if (IsClicked(In::SwitchTarget))
@@ -966,7 +974,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 				if (flag)
 				{
-					player.TargetEntity = nearestEntityPtr;
+					player.TargetEntity = closestEntityPtr;
 					LastTargets[0] = nullptr;
 				}
 			}

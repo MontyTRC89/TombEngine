@@ -336,9 +336,13 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 	else
 	{
 		if (isThrown)
+		{
 			flareItem.Pose.Orientation.y = laraItem.Pose.Orientation.y;
+		}
 		else
+		{
 			flareItem.Pose.Orientation.y = laraItem.Pose.Orientation.y - ANGLE(45.0f);
+		}
 
 		flareItem.RoomNumber = laraItem.RoomNumber;
 	}

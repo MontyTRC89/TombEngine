@@ -415,7 +415,11 @@ void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRigh
 	laraItem.Model.MeshIndex[jointIndex] = laraItem.Model.BaseMesh + jointIndex;
 
 	if (player.Weapons[(int)weaponType].Present)
+	{
 		holster = GetWeaponHolsterSlot(weaponType);
+	}
 	else
+	{
 		holster = HolsterSlot::Empty;
+	}
 }
