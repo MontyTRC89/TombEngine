@@ -3825,7 +3825,7 @@ __Default: empty__</description>
  If false or omitted, this will be the string that's displayed.</description>
 	<returns>
 		<return>
-			<type>String</type>
+			<type>string</type>
 			<description>a string</description>
 		</return>
 	</returns>
@@ -3842,7 +3842,7 @@ __Default: empty__</description>
 	<parameters>
 		<parameter>
 			<name>string</name>
-			<type>String</type>
+			<type>string</type>
 			<description>the new key for the display string</description>
 		</parameter>
 	</parameters>
@@ -3884,6 +3884,20 @@ __Default: empty__</description>
 			<description>y y-coordinate of the string</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetFlags</name>
+	<summary>Set the display string's flags</summary>
+	<parameters>
+		<parameter>
+			<name>table</name>
+			<type>table</type>
+			<description>the new table with display flags options</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>

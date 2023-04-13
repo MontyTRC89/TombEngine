@@ -12,22 +12,24 @@
 // The alternative would be to pass in a full string, but then we would need to split the string at runtime to find
 // the exact tables to look in, which seems like it would take longer.
 
-class LevelFunc {
+class LevelFunc
+{
 public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
-	sol::protected_function_result Call(sol::variadic_args vs)
+
+	sol::protected_function_result Call(sol::variadic_args args)
 	{
-		return m_handler->CallLevelFunc(m_funcName, vs);
-	}
-	sol::protected_function_result CallDT(float dt)
-	{
-		return m_handler->CallLevelFunc(m_funcName, dt);
+		return m_handler->CallLevelFunc(m_funcName, args);
 	}
 
-	static void Register(sol::table & parent)
+	sol::protected_function_result CallDT(float deltaTime)
+	{
+		return m_handler->CallLevelFunc(m_funcName, deltaTime);
+	}
+
+	static void Register(sol::table& parent)
 	{
 		parent.new_usertype<LevelFunc>(ScriptReserved_LevelFunc, sol::no_constructor, sol::meta_function::call, &Call);
 	}
 };
-

@@ -121,7 +121,7 @@ void UndrawFlare(ItemInfo* laraItem)
 	lara.Flare.ControlLeft = true;
 
 	if (laraItem->Animation.TargetState == LS_IDLE &&
-		lara.Vehicle == NO_ITEM)
+		lara.Context.Vehicle == NO_ITEM)
 	{
 		if (laraItem->Animation.AnimNumber == LA_STAND_IDLE)
 		{

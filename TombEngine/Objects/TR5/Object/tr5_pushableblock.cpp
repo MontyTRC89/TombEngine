@@ -96,7 +96,7 @@ namespace TEN::Entities::Generic
 		if (PushableBlockManageGravity(itemNumber))
 			return;
 
-		Lara.InteractedItem = itemNumber;
+		Lara.Context.InteractedItem = itemNumber;
 
 		int pullAnim = PushableAnimationVector[pushable.AnimationSystemIndex].PullAnimIndex;
 		int pushAnim = PushableAnimationVector[pushable.AnimationSystemIndex].PushAnimIndex;
@@ -130,7 +130,7 @@ namespace TEN::Entities::Generic
 			 player.Control.HandStatus == HandStatus::Free &&
 			 pushableItem.Status != ITEM_INVISIBLE &&
 			 pushableItem.TriggerFlags >= 0) ||
-			 (player.Control.IsMoving && player.InteractedItem == itemNumber))
+			 (player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 		{
 
 			auto bounds = GameBoundingBox(&pushableItem);
@@ -177,16 +177,16 @@ namespace TEN::Entities::Generic
 					laraItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
-					player.NextCornerPos.Position.x = itemNumber;
+					player.Context.NextCornerPos.Position.x = itemNumber; // TODO: Do this differently.
 				}
 				else
 				{
-					player.InteractedItem = itemNumber;
+					player.Context.InteractedItem = itemNumber;
 				}
 			}
 			else
 			{
-				if (player.Control.IsMoving && player.InteractedItem == itemNumber)
+				if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 				{
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Free;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Generic
 			// If player is not grabbing pushable, simply do collision routine if needed.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
-				player.NextCornerPos.Position.x != itemNumber)
+				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
 				if (!pushable.HasFloorColission)
 					ObjectCollision(itemNumber, laraItem, coll);
@@ -304,7 +304,7 @@ namespace TEN::Entities::Generic
 			// If object has started to move, activate it to do its mechanics in control function.
 			pushableItem.Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 
 			pushable.StartPos = pushableItem.Pose.Position;
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;

@@ -88,37 +88,51 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
+// LevelData
 struct LEVEL
 {
-	std::vector<TEXTURE> RoomTextures;
-	std::vector<TEXTURE> MoveablesTextures;
-	std::vector<TEXTURE> StaticsTextures;
-	std::vector<TEXTURE> AnimatedTextures;
-	std::vector<TEXTURE> SpritesTextures;
-	TEXTURE SkyTexture;
-	std::vector<ROOM_INFO> Rooms;
-	std::vector<short> FloorData;
-	std::vector<MESH> Meshes;
-	std::vector<int> Bones;
-	std::vector<AnimData> Anims;
-	std::vector<StateDispatchData> Changes;
-	std::vector<StateDispatchRangeData> Ranges;
-	std::vector<short> Commands;
-	std::vector<AnimFrame> Frames;
-	std::vector<ItemInfo> Items;
-	std::vector<AI_OBJECT> AIObjects;
-	std::vector<SPRITE> Sprites;
-	std::vector<LevelCameraInfo> Cameras;
-	std::vector<SinkInfo> Sinks;
-	std::vector<SoundSourceInfo> SoundSources;
-	std::vector<BOX_INFO> Boxes;
-	std::vector<OVERLAP> Overlaps;
-	std::vector<int> Zones[(int)ZoneType::MaxZone][2];
-	std::vector<short> SoundMap;
-	std::vector<SampleInfo> SoundDetails;
-	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
-	std::vector<VolumeEventSet> EventSets;
-	int NumItems;
+	// Object data
+	int					  NumItems = 0;
+	std::vector<ItemInfo> Items	   = {};
+	std::vector<MESH>	  Meshes   = {};
+	std::vector<int>	  Bones	   = {};
+
+	// Animation data
+	std::vector<AnimData>				Anims	 = {};
+	std::vector<AnimFrame>				Frames	 = {};
+	std::vector<StateDispatchData>		Changes	 = {};
+	std::vector<StateDispatchRangeData> Ranges	 = {};
+	std::vector<short>					Commands = {};
+
+	// Collision data
+	std::vector<ROOM_INFO> Rooms	 = {};
+	std::vector<short>	   FloorData = {};
+	std::vector<SinkInfo>  Sinks	 = {};
+
+	// Pathfinding data
+	std::vector<BOX_INFO> Boxes	   = {};
+	std::vector<OVERLAP>  Overlaps = {};
+	std::vector<int>	  Zones[(int)ZoneType::MaxZone][2] = {};
+
+	// Sound data
+	std::vector<short>			 SoundMap	  = {};
+	std::vector<SoundSourceInfo> SoundSources = {};
+	std::vector<SampleInfo>		 SoundDetails = {};
+
+	// Misc. data
+	std::vector<LevelCameraInfo> Cameras   = {};
+	std::vector<VolumeEventSet>	 EventSets = {};
+	std::vector<AI_OBJECT>		 AIObjects = {};
+	std::vector<SPRITE>			 Sprites   = {};
+
+	// Texture data
+	TEXTURE				 SkyTexture		   = {};
+	std::vector<TEXTURE> RoomTextures	   = {};
+	std::vector<TEXTURE> MoveablesTextures = {};
+	std::vector<TEXTURE> StaticsTextures   = {};
+	std::vector<TEXTURE> AnimatedTextures  = {};
+	std::vector<TEXTURE> SpritesTextures   = {};
+	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
 };
 
 extern std::vector<int> MoveablesIds;

@@ -21,9 +21,9 @@ namespace TEN::Entities::Generic
 
 	struct PushablesSounds
 	{
-		int LoopSound;			// looped sound index for movement
-		int StopSound;			// ending sound index
-		int FallSound;			// sound on hitting floor (if dropped)
+		int LoopSound; // Looped sound index for movement.
+		int StopSound; // Ending sound index.
+		int FallSound; // Sound upon hitting floor (when dropped).
 
 		PushablesSounds()
 		{

@@ -197,7 +197,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
-			if (Lara.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
 				creature->Mood = MoodType::Escape;
 
 			angle = CreatureTurn(item, creature->MaxTurn);

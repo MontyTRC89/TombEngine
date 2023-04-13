@@ -190,7 +190,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			GetCreatureMood(item, &AI, true);
 
-			if (Lara.Vehicle != NO_ITEM)
+			if (Lara.Context.Vehicle != NO_ITEM)
 				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, true);

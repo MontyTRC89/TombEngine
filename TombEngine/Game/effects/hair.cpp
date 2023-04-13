@@ -81,7 +81,7 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
-								 (player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
+								 (player.Context.Vehicle == -1 || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
 
 				// Handle segment room collision.
 				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
@@ -161,7 +161,7 @@ namespace TEN::Effects::Hair
 				break;
 			}
 
-			int frameBaseIndex = GetAnimData(animNumber).FramePtr;
+			int frameBaseIndex = GetAnimData(item.ObjectNumber, animNumber).FramePtr;
 			const auto& frame = g_Level.Frames[frameBaseIndex + player.HitFrame];
 			return frame.BoundingBox.GetCenter();
 		}

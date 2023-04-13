@@ -145,16 +145,16 @@ Any returned value will be discarded.
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
 */
-void LogicHandler::AddCallback(CallbackPoint point, LevelFunc const & lf)
+void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	switch(point)
 	{
 	case CallbackPoint::PreControl:
-		m_callbacksPreControl.insert(lf.m_funcName);
+		m_callbacksPreControl.insert(levelFunc.m_funcName);
 		break;
 
 	case CallbackPoint::PostControl:
-		m_callbacksPostControl.insert(lf.m_funcName);
+		m_callbacksPostControl.insert(levelFunc.m_funcName);
 		break;
 	}
 }
@@ -168,16 +168,16 @@ Will have no effect if the function was not registered as a callback
 @usage
 	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
 */
-void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
+void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	switch(point)
 	{
 	case CallbackPoint::PreControl:
-		m_callbacksPreControl.erase(lf.m_funcName);
+		m_callbacksPreControl.erase(levelFunc.m_funcName);
 		break;
 
 	case CallbackPoint::PostControl:
-		m_callbacksPostControl.erase(lf.m_funcName);
+		m_callbacksPostControl.erase(levelFunc.m_funcName);
 		break;
 	}
 }
@@ -190,10 +190,10 @@ void LogicHandler::ResetLevelTables()
 	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
-sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& name)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
-	auto & theMap = m_levelFuncs_tablesOfNames[partName];
+	auto& theMap = m_levelFuncs_tablesOfNames[partName];
 
 	auto fullNameIt = theMap.find(name);
 	if (fullNameIt != std::cend(theMap))
@@ -202,13 +202,14 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const&
 		if (m_levelFuncs_levelFuncObjects[key].valid())
 			return m_levelFuncs_levelFuncObjects[key];
 	}
+
 	return sol::nil;
 }
 
-sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & name, float dt)
+sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, float deltaTime)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call(dt);
+	auto r = f.call(deltaTime);
 
 	if (!r.valid())
 	{
@@ -272,28 +273,28 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& name, 
 		// "populate" the new table. This will trigger the __newindex metafunction and will
 		// thus call this function recursively, handling all subtables and functions.
 		for (auto& [key, val] : value.as<sol::table>())
-		{
 			newLevelFuncsTab[key] = val;
-		}
 	}
-	else{
+	else
+	{
 		std::string error{ "Failed to add " };
 		error += name + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
+
 	return true;
 }
 
-
-void LogicHandler::LogPrint(sol::variadic_args va)
+void LogicHandler::LogPrint(sol::variadic_args args)
 {
 	std::string str;
-	for (sol::object const & o : va)
+	for (const sol::object& o : args)
 	{
 		auto strPart = (*m_handler.GetState())["tostring"](o).get<std::string>();
 		str += strPart;
 		str += "\t";
 	}
+
 	TENLog(str, LogLevel::Info, LogConfig::All, true);
 }
 
@@ -532,7 +533,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		return first->second;
 	};
 
-	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj) 
+	std::function<uint32_t(const sol::table&)> populate = [&](const sol::table& obj) 
 	{
 		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), nVars));
 
@@ -558,6 +559,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					m_savedVarPath.push_back(key);
 				}
 					break;
+
 				case sol::type::number:
 				{
 					if (double data = first.as<double>(); std::floor(data) != data)
@@ -573,6 +575,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					}
 				}
 					break;
+
 				default:
 					validKey = false;
 					ScriptAssert(false, "Tried using an unsupported type as a key in table " + GetRequestedPath());
@@ -591,29 +594,44 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 				case sol::type::table:
 					putInVars(populate(second.as<sol::table>()));
 					break;
+
 				case sol::type::string:
 					putInVars(handleStr(second));
 					break;
+
 				case sol::type::number:
 					putInVars(handleNum(second.as<double>(), numMap));
 					break;
+
 				case sol::type::boolean:
 					putInVars(handleNum(second.as<bool>(), boolMap));
 					break;
+
 				case sol::type::userdata:
 				{
-					if(second.is<Vec3>())
+					if (second.is<Vec3>())
+					{
 						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
-					else if(second.is<Rotation>())
+					}
+					else if (second.is<Rotation>())
+					{
 						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, nVars, vars));
-					else if(second.is<ScriptColor>())
+					}
+					else if (second.is<ScriptColor>())
+					{
 						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, nVars, vars));
-					else if(second.is<LevelFunc>())
+					}
+					else if (second.is<LevelFunc>())
+					{
 						putInVars(handleFuncName(second.as<LevelFunc>()));
+					}
 					else
+					{
 						ScriptAssert(false, "Tried saving an unsupported userdata as a value; variable is " + GetRequestedPath());
+					}
 				}
-				break;
+					break;
+
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a value; variable is " + GetRequestedPath());
 				}
@@ -621,8 +639,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 				m_savedVarPath.pop_back();
 			}
 		}
+
 		return first->second;
 	};
+
 	populate(tab);
 }
 
@@ -663,7 +683,6 @@ void LogicHandler::ResetVariables()
 	(*m_handler.GetState())["Lara"] = nullptr;
 }
 
-
 void LogicHandler::ShortenTENCalls()
 {
 	auto str = R"(local ShortenInner 
@@ -689,7 +708,7 @@ void LogicHandler::ShortenTENCalls()
 	m_shortenedCalls = true;
 }
 
-void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
+void LogicHandler::ExecuteScriptFile(const std::string& luaFilename)
 {
 	if (!m_shortenedCalls)
 		ShortenTENCalls();
@@ -702,16 +721,15 @@ void LogicHandler::ExecuteString(const std::string& command)
 	m_handler.ExecuteString(command);
 }
 
-// These wind up calling CallLevelFunc, which is where all the error checking is.
-void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
+// These wind up calling CallLevelFunc, which is where all error checking is.
+void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short idTwo) 
 {
 	sol::protected_function func = m_levelFuncs_luaFunctions[name];
 
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
-
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator activator, std::string const& arguments)
+void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
 	if (std::holds_alternative<short>(activator))
@@ -724,9 +742,9 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 	}
 }
 
-static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)
+static void doCallback(const sol::protected_function& func, std::optional<float> deltaTime = std::nullopt)
 {
-	auto r = dt.has_value() ? func(dt) : func();
+	auto r = deltaTime.has_value() ? func(deltaTime) : func();
 
 	if (!r.valid())
 	{
@@ -743,28 +761,28 @@ void LogicHandler::OnStart()
 
 void LogicHandler::OnLoad()
 {
-	if(m_onLoad.valid())
+	if (m_onLoad.valid())
 		doCallback(m_onLoad);
 }
 
-void LogicHandler::OnControlPhase(float dt)
+void LogicHandler::OnControlPhase(float deltaTime)
 {
-	auto tryCall = [this, dt](std::string const& name)
+	auto tryCall = [this, deltaTime](const std::string& name)
 	{
 		auto func = m_handler.GetState()->script("return " + name);
 
 		if (!func.valid())
 			ScriptAssertF(false, "Callback {} not valid", name);
 		else 
-			func.get<LevelFunc>().CallDT(dt);
+			func.get<LevelFunc>().CallDT(deltaTime);
 	};
 
 	for (auto& name : m_callbacksPreControl)
 		tryCall(name);
 
 	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
-	if(m_onControlPhase.valid())
-		doCallback(m_onControlPhase, dt);
+	if (m_onControlPhase.valid())
+		doCallback(m_onControlPhase, deltaTime);
 
 	for (auto& name : m_callbacksPostControl)
 		tryCall(name);
@@ -772,7 +790,7 @@ void LogicHandler::OnControlPhase(float dt)
 
 void LogicHandler::OnSave()
 {
-	if(m_onSave.valid())
+	if (m_onSave.valid())
 		doCallback(m_onSave);
 }
 

@@ -241,11 +241,8 @@ namespace TEN::Renderer
 					case 2:
 					case 3:
 					case 4:
-						// TODO: Sort out this nonsense.
-						currentBone->ExtraRotation = EulerAngles(
-							0,
-							0,
-							(short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(EulerAngles(prevRotation).z)).ToQuaternion();
+						short zRot = (short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + EulerAngles(prevRotation).z;
+						currentBone->ExtraRotation = EulerAngles(0, 0, zRot).ToQuaternion();
 						break;
 					}
 				},
@@ -274,27 +271,33 @@ namespace TEN::Renderer
 				[&j, &currentBone](BigGunInfo& bigGun)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation = EulerAngles(0, 0, bigGun.BarrelRotation).ToQuaternion();
+						currentBone->ExtraRotation = EulerAngles(0, 0, FROM_RAD(bigGun.BarrelRotation)).ToQuaternion();
 				},
-				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{
+					auto xRot = Quaternion::Identity;
+					auto yRot = Quaternion::Identity;
+					auto zRot = Quaternion::Identity;
+
 					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						currentBone->ExtraRotation = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
+						yRot = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						currentBone->ExtraRotation = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
+						xRot = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_Z)
 					{
-						currentBone->ExtraRotation = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
+						zRot = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
 						lastJoint++;
 					}
+
+					currentBone->ExtraRotation = xRot * yRot * zRot;
 				});
 		}
 
@@ -307,17 +310,14 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
-		Matrix translation;
-		Matrix rotation;
-
-		for (auto* room : view.roomsToDraw)
+		for (const auto* room : view.roomsToDraw)
 		{
-			for (auto* itemToDraw : room->ItemsToDraw)
+			for (const auto* itemToDraw : room->ItemsToDraw)
 			{
-				auto* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				const auto& nativeItem = g_Level.Items[itemToDraw->ItemNumber];
 
-				// Lara has her own routine
-				if (nativeItem->ObjectNumber == ID_LARA)
+				// Player has its own routine.
+				if (nativeItem.ObjectNumber == ID_LARA)
 					continue;
 
 				UpdateItemAnimations(itemToDraw->ItemNumber, false);
@@ -329,21 +329,21 @@ namespace TEN::Renderer
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
-		for (int j = 0; j < node->Children.size(); j++)
-			BuildHierarchyRecursive(obj, node->Children[j], node);
+		for (auto* childNode : node->Children)
+			BuildHierarchyRecursive(obj, childNode, node);
 	}
 
 	void Renderer11::BuildHierarchy(RendererObject *obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 
-		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
+		for (auto* childNode : obj->Skeleton->Children)
+			BuildHierarchyRecursive(obj, childNode, obj->Skeleton);
 	}
 
 	bool Renderer11::IsFullsScreen() 
