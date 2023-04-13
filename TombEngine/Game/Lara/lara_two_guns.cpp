@@ -141,14 +141,19 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 			if (IsHeld(In::Action))
 			{
 				// HACK: Special case for revolver.
-				bool canShoot = (weaponType == LaraWeaponType::Revolver) ? !isRightWeapon : true;
-
+				bool canShoot = (weaponType == LaraWeaponType::Revolver) ? isRightWeapon : true;
 				if (canShoot)
 				{
-					auto armOrient = EulerAngles(
-						arm.Orientation.x,
-						arm.Orientation.y + laraItem.Pose.Orientation.y,
-						0);
+					// HACK: Revolver, a right weapon, uses the left arm's orientation.
+					auto armOrient = (weaponType == LaraWeaponType::Revolver) ?
+						EulerAngles(
+							player.LeftArm.Orientation.x,
+							player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
+							0) :
+						EulerAngles(
+							arm.Orientation.x,
+							arm.Orientation.y + laraItem.Pose.Orientation.y,
+							0);
 
 					if (FireWeapon(weaponType, *player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
 					{
@@ -403,11 +408,8 @@ void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRigh
 	auto& holster = isRightWeapon ? player.Control.Weapon.HolsterInfo.RightHolster : player.Control.Weapon.HolsterInfo.LeftHolster;
 
 	// HACK: Special case for revolver.
-	if (!isRightWeapon)
-	{
-		if (weaponType == LaraWeaponType::Revolver)
-			return;
-	}
+	if (!isRightWeapon && weaponType == LaraWeaponType::Revolver)
+		return;
 
 	int jointIndex = isRightWeapon ? LM_RHAND : LM_LHAND;
 	laraItem.Model.MeshIndex[jointIndex] = laraItem.Model.BaseMesh + jointIndex;
