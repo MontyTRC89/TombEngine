@@ -169,7 +169,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
+		if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -254,7 +254,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 		}
 
-		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 12 &&
+		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -263,7 +263,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 0)
+		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 0)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
@@ -342,8 +342,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(&item);
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
+	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(item).FramePtr;
+	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = item.Animation.AnimNumber;
 }
 
@@ -461,7 +461,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 1;
 		}
 
-		weaponItemPtr->Animation.FrameNumber = g_Level.Anims[weaponItemPtr->Animation.AnimNumber].frameBase;
+		weaponItemPtr->Animation.FrameNumber = GetAnimData(*weaponItemPtr).frameBase;
 		weaponItemPtr->Animation.ActiveState =
 		weaponItemPtr->Animation.TargetState = WEAPON_STATE_DRAW;
 		weaponItemPtr->Status = ITEM_ACTIVE;

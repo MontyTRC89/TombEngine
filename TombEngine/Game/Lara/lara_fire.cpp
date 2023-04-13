@@ -543,11 +543,11 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
 			else if (player.Control.Weapon.RequestGunType == LaraWeaponType::Flare ||
-				(player.Vehicle == NO_ITEM &&
+				(player.Context.Vehicle == NO_ITEM &&
 					(player.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						player.Control.WaterStatus == WaterStatus::Dry ||
 						(player.Control.WaterStatus == WaterStatus::Wade &&
-							player.WaterSurfaceDist > -Weapons[(int)player.Control.Weapon.GunType].GunHeight))))
+							player.Context.WaterSurfaceDist > -Weapons[(int)player.Control.Weapon.GunType].GunHeight))))
 			{
 				if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 				{
@@ -584,7 +584,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		else if (player.Control.Weapon.GunType != LaraWeaponType::HarpoonGun &&
 			player.Control.WaterStatus != WaterStatus::Dry &&
 			(player.Control.WaterStatus != WaterStatus::Wade ||
-				player.WaterSurfaceDist < -Weapons[(int)player.Control.Weapon.GunType].GunHeight))
+				player.Context.WaterSurfaceDist < -Weapons[(int)player.Control.Weapon.GunType].GunHeight))
 		{
 			player.Control.HandStatus = HandStatus::WeaponUndraw;
 		}
@@ -723,7 +723,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	case HandStatus::Free:
 		if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (player.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
+			if (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
 			{
 				if (player.Flare.ControlLeft)
 				{
@@ -755,7 +755,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				player.Flare.ControlLeft = (player.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);
 			}

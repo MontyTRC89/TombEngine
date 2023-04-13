@@ -143,7 +143,7 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto* pushable = GetPushableInfo(item);
 
-		Lara.InteractedItem = itemNumber;
+		Lara.Context.InteractedItem = itemNumber;
 
 		auto pos = Vector3i::Zero;
 
@@ -431,11 +431,11 @@ namespace TEN::Entities::Generic
 			lara->Control.HandStatus != HandStatus::Free ||
 			pushableItem->Status == ITEM_INVISIBLE ||
 			pushableItem->TriggerFlags < 0) &&
-			(!lara->Control.IsMoving || lara->InteractedItem != itemNumber))
+			(!lara->Control.IsMoving || lara->Context.InteractedItem != itemNumber))
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
-				lara->NextCornerPos.Position.x != itemNumber)
+				lara->Context.NextCornerPos.Position.x != itemNumber)
 			{
 				if (!pushable->hasFloorCeiling)
 					ObjectCollision(itemNumber, laraItem, coll);
@@ -491,7 +491,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 		
 			pushable->moveX = pushableItem->Pose.Position.x;
 			pushable->moveZ = pushableItem->Pose.Position.z;
@@ -539,7 +539,7 @@ namespace TEN::Entities::Generic
 					laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Busy;
-					lara->NextCornerPos.Position.x = itemNumber;
+					lara->Context.NextCornerPos.Position.x = itemNumber;
 					pushableItem->Pose.Orientation.y = yOrient;
 				}
 				else
@@ -549,19 +549,19 @@ namespace TEN::Entities::Generic
 						SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
-						lara->NextCornerPos.Position.x = itemNumber;
+						lara->Context.NextCornerPos.Position.x = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 					else
 					{
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 				}
 			}
 			else
 			{
-				if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;

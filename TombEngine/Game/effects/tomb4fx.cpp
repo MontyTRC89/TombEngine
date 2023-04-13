@@ -1156,8 +1156,8 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
-	KillItem(lara->Vehicle);
+	ExplodingDeath(lara->Context.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	KillItem(lara->Context.Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);

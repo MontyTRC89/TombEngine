@@ -389,7 +389,7 @@ bool SaveGame::Save(int slot)
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
-	control.add_calculated_jump_velocity(Lara.Control.CalculatedJumpVelocity);
+	control.add_calculated_jump_velocity(Lara.Context.CalcJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_moving(Lara.Control.IsMoving);
@@ -452,7 +452,7 @@ bool SaveGame::Save(int slot)
 
 	Save::LaraBuilder lara{ fbb };
 	lara.add_control(controlOffset);
-	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
+	lara.add_next_corner_pose(&FromPHD(Lara.Context.NextCornerPos));
 	lara.add_effect(effectOffset);
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
@@ -461,23 +461,23 @@ bool SaveGame::Save(int slot)
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
 	lara.add_hit_frame(Lara.HitFrame);
-	lara.add_interacted_item(Lara.InteractedItem);
+	lara.add_interacted_item(Lara.Context.InteractedItem);
 	lara.add_inventory(inventoryOffset);
 	lara.add_item_number(Lara.ItemNumber);
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
+	lara.add_projected_floor_height(Lara.Context.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
-	lara.add_target_facing_angle(Lara.TargetOrientation.y);
+	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
 	lara.add_torch(torchOffset);
-	lara.add_vehicle(Lara.Vehicle);
-	lara.add_water_current_active(Lara.WaterCurrentActive);
-	lara.add_water_current_pull(&FromVector3(Lara.WaterCurrentPull));
-	lara.add_water_surface_dist(Lara.WaterSurfaceDist);
+	lara.add_vehicle(Lara.Context.Vehicle);
+	lara.add_water_current_active(Lara.Context.WaterCurrentActive);
+	lara.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
+	lara.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
 	lara.add_weapons(carriedWeaponsOffset);
 	auto laraOffset = lara.Finish();
 
@@ -1813,7 +1813,7 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
 		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
 
-	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
+	Lara.Context.CalcJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
@@ -1853,17 +1853,17 @@ bool SaveGame::Load(int slot)
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
 	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
-	Lara.WaterCurrentActive = s->lara()->water_current_active();
-	Lara.WaterCurrentPull.x = s->lara()->water_current_pull()->x();
-	Lara.WaterCurrentPull.y = s->lara()->water_current_pull()->y();
-	Lara.WaterCurrentPull.z = s->lara()->water_current_pull()->z();
+	Lara.Context.WaterCurrentActive = s->lara()->water_current_active();
+	Lara.Context.WaterCurrentPull.x = s->lara()->water_current_pull()->x();
+	Lara.Context.WaterCurrentPull.y = s->lara()->water_current_pull()->y();
+	Lara.Context.WaterCurrentPull.z = s->lara()->water_current_pull()->z();
 	Lara.Flare.Life = s->lara()->flare()->life();
 	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
 	Lara.Flare.Frame = s->lara()->flare()->frame();
 	Lara.HighestLocation = s->lara()->highest_location();
 	Lara.HitDirection = s->lara()->hit_direction();
 	Lara.HitFrame = s->lara()->hit_frame();
-	Lara.InteractedItem = s->lara()->interacted_item();
+	Lara.Context.InteractedItem = s->lara()->interacted_item();
 	Lara.Inventory.BeetleComponents = s->lara()->inventory()->beetle_components();
 	Lara.Inventory.BeetleLife = s->lara()->inventory()->beetle_life();
 	Lara.Inventory.BigWaterskin = s->lara()->inventory()->big_waterskin();
@@ -1888,8 +1888,8 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
-	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
-	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
+	Lara.Context.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
+	Lara.Context.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
 	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
@@ -1934,9 +1934,9 @@ bool SaveGame::Load(int slot)
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);
-	Lara.TargetOrientation.y = s->lara()->target_facing_angle();
-	Lara.Vehicle = s->lara()->vehicle();
-	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();
+	Lara.Context.TargetOrientation.y = s->lara()->target_facing_angle();
+	Lara.Context.Vehicle = s->lara()->vehicle();
+	Lara.Context.WaterSurfaceDist = s->lara()->water_surface_dist();
 
 	for (int i = 0; i < s->lara()->weapons()->size(); i++)
 	{

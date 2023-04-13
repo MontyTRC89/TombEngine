@@ -9,11 +9,15 @@ using namespace TEN::Math;
 // Ceiling:		Upper surface of a collision block.
 // Floor:		Lower surface of a collision block.
 // Floordata:	Name of the engine's level geometry collision system consisting of rooms and their divisions within a grid.
-// Plane:		One of two surface triangles. CHECK: If it's a Vector3, isn't that simply the surface normal?
+// Plane:		One of two surface triangles.
 // Portal:		Link from one room to another allowing traversal.
 // Room number: Unique numeric index of a room.
 // Surface:		Floor or ceiling.
 // Wall:		Inferred from a floor or ceiling with max height. Note that true "walls" do not exist.
+
+// Planes are non-standard. Instead of 4 components storing a normal and a distance, floordata uses a Vector3:
+// x and y store the 2D direction vector in the xz plane (not normalized).
+// z stores the distance.
 
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
@@ -183,4 +187,6 @@ namespace TEN::Floordata
 	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
 	int				   GetBridgeBorder(int itemNumber, bool bottom);
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
+
+	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList);
 }

@@ -107,9 +107,9 @@ namespace TEN::Hud
 		}
 
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
-		if (player.Vehicle != NO_ITEM)
+		if (player.Context.Vehicle != NO_ITEM)
 		{
-			const auto& vehicleItem = g_Level.Items[player.Vehicle];
+			const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 			if (vehicleItem.ObjectNumber == ID_UPV)
 				AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
 		}
