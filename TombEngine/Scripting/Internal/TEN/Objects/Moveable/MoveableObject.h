@@ -29,7 +29,7 @@ class Moveable : public NamedBase<Moveable, short>
 public:
 	using IdentifierType = short;
 
-	Moveable(short num, bool alreadyInitialised = true);
+	Moveable(short num, bool alreadyInitialized = true);
 	~Moveable();
 	Moveable& operator=(Moveable const& other) = delete;
 	Moveable(Moveable const& other) = delete;
@@ -137,7 +137,7 @@ protected:
 
 private:
 	short m_num;
-	bool m_initialised;
+	bool m_initialized;
 
 	bool MeshExists(int number) const;
 };

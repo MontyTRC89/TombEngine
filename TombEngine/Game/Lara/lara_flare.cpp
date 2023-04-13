@@ -141,7 +141,7 @@ void UndrawFlare(ItemInfo* laraItem)
 				lara.Control.Weapon.GunType = lara.Control.Weapon.LastGunType;
 				lara.Control.HandStatus = HandStatus::Free;
 
-				InitialiseNewWeapon(laraItem);
+				InitializeNewWeapon(laraItem);
 
 				lara.TargetEntity = nullptr;
 				lara.RightArm.Locked = false;
@@ -197,7 +197,7 @@ void UndrawFlare(ItemInfo* laraItem)
 			lara.Control.Weapon.GunType = lara.Control.Weapon.LastGunType;
 			lara.Control.HandStatus = HandStatus::Free;
 
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(laraItem);
 
 			lara.TargetEntity = nullptr;
 			lara.LeftArm.Locked = false;
@@ -340,7 +340,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 		flareItem.RoomNumber = laraItem->RoomNumber;
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	flareItem.Pose.Orientation.x = 0;
 	flareItem.Pose.Orientation.z = 0;

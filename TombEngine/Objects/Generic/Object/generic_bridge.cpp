@@ -5,7 +5,7 @@
 
 using namespace TEN::Floordata;
 
-void InitialiseBridge(short itemNumber)
+void InitializeBridge(short itemNumber)
 {
 	UpdateBridgeItem(itemNumber);
 }

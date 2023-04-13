@@ -469,7 +469,7 @@ bool FlowHandler::DoFlow()
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
-			InitialiseGame = true;
+			InitializeGame = true;
 			break;
 		case GameStatus::LoadGame:
 			// Load the header of the savegame for getting the level to load

@@ -78,7 +78,7 @@ namespace TEN::Entities::Vehicles
 		return (BigGunInfo*)bigGunItem->Data;
 	}
 
-	void BigGunInitialise(short itemNumber)
+	void BigGunInitialize(short itemNumber)
 	{
 		auto* bigGunItem = &g_Level.Items[itemNumber];
 		bigGunItem->Data = BigGunInfo();
@@ -134,7 +134,7 @@ namespace TEN::Entities::Vehicles
 			bigGunItem->Pose.Orientation.y,
 			0
 		);
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		projectileItem->Animation.Velocity.z = BGUN_ROCKET_VELOCITY;
 		projectileItem->HitPoints = BGUN_ROCKET_TIMER; // NOTE: Time before it explode, TR5 use it, if 0, it will explode by default.

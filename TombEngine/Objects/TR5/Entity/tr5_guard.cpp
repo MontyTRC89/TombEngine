@@ -198,12 +198,12 @@ namespace TEN::Entities::Creatures::TR5
 		Run = 11
 	};
 
-	void InitialiseGuard(short itemNum)
+	void InitializeGuard(short itemNum)
 	{
 		auto* item = &g_Level.Items[itemNum];
 		short roomItemNumber;
 
-		InitialiseCreature(itemNum);
+		InitializeCreature(itemNum);
 
 		switch ((GuardOcb)item->TriggerFlags)
 		{
@@ -286,22 +286,22 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void InitialiseSniper(short itemNumber)
+	void InitializeSniper(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.y += CLICK(2);
 		item->Pose.Position.z += SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 	}
 
-	void InitialiseGuardLaser(short itemNumber)
+	void InitializeGuardLaser(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 6);
 	}
 
@@ -1108,11 +1108,11 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
-	void InitialiseMafia2(short itemNumber)
+	void InitializeMafia2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->SetMeshSwapFlags(9216);
 	}

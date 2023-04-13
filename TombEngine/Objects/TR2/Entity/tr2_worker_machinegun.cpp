@@ -15,11 +15,11 @@ namespace TEN::Entities::Creatures::TR2
 {
 	const auto WorkerMachineGunBite = BiteInfo(Vector3(0.0f, 308.0f, 32.0f), 9);
 
-	void InitialiseWorkerMachineGun(short itemNumber)
+	void InitializeWorkerMachineGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 12);
 	}
 

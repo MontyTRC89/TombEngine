@@ -642,7 +642,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 						UseSpotCam = true;
 						if (LastSpotCamSequence != value)
 							TrackCameraInit = false;
-						InitialiseSpotCam(value);
+						InitializeSpotCam(value);
 					}
 				}
 			}

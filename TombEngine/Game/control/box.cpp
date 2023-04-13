@@ -1075,7 +1075,7 @@ bool CreatureActive(short itemNumber)
 	return true;
 }
 
-void InitialiseCreature(short itemNumber) 
+void InitializeCreature(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -2084,7 +2084,7 @@ void AdjustStopperFlag(ItemInfo* item, int direction)
 	floor->Stopper = !floor->Stopper;
 }
 
-void InitialiseItemBoxData()
+void InitializeItemBoxData()
 {
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{

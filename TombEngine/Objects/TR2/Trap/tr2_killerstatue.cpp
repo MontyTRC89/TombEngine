@@ -9,7 +9,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void InitialiseKillerStatue(short itemNumber)
+void InitializeKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

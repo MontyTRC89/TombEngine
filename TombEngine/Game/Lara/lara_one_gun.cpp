@@ -580,7 +580,7 @@ ItemInfo* FireHarpoon(ItemInfo* laraItem)
 		item.RoomNumber = laraItem->RoomNumber;
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	item.Pose.Orientation.x = lara.LeftArm.Orientation.x + laraItem->Pose.Orientation.x;
 	item.Pose.Orientation.y = lara.LeftArm.Orientation.y + laraItem->Pose.Orientation.y;
@@ -693,7 +693,7 @@ void FireGrenade(ItemInfo* laraItem)
 			TriggerGunSmoke(smokePos.x, smokePos.y, smokePos.z, jointPos.x - smokePos.x, jointPos.y - smokePos.y, jointPos.z - smokePos.z, 1, LaraWeaponType::GrenadeLauncher, lara.LeftArm.GunSmoke);
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x + ANGLE(180);
 	item.Pose.Orientation.y = laraItem->Pose.Orientation.y + lara.LeftArm.Orientation.y;
@@ -859,7 +859,7 @@ void FireRocket(ItemInfo* laraItem)
 	for (int i = 0; i < 10; i++)
 		TriggerGunSmoke(jointPos.x, jointPos.y, jointPos.z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 2, LaraWeaponType::RocketLauncher, 32);
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	item.Pose.Orientation.x = laraItem->Pose.Orientation.x + lara.LeftArm.Orientation.x;
 	item.Pose.Orientation.y = laraItem->Pose.Orientation.y + lara.LeftArm.Orientation.y;
@@ -974,7 +974,7 @@ void FireCrossbow(ItemInfo* laraItem, Pose* pos)
 		item.Pose.Position = pos->Position;
 		item.RoomNumber = laraItem->RoomNumber;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		item.Pose.Orientation = pos->Orientation;
 	}
@@ -993,7 +993,7 @@ void FireCrossbow(ItemInfo* laraItem, Pose* pos)
 			item.RoomNumber = laraItem->RoomNumber;
 		}
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		item.Pose.Orientation.x = lara.LeftArm.Orientation.x + laraItem->Pose.Orientation.x;
 		item.Pose.Orientation.z = 0;
@@ -1344,7 +1344,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		newGrenade.Pose.Position.y = projectile.Pose.Position.y - CLICK(1);
 		newGrenade.Pose.Position.z = Random::GenerateInt(0, 512) + projectile.Pose.Position.z - CLICK(1);
 
-		InitialiseItem(newGrenadeItemNumber);
+		InitializeItem(newGrenadeItemNumber);
 
 		newGrenade.Pose.Orientation.x = Random::GenerateAngle(0, ANGLE(90.0f)) + ANGLE(45.0f);
 		newGrenade.Pose.Orientation.y = Random::GenerateAngle(0, ANGLE(359.0f));

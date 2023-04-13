@@ -165,10 +165,10 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseHarpy(short itemNumber)
+	void InitializeHarpy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HARPY_ANIM_IDLE);
 	}
 

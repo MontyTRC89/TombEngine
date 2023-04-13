@@ -24,7 +24,7 @@ constexpr auto FALLINGBLOCK_WIBBLE				= 3;
 constexpr auto FALLINGBLOCK_HEIGHT_TOLERANCE	= 8;
 constexpr auto FALLINGBLOCK_CRUMBLE_DELAY		= 100;
 
-void InitialiseFallingBlock(short itemNumber)
+void InitializeFallingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

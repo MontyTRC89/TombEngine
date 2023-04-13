@@ -33,7 +33,7 @@ const ObjectCollisionBounds GameStixBounds =
 	)
 };
 
-void InitialiseGameSticks(short itemNumber)
+void InitializeGameSticks(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -503,7 +503,7 @@ void ControlGodHead(short itemNumber)
 	}
 }
 
-void InitialiseGamePiece(short itemNumber)
+void InitializeGamePiece(short itemNumber)
 {
 	if (!SenetPiecesNumber[0])
 	{

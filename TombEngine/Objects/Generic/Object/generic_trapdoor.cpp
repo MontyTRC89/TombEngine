@@ -44,7 +44,7 @@ const ObjectCollisionBounds FloorTrapDoorBounds =
 };
 static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 
-void InitialiseTrapDoor(short itemNumber)
+void InitializeTrapDoor(short itemNumber)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 	TEN::Floordata::UpdateBridgeItem(itemNumber);

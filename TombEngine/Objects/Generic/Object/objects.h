@@ -11,8 +11,8 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void CutsceneRopeControl(short itemNumber);
 void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-void InitialiseSmashObject(short itemNumber);
-void InitialiseTightrope(short itemNumber);
+void InitializeSmashObject(short itemNumber);
+void InitializeTightrope(short itemNumber);
 void HighObject2Control(short itemNumber);
-void InitialiseAnimating(short itemNumber);
+void InitializeAnimating(short itemNumber);
 void AnimatingControl(short itemNumber);

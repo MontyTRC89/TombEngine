@@ -803,7 +803,7 @@ void Sound_UpdateScene()
 	BASS_Apply3D();
 }
 
-// Initialise BASS engine and also prepare all sound data.
+// Initialize BASS engine and also prepare all sound data.
 // Called once on engine start-up.
 
 void Sound_Init()
@@ -815,7 +815,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	// Initialise BASS_FX plugin
+	// Initialize BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;
@@ -842,7 +842,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Starting 3D mixdown", true))
 		return;
 
-	// Initialise channels and tracks array
+	// Initialize channels and tracks array
 	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 

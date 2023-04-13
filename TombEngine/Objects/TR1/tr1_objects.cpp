@@ -32,7 +32,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWolf;
+		obj->Initialize = InitializeWolf;
 		obj->control = WolfControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -47,7 +47,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BEAR];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = BearControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -62,7 +62,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_APE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = ApeControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -77,7 +77,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BIG_RAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseBigRat;
+		obj->Initialize = InitializeBigRat;
 		obj->control = BigRatControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -94,7 +94,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_NATLA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = NatlaControl;
 		obj->shadowType = ShadowMode::All;
@@ -108,7 +108,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GIANT_MUTANT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = GiantMutantControl;
 		obj->shadowType = ShadowMode::All;
@@ -124,7 +124,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		obj->shadowType = ShadowMode::All;
@@ -136,7 +136,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_CENTAUR_MUTANT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = CentaurControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -152,7 +152,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WINGED_MUMMY];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWingedMutant;
+		obj->Initialize = InitializeWingedMutant;
 		obj->control = WingedMutantControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -183,7 +183,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_DAMOCLES_SWORD];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseDamoclesSword;
+		obj->Initialize = InitializeDamoclesSword;
 		obj->control = ControlDamoclesSword;
 		obj->collision = CollideDamoclesSword;
 		obj->shadowType = ShadowMode::All;
@@ -193,7 +193,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_SLAMMING_DOORS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSlammingDoors;
+		obj->Initialize = InitializeSlammingDoors;
 		obj->control = ControlSlammingDoors;
 		obj->collision = GenericSphereBoxCollision;
 		obj->shadowType = ShadowMode::All;
@@ -208,7 +208,7 @@ static void StartProjectiles(ObjectInfo* obj)
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 
-void InitialiseTR1Objects()
+void InitializeTR1Objects()
 {
 	ObjectInfo* objectPtr = nullptr;
 	StartEntity(objectPtr);

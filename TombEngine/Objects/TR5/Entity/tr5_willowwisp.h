@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseLightingGuide(short itemNumber);
+	void InitializeLightingGuide(short itemNumber);
 }

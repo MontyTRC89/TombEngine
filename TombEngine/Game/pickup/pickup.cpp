@@ -301,7 +301,7 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			DrawFlareMeshes(laraItem);
@@ -315,7 +315,7 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			KillItem(pickupItemNumber);
@@ -1071,7 +1071,7 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
 }
 
-void InitialisePickup(short itemNumber)
+void InitializePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1130,7 +1130,7 @@ void InitialisePickup(short itemNumber)
 	}
 }
 
-void InitialiseSearchObject(short itemNumber)
+void InitializeSearchObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)

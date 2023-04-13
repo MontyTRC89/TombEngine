@@ -23,11 +23,11 @@ namespace TEN::Entities::TR4
 	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
 	const auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
 
-	void InitialiseSentryGun(short itemNumber)
+	void InitializeSentryGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[1] = 768;
 		item->ItemFlags[2] = 0;

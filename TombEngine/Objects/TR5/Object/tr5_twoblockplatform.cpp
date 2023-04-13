@@ -12,7 +12,7 @@ using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;
 
-void InitialiseTwoBlocksPlatform(short itemNumber)
+void InitializeTwoBlocksPlatform(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

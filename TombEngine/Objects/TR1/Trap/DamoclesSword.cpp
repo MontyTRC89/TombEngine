@@ -25,7 +25,7 @@ namespace TEN::Entities::Traps::TR1
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 
-	void InitialiseDamoclesSword(short itemNumber)
+	void InitializeDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

@@ -36,11 +36,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	};
 
-	void InitialiseBrownBeast(short itemNumber)
+	void InitializeBrownBeast(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 

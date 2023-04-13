@@ -6,7 +6,7 @@
 
 using namespace TEN::Floordata;
 
-void InitialiseBridge(short itemNumber);
+void InitializeBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);
 
 template <int tilt>

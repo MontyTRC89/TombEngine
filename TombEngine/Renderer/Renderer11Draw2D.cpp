@@ -19,7 +19,7 @@ TEN::Renderer::RendererHudBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
-	void Renderer11::InitialiseGameBars()
+	void Renderer11::InitializeGameBars()
 	{
 		constexpr auto AIR_BAR_POS		= Vector2(630.0f, 30.0f);
 		constexpr auto EXPOSURE_BAR_POS = Vector2(630.0f, 70.0f);

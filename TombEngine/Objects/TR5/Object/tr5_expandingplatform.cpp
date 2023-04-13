@@ -14,7 +14,7 @@
 
 using namespace TEN::Floordata;
 
-void InitialiseExpandingPlatform(short itemNumber)
+void InitializeExpandingPlatform(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

@@ -38,9 +38,9 @@ static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
-Moveable::Moveable(short num, bool alreadyInitialised) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ alreadyInitialised }
+Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
 {
-	if (alreadyInitialised)
+	if (alreadyInitialized)
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
 	}
@@ -49,7 +49,7 @@ Moveable::Moveable(short num, bool alreadyInitialised) : m_item{ &g_Level.Items[
 Moveable::Moveable(Moveable&& other) noexcept : 
 	m_item{ std::exchange(other.m_item, nullptr) },
 	m_num{ std::exchange(other.m_num, NO_ITEM) },
-	m_initialised{ std::exchange(other.m_initialised, false) }
+	m_initialized{ std::exchange(other.m_initialized, false) }
 {
 	if (GetValid())
 	{
@@ -395,7 +395,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
-/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
+/// Destroy the moveable. This will mean it can no longer be used, except to re-initialize it with another object.
 // @function Moveable:Destroy
 	ScriptReserved_Destroy, &Moveable::Destroy,
 
@@ -425,8 +425,8 @@ void Moveable::Init()
 		// reset position but not rotation
 		m_item->Pose.Position = center;
 	}
-	InitialiseItem(m_num);
-	m_initialised = true;
+	InitializeItem(m_num);
+	m_initialized = true;
 }
 
 GAME_OBJECT_ID Moveable::GetObjectID() const
@@ -556,7 +556,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
-	if (m_initialised && willUpdate)
+	if (m_initialized && willUpdate)
 	{
 		bool roomUpdated = false;
 
@@ -894,7 +894,7 @@ void Moveable::SetRoomNumber(short room)
 		return;
 	}
 
-	if (!m_initialised)
+	if (!m_initialized)
 		m_item->RoomNumber = room;
 	else
 	{
@@ -1118,7 +1118,7 @@ void Moveable::Invalidate()
 	// keep m_item as it is so that we can properly remove it from the moveables set when
 	// its destructor is called
 	m_num = NO_ITEM;
-	m_initialised = false;
+	m_initialized = false;
 }
 
 bool Moveable::GetValid() const

@@ -258,11 +258,11 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dSize = spark->size / 4;
 	}
 
-	void InitialiseRomanStatue(short itemNumber)
+	void InitializeRomanStatue(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, STATUE_ANIM_START_JUMP_DOWN);
 		item->Status = ITEM_NOT_ACTIVE;
 		item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
