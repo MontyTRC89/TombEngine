@@ -22,7 +22,7 @@ using namespace TEN::Renderer;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto LADDER_STEP_HEIGHT = BLOCK(1 / 8.0f);
+	constexpr auto LADDER_STEP_HEIGHT = CLICK(0.5f);
 
 	enum class LadderMountType
 	{
@@ -197,7 +197,7 @@ namespace TEN::Entities::Generic
 	{
 		const auto& player = *GetLaraInfo(&laraItem);
 
-		// Assesss ladder mountability.
+		// Test ladder mountability.
 		if (!TestLadderMount(ladderItem, laraItem))
 			return LadderMountType::None;
 
@@ -317,8 +317,8 @@ namespace TEN::Entities::Generic
 				Vector3i(
 				0,
 				round(laraItem.Pose.Position.y / ladderItem.Pose.Position.y) * LADDER_STEP_HEIGHT, // Target closest step on ladder.
-				0
-			)*/;
+				0)*/;
+
 			SetEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsOffset);
 			SetAnimation(&laraItem, LA_LADDER_MOUNT_RIGHT);
 			break;
