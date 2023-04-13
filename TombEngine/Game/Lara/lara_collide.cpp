@@ -239,9 +239,10 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	case LS_TURN_LEFT_SLOW:
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 		{
@@ -267,7 +268,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 
 		break;
 
@@ -288,9 +289,10 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 	case LS_CRAWL_IDLE:
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
@@ -299,7 +301,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 		break;
 
 	default:
@@ -309,7 +311,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_CRAWL_IDLE)
 		{
 			item->Animation.AnimNumber = LA_CRAWL_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;
@@ -323,9 +325,10 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 	case LS_MONKEY_IDLE:
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+		item->Animation.ActiveState = coll->Setup.OldState;
 
 		if (TrInput & IN_LEFT)
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
@@ -334,7 +337,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		else
 			item->Animation.TargetState = LS_MONKEY_IDLE;
 
-		AnimateLara(item);
+		AnimateItem(item);
 		break;
 
 	default:
@@ -344,7 +347,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.AnimNumber != LA_MONKEY_IDLE)
 		{
 			item->Animation.AnimNumber = LA_MONKEY_IDLE;
-			item->Animation.FrameNumber = GetFrameNumber(item, 0);
+			item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		}
 
 		break;
@@ -620,13 +623,13 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->WaterCurrentActive)
+	if (lara->Context.WaterCurrentActive)
 	{
-		const auto& sink = g_Level.Sinks[lara->WaterCurrentActive - 1];
+		const auto& sink = g_Level.Sinks[lara->Context.WaterCurrentActive - 1];
 
 		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position).y;
-		lara->WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->WaterCurrentPull.x) / 16;
-		lara->WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->WaterCurrentPull.z) / 16;
+		lara->Context.WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
+		lara->Context.WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
 
 		item->Pose.Position.y += (sink.Position.y - item->Pose.Position.y) / 16;
 	}
@@ -634,31 +637,31 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	{
 		int shift = 0;
 
-		if (abs(lara->WaterCurrentPull.x) <= 16)
-			shift = (abs(lara->WaterCurrentPull.x) > 8) + 2;
+		if (abs(lara->Context.WaterCurrentPull.x) <= 16)
+			shift = (abs(lara->Context.WaterCurrentPull.x) > 8) + 2;
 		else
 			shift = 4;
-		lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
+		lara->Context.WaterCurrentPull.x -= lara->Context.WaterCurrentPull.x >> shift;
 
-		if (abs(lara->WaterCurrentPull.x) < 4)
-			lara->WaterCurrentPull.x = 0;
+		if (abs(lara->Context.WaterCurrentPull.x) < 4)
+			lara->Context.WaterCurrentPull.x = 0;
 
-		if (abs(lara->WaterCurrentPull.z) <= 16)
-			shift = (abs(lara->WaterCurrentPull.z) > 8) + 2;
+		if (abs(lara->Context.WaterCurrentPull.z) <= 16)
+			shift = (abs(lara->Context.WaterCurrentPull.z) > 8) + 2;
 		else
 			shift = 4;
-		lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
+		lara->Context.WaterCurrentPull.z -= lara->Context.WaterCurrentPull.z >> shift;
 
-		if (abs(lara->WaterCurrentPull.z) < 4)
-			lara->WaterCurrentPull.z = 0;
+		if (abs(lara->Context.WaterCurrentPull.z) < 4)
+			lara->Context.WaterCurrentPull.z = 0;
 
-		if (!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
+		if (!lara->Context.WaterCurrentPull.x && !lara->Context.WaterCurrentPull.z)
 			return;
 	}
 
-	item->Pose.Position.x += lara->WaterCurrentPull.x / 256;
-	item->Pose.Position.z += lara->WaterCurrentPull.z / 256;
-	lara->WaterCurrentActive = 0;
+	item->Pose.Position.x += lara->Context.WaterCurrentPull.x / 256;
+	item->Pose.Position.z += lara->Context.WaterCurrentPull.z / 256;
+	lara->Context.WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;

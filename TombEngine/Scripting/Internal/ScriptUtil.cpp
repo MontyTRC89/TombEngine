@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "ScriptUtil.h"
+#include "Scripting/Internal/ScriptUtil.h"
 
-sol::table MakeSpecialTableBase(sol::state * state, std::string const & name)
+sol::table MakeSpecialTableBase(sol::state* state, const std::string& name)
 {
 	std::string metaName{ name + "Meta" };
 	auto meta = sol::table{ *state, sol::create };
@@ -13,4 +13,3 @@ sol::table MakeSpecialTableBase(sol::state * state, std::string const & name)
 	state->set(metaName, sol::nil);
 	return meta;
 }
-

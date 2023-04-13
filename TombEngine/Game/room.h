@@ -79,7 +79,7 @@ enum RoomEnvFlags
 	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
 	ENV_FLAG_WIND			  = (1 << 5),
 	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
-	ENV_FLAG_NO_LENSFLARE	  = (1 << 7), // NOTE: Was quicksand in TR3.
+	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
 	ENV_FLAG_MIST			  = (1 << 8),
 	ENV_FLAG_CAUSTICS		  = (1 << 9),
 	ENV_FLAG_UNKNOWN3		  = (1 << 10),

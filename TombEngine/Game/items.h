@@ -5,13 +5,12 @@
 
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
+#include "Objects/game_object_ids.h"
 #include "Math/Math.h"
 #include "Specific/BitField.h"
 #include "Specific/newtypes.h"
 
 using namespace TEN::Utils;
-
-enum GAME_OBJECT_ID : short;
 
 constexpr auto NO_ITEM		  = -1;
 constexpr auto NOT_TARGETABLE = -16384;
@@ -48,9 +47,9 @@ enum ItemFlags
 	IFLAG_TRIGGERED       = (1 << 5),
 	IFLAG_CLEAR_BODY	  = (1 << 7),
 	IFLAG_INVISIBLE		  = (1 << 8),
+	IFLAG_ACTIVATION_MASK = 0x3E00, // Bits 9-13 (IFLAG_CODEBITS)
 	IFLAG_REVERSE		  = (1 << 14),
-	IFLAG_KILLED		  = (1 << 15),
-	IFLAG_ACTIVATION_MASK = 0x3E00 // Bits 9-13 (IFLAG_CODEBITS)
+	IFLAG_KILLED		  = (1 << 15)
 };
 
 enum class BlendType
@@ -92,20 +91,21 @@ enum class EffectType
 	Smoke,
 	ElectricIgnite,
 	RedIgnite,
-	Cadaver,
 	Custom
 };
 
 struct EntityAnimationData
 {
-	int AnimNumber	  = 0;
-	int FrameNumber	  = 0;
+	GAME_OBJECT_ID AnimObjectID = ID_NO_OBJECT;
+
+	int AnimNumber	  = 0; // g_Level.Anims index.
+	int FrameNumber	  = 0; // g_Level.Frames index.
 	int ActiveState	  = 0;
 	int TargetState	  = 0;
 	int RequiredState = NO_STATE;
 
-	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+	bool	IsAirborne = false;
+	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
 };
 
 struct EntityModelData
@@ -115,7 +115,7 @@ struct EntityModelData
 	Vector4 Color = Vector4::Zero;
 
 	std::vector<int>		 MeshIndex = {};
-	std::vector<BoneMutator> Mutator   = {};
+	std::vector<BoneMutator> Mutators  = {};
 };
 
 struct EntityCallbackData
@@ -138,8 +138,8 @@ struct EntityEffectData
 // TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
-	GAME_OBJECT_ID ObjectNumber;
-	std::string Name;
+	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
+	std::string	   Name			= {};
 
 	int Status;	// ItemStatus enum.
 	bool Active;
@@ -148,7 +148,7 @@ struct ItemInfo
 	short NextItem;
 	short NextActive;
 
-	ITEM_DATA Data;
+	ItemData Data;
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
@@ -169,8 +169,8 @@ struct ItemInfo
 	int BoxNumber;
 	int Timer;
 
-	BitField TouchBits = BitField();
-	BitField MeshBits  = BitField();
+	BitField TouchBits = BitField::Default;
+	BitField MeshBits  = BitField::Default;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[NUM_ITEM_FLAGS];

@@ -14,30 +14,30 @@ using namespace TEN::Math;
 //{
 	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
-		this->PosOffset = posOffset;
-		this->OrientOffset = orientOffset;
-		this->Bounds = bounds;
-		this->OrientConstraint = orientConstraint;
+		PosOffset = posOffset;
+		OrientOffset = orientOffset;
+		Bounds = bounds;
+		OrientConstraint = orientConstraint;
 	}
 	
 	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
-		this->PosOffset = posOffset;
-		this->Bounds = bounds;
-		this->OrientConstraint = orientConstraint;
+		PosOffset = posOffset;
+		Bounds = bounds;
+		OrientConstraint = orientConstraint;
 	}
 
 	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
-		this->OrientOffset = orientOffset;
-		this->Bounds = bounds;
-		this->OrientConstraint = orientConstraint;
+		OrientOffset = orientOffset;
+		Bounds = bounds;
+		OrientConstraint = orientConstraint;
 	}
 
 	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
-		this->Bounds = bounds;
-		this->OrientConstraint = orientConstraint;
+		Bounds = bounds;
+		OrientConstraint = orientConstraint;
 	};
 
 	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension)
@@ -64,7 +64,7 @@ using namespace TEN::Math;
 		}
 
 		auto direction = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
-		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
+		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but Transpose() equivalent and faster.
 		auto relPos = Vector3::Transform(direction, rotMatrix);
 
 		// Check whether entityFrom is inside interaction bounds.

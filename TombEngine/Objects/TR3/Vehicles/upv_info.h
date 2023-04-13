@@ -14,6 +14,6 @@ namespace TEN::Entities::Vehicles
 		unsigned int HarpoonTimer = 0;
 		bool HarpoonLeft = false;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

@@ -73,7 +73,7 @@ namespace TEN::Entities::Generic
 		if (TrInput & IN_ACTION && isFacingPole &&
 			TestState(laraItem->Animation.ActiveState, VPoleGroundedMountStates) &&
 			lara->Control.HandStatus == HandStatus::Free ||
-			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
+			(lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber))
 		{
 			// Temporarily reorient pole.
 			short yOrient = poleItem->Pose.Orientation.y;
@@ -88,13 +88,13 @@ namespace TEN::Entities::Generic
 					lara->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					lara->InteractedItem = itemNumber;
+					lara->Context.InteractedItem = itemNumber;
 
 				poleItem->Pose.Orientation.y = yOrient;
 			}
 			else
 			{
-				if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;

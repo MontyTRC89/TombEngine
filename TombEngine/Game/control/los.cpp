@@ -149,7 +149,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
-								if (object->intelligent)
+								if (object->intelligent || object->HitRoutine)
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 

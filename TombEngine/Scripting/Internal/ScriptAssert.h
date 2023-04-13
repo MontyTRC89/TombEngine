@@ -1,8 +1,7 @@
 #pragma once
-
-#include <string>
 #include <optional>
 #include <spdlog/fmt/fmt.h>
+#include <string>
 
 enum class ErrorMode
 {
@@ -14,9 +13,9 @@ enum class ErrorMode
 void SetScriptErrorMode(ErrorMode mode);
 ErrorMode GetScriptErrorMode();
 
-void ScriptWarn(std::string const& msg);
+void ScriptWarn(const std::string& msg);
 
-bool ScriptAssert(bool cond, std::string const& msg, std::optional<ErrorMode> forceMode = std::nullopt);
+bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
 template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
 {
@@ -28,11 +27,13 @@ template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, T
 		case ErrorMode::Warn:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			break;
+
 		case ErrorMode::Terminate:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			throw TENScriptException(msg);
 		}
 	}
+
 	return cond;
 }
 
@@ -44,6 +45,6 @@ template <typename ... Ts> bool ScriptAssertTerminateF(bool cond, std::string_vi
 		TENLog(msg, LogLevel::Error, LogConfig::All);
 		throw TENScriptException(msg);
 	}
+
 	return cond;
 }
-

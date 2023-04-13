@@ -217,7 +217,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
-// @tparam ObjectID ID the new ID 
+// @tparam Objects.ObjID ID the new ID 
 // @usage
 // shiva = TEN.Objects.GetMoveableByName("shiva_60")
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
@@ -386,7 +386,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // It cannot be blank and cannot share a name with any existing object.
 // @function Moveable:SetName
-// @tparam name string the new moveable's name
+// @tparam string name the new moveable's name
 // @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
 	ScriptReserved_SetName, &Moveable::SetName, 
 
@@ -478,7 +478,7 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 
 /// Set the function to be called when this moveable collides with another moveable
 // @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
 // @usage
 // LevelFuncs.objCollided = function(obj1, obj2)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
@@ -677,10 +677,6 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
 
-	case EffectType::Cadaver:
-		ItemSetAsCadaver(m_item, realTimeout);
-		break;
-
 	case EffectType::Custom:
 		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
 	}
@@ -711,7 +707,7 @@ void Moveable::SetItemFlags(short value, int index)
 
 /// Get the location value stored in the Enemy AI
 // @function Moveable:GetLocationAI
-// @treturn (short) the value contained in the LocationAI of the creature.
+// @treturn short the value contained in the LocationAI of the creature.
 short Moveable::GetLocationAI() const
 {
 	if (m_item->IsCreature())
@@ -725,7 +721,7 @@ short Moveable::GetLocationAI() const
 
 /// Updates the location in the enemy AI with the given value.
 // @function Moveable:SetLocationAI
-// @tparam value: (short) value to store.
+// @tparam short value to store.
 void Moveable::SetLocationAI(short value)
 {
 	if (m_item->IsCreature())
@@ -866,7 +862,7 @@ bool Moveable::GetHitStatus() const
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
-// @treturn Room current room of the object
+// @treturn Objects.Room current room of the object
 std::unique_ptr<Room> Moveable::GetRoom() const
 {
 	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);

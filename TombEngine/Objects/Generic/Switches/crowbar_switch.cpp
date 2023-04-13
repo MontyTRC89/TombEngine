@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 			laraitem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ItemFlags[0] == 0) ||
-			(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
+			(laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
@@ -75,14 +75,14 @@ namespace TEN::Entities::Switches
 							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
-							laraInfo->InteractedItem = itemNumber;
+							laraInfo->Context.InteractedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
 						doSwitch = -1;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -104,14 +104,14 @@ namespace TEN::Entities::Switches
 							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else
-							laraInfo->InteractedItem = itemNumber;
+							laraInfo->Context.InteractedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
 						doSwitch = -1;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -138,7 +138,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				ResetLaraFlex(laraitem);
+				ResetPlayerFlex(laraitem);
 				laraitem->Animation.TargetState = LS_SWITCH_DOWN;
 				laraitem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraInfo->Control.IsMoving = false;

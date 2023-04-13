@@ -348,7 +348,7 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 
 GameVector GetTargetPoint(ItemInfo* targetEntity)
 {
-	const auto& bounds = GetBestFrame(targetEntity)->boundingBox;
+	const auto& bounds = GetBestFrame(*targetEntity).BoundingBox;
 
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,
@@ -541,11 +541,11 @@ void HandleWeapon(ItemInfo* laraItem)
 					lara.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
 			else if (lara.Control.Weapon.RequestGunType == LaraWeaponType::Flare ||
-				(lara.Vehicle == NO_ITEM &&
+				(lara.Context.Vehicle == NO_ITEM &&
 					(lara.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						lara.Control.WaterStatus == WaterStatus::Dry ||
 						(lara.Control.WaterStatus == WaterStatus::Wade &&
-							lara.WaterSurfaceDist > -Weapons[(int)lara.Control.Weapon.GunType].GunHeight))))
+							lara.Context.WaterSurfaceDist > -Weapons[(int)lara.Control.Weapon.GunType].GunHeight))))
 			{
 				if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 				{
@@ -582,7 +582,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		else if (lara.Control.Weapon.GunType != LaraWeaponType::HarpoonGun &&
 			lara.Control.WaterStatus != WaterStatus::Dry &&
 			(lara.Control.WaterStatus != WaterStatus::Wade ||
-				lara.WaterSurfaceDist < -Weapons[(int)lara.Control.Weapon.GunType].GunHeight))
+				lara.Context.WaterSurfaceDist < -Weapons[(int)lara.Control.Weapon.GunType].GunHeight))
 		{
 			lara.Control.HandStatus = HandStatus::WeaponUndraw;
 		}
@@ -721,7 +721,7 @@ void HandleWeapon(ItemInfo* laraItem)
 	case HandStatus::Free:
 		if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (lara.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates))
+			if (lara.Context.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates))
 			{
 				if (lara.Flare.ControlLeft)
 				{
@@ -753,7 +753,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		{
 			if (laraItem->Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				lara.Flare.ControlLeft = (lara.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates));
+				lara.Flare.ControlLeft = (lara.Context.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara.Flare.Life);
 				SetFlareArm(laraItem, lara.LeftArm.FrameNumber);
 			}

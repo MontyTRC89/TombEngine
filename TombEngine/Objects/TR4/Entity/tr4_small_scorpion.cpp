@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 							else
 							{
 								if (creature->Enemy->IsLara())
-									GetLaraInfo(creature->Enemy)->PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
+									GetLaraInfo(creature->Enemy)->Status.Poison += SMALL_SCORPION_STINGER_POISON_POTENCY;
 
 								DoDamage(creature->Enemy, SMALL_SCORPION_STINGER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);

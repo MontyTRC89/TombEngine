@@ -49,7 +49,7 @@ namespace TEN::Entities::Doors
 			doorItem->Status != ITEM_ACTIVE &&
 			!doorItem->Animation.IsAirborne &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
@@ -61,20 +61,20 @@ namespace TEN::Entities::Doors
 
 					AddActiveItem(itemNumber);
 
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					doorItem->Status = ITEM_ACTIVE;
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 
 				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 			else
 			{
 				if (laraInfo->Control.IsMoving &&
-					laraInfo->InteractedItem == itemNumber)
+					laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

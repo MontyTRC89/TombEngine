@@ -13,9 +13,7 @@ namespace TEN::Entities::Vehicles
 
 	void KayakDraw(ItemInfo* kayakItem);
 
-	void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate);
 	void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset);
-	void KayakUpdateWakeFX();
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff);
 	int KayakDoDynamics(int height, int verticalVelocity, int* y);
@@ -26,6 +24,6 @@ namespace TEN::Entities::Vehicles
 	void KayakUserInput(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakLaraRapidsDrown(ItemInfo* laraItem);
-
+	void PreDrawWakeFx(ItemInfo* kayakItem);
 	bool KayakControl(ItemInfo* laraItem);
 }

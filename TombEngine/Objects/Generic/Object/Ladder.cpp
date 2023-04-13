@@ -22,7 +22,7 @@ using namespace TEN::Renderer;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto LADDER_STEP_HEIGHT = BLOCK(1.0f / 8);
+	constexpr auto LADDER_STEP_HEIGHT = BLOCK(1 / 8.0f);
 
 	enum class LadderMountType
 	{
@@ -63,7 +63,7 @@ namespace TEN::Entities::Generic
 	const auto LadderInteractBounds2D = GameBoundingBox(
 		-BLOCK(0.25f), BLOCK(0.25f),
 		0, 0,
-		-BLOCK(3.0f / 8), BLOCK(3.0f / 8));
+		-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f));
 
 	const auto LadderMountTopFrontBasis = InteractionBasis(
 		LadderMountedOffset2D, // TODO
@@ -116,7 +116,7 @@ namespace TEN::Entities::Generic
 		auto& ladderItem = g_Level.Items[itemNumber];
 		auto& player = *GetLaraInfo(laraItem);
 
-		DisplayLadderDebug(ladderItem);
+		DrawLadderDebug(ladderItem);
 
 		// TODO!! This will be MUCH cleaner.
 		auto mountType = GetLadderMountType(ladderItem, *laraItem);
@@ -136,9 +136,9 @@ namespace TEN::Entities::Generic
 		if ((IsHeld(In::Action) &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
 			player.Control.HandStatus == HandStatus::Free) ||
-			(player.Control.IsMoving && player.InteractedItem == itemNumber))
+			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 		{
-			if (player.Control.IsMoving && player.InteractedItem == itemNumber)
+			if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 			{
 				player.Control.HandStatus = HandStatus::Free;
 				player.Control.IsMoving = false;
@@ -195,7 +195,7 @@ namespace TEN::Entities::Generic
 
 	LadderMountType GetLadderMountType(ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
-		const auto& lara = *GetLaraInfo(&laraItem);
+		const auto& player = *GetLaraInfo(&laraItem);
 
 		// Assesss ladder mountability.
 		if (!TestLadderMount(ladderItem, laraItem))
@@ -274,7 +274,7 @@ namespace TEN::Entities::Generic
 
 		// Avoid interference if already interacting.
 		if (laraItem.OffsetBlend.IsActive)
-			player.InteractedItem = itemNumber;
+			player.Context.InteractedItem = itemNumber;
 
 		ModulateLaraTurnRateY(&laraItem, 0, 0, 0);
 
@@ -335,7 +335,7 @@ namespace TEN::Entities::Generic
 		player.Control.HandStatus = HandStatus::Busy;
 	}
 
-	void DisplayLadderDebug(ItemInfo& ladderItem)
+	void DrawLadderDebug(ItemInfo& ladderItem)
 	{
 		// Render collision bounds.
 		auto ladderBounds = GameBoundingBox(&ladderItem);

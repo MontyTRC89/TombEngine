@@ -52,9 +52,6 @@ namespace TEN::Entities::TR4
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
-	constexpr auto LARA_STATE_SETH_DEATH = 14;
-	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
-
 	enum SethState
 	{
 		// No state 0.
@@ -668,10 +665,7 @@ namespace TEN::Entities::TR4
 
 		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
 
-		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
-		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
+		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_SETH_DEATH );
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
@@ -682,7 +676,7 @@ namespace TEN::Entities::TR4
 		laraItem->HitPoints = -1;
 		lara.ExtraAnim = 1;
 		lara.HitDirection = -1;
-		lara.Air = -1;
+		lara.Status.Air = -1;
 		lara.Control.HandStatus = HandStatus::Busy;
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 

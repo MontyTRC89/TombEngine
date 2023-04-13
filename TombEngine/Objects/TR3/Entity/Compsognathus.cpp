@@ -11,10 +11,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
+#include "Objects/TR3/Object/Corpse.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
+using namespace TEN::Entities::TR3;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -35,13 +37,14 @@ namespace TEN::Entities::Creatures::TR3
 
 	const auto CompyBite = BiteInfo(Vector3::Zero, 2);
 	const auto CompyAttackJoints = std::vector<unsigned int>{ 1, 2 };
-	
+
 	enum CompyState
 	{
 		COMPY_STATE_IDLE = 0,
 		COMPY_STATE_RUN_FORWARD = 1,
 		COMPY_STATE_JUMP_ATTACK = 2,
-		COMPY_STATE_ATTACK = 3
+		COMPY_STATE_ATTACK = 3,
+		COMPY_STATE_DEATH = 4
 	};
 
 	enum CompyAnim
@@ -74,7 +77,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	void CompsognathusControl(short itemNumber)
 	{
-		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX);
 
 		if (!CreatureActive(itemNumber))
 			return;
@@ -89,14 +92,17 @@ namespace TEN::Entities::Creatures::TR3
 
 		int random = 0;
 		int roomNumber = 0;
-		int target = 0;;
+		int target = 0;
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
 		
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != COMPY_STATE_IDLE)
+			if (item->Animation.ActiveState != COMPY_STATE_DEATH)
+			{
+				item->Animation.TargetState = COMPY_STATE_DEATH;
 				SetAnimation(item, COMPY_ANIM_DEATH);
+			}
 		}
 		else
 		{
@@ -120,7 +126,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (SameZone(creature, &targetItem))
 					{
 						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-						if (distance < shortestDistance && targetItem.Effect.Type == EffectType::Cadaver)
+						if (distance < shortestDistance && targetItem.ObjectNumber == ID_CORPSE && targetItem.Active && TriggerActive(&targetItem) && targetItem.ItemFlags[1] == (int)CorpseFlags::Lying)
 						{
 							cadaverPos = targetItem.Pose.Position.ToVector3();
 							shortestDistance = distance;

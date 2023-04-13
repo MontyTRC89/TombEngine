@@ -86,7 +86,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Animation.Velocity.y = 0;
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
@@ -126,13 +126,13 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		trapDoorItem->Status != ITEM_ACTIVE) ||
-		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
+		(laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
 	{
 		if (TestPlayerEntityInteract(trapDoorItem, laraItem, FloorTrapDoorBounds))
 		{
 			if (AlignPlayerToEntity(trapDoorItem, laraItem, FloorTrapDoorPos))
 			{
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_TRAPDOOR_FLOOR_OPEN;
@@ -153,7 +153,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 			}
 			else
-				laraInfo->InteractedItem =itemNumber;
+				laraInfo->Context.InteractedItem =itemNumber;
 		}
 	}
 	else

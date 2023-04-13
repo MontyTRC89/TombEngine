@@ -31,9 +31,9 @@ void InitialiseFallingBlock(short itemNumber)
 	g_Level.Items[itemNumber].MeshBits = 1;
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
 
-	// Set mutators to 0 by default
-	for (int i = 0; i < item->Model.Mutator.size(); i++)
-		item->Model.Mutator[i].Rotation = Vector3::Zero;
+	// Set mutators to EulerAngles identity by default.
+	for (auto& mutator : item->Model.Mutators)
+		mutator.Rotation = EulerAngles::Zero;
 }
 
 void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -69,24 +69,27 @@ void FallingBlockControl(short itemNumber)
 		{
 			if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
 			{
-				// Subtly shake all meshes separately.
-				for (int i = 0; i < item->Model.Mutator.size(); i++)
+				// Subtly wobble all meshes separately.
+				for (auto& mutator : item->Model.Mutators)
 				{
-					item->Model.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Model.Mutator[i].Rotation.y = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Model.Mutator[i].Rotation.z = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					mutator.Rotation = EulerAngles(
+						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
+						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
+						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)));
 				}
 			}
 			else
 			{
-				// Make rotational falling movement with some random seed.
-				for (int i = 0; i < item->Model.Mutator.size(); i++)
+				// Make rotational falling movement with random seed.
+				for (int i = 0; i < item->Model.Mutators.size(); i++)
 				{
-					auto rotSpeed = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
-					rotSpeed += i % 3 ? rotSpeed / 2 : rotSpeed;
-					item->Model.Mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Model.Mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Model.Mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					auto rotRate = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
+					rotRate += i % 3 ? (rotRate / 2) : rotRate;
+
+					item->Model.Mutators[i].Rotation += EulerAngles(
+						ANGLE(rotRate + GenerateFloat(-1, 1)),
+						ANGLE(rotRate + GenerateFloat(-1, 1)),
+						ANGLE(rotRate + GenerateFloat(-1, 1)));
 				}
 
 				if (item->ItemFlags[0] == FALLINGBLOCK_DELAY)

@@ -721,7 +721,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.Velocity.z = 2;
 						LaraItem->Animation.Velocity.y = 1;
 
-						ResetLaraFlex(LaraItem);
+						ResetPlayerFlex(LaraItem);
 						LaraItem->HitStatus = true;
 						Lara.Control.HandStatus = HandStatus::Free;
 					}

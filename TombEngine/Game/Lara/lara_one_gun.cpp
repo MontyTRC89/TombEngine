@@ -166,7 +166,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
+		if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -247,7 +247,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 		}
 
-		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 12 &&
+		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -256,7 +256,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 0)
+		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 0)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
@@ -328,10 +328,12 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	item.Pose.Position = laraItem->Pose.Position;
+	item.RoomNumber = laraItem->RoomNumber;
+
 	AnimateItem(&item);
 
-	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	lara.LeftArm.FrameNumber = lara.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
+	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = GetAnimData(item).FramePtr;
+	lara.LeftArm.FrameNumber = lara.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 	lara.LeftArm.AnimNumber = lara.RightArm.AnimNumber = item.Animation.AnimNumber;
 }
 
@@ -444,7 +446,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = GetAnimData(*item).frameBase;
 		item->Animation.TargetState = WEAPON_STATE_DRAW;
 		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
@@ -788,7 +790,7 @@ void GrenadeControl(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+		TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 		TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	}
 
@@ -924,7 +926,7 @@ void RocketControl(short itemNumber)
 	int wz = world.Translation().z;
 
 	// Trigger fire, smoke, and light.
-	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z, -1);
+	TriggerRocketSmoke(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerRocketFire(wx + item.Pose.Position.x, wy + item.Pose.Position.y, wz + item.Pose.Position.z);
 	TriggerDynamicLight(
 		wx + item.Pose.Position.x + (GetRandomControl() & 15) - 8, 
@@ -1565,7 +1567,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 						GetCreatureInfo(currentItem)->Poisoned = true;
 
 					if (currentItem->IsLara())
-						GetLaraInfo(currentItem)->PoisonPotency += 5;
+						GetLaraInfo(currentItem)->Status.Poison += 5;
 				}
 				else if (!currentObject.undead)
 				{

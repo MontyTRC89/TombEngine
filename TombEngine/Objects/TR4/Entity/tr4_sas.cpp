@@ -180,7 +180,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(&item, &AI, !creature.Enemy->IsLara());
 
 			// Vehicle handling
-			if (Lara.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
 				creature.Mood = MoodType::Escape;
 
 			CreatureMood(&item, &AI, !creature.Enemy->IsLara());
@@ -208,7 +208,7 @@ namespace TEN::Entities::TR4
 					else
 						item.Pose.Orientation.y += ANGLE(10.0f);
 				}
-				else if (item.AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
+				else if (item.AIBits & MODIFY || Lara.Context.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) < ANGLE(2.0f))
 						item.Pose.Orientation.y += AI.angle;
@@ -232,7 +232,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item.AIBits & PATROL1 &&
 					item.AIBits != MODIFY &&
-					Lara.Vehicle == NO_ITEM)
+					Lara.Context.Vehicle == NO_ITEM)
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 					joint2 = 0;
@@ -302,7 +302,7 @@ namespace TEN::Entities::TR4
 					creature.Mood == MoodType::Bored ||
 					!AI.ahead ||
 					item.AIBits & MODIFY ||
-					Lara.Vehicle != NO_ITEM)
+					Lara.Context.Vehicle != NO_ITEM)
 				{
 					item.Animation.TargetState = SAS_STATE_IDLE;
 				}
@@ -318,7 +318,7 @@ namespace TEN::Entities::TR4
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 				}
-				else if (Lara.Vehicle != NO_ITEM &&
+				else if (Lara.Context.Vehicle != NO_ITEM &&
 					(item.AIBits == MODIFY ||
 						!item.AIBits))
 				{
@@ -366,7 +366,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint2 = AI.angle;
 
-				if (Lara.Vehicle != NO_ITEM)
+				if (Lara.Context.Vehicle != NO_ITEM)
 				{
 					if (item.AIBits == MODIFY || !item.AIBits)
 					{
@@ -607,14 +607,14 @@ namespace TEN::Entities::TR4
 			player.Control.HandStatus == HandStatus::Free &&
 			!laraItem->Animation.IsAirborne &&
 			!(item.Flags & IFLAG_ACTIVATION_MASK)) ||
-			player.Control.IsMoving && player.InteractedItem == itemNumber)
+			player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 		{
 			if (TestPlayerEntityInteract(&item, laraItem, SasDragBounds))
 			{
 				if (AlignPlayerToEntity(&item, laraItem, SasDragBodyPosition))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Control.IsMoving = false;
@@ -625,7 +625,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					player.InteractedItem = itemNumber;
+					player.Context.InteractedItem = itemNumber;
 				}
 			}
 		}

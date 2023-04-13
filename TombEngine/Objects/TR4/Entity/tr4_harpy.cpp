@@ -446,12 +446,12 @@ namespace TEN::Entities::TR4
 						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
 						AI.distance < SQUARE(BLOCK(2)) &&
-						item->Animation.AnimNumber == GetAnimNumber(*item, HARPY_ANIM_STINGER_ATTACK) &&
-						item->Animation.FrameNumber > GetFrameNumber(item, 17))
+						item->Animation.AnimNumber == GetAnimIndex(*item, HARPY_ANIM_STINGER_ATTACK) &&
+						item->Animation.FrameNumber > GetFrameIndex(item, 17))
 					)
 				{
 					if (creature->Enemy->IsLara())
-						GetLaraInfo(creature->Enemy)->PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+						GetLaraInfo(creature->Enemy)->Status.Poison += HARPY_STINGER_POISON_POTENCY;
 
 					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
 					CreatureEffect2(item, HarpyBite3, 10, -1, DoBloodSplat);

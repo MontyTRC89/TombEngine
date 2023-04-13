@@ -5,22 +5,11 @@
 //{
 	const Vector3i Vector3i::Zero = Vector3i(0, 0, 0);
 
-	Vector3i::Vector3i()
-	{
-	}
-
-	Vector3i::Vector3i(int x, int y, int z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
 	Vector3i::Vector3i(const Vector3& vector)
 	{
-		this->x = (int)round(vector.x);
-		this->y = (int)round(vector.y);
-		this->z = (int)round(vector.z);
+		x = (int)round(vector.x);
+		y = (int)round(vector.y);
+		z = (int)round(vector.z);
 	}
 
 	float Vector3i::Distance(const Vector3i& origin, const Vector3i& target)
@@ -50,49 +39,49 @@
 
 	Vector3i& Vector3i::operator =(const Vector3i& vector)
 	{
-		this->x = vector.x;
-		this->y = vector.y;
-		this->z = vector.z;
+		x = vector.x;
+		y = vector.y;
+		z = vector.z;
 		return *this;
 	}
 
 	Vector3i& Vector3i::operator +=(const Vector3i& vector)
 	{
-		this->x += vector.x;
-		this->y += vector.y;
-		this->z += vector.z;
+		x += vector.x;
+		y += vector.y;
+		z += vector.z;
 		return *this;
 	}
 
 	Vector3i& Vector3i::operator -=(const Vector3i& vector)
 	{
-		this->x -= vector.x;
-		this->y -= vector.y;
-		this->z -= vector.z;
+		x -= vector.x;
+		y -= vector.y;
+		z -= vector.z;
 		return *this;
 	}
 
 	Vector3i& Vector3i::operator *=(const Vector3i& vector)
 	{
-		this->x *= vector.x;
-		this->y *= vector.y;
-		this->z *= vector.z;
+		x *= vector.x;
+		y *= vector.y;
+		z *= vector.z;
 		return *this;
 	}
 
 	Vector3i& Vector3i::operator *=(float scale)
 	{
-		this->x *= scale;
-		this->y *= scale;
-		this->z *= scale;
+		x *= scale;
+		y *= scale;
+		z *= scale;
 		return *this;
 	}
 
 	Vector3i& Vector3i::operator /=(float scale)
 	{
-		this->x /= scale;
-		this->y /= scale;
-		this->z /= scale;
+		x /= scale;
+		y /= scale;
+		z /= scale;
 		return *this;
 	}
 

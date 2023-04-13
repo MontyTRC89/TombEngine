@@ -8,6 +8,8 @@ namespace TEN::Hud
 {
 	struct DisplayPickup
 	{
+		static constexpr auto LIFE_MAX = 3.0f;
+
 		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
 		unsigned int   Count	= 0;
 
@@ -33,7 +35,7 @@ namespace TEN::Hud
 		// Constants
 		static constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
 
-		// Components
+		// Members
 		std::vector<DisplayPickup> DisplayPickups = {};
 
 	public:
