@@ -466,7 +466,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	if (item->Animation.ActiveState != WEAPON_STATE_AIM &&
 		item->Animation.ActiveState != WEAPON_STATE_UNDERWATER_AIM)
 	{
-		if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == Weapons[(int)weaponType].DrawFrame)
+		if ((item->Animation.FrameNumber - GetAnimData(item).frameBase) == Weapons[(int)weaponType].DrawFrame)
 		{
 			DrawShotgunMeshes(laraItem, weaponType);
 		}
@@ -480,8 +480,8 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		ReadyShotgun(laraItem, weaponType);
 	}
 
-	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara.LeftArm.FrameNumber = lara.RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = GetAnimData(item).FramePtr;
+	lara.LeftArm.FrameNumber = lara.RightArm.FrameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 	lara.LeftArm.AnimNumber = lara.RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
@@ -508,17 +508,17 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 	else if (item.Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		if (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase == 21 ||
-			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase == 15))
+		if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber - GetAnimData(item).frameBase == 15))
 		{
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
 
-	lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	lara.LeftArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	lara.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
-	lara.LeftArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
+	lara.RightArm.FrameBase = GetAnimData(item).FramePtr;
+	lara.LeftArm.FrameBase = GetAnimData(item).FramePtr;
+	lara.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+	lara.LeftArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 	lara.RightArm.AnimNumber = item.Animation.AnimNumber;
 	lara.LeftArm.AnimNumber = lara.RightArm.AnimNumber;
 }

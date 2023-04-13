@@ -63,7 +63,7 @@ namespace TEN::Entities::Switches
 				}
 
 				laraItem->Animation.TargetState = LS_IDLE;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);

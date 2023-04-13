@@ -335,8 +335,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	default:
-		lara.RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
-		lara.LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
+		lara.LeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }

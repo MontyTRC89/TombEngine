@@ -497,7 +497,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_FREEFALL;
 			item->Animation.ActiveState = LS_FREEFALL;
 			item->Animation.AnimNumber = LA_FREEFALL;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 
 			item->Animation.Velocity.y = 81;
 			Camera.targetspeed = 16;
@@ -526,7 +526,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 		else
 			return;
 
-		undoFrame = g_Level.Anims[item->Animation.AnimNumber].frameEnd + g_Level.Anims[undoAnim].frameBase - item->Animation.FrameNumber;
+		undoFrame = GetAnimData(item).frameEnd + g_Level.Anims[undoAnim].frameBase - item->Animation.FrameNumber;
 
 		if (TrInput & undoInput && lara->Control.TightropeControl.OnCount == 0)
 		{
@@ -682,7 +682,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_ROPE_IDLE;
 			item->Animation.ActiveState = LS_ROPE_IDLE;
 			item->Animation.AnimNumber = LA_JUMP_UP_TO_ROPE_END;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 		}
 
 		if (TrInput & IN_JUMP)

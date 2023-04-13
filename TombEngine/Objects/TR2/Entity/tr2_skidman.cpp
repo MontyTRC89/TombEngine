@@ -125,7 +125,7 @@ namespace TEN::Entities::Creatures::TR2
 				riderItem->RoomNumber = item->RoomNumber;
 
 				riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
-				riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].frameBase;
+				riderItem->Animation.FrameNumber =  GetAnimData(riderItem).frameBase;
 				riderItem->Animation.ActiveState = SMAN_STATE_DEATH;
 
 				if (Lara.TargetEntity == item)
@@ -231,7 +231,7 @@ namespace TEN::Entities::Creatures::TR2
 				ItemNewRoom(riderItemNumber, item->RoomNumber);
 
 			riderItem->Animation.AnimNumber = item->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-			riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+			riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (GetAnimData(riderItem).frameBase - GetAnimData(item).frameBase);
 		}
 		else if (riderItem->Status == ITEM_DEACTIVATED &&
 			item->Animation.Velocity.z == 0 &&

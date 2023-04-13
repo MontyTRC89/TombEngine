@@ -20,7 +20,7 @@ void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::s
 bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName, const std::string& requiredName)
 {
 	// Check if the object has at least 1 animation with more than 1 frame.
-	const auto& anim = g_Level.Anims[object.animIndex];
+	const auto& anim = GetAnimData(object.animIndex);
 	if ((anim.frameEnd - anim.frameBase) > 1)
 		return true;
 

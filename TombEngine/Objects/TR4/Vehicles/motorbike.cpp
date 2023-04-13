@@ -1095,7 +1095,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_MOVING_BACK)
 			{
 				int currentFrame = laraItem->Animation.FrameNumber;
-				int frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				int frameBase = GetAnimData(laraItem).frameBase;
 
 				if (currentFrame >= frameBase + 24 &&
 					currentFrame <= frameBase + 29)

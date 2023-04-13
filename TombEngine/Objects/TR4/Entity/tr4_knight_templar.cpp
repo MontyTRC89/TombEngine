@@ -179,7 +179,7 @@ namespace TEN::Entities::TR4
 			}
 
 			frameNumber = item->Animation.FrameNumber;
-			frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			frameBase = GetAnimData(item).frameBase;
 			if (frameNumber > (frameBase + 42) &&
 				frameNumber < (frameBase + 51))
 			{

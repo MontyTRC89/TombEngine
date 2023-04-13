@@ -118,6 +118,7 @@ AnimData& GetAnimData(int animIndex); // Deprecated.
 AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
+AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_ANIM);
 
 int GetAnimNumber(const ItemInfo& item);
 int GetAnimIndex(const ItemInfo& item, int animNumber);
