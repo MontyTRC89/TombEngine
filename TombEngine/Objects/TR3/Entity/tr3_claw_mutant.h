@@ -2,7 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-    void ClawMutantControl(short itemNumber);
-
-    void TriggerPlasmaBallFlame(short fxNumber, int xv, int yv, int zv, Vector3 offset, int life);
+	void ClawMutantControl(short itemNumber);
+	void SpawnPlasmaBallFlame(int fxNumber, const Vector3& vel, const Vector3& offset, float life);
 }

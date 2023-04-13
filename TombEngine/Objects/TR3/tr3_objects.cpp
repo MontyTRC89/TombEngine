@@ -17,11 +17,11 @@
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
+#include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
-#include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
 #include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
@@ -29,7 +29,6 @@
 #include "Objects/TR3/Entity/tr3_tiger.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-
 
 // Effects
 #include "Objects/Effects/Boss.h"

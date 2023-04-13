@@ -18,8 +18,8 @@
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Items;
-using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::TR4;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
@@ -60,9 +60,13 @@ namespace TEN::Entities::Effects
 		flame.fxObj = fxNumber;
 
 		if (fx.flag1 == 1)
+		{
 			flame.scalar = 3;
+		}
 		else
+		{
 			flame.scalar = 2;
+		}
 
 		flame.sSize = flame.size = (GetRandomControl() & 7) + 64;
 		flame.dSize = flame.size / 32;
@@ -94,9 +98,13 @@ namespace TEN::Entities::Effects
 		flame.rotAng = GetRandomControl() & 0xFFF;
 
 		if (GetRandomControl() & 1)
+		{
 			flame.rotAdd = -32 - (GetRandomControl() & 0x1F);
+		}
 		else
+		{
 			flame.rotAdd = (GetRandomControl() & 0x1F) + 32;
+		}
 
 		flame.gravity = 0;
 		flame.maxYvel = 0;
@@ -155,9 +163,13 @@ namespace TEN::Entities::Effects
 		if (fx.speed < maxVelocity)
 		{
 			if (fx.flag1 == (int)MissileType::CrocgodMutant)
+			{
 				fx.speed++;
+			}
 			else
+			{
 				fx.speed += 3;
+			}
 		}
 
 		if (fx.speed < maxVelocity &&
@@ -168,21 +180,30 @@ namespace TEN::Entities::Effects
 			short dy = orient.y - fx.pos.Orientation.y;
 			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
+
 			short dx = orient.x - fx.pos.Orientation.x;
 			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 
 			dy >>= 3;
 			if (dy < -maxRotation)
+			{
 				dy = -maxRotation;
+			}
 			else if (dy > maxRotation)
+			{
 				dy = maxRotation;
+			}
 
 			dx >>= 3;
 			if (dx < -maxRotation)
+			{
 				dx = -maxRotation;
+			}
 			else if (dx > maxRotation)
+			{
 				dx = maxRotation;
+			}
 
 			fx.pos.Orientation.x += dx;
 			if (fx.flag1 != (int)MissileType::Demigod3Radial && (fx.flag1 != (int)MissileType::CrocgodMutant || !fx.counter))
@@ -196,60 +217,71 @@ namespace TEN::Entities::Effects
 		auto prevPos = fx.pos.Position;
 
 		int speed = (fx.speed * phd_cos(fx.pos.Orientation.x));
-		fx.pos.Position.x += (speed * phd_sin(fx.pos.Orientation.y));
+		fx.pos.Position.x += speed * phd_sin(fx.pos.Orientation.y);
 		fx.pos.Position.y += -((fx.speed * phd_sin(fx.pos.Orientation.x))) + fx.fallspeed;
-		fx.pos.Position.z += (speed * phd_cos(fx.pos.Orientation.y));
+		fx.pos.Position.z += speed * phd_cos(fx.pos.Orientation.y);
 
-		auto probe = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+		auto pointColl = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
 
-		if (fx.pos.Position.y >= probe.Position.Floor || fx.pos.Position.y <= probe.Position.Ceiling)
+		if (fx.pos.Position.y >= pointColl.Position.Floor || fx.pos.Position.y <= pointColl.Position.Ceiling)
 		{
 			fx.pos.Position = prevPos;
 
 			switch ((MissileType)fx.flag1)
 			{
 			case MissileType::SethLarge:
-				TriggerShockwave(&fx.pos, 32, 160, 64, 64, 128, 00, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.pos, 32, 160, 64, 64, 128, 00, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90.0f), 0, 0), 0, true, false, (int)ShockwaveStyle::Normal);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::SophiaLeighNormal:
-				TriggerShockwave(&fx.pos, 5, 32, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.pos, 5, 32, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90.0f), 0, 0), 0, true, false, (int)ShockwaveStyle::Normal);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				break;
+
 			case MissileType::SophiaLeighLarge:
-				TriggerShockwave(&fx.pos, 10, 64, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.pos, 10, 64, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.x - ANGLE(90.0f), 0, 0), 0, true, false, (int)ShockwaveStyle::Normal);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				break;
+
 			case MissileType::Demigod3Single:
 			case MissileType::Demigod3Radial:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 0, 96, 128, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::Demigod2:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 128, 64, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::Harpy:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 128, 128, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::CrocgodMutant:
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, fx.roomNumber);
 				TriggerShockwave(&fx.pos, 48, 240, 64, 128, 96, 0, 24, EulerAngles::Zero, 15, true, false, (int)ShockwaveStyle::Normal);
+				
 				fx.pos.Position.y -= 128;
 				TriggerShockwave(&fx.pos, 48, 240, 48, 128, 112, 0, 16, EulerAngles::Zero, 15, true, false, (int)ShockwaveStyle::Normal);
+				
 				fx.pos.Position.y += 256;
 				TriggerShockwave(&fx.pos, 48, 240, 48, 128, 112, 0, 16, EulerAngles::Zero, 15, true, false, (int)ShockwaveStyle::Normal);
 				break;
+
 			case MissileType::ClawMutantPlasma:
 				for (int i = 0; i < 6; i++)
 				{
-					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
-					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
-					TriggerPlasmaBallFlame(fxNumber, 20, 32, 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
 				}
+
 				break;
+
 			default:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 0, 128, 64, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
@@ -270,55 +302,67 @@ namespace TEN::Entities::Effects
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f));
 				break;
+
 			case MissileType::SophiaLeighLarge:
 				TriggerShockwave(&fx.pos, 5, 32, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.y, 0.0f, 0.0f), fx.flag2, true, false, (int)ShockwaveStyle::Normal);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				break;
+
 			case MissileType::SophiaLeighNormal:
 				TriggerShockwave(&fx.pos, 10, 64, 128, 0, 128, 128, 24, EulerAngles(fx.pos.Orientation.y, 0.0f, 0.0f), fx.flag2, true, false, (int)ShockwaveStyle::Normal);
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 2, fx.roomNumber);
 				break;
+
 			case MissileType::Demigod3Single:
 			case MissileType::Demigod3Radial:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 0, 96, 128, 16, EulerAngles::Zero, 10, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::Demigod2:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 128, 64, 0, 16, EulerAngles::Zero, 5, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::ClawMutantPlasma:
 				DoDamage(LaraItem, fx.flag2);
 				for (int i = 0; i < 3; i++)
 				{
-					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
-					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
-					TriggerPlasmaBallFlame(fxNumber, 20, 32 , 20, Vector3(Random::GenerateInt(-115, 185), 0, Random::GenerateInt(-115, 185)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
+					SpawnPlasmaBallFlame(fxNumber, Vector3(20.0f, 32.0f, 20.0f), Vector3(Random::GenerateFloat(-115.0f, 185.0f), 0, Random::GenerateFloat(-115.0f, 185.0f)), 24);
 				}
+
 				break;
+
 			case MissileType::Harpy:
 				TriggerShockwave(&fx.pos, 32, 160, 64, 128, 128, 0, 16, EulerAngles::Zero, 3, true, false, (int)ShockwaveStyle::Normal);
 				BubblesShatterFunction(&fx, 0, -32);
 				break;
+
 			case MissileType::CrocgodMutant:
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, fx.roomNumber);
 				TriggerShockwave(&fx.pos, 48, 240, 64, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+				
 				fx.pos.Position.y -= 128;
 				TriggerShockwave(&fx.pos, 48, 240, 48, 128, 112, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+				
 				fx.pos.Position.y += 256;
 				TriggerShockwave(&fx.pos, 48, 240, 48, 128, 112, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 				ItemBurn(LaraItem);
 				break;
+
 			default:
 				TriggerShockwave(&fx.pos, 24, 88, 48, 0, 128, 64, 16, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 				break;
 			}
+
 			KillEffect(fxNumber);
 		}
 		else
 		{
-			if (probe.RoomNumber != fx.roomNumber)
-				EffectNewRoom(fxNumber, probe.RoomNumber);
+			if (pointColl.RoomNumber != fx.roomNumber)
+				EffectNewRoom(fxNumber, pointColl.RoomNumber);
 
 			auto deltaPos = prevPos - fx.pos.Position;
 
@@ -328,22 +372,27 @@ namespace TEN::Entities::Effects
 				{
 				default:
 				case MissileType::SethLarge:
-					TriggerSethMissileFlame(fxNumber, 32 * deltaPos.x, 32 * deltaPos.y, 32 * deltaPos.z);
+					TriggerSethMissileFlame(fxNumber, deltaPos.x * 32, deltaPos.y * 32, deltaPos.z * 32);
 					break;
+
 				case MissileType::Harpy:
-					TriggerHarpyFlameFlame(fxNumber, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
+					TriggerHarpyFlameFlame(fxNumber, deltaPos.x * 16, deltaPos.y * 16, deltaPos.z * 16);
 					break;
+
 				case MissileType::Demigod3Single:
 				case MissileType::Demigod3Radial:
 				case MissileType::Demigod2:
-					TriggerDemigodMissileFlame(fxNumber, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
+					TriggerDemigodMissileFlame(fxNumber, deltaPos.x * 16, deltaPos.y * 16, deltaPos.z * 16);
 					break;
+
 				case MissileType::ClawMutantPlasma:
 					for (int i = 0; i < 3; i++)
-						TriggerPlasmaBallFlame(fxNumber,  deltaPos.x, 16 * deltaPos.y,  deltaPos.z, Vector3::Zero, 10);
+						SpawnPlasmaBallFlame(fxNumber, Vector3(deltaPos.x, deltaPos.y * 16, deltaPos.z), Vector3::Zero, 10.0f);
+
 					break;
+
 				case MissileType::CrocgodMutant:
-					TriggerCrocgodMissileFlame(fxNumber, 16 * deltaPos.x, 16 * deltaPos.y, 16 * deltaPos.z);
+					TriggerCrocgodMissileFlame(fxNumber, deltaPos.x * 16, deltaPos.y * 16, deltaPos.z * 16);
 					break;
 				}
 			}
