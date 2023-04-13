@@ -19,45 +19,31 @@ namespace TEN::Entities::Generic
 		Fall
 	};
 
-	struct PushablesSounds
+	struct PushableSoundData
 	{
-		int LoopSound = 0; // Looped sound index for movement.
-		int StopSound = 0; // Ending sound index.
-		int FallSound = 0; // Sound upon hitting floor (when dropped).
-
-		PushablesSounds()
-		{
-			LoopSound = SFX_TR4_PUSHABLE_SOUND;
-			StopSound = SFX_TR4_PUSH_BLOCK_END;
-			FallSound = SFX_TR4_BOULDER_FALL;
-		}
-
-		PushablesSounds(int loopValue, int stopValue, int fallValue)
-		{
-			LoopSound = loopValue;
-			StopSound = stopValue;
-			FallSound = fallValue;
-		}
+		int LoopSfx = 0; // Looped sound during moving.
+		int StopSfx = 0; // Ending sound after movement.
+		int LandSfx = 0; // Landing sound following drop.
 	};
 
 	struct PushableAnimationInfo
 	{
-		int	 PullAnimIndex = 0;
-		int	 PushAnimIndex = 0;
-		bool AllowLoop	   = 0;
+		int	 PullAnimNumber = 0;
+		int	 PushAnimNumber = 0;
+		bool EnableAnimLoop = 0;
 
 		PushableAnimationInfo()
 		{
-			PullAnimIndex = LA_PUSHABLE_PULL;
-			PushAnimIndex = LA_PUSHABLE_PUSH;
-			AllowLoop = true;
+			PullAnimNumber = LA_PUSHABLE_PULL;
+			PushAnimNumber = LA_PUSHABLE_PUSH;
+			EnableAnimLoop = true;
 		}
 
-		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, bool isLoop)
+		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, bool enableAnimLoop)
 		{
-			PullAnimIndex = pullAnimNumber;
-			PushAnimIndex = pushAnimNumber;
-			AllowLoop = isLoop;
+			PullAnimNumber = pullAnimNumber;
+			PushAnimNumber = pushAnimNumber;
+			EnableAnimLoop = enableAnimLoop;
 		}
 	};
 
@@ -71,8 +57,8 @@ namespace TEN::Entities::Generic
 	void PushableBlockManageIdle(int itemNumber);
 	void PushableBlockManageMoving(int itemNumber);
 
-	// Sounds functions
-	int	 GetPushableSound(PushableSoundType soundType, const GameVector& pos);
+	// Sound functions
+	int	 GetPushableSfx(PushableSoundType soundType, const GameVector& pos);
 	void PushablesManageSounds(int itemNumber);
 	
 	// General functions
@@ -84,7 +70,7 @@ namespace TEN::Entities::Generic
 	void ForcePushableActivation(int itemNumber);
 
 	// Collision test functions
-	bool IsNextSectorValid(ItemInfo& item, const GameVector& target, bool checkIfLaraFits);
+	bool IsNextSectorValid(ItemInfo& item, const GameVector& target, bool checkIfPlayerFits);
 	bool IsValidForLara(const ItemInfo& pushableItem, const PushableInfo& pushable, const GameVector& target);
 	bool IsPushableOnValidSurface(ItemInfo& item);
 
