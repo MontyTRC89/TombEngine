@@ -16,16 +16,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto CLAW_MUTANT_ATTACK_DAMAGE		= 100;
+	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_DAMAGE = 200;
+
+	constexpr auto CLAW_MUTANT_WALK_CHANCE = 1 / 64.0f;
+
 	constexpr auto CLAW_MUTANT_SWIPE_ATTACK_RANGE  = SQUARE(BLOCK(1));
 	constexpr auto CLAW_MUTANT_CLAW_ATTACK_RANGE   = SQUARE(BLOCK(1));
 	constexpr auto CLAW_MUTANT_RUN_ATTACK_RANGE	   = SQUARE(BLOCK(2));
 	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_RANGE = SQUARE(BLOCK(3));
 
-	constexpr auto CLAW_MUTANT_ATTACK_DAMAGE		= 100;
-	constexpr auto CLAW_MUTANT_PLASMA_ATTACK_DAMAGE = 200;
-	constexpr auto CLAW_MUTANT_PLASMA_VELOCITY		= 250;
-
-	constexpr auto CLAW_MUTANT_WALK_CHANCE = 1 / 64.0f;
+	constexpr auto CLAW_MUTANT_PLASMA_VELOCITY = 250;
 
 	constexpr auto CLAW_MUTANT_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
@@ -482,14 +483,14 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0) && Random::TestProbability(1 / 4.0f) == 0)
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0) && Random::TestProbability(1 / 4.0f) == 0)
 					item.ItemFlags[0] = 1;
 
-				if (item.Animation.FrameNumber < GetFrameNumber(&item, 28))
+				if (item.Animation.FrameNumber < GetFrameIndex(&item, 28))
 				{
 					SpawnClawMutantPlasma(itemNumber);
 				}
-				else if (item.Animation.FrameNumber == GetFrameNumber(&item, 28))
+				else if (item.Animation.FrameNumber == GetFrameIndex(&item, 28))
 				{
 					SpawnClawMutantPlasmaBall(item);
 				}
