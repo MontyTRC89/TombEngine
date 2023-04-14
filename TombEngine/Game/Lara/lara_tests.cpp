@@ -34,80 +34,8 @@ bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
-// Test if ledge in front of entity is valid to climb.
-bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
-{
-	// Get point collision.
-	auto pointCollLeft = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
-	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
-
-	//g_Renderer.AddSphere(pointCollLeft.Coordinates.ToVector3(), 20, Vector4::One);
-	//g_Renderer.AddSphere(pointCollRight.Coordinates.ToVector3(), 20, Vector4::One);
-
-	// If any front point collision intersects entity bounds, return false, because there is a material intersection.
-	// This check helps to filter out cases when the player is formally facing corner but ledge check returns true
-	// because probe distance is fixed.
-	int vTestPos = item->Pose.Position.y - CLICK(0.5f);
-	if (pointCollLeft.Position.Floor < vTestPos ||
-		pointCollRight.Position.Floor < vTestPos)
-	{
-		return false;
-	}
-
-	int vPos = item->Pose.Position.y - coll->Setup.Height;
-	if (pointCollLeft.Position.Ceiling > vPos ||
-		pointCollRight.Position.Ceiling > vPos)
-	{
-		return false;
-	}
-
-	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
-	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
-	
-	// Determine ledge probe offset.
-	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
-	// and misfire may occur. Second - it guarantees the player won't land on a very thin edge of diagonal geometry.
-
-	// Get floor heights at both points.
-	int leftHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
-	int rightHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, coll->Setup.Radius).Position.Floor;
-
-	// limit vertical search range only to nearest height (if specified).
-	if (heightLimit)
-	{
-		if (abs(leftHeight - vPos) > CLICK(0.5f) ||
-			abs(rightHeight - vPos) > CLICK(0.5f))
-		{
-			return false;
-		}
-	}
-
-	// Test if slope angle is beyond threshold.
-	// TODO: Compare slope, aspect, and player angles instead.
-	float slopeDelta = ((float)STEPUP_HEIGHT / (float)BLOCK(1)) * (coll->Setup.Radius * 2);
-	if (abs(leftHeight - rightHeight) >= slopeDelta)
-		return false;
-
-	// Test if ledge is outside distance threshold.
-	if (abs(coll->NearestLedgeDistance) > OFFSET_RADIUS(coll->Setup.Radius))
-		return false;
-
-	// Test if ledge is within angle threshold.
-	if (!TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
-		return false;
-	
-	if (!ignoreHeadroom)
-	{
-		int headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
-		if (headroom < CLICK(1))
-			return false;
-	}
-	
-	return true;
-}
-
 static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const ItemInfo& item, const CollisionInfo& coll,
-																			  const std::vector<AttractorCollisionData>& attracColls)
+																		  const std::vector<AttractorCollisionData>& attracColls)
 {
 	const AttractorCollisionData* attracCollPtr = nullptr;
 	float closestDist = INFINITY;
@@ -120,7 +48,6 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const 
 		if (!attracColl.AttractorPtr->IsEdge())
 			continue;
 
-		// TODO: Proper Z offset causes problems with intersection?
 		// 2) Check if edge is within range and in front.
 		if (!attracColl.IsIntersected || !attracColl.IsInFront)
 			continue;
@@ -156,6 +83,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const 
 		}
 	}
 
+	// No edge found, return nullopt.
 	if (attracCollPtr == nullptr)
 		return std::nullopt;
 
@@ -393,6 +321,78 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return canHang;
+}
+
+// Test if ledge in front of entity is valid to climb.
+bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
+{
+	// Get point collision.
+	auto pointCollLeft = GetCollision(item, coll->NearestLedgeAngle - ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
+	auto pointCollRight = GetCollision(item, coll->NearestLedgeAngle + ANGLE(90.0f), coll->Setup.Radius, -coll->Setup.Height);
+
+	//g_Renderer.AddSphere(pointCollLeft.Coordinates.ToVector3(), 20, Vector4::One);
+	//g_Renderer.AddSphere(pointCollRight.Coordinates.ToVector3(), 20, Vector4::One);
+
+	// If any front point collision intersects entity bounds, return false, because there is a material intersection.
+	// This check helps to filter out cases when the player is formally facing corner but ledge check returns true
+	// because probe distance is fixed.
+	int vTestPos = item->Pose.Position.y - CLICK(0.5f);
+	if (pointCollLeft.Position.Floor < vTestPos ||
+		pointCollRight.Position.Floor < vTestPos)
+	{
+		return false;
+	}
+
+	int vPos = item->Pose.Position.y - coll->Setup.Height;
+	if (pointCollLeft.Position.Ceiling > vPos ||
+		pointCollRight.Position.Ceiling > vPos)
+	{
+		return false;
+	}
+
+	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
+	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
+
+	// Determine ledge probe offset.
+	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
+	// and misfire may occur. Second - it guarantees the player won't land on a very thin edge of diagonal geometry.
+
+	// Get floor heights at both points.
+	int leftHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, -coll->Setup.Radius).Position.Floor;
+	int rightHeight = GetCollision(item, coll->NearestLedgeAngle, coll->Setup.Radius * 1.2f, -coll->Setup.Height, coll->Setup.Radius).Position.Floor;
+
+	// limit vertical search range only to nearest height (if specified).
+	if (heightLimit)
+	{
+		if (abs(leftHeight - vPos) > CLICK(0.5f) ||
+			abs(rightHeight - vPos) > CLICK(0.5f))
+		{
+			return false;
+		}
+	}
+
+	// Test if slope angle is beyond threshold.
+	// TODO: Compare slope, aspect, and player angles instead.
+	float slopeDelta = ((float)STEPUP_HEIGHT / (float)BLOCK(1)) * (coll->Setup.Radius * 2);
+	if (abs(leftHeight - rightHeight) >= slopeDelta)
+		return false;
+
+	// Test if ledge is outside distance threshold.
+	if (abs(coll->NearestLedgeDistance) > OFFSET_RADIUS(coll->Setup.Radius))
+		return false;
+
+	// Test if ledge is within angle threshold.
+	if (!TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
+		return false;
+
+	if (!ignoreHeadroom)
+	{
+		int headroom = (coll->Front.Floor + coll->Setup.Height) - coll->Middle.Ceiling;
+		if (headroom < CLICK(1))
+			return false;
+	}
+
+	return true;
 }
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
