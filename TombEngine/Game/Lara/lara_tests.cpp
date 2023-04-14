@@ -110,10 +110,87 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Get nearby attractor pointers.
+	auto attracPtrs = GetNearbyAttractorPtrs(*item);
+
+	// Get attractor collisions.
+	auto refPoint = item->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT_STRETCH, 0.0f);
+	float range = OFFSET_RADIUS(BLOCK(0.25f));
+	auto attracColls = GetAttractorCollisions(*item, attracPtrs, refPoint, range);
+
+	g_Renderer.AddSphere(refPoint, 50, Vector4::One);
+
+	const AttractorCollisionData* attracCollPtr = nullptr;
+	float closestDist = INFINITY;
+	bool hasFoundCorner = false;
+
+	// Assess attractor collision.
+	for (const auto& attracColl : attracColls)
+	{
+		// 1) Check if attractor is edge type.
+		if (!attracColl.AttractorPtr->IsEdge())
+			continue;
+
+		// 2) Check if edge is within range and in front.
+		if (!attracColl.IsIntersected || !attracColl.IsInFront)
+			continue;
+
+		// TODO: Test if this works.
+		// 3) Test if target point is lone corner.
+		if (attracColl.DistanceFromEnd <= EPSILON && !hasFoundCorner)
+		{
+			hasFoundCorner = true;
+			continue;
+		}
+
+		// 4) Test catch angle.
+		//if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			//continue;
+
+		// 5) Test if edge slope is slippery.
+		if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
+			continue;
+
+		// Get point collision off side of edge.
+		auto pointCollOffSide = GetCollision(
+			Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
+			attracColl.HeadingAngle, -coll->Setup.Radius);
+
+		// 6) Test if edge is too low to the ground.
+		int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
+		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
+			continue;
+
+		// Track closest attractor.
+		if (attracColl.Distance < closestDist)
+		{
+			attracCollPtr = &attracColl;
+			closestDist = attracColl.Distance;
+			continue;
+		}
+	}
+
+	// Check if edge was found.
+	if (attracCollPtr == nullptr)
+	{
+		SetAnimation(item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
+		item->Animation.IsAirborne = true;
+		item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
+		item->Pose.Position += coll->Shift;
+		player.Control.HandStatus = HandStatus::Free;
+		return false;
+	}
+
 	// Align orientation to edge.
-	item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.4f);
+	player.Context.TargetOrientation = EulerAngles(0, attracCollPtr->HeadingAngle, 0);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.4f);
+
+	auto pos = attracCollPtr->TargetPoint + Vector3(0.0f, LARA_HEIGHT_STRETCH, 0.0f);
+	item->Pose.Position = Geometry::TranslatePoint(pos, attracCollPtr->HeadingAngle, -coll->Setup.Radius);
 
 	return true;
+
+	// -----------------------------------------
 
 	short moveAngle = player.Control.MoveAngle;
 
