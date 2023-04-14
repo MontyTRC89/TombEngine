@@ -106,21 +106,8 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 	return true;
 }
 
-bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
+static std::optional<AttractorCollisionData> GetEdgeHangAttractorCollision(const std::vector<AttractorCollisionData>& attracColls, float radius)
 {
-	auto& player = GetLaraInfo(*item);
-
-	// Get nearby attractor pointers.
-	auto attracPtrs = GetNearbyAttractorPtrs(*item);
-
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
-	auto relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, coll->Setup.Radius);
-
-	// Get attractor collisions.
-	auto refPoint = item->Pose.Position.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
-	float range = OFFSET_RADIUS(BLOCK(0.25f));
-	auto attracColls = GetAttractorCollisions(*item, attracPtrs, refPoint, range);
-
 	const AttractorCollisionData* attracCollPtr = nullptr;
 	float closestDist = INFINITY;
 	bool hasFoundCorner = false;
@@ -147,7 +134,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 
 		// 4) Test catch angle.
 		//if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			//continue;
+		//continue;
 
 		// 5) Test if edge slope is slippery.
 		if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
@@ -156,7 +143,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		// Get point collision off side of edge.
 		auto pointCollOffSide = GetCollision(
 			Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
-			attracColl.HeadingAngle, -coll->Setup.Radius);
+			attracColl.HeadingAngle, -radius);
 
 		// 6) Test if edge is too low to the ground.
 		int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
@@ -172,21 +159,70 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	// Check if edge was found.
 	if (attracCollPtr == nullptr)
+		return std::nullopt;
+
+	return *attracCollPtr;
+}
+
+bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	// Get nearby attractor pointers.
+	auto attracPtrs = GetNearbyAttractorPtrs(*item);
+
+	// Calculate relative offsets.
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
+	auto relOffsetCenter = Vector3(0.0f, LARA_HEIGHT_STRETCH, coll->Setup.Radius);
+	auto relOffsetLeft = Vector3(-coll->Setup.Radius, LARA_HEIGHT_STRETCH, coll->Setup.Radius);
+	auto relOffsetRight = Vector3(coll->Setup.Radius, LARA_HEIGHT_STRETCH, coll->Setup.Radius);
+
+	// Calculate reference points.
+	auto refPointCenter = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetCenter, rotMatrix);
+	auto refPointLeft = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetLeft, rotMatrix);
+	auto refPointRight = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetRight, rotMatrix);
+
+	// Get attractor collisions.
+	float range = BLOCK(0.25f);
+	auto attracCollsCenter = GetAttractorCollisions(*item, attracPtrs, refPointCenter, range);
+	auto attracCollsLeft = GetAttractorCollisions(*item, attracPtrs, refPointLeft, range);
+	auto attracCollsRight = GetAttractorCollisions(*item, attracPtrs, refPointRight, range);
+
+	// Get best attractor collisions.
+	auto attracCollCenter = GetEdgeHangAttractorCollision(attracCollsCenter, coll->Setup.Radius);
+	auto attracCollLeft = GetEdgeHangAttractorCollision(attracCollsLeft, coll->Setup.Radius);
+	auto attracCollRight = GetEdgeHangAttractorCollision(attracCollsRight, coll->Setup.Radius);
+
+	// Check if edge was found.
+	if (!attracCollCenter.has_value())
+	{
+		SetPlayerEdgeHangRelease(*item);
+		return false;
+	}
+	
+	if (!attracCollLeft.has_value() ||
+		!attracCollRight.has_value())
 	{
 		SetPlayerEdgeHangRelease(*item);
 		return false;
 	}
 
+	auto orient = Geometry::GetOrientToPoint(attracCollLeft.value().TargetPoint, attracCollRight.value().TargetPoint);
+	auto headingAngle = orient.y - ANGLE(90.0f);
+
+	// TODO: Works on reflex transition, but not an obtuse one.
+	auto targetPoint = //Geometry::GetClosestPointOnLinePerp(attracCollCenter->TargetPoint, attracCollLeft->TargetPoint, attracCollRight->TargetPoint)
+		attracCollCenter->TargetPoint;
+
 	// Align orientation.
-	player.Context.TargetOrientation = EulerAngles(0, attracCollPtr->HeadingAngle, 0);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.3f);
+	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.9f);
 
 	// Align position.
-	rotMatrix = Matrix::CreateRotationY(TO_RAD(attracCollPtr->HeadingAngle));
-	relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll->Setup.Radius);
-	item->Pose.Position = attracCollPtr->TargetPoint + Vector3::Transform(relOffset, rotMatrix);
+	rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+	relOffsetCenter = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll->Setup.Radius);
+	item->Pose.Position = targetPoint + Vector3::Transform(relOffsetCenter, rotMatrix);
 
 	return true;
 
