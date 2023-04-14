@@ -14,8 +14,8 @@ using namespace TEN::Entities::Player;
 // For State Control & Collision
 // -----------------------------
 
+bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle);
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
-bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll);
 
 bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll);
 

@@ -6,7 +6,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-constexpr auto PLAYER_INTERACT_CONSTRAINT_ANGLE = ANGLE(40.0f);
+constexpr auto PLAYER_INTERACT_ANGLE_CONSTRAINT = ANGLE(40.0f);
 constexpr auto FRONT_ARC = ANGLE(90.0f);
 
 // Lean rates

@@ -29,6 +29,11 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
+bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
+{
+	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
+}
+
 // Test if ledge in front of entity is valid to climb.
 bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom, bool heightLimit)
 {
@@ -88,7 +93,7 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 		return false;
 
 	// Test if ledge is within angle threshold.
-	if (!TestValidLedgeAngle(item, coll))
+	if (!TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
 		return false;
 	
 	if (!ignoreHeadroom)
@@ -101,11 +106,6 @@ bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignore
 	return true;
 }
 
-bool TestValidLedgeAngle(const ItemInfo* item, const CollisionInfo* coll)
-{
-	return (abs(short(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= PLAYER_INTERACT_CONSTRAINT_ANGLE);
-}
-
 bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -113,8 +113,11 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// Get nearby attractor pointers.
 	auto attracPtrs = GetNearbyAttractorPtrs(*item);
 
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
+	auto relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, coll->Setup.Radius);
+
 	// Get attractor collisions.
-	auto refPoint = item->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT_STRETCH, 0.0f);
+	auto refPoint = item->Pose.Position.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
 	float range = OFFSET_RADIUS(BLOCK(0.25f));
 	auto attracColls = GetAttractorCollisions(*item, attracPtrs, refPoint, range);
 
@@ -129,8 +132,9 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		if (!attracColl.AttractorPtr->IsEdge())
 			continue;
 
+		// TODO: Proper Z offset causes problems with intersection?
 		// 2) Check if edge is within range and in front.
-		if (!attracColl.IsIntersected || !attracColl.IsInFront)
+		if (/*!attracColl.IsIntersected || */!attracColl.IsInFront)
 			continue;
 
 		// TODO: Test if this works.
@@ -180,8 +184,8 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.3f);
 
 	// Align position.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(attracCollPtr->HeadingAngle));
-	auto relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll->Setup.Radius);
+	rotMatrix = Matrix::CreateRotationY(TO_RAD(attracCollPtr->HeadingAngle));
+	relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll->Setup.Radius);
 	item->Pose.Position = attracCollPtr->TargetPoint + Vector3::Transform(relOffset, rotMatrix);
 
 	return true;
@@ -314,7 +318,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 
 			if (!isStopped &&
 				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic &&
-				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
+				abs(verticalShift) < SLOPE_DIFFERENCE && TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
 			{
 				if (item->Animation.Velocity.z != 0.0f)
 					AlignEntityToEdge(item, coll);
@@ -1910,7 +1914,7 @@ VaultTestResult TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll)
 	auto probeMiddle = GetCollision(item);
 
 	// Check ledge angle.
-	if (!TestValidLedgeAngle(item, coll))
+	if (!TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
 		return VaultTestResult{ false };
 
 	if (lara->Control.CanClimbLadder &&								// Ladder sector flag set.
@@ -1935,7 +1939,7 @@ VaultTestResult TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll)
 	auto probeMiddle = GetCollision(item);
 
 	// Check ledge angle.
-	if (!TestValidLedgeAngle(item, coll))
+	if (!TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
 		return VaultTestResult{ false };
 
 	if (lara->Control.CanClimbLadder &&							// Ladder sector flag set.

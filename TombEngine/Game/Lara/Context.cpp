@@ -208,65 +208,6 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	// TODO: use as base for orientation aligment.
-	/*static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isRight)
-	{
-		// Get nearby attractor pointers.
-		auto attracPtrs = GetNearbyAttractorPtrs(item);
-
-		auto rotMatrix = Matrix::CreateRotationY(item.Pose.Orientation.y);
-		auto relOffset = Vector3(coll.Setup.Radius * (isRight ? 1 : -1), -coll.Setup.Height, coll.Setup.Radius);
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
-
-		// Determine relative offsets.
-		auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
-		auto relOffsetLeft = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-		auto relOffsetRight = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-
-		// Calculate reference points.
-		auto basePos = item.Pose.Position.ToVector3();
-		auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
-		auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
-		auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
-
-		// Get attractor collisions.
-		auto attracCollsCenter = GetAttractorCollisions(item, attracPtrs, refPointCenter, range);
-		auto attracCollsLeft = GetAttractorCollisions(item, attracPtrs, refPointLeft, range);
-		auto attracCollsRight = GetAttractorCollisions(item, attracPtrs, refPointRight, range);
-
-		// Assess center attractor collision.
-		for (const auto& attracColl : attracCollsCenter)
-		{
-			// 1) Check if attractor is edge type.
-			if (!attracColl.AttractorPtr->IsEdge())
-				continue;
-
-			// 2) Check if edge is within range.
-			if (!attracColl.IsIntersected)
-				continue;
-
-			// 3) Test if edge slope is slippery.
-			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
-				continue;
-
-			// Get point collision off edge side.
-			auto pointCollOffEdge = GetCollision(
-				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
-
-			// 4) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffEdge.Position.Floor);
-			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
-				continue;
-
-			return true;
-		}
-
-		// TODO: Point collision assessment.
-
-		return false;
-	}*/
-
 	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isRight)
 	{
 		// Get nearby attractor pointers.
@@ -334,11 +275,6 @@ namespace TEN::Entities::Player::Context
 	{
 		return TestLateralShimmy(item, coll, true);
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
-	}
-
-	static bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
-	{
-		return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_CONSTRAINT_ANGLE);
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,

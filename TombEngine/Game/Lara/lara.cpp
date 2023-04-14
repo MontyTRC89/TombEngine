@@ -435,7 +435,7 @@ static void SpawnAttractorPentagon(ItemInfo& item)
 
 		angle += STEP_ANGLE;
 	}
-	//std::reverse(points.begin(), points.end());
+	std::reverse(points.begin(), points.end());
 
 	auto attracs = GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
 	player.Context.Attractor.DebugAttractor0 = attracs[0];
