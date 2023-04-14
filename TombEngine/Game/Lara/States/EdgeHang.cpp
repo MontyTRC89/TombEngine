@@ -23,7 +23,12 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
+		// Setup
+		item->Animation.IsAirborne = false;
+		player.Control.MoveAngle = item->Pose.Orientation.y;
 		player.Control.IsClimbingLadder = false;
+		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
+		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
 		Camera.targetAngle = 0;
@@ -144,14 +149,6 @@ namespace TEN::Entities::Player
 	// Control: lara_as_hang_idle()
 	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto& player = *GetLaraInfo(item);
-
-		item->Animation.IsAirborne = false;
-		item->Animation.Velocity.y = 0.0f;
-		player.Control.MoveAngle = item->Pose.Orientation.y;
-		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
-		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-
 		HandlePlayerEdgeHang(item, coll);
 	}
 
@@ -159,7 +156,12 @@ namespace TEN::Entities::Player
 	// Collision: lara_col_shimmy_left()
 	void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
+		auto& player = GetLaraInfo(*item);
+
+		// Setup
+		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
+		coll->Setup.Radius = LARA_RADIUS;
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -193,9 +195,6 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
-		coll->Setup.Radius = LARA_RADIUS;
-
 		HandlePlayerEdgeHang(item, coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
@@ -204,7 +203,12 @@ namespace TEN::Entities::Player
 	// Collision: lara_col_shimmy_right()
 	void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
+		auto& player = GetLaraInfo(*item);
+
+		// Setup
+		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
+		coll->Setup.Radius = LARA_RADIUS;
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -238,9 +242,6 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
-		coll->Setup.Radius = LARA_RADIUS;
-
 		HandlePlayerEdgeHang(item, coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
@@ -249,6 +250,7 @@ namespace TEN::Entities::Player
 	// Collision: lara_default_col()
 	void lara_as_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
 	{
+		// Setup
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		Camera.targetAngle = 0;
 		Camera.targetElevation = ANGLE(-33.0f);
@@ -261,6 +263,7 @@ namespace TEN::Entities::Player
 	// Collision: lara_default_col()
 	void lara_as_handstand(ItemInfo* item, CollisionInfo* coll)
 	{
+		// Setup
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
 	}
