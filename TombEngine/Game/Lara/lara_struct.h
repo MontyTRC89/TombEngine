@@ -1296,6 +1296,9 @@ struct PlayerAttractorData
 	// Debug
 	Attractor			   DebugAttractor0	= {};
 	Attractor			   DebugAttractor1	= {};
+	Attractor			   DebugAttractor2	= {};
+	Attractor			   DebugAttractor3	= {};
+	Attractor			   DebugAttractor4	= {};
 	std::vector<Attractor> SectorAttractors = {};
 };
 

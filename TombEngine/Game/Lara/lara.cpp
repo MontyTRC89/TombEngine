@@ -414,6 +414,38 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 };
 
 // Debug
+static void SpawnAttractorPentagon(ItemInfo& item)
+{
+	constexpr auto RADIUS	  = BLOCK(0.5f);
+	constexpr auto STEP_COUNT = 5;
+	constexpr auto STEP_ANGLE = PI_MUL_2 / STEP_COUNT;
+	constexpr auto REL_OFFSET = Vector3(0.0f, 0.0f, RADIUS);
+
+	auto& player = GetLaraInfo(item);
+
+	auto center = item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(5), 0.0f);
+
+	float angle = 0.0f;
+	auto points = std::vector<Vector3>{};
+	for (int i = 0; i < STEP_COUNT; i++)
+	{
+		auto rotMatrix = Matrix::CreateRotationY(angle);
+		auto point = center + Vector3::Transform(REL_OFFSET, rotMatrix);
+		points.push_back(point);
+
+		angle += STEP_ANGLE;
+	}
+	//std::reverse(points.begin(), points.end());
+
+	auto attracs = GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
+	player.Context.Attractor.DebugAttractor0 = attracs[0];
+	player.Context.Attractor.DebugAttractor1 = attracs[1];
+	player.Context.Attractor.DebugAttractor2 = attracs[2];
+	player.Context.Attractor.DebugAttractor3 = attracs[3];
+	player.Context.Attractor.DebugAttractor4 = attracs[4];
+}
+
+// Debug
 static void DrawPlayerAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
@@ -423,7 +455,7 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 	for (const auto* attrac : attracPtrs)
 	{
 		attrac->DrawDebug();
-		g_Renderer.AddLine3D(attrac->GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
+		//g_Renderer.AddLine3D(attrac->GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
 	}
 }
 
@@ -456,6 +488,10 @@ static void SetDebugAttractors(ItemInfo& item)
 		player.Context.Attractor.DebugAttractor0 = Attractor(
 			AttractorType::Edge,
 			player.Context.Attractor.DebugAttractor0.GetPoint0(), pos, item.RoomNumber);
+	}
+	if (KeyMap[OIS::KeyCode::KC_E])
+	{
+		SpawnAttractorPentagon(item);
 	}
 	
 	// Set points for debug attractor 1.

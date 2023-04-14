@@ -66,8 +66,8 @@ namespace TEN::Collision
 		return !(*this == attrac);
 	}
 
-	static std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
-															   bool isClosedLoop = true)
+	std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
+														bool isClosedLoop)
 	{
 		// No points; return empty collection.
 		if (points.empty())
@@ -156,6 +156,9 @@ namespace TEN::Collision
 
 		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
 		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
+		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);
 		return attracPtrs;
 	}
 

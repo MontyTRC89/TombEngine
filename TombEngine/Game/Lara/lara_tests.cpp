@@ -118,8 +118,6 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	float range = OFFSET_RADIUS(BLOCK(0.25f));
 	auto attracColls = GetAttractorCollisions(*item, attracPtrs, refPoint, range);
 
-	g_Renderer.AddSphere(refPoint, 50, Vector4::One);
-
 	const AttractorCollisionData* attracCollPtr = nullptr;
 	float closestDist = INFINITY;
 	bool hasFoundCorner = false;
@@ -173,20 +171,18 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// Check if edge was found.
 	if (attracCollPtr == nullptr)
 	{
-		SetAnimation(item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
-		item->Animation.IsAirborne = true;
-		item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
-		item->Pose.Position += coll->Shift;
-		player.Control.HandStatus = HandStatus::Free;
+		SetPlayerEdgeHangRelease(*item);
 		return false;
 	}
 
-	// Align orientation to edge.
+	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, attracCollPtr->HeadingAngle, 0);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.4f);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.3f);
 
-	auto pos = attracCollPtr->TargetPoint + Vector3(0.0f, LARA_HEIGHT_STRETCH, 0.0f);
-	item->Pose.Position = Geometry::TranslatePoint(pos, attracCollPtr->HeadingAngle, -coll->Setup.Radius);
+	// Align position.
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(attracCollPtr->HeadingAngle));
+	auto relOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll->Setup.Radius);
+	item->Pose.Position = attracCollPtr->TargetPoint + Vector3::Transform(relOffset, rotMatrix);
 
 	return true;
 
