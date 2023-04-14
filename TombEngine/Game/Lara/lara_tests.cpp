@@ -29,6 +29,13 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
+struct EdgeHangAttractorCollisionData
+{
+	std::optional<AttractorCollisionData> Center = {};
+	std::optional<AttractorCollisionData> Left	 = {};
+	std::optional<AttractorCollisionData> Right	 = {};
+};
+
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 {
 	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
@@ -90,61 +97,73 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const 
 	return *attracCollPtr;
 }
 
+static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const ItemInfo& item, const CollisionInfo& coll)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Get nearby attractor pointers.
+	auto attracPtrs = GetNearbyAttractorPtrs(item);
+
+	auto basePos = item.Pose.Position.ToVector3();
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
+	float range = OFFSET_RADIUS(coll.Setup.Radius);
+
+	// Get center attractor collision.
+	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
+	auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
+	auto attracCollsCenter = GetAttractorCollisions(item, attracPtrs, refPointCenter, range);
+	auto attracCollCenter = GetBestEdgeHangAttractorColl(item, coll, attracCollsCenter);
+
+	// Get left attractor collision.
+	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+	auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
+	auto attracCollsLeft = GetAttractorCollisions(item, attracPtrs, refPointLeft, range);
+	auto attracCollLeft = GetBestEdgeHangAttractorColl(item, coll, attracCollsLeft);
+
+	// Get right attractor collision.
+	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+	auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
+	auto attracCollsRight = GetAttractorCollisions(item, attracPtrs, refPointRight, range);
+	auto attracCollRight = GetBestEdgeHangAttractorColl(item, coll, attracCollsRight);
+
+	// Return edge attractor collision at three points.
+	return EdgeHangAttractorCollisionData{ attracCollCenter, attracCollLeft, attracCollRight };
+}
+
 bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	// Get nearby attractor pointers.
-	auto attracPtrs = GetNearbyAttractorPtrs(*item);
-
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
-	float range = OFFSET_RADIUS(coll->Setup.Radius);
-
-	// Get center attractor collision.
-	auto relOffsetCenter = Vector3(0.0f, -coll->Setup.Height, coll->Setup.Radius);
-	auto refPointCenter = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetCenter, rotMatrix);
-	auto attracCollsCenter = GetAttractorCollisions(*item, attracPtrs, refPointCenter, range);
-	auto attracCollCenter = GetBestEdgeHangAttractorColl(*item, *coll, attracCollsCenter);
-
-	// Get center attractor collision.
-	auto relOffsetLeft = Vector3(-coll->Setup.Radius, -coll->Setup.Height, coll->Setup.Radius);
-	auto refPointLeft = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetLeft, rotMatrix);
-	auto attracCollsLeft = GetAttractorCollisions(*item, attracPtrs, refPointLeft, range);
-	auto attracCollLeft = GetBestEdgeHangAttractorColl(*item, *coll, attracCollsLeft);
-
-	// Get center attractor collision.
-	auto relOffsetRight = Vector3(coll->Setup.Radius, -coll->Setup.Height, coll->Setup.Radius);
-	auto refPointRight = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetRight, rotMatrix);
-	auto attracCollsRight = GetAttractorCollisions(*item, attracPtrs, refPointRight, range);
-	auto attracCollRight = GetBestEdgeHangAttractorColl(*item, *coll, attracCollsRight);
+	// Get edge attractor collision at three points.
+	auto edgeAttracColl = GetEdgeHangAttractorCollisionData(*item, *coll);
 
 	// Check if edge was found.
-	if (!attracCollCenter.has_value())
+	if (!edgeAttracColl.Center.has_value())
 	{
 		SetPlayerEdgeHangRelease(*item);
 		return false;
 	}
 	
-	// TODO: Handle correstion at attractor ends.
-	if (!attracCollLeft.has_value() ||
-		!attracCollRight.has_value())
+	// TODO: Handle correction at attractor ends.
+	if (!edgeAttracColl.Left.has_value() ||
+		!edgeAttracColl.Right.has_value())
 	{
 		SetPlayerEdgeHangRelease(*item);
 		return false;
 	}
 
-	auto orient = Geometry::GetOrientToPoint(attracCollLeft->TargetPoint, attracCollRight->TargetPoint);
+	auto orient = Geometry::GetOrientToPoint(edgeAttracColl.Left->TargetPoint, edgeAttracColl.Right->TargetPoint);
 	auto headingAngle = orient.y - ANGLE(90.0f);
 
 	// TODO: Works on reflex transition, but not an obtuse one.
-	auto targetPoint = attracCollCenter->TargetPoint;
+	auto targetPoint = edgeAttracColl.Center->TargetPoint;
 
 	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.9f);
 
 	// Align position.
-	rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
 	auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
 	item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 

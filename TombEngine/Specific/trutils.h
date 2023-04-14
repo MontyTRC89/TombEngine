@@ -11,4 +11,24 @@ namespace TEN::Utils
 	std::vector<std::string> SplitString(const std::string& string);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
+
+	template<typename T>
+	std::vector<T> RemoveVectorDuplicates(const std::vector<T>& vector)
+	{
+		auto seenSet = std::unordered_set<T>{};
+
+		auto newVector = std::vector<T>{};
+		newVector.reserve(vector.size());
+
+		for (const auto& item : vector)
+		{
+			if (seenSet.find(item) == seenSet.end())
+			{
+				seenSet.insert(item);
+				newVector.push_back(item);
+			}
+		}
+
+		return newVector;
+	}
 }
