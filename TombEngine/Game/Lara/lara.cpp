@@ -414,7 +414,7 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 };
 
 // Debug
-static void SpawnAttractorPentagon(ItemInfo& item)
+static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 {
 	constexpr auto RADIUS	  = BLOCK(0.5f);
 	constexpr auto STEP_COUNT = 5;
@@ -435,7 +435,9 @@ static void SpawnAttractorPentagon(ItemInfo& item)
 
 		angle += STEP_ANGLE;
 	}
-	std::reverse(points.begin(), points.end());
+	
+	if (isOuter)
+		std::reverse(points.begin(), points.end());
 
 	auto attracs = GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
 	player.Context.Attractor.DebugAttractor0 = attracs[0];
@@ -489,10 +491,11 @@ static void SetDebugAttractors(ItemInfo& item)
 			AttractorType::Edge,
 			player.Context.Attractor.DebugAttractor0.GetPoint0(), pos, item.RoomNumber);
 	}
+
 	if (KeyMap[OIS::KeyCode::KC_E])
-	{
-		SpawnAttractorPentagon(item);
-	}
+		SpawnAttractorPentagon(item, true);
+	if (KeyMap[OIS::KeyCode::KC_R])
+		SpawnAttractorPentagon(item, false);
 	
 	// Set points for debug attractor 1.
 	if (KeyMap[OIS::KeyCode::KC_A])

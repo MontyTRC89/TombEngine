@@ -184,7 +184,7 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	auto refPointRight = item->Pose.Position.ToVector3() + Vector3::Transform(relOffsetRight, rotMatrix);
 
 	// Get attractor collisions.
-	float range = BLOCK(0.25f);
+	float range = coll->Setup.Radius;
 	auto attracCollsCenter = GetAttractorCollisions(*item, attracPtrs, refPointCenter, range);
 	auto attracCollsLeft = GetAttractorCollisions(*item, attracPtrs, refPointLeft, range);
 	auto attracCollsRight = GetAttractorCollisions(*item, attracPtrs, refPointRight, range);
@@ -208,12 +208,11 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		return false;
 	}
 
-	auto orient = Geometry::GetOrientToPoint(attracCollLeft.value().TargetPoint, attracCollRight.value().TargetPoint);
+	auto orient = Geometry::GetOrientToPoint(attracCollLeft->TargetPoint, attracCollRight->TargetPoint);
 	auto headingAngle = orient.y - ANGLE(90.0f);
 
 	// TODO: Works on reflex transition, but not an obtuse one.
-	auto targetPoint = //Geometry::GetClosestPointOnLinePerp(attracCollCenter->TargetPoint, attracCollLeft->TargetPoint, attracCollRight->TargetPoint)
-		attracCollCenter->TargetPoint;
+	auto targetPoint = attracCollCenter->TargetPoint;
 
 	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
