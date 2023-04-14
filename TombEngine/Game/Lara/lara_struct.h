@@ -1275,12 +1275,6 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
-struct PlayerEffectData
-{
-	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
-	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
-};
-
 // TODO: Refactor status handling to use floats.
 struct PlayerStatusData
 {
@@ -1327,8 +1321,8 @@ struct LaraInfo
 
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};
-	PlayerEffectData  Effect	= {};
 	PlayerStatusData  Status	= {};
+	PlayerEffectData  Effect	= {};
 	LaraInventoryData Inventory = {};
 
 	FlareData		  Flare = {};

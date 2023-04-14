@@ -72,7 +72,7 @@ namespace TEN::Entities::Switches
 			switchItem->Status == ITEM_NOT_ACTIVE &&
 			!(switchItem->Flags & 0x100) &&
 			switchItem->TriggerFlags >= 0 ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			auto bounds = GameBoundingBox(switchItem);
 
@@ -215,9 +215,9 @@ namespace TEN::Entities::Switches
 					AnimateItem(switchItem);
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;

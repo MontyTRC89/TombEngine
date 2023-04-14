@@ -179,7 +179,7 @@ namespace TEN::Entities::Doors
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
 				laraInfo->Control.HandStatus == HandStatus::Free ||
-				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
+				laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			if (TestLaraPosition(CrowbarDoorBounds, doorItem, laraItem))
@@ -233,9 +233,9 @@ namespace TEN::Entities::Doors
 					return;
 				}
 
-				laraInfo->InteractedItem = itemNumber;
+				laraInfo->Context.InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = 0;
 				laraInfo->Control.HandStatus = HandStatus::Free;

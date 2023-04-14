@@ -36,7 +36,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			player.Control.HandStatus == HandStatus::Free) ||
-			(player.Control.IsMoving && player.InteractedItem == itemNumber))
+			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 		{
 			auto bounds = GameBoundingBox(&switchItem);
 
@@ -67,10 +67,10 @@ namespace TEN::Entities::Switches
 				}
 				else
 				{
-					player.InteractedItem = itemNumber;
+					player.Context.InteractedItem = itemNumber;
 				}
 			}
-			else if (player.Control.IsMoving && player.InteractedItem == itemNumber)
+			else if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 			{
 				player.Control.IsMoving = false;
 				player.Control.HandStatus = HandStatus::Free;

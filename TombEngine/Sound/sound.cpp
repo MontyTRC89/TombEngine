@@ -791,9 +791,9 @@ void Sound_UpdateScene()
 		Camera.mikePos.y,
 		Camera.mikePos.z);
 	auto laraVel = BASS_3DVECTOR(					// Vel
-		Lara.WaterCurrentPull.x,
-		Lara.WaterCurrentPull.y,
-		Lara.WaterCurrentPull.z);
+		Lara.Context.WaterCurrentPull.x,
+		Lara.Context.WaterCurrentPull.y,
+		Lara.Context.WaterCurrentPull.z);
 	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
 	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
 	BASS_Set3DPosition(&mikePos,

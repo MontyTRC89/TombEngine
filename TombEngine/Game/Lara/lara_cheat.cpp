@@ -62,7 +62,7 @@ void LaraCheatyBits(ItemInfo* item)
 		static bool dbFlyCheat = true;
 		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
-			if (lara->Vehicle == NO_ITEM)
+			if (lara->Context.Vehicle == NO_ITEM)
 			{
 				LaraCheatGetStuff(item);
 				DelsGiveLaraItemsCheat(item);

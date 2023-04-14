@@ -143,7 +143,7 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto* pushable = GetPushableInfo(item);
 
-		Lara.InteractedItem = itemNumber;
+		Lara.Context.InteractedItem = itemNumber;
 
 		auto pos = Vector3i::Zero;
 
@@ -431,7 +431,7 @@ namespace TEN::Entities::Generic
 			lara->Control.HandStatus != HandStatus::Free ||
 			pushableItem->Status == ITEM_INVISIBLE ||
 			pushableItem->TriggerFlags < 0) &&
-			(!lara->Control.IsMoving || lara->InteractedItem != itemNumber))
+			(!lara->Control.IsMoving || lara->Context.InteractedItem != itemNumber))
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
@@ -554,14 +554,14 @@ namespace TEN::Entities::Generic
 					}
 					else
 					{
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 				}
 			}
 			else
 			{
-				if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;

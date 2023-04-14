@@ -1201,7 +1201,7 @@ bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
 		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled.
 			lara->Flare.Life) &&
-		lara->Vehicle == NO_ITEM)									// Not in a vehicle.
+		lara->Context.Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1610,7 +1610,7 @@ bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Assess water depth.
-	if (lara->WaterSurfaceDist < -CLICK(1))
+	if (lara->Context.WaterSurfaceDist < -CLICK(1))
 		return false;
 
 	// Assess continuity of path.
@@ -1795,7 +1795,7 @@ VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, Vaul
 	auto probeMiddle = GetCollision(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	bool swampTooDeep = testSetup.CheckSwampDepth ? (isSwamp && lara->WaterSurfaceDist < -CLICK(3)) : isSwamp;
+	bool swampTooDeep = testSetup.CheckSwampDepth ? (isSwamp && lara->Context.WaterSurfaceDist < -CLICK(3)) : isSwamp;
 	int y = isSwamp ? item->Pose.Position.y : probeMiddle.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
 	// Check swamp depth (if applicable).
@@ -2030,7 +2030,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
 		return VaultTestResult{ false };
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->Context.WaterSurfaceDist < -CLICK(3))
 		return VaultTestResult{ false };
 
 	VaultTestResult vaultResult;
@@ -2119,7 +2119,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || lara->Control.HandStatus != HandStatus::Free)
 		return false;
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->Context.WaterSurfaceDist < -CLICK(3))
 		return false;
 
 	// Auto jump to ladder.

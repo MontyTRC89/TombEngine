@@ -97,20 +97,20 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		return false;
 
-	if (!g_Level.Items[lara->Vehicle].Active)
+	if (!g_Level.Items[lara->Context.Vehicle].Active)
 	{
-		lara->Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_ITEM;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
 		return false;
 	}
 
-	TestVolumes(lara->Vehicle);
+	TestVolumes(lara->Context.Vehicle);
 
-	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
+	switch (g_Level.Items[lara->Context.Vehicle].ObjectNumber)
 	{
 	case ID_QUAD:
 		QuadBikeControl(item, coll);
@@ -146,7 +146,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 		// Boats are processed like normal items in loop.
 	default:
-		HandleWeapon(item);
+		HandleWeapon(*item);
 	}
 
 	return true;
@@ -371,7 +371,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraStepUp(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -380,7 +380,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraStepDown(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -905,7 +905,8 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 		else if (height < -CLICK(7.5f))
 			height = -CLICK(7.5f);
 
-		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
+		// TODO: Find a better formula for this that won't require the above block.
+		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * (height));
 	}
 }
 
@@ -1110,15 +1111,15 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Vehicle != NO_ITEM)
-			g_Level.Items[lara->Vehicle].Active = false;
+		if (lara->Context.Vehicle != NO_ITEM)
+			g_Level.Items[lara->Context.Vehicle].Active = false;
 
-		lara->Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_ITEM;
 	}
 	else
 	{
 		g_Level.Items[vehicle->Index].Active = true;
-		lara->Vehicle = vehicle->Index;
+		lara->Context.Vehicle = vehicle->Index;
 	}
 }
 
