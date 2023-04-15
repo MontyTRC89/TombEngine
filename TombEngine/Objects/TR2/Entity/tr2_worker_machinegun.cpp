@@ -196,7 +196,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon = 1;
+					creature->FiredWeapon[0] = 1;
 					creature->Flags = 5;
 				}
 
@@ -220,7 +220,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon = 1;
+					creature->FiredWeapon[0] = 1;
 					creature->Flags = 5;
 				}
 

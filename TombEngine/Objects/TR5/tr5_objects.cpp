@@ -109,7 +109,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -129,7 +128,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
@@ -151,7 +149,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -172,7 +169,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -215,7 +211,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -237,7 +232,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -277,7 +271,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 0;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -354,7 +347,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = Mafia2Control;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 7;
 		obj->HitPoints = 26;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -374,7 +366,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 1;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -392,7 +383,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 3;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -410,7 +400,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = CyborgControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 5;
 		obj->HitPoints = 50;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -430,7 +419,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = SniperControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 6;
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -447,9 +435,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseHeavyGuard;
 		obj->collision = CreatureCollision;
 		obj->control = HeavyGuardControl;
-		obj->shadowType = ShadowMode::All;
 		obj->HitRoutine = HeavyGuardHit;
-		obj->biteOffset = 0;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
@@ -470,7 +457,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 30;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 1024;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -502,7 +488,6 @@ static void StartEntity(ObjectInfo *obj)
 		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = nullptr;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->radius = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
@@ -520,7 +505,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = ControlBrowsBeast;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 341;
@@ -537,7 +521,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LagoonWitchControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -556,7 +539,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = InvisibleGhostControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -601,7 +583,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlGladiator;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 20;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -621,7 +602,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->control = RomanStatueControl;
 			obj->HitRoutine = RomanStatueHit;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 0;
 			obj->HitPoints = 300;
 			obj->pivotLength = 50;
 			obj->radius = 256;

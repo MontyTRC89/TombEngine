@@ -146,11 +146,11 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 
 		// Handle SAS firing.
-		if (creature.FiredWeapon)
+		if (creature.FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
-			creature.FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature.FiredWeapon[0] + 10, 24, 16, 4);
+			creature.FiredWeapon[0]--;
 		}
 
 		if (item.HitPoints > 0)
@@ -529,7 +529,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					ShotLara(&item, &AI, SasGunBite, joint0, SAS_SHOT_DAMAGE);
-					creature.FiredWeapon = 3;
+					creature.FiredWeapon[0] = 3;
 					creature.Flags = 5;
 				}
 

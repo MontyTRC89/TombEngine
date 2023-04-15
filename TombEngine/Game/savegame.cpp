@@ -543,7 +543,13 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_can_jump(creature->LOT.CanJump);
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
 			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
-			creatureBuilder.add_fired_weapon(creature->FiredWeapon);
+
+			std::vector<int> firedWeapon;
+			for (int i = 0; i < 2; i++)
+				firedWeapon.push_back(creature->FiredWeapon[i]);
+			auto firedWeaponOffset = fbb.CreateVector(firedWeapon);
+
+			creatureBuilder.add_fired_weapon(firedWeaponOffset);
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
@@ -1545,7 +1551,8 @@ bool SaveGame::Load(int slot)
 			creature->LOT.CanMonkey = savedCreature->can_monkey();
 			if (savedCreature->enemy() >= 0)
 				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
-			creature->FiredWeapon = savedCreature->fired_weapon();
+			for (int j = 0; j < 2; j++)
+				creature->FiredWeapon[j] = savedCreature->fired_weapon()->Get(j);
 			creature->Flags = savedCreature->flags();
 			creature->Friendly = savedCreature->friendly();
 			creature->HeadLeft = savedCreature->head_left();

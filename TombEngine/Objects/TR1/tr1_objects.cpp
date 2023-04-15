@@ -16,8 +16,8 @@
 #include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
 #include "Objects/TR1/Entity/tr1_wolf.h" // OK
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
-#include "Objects/TR1/Entity/tr1_centaur.h"
-#include "Objects/TR1/Entity/tr1_winged_mutant.h"
+#include "Objects/TR1/Entity/tr1_centaur.h" // OK
+#include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps
@@ -156,7 +156,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WingedMutantControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->hitEffect = HitEffect::Blood;
 		obj->pivotLength = 150;
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->HitPoints = 50;

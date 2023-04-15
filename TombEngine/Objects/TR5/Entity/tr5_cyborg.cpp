@@ -176,11 +176,11 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		// Fire weapon.
-		if (creature.FiredWeapon)
+		if (creature.FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(&item, CyborgGunBite.meshNum, Vector3i(CyborgGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature.FiredWeapon + 10, 192, 128, 32);
-			creature.FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature.FiredWeapon[0] + 10, 192, 128, 32);
+			creature.FiredWeapon[0]--;
 		}
 
 		if (item.AIBits)
@@ -577,7 +577,7 @@ namespace TEN::Entities::Creatures::TR5
 					item.Animation.FrameNumber < g_Level.Anims[item.Animation.AnimNumber].frameBase + 16 &&
 					((byte)item.Animation.FrameNumber - (byte)g_Level.Anims[item.Animation.AnimNumber].frameBase) & 1)
 				{
-					creature.FiredWeapon = 1;
+					creature.FiredWeapon[0] = 1;
 					ShotLara(&item, &AI, CyborgGunBite, joint0, CYBORG_GUN_ATTACK_DAMAGE);
 				}
 

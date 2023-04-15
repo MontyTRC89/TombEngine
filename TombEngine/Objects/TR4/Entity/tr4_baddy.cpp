@@ -420,11 +420,11 @@ namespace TEN::Entities::TR4
 		item->ItemFlags[1] = item->RoomNumber;
 
 		// Handle baddy firing.
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon[0] + 8, 24, 16, 4);
+			creature->FiredWeapon[0]--;
 		}
 
 		CollisionResult probe;
@@ -1158,7 +1158,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				creature->FiredWeapon = 1;
+				creature->FiredWeapon[0] = 1;
 
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Objects/objectslist.h"
+#include "Game/control/box.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
@@ -7,6 +8,7 @@
 enum class ZoneType;
 struct CollisionInfo;
 struct ItemInfo;
+struct BiteInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
@@ -67,7 +69,9 @@ struct ObjectInfo
 	int meshSwapSlot;
 	int pivotLength;
 	int radius;
-	int biteOffset;
+	bool haveBiteOffset;
+	BiteInfo leftBiteOffset;
+	BiteInfo rightBiteOffset;
 
 	int HitPoints;
 	bool intelligent;	// IsIntelligent

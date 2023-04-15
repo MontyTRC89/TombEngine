@@ -57,11 +57,11 @@ namespace TEN::Entities::Creatures::TR2
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, WorkerShotgunBite.meshNum, Vector3i(WorkerShotgunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon[0] * 2) + 4, 24, 16, 4);
+			creature->FiredWeapon[0]--;
 		}
 
 		if (item->HitPoints <= 0)
@@ -205,7 +205,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (!creature->Flags)
 				{
 					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, extraTorsoRot.y, 25);
-					creature->FiredWeapon = 2;
+					creature->FiredWeapon[0] = 2;
 					creature->Flags = 1;
 				}
 
@@ -227,7 +227,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (!creature->Flags)
 				{
 					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, extraTorsoRot.y, 25);
-					creature->FiredWeapon = 2;
+					creature->FiredWeapon[0] = 2;
 					creature->Flags = 1;
 				}
 

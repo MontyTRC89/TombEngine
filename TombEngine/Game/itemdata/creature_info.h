@@ -96,10 +96,15 @@ struct CreatureInfo
 	bool MonkeySwingAhead = false;
 	bool ReachedGoal	  = false;
 
-	short FiredWeapon = 0;
+	// NOTE: 0 is left, 1 is right.
+	short FiredWeapon[2] = { 0, 0 };
 	short Tosspad	  = 0;
 	short LocationAI  = 0;
 	short Flags		  = 0;
+
+	bool TargetIsAlive() {
+		return Enemy != nullptr && Enemy->HitPoints > 0;
+	}
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority = CreatureAIPriority::None;

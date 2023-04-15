@@ -80,11 +80,11 @@ namespace TEN::Entities::Creatures::TR5
 		}*/
 
 		// Fire weapon effects.
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, LarsonGun.meshNum, Vector3i(LarsonGun.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 10, 192, 128, 32);
+			creature->FiredWeapon[0]--;
 		}
 
 		if (item->TriggerFlags)
@@ -333,7 +333,7 @@ namespace TEN::Entities::Creatures::TR5
 					else
 						ShotLara(item, &AI, LarsonGun, joint0, 20);
 					
-					creature->FiredWeapon = 2;
+					creature->FiredWeapon[0] = 2;
 				}
 
 				if (creature->Mood == MoodType::Escape && Random::TestProbability(0.75f))

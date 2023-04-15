@@ -5,6 +5,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 
+#include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Game/Gui.h"

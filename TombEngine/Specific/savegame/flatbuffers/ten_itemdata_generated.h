@@ -760,7 +760,7 @@ struct CreatureT : public flatbuffers::NativeTable {
   bool hurt_by_lara = false;
   int32_t tosspad = 0;
   int32_t location_ai = 0;
-  int32_t fired_weapon = 0;
+  std::vector<int32_t> fired_weapon{};
   int32_t mood = 0;
   int32_t enemy = 0;
   int32_t ai_target_number = 0;
@@ -844,8 +844,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t location_ai() const {
     return GetField<int32_t>(VT_LOCATION_AI, 0);
   }
-  int32_t fired_weapon() const {
-    return GetField<int32_t>(VT_FIRED_WEAPON, 0);
+  const flatbuffers::Vector<int32_t> *fired_weapon() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_FIRED_WEAPON);
   }
   int32_t mood() const {
     return GetField<int32_t>(VT_MOOD, 0);
@@ -891,7 +891,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HURT_BY_LARA) &&
            VerifyField<int32_t>(verifier, VT_TOSSPAD) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_AI) &&
-           VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
+           VerifyOffset(verifier, VT_FIRED_WEAPON) &&
+           verifier.VerifyVector(fired_weapon()) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
            VerifyField<int32_t>(verifier, VT_AI_TARGET_NUMBER) &&
@@ -954,8 +955,8 @@ struct CreatureBuilder {
   void add_location_ai(int32_t location_ai) {
     fbb_.AddElement<int32_t>(Creature::VT_LOCATION_AI, location_ai, 0);
   }
-  void add_fired_weapon(int32_t fired_weapon) {
-    fbb_.AddElement<int32_t>(Creature::VT_FIRED_WEAPON, fired_weapon, 0);
+  void add_fired_weapon(flatbuffers::Offset<flatbuffers::Vector<int32_t>> fired_weapon) {
+    fbb_.AddOffset(Creature::VT_FIRED_WEAPON, fired_weapon);
   }
   void add_mood(int32_t mood) {
     fbb_.AddElement<int32_t>(Creature::VT_MOOD, mood, 0);
@@ -1011,7 +1012,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> fired_weapon = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1070,7 +1071,7 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    const std::vector<int32_t> *fired_weapon = nullptr,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1081,6 +1082,7 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool is_jumping = false,
     bool is_monkeying = false) {
   auto joint_rotation__ = joint_rotation ? _fbb.CreateVector<int32_t>(*joint_rotation) : 0;
+  auto fired_weapon__ = fired_weapon ? _fbb.CreateVector<int32_t>(*fired_weapon) : 0;
   return TEN::Save::CreateCreature(
       _fbb,
       maximum_turn,
@@ -1097,7 +1099,7 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
       hurt_by_lara,
       tosspad,
       location_ai,
-      fired_weapon,
+      fired_weapon__,
       mood,
       enemy,
       ai_target_number,
@@ -2709,7 +2711,7 @@ inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_functi
   { auto _e = hurt_by_lara(); _o->hurt_by_lara = _e; }
   { auto _e = tosspad(); _o->tosspad = _e; }
   { auto _e = location_ai(); _o->location_ai = _e; }
-  { auto _e = fired_weapon(); _o->fired_weapon = _e; }
+  { auto _e = fired_weapon(); if (_e) { _o->fired_weapon.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fired_weapon[_i] = _e->Get(_i); } } }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
   { auto _e = ai_target_number(); _o->ai_target_number = _e; }
@@ -2743,7 +2745,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _hurt_by_lara = _o->hurt_by_lara;
   auto _tosspad = _o->tosspad;
   auto _location_ai = _o->location_ai;
-  auto _fired_weapon = _o->fired_weapon;
+  auto _fired_weapon = _fbb.CreateVector(_o->fired_weapon);
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
   auto _ai_target_number = _o->ai_target_number;

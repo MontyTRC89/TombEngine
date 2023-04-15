@@ -87,12 +87,11 @@ namespace TEN::Entities::TR4
 		int dy = 0;
 		int dz = 0;
 
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, TroopsBite1.meshNum, Vector3i(TroopsBite1.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
-
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 8, 24, 16, 4);
+			creature->FiredWeapon[0]--;
 		}
 
 		if (item->HitPoints <= 0)
@@ -372,7 +371,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
-					creature->FiredWeapon = 1;
+					creature->FiredWeapon[0] = 1;
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
@@ -431,7 +430,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
-					creature->FiredWeapon = 1;
+					creature->FiredWeapon[0] = 1;
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}

@@ -81,7 +81,7 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	auto pos = GameVector(
 		LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
-		LaraItem->Floor,
+		LaraItem->Floor - 128,
 		LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
 		LaraItem->RoomNumber);
 

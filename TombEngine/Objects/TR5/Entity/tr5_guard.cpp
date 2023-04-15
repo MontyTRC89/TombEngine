@@ -327,11 +327,11 @@ namespace TEN::Entities::Creatures::TR5
 		bool canJump1block = CanCreatureJump(*item, JumpDistance::Block1);
 		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
 
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, SwatGunBite.meshNum, Vector3i(SwatGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 10, 192, 128, 32);
+			creature->FiredWeapon[0]--;
 		}
 
 		if (item->AIBits)
@@ -580,7 +580,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!creature->Flags)
 				{
-					creature->FiredWeapon = 2;
+					creature->FiredWeapon[0] = 2;
 					creature->Flags = 1;
 
 					if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
@@ -1018,11 +1018,11 @@ namespace TEN::Entities::Creatures::TR5
 		short joint1 = 0;
 		short joint2 = 0;
 
-		if (creature->FiredWeapon)
+		if (creature->FiredWeapon[0])
 		{
 			auto pos = GetJointPosition(item, SniperGunBite.meshNum, Vector3i(SniperGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 10, 192, 128, 32);
+			creature->FiredWeapon[0]--;
 		}
 
 		if (item->HitPoints > 0)
@@ -1079,7 +1079,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (!creature->Flags)
 				{
 					ShotLara(item, &AI, SniperGunBite, joint0, 100);
-					creature->FiredWeapon = 2;
+					creature->FiredWeapon[0] = 2;
 					creature->Flags = 1;
 				}
 
@@ -1174,8 +1174,8 @@ namespace TEN::Entities::Creatures::TR5
 		if (creature->FiredWeapon)
 		{
 			auto pos = GetJointPosition(item, ArmedMafia2GunBite.meshNum, Vector3i(ArmedMafia2GunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
-			creature->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon[0] + 8, 24, 16, 4);
+			creature->FiredWeapon[0]--;
 		}
 
 		AI_INFO AI;
@@ -1332,8 +1332,8 @@ namespace TEN::Entities::Creatures::TR5
 				if (!creature->Flags)
 				{
 					ShotLara(item, &AI, ArmedMafia2GunBite, laraAI.angle / 2, 35);
+					creature->FiredWeapon[0] = 2;
 					creature->Flags = 1;
-					creature->FiredWeapon = 2;
 				}
 			
 				break;

@@ -352,7 +352,9 @@ void InitialiseObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
 		obj->LotType = LotType::Basic;
-		obj->biteOffset = -1;
+		obj->haveBiteOffset = false;
+		obj->leftBiteOffset = BiteInfo(Vector3::Zero, -1);
+		obj->rightBiteOffset = BiteInfo(Vector3::Zero, -1);
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
