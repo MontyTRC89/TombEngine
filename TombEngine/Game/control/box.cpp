@@ -582,13 +582,13 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 
 short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.BoneID, bite.Position);
+	auto pos = GetJointPosition(item, bite);
 	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
 short CreatureEffect(ItemInfo* item, const CreatureBiteInfo& bite, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.BoneID, bite.Position);
+	auto pos = GetJointPosition(item, bite);
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
 
