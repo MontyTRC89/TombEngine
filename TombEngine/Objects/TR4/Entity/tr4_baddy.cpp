@@ -54,8 +54,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
+	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
@@ -418,14 +418,6 @@ namespace TEN::Entities::TR4
 		}
 
 		item->ItemFlags[1] = item->RoomNumber;
-
-		// Handle baddy firing.
-		if (creature->FiredWeapon[0])
-		{
-			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon[0] + 8, 24, 16, 4);
-			creature->FiredWeapon[0]--;
-		}
 
 		CollisionResult probe;
 
@@ -1158,13 +1150,13 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				creature->FiredWeapon[0] = 1;
-
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
-				
+
 				if (!ShotLara(item, &AI, BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
+				creature->MuzzleFlash[0].Bite = BaddyGunBite;
+				creature->MuzzleFlash[0].Delay = 1;
 
 				break;
 

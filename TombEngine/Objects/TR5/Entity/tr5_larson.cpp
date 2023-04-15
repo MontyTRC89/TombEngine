@@ -31,9 +31,9 @@ namespace TEN::Entities::Creatures::TR5
 
 	#define TR5_LARSON_MIN_HP 40
 
-	const auto LarsonGun  = BiteInfo(Vector3(-55.0f, 200.0f, 5.0f), 14);
-	const auto PierreGun1 = BiteInfo(Vector3(60.0f, 200.0f, 0.0f), 11);
-	const auto PierreGun2 = BiteInfo(Vector3(-57.0f, 200.0f, 0.0f), 14);
+	const auto LarsonGun  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
+	const auto PierreGun1 = CreatureBiteInfo(Vector3i(60, 200, 0), 11);
+	const auto PierreGun2 = CreatureBiteInfo(Vector3i(-57, 200, 0), 14);
 
 	void InitialiseLarson(short itemNumber)
 	{
@@ -79,13 +79,8 @@ namespace TEN::Entities::Creatures::TR5
 			creature->flags++;
 		}*/
 
-		// Fire weapon effects.
-		if (creature->FiredWeapon[0])
-		{
-			auto pos = GetJointPosition(item, LarsonGun.meshNum, Vector3i(LarsonGun.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 10, 192, 128, 32);
-			creature->FiredWeapon[0]--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->TriggerFlags)
 		{
@@ -332,8 +327,9 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else
 						ShotLara(item, &AI, LarsonGun, joint0, 20);
-					
-					creature->FiredWeapon[0] = 2;
+
+					creature->MuzzleFlash[0].Bite = LarsonGun;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 
 				if (creature->Mood == MoodType::Escape && Random::TestProbability(0.75f))

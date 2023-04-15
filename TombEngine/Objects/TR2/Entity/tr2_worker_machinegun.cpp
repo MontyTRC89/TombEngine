@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerMachineGunBite = BiteInfo(Vector3(0.0f, 308.0f, 32.0f), 9);
+	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3i(0, 308, 32), 9);
 
 	void InitialiseWorkerMachineGun(short itemNumber)
 	{
@@ -196,7 +196,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon[0] = 1;
+					creature->MuzzleFlash[0].Delay = 1;
 					creature->Flags = 5;
 				}
 
@@ -220,7 +220,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon[0] = 1;
+					creature->MuzzleFlash[0].Delay = 1;
 					creature->Flags = 5;
 				}
 

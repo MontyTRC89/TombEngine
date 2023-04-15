@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
+	const auto InvisibleGhostBite = CreatureBiteInfo(Vector3i::Zero, 17);
 
 	void InitialiseInvisibleGhost(short itemNumber)
 	{

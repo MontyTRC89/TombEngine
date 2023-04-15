@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 	constexpr auto WILD_BOAR_ATTACK_RANGE = SQUARE(CLICK(1));
 
-	const auto WildBoarBite = BiteInfo(Vector3::Zero, 14);
+	const auto WildBoarBite = CreatureBiteInfo(Vector3i::Zero, 14);
 
 	enum WildBoarState
 	{

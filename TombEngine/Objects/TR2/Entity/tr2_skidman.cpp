@@ -21,8 +21,8 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
-	const auto SkidooBiteLeft  = BiteInfo(Vector3(240.0f, -190.0f, 540.0f), 0);
-	const auto SkidooBiteRight = BiteInfo(Vector3(-240.0f, -190.0f, 540.0f), 0);
+	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3i(240, -190, 540), 0);
+	const auto SkidooBiteRight = CreatureBiteInfo(Vector3i(-240, -190, 540), 0);
 
 	constexpr auto SMAN_MIN_TURN = ANGLE(2.0f);
 	constexpr auto SMAN_TARGET_ANGLE = ANGLE(15.0f);

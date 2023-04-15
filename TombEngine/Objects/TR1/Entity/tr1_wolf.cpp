@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
 	constexpr auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
 	constexpr auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
-
-	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
+	
+	const auto WolfBite = CreatureBiteInfo(Vector3i(0, -14, 174), 6);
 	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState

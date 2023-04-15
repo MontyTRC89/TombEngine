@@ -7,6 +7,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
+#include "Game/effects/smoke.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -20,6 +21,8 @@
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
+
+using namespace TEN::Effects::Smoke;
 
 constexpr auto ESCAPE_DIST = SECTOR(5);
 constexpr auto STALK_DIST = SECTOR(3);
@@ -577,15 +580,15 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.meshNum, Vector3i(bite.Position));
+	auto pos = GetJointPosition(item, bite.BoneID, bite.Position);
 	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
-short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
+short CreatureEffect(ItemInfo* item, const CreatureBiteInfo& bite, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.meshNum, Vector3i(bite.Position));
+	auto pos = GetJointPosition(item, bite.BoneID, bite.Position);
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
 
@@ -725,9 +728,22 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 bool CreatureAnimation(short itemNumber, short angle, short tilt)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
 	if (!item->IsCreature())
 		return false;
+	auto* creature = GetCreatureInfo(item);
+
+	if (creature->MuzzleFlash[0].Delay != 0)
+	{
+		auto pos = GetJointPosition(item, creature->MuzzleFlash[0].Bite);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
+		TriggerGunSmokeParticles(item, pos.x, pos.y, pos.z, 0, 0, 0, 1, 12, item->RoomNumber);
+	}
+	if (creature->MuzzleFlash[1].Delay != 0)
+	{
+		auto pos = GetJointPosition(item, creature->MuzzleFlash[1].Bite);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
+		TriggerGunSmokeParticles(item, pos.x, pos.y, pos.z, 0, 0, 0, 1, 12, item->RoomNumber);
+	}
 
 	auto prevPos = item->Pose.Position;
 

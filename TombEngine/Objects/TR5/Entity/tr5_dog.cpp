@@ -14,7 +14,7 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3);
+	const auto DogBite = CreatureBiteInfo(Vector3i(0, 0, 100), 3);
 	static BYTE DogAnims[] = { 20, 21, 22, 20 };
 
 	void InitialiseTr5Dog(short itemNumber)

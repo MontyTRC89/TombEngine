@@ -915,11 +915,11 @@ namespace TEN::Renderer
 				auto* nativeItem = &g_Level.Items[item->ItemNumber];
 				auto* obj = &Objects[nativeItem->ObjectNumber];
 
-				if (!obj->haveBiteOffset || !nativeItem->IsCreature())
+				if (!nativeItem->IsCreature())
 					continue;
+				auto* creature = GetCreatureInfo(nativeItem);
 				auto const& room_item = m_rooms[nativeItem->RoomNumber];
 				auto* flashMoveable = m_moveableObjects[ID_GUN_FLASH]->ObjectMeshes.at(0);
-				auto* creature = GetCreatureInfo(nativeItem);
 
 				m_stStatic.Color = Vector4::One;
 				m_stStatic.AmbientLight = room_item.AmbientLight;
@@ -929,7 +929,7 @@ namespace TEN::Renderer
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				if (creature->FiredWeapon[0] != 0 && obj->leftBiteOffset.meshNum != -1)
+				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
 				{
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
@@ -940,11 +940,11 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(obj->leftBiteOffset.Position);
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[0].Bite.Position.ToVector3());
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[obj->leftBiteOffset.meshNum] * item->World;
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[0].Bite.BoneID] * item->World;
 						world = offset * world;
 						world = rotationX * world;
 						world = rotationZ * world;
@@ -955,9 +955,12 @@ namespace TEN::Renderer
 						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
+
+					auto pos = GetJointPosition(nativeItem, creature->MuzzleFlash[0].Bite);
+					TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
 				}
 
-				if (creature->FiredWeapon[1] != 0 && obj->rightBiteOffset.meshNum != -1)
+				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
 				{
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
@@ -968,11 +971,11 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(obj->rightBiteOffset.Position);
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[1].Bite.Position.ToVector3());
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[obj->rightBiteOffset.meshNum] * item->World;
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[1].Bite.BoneID] * item->World;
 						world = offset * world;
 						world = rotationX * world;
 						world = rotationZ * world;

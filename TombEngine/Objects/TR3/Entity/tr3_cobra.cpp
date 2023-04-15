@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15.0f;
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
-	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
+	const auto CobraBite = CreatureBiteInfo(Vector3i::Zero, 13);
 	const auto CobraAttackJoints = std::vector<unsigned int>{ 13 };
 
 	enum CobraState

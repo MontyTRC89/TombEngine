@@ -21,7 +21,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SILENCER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto SILENCER_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
-	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
+	const auto SilencerGunBite = CreatureBiteInfo(Vector3(3, 331, 56), 10);
 
 	enum SilencerState
 	{

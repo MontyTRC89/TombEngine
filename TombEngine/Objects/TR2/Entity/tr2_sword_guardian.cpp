@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SWORD_GUARDIAN_MESH_SWAP_TIME = 3;
 
-	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
+	const auto SwordBite = CreatureBiteInfo(Vector3i(0, 37, 550), 15);
 
 	enum SwordGuardianState
 	{
@@ -352,7 +352,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (!creature->Flags && item->TouchBits.Test(SwordBite.meshNum))
+				if (!creature->Flags && item->TouchBits.Test(SwordBite.BoneID))
 				{
 					DoDamage(creature->Enemy, SWORD_GUARDIAN_ATTACK_DAMAGE);
 					CreatureEffect(item, SwordBite, DoBloodSplat);

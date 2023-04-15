@@ -52,7 +52,7 @@ int SplashCount = 0;
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
 {
-	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0, TODO: This mesh is invalid as it can't be negative. -- TokyoSU 23.02.20
+	{ -16, 40, 160, 13, false }, // TR5 offset 0, TODO: This mesh is invalid as it can't be negative. -- TokyoSU 23.02.20
 	{ -16, -8, 160, 0, false },			// TR5 offset 1
 	{ 0, 0, 256, 8, false },			// TR5 offset 2
 	{ 0, 0, 256, 17, false },			// TR5 offset 3

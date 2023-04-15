@@ -527,8 +527,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent
-			&& itemToSerialize.Data.is<CreatureInfo>())
+		if (Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
@@ -546,10 +545,10 @@ bool SaveGame::Save(int slot)
 
 			std::vector<int> firedWeapon;
 			for (int i = 0; i < 2; i++)
-				firedWeapon.push_back(creature->FiredWeapon[i]);
+				firedWeapon.push_back(creature->MuzzleFlash[i].Delay);
 			auto firedWeaponOffset = fbb.CreateVector(firedWeapon);
 
-			creatureBuilder.add_fired_weapon(firedWeaponOffset);
+			creatureBuilder.add_weapon_delay(firedWeaponOffset);
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
@@ -1552,7 +1551,7 @@ bool SaveGame::Load(int slot)
 			if (savedCreature->enemy() >= 0)
 				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
 			for (int j = 0; j < 2; j++)
-				creature->FiredWeapon[j] = savedCreature->fired_weapon()->Get(j);
+				creature->MuzzleFlash[j].Delay = savedCreature->weapon_delay()->Get(j);
 			creature->Flags = savedCreature->flags();
 			creature->Friendly = savedCreature->friendly();
 			creature->HeadLeft = savedCreature->head_left();

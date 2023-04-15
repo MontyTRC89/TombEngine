@@ -28,8 +28,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-	const auto WaspBite			 = BiteInfo(Vector3(0.0f, 0.0f, -260.0f), 12);
-	const auto WaspVenomSackBite = BiteInfo(Vector3::Zero, 10);
+	const auto WaspBite			 = CreatureBiteInfo(Vector3i(0, 0, -260), 12);
+	const auto WaspVenomSackBite = CreatureBiteInfo(Vector3i::Zero, 10);
 
 	enum WaspMutantState
 	{
@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR3
 			item.ItemFlags[0] = 0;
 
 		// Spawn light.
-		auto pos = GetJointPosition(&item, WaspVenomSackBite.meshNum, WaspVenomSackBite.Position);
+		auto pos = GetJointPosition(&item, WaspVenomSackBite);
 		TriggerDynamicLight(
 			pos.x, pos.y, pos.z,
 			item.ItemFlags[0],
@@ -276,7 +276,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.RequiredState = WASP_STATE_FLY_FORWARD;
 				}
 
-				if (!creature.Flags && item.TouchBits.Test(WaspBite.meshNum))
+				if (!creature.Flags && item.TouchBits.Test(WaspBite.BoneID))
 				{
 					DoDamage(creature.Enemy, WASP_DAMAGE);
 					CreatureEffect2(&item, WaspBite, 10, item.Pose.Orientation.y, DoBloodSplat);

@@ -71,6 +71,46 @@ struct LOTInfo
 	bool CanMonkey	  = false;
 };
 
+struct CreatureBiteInfo
+{
+	Vector3i Position = Vector3i::Zero;
+	int BoneID = -1;
+
+	CreatureBiteInfo() {}
+	CreatureBiteInfo(Vector3i pos, int bone)
+	{
+		Position = pos;
+		BoneID = bone;
+	}
+	CreatureBiteInfo(int x, int y, int z, int bone)
+	{
+		Position = Vector3i(x, y, z);
+		BoneID = bone;
+	}
+};
+
+struct CreatureMuzzleflashInfo
+{
+	CreatureBiteInfo Bite;
+	int Delay = 0;
+	// This will change the muzzle object to ID_GUNFLASH2.
+	bool SwitchToMuzzle2 = false;
+
+	CreatureMuzzleflashInfo() {}
+	CreatureMuzzleflashInfo(Vector3i pos, int bone, int delay, bool changeToMuzzle2 = false)
+	{
+		Bite = CreatureBiteInfo(pos, bone);
+		Delay = delay;
+		SwitchToMuzzle2 = changeToMuzzle2;
+	}
+	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false)
+	{
+		Bite = bite;
+		Delay = delay;
+		SwitchToMuzzle2 = changeToMuzzle2;
+	}
+};
+
 struct CreatureInfo 
 {
 	int ItemNumber = -1;
@@ -96,8 +136,7 @@ struct CreatureInfo
 	bool MonkeySwingAhead = false;
 	bool ReachedGoal	  = false;
 
-	// NOTE: 0 is left, 1 is right.
-	short FiredWeapon[2] = { 0, 0 };
+	CreatureMuzzleflashInfo MuzzleFlash[2];
 	short Tosspad	  = 0;
 	short LocationAI  = 0;
 	short Flags		  = 0;

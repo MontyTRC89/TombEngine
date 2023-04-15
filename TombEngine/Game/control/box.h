@@ -2,10 +2,10 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 
-struct BiteInfo;
 struct CreatureInfo;
 struct ItemInfo;
 struct LOTInfo;
+struct CreatureBiteInfo;
 
 enum class JumpDistance
 {
@@ -18,55 +18,6 @@ enum TARGET_TYPE
 	NO_TARGET,
 	PRIME_TARGET,
 	SECONDARY_TARGET
-};
-
-struct OBJECT_BONES
-{
-	short bone0;
-	short bone1;
-	short bone2;
-	short bone3;
-
-	OBJECT_BONES()
-	{
-		this->bone0 = 0;
-		this->bone1 = 0;
-		this->bone2 = 0;
-		this->bone3 = 0;
-	}
-
-	OBJECT_BONES(short all)
-	{
-		this->bone0 = all;
-		this->bone1 = all;
-		this->bone2 = all;
-		this->bone3 = all;
-	}
-
-	OBJECT_BONES(short angleY, short angleX)
-	{
-		this->bone0 = angleY;
-		this->bone1 = angleX;
-		this->bone2 = angleY;
-		this->bone3 = angleX;
-	}
-
-	OBJECT_BONES(short angleY, short angleX, bool total)
-	{
-		this->bone0 = angleY;
-		this->bone1 = angleX;
-
-		if (total)
-		{
-			this->bone2 = angleY;
-			this->bone3 = angleX;
-		}
-		else
-		{
-			this->bone2 = 0;
-			this->bone3 = 0;
-		}
-	}
 };
 
 struct AI_INFO
@@ -99,10 +50,10 @@ struct OVERLAP
 	int flags;
 };
 
-struct BiteInfo
+/*struct BiteInfo
 {
 	Vector3 Position = Vector3::Zero;
-	int		meshNum	 = 0;
+	int		meshNum = 0;
 
 	BiteInfo()
 	{
@@ -121,7 +72,7 @@ struct BiteInfo
 		this->Position = Vector3(xPos, yPos, zPos);
 		this->meshNum = meshNumber;
 	}
-};
+};*/
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
 
@@ -164,8 +115,8 @@ short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ItemInfo* item, int entityKillAnim, int laraExtraKillAnim, int entityKillState, int laraKillState);
-short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func);
-short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
+short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect(ItemInfo* item, const CreatureBiteInfo& bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle = ANGLE(70.0f));

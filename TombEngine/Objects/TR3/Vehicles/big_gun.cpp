@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -125,7 +125,7 @@ namespace TEN::Entities::Vehicles
 
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
-		auto pos = GetJointPosition(bigGunItem, BigGunBite.meshNum, BigGunBite.Position);
+		auto pos = GetJointPosition(bigGunItem, BigGunBite);
 		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
 		projectileItem->RoomNumber = probe.RoomNumber;
 		projectileItem->Pose.Position = pos;

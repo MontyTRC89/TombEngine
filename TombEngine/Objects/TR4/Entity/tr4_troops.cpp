@@ -20,7 +20,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto TroopsBite1 = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
+	const auto TroopsBite1 = CreatureBiteInfo(Vector3i(0, 300, 64), 7);
 
 	enum TroopState
 	{
@@ -87,12 +87,8 @@ namespace TEN::Entities::TR4
 		int dy = 0;
 		int dz = 0;
 
-		if (creature->FiredWeapon[0])
-		{
-			auto pos = GetJointPosition(item, TroopsBite1.meshNum, Vector3i(TroopsBite1.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon[0] + 8, 24, 16, 4);
-			creature->FiredWeapon[0]--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -368,11 +364,14 @@ namespace TEN::Entities::TR4
 				}
 
 				if (creature->Flags)
+				{
 					creature->Flags--;
+				}
 				else
 				{
-					creature->FiredWeapon[0] = 1;
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
+					creature->MuzzleFlash[0].Bite = TroopsBite1;
+					creature->MuzzleFlash[0].Delay = 1;
 					creature->Flags = 5;
 				}
 
@@ -427,11 +426,14 @@ namespace TEN::Entities::TR4
 				}
 
 				if (creature->Flags)
+				{
 					creature->Flags--;
+				}
 				else
 				{
-					creature->FiredWeapon[0] = 1;
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
+					creature->MuzzleFlash[0].Bite = TroopsBite1;
+					creature->MuzzleFlash[0].Delay = 1;
 					creature->Flags = 5;
 				}
 

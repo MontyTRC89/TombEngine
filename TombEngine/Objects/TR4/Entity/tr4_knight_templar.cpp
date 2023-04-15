@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
-	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
+	const auto KnightTemplarBite = CreatureBiteInfo(Vector3i::Zero, 11);
 	const auto KnightTemplarSwordAttackJoints = std::vector<unsigned int>{ 10, 11 };
 
 	enum KnightTemplarState

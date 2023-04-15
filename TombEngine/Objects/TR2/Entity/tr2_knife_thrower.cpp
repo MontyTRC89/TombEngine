@@ -24,8 +24,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	// TODO: Ranges.
 
-	const auto KnifeBiteLeft  = BiteInfo(Vector3::Zero, 5);
-	const auto KnifeBiteRight = BiteInfo(Vector3::Zero, 8);
+	const auto KnifeBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 5);
+	const auto KnifeBiteRight = CreatureBiteInfo(Vector3i::Zero, 8);
 
 	enum KnifeThrowerState
 	{

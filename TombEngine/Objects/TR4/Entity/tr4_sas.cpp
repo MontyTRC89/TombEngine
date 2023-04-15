@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SAS_WALK_RANGE  = SQUARE(BLOCK(2));
 	constexpr auto SAS_SHOOT_RANGE = SQUARE(BLOCK(3));
 
-	const auto SasGunBite = BiteInfo(Vector3(0.0f, 550.0f, 84.0f), 7);
+	const auto SasGunBite = CreatureBiteInfo(Vector3i(0, 550, 84), 7);
 
 	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
 	const auto SasDragBounds = ObjectCollisionBounds
@@ -145,13 +145,8 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 
-		// Handle SAS firing.
-		if (creature.FiredWeapon[0])
-		{
-			auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature.FiredWeapon[0] + 10, 24, 16, 4);
-			creature.FiredWeapon[0]--;
-		}
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
 
 		if (item.HitPoints > 0)
 		{
@@ -529,7 +524,8 @@ namespace TEN::Entities::TR4
 				else
 				{
 					ShotLara(&item, &AI, SasGunBite, joint0, SAS_SHOT_DAMAGE);
-					creature.FiredWeapon[0] = 3;
+					creature.MuzzleFlash[0].Bite = SasGunBite;
+					creature.MuzzleFlash[0].Delay = 3;
 					creature.Flags = 5;
 				}
 
@@ -659,7 +655,7 @@ namespace TEN::Entities::TR4
 		grenadeItem->ObjectNumber = ID_GRENADE;
 		grenadeItem->RoomNumber = item.RoomNumber;
 
-		auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
+		auto pos = GetJointPosition(&item, SasGunBite);
 		grenadeItem->Pose.Position = pos;
 
 		auto floorHeight = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
