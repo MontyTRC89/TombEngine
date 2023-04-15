@@ -919,7 +919,6 @@ namespace TEN::Renderer
 					continue;
 				auto* creature = GetCreatureInfo(nativeItem);
 				auto const& room_item = m_rooms[nativeItem->RoomNumber];
-				auto* flashMoveable = m_moveableObjects[ID_GUN_FLASH]->ObjectMeshes.at(0);
 
 				m_stStatic.Color = Vector4::One;
 				m_stStatic.AmbientLight = room_item.AmbientLight;
@@ -931,6 +930,8 @@ namespace TEN::Renderer
 
 				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
 				{
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? ID_GUN_FLASH2 : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
@@ -962,6 +963,8 @@ namespace TEN::Renderer
 
 				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
 				{
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? ID_GUN_FLASH2 : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
