@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 // debug
@@ -403,7 +403,7 @@ void FloorInfo::RemoveBridge(int itemNumber)
 	BridgeItemNumbers.erase(itemNumber);
 }
 
-namespace TEN::Floordata
+namespace TEN::Collision::Floordata
 {
 	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor)
 	{

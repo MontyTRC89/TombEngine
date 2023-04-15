@@ -41,7 +41,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;

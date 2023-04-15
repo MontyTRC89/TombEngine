@@ -1,3 +1,9 @@
+Version 1.0.9
+=============
+
+- Fix Cold bar triggered when room is dry (only trigger if and only if the room is water).
+- Fix spiky wall being too slow when triggered.
+
 Version 1.0.8
 =============
 
