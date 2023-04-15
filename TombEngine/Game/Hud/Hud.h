@@ -14,8 +14,8 @@ namespace TEN::Hud
 		PickupSummaryController PickupSummary = {};
 
 		// Utilities
-		void Update(ItemInfo& item);
-		void Draw(ItemInfo& item) const;
+		void Update(const ItemInfo& item);
+		void Draw(const ItemInfo& item) const;
 		void Clear();
 	};
 

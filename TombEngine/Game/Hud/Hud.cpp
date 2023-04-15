@@ -11,13 +11,13 @@ namespace TEN::Hud
 {
 	HudController g_Hud = {};
 
-	void HudController::Update(ItemInfo& item)
+	void HudController::Update(const ItemInfo& item)
 	{
 		PickupSummary.Update();
 		StatusBars.Update(item);
 	}
 
-	void HudController::Draw(ItemInfo& item) const
+	void HudController::Draw(const ItemInfo& item) const
 	{
 		PickupSummary.Draw();
 		StatusBars.Draw(item);
