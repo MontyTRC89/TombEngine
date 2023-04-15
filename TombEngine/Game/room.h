@@ -1,11 +1,43 @@
 #pragma once
 #include "framework.h"
 #include "Game/collision/floordata.h"
-#include "Specific/newtypes.h"
 #include "Math/Math.h"
+#include "Specific/newtypes.h"
 
-struct TriggerVolume;
 enum class ReverbType;
+struct TriggerVolume;
+
+constexpr auto MAX_FLIPMAP	= 256;
+constexpr auto NUM_ROOMS	= 1024;
+constexpr auto NO_ROOM		= -1;
+constexpr auto OUTSIDE_Z	= 64;
+constexpr auto OUTSIDE_SIZE = 1024;
+
+extern byte FlipStatus;
+extern int FlipStats[MAX_FLIPMAP];
+extern int FlipMap[MAX_FLIPMAP];
+
+enum RoomEnvFlags
+{
+	ENV_FLAG_WATER			  = (1 << 0),
+	ENV_FLAG_SWAMP			  = (1 << 2),
+	ENV_FLAG_OUTSIDE		  = (1 << 3),
+	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
+	ENV_FLAG_WIND			  = (1 << 5),
+	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
+	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
+	ENV_FLAG_MIST			  = (1 << 8),
+	ENV_FLAG_CAUSTICS		  = (1 << 9),
+	ENV_FLAG_UNKNOWN3		  = (1 << 10),
+	ENV_FLAG_DAMAGE			  = (1 << 11),
+	ENV_FLAG_COLD			  = (1 << 12)
+};
+
+enum StaticMeshFlags : short
+{
+	SM_VISIBLE = 1,
+	SM_SOLID = 2
+};
 
 struct ROOM_VERTEX
 {
@@ -13,8 +45,8 @@ struct ROOM_VERTEX
 	Vector3 normal;
 	Vector2 textureCoordinates;
 	Vector3 color;
-	int effects;
-	int index;
+	int		effects;
+	int		index;
 };
 
 struct ROOM_DOOR
@@ -53,44 +85,22 @@ struct MESH_INFO
 
 struct LIGHTINFO
 {
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	unsigned char Type; // size=0, offset=12
-	unsigned char r; // size=0, offset=13
-	unsigned char g; // size=0, offset=14
-	unsigned char b; // size=0, offset=15
-	short nx; // size=0, offset=16
-	short ny; // size=0, offset=18
-	short nz; // size=0, offset=20
-	short Intensity; // size=0, offset=22
-	unsigned char Inner; // size=0, offset=24
-	unsigned char Outer; // size=0, offset=25
-	short FalloffScale; // size=0, offset=26
-	short Length; // size=0, offset=28
-	short Cutoff; // size=0, offset=30
-};
-
-enum RoomEnvFlags
-{
-	ENV_FLAG_WATER			  = (1 << 0),
-	ENV_FLAG_SWAMP			  = (1 << 2),
-	ENV_FLAG_OUTSIDE		  = (1 << 3),
-	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
-	ENV_FLAG_WIND			  = (1 << 5),
-	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
-	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
-	ENV_FLAG_MIST			  = (1 << 8),
-	ENV_FLAG_CAUSTICS		  = (1 << 9),
-	ENV_FLAG_UNKNOWN3		  = (1 << 10),
-	ENV_FLAG_DAMAGE			  = (1 << 11),
-	ENV_FLAG_COLD			  = (1 << 12)
-};
-
-enum StaticMeshFlags : short
-{
-	SM_VISIBLE = 1,
-	SM_SOLID = 2
+	int x;
+	int y;
+	int z;
+	unsigned char Type;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+	short nx;
+	short ny;
+	short nz;
+	short Intensity;
+	unsigned char Inner;
+	unsigned char Outer;
+	short FalloffScale;
+	short Length;
+	short Cutoff;
 };
 
 struct ROOM_INFO
@@ -113,35 +123,25 @@ struct ROOM_INFO
 	short fxNumber;
 	bool boundActive;
 
-	std::string name;
-	std::vector<std::string> tags;
+	std::string name = {};
+	std::vector<std::string> tags = {};
 
-	std::vector<FloorInfo> floor;
-	std::vector<ROOM_LIGHT> lights;
-	std::vector<MESH_INFO> mesh;
-	std::vector<TriggerVolume> triggerVolumes;
+	std::vector<FloorInfo>	   floor		  = {};
+	std::vector<ROOM_LIGHT>	   lights		  = {};
+	std::vector<MESH_INFO>	   mesh			  = {};
+	std::vector<TriggerVolume> triggerVolumes = {};
 
-	std::vector<Vector3> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector3> colors;
-	std::vector<Vector3> effects;
-	std::vector<BUCKET> buckets;
-	std::vector<ROOM_DOOR> doors;
+	std::vector<Vector3>   positions = {};
+	std::vector<Vector3>   normals	 = {};
+	std::vector<Vector3>   colors	 = {};
+	std::vector<Vector3>   effects	 = {};
+	std::vector<BUCKET>	   buckets	 = {};
+	std::vector<ROOM_DOOR> doors	 = {};
 
-	std::vector<int> neighbors;
+	std::vector<int> neighbors = {};
 
 	bool Active();
 };
-
-constexpr auto MAX_FLIPMAP = 256;
-constexpr auto NUM_ROOMS = 1024;
-constexpr auto NO_ROOM = -1;
-constexpr auto OUTSIDE_Z = 64;
-constexpr auto OUTSIDE_SIZE = 1024;
-
-extern byte FlipStatus;
-extern int FlipStats[MAX_FLIPMAP];
-extern int FlipMap[MAX_FLIPMAP];
 
 void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* room);

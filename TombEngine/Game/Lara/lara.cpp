@@ -857,17 +857,17 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
 						auto pointColl = GetCollision(item, 0, 0, CLICK(1));
-						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
-					}
-				}
 
-				if (isCold)
-				{
-					lara->Status.Exposure--;
-					if (lara->Status.Exposure <= 0)
-					{
-						lara->Status.Exposure = 0;
-						item->HitPoints -= 10;
+						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
+						if (isCold)
+						{
+							lara->Status.Exposure--;
+							if (lara->Status.Exposure <= 0)
+							{
+								lara->Status.Exposure = 0;
+								item->HitPoints -= 10;
+							}
+						}
 					}
 				}
 				else
