@@ -129,7 +129,6 @@ namespace TEN::Collision::Attractors
 		return attracColl;
 	}
 
-	// TODO: Maybe return struct with this vector and the refPoint + range just in case.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& refPoint, float range)
 	{
@@ -217,24 +216,24 @@ namespace TEN::Collision::Attractors
 			box.Center + Vector3::Transform(point3, rotMatrix)
 		};
 
-		// Return attractors generated from points.
+		// Generate and return attractors.
 		return GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
 	}
 
 	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
 	{
-		// Invalid sector; return empty collection.
+		// Invalid sector; return empty vector.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return {};
 
-		// Generate bridge attractors.
+		// Generate and return bridge attractors.
 		if (pointColl.Position.Bridge >= 0)
 		{
 			const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
 			return GenerateBridgeAttractors(bridgeItem);
 		}
 
-		// Generate room attractors.
+		// Generate and return floor attractors.
 		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
 		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber, AttractorType::Edge);
 	}
