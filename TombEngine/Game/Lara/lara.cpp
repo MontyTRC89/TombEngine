@@ -232,6 +232,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_turn_180,//171
 	lara_as_crawl_turn_180,//172
 	lara_as_turn_180,//173
+	lara_as_use_puzzle,//174
 };
 
 std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -410,6 +411,7 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
 	lara_col_turn_180,//173
+	lara_default_col,//174
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)

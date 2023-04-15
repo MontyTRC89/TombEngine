@@ -192,12 +192,85 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			return;
 		}
 	}
+
+}
+
+void PuzzleDoneControl(short itemNumber)
+{
+
 }
 
 void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	if ((g_Level.Items[itemNumber].TriggerFlags - 998) > 1)
 		ObjectCollision(itemNumber, laraItem, coll);
+	
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* receptableItem = &g_Level.Items[itemNumber];
+
+	auto puzzleType = PuzzleType::Normal;
+	AnimateItem(receptableItem);
+
+	if ((TrInput & IN_ACTION  &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+		laraInfo->Control.HandStatus == HandStatus::Free &&
+		!BinocularRange) ||
+		(laraInfo->Control.IsMoving &&
+			laraInfo->Context.InteractedItem == itemNumber))
+	{
+		short oldYrot = receptableItem->Pose.Orientation.y;
+
+		auto bounds = GameBoundingBox(receptableItem);
+		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
+		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);
+
+		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
+		{
+				laraItem->Animation.AnimNumber = LA_REMOVE_PUZZLE;
+				laraItem->Animation.ActiveState = LS_EJECT_PUZZLE;
+				receptableItem->ItemFlags[0] = 1;
+
+				auto pickedUPItem = static_cast<GAME_OBJECT_ID>(receptableItem->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
+				PickedUpObject(pickedUPItem, 1);
+				auto pickedUPItem = &g_Level.Items[pickedUPItem]->;
+				CollectCarriedItems(pickedUPItem);
+
+				ResetPlayerFlex(laraItem);
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Busy;
+				laraInfo->Context.InteractedItem = itemNumber;
+				receptableItem->Pose.Orientation.y = oldYrot;
+				receptableItem->Flags |= TRIGGERED;
+				return;
+		}
+		if (laraInfo->Control.IsMoving)
+		{
+			if (laraInfo->Context.InteractedItem == itemNumber)
+			{
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Free;
+			}
+		}
+
+		receptableItem->Pose.Orientation.y = oldYrot;
+	}
+	else
+	{
+		if (!laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber || laraInfo->Context.InteractedItem != itemNumber)
+		{
+			if (laraItem->Animation.ActiveState == LS_MISC_CONTROL)
+				return;
+
+			if (puzzleType != PuzzleType::Cutscene)
+				ObjectCollision(itemNumber, laraItem, coll);
+
+			return;
+		}
+	}
 }
 
 void PuzzleDone(ItemInfo* item, short itemNumber)
@@ -208,12 +281,25 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.RequiredState = NO_STATE;
-	item->ResetModelToDefault();
-
 	AddActiveItem(itemNumber);
 
 	item->Flags |= IFLAG_ACTIVATION_MASK;
-	item->Status = ITEM_ACTIVE;
+	item->Status = ITEM_DEACTIVATED;
+	//item->Status = ITEM_ACTIVE;
+	item->ResetModelToDefault();
+}
+
+void PuzzleHole(ItemInfo* item, short itemNumber)
+{
+	item->ObjectNumber = static_cast<GAME_OBJECT_ID>(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+	item->Animation.RequiredState = NO_STATE;
+
+	item->Status = ITEM_DEACTIVATED;
+	item->ResetModelToDefault();
 }
 
 void DoPuzzle()
@@ -251,6 +337,21 @@ void DoPuzzle()
 		}
 		if (LaraItem->Animation.AnimNumber == LA_TRIDENT_SET)
 			PuzzleDone(item, PuzzleItem);
+	}
+
+	if (LaraItem->Animation.ActiveState == LS_EJECT_PUZZLE)
+	{
+		if (item->ItemFlags[0])
+		{
+			if (flag == 3)
+				LaraItem->ItemFlags[0] = item->TriggerFlags;
+			else
+			{
+				LaraItem->ItemFlags[0] = 0;
+				PuzzleHole(item, PuzzleItem);
+				item->ItemFlags[0] = 0;
+			}
+		}
 	}
 }
 
