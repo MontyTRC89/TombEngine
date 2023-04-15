@@ -29,28 +29,27 @@ namespace TEN::Entities::Traps
 	void InitialiseWallMountedBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
 		SetAnimation(item, WALL_MOUNTED_BLADE_ANIM_IDLE);
 
 		// Used for GenericSphereBoxCollision.
 		item.ItemFlags[0] = WALL_MOUNTED_BLADE_JOINT;
 		item.ItemFlags[3] = WALL_MOUNTED_BLADE_HARM_DAMAGE;
+		item.ItemFlags[4] = 1; // NOTE: avoid the blade pushing lara in GenericSphereBoxCollision() !
 	}
 
 	void WallMountedBladeControl(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (TriggerActive(&item) && item.Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_DISABLED)
-		{
-			item.Animation.TargetState = WALL_MOUNTED_BLADE_STATE_ENABLED;
+		if (item.Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_ENABLED)
 			item.ItemFlags[3] = WALL_MOUNTED_BLADE_HARM_DAMAGE;
-		}
 		else
-		{
-			item.Animation.TargetState = WALL_MOUNTED_BLADE_STATE_DISABLED;
 			item.ItemFlags[3] = 0; // NOTE: Reset damage to avoid GenericSphereBoxCollision() damaging player when disabled.
-		}
+
+		if (TriggerActive(&item) && item.Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_DISABLED)
+			item.Animation.TargetState = WALL_MOUNTED_BLADE_STATE_ENABLED;
+		else
+			item.Animation.TargetState = WALL_MOUNTED_BLADE_STATE_DISABLED;
 
 		AnimateItem(&item);
 	}
