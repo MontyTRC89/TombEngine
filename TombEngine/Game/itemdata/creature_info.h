@@ -102,9 +102,7 @@ struct CreatureInfo
 	short LocationAI  = 0;
 	short Flags		  = 0;
 
-	bool TargetIsAlive() {
-		return Enemy != nullptr && Enemy->HitPoints > 0;
-	}
+	bool TargetIsAlive();
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority = CreatureAIPriority::None;
