@@ -12,7 +12,7 @@ void InitialiseSpikyWall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = item->Animation.Velocity.z;
+	item->ItemFlags[0] = item->TriggerFlags;
 }
 
 void ControlSpikyWall(short itemNumber)
