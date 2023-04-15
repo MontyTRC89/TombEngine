@@ -82,7 +82,7 @@ void InitPuzzleHole(ObjectInfo* object, int objectNumber)
 	if (object->loaded)
 	{
 		object->collision = PuzzleHoleCollision;
-		object->control = PuzzleDoneControl;
+		object->control = AnimatingControl;
 		object->isPuzzleHole = true;
 		object->SetupHitEffect(true);
 	}
@@ -94,7 +94,7 @@ void InitPuzzleDone(ObjectInfo* object, int objectNumber)
 	if (object->loaded)
 	{		
 		object->collision = PuzzleDoneCollision;
-		object->control = PuzzleDoneControl;
+		object->control = AnimatingControl;
 		object->SetupHitEffect(true);
 	}
 }

@@ -8,6 +8,13 @@
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 
+void InitialiseSpikyWall(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	item->ItemFlags[0] = item->Animation.Velocity.z;
+}
+
 void ControlSpikyWall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -15,8 +22,8 @@ void ControlSpikyWall(short itemNumber)
 	// Move wall.
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int x = item->Pose.Position.x + phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + phd_cos(item->Pose.Orientation.y);
+		int x = item->Pose.Position.x + (item->ItemFlags[0] * phd_sin(item->Pose.Orientation.y));
+		int z = item->Pose.Position.z + (item->ItemFlags[0] * phd_cos(item->Pose.Orientation.y));
 		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 
 		if (probe.Position.Floor != item->Pose.Position.y)
@@ -33,6 +40,7 @@ void ControlSpikyWall(short itemNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
+			AnimateItem(item);
 		}
 	}
 

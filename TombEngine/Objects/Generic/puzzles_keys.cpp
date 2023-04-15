@@ -6,6 +6,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
+#include "Game/Hud/PickupSummary.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -14,7 +16,10 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Game/pickup/pickuputil.h"
+#include "Game/collision/floordata.h"
 
+using namespace TEN::Hud;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Gui;
 using namespace TEN::Input;
@@ -192,12 +197,6 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			return;
 		}
 	}
-
-}
-
-void PuzzleDoneControl(short itemNumber)
-{
-
 }
 
 void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -207,6 +206,13 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* receptableItem = &g_Level.Items[itemNumber];
+
+	//Only execute code below if Triggertype is sSwitch trigger
+	auto triggerIndex = GetTriggerIndex(receptableItem);
+	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+
+	if (triggerType != TRIGGER_TYPES::SWITCH)
+		return;
 
 	auto puzzleType = PuzzleType::Normal;
 	AnimateItem(receptableItem);
@@ -232,11 +238,6 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				laraItem->Animation.AnimNumber = LA_REMOVE_PUZZLE;
 				laraItem->Animation.ActiveState = LS_EJECT_PUZZLE;
 				receptableItem->ItemFlags[0] = 1;
-
-				auto pickedUPItem = static_cast<GAME_OBJECT_ID>(receptableItem->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
-				PickedUpObject(pickedUPItem, 1);
-				auto pickedUPItem = &g_Level.Items[pickedUPItem]->;
-				CollectCarriedItems(pickedUPItem);
 
 				ResetPlayerFlex(laraItem);
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -275,22 +276,45 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
-	item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.RequiredState = NO_STATE;
-	AddActiveItem(itemNumber);
+	auto triggerIndex = GetTriggerIndex(item);
+	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
 
-	item->Flags |= IFLAG_ACTIVATION_MASK;
-	item->Status = ITEM_DEACTIVATED;
-	//item->Status = ITEM_ACTIVE;
-	item->ResetModelToDefault();
+	if (triggerType == TRIGGER_TYPES::SWITCH)
+	{
+		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.RequiredState = NO_STATE;
+		AddActiveItem(itemNumber);
+
+		item->Flags |= IFLAG_ACTIVATION_MASK;
+		item->Status = ITEM_DEACTIVATED;
+		item->ResetModelToDefault();
+	}
+	else
+	{
+		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.RequiredState = NO_STATE;
+		item->ResetModelToDefault();
+
+		AddActiveItem(itemNumber);
+
+		item->Flags |= IFLAG_ACTIVATION_MASK;
+		item->Status = ITEM_ACTIVE;
+	}
 }
 
 void PuzzleHole(ItemInfo* item, short itemNumber)
 {
+	auto pickedUPItem = static_cast<GAME_OBJECT_ID>(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
+	g_Hud.PickupSummary.AddDisplayPickup(pickedUPItem, item->Pose.Position.ToVector3());
+	
 	item->ObjectNumber = static_cast<GAME_OBJECT_ID>(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

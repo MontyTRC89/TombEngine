@@ -8,7 +8,6 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void PuzzleDone(ItemInfo* item, short itemNumber);
 void PuzzleHole(ItemInfo* item, short itemNumber);
-void PuzzleDoneControl(short itemNumber);
 void DoPuzzle();
 
 // Keys
