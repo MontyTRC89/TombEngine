@@ -3,7 +3,7 @@
 struct CollisionResult;
 struct ItemInfo;
 
-namespace TEN::Collision
+namespace TEN::Collision::Attractors
 {
 	enum class AttractorType
 	{

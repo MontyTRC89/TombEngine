@@ -128,7 +128,7 @@ struct ROOM_INFO
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 
-	std::vector<int> neighbors; // TODO: Move to level struct
+	std::vector<int> neighbors;
 
 	bool Active();
 };

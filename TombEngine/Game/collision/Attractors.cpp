@@ -11,7 +11,7 @@
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-namespace TEN::Collision
+namespace TEN::Collision::Attractors
 {
 	Attractor::Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber)
 	{
