@@ -1,7 +1,7 @@
 #pragma once
 
-struct ItemInfo;
-struct LaraInfo;
-
-void InitialiseWallMountedBlade(short itemNumber);
-void WallMountedBladeControl(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void InitialiseWallMountedBlade(short itemNumber);
+	void WallMountedBladeControl(short itemNumber);
+}
