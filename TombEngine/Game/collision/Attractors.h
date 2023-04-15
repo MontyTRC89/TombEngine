@@ -1,5 +1,6 @@
 #pragma once
 
+class EulerAngles;
 struct CollisionResult;
 struct ItemInfo;
 
@@ -72,9 +73,13 @@ namespace TEN::Collision::Attractors
 		float	Range	 = 0.0f;
 	};
 
+	std::vector<const Attractor*>		GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float range);
 	std::vector<const Attractor*>		GetNearbyAttractorPtrs(const ItemInfo& item);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
+															   const Vector3& basePos, const EulerAngles& orient,
 															   const Vector3& refPoint, float range);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
+															   const ItemInfo& item, const Vector3& refPoint, float range);
 
 	std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type, bool isClosedLoop = true);
 	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);

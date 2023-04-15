@@ -113,19 +113,19 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const It
 	// Get center attractor collision.
 	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
-	auto attracCollsCenter = GetAttractorCollisions(item, attracPtrs, refPointCenter, range);
+	auto attracCollsCenter = GetAttractorCollisions(attracPtrs, item, refPointCenter, range);
 	auto attracCollCenter = GetBestEdgeHangAttractorColl(item, coll, attracCollsCenter);
 
 	// Get left attractor collision.
 	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
-	auto attracCollsLeft = GetAttractorCollisions(item, attracPtrs, refPointLeft, range);
+	auto attracCollsLeft = GetAttractorCollisions(attracPtrs, item, refPointLeft, range);
 	auto attracCollLeft = GetBestEdgeHangAttractorColl(item, coll, attracCollsLeft);
 
 	// Get right attractor collision.
 	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
-	auto attracCollsRight = GetAttractorCollisions(item, attracPtrs, refPointRight, range);
+	auto attracCollsRight = GetAttractorCollisions(attracPtrs, item, refPointRight, range);
 	auto attracCollRight = GetBestEdgeHangAttractorColl(item, coll, attracCollsRight);
 
 	// Return edge attractor collision at three points.

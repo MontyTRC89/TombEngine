@@ -130,6 +130,10 @@ struct LEVEL
 	std::vector<TEXTURE> AnimatedTextures  = {};
 	std::vector<TEXTURE> SpritesTextures   = {};
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
+
+	// TODO: Reserve map entries for all bridge items that can ever exist in the level
+	// and update them as needed.
+	std::unordered_map<int, std::array<Attractor, 4>> BridgeAttractors = {};
 };
 
 extern std::vector<int> MoveablesIds;

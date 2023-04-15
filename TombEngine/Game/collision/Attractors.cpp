@@ -7,6 +7,7 @@
 #include "lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/level.h"
 
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -67,52 +68,89 @@ namespace TEN::Collision::Attractors
 	}
 
 	// TODO: Actually probe for attractors.
+	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float range)
+	{
+		constexpr auto COUNT_MAX = 64;
+
+		auto rangeSqr = SQUARE(range);
+
+		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
+		auto subRoomNumbers = std::set<int>{ roomNumber };
+
+		// Assess attractors in current room.
+		const auto& room = g_Level.Rooms[roomNumber];
+		for (const auto& attrac : room.Attractors)
+		{
+
+		}
+
+		// Assess attractors in neighboring rooms (search depth of 2).
+		for (const int& subRoomNumber : room.neighbors)
+		{
+			const auto& subRoom = g_Level.Rooms[subRoomNumber];
+		}
+
+		// Assess bridge attractors.
+		for (const auto& [bridgeItemNumber, attracs] : g_Level.BridgeAttractors)
+		{
+			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+
+			if (!subRoomNumbers.count(bridgeItem.RoomNumber))
+				continue;
+
+			if (Vector3::DistanceSquared(pos, bridgeItem.Pose.Position.ToVector3()) > rangeSqr)
+				continue;
+		}
+
+		return nearbyAttracPtrs;
+	}
+
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
 	{
+		constexpr auto RANGE	 = BLOCK(5);
 		constexpr auto COUNT_MAX = 64;
 
 		auto& player = GetLaraInfo(item);
 
-		auto attracPtrs = std::vector<const Attractor*>{};
+		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 		for (auto& attrac : player.Context.Attractor.SectorAttractors)
 		{
-			assertion(attracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
-			if (attracPtrs.size() == COUNT_MAX)
-				return attracPtrs;
+			assertion(nearbyAttracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
+			if (nearbyAttracPtrs.size() == COUNT_MAX)
+				return nearbyAttracPtrs;
 
-			attracPtrs.push_back(&attrac);
+			nearbyAttracPtrs.push_back(&attrac);
 			attrac.DrawDebug();
 		}
-
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
-		attracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);
-		return attracPtrs;
+		
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);
+		return nearbyAttracPtrs;
 	}
 
-	static AttractorCollisionData GetAttractorCollision(const ItemInfo& item, const Attractor& attrac, const Vector3& refPoint, float range)
+	static AttractorCollisionData GetAttractorCollision(const Attractor& attrac, const Vector3& basePos, const EulerAngles& orient,
+														const Vector3& refPoint, float range)
 	{
 		// Get points.
 		auto point0 = attrac.GetPoint0();
 		auto point1 = attrac.GetPoint1();
-		auto targetPoint = attrac.IsEdge() ?
-			Geometry::GetClosestPointOnLinePerp(refPoint, point0, point1) :
-			Geometry::GetClosestPointOnLine(refPoint, point0, point1);
+		auto targetPoint = Geometry::GetClosestPointOnLinePerp(refPoint, point0, point1);
 
 		// Calculate distances.
 		float dist = Vector3::Distance(refPoint, targetPoint);
 		float distFromEnd = std::min(Vector3::Distance(targetPoint, point0), Vector3::Distance(targetPoint, point1));
 
 		// Calculate angles.
-		auto orient = Geometry::GetOrientToPoint(point0, point1);
-		short headingAngle = orient.y - ANGLE(90.0f);
-		short slopeAngle = orient.x;
+		auto attracOrient = Geometry::GetOrientToPoint(point0, point1);
+		short headingAngle = attracOrient.y - ANGLE(90.0f);
+		short slopeAngle = attracOrient.x;
 
 		// Determine inquiries.
 		bool isIntersected = (dist <= range);
-		bool isInFront = Geometry::IsPointInFront(item.Pose, targetPoint);
+		bool isInFront = Geometry::IsPointInFront(basePos, targetPoint, orient);
 
 		// Create new attractor collision.
 		auto attracColl = AttractorCollisionData{};
@@ -128,18 +166,27 @@ namespace TEN::Collision::Attractors
 
 		return attracColl;
 	}
-
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
+	
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
+															   const Vector3& basePos, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)
 	{
 		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(attracPtrs.size());
+
 		for (const auto* attrac : attracPtrs)
 		{
-			auto attracColl = GetAttractorCollision(item, *attrac, refPoint, range);
+			auto attracColl = GetAttractorCollision(*attrac, basePos, orient, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 
 		return attracColls;
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
+															   const ItemInfo& item, const Vector3& refPoint, float range)
+	{
+		return GetAttractorCollisions(attracPtrs, item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
 	}
 
 	/*static */std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,

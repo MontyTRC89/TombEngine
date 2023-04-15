@@ -222,7 +222,7 @@ namespace TEN::Entities::Player::Context
 		auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
+		auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
 
 		// Assess center attractor collision.
 		bool hasFoundCorner = false;
@@ -423,7 +423,7 @@ namespace TEN::Entities::Player::Context
 		// Get attractor collisions.
 		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, attracPtrs, refPoint, range);
+		auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
 
 		// 1) Get and return ledge catch data (if valid).
 		auto ledgeCatchData = GetLedgeCatchData(item, coll, attracColls);
