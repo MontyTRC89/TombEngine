@@ -9,7 +9,7 @@ namespace TEN::Hud
 	class HudController
 	{
 	public:
-		// Components
+		// Members
 		StatusBarsController	StatusBars	  = {};
 		PickupSummaryController PickupSummary = {};
 
