@@ -34,12 +34,12 @@ void WallMountedBladeControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_ENABLED)
+	if (TriggerActive(item) && item->Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_DISABLED)
 		item->Animation.TargetState = WALL_MOUNTED_BLADE_STATE_ENABLED;
 	else
 		item->Animation.TargetState = WALL_MOUNTED_BLADE_STATE_DISABLED;
 
-	if (item->TouchBits.Test(1) && item->Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_DISABLED)
+	if (item->TouchBits.Test(1) && item->Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_ENABLED)
 	{
 		DoDamage(LaraItem, WALL_MOUNTED_BLADE_HARM_DAMAGE);
 	}
