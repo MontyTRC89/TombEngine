@@ -163,6 +163,8 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// Debug
 	// Draw tether line.
 	g_Renderer.AddLine3D(targetPoint, targetPoint + Vector3(0.0f, -150.0f, 0.0f), Vector4(1, 0, 1, 1));
+	g_Renderer.AddLine3D(edgeAttracColl.Left->TargetPoint, edgeAttracColl.Left->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), Vector4(1, 0, 1, 1));
+	g_Renderer.AddLine3D(edgeAttracColl.Right->TargetPoint, edgeAttracColl.Right->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), Vector4(1, 0, 1, 1));
 	// ---------------
 	
 	// Align orientation.

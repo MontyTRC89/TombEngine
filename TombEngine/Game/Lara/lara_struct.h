@@ -3,7 +3,7 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
-using namespace TEN::Collision;
+using namespace TEN::Collision::Attractors;
 using namespace TEN::Math;
 
 namespace TEN::Renderer { struct RendererMesh; };
@@ -1313,12 +1313,12 @@ struct PlayerContextData
 	Pose		NextCornerPos		 = Pose::Zero;
 	EulerAngles TargetOrientation	 = EulerAngles::Zero;
 
-	int		 WaterSurfaceDist	= 0;//
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.//
-	Vector3i WaterCurrentPull	= Vector3i::Zero;//
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
 
-	int InteractedItem = 0; // Item number.//
-	int Vehicle		   = 0; // Item number.//
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
 };
 
 struct LaraInfo
@@ -1352,11 +1352,4 @@ struct LaraInfo
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
 	signed char LocationPad		= 0;
-
-	// TODO: Moved to PlayerContextData. Remove from this struct.
-	int		 WaterSurfaceDist	  = 0;
-	short	 WaterCurrentActive	  = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	  = Vector3i::Zero;
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
 };
