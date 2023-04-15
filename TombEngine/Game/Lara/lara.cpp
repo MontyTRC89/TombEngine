@@ -525,7 +525,7 @@ void HandleAttractorDebug(ItemInfo& item)
 
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);
-	player.Context.Attractor.SectorAttractors = GetSectorAttractors(pointColl);
+	player.Context.Attractor.SectorAttractors = GenerateSectorAttractors(pointColl);
 
 	DrawPlayerAttractors(item);
 }

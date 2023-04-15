@@ -1,11 +1,14 @@
 #pragma once
 #include "framework.h"
+#include "Game/collision/Attractors.h"
 #include "Game/collision/floordata.h"
 #include "Math/Math.h"
 #include "Specific/newtypes.h"
 
 enum class ReverbType;
 struct TriggerVolume;
+
+using namespace TEN::Collision::Attractors;
 
 constexpr auto MAX_FLIPMAP	= 256;
 constexpr auto NUM_ROOMS	= 1024;
@@ -130,6 +133,7 @@ struct ROOM_INFO
 	std::vector<ROOM_LIGHT>	   lights		  = {};
 	std::vector<MESH_INFO>	   mesh			  = {};
 	std::vector<TriggerVolume> triggerVolumes = {};
+	std::vector<Attractor>	   Attractors	  = {}; // TODO: Generate edge attractors for each room.
 
 	std::vector<Vector3>   positions = {};
 	std::vector<Vector3>   normals	 = {};

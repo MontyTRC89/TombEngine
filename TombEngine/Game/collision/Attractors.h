@@ -72,11 +72,10 @@ namespace TEN::Collision::Attractors
 		float	Range	 = 0.0f;
 	};
 
-	std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
-														bool isClosedLoop = true);
-	std::vector<Attractor> GetSectorAttractors(const CollisionResult& pointColl);
-
 	std::vector<const Attractor*>		GetNearbyAttractorPtrs(const ItemInfo& item);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& refPoint, float range);
+
+	std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type, bool isClosedLoop = true);
+	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
 }
