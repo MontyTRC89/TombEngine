@@ -3,6 +3,7 @@
 
 #include "Game/control/box.h"
 #include "Game/items.h"
+#include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 
 constexpr auto WALL_MOUNTED_BLADE_HARM_DAMAGE = 200;
@@ -40,9 +41,7 @@ void WallMountedBladeControl(short itemNumber)
 		item->Animation.TargetState = WALL_MOUNTED_BLADE_STATE_DISABLED;
 
 	if (item->TouchBits.Test(1) && item->Animation.ActiveState == WALL_MOUNTED_BLADE_STATE_ENABLED)
-	{
-		DoDamage(LaraItem, WALL_MOUNTED_BLADE_HARM_DAMAGE);
-	}
+		DoDamage(LaraItem, WALL_MOUNTED_BLADE_HARM_DAMAGE);	
 
 	AnimateItem(item);
 }
