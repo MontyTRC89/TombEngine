@@ -81,7 +81,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 									TriggerLaraBlood();
 							}
 
-							// TODO: Find out why it was checking false which is supposedly wrong - TokyoSU: 15/04/2023
+							// TODO: Find out why it is checking false which is supposedly wrong - TokyoSU: 15/04/2023
 							if (!coll->Setup.EnableObjectPush)
 							{
 								laraItem->Pose.Position.x += dx;
