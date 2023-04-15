@@ -1275,6 +1275,12 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
 // TODO: Refactor status handling to use floats.
 struct PlayerStatusData
 {

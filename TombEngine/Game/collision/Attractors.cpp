@@ -95,14 +95,14 @@ namespace TEN::Collision
 	// TODO: Bridge tilts.
 	static std::vector<Attractor> GetBridgeAttractors(const ItemInfo& item)
 	{
-		// Get bridge bounding box.
+		// Get bounding box.
 		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		// Determine relative corner points.
-		auto point0 = Vector3(box.Extents.x, -box.Extents.y, box.Extents.z);
-		auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
+		auto point0 = Vector3( box.Extents.x, -box.Extents.y,  box.Extents.z);
+		auto point1 = Vector3(-box.Extents.x, -box.Extents.y,  box.Extents.z);
 		auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
-		auto point3 = Vector3(box.Extents.x, -box.Extents.y, -box.Extents.z);
+		auto point3 = Vector3( box.Extents.x, -box.Extents.y, -box.Extents.z);
 
 		// Calculate absolute corner points.
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);

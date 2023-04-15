@@ -523,17 +523,6 @@ void HandleAttractorDebug(ItemInfo& item)
 
 	SetDebugAttractors(item);
 
-	// Show tether lines.
-	auto lineOrigin = LaraItem->Pose.Position.ToVector3() + Vector3(0.0f, -LARA_HEIGHT, 0.0f);
-	auto closestPoint0 = Geometry::GetClosestPointOnLinePerp(
-		LaraItem->Pose.Position.ToVector3(),
-		player.Context.Attractor.DebugAttractor0.GetPoint0(),
-		player.Context.Attractor.DebugAttractor0.GetPoint1());
-
-	// Draw tether line.
-	if (Geometry::IsPointInFront(LaraItem->Pose, closestPoint0))
-		g_Renderer.AddLine3D(lineOrigin, closestPoint0, Vector4(1, 0, 1, 1));
-
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);
 	player.Context.Attractor.SectorAttractors = GetSectorAttractors(pointColl);

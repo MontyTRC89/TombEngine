@@ -90,7 +90,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const 
 		}
 	}
 
-	// No edge found, return nullopt.
+	// No edge found; return nullopt.
 	if (attracCollPtr == nullptr)
 		return std::nullopt;
 
@@ -158,6 +158,11 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Works on reflex transition, but not an obtuse one.
 	auto targetPoint = edgeAttracColl.Center->TargetPoint;
 
+	// Debug
+	// Draw tether line.
+	g_Renderer.AddLine3D(targetPoint, targetPoint + Vector3(0.0f, -150.0f, 0.0f), Vector4(1, 0, 1, 1));
+	// ---------------
+	
 	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.9f);
