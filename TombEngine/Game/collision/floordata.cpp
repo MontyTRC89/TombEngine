@@ -16,12 +16,15 @@ using TEN::Renderer::g_Renderer;
 
 std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
+	constexpr auto TILT_STEP  = CLICK(1);
+	constexpr auto HALF_BLOCK = BLOCK(0.5f);
+
 	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
 
 	auto sectorCenter2D = GetSectorCenter(x, z);
 
 	int surfaceHeight = IsSurfaceSplit(isFloor) ? GetSurfaceHeight(x, z, isFloor) : GetSurfaceHeight(sectorCenter2D.x, sectorCenter2D.y, isFloor);
-	auto tiltOffset = GetSurfaceTilt(x, z, isFloor) * CLICK(1);
+	auto tiltOffset = GetSurfaceTilt(x, z, isFloor) * TILT_STEP;
 	int offset = (tiltOffset.x + tiltOffset.y) / 2;
 
 	// Calculate corner heights.
@@ -31,13 +34,12 @@ std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 	float vertex3Height = surfaceHeight - tiltOffset.x + offset;
 
 	auto sectorCenter = Vector3(sectorCenter2D.x, 0.0f, sectorCenter2D.y);
-	float halfBlock = BLOCK(0.5f);
 
 	// Calculate base corner vertices.
-	auto vertex0 = sectorCenter + Vector3(halfBlock, 0.0f, halfBlock);
-	auto vertex1 = sectorCenter + Vector3(-halfBlock, 0.0f, halfBlock);
-	auto vertex2 = sectorCenter + Vector3(-halfBlock, 0.0f, -halfBlock);
-	auto vertex3 = sectorCenter + Vector3(halfBlock, 0.0f, -halfBlock);
+	auto vertex0 = sectorCenter + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK);
+	auto vertex1 = sectorCenter + Vector3(-HALF_BLOCK, 0.0f, HALF_BLOCK);
+	auto vertex2 = sectorCenter + Vector3(-HALF_BLOCK, 0.0f, -HALF_BLOCK);
+	auto vertex3 = sectorCenter + Vector3(HALF_BLOCK, 0.0f, -HALF_BLOCK);
 
 	// Handle split sector.
 	// TODO: Bugged. Range isn't always right.
