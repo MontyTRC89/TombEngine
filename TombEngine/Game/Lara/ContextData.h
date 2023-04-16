@@ -11,11 +11,13 @@ namespace TEN::Entities::Player::Context
 		ClimbableWall
 	};
 
-	enum class CornerType
+	enum ShimmyType
 	{
-		None,
-		Inner,
-		Outer
+		Lateral,
+		LeftCornerInner90,
+		RightCornerInner90,
+		LeftCornerOuter90,
+		RightCornerOuter90
 	};
 
 	struct EdgeCatchData
@@ -27,15 +29,13 @@ namespace TEN::Entities::Player::Context
 
 	struct MonkeySwingCatchData
 	{
-		int AnimNumber = 0; // TODO: State dispatch.
-		int Height	   = 0;
+		int Height = 0;
 	};
 
-	struct CornerShimmyData
+	struct ShimmyData
 	{
-		bool Success			= false;
-		Pose RealPositionResult = Pose::Zero;
-		Pose ProbeResult		= Pose::Zero;
+		ShimmyType Type			= ShimmyType::Lateral;
+		short	   HeadingAngle = 0;
 	};
 
 	struct LedgeClimbSetupData
@@ -46,5 +46,19 @@ namespace TEN::Entities::Player::Context
 		int	  GapHeightMin		   = 0;
 
 		bool TestSlipperySlope = false;
+	};
+
+	// Old
+	enum class CornerType
+	{
+		None,
+		Inner,
+		Outer
+	};
+	struct CornerShimmyData
+	{
+		bool Success			= false;
+		Pose RealPositionResult = Pose::Zero;
+		Pose ProbeResult		= Pose::Zero;
 	};
 }

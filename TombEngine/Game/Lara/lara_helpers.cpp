@@ -174,8 +174,9 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	if (catchData.Type == Context::EdgeType::ClimbableWall)
 		SnapEntityToGrid(&item, &coll);
 
+	// TODO: Use coll.Setup.Height.
 	// Calculate position.
-	int playerHeight = (item.Animation.ActiveState == LS_REACH) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
+	int playerHeight = (item.Animation.ActiveState == LS_JUMP_UP) ? LARA_HEIGHT_STRETCH : LARA_HEIGHT;
 	auto catchPos = (catchData.Type == Context::EdgeType::ClimbableWall) ?
 		Vector3(item.Pose.Position.x, catchData.Position.y, item.Pose.Position.z) :
 		catchData.Position;
@@ -196,7 +197,10 @@ static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const
 {
 	auto& player = GetLaraInfo(item);
 
-	SetAnimation(&item, catchData.AnimNumber);
+	// TODO: Address hardcoding.
+	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+	SetAnimation(&item, animNumber);
+
 	ResetPlayerFlex(&item);
 	item.Animation.IsAirborne = false;
 	item.Animation.Velocity = Vector3::Zero;

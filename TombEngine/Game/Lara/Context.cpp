@@ -280,7 +280,8 @@ namespace TEN::Entities::Player::Context
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
 														  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto EDGE_TYPE = EdgeType::Ledge;
+		constexpr auto EDGE_TYPE				= EdgeType::Ledge;
+		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
 		const auto& player = GetLaraInfo(item);
 
@@ -322,7 +323,7 @@ namespace TEN::Entities::Player::Context
 
 			// 6) Test if edge is too low to the ground.
 			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
-			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
+			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
@@ -391,7 +392,7 @@ namespace TEN::Entities::Player::Context
 		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
-		// 5) Test if edge isn't within a wall.
+		// 5) Test if edge is on a wall.
 		if (edgeHeight < pointCollFront.Position.Floor && // Edge is above floor.
 			edgeHeight > pointCollFront.Position.Ceiling) // Edge is below ceiling.
 		{
@@ -469,7 +470,7 @@ namespace TEN::Entities::Player::Context
 		{
 			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
 			int monkeyHeight = pointColl.Position.Ceiling;
-			return MonkeySwingCatchData{ animNumber, monkeyHeight };
+			return MonkeySwingCatchData{ monkeyHeight };
 		}
 
 		return std::nullopt;
