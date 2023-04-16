@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 
 class FloorInfo;
 struct ItemInfo;
@@ -87,10 +87,11 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve previous parameters to restore later
-	Vector3i PrevPosition;
-	int PrevAnimNumber;
-	int PrevFrameNumber;
-	int PrevState;
+	Vector3i	   PrevPosition		= Vector3i::Zero;
+	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
+	int			   PrevAnimNumber	= 0;
+	int			   PrevFrameNumber	= 0;
+	int			   PrevState		= 0;
 };
 
 struct CollisionInfo

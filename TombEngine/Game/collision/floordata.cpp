@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool isFloor) const
@@ -313,7 +313,7 @@ void FloorInfo::RemoveBridge(int itemNumber)
 	BridgeItemNumbers.erase(itemNumber);
 }
 
-namespace TEN::Floordata
+namespace TEN::Collision::Floordata
 {
 	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor)
 	{
@@ -896,5 +896,16 @@ namespace TEN::Floordata
 					AddBridge(itemNumber, offX, offZ); // Intersects; try adding bridge to this block.
 			}
 		}
+	}
+
+	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList)
+	{
+		for (const auto& material : materialList)
+		{
+			if (material == refMaterial)
+				return true;
+		}
+
+		return false;
 	}
 }

@@ -7,7 +7,7 @@
 #include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -25,7 +25,7 @@
 #include "Objects/Effects/tr4_locusts.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 
 int FlipEffect;
@@ -121,12 +121,12 @@ void Puzzle(ItemInfo* item)
 
 void AddLeftFootprint(ItemInfo* item)
 {
-	AddFootprint(item, false);
+	SpawnFootprint(*item, false);
 }
 
 void AddRightFootprint(ItemInfo* item)
 {
-	AddFootprint(item, true);
+	SpawnFootprint(*item, true);
 }
 
 void ResetHair(ItemInfo* item)
@@ -155,7 +155,7 @@ void DrawLeftPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
-		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
+		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
@@ -171,7 +171,7 @@ void DrawRightPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
-		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
 		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else

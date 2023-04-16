@@ -1,264 +1,218 @@
 #include "framework.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
-namespace TEN::Effects::Footprints
+namespace TEN::Effects::Footprint
 {
-	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
-
-	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition)
+	const auto FootprintMaterials = std::vector<MaterialType>
 	{
-		int x = item.Pose.Position.x;
-		int y = item.Pose.Position.y;
-		int z = item.Pose.Position.z;
-		short roomNumber = item.RoomNumber;
+		MaterialType::Mud,
+		MaterialType::Snow,
+		MaterialType::Sand,
+		MaterialType::Gravel,
+		MaterialType::Custom1,
+		MaterialType::Custom2,
+		MaterialType::Custom3,
+		MaterialType::Custom4
+	};
 
-		auto floor = GetFloor(x, y, z, &roomNumber);
-		auto pos = GetJointPosition(LaraItem, mesh, Vector3i(0, FOOT_HEIGHT_OFFSET, 0));
-		int height = GetFloorHeight(floor, pos.x, pos.y - CLICK(1), pos.z);
+	struct FootprintPositionData
+	{
+		bool	CanSpawn = false;
+		Vector3 Position = Vector3::Zero;
+	};
 
-		outFootprintPosition.x = pos.x;
-		outFootprintPosition.y = height - 8;
-		outFootprintPosition.z = pos.z;
+	std::vector<Footprint> Footprints = {};
 
-		return abs(pos.y - height) < 64;
+	static SOUND_EFFECTS GetFootprintSfx(MaterialType material)
+	{
+		static const auto SOUND_MAP = std::unordered_map<MaterialType, SOUND_EFFECTS>
+		{
+			{ MaterialType::Mud, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD },
+			{ MaterialType::Snow, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW },
+			{ MaterialType::Sand, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND },
+			{ MaterialType::Gravel, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL },
+			{ MaterialType::Ice, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE },
+			{ MaterialType::Water, SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET },
+			{ MaterialType::Stone, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
+			{ MaterialType::Wood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
+			{ MaterialType::Metal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
+			{ MaterialType::Marble, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE },
+			{ MaterialType::Grass, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS },
+			{ MaterialType::Concrete, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
+			{ MaterialType::OldWood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
+			{ MaterialType::OldMetal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
+			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1 },
+			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2 },
+			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3 },
+			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4 },
+			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5 },
+			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6 },
+			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7 },
+			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8 }
+		};
+
+		auto it = SOUND_MAP.find(material);
+		return ((it != SOUND_MAP.end()) ? it->second : SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS);
 	}
 
-	void AddFootprint(ItemInfo* item, bool rightFoot)
+	static std::array<Vector3, Footprint::VERTEX_COUNT> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		if (item != LaraItem)
-			return;
+		constexpr auto SCALE   = BLOCK(1 / 16.0f);
+		constexpr auto POINT_0 = Vector3( SCALE, 0.0f,  SCALE);
+		constexpr auto POINT_1 = Vector3(-SCALE, 0.0f,  SCALE);
+		constexpr auto POINT_2 = Vector3(-SCALE, 0.0f, -SCALE);
+		constexpr auto POINT_3 = Vector3( SCALE, 0.0f, -SCALE);
 
-		auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
+		// Determine rotation matrix.
+		auto rotMatrix = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, normal).ToRotationMatrix();
 
-		// Don't process actual footprint placement if foot isn't on floor.
-		auto footPos = Vector3();
-		if (!CheckFootOnFloor(*item, foot, footPos))
-			return;
-
-		// Slightly randomize foot position to avoid patterns.
-		footPos.x += (GetRandomControl() & 10) - 5;
-		footPos.z += (GetRandomControl() & 10) - 5;
-
-		auto result = GetCollision(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->RoomNumber);
-		auto floor = result.BottomBlock;
-
-		// Don't process material if foot has hit bridge object.
-		if (result.Position.Bridge >= 0)
-			return;
-
-		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
-		// Choose material for footstep sound
-		switch (floor->Material)
+		return std::array<Vector3, Footprint::VERTEX_COUNT>
 		{
-		case MaterialType::Concrete:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
-			break;
+			pos + Vector3::Transform(POINT_0, rotMatrix),
+			pos + Vector3::Transform(POINT_1, rotMatrix),
+			pos + Vector3::Transform(POINT_2, rotMatrix),
+			pos + Vector3::Transform(POINT_3, rotMatrix)
+		};
+	}
 
-		case MaterialType::Grass:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
-			break;
+	static FootprintPositionData GetFootprintPositionData(const ItemInfo& item, int jointIndex)
+	{
+		constexpr auto SURFACE_OFFSET  = 4;
+		constexpr auto ABS_FLOOR_BOUND = CLICK(0.25f);
+		constexpr auto HEIGHT_OFFSET   = CLICK(0.25f);
+		constexpr auto FOOT_OFFSET	   = Vector3i(0, HEIGHT_OFFSET, 0);
 
-		case MaterialType::Gravel:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
-			break;
+		auto footPos = GetJointPosition(item, jointIndex, FOOT_OFFSET);
+		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
 
-		case MaterialType::Ice:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
-			break;
+		bool canSpawn = (abs(footPos.y - floorHeight) < ABS_FLOOR_BOUND);
+		auto pos = Vector3(footPos.x, floorHeight - SURFACE_OFFSET, footPos.z);
+		return FootprintPositionData{ canSpawn, pos };
+	}
 
-		case MaterialType::Marble:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
-			break;
+	static bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints)
+	{
+		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
 
-		case MaterialType::Metal:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-			break;
+		// Get point collision at every vertex point.
+		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
+		auto pointColl1 = GetCollision(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z, item.RoomNumber);
+		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
+		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
-		case MaterialType::Mud:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
-			break;
-
-		case MaterialType::OldMetal:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-			break;
-
-		case MaterialType::OldWood:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
-			break;
-
-		case MaterialType::Sand:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
-			break;
-
-		case MaterialType::Snow:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
-			break;
-
-		case MaterialType::Stone:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
-			break;
-
-		case MaterialType::Water:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
-			break;
-
-		case MaterialType::Wood:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
-			break;
-
-		case MaterialType::Custom1:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
-		break;
-
-		case MaterialType::Custom2:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
-		break; 
-		
-		case MaterialType::Custom3:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
-		break;
-		
-		case MaterialType::Custom4:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
-		break; 
-		
-		case MaterialType::Custom5:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
-			break;
-
-		case MaterialType::Custom6:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
-			break;
-
-		case MaterialType::Custom7:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
-			break;
-
-		case MaterialType::Custom8:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
-			break;
+		// Don't spawn footprint if floor heights at vertex points are outside upper/lower floor height bound.
+		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > ABS_FLOOR_BOUND))
+		{
+			return false;
 		}
 
-		// HACK: Must be here until reference WAD2 is revised.
-		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
-			SoundEffect(fx, &item->Pose);
+		return true;
+	}
 
-		if (floor->Material != MaterialType::Sand &&
-			floor->Material != MaterialType::Snow &&
-			floor->Material != MaterialType::Gravel &&
-			floor->Material != MaterialType::Mud &&
-			floor->Material != MaterialType::Custom2 &&
-			floor->Material != MaterialType::Custom1 &&
-			floor->Material != MaterialType::Custom3 &&
-			floor->Material != MaterialType::Custom4)
-		{
+	void SpawnFootprint(bool isRight, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints)
+	{
+		constexpr auto LIFE_MAX			 = 20.0f;
+		constexpr auto LIFE_START_FADING = 10.0f;
+		constexpr auto OPACITY_MAX		 = 0.5f;
+
+		auto& footprint = GetNewEffect(Footprints, Footprint::COUNT_MAX);
+
+		footprint.SpriteIndex = Objects[ID_MISC_SPRITES].meshIndex + (1 + (int)isRight);
+		footprint.IsRight = isRight;
+		footprint.VertexPoints = vertexPoints;
+		footprint.Life = std::round(LIFE_MAX * FPS);
+		footprint.LifeStartFading = std::round(LIFE_START_FADING * FPS);
+		footprint.Opacity =
+		footprint.OpacityStart = OPACITY_MAX;
+	}
+
+	void SpawnFootprint(const ItemInfo& item, bool isRight)
+	{
+		if (!item.IsLara())
 			return;
+
+		// Don't spawn footprint if foot isn't on floor.
+		int jointIndex = isRight ? LM_RFOOT : LM_LFOOT;
+		auto posData = GetFootprintPositionData(item, jointIndex);
+		if (!posData.CanSpawn)
+			return;
+
+		// Slightly randomize 2D position.
+		posData.Position += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
+
+		auto pointColl = GetCollision(posData.Position.x, posData.Position.y - CLICK(1), posData.Position.z, item.RoomNumber);
+
+		// Don't process material if foot hit bridge object.
+		// TODO: Handle bridges once bridge collision is less stupid.
+		if (pointColl.Position.Bridge >= 0)
+			return;
+
+		// Get and emit footstep sound for floor material.
+		auto sfx = GetFootprintSfx(pointColl.BottomBlock->Material);
+		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS) // HACK: Must be here until reference WAD2 is revised.
+		{
+			auto pose = item.Pose;
+			SoundEffect(sfx, &pose);
 		}
 
-		// Calculate footprint tilts.
-		auto plane = floor->FloorCollision.Planes[floor->GetSurfacePlaneIndex(footPos.x, footPos.z, true)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
-		auto yRot = TO_RAD(item->Pose.Orientation.y);
-		auto xRot = plane.x * s + plane.y * c;
-		auto zRot = plane.y * s - plane.x * c;
-
-		// Calculate footprint positions.
-		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
-		auto p1 = Vector3(-FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
-		auto p2 = Vector3(-FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
-		auto p3 = Vector3( FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
-		auto rot = Matrix::CreateFromYawPitchRoll(yRot, xRot, zRot);
-		p0 = XMVector3Transform(p0, rot);
-		p1 = XMVector3Transform(p1, rot);
-		p2 = XMVector3Transform(p2, rot);
-		p3 = XMVector3Transform(p3, rot);
-		p0 += Vector3(footPos.x, footPos.y, footPos.z);
-		p1 += Vector3(footPos.x, footPos.y, footPos.z);
-		p2 += Vector3(footPos.x, footPos.y, footPos.z);
-		p3 += Vector3(footPos.x, footPos.y, footPos.z);
-
-		// Get blocks for every footprint corner
-		auto c0 = GetCollision(p0.x, footPos.y - STEP_SIZE, p0.z, item->RoomNumber);
-		auto c1 = GetCollision(p1.x, footPos.y - STEP_SIZE, p1.z, item->RoomNumber);
-		auto c2 = GetCollision(p2.x, footPos.y - STEP_SIZE, p2.z, item->RoomNumber);
-		auto c3 = GetCollision(p3.x, footPos.y - STEP_SIZE, p3.z, item->RoomNumber);
-
-		// Don't process footprint placement if all foot corners aren't on the same tilt level
-		if ((c0.FloorTilt.x != c1.FloorTilt.x) || (c1.FloorTilt.x != c2.FloorTilt.x) || (c2.FloorTilt.x != c3.FloorTilt.x))
-			return;
-		if ((c0.FloorTilt.y != c1.FloorTilt.y) || (c1.FloorTilt.y != c2.FloorTilt.y) || (c2.FloorTilt.y != c3.FloorTilt.y))
+		// Check floor material.
+		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
 			return;
 
-		// Don't process footprint placement if all foot corners aren't on the same height
-		if ((abs(c0.Position.Floor - c1.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c1.Position.Floor - c2.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c2.Position.Floor - c3.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c3.Position.Floor - c0.Position.Floor) > STEP_SIZE / 2))
+		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, GetSurfaceNormal(pointColl.FloorTilt, true));
+
+		// Test floor continuity.
+		if (!TestFootprintFloor(item, posData.Position, vertexPoints))
 			return;
 
-		// Construct footprint
-		FOOTPRINT_STRUCT footprint = {};
-		footprint.Position[0] = p0;
-		footprint.Position[1] = p1;
-		footprint.Position[2] = p2;
-		footprint.Position[3] = p3;
-		footprint.StartOpacity = 0.5f;
-		footprint.LifeStartFading = FPS * 10;
-		footprint.Life = FPS * 20;
-		footprint.Active = true;
-		footprint.RightFoot = rightFoot;
-
-		// Add footprint
-		if (footprints.size() >= MAX_FOOTPRINTS)
-			footprints.pop_back();
-		footprints.push_front(footprint);
+		SpawnFootprint(isRight, vertexPoints);
 	}
 
 	void UpdateFootprints()
 	{
-		if (footprints.size() == 0)
+		if (Footprints.empty())
 			return;
 
-		int numInvalidFootprints = 0;
-
-		for (auto i = footprints.begin(); i != footprints.end(); i++) 
+		for (auto& footprint: Footprints)
 		{
-			FOOTPRINT_STRUCT& footprint = *i;
-			footprint.Life--;
-
-			if (footprint.Life <= 0) 
-			{
-				numInvalidFootprints++;
+			if (footprint.Life <= 0.0f)
 				continue;
+
+			// Update opacity.
+			if (footprint.Life <= footprint.LifeStartFading)
+			{
+				float alpha = 1.0f - (footprint.Life / footprint.LifeStartFading);
+				footprint.Opacity = Lerp(footprint.OpacityStart, 0.0f, alpha);
 			}
 
-			if (footprint.Life > footprint.LifeStartFading) 
-			{
-				footprint.Opacity = footprint.StartOpacity;
-			}
-			else 
-			{
-				float opacity = Lerp(0.0f, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
-				footprint.Opacity = opacity;
-			}
+			// Update life.
+			footprint.Life -= 1.0f;
 		}
 
-		for (int i = 0; i < numInvalidFootprints; i++) 
-		{
-			footprints.pop_back();
-		}
+		ClearInactiveEffects(Footprints);
+	}
+
+	void ClearFootprints()
+	{
+		Footprints.clear();
 	}
 }

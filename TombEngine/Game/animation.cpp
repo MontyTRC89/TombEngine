@@ -74,10 +74,10 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					auto& player = GetLaraInfo(item);
 
-					if (player.Control.CalculatedJumpVelocity != 0)
+					if (player.Context.CalcJumpVelocity != 0)
 					{
-						item.Animation.Velocity.y = player.Control.CalculatedJumpVelocity;
-						player.Control.CalculatedJumpVelocity = 0;
+						item.Animation.Velocity.y = player.Context.CalcJumpVelocity;
+						player.Context.CalcJumpVelocity = 0;
 					}
 				}
 			}
@@ -121,8 +121,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 						auto& player = GetLaraInfo(item);
 
 						if (playAlways ||
-							(playOnLand && (player.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
+							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
+							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
 						{
 							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
@@ -216,6 +216,19 @@ void AnimateItem(ItemInfo* item)
 		{
 			item->Animation.ActiveState = animPtr->ActiveState;
 		}
+
+		// TODO: Theoretically this is better than above block, but it must be checked. -- Sezz 2023.03.31
+		/*if (item->Animation.ActiveState != animPtr->ActiveState)
+		{
+			item->Animation.ActiveState =
+			item->Animation.TargetState = animPtr->ActiveState;
+		}
+
+		if (!item->IsLara())
+		{
+			if (item->Animation.RequiredState == item->Animation.ActiveState)
+				item->Animation.RequiredState = NO_STATE;
+		}*/
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
@@ -336,19 +349,23 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 
 bool TestAnimNumber(const ItemInfo& item, int animNumber)
 {
-	const auto& object = Objects[item.ObjectNumber];
+	const auto& object = Objects[item.Animation.AnimObjectID];
 	return (item.Animation.AnimNumber == (object.animIndex + animNumber));
 }
 
 bool TestLastFrame(ItemInfo* item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
-		animNumber = item->Animation.AnimNumber;
+	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (item->Animation.AnimNumber != animNumber)
+	if (animNumber == NO_ANIM)
+		animNumber = item->Animation.AnimNumber - object.animIndex;
+
+	// Animation to test doesn't match; return early.
+	int animIndex = object.animIndex + animNumber;
+	if (item->Animation.AnimNumber != animIndex)
 		return false;
 
-	const auto& anim = GetAnimData(*item, animNumber);
+	const auto& anim = GetAnimData(object, animNumber);
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
@@ -380,37 +397,60 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
+void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
-	const auto& object = Objects[item->ObjectNumber];
-	int animIndex = object.animIndex + animNumber;
+	const auto& animObject = Objects[animObjectID];
+	const auto& anim = GetAnimData(animObject, animNumber);
+
+	int animIndex = animObject.animIndex + animNumber;
+	int frameIndex = anim.frameBase + frameNumber;
 
 	// Animation already set; return early.
-	if (item->Animation.AnimNumber == animIndex)
+	if (item.Animation.AnimObjectID == animObjectID &&
+		item.Animation.AnimNumber == animIndex &&
+		item.Animation.FrameNumber == frameIndex)
+	{
 		return;
+	}
 
-	// Animation doesn't exist; return early.
+	// Animation is missing; return early.
 	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
 	{
 		TENLog(
-			std::string("Attempted to set nonexistent animation ") + std::to_string(animNumber) +
-			std::string(" for object ") + std::to_string(item->ObjectNumber),
+			std::string("Attempted to set missing animation ") + std::to_string(animNumber) +
+			std::string(" from object ") + std::to_string(animObjectID) +
+			std::string(" for object ") + std::to_string(item.ObjectNumber),
 			LogLevel::Warning);
 
 		return;
 	}
 
-	const auto& anim = GetAnimData(*item, animNumber);
-	
-	item->Animation.AnimNumber = animIndex;
-	item->Animation.FrameNumber = anim.frameBase + frameNumber;
-	item->Animation.ActiveState =
-	item->Animation.TargetState = anim.ActiveState;
+	item.Animation.AnimObjectID = animObjectID;
+	item.Animation.AnimNumber = animIndex;
+	item.Animation.FrameNumber = frameIndex;
+	item.Animation.ActiveState =
+	item.Animation.TargetState = anim.ActiveState;
+}
+
+void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
+{
+	SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
+}
+
+void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
+{
+	SetAnimation(*item, item->ObjectNumber, animNumber, frameNumber);
 }
 
 AnimData& GetAnimData(int animIndex)
 {
 	return g_Level.Anims[animIndex];
+}
+
+AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
+{
+	const auto& object = Objects[objectID];
+	return GetAnimData(object, animNumber);
 }
 
 AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
@@ -421,10 +461,138 @@ AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
 	if (animNumber == NO_ANIM)
-		return g_Level.Anims[item.Animation.AnimNumber];
+		return GetAnimData(item.Animation.AnimNumber);
 
-	const auto& object = Objects[item.ObjectNumber];
+	const auto& object = Objects[item.Animation.AnimObjectID];
 	return GetAnimData(object, animNumber);
+}
+
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
+{
+	const auto& anim = GetAnimData(item);
+
+	// Normalize animation's current frame number into keyframe range.
+	int frameNumber = GetFrameNumber(item);
+	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
+
+	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
+	int frame0 = (int)floor(frameNumberNorm);
+	int frame1 = (int)ceil(frameNumberNorm);
+	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
+	auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
+
+	// Calculate interpolation alpha between keyframes.
+	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
+
+	// Return frame interpolation data.
+	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
+}
+
+AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber)
+{
+	return *GetFrame(item.ObjectNumber, animNumber, frameNumber);
+}
+
+AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+{
+	const auto& object = Objects[objectID];
+
+	int animIndex = object.animIndex + animNumber;
+	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+
+	const auto& anim = GetAnimData(object, animNumber);
+
+	// Get and clamp frame count.
+	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	if (frameNumber > frameCount)
+		frameNumber = frameCount;
+
+	// Interpolate and return frame pointer.
+	auto* framePtr = &g_Level.Frames[anim.FramePtr];
+	framePtr += frameNumber / anim.Interpolation;
+	return framePtr;
+}
+
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber)
+{
+	return GetFrame(objectID, animNumber, 0);
+}
+
+AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
+{
+	return GetFrame(objectID, animNumber, INT_MAX);
+}
+
+AnimFrame& GetBestFrame(const ItemInfo& item)
+{
+	auto frameData = GetFrameInterpData(item);
+	if (frameData.Alpha <= 0.5f)
+		return *frameData.FramePtr0;
+	else
+		return *frameData.FramePtr1;
+}
+
+int GetFrameNumber(const ItemInfo& item)
+{
+	const auto& anim = GetAnimData(item);
+	return (item.Animation.FrameNumber - anim.frameBase);
+}
+
+int GetFrameNumber(ItemInfo* item)
+{
+	return GetFrameNumber(*item);
+}
+
+int GetAnimNumber(const ItemInfo& item)
+{
+	const auto& object = Objects[item.Animation.AnimObjectID];
+	return (item.Animation.AnimNumber - object.animIndex);
+}
+
+int GetAnimIndex(const ItemInfo& item, int animNumber)
+{
+	const auto& object = Objects[item.Animation.AnimObjectID];
+	return (object.animIndex + animNumber);
+}
+
+int GetFrameIndex(ItemInfo* item, int frameNumber)
+{
+	int animNumber = item->Animation.AnimNumber - Objects[item->Animation.AnimObjectID].animIndex;
+	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
+}
+
+int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+{
+	const auto& object = Objects[objectID];
+	const auto& anim = GetAnimData(object, animNumber);
+
+	return (anim.frameBase + frameNumber);
+}
+
+int GetFrameCount(int animIndex)
+{
+	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
+		return 0;
+
+	const auto& anim = GetAnimData(animIndex);
+
+	int end = anim.frameEnd;
+	int base = anim.frameBase;
+	return (end - base);
+}
+
+int GetNextAnimState(ItemInfo* item)
+{
+	return GetNextAnimState(item->Animation.AnimObjectID, item->Animation.AnimNumber);
+}
+
+int GetNextAnimState(int objectID, int animNumber)
+{
+	const auto& object = Objects[objectID];
+	const auto& anim = GetAnimData(object, animNumber);
+
+	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
+	return nextAnim.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
@@ -462,123 +630,6 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	}
 
 	return false;
-}
-
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
-{
-	const auto& anim = GetAnimData(item);
-
-	// Normalize animation's current frame number into keyframe range.
-	int frameNumber = item.Animation.FrameNumber - anim.frameBase;
-	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
-
-	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
-	int frame0 = (int)floor(frameNumberNorm);
-	int frame1 = (int)ceil(frameNumberNorm);
-	auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
-	auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
-
-	// Calculate interpolation alpha between keyframes.
-	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
-
-	// Return frame interpolation data.
-	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
-}
-
-AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber)
-{
-	return *GetFrame(item.ObjectNumber, animNumber, frameNumber);
-}
-
-AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
-{
-	const auto& object = Objects[objectID];
-
-	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
-
-	const auto& anim = GetAnimData(object, animNumber);
-
-	// Get and clamp frame count.
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
-	if (frameNumber > frameCount)
-		frameNumber = frameCount;
-
-	// Interpolate and return frame pointer.
-	auto* framePtr = &g_Level.Frames[anim.FramePtr];
-	framePtr += frameNumber / anim.Interpolation;
-	return framePtr;
-}
-
-AnimFrame* GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber)
-{
-	return GetFrame(objectID, animNumber, 0);
-}
-
-AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
-{
-	return GetFrame(objectID, animNumber, INT_MAX);
-}
-
-AnimFrame& GetBestFrame(const ItemInfo& item)
-{
-	auto frameData = GetFrameInterpData(item);
-	if (frameData.Alpha <= 0.5f)
-		return *frameData.FramePtr0;
-	else
-		return *frameData.FramePtr1;
-}
-
-int GetCurrentRelativeFrameNumber(ItemInfo* item)
-{
-	return (item->Animation.FrameNumber - GetFrameNumber(item, 0));
-}
-
-// NOTE: Returns g_Level.Anims index.
-int GetAnimNumber(ItemInfo& item, int animNumber)
-{
-	const auto& object = Objects[item.ObjectNumber];
-	return (object.animIndex + animNumber);
-}
-
-int GetFrameNumber(ItemInfo* item, int frameToStart)
-{
-	int animNumber = item->Animation.AnimNumber - Objects[item->ObjectNumber].animIndex;
-	return GetFrameNumber(item->ObjectNumber, animNumber, frameToStart);
-}
-
-int GetFrameNumber(int objectID, int animNumber, int frameToStart)
-{
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
-
-	return (anim.frameBase + frameToStart);
-}
-
-int GetFrameCount(int animIndex)
-{
-	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
-		return 0;
-
-	const auto& anim = GetAnimData(animIndex);
-
-	int end = anim.frameEnd;
-	int base = anim.frameBase;
-	return (end - base);
-}
-
-int GetNextAnimState(ItemInfo* item)
-{
-	return GetNextAnimState(item->ObjectNumber, item->Animation.AnimNumber);
-}
-
-int GetNextAnimState(int objectID, int animNumber)
-{
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
-
-	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
-	return nextAnim.ActiveState;
 }
 
 void DrawAnimatingItem(ItemInfo* item)

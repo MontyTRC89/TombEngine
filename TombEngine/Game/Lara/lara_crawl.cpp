@@ -442,7 +442,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.TargetState = crawlVaultContext.TargetState;
 				ResetLaraTurnRateY(item);
-				ResetLaraFlex(item);
+				ResetPlayerFlex(item);
 				return;
 			}
 			
@@ -869,7 +869,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = 0;
 	Camera.targetDistance = BLOCK(1);
 
-	ResetLaraLean(item, 6.0f);
+	ResetPlayerLean(item, 1 / 6.0f);
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
 	{

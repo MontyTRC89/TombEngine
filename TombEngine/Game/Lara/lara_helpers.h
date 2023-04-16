@@ -67,7 +67,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item);
 void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
 void ResetLaraTurnRate(ItemInfo* item, bool divesuit = false);
-void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
-void ResetLaraFlex(ItemInfo* item, float rate = 1.0f);
+void ResetPlayerLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
+void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);
