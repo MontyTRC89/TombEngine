@@ -57,6 +57,11 @@
 		return ((Vector3(X1, Y1, Z1) + Vector3(X2, Y2, Z2)) / 2);
 	}
 
+	/*Vector3 GameBoundingBox::GetOffset() const
+	{
+
+	}*/
+
 	Vector3 GameBoundingBox::GetExtents() const
 	{
 		return ((Vector3(X2, Y2, Z2) - Vector3(X1, Y1, Z1)) / 2);
