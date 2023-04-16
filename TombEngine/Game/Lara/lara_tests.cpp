@@ -33,9 +33,13 @@ using namespace TEN::Renderer;
 
 struct EdgeHangAttractorCollisionData
 {
-	std::optional<AttractorCollisionData> Center = {};
-	std::optional<AttractorCollisionData> Left	 = {};
-	std::optional<AttractorCollisionData> Right	 = {};
+	std::optional<AttractorCollisionData> Center	 = {};
+	std::optional<AttractorCollisionData> Left		 = {};
+	std::optional<AttractorCollisionData> Right		 = {};
+	std::optional<AttractorCollisionData> FrontLeft	 = {};
+	std::optional<AttractorCollisionData> FrontRight = {};
+	std::optional<AttractorCollisionData> BackLeft	 = {};
+	std::optional<AttractorCollisionData> BackRight	 = {};
 };
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
@@ -99,6 +103,22 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const 
 	return *attracCollPtr;
 }
 
+static std::optional<AttractorCollisionData> GetEdgeHangAttractorCollision(const std::vector<const Attractor*>& attracPtrs,
+																		   const ItemInfo& item, const CollisionInfo& coll,
+																		   const Vector3& relOffset, const Matrix& rotMatrix, float range)
+{
+	auto basePos = item.Pose.Position.ToVector3();
+	auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
+	auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
+
+	// Debug
+	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
+	g_Renderer.AddSphere(refPoint, 15.0f, COLOR_MAGENTA);
+	// ---------------
+
+	return GetBestEdgeHangAttractorColl(attracColls, item, coll);
+}
+
 static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const ItemInfo& item, const CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
@@ -112,45 +132,31 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const It
 
 	// Get center attractor collision.
 	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
-	auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
-	auto attracCollsCenter = GetAttractorCollisions(attracPtrs, item, refPointCenter, range);
-	auto attracCollCenter = GetBestEdgeHangAttractorColl(attracCollsCenter, item, coll);
+	auto attracCollCenter = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetCenter, rotMatrix, range);
 
 	// Get left attractor collision.
 	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-	auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
-	auto attracCollsLeft = GetAttractorCollisions(attracPtrs, item, refPointLeft, range);
-	auto attracCollLeft = GetBestEdgeHangAttractorColl(attracCollsLeft, item, coll);
+	auto attracCollLeft = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetLeft, rotMatrix, range);
 
 	// Get right attractor collision.
 	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-	auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
-	auto attracCollsRight = GetAttractorCollisions(attracPtrs, item, refPointRight, range);
-	auto attracCollRight = GetBestEdgeHangAttractorColl(attracCollsRight, item, coll);
+	auto attracCollRight = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetRight, rotMatrix, range);
 	
 	// Get front-left attractor collision.
 	auto relOffsetFrontLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto refPointFrontLeft = basePos + Vector3::Transform(relOffsetFrontLeft, rotMatrix);
-	auto attracCollsFrontLeft = GetAttractorCollisions(attracPtrs, item, refPointFrontLeft, range);
-	auto attracCollFrontLeft = GetBestEdgeHangAttractorColl(attracCollsFrontLeft, item, coll);
+	auto attracCollFrontLeft = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontLeft, rotMatrix, range);
 	
 	// Get front-right attractor collision.
 	auto relOffsetFrontRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto refPointFrontRight = basePos + Vector3::Transform(relOffsetFrontRight, rotMatrix);
-	auto attracCollsFrontRight = GetAttractorCollisions(attracPtrs, item, refPointFrontRight, range);
-	auto attracCollFrontRight = GetBestEdgeHangAttractorColl(attracCollsFrontRight, item, coll);
+	auto attracCollFrontRight = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontRight, rotMatrix, range);
 
 	// Get back-left attractor collision.
 	auto relOffsetBackLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, 0.0f);
-	auto refPointBackLeft = basePos + Vector3::Transform(relOffsetBackLeft, rotMatrix);
-	auto attracCollsBackLeft = GetAttractorCollisions(attracPtrs, item, refPointBackLeft, range);
-	auto attracCollBackLeft = GetBestEdgeHangAttractorColl(attracCollsBackLeft, item, coll);
+	auto attracCollBackLeft = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackLeft, rotMatrix, range);
 	
 	// Get back-right attractor collision.
 	auto relOffsetBackRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, 0.0f);
-	auto refPointBackRight = basePos + Vector3::Transform(relOffsetBackRight, rotMatrix);
-	auto attracCollsBackRight = GetAttractorCollisions(attracPtrs, item, refPointBackRight, range);
-	auto attracCollBackRight = GetBestEdgeHangAttractorColl(attracCollsBackRight, item, coll);
+	auto attracCollBackRight = GetEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackRight, rotMatrix, range);
 
 	// Debug
 	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
@@ -162,16 +168,6 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const It
 		g_Renderer.AddLine3D(attracCollLeft->TargetPoint, attracCollLeft->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollRight.has_value())
 		g_Renderer.AddLine3D(attracCollRight->TargetPoint, attracCollRight->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-
-	// Probe points.
-	g_Renderer.AddSphere(refPointCenter, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointLeft, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointRight, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointFrontLeft, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointFrontRight, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointBackLeft, 15.0f, COLOR_MAGENTA);
-	g_Renderer.AddSphere(refPointBackRight, 15.0f, COLOR_MAGENTA);
-	// ---------------
 
 	// Return edge attractor collision at three points.
 	return EdgeHangAttractorCollisionData{ attracCollCenter, attracCollLeft, attracCollRight };
