@@ -43,7 +43,6 @@ void ControlSpikyWall(short itemNumber)
 				ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
-			AnimateItem(&item);
 		}
 	}
 
