@@ -287,6 +287,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_skateboard.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_skateboard_kid.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
@@ -720,6 +722,8 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_skateboard.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_skateboard_kid.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
