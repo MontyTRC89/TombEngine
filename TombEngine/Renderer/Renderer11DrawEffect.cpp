@@ -929,7 +929,7 @@ namespace TEN::Renderer
 
 				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
 				{
-					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? ID_GUN_FLASH2 : ID_GUN_FLASH;
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
 					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
@@ -957,14 +957,11 @@ namespace TEN::Renderer
 						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
-
-					auto pos = GetJointPosition(nativeItem, creature->MuzzleFlash[0].Bite);
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
 				}
 
 				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
 				{
-					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? ID_GUN_FLASH2 : ID_GUN_FLASH;
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
 					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
 					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{

@@ -75,7 +75,10 @@ namespace TEN::Entities::Creatures::TR2
 	void InitialiseSkidooMan(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		item->Status = ITEM_INVISIBLE;
+		if (item->Flags & IFLAG_REVERSE)
+			item->Status &= ~ITEM_INVISIBLE;
+		else
+			item->Status = ITEM_INVISIBLE;
 	}
 
 	void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -157,7 +160,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			CreatureAIInfo(skidoo, &AI);
 
-			//GetCreatureMood(skidoo, &AI, true);
+			GetCreatureMood(skidoo, &AI, true);
 			CreatureMood(skidoo, &AI, true);
 
 			angle = CreatureTurn(skidoo, ANGLE(3.0f));
