@@ -223,7 +223,7 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* harpoon = FireHarpoon(laraItem);
+		auto* harpoon = FireHarpoon(*laraItem);
 
 		if (harpoon == nullptr)
 			return;

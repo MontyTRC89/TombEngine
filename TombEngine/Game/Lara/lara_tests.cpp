@@ -22,7 +22,7 @@
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using std::vector;
 
 // -----------------------------

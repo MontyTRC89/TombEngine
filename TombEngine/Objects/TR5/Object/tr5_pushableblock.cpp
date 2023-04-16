@@ -15,7 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushable->hasFloorCeiling = true;
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 			height = (ocb & 0x1F) * CLICK(1);
 		}
 		else
@@ -896,13 +896,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::AddBridge(stackIndex);
+				TEN::Collision::Floordata::AddBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}
@@ -914,13 +914,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::RemoveBridge(itemNumber);
+			TEN::Collision::Floordata::RemoveBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::RemoveBridge(stackIndex);
+				TEN::Collision::Floordata::RemoveBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}
