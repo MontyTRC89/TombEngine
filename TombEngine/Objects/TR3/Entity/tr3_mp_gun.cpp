@@ -93,14 +93,14 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.angle > -ANGLE(45.0f) &&
-						AI.angle < ANGLE(45.0f))
+					if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
 					{
 						head = AI.angle;
 						extraTorsoRot.y = AI.angle;
 						ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32);
+						creature->MuzzleFlash[0].Bite = MPGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
 						SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
-						creature->MuzzleFlash[0].Delay = 1;
 					}
 				}
 			}
