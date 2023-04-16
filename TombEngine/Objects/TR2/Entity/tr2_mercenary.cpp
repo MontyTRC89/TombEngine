@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3i(0, 150, 19), 17);
+	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3i(0, 200, 19), 17);
 	const auto MercenaryAutoPistolBite = CreatureBiteInfo(Vector3i(0, 230, 9), 17);
 
 	// TODO
@@ -40,6 +40,9 @@ namespace TEN::Entities::Creatures::TR2
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -163,8 +166,13 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
-					item->Animation.TargetState = 1;
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				{
+					if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
+						item->Animation.TargetState = 1;
+					creature->MuzzleFlash[0].Bite = MercenaryUziBite;
+					creature->MuzzleFlash[0].Delay = 2;
+				}
 
 				if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 1;
@@ -179,8 +187,13 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
-					item->Animation.TargetState = 1;
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				{
+					if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
+						item->Animation.TargetState = 1;
+					creature->MuzzleFlash[0].Bite = MercenaryUziBite;
+					creature->MuzzleFlash[0].Delay = 2;
+				}
 
 				if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 2;
@@ -209,6 +222,9 @@ namespace TEN::Entities::Creatures::TR2
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -330,12 +346,13 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.x = AI.xAngle;
 					extraTorsoRot.y = AI.angle;
 
-					if (!creature->Flags)
+					if (creature->Flags == 0)
 					{
 						if (GetRandomControl() < 0x2000)
 							item->Animation.TargetState = 2;
-
 						ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50);
+						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
+						creature->MuzzleFlash[0].Delay = 2;
 						creature->Flags = 1;
 					}
 				}
@@ -353,11 +370,12 @@ namespace TEN::Entities::Creatures::TR2
 					if (AI.distance < pow(SECTOR(2), 2))
 						item->Animation.TargetState = 3;
 
-					if (creature->Flags != 1)
+					if (creature->Flags == 0)
 					{
 						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
 							item->Animation.TargetState = 3;
-
+						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
+						creature->MuzzleFlash[0].Delay = 2;
 						creature->Flags = 1;
 					}
 				}
@@ -395,7 +413,8 @@ namespace TEN::Entities::Creatures::TR2
 					{
 						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
 							item->Animation.TargetState = 3;
-
+						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
+						creature->MuzzleFlash[0].Delay = 2;
 						creature->Flags = 2;
 					}
 				}

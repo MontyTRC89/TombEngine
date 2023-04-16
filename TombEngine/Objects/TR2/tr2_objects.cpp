@@ -8,6 +8,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+#include "Game/missile.h"
+
 // Creatures
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
 #include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
@@ -311,10 +313,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_KNIFETHROWER_KNIFE];
-	if (obj->loaded)
-		obj->control = KnifeControl;
-
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
 	{
@@ -480,16 +478,16 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SNOWMOBILE_GUN, "ID_SNOWMOBILE_DRIVER", "ID_SNOWMOBILE_GUN");
 		obj->initialise = InitialiseSkidooMan;
 		obj->control = SkidooManControl;
-		obj->HitPoints = 1;
 		obj->SetupHitEffect(true);
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
-	
+	InitProjectile(obj, ControlMissile, ID_KNIFETHROWER_KNIFE);
 }
 
 static void StartTrap(ObjectInfo* obj)

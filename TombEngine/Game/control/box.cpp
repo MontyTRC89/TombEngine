@@ -733,11 +733,14 @@ static void PlayGunEffectForCreature(ItemInfo* item, const CreatureMuzzleflashIn
 		auto muzzleNewpos = muzzleFlash.Bite;
 		auto pos = GetJointPosition(item, muzzleNewpos);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
-		// NOTE: Fix the smoke position,
-		// avoiding creating new variable in CreatureMuzzleflashInfo for a smoke biteInfo
-		muzzleNewpos.Position.y -= GUN_EFFECT_CREATURE_YSHIFT;
-		auto smokePos = GetJointPosition(item, muzzleNewpos);
-		TriggerGunSmokeParticles(item, smokePos.x, smokePos.y, smokePos.z, 0, 0, 0, 1, 12, item->RoomNumber);
+		if (muzzleFlash.UseSmoke)
+		{
+			// NOTE: Fix the smoke position,
+			// avoiding creating new variable in CreatureMuzzleflashInfo for a smoke biteInfo
+			muzzleNewpos.Position.y -= GUN_EFFECT_CREATURE_YSHIFT;
+			auto smokePos = GetJointPosition(item, muzzleNewpos);
+			TriggerGunSmokeParticles(item, smokePos.x, smokePos.y, smokePos.z, 0, 0, 0, 1, 12, item->RoomNumber);
+		}
 	}
 }
 

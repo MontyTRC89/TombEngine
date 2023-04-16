@@ -7,8 +7,10 @@
 #include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
+#include "Game/effects/smoke.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
@@ -17,15 +19,19 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Smoke;
+
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
-	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3i(240, -190, 540), 0);
-	const auto SkidooBiteRight = CreatureBiteInfo(Vector3i(-240, -190, 540), 0);
+	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3i(240, -80, 540), 0);
+	const auto SkidooBiteRight = CreatureBiteInfo(Vector3i(-240, -80, 540), 0);
+	const auto SkidooBiteSmokeLeft = CreatureBiteInfo(Vector3i(240, -80, 450), 0);
+	const auto SkidooBiteSmokeRight = CreatureBiteInfo(Vector3i(-240, -80, 450), 0);
 
 	constexpr auto SMAN_MIN_TURN = ANGLE(2.0f);
-	constexpr auto SMAN_TARGET_ANGLE = ANGLE(15.0f);
+	constexpr auto SMAN_TARGET_ANGLE = ANGLE(30.0f);
 
 	enum SnowmobileManState
 	{
@@ -45,30 +51,31 @@ namespace TEN::Entities::Creatures::TR2
 		SMAN_ANIM_DEATH = 10
 	};
 
-	void InitialiseSkidooMan(short itemNumber)
+	static void CreateSnowmobileGun(ItemInfo* driver)
 	{
-		short skidooItemNumber = CreateItem();
-		if (skidooItemNumber != NO_ITEM)
+		short snowmobileNumber = CreateItem();
+		if (snowmobileNumber != NO_ITEM)
 		{
-			auto* riderItem = &g_Level.Items[itemNumber];
-			auto* skidooItem = &g_Level.Items[skidooItemNumber];
-
-			skidooItem->ObjectNumber = ID_SNOWMOBILE_GUN;
-			skidooItem->Pose.Position = riderItem->Pose.Position;
-			skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
-			skidooItem->RoomNumber = riderItem->RoomNumber;
-			skidooItem->Flags = ITEM_INVISIBLE;
-			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-
-			InitialiseItem(skidooItemNumber);
-
-			// The rider remembers his skidoo.
-			riderItem->Data = skidooItemNumber;
-
-			g_Level.NumItems++;
+			auto* snowmobileGunItem = &g_Level.Items[snowmobileNumber];
+			snowmobileGunItem->Pose.Position = driver->Pose.Position;
+			snowmobileGunItem->Pose.Orientation.y = driver->Pose.Orientation.y;
+			snowmobileGunItem->RoomNumber = driver->RoomNumber;
+			snowmobileGunItem->ObjectNumber = ID_SNOWMOBILE_GUN;
+			snowmobileGunItem->Model.Color = driver->Model.Color;
+			snowmobileGunItem->Flags = IFLAG_ACTIVATION_MASK;
+			InitialiseItem(snowmobileNumber); g_Level.NumItems++;
+			driver->Data = snowmobileNumber; // Register the snowmobile gun for the driver to control it.
 		}
 		else
-			TENLog("Can't create skidoo for rider!", LogLevel::Error);
+		{
+			TENLog("Failed to create the ID_SNOWMOBILE_GUN from ID_SNOWMOBILE_DRIVER.", LogLevel::Warning);
+		}
+	}
+
+	void InitialiseSkidooMan(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+		item->Status = ITEM_INVISIBLE;
 	}
 
 	void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -95,60 +102,67 @@ namespace TEN::Entities::Creatures::TR2
 
 	void SkidooManControl(short riderItemNumber)
 	{
-		auto* riderItem = &g_Level.Items[riderItemNumber];
-		if (!riderItem->Data)
+		auto* rider = &g_Level.Items[riderItemNumber];
+		if (!rider->Data)
 		{
-			TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
+			// Create the snowmobile.
+			CreateSnowmobileGun(rider);
+			if (!rider->Data)
+				TENLog("Rider data does not contain the skidoo itemNumber !", LogLevel::Error);
 			return;
 		}
 
-		short itemNumber = (short)riderItem->Data;
-		auto* item = &g_Level.Items[itemNumber];
+		short itemNumber = (short)rider->Data;
+		auto* skidoo = &g_Level.Items[itemNumber];
 
-		if (!item->Data)
+		if (!skidoo->Data)
 		{
 			EnableEntityAI(itemNumber, true);
-			item->Status = ITEM_ACTIVE;
+			skidoo->Status = ITEM_ACTIVE;
 		}
 
-		auto* creatureInfo = GetCreatureInfo(item);
+		auto* creatureInfo = GetCreatureInfo(skidoo);
 		short angle = 0;
-		int damage;
+
+		if (creatureInfo->MuzzleFlash[0].Delay != 0)
+			creatureInfo->MuzzleFlash[0].Delay--;
+		if (creatureInfo->MuzzleFlash[1].Delay != 0)
+			creatureInfo->MuzzleFlash[1].Delay--;
 
 		AI_INFO AI;
-		if (item->HitPoints <= 0)
+		if (skidoo->HitPoints <= 0)
 		{
-			if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
+			if (rider->Animation.ActiveState != SMAN_STATE_DEATH)
 			{
-				riderItem->Pose.Position = item->Pose.Position;
-				riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				riderItem->RoomNumber = item->RoomNumber;
+				rider->Pose.Position = skidoo->Pose.Position;
+				rider->Pose.Orientation.y = skidoo->Pose.Orientation.y;
+				rider->RoomNumber = skidoo->RoomNumber;
 
-				riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
-				riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].frameBase;
-				riderItem->Animation.ActiveState = SMAN_STATE_DEATH;
+				rider->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
+				rider->Animation.FrameNumber = g_Level.Anims[rider->Animation.AnimNumber].frameBase;
+				rider->Animation.ActiveState = SMAN_STATE_DEATH;
 
-				if (Lara.TargetEntity == item)
+				if (Lara.TargetEntity == skidoo)
 					Lara.TargetEntity = nullptr;
 			}
 			else
-				AnimateItem(riderItem);
+				AnimateItem(rider);
 
-			if (item->Animation.ActiveState == SMAN_STATE_MOVING || item->Animation.ActiveState == SMAN_STATE_WAIT)
-				item->Animation.TargetState = SMAN_STATE_WAIT;
+			if (skidoo->Animation.ActiveState == SMAN_STATE_MOVING || skidoo->Animation.ActiveState == SMAN_STATE_WAIT)
+				skidoo->Animation.TargetState = SMAN_STATE_WAIT;
 			else
-				item->Animation.TargetState = SMAN_STATE_MOVING;
+				skidoo->Animation.TargetState = SMAN_STATE_MOVING;
 		}
 		else
 		{
-			CreatureAIInfo(item, &AI);
+			CreatureAIInfo(skidoo, &AI);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			//GetCreatureMood(skidoo, &AI, true);
+			CreatureMood(skidoo, &AI, true);
 
-			angle = CreatureTurn(item, ANGLE(3.0f));
+			angle = CreatureTurn(skidoo, ANGLE(3.0f));
 
-			switch (item->Animation.ActiveState)
+			switch (skidoo->Animation.ActiveState)
 			{
 			case SMAN_STATE_WAIT:
 				if (creatureInfo->Mood == MoodType::Bored)
@@ -156,98 +170,119 @@ namespace TEN::Entities::Creatures::TR2
 				else if (abs(AI.angle) < SMAN_TARGET_ANGLE && AI.distance < SMAN_WAIT_RANGE)
 					break;
 
-				item->Animation.TargetState = SMAN_STATE_MOVING;
+				skidoo->Animation.TargetState = SMAN_STATE_MOVING;
 				break;
 
 			case SMAN_STATE_MOVING:
 				if (creatureInfo->Mood == MoodType::Bored)
-					item->Animation.TargetState = SMAN_STATE_WAIT;
+					skidoo->Animation.TargetState = SMAN_STATE_WAIT;
 				else if (abs(AI.angle) < SMAN_TARGET_ANGLE && AI.distance < SMAN_WAIT_RANGE)
-					item->Animation.TargetState = SMAN_STATE_WAIT;
+					skidoo->Animation.TargetState = SMAN_STATE_WAIT;
 				else if (angle < -SMAN_MIN_TURN)
-					item->Animation.TargetState = SMAN_STATE_START_LEFT;
+					skidoo->Animation.TargetState = SMAN_STATE_START_LEFT;
 				else if (angle > SMAN_MIN_TURN)
-					item->Animation.TargetState = SMAN_STATE_START_RIGHT;
+					skidoo->Animation.TargetState = SMAN_STATE_START_RIGHT;
 
 				break;
 
 			case SMAN_STATE_START_LEFT:
 			case SMAN_STATE_LEFT:
 				if (angle < -SMAN_MIN_TURN)
-					item->Animation.TargetState = SMAN_STATE_LEFT;
+					skidoo->Animation.TargetState = SMAN_STATE_LEFT;
 				else
-					item->Animation.TargetState = SMAN_STATE_MOVING;
+					skidoo->Animation.TargetState = SMAN_STATE_MOVING;
 
 				break;
 
 			case SMAN_STATE_START_RIGHT:
 			case SMAN_STATE_RIGHT:
 				if (angle < -SMAN_MIN_TURN)
-					item->Animation.TargetState = SMAN_STATE_LEFT;
+					skidoo->Animation.TargetState = SMAN_STATE_LEFT;
 				else
-					item->Animation.TargetState = SMAN_STATE_MOVING;
+					skidoo->Animation.TargetState = SMAN_STATE_MOVING;
 
 				break;
 			}
 		}
 
-		if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
+		if (rider->Animation.ActiveState != SMAN_STATE_DEATH)
 		{
-			if (!creatureInfo->Flags && abs(AI.angle) < SMAN_TARGET_ANGLE && LaraItem->HitPoints > 0)
+			if (creatureInfo->Flags == 0 && abs(AI.angle) < SMAN_TARGET_ANGLE && creatureInfo->Enemy->HitPoints > 0)
 			{
-				damage = (Lara.Context.Vehicle != NO_ITEM) ? 10 : 50;
+				int damage = (creatureInfo->Enemy->IsLara() && GetLaraInfo(creatureInfo->Enemy)->Context.Vehicle != NO_ITEM) ? 10 : 50;
+				
+				ShotLara(skidoo, &AI, SkidooBiteLeft, 0, damage);
+				auto jointPos = GetJointPosition(skidoo, SkidooBiteSmokeLeft);
+				TriggerGunSmokeParticles(skidoo, jointPos.x, jointPos.y, jointPos.z, 0, 0, 0, 1, 16, skidoo->RoomNumber);
+				creatureInfo->MuzzleFlash[0].Bite = SkidooBiteLeft;
+				creatureInfo->MuzzleFlash[0].Delay = 1;
+				creatureInfo->MuzzleFlash[0].SwitchToMuzzle2 = true;
+				creatureInfo->MuzzleFlash[0].ApplyXRotation = false;
+				creatureInfo->MuzzleFlash[0].UseSmoke = false;
 
-				if (ShotLara(item, &AI, SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, SkidooBiteRight, 0, damage))
-					creatureInfo->Flags = 5;
+				ShotLara(skidoo, &AI, SkidooBiteRight, 0, damage);
+				jointPos = GetJointPosition(skidoo, SkidooBiteSmokeRight);
+				TriggerGunSmokeParticles(skidoo, jointPos.x, jointPos.y, jointPos.z, 0, 0, 0, 1, 16, skidoo->RoomNumber);
+				creatureInfo->MuzzleFlash[1].Bite = SkidooBiteRight;
+				creatureInfo->MuzzleFlash[1].Delay = 1;
+				creatureInfo->MuzzleFlash[1].SwitchToMuzzle2 = true;
+				creatureInfo->MuzzleFlash[1].ApplyXRotation = false;
+				creatureInfo->MuzzleFlash[1].UseSmoke = false;
+
+				creatureInfo->Flags = 4;
 			}
 
-			if (creatureInfo->Flags)
+			if (creatureInfo->Flags != 0)
 			{
-				SoundEffect(SFX_TR4_BADDY_UZI, &item->Pose);
+				SoundEffect(SFX_TR4_BADDY_UZI, &skidoo->Pose);
 				creatureInfo->Flags--;
 			}
 		}
 
-		if (item->Animation.ActiveState == SMAN_STATE_WAIT)
+		if (skidoo->Animation.ActiveState == SMAN_STATE_WAIT)
 		{
-			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose);
+			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &skidoo->Pose);
 			creatureInfo->JointRotation[0] = 0;
 		}
 		else
 		{
 			creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
-			DoSnowEffect(item);
-			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+			DoSnowEffect(skidoo);
+			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &skidoo->Pose, SoundEnvironment::Land, 0.5f + skidoo->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);
 
-		if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
+		if (rider->Animation.ActiveState != SMAN_STATE_DEATH)
 		{
-			riderItem->Pose.Position = item->Pose.Position;
-			riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
+			rider->Pose.Position = skidoo->Pose.Position;
+			rider->Pose.Orientation.y = skidoo->Pose.Orientation.y;
 
-			if (item->RoomNumber != riderItem->RoomNumber)
-				ItemNewRoom(riderItemNumber, item->RoomNumber);
+			if (skidoo->RoomNumber != rider->RoomNumber)
+				ItemNewRoom(riderItemNumber, skidoo->RoomNumber);
 
-			riderItem->Animation.AnimNumber = item->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-			riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+			rider->Animation.AnimNumber = skidoo->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
+			rider->Animation.FrameNumber = skidoo->Animation.FrameNumber + (g_Level.Anims[rider->Animation.AnimNumber].frameBase - g_Level.Anims[skidoo->Animation.AnimNumber].frameBase);
 		}
-		else if (riderItem->Status == ITEM_DEACTIVATED &&
-			item->Animation.Velocity.z == 0 &&
-			item->Animation.Velocity.y == 0)
+		else if (rider->Status == ITEM_DEACTIVATED &&
+			skidoo->Animation.Velocity.z == 0 &&
+			skidoo->Animation.Velocity.y == 0)
 		{
 			RemoveActiveItem(riderItemNumber);
-			riderItem->Collidable = false;
-			riderItem->HitPoints = NOT_TARGETABLE;
-			riderItem->Flags |= IFLAG_INVISIBLE;
+			rider->Collidable = false;
+			rider->HitPoints = NOT_TARGETABLE;
+			rider->Flags |= IFLAG_INVISIBLE;
 
 			DisableEntityAI(itemNumber);
-			item->ObjectNumber = ID_SNOWMOBILE;
-			item->Status = ITEM_DEACTIVATED;
-			InitialiseSkidoo(itemNumber);
+			skidoo->ObjectNumber = ID_SNOWMOBILE;
+			skidoo->Status = ITEM_DEACTIVATED;
 
-			((SkidooInfo*)item->Data)->Armed = true;
+			InitialiseSkidoo(itemNumber);
+			if (skidoo->Data.is<SkidooInfo>())
+			{
+				auto* skidooData = (SkidooInfo*)skidoo->Data;
+				skidooData->Armed = true;
+			}
 		}
 	}
 }

@@ -16,7 +16,7 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;
 
-	const auto WorkerShotgunBite = CreatureBiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
+	const auto WorkerShotgunBite = CreatureBiteInfo(Vector3i(0, 350, 40), 9);
 
 	// TODO
 	enum ShotgunWorkerState
@@ -200,9 +200,9 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Flags == 0)
 				{
-					creature->MuzzleFlash[0].Bite = WorkerShotgunBite;
-					creature->MuzzleFlash[0].Delay = 1;
 					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, extraTorsoRot.y, 25);
+					creature->MuzzleFlash[0].Bite = WorkerShotgunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 

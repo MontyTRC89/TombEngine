@@ -95,6 +95,12 @@ struct CreatureMuzzleflashInfo
 	int Delay = 0;
 	// This will change the muzzle object to ID_GUNFLASH2.
 	bool SwitchToMuzzle2 = false;
+	// This value apply the x rotation for the muzzleflash, it's required for entity.
+	bool ApplyXRotation = true;
+	// This value apply the y rotation for the muzzleflash, it's required for entity.
+	bool ApplyZRotation = true;
+	// Does CreatureAnimation call TriggerGunSmokeParticles ?
+	bool UseSmoke = true;
 
 	CreatureMuzzleflashInfo() {}
 	CreatureMuzzleflashInfo(Vector3i pos, int bone, int delay, bool changeToMuzzle2 = false)
@@ -108,6 +114,14 @@ struct CreatureMuzzleflashInfo
 		Bite = bite;
 		Delay = delay;
 		SwitchToMuzzle2 = changeToMuzzle2;
+	}
+	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false, bool applyXRot = true, bool applyZRot = true)
+	{
+		Bite = bite;
+		Delay = delay;
+		SwitchToMuzzle2 = changeToMuzzle2;
+		ApplyXRotation = applyXRot;
+		ApplyZRotation = applyZRot;
 	}
 };
 

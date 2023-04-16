@@ -21,7 +21,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPGunBite = CreatureBiteInfo(Vector3i(0, 160, 40), 13);
+	const auto MPGunBite = CreatureBiteInfo(Vector3i(0, 225, 50), 13);
 
 	enum MPGunState
 	{
@@ -325,6 +325,12 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				{
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 1;
+				}
+
 				if (item->Animation.RequiredState == MPGUN_STATE_WAIT)
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
 
@@ -341,7 +347,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -364,7 +371,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -388,7 +396,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WALK;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -416,7 +425,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WALK;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 
 				if (AI.distance < pow(SECTOR(1.5f), 2))
@@ -460,7 +470,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32) || Random::TestProbability(1 / 8.0f))
 						item->Animation.TargetState = MPGUN_STATE_CROUCHED;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 
 				break;

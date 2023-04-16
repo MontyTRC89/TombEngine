@@ -280,7 +280,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		BLOCK(8),
 		3,
 		0,
-		0,
+		2,
 		0,
 		SFX_TR4_UZI_FIRE,
 		0
@@ -786,10 +786,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, weaponType);
 
-	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite() && weaponType != LaraWeaponType::Snowmobile)
 		return FireWeaponType::NoAmmo;
 
-	if (!ammo.HasInfinite())
+	if (!ammo.HasInfinite() && weaponType != LaraWeaponType::Snowmobile)
 		ammo--;
 
 	const auto& weapon = Weapons[(int)weaponType];

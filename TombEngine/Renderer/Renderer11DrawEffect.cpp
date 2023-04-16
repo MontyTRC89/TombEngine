@@ -822,7 +822,6 @@ namespace TEN::Renderer
 				zOffset = 92;
 				rotationX = -14560;
 				break;
-
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
@@ -947,8 +946,10 @@ namespace TEN::Renderer
 
 						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[0].Bite.BoneID] * item->World;
 						world = offset * world;
-						world = rotationX * world;
-						world = rotationZ * world;
+						if (creature->MuzzleFlash[0].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[0].ApplyZRotation)
+							world = rotationZ * world;
 
 						m_stStatic.World = world;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -980,8 +981,10 @@ namespace TEN::Renderer
 
 						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[1].Bite.BoneID] * item->World;
 						world = offset * world;
-						world = rotationX * world;
-						world = rotationZ * world;
+						if (creature->MuzzleFlash[1].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[1].ApplyZRotation)
+							world = rotationZ * world;
 
 						m_stStatic.World = world;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
