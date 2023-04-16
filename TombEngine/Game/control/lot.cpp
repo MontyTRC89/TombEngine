@@ -146,6 +146,12 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 
 			break;
 
+		case LotType::SnowmobileGun:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
+			break;
+
 		// Can climb.
 		case LotType::Human:
 			creature->LOT.Step = BLOCK(1);

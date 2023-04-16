@@ -472,6 +472,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::SnowmobileGun;
 		obj->SetupHitEffect();
 	}
 
