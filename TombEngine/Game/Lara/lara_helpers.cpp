@@ -460,6 +460,32 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
+JumpDirection GetPlayerJumpDirection(ItemInfo* item, CollisionInfo* coll) 
+{
+	if (IsHeld(In::Forward) && Context::CanJumpForward(item, coll))
+	{
+		return JumpDirection::Forward;
+	}
+	else if (IsHeld(In::Back) && Context::CanJumpBackward(item, coll))
+	{
+		return JumpDirection::Back;
+	}
+	else if (IsHeld(In::Left) && Context::CanJumpLeft(item, coll))
+	{
+		return JumpDirection::Left;
+	}
+	else if (IsHeld(In::Right) && Context::CanJumpRight(item, coll))
+	{
+		return JumpDirection::Right;
+	}
+	else if (Context::CanJumpUp(item, coll))
+	{
+		return JumpDirection::Up;
+	}
+
+	return JumpDirection::None;
+}
+
 int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 {
 	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
@@ -799,34 +825,6 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	// Apply extra rotation according to alpha.
 	auto extraRot = orient - item->Pose.Orientation;
 	item->Pose.Orientation += extraRot * alpha;
-}
-
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
-{
-	auto& lara = *GetLaraInfo(item);
-
-	if (IsHeld(In::Forward) && Context::CanJumpForward(item, coll))
-	{
-		lara.Control.JumpDirection = JumpDirection::Forward;
-	}
-	else if (IsHeld(In::Back) && Context::CanJumpBackward(item, coll))
-	{
-		lara.Control.JumpDirection = JumpDirection::Back;
-	}
-	else if (IsHeld(In::Left) && Context::CanJumpLeft(item, coll))
-	{
-		lara.Control.JumpDirection = JumpDirection::Left;
-	}
-	else if (IsHeld(In::Right) && Context::CanJumpRight(item, coll))
-	{
-		lara.Control.JumpDirection = JumpDirection::Right;
-	}
-	else if (Context::CanJumpUp(item, coll))
-	{
-		lara.Control.JumpDirection = JumpDirection::Up;
-	}
-	else
-		lara.Control.JumpDirection = JumpDirection::None;
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.

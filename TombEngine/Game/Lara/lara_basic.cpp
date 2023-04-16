@@ -394,11 +394,10 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_idle()
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& lara = *GetLaraInfo(item);
+	auto& player = *GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-
-	lara.Control.CanLook = ((isSwamp && lara.Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
+	player.Control.CanLook = !((isSwamp && player.Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
 
 	if (item->HitPoints <= 0)
 	{
@@ -407,7 +406,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// HACK: Interaction alignment.
-	if (lara.Control.IsMoving)
+	if (player.Control.IsMoving)
 	{
 		ResetLaraTurnRateY(item);
 		return;
@@ -417,14 +416,14 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (IsHeld(In::Look) && lara.Control.CanLook)
+	if (IsHeld(In::Look) && player.Control.CanLook)
 		LookUpDown(item);
 
 	// HACK: Handle binoculars.
 	if (BinocularOn)
 		return;
 
-	// Jump locks orientation. TODO: Check over this.
+	// Jump locks orientation.
 	if (!IsHeld(In::Jump))
 	{
 		// Sidestep locks orientation.
@@ -441,19 +440,25 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) && Context::CanPerformJump(item, coll))
 	{
-		SetLaraJumpDirection(item, coll);
-		if (lara.Control.JumpDirection != JumpDirection::None)
+		auto jumpDirection = GetPlayerJumpDirection(item, coll);
+		if (jumpDirection != JumpDirection::None)
+		{
 			item->Animation.TargetState = LS_JUMP_PREPARE;
-
-		return;
+			player.Control.JumpDirection = jumpDirection;
+			return;
+		}
 	}
 
 	if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 	{
 		if (IsHeld(In::Walk) || Context::CanTurn180(item, coll))
+		{
 			item->Animation.TargetState = LS_TURN_180;
+		}
 		else
+		{
 			item->Animation.TargetState = LS_ROLL_180_FORWARD;
+		}
 		
 		return;
 	}
@@ -493,9 +498,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		else if (Context::CanRunForward(item, coll))
 		{
 			if (IsHeld(In::Sprint))
+			{
 				item->Animation.TargetState = LS_SPRINT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_RUN_FORWARD;
+			}
 
 			return;
 		}
@@ -525,43 +534,55 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
 		if (Context::CanSidestepLeft(item, coll))
+		{
 			item->Animation.TargetState = LS_STEP_LEFT;
+		}
 		else
+		{
 			item->Animation.TargetState = LS_IDLE;
+		}
 
 		return;
 	}
 	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
 		if (Context::CanSidestepRight(item, coll))
+		{
 			item->Animation.TargetState = LS_STEP_RIGHT;
+		}
 		else
+		{
 			item->Animation.TargetState = LS_IDLE;
+		}
 
 		return;
 	}
 
 	if (IsHeld(In::Left))
 	{
-		if ((IsHeld(In::Sprint) || lara.Control.TurnRate.y <= -LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(item, coll)) &&
-			lara.Control.WaterStatus != WaterStatus::Wade)
+		if ((IsHeld(In::Sprint) || player.Control.TurnRate.y <= -LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(item, coll)) &&
+			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+		}
 
 		return;
 	}
 	else if (IsHeld(In::Right))
 	{
-		if ((IsHeld(In::Sprint) || lara.Control.TurnRate.y >= LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(item, coll)) &&
-			lara.Control.WaterStatus != WaterStatus::Wade)
+		if ((IsHeld(In::Sprint) || player.Control.TurnRate.y >= LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(item, coll)) &&
+			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+		}
 
 		return;
 	}
@@ -732,11 +753,10 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_turn_slow()
 void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& lara = *GetLaraInfo(item);
+	auto& player = *GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-
-	lara.Control.CanLook = (isSwamp && lara.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	player.Control.CanLook = (isSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -744,28 +764,28 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (lara.Control.WaterStatus == WaterStatus::Wade)
+	if (player.Control.WaterStatus == WaterStatus::Wade)
 	{
-		if (isSwamp)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SWAMP_TURN_RATE_MAX);
-		else
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_WADE_TURN_RATE_MAX);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
 	}
 	else
+	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+	}
 
 	if (IsHeld(In::Jump) && Context::CanPerformJump(item, coll))
 	{
-		SetLaraJumpDirection(item, coll);
-		if (lara.Control.JumpDirection != JumpDirection::None)
+		auto jumpDirection = GetPlayerJumpDirection(item, coll);
+		if (jumpDirection != JumpDirection::None)
 		{
 			item->Animation.TargetState = LS_JUMP_PREPARE;
+			player.Control.JumpDirection = jumpDirection;
 			return;
 		}
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		lara.Control.WaterStatus != WaterStatus::Wade)
+		player.Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -803,9 +823,13 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		else if (Context::CanRunForward(item, coll))
 		{
 			if (IsHeld(In::Sprint))
+			{
 				item->Animation.TargetState = LS_SPRINT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_RUN_FORWARD;
+			}
 
 			return;
 		}
@@ -848,25 +872,29 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
 	{
-		if (lara.Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX &&
-			lara.Control.WaterStatus != WaterStatus::Wade)
+		if (player.Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX &&
+			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+		}
 
 		return;
 	}
 	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 	{
-		if (lara.Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX &&
-			lara.Control.WaterStatus != WaterStatus::Wade)
+		if (player.Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX &&
+			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+		}
 
 		return;
 	}
@@ -1067,7 +1095,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_turn_fast()
 void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& lara = *GetLaraInfo(item);
+	auto& player = *GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1079,16 +1107,17 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) && Context::CanPerformJump(item, coll))
 	{
-		SetLaraJumpDirection(item, coll);
-		if (lara.Control.JumpDirection != JumpDirection::None)
+		auto jumpDirection = GetPlayerJumpDirection(item, coll);
+		if (jumpDirection != JumpDirection::None)
 		{
 			item->Animation.TargetState = LS_JUMP_PREPARE;
+			player.Control.JumpDirection = jumpDirection;
 			return;
 		}
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		lara.Control.WaterStatus != WaterStatus::Wade)
+		player.Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;

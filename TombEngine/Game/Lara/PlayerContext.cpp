@@ -733,7 +733,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const auto setupData = Context::JumpSetupData
+		constexpr auto setupData = Context::JumpSetupData
 		{
 			0,
 			0.0f,

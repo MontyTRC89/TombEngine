@@ -1,12 +1,13 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
+enum LaraState;
+enum class JumpDirection;
 struct ItemInfo;
 struct CollisionInfo;
 struct LaraInfo;
 struct VaultTestResult;
 struct WaterClimbOutTestResult;
-enum LaraState;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -32,6 +33,7 @@ LaraInfo& GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 
+JumpDirection GetPlayerJumpDirection(ItemInfo* item, CollisionInfo* coll);
 int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
 short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 
@@ -50,7 +52,6 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult);
 void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutTestResult climbOutContext);
