@@ -20,7 +20,6 @@
 #include "Game/room.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/Sink.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
@@ -543,12 +542,11 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
 			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
 
-			std::vector<int> firedWeapon;
+			std::vector<int> muzzleFlashDelays;
 			for (int i = 0; i < 2; i++)
-				firedWeapon.push_back(creature->MuzzleFlash[i].Delay);
-			auto firedWeaponOffset = fbb.CreateVector(firedWeapon);
+				muzzleFlashDelays.push_back(creature->MuzzleFlash[i].Delay);
 
-			creatureBuilder.add_weapon_delay(firedWeaponOffset);
+			creatureBuilder.add_weapon_delay(fbb.CreateVector(muzzleFlashDelays));
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
