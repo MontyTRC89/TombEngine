@@ -17,6 +17,13 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Entities::Player::Context
 {
+	struct EdgeHangAttractorCollisionData
+	{
+		std::optional<AttractorCollisionData> Center = {};
+		std::optional<AttractorCollisionData> Left	 = {};
+		std::optional<AttractorCollisionData> Right	 = {};
+	};
+
 	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
@@ -473,6 +480,12 @@ namespace TEN::Entities::Player::Context
 			return MonkeySwingCatchData{ monkeyHeight };
 		}
 
+		return std::nullopt;
+	}
+
+	// TODO
+	std::optional<ShimmyData> GetShimmyData(const ItemInfo& item, const CollisionInfo& coll)
+	{
 		return std::nullopt;
 	}
 }

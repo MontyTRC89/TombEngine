@@ -127,6 +127,51 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const It
 	auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
 	auto attracCollsRight = GetAttractorCollisions(attracPtrs, item, refPointRight, range);
 	auto attracCollRight = GetBestEdgeHangAttractorColl(attracCollsRight, item, coll);
+	
+	// Get front-left attractor collision.
+	auto relOffsetFrontLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
+	auto refPointFrontLeft = basePos + Vector3::Transform(relOffsetFrontLeft, rotMatrix);
+	auto attracCollsFrontLeft = GetAttractorCollisions(attracPtrs, item, refPointFrontLeft, range);
+	auto attracCollFrontLeft = GetBestEdgeHangAttractorColl(attracCollsFrontLeft, item, coll);
+	
+	// Get front-right attractor collision.
+	auto relOffsetFrontRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
+	auto refPointFrontRight = basePos + Vector3::Transform(relOffsetFrontRight, rotMatrix);
+	auto attracCollsFrontRight = GetAttractorCollisions(attracPtrs, item, refPointFrontRight, range);
+	auto attracCollFrontRight = GetBestEdgeHangAttractorColl(attracCollsFrontRight, item, coll);
+
+	// Get back-left attractor collision.
+	auto relOffsetBackLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, 0.0f);
+	auto refPointBackLeft = basePos + Vector3::Transform(relOffsetBackLeft, rotMatrix);
+	auto attracCollsBackLeft = GetAttractorCollisions(attracPtrs, item, refPointBackLeft, range);
+	auto attracCollBackLeft = GetBestEdgeHangAttractorColl(attracCollsBackLeft, item, coll);
+	
+	// Get back-right attractor collision.
+	auto relOffsetBackRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, 0.0f);
+	auto refPointBackRight = basePos + Vector3::Transform(relOffsetBackRight, rotMatrix);
+	auto attracCollsBackRight = GetAttractorCollisions(attracPtrs, item, refPointBackRight, range);
+	auto attracCollBackRight = GetBestEdgeHangAttractorColl(attracCollsBackRight, item, coll);
+
+	// Debug
+	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
+
+	// Attractor target points.
+	if (attracCollCenter.has_value())
+		g_Renderer.AddLine3D(attracCollCenter->TargetPoint, attracCollCenter->TargetPoint + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+	if (attracCollLeft.has_value())
+		g_Renderer.AddLine3D(attracCollLeft->TargetPoint, attracCollLeft->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+	if (attracCollRight.has_value())
+		g_Renderer.AddLine3D(attracCollRight->TargetPoint, attracCollRight->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+
+	// Probe points.
+	g_Renderer.AddSphere(refPointCenter, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointLeft, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointRight, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointFrontLeft, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointFrontRight, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointBackLeft, 15.0f, COLOR_MAGENTA);
+	g_Renderer.AddSphere(refPointBackRight, 15.0f, COLOR_MAGENTA);
+	// ---------------
 
 	// Return edge attractor collision at three points.
 	return EdgeHangAttractorCollisionData{ attracCollCenter, attracCollLeft, attracCollRight };
@@ -160,16 +205,9 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Works on reflex transition, but not an obtuse one.
 	auto targetPoint = edgeAttracColl.Center->TargetPoint;
 
-	// Debug
-	// Draw tether line.
-	g_Renderer.AddLine3D(targetPoint, targetPoint + Vector3(0.0f, -150.0f, 0.0f), Vector4(1, 0, 1, 1));
-	g_Renderer.AddLine3D(edgeAttracColl.Left->TargetPoint, edgeAttracColl.Left->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), Vector4(1, 0, 1, 1));
-	g_Renderer.AddLine3D(edgeAttracColl.Right->TargetPoint, edgeAttracColl.Right->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), Vector4(1, 0, 1, 1));
-	// ---------------
-	
 	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.9f);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
 
 	// Align position.
 	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));

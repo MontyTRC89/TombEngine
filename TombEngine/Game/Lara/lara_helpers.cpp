@@ -176,7 +176,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// TODO: Use coll.Setup.Height.
 	// Calculate position.
-	int playerHeight = (item.Animation.ActiveState == LS_JUMP_UP) ? LARA_HEIGHT_STRETCH : LARA_HEIGHT;
+	int playerHeight = (item.Animation.ActiveState == LS_JUMP_UP) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 	auto catchPos = (catchData.Type == Context::EdgeType::ClimbableWall) ?
 		Vector3(item.Pose.Position.x, catchData.Position.y, item.Pose.Position.z) :
 		catchData.Position;
