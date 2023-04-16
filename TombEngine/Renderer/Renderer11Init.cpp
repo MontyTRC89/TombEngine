@@ -28,6 +28,13 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
+	m_whiteSprite.Height = m_whiteTexture.Height;
+	m_whiteSprite.Width = m_whiteTexture.Width;
+	m_whiteSprite.UV[0] = Vector2(0.0f, 0.0f);
+	m_whiteSprite.UV[1] = Vector2(1.0f, 0.0f);
+	m_whiteSprite.UV[2] = Vector2(1.0f, 1.0f);
+	m_whiteSprite.UV[3] = Vector2(0.0f, 1.0f);
+	m_whiteSprite.Texture = &m_whiteTexture;
 
 	auto logoName = L"Textures/Logo.png";
 	SetTextureOrDefault(m_logo, logoName);
@@ -46,7 +53,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"ANIMATIONFRAMEOFFSET", 0, DXGI_FORMAT_R8_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"ANIMATIONFRAMEOFFSET", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"EFFECTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"POLYINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -81,11 +88,12 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
-
-	// Initialise input layout using the first vertex shader
+	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "VS", "vs_4_0", nullptr, blob);
+	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "PS", "ps_4_0", nullptr, blob);
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "PS", "ps_4_0", nullptr, blob);
 
+	// Initialise input layout using the first vertex
 	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -110,18 +118,19 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
 	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
+	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 
 	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
 	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_SPACE_RES.x, 0, SCREEN_SPACE_RES.y, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 
 	// Preallocate lists
-	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
+	m_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
 	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);

@@ -4,6 +4,7 @@ constexpr bool DebugBuild = true;
 #else
 constexpr bool DebugBuild = false;
 #endif
+
 #include <stdexcept>
 #include <string_view>
 #include <iostream>

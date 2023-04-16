@@ -1,36 +1,20 @@
 #pragma once
 #include <string>
 
-#include "Math/Math.h"
-
-using namespace TEN::Math;
-using std::string;
-
 struct SinkInfo
 {
-	Vector3i Position = Vector3i::Zero;
-	int		 Strength = 0;
-	int		 BoxIndex = 0;
-	string	 Name  = "";
+	Vector3		Position = Vector3::Zero;
+	int			Strength = 0;
+	int			BoxIndex = 0;
+	std::string Name	 = {};
 
 	SinkInfo()
 	{
 	}
 
-	SinkInfo(int xPos, int yPos, int zPos)
+	SinkInfo(const Vector3& pos, int strength = 0, int boxIndex = 0)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-	}
-
-	SinkInfo(int xPos, int yPos, int zPos, short strength)
-	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->Strength = strength;
-	}
-
-	SinkInfo(int xPos, int yPos, int zPos, short strength, short boxIndex)
-	{
-		this->Position = Vector3i(xPos, yPos, zPos);
+		this->Position = pos;
 		this->Strength = strength;
 		this->BoxIndex = boxIndex;
 	}

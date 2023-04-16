@@ -15,9 +15,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
@@ -51,9 +51,6 @@ namespace TEN::Entities::TR4
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
-
-	constexpr auto LARA_STATE_SETH_DEATH = 14;
-	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
 
 	enum SethState
 	{
@@ -184,7 +181,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -668,10 +665,7 @@ namespace TEN::Entities::TR4
 
 		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
 
-		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
-		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
+		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_SETH_DEATH );
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
@@ -682,7 +676,7 @@ namespace TEN::Entities::TR4
 		laraItem->HitPoints = -1;
 		lara.ExtraAnim = 1;
 		lara.HitDirection = -1;
-		lara.Air = -1;
+		lara.Status.Air = -1;
 		lara.Control.HandStatus = HandStatus::Busy;
 		lara.Control.Weapon.GunType = LaraWeaponType::None;
 

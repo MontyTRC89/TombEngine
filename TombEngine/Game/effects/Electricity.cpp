@@ -37,7 +37,7 @@ namespace TEN::Effects::Electricity
 
 	// 4-point Catmull-Rom spline interpolation.
 	// Function takes reference to array of knots and
-	// calculates using subset of 4 determined alpha value.
+	// calculates using subset of 4 determined by alpha value.
 	static Vector3 ElectricitySpline(const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, float alpha)
 	{
 		alpha *= ELECTRICITY_KNOTS_SIZE - 3;
@@ -201,7 +201,7 @@ namespace TEN::Effects::Electricity
 				[](const HelicalLaser& laser) { return (laser.Life <= 0.0f); }), HelicalLasers.end());
 	}
 
-	void UpdateElectricitys()
+	void UpdateElectricityArcs()
 	{
 		// No active effects; return early.
 		if (ElectricityArcs.empty())
@@ -309,16 +309,13 @@ namespace TEN::Effects::Electricity
 
 		float lengthStep = laser.Length / laser.NumSegments;
 		float radiusStep = laser.Radius;
-
-		auto refPoint = Geometry::RotatePoint(Vector3::Right, EulerAngles(direction));
 		auto axisAngle = AxisAngle(direction, laser.Orientation2D);
 
 		for (int i = 0; i < laser.NumSegments; i++)
 		{
 			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
-
-			auto offset = Geometry::RotatePoint(refPoint * (radiusStep * i), axisAngle);
-			auto knot = Geometry::TranslatePoint(offset, axisAngle.GetAxis(), lengthStep * i);
+			auto knot = Geometry::TranslatePoint(origin, axisAngle.GetAxis(), lengthStep * i);
+			knot = Geometry::TranslatePoint(knot, axisAngle, radiusStep * i);
 
 			buffer[bufferIndex] = origin + knot;
 			bufferIndex++;

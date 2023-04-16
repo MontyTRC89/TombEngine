@@ -331,6 +331,10 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 	Camera.timer = -1;
 }
 
+void ClearObjCamera()
+{
+	ItemCamera.ItemCameraOn = false;
+}
 
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
 {
@@ -403,6 +407,16 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 										ItemCamera.LastAngle.y = angle.y, 
 										ItemCamera.LastAngle.z = angle.z);
 	}
+}
+
+void RefreshFixedCamera(short camNumber)
+{
+	auto& camera = g_Level.Cameras[camNumber];
+
+	auto origin = GameVector(camera.Position, camera.RoomNumber);
+	int moveSpeed = camera.Speed * 8 + 1;
+
+	MoveCamera(&origin, moveSpeed);
 }
 
 void ChaseCamera(ItemInfo* item)
@@ -1549,7 +1563,7 @@ void LookLeftRight(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1588,7 +1602,7 @@ void LookUpDown(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1620,7 +1634,7 @@ void ResetLook(ItemInfo* item)
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&
 			!lara->RightArm.Locked &&
-			lara->Vehicle == NO_ITEM)
+			lara->Context.Vehicle == NO_ITEM)
 		{
 			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
@@ -2060,7 +2074,7 @@ void HandleOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 
 	Lara.Inventory.IsBusy = false;
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	TrInput &= ~IN_LOOK;
 }

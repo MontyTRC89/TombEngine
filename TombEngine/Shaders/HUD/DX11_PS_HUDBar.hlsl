@@ -3,6 +3,8 @@
 
 cbuffer HUDBarBuffer : register(b11)
 {
+	float2 BarStartUV;
+	float2 BarScale;
 	float Percent;
 	int Poisoned;
 	int Frame;
@@ -39,6 +41,7 @@ half4 PSColored(PixelShaderInput input) : SV_TARGET
 		float factor = sin(((Frame % 30) / 30.0) * PI2)*0.5 + 0.5;
 		col = lerp(col,half4(214 / 512.0, 241 / 512.0, 18 / 512.0, 1),factor);
 	}
+
 	return glassOverlay(input.UV,col);
 }
 
@@ -47,10 +50,12 @@ half4 PSTextured(PixelShaderInput input) : SV_TARGET
 	if (input.UV.x > Percent) {
 		discard;
 	}
-	half4 col = Texture.Sample(Sampler, input.UV);
+	float2 uv = float2((input.UV.x * BarScale.x) + BarStartUV.x, (input.UV.y * BarScale.y) + BarStartUV.y); 
+	half4 col = Texture.Sample(Sampler, uv);
 	if (Poisoned) {
 		float factor = sin(((Frame % 30) / 30.0) * PI2)*0.5 + 0.5;
 		col = lerp(col, half4(214 / 512.0, 241 / 512.0, 18 / 512.0, 1), factor);
 	}
+	
 	return glassOverlay(input.UV, col);
 }

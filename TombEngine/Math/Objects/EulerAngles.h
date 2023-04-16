@@ -15,12 +15,12 @@
 		static const EulerAngles Zero; // TODO: Should be "Identity", not "Zero".
 
 		// Constructors
-		EulerAngles();
-		EulerAngles(short x, short y, short z);
-		EulerAngles(const Vector3& direction);
-		EulerAngles(const AxisAngle& axisAngle);
-		EulerAngles(const Quaternion& quat);
-		EulerAngles(const Matrix& rotMatrix);
+		constexpr EulerAngles() {};
+		constexpr EulerAngles(short x, short y, short z) { this->x = x; this->y = y; this->z = z; };
+				  EulerAngles(const Vector3& direction);
+				  EulerAngles(const AxisAngle& axisAngle);
+				  EulerAngles(const Quaternion& quat);
+				  EulerAngles(const Matrix& rotMatrix);
 
 		// Utilities
 		static bool		   Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon = 2);

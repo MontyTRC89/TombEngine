@@ -14,17 +14,15 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
 	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
 	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
-	const vector<unsigned int> GuideLeftFingerSwapJoints = { 15 };
-	const vector<unsigned int> GuideRightHandSwapJoints	= { 18 };
-	const vector<unsigned int> GuideHeadSwapJoints		= { 21 };
+	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
+	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
+	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
 
 	enum GuideState
 	{
@@ -282,7 +280,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (item->Animation.RequiredState)
+			if (item->Animation.RequiredState != NO_STATE)
 				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (goalNode >= item->ItemFlags[3] ||
 				item->ItemFlags[1] != 2)

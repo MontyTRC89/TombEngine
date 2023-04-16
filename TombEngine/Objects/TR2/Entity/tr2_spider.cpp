@@ -90,6 +90,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (item->Animation.ActiveState != SPIDER_STATE_DEATH)
 			{
+				SoundEffect(SFX_TR2_SPIDER_EXPLODE, &item->Pose);
 				SetAnimation(item, SMALL_SPIDER_ANIM_DEATH);
 				ExplodingDeath(itemNumber, 0);
 				DisableEntityAI(itemNumber);
@@ -179,6 +180,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					DoSpiderBloodEffect(*item);
 					DoDamage(creature->Enemy, SMALL_SPIDER_ATTACK_DAMAGE);
+					SoundEffect(SFX_TR2_SPIDER_BITE, &item->Pose);
 					creature->Flags = 1;
 				}
 

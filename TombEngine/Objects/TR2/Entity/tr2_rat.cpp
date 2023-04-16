@@ -8,11 +8,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto RAT_IDLE_CHANCE	 = 0.08f;
 	constexpr auto RAT_WALK_CHANCE	 = 0.92f;
 
-	#define RAT_TURN_RATE_MAX ANGLE(6.0f)
+	constexpr auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
 
 	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
 
@@ -87,9 +87,9 @@ namespace TEN::Entities::Creatures::TR2
 				if (creature->Mood == MoodType::Bored ||
 					creature->Mood == MoodType::Stalk)
 				{
-					if (TestProbability(RAT_SQUEAK_CHANCE))
+					if (Random::TestProbability(RAT_SQUEAK_CHANCE))
 						item->Animation.RequiredState = RAT_STATE_SQUEAK;
-					else if (TestProbability(RAT_WALK_CHANCE))
+					else if (Random::TestProbability(RAT_WALK_CHANCE))
 						item->Animation.RequiredState = RAT_STATE_WALK_FORWARD;
 				}
 				else if (AI.distance < RAT_ATTACK_RANGE)
@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					item->Animation.RequiredState = RAT_STATE_WALK_FORWARD;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
@@ -105,7 +105,7 @@ namespace TEN::Entities::Creatures::TR2
 			case RAT_STATE_IDLE:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
@@ -116,12 +116,12 @@ namespace TEN::Entities::Creatures::TR2
 				if (creature->Mood == MoodType::Bored ||
 					creature->Mood == MoodType::Stalk)
 				{
-					if (TestProbability(RAT_SQUEAK_CHANCE))
+					if (Random::TestProbability(RAT_SQUEAK_CHANCE))
 					{
 						item->Animation.TargetState = RAT_STATE_IDLE;
 						item->Animation.RequiredState = RAT_STATE_SQUEAK;
 					}
-					else if (TestProbability(RAT_IDLE_CHANCE))
+					else if (Random::TestProbability(RAT_IDLE_CHANCE))
 						item->Animation.TargetState = RAT_STATE_IDLE;
 				}
 				else if (AI.ahead && AI.distance < RAT_ATTACK_RANGE)
@@ -130,7 +130,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case RAT_STATE_POUNCE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(RatBite.meshNum))
 				{
 					item->Animation.RequiredState = RAT_STATE_IDLE;
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR2
 			case RAT_STATE_SQUEAK:
 				creature->MaxTurn = 0;
 
-				if (TestProbability(RAT_SQUEAK_CHANCE))
+				if (Random::TestProbability(RAT_SQUEAK_CHANCE))
 					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;

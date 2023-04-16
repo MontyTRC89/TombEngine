@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 
 struct ItemInfo;
 struct CollisionInfo;
@@ -87,10 +87,11 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	Vector3i OldPosition;
-	int OldAnimNumber;
-	int OldFrameNumber;
-	int OldState;
+	Vector3i	   OldPosition		= Vector3i::Zero;
+	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
+	int			   OldAnimNumber	= 0;
+	int			   OldFrameNumber	= 0;
+	int			   OldState			= 0;
 };
 
 struct CollisionInfo
@@ -126,6 +127,7 @@ CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(const GameVector& point);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
@@ -152,7 +154,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, float constraintAngle = 70.0f);
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);

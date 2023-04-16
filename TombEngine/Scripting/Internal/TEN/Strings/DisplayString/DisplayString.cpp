@@ -1,9 +1,9 @@
 #include "framework.h"
 
-#include "DisplayString.h"
-#include "ScriptAssert.h"
-#include "ReservedScriptNames.h"
-#include "ScriptUtil.h"
+#include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptUtil.h"
 
 /*** A string appearing on the screen.
 Can be used for subtitles and "2001, somewhere in Egypt"-style messages.
@@ -19,11 +19,11 @@ when you need to use screen-space coordinates.
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(std::string const& key, int x, int y, D3DCOLOR col, FlagArray const & flags, bool translated) :
+UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated) :
 	m_key{ key },
 	m_x{ x },
 	m_y{ y },
-	m_color{ col },
+	m_color{ color },
 	m_flags{ flags },
 	m_isTranslated{ translated }
 {
@@ -53,10 +53,11 @@ strings.lua. __Default: false__.
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
+static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, ScriptColor color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
+
 	FlagArray f{};
 	if (std::holds_alternative<sol::table>(flags))
 	{
@@ -74,11 +75,15 @@ static std::unique_ptr<DisplayString> CreateString(std::string const & key, int 
 
 	bool translated = false;
 	if (std::holds_alternative<bool>(maybeTranslated))	
+	{
 		translated = std::get<bool>(maybeTranslated);
+	}
 	else if (!std::holds_alternative<sol::nil_t>(maybeTranslated))
+	{
 		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.", ScriptReserved_DisplayString);
+	}
 
-	UserDisplayString ds{ key, x, y, col, f, translated};
+	UserDisplayString ds{ key, x, y, color, f, translated};
 
 	DisplayString::s_setItemCallback(id, ds);
 	return ptr;
@@ -89,7 +94,7 @@ DisplayString::~DisplayString()
 	s_removeItemCallback(m_id);
 }
 
-void DisplayString::Register(sol::table & parent)
+void DisplayString::Register(sol::table& parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
@@ -109,14 +114,14 @@ void DisplayString::Register(sol::table & parent)
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey
-		// @treturn String a string
+		// @treturn string a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
 		/// Set the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:SetKey
-		// @tparam String string the new key for the display string 
+		// @tparam string string the new key for the display string 
 		ScriptReserved_SetKey, &DisplayString::SetKey, 
 
 
@@ -132,7 +137,20 @@ void DisplayString::Register(sol::table & parent)
 		// @function DisplayString:GetPosition
 		// @treturn int x x-coordinate of the string
 		// @treturn int y y-coordinate of the string
-		ScriptReserved_GetPosition, &DisplayString::GetPos
+		ScriptReserved_GetPosition, &DisplayString::GetPos,
+
+		/// Set the display string's flags 
+		// @function DisplayString:SetFlags
+		// @tparam table table the new table with display flags options
+		// @usage
+		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
+		// varDisplayString:SetFlags({})
+		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW })
+		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.CENTER })
+		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.DisplayStringOption.CENTER })
+		// -- When passing a table to a function, you can omit the parentheses
+		// varDisplayString:SetFlags{ TEN.Strings.DisplayStringOption.CENTER }
+		ScriptReserved_SetFlags, &DisplayString::SetFlags
 	);
 }
 
@@ -154,10 +172,10 @@ std::tuple<int, int> DisplayString::GetPos() const
 	return std::make_tuple(s.m_x, s.m_y);
 }
 	
-void DisplayString::SetCol(ScriptColor const & col)
+void DisplayString::SetCol(const ScriptColor& color)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_color = col;
+	s.m_color = color;
 	//todo maybe change getItemCallback to return a ref instead? or move its
 	//todo UserDisplayString object? and then move back?
 	//s_addItemCallback(m_id, s);
@@ -169,7 +187,7 @@ ScriptColor DisplayString::GetCol()
 	return s.m_color;
 }
 
-void DisplayString::SetKey(std::string const & key)
+void DisplayString::SetKey(const std::string& key)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	s.m_key = key;
@@ -179,6 +197,20 @@ std::string DisplayString::GetKey() const
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return s.m_key;
+}
+
+void DisplayString::SetFlags(const sol::table& flags) 
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+
+	FlagArray f{};
+	for (const auto& val : flags)
+	{
+		auto i = val.second.as<size_t>();
+		f[i] = true;
+	}
+
+	s.m_flags = f;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
@@ -203,4 +235,3 @@ GetItemCallback DisplayString::s_getItemCallback = [](DisplayStringIDType)
 	throw TENScriptException(err);
 	return std::nullopt;
 };
-

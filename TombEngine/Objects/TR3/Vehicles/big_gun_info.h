@@ -13,6 +13,6 @@ namespace TEN::Entities::Vehicles
 		unsigned int FireCount = 0;
 		bool IsBarrelRotating = false;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

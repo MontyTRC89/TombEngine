@@ -28,9 +28,9 @@ namespace TEN::Entities::Doors
 	const ObjectCollisionBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
-			-BLOCK(3.0f / 4), BLOCK(3.0f / 4),
+			-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f),
 			-BLOCK(1), 0,
-			-BLOCK(1.0f / 2), 0
+			-BLOCK(1 / 2.0f), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -49,7 +49,7 @@ namespace TEN::Entities::Doors
 			doorItem->Status != ITEM_ACTIVE &&
 			!doorItem->Animation.IsAirborne &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
@@ -71,13 +71,13 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 
 				laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

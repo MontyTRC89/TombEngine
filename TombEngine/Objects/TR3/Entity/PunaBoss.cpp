@@ -31,7 +31,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto PUNA_EXPLOSION_NUM_MAX	= 60;
 	constexpr auto PUNA_HEAD_ATTACK_NUM_MAX = 4;
-	constexpr auto PUNA_EFFECT_COLOR		= Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+
+	constexpr auto PUNA_EFFECT_COLOR		   = Vector4(0.0f, 0.4f, 0.5f, 0.5f);
+	constexpr auto PUNA_EXPLOSION_MAIN_COLOR   = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
+	constexpr auto PUNA_EXPLOSION_SECOND_COLOR = Vector4(0.1f, 0.3f, 0.7f, 0.5f);
 
 	const auto PunaBossHeadBite = BiteInfo(Vector3::Zero, 8);
 	const auto PunaBossHandBite = BiteInfo(Vector3::Zero, 14);
@@ -334,7 +337,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
 				// Do explosion effect.
-				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR);
+				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR, PUNA_EXPLOSION_MAIN_COLOR, PUNA_EXPLOSION_SECOND_COLOR);
 				return;
 			}
 			else
@@ -455,7 +458,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 					SpawnPunaLightning(item, targetPos.ToVector3(), PunaBossHeadBite, false);
 
 				break;
@@ -464,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.SetFlagField((int)BossItemFlags::ShieldIsEnabled, 0);
 				creature.MaxTurn = 0;
 
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 30))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 30))
 				{
 					if (item.TestFlags((int)BossItemFlags::Object, (short)BossFlagValue::Lizard) &&
 						item.TestFlagField((int)BossItemFlags::AttackType, (int)PunaAttackType::SummonLightning) &&

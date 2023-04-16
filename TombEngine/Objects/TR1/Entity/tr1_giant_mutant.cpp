@@ -22,17 +22,15 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
 	constexpr auto MUTANT_CONTACT_DAMAGE = 6;
 
-	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
+	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(BLOCK(5 / 2.0f));
+	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(BLOCK(2.2f));
 
 	// TODO: Chance values are unused. -- Sezz 2022.11.05
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 1.0f / 3;
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 1 / 3.0f;
 	constexpr auto MUTANT_ATTACK_2_CHANCE = MUTANT_ATTACK_1_CHANCE * 2;
 
-	const auto MUTANT_NEED_TURN = ANGLE(45.0f);
-	const auto MUTANT_TURN	    = ANGLE(3.0f);
-
-	constexpr auto LARA_GIANT_MUTANT_DEATH = 6;
+	constexpr auto MUTANT_NEED_TURN = ANGLE(45.0f);
+	constexpr auto MUTANT_TURN	    = ANGLE(3.0f);
 
 	const auto MutantAttackJoints	   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 	const auto MutantAttackLeftJoint   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
@@ -118,7 +116,7 @@ namespace TEN::Entities::Creatures::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (Random::TestProbability(1.0f / 2))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
@@ -193,18 +191,15 @@ namespace TEN::Entities::Creatures::TR1
 				if (item->TouchBits.Test(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
 					item->Animation.TargetState = MUTANT_STATE_KILL;
-					Camera.targetDistance = SECTOR(2);
+					Camera.targetDistance = BLOCK(2);
 					Camera.flags = CF_FOLLOW_CENTER;
 
-					LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_GIANT_MUTANT_DEATH;
-					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-					LaraItem->Animation.ActiveState = 46;
-					LaraItem->Animation.TargetState = 46;
+					SetAnimation(*LaraItem, ID_LARA_EXTRA_ANIMS, LEA_GIANT_MUTANT_DEATH);
 					LaraItem->Animation.IsAirborne = false;
 					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
-					Lara.Air = -1;
+					Lara.Status.Air = -1;
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.Control.Weapon.GunType = LaraWeaponType::None;
 				}
@@ -212,7 +207,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case MUTANT_STATE_KILL:
-				Camera.targetDistance = SECTOR(2);
+				Camera.targetDistance = BLOCK(2);
 				Camera.flags = CF_FOLLOW_CENTER;
 				break;
 			}

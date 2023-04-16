@@ -11,10 +11,10 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Gui;
 
@@ -65,7 +65,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Pose.Position.y -= CLICK(2);
 
-				AI_INFO AI;;
+				AI_INFO AI;
 				CreatureAIInfo(item, &AI);
 
 				item->Pose.Position.y += CLICK(2);

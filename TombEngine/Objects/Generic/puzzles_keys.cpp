@@ -87,15 +87,15 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		!BinocularRange) ||
 		(laraInfo->Control.IsMoving &&
-			laraInfo->InteractedItem == itemNumber))
+			laraInfo->Context.InteractedItem == itemNumber))
 	{
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(receptableItem);
 		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
 		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);
 
 		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
 		{
@@ -122,7 +122,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
 				if (!MoveLaraPosition(pos, receptableItem, laraItem))
 				{
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
 					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
@@ -147,11 +147,11 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			}
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Busy;
-			laraInfo->InteractedItem = itemNumber;
+			laraInfo->Context.InteractedItem = itemNumber;
 			receptableItem->Pose.Orientation.y = oldYrot;
 			receptableItem->Flags |= TRIGGERED;
 			return;
@@ -159,7 +159,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 		if (laraInfo->Control.IsMoving)
 		{
-			if (laraInfo->InteractedItem == itemNumber)
+			if (laraInfo->Context.InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;
@@ -170,9 +170,9 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	}
 	else
 	{
-		if (!laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber || laraInfo->InteractedItem != itemNumber)
+		if (!laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber || laraInfo->Context.InteractedItem != itemNumber)
 		{
-			if (laraInfo->InteractedItem == itemNumber)
+			if (laraInfo->Context.InteractedItem == itemNumber)
 			{
 				if (laraItem->Animation.ActiveState != LS_MISC_CONTROL)
 				{
@@ -207,7 +207,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.RequiredState = 0;
+	item->Animation.RequiredState = NO_STATE;
 	item->ResetModelToDefault();
 
 	AddActiveItem(itemNumber);
@@ -218,7 +218,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 void DoPuzzle()
 {
-	PuzzleItem = Lara.InteractedItem;
+	PuzzleItem = Lara.Context.InteractedItem;
 	auto* item = &g_Level.Items[PuzzleItem];
 
 	int flag = 0;
@@ -277,7 +277,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						 laraItem->Animation.ActiveState == LS_IDLE &&
 						 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
 
-	bool actionActive = laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber;
+	bool actionActive = laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber;
 
 	if (actionActive || (actionReady && laraAvailable))
 	{
@@ -299,10 +299,10 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (g_Gui.GetInventoryItemChosen() != keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
 
-				laraInfo->InteractedItem = itemNumber;
+				laraInfo->Context.InteractedItem = itemNumber;
 			}
 
-			if (laraInfo->InteractedItem != itemNumber)
+			if (laraInfo->Context.InteractedItem != itemNumber)
 				return;
 
 			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
@@ -318,7 +318,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				keyHoleItem->Flags |= TRIGGERED;
 				keyHoleItem->Status = ITEM_ACTIVE;
@@ -335,7 +335,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 
-		if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Free;

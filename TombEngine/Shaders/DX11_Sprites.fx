@@ -1,15 +1,15 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
+#include "./Math.hlsli"
 
-cbuffer SpriteBuffer: register(b9)
+// NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
+// instead of instances
+
+cbuffer SpriteBuffer : register(b9)
 {
-	float4x4 BillboardMatrix;
-	float4 Color;
-	float IsBillboard;
 	float IsSoftParticle;
-	float2 SpritesPadding;
-}
+};
 
 struct PixelShaderInput
 {
@@ -31,23 +31,12 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	float4 worldPosition;
+	float4 worldPosition = float4(input.Position, 1.0f);
 
-	if (IsBillboard) 
-	{
-		worldPosition = mul(float4(input.Position, 1.0f), BillboardMatrix);
-		output.Position = mul(mul(float4(input.Position, 1.0f), BillboardMatrix), ViewProjection);
-	}
-	else 
-	{
-		worldPosition = float4(input.Position, 1.0f);
-		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
-	}
-
-	output.PositionCopy = output.Position;
-	
+	output.Position = mul(worldPosition, ViewProjection);
+	output.PositionCopy = output.Position;	
 	output.Normal = input.Normal;
-	output.Color = input.Color * Color;
+	output.Color = input.Color;
 	output.UV = input.UV;
 
 	float4 d = length(CamPositionWS - worldPosition);
@@ -57,11 +46,6 @@ PixelShaderInput VS(VertexShaderInput input)
 		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
 
 	return output;
-}
-
-float LinearizeDepth(float depth)
-{
-	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
 }
 
 float4 PS(PixelShaderInput input) : SV_TARGET
@@ -77,8 +61,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
 		float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-		sceneDepth = LinearizeDepth(sceneDepth);
-		particleDepth = LinearizeDepth(particleDepth);
+		sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);
+		particleDepth = LinearizeDepth(particleDepth, NearPlane, FarPlane);
 
 		if (particleDepth - sceneDepth > 0.01f)
 			discard;

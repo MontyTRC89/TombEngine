@@ -17,8 +17,6 @@
 #include "Specific/winmain.h"
 
 using namespace OIS;
-
-using std::vector;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
@@ -80,16 +78,16 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData			RumbleInfo  = {};
-	vector<InputAction>	ActionMap   = {};
-	vector<QueueState>  ActionQueue = {};
-	vector<bool>		KeyMap	    = {};
-	vector<float>		AxisMap     = {};
+	RumbleData				 RumbleInfo  = {};
+	std::vector<InputAction> ActionMap	 = {};
+	vector<QueueState>		 ActionQueue = {};
+	std::vector<bool>		 KeyMap		 = {};
+	std::vector<float>		 AxisMap	 = {};
 
 	int DbInput = 0;
 	int TrInput = 0;
 
-	vector<int>DefaultBindings =
+	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
@@ -217,17 +215,13 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			if (ActionQueue[i] != QueueState::None)
-			{
-				if (ActionQueue[i] == QueueState::Push)
-				{
-					ActionMap[i].Update(true);
-				}
-				else
-				{
-					ActionMap[i].Clear();
-				}
-			}
+			if (ActionQueue[i] == QueueState::None)
+				continue;
+
+			if (ActionQueue[i] == QueueState::Push)
+				ActionMap[i].Update(true);
+			else
+				ActionMap[i].Clear();
 		}
 	}
 
@@ -512,7 +506,7 @@ namespace TEN::Input
 		if (IsClicked(In::Flare))
 		{
 			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
-				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
+				SayNo();
 		}
 
 		// Handle weapon hotkeys.
@@ -548,7 +542,7 @@ namespace TEN::Input
 		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara.PoisonPotency)
+				lara.Status.Poison)
 			{
 				bool hasUsedMedipack = false;
 
@@ -576,7 +570,7 @@ namespace TEN::Input
 
 				if (hasUsedMedipack)
 				{
-					lara.PoisonPotency = 0;
+					lara.Status.Poison = 0;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 					Statistics.Game.HealthUsed++;
 				}

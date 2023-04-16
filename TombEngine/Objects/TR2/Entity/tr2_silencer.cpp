@@ -7,20 +7,21 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SILENCER_SHOOT_ATTACK_DAMAGE = 50;
 	constexpr auto SILENCER_RUN_RANGE = SQUARE(SECTOR(2));
 
-	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
+	constexpr auto SILENCER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto SILENCER_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
-	#define SILENCER_WALK_TURN_RATE_MAX ANGLE(5.0f)
-	#define SILENCER_RUN_TURN_RATE_MAX	ANGLE(5.0f)
+	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
 
 	enum SilencerState
 	{
@@ -112,7 +113,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
@@ -133,7 +134,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (Targetable(item, &AI))
 					{
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
-						item->Animation.RequiredState = TestProbability(0.5f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
+						item->Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 					}
 
 					if (creature->Mood == MoodType::Attack || !AI.ahead)
@@ -151,9 +152,9 @@ namespace TEN::Entities::Creatures::TR2
 					}
 					else
 					{
-						if (TestProbability(0.96f))
+						if (Random::TestProbability(0.96f))
 						{
-							if (TestProbability(0.08f))
+							if (Random::TestProbability(0.08f))
 							{
 								item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 								item->Animation.RequiredState = SILENCER_STATE_WALK_FORWARD;
@@ -180,13 +181,13 @@ namespace TEN::Entities::Creatures::TR2
 				else if (Targetable(item, &AI))
 				{
 					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
-					item->Animation.RequiredState = TestProbability(0.5f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
+					item->Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 				}
 				else
 				{
 					if (AI.distance > SILENCER_RUN_RANGE || !AI.ahead)
 						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
-					if (creature->Mood == MoodType::Bored && TestProbability(0.025f))
+					if (creature->Mood == MoodType::Bored && Random::TestProbability(0.025f))
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 				}
 
@@ -216,7 +217,7 @@ namespace TEN::Entities::Creatures::TR2
 					break;
 				}
 				else if (creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = TestProbability(0.5f) ? SILENCER_STATE_RUN_FORWARD : SILENCER_STATE_IDLE_FRAME;
+					item->Animation.TargetState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_RUN_FORWARD : SILENCER_STATE_IDLE_FRAME;
 				else
 					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
@@ -235,7 +236,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
+					if (creature->Mood == MoodType::Attack || Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
 					if (!AI.ahead)
@@ -297,7 +298,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					extraHeadRot.y = AI.angle;
 
-				if (!item->Animation.RequiredState)
+				if (item->Animation.RequiredState == NO_STATE)
 				{
 					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE))
 						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;

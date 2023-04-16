@@ -38,6 +38,7 @@ namespace TEN::Effects
 		p.worldPosition = {x, float(snowMobile->Pose.Position.y) - size / 2 , z};
 		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;
 		p.size = Random::GenerateFloat(256, 512);
+		p.blendMode = BLENDMODE_ALPHABLEND;
 	}
 
 	void TriggerSpeedboatFoam(ItemInfo* boat, Vector3 offset)
@@ -61,6 +62,7 @@ namespace TEN::Effects
 			p.worldPosition = { x, y, z };
 			p.sequence = ID_MOTORBOAT_FOAM_SPRITES;
 			p.size = Random::GenerateFloat(256, 512);
+			p.blendMode = BLENDMODE_ADDITIVE;
 		}
 	}
 

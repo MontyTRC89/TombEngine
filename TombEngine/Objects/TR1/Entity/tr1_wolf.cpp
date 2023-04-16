@@ -19,25 +19,25 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;
 
-	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto WOLF_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto WOLF_STALK_RANGE	 = SQUARE(BLOCK(2));
 
-	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
-	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
+	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1024;
+	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1024;
 	constexpr auto WOLF_HOWL_CHANCE  = 1.0f / 85;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
-	const auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
-	const auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
-	const auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
+	constexpr auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
+	constexpr auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
 	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState
 	{
-		WOLF_STATE_NONE = 0,
+		// No state 0.
 		WOLF_STATE_IDLE = 1,
 		WOLF_STATE_WALK = 2,
 		WOLF_STATE_RUN = 3,
@@ -120,7 +120,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_IDLE:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else
 					item->Animation.TargetState = WOLF_STATE_WALK;
@@ -132,7 +132,7 @@ namespace TEN::Entities::Creatures::TR1
 				if (creature->Mood != MoodType::Bored)
 				{
 					item->Animation.TargetState = WOLF_STATE_STALK;
-					item->Animation.RequiredState = WOLF_STATE_NONE;
+					item->Animation.RequiredState = NO_STATE;
 				}
 				else if (Random::TestProbability(WOLF_SLEEP_CHANCE))
 				{
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_CROUCH:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = WOLF_STATE_RUN;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 					{
 						item->Animation.TargetState = WOLF_STATE_ATTACK;
-						item->Animation.RequiredState = WOLF_STATE_NONE;
+						item->Animation.RequiredState = NO_STATE;
 					}
 				}
 				else if (creature->Mood == MoodType::Stalk &&
@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR1
 			case WOLF_STATE_ATTACK:
 				tilt = angle;
 
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WolfAttackJoints))
 				{
 					item->Animation.RequiredState = WOLF_STATE_RUN;

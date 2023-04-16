@@ -21,7 +21,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			0, BLOCK(3.0f / 4)
+			0, BLOCK(3 / 4.0f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -34,8 +34,8 @@ namespace TEN::Entities::Switches
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
-			-BLOCK(1.0f / 2), 0
+			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			-BLOCK(1 / 2.0f), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -48,8 +48,8 @@ namespace TEN::Entities::Switches
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
-			0, BLOCK(1.0f / 2)
+			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			0, BLOCK(1 / 2.0f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -90,7 +90,7 @@ namespace TEN::Entities::Switches
 
 						do
 						{
-							AnimateLara(laraItem);
+							AnimateItem(laraItem);
 						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
@@ -119,14 +119,14 @@ namespace TEN::Entities::Switches
 			lara->Control.WaterStatus == WaterStatus::Underwater &&
 			lara->Control.HandStatus == HandStatus::Free &&
 			switchItem->Animation.ActiveState == SWITCH_OFF) ||
-			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
+			(lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber))
 		{
 			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
 					doInteraction = true;
 				else
-					lara->InteractedItem = itemNumber;
+					lara->Context.InteractedItem = itemNumber;
 			}
 			else
 			{
@@ -137,7 +137,7 @@ namespace TEN::Entities::Switches
 					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
 						doInteraction = true;
 					else
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 				}
 
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);

@@ -217,7 +217,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
-// @tparam ObjectID ID the new ID 
+// @tparam Objects.ObjID ID the new ID 
 // @usage
 // shiva = TEN.Objects.GetMoveableByName("shiva_60")
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
@@ -299,15 +299,19 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @tparam index: (short) index the ItemFlags, can be between 0 and 7.
-// @treturn (short) the value contained in the ItemFlags[index]
+// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @treturn int the value contained in the ItemFlags[index]
 	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
 /// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam value: (short) value to store in the moveable's ItemFlags[index]
-// @tparam index: (short) index of the ItemFlags where store the value.
+// @tparam short value to store in the moveable's ItemFlags[index]
+// @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
+
+	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
+
+	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -382,7 +386,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // It cannot be blank and cannot share a name with any existing object.
 // @function Moveable:SetName
-// @tparam name string the new moveable's name
+// @tparam string name the new moveable's name
 // @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
 	ScriptReserved_SetName, &Moveable::SetName, 
 
@@ -474,7 +478,7 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 
 /// Set the function to be called when this moveable collides with another moveable
 // @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
 // @usage
 // LevelFuncs.objCollided = function(obj1, obj2)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
@@ -701,6 +705,33 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn short the value contained in the LocationAI of the creature.
+short Moveable::GetLocationAI() const
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		return creature->LocationAI;
+	}
+	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	return 0;
+}
+
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam short value to store.
+void Moveable::SetLocationAI(short value)
+{
+	if (m_item->IsCreature())
+	{
+		auto creature = (CreatureInfo*)m_item->Data;
+		creature->LocationAI = value;
+	}
+	else
+		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+}
 
 ScriptColor Moveable::GetColor() const
 {
@@ -831,7 +862,7 @@ bool Moveable::GetHitStatus() const
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
-// @treturn Room current room of the object
+// @treturn Objects.Room current room of the object
 std::unique_ptr<Room> Moveable::GetRoom() const
 {
 	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);

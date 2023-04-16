@@ -10,6 +10,8 @@ cbuffer StaticMatrixBuffer : register(b8)
 	float4x4 World;
 	float4 Color;
 	float4 AmbientLight;
+	ShaderLight StaticLights[MAX_LIGHTS_PER_ITEM];
+	int NumStaticLights;
 	int LightType;
 };
 
@@ -72,7 +74,15 @@ PixelShaderOutput PS(PixelShaderInput input)
     DoAlphaTest(tex);
 
 	float3 color = (LightType == 0) ?
-		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normalize(input.Normal), input.Sheen) :
+		CombineLights(
+			AmbientLight.xyz, 
+			input.Color.xyz, 
+			tex.xyz, 
+			input.WorldPosition, 
+			normalize(input.Normal), 
+			input.Sheen, 
+			StaticLights, 
+			NumStaticLights) :
 		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = float4(color, tex.w);
