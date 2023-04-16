@@ -47,8 +47,8 @@ bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
-static std::optional<AttractorCollisionData> GetClosestEdgeHangAttractorCollision(const std::vector<AttractorCollisionData>& attracColls,
-																				  const ItemInfo& item, const CollisionInfo& coll)
+static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(const std::vector<AttractorCollisionData>& attracColls,
+																			   const ItemInfo& item, const CollisionInfo& coll)
 {
 	const AttractorCollisionData* attracCollPtr = nullptr;
 	float closestDist = INFINITY;
@@ -103,10 +103,10 @@ static std::optional<AttractorCollisionData> GetClosestEdgeHangAttractorCollisio
 	return *attracCollPtr;
 }
 
-static std::optional<AttractorCollisionData> GetClosestEdgeHangAttractorCollision(const std::vector<const Attractor*>& attracPtrs,
-																				  const ItemInfo& item, const CollisionInfo& coll,
-																				  const Vector3& relOffset, const Matrix& rotMatrix,
-																				  float range)
+static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(const std::vector<const Attractor*>& attracPtrs,
+																			   const ItemInfo& item, const CollisionInfo& coll,
+																			   const Vector3& relOffset, const Matrix& rotMatrix,
+																			   float range)
 {
 	auto basePos = item.Pose.Position.ToVector3();
 	auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
@@ -117,7 +117,7 @@ static std::optional<AttractorCollisionData> GetClosestEdgeHangAttractorCollisio
 	g_Renderer.AddSphere(refPoint, 15.0f, COLOR_MAGENTA);
 	// ---------------
 
-	return GetClosestEdgeHangAttractorCollision(attracColls, item, coll);
+	return GetBestEdgeHangAttractorCollision(attracColls, item, coll);
 }
 
 static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll)
@@ -133,31 +133,31 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 
 	// Get center attractor collision.
 	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
-	auto attracCollCenter = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetCenter, rotMatrix, range);
+	auto attracCollCenter = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetCenter, rotMatrix, range);
 
 	// Get left attractor collision.
 	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-	auto attracCollLeft = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetLeft, rotMatrix, range);
+	auto attracCollLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetLeft, rotMatrix, range);
 
 	// Get right attractor collision.
 	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-	auto attracCollRight = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetRight, rotMatrix, range);
+	auto attracCollRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetRight, rotMatrix, range);
 	
 	// Get front-left attractor collision.
 	auto relOffsetFrontLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto attracCollFrontLeft = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontLeft, rotMatrix, range);
+	auto attracCollFrontLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontLeft, rotMatrix, range);
 	
 	// Get front-right attractor collision.
 	auto relOffsetFrontRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto attracCollFrontRight = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontRight, rotMatrix, range);
+	auto attracCollFrontRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontRight, rotMatrix, range);
 
 	// Get back-left attractor collision.
 	auto relOffsetBackLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, 0.0f);
-	auto attracCollBackLeft = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackLeft, rotMatrix, range);
+	auto attracCollBackLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackLeft, rotMatrix, range);
 	
 	// Get back-right attractor collision.
 	auto relOffsetBackRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, 0.0f);
-	auto attracCollBackRight = GetClosestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackRight, rotMatrix, range);
+	auto attracCollBackRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackRight, rotMatrix, range);
 
 	// Debug
 	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);

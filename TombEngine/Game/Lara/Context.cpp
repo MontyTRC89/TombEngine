@@ -274,12 +274,16 @@ namespace TEN::Entities::Player::Context
 
 	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
 	{
+		return true;
+
 		return TestLateralShimmy(item, coll, false);
 		//return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
 	}
 
 	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll)
 	{
+		return true;
+
 		return TestLateralShimmy(item, coll, true);
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
