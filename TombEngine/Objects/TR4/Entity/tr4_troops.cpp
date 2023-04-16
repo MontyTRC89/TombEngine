@@ -20,7 +20,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto TroopsBite1 = CreatureBiteInfo(Vector3i(0, 300, 64), 7);
+	const auto TroopsBite1 = CreatureBiteInfo(Vector3i(0, 270, 40), 7);
 
 	enum TroopState
 	{
@@ -371,7 +371,7 @@ namespace TEN::Entities::TR4
 				{
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->MuzzleFlash[0].Bite = TroopsBite1;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 5;
 				}
 
@@ -433,7 +433,7 @@ namespace TEN::Entities::TR4
 				{
 					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->MuzzleFlash[0].Bite = TroopsBite1;
-					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 5;
 				}
 

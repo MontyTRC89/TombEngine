@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(-5, 200, 50), 11);
 	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
@@ -329,6 +329,9 @@ namespace TEN::Entities::TR4
 
 		// TODO: better add a second control routine for baddy 2 instead of mixing them?
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		bool roll = false;
 		bool jump = false;
@@ -1156,7 +1159,7 @@ namespace TEN::Entities::TR4
 				if (!ShotLara(item, &AI, BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 				creature->MuzzleFlash[0].Bite = BaddyGunBite;
-				creature->MuzzleFlash[0].Delay = 1;
+				creature->MuzzleFlash[0].Delay = 2;
 
 				break;
 

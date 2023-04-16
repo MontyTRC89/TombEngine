@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SAS_WALK_RANGE  = SQUARE(BLOCK(2));
 	constexpr auto SAS_SHOOT_RANGE = SQUARE(BLOCK(3));
 
-	const auto SasGunBite = CreatureBiteInfo(Vector3i(0, 550, 84), 7);
+	const auto SasGunBite = CreatureBiteInfo(Vector3i(0, 420, 80), 7);
 
 	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
 	const auto SasDragBounds = ObjectCollisionBounds
@@ -517,7 +517,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.xAngle;
 				}
 
-				if (creature.Flags)
+				if (creature.Flags != 0)
 				{
 					creature.Flags -= 1;
 				}
@@ -525,7 +525,7 @@ namespace TEN::Entities::TR4
 				{
 					ShotLara(&item, &AI, SasGunBite, joint0, SAS_SHOT_DAMAGE);
 					creature.MuzzleFlash[0].Bite = SasGunBite;
-					creature.MuzzleFlash[0].Delay = 3;
+					creature.MuzzleFlash[0].Delay = 2;
 					creature.Flags = 5;
 				}
 
@@ -535,9 +535,6 @@ namespace TEN::Entities::TR4
 				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F)) // TODO: This is a probabliity of roughly 0.998f.
 					item.Animation.TargetState = SAS_STATE_WAIT;
 
-				break;
-
-			default:
 				break;
 			}
 

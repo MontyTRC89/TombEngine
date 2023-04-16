@@ -108,12 +108,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -127,11 +127,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -168,11 +168,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -189,12 +189,12 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->HitRoutine = GuardHit;
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
@@ -210,11 +210,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -231,11 +231,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
+		obj->HitRoutine = GuardHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->HitRoutine = GuardHit;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -362,6 +362,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_PIERRE];
 	if (obj->loaded)
 	{
+		//AssignObjectAnimations(*obj, ID_LARSON, "ID_PIERRE", "ID_LARSON");
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;

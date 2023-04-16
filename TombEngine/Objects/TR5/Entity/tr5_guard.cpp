@@ -30,10 +30,11 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
 	constexpr auto GUARD_HEAD_MESH = 14;
 
-	const auto SwatGunBite		  = CreatureBiteInfo(Vector3i(80, 200, 13), 0);
-	const auto SniperGunBite	  = CreatureBiteInfo(Vector3i(0, 480, 110), 13);
-	const auto ArmedMafia2GunLeftBite = CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
-	const auto ArmedMafia2GunRightBite = CreatureBiteInfo(Vector3i(16, 200, 60), 13);
+	const auto SwatGunBite				= CreatureBiteInfo(Vector3i(16, 240, 90), 13);
+	const auto MafiaGunBite				= CreatureBiteInfo(Vector3i(16, 270, 90), 13);
+	const auto SniperGunBite			= CreatureBiteInfo(Vector3i(0, 480, 110), 13);
+	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
+	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3i(16, 200, 60), 13);
 
 	// TODO: Revise names of enum elements.
 
@@ -571,15 +572,27 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0)
 				{
-					if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
-						ShotLara(item, &AI, SwatGunBite, torsoX, 30);
+					if (item->ObjectNumber == ID_MAFIA)
+					{
+						if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
+							ShotLara(item, &AI, MafiaGunBite, torsoX, 30);
+						else
+							ShotLara(item, &AI, MafiaGunBite, torsoX, 10);
+						creature->MuzzleFlash[0].Bite = MafiaGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
+					}
 					else
-						ShotLara(item, &AI, SwatGunBite, torsoX, 10);
-
-					creature->MuzzleFlash[0].Bite = SwatGunBite;
-					creature->MuzzleFlash[0].Delay = 2;
+					{
+						if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
+							ShotLara(item, &AI, SwatGunBite, torsoX, 30);
+						else
+							ShotLara(item, &AI, SwatGunBite, torsoX, 10);
+						creature->MuzzleFlash[0].Bite = SwatGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
+					}
+					
 					creature->Flags = 1;
 				}
 
@@ -1067,9 +1080,6 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				break;
-
-			default:
-				break;
 			}
 		}
 		else
@@ -1515,9 +1525,6 @@ namespace TEN::Entities::Creatures::TR5
 				item->Animation.ActiveState = 22;
 				creature->MaxTurn = 0;
 				break;
-
-			default:
-				return;
 			}
 		}
 	}

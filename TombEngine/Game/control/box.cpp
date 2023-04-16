@@ -35,6 +35,7 @@ constexpr auto FEELER_DISTANCE = CLICK(2);
 constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
 constexpr auto CREATURE_JOINT_ROTATION_MAX = ANGLE(70.0f);
+constexpr auto GUN_EFFECT_CREATURE_YSHIFT = 75;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 constexpr int HIGH_PRIO_RANGE = 8;
@@ -725,25 +726,29 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	return angle;
 }
 
+static void PlayGunEffectForCreature(ItemInfo* item, const CreatureMuzzleflashInfo& muzzleFlash)
+{
+	if (muzzleFlash.Delay != 0)
+	{
+		auto muzzleNewpos = muzzleFlash.Bite;
+		auto pos = GetJointPosition(item, muzzleNewpos);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
+		// NOTE: Fix the smoke position,
+		// avoiding creating new variable in CreatureMuzzleflashInfo for a smoke biteInfo
+		muzzleNewpos.Position.y -= GUN_EFFECT_CREATURE_YSHIFT;
+		auto smokePos = GetJointPosition(item, muzzleNewpos);
+		TriggerGunSmokeParticles(item, smokePos.x, smokePos.y, smokePos.z, 0, 0, 0, 1, 12, item->RoomNumber);
+	}
+}
+
 bool CreatureAnimation(short itemNumber, short angle, short tilt)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	if (!item->IsCreature())
 		return false;
 	auto* creature = GetCreatureInfo(item);
-
-	if (creature->MuzzleFlash[0].Delay != 0)
-	{
-		auto pos = GetJointPosition(item, creature->MuzzleFlash[0].Bite);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
-		TriggerGunSmokeParticles(item, pos.x, pos.y, pos.z, 0, 0, 0, 1, 12, item->RoomNumber);
-	}
-	if (creature->MuzzleFlash[1].Delay != 0)
-	{
-		auto pos = GetJointPosition(item, creature->MuzzleFlash[1].Bite);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 24, 16, 4);
-		TriggerGunSmokeParticles(item, pos.x, pos.y, pos.z, 0, 0, 0, 1, 12, item->RoomNumber);
-	}
+	PlayGunEffectForCreature(item, creature->MuzzleFlash[0]);
+	PlayGunEffectForCreature(item, creature->MuzzleFlash[1]);
 
 	auto prevPos = item->Pose.Position;
 

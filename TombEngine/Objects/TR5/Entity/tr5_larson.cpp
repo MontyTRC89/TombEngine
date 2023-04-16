@@ -32,8 +32,8 @@ namespace TEN::Entities::Creatures::TR5
 	#define TR5_LARSON_MIN_HP 40
 
 	const auto LarsonGun  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
-	const auto PierreGun1 = CreatureBiteInfo(Vector3i(60, 200, 0), 11);
-	const auto PierreGun2 = CreatureBiteInfo(Vector3i(-57, 200, 0), 14);
+	const auto PierreGunLeft = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
+	const auto PierreGunRight = CreatureBiteInfo(Vector3i(-40, 200, 0), 14);
 
 	void InitialiseLarson(short itemNumber)
 	{
@@ -81,6 +81,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
+		if (creature->MuzzleFlash[1].Delay != 0)
+			creature->MuzzleFlash[1].Delay--;
 
 		if (item->TriggerFlags)
 		{
@@ -318,18 +320,23 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += AI.angle;
 				
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
-						ShotLara(item, &AI, PierreGun1, joint0, 20);
-						ShotLara(item, &AI, PierreGun2, joint0, 20);
+						ShotLara(item, &AI, PierreGunLeft, joint0, 20);
+						ShotLara(item, &AI, PierreGunRight, joint0, 20);
+						creature->MuzzleFlash[0].Bite = PierreGunLeft;
+						creature->MuzzleFlash[0].Delay = 2;
+						creature->MuzzleFlash[1].Bite = PierreGunRight;
+						creature->MuzzleFlash[1].Delay = 2;
 					}
 					else
+					{
 						ShotLara(item, &AI, LarsonGun, joint0, 20);
-
-					creature->MuzzleFlash[0].Bite = LarsonGun;
-					creature->MuzzleFlash[0].Delay = 2;
+						creature->MuzzleFlash[0].Bite = LarsonGun;
+						creature->MuzzleFlash[0].Delay = 2;
+					}
 				}
 
 				if (creature->Mood == MoodType::Escape && Random::TestProbability(0.75f))
