@@ -5,7 +5,10 @@ Version 1.0.9
 - Fix spiky wall being too slow when triggered.
 - Fix gunflash rendering for entities.
 - Fix all entities gunflash position.
+- Fix snowmobile driver crashing the game.
+- Fix knifethrower not throwing knife.
 - Added gunflash for entities (some didn't have it), also include dynamic light and smoke.
+- Warning: savegame now include 2 gun flash delay, maybe this could cause wrong savegame loading for older game version.
 
 Version 1.0.8
 =============
