@@ -1,6 +1,7 @@
 Version 1.0.9
 =============
 
+- Add TR3 Wall mounted blade.
 - Fix Cold bar triggered when room is dry (only trigger if and only if the room is water).
 - Fix spiky wall being too slow when triggered.
 - Fix gunflash rendering for entities.
