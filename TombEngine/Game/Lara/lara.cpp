@@ -42,7 +42,7 @@
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -736,17 +736,17 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
 						auto pointColl = GetCollision(item, 0, 0, CLICK(1));
-						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
-					}
-				}
 
-				if (isCold)
-				{
-					lara->Status.Exposure--;
-					if (lara->Status.Exposure <= 0)
-					{
-						lara->Status.Exposure = 0;
-						item->HitPoints -= 10;
+						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
+						if (isCold)
+						{
+							lara->Status.Exposure--;
+							if (lara->Status.Exposure <= 0)
+							{
+								lara->Status.Exposure = 0;
+								item->HitPoints -= 10;
+							}
+						}
 					}
 				}
 				else
@@ -895,7 +895,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Handle weapons.
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	// Handle breath.
 	LaraBreath(item);
@@ -973,7 +973,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, LARA_RADIUS);
 
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1062,7 +1062,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, 0);
 
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);

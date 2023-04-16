@@ -39,6 +39,7 @@
 // Traps
 #include "Objects/TR3/Trap/ElectricCleaner.h"
 #include "Objects/TR3/Trap/train.h"
+#include "Objects/TR3/Trap/WallMountedBlade.h"
 
 // Vehicles
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -461,6 +462,14 @@ static void StartTrap(ObjectInfo* obj)
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;
 		obj->radius = 512;
+	}
+
+	obj = &Objects[ID_WALL_MOUNTED_BLADE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWallMountedBlade;
+		obj->control = WallMountedBladeControl;
+		obj->collision = GenericSphereBoxCollision;
 	}
 }
 
