@@ -15,7 +15,6 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_fire.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"

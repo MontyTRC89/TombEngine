@@ -653,6 +653,13 @@ static void StartObject(ObjectInfo *obj)
 {
 	InitFlare(obj, ID_FLARE_ITEM);
 
+	obj = &Objects[ID_CAMERA_TARGET];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
 	for (int objectNumber = ID_SEARCH_OBJECT1; objectNumber <= ID_SEARCH_OBJECT4; objectNumber++)
 		InitSearchObject(obj, objectNumber);
 
@@ -806,6 +813,77 @@ static void StartObject(ObjectInfo *obj)
 			obj->collision = AIPickupCollision;
 		}
 	}
+
+	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
+	{
+		InitAnimating(obj, objNum);
+	}
+
+	InitAnimating(obj, ID_LASERHEAD_BASE);
+	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
+
+	obj = &Objects[ID_TIGHT_ROPE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTightrope;
+		obj->collision = TightropeCollision;
+		obj->drawRoutine = nullptr;
+
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_PARALLEL_BARS];
+	if (obj->loaded)
+	{
+		obj->collision = HorizontalBarCollision;
+	}
+
+	obj = &Objects[ID_EARTHQUAKE];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+	}
+
+	obj = &Objects[ID_HIGH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+		obj->control = HighObject2Control;
+	}
+
+	/*obj = &Objects[ID_LENS_FLARE];
+	if (obj->loaded)
+	{
+
+	}*/
+
+	obj = &Objects[ID_WATERFALLMIST];
+	if (obj->loaded)
+	{
+		obj->control = ControlWaterfallMist;
+		obj->drawRoutine = nullptr;
+	}
+
+	for (int objNum = ID_WATERFALL1; objNum <= ID_WATERFALL6; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->control = nullptr;
+		}
+	}
+
+	obj = &Objects[ID_WATERFALLSS1];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
+	}
+
+	obj = &Objects[ID_WATERFALLSS2];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
+	}
 }
 
 static void StartTrap(ObjectInfo *obj)
@@ -912,6 +990,15 @@ static void StartTrap(ObjectInfo *obj)
 
 static void StartSwitch(ObjectInfo *obj)
 {
+	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
+		InitKeyHole(obj, objNum);
+
+	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
+		InitPuzzleHole(obj, objNum);
+
+	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
+		InitPuzzleDone(obj, objNum);
+
 	obj = &Objects[ID_RAISING_COG];
 	if (obj->loaded)
 	{
@@ -936,6 +1023,17 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
 		obj->SetupHitEffect(true);
+	}
+
+	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseShootSwitch;
+			obj->control = ControlAnimatingSlots;
+			obj->collision = ShootSwitchCollision;
+		}
 	}
 }
 
