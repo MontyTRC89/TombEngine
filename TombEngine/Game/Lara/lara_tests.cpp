@@ -43,8 +43,8 @@ bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
-static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const ItemInfo& item, const CollisionInfo& coll,
-																		  const std::vector<AttractorCollisionData>& attracColls)
+static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorColl(const std::vector<AttractorCollisionData>& attracColls,
+																		  const ItemInfo& item, const CollisionInfo& coll)
 {
 	const AttractorCollisionData* attracCollPtr = nullptr;
 	float closestDist = INFINITY;
@@ -114,19 +114,19 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisionData(const It
 	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointCenter = basePos + Vector3::Transform(relOffsetCenter, rotMatrix);
 	auto attracCollsCenter = GetAttractorCollisions(attracPtrs, item, refPointCenter, range);
-	auto attracCollCenter = GetBestEdgeHangAttractorColl(item, coll, attracCollsCenter);
+	auto attracCollCenter = GetBestEdgeHangAttractorColl(attracCollsCenter, item, coll);
 
 	// Get left attractor collision.
 	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointLeft = basePos + Vector3::Transform(relOffsetLeft, rotMatrix);
 	auto attracCollsLeft = GetAttractorCollisions(attracPtrs, item, refPointLeft, range);
-	auto attracCollLeft = GetBestEdgeHangAttractorColl(item, coll, attracCollsLeft);
+	auto attracCollLeft = GetBestEdgeHangAttractorColl(attracCollsLeft, item, coll);
 
 	// Get right attractor collision.
 	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
 	auto refPointRight = basePos + Vector3::Transform(relOffsetRight, rotMatrix);
 	auto attracCollsRight = GetAttractorCollisions(attracPtrs, item, refPointRight, range);
-	auto attracCollRight = GetBestEdgeHangAttractorColl(item, coll, attracCollsRight);
+	auto attracCollRight = GetBestEdgeHangAttractorColl(attracCollsRight, item, coll);
 
 	// Return edge attractor collision at three points.
 	return EdgeHangAttractorCollisionData{ attracCollCenter, attracCollLeft, attracCollRight };

@@ -453,12 +453,8 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 	const auto& player = GetLaraInfo(item);
 
 	auto attracPtrs = GetNearbyAttractorPtrs(item);
-
 	for (const auto* attrac : attracPtrs)
-	{
 		attrac->DrawDebug();
-		//g_Renderer.AddLine3D(attrac->GetPoint0(), item.Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), Vector4(0, 1, 0, 1));
-	}
 }
 
 // Debug
@@ -492,11 +488,6 @@ static void SetDebugAttractors(ItemInfo& item)
 			player.Context.Attractor.DebugAttractor0.GetPoint0(), pos, item.RoomNumber);
 	}
 
-	if (KeyMap[OIS::KeyCode::KC_E])
-		SpawnAttractorPentagon(item, true);
-	if (KeyMap[OIS::KeyCode::KC_R])
-		SpawnAttractorPentagon(item, false);
-	
 	// Set points for debug attractor 1.
 	if (KeyMap[OIS::KeyCode::KC_A])
 	{
@@ -514,6 +505,12 @@ static void SetDebugAttractors(ItemInfo& item)
 			AttractorType::Edge,
 			player.Context.Attractor.DebugAttractor1.GetPoint0(), pos, item.RoomNumber);
 	}
+
+	// Spawn attractor pentagon.
+	if (KeyMap[OIS::KeyCode::KC_E])
+		SpawnAttractorPentagon(item, true);
+	if (KeyMap[OIS::KeyCode::KC_R])
+		SpawnAttractorPentagon(item, false);
 }
 
 // Debug
