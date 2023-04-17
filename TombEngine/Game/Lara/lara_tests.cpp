@@ -33,13 +33,13 @@ using namespace TEN::Renderer;
 
 struct EdgeHangAttractorCollisionData
 {
-	std::optional<AttractorCollisionData> Center	 = {};
-	std::optional<AttractorCollisionData> Left		 = {};
-	std::optional<AttractorCollisionData> Right		 = {};
-	std::optional<AttractorCollisionData> FrontLeft	 = {};
-	std::optional<AttractorCollisionData> FrontRight = {};
-	std::optional<AttractorCollisionData> BackLeft	 = {};
-	std::optional<AttractorCollisionData> BackRight	 = {};
+	std::optional<AttractorCollisionData> Center	 = std::nullopt;
+	std::optional<AttractorCollisionData> Left		 = std::nullopt;
+	std::optional<AttractorCollisionData> Right		 = std::nullopt;
+	std::optional<AttractorCollisionData> FrontLeft	 = std::nullopt;
+	std::optional<AttractorCollisionData> FrontRight = std::nullopt;
+	std::optional<AttractorCollisionData> BackLeft	 = std::nullopt;
+	std::optional<AttractorCollisionData> BackRight	 = std::nullopt;
 };
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
@@ -160,8 +160,17 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	if (attracCollRight.has_value())
 		g_Renderer.AddLine3D(attracCollRight->TargetPoint, attracCollRight->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
-	// Return edge attractor collision at three points.
-	return EdgeHangAttractorCollisionData{ attracCollCenter, attracCollLeft, attracCollRight };
+	// Return edge attractor collisions.
+	return EdgeHangAttractorCollisionData
+	{
+		attracCollCenter,
+		attracCollLeft,
+		attracCollRight,
+		attracCollFrontLeft,
+		attracCollFrontRight,
+		attracCollBackLeft,
+		attracCollBackRight
+	};
 }
 
 bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
@@ -176,12 +185,6 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 	{
 		SetPlayerEdgeHangRelease(*item);
 		return false;
-	}
-
-	if (edgeAttracColls.FrontLeft.has_value())
-	{
-		SetAnimation(item, LA_SHIMMY_LEFT_CORNER_OUTER_90);
-		return true;
 	}
 
 	// TODO: Handle correction at attractor ends.
@@ -204,6 +207,12 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
 		item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
+		return true;
+	}
+
+	if (edgeAttracColls.FrontLeft.has_value() && IsHeld(In::Left))
+	{
+		SetAnimation(item, LA_SHIMMY_LEFT_CORNER_OUTER_90);
 		return true;
 	}
 

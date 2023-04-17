@@ -49,8 +49,8 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
-		constexpr auto COLOR_GREEN	 = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
-		constexpr auto COLOR_YELLOW	 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+		constexpr auto COLOR_GREEN	= Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+		constexpr auto COLOR_YELLOW = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 
 		auto labelString = std::string();
 		switch (Type)

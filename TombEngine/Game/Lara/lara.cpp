@@ -489,7 +489,7 @@ static void SetDebugAttractors(ItemInfo& item)
 	}
 
 	// Set points for debug attractor 1.
-	if (KeyMap[OIS::KeyCode::KC_A])
+	if (KeyMap[OIS::KeyCode::KC_E])
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
@@ -497,7 +497,7 @@ static void SetDebugAttractors(ItemInfo& item)
 			AttractorType::Edge,
 			pos, player.Context.Attractor.DebugAttractor1.GetPoint1(), item.RoomNumber);
 	}
-	if (KeyMap[OIS::KeyCode::KC_S])
+	if (KeyMap[OIS::KeyCode::KC_R])
 	{
 		auto pos = LaraItem->Pose.Position.ToVector3() +
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
@@ -507,9 +507,9 @@ static void SetDebugAttractors(ItemInfo& item)
 	}
 
 	// Spawn attractor pentagon.
-	if (KeyMap[OIS::KeyCode::KC_E])
+	if (KeyMap[OIS::KeyCode::KC_T])
 		SpawnAttractorPentagon(item, true);
-	if (KeyMap[OIS::KeyCode::KC_R])
+	if (KeyMap[OIS::KeyCode::KC_Y])
 		SpawnAttractorPentagon(item, false);
 }
 
