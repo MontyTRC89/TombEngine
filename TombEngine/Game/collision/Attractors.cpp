@@ -47,6 +47,47 @@ namespace TEN::Collision::Attractors
 		return Length;
 	}
 
+	AttractorTargetData Attractor::GetTargetData(const Vector3& refPoint) const
+	{
+		static const auto EMPTY_TARGET_DATA = AttractorTargetData{};
+
+		// No points exist; return default.
+		if (Points.empty())
+			return EMPTY_TARGET_DATA;
+
+		// Single point exists; do simple assessment.
+		if (Points.size() == 1)
+		{
+			auto targetPoint = Points[0];
+			float closestDist = Vector3::Distance(refPoint, targetPoint);
+			int segmentIndex = 0;
+
+			// Return attractor target data.
+			return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+		}
+
+		auto targetPoint = Points[0];
+		float closestDist = INFINITY;
+		int segmentIndex = 0;
+
+		// Find closest point on attractor.
+		for (int i = 0; i < (Points.size() - 1); i++)
+		{
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, Points[i], Points[i + 1]);
+			float distance = Vector3::Distance(refPoint, closestPoint);
+
+			if (distance < closestDist)
+			{
+				targetPoint = closestPoint;
+				closestDist = distance;
+				segmentIndex = i;
+			}
+		}
+
+		// Return attractor target data.
+		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+	}
+
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
 		// No points exist; return default.
@@ -181,7 +222,7 @@ namespace TEN::Collision::Attractors
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			auto attracTarget = GetAttractorTargetData(attrac, refPoint);
+			auto attracTarget = attrac.GetTargetData(refPoint);
 			if (attracTarget.Distance <= range)
 				nearbyAttracPtrMap.insert({ attracTarget.Distance, &attrac });
 		}
@@ -192,7 +233,7 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				auto attracTarget = GetAttractorTargetData(attrac, refPoint);
+				auto attracTarget = attrac.GetTargetData(refPoint);
 				if (attracTarget.Distance <= range)
 					nearbyAttracPtrMap.insert({ attracTarget.Distance, &attrac });
 			}
@@ -245,33 +286,6 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
-	// TODO: Convert to method?
-	AttractorTargetData GetAttractorTargetData(const Attractor& attrac, const Vector3& refPoint)
-	{
-		auto points = attrac.GetPoints();
-
-		int segmentIndex = 0;
-		auto targetPoint = points[0];
-		float closestDist = INFINITY;
-
-		for (int i = 0; i < (points.size() - 1); i++)
-		{
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, points[i], points[i + 1]);
-			float distance = Vector3::Distance(refPoint, closestPoint);
-
-			if (distance < closestDist)
-			{
-				segmentIndex = i;
-				targetPoint = closestPoint;
-				closestDist = distance;
-			}
-		}
-
-		// Return attractor target.
-		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
-	}
-
-	// TODO: Convert to method?
 	static AttractorCollisionData GetAttractorCollision(const Attractor& attrac, const Vector3& basePos, const EulerAngles& orient,
 														const Vector3& refPoint, float range)
 	{
@@ -281,7 +295,7 @@ namespace TEN::Collision::Attractors
 		if (points.empty())
 			return EMPTY_ATTRAC_COLL;
 
-		auto attracTarget = GetAttractorTargetData(attrac, refPoint);
+		auto attracTarget = attrac.GetTargetData(refPoint);
 		float distFromStart = attrac.GetDistanceAtPoint(attracTarget.TargetPoint, attracTarget.SegmentIndex);
 
 		// Calculate angles.
@@ -307,7 +321,7 @@ namespace TEN::Collision::Attractors
 
 		return attracColl;
 	}
-	
+
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& basePos, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)

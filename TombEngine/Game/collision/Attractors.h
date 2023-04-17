@@ -17,6 +17,13 @@ namespace TEN::Collision::Attractors
 		Pinnacle*/
 	};
 
+	struct AttractorTargetData
+	{
+		Vector3 TargetPoint	 = Vector3::Zero;
+		float	Distance	 = 0.0f;
+		int		SegmentIndex = 0;
+	};
+
 	class Attractor
 	{
 	private:
@@ -36,8 +43,10 @@ namespace TEN::Collision::Attractors
 		std::vector<Vector3> GetPoints() const;
 		int					 GetRoomNumber() const;
 		float				 GetLength() const;
-		Vector3				 GetPointAtDistance(float dist) const;
-		float				 GetDistanceAtPoint(const Vector3& point, int segmentIndex) const;
+
+		AttractorTargetData GetTargetData(const Vector3& refPoint) const;
+		Vector3				GetPointAtDistance(float dist) const;
+		float				GetDistanceAtPoint(const Vector3& point, int segmentIndex) const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -63,16 +72,8 @@ namespace TEN::Collision::Attractors
 		bool IsInFront	   = false;
 	};
 
-	struct AttractorTargetData
-	{
-		Vector3 TargetPoint	 = Vector3::Zero;
-		float	Distance	 = 0.0f;
-		int		SegmentIndex = 0;
-	};
-
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float range);
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item);
-	AttractorTargetData			  GetAttractorTargetData(const Attractor& attrac, const Vector3& refPoint);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const Vector3& basePos, const EulerAngles& orient,
