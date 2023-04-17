@@ -22,6 +22,11 @@ namespace TEN::Collision::Attractors
 		RoomNumber = roomNumber;
 	}
 
+	AttractorType Attractor::GetType() const
+	{
+		return Type;
+	}
+
 	Vector3 Attractor::GetPoint0() const
 	{
 		return Point0;
@@ -44,14 +49,31 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
-		constexpr auto COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+		auto labelString = std::string();
+		switch (Type)
+		{
+		default:
+		case AttractorType::Edge:
+			labelString = "Edge";
+			break;
+		}
 
-		g_Renderer.AddLine3D(GetPoint0(), GetPoint1(), COLOR);
+		auto orient = Geometry::GetOrientToPoint(Point0, Point1);
+		orient.y += ANGLE(90.0f);
+		auto direction = orient.ToDirection();
+
+		auto stringPos = ((Point0 + Point1) / 2) + Vector3(0.0f, -CLICK(0.25f), 0.0f);
+		auto stringPos2D = g_Renderer.GetScreenSpacePosition(stringPos);
+
+		g_Renderer.AddLine3D(Point0, Point1, Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+		g_Renderer.AddLine3D(Point0, Point0 + (direction * 50.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+		g_Renderer.AddLine3D(Point1, Point1 + (direction * 50.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+		g_Renderer.AddString(labelString, stringPos2D, Color(PRINTSTRING_COLOR_WHITE), 0.75f, 0);
 	}
 
 	bool Attractor::operator ==(const Attractor& attrac) const
 	{
-		if (Type == attrac.Type &&
+		if (Type == attrac.GetType() &&
 			Point0 == attrac.GetPoint0() &&
 			Point1 == attrac.GetPoint1() &&
 			RoomNumber == attrac.GetRoomNumber())

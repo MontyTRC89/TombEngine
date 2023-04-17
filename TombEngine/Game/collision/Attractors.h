@@ -32,9 +32,10 @@ namespace TEN::Collision::Attractors
 		Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber);
 
 		// Getters
-		Vector3 GetPoint0() const;
-		Vector3 GetPoint1() const;
-		int		GetRoomNumber() const;
+		AttractorType GetType() const;
+		Vector3		  GetPoint0() const;
+		Vector3		  GetPoint1() const;
+		int			  GetRoomNumber() const;
 
 		// Inquirers
 		bool IsEdge() const;

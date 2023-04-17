@@ -177,31 +177,38 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		SetPlayerEdgeHangRelease(*item);
 		return false;
 	}
-	
-	// TODO: Handle correction at attractor ends.
-	if (!edgeAttracColls.Left.has_value() ||
-		!edgeAttracColls.Right.has_value())
+
+	if (edgeAttracColls.FrontLeft.has_value())
 	{
-		SetPlayerEdgeHangRelease(*item);
-		return false;
+		SetAnimation(item, LA_SHIMMY_LEFT_CORNER_OUTER_90);
+		return true;
 	}
 
-	auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->TargetPoint, edgeAttracColls.Right->TargetPoint);
-	auto headingAngle = orient.y - ANGLE(90.0f);
+	// TODO: Handle correction at attractor ends.
+	if (edgeAttracColls.Center.has_value() &&
+		edgeAttracColls.Left.has_value() &&
+		edgeAttracColls.Right.has_value())
+	{
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->TargetPoint, edgeAttracColls.Right->TargetPoint);
+		auto headingAngle = orient.y - ANGLE(90.0f);
 
-	// TODO: Works on reflex transition, but not an obtuse one.
-	auto targetPoint = edgeAttracColls.Center->TargetPoint;
+		// TODO: Works on reflex transition, but not an obtuse one.
+		auto targetPoint = edgeAttracColls.Center->TargetPoint;
 
-	// Align orientation.
-	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
+		// Align orientation.
+		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
+		item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
 
-	// Align position.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-	auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
-	item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
+		// Align position.
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+		auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
+		item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
-	return true;
+		return true;
+	}
+
+	SetPlayerEdgeHangRelease(*item);
+	return false;
 
 	// -----------------------------------------
 
