@@ -49,6 +49,9 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
+		constexpr auto COLOR_GREEN	 = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+		constexpr auto COLOR_YELLOW	 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+
 		auto labelString = std::string();
 		switch (Type)
 		{
@@ -68,9 +71,9 @@ namespace TEN::Collision::Attractors
 		auto stringPos = ((Point0 + Point1) / 2) + Vector3(0.0f, -CLICK(0.25f), 0.0f);
 		auto stringPos2D = g_Renderer.GetScreenSpacePosition(stringPos);
 
-		g_Renderer.AddLine3D(Point0, Point1, Vector4(1.0f, 1.0f, 0.0f, 1.0f));
-		g_Renderer.AddLine3D(Point0, Point0 + (direction * 50.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-		g_Renderer.AddLine3D(Point1, Point1 + (direction * 50.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+		g_Renderer.AddLine3D(Point0, Point1, COLOR_YELLOW);
+		g_Renderer.AddLine3D(Point0, Point0 + (direction * 50.0f), COLOR_GREEN);
+		g_Renderer.AddLine3D(Point1, Point1 + (direction * 50.0f), COLOR_GREEN);
 		g_Renderer.AddString(labelString, stringPos2D, Color(PRINTSTRING_COLOR_WHITE), 0.75f, 0);
 	}
 

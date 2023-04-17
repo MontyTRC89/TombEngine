@@ -169,12 +169,21 @@ void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 	LaraSlideEdgeJump(item, coll);
 }
 
-// State:		LS_REACH (11)
-// Collision:	lara_col_reach()
+// State:	  LS_REACH (11)
+// Collision: lara_col_reach()
 void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
+	// Setup
+	item->Animation.IsAirborne = (player.Control.Rope.Ptr == -1) ? true : item->Animation.IsAirborne;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
+	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	Camera.targetAngle = ANGLE(85.0f);
 
 	if (item->HitPoints <= 0)
@@ -188,18 +197,13 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
-
-		if (item->HitPoints <= 0)
-			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = (item->HitPoints <= 0) ? LS_DEATH : LS_IDLE;
 		SetLaraLand(item, coll);
 		return;
 	}
@@ -217,18 +221,6 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_reach()
 void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (lara->Control.Rope.Ptr == -1)
-		item->Animation.IsAirborne = true;
-
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
-	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	// Overhang hook.
@@ -543,13 +535,24 @@ void lara_col_jump_left(ItemInfo* item, CollisionInfo* coll)
 	LaraJumpCollision(item, coll, item->Pose.Orientation.y - ANGLE(90.0f));
 }
 
-// State:		LS_JUMP_UP (28)
-// Collision:	lara_col_jump_up()
+// State:	  LS_JUMP_UP (28)
+// Collision: lara_col_jump_up()
 void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto VEL_MAX	 = 5.0f;
+	constexpr auto VEL_ACCEL = 2.0f;
 
-	lara->Control.CanLook = false;
+	auto& player = GetLaraInfo(*item);
+
+	// Setup
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.CanLook = false;
+	coll->Setup.Mode = CollisionProbeMode::FreeForward;
+	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? player.Control.MoveAngle : (player.Control.MoveAngle + ANGLE(180.0f));
+	coll->Setup.Height = LARA_HEIGHT_STRETCH;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 
 	if (item->HitPoints <= 0)
 	{
@@ -564,11 +567,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (item->HitPoints <= 0)
-			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = (item->HitPoints <= 0) ? LS_DEATH : LS_IDLE;
 		SetLaraLand(item, coll);
 		return;
 	}
@@ -579,26 +578,27 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
-		item->Animation.Velocity.z += 2;
-		if (item->Animation.Velocity.z > 5)
-			item->Animation.Velocity.z = 5;
+		item->Animation.Velocity.z += VEL_ACCEL;
+		if (item->Animation.Velocity.z > VEL_MAX)
+			item->Animation.Velocity.z = VEL_MAX;
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
-		item->Animation.Velocity.z -= 2;
-		if (item->Animation.Velocity.z < -5)
-			item->Animation.Velocity.z = -5;
+		item->Animation.Velocity.z -= VEL_ACCEL;
+		if (item->Animation.Velocity.z < -VEL_MAX)
+			item->Animation.Velocity.z = -VEL_MAX;
 	}
 	else
-		item->Animation.Velocity.z = (item->Animation.Velocity.z < 0) ? -2 : 2;
-
-	if (item->Animation.Velocity.z < 0)
 	{
-		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
+		item->Animation.Velocity.z = (item->Animation.Velocity.z < 0.0f) ? -VEL_ACCEL : VEL_ACCEL;
+	}
+
+	if (item->Animation.Velocity.z < 0.0f)
+	{
 		item->Pose.Orientation.x += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Animation.Velocity.z) - item->Pose.Orientation.x) / 3);
-		lara->ExtraHeadRot.y += (ANGLE(10.0f) - item->Pose.Orientation.z) / 3;
+		player.ExtraHeadRot.y += (ANGLE(10.0f) - item->Pose.Orientation.z) / 3;
 	}
 
 	item->Animation.TargetState = LS_JUMP_UP;
@@ -608,15 +608,6 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_up()
 void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = LARA_HEIGHT_STRETCH;
-	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? lara->Control.MoveAngle : lara->Control.MoveAngle + ANGLE(180.0f);
-	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	if (IsHeld(In::Action))

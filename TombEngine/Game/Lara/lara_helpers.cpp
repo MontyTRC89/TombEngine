@@ -482,21 +482,21 @@ void DoLaraFallDamage(ItemInfo* item)
 	constexpr auto RUMBLE_POWER_COEFF = 0.7f;
 	constexpr auto RUMBLE_DELAY		  = 0.3f;
 
-	if (item->Animation.Velocity.y >= LARA_DAMAGE_VELOCITY)
-	{
-		if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
-		{
-			item->HitPoints = 0;
-		}
-		else
-		{
-			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
-			item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
-		}
+	if (item->Animation.Velocity.y < LARA_DAMAGE_VELOCITY)
+		return;
 
-		float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;
-		Rumble(rumblePower, RUMBLE_DELAY);
+	if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
+	{
+		item->HitPoints = 0;
 	}
+	else
+	{
+		float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
+		item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
+	}
+
+	float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;
+	Rumble(rumblePower, RUMBLE_DELAY);
 }
 
 LaraInfo& GetLaraInfo(ItemInfo& item)
