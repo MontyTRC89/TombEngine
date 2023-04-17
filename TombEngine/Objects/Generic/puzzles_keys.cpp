@@ -231,6 +231,15 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 		if (TestLaraPosition(PuzzleBounds, &receptacleItem, laraItem))
 		{
+			auto pos = Vector3i(0, 0, bounds.Z1 - 100);
+			if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
+			{
+				player.Context.InteractedItem = itemNumber;
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				receptacleItem.Pose.Orientation.y = prevYOrient;
+				return;
+			}
+
 			laraItem->Animation.AnimNumber = LA_REMOVE_PUZZLE;
 			laraItem->Animation.ActiveState = LS_REMOVE_PUZZLE;
 			receptacleItem.ItemFlags[0] = 1;
