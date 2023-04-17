@@ -439,12 +439,8 @@ static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 	if (isOuter)
 		std::reverse(points.begin(), points.end());
 
-	auto attracs = GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
-	player.Context.Attractor.DebugAttractor0 = attracs[0];
-	player.Context.Attractor.DebugAttractor1 = attracs[1];
-	player.Context.Attractor.DebugAttractor2 = attracs[2];
-	player.Context.Attractor.DebugAttractor3 = attracs[3];
-	player.Context.Attractor.DebugAttractor4 = attracs[4];
+	auto attrac = GenerateAttractorFromPoints(points, item.RoomNumber, AttractorType::Edge);
+	player.Context.Attractor.DebugAttractor0 = attrac;
 }
 
 // Debug
@@ -477,7 +473,7 @@ static void SetDebugAttractors(ItemInfo& item)
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
 		player.Context.Attractor.DebugAttractor0 = Attractor(
 			AttractorType::Edge,
-			pos, player.Context.Attractor.DebugAttractor0.GetPoint1(), item.RoomNumber);
+			{ pos, player.Context.Attractor.DebugAttractor0.GetPoints()[1] }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_W])
 	{
@@ -485,25 +481,21 @@ static void SetDebugAttractors(ItemInfo& item)
 			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
 		player.Context.Attractor.DebugAttractor0 = Attractor(
 			AttractorType::Edge,
-			player.Context.Attractor.DebugAttractor0.GetPoint0(), pos, item.RoomNumber);
+			{ player.Context.Attractor.DebugAttractor0.GetPoints()[0], pos }, item.RoomNumber);
 	}
 
 	// Set points for debug attractor 1.
 	if (KeyMap[OIS::KeyCode::KC_E])
 	{
-		auto pos = LaraItem->Pose.Position.ToVector3() +
-			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor1 = Attractor(
-			AttractorType::Edge,
-			pos, player.Context.Attractor.DebugAttractor1.GetPoint1(), item.RoomNumber);
+		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		auto pos1 = player.Context.Attractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor0.GetPoints()[1];
+		player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_R])
 	{
-		auto pos = LaraItem->Pose.Position.ToVector3() +
-			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor1 = Attractor(
-			AttractorType::Edge,
-			player.Context.Attractor.DebugAttractor1.GetPoint0(), pos, item.RoomNumber);
+		auto pos0 = player.Context.Attractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor0.GetPoints()[0];
+		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 
 	// Spawn attractor pentagon.
@@ -522,7 +514,10 @@ void HandleAttractorDebug(ItemInfo& item)
 
 	// Generate sector attractors.
 	auto pointColl = GetCollision(&item);
-	player.Context.Attractor.SectorAttractors = GenerateSectorAttractors(pointColl);
+	auto attrac = GenerateSectorAttractor(pointColl);
+
+	if (attrac.has_value())
+		player.Context.Attractor.DebugAttractor1 = GenerateSectorAttractor(pointColl).value();
 
 	DrawPlayerAttractors(item);
 }

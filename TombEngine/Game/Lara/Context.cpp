@@ -257,13 +257,15 @@ namespace TEN::Entities::Player::Context
 			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 				continue;
 			
-			if (attracColl.DistanceFromEnd <= EPSILON && !hasFoundCorner)
+			// TODO
+			if (attracColl.DistanceFromStart <= EPSILON && !hasFoundCorner)
 			{
 				hasFoundCorner = true;
 				continue;
 			}
 
-			if (attracColl.DistanceFromEnd <= EPSILON)
+			// TODO
+			if (attracColl.DistanceFromStart <= EPSILON)
 				return false;
 		}
 
@@ -311,9 +313,9 @@ namespace TEN::Entities::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
-			// TODO: Test if this works.
+			// TODO: Test if this works. Redo.
 			// 3) Test if target point is lone corner.
-			if (attracColl.DistanceFromEnd <= EPSILON && !hasFoundCorner)
+			if (attracColl.DistanceFromStart <= EPSILON && !hasFoundCorner)
 			{
 				hasFoundCorner = true;
 				continue;

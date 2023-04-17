@@ -21,21 +21,22 @@ namespace TEN::Collision::Attractors
 	{
 	private:
 		// Members
-		AttractorType Type		 = AttractorType::Edge;
-		Vector3		  Point0	 = Vector3::Zero;
-		Vector3		  Point1	 = Vector3::Zero;
-		int			  RoomNumber = 0;
+		AttractorType		 Type		= AttractorType::Edge;
+		std::vector<Vector3> Points		= {};
+		int					 RoomNumber = 0;
+		float				 Length		= 0.0f;
 
 	public:
 		// Constructors
 		Attractor() {};
-		Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber);
+		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Getters
-		AttractorType GetType() const;
-		Vector3		  GetPoint0() const;
-		Vector3		  GetPoint1() const;
-		int			  GetRoomNumber() const;
+		AttractorType		 GetType() const;
+		std::vector<Vector3> GetPoints() const;
+		int					 GetRoomNumber() const;
+		float				 GetLength() const;
+		Vector3				 GetPointAtDistance(float dist) const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -43,9 +44,7 @@ namespace TEN::Collision::Attractors
 		// Helpers
 		void DrawDebug() const;
 
-		// Operators
-		bool operator ==(const Attractor& attrac) const;
-		bool operator !=(const Attractor& attrac) const;
+		Attractor& operator =(const Attractor& attrac);
 	};
 
 	struct AttractorCollisionData
@@ -53,14 +52,22 @@ namespace TEN::Collision::Attractors
 		const Attractor* AttractorPtr = nullptr;
 
 		Vector3 TargetPoint = Vector3::Zero;
+		float	Alpha		= 0.0f;
 
-		float Distance		  = 0.0f;
-		float DistanceFromEnd = 0.0f;
-		short HeadingAngle	  = 0;
-		short SlopeAngle	  = 0;
+		float Distance			= 0.0f;
+		float DistanceFromStart = 0.0f;
+		short HeadingAngle		= 0;
+		short SlopeAngle		= 0;
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;
+	};
+
+	struct AttractorTargetData
+	{
+		Vector3 TargetPoint	 = Vector3::Zero;
+		float	Distance	 = 0.0f;
+		int		SegmentIndex = 0;
 	};
 
 	// TODO: Probably overkill but keeping ready if needed.
@@ -82,6 +89,6 @@ namespace TEN::Collision::Attractors
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const ItemInfo& item, const Vector3& refPoint, float range);
 
-	std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type, bool isClosedLoop = true);
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
+	Attractor				 GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
+	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl);
 }

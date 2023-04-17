@@ -14,12 +14,17 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractors
 {
-	Attractor::Attractor(AttractorType type, const Vector3& point0, const Vector3& point1, int roomNumber)
+	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		Type = type;
-		Point0 = point0;
-		Point1 = point1;
+		Points = points;
 		RoomNumber = roomNumber;
+
+		if (points.size() > 1)
+		{
+			for (int i = 0; i < (points.size() - 1); i++)
+				Length += Vector3::Distance(points[i], points[i + 1]);
+		}
 	}
 
 	AttractorType Attractor::GetType() const
@@ -27,19 +32,24 @@ namespace TEN::Collision::Attractors
 		return Type;
 	}
 
-	Vector3 Attractor::GetPoint0() const
+	std::vector<Vector3> Attractor::GetPoints() const
 	{
-		return Point0;
-	}
-
-	Vector3 Attractor::GetPoint1() const
-	{
-		return Point1;
+		return Points;
 	}
 
 	int Attractor::GetRoomNumber() const
 	{
 		return RoomNumber;
+	}
+
+	Vector3 Attractor::GetPointAtDistance(float dist) const
+	{
+		return Vector3::Zero;
+	}
+
+	float Attractor::GetLength() const
+	{
+		return Length;
 	}
 
 	bool Attractor::IsEdge() const
@@ -49,7 +59,7 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
-		constexpr auto COLOR_GREEN	= Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+		constexpr auto COLOR_GREEN = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 		constexpr auto COLOR_YELLOW = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 
 		auto labelString = std::string();
@@ -64,39 +74,40 @@ namespace TEN::Collision::Attractors
 			break;
 		}
 
-		auto orient = Geometry::GetOrientToPoint(Point0, Point1);
-		orient.y += ANGLE(90.0f);
-		auto direction = orient.ToDirection();
-
-		auto stringPos = ((Point0 + Point1) / 2) + Vector3(0.0f, -CLICK(0.25f), 0.0f);
-		auto stringPos2D = g_Renderer.GetScreenSpacePosition(stringPos);
-
-		g_Renderer.AddLine3D(Point0, Point1, COLOR_YELLOW);
-		g_Renderer.AddLine3D(Point0, Point0 + (direction * 50.0f), COLOR_GREEN);
-		g_Renderer.AddLine3D(Point1, Point1 + (direction * 50.0f), COLOR_GREEN);
-		g_Renderer.AddString(labelString, stringPos2D, Color(PRINTSTRING_COLOR_WHITE), 0.75f, 0);
-	}
-
-	bool Attractor::operator ==(const Attractor& attrac) const
-	{
-		if (Type == attrac.GetType() &&
-			Point0 == attrac.GetPoint0() &&
-			Point1 == attrac.GetPoint1() &&
-			RoomNumber == attrac.GetRoomNumber())
+		if (Points.size() > 1)
 		{
-			return true;
-		}
+			for (int i = 0; i < (Points.size() - 1); i++)
+			{
+				auto orient = Geometry::GetOrientToPoint(Points[i], Points[i + 1]);
+				orient.y += ANGLE(90.0f);
+				auto direction = orient.ToDirection();
 
-		return false;
+				auto stringPos = ((Points[i] + Points[i + 1]) / 2) + Vector3(0.0f, -CLICK(0.25f), 0.0f);
+				auto stringPos2D = g_Renderer.GetScreenSpacePosition(stringPos);
+
+				g_Renderer.AddLine3D(Points[i], Points[i + 1], COLOR_YELLOW);
+				g_Renderer.AddLine3D(Points[i], Points[i] + (direction * 50.0f), COLOR_GREEN);
+				g_Renderer.AddLine3D(Points[i + 1], Points[i + 1] + (direction * 50.0f), COLOR_GREEN);
+				g_Renderer.AddString(labelString, stringPos2D, Color(PRINTSTRING_COLOR_WHITE), 0.75f, 0);
+			}
+		}
+		else
+		{
+			//g_Renderer.AddSphere(Points[0], 15.0f, COLOR_YELLOW);
+		}
 	}
-	
-	bool Attractor::operator !=(const Attractor& attrac) const
+
+	Attractor& Attractor::operator =(const Attractor& attrac)
 	{
-		return !(*this == attrac);
+		Type = attrac.GetType();
+		Points = attrac.GetPoints();
+		RoomNumber = attrac.GetRoomNumber();
+		Length = attrac.GetLength();
+		return *this;
 	}
 
 	// TODO: Actually probe for attractors.
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float range)
+	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
 	{
 		constexpr auto COUNT_MAX = 64;
 
@@ -126,7 +137,7 @@ namespace TEN::Collision::Attractors
 			if (!subRoomNumbers.count(bridgeItem.RoomNumber))
 				continue;
 
-			if (Vector3::DistanceSquared(pos, bridgeItem.Pose.Position.ToVector3()) > rangeSqr)
+			if (Vector3::DistanceSquared(refPoint, bridgeItem.Pose.Position.ToVector3()) > rangeSqr)
 				continue;
 		}
 
@@ -152,41 +163,87 @@ namespace TEN::Collision::Attractors
 		}
 		
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
+		/*nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);*/
 		return nearbyAttracPtrs;
+	}
+
+	static AttractorTargetData GetAttractorTargetData(const Attractor& attrac, const Vector3& refPoint)
+	{
+		auto points = attrac.GetPoints();
+
+		int segmentIndex = 0;
+		auto targetPoint = points[0];
+		float closestDist = INFINITY;
+
+		for (int i = 0; i < (points.size() - 1); i++)
+		{
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, points[i], points[i + 1]);
+			float distance = Vector3::Distance(refPoint, closestPoint);
+
+			if (distance < closestDist)
+			{
+				segmentIndex = i;
+				targetPoint = closestPoint;
+				closestDist = distance;
+			}
+		}
+
+		// Return attractor target.
+		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+	}
+
+	static float GetDistanceAlongAttractor(const Attractor& attrac, const Vector3& targetPoint, int segmentIndex)
+	{
+		auto points = attrac.GetPoints();
+		assertion(segmentIndex < points.size(), "Attractor segment index out of range.");
+
+		// Calculate distance along attractor to segment point.
+		float distance = 0.0f;
+		for (int i = 0; i <= segmentIndex; i++)
+		{
+			if (i != segmentIndex)
+			{
+				distance += Vector3::Distance(points[i], points[i + 1]);
+				continue;
+			}
+		
+			distance += Vector3::Distance(points[i], targetPoint);
+		}
+
+		return distance;
 	}
 
 	static AttractorCollisionData GetAttractorCollision(const Attractor& attrac, const Vector3& basePos, const EulerAngles& orient,
 														const Vector3& refPoint, float range)
 	{
-		// Get points.
-		auto point0 = attrac.GetPoint0();
-		auto point1 = attrac.GetPoint1();
-		auto targetPoint = Geometry::GetClosestPointOnLinePerp(refPoint, point0, point1);
+		static const auto EMPTY_ATTRAC_COLL = AttractorCollisionData{};
 
-		// Calculate distances.
-		float dist = Vector3::Distance(refPoint, targetPoint);
-		float distFromEnd = std::min(Vector3::Distance(targetPoint, point0), Vector3::Distance(targetPoint, point1));
+		auto points = attrac.GetPoints();
+		if (points.empty())
+			return EMPTY_ATTRAC_COLL;
+
+		auto attracTarget = GetAttractorTargetData(attrac, refPoint);
+		float distFromStart = GetDistanceAlongAttractor(attrac, attracTarget.TargetPoint, attracTarget.SegmentIndex);
 
 		// Calculate angles.
-		auto attracOrient = Geometry::GetOrientToPoint(point0, point1);
+		auto attracOrient = Geometry::GetOrientToPoint(points[attracTarget.SegmentIndex], points[attracTarget.SegmentIndex + 1]);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
 		// Determine inquiries.
-		bool isIntersected = (dist <= range);
-		bool isInFront = Geometry::IsPointInFront(basePos, targetPoint, orient);
+		bool isIntersected = (attracTarget.Distance <= range);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracTarget.TargetPoint, orient);
 
 		// Create new attractor collision.
-		auto attracColl = AttractorCollisionData{};
+		auto attracColl = EMPTY_ATTRAC_COLL;
 
 		attracColl.AttractorPtr = &attrac;
-		attracColl.TargetPoint = targetPoint;
-		attracColl.Distance = dist;
-		attracColl.DistanceFromEnd = distFromEnd;
+		attracColl.TargetPoint = attracTarget.TargetPoint;
+		attracColl.Distance = attracTarget.Distance;
+		attracColl.DistanceFromStart = distFromStart;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
@@ -217,33 +274,21 @@ namespace TEN::Collision::Attractors
 		return GetAttractorCollisions(attracPtrs, item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
 	}
 
-	/*static */std::vector<Attractor> GenerateAttractorsFromPoints(const std::vector<Vector3>& points, int roomNumber, AttractorType type,
-															   bool isClosedLoop)
+	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)
 	{
 		// No points; return empty vector.
 		if (points.empty())
 			return {};
 
-		// Prepare container.
-		auto attracs = std::vector<Attractor>{};
-		attracs.reserve(points.size());
+		// Add point to create loop (if applicable).
+		if (isClosedLoop)
+			points.push_back(points[0]);
 
-		// Generate attractors between points.
-		unsigned int count = isClosedLoop ? points.size() : (points.size() - 1);
-		for (int i = 0; i < count; i++)
-		{
-			auto linePoint0 = points[i];
-			auto linePoint1 = points[(i < (points.size() - 1)) ? (i + 1) : 0];
-			auto attrac = Attractor(type, linePoint0, linePoint1, roomNumber);
-
-			attracs.push_back(attrac);
-		}
-
-		// Return attractors.
-		return attracs;
+		// Generate attractor.
+		return Attractor(type, points, roomNumber);
 	}
 
-	static std::vector<Attractor> GenerateBridgeAttractors(const ItemInfo& item)
+	static Attractor GenerateBridgeAttractor(const ItemInfo& item)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
 
@@ -291,25 +336,25 @@ namespace TEN::Collision::Attractors
 			box.Center + Vector3::Transform(point3, rotMatrix)
 		};
 
-		// Generate and return attractors.
-		return GenerateAttractorsFromPoints(points, item.RoomNumber, AttractorType::Edge);
+		// Generate and return attractor.
+		return GenerateAttractorFromPoints(points, item.RoomNumber, AttractorType::Edge);
 	}
 
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
+	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl)
 	{
-		// Invalid sector; return empty vector.
+		// Invalid sector; return nullopt
 		if (pointColl.Position.Floor == NO_HEIGHT)
-			return {};
+			return std::nullopt;
 
-		// Generate and return bridge attractors.
+		// Generate and return bridge attractor.
 		if (pointColl.Position.Bridge >= 0)
 		{
 			const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-			return GenerateBridgeAttractors(bridgeItem);
+			return GenerateBridgeAttractor(bridgeItem);
 		}
 
-		// Generate and return floor attractors.
+		// Generate and return floor attractor.
 		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		return GenerateAttractorsFromPoints(points, pointColl.RoomNumber, AttractorType::Edge);
+		return GenerateAttractorFromPoints(points, pointColl.RoomNumber, AttractorType::Edge);
 	}
 }
