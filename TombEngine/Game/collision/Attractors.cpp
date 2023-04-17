@@ -53,6 +53,9 @@ namespace TEN::Collision::Attractors
 		switch (Type)
 		{
 		default:
+			labelString = "Attractor";
+			break;
+
 		case AttractorType::Edge:
 			labelString = "Edge";
 			break;
