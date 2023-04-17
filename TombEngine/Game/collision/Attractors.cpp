@@ -42,44 +42,66 @@ namespace TEN::Collision::Attractors
 		return RoomNumber;
 	}
 
+	float Attractor::GetLength() const
+	{
+		return Length;
+	}
+
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
+		// No points exist; return default.
 		if (Points.empty())
 			return Vector3::Zero;
 
-		if (dist < 0.0f)
+		// Single point exists; return it.
+		if (Points.size() == 1)
+			return Points[0];
+
+		// Clamp point position according to attractor length.
+		if (dist <= 0.0f)
 		{
 			return Points[0];
 		}
-		else if (dist > Length)
+		else if (dist >= Length)
 		{
 			return Points.back();
 		}
 
-		auto point = Points[0];
+		// Calculate point on attractor found at distance.
 		float currentDist = 0.0f;
-
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
-			float segmentLength = Vector3::Distance(Points[i], Points[i + 1]);
-			currentDist += segmentLength;
-
+			currentDist += Vector3::Distance(Points[i], Points[i + 1]);
 			if (currentDist > dist)
 			{
 				float segmentDist = currentDist - dist;
 				auto direction = Points[i + 1] - Points[i];
 				direction.Normalize();
-				point = Points[i] + (direction * segmentDist);
-				break;
+				return (Points[i] + (direction * segmentDist));
 			}
 		}
 
-		return point;
+		return Points.back();
 	}
 
-	float Attractor::GetLength() const
+	float Attractor::GetDistanceAtPoint(const Vector3& point, int segmentIndex) const 
 	{
-		return Length;
+		assertion(segmentIndex < Points.size(), "Attractor segment index out of range.");
+
+		// Calculate distance along attractor at point.
+		float distance = 0.0f;
+		for (int i = 0; i <= segmentIndex; i++)
+		{
+			if (i != segmentIndex)
+			{
+				distance += Vector3::Distance(Points[i], Points[i + 1]);
+				continue;
+			}
+
+			distance += Vector3::Distance(Points[i], point);
+		}
+
+		return distance;
 	}
 
 	bool Attractor::IsEdge() const
@@ -96,6 +118,7 @@ namespace TEN::Collision::Attractors
 		constexpr auto COLOR_GREEN			 = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 		constexpr auto COLOR_YELLOW			 = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 
+		// Determine label string.
 		auto labelString = std::string();
 		switch (Type)
 		{
@@ -108,6 +131,7 @@ namespace TEN::Collision::Attractors
 			break;
 		}
 
+		// Draw attractor debug elements.
 		if (Points.size() > 1)
 		{
 			for (int i = 0; i < (Points.size() - 1); i++)
@@ -145,52 +169,6 @@ namespace TEN::Collision::Attractors
 		RoomNumber = attrac.GetRoomNumber();
 		Length = attrac.GetLength();
 		return *this;
-	}
-
-	static AttractorTargetData GetAttractorTargetData(const Attractor& attrac, const Vector3& refPoint)
-	{
-		auto points = attrac.GetPoints();
-
-		int segmentIndex = 0;
-		auto targetPoint = points[0];
-		float closestDist = INFINITY;
-
-		for (int i = 0; i < (points.size() - 1); i++)
-		{
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, points[i], points[i + 1]);
-			float distance = Vector3::Distance(refPoint, closestPoint);
-
-			if (distance < closestDist)
-			{
-				segmentIndex = i;
-				targetPoint = closestPoint;
-				closestDist = distance;
-			}
-		}
-
-		// Return attractor target.
-		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
-	}
-
-	static float GetDistanceAlongAttractor(const Attractor& attrac, const Vector3& targetPoint, int segmentIndex)
-	{
-		auto points = attrac.GetPoints();
-		assertion(segmentIndex < points.size(), "Attractor segment index out of range.");
-
-		// Calculate distance along attractor to segment point.
-		float distance = 0.0f;
-		for (int i = 0; i <= segmentIndex; i++)
-		{
-			if (i != segmentIndex)
-			{
-				distance += Vector3::Distance(points[i], points[i + 1]);
-				continue;
-			}
-
-			distance += Vector3::Distance(points[i], targetPoint);
-		}
-
-		return distance;
 	}
 
 	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
@@ -267,6 +245,33 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
+	// TODO: Convert to method?
+	AttractorTargetData GetAttractorTargetData(const Attractor& attrac, const Vector3& refPoint)
+	{
+		auto points = attrac.GetPoints();
+
+		int segmentIndex = 0;
+		auto targetPoint = points[0];
+		float closestDist = INFINITY;
+
+		for (int i = 0; i < (points.size() - 1); i++)
+		{
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, points[i], points[i + 1]);
+			float distance = Vector3::Distance(refPoint, closestPoint);
+
+			if (distance < closestDist)
+			{
+				segmentIndex = i;
+				targetPoint = closestPoint;
+				closestDist = distance;
+			}
+		}
+
+		// Return attractor target.
+		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+	}
+
+	// TODO: Convert to method?
 	static AttractorCollisionData GetAttractorCollision(const Attractor& attrac, const Vector3& basePos, const EulerAngles& orient,
 														const Vector3& refPoint, float range)
 	{
@@ -277,7 +282,7 @@ namespace TEN::Collision::Attractors
 			return EMPTY_ATTRAC_COLL;
 
 		auto attracTarget = GetAttractorTargetData(attrac, refPoint);
-		float distFromStart = GetDistanceAlongAttractor(attrac, attracTarget.TargetPoint, attracTarget.SegmentIndex);
+		float distFromStart = attrac.GetDistanceAtPoint(attracTarget.TargetPoint, attracTarget.SegmentIndex);
 
 		// Calculate angles.
 		auto attracOrient = Geometry::GetOrientToPoint(points[attracTarget.SegmentIndex], points[attracTarget.SegmentIndex + 1]);

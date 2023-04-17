@@ -68,10 +68,10 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 		// TODO: Test if this works. Redo.
 		// 3) Test if target point is lone corner.
 		if (attracColl.DistanceFromStart <= EPSILON && !hasFoundCorner)
-		{
+		/*{
 			hasFoundCorner = true;
 			continue;
-		}
+		}*/
 
 		// 4) Test if edge slope is slippery.
 		if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
