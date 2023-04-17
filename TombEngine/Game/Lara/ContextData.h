@@ -13,11 +13,14 @@ namespace TEN::Entities::Player::Context
 
 	enum ShimmyType
 	{
-		Lateral,
-		LeftCornerInner90,
-		RightCornerInner90,
-		LeftCornerOuter90,
-		RightCornerOuter90
+		Up,
+		Down,
+		Left,
+		LeftInnerCorner,
+		LeftOuterCorner,
+		Right,
+		RightInnerCorner,
+		RightOuterCorner
 	};
 
 	struct EdgeCatchData
@@ -34,7 +37,7 @@ namespace TEN::Entities::Player::Context
 
 	struct ShimmyData
 	{
-		ShimmyType Type			= ShimmyType::Lateral;
+		ShimmyType Type			= ShimmyType::Up;
 		short	   HeadingAngle = 0;
 	};
 
