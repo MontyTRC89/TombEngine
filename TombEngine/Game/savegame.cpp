@@ -536,17 +536,10 @@ bool SaveGame::Save(int slot)
 			auto jointRotationsOffset = fbb.CreateVector(jointRotations);
 
 			Save::CreatureBuilder creatureBuilder{ fbb };
-
 			creatureBuilder.add_alerted(creature->Alerted);
 			creatureBuilder.add_can_jump(creature->LOT.CanJump);
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
 			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
-
-			std::vector<int> muzzleFlashDelays;
-			for (int i = 0; i < 2; i++)
-				muzzleFlashDelays.push_back(creature->MuzzleFlash[i].Delay);
-
-			creatureBuilder.add_weapon_delay(fbb.CreateVector(muzzleFlashDelays));
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
@@ -558,6 +551,8 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_joint_rotation(jointRotationsOffset);
 			creatureBuilder.add_jump_ahead(creature->JumpAhead);
 			creatureBuilder.add_location_ai(creature->LocationAI);
+			creatureBuilder.add_weapon_delay1(creature->MuzzleFlash[0].Delay);
+			creatureBuilder.add_weapon_delay2(creature->MuzzleFlash[1].Delay);
 			creatureBuilder.add_maximum_turn(creature->MaxTurn);
 			creatureBuilder.add_monkey_swing_ahead(creature->MonkeySwingAhead);
 			creatureBuilder.add_mood((int)creature->Mood);
@@ -1548,14 +1543,14 @@ bool SaveGame::Load(int slot)
 			creature->LOT.CanMonkey = savedCreature->can_monkey();
 			if (savedCreature->enemy() >= 0)
 				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
-			for (int j = 0; j < 2; j++)
-				creature->MuzzleFlash[j].Delay = savedCreature->weapon_delay()->Get(j);
 			creature->Flags = savedCreature->flags();
 			creature->Friendly = savedCreature->friendly();
 			creature->HeadLeft = savedCreature->head_left();
 			creature->HeadRight = savedCreature->head_right();
 			creature->HurtByLara = savedCreature->hurt_by_lara();
 			creature->LocationAI = savedCreature->location_ai();
+			creature->MuzzleFlash[0].Delay = savedCreature->weapon_delay1();
+			creature->MuzzleFlash[1].Delay = savedCreature->weapon_delay2();
 			creature->LOT.IsAmphibious = savedCreature->is_amphibious();
 			creature->LOT.IsJumping = savedCreature->is_jumping();
 			creature->LOT.IsMonkeying = savedCreature->is_monkeying();

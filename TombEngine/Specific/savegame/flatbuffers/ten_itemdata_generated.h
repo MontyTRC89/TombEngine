@@ -760,7 +760,8 @@ struct CreatureT : public flatbuffers::NativeTable {
   bool hurt_by_lara = false;
   int32_t tosspad = 0;
   int32_t location_ai = 0;
-  std::vector<int32_t> weapon_delay{};
+  int32_t weapon_delay1 = 0;
+  int32_t weapon_delay2 = 0;
   int32_t mood = 0;
   int32_t enemy = 0;
   int32_t ai_target_number = 0;
@@ -791,16 +792,17 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HURT_BY_LARA = 26,
     VT_TOSSPAD = 28,
     VT_LOCATION_AI = 30,
-    VT_WEAPON_DELAY = 32,
-    VT_MOOD = 34,
-    VT_ENEMY = 36,
-    VT_AI_TARGET_NUMBER = 38,
-    VT_FLAGS = 40,
-    VT_CAN_JUMP = 42,
-    VT_CAN_MONKEY = 44,
-    VT_IS_AMPHIBIOUS = 46,
-    VT_IS_JUMPING = 48,
-    VT_IS_MONKEYING = 50
+    VT_WEAPON_DELAY1 = 32,
+    VT_WEAPON_DELAY2 = 34,
+    VT_MOOD = 36,
+    VT_ENEMY = 38,
+    VT_AI_TARGET_NUMBER = 40,
+    VT_FLAGS = 42,
+    VT_CAN_JUMP = 44,
+    VT_CAN_MONKEY = 46,
+    VT_IS_AMPHIBIOUS = 48,
+    VT_IS_JUMPING = 50,
+    VT_IS_MONKEYING = 52
   };
   int32_t maximum_turn() const {
     return GetField<int32_t>(VT_MAXIMUM_TURN, 0);
@@ -844,8 +846,11 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t location_ai() const {
     return GetField<int32_t>(VT_LOCATION_AI, 0);
   }
-  const flatbuffers::Vector<int32_t> *weapon_delay() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_WEAPON_DELAY);
+  int32_t weapon_delay1() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY1, 0);
+  }
+  int32_t weapon_delay2() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY2, 0);
   }
   int32_t mood() const {
     return GetField<int32_t>(VT_MOOD, 0);
@@ -891,8 +896,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HURT_BY_LARA) &&
            VerifyField<int32_t>(verifier, VT_TOSSPAD) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_AI) &&
-           VerifyOffset(verifier, VT_WEAPON_DELAY) &&
-           verifier.VerifyVector(weapon_delay()) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY1) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY2) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
            VerifyField<int32_t>(verifier, VT_AI_TARGET_NUMBER) &&
@@ -955,8 +960,11 @@ struct CreatureBuilder {
   void add_location_ai(int32_t location_ai) {
     fbb_.AddElement<int32_t>(Creature::VT_LOCATION_AI, location_ai, 0);
   }
-  void add_weapon_delay(flatbuffers::Offset<flatbuffers::Vector<int32_t>> weapon_delay) {
-    fbb_.AddOffset(Creature::VT_WEAPON_DELAY, weapon_delay);
+  void add_weapon_delay1(int32_t weapon_delay1) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY1, weapon_delay1, 0);
+  }
+  void add_weapon_delay2(int32_t weapon_delay2) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY2, weapon_delay2, 0);
   }
   void add_mood(int32_t mood) {
     fbb_.AddElement<int32_t>(Creature::VT_MOOD, mood, 0);
@@ -1012,7 +1020,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> weapon_delay = 0,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1027,7 +1036,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
   builder_.add_ai_target_number(ai_target_number);
   builder_.add_enemy(enemy);
   builder_.add_mood(mood);
-  builder_.add_weapon_delay(weapon_delay);
+  builder_.add_weapon_delay2(weapon_delay2);
+  builder_.add_weapon_delay1(weapon_delay1);
   builder_.add_location_ai(location_ai);
   builder_.add_tosspad(tosspad);
   builder_.add_joint_rotation(joint_rotation);
@@ -1071,7 +1081,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    const std::vector<int32_t> *weapon_delay = nullptr,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1082,7 +1093,6 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool is_jumping = false,
     bool is_monkeying = false) {
   auto joint_rotation__ = joint_rotation ? _fbb.CreateVector<int32_t>(*joint_rotation) : 0;
-  auto weapon_delay__ = weapon_delay ? _fbb.CreateVector<int32_t>(*weapon_delay) : 0;
   return TEN::Save::CreateCreature(
       _fbb,
       maximum_turn,
@@ -1099,7 +1109,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
       hurt_by_lara,
       tosspad,
       location_ai,
-      weapon_delay__,
+      weapon_delay1,
+      weapon_delay2,
       mood,
       enemy,
       ai_target_number,
@@ -2711,7 +2722,8 @@ inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_functi
   { auto _e = hurt_by_lara(); _o->hurt_by_lara = _e; }
   { auto _e = tosspad(); _o->tosspad = _e; }
   { auto _e = location_ai(); _o->location_ai = _e; }
-  { auto _e = weapon_delay(); if (_e) { _o->weapon_delay.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->weapon_delay[_i] = _e->Get(_i); } } }
+  { auto _e = weapon_delay1(); _o->weapon_delay1 = _e; }
+  { auto _e = weapon_delay2(); _o->weapon_delay2 = _e; }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
   { auto _e = ai_target_number(); _o->ai_target_number = _e; }
@@ -2745,7 +2757,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _hurt_by_lara = _o->hurt_by_lara;
   auto _tosspad = _o->tosspad;
   auto _location_ai = _o->location_ai;
-  auto _weapon_delay = _fbb.CreateVector(_o->weapon_delay);
+  auto _weapon_delay1 = _o->weapon_delay1;
+  auto _weapon_delay2 = _o->weapon_delay2;
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
   auto _ai_target_number = _o->ai_target_number;
@@ -2771,7 +2784,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
       _hurt_by_lara,
       _tosspad,
       _location_ai,
-      _weapon_delay,
+      _weapon_delay1,
+      _weapon_delay2,
       _mood,
       _enemy,
       _ai_target_number,
