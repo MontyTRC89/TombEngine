@@ -1,9 +1,9 @@
 #pragma once
-#include "Game/collision/Attractors.h"
 #include "Math/Math.h"
 
-using namespace TEN::Collision::Attractors;
 using namespace TEN::Math;
+
+namespace TEN::Collision::Attractors { class Attractor; }
 
 namespace TEN::Entities::Player::Context
 {

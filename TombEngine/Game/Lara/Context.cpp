@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/Context.h"
 
+#include "Game/collision/Attractors.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
@@ -11,9 +12,12 @@
 #include "Game/Lara/lara_tests.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 
+using namespace TEN::Collision::Attractors;
+
 // Debug
 #include "Renderer/Renderer11.h"
 using TEN::Renderer::g_Renderer;
+// ---
 
 namespace TEN::Entities::Player::Context
 {
