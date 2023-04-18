@@ -1,6 +1,8 @@
 #pragma once
+#include "Game/collision/Attractors.h"
 #include "Math/Math.h"
 
+using namespace TEN::Collision::Attractors;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Player::Context
@@ -25,9 +27,12 @@ namespace TEN::Entities::Player::Context
 
 	struct EdgeCatchData
 	{
-		EdgeType Type		  = EdgeType::Ledge;
-		Vector3	 Position	  = Vector3::Zero;
-		short	 HeadingAngle = 0;
+		const Attractor* AttractorPtr = nullptr;
+		EdgeType Type = EdgeType::Ledge; // TODO: Won't be needed later.
+
+		Vector3 TargetPoint		  = Vector3::Zero;
+		float	DistanceFromStart = 0.0f;
+		short	HeadingAngle	  = 0;
 	};
 
 	struct MonkeySwingCatchData

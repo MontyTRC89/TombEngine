@@ -290,13 +290,10 @@ namespace TEN::Entities::Player::Context
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
-	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
-														  const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																				const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto EDGE_TYPE				= EdgeType::Ledge;
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
-
-		const auto& player = GetLaraInfo(item);
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
@@ -366,8 +363,39 @@ namespace TEN::Entities::Player::Context
 		if (attracCollPtr == nullptr)
 			return std::nullopt;
 
+		return *attracCollPtr;
+	}
+
+	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
+														  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto EDGE_TYPE = EdgeType::Ledge;
+
+		const auto& player = GetLaraInfo(item);
+
+		// Get edge catch attractor collision.
+		auto edgeCatchAttracColl = GetEdgeCatchAttractorCollision(item, coll, attracColls);
+		if (!edgeCatchAttracColl.has_value())
+			return std::nullopt;
+
+		// Calculate heading angle. Not working.
+		auto point0 = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart - coll.Setup.Radius);
+		auto point1 = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart + coll.Setup.Radius);
+		short headingAngle = Geometry::GetOrientToPoint(point0, point1).y - ANGLE(90.0f);
+
+		g_Renderer.PrintDebugMessage("%.3f", edgeCatchAttracColl->DistanceFromStart);
+		g_Renderer.AddSphere(point0, 50, Vector4::One);
+		g_Renderer.AddSphere(point1, 50, Vector4::One);
+
 		// Return edge catch data.
-		return EdgeCatchData{ EDGE_TYPE, attracCollPtr->TargetPoint, attracCollPtr->HeadingAngle };
+		return EdgeCatchData
+		{
+			edgeCatchAttracColl->AttractorPtr,
+			EDGE_TYPE,
+			edgeCatchAttracColl->TargetPoint,
+			edgeCatchAttracColl->DistanceFromStart,
+			edgeCatchAttracColl->HeadingAngle
+		};
 	}
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
@@ -423,7 +451,12 @@ namespace TEN::Entities::Player::Context
 			relEdgeHeight >= 0)							  // Edge height is below upper height bound.
 		{
 			auto offset = Vector3(0.0f, edgeHeight, 0.0f);
-			return EdgeCatchData{ EDGE_TYPE, offset };
+			return EdgeCatchData
+			{
+				nullptr,
+				EDGE_TYPE,
+				offset
+			};
 		}
 		
 		return std::nullopt;
@@ -431,13 +464,10 @@ namespace TEN::Entities::Player::Context
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
-		// Get nearby attractor pointers.
-		auto attracPtrs = GetNearbyAttractorPtrs(item);
-
 		// Get attractor collisions.
 		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
 		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
+		auto attracColls = GetAttractorCollisions(item, refPoint, range);
 
 		// 1) Get and return ledge catch data (if valid).
 		auto ledgeCatchData = GetLedgeCatchData(item, coll, attracColls);

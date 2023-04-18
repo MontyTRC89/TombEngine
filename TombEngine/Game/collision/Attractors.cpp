@@ -47,9 +47,9 @@ namespace TEN::Collision::Attractors
 		return Length;
 	}
 
-	AttractorTargetData Attractor::GetTargetData(const Vector3& refPoint) const
+	AttractorPointData Attractor::GetPointData(const Vector3& refPoint) const
 	{
-		static const auto TARGET_DATA_DEFAULT = AttractorTargetData{};
+		static const auto TARGET_DATA_DEFAULT = AttractorPointData{};
 
 		// No points; return default target data.
 		if (Points.empty())
@@ -60,7 +60,7 @@ namespace TEN::Collision::Attractors
 
 		// Single point; return simple target data.
 		if (Points.size() == 1)
-			return AttractorTargetData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
+			return AttractorPointData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
 
 		auto targetPoint = Points[0];
 		float closestDist = INFINITY;
@@ -81,11 +81,14 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Return target data.
-		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+		return AttractorPointData{ targetPoint, closestDist, segmentIndex };
 	}
 
+	// TODO: It's reversed????!?!?!?
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
+		dist = Length - dist;
+
 		// No points; return default.
 		if (Points.empty())
 		{
@@ -248,7 +251,7 @@ namespace TEN::Collision::Attractors
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			auto attracTarget = attrac.GetTargetData(refPoint);
+			auto attracTarget = attrac.GetPointData(refPoint);
 			if (attracTarget.Distance <= range)
 				nearbyAttracPtrMap.insert({ attracTarget.Distance, &attrac });
 		}
@@ -259,9 +262,9 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				auto attracTarget = attrac.GetTargetData(refPoint);
-				if (attracTarget.Distance <= range)
-					nearbyAttracPtrMap.insert({ attracTarget.Distance, &attrac });
+				auto attracPointData = attrac.GetPointData(refPoint);
+				if (attracPointData.Distance <= range)
+					nearbyAttracPtrMap.insert({ attracPointData.Distance, &attrac });
 			}
 		}
 
@@ -324,26 +327,26 @@ namespace TEN::Collision::Attractors
 			return ATTRAC_COLL_DEFAULT;
 		}
 
-		auto attracTarget = attrac.GetTargetData(refPoint);
-		float distFromStart = attrac.GetDistanceAtPoint(attracTarget.TargetPoint, attracTarget.SegmentIndex);
+		auto attracPointData = attrac.GetPointData(refPoint);
+		float distFromStart = attrac.GetDistanceAtPoint(attracPointData.Point, attracPointData.SegmentIndex);
 
 		// Calculate angles.
 		auto attracOrient = (points.size() == 1) ?
 			EulerAngles::Zero :
-			Geometry::GetOrientToPoint(points[attracTarget.SegmentIndex], points[attracTarget.SegmentIndex + 1]);
+			Geometry::GetOrientToPoint(points[attracPointData.SegmentIndex], points[attracPointData.SegmentIndex + 1]);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
 		// Determine inquiries.
-		bool isIntersected = (attracTarget.Distance <= range);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracTarget.TargetPoint, orient);
+		bool isIntersected = (attracPointData.Distance <= range);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracPointData.Point, orient);
 
 		// Create new attractor collision.
 		auto attracColl = ATTRAC_COLL_DEFAULT;
 
 		attracColl.AttractorPtr = &attrac;
-		attracColl.TargetPoint = attracTarget.TargetPoint;
-		attracColl.Distance = attracTarget.Distance;
+		attracColl.TargetPoint = attracPointData.Point;
+		attracColl.Distance = attracPointData.Distance;
 		attracColl.DistanceFromStart = distFromStart;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
@@ -363,6 +366,43 @@ namespace TEN::Collision::Attractors
 		for (const auto* attrac : attracPtrs)
 		{
 			auto attracColl = GetAttractorCollision(*attrac, basePos, orient, refPoint, range);
+			attracColls.push_back(attracColl);
+		}
+
+		return attracColls;
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
+															   const Vector3& refPoint, float range)
+	{
+		auto attracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
+
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(attracPtrs.size());
+
+		for (const auto* attrac : attracPtrs)
+		{
+			auto attracColl = GetAttractorCollision(*attrac, basePos, orient, refPoint, range);
+			attracColls.push_back(attracColl);
+		}
+
+		return attracColls;
+	}
+	
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range)
+	{
+		// TODO: This call will do actual probing. For now, using debug attractors.
+		//return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, range);
+		
+		// Get debug attractor pointers.
+		auto attracPtrs = GetNearbyAttractorPtrs(item);
+
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(attracPtrs.size());
+
+		for (const auto* attrac : attracPtrs)
+		{
+			auto attracColl = GetAttractorCollision(*attrac, item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 

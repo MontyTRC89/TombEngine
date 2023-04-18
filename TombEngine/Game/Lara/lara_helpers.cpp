@@ -178,8 +178,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	// Calculate position.
 	int playerHeight = (item.Animation.ActiveState == LS_JUMP_UP) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
 	auto catchPos = (catchData.Type == Context::EdgeType::ClimbableWall) ?
-		Vector3(item.Pose.Position.x, catchData.Position.y, item.Pose.Position.z) :
-		catchData.Position;
+		Vector3(item.Pose.Position.x, catchData.TargetPoint.y, item.Pose.Position.z) :
+		catchData.TargetPoint;
 	auto pos = catchPos + Vector3(0.0f, playerHeight, 0.0f);
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
