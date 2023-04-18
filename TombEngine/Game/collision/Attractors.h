@@ -19,9 +19,10 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorPointData
 	{
-		Vector3		 Point		  = Vector3::Zero;
-		float		 Distance	  = 0.0f;
-		unsigned int SegmentIndex = 0;
+		Vector3		 Point			   = Vector3::Zero;
+		float		 Distance		   = 0.0f;
+		float		 DistanceFromStart = 0.0f;
+		unsigned int SegmentIndex	   = 0;
 	};
 
 	class Attractor
@@ -63,12 +64,13 @@ namespace TEN::Collision::Attractors
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		Vector3 TargetPoint = Vector3::Zero;
+		Vector3 TargetPoint		  = Vector3::Zero;
+		float	Distance		  = 0.0f;
+		float	DistanceFromStart = 0.0f;
+		int		SegmentIndex	  = 0;
 
-		float Distance			= 0.0f;
-		float DistanceFromStart = 0.0f;
-		short HeadingAngle		= 0;
-		short SlopeAngle		= 0;
+		short HeadingAngle = 0;
+		short SlopeAngle   = 0;
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;

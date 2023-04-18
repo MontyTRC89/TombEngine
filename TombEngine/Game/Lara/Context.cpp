@@ -366,12 +366,16 @@ namespace TEN::Entities::Player::Context
 		return *attracCollPtr;
 	}
 
-	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll,
-														  const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto EDGE_TYPE = EdgeType::Ledge;
 
 		const auto& player = GetLaraInfo(item);
+
+		// Get attractor collisions.
+		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
+		float range = OFFSET_RADIUS(coll.Setup.Radius);
+		auto attracColls = GetAttractorCollisions(item, refPoint, range);
 
 		// Get edge catch attractor collision.
 		auto edgeCatchAttracColl = GetEdgeCatchAttractorCollision(item, coll, attracColls);
@@ -379,13 +383,13 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Calculate heading angle. Not working.
-		auto point0 = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart - coll.Setup.Radius);
-		auto point1 = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart + coll.Setup.Radius);
-		short headingAngle = Geometry::GetOrientToPoint(point0, point1).y - ANGLE(90.0f);
+		auto pointLeft = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart - coll.Setup.Radius);
+		auto pointRight = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart + coll.Setup.Radius);
+		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		g_Renderer.PrintDebugMessage("%.3f", edgeCatchAttracColl->DistanceFromStart);
-		g_Renderer.AddSphere(point0, 50, Vector4::One);
-		g_Renderer.AddSphere(point1, 50, Vector4::One);
+		g_Renderer.AddSphere(pointLeft, 50, Vector4::One);
+		g_Renderer.AddSphere(pointRight, 50, Vector4::One);
 
 		// Return edge catch data.
 		return EdgeCatchData
@@ -464,13 +468,8 @@ namespace TEN::Entities::Player::Context
 
 	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
-		// Get attractor collisions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, refPoint, range);
-
 		// 1) Get and return ledge catch data (if valid).
-		auto ledgeCatchData = GetLedgeCatchData(item, coll, attracColls);
+		auto ledgeCatchData = GetLedgeCatchData(item, coll);
 		if (ledgeCatchData.has_value())
 			return ledgeCatchData;
 

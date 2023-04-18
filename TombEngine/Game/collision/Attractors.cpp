@@ -81,14 +81,13 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Return target data.
-		return AttractorPointData{ targetPoint, closestDist, segmentIndex };
+		float distFromStart = GetDistanceAtPoint(targetPoint, segmentIndex);
+		return AttractorPointData{ targetPoint, closestDist, distFromStart, segmentIndex };
 	}
 
 	// TODO: It's reversed????!?!?!?
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
-		dist = Length - dist;
-
 		// No points; return default.
 		if (Points.empty())
 		{
@@ -327,8 +326,8 @@ namespace TEN::Collision::Attractors
 			return ATTRAC_COLL_DEFAULT;
 		}
 
+		// Get point data.
 		auto attracPointData = attrac.GetPointData(refPoint);
-		float distFromStart = attrac.GetDistanceAtPoint(attracPointData.Point, attracPointData.SegmentIndex);
 
 		// Calculate angles.
 		auto attracOrient = (points.size() == 1) ?
@@ -347,7 +346,8 @@ namespace TEN::Collision::Attractors
 		attracColl.AttractorPtr = &attrac;
 		attracColl.TargetPoint = attracPointData.Point;
 		attracColl.Distance = attracPointData.Distance;
-		attracColl.DistanceFromStart = distFromStart;
+		attracColl.DistanceFromStart = attracPointData.DistanceFromStart;
+		attracColl.SegmentIndex = attracPointData.SegmentIndex;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
