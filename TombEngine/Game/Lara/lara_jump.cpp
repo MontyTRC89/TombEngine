@@ -214,6 +214,12 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (IsHeld(In::Action))
+	{
+		if (HandlePlayerJumpCatch(*item, *coll))
+			return;
+	}
+
 	item->Animation.TargetState = LS_REACH;
 }
 
@@ -223,15 +229,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
-	// Overhang hook.
-	SlopeReachExtra(item, coll);
-
-	if (IsHeld(In::Action))
-	{
-		if (HandlePlayerJumpCatch(*item, *coll))
-			return;
-	}
-
+	SlopeReachExtra(item, coll); // Overhang hook.
 	LaraSlideEdgeJump(item, coll);
 
 	GetCollisionInfo(coll, item);
@@ -595,6 +593,12 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Velocity.z = (item->Animation.Velocity.z < 0.0f) ? -VEL_ACCEL : VEL_ACCEL;
 	}
 
+	if (IsHeld(In::Action))
+	{
+		if (HandlePlayerJumpCatch(*item, *coll))
+			return;
+	}
+
 	if (item->Animation.Velocity.z < 0.0f)
 	{
 		item->Pose.Orientation.x += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Animation.Velocity.z) - item->Pose.Orientation.x) / 3);
@@ -610,12 +614,6 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
-	if (IsHeld(In::Action))
-	{
-		if (HandlePlayerJumpCatch(*item, *coll))
-			return;
-	}
-
 	LaraDeflectTopSide(item, coll);
 
 	if (coll->Middle.Ceiling >= 0 ||
@@ -623,7 +621,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 		coll->CollisionType == CT_TOP_FRONT ||
 		coll->CollisionType == CT_CLAMP)
 	{
-		item->Animation.Velocity.y = 1;
+		item->Animation.Velocity.y = PLAYER_RELEASE_VELOCITY.y;
 	}
 
 	ShiftItem(item, coll);
