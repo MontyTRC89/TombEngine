@@ -55,6 +55,14 @@ const ObjectCollisionBounds KeyHoleBounds =
 };
 
 // Puzzles
+void InitialisePuzzleDone(short itemNumber)
+{
+	auto& receptacleItem = g_Level.Items[itemNumber];
+	receptacleItem.Status = ITEM_NOT_ACTIVE;
+	receptacleItem.Animation.RequiredState = NO_STATE;
+	receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
+}
+
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];

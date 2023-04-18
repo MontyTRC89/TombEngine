@@ -93,6 +93,7 @@ void InitPuzzleDone(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->initialise = InitialisePuzzleDone;
 		object->collision = PuzzleDoneCollision;
 		object->control = AnimatingControl;
 		object->SetupHitEffect(true);
