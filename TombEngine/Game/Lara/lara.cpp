@@ -414,6 +414,18 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 };
 
 // Debug
+void InitAttractors(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Context.Attractor.DebugAttractor0 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor2 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor3 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor4 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+}
+
+// Debug
 static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 {
 	constexpr auto RADIUS	  = BLOCK(0.5f);
@@ -440,7 +452,7 @@ static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 		std::reverse(points.begin(), points.end());
 
 	auto attrac = GenerateAttractorFromPoints(points, item.RoomNumber, AttractorType::Edge);
-	player.Context.Attractor.DebugAttractor0 = attrac;
+	player.Context.Attractor.DebugAttractor2 = attrac;
 }
 
 // Debug
@@ -466,34 +478,30 @@ static void SetDebugAttractors(ItemInfo& item)
 
 	auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 
-	// Set points for debug attractor 0.
+	// Set debug attractor 0.
 	if (KeyMap[OIS::KeyCode::KC_Q])
-	{
-		auto pos = LaraItem->Pose.Position.ToVector3() +
-			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor0 = Attractor(
-			AttractorType::Edge,
-			{ pos, player.Context.Attractor.DebugAttractor0.GetPoints()[1] }, item.RoomNumber);
-	}
-	if (KeyMap[OIS::KeyCode::KC_W])
-	{
-		auto pos = LaraItem->Pose.Position.ToVector3() +
-			Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.Attractor.DebugAttractor0 = Attractor(
-			AttractorType::Edge,
-			{ player.Context.Attractor.DebugAttractor0.GetPoints()[0], pos }, item.RoomNumber);
-	}
-
-	// Set points for debug attractor 1.
-	if (KeyMap[OIS::KeyCode::KC_E])
 	{
 		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
 		auto pos1 = player.Context.Attractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor0.GetPoints()[1];
+		player.Context.Attractor.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+	}
+	if (KeyMap[OIS::KeyCode::KC_W])
+	{
+		auto pos0 = player.Context.Attractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor0.GetPoints()[0];
+		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		player.Context.Attractor.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+	}
+
+	// Set debug attractor 1.
+	if (KeyMap[OIS::KeyCode::KC_E])
+	{
+		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		auto pos1 = player.Context.Attractor.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor1.GetPoints()[1];
 		player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_R])
 	{
-		auto pos0 = player.Context.Attractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor0.GetPoints()[0];
+		auto pos0 = player.Context.Attractor.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.Attractor.DebugAttractor1.GetPoints()[0];
 		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
 		player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
@@ -527,7 +535,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Debug
+	static bool hasAttracInit = false;
+	if (!hasAttracInit)
+	{
+		InitAttractors(*item);
+		hasAttracInit = true;
+	}
+
 	HandleAttractorDebug(*item);
+
+	//-------
 
 	if (lara->Control.Weapon.HasFired)
 	{

@@ -305,9 +305,9 @@ namespace TEN::Collision::Attractors
 		}
 		
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
-		/*nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
+		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
+		/*nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
 		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);*/
 		return nearbyAttracPtrs;
 	}

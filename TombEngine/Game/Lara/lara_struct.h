@@ -1290,9 +1290,11 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
-// TODO: Maybe not necessary after all?
 struct PlayerAttractorData
 {
+	const Attractor* AttractorPtr = nullptr;
+	float DistanceFromStart = 0.0f;
+
 	// Debug
 	Attractor			   DebugAttractor0	= {};
 	Attractor			   DebugAttractor1	= {};
@@ -1302,11 +1304,15 @@ struct PlayerAttractorData
 	std::vector<Attractor> SectorAttractors = {};
 };
 
-// TODO: Use this struct for all collision context stuff.
 // TODO: Savegame.
 struct PlayerContextData
 {
+	// Debug
 	PlayerAttractorData Attractor = {};
+
+	// TODO: Edge attractors could be used for climbable walls too since the concept is essentially the same.
+	PlayerAttractorData HandsAttractor = {};
+	PlayerAttractorData FeetAttractor  = {};
 
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;
