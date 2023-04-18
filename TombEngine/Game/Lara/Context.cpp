@@ -257,15 +257,7 @@ namespace TEN::Entities::Player::Context
 
 			// 4) Test catch angle.
 			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			{
-				// TODO: Maybe overkill.
-				/*auto pointLeft = attracColl.AttractorPtr->GetPointAtDistance(attracColl.DistanceAlongLine - coll.Setup.Radius);
-				auto pointRight = attracColl.AttractorPtr->GetPointAtDistance(attracColl.DistanceAlongLine + coll.Setup.Radius);
-
-				auto headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
-				if (!TestPlayerInteractAngle(item, headingAngle))*/
 					continue;
-			}
 
 			// 5) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
