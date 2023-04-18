@@ -17,7 +17,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
@@ -65,7 +65,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
@@ -74,7 +74,7 @@ using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;

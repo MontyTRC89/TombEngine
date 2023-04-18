@@ -12,7 +12,7 @@
 static sol::state s_solState;
 static sol::table s_rootTable;
 
-int lua_exception_handler(lua_State* L, sol::optional<std::exception const &> maybe_exception, sol::string_view description)
+int lua_exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
 }
@@ -46,9 +46,8 @@ void ScriptInterfaceState::Init()
 	s_rootTable = sol::table{ s_solState.lua_state(), sol::create };
 	s_solState.set(ScriptReserved_TEN, s_rootTable);
 
-	// Misc handlers not assigned above
+	// Misc. handlers not assigned above.
 	InventoryHandler::Register(&s_solState, s_rootTable);
 	Misc::Register(&s_solState, s_rootTable);
 	Effects::Register(&s_solState, s_rootTable);
 }
-

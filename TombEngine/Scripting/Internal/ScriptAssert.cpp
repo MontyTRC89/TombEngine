@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 static ErrorMode ScriptErrorMode = ErrorMode::Warn;
 
-void ScriptWarn(std::string const& msg)
+void ScriptWarn(const std::string& msg)
 {
 	switch (ScriptErrorMode)
 	{
@@ -14,26 +14,26 @@ void ScriptWarn(std::string const& msg)
 	}
 }
 
-
-bool ScriptAssert(bool cond, std::string const& msg, std::optional<ErrorMode> forceMode)
+bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode)
 {
 	if (!cond)
 	{
-		ErrorMode mode = forceMode ? *forceMode : ScriptErrorMode;
+		auto mode = forceMode ? *forceMode : ScriptErrorMode;
 		switch (mode)
 		{
 		case ErrorMode::Warn:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			break;
+
 		case ErrorMode::Terminate:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			throw TENScriptException(msg);
 			break;
 		}
 	}
+
 	return cond;
 }
-
 
 void SetScriptErrorMode(ErrorMode mode)
 {
@@ -44,4 +44,3 @@ ErrorMode GetScriptErrorMode()
 {
 	return ScriptErrorMode;
 }
-

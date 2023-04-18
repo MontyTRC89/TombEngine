@@ -16,13 +16,13 @@ namespace TEN::Hud
 {
 	HudController g_Hud = {};
 
-	void HudController::Update(ItemInfo& item)
+	void HudController::Update(const ItemInfo& item)
 	{
-		this->PickupSummary.Update();
-		this->StatusBars.Update(item);
+		PickupSummary.Update();
+		StatusBars.Update(item);
 	}
 
-	void HudController::Draw(ItemInfo& item) const
+	void HudController::Draw(const ItemInfo& item) const
 	{
 		// ----------------Debug
 		static short orient2D = 0;
@@ -35,13 +35,13 @@ namespace TEN::Hud
 
 		//------------------
 
-		this->PickupSummary.Draw();
-		this->StatusBars.Draw(item);
+		PickupSummary.Draw();
+		StatusBars.Draw(item);
 	}
 
 	void HudController::Clear()
 	{
-		this->PickupSummary.Clear();
-		this->StatusBars.Clear();
+		PickupSummary.Clear();
+		StatusBars.Clear();
 	}
 }

@@ -4,14 +4,10 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Renderer
-{
-	struct RendererMesh;
-}
-
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
+namespace TEN::Renderer { struct RendererMesh; };
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -865,6 +861,18 @@ enum LARA_MESHES
 	NUM_LARA_MESHES
 };
 
+enum LaraWeaponTypeCarried
+{
+	WTYPE_MISSING	 = 0,
+	WTYPE_PRESENT	 = (1 << 0),
+	WTYPE_SILENCER	 = (1 << 1),
+	WTYPE_LASERSIGHT = (1 << 2),
+	WTYPE_AMMO_1	 = (1 << 3),
+	WTYPE_AMMO_2	 = (1 << 4),
+	WTYPE_AMMO_3	 = (1 << 5),
+	WTYPE_MASK_AMMO	 = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
+};
+
 enum class WeaponAmmoType
 {
 	Ammo1,
@@ -893,18 +901,6 @@ enum class LaraWeaponType
 	NumWeapons
 };
 
-enum LaraWeaponTypeCarried
-{
-	WTYPE_MISSING	 = 0,
-	WTYPE_PRESENT	 = (1 << 0),
-	WTYPE_SILENCER	 = (1 << 1),
-	WTYPE_LASERSIGHT = (1 << 2),
-	WTYPE_AMMO_1	 = (1 << 3),
-	WTYPE_AMMO_2	 = (1 << 4),
-	WTYPE_AMMO_3	 = (1 << 5),
-	WTYPE_MASK_AMMO	 = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
-};
-
 enum class HolsterSlot
 {
 	Empty			= ID_LARA_HOLSTERS,
@@ -917,14 +913,6 @@ enum class HolsterSlot
 	Crossbow		= ID_CROSSBOW_ANIM,
 	GrenadeLauncher = ID_GRENADE_ANIM,
 	RocketLauncher	= ID_ROCKET_ANIM
-};
-
-// TODO: Unused.
-enum class ClothType
-{
-	None,
-	Dry,
-	Wet
 };
 
 enum class WaterStatus
@@ -966,16 +954,16 @@ enum class JumpDirection
 
 struct Ammo
 {
-	using CountType = uint16_t;
+	using CountType = unsigned short;
 
 private:
-	CountType Count;
-	bool	  IsInfinite;
+	CountType Count		 = 0;
+	bool	  IsInfinite = false;
 
 public:
 	static CountType Clamp(int value)
 	{
-		return std::clamp(value, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
+		return std::clamp(value, 0, (int)std::numeric_limits<CountType>::max());
 	}
 
 	bool HasInfinite() const
@@ -988,15 +976,15 @@ public:
 		return Count;
 	}
 
-	void SetInfinite(bool infinite)
+	void SetInfinite(bool isInfinite)
 	{
-		this->IsInfinite = infinite;
+		IsInfinite = isInfinite;
 	}
 
 	Ammo& operator --()
 	{
-		assertion(this->Count > 0, "Ammo count is already 0!");
-		--this->Count;
+		assertion(Count > 0, "Ammo count is already 0.");
+		--Count;
 		return *this;
 	}
 
@@ -1009,7 +997,7 @@ public:
 
 	Ammo& operator ++()
 	{
-		++this->Count;
+		++Count;
 		return *this;
 	}
 
@@ -1022,7 +1010,7 @@ public:
 
 	Ammo& operator =(size_t value)
 	{
-		this->Count = Clamp(value);
+		Count = Clamp(value);
 		return *this;
 	}
 
@@ -1031,10 +1019,10 @@ public:
 		return (Count == Clamp(value));
 	}
 
-	Ammo& operator =(Ammo& rhs)
+	Ammo& operator =(Ammo& ammo)
 	{
-		this->Count = rhs.Count;
-		this->IsInfinite = rhs.Count;
+		Count = ammo.Count;
+		IsInfinite = ammo.Count;
 		return *this;
 	}
 
@@ -1055,20 +1043,20 @@ public:
 	Ammo& operator +=(size_t value)
 	{
 		int temp = Count + value;
-		this->Count = Clamp(temp);
+		Count = Clamp(temp);
 		return *this;
 	}
 
 	Ammo& operator -=(size_t value)
 	{
 		int temp = Count - value;
-		this->Count = Clamp(temp);
+		Count = Clamp(temp);
 		return *this;
 	}
 
 	operator bool()
 	{
-		return (IsInfinite || Count > 0);
+		return (IsInfinite || (Count > 0));
 	}
 };
 
@@ -1085,22 +1073,22 @@ struct CarriedWeaponInfo
 	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
-	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType SelectedAmmo = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
-	LaraWeaponTypeCarried WeaponMode = LaraWeaponTypeCarried::WTYPE_MISSING;
+	Ammo				  Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
+	WeaponAmmoType		  SelectedAmmo							  = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode							  = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo
 {
-	int AnimNumber;
-	int FrameNumber;
-	int FrameBase;
+	int AnimNumber	= 0;
+	int FrameNumber = 0;
+	int FrameBase	= 0;
 
-	EulerAngles Orientation;
+	EulerAngles Orientation = EulerAngles::Zero;
+	bool		Locked		= false;
 
-	bool Locked;
-	int GunFlash;
-	int GunSmoke;
+	int GunFlash = 0;
+	int GunSmoke = 0;
 };
 
 struct FlareData
@@ -1122,29 +1110,29 @@ constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	Vector2i Position;
-	int		StringID;
+	Vector2i Position = Vector2i::Zero;
+	int		 StringID = 0;
 };
 
 struct DiaryPage
 {
-	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE];
+	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE] = {};
 };
 
 struct DiaryInfo
 {
-	bool		 Present;
-	DiaryPage	 Pages[MAX_DIARY_PAGES];
-	unsigned int NumPages;
-	unsigned int CurrentPage;
+	bool		 Present				= false;
+	DiaryPage	 Pages[MAX_DIARY_PAGES] = {};
+	unsigned int NumPages				= 0;
+	unsigned int CurrentPage			= 0;
 };
 
 struct LaraInventoryData
 {
-	bool IsBusy;
-	bool OldBusy;
+	bool IsBusy	 = false;
+	bool OldBusy = false;
 
-	DiaryInfo Diary;
+	DiaryInfo Diary = {};
 
 	byte BeetleLife;
 	int BeetleComponents; // BeetleComponentFlags enum
@@ -1157,29 +1145,29 @@ struct LaraInventoryData
 	int TotalFlares;
 	unsigned int TotalSecrets;
 
-	bool HasBinoculars;
-	bool HasCrowbar;
-	bool HasTorch;
-	bool HasLasersight;
-	bool HasSilencer; // TODO: Unused.
+	bool HasBinoculars = false;
+	bool HasCrowbar	   = false;
+	bool HasTorch	   = false;
+	bool HasLasersight = false;
+	bool HasSilencer   = false; // TODO: Unused.
 
 	// TODO: Convert to bools.
-	int Puzzles[NUM_PUZZLES];
-	int Keys[NUM_KEYS];
-	int Pickups[NUM_PICKUPS];
-	int Examines[NUM_EXAMINES];
-	int PuzzlesCombo[NUM_PUZZLES * 2];
-	int KeysCombo[NUM_KEYS * 2];
-	int PickupsCombo[NUM_PICKUPS * 2];
-	int ExaminesCombo[NUM_EXAMINES * 2];
+	int Puzzles[NUM_PUZZLES]			= {};
+	int Keys[NUM_KEYS]					= {};
+	int Pickups[NUM_PICKUPS]			= {};
+	int Examines[NUM_EXAMINES]			= {};
+	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
+	int KeysCombo[NUM_KEYS * 2]			= {};
+	int PickupsCombo[NUM_PICKUPS * 2]	= {};
+	int ExaminesCombo[NUM_EXAMINES * 2] = {};
 };
 
 struct LaraCountData
 {
-	unsigned int Pose;
-	unsigned int PositionAdjust;
-	unsigned int Run;
-	unsigned int Death;
+	unsigned int Pose			= 0;
+	unsigned int PositionAdjust = 0;
+	unsigned int Run			= 0;
+	unsigned int Death			= 0;
 };
 
 struct WeaponControlData
@@ -1204,31 +1192,37 @@ struct WeaponControlData
 
 struct RopeControlData
 {
-	byte Segment;
-	byte Direction;
-	short ArcFront;
-	short ArcBack;
-	short LastX;
-	short MaxXForward;
-	short MaxXBackward;
-	int DFrame;
-	int Frame;
-	unsigned short FrameRate;
-	unsigned short Y;
-	int Ptr;
-	int Offset;
-	int DownVel;
-	byte Flag;
-	int Count;
+	byte Segment = 0;
+	byte Direction = 0;
+
+	short ArcFront = 0;
+	short ArcBack = 0;
+
+	short LastX = 0;
+	short MaxXForward = 0;
+	short MaxXBackward = 0;
+
+	int DFrame = 0;
+	int Frame = 0;
+	unsigned short FrameRate = 0;
+
+	unsigned short Y = 0;
+	int Ptr = 0;
+	int Offset = 0;
+	int DownVel = 0;
+	byte Flag = 0;
+	int Count = 0;
 };
 
+// TODO: Give tightrope a property for difficulty?
+// TODO: Remove old tightrope functionality.
 struct TightropeControlData
 {
 #if NEW_TIGHTROPE
-	float Balance;
-	unsigned int TimeOnTightrope;
-	bool CanDismount;
-	short TightropeItem; // TODO: Give tightrope a property for difficulty?
+	short		 TightropeItem	 = 0;
+	bool		 CanDismount	 = false;
+	float		 Balance		 = 0.0f;
+	unsigned int TimeOnTightrope = 0;
 #else // !NEW_TIGHTROPE
 	unsigned int OnCount;
 	byte Off;
@@ -1238,25 +1232,24 @@ struct TightropeControlData
 
 struct SubsuitControlData
 {
-	short XRot;
-	short DXRot;
-	int Velocity[2];
-	int VerticalVelocity;
+	short XRot = 0;
+	short DXRot = 0;
+	int Velocity[2] = {};
+	int VerticalVelocity = 0;
 
 	// TODO: These appear to be unused.
-	short XRotVel;
-	unsigned short HitCount;
+	short XRotVel = 0;
+	unsigned short HitCount = 0;
 };
 
 struct LaraControlData
 {
 	short MoveAngle = 0;
 	short TurnRate	= 0;
-	int	  CalculatedJumpVelocity = 0;
 
-	JumpDirection JumpDirection = {};
 	HandStatus	  HandStatus	= {};
 	WaterStatus	  WaterStatus	= {};
+	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
 	RopeControlData		 Rope	   = {};
@@ -1265,25 +1258,19 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool Locked			  = false;
+	bool Locked			  = false; // IsLocked
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false;
-	bool KeepLow		  = false;
+	bool RunJumpQueued	  = false; // IsRunJumpQueued
+	bool KeepLow		  = false; // IsInLowSpace
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;
 	bool CanMonkeySwing = false;
 };
 
-struct PlayerEffectData
-{
-	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
-	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
-};
-
-// TODO: Make these floats.
+// TODO: Refactor status handling to use floats.
 struct PlayerStatusData
 {
 	int Air		 = 0;
@@ -1292,40 +1279,54 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
+struct PlayerContextData
+{
+	int			ProjectedFloorHeight = 0;
+	float		CalcJumpVelocity	 = 0;
+	Pose		NextCornerPos		 = Pose::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
+};
+
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
 struct LaraInfo
 {
-	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has this.
+	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
-	PlayerStatusData Status = {};
-	LaraControlData Control = {};
-	LaraInventoryData Inventory;
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
-	FlareData Flare = {};
-	TorchData Torch = {};
+	LaraControlData	  Control	= {};
+	PlayerContextData Context	= {};
+	PlayerStatusData  Status	= {};
+	PlayerEffectData  Effect	= {};
+	LaraInventoryData Inventory = {};
 
-	EulerAngles ExtraHeadRot = {};
-	EulerAngles ExtraTorsoRot = {};
-	short WaterCurrentActive = 0;
-	Vector3i WaterCurrentPull = Vector3i::Zero;
+	FlareData		  Flare = {};
+	TorchData		  Torch = {};
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
+	EulerAngles ExtraHeadRot	= {};
+	EulerAngles ExtraTorsoRot	= {};
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 	EulerAngles TargetArmOrient = EulerAngles::Zero;
-	ItemInfo*	TargetEntity	= nullptr;
+	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
 
-	int Vehicle;
-	int ExtraAnim;
-	int HitFrame;
-	int HitDirection;
-	FX_INFO* SpasmEffect; // Not saved. TODO: Restore this effect.
+	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
+	int		 HitFrame	  = 0;		 // Frame index.
+	int		 HitDirection = 0;		 // Cardinal direction.
+	FX_INFO* SpasmEffect  = nullptr; // Not saved.
 
-	short InteractedItem;
-	int ProjectedFloorHeight;
-	EulerAngles TargetOrientation;
-	int WaterSurfaceDist;
-	Pose NextCornerPos;
-
-	PlayerEffectData Effect = {};
+	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;

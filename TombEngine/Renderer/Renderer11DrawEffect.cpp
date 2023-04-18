@@ -13,7 +13,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
@@ -35,7 +35,7 @@ using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
@@ -1011,17 +1011,12 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawFootprints(RenderView& view) 
 	{
-		for (auto i = footprints.begin(); i != footprints.end(); i++) 
+		for (const auto& footprint : Footprints)
 		{
-			FOOTPRINT_STRUCT& footprint = *i;
-			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
-
-			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-			{
-				AddQuad(&m_sprites[spriteIndex],
-					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3],
-					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
-			}
+			AddQuad(
+				&m_sprites[footprint.SpriteIndex],
+				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
+				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BLENDMODE_SUBTRACTIVE, false, view);
 		}
 	}
 
