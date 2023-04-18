@@ -177,10 +177,6 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	auto somePoint = player.Context.Attractor.AttractorPtr->GetPointAtDistance(player.Context.Attractor.DistanceAlongLine);
-	g_Renderer.AddSphere(somePoint, 50, Vector4::One);
-	g_Renderer.PrintDebugMessage("%.3f", player.Context.Attractor.DistanceAlongLine);
-
 	// Get edge attractor collision at three points.
 	auto edgeAttracColls = GetEdgeHangAttractorCollisions(*item, *coll);
 

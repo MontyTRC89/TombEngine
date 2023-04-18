@@ -17,13 +17,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Entities::Player::Context
 {
-	struct EdgeHangAttractorCollisionData
-	{
-		std::optional<AttractorCollisionData> Center = {};
-		std::optional<AttractorCollisionData> Left	 = {};
-		std::optional<AttractorCollisionData> Right	 = {};
-	};
-
 	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
@@ -236,7 +229,6 @@ namespace TEN::Entities::Player::Context
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
-		bool hasFoundCorner = false;
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -249,14 +241,17 @@ namespace TEN::Entities::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
-			// TODO: Test if this works. Redo.
+			// TODO: Account for connecting attractors.
 			// 3) Test if target point is lone corner.
-			if (attracColl.DistanceAlongLine <= EPSILON && !hasFoundCorner)
+			if (attracColl.DistanceAlongLine == 0.0f ||
+				attracColl.DistanceAlongLine == attracColl.AttractorPtr->GetLength())
 			{
-				hasFoundCorner = true;
-				continue;
+				auto points = attracColl.AttractorPtr->GetPoints();
+				if (Vector3::Distance(points[0], points.back()) > EPSILON)
+					continue;
 			}
 
+			// TODO: Accuracy?
 			// 4) Test catch angle.
 			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 				continue;
@@ -317,23 +312,23 @@ namespace TEN::Entities::Player::Context
 		auto attracColls = GetAttractorCollisions(item, refPoint, range);
 
 		// Get edge catch attractor collision.
-		auto edgeCatchAttracColl = GetEdgeCatchAttractorCollision(item, coll, attracColls);
-		if (!edgeCatchAttracColl.has_value())
+		auto AttracColl = GetEdgeCatchAttractorCollision(item, coll, attracColls);
+		if (!AttracColl.has_value())
 			return std::nullopt;
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine - coll.Setup.Radius);
-		auto pointRight = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine + coll.Setup.Radius);
+		auto pointLeft = AttracColl->AttractorPtr->GetPointAtDistance(AttracColl->DistanceAlongLine - coll.Setup.Radius);
+		auto pointRight = AttracColl->AttractorPtr->GetPointAtDistance(AttracColl->DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchData
 		{
-			edgeCatchAttracColl->AttractorPtr,
+			AttracColl->AttractorPtr,
 			EDGE_TYPE,
-			edgeCatchAttracColl->TargetPoint,
-			edgeCatchAttracColl->DistanceAlongLine,
+			AttracColl->TargetPoint,
+			AttracColl->DistanceAlongLine,
 			headingAngle
 		};
 	}

@@ -46,7 +46,7 @@ namespace TEN::Collision::Attractors
 		float				 GetLength() const;
 
 		AttractorPointData GetPointData(const Vector3& refPoint) const;
-		Vector3			   GetPointAtDistance(float dist) const;
+		Vector3			   GetPointAtDistance(float distAlongLine) const;
 		float			   GetDistanceAtPoint(const Vector3& point, unsigned int segmentIndex) const;
 
 		// Inquirers
