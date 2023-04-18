@@ -35,8 +35,8 @@ namespace TEN::Entities::Player::Context
 		int floorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
 		int gapHeight = abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor);
 
-		// 1) Test for slippery slope (if applicable).
 		// TODO: This check fails for no reason.
+		// 1) Test for slippery slope (if applicable).
 		bool isSlipperySlope = setupData.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlipperySlope)
 			return false;
@@ -245,7 +245,7 @@ namespace TEN::Entities::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
-			// TODO: Account for connecting attractors.
+			// TODO: Account for connecting attractors. Maybe not necessary since it's an edge case.
 			// 3) Test if target point is lone corner.
 			if (attracColl.DistanceAlongLine == 0.0f ||
 				attracColl.DistanceAlongLine == attracColl.AttractorPtr->GetLength())
@@ -255,10 +255,17 @@ namespace TEN::Entities::Player::Context
 					continue;
 			}
 
-			// TODO: Accuracy?
 			// 4) Test catch angle.
 			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-				continue;
+			{
+				// TODO: Maybe overkill.
+				/*auto pointLeft = attracColl.AttractorPtr->GetPointAtDistance(attracColl.DistanceAlongLine - coll.Setup.Radius);
+				auto pointRight = attracColl.AttractorPtr->GetPointAtDistance(attracColl.DistanceAlongLine + coll.Setup.Radius);
+
+				auto headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
+				if (!TestPlayerInteractAngle(item, headingAngle))*/
+					continue;
+			}
 
 			// 5) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)

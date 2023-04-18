@@ -9,7 +9,7 @@ namespace TEN::Entities::Player::Context
 	struct MonkeySwingCatchData;
 	struct ShimmyData;
 
-	// Ledge context inquirers
+	// Edge context inquirers
 	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
