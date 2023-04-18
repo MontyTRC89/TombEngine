@@ -346,7 +346,7 @@ namespace TEN::Collision::Attractors
 		attracColl.AttractorPtr = &attrac;
 		attracColl.TargetPoint = attracPointData.Point;
 		attracColl.Distance = attracPointData.Distance;
-		attracColl.DistanceFromStart = attracPointData.DistanceFromStart;
+		attracColl.DistanceAlongLine = attracPointData.DistanceAlongLine;
 		attracColl.SegmentIndex = attracPointData.SegmentIndex;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;

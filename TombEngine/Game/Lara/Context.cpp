@@ -215,65 +215,6 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	static bool TestLateralShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isRight)
-	{
-		// Get nearby attractor pointers.
-		auto attracPtrs = GetNearbyAttractorPtrs(item);
-
-		auto rotMatrix = Matrix::CreateRotationY(item.Pose.Orientation.y);
-		auto relOffset = Vector3(coll.Setup.Radius * (isRight ? 1 : -1), -coll.Setup.Height, coll.Setup.Radius);
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
-
-		// Calculate reference points.
-		auto basePos = item.Pose.Position.ToVector3();
-		auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
-
-		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
-
-		// Assess center attractor collision.
-		bool hasFoundCorner = false;
-		for (const auto& attracColl : attracColls)
-		{
-			// 1) Check if attractor is edge type.
-			if (!attracColl.AttractorPtr->IsEdge())
-				continue;
-
-			// 2) Check if edge is within range.
-			if (!attracColl.IsIntersected)
-				continue;
-
-			// 3) Test if edge slope is slippery.
-			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
-				continue;
-
-			// Get point collision off edge side.
-			auto pointCollOffEdge = GetCollision(
-				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
-
-			// 4) Test if edge is too low to the ground.
-			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffEdge.Position.Floor);
-			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
-				continue;
-			
-			// TODO
-			if (attracColl.DistanceFromStart <= EPSILON && !hasFoundCorner)
-			{
-				hasFoundCorner = true;
-				continue;
-			}
-
-			// TODO
-			if (attracColl.DistanceFromStart <= EPSILON)
-				return false;
-		}
-
-		// TODO: Point collision assessment.
-
-		return true;
-	}
-
 	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
 	{
 		return true;
@@ -312,7 +253,7 @@ namespace TEN::Entities::Player::Context
 
 			// TODO: Test if this works. Redo.
 			// 3) Test if target point is lone corner.
-			if (attracColl.DistanceFromStart <= EPSILON && !hasFoundCorner)
+			if (attracColl.DistanceAlongLine <= EPSILON && !hasFoundCorner)
 			{
 				hasFoundCorner = true;
 				continue;
@@ -383,11 +324,11 @@ namespace TEN::Entities::Player::Context
 			return std::nullopt;
 
 		// Calculate heading angle. Not working.
-		auto pointLeft = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart - coll.Setup.Radius);
-		auto pointRight = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceFromStart + coll.Setup.Radius);
+		auto pointLeft = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine - coll.Setup.Radius);
+		auto pointRight = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
-		g_Renderer.PrintDebugMessage("%.3f", edgeCatchAttracColl->DistanceFromStart);
+		g_Renderer.PrintDebugMessage("%.3f", edgeCatchAttracColl->DistanceAlongLine);
 		g_Renderer.AddSphere(pointLeft, 50, Vector4::One);
 		g_Renderer.AddSphere(pointRight, 50, Vector4::One);
 
@@ -397,7 +338,7 @@ namespace TEN::Entities::Player::Context
 			edgeCatchAttracColl->AttractorPtr,
 			EDGE_TYPE,
 			edgeCatchAttracColl->TargetPoint,
-			edgeCatchAttracColl->DistanceFromStart,
+			edgeCatchAttracColl->DistanceAlongLine,
 			edgeCatchAttracColl->HeadingAngle
 		};
 	}

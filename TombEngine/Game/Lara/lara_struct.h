@@ -1293,7 +1293,7 @@ struct PlayerStatusData
 struct PlayerAttractorData
 {
 	const Attractor* AttractorPtr = nullptr;
-	float DistanceFromStart = 0.0f;
+	float DistanceAlongLine = 0.0f;
 
 	// Debug
 	Attractor			   DebugAttractor0	= {};

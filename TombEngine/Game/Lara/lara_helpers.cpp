@@ -174,13 +174,11 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	if (catchData.Type == Context::EdgeType::ClimbableWall)
 		SnapEntityToGrid(&item, &coll);
 
-	// TODO: Use coll.Setup.Height.
 	// Calculate position.
-	int playerHeight = (item.Animation.ActiveState == LS_JUMP_UP) ? LARA_HEIGHT : LARA_HEIGHT_STRETCH;
-	auto catchPos = (catchData.Type == Context::EdgeType::ClimbableWall) ?
+	auto catchPoint = (catchData.Type == Context::EdgeType::ClimbableWall) ?
 		Vector3(item.Pose.Position.x, catchData.TargetPoint.y, item.Pose.Position.z) :
 		catchData.TargetPoint;
-	auto pos = catchPos + Vector3(0.0f, playerHeight, 0.0f);
+	auto pos = catchPoint + Vector3(0.0f, coll.Setup.Height, 0.0f); // TODO: Weird with reach catch.
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
 	ResetPlayerFlex(&item);

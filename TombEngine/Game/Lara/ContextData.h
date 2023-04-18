@@ -31,7 +31,7 @@ namespace TEN::Entities::Player::Context
 		EdgeType Type = EdgeType::Ledge; // TODO: Won't be needed later.
 
 		Vector3 TargetPoint		  = Vector3::Zero;
-		float	DistanceFromStart = 0.0f;
+		float	DistanceAlongLine = 0.0f;
 		short	HeadingAngle	  = 0;
 	};
 

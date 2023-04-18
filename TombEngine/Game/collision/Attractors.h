@@ -21,7 +21,7 @@ namespace TEN::Collision::Attractors
 	{
 		Vector3		 Point			   = Vector3::Zero;
 		float		 Distance		   = 0.0f;
-		float		 DistanceFromStart = 0.0f;
+		float		 DistanceAlongLine = 0.0f;
 		unsigned int SegmentIndex	   = 0;
 	};
 
@@ -66,7 +66,7 @@ namespace TEN::Collision::Attractors
 
 		Vector3 TargetPoint		  = Vector3::Zero;
 		float	Distance		  = 0.0f;
-		float	DistanceFromStart = 0.0f;
+		float	DistanceAlongLine = 0.0f;
 		int		SegmentIndex	  = 0;
 
 		short HeadingAngle = 0;
