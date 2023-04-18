@@ -189,6 +189,11 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
+
+	player.Context.Attractor.AttractorPtr = catchData.AttractorPtr;
+	player.Context.Attractor.DistanceAlongLine = catchData.DistanceAlongLine;
+	player.Context.HandsAttractor.DistanceAlongLine = catchData.DistanceAlongLine;
+	player.Context.HandsAttractor.AttractorPtr = catchData.AttractorPtr;
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)

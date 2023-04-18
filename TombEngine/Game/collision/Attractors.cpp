@@ -51,14 +51,14 @@ namespace TEN::Collision::Attractors
 	{
 		static const auto TARGET_DATA_DEFAULT = AttractorPointData{};
 
-		// No points; return default target data.
+		// Attractor has no points; return default target data.
 		if (Points.empty())
 		{
 			TENLog(std::string("GetTargetData(): attractor points undefined."), LogLevel::Warning);
 			return TARGET_DATA_DEFAULT;
 		}
 
-		// Single point; return simple target data.
+		// Attractor is single point; return simple target data.
 		if (Points.size() == 1)
 			return AttractorPointData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
 
@@ -85,21 +85,20 @@ namespace TEN::Collision::Attractors
 		return AttractorPointData{ targetPoint, closestDist, distFromStart, segmentIndex };
 	}
 
-	// TODO: It's reversed????!?!?!?
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
-		// No points; return default.
+		// Attractor has no points; return default point.
 		if (Points.empty())
 		{
 			TENLog(std::string("GetPointAtDistance(): attractor points undefined."), LogLevel::Warning);
 			return Vector3::Zero;
 		}
 
-		// Single point; return it.
+		// Attractor is single point; return it.
 		if (Points.size() == 1)
 			return Points[0];
 
-		// Clamp point position according to attractor length.
+		// Clamp point according to attractor length.
 		if (dist <= 0.0f)
 		{
 			return Points[0];
@@ -110,17 +109,22 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Find point along attractor line at distance from start.
-		float currentDist = 0.0f;
+		float distTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
-			currentDist += Vector3::Distance(Points[i], Points[i + 1]);
-			if (currentDist > dist)
+			const auto& origin = Points[i];
+			const auto& target = Points[i + 1];
+
+			float segmentLength = Vector3::Distance(origin, target);
+			float remainingDist = dist - distTravelled;
+
+			if (remainingDist <= segmentLength)
 			{
-				float segmentDist = currentDist - dist;
-				auto direction = Points[i + 1] - Points[i];
-				direction.Normalize();
-				return (Points[i] + (direction * segmentDist));
+				float alpha = remainingDist / segmentLength;
+				return Vector3::Lerp(origin, target, alpha);
 			}
+
+			distTravelled += segmentLength;
 		}
 
 		return Points.back();

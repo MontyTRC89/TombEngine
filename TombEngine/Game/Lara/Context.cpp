@@ -219,7 +219,6 @@ namespace TEN::Entities::Player::Context
 	{
 		return true;
 
-		return TestLateralShimmy(item, coll, false);
 		//return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
 	}
 
@@ -227,7 +226,6 @@ namespace TEN::Entities::Player::Context
 	{
 		return true;
 
-		return TestLateralShimmy(item, coll, true);
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
@@ -323,14 +321,11 @@ namespace TEN::Entities::Player::Context
 		if (!edgeCatchAttracColl.has_value())
 			return std::nullopt;
 
-		// Calculate heading angle. Not working.
+		// TODO: Accuracy.
+		// Calculate heading angle.
 		auto pointLeft = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine - coll.Setup.Radius);
 		auto pointRight = edgeCatchAttracColl->AttractorPtr->GetPointAtDistance(edgeCatchAttracColl->DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
-
-		g_Renderer.PrintDebugMessage("%.3f", edgeCatchAttracColl->DistanceAlongLine);
-		g_Renderer.AddSphere(pointLeft, 50, Vector4::One);
-		g_Renderer.AddSphere(pointRight, 50, Vector4::One);
 
 		// Return edge catch data.
 		return EdgeCatchData
@@ -339,7 +334,7 @@ namespace TEN::Entities::Player::Context
 			EDGE_TYPE,
 			edgeCatchAttracColl->TargetPoint,
 			edgeCatchAttracColl->DistanceAlongLine,
-			edgeCatchAttracColl->HeadingAngle
+			headingAngle
 		};
 	}
 
