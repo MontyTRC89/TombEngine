@@ -208,18 +208,20 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 {
 	if ((g_Level.Items[itemNumber].TriggerFlags - 998) > 1)
 		ObjectCollision(itemNumber, laraItem, coll);
-	
+
 	auto& receptacleItem = g_Level.Items[itemNumber];
 	auto& player = GetLaraInfo(*laraItem);
+
+	AnimateItem(&receptacleItem);
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
 	auto triggerIndex = GetTriggerIndex(&receptacleItem);
 	int triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
 
 	auto puzzleType = PuzzleType::Normal;
-	AnimateItem(&receptacleItem);
 
 	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
@@ -309,8 +311,10 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	else
 	{
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-
-		SetAnimation(item, 0);
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 		item->Animation.RequiredState = NO_STATE;
 		item->ResetModelToDefault();
 
