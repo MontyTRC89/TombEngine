@@ -19,9 +19,9 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorTargetData
 	{
-		Vector3 TargetPoint	 = Vector3::Zero;
-		float	Distance	 = 0.0f;
-		int		SegmentIndex = 0;
+		Vector3		 TargetPoint  = Vector3::Zero;
+		float		 Distance	  = 0.0f;
+		unsigned int SegmentIndex = 0;
 	};
 
 	class Attractor
@@ -46,14 +46,16 @@ namespace TEN::Collision::Attractors
 
 		AttractorTargetData GetTargetData(const Vector3& refPoint) const;
 		Vector3				GetPointAtDistance(float dist) const;
-		float				GetDistanceAtPoint(const Vector3& point, int segmentIndex) const;
+		float				GetDistanceAtPoint(const Vector3& point, unsigned int segmentIndex) const;
 
 		// Inquirers
 		bool IsEdge() const;
 
 		// Helpers
+		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void DrawDebug() const;
 
+		// Operators (for debug only)
 		Attractor& operator =(const Attractor& attrac);
 	};
 

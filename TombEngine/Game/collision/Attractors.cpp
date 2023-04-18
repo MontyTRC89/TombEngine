@@ -17,7 +17,7 @@ namespace TEN::Collision::Attractors
 	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		Type = type;
-		Points = points;
+		Points = std::move(points); // TODO: Check.
 		RoomNumber = roomNumber;
 
 		if (points.size() > 1)
@@ -49,26 +49,22 @@ namespace TEN::Collision::Attractors
 
 	AttractorTargetData Attractor::GetTargetData(const Vector3& refPoint) const
 	{
-		static const auto EMPTY_TARGET_DATA = AttractorTargetData{};
+		static const auto TARGET_DATA_DEFAULT = AttractorTargetData{};
 
-		// No points exist; return default.
+		// No points; return default target data.
 		if (Points.empty())
-			return EMPTY_TARGET_DATA;
-
-		// Single point exists; do simple assessment.
-		if (Points.size() == 1)
 		{
-			auto targetPoint = Points[0];
-			float closestDist = Vector3::Distance(refPoint, targetPoint);
-			int segmentIndex = 0;
-
-			// Return attractor target data.
-			return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
+			TENLog(std::string("GetTargetData(): attractor points undefined."), LogLevel::Warning);
+			return TARGET_DATA_DEFAULT;
 		}
+
+		// Single point; return simple target data.
+		if (Points.size() == 1)
+			return AttractorTargetData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
 
 		auto targetPoint = Points[0];
 		float closestDist = INFINITY;
-		int segmentIndex = 0;
+		unsigned int segmentIndex = 0;
 
 		// Find closest point on attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
@@ -84,17 +80,20 @@ namespace TEN::Collision::Attractors
 			}
 		}
 
-		// Return attractor target data.
+		// Return target data.
 		return AttractorTargetData{ targetPoint, closestDist, segmentIndex };
 	}
 
 	Vector3 Attractor::GetPointAtDistance(float dist) const
 	{
-		// No points exist; return default.
+		// No points; return default.
 		if (Points.empty())
+		{
+			TENLog(std::string("GetPointAtDistance(): attractor points undefined."), LogLevel::Warning);
 			return Vector3::Zero;
+		}
 
-		// Single point exists; return it.
+		// Single point; return it.
 		if (Points.size() == 1)
 			return Points[0];
 
@@ -108,7 +107,7 @@ namespace TEN::Collision::Attractors
 			return Points.back();
 		}
 
-		// Calculate point on attractor found at distance.
+		// Find point along attractor line at distance from start.
 		float currentDist = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
@@ -125,11 +124,16 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	float Attractor::GetDistanceAtPoint(const Vector3& point, int segmentIndex) const 
+	float Attractor::GetDistanceAtPoint(const Vector3& point, unsigned int segmentIndex) const 
 	{
-		assertion(segmentIndex < Points.size(), "Attractor segment index out of range.");
+		// Segment index out of range; return attractor length.
+		if (segmentIndex >= Points.size())
+		{
+			TENLog(std::string("GetDistanceAtPoint(): attractor segment index out of range."), LogLevel::Warning);
+			return Length;
+		}
 
-		// Calculate distance along attractor at point.
+		// Calculate distance along attractor to point.
 		float distance = 0.0f;
 		for (int i = 0; i <= segmentIndex; i++)
 		{
@@ -138,6 +142,10 @@ namespace TEN::Collision::Attractors
 				distance += Vector3::Distance(Points[i], Points[i + 1]);
 				continue;
 			}
+
+			float pointToAttractorThreshold = Geometry::GetDistanceToLine(point, Points[i], Points[i + 1]);
+			if (pointToAttractorThreshold > EPSILON)
+				TENLog(std::string("GetDistanceAtPoint(): point beyond attractor."), LogLevel::Warning);
 
 			distance += Vector3::Distance(Points[i], point);
 		}
@@ -148,6 +156,22 @@ namespace TEN::Collision::Attractors
 	bool Attractor::IsEdge() const
 	{
 		return (Type == AttractorType::Edge);
+	}
+
+	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
+	{
+		Points = std::move(points); // TODO: Check.
+		RoomNumber = roomNumber;
+
+		if (points.size() > 1)
+		{
+			for (int i = 0; i < (points.size() - 1); i++)
+				Length += Vector3::Distance(points[i], points[i + 1]);
+		}
+		else
+		{
+			Length = 0.0f;
+		}
 	}
 
 	void Attractor::DrawDebug() const
@@ -195,18 +219,20 @@ namespace TEN::Collision::Attractors
 				g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
 			}
 		}
-		else
+		else if (Points.size() == 1)
 		{
-			// Draw single sphere.
-			if (!Points.empty())
-				g_Renderer.AddSphere(Points[0], SPHERE_SCALE, COLOR_YELLOW);
+			auto labelPos2D = g_Renderer.GetScreenSpacePosition(Points[0]);
+
+			// Draw sphere and label.
+			g_Renderer.AddSphere(Points[0], SPHERE_SCALE, COLOR_YELLOW);
+			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
 		}
 	}
 
 	Attractor& Attractor::operator =(const Attractor& attrac)
 	{
 		Type = attrac.GetType();
-		Points = attrac.GetPoints();
+		Points = std::move(attrac.GetPoints());
 		RoomNumber = attrac.GetRoomNumber();
 		Length = attrac.GetLength();
 		return *this;
@@ -289,17 +315,22 @@ namespace TEN::Collision::Attractors
 	static AttractorCollisionData GetAttractorCollision(const Attractor& attrac, const Vector3& basePos, const EulerAngles& orient,
 														const Vector3& refPoint, float range)
 	{
-		static const auto EMPTY_ATTRAC_COLL = AttractorCollisionData{};
+		static const auto ATTRAC_COLL_DEFAULT = AttractorCollisionData{};
 
 		auto points = attrac.GetPoints();
 		if (points.empty())
-			return EMPTY_ATTRAC_COLL;
+		{
+			TENLog(std::string("GetAttractorCollision(): attractor undefined."), LogLevel::Warning);
+			return ATTRAC_COLL_DEFAULT;
+		}
 
 		auto attracTarget = attrac.GetTargetData(refPoint);
 		float distFromStart = attrac.GetDistanceAtPoint(attracTarget.TargetPoint, attracTarget.SegmentIndex);
 
 		// Calculate angles.
-		auto attracOrient = Geometry::GetOrientToPoint(points[attracTarget.SegmentIndex], points[attracTarget.SegmentIndex + 1]);
+		auto attracOrient = (points.size() == 1) ?
+			EulerAngles::Zero :
+			Geometry::GetOrientToPoint(points[attracTarget.SegmentIndex], points[attracTarget.SegmentIndex + 1]);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
@@ -308,7 +339,7 @@ namespace TEN::Collision::Attractors
 		bool isInFront = Geometry::IsPointInFront(basePos, attracTarget.TargetPoint, orient);
 
 		// Create new attractor collision.
-		auto attracColl = EMPTY_ATTRAC_COLL;
+		auto attracColl = ATTRAC_COLL_DEFAULT;
 
 		attracColl.AttractorPtr = &attrac;
 		attracColl.TargetPoint = attracTarget.TargetPoint;
