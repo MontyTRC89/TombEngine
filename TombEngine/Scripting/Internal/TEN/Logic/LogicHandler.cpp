@@ -648,19 +648,19 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 void LogicHandler::GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const
 {
-	for (auto const& s : m_callbacksPreControl)
+	for (const auto& s : m_callbacksPreControl)
 		preControl.push_back(s);
 
-	for (auto const& s : m_callbacksPostControl)
+	for (const auto& s : m_callbacksPostControl)
 		postControl.push_back(s);
 }
 
 void LogicHandler::SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl)
 {
-	for (auto const& s : preControl)
+	for (const auto& s : preControl)
 		m_callbacksPreControl.insert(s);
 
-	for (auto const& s : postControl)
+	for (const auto& s : postControl)
 		m_callbacksPostControl.insert(s);
 }
 
@@ -737,9 +737,7 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
 	}
 	else
-	{
 		func(nullptr, arguments);
-	}
 }
 
 static void doCallback(const sol::protected_function& func, std::optional<float> deltaTime = std::nullopt)
@@ -906,16 +904,17 @@ and provides the delta time (a float representing game time since last call) via
 
 void LogicHandler::InitCallbacks()
 {
-	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
+	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc)
+	{
 		auto state = m_handler.GetState();
 		std::string fullName = std::string{ ScriptReserved_LevelFuncs } + "." + luaFunc;
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName
-			+ ". Defaulting to no " + fullName + " behaviour."};
+		std::string msg{ "Level's script does not define callback " + fullName +
+			". Defaulting to no " + fullName + " behaviour."};
 
-		if(!theData.valid())
+		if (!theData.valid())
 		{
 			TENLog(msg);
 			return;
@@ -925,9 +924,8 @@ void LogicHandler::InitCallbacks()
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
-		if (!func.valid()) {
+		if (!func.valid())
 			TENLog(msg);
-		}
 	};
 
 	assignCB(m_onStart, ScriptReserved_OnStart);

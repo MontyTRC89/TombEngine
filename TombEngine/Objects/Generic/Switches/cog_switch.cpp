@@ -77,20 +77,20 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus == HandStatus::Free &&
 					!switchItem->Animation.IsAirborne ||
 					lara->Control.IsMoving &&
-					lara->InteractedItem == itemNum))
+					lara->Context.InteractedItem == itemNum))
 			{
 				if (TestLaraPosition(CogSwitchBounds, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(CogSwitchPos, switchItem, laraItem))
 					{
-						ResetLaraFlex(laraItem);
+						ResetPlayerFlex(laraItem);
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
-						lara->InteractedItem = targetItemNum;
+						lara->Context.InteractedItem = targetItemNum;
 
 						AddActiveItem(itemNum);
 						switchItem->Animation.TargetState = SWITCH_ON;
@@ -106,11 +106,11 @@ namespace TEN::Entities::Switches
 						}
 					}
 					else
-						lara->InteractedItem = itemNum;
+						lara->Context.InteractedItem = itemNum;
 
 					return;
 				}
-				else if (lara->Control.IsMoving && lara->InteractedItem == itemNum)
+				else if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNum)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;
@@ -141,7 +141,7 @@ namespace TEN::Entities::Switches
 				{
 					if (!switchItem->TriggerFlags)
 					{
-						auto* doorItem = &g_Level.Items[Lara.InteractedItem];
+						auto* doorItem = &g_Level.Items[Lara.Context.InteractedItem];
 						doorItem->ItemFlags[0] = COG_DOOR_TURN;
 					}
 				}

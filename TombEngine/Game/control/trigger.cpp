@@ -122,6 +122,28 @@ int SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 
+	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) && item.ItemFlags[1])
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_ACTIVE;
+		item.ItemFlags[1] = false;
+	
+		return 1;
+	}
+
+	if ((item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16) && item.ItemFlags[1])
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_DEACTIVATED;
+		item.ItemFlags[1] = false;
+	
+		return  1;
+	}
+
+	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) ||
+		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
+		return 0;
+
 	if (item.Status == ITEM_DEACTIVATED)
 	{
 		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&
@@ -145,7 +167,8 @@ int SwitchTrigger(short itemNumber, short timer)
 				item.Flags |= ONESHOT;
 			return 1;
 		}
-		else
+		else //if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) && item.ItemFlags[1] == 0 ||
+			//(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16) && item.ItemFlags[1] == 0)
 		{
 			item.Status = ITEM_ACTIVE;
 			return 1;
@@ -154,8 +177,8 @@ int SwitchTrigger(short itemNumber, short timer)
 	else if (item.Status)
 	{
 		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
-			item.Animation.AnimNumber == GetAnimNumber(item, 2) &&
-			item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&
+			item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 		{
 			return 1;
 		}
@@ -653,7 +676,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			break;
 
 		case TO_SINK:
-			Lara.WaterCurrentActive = value + 1;
+			Lara.Context.WaterCurrentActive = value + 1;
 			break;
 
 		case TO_FLIPMAP:

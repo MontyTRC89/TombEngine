@@ -126,7 +126,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Velocity.z = item->Animation.Velocity.z * 0.95f;
+	item->Animation.Velocity.z *= 0.95f;
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
