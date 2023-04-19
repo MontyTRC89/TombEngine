@@ -220,6 +220,8 @@ namespace TEN::Collision::Attractors
 				// Draw indicator lines.
 				g_Renderer.AddLine3D(Points[i], Points[i] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(Points[i + 1], Points[i + 1] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(Points[0], Points[0] + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(Points.back(), Points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 				// Draw attractor label.
 				g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
@@ -244,7 +246,7 @@ namespace TEN::Collision::Attractors
 		return *this;
 	}
 
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
+	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
 	{
 		constexpr auto COUNT_MAX = 32;
 
@@ -292,7 +294,8 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item)
+	// Fake version.
+	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
 		constexpr auto RANGE	 = BLOCK(5);
 		constexpr auto COUNT_MAX = 64;
@@ -335,8 +338,7 @@ namespace TEN::Collision::Attractors
 
 		// Calculate angles.
 		auto attracOrient = (points.size() == 1) ?
-			EulerAngles::Zero :
-			Geometry::GetOrientToPoint(points[attracPointData.SegmentIndex], points[attracPointData.SegmentIndex + 1]);
+			orient : Geometry::GetOrientToPoint(points[attracPointData.SegmentIndex], points[attracPointData.SegmentIndex + 1]);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
@@ -358,22 +360,6 @@ namespace TEN::Collision::Attractors
 		attracColl.IsInFront = isInFront;
 
 		return attracColl;
-	}
-
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
-															   const Vector3& basePos, const EulerAngles& orient,
-															   const Vector3& refPoint, float range)
-	{
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(attracPtrs.size());
-
-		for (const auto* attrac : attracPtrs)
-		{
-			auto attracColl = GetAttractorCollision(*attrac, basePos, orient, refPoint, range);
-			attracColls.push_back(attracColl);
-		}
-
-		return attracColls;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
@@ -399,7 +385,7 @@ namespace TEN::Collision::Attractors
 		//return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, range);
 		
 		// Get debug attractor pointers.
-		auto attracPtrs = GetNearbyAttractorPtrs(item);
+		auto attracPtrs = GetDebugAttractorPtrs(item);
 
 		auto attracColls = std::vector<AttractorCollisionData>{};
 		attracColls.reserve(attracPtrs.size());
@@ -412,11 +398,21 @@ namespace TEN::Collision::Attractors
 
 		return attracColls;
 	}
-
+	
+	// Fake version.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const ItemInfo& item, const Vector3& refPoint, float range)
 	{
-		return GetAttractorCollisions(attracPtrs, item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(attracPtrs.size());
+
+		for (const auto* attrac : attracPtrs)
+		{
+			auto attracColl = GetAttractorCollision(*attrac, item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
+			attracColls.push_back(attracColl);
+		}
+
+		return attracColls;
 	}
 
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)

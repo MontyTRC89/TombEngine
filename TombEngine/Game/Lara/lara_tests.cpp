@@ -125,7 +125,7 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	auto& player = GetLaraInfo(item);
 
 	// Get nearby attractor pointers.
-	auto attracPtrs = GetNearbyAttractorPtrs(item);
+	auto attracPtrs = GetDebugAttractorPtrs(item);
 
 	auto basePos = item.Pose.Position.ToVector3();
 	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y)); // Or simply use player orient?

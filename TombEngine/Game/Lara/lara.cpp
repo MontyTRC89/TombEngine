@@ -23,6 +23,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/Attractors.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
@@ -43,6 +44,7 @@ using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Player;
+using namespace TEN::Collision::Attractors;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -462,7 +464,7 @@ static void DrawPlayerAttractors(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	auto attracPtrs = GetNearbyAttractorPtrs(item);
+	auto attracPtrs = GetDebugAttractorPtrs(item);
 	for (const auto* attrac : attracPtrs)
 		attrac->DrawDebug();
 }

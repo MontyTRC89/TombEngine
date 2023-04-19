@@ -3,13 +3,13 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
-using namespace TEN::Collision::Attractors;
-using namespace TEN::Math;
-
-namespace TEN::Renderer { struct RendererMesh; };
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
+namespace TEN::Renderer { struct RendererMesh; };
+
+using namespace TEN::Collision::Attractors;
+using namespace TEN::Math;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;

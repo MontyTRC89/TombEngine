@@ -76,17 +76,11 @@ namespace TEN::Collision::Attractors
 		bool IsInFront	   = false;
 	};
 
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float range);
-	std::vector<const Attractor*> GetNearbyAttractorPtrs(const ItemInfo& item);
-
-	// Old
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
-															   const Vector3& basePos, const EulerAngles& orient,
-															   const Vector3& refPoint, float range);
+	// Temp
+	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const ItemInfo& item, const Vector3& refPoint, float range);
 
-	// New
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range);

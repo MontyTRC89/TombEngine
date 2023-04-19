@@ -252,8 +252,7 @@ namespace TEN::Entities::Player::Context
 
 			// 3) Test if target point is attractor end.
 			if (!hasEnd &&
-				(attracColl.DistanceAlongLine <= EPSILON ||
-					(attracColl.AttractorPtr->GetLength() - attracColl.DistanceAlongLine) <= EPSILON))
+				(attracColl.DistanceAlongLine <= EPSILON || (attracColl.AttractorPtr->GetLength() - attracColl.DistanceAlongLine) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
