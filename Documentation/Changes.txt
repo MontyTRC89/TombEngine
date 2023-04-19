@@ -4,10 +4,10 @@ Version 1.0.9
 - Add TR3 Wall mounted blade.
 - Add removable puzzles from puzzle holes and puzzle dones.
 	- employed by setting the trigger type as "Switch" for either puzzle hole or puzzle 	  done.
-	- Can be mixed with puzzle done and puzzle holes of the same type.
+	- Can be mixed with puzzle done and puzzle holes of the same or different type.
 - Fix Cold bar triggered when room is dry (only trigger if and only if the room is water).
 - Fix spiky wall speed value.
-	- Change speed by giving an OCB number to it.
+	- Change speed by giving an OCB number to it or lua (Moveable::SetItemFlags[0]).
 - Fix spiky wall being too slow when triggered.
 
 Version 1.0.8
