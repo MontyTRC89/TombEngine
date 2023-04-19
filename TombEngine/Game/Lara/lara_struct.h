@@ -1299,20 +1299,14 @@ struct PlayerAttractorData
 	Attractor			   DebugAttractor0	= {};
 	Attractor			   DebugAttractor1	= {};
 	Attractor			   DebugAttractor2	= {};
-	Attractor			   DebugAttractor3	= {};
-	Attractor			   DebugAttractor4	= {};
 	std::vector<Attractor> SectorAttractors = {};
 };
 
 // TODO: Savegame.
 struct PlayerContextData
 {
-	// Debug
-	PlayerAttractorData Attractor = {};
-
-	// TODO: Edge attractors could be used for climbable walls too since the concept is essentially the same.
 	PlayerAttractorData HandsAttractor = {};
-	PlayerAttractorData FeetAttractor  = {};
+	PlayerAttractorData FeetAttractor  = {}; // TODO: For climbable walls.
 
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;

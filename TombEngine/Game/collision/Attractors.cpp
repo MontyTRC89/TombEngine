@@ -17,13 +17,18 @@ namespace TEN::Collision::Attractors
 	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		Type = type;
-		Points = std::move(points); // TODO: Check.
+		Points = points;
 		RoomNumber = roomNumber;
 
 		if (points.size() > 1)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
-				Length += Vector3::Distance(points[i], points[i + 1]);
+			{
+				const auto& origin = Points[i];
+				const auto& target = Points[i + 1];
+
+				Length += Vector3::Distance(origin, target);
+			}
 		}
 	}
 
@@ -69,7 +74,10 @@ namespace TEN::Collision::Attractors
 		// Find closest point on attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, Points[i], Points[i + 1]);
+			const auto& origin = Points[i];
+			const auto& target = Points[i + 1];
+
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
 			float distance = Vector3::Distance(refPoint, closestPoint);
 
 			if (distance < closestDist)
@@ -85,9 +93,9 @@ namespace TEN::Collision::Attractors
 		return AttractorPointData{ targetPoint, closestDist, distFromStart, segmentIndex };
 	}
 
-	Vector3 Attractor::GetPointAtDistance(float dist) const
+	Vector3 Attractor::GetPointAtDistance(float distAlongLine) const
 	{
-		// Attractor has no points; return default point.
+		// Attractor has no points; return world origin.
 		if (Points.empty())
 		{
 			TENLog(std::string("GetPointAtDistance(): attractor points undefined."), LogLevel::Warning);
@@ -99,11 +107,11 @@ namespace TEN::Collision::Attractors
 			return Points[0];
 
 		// Clamp point according to attractor length.
-		if (dist <= 0.0f)
+		if (distAlongLine <= 0.0f)
 		{
 			return Points[0];
 		}
-		else if (dist >= Length)
+		else if (distAlongLine >= Length)
 		{
 			return Points.back();
 		}
@@ -116,7 +124,7 @@ namespace TEN::Collision::Attractors
 			const auto& target = Points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingDist = dist - distTravelled;
+			float remainingDist = distAlongLine - distTravelled;
 
 			if (remainingDist <= segmentLength)
 			{
@@ -130,7 +138,7 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	float Attractor::GetDistanceAtPoint(const Vector3& point, unsigned int segmentIndex) const 
+	float Attractor::GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const 
 	{
 		// Segment index out of range; return attractor length.
 		if (segmentIndex >= Points.size())
@@ -143,17 +151,20 @@ namespace TEN::Collision::Attractors
 		float distance = 0.0f;
 		for (int i = 0; i <= segmentIndex; i++)
 		{
+			const auto& origin = Points[i];
+			const auto& target = Points[i + 1];
+
 			if (i != segmentIndex)
 			{
-				distance += Vector3::Distance(Points[i], Points[i + 1]);
+				distance += Vector3::Distance(origin, target);
 				continue;
 			}
 
-			float pointToAttractorThreshold = Geometry::GetDistanceToLine(point, Points[i], Points[i + 1]);
-			if (pointToAttractorThreshold > EPSILON)
+			float pointToAttractorThreshold = Geometry::GetDistanceToLine(pointOnLine, origin, target);
+			if (pointToAttractorThreshold > SQRT_2)
 				TENLog(std::string("GetDistanceAtPoint(): point beyond attractor."), LogLevel::Warning);
 
-			distance += Vector3::Distance(Points[i], point);
+			distance += Vector3::Distance(origin, pointOnLine);
 		}
 
 		return distance;
@@ -166,13 +177,18 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
-		Points = std::move(points); // TODO: Check.
+		Points = points;
 		RoomNumber = roomNumber;
 
 		if (points.size() > 1)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
-				Length += Vector3::Distance(points[i], points[i + 1]);
+			{
+				const auto& origin = Points[i];
+				const auto& target = Points[i + 1];
+
+				Length += Vector3::Distance(origin, target);
+			}
 		}
 		else
 		{
@@ -237,22 +253,13 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
-	Attractor& Attractor::operator =(const Attractor& attrac)
-	{
-		Type = attrac.GetType();
-		Points = std::move(attrac.GetPoints());
-		RoomNumber = attrac.GetRoomNumber();
-		Length = attrac.GetLength();
-		return *this;
-	}
-
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
 	{
 		constexpr auto COUNT_MAX = 32;
 
 		auto nearbyAttracPtrMap = std::multimap<float, const Attractor*>{};
 
-		// Assess attractors in current room.
+		// Get attractors in current room.
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
@@ -261,7 +268,7 @@ namespace TEN::Collision::Attractors
 				nearbyAttracPtrMap.insert({ attracTarget.Distance, &attrac });
 		}
 
-		// Assess attractors in neighboring rooms (search depth of 2).
+		// Get attractors in neighboring rooms (search depth of 2).
 		for (const int& subRoomNumber : room.neighbors)
 		{
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
@@ -274,19 +281,19 @@ namespace TEN::Collision::Attractors
 		}
 
 		// TODO
-		// Assess bridge attractors.
+		// Get bridge attractors.
 		/*for (const auto& [bridgeItemNumber, attracs] : g_Level.BridgeAttractors)
 		{
 			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
-			if (Vector3::DistanceSquared(refPoint, bridgeItem.Pose.Position.ToVector3()) > range)
+			if (Vector3::Distance(refPoint, bridgeItem.Pose.Position.ToVector3()) > range)
 				continue;
 		}*/
 
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 		nearbyAttracPtrs.reserve(COUNT_MAX);
 
-		// Move elements pointer into vector.
+		// Move pointers into vector.
 		auto it = nearbyAttracPtrMap.begin();
 		for (int i = 0; i < COUNT_MAX && it != nearbyAttracPtrMap.end(); i++, it++)
 			nearbyAttracPtrs.push_back(std::move(it->second));
@@ -298,12 +305,12 @@ namespace TEN::Collision::Attractors
 	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
 		constexpr auto RANGE	 = BLOCK(5);
-		constexpr auto COUNT_MAX = 64;
+		constexpr auto COUNT_MAX = 32;
 
 		auto& player = GetLaraInfo(item);
 
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		for (auto& attrac : player.Context.Attractor.SectorAttractors)
+		for (auto& attrac : player.Context.HandsAttractor.SectorAttractors)
 		{
 			assertion(nearbyAttracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
 			if (nearbyAttracPtrs.size() == COUNT_MAX)
@@ -313,11 +320,9 @@ namespace TEN::Collision::Attractors
 			attrac.DrawDebug();
 		}
 		
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor0);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor1);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor2);
-		/*nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor3);
-		nearbyAttracPtrs.push_back(&player.Context.Attractor.DebugAttractor4);*/
+		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor0);
+		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor1);
+		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor2);
 		return nearbyAttracPtrs;
 	}
 

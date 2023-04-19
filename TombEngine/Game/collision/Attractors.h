@@ -47,7 +47,7 @@ namespace TEN::Collision::Attractors
 
 		AttractorPointData GetPointData(const Vector3& refPoint) const;
 		Vector3			   GetPointAtDistance(float distAlongLine) const;
-		float			   GetDistanceAtPoint(const Vector3& point, unsigned int segmentIndex) const;
+		float			   GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -55,9 +55,6 @@ namespace TEN::Collision::Attractors
 		// Helpers
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void DrawDebug() const;
-
-		// Operators (for debug only)
-		Attractor& operator =(const Attractor& attrac);
 	};
 
 	struct AttractorCollisionData
@@ -77,7 +74,7 @@ namespace TEN::Collision::Attractors
 	};
 
 	// Temp
-	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item);
+	std::vector<const Attractor*>		GetDebugAttractorPtrs(const ItemInfo& item);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
 															   const ItemInfo& item, const Vector3& refPoint, float range);
 
