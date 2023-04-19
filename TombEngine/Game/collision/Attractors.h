@@ -6,6 +6,8 @@ struct ItemInfo;
 
 namespace TEN::Collision::Attractors
 {
+	class Attractor;
+
 	enum class AttractorType
 	{
 		Edge,
@@ -17,7 +19,23 @@ namespace TEN::Collision::Attractors
 		Pinnacle*/
 	};
 
-	struct AttractorPointData
+	struct AttractorCollisionData
+	{
+		const Attractor* AttractorPtr = nullptr;
+
+		Vector3 TargetPoint		  = Vector3::Zero;
+		float	Distance		  = 0.0f;
+		float	DistanceAlongLine = 0.0f;
+		int		SegmentIndex	  = 0;
+
+		short HeadingAngle = 0;
+		short SlopeAngle   = 0;
+
+		bool IsIntersected = false;
+		bool IsInFront	   = false;
+	};
+
+	struct AttractorProbeData
 	{
 		Vector3		 Point			   = Vector3::Zero;
 		float		 Distance		   = 0.0f;
@@ -45,9 +63,11 @@ namespace TEN::Collision::Attractors
 		int					 GetRoomNumber() const;
 		float				 GetLength() const;
 
-		AttractorPointData GetPointData(const Vector3& refPoint) const;
-		Vector3			   GetPointAtDistance(float distAlongLine) const;
-		float			   GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const;
+		// Utilities
+		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
+		AttractorProbeData	   GetProbe(const Vector3& refPoint) const;
+		Vector3				   GetPointAtDistance(float distAlongLine) const;
+		float				   GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -55,22 +75,6 @@ namespace TEN::Collision::Attractors
 		// Helpers
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void DrawDebug() const;
-	};
-
-	struct AttractorCollisionData
-	{
-		const Attractor* AttractorPtr = nullptr;
-
-		Vector3 TargetPoint		  = Vector3::Zero;
-		float	Distance		  = 0.0f;
-		float	DistanceAlongLine = 0.0f;
-		int		SegmentIndex	  = 0;
-
-		short HeadingAngle = 0;
-		short SlopeAngle   = 0;
-
-		bool IsIntersected = false;
-		bool IsInFront	   = false;
 	};
 
 	// Temp
