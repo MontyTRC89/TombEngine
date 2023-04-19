@@ -226,13 +226,18 @@ namespace TEN::Entities::Player::Context
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																				const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
+		// Get attractor collisions.
+		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
+		float range = OFFSET_RADIUS(coll.Setup.Radius);
+		auto attracColls = GetAttractorCollisions(item, refPoint, range);
+
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
+		bool hasEnd = false;
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -245,11 +250,15 @@ namespace TEN::Entities::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
-			// TODO: Account for connecting attractors. Maybe not necessary since it's an edge case.
-			// 3) Test if target point is lone corner.
-			if (attracColl.DistanceAlongLine == 0.0f ||
-				attracColl.DistanceAlongLine == attracColl.AttractorPtr->GetLength())
+			// 3) Test if target point is attractor end.
+			if (!hasEnd &&
+				(attracColl.DistanceAlongLine <= EPSILON ||
+					(attracColl.AttractorPtr->GetLength() - attracColl.DistanceAlongLine) <= EPSILON))
 			{
+				// Handle seams between attractors.
+				hasEnd = true;
+
+				// 3.1) Test for loop seam.
 				auto points = attracColl.AttractorPtr->GetPoints();
 				if (Vector3::Distance(points[0], points.back()) > EPSILON)
 					continue;
@@ -268,7 +277,7 @@ namespace TEN::Entities::Player::Context
 				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 6) Test if edge is too low to the ground.
+			// 6) Test if edge is high enough off the ground.
 			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
@@ -309,29 +318,24 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(item);
 
-		// Get attractor collisions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, refPoint, range);
-
 		// Get edge catch attractor collision.
-		auto AttracColl = GetEdgeCatchAttractorCollision(item, coll, attracColls);
-		if (!AttracColl.has_value())
+		auto attracColl = GetEdgeCatchAttractorCollision(item, coll);
+		if (!attracColl.has_value())
 			return std::nullopt;
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = AttracColl->AttractorPtr->GetPointAtDistance(AttracColl->DistanceAlongLine - coll.Setup.Radius);
-		auto pointRight = AttracColl->AttractorPtr->GetPointAtDistance(AttracColl->DistanceAlongLine + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->DistanceAlongLine - coll.Setup.Radius);
+		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchData
 		{
-			AttracColl->AttractorPtr,
+			attracColl->AttractorPtr,
 			EDGE_TYPE,
-			AttracColl->TargetPoint,
-			AttracColl->DistanceAlongLine,
+			attracColl->TargetPoint,
+			attracColl->DistanceAlongLine,
 			headingAngle
 		};
 	}

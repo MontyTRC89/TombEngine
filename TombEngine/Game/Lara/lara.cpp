@@ -418,11 +418,13 @@ void InitAttractors(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
-	player.Context.Attractor.DebugAttractor0 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
-	player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
-	player.Context.Attractor.DebugAttractor2 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
-	player.Context.Attractor.DebugAttractor3 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
-	player.Context.Attractor.DebugAttractor4 = Attractor(AttractorType::Edge, {}, item.RoomNumber);
+	auto points = std::vector<Vector3>{ Vector3::Zero, Vector3::Zero };
+
+	player.Context.Attractor.DebugAttractor0 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor1 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor3 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.Attractor.DebugAttractor4 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 }
 
 // Debug
