@@ -10,6 +10,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber);
 void PuzzleHole(ItemInfo* item, short itemNumber);
 void DoPuzzle();
 void InitialisePuzzleDone(short itemNumber);
+void InitialisePuzzleHole(short itemNumber);
 
 // Keys
 void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

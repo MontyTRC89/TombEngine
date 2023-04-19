@@ -122,28 +122,27 @@ int SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 
-
-	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) && item.ItemFlags[1] == 1)
+	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) && item.ItemFlags[1])
 	{
-		//AddActiveItem(itemNumber);
-		//item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_ACTIVE;
-		item.ItemFlags[1] = 0;
-		item.ItemFlags[6] = 1;
+		item.ItemFlags[1] = false;
+	
 		return 1;
 	}
 
-	if ((item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16) && item.ItemFlags[1] == 1)
+	if ((item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16) && item.ItemFlags[1])
 	{
-		//RemoveActiveItem(itemNumber);
-		//item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_DEACTIVATED;
-		item.ItemFlags[1] = 0;
-		item.ItemFlags[6] = 2;
+		item.ItemFlags[1] = false;
+	
 		return  1;
 	}
 
-	/*
+	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) ||
+		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
+		return 0;
 
 	if (item.Status == ITEM_DEACTIVATED)
 	{
@@ -189,7 +188,7 @@ int SwitchTrigger(short itemNumber, short timer)
 	else
 	{
 		return 0;
-	}*/
+	}
 
 	return 0;
 }

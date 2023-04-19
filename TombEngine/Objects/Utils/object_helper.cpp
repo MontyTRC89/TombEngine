@@ -81,6 +81,7 @@ void InitPuzzleHole(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->initialise = InitialisePuzzleHole;
 		object->collision = PuzzleHoleCollision;
 		object->control = AnimatingControl;
 		object->isPuzzleHole = true;
