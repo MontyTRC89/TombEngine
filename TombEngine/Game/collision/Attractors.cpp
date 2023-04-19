@@ -79,10 +79,7 @@ namespace TEN::Collision::Attractors
 		auto attracColl = ATTRAC_COLL_DEFAULT;
 
 		attracColl.AttractorPtr = this;
-		attracColl.TargetPoint = attracProbe.Point;
-		attracColl.Distance = attracProbe.Distance;
-		attracColl.DistanceAlongLine = attracProbe.DistanceAlongLine;
-		attracColl.SegmentIndex = attracProbe.SegmentIndex;
+		attracColl.Probe = attracProbe;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;

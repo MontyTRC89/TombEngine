@@ -176,7 +176,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// Calculate position.
 	auto catchPoint = (catchData.Type == Context::EdgeType::ClimbableWall) ?
-		Vector3(item.Pose.Position.x, catchData.TargetPoint.y, item.Pose.Position.z) : catchData.TargetPoint;
+		Vector3(item.Pose.Position.x, catchData.Point.y, item.Pose.Position.z) : catchData.Point;
 	auto pos = catchPoint + Vector3(0.0f, coll.Setup.Height, 0.0f); // TODO: Weird with reach catch.
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 

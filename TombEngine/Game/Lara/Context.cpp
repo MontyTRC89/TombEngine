@@ -252,7 +252,8 @@ namespace TEN::Entities::Player::Context
 
 			// 3) Test if target point is attractor end.
 			if (!hasEnd &&
-				(attracColl.DistanceAlongLine <= EPSILON || (attracColl.AttractorPtr->GetLength() - attracColl.DistanceAlongLine) <= EPSILON))
+				(attracColl.Probe.DistanceAlongLine <= EPSILON ||
+					(attracColl.AttractorPtr->GetLength() - attracColl.Probe.DistanceAlongLine) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
@@ -273,16 +274,16 @@ namespace TEN::Entities::Player::Context
 
 			// Get point collision off side of edge.
 			auto pointCollOffSide = GetCollision(
-				Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
+				Vector3i(attracColl.Probe.Point), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough off the ground.
-			int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.Probe.Point.y - pointCollOffSide.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int edgeHeight = attracColl.TargetPoint.y;
+			int edgeHeight = attracColl.Probe.Point.y;
 			int relEdgeHeight = edgeHeight - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
@@ -294,10 +295,10 @@ namespace TEN::Entities::Player::Context
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
 				// Track closest attractor.
-				if (attracColl.Distance < closestDist)
+				if (attracColl.Probe.Distance < closestDist)
 				{
 					attracCollPtr = &attracColl;
-					closestDist = attracColl.Distance;
+					closestDist = attracColl.Probe.Distance;
 				}
 
 				continue;
@@ -324,8 +325,8 @@ namespace TEN::Entities::Player::Context
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->DistanceAlongLine - coll.Setup.Radius);
-		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->DistanceAlongLine + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Probe.DistanceAlongLine - coll.Setup.Radius);
+		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Probe.DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
@@ -333,8 +334,8 @@ namespace TEN::Entities::Player::Context
 		{
 			attracColl->AttractorPtr,
 			EDGE_TYPE,
-			attracColl->TargetPoint,
-			attracColl->DistanceAlongLine,
+			attracColl->Probe.Point,
+			attracColl->Probe.DistanceAlongLine,
 			headingAngle
 		};
 	}

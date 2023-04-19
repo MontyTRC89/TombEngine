@@ -67,7 +67,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// TODO: Test if this works. Redo.
 		// 3) Test if target point is lone corner.
-		if (attracColl.DistanceAlongLine <= EPSILON && !hasFoundCorner)
+		if (attracColl.Probe.DistanceAlongLine <= EPSILON && !hasFoundCorner)
 		/*{
 			hasFoundCorner = true;
 			continue;
@@ -79,19 +79,19 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// Get point collision off side of edge.
 		auto pointCollOffSide = GetCollision(
-			Vector3i(attracColl.TargetPoint), attracColl.AttractorPtr->GetRoomNumber(),
+			Vector3i(attracColl.Probe.Point), attracColl.AttractorPtr->GetRoomNumber(),
 			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 5) Test if edge is too low to the ground.
-		int floorToEdgeHeight = abs(attracColl.TargetPoint.y - pointCollOffSide.Position.Floor);
+		int floorToEdgeHeight = abs(attracColl.Probe.Point.y - pointCollOffSide.Position.Floor);
 		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			continue;
 
 		// 6) Track closest attractor.
-		if (attracColl.Distance < closestDist)
+		if (attracColl.Probe.Distance < closestDist)
 		{
 			attracCollPtr = &attracColl;
-			closestDist = attracColl.Distance;
+			closestDist = attracColl.Probe.Distance;
 			continue;
 		}
 	}
@@ -154,11 +154,11 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 
 	// Attractor target points.
 	if (attracCollCenter.has_value())
-		g_Renderer.AddLine3D(attracCollCenter->TargetPoint, attracCollCenter->TargetPoint + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollCenter->Probe.Point, attracCollCenter->Probe.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollLeft.has_value())
-		g_Renderer.AddLine3D(attracCollLeft->TargetPoint, attracCollLeft->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollLeft->Probe.Point, attracCollLeft->Probe.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollRight.has_value())
-		g_Renderer.AddLine3D(attracCollRight->TargetPoint, attracCollRight->TargetPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollRight->Probe.Point, attracCollRight->Probe.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
 	// Return edge attractor collisions.
 	return EdgeHangAttractorCollisionData
@@ -192,11 +192,11 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		edgeAttracColls.Left.has_value() &&
 		edgeAttracColls.Right.has_value())
 	{
-		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->TargetPoint, edgeAttracColls.Right->TargetPoint);
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Probe.Point, edgeAttracColls.Right->Probe.Point);
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
 		// TODO: Works on reflex transition, but not an obtuse one.
-		auto targetPoint = edgeAttracColls.Center->TargetPoint;
+		auto targetPoint = edgeAttracColls.Center->Probe.Point;
 
 		// Align orientation.
 		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);

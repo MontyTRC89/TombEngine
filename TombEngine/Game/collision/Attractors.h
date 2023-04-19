@@ -23,13 +23,9 @@ namespace TEN::Collision::Attractors
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		Vector3 TargetPoint		  = Vector3::Zero;
-		float	Distance		  = 0.0f;
-		float	DistanceAlongLine = 0.0f;
-		int		SegmentIndex	  = 0;
-
-		short HeadingAngle = 0;
-		short SlopeAngle   = 0;
+		AttractorProbeData Probe		= {};
+		short			   HeadingAngle = 0;
+		short			   SlopeAngle	= 0;
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;
