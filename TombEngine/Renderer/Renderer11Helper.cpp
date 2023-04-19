@@ -510,7 +510,7 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::Get2DPosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
@@ -524,9 +524,9 @@ namespace TEN::Renderer
 			gameCamera.camera.WorldDirection.z,
 			1.0f);
 		
-		// If point is behind camera, return invalid screen space position.
+		// Point is behind camera; return nullopt.
 		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_2D_POSITION;
+			return std::nullopt;
 
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
@@ -534,7 +534,7 @@ namespace TEN::Renderer
 		// Calculate NDC.
 		point /= point.w;
 
-		// Calculate and return screen space position.
+		// Calculate and return 2D position.
 		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 

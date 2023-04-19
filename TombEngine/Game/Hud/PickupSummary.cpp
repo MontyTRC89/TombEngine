@@ -16,10 +16,15 @@ namespace TEN::Hud
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
 		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, SCREEN_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
 
-		return (Position2D.x <= -SCREEN_THRESHOLD.x ||
-				Position2D.y <= -SCREEN_THRESHOLD.y ||
-				Position2D.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
-				Position2D.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y));
+		if (Position2D.x <= -SCREEN_THRESHOLD.x ||
+			Position2D.y <= -SCREEN_THRESHOLD.y ||
+			Position2D.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
+			Position2D.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	void DisplayPickup::Update(bool isHead)
@@ -104,13 +109,13 @@ namespace TEN::Hud
 		auto& pickup = GetNewDisplayPickup();
 
 		auto origin2D = g_Renderer.Get2DPosition(pos);
-		if (origin2D == INVALID_2D_POSITION)
+		if (!origin2D.has_value())
 			origin2D = Vector2::Zero;
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position2D =
-		pickup.Origin2D = origin2D;
+		pickup.Origin2D = origin2D.value();
 		pickup.Target2D = Vector2::Zero;
 		pickup.Life = life;
 		pickup.Scale = 0.0f;
@@ -126,7 +131,7 @@ namespace TEN::Hud
 			return;
 
 		// Get and apply 2D stack positions as targets.
-		auto stack2DPositions = GetStack2DPositions();
+		auto stack2DPositions = Get2DStackPositions();
 		for (int i = 0; i < stack2DPositions.size(); i++)
 			DisplayPickups[i].Target2D = std::move(stack2DPositions[i]);
 
@@ -163,7 +168,7 @@ namespace TEN::Hud
 		DisplayPickups.clear();
 	}
 
-	std::vector<Vector2> PickupSummaryController::GetStack2DPositions() const
+	std::vector<Vector2> PickupSummaryController::Get2DStackPositions() const
 	{
 		constexpr auto STACK_HEIGHT_MAX	   = 6;
 		constexpr auto SCREEN_SCALE_COEFF  = 1 / 7.0f;
