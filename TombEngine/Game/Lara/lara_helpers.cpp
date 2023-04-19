@@ -193,7 +193,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.Context.HandsAttractor.DistanceAlongLine = catchData.DistanceAlongLine;
 }
 
-static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData catchData)
+static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData& catchData)
 {
 	auto& player = GetLaraInfo(item);
 
