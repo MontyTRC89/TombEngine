@@ -62,24 +62,24 @@ namespace TEN::Collision::Attractors
 			return ATTRAC_COLL_DEFAULT;
 		}
 
-		// Get attractor probe.
-		auto attracProbe = GetProbe(refPoint);
+		// Get attractor proximity data.
+		auto attracProx = GetProximityData(refPoint);
 
 		// Calculate angles.
 		auto attracOrient = (Points.size() == 1) ?
-			orient : Geometry::GetOrientToPoint(Points[attracProbe.SegmentIndex], Points[attracProbe.SegmentIndex + 1]);
+			orient : Geometry::GetOrientToPoint(Points[attracProx.SegmentIndex], Points[attracProx.SegmentIndex + 1]);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
 		// Determine inquiries.
-		bool isIntersected = (attracProbe.Distance <= range);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracProbe.Point, orient);
+		bool isIntersected = (attracProx.Distance <= range);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.ClosestPoint, orient);
 
 		// Create new attractor collision.
 		auto attracColl = ATTRAC_COLL_DEFAULT;
 
 		attracColl.AttractorPtr = this;
-		attracColl.Probe = attracProbe;
+		attracColl.Proximity = attracProx;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
@@ -88,22 +88,22 @@ namespace TEN::Collision::Attractors
 		return attracColl;
 	}
 
-	AttractorProbeData Attractor::GetProbe(const Vector3& refPoint) const
+	AttractorProximityData Attractor::GetProximityData(const Vector3& refPoint) const
 	{
-		static const auto ATTRAC_PROBE_DEFAULT = AttractorProbeData{};
+		static const auto ATTRAC_PROX_DEFAULT = AttractorProximityData{};
 
-		// Attractor has no points; return default attractor probe.
+		// Attractor has no points; return default attractor proximity data.
 		if (Points.empty())
 		{
 			TENLog(std::string("GetTargetData(): attractor points undefined."), LogLevel::Warning);
-			return ATTRAC_PROBE_DEFAULT;
+			return ATTRAC_PROX_DEFAULT;
 		}
 
-		// Attractor is single point; return simple attractor probe.
+		// Attractor is single point; return simple attractor proximity data.
 		if (Points.size() == 1)
-			return AttractorProbeData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
+			return AttractorProximityData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
 
-		auto targetPoint = Points[0];
+		auto closestPoint = Points[0];
 		float closestDist = INFINITY;
 		unsigned int segmentIndex = 0;
 
@@ -113,20 +113,20 @@ namespace TEN::Collision::Attractors
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
-			float distance = Vector3::Distance(refPoint, closestPoint);
+			auto closestPointPerp = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
+			float distance = Vector3::Distance(refPoint, closestPointPerp);
 
 			if (distance < closestDist)
 			{
-				targetPoint = closestPoint;
+				closestPoint = closestPointPerp;
 				closestDist = distance;
 				segmentIndex = i;
 			}
 		}
 
-		// Return attractor probe.
-		float distFromStart = GetDistanceAtPoint(targetPoint, segmentIndex);
-		return AttractorProbeData{ targetPoint, closestDist, distFromStart, segmentIndex };
+		// Return attractor proximity data.
+		float distFromStart = GetDistanceAtPoint(closestPoint, segmentIndex);
+		return AttractorProximityData{ closestPoint, closestDist, distFromStart, segmentIndex };
 	}
 
 	Vector3 Attractor::GetPointAtDistance(float distAlongLine) const
@@ -300,9 +300,9 @@ namespace TEN::Collision::Attractors
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			auto attracProbe = attrac.GetProbe(refPoint);
-			if (attracProbe.Distance <= range)
-				nearbyAttracPtrMap.insert({ attracProbe.Distance, &attrac });
+			auto attracProximity = attrac.GetProximityData(refPoint);
+			if (attracProximity.Distance <= range)
+				nearbyAttracPtrMap.insert({ attracProximity.Distance, &attrac });
 		}
 
 		// Get attractors in neighboring rooms (search depth of 2).
@@ -311,7 +311,7 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				auto attracPointData = attrac.GetProbe(refPoint);
+				auto attracPointData = attrac.GetProximityData(refPoint);
 				if (attracPointData.Distance <= range)
 					nearbyAttracPtrMap.insert({ attracPointData.Distance, &attrac });
 			}

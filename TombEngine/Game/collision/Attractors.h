@@ -19,24 +19,24 @@ namespace TEN::Collision::Attractors
 		Pinnacle*/
 	};
 
+	struct AttractorProximityData
+	{
+		Vector3		 ClosestPoint	   = Vector3::Zero;
+		float		 Distance		   = 0.0f;
+		float		 DistanceAlongLine = 0.0f;
+		unsigned int SegmentIndex	   = 0;
+	};
+
 	struct AttractorCollisionData
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		AttractorProbeData Probe		= {};
-		short			   HeadingAngle = 0;
-		short			   SlopeAngle	= 0;
+		AttractorProximityData Proximity	= {};
+		short				   HeadingAngle = 0;
+		short				   SlopeAngle	= 0;
 
 		bool IsIntersected = false;
 		bool IsInFront	   = false;
-	};
-
-	struct AttractorProbeData
-	{
-		Vector3		 Point			   = Vector3::Zero;
-		float		 Distance		   = 0.0f;
-		float		 DistanceAlongLine = 0.0f;
-		unsigned int SegmentIndex	   = 0;
 	};
 
 	class Attractor
@@ -61,7 +61,7 @@ namespace TEN::Collision::Attractors
 
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
-		AttractorProbeData	   GetProbe(const Vector3& refPoint) const;
+		AttractorProximityData GetProximityData(const Vector3& refPoint) const;
 		Vector3				   GetPointAtDistance(float distAlongLine) const;
 		float				   GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const;
 
