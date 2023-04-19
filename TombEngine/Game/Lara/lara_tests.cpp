@@ -79,11 +79,11 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// Get point collision off side of edge.
 		auto pointCollOffSide = GetCollision(
-			Vector3i(attracColl.Proximity.ClosestPoint), attracColl.AttractorPtr->GetRoomNumber(),
+			Vector3i(attracColl.Proximity.Point), attracColl.AttractorPtr->GetRoomNumber(),
 			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 5) Test if edge is too low to the ground.
-		int floorToEdgeHeight = abs(attracColl.Proximity.ClosestPoint.y - pointCollOffSide.Position.Floor);
+		int floorToEdgeHeight = abs(attracColl.Proximity.Point.y - pointCollOffSide.Position.Floor);
 		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			continue;
 
@@ -154,11 +154,11 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 
 	// Attractor target points.
 	if (attracCollCenter.has_value())
-		g_Renderer.AddLine3D(attracCollCenter->Proximity.ClosestPoint, attracCollCenter->Proximity.ClosestPoint + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollCenter->Proximity.Point, attracCollCenter->Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollLeft.has_value())
-		g_Renderer.AddLine3D(attracCollLeft->Proximity.ClosestPoint, attracCollLeft->Proximity.ClosestPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollLeft->Proximity.Point, attracCollLeft->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollRight.has_value())
-		g_Renderer.AddLine3D(attracCollRight->Proximity.ClosestPoint, attracCollRight->Proximity.ClosestPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollRight->Proximity.Point, attracCollRight->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
 	// Return edge attractor collisions.
 	return EdgeHangAttractorCollisionData
@@ -192,11 +192,11 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		edgeAttracColls.Left.has_value() &&
 		edgeAttracColls.Right.has_value())
 	{
-		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Proximity.ClosestPoint, edgeAttracColls.Right->Proximity.ClosestPoint);
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Proximity.Point, edgeAttracColls.Right->Proximity.Point);
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
 		// TODO: Works on reflex transition, but not an obtuse one.
-		auto targetPoint = edgeAttracColls.Center->Proximity.ClosestPoint;
+		auto targetPoint = edgeAttracColls.Center->Proximity.Point;
 
 		// Align orientation.
 		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);

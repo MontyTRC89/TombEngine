@@ -21,7 +21,7 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorProximityData
 	{
-		Vector3		 ClosestPoint	   = Vector3::Zero;
+		Vector3		 Point			   = Vector3::Zero;
 		float		 Distance		   = 0.0f;
 		float		 DistanceAlongLine = 0.0f;
 		unsigned int SegmentIndex	   = 0;

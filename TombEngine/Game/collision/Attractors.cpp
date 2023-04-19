@@ -73,7 +73,7 @@ namespace TEN::Collision::Attractors
 
 		// Determine inquiries.
 		bool isIntersected = (attracProx.Distance <= range);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.ClosestPoint, orient);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
 
 		// Create new attractor collision.
 		auto attracColl = ATTRAC_COLL_DEFAULT;
