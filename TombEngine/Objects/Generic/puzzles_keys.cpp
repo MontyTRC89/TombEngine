@@ -15,6 +15,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Game/control/trigger.h"
+#include "Game/items.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Gui;
@@ -28,7 +30,16 @@ enum class PuzzleType
 	Normal, 
 	Specfic, 
 	Cutscene, 
-	AnimAfter 
+	AnimAfter
+};
+
+enum PuzzleHoleType
+{
+	None = 0,
+	Done = 1,
+	Hole = 2
+	
+
 };
 
 ObjectCollisionBounds PuzzleBounds =
@@ -58,9 +69,25 @@ const ObjectCollisionBounds KeyHoleBounds =
 void InitialisePuzzleDone(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
-	receptacleItem.Status = ITEM_NOT_ACTIVE;
-	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
+	
+	
+	//receptacleItem.Flags |= CODE_BITS;
+	
+	//receptacleItem.Status = ITEM_ACTIVE;
+	//receptacleItem.Flags |= IFLAG_ACTIVATION_MASK;
+	
+	//AddActiveItem(itemNumber);
+	if (receptacleItem.ItemFlags[6] == PuzzleHoleType::Hole)
+	{
+		//receptacleItem.ObjectNumber = GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
+		//receptacleItem.ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+		receptacleItem.ObjectNumber = GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
+		//receptacleItem.ResetModelToDefault();
+	}
+
+		receptacleItem.Animation.RequiredState = NO_STATE;
+		receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
+	
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -68,8 +95,9 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& receptacleItem = g_Level.Items[itemNumber];
 	auto& player = GetLaraInfo(*laraItem);
 
+
 	auto puzzleType = PuzzleType::Normal;
-	
+
 	if (receptacleItem.TriggerFlags >= 0)
 	{
 		if (receptacleItem.TriggerFlags <= 1024)
@@ -164,6 +192,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			player.Context.InteractedItem = itemNumber;
 			receptacleItem.Pose.Orientation.y = prevYOrient;
 			receptacleItem.Flags |= TRIGGERED;
+			//receptacleItem.Flags |= CODE_BITS;
 			return;
 		}
 
@@ -221,6 +250,16 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
 
+
+	if (receptacleItem.ItemFlags[6] == PuzzleHoleType::None)
+	{
+		receptacleItem.ItemFlags[1] = 1;
+		TestTriggers(receptacleItem.Pose.Position.x, receptacleItem.Pose.Position.y, receptacleItem.Pose.Position.z, receptacleItem.RoomNumber, false, 0);
+		//TestTriggers(&receptacleItem, false);
+		receptacleItem.ItemFlags[6] = PuzzleHoleType::Done;
+	}
+
+//	TestTriggers(&receptacleItem, false, receptacleItem.Flags & IFLAG_ACTIVATION_MASK);
 	auto puzzleType = PuzzleType::Normal;
 
 	if ((IsHeld(In::Action) &&
@@ -261,6 +300,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			player.Context.InteractedItem = itemNumber;
 			receptacleItem.Pose.Orientation.y = prevYOrient;
 			receptacleItem.Flags |= TRIGGERED;
+			//receptacleItem.Flags |= CODE_BITS;
 			return;
 		}
 
@@ -298,15 +338,29 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
+		//AddActiveItem(itemNumber);
+		//item->Status = ITEM_DEACTIVATED;
+		
+		//item->ItemFlags[1] = 1;
+		item->ItemFlags[1] = 1;
+
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-
-		SetAnimation(item, 0);
-		item->Animation.RequiredState = NO_STATE;
-		AddActiveItem(itemNumber);
-
-		item->Flags |= IFLAG_ACTIVATION_MASK;
-		item->Status = ITEM_DEACTIVATED;
+	
+		//SpawnItem(ItemInfo * item, GAME_OBJECT_ID objectNumber)
+		//KillItem(itemNumber);
 		item->ResetModelToDefault();
+		//item->ItemFlags[2] = PuzzleHoleType::Done;
+		//item->ItemFlags[1] = 1;
+		SetAnimation(item, 0);
+		//item->Animation.RequiredState = NO_STATE;
+		//AddActiveItem(itemNumber);
+		//item->Flags |= CODE_BITS;
+
+		//item->Flags |= IFLAG_ACTIVATION_MASK;
+		//item->Status = ITEM_DEACTIVATED;
+		// item->Flags |= IFLAG_ACTIVATION_MASK;
+		//item->Status = ITEM_ACTIVE;
+	
 	}
 	else
 	{
@@ -327,17 +381,32 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 void PuzzleHole(ItemInfo* item, short itemNumber)
 {
+	//item->Flags |= IFLAG_ACTIVATION_MASK;
+	//item->Status = ITEM_DEACTIVATED;
+	//RemoveActiveItem(itemNumber);
+	item->ItemFlags[1] = 1;
+
 	// Display pickup object. TODO: Get offset.
 	auto objectID = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
 	g_Hud.PickupSummary.AddDisplayPickup(objectID, item->Pose.Position.ToVector3());
-	
+	//item->ItemFlags[1] = 1;
+
+
 	item->ObjectNumber = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 
+	//item->ItemFlags[2] = PuzzleHoleType::Hole;
+	//item->Flags |= CODE_BITS;
 	SetAnimation(item, 0);
-	item->Animation.RequiredState = NO_STATE;
-
-	item->Status = ITEM_DEACTIVATED;
+//	AddActiveItem(itemNumber);
+// 	   	item->ResetModelToDefault();
+	//item->Animation.RequiredState = NO_STATE;
+	//item->ItemFlags[1] = 1;
+	//item->Flags |= IFLAG_ACTIVATION_MASK;
+	//item->Status = ITEM_DEACTIVATED;
+	//item->Status = ITEM_ACTIVE;
+	//item->Status = ITEM_NOT_ACTIVE;;
 	item->ResetModelToDefault();
+	//item->ItemFlags[2] = PuzzleHoleType::Hole;
 }
 
 void DoPuzzle()
