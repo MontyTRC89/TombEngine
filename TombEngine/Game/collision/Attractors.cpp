@@ -113,12 +113,12 @@ namespace TEN::Collision::Attractors
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			auto closestPointPerp = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
-			float distance = Vector3::Distance(refPoint, closestPointPerp);
+			auto closestLinePoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
+			float distance = Vector3::Distance(refPoint, closestLinePoint);
 
 			if (distance < closestDist)
 			{
-				closestPoint = closestPointPerp;
+				closestPoint = closestLinePoint;
 				closestDist = distance;
 				segmentIndex = i;
 			}
