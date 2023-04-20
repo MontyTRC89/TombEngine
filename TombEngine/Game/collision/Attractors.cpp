@@ -400,22 +400,6 @@ namespace TEN::Collision::Attractors
 		return attracColls;
 	}
 	
-	// Fake version.
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
-															   const ItemInfo& item, const Vector3& refPoint, float range)
-	{
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(attracPtrs.size());
-
-		for (const auto* attrac : attracPtrs)
-		{
-			auto attracColl = attrac->GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
-			attracColls.push_back(attracColl);
-		}
-
-		return attracColls;
-	}
-
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)
 	{
 		static const auto DEFAULT_ATTRACTOR = Attractor{};

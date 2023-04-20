@@ -31,15 +31,24 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
+/*
+dev notes for edge hang attractors
+
+probing:
+always reference current attractor. get its collision at the next point along the line.
+if next point is below or beyond its length, find a new attractor.
+
+shimmy:
+context assessment returns bool only.
+-shimmy handling function handles movement along attractor and hands off to new attractors when necessary.
+-special coll stop function unnecessary?
+*/
+
 struct EdgeHangAttractorCollisionData
 {
 	std::optional<AttractorCollisionData> Center	 = std::nullopt;
 	std::optional<AttractorCollisionData> Left		 = std::nullopt;
 	std::optional<AttractorCollisionData> Right		 = std::nullopt;
-	std::optional<AttractorCollisionData> FrontLeft	 = std::nullopt;
-	std::optional<AttractorCollisionData> FrontRight = std::nullopt;
-	std::optional<AttractorCollisionData> BackLeft	 = std::nullopt;
-	std::optional<AttractorCollisionData> BackRight	 = std::nullopt;
 };
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
@@ -103,14 +112,13 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	return *attracCollPtr;
 }
 
-static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(const std::vector<const Attractor*>& attracPtrs,
-																			   const ItemInfo& item, const CollisionInfo& coll,
+static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																			   const Vector3& relOffset, const Matrix& rotMatrix,
 																			   float range)
 {
 	auto basePos = item.Pose.Position.ToVector3();
 	auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
-	auto attracColls = GetAttractorCollisions(attracPtrs, item, refPoint, range);
+	auto attracColls = GetAttractorCollisions(item, refPoint, range);
 
 	// Debug
 	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
@@ -124,9 +132,6 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 {
 	auto& player = GetLaraInfo(item);
 
-	// Get nearby attractor pointers.
-	auto attracPtrs = GetDebugAttractorPtrs(item);
-
 	auto basePos = item.Pose.Position.ToVector3();
 	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y)); // Or simply use player orient?
 	float range = OFFSET_RADIUS(coll.Setup.Radius);
@@ -135,19 +140,11 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
 	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
 	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
-	auto relOffsetFrontLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto relOffsetFrontRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius * 2);
-	auto relOffsetBackLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, 0.0f);
-	auto relOffsetBackRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, 0.0f);
 
 	// Get attractor collisions.
-	auto attracCollCenter = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetCenter, rotMatrix, range);
-	auto attracCollLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetLeft, rotMatrix, range);
-	auto attracCollRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetRight, rotMatrix, range);
-	auto attracCollFrontLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontLeft, rotMatrix, range);
-	auto attracCollFrontRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetFrontRight, rotMatrix, range);
-	auto attracCollBackLeft = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackLeft, rotMatrix, range);
-	auto attracCollBackRight = GetBestEdgeHangAttractorCollision(attracPtrs, item, coll, relOffsetBackRight, rotMatrix, range);
+	auto attracCollCenter = GetBestEdgeHangAttractorCollision(item, coll, relOffsetCenter, rotMatrix, range);
+	auto attracCollLeft = GetBestEdgeHangAttractorCollision(item, coll, relOffsetLeft, rotMatrix, range);
+	auto attracCollRight = GetBestEdgeHangAttractorCollision(item, coll, relOffsetRight, rotMatrix, range);
 	
 	// Debug
 	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
@@ -165,11 +162,7 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	{
 		attracCollCenter,
 		attracCollLeft,
-		attracCollRight,
-		attracCollFrontLeft,
-		attracCollFrontRight,
-		attracCollBackLeft,
-		attracCollBackRight
+		attracCollRight
 	};
 }
 
@@ -207,12 +200,6 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
 		item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
-		return true;
-	}
-
-	if (edgeAttracColls.FrontLeft.has_value() && IsHeld(In::Left))
-	{
-		SetAnimation(item, LA_SHIMMY_LEFT_CORNER_OUTER_90);
 		return true;
 	}
 

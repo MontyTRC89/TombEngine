@@ -74,9 +74,7 @@ namespace TEN::Collision::Attractors
 	};
 
 	// Temp
-	std::vector<const Attractor*>		GetDebugAttractorPtrs(const ItemInfo& item);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const std::vector<const Attractor*>& attracPtrs,
-															   const ItemInfo& item, const Vector3& refPoint, float range);
+	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range);
