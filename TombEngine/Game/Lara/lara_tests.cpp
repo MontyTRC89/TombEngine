@@ -144,25 +144,25 @@ static std::optional<AttractorCollisionData> GetEdgeHangAttractorCollision(const
 
 		return GetBestEdgeHangAttractorCollision(item, coll, relOffset, rotMatrix, range);//
 	}*/
-	g_Renderer.PrintDebugMessage("%.3f", lineDistOffset);
-	g_Renderer.PrintDebugMessage("%.3f", lineDist);
 
 	// Get and return attractor collision on current attractor.
 	auto refPoint = handsAttrac.AttractorPtr->GetPointAtDistance(lineDist);
 	return handsAttrac.AttractorPtr->GetCollision(basePos, orient, refPoint, range);
 }
 
-bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
+bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto& player = GetLaraInfo(item);
+
+	bool isGoingRight = ((item.Pose.Orientation.y - player.Control.MoveAngle) >= 0);
 
 	// Get edge attractor collision.
-	auto edgeAttracColl = GetEdgeHangAttractorCollision(*item, *coll, item->Animation.Velocity.z);
+	auto edgeAttracColl = GetEdgeHangAttractorCollision(item, coll, item.Animation.Velocity.z * (isGoingRight ? 1 : -1));
 
 	// If no edge, release.
 	if (!edgeAttracColl.has_value())
 	{
-		SetPlayerEdgeHangRelease(*item);
+		SetPlayerEdgeHangRelease(item);
 		return false;
 	}
 	
@@ -170,17 +170,17 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 
 	// Align orientation.
 	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
+	item.Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
 
 	// Align position.
 	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-	auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
-	item->Pose.Position = edgeAttracColl->Proximity.Point + Vector3::Transform(relOffset, rotMatrix);
+	auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
+	item.Pose.Position = edgeAttracColl->Proximity.Point + Vector3::Transform(relOffset, rotMatrix);
 
 	player.Context.HandsAttractor.AttractorPtr = edgeAttracColl->AttractorPtr;
 	player.Context.HandsAttractor.LineDistance = edgeAttracColl->Proximity.LineDistance;
 
-	g_Renderer.PrintDebugMessage("vel: %.3f", item->Animation.Velocity.x);
+	g_Renderer.PrintDebugMessage("vel: %.3f", item.Animation.Velocity.x);
 	g_Renderer.PrintDebugMessage("full: %.3f", player.Context.HandsAttractor.LineDistance);
 
 	return true;
@@ -191,63 +191,63 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 
 	// Determine direction of player's shimmy. 0 if hanging still.
 	int climbDirection = 0;
-	if (player.Control.MoveAngle == short(item->Pose.Orientation.y - ANGLE(90.0f)))
+	if (player.Control.MoveAngle == short(item.Pose.Orientation.y - ANGLE(90.0f)))
 	{
 		climbDirection = -1;
 	}
-	else if (player.Control.MoveAngle == short(item->Pose.Orientation.y + ANGLE(90.0f)))
+	else if (player.Control.MoveAngle == short(item.Pose.Orientation.y + ANGLE(90.0f)))
 	{
 		climbDirection = 1;
 	}
 
 	// Temporarily move player slightly closer to wall for more precise collision results.
-	auto prevPose = item->Pose;
-	TranslateItem(item, item->Pose.Orientation.y, coll->Setup.Radius * 0.5f);
+	auto prevPose = item.Pose;
+	TranslateItem(&item, item.Pose.Orientation.y, coll.Setup.Radius * 0.5f);
 
 	// Get height difference with side spaces (left or right, depending on movement direction)
-	int heightDelta = LaraFloorFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.4f);
+	int heightDelta = LaraFloorFront(&item, player.Control.MoveAngle, coll.Setup.Radius * 1.4f);
 
 	// Set stopped flag if floor height is above footspace, which is step size.
 	bool isStopped = (heightDelta < CLICK(0.5f));
 
 	// Set stopped flag if ceiling height is below headspace, which is step size.
-	if (LaraCeilingFront(item, player.Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
+	if (LaraCeilingFront(&item, player.Control.MoveAngle, coll.Setup.Radius * 1.5f, 0) > -950)
 		isStopped = true;
 
 	// Restore backup pose after collision tests.
-	item->Pose = prevPose;
+	item.Pose = prevPose;
 
 	// Player collision setup.
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	player.Control.MoveAngle = item.Pose.Orientation.y;
+	coll.Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll.Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll.Setup.LowerCeilingBound = 0;
+	coll.Setup.ForwardAngle = player.Control.MoveAngle;
 
 	// When player is about to move, use larger embed offset to stabilize diagonal shimmy.
 	int embedOffset = 4;
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		embedOffset = 32;
 
-	TranslateItem(item, item->Pose.Orientation.y, embedOffset);
-	GetCollisionInfo(coll, item);
+	TranslateItem(&item, item.Pose.Orientation.y, embedOffset);
+	GetCollisionInfo(&coll, &item);
 
 	bool canHang = false;
 
 	// Ladder case.
 	if (player.Control.CanClimbLadder)
 	{
-		if (IsHeld(In::Action) && item->HitPoints > 0)
+		if (IsHeld(In::Action) && item.HitPoints > 0)
 		{
 			player.Control.MoveAngle = moveAngle;
 
-			if (!TestLaraHangOnClimbableWall(item, coll))
+			if (!TestLaraHangOnClimbableWall(&item, &coll))
 			{
-				if (item->Animation.AnimNumber != LA_LADDER_TO_HANG_RIGHT &&
-					item->Animation.AnimNumber != LA_LADDER_TO_HANG_LEFT)
+				if (item.Animation.AnimNumber != LA_LADDER_TO_HANG_RIGHT &&
+					item.Animation.AnimNumber != LA_LADDER_TO_HANG_LEFT)
 				{
-					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
-					item->Pose.Position.y = coll->Setup.OldPosition.y;
+					LaraSnapToEdgeOfBlock(&item, &coll, GetQuadrant(item.Pose.Orientation.y));
+					item.Pose.Position.y = coll.Setup.OldPosition.y;
 					SetAnimation(item, LA_HANG_IDLE);
 				}
 
@@ -255,34 +255,34 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (item->Animation.ActiveState == LS_HANG_IDLE && TestLaraClimbIdle(item, coll))
-					item->Animation.TargetState = LS_LADDER_IDLE;
+				if (item.Animation.ActiveState == LS_HANG_IDLE && TestLaraClimbIdle(&item, &coll))
+					item.Animation.TargetState = LS_LADDER_IDLE;
 			}
 		}
 		// Death or Action release. Unused block?
 		else
 		{
-			SetPlayerEdgeHangRelease(*item);
+			SetPlayerEdgeHangRelease(item);
 		}
 	}
 	// Regular case.
 	else
 	{
-		auto pointColl = GetCollision(item, item->Pose.Orientation.y, -coll->Setup.Radius);
-		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, -coll.Setup.Radius);
+		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
-		if ((IsHeld(In::Action) && item->HitPoints > 0 && relFloorHeight >= 0) ||
-			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
+		if ((IsHeld(In::Action) && item.HitPoints > 0 && relFloorHeight >= 0) ||
+			(item.Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item.Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
 		{
 			if (isStopped && heightDelta > 0 && climbDirection != 0 &&
-				((climbDirection > 0) == (coll->MiddleLeft.Floor > coll->MiddleRight.Floor)))
+				((climbDirection > 0) == (coll.MiddleLeft.Floor > coll.MiddleRight.Floor)))
 			{
 				isStopped = false;
 			}
 
-			auto verticalShift = coll->Front.Floor - GameBoundingBox(item).Y1;
-			int x = item->Pose.Position.x;
-			int z = item->Pose.Position.z;
+			auto verticalShift = coll.Front.Floor - GameBoundingBox(&item).Y1;
+			int x = item.Pose.Position.x;
+			int z = item.Pose.Position.z;
 
 			player.Control.MoveAngle = moveAngle;
 
@@ -290,53 +290,53 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 			{
 				float sinMoveAngle = phd_sin(player.Control.MoveAngle);
 				float cosMoveAngle = phd_cos(player.Control.MoveAngle);
-				auto testShift = Vector2(sinMoveAngle, cosMoveAngle) * coll->Setup.Radius;
+				auto testShift = Vector2(sinMoveAngle, cosMoveAngle) * coll.Setup.Radius;
 
 				x += testShift.x;
 				z += testShift.y;
 			}
 
-			if (TestLaraNearClimbableWall(item, GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock))
+			if (TestLaraNearClimbableWall(&item, GetCollision(x, item.Pose.Position.y, z, item.RoomNumber).BottomBlock))
 			{
 				// Ignore vertical shift if climbable wall is encountered in next block.
-				if (!TestLaraHangOnClimbableWall(item, coll))
+				if (!TestLaraHangOnClimbableWall(&item, &coll))
 					verticalShift = 0;
 			}
-			else if (!TestValidLedge(item, coll, true))
+			else if (!TestValidLedge(&item, &coll, true))
 			{
-				if ((climbDirection < 0 && coll->FrontLeft.Floor  != coll->Front.Floor) ||
-					(climbDirection > 0 && coll->FrontRight.Floor != coll->Front.Floor))
+				if ((climbDirection < 0 && coll.FrontLeft.Floor  != coll.Front.Floor) ||
+					(climbDirection > 0 && coll.FrontRight.Floor != coll.Front.Floor))
 				{
 					isStopped = true;
 				}
 			}
 
 			if (!isStopped &&
-				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic &&
-				abs(verticalShift) < SLOPE_DIFFERENCE && TestPlayerInteractAngle(*item, coll->NearestLedgeAngle))
+				coll.Middle.Ceiling < 0 && coll.CollisionType == CT_FRONT && !coll.HitStatic &&
+				abs(verticalShift) < SLOPE_DIFFERENCE && TestPlayerInteractAngle(item, coll.NearestLedgeAngle))
 			{
-				if (item->Animation.Velocity.z != 0.0f)
-					AlignEntityToEdge(item, coll);
+				if (item.Animation.Velocity.z != 0.0f)
+					AlignEntityToEdge(&item, &coll);
 
-				item->Pose.Position.y += verticalShift;
+				item.Pose.Position.y += verticalShift;
 			}
 			else
 			{
-				item->Pose.Position = coll->Setup.OldPosition;
+				item.Pose.Position = coll.Setup.OldPosition;
 
 				// Stop shimmying.
-				if (item->Animation.ActiveState == LS_SHIMMY_LEFT ||
-					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
+				if (item.Animation.ActiveState == LS_SHIMMY_LEFT ||
+					item.Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
 					SetAnimation(item, LA_HANG_IDLE);
 				}
 
 				// TODO
-				/*if (item->Animation.ActiveState == LS_SHIMMY_LEFT)
+				/*if (item.Animation.ActiveState == LS_SHIMMY_LEFT)
 				{
 					SetAnimation(item, LA_SHIMMY_LEFT_TO_IDLE);
 				}
-				else if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
+				else if (item.Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
 					SetAnimation(item, LA_SHIMMY_RIGHT_TO_IDLE);
 				}*/
@@ -348,9 +348,9 @@ bool HandlePlayerEdgeHang(ItemInfo* item, CollisionInfo* coll)
 		else
 		{
 			SetAnimation(item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
-			item->Animation.IsAirborne = true;
-			item->Animation.Velocity = PLAYER_RELEASE_VELOCITY;
-			item->Pose.Position += coll->Shift;
+			item.Animation.IsAirborne = true;
+			item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
+			item.Pose.Position += coll.Shift;
 			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
@@ -773,7 +773,7 @@ bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short testAngle)
 	TranslateItem(item, player.Control.MoveAngle, SIDEWAY_SHIMMY_TEST_DIST);
 	coll->Setup.OldPosition.y = item->Pose.Position.y;
 
-	bool canHang = HandlePlayerEdgeHang(item, coll);
+	bool canHang = HandlePlayerEdgeHang(*item, *coll);
 	item->Pose = prevPose;
 	return !canHang;
 }

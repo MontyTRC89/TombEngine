@@ -149,7 +149,7 @@ namespace TEN::Entities::Player
 	// Control: lara_as_hang_idle()
 	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
-		HandlePlayerEdgeHang(item, coll);
+		HandlePlayerEdgeHang(*item, *coll);
 	}
 
 	// State:	  LS_SHIMMY_LEFT (30)
@@ -195,7 +195,7 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		HandlePlayerEdgeHang(item, coll);
+		HandlePlayerEdgeHang(*item, *coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
 
@@ -242,7 +242,7 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		HandlePlayerEdgeHang(item, coll);
+		HandlePlayerEdgeHang(*item, *coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 
