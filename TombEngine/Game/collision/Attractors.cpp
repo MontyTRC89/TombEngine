@@ -129,7 +129,7 @@ namespace TEN::Collision::Attractors
 		return AttractorProximityData{ closestPoint, closestDist, distFromStart, segmentIndex };
 	}
 
-	Vector3 Attractor::GetPointAtDistance(float distAlongLine) const
+	Vector3 Attractor::GetPointAtDistance(float lineDist) const
 	{
 		// Attractor has no points; return world origin.
 		if (Points.empty())
@@ -143,11 +143,11 @@ namespace TEN::Collision::Attractors
 			return Points[0];
 
 		// Clamp point according to attractor length.
-		if (distAlongLine <= 0.0f)
+		if (lineDist <= 0.0f)
 		{
 			return Points[0];
 		}
-		else if (distAlongLine >= Length)
+		else if (lineDist >= Length)
 		{
 			return Points.back();
 		}
@@ -160,7 +160,7 @@ namespace TEN::Collision::Attractors
 			const auto& target = Points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingDist = distAlongLine - distTravelled;
+			float remainingDist = lineDist - distTravelled;
 
 			if (remainingDist <= segmentLength)
 			{
@@ -185,7 +185,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Calculate distance along attractor to point.
-		float distAlongLine = 0.0f;
+		float lineDist = 0.0f;
 		for (int i = 0; i <= segmentIndex; i++)
 		{
 			const auto& origin = Points[i];
@@ -193,7 +193,7 @@ namespace TEN::Collision::Attractors
 
 			if (i != segmentIndex)
 			{
-				distAlongLine += Vector3::Distance(origin, target);
+				lineDist += Vector3::Distance(origin, target);
 				continue;
 			}
 
@@ -201,10 +201,10 @@ namespace TEN::Collision::Attractors
 			if (pointToAttractorThreshold > SQRT_2)
 				TENLog(std::string("GetDistanceAtPoint(): point beyond attractor."), LogLevel::Warning);
 
-			distAlongLine += Vector3::Distance(origin, pointOnLine);
+			lineDist += Vector3::Distance(origin, pointOnLine);
 		}
 
-		return distAlongLine;
+		return lineDist;
 	}
 
 	bool Attractor::IsEdge() const
@@ -347,7 +347,7 @@ namespace TEN::Collision::Attractors
 		auto& player = GetLaraInfo(item);
 
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		for (auto& attrac : player.Context.HandsAttractor.SectorAttractors)
+		for (auto& attrac : player.Context.SectorAttractors)
 		{
 			assertion(nearbyAttracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
 			if (nearbyAttracPtrs.size() == COUNT_MAX)
@@ -357,9 +357,9 @@ namespace TEN::Collision::Attractors
 			attrac.DrawDebug();
 		}
 		
-		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor0);
-		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor1);
-		nearbyAttracPtrs.push_back(&player.Context.HandsAttractor.DebugAttractor2);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttractor0);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttractor1);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttractor2);
 		return nearbyAttracPtrs;
 	}
 
