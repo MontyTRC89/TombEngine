@@ -17,11 +17,11 @@
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
+#include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
-
 #include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
 #include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
@@ -379,6 +379,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Z);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_CLAW_MUTANT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = ClawMutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 130;
+		obj->intelligent = true;
+		obj->radius = 204;
+		obj->pivotLength = 0;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Z);
+		obj->SetBoneRotationFlags(7, ROT_Y);
 		obj->SetupHitEffect();
 	}
 }
