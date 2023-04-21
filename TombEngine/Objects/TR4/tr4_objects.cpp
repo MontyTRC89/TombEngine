@@ -896,7 +896,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SPIKY_WALL];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSpikyWall;
+			obj->Initialize = InitializeSpikyWall;
 			obj->control = ControlSpikyWall;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);

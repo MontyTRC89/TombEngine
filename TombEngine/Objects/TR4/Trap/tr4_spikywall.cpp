@@ -12,7 +12,7 @@
 
 using namespace TEN::Math;
 
-void InitialiseSpikyWall(short itemNumber)
+void InitializeSpikyWall(short itemNumber)
 {
 	auto& item = g_Level.Items[itemNumber];
 

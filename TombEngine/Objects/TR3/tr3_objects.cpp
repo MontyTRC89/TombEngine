@@ -385,7 +385,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_CLAW_MUTANT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = ClawMutantControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -467,7 +467,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_WALL_MOUNTED_BLADE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWallMountedBlade;
+		obj->Initialize = InitializeWallMountedBlade;
 		obj->control = WallMountedBladeControl;
 		obj->collision = GenericSphereBoxCollision;
 	}

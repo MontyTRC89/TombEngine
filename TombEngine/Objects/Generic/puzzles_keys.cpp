@@ -64,13 +64,13 @@ const ObjectCollisionBounds KeyHoleBounds =
 };
 
 // Puzzles
-void InitialisePuzzleHole(short itemNumber)
+void InitializePuzzleHole(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
 	receptacleItem.ItemFlags[5] = PuzzleHoleType::Hole;
 }
 
-void InitialisePuzzleDone(short itemNumber)
+void InitializePuzzleDone(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
 
