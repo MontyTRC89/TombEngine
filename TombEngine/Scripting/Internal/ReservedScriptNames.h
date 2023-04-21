@@ -173,7 +173,7 @@ static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
 static constexpr char ScriptReserved_HideString[]					= "HideString";
-static constexpr char ScriptReserved_isStringDisplaying[]			= "isStringDisplaying";
+static constexpr char ScriptReserved_IsStringDisplaying[]			= "IsStringDisplaying";
 static constexpr char ScriptReserved_SetAmbientTrack[]				= "SetAmbientTrack";
 static constexpr char ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
 static constexpr char ScriptReserved_StopAudioTrack[]				= "StopAudioTrack";
