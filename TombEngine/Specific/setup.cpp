@@ -34,7 +34,7 @@ using namespace TEN::Entities::Switches;
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[MAX_STATICS];
 
-void InitialiseGameFlags()
+void InitializeGameFlags()
 {
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
 	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
@@ -44,7 +44,7 @@ void InitialiseGameFlags()
 	Camera.underwater = false;
 }
 
-void InitialiseSpecialEffects()
+void InitializeSpecialEffects()
 {
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
@@ -74,7 +74,7 @@ void CustomObjects()
 	
 }
 
-void InitialiseObjects()
+void InitializeObjects()
 {
 	AllocTR4Objects();
 	AllocTR5Objects();
@@ -84,7 +84,7 @@ void InitialiseObjects()
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
 		obj = &Objects[i];
-		obj->initialise = nullptr;
+		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
 		obj->floor = nullptr;
@@ -108,19 +108,19 @@ void InitialiseObjects()
 		obj->isPuzzleHole = false;
 	}
 
-	InitialiseEffectsObjects();
-	InitialiseGenericObjects(); // Generic objects
-	InitialiseTR1Objects(); // Standard TR1 objects
-	InitialiseTR2Objects(); // Standard TR2 objects
-	InitialiseTR3Objects(); // Standard TR3 objects
-	InitialiseTR4Objects(); // Standard TR4 objects
-	InitialiseTR5Objects(); // Standard TR5 objects
+	InitializeEffectsObjects();
+	InitializeGenericObjects(); // Generic objects
+	InitializeTR1Objects(); // Standard TR1 objects
+	InitializeTR2Objects(); // Standard TR2 objects
+	InitializeTR3Objects(); // Standard TR3 objects
+	InitializeTR4Objects(); // Standard TR4 objects
+	InitializeTR5Objects(); // Standard TR5 objects
 
 	// User defined objects
 	CustomObjects();
 
 	HairEffect.Initialize();
-	InitialiseSpecialEffects();
+	InitializeSpecialEffects();
 
 	NumRPickups = 0;
 	CurrentSequence = 0;

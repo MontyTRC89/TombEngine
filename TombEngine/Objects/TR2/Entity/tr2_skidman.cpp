@@ -63,7 +63,7 @@ namespace TEN::Entities::Creatures::TR2
 			snowmobileGunItem->ObjectNumber = ID_SNOWMOBILE_GUN;
 			snowmobileGunItem->Model.Color = driver->Model.Color;
 			snowmobileGunItem->Flags = IFLAG_ACTIVATION_MASK;
-			InitialiseItem(snowmobileNumber); g_Level.NumItems++;
+			InitializeItem(snowmobileNumber); g_Level.NumItems++;
 			driver->Data = snowmobileNumber; // Register the snowmobile gun for the driver to control it.
 		}
 		else
@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	void InitialiseSkidooMan(short itemNumber)
+	void InitializeSkidooMan(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		if (item->Flags & IFLAG_REVERSE)
@@ -280,7 +280,7 @@ namespace TEN::Entities::Creatures::TR2
 			skidoo->ObjectNumber = ID_SNOWMOBILE;
 			skidoo->Status = ITEM_DEACTIVATED;
 
-			InitialiseSkidoo(itemNumber);
+			InitializeSkidoo(itemNumber);
 			if (skidoo->Data.is<SkidooInfo>())
 			{
 				auto* skidooData = (SkidooInfo*)skidoo->Data;
