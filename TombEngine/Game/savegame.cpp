@@ -389,7 +389,7 @@ bool SaveGame::Save(int slot)
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate.y);
-	control.add_calculated_jump_velocity(Lara.Context.CalculatedJumpVelocity);
+	control.add_calculated_jump_velocity(Lara.Context.CalcJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_moving(Lara.Control.IsMoving);

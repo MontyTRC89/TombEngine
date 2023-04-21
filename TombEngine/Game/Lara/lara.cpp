@@ -686,7 +686,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.Velocity.y = 0.0f;
 			}
 
-			ResetLaraLean(item, 6.0f);
+			ResetPlayerLean(item, 6.0f);
 			break;
 
 		case WaterStatus::Wade:
@@ -785,7 +785,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 							if (lara.Status.Exposure <= 0)
 							{
 								lara.Status.Exposure = 0;
-								item.HitPoints -= 10;
+								item->HitPoints -= 10;
 							}
 						}
 					}
@@ -1062,11 +1062,11 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	// Apply and reset turn rates.
 	item->Pose.Orientation.x += lara.Control.TurnRate.x;
 	if (!(IsHeld(In::Forward) || IsHeld(In::Back)))
-		ResetLaraTurnRateX(item, ANGLE(1.5f));
+		ResetPlayerTurnRateX(item, ANGLE(1.5f));
 
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		ResetLaraTurnRateY(item, ANGLE(1.5f));
+		ResetPlayerTurnRateY(item, ANGLE(1.5f));
 
 	if (level.GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -1085,7 +1085,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Reset lean.
 		if (!lara.Control.IsMoving || (lara.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right))))
-			ResetLaraLean(item, 6.0f, true, false);
+			ResetPlayerLean(item, 6.0f, true, false);
 	}
 
 	if (lara.Context.WaterCurrentActive && lara.Control.WaterStatus != WaterStatus::FlyCheat)
@@ -1122,7 +1122,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Walk) && !IsHeld(In::Look))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara.Context.Context.WaterSurfaceDist > 0 && lara.WaterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara.Context.WaterSurfaceDist > 0 && lara.Context.WaterSurfaceDist != NO_HEIGHT))
 		{
 			SetAnimation(item, LA_UNDERWATER_IDLE);
 			ResetPlayerFlex(item);

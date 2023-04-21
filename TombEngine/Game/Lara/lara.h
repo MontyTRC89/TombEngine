@@ -20,7 +20,7 @@ const auto LARA_LEAN_MAX = ANGLE(11.0f);
 constexpr auto LARA_TURN_RATE_ACCEL			   = ANGLE(0.25f);
 constexpr auto LARA_CRAWL_MOVE_TURN_RATE_ACCEL = ANGLE(0.15f);
 constexpr auto LARA_POLE_TURN_RATE_ACCEL	   = ANGLE(0.25f);
-constexpr auto LARA_SWIM_TURN_RATE_ACCEL	   = ANGLE(0.55f);
+constexpr auto LARA_SWIM_TURN_RATE_ACCEL	   = ANGLE(1.0f);
 constexpr auto LARA_SUBSUIT_TURN_RATE_ACCEL	   = ANGLE(0.25f);
 
 // Turn rate maxes

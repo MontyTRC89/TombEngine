@@ -22,13 +22,14 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
-// State:		LS_UNDERWATER_IDLE (13)
-// Collision:	lara_col_underwater_idle()
+// State:	  LS_UNDERWATER_IDLE (13)
+// Collision: lara_col_underwater_idle()
 void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	auto playerType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
+	bool isInDivesuit = (playerType == LaraType::Divesuit);
 
 	if (item->HitPoints <= 0)
 	{
@@ -36,41 +37,42 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		playerType != LaraType::Divesuit)
+	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
+		!isInDivesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	(playerType != LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0.0f)
 		item->Animation.Velocity.y = 0.0f;
 
-	if (lara->Control.HandStatus == HandStatus::Busy)
-		lara->Control.HandStatus = HandStatus::Free;
+	if (player.Control.HandStatus == HandStatus::Busy)
+		player.Control.HandStatus = HandStatus::Free;
 }
 
-// State:		LS_UNDERWATER_IDLE (13)
-// Control:		lara_as_underwater_idle()
+// State:	LS_UNDERWATER_IDLE (13)
+// Control: lara_as_underwater_idle()
 void lara_col_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-// State:		LS_UNDERWATER_SWIM_FORWARD (17)
-// Collision:	lara_col_underwater_swim_forward()
+// State:	  LS_UNDERWATER_SWIM_FORWARD (17)
+// Collision: lara_col_underwater_swim_forward()
 void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraType playerType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
+	auto playerType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
+	bool isInDivesuit = (playerType == LaraType::Divesuit);
 
 	if (item->HitPoints <= 0)
 	{
@@ -78,34 +80,35 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL && playerType != LaraType::Divesuit)
+	if (IsHeld(In::Roll) && !isInDivesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
-	(playerType != LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
 	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
 		item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX;
 
-	if (!(TrInput & IN_JUMP))
+	if (!IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_INERTIA;
 }
 
-// State:		LS_UNDERWATER_SWIM_FORWARD (17)
-// Control:		lara_as_underwater_swim_forward()
+// State:	LS_UNDERWATER_SWIM_FORWARD (17)
+// Control: lara_as_underwater_swim_forward()
 void lara_col_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-// State:		LS_UNDERWATER_INERTIA (18)
-// Collision:	lara_col_underwater_inertia()
+// State:	  LS_UNDERWATER_INERTIA (18)
+// Collision: lara_col_underwater_inertia()
 void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	auto playerType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
+	bool isInDivesuit = (playerType == LaraType::Divesuit);
 
 	if (item->HitPoints <= 0)
 	{
@@ -113,15 +116,15 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL && playerType != LaraType::Divesuit)
+	if (IsHeld(In::Roll) && !isInDivesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
-	(playerType != LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
@@ -132,20 +135,20 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_UNDERWATER_IDLE;
 }
 
-// State:		LS_UNDERWATER_INERTIA (18)
-// Collision:	lara_as_underwater_inertia()
+// State:	  LS_UNDERWATER_INERTIA (18)
+// Collision: lara_as_underwater_inertia()
 void lara_col_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-// State:		LS_WATER_DEATH (44)
-// Collision:	lara_col_underwater_death()
+// State:	  LS_WATER_DEATH (44)
+// Collision: lara_col_underwater_death()
 void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.CanLook = false;
+	player.Control.CanLook = false;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0.0f)
@@ -169,19 +172,20 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_WATER_DEATH (44)
+// State:	LS_WATER_DEATH (44)
 // Control:	lara_as_underwater_death()
 void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto VERTICAL_VEL = -5.0f;
+	constexpr auto UPPER_WATER_BOUND = CLICK(0.4f);
+	constexpr auto VERTICAL_VEL		 = -5.0f;
 
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	item->HitPoints = -1;
-	lara->Control.HandStatus = HandStatus::Busy;
+	player.Control.HandStatus = HandStatus::Busy;
 
 	int waterHeight = GetWaterHeight(item);
-	if (waterHeight < (item->Pose.Position.y - CLICK(0.4f)) &&
+	if (waterHeight < (item->Pose.Position.y - UPPER_WATER_BOUND) &&
 		waterHeight != NO_HEIGHT)
 	{
 		item->Pose.Position.y += VERTICAL_VEL;
@@ -190,15 +194,15 @@ void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	LaraSwimCollision(item, coll);
 }
 
-// State:		LS_UNDERWATER_ROLL (66)
-// Collision:	lara_col_underwater_roll_180()
+// State:	  LS_UNDERWATER_ROLL (66)
+// Collision: lara_col_underwater_roll_180()
 void lara_as_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity.y = 0.0f;
 }
 
-// State:		LS_UNDERWATER_ROLL (66)
-// Control:		lara_as_underwater_roll_180()
+// State:	LS_UNDERWATER_ROLL (66)
+// Control: lara_as_underwater_roll_180()
 void lara_col_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
