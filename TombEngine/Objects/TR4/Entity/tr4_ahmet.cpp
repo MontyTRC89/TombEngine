@@ -103,11 +103,11 @@ namespace TEN::Entities::TR4
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 	}
 
-	void InitialiseAhmet(short itemNumber)
+	void InitializeAhmet(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, AHMET_ANIM_IDLE);
 		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
 		item->ItemFlags[1] = (item->Pose.Position.y * 4) / SECTOR(1);

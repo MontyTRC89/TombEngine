@@ -68,7 +68,7 @@ namespace TEN::Entities::Creatures::TR3
 		harpoonItem->RoomNumber = item->RoomNumber;
 		harpoonItem->Pose.Position = pos;
 
-		InitialiseItem(harpoonItemNumber);
+		InitializeItem(harpoonItemNumber);
 
 		harpoonItem->Animation.Velocity.z = 150.0f;
 		harpoonItem->Pose.Orientation.x = 0;

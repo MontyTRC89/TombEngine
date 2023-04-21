@@ -45,11 +45,11 @@ namespace TEN::Entities::TR4
 		BOAR_ANIM_RUN_FORWARD_TO_IDLE = 8
 	};
 
-	void InitialiseWildBoar(short itemNumber)
+	void InitializeWildBoar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BOAR_ANIM_IDLE);
 	}
 

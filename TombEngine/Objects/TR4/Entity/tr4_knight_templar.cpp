@@ -57,11 +57,11 @@ namespace TEN::Entities::TR4
 		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2 = 12
 	};
 
-	void InitialiseKnightTemplar(short itemNumber)
+	void InitializeKnightTemplar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, KTEMPLAR_ANIM_IDLE);
 		item->MeshBits &= 0xF7FF;
 	}

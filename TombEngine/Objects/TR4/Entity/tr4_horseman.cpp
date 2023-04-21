@@ -118,7 +118,7 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	void InitialiseHorse(short itemNumber)
+	void InitializeHorse(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -127,11 +127,11 @@ namespace TEN::Entities::TR4
 		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 	}
 
-	void InitialiseHorseman(short itemNumber)
+	void InitializeHorseman(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HORSEMAN_ANIM_IDLE);
 		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}

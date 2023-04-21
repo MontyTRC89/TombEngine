@@ -153,7 +153,7 @@ namespace TEN::Entities::Vehicles
 		return (SpeedboatInfo*)speedboatItem->Data;
 	}
 
-	void InitialiseSpeedboat(short itemNumber)
+	void InitializeSpeedboat(short itemNumber)
 	{
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		speedboatItem->Data = SpeedboatInfo();

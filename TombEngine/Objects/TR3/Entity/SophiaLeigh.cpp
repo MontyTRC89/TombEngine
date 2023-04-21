@@ -692,11 +692,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialiseSophiaLeigh(short itemNumber)
+	void InitializeSophiaLeigh(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		CheckForRequiredObjects(item);						// ItemFlags[0] is used.
 		item.ItemFlags[1] = 0;								// Light timer (for smoothing).
 		item.ItemFlags[4] = 0;								// Charged state (true or false).

@@ -196,11 +196,11 @@ namespace TEN::Entities::Creatures::TR1
 	}
 
 	// NOTE: Doesn't exist in the original game. -- TokyoSU 5/8/2022
-	void InitialiseWingedMutant(short itemNumber)
+	void InitializeWingedMutant(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_GROUND);
 		item->SetFlagField(WMUTANT_CONF_PROJECTILE_MODE, WMUTANT_PROJ_NONE);
 

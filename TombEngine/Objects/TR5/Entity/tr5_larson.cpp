@@ -35,11 +35,11 @@ namespace TEN::Entities::Creatures::TR5
 	const auto PierreGunLeft = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
 	const auto PierreGunRight = CreatureBiteInfo(Vector3i(-40, 200, 0), 14);
 
-	void InitialiseLarson(short itemNumber)
+	void InitializeLarson(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)

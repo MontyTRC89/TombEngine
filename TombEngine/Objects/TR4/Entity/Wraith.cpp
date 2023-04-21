@@ -177,7 +177,7 @@ namespace TEN::Entities::TR4
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 	}
 
-	void InitialiseWraith(short itemNumber)
+	void InitializeWraith(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

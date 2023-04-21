@@ -1,3 +1,3 @@
 #pragma once
 
-void InitialiseTR2Objects();
+void InitializeTR2Objects();

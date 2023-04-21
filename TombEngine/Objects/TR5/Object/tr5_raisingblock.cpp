@@ -14,7 +14,7 @@
 
 using namespace TEN::Collision::Floordata;
 
-void InitialiseRaisingBlock(short itemNumber)
+void InitializeRaisingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

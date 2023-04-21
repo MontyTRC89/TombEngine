@@ -69,11 +69,11 @@ namespace TEN::Entities::Creatures::TR1
 		BIG_RAT_ANIM_SWIM_TO_RUN_FORWARD = 13
 	};
 
-	void InitialiseBigRat(short itemNumber)
+	void InitializeBigRat(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
 			SetAnimation(item, BIG_RAT_ANIM_SWIM);

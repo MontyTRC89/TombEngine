@@ -36,11 +36,11 @@ namespace TEN::Entities::Creatures::TR2
 			ShotLara(item, info, bite, angleY, damage);
 	}
 
-	void InitialiseWorkerShotgun(short itemNumber)
+	void InitializeWorkerShotgun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 5);
 	}
 

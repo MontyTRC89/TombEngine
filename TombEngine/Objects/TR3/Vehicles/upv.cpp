@@ -162,7 +162,7 @@ namespace TEN::Entities::Vehicles
 		return (UPVInfo*)UPVItem->Data;
 	}
 
-	void UPVInitialise(short itemNumber)
+	void UPVInitialize(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();

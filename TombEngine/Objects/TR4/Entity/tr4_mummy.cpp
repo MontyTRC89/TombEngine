@@ -72,11 +72,11 @@ namespace TEN::Entities::TR4
 		MUMMY_ANIM_ARMS_UP_RECOIL = 20
 	};
 
-	void InitialiseMummy(short itemNumber)
+	void InitializeMummy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->TriggerFlags == 2)
 		{

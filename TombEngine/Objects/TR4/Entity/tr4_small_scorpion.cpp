@@ -52,11 +52,11 @@ namespace TEN::Entities::TR4
 		SSCORPION_ANIM_FLAT_2 = 7,
 	};
 
-	void InitialiseSmallScorpion(short itemNumber)
+	void InitializeSmallScorpion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 

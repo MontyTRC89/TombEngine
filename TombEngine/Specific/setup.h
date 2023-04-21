@@ -10,7 +10,7 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
-// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+// Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
 enum class LotType
 {
 	Skeleton,
@@ -80,7 +80,7 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)>										   initialise;
+	std::function<void(short itemNumber)>										   Initialize;
 	std::function<void(short itemNumber)>										   control;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 
@@ -160,6 +160,6 @@ constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];
 
-void InitialiseGameFlags();
-void InitialiseSpecialEffects();
-void InitialiseObjects();
+void InitializeGameFlags();
+void InitializeSpecialEffects();
+void InitializeObjects();

@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 		SETHBLADE_ANIM_IDLE = 1
 	};
 
-	void InitialiseSethBlade(short itemNumber)
+	void InitializeSethBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

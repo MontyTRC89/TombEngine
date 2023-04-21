@@ -158,11 +158,11 @@ namespace TEN::Entities::Creatures::TR3
 		return *result;
 	}
 
-	void InitialiseCivvy(short itemNumber)
+	void InitializeCivvy(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, CIVVY_ANIM_IDLE);
 	}
 

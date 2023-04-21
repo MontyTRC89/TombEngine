@@ -37,11 +37,11 @@ namespace TEN::Entities::Creatures::TR5
 		CHEF_ANIM_DEATH = 16
 	};
 
-	void InitialiseChef(short itemNumber)
+	void InitializeChef(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);

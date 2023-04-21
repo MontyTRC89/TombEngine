@@ -66,10 +66,10 @@ namespace TEN::Entities::Creatures::TR3
 		ATTACK_PLAYER = 1
 	};
 
-	void InitialiseCompsognathus(short itemNumber)
+	void InitializeCompsognathus(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		// Set friendly.
 		item.ItemFlags[1] = ATTACK_CADAVER;		

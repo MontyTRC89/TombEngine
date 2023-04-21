@@ -56,11 +56,11 @@ namespace TEN::Entities::Creatures::TR3
 		MPSTICK_ANIM_VAULT_4_STEPS_DOWN = 30
 	};
 
-	void InitialiseMPStick(short itemNumber)
+	void InitializeMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
 

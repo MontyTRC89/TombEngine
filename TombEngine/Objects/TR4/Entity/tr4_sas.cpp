@@ -104,15 +104,15 @@ namespace TEN::Entities::TR4
 		SAS_ANIM_BLIND_TO_STAND = 29
 	};
 
-	void InitialiseSas(short itemNumber)
+	void InitializeSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SAS_ANIM_STAND);
 	}
 
-	void InitialiseInjuredSas(short itemNumber)
+	void InitializeInjuredSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -665,7 +665,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		grenadeItem->Pose.Orientation = EulerAngles(
 			angle1 + item.Pose.Orientation.x,

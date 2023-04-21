@@ -107,14 +107,14 @@ void TargetBox(LOTInfo* LOT, int boxNumber);
 bool UpdateLOT(LOTInfo* LOT, int expansion);
 bool SearchLOT(LOTInfo* LOT, int expansion);
 bool CreatureActive(short itemNumber);
-void InitialiseCreature(short itemNumber);
+void InitializeCreature(short itemNumber);
 bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
 bool CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction);
-void InitialiseItemBoxData();
+void InitializeItemBoxData();
 
 bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType);
 

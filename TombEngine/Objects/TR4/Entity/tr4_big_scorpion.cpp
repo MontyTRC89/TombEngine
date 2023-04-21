@@ -55,11 +55,11 @@ namespace TEN::Entities::TR4
 		BSCORPION_ANIM_KILL_TROOP = 7
 	};
 
-	void InitialiseScorpion(short itemNumber)
+	void InitializeScorpion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 			SetAnimation(item, BSCORPION_ANIM_KILL_TROOP);

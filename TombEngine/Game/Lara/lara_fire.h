@@ -46,7 +46,7 @@ struct WeaponInfo
 extern int FlashGrenadeAftershockTimer;
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
-void InitialiseNewWeapon(ItemInfo& laraItem);
+void InitializeNewWeapon(ItemInfo& laraItem);
 
 Ammo&		   GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
 GameVector	   GetTargetPoint(ItemInfo& targetEntity);

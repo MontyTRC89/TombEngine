@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseMummy(short itemNumber);
+	void InitializeMummy(short itemNumber);
 	void MummyControl(short itemNumber);
 }

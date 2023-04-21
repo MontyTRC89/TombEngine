@@ -58,7 +58,7 @@ namespace TEN::Entities::Creatures::TR5
 		DOBERMAN_ANIM_RUN_STOP = 20,
 	};
 
-	void InitialiseDoberman(short itemNumber)
+	void InitializeDoberman(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

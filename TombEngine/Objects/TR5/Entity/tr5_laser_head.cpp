@@ -53,7 +53,7 @@ namespace TEN::Entities::Creatures::TR5
 		return (GuardianInfo&)item.Data;
 	}
 
-	void InitialiseGuardian(short itemNumber)
+	void InitializeGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = GuardianInfo();

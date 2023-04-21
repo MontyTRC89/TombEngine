@@ -85,11 +85,11 @@ namespace TEN::Entities::Creatures::TR3
 		MONKEY_ANIM_WALK_FORWARD_TO_IDLE = 30
 	};
 
-	void InitialiseMonkey(short itemNumber)
+	void InitializeMonkey(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, MONKEY_ANIM_SIT);
 	}
 

@@ -3,6 +3,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseEnemyJeep(short itemNumber);
+	void InitializeEnemyJeep(short itemNumber);
 	void EnemyJeepControl(short itemNumber);
 }

@@ -377,7 +377,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		dartItem->Pose.Position = pos1;
 
-		InitialiseItem(dartItemNumber);
+		InitializeItem(dartItemNumber);
 
 		dartItem->Pose.Orientation = orient;
 		dartItem->Animation.Velocity.z = CLICK(1);

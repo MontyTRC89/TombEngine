@@ -343,11 +343,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialiseTony(short itemNumber)
+	void InitializeTony(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		CheckForRequiredObjects(item);
 
 		item.ItemFlags[1] = 0; // Attack type.

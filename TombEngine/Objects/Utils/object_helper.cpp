@@ -60,7 +60,7 @@ void InitSmashObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseSmashObject;
+		object->Initialize = InitializeSmashObject;
 		object->collision = ObjectCollision;
 		object->control = SmashObjectControl;
 		object->SetupHitEffect(true);
@@ -82,6 +82,7 @@ void InitPuzzleHole(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->Initialize = InitializePuzzleHole;
 		object->collision = PuzzleHoleCollision;
 		object->control = AnimatingControl;
 		object->isPuzzleHole = true;
@@ -94,6 +95,7 @@ void InitPuzzleDone(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->Initialize = InitializePuzzleDone;
 		object->collision = PuzzleDoneCollision;
 		object->control = AnimatingControl;
 		object->SetupHitEffect(true);
@@ -105,7 +107,7 @@ void InitAnimating(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseAnimating;
+		object->Initialize = InitializeAnimating;
 		object->control = AnimatingControl;
 		object->collision = ObjectCollision;
 		object->SetupHitEffect(true);
@@ -117,7 +119,7 @@ void InitPickup(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePickup;
+		object->Initialize = InitializePickup;
 		object->collision = PickupCollision;
 		object->control = PickupControl;
 		object->isPickup = true;
@@ -130,7 +132,7 @@ void InitPickup(ObjectInfo* object, int objectNumber, std::function<ControlFunct
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePickup;
+		object->Initialize = InitializePickup;
 
 		object->collision = PickupCollision;
 		object->control = (func != nullptr) ? func : PickupControl;
@@ -158,7 +160,7 @@ void InitProjectile(ObjectInfo* object, std::function<InitFunction> func, int ob
 	object = &Objects[objectNumber];
 	if (object->loaded || noLoad)
 	{
-		object->initialise = nullptr;
+		object->Initialize = nullptr;
 		object->collision = nullptr;
 		object->control = func;
 	}
@@ -169,7 +171,7 @@ void InitSearchObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseSearchObject;
+		object->Initialize = InitializeSearchObject;
 		object->collision = SearchObjectCollision;
 		object->control = SearchObjectControl;
 	}
@@ -180,7 +182,7 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePushableBlock;
+		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
 		object->floor = PushableBlockFloor;

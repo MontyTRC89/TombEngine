@@ -45,7 +45,7 @@ struct BoxNode
 
 struct LOTInfo 
 {
-	bool Initialised = false;
+	bool Initialized = false;
 
 	std::vector<BoxNode> Node = {};
 	int Head = 0;

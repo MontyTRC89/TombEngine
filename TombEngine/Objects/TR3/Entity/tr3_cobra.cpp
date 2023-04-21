@@ -45,11 +45,11 @@ namespace TEN::Entities::Creatures::TR3
 		COBRA_ANIM_DEATH = 4
 	};
 
-	void InitialiseCobra(short itemNumber)
+	void InitializeCobra(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, COBRA_ANIM_IDLE_TO_SLEEP, COBRA_SLEEP_FRAME);
 		item->ItemFlags[2] = item->HitStatus;
 	}

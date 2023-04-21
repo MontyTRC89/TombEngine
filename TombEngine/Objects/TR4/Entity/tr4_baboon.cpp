@@ -232,13 +232,13 @@ namespace TEN::Entities::TR4
 		UpdateRespawnedBaboon(itemNumber);
 	}
 
-	void InitialiseBaboon(short itemNumber)
+	void InitializeBaboon(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		if (!Objects[ID_BABOON_NORMAL].loaded)
 			TENLog("Failed to assign ID_BABOON_INV|ID_BABOON_SILENT animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BABOON_ANIM_SIT_IDLE);
 
 		if (item->ObjectNumber == ID_BABOON_SILENT && item->TriggerFlags != 0)

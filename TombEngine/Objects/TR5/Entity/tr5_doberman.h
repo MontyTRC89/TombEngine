@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseDoberman(short itemNumber);
+	void InitializeDoberman(short itemNumber);
 	void DobermanControl(short itemNumber);
 }

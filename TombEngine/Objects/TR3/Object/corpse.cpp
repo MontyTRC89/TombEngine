@@ -39,7 +39,7 @@ namespace TEN::Entities::TR3
 		CORPSE_ANIM_LANDING = 3
 	};
 
-	void InitialiseCorpse(short itemNumber)
+	void InitializeCorpse(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

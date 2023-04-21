@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseHarpy(short itemNumber);
+	void InitializeHarpy(short itemNumber);
 	void HarpyControl(short itemNumber);
 }

@@ -15,11 +15,11 @@ namespace TEN::Entities::Creatures::TR5
 {
 	const auto InvisibleGhostBite = CreatureBiteInfo(Vector3i::Zero, 17);
 
-	void InitialiseInvisibleGhost(short itemNumber)
+	void InitializeInvisibleGhost(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.y += CLICK(2);
 	}

@@ -58,11 +58,11 @@ namespace TEN::Entities::TR4
 		SPHINX_ANIM_WALK_BACK_TO_IDLE = 15
 	};
 
-	void InitialiseSphinx(short itemNumber)
+	void InitializeSphinx(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, SPHINX_ANIM_REST);
 	}
 

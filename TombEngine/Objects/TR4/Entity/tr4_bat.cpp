@@ -52,11 +52,11 @@ namespace TEN::Entities::TR4
 		return (item->TouchBits.ToPackedBits() >= 0);
 	}
 
-	void InitialiseBat(short itemNumber)
+	void InitializeBat(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BAT_ANIM_IDLE);
 	}
 
