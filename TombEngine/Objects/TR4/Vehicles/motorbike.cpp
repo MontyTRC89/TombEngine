@@ -157,7 +157,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE);
@@ -178,9 +178,7 @@ namespace TEN::Entities::Vehicles
 		switch (mountType)
 		{
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_IDLE;
-			laraItem->Animation.ActiveState = MOTORBIKE_STATE_IDLE;
-			laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
+			SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_IDLE);
 			break;
 
 		default:
@@ -188,22 +186,21 @@ namespace TEN::Entities::Vehicles
 			// HACK: Hardcoded Nitro item check.
 			/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_UNLOCK);
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;*/
-			
-			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;
-			laraItem->Animation.ActiveState = MOTORBIKE_STATE_MOUNT;
-			laraItem->Animation.TargetState = MOTORBIKE_STATE_MOUNT;
+			{
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_MOUNT);
+			}*/
+
+			SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_MOUNT);
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
+		ResetPlayerFlex(laraItem);
 		laraItem->Pose.Position = motorbikeItem->Pose.Position;
 		laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
 		lara->Control.HandStatus = HandStatus::Free;
@@ -400,7 +397,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_ITEM)
 			return;
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
@@ -432,12 +429,12 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_ITEM)
 		{
-			auto* item = &g_Level.Items[lara->Vehicle];
+			auto* item = &g_Level.Items[lara->Context.Vehicle];
 
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_DISMOUNT &&
-				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+				TestLastFrame(laraItem))
 			{
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				laraItem->Pose.Orientation.x = 0;
@@ -450,7 +447,7 @@ namespace TEN::Entities::Vehicles
 				return true;
 			}
 
-			if (laraItem->Animation.FrameNumber != g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+			if (!TestLastFrame(laraItem))
 				return true;
 
 			// exit when falling
@@ -724,7 +721,7 @@ namespace TEN::Entities::Vehicles
 		if (collide)
 		{
 			newSpeed = ((motorbikeItem->Pose.Position.z - oldPos.z) * phd_cos(motorbike->MomentumAngle) + (motorbikeItem->Pose.Position.x - oldPos.x) * phd_sin(motorbike->MomentumAngle)) * 256;
-			if (&g_Level.Items[lara->Vehicle] == motorbikeItem &&
+			if (&g_Level.Items[lara->Context.Vehicle] == motorbikeItem &&
 				motorbike->Velocity >= MOTORBIKE_ACCEL && newSpeed < (motorbike->Velocity - 10))
 			{
 				DoDamage(laraItem, (motorbike->Velocity - newSpeed) / 128);
@@ -923,32 +920,20 @@ namespace TEN::Entities::Vehicles
 				switch (collide)
 				{
 				case 13:
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_BACK_HIT;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITBACK;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITBACK;
+					SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_BACK_HIT);
 					break;
 
 				case 14:
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_FRONT_HIT;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITFRONT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITFRONT;
+					SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_FRONT_HIT);
 					break;
 
 				case 11:
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_RIGHT_HIT;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITRIGHT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITRIGHT;
+					SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_RIGHT_HIT);
 					break;
 
 				case 12:
 				default:
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_LEFT_HIT;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITLEFT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITLEFT;
+					SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_LEFT_HIT);
 					break;
 				}
 			}
@@ -956,13 +941,9 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			if (motorbike->Velocity >= 0)
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_JUMP;
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_START_JUMP);
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_FALL;
-
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = MOTORBIKE_STATE_FALLING;
-			laraItem->Animation.TargetState = MOTORBIKE_STATE_FALLING;
+				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_START_FALL);
 		}
 	}
 
@@ -1155,16 +1136,14 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_IDLE;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Animation.ActiveState = MOTORBIKE_STATE_IDLE;
-		laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
+		SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_IDLE);
 		laraItem->Animation.IsAirborne = false;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->HitDirection = -1;
 
-		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
+		// Sync vehicle with player animation.
+		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+
 		motorbikeItem->HitPoints = 1;
 		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
 		motorbike->Revs = 0;
@@ -1173,7 +1152,7 @@ namespace TEN::Entities::Vehicles
 	bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* motorbikeItem = &g_Level.Items[lara->Vehicle];
+		auto* motorbikeItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		int collide = MotorBikeDynamics(motorbikeItem, laraItem);
@@ -1290,7 +1269,7 @@ namespace TEN::Entities::Vehicles
 
 		if (probe.RoomNumber != motorbikeItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
@@ -1298,9 +1277,7 @@ namespace TEN::Entities::Vehicles
 
 		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
 		AnimateItem(laraItem);
-
-		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[motorbikeItem->Animation.AnimNumber].frameBase - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		SyncVehicleAnimation(*motorbikeItem, *laraItem);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 

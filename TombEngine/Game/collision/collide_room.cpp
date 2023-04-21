@@ -12,7 +12,7 @@
 #include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -249,7 +249,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	int xFront, zFront, xRight, zRight, xLeft, zLeft;
 
 	// Get nearest 90-degree snapped angle (quadrant).
-	auto quadrant = GetQuadrant(coll->Setup.ForwardAngle);
+	int quadrant = GetQuadrant(coll->Setup.ForwardAngle);
 
 	// Get side probe offsets depending on quadrant.
 	// If unconstrained mode is specified, don't use quadrant.
@@ -332,7 +332,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	// TEST 2: CENTERPOINT PROBE
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, realRoomNumber);
-	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room.
+	int topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room.
 	
 	if (doPlayerCollision)
 	{
@@ -404,7 +404,9 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		height = GetFloorHeight(tfLocation, probePos.x + xFront, probePos.z + zFront).value_or(NO_HEIGHT);
 	}
 	else
+	{
 		height = GetCollision(probePos.x + xFront, probePos.y, probePos.z + zFront, topRoomNumber).Position.Floor;
+	}
 	
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
@@ -418,19 +420,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->Front.FloorSlope && 
-			 coll->Front.Floor > coll->Middle.Floor)
+		coll->Front.FloorSlope && 
+		coll->Front.Floor > coll->Middle.Floor)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
-			 coll->Front.CeilingSlope)
+		coll->Front.CeilingSlope)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockDeathFloorDown && 
-			 coll->Front.Floor >= CLICK(0.5f) &&
-			 collResult.BottomBlock->Flags.Death)
+		coll->Front.Floor >= CLICK(0.5f) &&
+		collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
@@ -481,19 +483,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->MiddleLeft.FloorSlope && 
-			 coll->MiddleLeft.Floor > 0)
+		coll->MiddleLeft.FloorSlope && 
+		coll->MiddleLeft.Floor > 0)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
-			 coll->MiddleLeft.CeilingSlope)
+		coll->MiddleLeft.CeilingSlope)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockDeathFloorDown && 
-			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
-			 collResult.BottomBlock->Flags.Death)
+		coll->MiddleLeft.Floor >= CLICK(0.5f) &&
+		collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
@@ -538,19 +540,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->FrontLeft.FloorSlope && 
-			 coll->FrontLeft.Floor > 0)
+		coll->FrontLeft.FloorSlope && 
+		coll->FrontLeft.Floor > 0)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
-			 coll->FrontLeft.CeilingSlope)
+		coll->FrontLeft.CeilingSlope)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockDeathFloorDown && 
-			 coll->FrontLeft.Floor >= CLICK(0.5f) &&
-			 collResult.BottomBlock->Flags.Death)
+		coll->FrontLeft.Floor >= CLICK(0.5f) &&
+		collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
@@ -600,19 +602,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->MiddleRight.FloorSlope && 
-			 coll->MiddleRight.Floor > 0)
+		coll->MiddleRight.FloorSlope && 
+		coll->MiddleRight.Floor > 0)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
-			 coll->MiddleRight.CeilingSlope)
+		coll->MiddleRight.CeilingSlope)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockDeathFloorDown && 
-			 coll->MiddleRight.Floor >= CLICK(0.5f) &&
-			 collResult.BottomBlock->Flags.Death)
+		coll->MiddleRight.Floor >= CLICK(0.5f) &&
+		collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
@@ -657,19 +659,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->FrontRight.FloorSlope && 
-			 coll->FrontRight.Floor > 0)
+		coll->FrontRight.FloorSlope && 
+		coll->FrontRight.Floor > 0)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
-			 coll->FrontRight.CeilingSlope)
+		coll->FrontRight.CeilingSlope)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockDeathFloorDown && 
-			 coll->FrontRight.Floor >= CLICK(0.5f) &&
-			 collResult.BottomBlock->Flags.Death)
+		coll->FrontRight.Floor >= CLICK(0.5f) &&
+		collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
@@ -735,7 +737,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 			}
 		}
-		coll->CollisionType = ((coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT);
+		coll->CollisionType = (coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT;
 		return;
 	}
 
@@ -783,12 +785,20 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
-				if (quarter) coll->CollisionType = CT_LEFT;
+			{
+				if (quarter)
+					coll->CollisionType = CT_LEFT;
+			}
 			else
-				if (!quarter) coll->CollisionType = CT_LEFT;
+			{
+				if (!quarter)
+					coll->CollisionType = CT_LEFT;
+			}
 		}
 		else
+		{
 			coll->CollisionType = CT_LEFT;
+		}
 
 		return;
 	}
@@ -825,16 +835,24 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 		if (coll->DiagonalStepAtRight())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90.0f); // NOTE: Different from quadrant!
+			int quarter = unsigned short(coll->Setup.ForwardAngle) / ANGLE(90.0f); // NOTE: Different from quadrant!
 			quarter %= 2;
 
 			if (coll->MiddleRight.HasFlippedDiagonalSplit())
-				if (quarter) coll->CollisionType = CT_RIGHT;
+			{
+				if (quarter)
+					coll->CollisionType = CT_RIGHT;
+			}
 			else
-				if (!quarter) coll->CollisionType = CT_RIGHT;
+			{
+				if (!quarter)
+					coll->CollisionType = CT_RIGHT;
+			}
 		}
 		else
+		{
 			coll->CollisionType = CT_RIGHT;
+		}
 
 		return;
 	}

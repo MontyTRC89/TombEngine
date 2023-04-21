@@ -52,17 +52,13 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 
 		if (item->HitPoints <= 0)
 		{
 			item->HitPoints = 0;
 			if (item->Animation.ActiveState != 7)
-			{
-				item->Animation.AnimNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
-				item->Animation.ActiveState = 7;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			}
+				SetAnimation(item, 10);
 		}
 		else
 		{
@@ -71,13 +67,13 @@ namespace TEN::Entities::Creatures::TR5
 			else if (creature->HurtByLara)
 				creature->Enemy = LaraItem;
 
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
 			int distance;
 
 			if (creature->Enemy == LaraItem)
-				distance = AI.distance;
+				distance = ai.distance;
 			else
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
@@ -87,10 +83,10 @@ namespace TEN::Entities::Creatures::TR5
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 			creature->MaxTurn = ANGLE(7.0f);
 
 			switch (item->Animation.ActiveState)
@@ -129,25 +125,24 @@ namespace TEN::Entities::Creatures::TR5
 			case 6:
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(ai.angle) >= ANGLE(2.0f))
 				{
-					if (AI.angle > 0)
+					if (ai.angle > 0)
 						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.y += ai.angle;
 
 				if (creature->Flags)
 					break;
 
 				if (item->TouchBits.Test(BrownBeastAttackJoints1))
 				{
-					if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+					if (TestAnimNumber(*item, 8))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
+						if (TestAnimFrameRange(*item, 20, 24))
 						{
 							DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 							CreatureEffect2(item, BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -156,10 +151,9 @@ namespace TEN::Entities::Creatures::TR5
 						}
 					}
 
-					if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 2))
+					if (TestAnimNumber(*item, 2))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
+						if (TestAnimFrameRange(*item, 7, 15))
 						{
 							DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 							CreatureEffect2(item, BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -172,10 +166,9 @@ namespace TEN::Entities::Creatures::TR5
 				if (!item->TouchBits.Test(BrownBeastAttackJoints2))
 					break;
 
-				if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 8))
+				if (TestAnimNumber(*item, 8))
 				{
-					if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 13) &&
-						item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
+					if (TestAnimFrameRange(*item, 14, 19))
 					{
 						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -184,10 +177,9 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 2))
+				if (TestAnimNumber(*item, 2))
 				{
-					if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 33) &&
-						item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 43))
+					if (TestAnimFrameRange(*item, 34, 42))
 					{
 						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
 						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -203,6 +195,6 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

@@ -51,6 +51,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 				if (item->ItemFlags[2] != 0)
 					collidedBits &= ~1;
+				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
 
 				while (collidedBits)
 				{

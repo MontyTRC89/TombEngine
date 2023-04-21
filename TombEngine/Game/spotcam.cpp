@@ -125,7 +125,7 @@ void InitialiseSpotCam(short Sequence)
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	Camera.bounce = 0;
 

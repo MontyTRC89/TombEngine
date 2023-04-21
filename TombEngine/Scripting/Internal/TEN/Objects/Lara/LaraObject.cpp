@@ -262,10 +262,10 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		return nullptr;
 
-	return std::make_unique<Moveable>(lara->Vehicle);
+	return std::make_unique<Moveable>(lara->Context.Vehicle);
 }
 
 /// Get current target enemy, if it exists

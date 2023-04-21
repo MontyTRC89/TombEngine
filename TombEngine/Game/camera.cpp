@@ -120,19 +120,25 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (BinocularRange)
 		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
-	// Modulate and apply turn rates.
-	player.Control.Look.TurnRate.x = ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
-	player.Control.Look.TurnRate.y = ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
+	// Modulate turn rates.
+	player.Control.Look.TurnRate = EulerAngles(
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false),
+		0);
+
+	// Apply turn rates.
 	player.Control.Look.Orientation += player.Control.Look.TurnRate;
-	player.Control.Look.Orientation.x = std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
-	player.Control.Look.Orientation.y = std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
+	player.Control.Look.Orientation = EulerAngles(
+		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
+		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
+		0);
 
 	// Visually adapt head and torso orientations.
 	// TODO: Rubber band effect.
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Vehicle == NO_ITEM)
+		player.Context.Vehicle == NO_ITEM)
 	{
 		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
@@ -1390,7 +1396,7 @@ void ResetLook(ItemInfo* item, float alpha)
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked && !lara->RightArm.Locked &&
-			lara->Vehicle == NO_ITEM)
+			lara->Context.Vehicle == NO_ITEM)
 		{
 			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
@@ -1815,7 +1821,7 @@ void HandleOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 
 	lara->Inventory.IsBusy = false;
-	ResetLaraFlex(item);
+	ResetPlayerFlex(item);
 
 	ClearAction(In::Look);
 }
