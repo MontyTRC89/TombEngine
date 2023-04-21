@@ -481,7 +481,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara.Control.Count.PositionAdjust = 0;
 	}
 
-	if (!lara.Control.Locked)
+	if (!lara.Control.IsLocked)
 		lara.LocationPad = -1;
 
 	auto prevPos = item->Pose.Position;
@@ -954,7 +954,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	lara.Control.IsLow = false;
+	lara.Control.IsInLowPosition = false;
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
@@ -1026,7 +1026,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	lara.Control.IsLow = false;
+	lara.Control.IsInLowPosition = false;
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;

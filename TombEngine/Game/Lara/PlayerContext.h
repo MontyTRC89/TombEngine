@@ -32,7 +32,7 @@ namespace TEN::Entities::Player::Context
 	bool CanSteerOnSlide(ItemInfo* item, CollisionInfo* coll);
 
 	// Crouch and crawl contexts
-	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll);
+	bool IsInLowSpace(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrouch(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrouchToCrawl(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll);

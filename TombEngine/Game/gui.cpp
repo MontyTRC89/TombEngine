@@ -1836,7 +1836,7 @@ namespace TEN::Gui
 			{
 			case INV_OBJECT_BINOCULARS:
 				if (((item->Animation.ActiveState == LS_IDLE && item->Animation.AnimNumber == LA_STAND_IDLE) ||
-						(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
+						(lara->Control.IsInLowPosition && !IsHeld(In::Crouch))) &&
 					!UseSpotCam && !TrackCameraInit)
 				{
 					BinocularRange = 128;

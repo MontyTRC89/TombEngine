@@ -1551,7 +1551,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	// Makes Lara smaller.
 	if (enemy->IsLara())
 	{
-		if (GetLaraInfo(enemy)->Control.IsLow)
+		if (GetLaraInfo(enemy)->Control.IsInLowPosition)
 			vector.y -= STEPUP_HEIGHT;
 	}
 

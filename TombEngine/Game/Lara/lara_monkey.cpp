@@ -52,7 +52,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 	}
 	else if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -362,7 +362,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 	}
 	else if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -445,7 +445,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 	}
 	else if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -515,7 +515,7 @@ void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = ANGLE(-5.0f);
 
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	item->Animation.TargetState = LS_MONKEY_IDLE;
 }

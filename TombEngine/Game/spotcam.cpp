@@ -137,7 +137,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	LaraAir = Lara.Status.Air;
 
@@ -174,7 +174,7 @@ void InitialiseSpotCam(short Sequence)
 
 	if ((spotcam->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		Lara.Control.Locked = true;
+		Lara.Control.IsLocked = true;
 		SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
@@ -359,7 +359,7 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO backup;
 
-	if (Lara.Control.Locked)
+	if (Lara.Control.IsLocked)
 	{
 		LaraItem->HitPoints = LaraHealth;
 		Lara.Status.Air = LaraAir;
@@ -558,14 +558,14 @@ void CalculateSpotCameras()
 				else
 				{
 					if (SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS)
-						Lara.Control.Locked = false;
+						Lara.Control.IsLocked = false;
 
 					if (SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS)
 					{						
 						if (CurrentLevel)
 							SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-						Lara.Control.Locked = true;
+						Lara.Control.IsLocked = true;
 					}
 
 					int sp2 = 0;
@@ -665,7 +665,7 @@ void CalculateSpotCameras()
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
 					UseSpotCam = false;
-					Lara.Control.Locked = false;
+					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
@@ -785,7 +785,7 @@ void CalculateSpotCameras()
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 		UseSpotCam = false;
-		Lara.Control.Locked = false;
+		Lara.Control.IsLocked = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera();

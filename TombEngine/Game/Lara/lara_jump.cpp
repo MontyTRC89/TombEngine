@@ -126,7 +126,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity.z *= 0.95f;
 
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	if (item->Animation.Velocity.y == LARA_DEATH_VELOCITY && item->HitPoints > 0)
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Pose);
@@ -238,7 +238,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Need to revise the directional jump system to work with changes done for OIS. @Sezz 2022.07.05
 
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -766,7 +766,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	if (item->HitPoints <= 0)
 	{

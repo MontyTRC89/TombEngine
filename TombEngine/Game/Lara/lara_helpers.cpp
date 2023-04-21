@@ -64,11 +64,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
-		lara.Control.RunJumpQueued = false;
+		lara.Control.IsRunJumpQueued = false;
 
 	// Reset lean.
 	if ((!lara.Control.IsMoving || (lara.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
-		(!lara.Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
+		(!lara.Control.IsInLowPosition && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		ResetPlayerLean(item, 1 / 6.0f);
 	}
@@ -83,9 +83,9 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 
-	lara.Control.IsLow = false;
+	lara.Control.IsInLowPosition = false;
 	lara.Control.IsMonkeySwinging = false;
 }
 
@@ -598,33 +598,30 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	lara.Control.TurnRate.y = ModulateLaraTurnRate(lara.Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
-short ResetLaraTurnRate(short turnRate, short decelRate)
+short ResetPlayerTurnRate(short turnRate, short decelRate)
 {
 	int sign = std::copysign(1, turnRate);
-
 	if (abs(turnRate) > decelRate)
 		return (turnRate - (decelRate * sign));
 	
 	return 0;
 }
 
-void ResetLaraTurnRateX(ItemInfo* item, short decelRate)
+void ResetPlayerTurnRateX(ItemInfo* item, short decelRate)
 {
-	auto& lara = *GetLaraInfo(item);
-
-	lara.Control.TurnRate.x = ResetLaraTurnRate(lara.Control.TurnRate.x, decelRate);
+	auto& player = GetLaraInfo(*item);
+	player.Control.TurnRate.x = ResetPlayerTurnRate(player.Control.TurnRate.x, decelRate);
 }
 
-void ResetLaraTurnRateY(ItemInfo* item, short decelRate)
+void ResetPlayerTurnRateY(ItemInfo* item, short decelRate)
 {
-	auto& lara = *GetLaraInfo(item);
-
-	lara.Control.TurnRate.y = ResetLaraTurnRate(lara.Control.TurnRate.y, decelRate);
+	auto& player = GetLaraInfo(*item);
+	player.Control.TurnRate.y = ResetPlayerTurnRate(player.Control.TurnRate.y, decelRate);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& lara = *GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	if (IsHeld(In::Forward) || IsHeld(In::Back))
 		ModulateLaraTurnRateX(item, LARA_SWIM_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
@@ -841,10 +838,10 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 		(pointColl.Position.Floor - vPos) >= CLICK(1.0f / 2)) &&									// OR there is a drop below far ahead.
 		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		lara.Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
+		lara.Control.IsRunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
 	}
 	else
-		lara.Control.RunJumpQueued = false;
+		lara.Control.IsRunJumpQueued = false;
 }
 
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)
@@ -867,13 +864,13 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara.ProjectedFloorHeight - item->Pose.Position.y;
+		int height = lara.Context.ProjectedFloorHeight - item->Pose.Position.y;
 		if (height > -CLICK(3.5f))
 			height = -CLICK(3.5f);
 		else if (height < -CLICK(7.5f))
 			height = -CLICK(7.5f);
 
-		lara.Context.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
+		lara.Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
 	}
 }
 
@@ -888,8 +885,8 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.Velocity.z = 0.0f;
-	lara.ProjectedFloorHeight = climbOutContext.Height;
-	lara.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+	lara.Context.ProjectedFloorHeight = climbOutContext.Height;
+	lara.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	lara.Control.TurnRate.y = 0;
 	lara.Control.HandStatus = HandStatus::Busy;
 	lara.Control.WaterStatus = WaterStatus::Dry;
@@ -1023,7 +1020,7 @@ void SetLaraHang(ItemInfo* item)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	ResetLaraFlex(item);
+	ResetPlayerFlex(item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.Velocity.z = 0.0f;

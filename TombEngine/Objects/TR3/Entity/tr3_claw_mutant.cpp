@@ -153,7 +153,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto enemyPos = creature.Enemy->Pose.Position;
-		if (creature.Enemy->IsLara() && GetLaraInfo(creature.Enemy)->Control.IsLow)
+		if (creature.Enemy->IsLara() && GetLaraInfo(creature.Enemy)->Control.IsInLowPosition)
 		{
 			enemyPos.y -= CLICK(1);
 		}

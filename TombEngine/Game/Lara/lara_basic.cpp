@@ -145,7 +145,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	// HACK: Interaction alignment.
 	if (lara.Control.IsMoving)
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 		return;
 	}
 
@@ -240,8 +240,8 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_RUN_FORWARD (1)
-// Collision:	lara_col_run_forward()
+// State:	  LS_RUN_FORWARD (1)
+// Collision: lara_col_run_forward()
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -262,7 +262,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 	}
 
-	if (IsHeld(In::Jump) || lara.Control.RunJumpQueued)
+	if (IsHeld(In::Jump) || lara.Control.IsRunJumpQueued)
 	{
 		if (!IsHeld(In::Sprint) && Context::CanRunJumpForward(item, coll))
 		{
@@ -275,7 +275,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
 		lara.Control.WaterStatus != WaterStatus::Wade &&
-		!lara.Control.RunJumpQueued) // Jump queue blocks 180 roll.
+		!lara.Control.IsRunJumpQueued) // NOTE: Jump queue blocks 180 roll.
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -305,12 +305,14 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		}
-		else if (IsHeld(In::Sprint) && lara.Status.Stamina)
+		else if (IsHeld(In::Sprint) && lara.Status.Stamina != 0)
 		{
 			item->Animation.TargetState = LS_SPRINT;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
+		}
 
 		return;
 	}
@@ -396,8 +398,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = !((isSwamp && player.Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	player.Control.CanLook = !((isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
 
 	if (item->HitPoints <= 0)
 	{
@@ -408,7 +410,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	// HACK: Interaction alignment.
 	if (player.Control.IsMoving)
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 		return;
 	}
 
@@ -430,7 +432,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if ((IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
 			(IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
-			ResetLaraTurnRateY(item);
+			ResetPlayerTurnRateY(item);
 		}
 		else if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -598,8 +600,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_IDLE (2), LS_POSE (4), LS_SPLAT_SOFT (170)
-// Control:		lara_as_idle(), lara_as_pose()
+// State:	LS_IDLE (2), LS_POSE (4), LS_SPLAT_SOFT (170)
+// Control: lara_as_idle(), lara_as_pose()
 void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -617,7 +619,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	// TODO: Better clamp handling. This can result in Lara standing above or below the floor. -- Sezz 2022.04.01
+	// TODO: Better clamp handling. This can result in the player standing above or below the floor. -- Sezz 2022.04.01
 	/*if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
@@ -755,8 +757,8 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = (isSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	player.Control.CanLook = (isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -766,7 +768,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (player.Control.WaterStatus == WaterStatus::Wade)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isInSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
 	}
 	else
 	{
@@ -920,7 +922,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	if (BinocularRange)
 	{
@@ -970,7 +972,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 	auto& lara = *GetLaraInfo(item);
 
 	lara.Control.CanLook = false;
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 }
 
 // State:		LS_SPLAT (12)
@@ -1003,9 +1005,9 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara.Control.CanLook = (isSwamp && lara.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara.Control.CanLook = (isInSwamp && lara.Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1015,13 +1017,13 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara.Control.IsMoving)
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 		return;
 	}
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		if (lara.Control.WaterStatus == WaterStatus::Wade && isSwamp)
+		if (lara.Control.WaterStatus == WaterStatus::Wade && isInSwamp)
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
 			ModulateLaraLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
@@ -1235,14 +1237,14 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara.Control.IsMoving)
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 		return;
 	}
 
 	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 	}
 	else if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -1331,14 +1333,14 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara.Control.IsMoving)
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 		return;
 	}
 
 	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
 	{
-		ResetLaraTurnRateY(item);
+		ResetPlayerTurnRateY(item);
 	}
 	else if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -1418,7 +1420,7 @@ void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 	auto& lara = *GetLaraInfo(item);
 
 	lara.Control.CanLook = false;
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -1437,7 +1439,7 @@ void lara_as_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 	auto& lara = *GetLaraInfo(item);
 
 	lara.Control.CanLook = false;
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -1493,7 +1495,7 @@ void lara_as_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& lara = *GetLaraInfo(item);
 
 	lara.Control.CanLook = false;
-	ResetLaraTurnRateY(item);
+	ResetPlayerTurnRateY(item);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -1547,9 +1549,9 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara.Control.CanLook = (isSwamp && lara.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara.Control.CanLook = (isInSwamp && lara.Control.WaterStatus == WaterStatus::Wade) ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -1560,7 +1562,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		if (isSwamp)
+		if (isInSwamp)
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SWAMP_TURN_RATE_MAX);
 			ModulateLaraLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX * 0.6f);
@@ -1667,7 +1669,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 	}
 
-	if (IsHeld(In::Jump) || lara.Control.RunJumpQueued)
+	if (IsHeld(In::Jump) || lara.Control.IsRunJumpQueued)
 	{
 		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && Context::CanSprintJumpForward(item, coll))
 		{

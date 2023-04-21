@@ -12,7 +12,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Player::Context
@@ -33,15 +33,15 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item);
 		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		// 2. Test if player is already aligned with floor.
+		// 2) Test if player is already aligned with floor.
 		if (relFloorHeight == 0)
 			return false;
 
-		// 3. Assess point collision and player status.
+		// 3) Assess point collision and player status.
 		if ((relFloorHeight <= LOWER_FLOOR_BOUND ||					// Floor height is above lower floor bound...
 				player.Control.WaterStatus == WaterStatus::Wade) && // OR player is wading.
 			relFloorHeight >= UPPER_FLOOR_BOUND)					// Floor height is below upper floor bound.
@@ -94,26 +94,26 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = GetLaraInfo(*item);
 
-		// 1. Check if AFK posing is enabled.
+		// 1) Check if AFK posing is enabled.
 		if (!g_GameFlow->HasAFKPose())
 			return false;
 
-		// 2. Test AFK pose timer.
+		// 2) Test AFK pose timer.
 		if (player.Control.Count.Pose < LARA_POSE_TIME)
 			return false;
 
-		// 3. Test player hand and water status.
+		// 3) Test player hand and water status.
 		if (player.Control.HandStatus != HandStatus::Free ||
 			player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			return false;
 		}
 
-		// 4. Assess player status.
+		// 4) Assess player status.
 		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Player not handling flare...
 				player.Flare.Life) &&								   // OR flare is still active.
-			player.Vehicle == NO_ITEM)								   // Player not in a vehicle.
+			player.Context.Vehicle == NO_ITEM)								   // Player not in a vehicle.
 		{
 			return true;
 		}
@@ -210,7 +210,7 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = GetLaraInfo(*item);
 
-		// 1. Test player water status.
+		// 1) Test player water status.
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::Player::Context
 			false, false, false
 		};
 
-		// 2. Assess context.
+		// 2) Assess context.
 		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
@@ -229,7 +229,7 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		// 1. Test player water status.
+		// 1) Test player water status.
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
@@ -240,7 +240,7 @@ namespace TEN::Entities::Player::Context
 			false, false, false
 		};
 
-		// 2. Assess context.
+		// 2) Assess context.
 		return Context::TestLandMovementSetup(item, coll, setupData);
 	}
 
@@ -250,7 +250,7 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(*item);
 
-		// 1. Test player water status.
+		// 1) Test player water status.
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 			return false;
 
@@ -258,7 +258,7 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
 		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (abs(relFloorHeight) <= ABS_FLOOR_BOUND && // Floor height is within upper/lower floor bounds.
 			pointColl.Position.FloorSlope)			  // Floor is a slippery slope.
 		{
@@ -273,7 +273,7 @@ namespace TEN::Entities::Player::Context
 		return g_GameFlow->HasSlideExtended();
 	}
 
-	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll)
+	bool IsInLowSpace(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const auto CROUCH_STATES = std::vector<int>
 		{
@@ -360,19 +360,19 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(*item);
 
-		// 1. Check if crouch roll is enabled.
+		// 1) Check if crouch roll is enabled.
 		if (!g_GameFlow->HasCrouchRoll())
 			return false;
 
-		// 2. Test water depth.
-		if (player.WaterSurfaceDist < WATER_HEIGHT_MAX)
+		// 2) Test water depth.
+		if (player.Context.WaterSurfaceDist < WATER_HEIGHT_MAX)
 			return false;
 
 		// TODO: Extend point collision struct to also find water depths.
 		float distance = 0.0f;
 		auto pointColl0 = GetCollision(item);
 
-		// 3. Test continuity of path.
+		// 3) Test continuity of path.
 		while (distance < PROBE_DIST_MAX)
 		{
 			// Get point collision.
@@ -427,11 +427,11 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_MONKEY);
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Ceiling == NO_HEIGHT)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relCeilHeight <= LOWER_CEIL_BOUND && // Ceiling height is above lower ceiling bound.
 			relCeilHeight >= UPPER_CEIL_BOUND)	 // Ceiling height is below upper ceiling bound.
 		{
@@ -447,7 +447,7 @@ namespace TEN::Entities::Player::Context
 
 		auto& player = GetLaraInfo(*item);
 
-		// 1. Check for monkey swing ceiling.
+		// 1) Check for monkey swing ceiling.
 		if (!player.Control.CanMonkeySwing)
 			return true;
 
@@ -455,15 +455,15 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_MONKEY);
 
-		// 2. Test for wall.
+		// 2) Test for wall.
 		if (pointColl.Position.Ceiling == NO_HEIGHT)
 			return true;
 
-		// 3. Test for slippery ceiling slope and check if overhang climb is disabled.
+		// 3) Test for slippery ceiling slope and check if overhang climb is disabled.
 		if (pointColl.Position.CeilingSlope && !g_GameFlow->HasOverhangClimb())
 			return true;
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if (abs(relCeilHeight) < ABS_CEIL_BOUND) // Ceiling height if within lower/upper ceiling bound.
 			return true;
 
@@ -477,7 +477,7 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = GetLaraInfo(*item);
 
-		// 1. Check for monkey swing ceiling.
+		// 1) Check for monkey swing ceiling.
 		if (!player.Control.CanMonkeySwing)
 			return false;
 
@@ -486,7 +486,7 @@ namespace TEN::Entities::Player::Context
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_MONKEY);
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
-		// 2. Assess collision with ceiling.
+		// 2) Assess collision with ceiling.
 		if (relCeilHeight < 0 &&
 			coll->CollisionType != CollisionType::CT_TOP &&
 			coll->CollisionType != CollisionType::CT_TOP_FRONT)
@@ -494,7 +494,7 @@ namespace TEN::Entities::Player::Context
 			return false;
 		}
 
-		// 3. Assess point collision.
+		// 3) Assess point collision.
 		if (relCeilHeight <= LOWER_CEIL_BOUND &&		  // Ceiling height is above lower ceiling bound.
 			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling space isn't too narrow.
 		{
@@ -547,11 +547,11 @@ namespace TEN::Entities::Player::Context
 		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_REACH);
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is lower than upper floor bound.
 			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
 		{
@@ -565,7 +565,7 @@ namespace TEN::Entities::Player::Context
 	{
 		constexpr auto LEDGE_HEIGHT_MIN = CLICK(2);
 
-		// 1. Check if ledge jumps are enabled.
+		// 1) Check if ledge jumps are enabled.
 		if (!g_GameFlow->HasLedgeJumps())
 			return false;
 
@@ -579,7 +579,7 @@ namespace TEN::Entities::Player::Context
 			Geometry::TranslatePoint(origin.ToVector3i(), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
 			item->RoomNumber);
 
-		// 2. Assess level geometry ray collision.
+		// 2) Assess level geometry ray collision.
 		if (LOS(&origin, &target))
 			return false;
 
@@ -589,7 +589,7 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item->Pose.Position.y - LARA_HEIGHT_STRETCH);
 
-		// 3. Assess point collision.
+		// 3) Assess point collision.
 		if (relCeilHeight >= -coll->Setup.Height) // Ceiling isn't too low.
 			return false;
 
@@ -648,11 +648,11 @@ namespace TEN::Entities::Player::Context
 		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPosTop;
 		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPosTop;
 
-		// 1. Test if wall is climbable.
+		// 1) Test if wall is climbable.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&
 			relCeilHeightLeft <= WALL_STEP_HEIGHT &&
 			relCeilHeightRight <= WALL_STEP_HEIGHT)
@@ -674,11 +674,11 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(item);
 		// Left and right.
 
-		// 1. Check whether wall is climbable.
+		// 1) Check whether wall is climbable.
 		if (!player.Control.CanClimbLadder)
 			return false;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if ((pointCollCenter.Position.Floor - vPos) >= wallStepHeight)
 			return true;
 
@@ -691,7 +691,7 @@ namespace TEN::Entities::Player::Context
 
 		const auto& player = *GetLaraInfo(item);
 
-		// 1. Test player water status.
+		// 1) Test player water status.
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 			return false;
 
@@ -699,7 +699,7 @@ namespace TEN::Entities::Player::Context
 		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
 		int relFloorHeight = pointColl.Position.Floor - item->Pose.Position.y;
 
-		// 2. Assess point collision.
+		// 2) Assess point collision.
 		if (relFloorHeight > UPPER_FLOOR_BOUND) // Floor height is below upper floor bound.
 			return true;
 
@@ -708,18 +708,18 @@ namespace TEN::Entities::Player::Context
 
 	bool CanLand(ItemInfo* item, CollisionInfo* coll)
 	{
-		// 1. Check airborne status and Y velocity.
+		// 1) Check airborne status and Y velocity.
 		if (!item->Animation.IsAirborne || item->Animation.Velocity.y < 0.0f)
 			return false;
 
-		// 2. Check for swamp.
+		// 2) Check for swamp.
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			return true;
 
 		int vPos = item->Pose.Position.y;
 		auto pointColl = GetCollision(item);
 
-		// 3. Assess point collision.
+		// 3) Assess point collision.
 		if ((pointColl.Position.Floor - vPos) <= item->Animation.Velocity.y)
 			return true;
 
@@ -784,15 +784,15 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		// 1. Check whether sprint jump is enabled.
+		// 1) Check whether sprint jump is enabled.
 		if (!g_GameFlow->HasSprintJump())
 			return false;
 
-		// 2. Check for jump state dispatch.
+		// 2) Check for jump state dispatch.
 		if (!HasStateDispatch(item, LS_JUMP_FORWARD))
 			return false;
 
-		// 3. Check run timer.
+		// 3) Check run timer.
 		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
 			return false;
 
@@ -802,7 +802,7 @@ namespace TEN::Entities::Player::Context
 			CLICK(1.8f)
 		};
 
-		// 4. Assess context.
+		// 4) Assess context.
 		return Context::TestJumpSetup(item, coll, setupData);
 	}
 
@@ -827,7 +827,7 @@ namespace TEN::Entities::Player::Context
 	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto pointColl = GetCollision(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
-		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInNarrowSpace(item, coll));
+		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInLowSpace(item, coll));
 	}
 
 	bool CanDismountTightrope(ItemInfo* item, CollisionInfo* coll)
@@ -950,7 +950,7 @@ namespace TEN::Entities::Player::Context
 		int relCeilingHeight = pointColl.Position.Ceiling - vPos;
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
@@ -958,7 +958,7 @@ namespace TEN::Entities::Player::Context
 		bool isSlipperySlopeUp	 = setupData.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
 		bool isDeathFloor		 = setupData.TestDeathFloor		   ? pointColl.Block->Flags.Death										  : false;
 
-		// 2. Check for slippery floor slope or death floor (if applicable).
+		// 2) Check for slippery floor slope or death floor (if applicable).
 		if (isSlipperySlopeDown || isSlipperySlopeUp || isDeathFloor)
 			return false;
 
@@ -986,13 +986,13 @@ namespace TEN::Entities::Player::Context
 			pointColl.Coordinates.z,
 			item->RoomNumber);
 
-		// 3. Assess level geometry ray collision.
+		// 3) Assess level geometry ray collision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
 			return false;
 
 		// TODO: Assess static object geometry ray collision.
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if (relFloorHeight <= setupData.LowerFloorBound && // Floor height is above lower floor bound.
 			relFloorHeight >= setupData.UpperFloorBound && // Floor height is below upper floor bound.
 			relCeilingHeight < -playerHeight &&				  // Ceiling height is above player height.
@@ -1013,11 +1013,11 @@ namespace TEN::Entities::Player::Context
 		int vPosTop = vPos - PLAYER_HEIGHT;
 		auto pointColl = GetCollision(item, setupData.HeadingAngle, OFFSET_RADIUS(coll->Setup.Radius));
 
-		// 1. Test for wall.
+		// 1) Test for wall.
 		if (pointColl.Position.Ceiling == NO_HEIGHT)
 			return false;
 
-		// 2. Test for ceiling slippery slope.
+		// 2) Test for ceiling slippery slope.
 		if (pointColl.Position.CeilingSlope)
 			return false;
 
@@ -1045,13 +1045,13 @@ namespace TEN::Entities::Player::Context
 			pointColl.Coordinates.z,
 			item->RoomNumber);
 
-		// 3. Assess level geometry ray collision.
+		// 3) Assess level geometry ray collision.
 		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
 			return false;
 
 		// TODO: Assess static object geometry ray collision.
 		
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if (pointColl.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is a monkey swing.
 			(pointColl.Position.Ceiling - vPosTop) <= setupData.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(pointColl.Position.Ceiling - vPosTop) >= setupData.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
@@ -1072,21 +1072,21 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(item);
 		auto pointCollFront = GetCollision(item, setupData.HeadingAngle, coll->Setup.Radius, -(LARA_HEIGHT_STRETCH + CLICK(1 / 2.0f)));
 
-		// 1. Check for slope (if applicable).
+		// 1) Check for slope (if applicable).
 		bool isSlope = setupData.CheckSlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlope)
 			return false;
 
-		// 2. Check for object.
+		// 2) Check for object.
 		TestForObjectOnLedge(item, coll);
 		if (coll->HitStatic)
 			return false;
 
-		// 3. Check for valid ledge.
+		// 3) Check for valid ledge.
 		if (!TestValidLedge(item, coll))
 			return false;
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if (abs(pointCollFront.Position.Floor - vPosTop) <= climbHeightTolerance &&							 // Ledge height is climbable.
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.SpaceMin &&  // Space isn't too narrow.
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.SpaceMax && // Space isn't too wide.
@@ -1105,22 +1105,22 @@ namespace TEN::Entities::Player::Context
 		int vPos = item->Pose.Position.y;
 		auto pointColl = GetCollision(item, setupData.HeadingAngle, setupData.Distance, -coll->Setup.Height);
 
-		// 1. Check for wall.
+		// 1) Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 
-		// 2. Check for swamp or wade status (if applicable).
+		// 2) Check for swamp or wade status (if applicable).
 		if (isSwamp || isWading)
 			return false;
 
-		// 3. Check for corner.
+		// 3) Check for corner.
 		if (TestLaraFacingCorner(item, setupData.HeadingAngle, setupData.Distance))
 			return false;
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&									 // Floor is within highest floor bound.
 			((pointColl.Position.Ceiling - vPos) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
 				((pointColl.Position.Ceiling - vPos) < -coll->Setup.Height &&							// OR ceiling is level with Lara's head...
@@ -1140,11 +1140,11 @@ namespace TEN::Entities::Player::Context
 		auto pointCollCenter = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
 
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-		bool isSwampTooDeep = setupData.TestSwampDepth ? (isSwamp && player.WaterSurfaceDist < -CLICK(3)) : isSwamp;
+		bool isSwampTooDeep = setupData.TestSwampDepth ? (isSwamp && player.Context.WaterSurfaceDist < -CLICK(3)) : isSwamp;
 		
 		int vPos = isSwamp ? item->Pose.Position.y : pointCollCenter.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
-		// 1. Check swamp depth (if applicable).
+		// 1) Check swamp depth (if applicable).
 		if (isSwampTooDeep)
 			return Context::VaultData{ false };
 
@@ -1153,7 +1153,7 @@ namespace TEN::Entities::Player::Context
 		// b) the space between the floor and ceiling is too narrow,
 		// any potentially climbable floor in a room above will be missed. The following loop hacks around this floordata limitation.
 
-		// 2. Raise vertical position of point collision probe by increments of 1/8th blocks to find potential vault ledge.
+		// 2) Raise vertical position of point collision probe by increments of 1/8th blocks to find potential vault ledge.
 		int vOffset = setupData.LowerFloorBound;
 		while (((pointCollFront.Position.Ceiling - vPos) > -coll->Setup.Height ||					 // Ceiling is below Lara's height...
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= setupData.SpaceMin/* ||	// OR space is too small...
@@ -1164,11 +1164,11 @@ namespace TEN::Entities::Player::Context
 			vOffset -= std::max(CLICK(1 / 2.0f), setupData.SpaceMin);
 		}
 
-		// 3. Check for wall.
+		// 3) Check for wall.
 		if (pointCollFront.Position.Floor == NO_HEIGHT)
 			return Context::VaultData{ false };
 
-		// 4. Assess point collision.
+		// 4) Assess point collision.
 		if ((pointCollFront.Position.Floor - vPos) < setupData.LowerFloorBound &&						 // Floor is within lower floor bound.
 			(pointCollFront.Position.Floor - vPos) >= setupData.UpperFloorBound &&						 // Floor is within upper floor bound.
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > setupData.SpaceMin &&	 // Space is not too narrow.

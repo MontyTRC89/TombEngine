@@ -1253,7 +1253,7 @@ struct SubsuitControlData
 struct LaraControlData
 {
 	short		MoveAngle = 0;
-	EulerAngles TurnRate = EulerAngles::Zero;
+	EulerAngles TurnRate  = EulerAngles::Zero;
 
 	HandStatus	  HandStatus	= {};
 	WaterStatus	  WaterStatus	= {};
@@ -1265,17 +1265,17 @@ struct LaraControlData
 	TightropeControlData Tightrope = {};
 	WeaponControlData	 Weapon	   = {};
 
-	bool IsClimbingLadder = false;
-	bool Locked			  = false; // IsLocked
-	bool IsLow			  = false;
-	bool IsMonkeySwinging = false;
-	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
-
 	bool CanClimbLadder = false;
 	bool CanLook		= false;
 	bool CanMonkeySwing = false;
+
+	bool IsClimbingLadder = false;
+	bool IsLocked		  = false;
+	bool IsInLowPosition  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool IsRunJumpQueued  = false;
+	bool IsInLowSpace	  = false;
 };
 
 // TODO: Refactor status handling to use floats.
