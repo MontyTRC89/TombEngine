@@ -211,9 +211,9 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// RESERVED. PLEASE DO NOT ADD STATES HERE.
+	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
 
-	LS_CRAWL_VAULT = 194,
+	LS_REMOVE_PUZZLE = 189,
 
 	NUM_LARA_STATES
 };
@@ -511,7 +511,7 @@ enum LaraAnim
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Unused.
+	LA_REMOVE_PUZZLE = 278,											// Remove puzzle item > idle
 	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
 	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
@@ -818,13 +818,12 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// UP TO 596 IS RESERVED. PLEASE DO NOT ADD ANIMS HERE.
+	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 102
-	// 274, 278, 280,
+	// 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
