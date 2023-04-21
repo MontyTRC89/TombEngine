@@ -551,8 +551,8 @@ Vec3 Moveable::GetPos() const
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 {
-	auto oldPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPHDPos(m_item->Pose);
+	auto prevPos = m_item->Pose.Position.ToVector3();
+	pos.StoreInPose(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
@@ -569,7 +569,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		// points is significant, do a predictive room update.
 
 		if (!roomUpdated && 
-			(willUpdate || Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
+			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
@@ -685,8 +685,8 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
 {
 	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
-	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
-	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
+	auto color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
+	auto color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
 	ItemCustomBurn(m_item, color1, color2, realTimeout);
 }
 
@@ -715,6 +715,7 @@ short Moveable::GetLocationAI() const
 		auto creature = (CreatureInfo*)m_item->Data;
 		return creature->LocationAI;
 	}
+
 	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
 	return 0;
 }
@@ -730,7 +731,9 @@ void Moveable::SetLocationAI(short value)
 		creature->LocationAI = value;
 	}
 	else
+	{
 		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+	}
 }
 
 ScriptColor Moveable::GetColor() const
@@ -767,6 +770,7 @@ aiBitsType Moveable::GetAIBits() const
 		uint8_t isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
+
 	return ret;
 }
 
@@ -815,9 +819,10 @@ int Moveable::GetFrameNumber() const
 
 Vec3 Moveable::GetVelocity() const
 {
-	return Vec3(int(round(m_item->Animation.Velocity.x)),
-				int(round(m_item->Animation.Velocity.y)),
-				int(round(m_item->Animation.Velocity.z)));
+	return Vec3(
+		(int)round(m_item->Animation.Velocity.x),
+		(int)round(m_item->Animation.Velocity.y),
+		(int)round(m_item->Animation.Velocity.z));
 }
 
 void Moveable::SetVelocity(Vec3 velocity)
@@ -833,6 +838,7 @@ void Moveable::SetFrameNumber(int frameNumber)
 	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
+	
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
 	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
@@ -850,9 +856,9 @@ bool Moveable::GetActive() const
 	return m_item->Active;
 }
 
-void Moveable::SetActive(bool active)
+void Moveable::SetActive(bool isActive)
 {
-	m_item->Active = active;
+	m_item->Active = isActive;
 }
 
 bool Moveable::GetHitStatus() const
@@ -884,27 +890,29 @@ int Moveable::GetRoomNumber() const
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
 // sas:SetRoomNumber(destinationRoom)
 // sas:SetPosition(destinationPosition, false)
-void Moveable::SetRoomNumber(short room)
+void Moveable::SetRoomNumber(int roomNumber)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
-	if (room < 0 || static_cast<size_t>(room) >= nRooms)
+	if (roomNumber < 0 || (size_t)roomNumber >= nRooms)
 	{
-		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", room, nRooms);
+		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", roomNumber, nRooms);
 		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
 		return;
 	}
 
 	if (!m_initialised)
-		m_item->RoomNumber = room;
+	{
+		m_item->RoomNumber = roomNumber;
+	}
 	else
 	{
-		ItemNewRoom(m_num, room);
+		ItemNewRoom(m_num, roomNumber);
 
 		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
 		// or else camera won't be updated properly.
 
 		if (m_item->IsLara())
-			m_item->Location.roomNumber = room;
+			m_item->Location.roomNumber = roomNumber;
 	}
 }
 
@@ -931,16 +939,20 @@ bool Moveable::GetMeshVisible(int meshId) const
 // Use this to show or hide a specified mesh of an object.
 // @function Moveable:SetMeshVisible
 // @int index index of a mesh
-// @bool visible true if you want the mesh to be visible, false otherwise
-void Moveable::SetMeshVisible(int meshId, bool visible)
+// @bool isVisible true if you want the mesh to be visible, false otherwise
+void Moveable::SetMeshVisible(int meshId, bool isVisible)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	if (visible)
+	if (isVisible)
+	{
 		m_item->MeshBits.Set(meshId);
+	}
 	else
+	{
 		m_item->MeshBits.Clear(meshId);
+	}
 }
 
 /// Shatters specified mesh and makes it invisible
@@ -982,7 +994,6 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 
 	if (!swapMeshIndex.has_value())
 		 swapMeshIndex = meshId;
-
 
 	if (swapSlotId <= -1 || swapSlotId >= ID_NUMBER_OBJECTS)
 	{
@@ -1079,14 +1090,18 @@ void Moveable::MakeInvisible()
 /// Set the item's visibility. __An invisible item will have collision turned off, as if it no longer exists in the game world__.
 // @bool visible true if the caller should become visible, false if it should become invisible
 // @function Moveable:SetVisible
-void Moveable::SetVisible(bool visible)
+void Moveable::SetVisible(bool isVisible)
 {
-	if (!visible)
+	if (!isVisible)
 	{
 		if (Objects[m_item->ObjectNumber].intelligent)
+		{
 			DisableItem();
+		}
 		else
+		{
 			RemoveActiveItem(m_num, false);
+		}
 
 		m_item->Status = ITEM_INVISIBLE;
 
@@ -1098,9 +1113,13 @@ void Moveable::SetVisible(bool visible)
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
 			if(!(m_item->Flags & IFLAG_KILLED))
+			{
 				EnableItem();
+			}
 			else
+			{
 				m_item->Status = ITEM_ACTIVE;
+			}
 		}
 		else
 		{
@@ -1153,9 +1172,7 @@ bool Moveable::MeshExists(int index) const
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
 	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
-	{
 		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
-	}
 }
 
 //Borrow an animtaion and state id from an object.
