@@ -74,7 +74,7 @@ struct LOTInfo
 struct CreatureBiteInfo
 {
 	Vector3i Position = Vector3i::Zero;
-	int BoneID = NO_JOINT;
+	int BoneID = -1;
 
 	CreatureBiteInfo() {}
 	CreatureBiteInfo(Vector3i pos, int bone)
