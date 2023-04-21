@@ -24,7 +24,7 @@ public:
 
 	void								ShowString(DisplayString const&, sol::optional<float> nSeconds);
 
-	bool								isStringDisplaying(DisplayString const& str);
+	bool								IsStringDisplaying(DisplayString const& str);
 
 	void								Register(sol::state* state);
 };
