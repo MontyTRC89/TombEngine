@@ -129,7 +129,7 @@ namespace TEN::Collision::Attractors
 		return AttractorProximityData{ closestPoint, closestDist, distFromStart, segmentIndex };
 	}
 
-	Vector3 Attractor::GetPointAtDistance(float distAlongLine) const
+	Vector3 Attractor::GetPointAtDistance(float lineDist) const
 	{
 		// Attractor has no points; return world origin.
 		if (Points.empty())
@@ -143,11 +143,11 @@ namespace TEN::Collision::Attractors
 			return Points[0];
 
 		// Clamp point according to attractor length.
-		if (distAlongLine <= 0.0f)
+		if (lineDist <= 0.0f)
 		{
 			return Points[0];
 		}
-		else if (distAlongLine >= Length)
+		else if (lineDist >= Length)
 		{
 			return Points.back();
 		}
@@ -160,7 +160,7 @@ namespace TEN::Collision::Attractors
 			const auto& target = Points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingDist = distAlongLine - distTravelled;
+			float remainingDist = lineDist - distTravelled;
 
 			if (remainingDist <= segmentLength)
 			{
@@ -175,7 +175,7 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	float Attractor::GetDistanceAtPoint(const Vector3& pointOnLine, unsigned int segmentIndex) const 
+	float Attractor::GetDistanceAtPoint(const Vector3& linePoint, unsigned int segmentIndex) const 
 	{
 		// Segment index out of range; return attractor length.
 		if (segmentIndex >= Points.size())
@@ -197,11 +197,11 @@ namespace TEN::Collision::Attractors
 				continue;
 			}
 
-			float pointToAttractorThreshold = Geometry::GetDistanceToLine(pointOnLine, origin, target);
+			float pointToAttractorThreshold = Geometry::GetDistanceToLine(linePoint, origin, target);
 			if (pointToAttractorThreshold > SQRT_2)
 				TENLog(std::string("GetDistanceAtPoint(): point beyond attractor."), LogLevel::Warning);
 
-			distAlongLine += Vector3::Distance(origin, pointOnLine);
+			distAlongLine += Vector3::Distance(origin, linePoint);
 		}
 
 		return distAlongLine;

@@ -130,6 +130,12 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll)
 {
+	// TODO:
+	// If center pos is not near the end of an attractor, only reference current attractor for collision.
+	// Otherwise, check side positions. If they have found a new attractor, the center can keep referencing the current attractor.
+	// If they have not found a new attractor, limit movement.
+	// If the center probe is beyond the end of the current attractor, probe for a new one using the same method as for the side.
+
 	auto& player = GetLaraInfo(item);
 
 	auto basePos = item.Pose.Position.ToVector3();
@@ -171,7 +177,7 @@ bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 	auto& player = GetLaraInfo(item);
 
 	// Get edge attractor collision at three points.
-	auto edgeAttracColls = GetEdgeHangAttractorCollisions(*item, *coll);
+	auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll);
 
 	// Check if edge was found.
 	if (!edgeAttracColls.Center.has_value())
@@ -193,17 +199,17 @@ bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 
 		// Align orientation.
 		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-		item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
+		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
 
 		// Align position.
 		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-		auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
-		item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
+		auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
+		item.Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
 		return true;
 	}
 
-	SetPlayerEdgeHangRelease(*item);
+	SetPlayerEdgeHangRelease(item);
 	return false;
 
 	// -----------------------------------------
