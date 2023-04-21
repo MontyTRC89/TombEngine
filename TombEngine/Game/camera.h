@@ -2,6 +2,8 @@
 #include "Game/items.h"
 #include "Math/Math.h"
 
+struct CollisionInfo;
+
 enum class CameraType
 {
 	Chase,
@@ -79,10 +81,10 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void DoLookAround(ItemInfo* item, bool invertVerticalAxis = true);
-void ClearLookAroundActions(ItemInfo* item);
+void DoLookAround(ItemInfo& item, bool invertVerticalAxis = true);
+void ClearLookAroundActions(const ItemInfo& item);
 void DoThumbstickCamera();
-void LookCamera(ItemInfo* item);
+void LookCamera(ItemInfo& item, const CollisionInfo& coll);
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(short value, bool store = true);
@@ -97,8 +99,8 @@ void FixedCamera(ItemInfo* item);
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
-void CalculateCamera();
-void ResetLook(ItemInfo* item, float alpha = 0.9f);
+void CalculateCamera(const CollisionInfo& coll);
+void ResetLook(ItemInfo& item, float alpha = 0.9f);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);

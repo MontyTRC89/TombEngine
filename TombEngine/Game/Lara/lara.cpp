@@ -895,10 +895,12 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
-		DoLookAround(item);
+		DoLookAround(*item);
 	}
 	else //if (!lara->Control.IsFlexing)
-		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
+	{
+		ResetLook(*item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
+	}
 	lara->Control.Look.Mode = LookMode::None;
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
@@ -907,7 +909,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle current Lara status.
+	// Handle player state.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
@@ -917,7 +919,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
-		// Handle player collision.
+		// Handle player state collision.
 		if (lara->Context.Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
 	}
@@ -963,10 +965,14 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
-		DoLookAround(item);
+	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	{
+		DoLookAround(*item);
+	}
 	else
-		ResetLook(item);
+	{
+		ResetLook(*item);
+	}
 
 	lara->Control.Count.Pose = 0;
 
@@ -1032,10 +1038,14 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
-		DoLookAround(item);
+	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	{
+		DoLookAround(*item);
+	}
 	else
-		ResetLook(item);
+	{
+		ResetLook(*item);
+	}
 
 	lara->Control.Count.Pose = 0;
 
@@ -1107,7 +1117,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	
 	LaraUnderwater(item, coll);
 
-	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
+	if (IsHeld(In::Walk) && !IsHeld(In::Look))
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->Context.WaterSurfaceDist > 0 && lara->Context.WaterSurfaceDist != NO_HEIGHT))
 		{

@@ -184,7 +184,7 @@ GameStatus ControlPhase(int numFrames)
 		{
 			// Do the standard camera.
 			TrackCameraInit = false;
-			CalculateCamera();
+			CalculateCamera(LaraCollision);
 		}
 
 		// Update oscillator seed.

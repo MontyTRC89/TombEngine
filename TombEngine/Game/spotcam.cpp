@@ -715,7 +715,7 @@ void CalculateSpotCameras()
 
 					int elevation = Camera.targetElevation;
 
-					CalculateCamera();
+					CalculateCamera(LaraCollision);
 
 					CameraRoll[2] = 0;
 					CameraRoll[3] = 0;
@@ -778,7 +778,7 @@ void CalculateSpotCameras()
 			SpotCamFirstLook = true;
 		}
 
-		CalculateCamera();
+		CalculateCamera(LaraCollision);
 	}
 	else
 	{
@@ -788,7 +788,7 @@ void CalculateSpotCameras()
 		Lara.Control.Locked = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
-		CalculateCamera();
+		CalculateCamera(LaraCollision);
 		CheckTrigger = false;
 	}
 }
