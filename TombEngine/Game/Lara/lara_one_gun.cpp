@@ -1371,7 +1371,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0.
 		int grenadeItemNumber = CreateItem();
-		if (renadeItemNumber == NO_ITEM)
+		if (grenadeItemNumber == NO_ITEM)
 			return true;
 
 		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
@@ -1396,7 +1396,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
 		grenadeItem.Animation.RequiredState = NO_STATE;
 
-		AddActiveItem(renadeItemNumber);
+		AddActiveItem(grenadeItemNumber);
 
 		grenadeItem.Status = ITEM_INVISIBLE;
 		grenadeItem.ItemFlags[3] = 1;
