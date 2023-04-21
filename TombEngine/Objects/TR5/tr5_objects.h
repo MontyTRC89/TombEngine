@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseTR5Objects();
+void InitializeTR5Objects();
 void AllocTR5Objects();

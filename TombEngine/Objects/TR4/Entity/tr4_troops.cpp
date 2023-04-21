@@ -47,11 +47,11 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseTroops(short itemNumber)
+	void InitializeTroops(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{

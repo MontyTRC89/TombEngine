@@ -9,7 +9,7 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSlicerDicer(short itemNumber)
+	void InitializeSlicerDicer(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

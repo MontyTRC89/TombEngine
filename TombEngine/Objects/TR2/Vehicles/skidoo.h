@@ -6,7 +6,7 @@
 namespace TEN::Entities::Vehicles
 {
 	SkidooInfo* GetSkidooInfo(ItemInfo* skidooItem);
-	void InitialiseSkidoo(short itemNumber);
+	void InitializeSkidoo(short itemNumber);
 
 	void SkidooPlayerCollision(short skidooItemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType);

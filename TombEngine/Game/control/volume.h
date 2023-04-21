@@ -44,7 +44,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(CAMERA_INFO* camera);
 
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
-	void InitialiseNodeScripts();
+	void InitializeNodeScripts();
 }
 
 // TODO: Move into namespace and deal with errors.

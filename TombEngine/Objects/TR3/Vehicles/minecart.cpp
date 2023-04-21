@@ -165,7 +165,7 @@ namespace TEN::Entities::Vehicles
 		return (MinecartInfo*)minecartItem->Data;
 	}
 
-	void InitialiseMinecart(short itemNumber)
+	void InitializeMinecart(short itemNumber)
 	{
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();

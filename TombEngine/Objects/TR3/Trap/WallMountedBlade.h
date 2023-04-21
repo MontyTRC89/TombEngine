@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Traps
 {
-	void InitialiseWallMountedBlade(short itemNumber);
+	void InitializeWallMountedBlade(short itemNumber);
 	void WallMountedBladeControl(short itemNumber);
 }

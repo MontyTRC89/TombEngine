@@ -36,7 +36,7 @@ namespace TEN::Entities::Traps
 
 	std::vector <ItemInfo*> MyPushablesList = {};
 
-	void InitialiseElectricCleaner(short itemNumber)
+	void InitializeElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

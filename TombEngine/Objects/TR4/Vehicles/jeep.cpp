@@ -142,7 +142,7 @@ namespace TEN::Entities::Vehicles
 		return (JeepInfo*)jeepItem->Data;
 	}
 
-	void InitialiseJeep(short itemNumber)
+	void InitializeJeep(short itemNumber)
 	{
 		auto* jeepItem = &g_Level.Items[itemNumber];
 		jeepItem->Data = JeepInfo();

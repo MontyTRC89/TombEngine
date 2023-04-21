@@ -99,7 +99,7 @@ void ClearRats()
 	}
 }
 
-void InitialiseLittleRats(short itemNumber)
+void InitializeLittleRats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

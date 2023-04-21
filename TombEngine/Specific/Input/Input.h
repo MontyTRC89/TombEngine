@@ -140,8 +140,8 @@ namespace TEN::Input
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
-	void InitialiseInput(HWND handle);
-	void DeinitialiseInput();
+	void InitializeInput(HWND handle);
+	void DeinitializeInput();
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
 	void ApplyActionQueue();

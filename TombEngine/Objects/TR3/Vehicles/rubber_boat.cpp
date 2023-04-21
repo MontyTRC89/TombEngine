@@ -102,7 +102,7 @@ namespace TEN::Entities::Vehicles
 		return (RubberBoatInfo*)rBoatItem->Data;
 	}
 
-	void InitialiseRubberBoat(short itemNumber)
+	void InitializeRubberBoat(short itemNumber)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		rBoatItem->Data = RubberBoatInfo();

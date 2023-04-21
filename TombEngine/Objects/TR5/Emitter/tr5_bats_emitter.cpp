@@ -17,7 +17,7 @@ using namespace TEN::Math;
 int NextBat;
 BatData Bats[NUM_BATS];
 
-void InitialiseLittleBats(short itemNumber)
+void InitializeLittleBats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

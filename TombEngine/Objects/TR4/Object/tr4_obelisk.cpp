@@ -15,7 +15,7 @@
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Input;
 
-void InitialiseObelisk(short itemNumber)
+void InitializeObelisk(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
