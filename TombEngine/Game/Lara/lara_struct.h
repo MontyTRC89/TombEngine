@@ -1293,7 +1293,13 @@ struct PlayerStatusData
 struct PlayerAttractorData
 {
 	const Attractor* AttractorPtr = nullptr;
-	float LineDistance = 0.0f;
+	float DistanceAlongLine = 0.0f;
+
+	// Debug
+	Attractor			   DebugAttractor0	= {};
+	Attractor			   DebugAttractor1	= {};
+	Attractor			   DebugAttractor2	= {};
+	std::vector<Attractor> SectorAttractors = {};
 };
 
 // TODO: Savegame.
@@ -1301,13 +1307,6 @@ struct PlayerContextData
 {
 	PlayerAttractorData HandsAttractor = {};
 	PlayerAttractorData FeetAttractor  = {}; // TODO: For climbable walls.
-
-	// -----Debug
-	Attractor			   DebugAttractor0	= {};
-	Attractor			   DebugAttractor1	= {};
-	Attractor			   DebugAttractor2	= {};
-	std::vector<Attractor> SectorAttractors = {};
-	// -----
 
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;

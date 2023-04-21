@@ -190,7 +190,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 
 	player.Context.HandsAttractor.AttractorPtr = catchData.AttractorPtr;
-	player.Context.HandsAttractor.LineDistance = catchData.DistanceAlongLine;
+	player.Context.HandsAttractor.DistanceAlongLine = catchData.DistanceAlongLine;
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData& catchData)
@@ -1062,8 +1062,6 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
-	player.Context.HandsAttractor.AttractorPtr = nullptr;
-	player.Context.HandsAttractor.LineDistance = 0.0f;
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)

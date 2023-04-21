@@ -252,8 +252,8 @@ namespace TEN::Entities::Player::Context
 
 			// 3) Test if target point is attractor end.
 			if (!hasEnd &&
-				(attracColl.Proximity.LineDistance <= EPSILON ||
-					(attracColl.AttractorPtr->GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
+				(attracColl.Proximity.DistanceAlongLine <= EPSILON ||
+					(attracColl.AttractorPtr->GetLength() - attracColl.Proximity.DistanceAlongLine) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
@@ -323,10 +323,10 @@ namespace TEN::Entities::Player::Context
 		if (!attracColl.has_value())
 			return std::nullopt;
 
-		// TODO: Probe new attractors.
+		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.DistanceAlongLine - coll.Setup.Radius);
+		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.DistanceAlongLine + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
@@ -335,7 +335,7 @@ namespace TEN::Entities::Player::Context
 			attracColl->AttractorPtr,
 			EDGE_TYPE,
 			attracColl->Proximity.Point,
-			attracColl->Proximity.LineDistance,
+			attracColl->Proximity.DistanceAlongLine,
 			headingAngle
 		};
 	}

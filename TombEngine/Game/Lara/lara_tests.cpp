@@ -44,6 +44,13 @@ context assessment returns bool only.
 -special coll stop function unnecessary?
 */
 
+struct EdgeHangAttractorCollisionData
+{
+	std::optional<AttractorCollisionData> Center	 = std::nullopt;
+	std::optional<AttractorCollisionData> Left		 = std::nullopt;
+	std::optional<AttractorCollisionData> Right		 = std::nullopt;
+};
+
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 {
 	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
@@ -69,7 +76,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// TODO: Test if this works. Redo.
 		// 3) Test if target point is lone corner.
-		if (attracColl.Proximity.LineDistance <= EPSILON && !hasFoundCorner)
+		if (attracColl.Proximity.DistanceAlongLine <= EPSILON && !hasFoundCorner)
 		/*{
 			hasFoundCorner = true;
 			continue;
@@ -121,69 +128,83 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	return GetBestEdgeHangAttractorCollision(attracColls, item, coll);
 }
 
-static std::optional<AttractorCollisionData> GetEdgeHangAttractorCollision(const ItemInfo& item, const CollisionInfo& coll, float lineDistOffset)
+static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll)
 {
-	const auto& player = GetLaraInfo(item);
-	const auto& handsAttrac = player.Context.HandsAttractor;
-
-	// No references attractor; return nullopt.
-	if (handsAttrac.AttractorPtr == nullptr)
-		return std::nullopt;
+	auto& player = GetLaraInfo(item);
 
 	auto basePos = item.Pose.Position.ToVector3();
-	auto orient = item.Pose.Orientation;
-	auto range = coll.Setup.Radius;
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y)); // Or simply use player orient?
+	float range = OFFSET_RADIUS(coll.Setup.Radius);
 
-	// 
-	float lineDist = handsAttrac.LineDistance + lineDistOffset;
-	/*if (lineDist < 0.0f || (handsAttrac.AttractorPtr->GetLength() - lineDist) < 0.0f)
+	// Determine relative probe offsets.
+	auto relOffsetCenter = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
+	auto relOffsetLeft = Vector3(-coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+	auto relOffsetRight = Vector3(coll.Setup.Radius, -coll.Setup.Height, coll.Setup.Radius);
+
+	// Get attractor collisions.
+	auto attracCollCenter = GetBestEdgeHangAttractorCollision(item, coll, relOffsetCenter, rotMatrix, range);
+	auto attracCollLeft = GetBestEdgeHangAttractorCollision(item, coll, relOffsetLeft, rotMatrix, range);
+	auto attracCollRight = GetBestEdgeHangAttractorCollision(item, coll, relOffsetRight, rotMatrix, range);
+	
+	// Debug
+	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
+
+	// Attractor target points.
+	if (attracCollCenter.has_value())
+		g_Renderer.AddLine3D(attracCollCenter->Proximity.Point, attracCollCenter->Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+	if (attracCollLeft.has_value())
+		g_Renderer.AddLine3D(attracCollLeft->Proximity.Point, attracCollLeft->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+	if (attracCollRight.has_value())
+		g_Renderer.AddLine3D(attracCollRight->Proximity.Point, attracCollRight->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+
+	// Return edge attractor collisions.
+	return EdgeHangAttractorCollisionData
 	{
-		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y));
-		auto relOffset = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
-		auto refPoint = basePos + Vector3::Transform(relOffset, rotMatrix);
-
-		return GetBestEdgeHangAttractorCollision(item, coll, relOffset, rotMatrix, range);//
-	}*/
-
-	// Get and return attractor collision on current attractor.
-	auto refPoint = handsAttrac.AttractorPtr->GetPointAtDistance(lineDist);
-	return handsAttrac.AttractorPtr->GetCollision(basePos, orient, refPoint, range);
+		attracCollCenter,
+		attracCollLeft,
+		attracCollRight
+	};
 }
 
 bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(item);
 
-	bool isGoingRight = ((item.Pose.Orientation.y - player.Control.MoveAngle) >= 0);
+	// Get edge attractor collision at three points.
+	auto edgeAttracColls = GetEdgeHangAttractorCollisions(*item, *coll);
 
-	// Get edge attractor collision.
-	auto edgeAttracColl = GetEdgeHangAttractorCollision(item, coll, item.Animation.Velocity.z * (isGoingRight ? 1 : -1));
-
-	// If no edge, release.
-	if (!edgeAttracColl.has_value())
+	// Check if edge was found.
+	if (!edgeAttracColls.Center.has_value())
 	{
 		SetPlayerEdgeHangRelease(item);
 		return false;
 	}
-	
-	short headingAngle = edgeAttracColl->HeadingAngle;
 
-	// Align orientation.
-	player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-	item.Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
+	// TODO: Handle correction at attractor ends.
+	if (edgeAttracColls.Center.has_value() &&
+		edgeAttracColls.Left.has_value() &&
+		edgeAttracColls.Right.has_value())
+	{
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Proximity.Point, edgeAttracColls.Right->Proximity.Point);
+		auto headingAngle = orient.y - ANGLE(90.0f);
 
-	// Align position.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-	auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
-	item.Pose.Position = edgeAttracColl->Proximity.Point + Vector3::Transform(relOffset, rotMatrix);
+		// TODO: Works on reflex transition, but not an obtuse one.
+		auto targetPoint = edgeAttracColls.Center->Proximity.Point;
 
-	player.Context.HandsAttractor.AttractorPtr = edgeAttracColl->AttractorPtr;
-	player.Context.HandsAttractor.LineDistance = edgeAttracColl->Proximity.LineDistance;
+		// Align orientation.
+		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
+		item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.5f);
 
-	g_Renderer.PrintDebugMessage("vel: %.3f", item.Animation.Velocity.x);
-	g_Renderer.PrintDebugMessage("full: %.3f", player.Context.HandsAttractor.LineDistance);
+		// Align position.
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+		auto relOffset = Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius);
+		item->Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
-	return true;
+		return true;
+	}
+
+	SetPlayerEdgeHangRelease(*item);
+	return false;
 
 	// -----------------------------------------
 
