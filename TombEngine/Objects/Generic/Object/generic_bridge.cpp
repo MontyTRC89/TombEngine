@@ -3,7 +3,7 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
 void InitializeBridge(short itemNumber)
 {

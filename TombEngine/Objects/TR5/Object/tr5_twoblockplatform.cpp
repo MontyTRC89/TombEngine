@@ -10,7 +10,7 @@
 #include "Renderer/Renderer11.h"
 using namespace TEN::Renderer;
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
 void InitializeTwoBlocksPlatform(short itemNumber)
 {
