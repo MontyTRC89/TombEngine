@@ -153,8 +153,8 @@ void DisplayString::Register(sol::table& parent)
 		// varDisplayString:SetFlags{ TEN.Strings.DisplayStringOption.CENTER }
 		ScriptReserved_SetFlags, &DisplayString::SetFlags,
 
-		//Set translated parameter of the string
-		// @tparam bool if true this will be the string key for the translation that will be displayed.
+		/// Set translated parameter of the string
+		// @tparam bool shouldTranslate if true this will be the string key for the translation that will be displayed.
 		// If false, this will be the string that's displayed
 		ScriptReserved_SetTranslated, & DisplayString::SetTranslated
 	);
