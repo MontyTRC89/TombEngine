@@ -135,6 +135,8 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	// Otherwise, check side positions. If they have found a new attractor, the center can keep referencing the current attractor.
 	// If they have not found a new attractor, limit movement.
 	// If the center probe is beyond the end of the current attractor, probe for a new one using the same method as for the side.
+	// OR
+	// Simple probes were the best method to begin with and this is overly complex.
 
 	auto& player = GetLaraInfo(item);
 
