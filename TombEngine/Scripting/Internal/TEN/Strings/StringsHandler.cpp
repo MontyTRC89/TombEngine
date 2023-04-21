@@ -41,7 +41,7 @@ Checks if the string is shown
 @tparam DisplayString str the string object to be checked
 @treturn bool true if it is shown, false if it is hidden
 */
-	table_strings.set_function(ScriptReserved_isStringDisplaying, &StringsHandler::isStringDisplaying, this);
+	table_strings.set_function(ScriptReserved_IsStringDisplaying, &StringsHandler::IsStringDisplaying, this);
 
 	DisplayString::Register(table_strings);
 	DisplayString::SetCallbacks(
@@ -89,7 +89,7 @@ void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> 
 	it->second.m_isInfinite = !nSeconds.has_value();
 }
 
-bool StringsHandler::isStringDisplaying(DisplayString const& str)
+bool StringsHandler::IsStringDisplaying(DisplayString const& str)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
 	bool endOfLife = 0.0f >= it->second.m_timeRemaining;
