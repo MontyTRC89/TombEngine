@@ -16,6 +16,9 @@ struct WaterClimbOutTestResult;
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
+void HandlePlayerCrawlFlex(ItemInfo& item);
+void HandlePlayerSwimFlex(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
@@ -47,8 +50,6 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);
 void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item);
 void ModulateLaraSlideSteering(ItemInfo* item, CollisionInfo* coll);
 void UpdateLaraSubsuitAngles(ItemInfo* item);
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 

@@ -1047,10 +1047,10 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (IsHeld(In::Look) && lara.Control.CanLook)
+	/*if (IsHeld(In::Look) && lara.Control.CanLook)
 		LookLeftRight(item);
 	else
-		ResetLook(item);
+		ResetLook(item);*/
 
 	lara.Control.CanLook = true;
 	lara.Control.Count.Pose = 0;

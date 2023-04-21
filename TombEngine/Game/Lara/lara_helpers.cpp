@@ -149,6 +149,67 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+{
+	// Check if player is moving.
+	if (item->Animation.Velocity.z == 0.0f)
+		return;
+
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	short angleMaxNorm = maxAngle * axisCoeff;
+
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		angleMaxNorm *= 0.6f;
+
+	int sign = copysign(1, axisCoeff);
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(angleMaxNorm - item->Pose.Orientation.z) / 3) * sign;
+}
+
+void HandlePlayerCrawlFlex(ItemInfo& item)
+{
+	constexpr auto FLEX_RATE_ANGLE = ANGLE(2.25f);
+	constexpr auto FLEX_ANGLE_MAX  = ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+
+	auto& player = GetLaraInfo(item);
+
+	// Check if player is moving.
+	if (item.Animation.Velocity.z == 0.0f)
+		return;
+
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = FLEX_ANGLE_MAX * axisCoeff;
+
+	if (abs(player.ExtraTorsoRot.z) < FLEX_ANGLE_MAX)
+		player.ExtraTorsoRot.z += std::min<short>(FLEX_RATE_ANGLE, abs(maxAngleNormalized - player.ExtraTorsoRot.z) / 6) * sign;
+
+	if (!IsHeld(In::Look) && item.Animation.ActiveState != LS_CRAWL_BACK)
+	{
+		player.ExtraHeadRot.z = player.ExtraTorsoRot.z / 2;
+		player.ExtraHeadRot.y = player.ExtraHeadRot.z;
+	}
+}
+
+void HandlePlayerSwimFlex(ItemInfo& item)
+{
+	constexpr auto FLEX_ANGLE_MAX = ANGLE(60.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+	constexpr auto ALPHA		  = 0.1f;
+
+	auto& player = GetLaraInfo(item);
+
+	// Calculate extra rotation target.
+	float axisCoeffX = AxisMap[InputAxis::MoveVertical];
+	float axisCoeffZ = AxisMap[InputAxis::MoveHorizontal];
+	auto targetRot = EulerAngles(
+		FLEX_ANGLE_MAX * -axisCoeffX,
+		0,
+		FLEX_ANGLE_MAX * axisCoeffZ);
+
+	// Apply extra rotation.
+	player.ExtraTorsoRot.Lerp(targetRot, ALPHA);
+	player.ExtraHeadRot = player.ExtraTorsoRot / 3;
+}
+
 void HandlePlayerWetnessDrips(ItemInfo& item)
 {
 	auto& player = *GetLaraInfo(&item);
@@ -674,7 +735,7 @@ void ModulateLaraSlideSteering(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0), 0.1f);
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLIDE_TURN_RATE_MAX);
-	ModulateLaraLean(item, coll, LARA_LEAN_RATE * 0.6f, LARA_LEAN_MAX);
+	HandlePlayerLean(item, coll, LARA_LEAN_RATE * 0.6f, LARA_LEAN_MAX);
 	//ModulateLaraSlideVelocity(item, coll);
 }
 
@@ -745,43 +806,6 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul2 = (float)abs(lara.Control.Subsuit.Velocity[1]) / SECTOR(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
 		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
-	}
-}
-
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
-{
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		maxAngleNormalized *= 0.6f;
-
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
-}
-
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
-{
-	auto& lara = *GetLaraInfo(item);
-
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (abs(lara.ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
-		lara.ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara.ExtraTorsoRot.z) / 6) * sign;
-
-	if (!IsHeld(In::Look) &&
-		item->Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		lara.ExtraHeadRot.z = lara.ExtraTorsoRot.z / 2;
-		lara.ExtraHeadRot.y = lara.ExtraHeadRot.z;
 	}
 }
 

@@ -39,10 +39,6 @@ constexpr auto LARA_CRAWL_MOVE_TURN_RATE_MAX  = ANGLE(1.75f);
 constexpr auto LARA_CROUCH_ROLL_TURN_RATE_MAX = ANGLE(0.75f);
 constexpr auto LARA_POLE_TURN_RATE_MAX		  = ANGLE(2.5f);
 
-// Flex rates
-constexpr auto LARA_CRAWL_FLEX_RATE = ANGLE(2.25f);
-constexpr auto LARA_CRAWL_FLEX_MAX	= ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
-
 constexpr auto LARA_HEIGHT			  = CLICK(3) - 1; // Height in basic states.
 constexpr auto LARA_HEIGHT_CRAWL	  = 350;		  // Height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY	  = 850;		  // Height in monkey swing states.

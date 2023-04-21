@@ -178,7 +178,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CROUCH_ROLL_TURN_RATE_MAX);
-		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+		HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 	}
 
 	item->Animation.TargetState = LS_CROUCH_IDLE;
@@ -553,7 +553,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-		ModulateLaraCrawlFlex(item, LARA_CRAWL_FLEX_RATE, LARA_CRAWL_FLEX_MAX);
+		HandlePlayerCrawlFlex(*item);
 	}
 
 	if ((IsHeld(In::Crouch) || lara.Control.IsInLowSpace) && Context::CanCrouch(item, coll))
@@ -648,7 +648,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-		ModulateLaraCrawlFlex(item, LARA_CRAWL_FLEX_RATE, LARA_CRAWL_FLEX_MAX);
+		HandlePlayerCrawlFlex(*item);
 	}
 
 	if ((IsHeld(In::Crouch) || lara.Control.IsInLowSpace) && Context::CanCrouch(item, coll))

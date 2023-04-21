@@ -5,14 +5,14 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
-#include "Specific/level.h"
 #include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
@@ -48,6 +48,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	HandlePlayerSwimFlex(*item);
 
 	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
@@ -87,6 +88,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	HandlePlayerSwimFlex(*item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
 	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
@@ -123,6 +125,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	isInDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	HandlePlayerSwimFlex(*item);
 
 	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
