@@ -786,10 +786,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, weaponType);
 
-	if (ammo.GetCount() == 0 && !ammo.HasInfinite() && weaponType != LaraWeaponType::Snowmobile)
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 		return FireWeaponType::NoAmmo;
 
-	if (!ammo.HasInfinite() && weaponType != LaraWeaponType::Snowmobile)
+	if (!ammo.HasInfinite())
 		ammo--;
 
 	const auto& weapon = Weapons[(int)weaponType];

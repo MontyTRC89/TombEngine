@@ -228,7 +228,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
 					ShotLara(item, &AI, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
 					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteLeft;
@@ -245,7 +245,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
 					ShotLara(item, &AI, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
 					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteRight;

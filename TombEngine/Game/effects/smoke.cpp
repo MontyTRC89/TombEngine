@@ -114,6 +114,11 @@ namespace TEN::Effects::Smoke
 	//TODO: Refactor different weapon types out of it
 	void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, LaraWeaponType weaponType, byte count)
 	{
+		TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count, LaraItem->RoomNumber);
+	}
+
+	void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, LaraWeaponType weaponType, byte count, short roomNumber)
+	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
 		s.active = true;
@@ -124,7 +129,7 @@ namespace TEN::Effects::Smoke
 
 		s.velocity = direction;
 		s.gravity = -.1f;
-		s.affectedByWind = TestEnvironment(ENV_FLAG_WIND, LaraItem);
+		s.affectedByWind = TestEnvironment(ENV_FLAG_WIND, x, y, z, roomNumber);
 		s.sourceColor = Vector4(.4f, .4f, .4f, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
 
@@ -135,7 +140,7 @@ namespace TEN::Effects::Smoke
 				float size = Random::GenerateFloat(48, 80);
 				s.sourceSize = size * 2;
 				s.destinationSize = size * 8;
-				s.sourceColor = {0.75,0.75,1,1};
+				s.sourceColor = { 0.75,0.75,1,1 };
 				s.terminalVelocity = 0;
 				s.friction = 0.82f;
 				s.life = Random::GenerateFloat(60, 90);
@@ -176,51 +181,6 @@ namespace TEN::Effects::Smoke
 			if (weaponType == LaraWeaponType::RocketLauncher)
 				s.sourceColor = { 0.75, 0.75, 1, 1 };
 
-			s.sourceSize = size / 2;
-			s.destinationSize = size * 4;
-			s.terminalVelocity = 0;
-			s.friction = 0.97f;
-			s.life = Random::GenerateFloat(42, 62);
-			s.velocity *= Random::GenerateFloat(16, 40);
-		}
-
-		s.position = Vector3(x, y, z);
-		s.position += Vector3(Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8));
-		s.angularVelocity = Random::GenerateFloat(-PI_DIV_4, PI_DIV_4);
-		s.angularDrag = 0.95f;
-		s.room = LaraItem->RoomNumber;
-	}
-
-	void TriggerGunSmokeParticles(ItemInfo* item, int x, int y, int z, int xv, int yv, int zv, byte initial, byte count, short roomNumber)
-	{
-		auto& s = GetFreeSmokeParticle();
-		s = {};
-		s.active = true;
-		s.position = Vector3(x, y, z);
-
-		Vector3 direction = Vector3(xv, yv, zv);
-		direction.Normalize();
-
-		s.velocity = direction;
-		s.gravity = -0.1f;
-		s.affectedByWind = TestEnvironment(ENV_FLAG_WIND, item);
-		s.sourceColor = Vector4(.4f, .4f, .4f, 1);
-		s.destinationColor = Vector4(0, 0, 0, 0);
-
-		if (initial)
-		{
-			float size = Random::GenerateFloat(48, 73);
-			s.sourceSize = size;
-			s.destinationSize = size * 4;
-			s.terminalVelocity = 0;
-			s.friction = 0.88f;
-			s.life = Random::GenerateFloat(60, 90);
-			s.velocity = Random::GenerateDirectionInCone(direction, 10);
-			s.velocity *= Random::GenerateFloat(16, 30);
-		}
-		else
-		{
-			float size = (float)((GetRandomControl() & 0x0F) + 48);
 			s.sourceSize = size / 2;
 			s.destinationSize = size * 4;
 			s.terminalVelocity = 0;

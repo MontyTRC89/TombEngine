@@ -50,30 +50,6 @@ struct OVERLAP
 	int flags;
 };
 
-/*struct BiteInfo
-{
-	Vector3 Position = Vector3::Zero;
-	int		meshNum = 0;
-
-	BiteInfo()
-	{
-		this->Position = Vector3::Zero;
-		this->meshNum = 0;
-	}
-
-	BiteInfo(const Vector3& pos, int meshNumber)
-	{
-		this->Position = pos;
-		this->meshNum = meshNumber;
-	}
-
-	BiteInfo(float xPos, float yPos, float zPos, int meshNumber)
-	{
-		this->Position = Vector3(xPos, yPos, zPos);
-		this->meshNum = meshNumber;
-	}
-};*/
-
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
