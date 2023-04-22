@@ -1004,7 +1004,7 @@ float GetPlayerJumpVelocity(float jumpHeight)
 	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
 	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
 	constexpr auto A2				= -9600.0f;
-	constexpr auto UNIT_CONV_FACTOR = 12;
+	constexpr auto UNIT_CONV_FACTOR = 12.0f;
 	constexpr auto OFFSET			= -3.0f;
 
 	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
