@@ -74,47 +74,49 @@ struct LOTInfo
 struct CreatureBiteInfo
 {
 	Vector3i Position = Vector3i::Zero;
-	int BoneID = -1;
+	int		 BoneID	  = -1;
 
 	CreatureBiteInfo() {}
-	CreatureBiteInfo(Vector3i pos, int bone)
+
+	CreatureBiteInfo(const Vector3i& pos, int boneID)
 	{
 		Position = pos;
-		BoneID = bone;
+		BoneID = boneID;
 	}
-	CreatureBiteInfo(int x, int y, int z, int bone)
+
+	CreatureBiteInfo(int x, int y, int z, int boneID)
 	{
 		Position = Vector3i(x, y, z);
-		BoneID = bone;
+		BoneID = boneID;
 	}
 };
 
 struct CreatureMuzzleflashInfo
 {
-	CreatureBiteInfo Bite;
-	int Delay = 0;
-	// This will change the muzzle object to ID_GUNFLASH2.
-	bool SwitchToMuzzle2 = false;
-	// This value apply the x rotation for the muzzleflash, it's required for entity.
-	bool ApplyXRotation = true;
-	// This value apply the y rotation for the muzzleflash, it's required for entity.
-	bool ApplyZRotation = true;
-	// Does CreatureAnimation call TriggerGunSmokeParticles ?
-	bool UseSmoke = true;
+	CreatureBiteInfo Bite = {};
+
+	int	 Delay			 = 0;
+	bool SwitchToMuzzle2 = false; // Changes muzzle object to ID_GUNFLASH2.
+	bool ApplyXRotation	 = true;  // Applies X axis rotation for muzzleflash (required for creatures).
+	bool ApplyZRotation	 = true;  // Applies Y axis rotation for muzzleflash (required for creatures).
+	bool UseSmoke		 = true;  // Determines if CreatureAnimation calls TriggerGunSmokeParticles().
 
 	CreatureMuzzleflashInfo() {}
-	CreatureMuzzleflashInfo(Vector3i pos, int bone, int delay, bool changeToMuzzle2 = false)
+
+	CreatureMuzzleflashInfo(const Vector3i& pos, int boneID, int delay, bool changeToMuzzle2 = false)
 	{
-		Bite = CreatureBiteInfo(pos, bone);
+		Bite = CreatureBiteInfo(pos, boneID);
 		Delay = delay;
 		SwitchToMuzzle2 = changeToMuzzle2;
 	}
+
 	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false)
 	{
 		Bite = bite;
 		Delay = delay;
 		SwitchToMuzzle2 = changeToMuzzle2;
 	}
+
 	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false, bool applyXRot = true, bool applyZRot = true)
 	{
 		Bite = bite;
@@ -155,7 +157,7 @@ struct CreatureInfo
 	short LocationAI  = 0;
 	short Flags		  = 0;
 
-	bool TargetIsAlive();
+	bool IsTargetAlive();
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority = CreatureAIPriority::None;
