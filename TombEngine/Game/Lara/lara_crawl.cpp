@@ -46,22 +46,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	// Setup
-	item->Animation.Velocity.y = 0.0f;
-	item->Animation.IsAirborne = false;
-	player.Control.IsInLowSpace = Context::IsInLowSpace(*item, *coll);
-	player.Control.IsInLowPosition = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = true;
 	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
@@ -130,6 +116,19 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.IsAirborne = false;
+	player.Control.IsInLowSpace = Context::IsInLowSpace(*item, *coll);
+	player.Control.IsInLowPosition = true;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.ExtraTorsoRot = EulerAngles::Zero;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
 	if (Context::CanFall(*item, *coll))
