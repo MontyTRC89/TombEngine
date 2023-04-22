@@ -741,7 +741,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (lara != nullptr && lara->Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (lara != nullptr && lara->Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Free;
@@ -815,7 +815,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		auto* lara = GetLaraInfo(item);
 		lara->Control.IsMoving = false;

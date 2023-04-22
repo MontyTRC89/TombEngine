@@ -13,6 +13,7 @@ namespace TEN::Player::Context
 	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanTurn180(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanRoll180Running(const ItemInfo& item);
 	bool CanRunForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanRunBackward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanWalkForward(const ItemInfo& item, const CollisionInfo& coll);
@@ -52,6 +53,7 @@ namespace TEN::Player::Context
 	bool CanJumpBackward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanJumpLeft(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanJumpRight(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanQueueRunningJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanRunJumpForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSprintJumpForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll);

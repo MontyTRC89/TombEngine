@@ -90,7 +90,7 @@ namespace TEN::Player::Context
 			return false;
 
 		// 2) Test AFK pose timer.
-		if (player.Control.Count.Pose < LARA_POSE_TIME)
+		if (player.Control.Count.Pose < PLAYER_POSE_TIME)
 			return false;
 
 		// 3) Test player hand and water status.
@@ -201,6 +201,19 @@ namespace TEN::Player::Context
 			relFloorHeight >= setupData.UpperFloorBound && // Floor height is below upper floor bound.
 			relCeilHeight < -playerHeight &&			   // Ceiling height is above player height.
 			floorToCeilHeight > playerHeight)			   // Floor-to-ceiling height isn't too narrow.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool CanRoll180Running(const ItemInfo& item)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		if (player.Control.WaterStatus != WaterStatus::Wade &&
+			!player.Control.IsRunJumpQueued)				   // NOTE: Queued running jump blocks 180 roll.
 		{
 			return true;
 		}
@@ -812,12 +825,40 @@ namespace TEN::Player::Context
 		return TestDirectionalStandingJump(item, coll, ANGLE(90.0f));
 	}
 
+	bool CanQueueRunningJump(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto UPPER_FLOOR_BOUND	 = CLICK(0.5f);
+		constexpr auto LOWER_CEIL_BOUND_BASE = -LARA_HEADROOM * 0.8f;
+
+		auto& player = GetLaraInfo(item);
+
+		// Test if running jump is immediately possible.
+		if (Context::CanRunJumpForward(item, coll))
+			return IsRunJumpQueueableState(item.Animation.TargetState);
+
+		// Get point collision.
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, BLOCK(1), -coll.Setup.Height);
+
+		int lowerCeilingBound = (LOWER_CEIL_BOUND_BASE - coll.Setup.Height);
+		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
+		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
+
+		// Assess point collision for possible running jump ahead.
+		if (relCeilHeight < lowerCeilingBound || // Ceiling height is above lower ceiling bound.
+			relFloorHeight >= UPPER_FLOOR_BOUND) // OR floor height ahead is below upper floor bound.
+		{
+			return IsRunJumpQueueableState(item.Animation.TargetState);
+		}
+
+		return false;
+	}
+
 	bool CanRunJumpForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Check running jump timer.
-		if (player.Control.Count.Run < LARA_RUN_JUMP_TIME)
+		if (player.Control.Count.Run < PLAYER_RUN_JUMP_TIME)
 			return false;
 
 		auto setupData = JumpSetupData
@@ -833,7 +874,7 @@ namespace TEN::Player::Context
 	{
 		const auto& player = GetLaraInfo(item);
 
-		// 1) Check whether sprint jump is enabled.
+		// 1) Check if sprint jump is enabled.
 		if (!g_GameFlow->HasSprintJump())
 			return false;
 
@@ -841,8 +882,8 @@ namespace TEN::Player::Context
 		if (!HasStateDispatch(&item, LS_JUMP_FORWARD))
 			return false;
 
-		// 3) Check run timer.
-		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
+		// 3) Check running jump timer.
+		if (player.Control.Count.Run < PLAYER_SPRINT_JUMP_TIME)
 			return false;
 
 		auto setupData = JumpSetupData

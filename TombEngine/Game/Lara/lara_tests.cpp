@@ -1176,14 +1176,15 @@ bool IsJumpState(int state)
 
 bool IsRunJumpQueueableState(int state)
 {
-	static const vector<int> runningJumpQueuableStates
+	static const auto RUN_JUMP_QUEUABLE_STATES = vector<int>
 	{
 		LS_RUN_FORWARD,
 		LS_SPRINT,
 		LS_STEP_UP,
 		LS_STEP_DOWN
 	};
-	return TestState(state, runningJumpQueuableStates);
+
+	return TestState(state, RUN_JUMP_QUEUABLE_STATES);
 }
 
 bool IsRunJumpCountableState(int state)

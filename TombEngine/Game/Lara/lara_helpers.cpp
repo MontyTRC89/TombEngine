@@ -50,7 +50,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && Context::CanStrikeAfkPose(*item, *coll) &&
+	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && Context::CanStrikeAfkPose(*item, *coll) &&
 		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
@@ -750,29 +750,6 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	// Apply extra rotation according to alpha.
 	auto extraRot = orient - item->Pose.Orientation;
 	item->Pose.Orientation += extraRot * alpha;
-}
-
-// TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. -- Sezz 2022.01.22
-void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	int distance = SECTOR(1);
-	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
-
-	if ((Context::CanRunJumpForward(*item, *coll) ||													// Area close ahead is permissive...
-		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
-		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		lara->Control.IsRunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
-	}
-	else
-	{
-		lara->Control.IsRunJumpQueued = false;
-	}
 }
 
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)

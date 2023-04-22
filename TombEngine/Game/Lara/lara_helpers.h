@@ -47,7 +47,6 @@ void UpdateLaraSubsuitAngles(ItemInfo* item);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 
-void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);

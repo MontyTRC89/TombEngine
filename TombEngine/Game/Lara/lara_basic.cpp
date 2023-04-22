@@ -132,9 +132,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.Count.Run++;
-	if (player.Control.Count.Run > (LARA_RUN_JUMP_TIME / 2 + 4))
-		player.Control.Count.Run = LARA_RUN_JUMP_TIME / 2 + 4;
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, (PLAYER_RUN_JUMP_TIME / 2) + 4);
 
 	if (item->HitPoints <= 0)
 	{
@@ -151,8 +149,8 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
-		HandlePlayerLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
+ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+HandlePlayerLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
 	}
 
 	if (IsHeld(In::Forward))
@@ -251,9 +249,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.Count.Run++;
-	if (player.Control.Count.Run > LARA_RUN_JUMP_TIME)
-		player.Control.Count.Run = LARA_RUN_JUMP_TIME;
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_RUN_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
 	{
@@ -275,12 +271,11 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		SetLaraRunJumpQueue(item, coll);
+		player.Control.IsRunJumpQueued = Context::CanQueueRunningJump(*item, *coll);
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		player.Control.WaterStatus != WaterStatus::Wade &&
-		!player.Control.IsRunJumpQueued) // NOTE: Jump queue blocks 180 roll.
+		Context::CanPerformRunning180Roll(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -1671,13 +1666,8 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Status.Stamina--;
-	if (player.Status.Stamina < 0)
-		player.Status.Stamina = 0;
-
-	player.Control.Count.Run++;
-	if (player.Control.Count.Run > LARA_SPRINT_JUMP_TIME)
-		player.Control.Count.Run = LARA_SPRINT_JUMP_TIME;
+	player.Status.Stamina = std::clamp(player.Status.Stamina--, 0, (int)LARA_STAMINA_MAX);
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_SPRINT_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1704,7 +1694,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		SetLaraRunJumpQueue(item, coll);
+		player.Control.IsRunJumpQueued = Context::CanQueueRunningJump(*item, *coll);
 	}
 
 	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
@@ -1716,7 +1706,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward))
 	{
 		if (IsHeld(In::Action) &&
-			!TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -BLOCK(5.0f / 8))) // HACK: Allow immediate vault only in the case of a soft splat.
+			!TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -BLOCK(5 / 8.0f))) // HACK: Allow immediate vault only in case of soft splat.
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -1826,9 +1816,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.Count.Run++;
-	if (player.Control.Count.Run > LARA_RUN_JUMP_TIME)
-		player.Control.Count.Run = LARA_RUN_JUMP_TIME;
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_RUN_JUMP_TIME);
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{

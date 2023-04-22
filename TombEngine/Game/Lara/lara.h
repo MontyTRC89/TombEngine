@@ -65,10 +65,10 @@ constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
 constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
 constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 
-constexpr auto LARA_POSITION_ADJUST_MAX_TIME = 3 * FPS;	 // 3 seconds allowed for position adjustment.
-constexpr auto LARA_POSE_TIME				 = 20 * FPS; // 20 seconds to AFK pose.
-constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
-constexpr auto LARA_SPRINT_JUMP_TIME		 = 46;		 // Frames to count before a sprint jump is possible.
+constexpr auto PLAYER_POSITION_ADJUST_MAX_TIME = 3 * FPS;  // 3 seconds allowed for position adjustment.
+constexpr auto PLAYER_POSE_TIME				   = 20 * FPS; // 20 seconds to AFK pose.
+constexpr auto PLAYER_RUN_JUMP_TIME			   = 22;	   // Frames to count before a running jump is possible.
+constexpr auto PLAYER_SPRINT_JUMP_TIME		   = 46;	   // Frames to count before a sprint jump is possible.
 
 constexpr auto LARA_AIR_MAX			  = 1800.0f;
 constexpr auto LARA_AIR_CRITICAL	  = LARA_AIR_MAX / 4;
@@ -90,7 +90,7 @@ constexpr auto BAD_JUMP_CEILING		= (int)CLICK(6.0f / 8);
 constexpr auto SHALLOW_WATER_DEPTH	= (int)CLICK(1.0f / 2);
 constexpr auto WADE_DEPTH			= STEPUP_HEIGHT;
 constexpr auto SWIM_DEPTH			= CLICK(3) - 38;
-constexpr auto SLOPE_DIFFERENCE	= 60;
+constexpr auto SLOPE_DIFFERENCE		= 60;
 
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
