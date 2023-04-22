@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Player::Context
 {
-	// Land movement contexts
+	// Ground movement contexts
 	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);

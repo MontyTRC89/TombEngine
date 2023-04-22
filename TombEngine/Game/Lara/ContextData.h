@@ -2,7 +2,7 @@
 
 namespace TEN::Player::Context
 {
-	struct LandMovementSetupData
+	struct GroundMovementSetupData
 	{
 		short HeadingAngle	  = 0;
 		int	  LowerFloorBound = 0;
