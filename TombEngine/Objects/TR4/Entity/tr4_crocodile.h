@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseCrocodile(short itemNumber);
+	void InitializeCrocodile(short itemNumber);
 	void CrocodileControl(short itemNumber);
 }

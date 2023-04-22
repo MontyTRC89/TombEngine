@@ -161,7 +161,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitialiseItemArray(NUM_ITEMS);
+	InitializeItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -190,7 +190,7 @@ void LoadItems()
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
-			InitialiseItem(i);
+			InitializeItem(i);
 	}
 }
 
@@ -368,7 +368,7 @@ void LoadObjects()
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
-	InitialiseObjects();
+	InitializeObjects();
 
 	int numStatics = ReadInt32();
 	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
@@ -1083,7 +1083,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			if (SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
 
-			InitialiseGame = true;
+			InitializeGame = true;
 			SystemNameHash = 0;
 		}
 
@@ -1121,7 +1121,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		LoadBoxes();
 
-		//InitialiseLOTarray(true);
+		//InitializeLOTarray(true);
 
 		LoadAnimatedTextures();
 		g_Renderer.UpdateProgress(70);
@@ -1136,9 +1136,9 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialise the game
-		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
+		// Initialize the game
+		InitializeGameFlags();
+		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

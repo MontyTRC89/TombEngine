@@ -23,11 +23,11 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseSubmarine(short itemNumber)
+	void InitializeSubmarine(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		torpedoItem->Pose.Position = pos1;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		torpedoItem->Pose.Orientation.x = 0;
 		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;

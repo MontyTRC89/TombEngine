@@ -3,7 +3,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 
-void InitialiseTrapDoor(short itemNumber);
+void InitializeTrapDoor(short itemNumber);
 void TrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

@@ -68,7 +68,7 @@ void ClearSpotCamSequences()
 		SpotCam[i] = {};
 }
 
-void InitialiseSpotCamSequences(bool startFirstSequence)
+void InitializeSpotCamSequences(bool startFirstSequence)
 {
 	TrackCameraInit = false;
 
@@ -105,12 +105,12 @@ void InitialiseSpotCamSequences(bool startFirstSequence)
 
 	if (startFirstSequence)
 	{
-		InitialiseSpotCam(0);
+		InitializeSpotCam(0);
 		UseSpotCam = true;
 	}
 }
 
-void InitialiseSpotCam(short Sequence)
+void InitializeSpotCam(short Sequence)
 {
 	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{

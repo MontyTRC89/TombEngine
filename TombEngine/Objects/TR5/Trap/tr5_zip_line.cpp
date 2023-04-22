@@ -33,7 +33,7 @@ const auto ZipLineMountBasis = ObjectCollisionBounds
 	)
 };
 
-void InitialiseZipLine(short itemNumber)
+void InitializeZipLine(short itemNumber)
 {
 	auto& zipLineItem = g_Level.Items[itemNumber];
 	zipLineItem.Data = GameVector();

@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
 	constexpr auto TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO = 0.95f;
 
-	void InitialiseTeethSpikes(short itemNumber)
+	void InitializeTeethSpikes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

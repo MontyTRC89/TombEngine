@@ -140,7 +140,7 @@ namespace TEN::Entities::Vehicles
 		return (KayakInfo*)kayakItem->Data;
 	}
 
-	void InitialiseKayak(short itemNumber)
+	void InitializeKayak(short itemNumber)
 	{
 		auto* kayakItem = &g_Level.Items[itemNumber];
 		kayakItem->Data = KayakInfo();

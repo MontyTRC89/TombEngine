@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 
     extern int CreateLocust();
     extern void SpawnLocust(ItemInfo* item);
-    extern void InitialiseLocust(short itemNumber);
+    extern void InitializeLocust(short itemNumber);
     extern void LocustControl(short itemNumber);
     extern void UpdateLocusts();
     extern void ClearLocusts();

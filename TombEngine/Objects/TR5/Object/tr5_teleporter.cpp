@@ -10,7 +10,7 @@
 
 using namespace TEN::Effects::Environment;
 
-void InitialiseTeleporter(short itemNumber)
+void InitializeTeleporter(short itemNumber)
 {
 	/*ItemInfo* item = &g_Level.Items[itemNumber];
 

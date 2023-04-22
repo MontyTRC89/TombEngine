@@ -26,7 +26,7 @@ namespace TEN::Entities::Traps
 		WALL_MOUNTED_BLADE_ANIM_ATTACK_TO_IDLE = 3
 	};
 
-	void InitialiseWallMountedBlade(short itemNumber)
+	void InitializeWallMountedBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		SetAnimation(item, WALL_MOUNTED_BLADE_ANIM_IDLE);

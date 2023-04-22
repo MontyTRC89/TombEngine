@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void InitialiseHeavyGuard(short itemNumber)
+	void InitializeHeavyGuard(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

@@ -15,7 +15,7 @@ using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseMine(short itemNumber)
+	void InitializeMine(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

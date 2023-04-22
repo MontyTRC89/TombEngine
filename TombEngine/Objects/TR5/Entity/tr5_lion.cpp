@@ -69,11 +69,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	const std::array LionDeathAnims = { LION_ANIM_DEATH_1, LION_ANIM_DEATH_2 };
 
-	void InitialiseLion(short itemNumber)
+	void InitializeLion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, LION_ANIM_IDLE);
 	}
 

@@ -117,7 +117,7 @@ inline void RumbleFromBounce()
 }
 
 
-void InitialiseCamera()
+void InitializeCamera()
 {
 	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
 
