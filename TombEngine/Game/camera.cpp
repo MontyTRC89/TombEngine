@@ -2031,7 +2031,7 @@ void HandleOptics(ItemInfo* item)
 		breakOptics = false;
 
 	// We are crouching, can use optics.
-	if ((lara->Control.IsLow || TrInput & IN_CROUCH) &&
+	if ((lara->Control.IsInLowPosition || TrInput & IN_CROUCH) &&
 		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
 

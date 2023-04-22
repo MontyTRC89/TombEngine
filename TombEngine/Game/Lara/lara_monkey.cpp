@@ -7,6 +7,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -17,6 +18,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
+using namespace TEN::Player;
 
 // -----------------------------
 // MONKEY SWING
@@ -144,13 +146,13 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (Context::CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -222,13 +224,13 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (Context::CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -294,13 +296,13 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (Context::CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -369,13 +371,13 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (Context::CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -444,13 +446,13 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (Context::CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;

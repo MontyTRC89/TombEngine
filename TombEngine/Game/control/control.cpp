@@ -397,7 +397,7 @@ void CleanUp()
 	Wibble = 0;
 
 	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
@@ -592,7 +592,7 @@ void HandleControls(bool isTitle)
 	// Poll keyboard and update input variables.
 	if (!isTitle)
 	{
-		if (Lara.Control.Locked)
+		if (Lara.Control.IsLocked)
 			ClearAllActions();
 		else
 			// TODO: To allow cutscene skipping later, don't clear Deselect action.

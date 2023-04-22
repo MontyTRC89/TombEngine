@@ -1263,12 +1263,12 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool Locked			  = false; // IsLocked
-	bool IsLow			  = false;
+	bool IsLocked		  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
+	bool IsRunJumpQueued  = false;
+	bool IsInLowPosition  = false;
+	bool IsInLowSpace	  = false;
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;

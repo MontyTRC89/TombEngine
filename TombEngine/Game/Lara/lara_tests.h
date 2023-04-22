@@ -30,7 +30,7 @@ bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
-bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);
+bool TestLaraFacingCorner(const ItemInfo* item, short angle, int distance);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
 int LaraFloorFront(ItemInfo* item, short angle, int distance);
 int LaraCeilingFront(ItemInfo* item, short angle, int distance, int height);
@@ -47,25 +47,11 @@ void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
-bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
+bool IsStandingWeapon(const ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(int state);
 bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
-
-bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLand(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraFall(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll);
-
-bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup = false);
 bool TestLaraRunForward(ItemInfo* item, CollisionInfo* coll);
@@ -91,17 +77,17 @@ bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
-VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
-VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraVault1StepToCrouch(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraVault2StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraVault3StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraLedgeAutoJump(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll);
-VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
+std::optional<VaultTestResult> TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVault1StepToCrouch(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVault2StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVault3StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraLedgeAutoJump(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll);
+std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll);
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
 
 CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup);
@@ -111,17 +97,6 @@ CrawlVaultTestResult TestLaraCrawlExitDownStep(ItemInfo* item, CollisionInfo* co
 CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
-
-bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup);
-bool TestLaraRunJumpForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpRight(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 

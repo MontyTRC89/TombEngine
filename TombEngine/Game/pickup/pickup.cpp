@@ -515,7 +515,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 	// Pick up from hole in wall.
 	case 1:
-		if (lara->Control.IsLow || !TestLaraPosition(HiddenPickUpBounds, item, laraItem))
+		if (lara->Control.IsInLowPosition || !TestLaraPosition(HiddenPickUpBounds, item, laraItem))
 		{
 			if (lara->Control.IsMoving)
 			{
@@ -543,7 +543,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 2:
 		item->Pose.Orientation.y = prevOrient.y;
 
-		if (lara->Control.IsLow || !TestLaraPosition(CrowbarPickUpBounds, item, laraItem))
+		if (lara->Control.IsInLowPosition || !TestLaraPosition(CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
@@ -621,7 +621,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		if (laraItem->Pose.Position.y < item->Pose.Position.y)
 			break;
 
-		if (TestLaraPosition(PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
+		if (TestLaraPosition(PlinthPickUpBounds, item, laraItem) && !lara->Control.IsInLowPosition)
 		{
 			if (item->Pose.Position.y == laraItem->Pose.Position.y)
 				PlinthPickUpPosition.y = 0;

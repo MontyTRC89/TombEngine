@@ -86,12 +86,12 @@ struct CollisionSetup
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
-	// Preserve old parameters to restore later
-	Vector3i	   OldPosition		= Vector3i::Zero;
+	// Preserve previous parameters to restore later
+	Vector3i	   PrevPosition		= Vector3i::Zero;
 	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
-	int			   OldAnimNumber	= 0;
-	int			   OldFrameNumber	= 0;
-	int			   OldState			= 0;
+	int			   PrevAnimNumber	= 0;
+	int			   PrevFrameNumber	= 0;
+	int			   PrevState		= 0;
 };
 
 struct CollisionInfo
@@ -123,8 +123,8 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const ItemInfo* item);
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& point);
@@ -158,7 +158,7 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
+bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);

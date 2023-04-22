@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -13,6 +14,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Player;
 
 // -----------------------------
 // SLIDE
@@ -36,7 +38,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(*item, *coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll);
 
@@ -66,7 +68,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (TrInput & IN_JUMP && Context::CanPerformSlideJump(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -107,19 +109,19 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (Context::CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(*item, *coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);
@@ -145,7 +147,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(*item, *coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
 
@@ -175,7 +177,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (TrInput & IN_JUMP && Context::CanPerformSlideJump(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -212,19 +214,19 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (Context::CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(*item, *coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);

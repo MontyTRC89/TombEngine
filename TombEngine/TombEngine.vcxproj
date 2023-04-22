@@ -156,6 +156,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
+    <ClInclude Include="Game\Lara\Context.h" />
+    <ClInclude Include="Game\Lara\ContextData.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -636,6 +638,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
+    <ClCompile Include="Game\Lara\Context.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />

@@ -145,19 +145,19 @@ namespace TEN::Effects::Hair
 			switch (player.HitDirection)
 			{
 			case NORTH:
-				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_FRONT : LA_STAND_HIT_FRONT;
+				animNumber = (player.Control.IsInLowPosition) ? LA_CROUCH_HIT_FRONT : LA_STAND_HIT_FRONT;
 				break;
 
 			case SOUTH:
-				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_BACK : LA_STAND_HIT_BACK;
+				animNumber = (player.Control.IsInLowPosition) ? LA_CROUCH_HIT_BACK : LA_STAND_HIT_BACK;
 				break;
 
 			case EAST:
-				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_LEFT : LA_STAND_HIT_LEFT;
+				animNumber = (player.Control.IsInLowPosition) ? LA_CROUCH_HIT_LEFT : LA_STAND_HIT_LEFT;
 				break;
 
 			default:
-				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_RIGHT : LA_STAND_HIT_RIGHT;
+				animNumber = (player.Control.IsInLowPosition) ? LA_CROUCH_HIT_RIGHT : LA_STAND_HIT_RIGHT;
 				break;
 			}
 
