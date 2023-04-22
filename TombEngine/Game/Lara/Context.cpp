@@ -309,7 +309,7 @@ namespace TEN::Player::Context
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		auto setupData = Context::LandMovementSetupData
+		auto setupData = LandMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by wade forward state.
@@ -328,7 +328,7 @@ namespace TEN::Player::Context
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		auto setupData = Context::LandMovementSetupData
+		auto setupData = LandMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk backward state.
@@ -336,7 +336,7 @@ namespace TEN::Player::Context
 		};
 
 		// 2) Assess context.
-		return Context::TestLandMovementSetup(item, coll, setupData);
+		return TestLandMovementSetup(item, coll, setupData);
 	}
 
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll)
@@ -493,24 +493,24 @@ namespace TEN::Player::Context
 
 	bool CanCrawlForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = Context::LandMovementSetupData
+		auto setupData = LandMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl forward state.
 		};
 
-		return Context::TestLandMovementSetup(item, coll, setupData, true);
+		return TestLandMovementSetup(item, coll, setupData, true);
 	}
 
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = Context::LandMovementSetupData
+		auto setupData = LandMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl backward state.
 		};
 
-		return Context::TestLandMovementSetup(item, coll, setupData, true);
+		return TestLandMovementSetup(item, coll, setupData, true);
 	}
 
 	bool CanPerformMonkeyStep(const ItemInfo& item, const CollisionInfo& coll)
@@ -599,26 +599,87 @@ namespace TEN::Player::Context
 		return false;
 	}
 
+	static bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const MonkeySwingSetupData& setupData)
+	{
+		// TODO
+		// HACK: Have to make the height explicit for now. -- Sezz 2022.07.28
+		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
+
+		int vPos = item.Pose.Position.y;
+		int vPosTop = vPos - PLAYER_HEIGHT;
+		auto pointColl = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius));
+
+		// 1) Test for wall.
+		if (pointColl.Position.Ceiling == NO_HEIGHT)
+			return false;
+
+		// 2) Test for ceiling slippery slope.
+		if (pointColl.Position.CeilingSlope)
+			return false;
+
+		// Ray collision setup at highest floor bound (player base).
+		auto origin0 = GameVector(
+			item.Pose.Position.x,
+			vPos - 1,
+			item.Pose.Position.z,
+			item.RoomNumber);
+		auto target0 = GameVector(
+			pointColl.Coordinates.x,
+			vPos - 1,
+			pointColl.Coordinates.z,
+			item.RoomNumber);
+
+		// Raycast setup at lower ceiling bound.
+		auto origin1 = GameVector(
+			item.Pose.Position.x,
+			(vPosTop + setupData.LowerCeilingBound) + 1,
+			item.Pose.Position.z,
+			item.RoomNumber);
+		auto target1 = GameVector(
+			pointColl.Coordinates.x,
+			(vPosTop + setupData.LowerCeilingBound) + 1,
+			pointColl.Coordinates.z,
+			item.RoomNumber);
+
+		// 3) Assess level geometry ray collision.
+		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
+			return false;
+
+		// TODO: Assess static object geometry ray collision.
+
+		// 4) Assess point collision.
+		if (pointColl.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is a monkey swing.
+			(pointColl.Position.Ceiling - vPosTop) <= setupData.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
+			(pointColl.Position.Ceiling - vPosTop) >= setupData.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
+			(pointColl.Position.Floor - vPos) > 0 &&									// Floor is within highest floor bound (player base).
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > PLAYER_HEIGHT)	// Space is not too narrow.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	bool CanMonkeyForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = Context::MonkeySwingSetupData
+		auto setupData = MonkeySwingSetupData
 		{
 			item.Pose.Orientation.y,
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey forward state.
 		};
 
-		return Context::TestMonkeySwingSetup(item, coll, setupData);
+		return TestMonkeySwingSetup(item, coll, setupData);
 	}
 
 	bool CanMonkeyBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = Context::MonkeySwingSetupData
+		auto setupData = MonkeySwingSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey backward state.
 		};
 
-		return Context::TestMonkeySwingSetup(item, coll, setupData);
+		return TestMonkeySwingSetup(item, coll, setupData);
 	}
 
 	static bool TestMonkeyShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
@@ -688,7 +749,7 @@ namespace TEN::Player::Context
 		return !TestEnvironment(ENV_FLAG_SWAMP, &item);
 	}
 
-	static bool TestJumpSetup(const ItemInfo& item, const CollisionInfo& coll, const Context::JumpSetupData& setupData)
+	static bool TestJumpSetup(const ItemInfo& item, const CollisionInfo& coll, const JumpSetupData& setupData)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -734,6 +795,21 @@ namespace TEN::Player::Context
 		return TestJumpSetup(item, coll, setupData);
 	}
 
+	static bool TestDirectionalStandingJump(const ItemInfo& item, const CollisionInfo& coll, short relHeadingAngle)
+	{
+		// Check for swamp.
+		if (TestEnvironment(ENV_FLAG_SWAMP, &item))
+			return false;
+
+		auto setupData = JumpSetupData
+		{
+			short(item.Pose.Orientation.y + relHeadingAngle),
+			CLICK(0.85f)
+		};
+
+		return TestJumpSetup(item, coll, setupData);
+	}
+
 	bool CanJumpForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return TestDirectionalStandingJump(item, coll, ANGLE(0.0f));
@@ -762,7 +838,7 @@ namespace TEN::Player::Context
 		if (player.Control.Count.Run < LARA_RUN_JUMP_TIME)
 			return false;
 
-		auto setupData = Context::JumpSetupData
+		auto setupData = JumpSetupData
 		{
 			item.Pose.Orientation.y,
 			CLICK(3 / 2.0f)
@@ -787,14 +863,14 @@ namespace TEN::Player::Context
 		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
 			return false;
 
-		auto setupData = Context::JumpSetupData
+		auto setupData = JumpSetupData
 		{
 			item.Pose.Orientation.y,
 			CLICK(1.8f)
 		};
 
 		// 4) Assess context.
-		return Context::TestJumpSetup(item, coll, setupData);
+		return TestJumpSetup(item, coll, setupData);
 	}
 
 	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll)
@@ -864,81 +940,6 @@ namespace TEN::Player::Context
 
 		if (player.Control.Tightrope.CanDismount &&			   // Dismount is allowed.
 			pointColl.Position.Floor == item.Pose.Position.y) // Floor is level with player.
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool TestDirectionalStandingJump(const ItemInfo& item, const CollisionInfo& coll, short relHeadingAngle)
-	{
-		// Check for swamp.
-		if (TestEnvironment(ENV_FLAG_SWAMP, &item))
-			return false;
-
-		auto setupData = Context::JumpSetupData
-		{
-			short(item.Pose.Orientation.y + relHeadingAngle),
-			CLICK(0.85f)
-		};
-
-		return Context::TestJumpSetup(item, coll, setupData);
-	}
-
-	bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const Context::MonkeySwingSetupData& setupData)
-	{
-		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
-		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
-
-		int vPos = item.Pose.Position.y;
-		int vPosTop = vPos - PLAYER_HEIGHT;
-		auto pointColl = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius));
-
-		// 1) Test for wall.
-		if (pointColl.Position.Ceiling == NO_HEIGHT)
-			return false;
-
-		// 2) Test for ceiling slippery slope.
-		if (pointColl.Position.CeilingSlope)
-			return false;
-
-		// Ray collision setup at highest floor bound (player base).
-		auto origin0 = GameVector(
-			item.Pose.Position.x,
-			vPos - 1,
-			item.Pose.Position.z,
-			item.RoomNumber);
-		auto target0 = GameVector(
-			pointColl.Coordinates.x,
-			vPos - 1,
-			pointColl.Coordinates.z,
-			item.RoomNumber);
-
-		// Raycast setup at lower ceiling bound.
-		auto origin1 = GameVector(
-			item.Pose.Position.x,
-			(vPosTop + setupData.LowerCeilingBound) + 1,
-			item.Pose.Position.z,
-			item.RoomNumber);
-		auto target1 = GameVector(
-			pointColl.Coordinates.x,
-			(vPosTop + setupData.LowerCeilingBound) + 1,
-			pointColl.Coordinates.z,
-			item.RoomNumber);
-
-		// 3) Assess level geometry ray collision.
-		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
-			return false;
-
-		// TODO: Assess static object geometry ray collision.
-
-		// 4) Assess point collision.
-		if (pointColl.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is a monkey swing.
-			(pointColl.Position.Ceiling - vPosTop) <= setupData.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
-			(pointColl.Position.Ceiling - vPosTop) >= setupData.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
-			(pointColl.Position.Floor - vPos) > 0 &&									// Floor is within highest floor bound (player base).
-			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > PLAYER_HEIGHT)	// Space is not too narrow.
 		{
 			return true;
 		}

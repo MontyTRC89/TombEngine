@@ -98,8 +98,6 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

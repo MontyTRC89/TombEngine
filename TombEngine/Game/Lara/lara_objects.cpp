@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
@@ -16,6 +17,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Player;
 
 // -----------------------------------
 // MISCELLANEOUS INTERACTABLE OBJECT
@@ -364,7 +366,7 @@ void lara_as_tightrope_walk(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TestLaraTightropeDismount(item, coll))
+	if (Context::CanDismountTightrope(*item, *coll))
 	{
 		item->Animation.TargetState = LS_TIGHTROPE_DISMOUNT;
 		DoLaraTightropeBalanceRegen(item);

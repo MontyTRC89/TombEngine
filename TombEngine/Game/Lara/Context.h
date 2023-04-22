@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Player::Context
 {
-	// Basic movement contexts
+	// Land movement contexts
 	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);
@@ -62,12 +62,4 @@ namespace TEN::Player::Context
 
 	// Object interaction contexts
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
-
-	// -------------------------------------------------------------------------------------------------
-
-	// Context assessment helpers
-	bool TestDirectionalStandingJump(const ItemInfo& item, const CollisionInfo& coll, short relHeadingAngle);
-
-	// Context setup inquirers
-	bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const Context::MonkeySwingSetupData& setupData);
 }

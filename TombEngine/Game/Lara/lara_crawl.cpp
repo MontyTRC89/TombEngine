@@ -20,17 +20,13 @@
 using namespace TEN::Player;
 using namespace TEN::Input;
 
-// -----------------------------
-// CROUCH & CRAWL
-// Control & Collision Functions
-// -----------------------------
-
 // State:	  LS_CRAWL_VAULT (194)
 // Collision: lara_void_func()
 void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup
 	player.Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -48,15 +44,24 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_crouch_idle()
 void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
-	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
-	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
-	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. -- Sezz 2021.10.21
-
 	auto& player = GetLaraInfo(*item);
 
+	// Setup
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.IsAirborne = false;
+	player.Control.IsInLowSpace = Context::IsInLowSpace(*item, *coll);
+	player.Control.IsInLowPosition = true;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockFloorSlopeDown = true;
 	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
@@ -125,19 +130,6 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	item->Animation.Velocity.y = 0.0f;
-	item->Animation.IsAirborne = false;
-	player.Control.IsInLowSpace = Context::IsInLowSpace(*item, *coll);
-	player.Control.IsInLowPosition = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.ExtraTorsoRot = EulerAngles::Zero;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
 	if (Context::CanFall(*item, *coll))
