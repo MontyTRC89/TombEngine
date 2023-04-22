@@ -1964,8 +1964,8 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 
 		return vaultResult;
 	}
-	
-	return VaultTestResult{ false };
+
+	return std::nullopt;
 }
 
 // Temporary solution to ladder mounts until ladders stop breaking whenever anyone tries to do anything with them. @Sezz 2022.02.05
