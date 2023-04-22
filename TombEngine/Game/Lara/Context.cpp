@@ -28,15 +28,11 @@ namespace TEN::Player::Context
 		auto pointColl = GetCollision(&item);
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
-		// 1) Test for wall.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return false;
-
-		// 2) Test if player is already aligned with floor.
+		// 1) Test if player is already aligned with floor.
 		if (relFloorHeight == 0)
 			return false;
 
-		// 3) Assess point collision and player status.
+		// 2) Assess point collision and player status.
 		if ((relFloorHeight <= LOWER_FLOOR_BOUND ||					// Floor height is above lower floor bound...
 				player.Control.WaterStatus == WaterStatus::Wade) && // OR player is wading.
 			relFloorHeight >= UPPER_FLOOR_BOUND)					// Floor height is below upper floor bound.
