@@ -149,8 +149,8 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
-HandlePlayerLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		HandlePlayerLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
 	}
 
 	if (IsHeld(In::Forward))
