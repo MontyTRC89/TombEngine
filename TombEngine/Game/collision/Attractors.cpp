@@ -101,9 +101,9 @@ namespace TEN::Collision::Attractors
 
 		// Attractor is single point; return simple attractor proximity data.
 		if (Points.size() == 1)
-			return AttractorProximityData{ Points[0], Vector3::Distance(refPoint, Points[0]), 0 };
+			return AttractorProximityData{ Points.front(), Vector3::Distance(refPoint, Points.front()), 0 };
 
-		auto closestPoint = Points[0];
+		auto closestPoint = Points.front();
 		float closestDist = INFINITY;
 		unsigned int segmentIndex = 0;
 
@@ -140,12 +140,12 @@ namespace TEN::Collision::Attractors
 
 		// Attractor is single point; return it.
 		if (Points.size() == 1)
-			return Points[0];
+			return Points.front();
 
 		// Clamp point according to attractor length.
 		if (lineDist <= 0.0f)
 		{
-			return Points[0];
+			return Points.front();
 		}
 		else if (lineDist >= Length)
 		{
@@ -175,7 +175,7 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	unsigned int Attractor::GetSegmentIndexAtDistance(float lineDist)
+	unsigned int Attractor::GetSegmentIndexAtDistance(float lineDist) const
 	{
 		// Attractor has no points; return default segment index.
 		if (Points.empty())
@@ -312,7 +312,7 @@ namespace TEN::Collision::Attractors
 				// Draw indicator lines.
 				g_Renderer.AddLine3D(Points[i], Points[i] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(Points[i + 1], Points[i + 1] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(Points[0], Points[0] + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(Points.front(), Points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(Points.back(), Points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 				// Draw attractor label.
@@ -321,10 +321,10 @@ namespace TEN::Collision::Attractors
 		}
 		else if (Points.size() == 1)
 		{
-			auto labelPos2D = g_Renderer.GetScreenSpacePosition(Points[0]);
+			auto labelPos2D = g_Renderer.GetScreenSpacePosition(Points.front());
 
 			// Draw sphere and label.
-			g_Renderer.AddSphere(Points[0], SPHERE_SCALE, COLOR_YELLOW);
+			g_Renderer.AddSphere(Points.front(), SPHERE_SCALE, COLOR_YELLOW);
 			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
 		}
 	}
@@ -449,7 +449,7 @@ namespace TEN::Collision::Attractors
 
 		// Add point to create loop (if applicable).
 		if (isClosedLoop)
-			points.push_back(points[0]);
+			points.push_back(points.front());
 
 		// Generate attractor.
 		return Attractor(type, points, roomNumber);

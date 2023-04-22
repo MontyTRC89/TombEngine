@@ -128,6 +128,19 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	return GetBestEdgeHangAttractorCollision(attracColls, item, coll);
 }
 
+static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																			   const Vector3& refPoint, float range)
+{
+	auto attracColls = GetAttractorCollisions(item, refPoint, range);
+
+	// Debug
+	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
+	g_Renderer.AddSphere(refPoint, 15.0f, COLOR_MAGENTA);
+	// ---------------
+
+	return GetBestEdgeHangAttractorCollision(attracColls, item, coll);
+}
+
 static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
 {
 	// TODO:
@@ -140,12 +153,21 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 
 	auto points = player.Context.HandsAttractor.AttractorPtr->GetPoints();
 	float projectedLineDist = player.Context.HandsAttractor.LineDistance + sideOffset;
+	unsigned int segmentIndex = player.Context.HandsAttractor.AttractorPtr->GetSegmentIndexAtDistance(projectedLineDist);
 
-	if (projectedLineDist < coll.Setup.Radius)
+	auto origin = points[segmentIndex];
+	auto target = points[segmentIndex + 1];
+	auto direction = target - origin;
+	direction.Normalize();
+
+	auto edgeAttracColls = EdgeHangAttractorCollisionData{};
+
+	if (projectedLineDist < 0.0f)
 	{
-
+		auto refPoint = Geometry::TranslatePoint(points.front(), direction, sideOffset);
+		edgeAttracColls.Center = GetBestEdgeHangAttractorCollision(item, coll, refPoint, coll.Setup.Radius);
 	}
-	else if (projectedLineDist > (player.Context.HandsAttractor.AttractorPtr->GetLength() - coll.Setup.Radius))
+	else if (projectedLineDist > player.Context.HandsAttractor.AttractorPtr->GetLength())
 	{
 
 	}
