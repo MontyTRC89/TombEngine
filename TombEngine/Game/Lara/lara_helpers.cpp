@@ -190,7 +190,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 
 	player.Context.HandsAttractor.AttractorPtr = catchData.AttractorPtr;
-	player.Context.HandsAttractor.DistanceAlongLine = catchData.DistanceAlongLine;
+	player.Context.HandsAttractor.LineDistance = catchData.DistanceAlongLine;
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData& catchData)

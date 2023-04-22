@@ -175,6 +175,45 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
+	unsigned int Attractor::GetSegmentIndexAtDistance(float lineDist)
+	{
+		// Attractor has no points; return default segment index.
+		if (Points.empty())
+		{
+			TENLog(std::string("GetSegmentIndexAtDistance(): attractor points undefined."), LogLevel::Warning);
+			return 0;
+		}
+
+		// Attractor is single point; return default segment index.
+		if (Points.size() == 1)
+			return 0;
+
+		// Clamp segment index according to attractor length.
+		if (lineDist <= 0.0f)
+		{
+			return 0;
+		}
+		else if (lineDist >= Length)
+		{
+			return (Points.size() - 1);
+		}
+
+		// Find attractor segment at distance from start.
+		float distTravelled = 0.0f;
+		for (int i = 0; i < (Points.size() - 1); i++)
+		{
+			const auto& origin = Points[i];
+			const auto& target = Points[i + 1];
+
+			distTravelled += Vector3::Distance(origin, target);
+			if (distTravelled >= lineDist)
+				return i;
+		}
+
+		// FAILSAFE: Return last segment index.
+		return (Points.size() - 1);
+	}
+
 	float Attractor::GetDistanceAtPoint(const Vector3& linePoint, unsigned int segmentIndex) const 
 	{
 		// Segment index out of range; return attractor length.

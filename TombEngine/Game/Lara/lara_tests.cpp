@@ -46,9 +46,9 @@ context assessment returns bool only.
 
 struct EdgeHangAttractorCollisionData
 {
-	std::optional<AttractorCollisionData> Center	 = std::nullopt;
-	std::optional<AttractorCollisionData> Left		 = std::nullopt;
-	std::optional<AttractorCollisionData> Right		 = std::nullopt;
+	std::optional<AttractorCollisionData> Center = std::nullopt;
+	std::optional<AttractorCollisionData> Left	 = std::nullopt;
+	std::optional<AttractorCollisionData> Right	 = std::nullopt;
 };
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
@@ -128,17 +128,31 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	return GetBestEdgeHangAttractorCollision(attracColls, item, coll);
 }
 
-static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll)
+static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
 {
 	// TODO:
 	// If center pos is not near the end of an attractor, only reference current attractor for collision.
 	// Otherwise, check side positions. If they have found a new attractor, the center can keep referencing the current attractor.
 	// If they have not found a new attractor, limit movement.
 	// If the center probe is beyond the end of the current attractor, probe for a new one using the same method as for the side.
-	// OR
-	// Simple probes were the best method to begin with and this is overly complex.
 
 	auto& player = GetLaraInfo(item);
+
+	auto points = player.Context.HandsAttractor.AttractorPtr->GetPoints();
+	float projectedLineDist = player.Context.HandsAttractor.LineDistance + sideOffset;
+
+	if (projectedLineDist < coll.Setup.Radius)
+	{
+
+	}
+	else if (projectedLineDist > (player.Context.HandsAttractor.AttractorPtr->GetLength() - coll.Setup.Radius))
+	{
+
+	}
+	else
+	{
+
+	}
 
 	auto basePos = item.Pose.Position.ToVector3();
 	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(player.Context.TargetOrientation.y)); // Or simply use player orient?
@@ -154,17 +168,16 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 	auto attracCollLeft = GetBestEdgeHangAttractorCollision(item, coll, relOffsetLeft, rotMatrix, range);
 	auto attracCollRight = GetBestEdgeHangAttractorCollision(item, coll, relOffsetRight, rotMatrix, range);
 	
-	// Debug
+	// ----------Debug
 	constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-
-	// Attractor target points.
 	if (attracCollCenter.has_value())
 		g_Renderer.AddLine3D(attracCollCenter->Proximity.Point, attracCollCenter->Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollLeft.has_value())
 		g_Renderer.AddLine3D(attracCollLeft->Proximity.Point, attracCollLeft->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 	if (attracCollRight.has_value())
 		g_Renderer.AddLine3D(attracCollRight->Proximity.Point, attracCollRight->Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-
+	//------------
+	
 	// Return edge attractor collisions.
 	return EdgeHangAttractorCollisionData
 	{
