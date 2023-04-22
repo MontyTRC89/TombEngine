@@ -380,7 +380,7 @@ namespace TEN::Player::Context
 		// Assess center point collision.
 		auto pointCollCenter = GetCollision(&item, 0, 0.0f, -LARA_HEIGHT / 2);
 		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
-			abs(coll.Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)							// Consider statics overhead detected by GetCollisionInfo().
+			abs(coll.Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)								// Consider statics overhead detected by GetCollisionInfo().
 		{
 			return true;
 		}
@@ -389,20 +389,18 @@ namespace TEN::Player::Context
 
 		// Assess front point collision.
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, radius, -coll.Setup.Height);
-		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		  // Front space is narrow enough.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL &&	  // Front space not too narrow.
-			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Front floor is within upper/lower floor bounds.
-			pointCollFront.Position.Floor != NO_HEIGHT)
+		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		// Front space is narrow enough.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL && // Front space not too narrow.
+			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT) // Front floor is within upper/lower floor bounds.
 		{
 			return true;
 		}
 
 		// Assess back point collision.
 		auto pointCollBack = GetCollision(&item, item.Pose.Orientation.y, -radius, -coll.Setup.Height);
-		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&			 // Back space is narrow enough.
-			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&	 // Back space not too narrow.
-			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Back floor is within upper/lower floor bounds.
-			pointCollBack.Position.Floor != NO_HEIGHT)
+		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&		   // Back space is narrow enough.
+			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&  // Back space not too narrow.
+			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT) // Back floor is within upper/lower floor bounds.
 		{
 			return true;
 		}
@@ -518,11 +516,7 @@ namespace TEN::Player::Context
 		auto pointColl = GetCollision(&item);
 		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_MONKEY);
 
-		// 1) Test for wall.
-		if (pointColl.Position.Ceiling == NO_HEIGHT)
-			return false;
-
-		// 2) Assess point collision.
+		// Assess point collision.
 		if (relCeilHeight <= LOWER_CEIL_BOUND && // Ceiling height is above lower ceiling bound.
 			relCeilHeight >= UPPER_CEIL_BOUND)	 // Ceiling height is below upper ceiling bound.
 		{
@@ -544,18 +538,14 @@ namespace TEN::Player::Context
 
 		// Get point collision.
 		auto pointColl = GetCollision(&item);
-		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_MONKEY);
 
-		// 2) Test for wall.
-		if (pointColl.Position.Ceiling == NO_HEIGHT)
-			return true;
-
-		// 3) Test for slippery ceiling slope and check if overhang climb is disabled.
+		// 2) Test for slippery ceiling slope and check if overhang climb is disabled.
 		if (pointColl.Position.CeilingSlope && !g_GameFlow->HasOverhangClimb())
 			return true;
 
-		// 4) Assess point collision.
-		if (abs(relCeilHeight) < ABS_CEIL_BOUND) // Ceiling height if within lower/upper ceiling bound.
+		// 3) Assess point collision.
+		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - LARA_HEIGHT_MONKEY);
+		if (abs(relCeilHeight) > ABS_CEIL_BOUND) // Ceiling height is within lower/upper ceiling bound.
 			return true;
 
 		return false;
@@ -756,22 +746,18 @@ namespace TEN::Player::Context
 		int vPos = item.Pose.Position.y;
 		auto pointColl = GetCollision(&item, setupData.HeadingAngle, setupData.Distance, -coll.Setup.Height);
 
-		// 1) Check for wall.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return false;
-
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
 		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 
-		// 2) Check for swamp or wade status (if applicable).
+		// 1) Check for swamp or wade status (if applicable).
 		if (isSwamp || isWading)
 			return false;
 
-		// 3) Check for corner.
+		// 2) Check for corner.
 		if (TestLaraFacingCorner(&item, setupData.HeadingAngle, setupData.Distance))
 			return false;
 
-		// 4) Assess point collision.
+		// 3) Assess point collision.
 		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&									 // Floor is within highest floor bound.
 			((pointColl.Position.Ceiling - vPos) < -(coll.Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
 				((pointColl.Position.Ceiling - vPos) < -coll.Setup.Height &&							// OR ceiling is level with Lara's head...
