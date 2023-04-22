@@ -752,34 +752,38 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
-void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)
+void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& vaultResult)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Context.ProjectedFloorHeight = vaultResult.Height;
-	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
-	lara->Control.TurnRate = 0;
+	player.Context.ProjectedFloorHeight = vaultResult.Height;
+	player.Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : player.Control.HandStatus;
+	player.Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		player.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else
 	{
-		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		player.Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara->Context.ProjectedFloorHeight - item->Pose.Position.y;
+		int height = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
 		if (height > -CLICK(3.5f))
+		{
 			height = -CLICK(3.5f);
+		}
 		else if (height < -CLICK(7.5f))
+		{
 			height = -CLICK(7.5f);
+		}
 
 		// TODO: Find a better formula for this that won't require the above block.
-		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * (height));
+		player.Context.CalcJumpVelocity = -3 - sqrt(-9600 - (height * 12));
 	}
 }
 
