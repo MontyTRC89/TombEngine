@@ -20,8 +20,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Player;
 using namespace TEN::Input;
+using namespace TEN::Player;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
