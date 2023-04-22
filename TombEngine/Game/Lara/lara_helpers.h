@@ -62,3 +62,5 @@ void ResetPlayerLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, 
 void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);
+
+float GetPlayerJumpVelocity(float height);

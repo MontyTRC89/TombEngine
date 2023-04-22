@@ -772,18 +772,8 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& va
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
-		if (height > -CLICK(3.5f))
-		{
-			height = -CLICK(3.5f);
-		}
-		else if (height < -CLICK(7.5f))
-		{
-			height = -CLICK(7.5f);
-		}
-
-		// TODO: Find a better formula for this that won't require the above block.
-		player.Context.CalcJumpVelocity = -3 - sqrt(-9600 - (height * 12));
+		int jumpHeight = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(jumpHeight);
 	}
 }
 
@@ -1006,4 +996,17 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
 		Rumble(POWER, DELAY);
+}
+
+// NOTE: Formula uses kinematic equation of motion for vertical motion under constant acceleration.
+float GetPlayerJumpVelocity(float jumpHeight)
+{
+	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
+	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
+	constexpr auto A2				= -9600.0f;
+	constexpr auto UNIT_CONV_FACTOR = 12;
+	constexpr auto OFFSET			= -3.0f;
+
+	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
+	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
