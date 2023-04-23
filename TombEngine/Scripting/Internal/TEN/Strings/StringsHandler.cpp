@@ -36,6 +36,13 @@ with a call to @{ShowString}, or this function will have no effect.
 */
 	table_strings.set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
 
+/***
+Checks if the string is shown
+@tparam DisplayString str the string object to be checked
+@treturn bool true if it is shown, false if it is hidden
+*/
+	table_strings.set_function(ScriptReserved_IsStringDisplaying, &StringsHandler::IsStringDisplaying, this);
+
 	DisplayString::Register(table_strings);
 	DisplayString::SetCallbacks(
 		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
@@ -80,6 +87,13 @@ void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> 
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
 	it->second.m_isInfinite = !nSeconds.has_value();
+}
+
+bool StringsHandler::IsStringDisplaying(DisplayString const& str)
+{
+	auto it = m_userDisplayStrings.find(str.GetID());
+	bool endOfLife = 0.0f >= it->second.m_timeRemaining;
+	return it->second.m_isInfinite ? endOfLife : !endOfLife;
 }
 
 void StringsHandler::ProcessDisplayStrings(float deltaTime)

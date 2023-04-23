@@ -144,13 +144,19 @@ void DisplayString::Register(sol::table& parent)
 		// @tparam table table the new table with display flags options
 		// @usage
 		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
+		// possible values:
 		// varDisplayString:SetFlags({})
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.CENTER })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.DisplayStringOption.CENTER })
 		// -- When passing a table to a function, you can omit the parentheses
 		// varDisplayString:SetFlags{ TEN.Strings.DisplayStringOption.CENTER }
-		ScriptReserved_SetFlags, &DisplayString::SetFlags
+		ScriptReserved_SetFlags, &DisplayString::SetFlags,
+
+		/// Set translated parameter of the string
+		// @tparam bool shouldTranslate if true this will be the string key for the translation that will be displayed.
+		// If false, this will be the string that's displayed
+		ScriptReserved_SetTranslated, & DisplayString::SetTranslated
 	);
 }
 
@@ -211,6 +217,13 @@ void DisplayString::SetFlags(const sol::table& flags)
 	}
 
 	s.m_flags = f;
+}
+
+void DisplayString::SetTranslated(bool isTranslated)
+{
+	UserDisplayString& s = s_getItemCallback(m_id).value();
+	TENLog(isTranslated ? "Translated string " : "Untranslated string " + std::to_string(isTranslated), LogLevel::Info);
+	s.m_isTranslated = isTranslated;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
