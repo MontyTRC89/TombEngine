@@ -53,7 +53,7 @@ namespace TEN::Entities::Creatures::TR1
     void InitialiseCowboy(short itemNumber)
     {
         auto& item = g_Level.Items[itemNumber];
-        InitialiseCreature(itemNumber);
+        InitializeCreature(itemNumber);
         SetAnimation(item, COWBOY_ANIM_IDLE);
     }
 
