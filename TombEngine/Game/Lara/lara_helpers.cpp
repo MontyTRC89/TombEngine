@@ -756,9 +756,11 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& va
 {
 	auto& player = GetLaraInfo(*item);
 
+	ResetPlayerTurnRateY(*item);
 	player.Context.ProjectedFloorHeight = vaultResult.Height;
-	player.Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : player.Control.HandStatus;
-	player.Control.TurnRate = 0;
+
+	if (vaultResult.SetBusyHands)
+		player.Control.HandStatus = HandStatus::Busy;
 
 	if (vaultResult.SnapToLedge)
 	{
