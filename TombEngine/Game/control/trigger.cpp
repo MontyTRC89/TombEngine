@@ -149,24 +149,24 @@ int SwitchTrigger(short itemNumber, short timer)
 	//Stuff for multi useable keyholes.
 	if ((item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16) && 
 		item.ItemFlags[1] && 
-		(item.ItemFlags[5] == PuzzleHoleType::Hole || item.ItemFlags[5] == PuzzleHoleType::None)&&
+		(item.ItemFlags[5] == ReusableType::Hole || item.ItemFlags[5] == ReusableType::None)&&
 		(Lara.Control.HandStatus != HandStatus::Busy))
 	{
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_ACTIVE;
-		item.ItemFlags[5] = PuzzleHoleType::Done;
+		item.ItemFlags[5] = ReusableType::Done;
 		item.ItemFlags[1] = false;
 		return 1;
 	}
 
 	if ((item.ObjectNumber >= ID_KEY_HOLE1 && 
 		item.ObjectNumber <= ID_KEY_HOLE16) && 
-		item.ItemFlags[1] && item.ItemFlags[5] == PuzzleHoleType::Done &&
+		item.ItemFlags[1] && item.ItemFlags[5] == ReusableType::Done &&
 		(Lara.Control.HandStatus != HandStatus::Busy))
 	{
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_DEACTIVATED;
-		item.ItemFlags[5] = PuzzleHoleType::Hole;
+		item.ItemFlags[5] = ReusableType::Hole;
 		item.ItemFlags[1] = false;
 		return  1;
 	}
