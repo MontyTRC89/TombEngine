@@ -440,17 +440,6 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	auto triggerIndex = GetTriggerIndex(keyHoleItem);
 	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
 
-	if (g_Level.Items[itemNumber].TriggerFlags == 1 &&
-		keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
-	{
-		if (keyHoleItem->ItemFlags[3])
-		{
-			keyHoleItem->ItemFlags[3]--;
-			if (!keyHoleItem->ItemFlags[3])
-				keyHoleItem->MeshBits = 2;
-		}
-	}
-
 	bool actionReady = (TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 
 	bool laraAvailable = !BinocularRange &&
@@ -487,10 +476,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 			{
-				if (keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
-					laraItem->Animation.AnimNumber = LA_KEYCARD_USE;
-				else
-				{
+			
 					if (triggerType != TRIGGER_TYPES::SWITCH)
 					{
 						RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
@@ -500,8 +486,8 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						keyHoleItem->ItemFlags[1] = true;						
 					}
 
-					laraItem->Animation.AnimNumber = LA_USE_KEY;
-				}
+					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				
 
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -510,13 +496,6 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				keyHoleItem->Flags |= TRIGGERED;
 				keyHoleItem->Status = ITEM_ACTIVE;
-
-				if (keyHoleItem->TriggerFlags == 1 && keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
-				{
-					keyHoleItem->ItemFlags[3] = 92;
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					return;
-				}
 			}
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
