@@ -219,11 +219,11 @@ void DisplayString::SetFlags(const sol::table& flags)
 	s.m_flags = f;
 }
 
-void DisplayString::SetTranslated(const bool& translated)
+void DisplayString::SetTranslated(bool isTranslated)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
-	TENLog((translated == true) ? "Translated string " : "Untranslated string " + std::to_string(translated), LogLevel::Info);
-	s.m_isTranslated = translated;
+	TENLog(isTranslated ? "Translated string " : "Untranslated string " + std::to_string(isTranslated), LogLevel::Info);
+	s.m_isTranslated = isTranslated;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
