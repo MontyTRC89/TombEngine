@@ -17,6 +17,7 @@
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/puzzles_keys.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Sound/sound.h"
@@ -122,6 +123,7 @@ int SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 
+	//Stuff for multi useable puzzleholes.
 	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) && item.ItemFlags[1])
 	{
 		item.Flags |= IFLAG_ACTIVATION_MASK;
@@ -144,6 +146,35 @@ int SwitchTrigger(short itemNumber, short timer)
 		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
 		return 0;
 
+	//Stuff for multi useable keyholes.
+	if ((item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16) && 
+		item.ItemFlags[1] && 
+		(item.ItemFlags[5] == PuzzleHoleType::Hole || item.ItemFlags[5] == PuzzleHoleType::None)&&
+		(Lara.Control.HandStatus != HandStatus::Busy))
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_ACTIVE;
+		item.ItemFlags[5] = PuzzleHoleType::Done;
+		item.ItemFlags[1] = false;
+		return 1;
+	}
+
+	if ((item.ObjectNumber >= ID_KEY_HOLE1 && 
+		item.ObjectNumber <= ID_KEY_HOLE16) && 
+		item.ItemFlags[1] && item.ItemFlags[5] == PuzzleHoleType::Done &&
+		(Lara.Control.HandStatus != HandStatus::Busy))
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_DEACTIVATED;
+		item.ItemFlags[5] = PuzzleHoleType::Hole;
+		item.ItemFlags[1] = false;
+		return  1;
+	}
+
+	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16)
+		return 0;
+
+	//Stuff for switches.
 	if (item.Status == ITEM_DEACTIVATED)
 	{
 		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&

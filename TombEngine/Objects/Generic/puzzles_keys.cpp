@@ -33,13 +33,6 @@ enum class PuzzleType
 	AnimAfter
 };
 
-enum PuzzleHoleType
-{
-	None = 0,
-	Done = 1,
-	Hole = 2	
-};
-
 ObjectCollisionBounds PuzzleBounds =
 {
 	GameBoundingBox(
@@ -444,6 +437,9 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* keyHoleItem = &g_Level.Items[itemNumber];
 
+	auto triggerIndex = GetTriggerIndex(keyHoleItem);
+	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+
 	if (g_Level.Items[itemNumber].TriggerFlags == 1 &&
 		keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
 	{
@@ -469,7 +465,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
 			{
-				if (keyHoleItem->Status != ITEM_NOT_ACTIVE)
+				if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
 					return;
 
 				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
@@ -495,7 +491,15 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					laraItem->Animation.AnimNumber = LA_KEYCARD_USE;
 				else
 				{
-					RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
+					if (triggerType != TRIGGER_TYPES::SWITCH)
+					{
+						RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
+					}
+					else
+					{
+						keyHoleItem->ItemFlags[1] = true;						
+					}
+
 					laraItem->Animation.AnimNumber = LA_USE_KEY;
 				}
 
