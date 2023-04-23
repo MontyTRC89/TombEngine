@@ -493,7 +493,7 @@ void ClassicRollingBallControl(short itemNum)
 	}
 }
 
-void InitialiseClassicRollingBall(short itemNum)
+void InitializeClassicRollingBall(short itemNum)
 {
 	ItemInfo *item;
 	GameVector* old;

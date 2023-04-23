@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
 
 	const std::array DogDeathAnims = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3 };
 
-	void InitialiseTr4Dog(short itemNumber)
+	void InitializeTr4Dog(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

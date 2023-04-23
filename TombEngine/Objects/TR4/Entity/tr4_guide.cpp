@@ -92,11 +92,11 @@ namespace TEN::Entities::TR4
 		GUIDE_ANIM_ACTIVATE_TRAP_CROUCHING = 69
 	};
 
-	void InitialiseGuide(short itemNumber)
+	void InitializeGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, GUIDE_ANIM_IDLE);
 		item->SetMeshSwapFlags(GuideRightHandSwapJoints);
 	}

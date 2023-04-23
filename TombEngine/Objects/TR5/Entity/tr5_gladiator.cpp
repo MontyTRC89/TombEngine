@@ -68,11 +68,11 @@ namespace TEN::Entities::Creatures::TR5
 		GLADIATOR_ANIM_WALK_SWORD_ATTACK = 22
 	};
 
-	void InitialiseGladiator(short itemNumber)
+	void InitializeGladiator(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, GLADIATOR_ANIM_IDLE);
 
 		if (item->TriggerFlags == 1)

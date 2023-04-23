@@ -112,10 +112,10 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_FALLING = 48
 	};
 
-	void InitialiseSkeleton(short itemNumber)
+	void InitializeSkeleton(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		// OCBs: Check cases 0 to 3.
 		switch (item->TriggerFlags)

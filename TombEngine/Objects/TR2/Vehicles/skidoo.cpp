@@ -117,7 +117,7 @@ namespace TEN::Entities::Vehicles
 		return (SkidooInfo*)skidooItem->Data;
 	}
 
-	void InitialiseSkidoo(short itemNumber)
+	void InitializeSkidoo(short itemNumber)
 	{
 		auto* skidooItem = &g_Level.Items[itemNumber];
 		skidooItem->Data = SkidooInfo{};

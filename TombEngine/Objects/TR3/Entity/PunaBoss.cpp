@@ -275,11 +275,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialisePuna(short itemNumber)
+	void InitializePuna(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, PUNA_ANIM_IDLE);
 		CheckForRequiredObjects(item);
 

@@ -39,11 +39,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	};
 
-	void InitialiseHydra(short itemNumber)
+	void InitializeHydra(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (item->TriggerFlags == 1)

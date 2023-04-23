@@ -252,9 +252,9 @@ namespace TEN::Entities::TR4
 		MoveItemBack(item, SECTOR(2));
 	}
 
-	void InitialiseCrocgod(short itemNumber)
+	void InitializeCrocgod(short itemNumber)
 	{
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		auto* item = &g_Level.Items[itemNumber];
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;

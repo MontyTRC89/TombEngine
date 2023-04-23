@@ -133,11 +133,11 @@ namespace TEN::Entities::TR4
 		VON_CROY_ANIM_LAND_TO_RUN = 59
 	};
 
-	void InitialiseVonCroy(short itemNumber)
+	void InitializeVonCroy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP);
 		item->SetMeshSwapFlags(VonCroyKnifeSwapJoints);
 

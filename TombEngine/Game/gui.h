@@ -199,7 +199,7 @@ namespace TEN::Gui
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);
-		void InitialiseInventory(ItemInfo* item);
+		void InitializeInventory(ItemInfo* item);
 		void FillDisplayOptions();
 		bool IsItemCurrentlyCombinable(int objectNumber);
 		bool IsItemInInventory(int objectNumber);

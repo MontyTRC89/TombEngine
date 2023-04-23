@@ -50,7 +50,7 @@ extern int RumbleTimer;
 extern int GlobalCounter;
 extern int Wibble;
 
-extern bool InitialiseGame;
+extern bool InitializeGame;
 extern bool DoTheGame;
 extern bool JustLoaded;
 extern bool ThreadEnded;
@@ -92,8 +92,8 @@ void UpdateShatters();
 
 void CleanUp();
 
-void InitialiseOrLoadGame(bool loadGame);
-void InitialiseScripting(int levelIndex, bool loadGame);
-void DeInitialiseScripting(int levelIndex);
+void InitializeOrLoadGame(bool loadGame);
+void InitializeScripting(int levelIndex, bool loadGame);
+void DeInitializeScripting(int levelIndex);
 
 unsigned CALLBACK GameMain(void*);

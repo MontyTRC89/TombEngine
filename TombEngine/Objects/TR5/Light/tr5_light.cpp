@@ -100,7 +100,7 @@ void ColorLightControl(short itemNumber)
 	}
 }
 
-void InitialiseElectricalLight(short itemNumber)
+void InitializeElectricalLight(short itemNumber)
 {
 	auto& item = g_Level.Items[itemNumber];
 	item.Data = ElectricalLightInfo();

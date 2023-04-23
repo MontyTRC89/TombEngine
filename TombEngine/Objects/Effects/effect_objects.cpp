@@ -7,7 +7,7 @@
 
 using namespace TEN::Entities::Effects;
 
-void InitialiseEffectsObjects()
+void InitializeEffectsObjects()
 {
 	ObjectInfo* obj;
 
@@ -22,7 +22,7 @@ void InitialiseEffectsObjects()
 	obj = &Objects[ID_FLAME_EMITTER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFlameEmitter;
+		obj->Initialize = InitializeFlameEmitter;
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitterControl;
 		obj->drawRoutine = nullptr;
@@ -32,7 +32,7 @@ void InitialiseEffectsObjects()
 	obj = &Objects[ID_FLAME_EMITTER2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFlameEmitter2;
+		obj->Initialize = InitializeFlameEmitter2;
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitter2Control;
 		obj->drawRoutine = nullptr;
@@ -42,7 +42,7 @@ void InitialiseEffectsObjects()
 	obj = &Objects[ID_FLAME_EMITTER3];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFlameEmitter3;
+		obj->Initialize = InitializeFlameEmitter3;
 		obj->control = FlameEmitter3Control;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
@@ -50,7 +50,7 @@ void InitialiseEffectsObjects()
 
 	obj = &Objects[ID_ENERGY_BUBBLES];
 	{
-		obj->initialise = nullptr;
+		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = ControlEnemyMissile;
 	}

@@ -139,7 +139,7 @@ namespace TEN::Entities::Vehicles
 		return (MotorbikeInfo*)motorbikeItem->Data;
 	}
 
-	void InitialiseMotorbike(short itemNumber)
+	void InitializeMotorbike(short itemNumber)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
 		motorbikeItem->Data = MotorbikeInfo();

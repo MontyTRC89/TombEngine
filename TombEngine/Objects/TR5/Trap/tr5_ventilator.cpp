@@ -126,7 +126,7 @@ void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int spe
 	}
 }
 
-void InitialiseVentilator(short itemNumber)
+void InitializeVentilator(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

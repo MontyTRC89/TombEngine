@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseWraithTrap(short itemNumber);
+	void InitializeWraithTrap(short itemNumber);
 	void WraithTrapControl(short itemNumber);
 }

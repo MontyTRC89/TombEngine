@@ -249,12 +249,12 @@ namespace TEN::Entities::Creatures::TR3
 		return false;
 	}
 
-	void InitialiseShiva(short itemNumber)
+	void InitializeShiva(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SHIVA_ANIM_INACTIVE);
 		item.ItemFlags[0] = 0; // Joint index when swapping mesh.
 		item.ItemFlags[1] = 1; // Immune state. true = immune to damage.

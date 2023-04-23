@@ -58,11 +58,11 @@ namespace TEN::Entities::Creatures::TR1
 		WOLF_ANIM_DEATH = 20,
 	};
 
-	void InitialiseWolf(short itemNumber)
+	void InitializeWolf(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->Animation.FrameNumber = WOLF_SLEEP_FRAME;
 	}
 

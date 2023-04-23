@@ -115,11 +115,11 @@ namespace TEN::Entities::Creatures::TR5
 		CYBORG_ANIM_DEATH_END = 71
 	};
 
-	void InitialiseCyborg(short itemNumber)
+	void InitializeCyborg(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, CYBORG_ANIM_IDLE);
 	}
 

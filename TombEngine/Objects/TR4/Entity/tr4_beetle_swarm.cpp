@@ -16,7 +16,7 @@ namespace TEN::Entities::TR4
 	BeetleData BeetleSwarm[NUM_BEETLES];
 	int NextBeetle;
 
-	void InitialiseBeetleSwarm(short itemNumber)
+	void InitializeBeetleSwarm(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

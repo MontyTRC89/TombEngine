@@ -287,7 +287,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
-void InitialiseNewWeapon(ItemInfo& laraItem)
+void InitializeNewWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 
@@ -558,7 +558,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				}
 
 				player.Control.Weapon.GunType = player.Control.Weapon.RequestGunType;
-				InitialiseNewWeapon(laraItem);
+				InitializeNewWeapon(laraItem);
 				player.RightArm.FrameNumber = 0;
 				player.LeftArm.FrameNumber = 0;
 				player.Control.HandStatus = HandStatus::WeaponDraw;

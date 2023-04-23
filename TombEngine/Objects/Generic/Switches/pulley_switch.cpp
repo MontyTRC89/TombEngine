@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto PulleyPos = Vector3i(0, 0, -148);
 
-	void InitialisePulleySwitch(short itemNumber)
+	void InitializePulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 

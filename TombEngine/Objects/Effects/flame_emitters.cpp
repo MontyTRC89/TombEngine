@@ -288,7 +288,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter(short itemNumber)
+	void InitializeFlameEmitter(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -321,7 +321,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter2(short itemNumber)
+	void InitializeFlameEmitter2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -366,7 +366,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter3(short itemNumber)
+	void InitializeFlameEmitter3(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

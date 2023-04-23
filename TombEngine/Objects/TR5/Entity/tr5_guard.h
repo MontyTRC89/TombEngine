@@ -5,16 +5,16 @@ struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseGuard(short itemNumber);
+	void InitializeGuard(short itemNumber);
 	void GuardControl(short itemNumber);
 
-	void InitialiseSniper(short itemNumber);
+	void InitializeSniper(short itemNumber);
 	void SniperControl(short itemNumberber);
 
-	void InitialiseGuardLaser(short itemNumber);
+	void InitializeGuardLaser(short itemNumber);
 	void ControlGuardLaser(short itemNumberber);
 
-	void InitialiseMafia2(short itemNumber);
+	void InitializeMafia2(short itemNumber);
 	void Mafia2Control(short itemNumber);
 
 	void GuardHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);

@@ -18,7 +18,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseWraithTrap(short itemNumber)
+	void InitializeWraithTrap(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

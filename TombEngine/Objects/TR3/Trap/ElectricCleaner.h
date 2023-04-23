@@ -5,7 +5,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Traps
 {
-	void InitialiseElectricCleaner(short itemNumber);
+	void InitializeElectricCleaner(short itemNumber);
 	void ElectricCleanerControl(short itemNumber);
 	void ElectricCleanerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 

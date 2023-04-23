@@ -21,7 +21,7 @@ using namespace TEN::Effects::Environment;
 
 static short WreckingBallData[2] = { 0, 0 };
 
-void InitialiseWreckingBall(short itemNumber)
+void InitializeWreckingBall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

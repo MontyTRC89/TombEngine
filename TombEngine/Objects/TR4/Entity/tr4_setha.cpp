@@ -106,11 +106,11 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE = 28
 	};
 
-	void InitialiseSeth(short itemNumber)
+	void InitializeSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
 

@@ -74,11 +74,11 @@ namespace TEN::Entities::TR4
 		CROC_ANIM_WATER_TO_LAND = 18
 	};
 
-	void InitialiseCrocodile(short itemNumber)
+	void InitializeCrocodile(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
 			SetAnimation(item, CROC_ANIM_SWIM_FORWARD);

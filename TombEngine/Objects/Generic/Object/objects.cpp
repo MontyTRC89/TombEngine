@@ -223,7 +223,7 @@ void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	}*/
 }
 
-void InitialiseTightrope(short itemNumber)
+void InitializeTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
@@ -243,7 +243,7 @@ void InitialiseTightrope(short itemNumber)
 		tightropeItem->Pose.Position.z -= CLICK(1);
 }
 
-void InitialiseAnimating(short itemNumber)
+void InitializeAnimating(short itemNumber)
 {
 	/*auto* item = &g_Level.Items[itemNumber];
 	item->ActiveState = 0;

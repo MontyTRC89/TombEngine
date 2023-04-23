@@ -45,7 +45,7 @@ namespace TEN::Entities::Creatures::TR2
 		SMAN_ANIM_DEATH = 10
 	};
 
-	void InitialiseSkidooMan(short itemNumber)
+	void InitializeSkidooMan(short itemNumber)
 	{
 		short skidooItemNumber = CreateItem();
 		if (skidooItemNumber != NO_ITEM)
@@ -60,7 +60,7 @@ namespace TEN::Entities::Creatures::TR2
 			skidooItem->Flags = ITEM_INVISIBLE;
 			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(skidooItemNumber);
+			InitializeItem(skidooItemNumber);
 
 			// The rider remembers his skidoo.
 			riderItem->Data = skidooItemNumber;
@@ -245,7 +245,7 @@ namespace TEN::Entities::Creatures::TR2
 			DisableEntityAI(itemNumber);
 			item->ObjectNumber = ID_SNOWMOBILE;
 			item->Status = ITEM_DEACTIVATED;
-			InitialiseSkidoo(itemNumber);
+			InitializeSkidoo(itemNumber);
 
 			((SkidooInfo*)item->Data)->Armed = true;
 		}
