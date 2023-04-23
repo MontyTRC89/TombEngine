@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-enum PuzzleHoleType
+enum ReusableType
 {
 	None = 0,
 	Done = 1,

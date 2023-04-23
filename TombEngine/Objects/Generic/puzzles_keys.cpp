@@ -60,7 +60,7 @@ const ObjectCollisionBounds KeyHoleBounds =
 void InitializePuzzleHole(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
-	receptacleItem.ItemFlags[5] = PuzzleHoleType::Hole;
+	receptacleItem.ItemFlags[5] = ReusableType::Hole;
 }
 
 void InitializePuzzleDone(short itemNumber)
@@ -77,7 +77,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& player = GetLaraInfo(*laraItem);
 
 	//Start level with the right object when loading the game.
-	if (receptacleItem.ItemFlags[5] == PuzzleHoleType::Done)
+	if (receptacleItem.ItemFlags[5] == ReusableType::Done)
 	{
 		receptacleItem.ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		SetAnimation(receptacleItem, 0);
@@ -238,7 +238,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	AnimateItem(&receptacleItem);
 
 	//Start level with the right object when loading the game.
-	if (receptacleItem.ItemFlags[5] == PuzzleHoleType::Hole) 
+	if (receptacleItem.ItemFlags[5] == ReusableType::Hole)
 	{
 		receptacleItem.ObjectNumber = GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 		SetAnimation(receptacleItem, 0);
@@ -247,11 +247,11 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	}
 
 	//Activate triggers when startig the level for the first time
-	if (receptacleItem.ItemFlags[5] == PuzzleHoleType::None)
+	if (receptacleItem.ItemFlags[5] == ReusableType::None)
 	{
 		receptacleItem.ItemFlags[1] = true;
 		TestTriggers(receptacleItem.Pose.Position.x, receptacleItem.Pose.Position.y, receptacleItem.Pose.Position.z, receptacleItem.RoomNumber, false, 0);
-		receptacleItem.ItemFlags[5] = PuzzleHoleType::Done;
+		receptacleItem.ItemFlags[5] = ReusableType::Done;
 	}
 
 	auto puzzleType = PuzzleType::Normal;
@@ -334,7 +334,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ItemFlags[1] = true;
 
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-		item->ItemFlags[5] = PuzzleHoleType::Done;
+		item->ItemFlags[5] = ReusableType::Done;
 		SetAnimation(item, 0);
 		item->ResetModelToDefault();	
 	}
@@ -364,7 +364,7 @@ void PuzzleHole(ItemInfo* item, short itemNumber)
 	item->ItemFlags[1] = true;
 
 	item->ObjectNumber = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
-	item->ItemFlags[5] = PuzzleHoleType::Hole;
+	item->ItemFlags[5] = ReusableType::Hole;
 	SetAnimation(item, 0);
 	item->ResetModelToDefault();
 }
