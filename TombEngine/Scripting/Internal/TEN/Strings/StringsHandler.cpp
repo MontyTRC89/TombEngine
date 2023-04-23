@@ -93,14 +93,7 @@ bool StringsHandler::IsStringDisplaying(DisplayString const& str)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
 	bool endOfLife = 0.0f >= it->second.m_timeRemaining;
-	if (it->second.m_isInfinite)
-	{
-		return endOfLife;
-	}
-	else
-	{
-		return !endOfLife;
-	}
+	return it->second.m_isInfinite ? endOfLife : !endOfLife;
 }
 
 void StringsHandler::ProcessDisplayStrings(float deltaTime)
