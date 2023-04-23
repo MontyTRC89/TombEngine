@@ -9,6 +9,7 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR1/Entity/Cowboy.h" // OK
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -164,6 +165,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(2, ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_COWBOY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCowboy;
+		obj->control = CowboyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 150;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 }
