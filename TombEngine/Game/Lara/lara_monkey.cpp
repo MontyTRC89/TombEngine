@@ -132,8 +132,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -142,7 +142,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 	
 	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
+	if (coll->Shift.y >= 0 && coll->Shift.y <= MONKEY_STEPUP_HEIGHT)
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);
 
@@ -212,8 +212,8 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -284,8 +284,8 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
