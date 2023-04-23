@@ -70,7 +70,7 @@ public:
 
 	void SetFlags(const sol::table&);
 
-	void SetTranslated(const bool& translated);
+	void SetTranslated(bool isTranslated);
 
 	static SetItemCallback s_setItemCallback;
 	static RemoveItemCallback s_removeItemCallback;
