@@ -19,15 +19,42 @@ extern TEN::Renderer::RendererHudBar* g_StaminaBar;
 
 namespace TEN::Hud
 {
+	void StatusBar::Initialize(float value)
+	{
+		Value = std::clamp(value, 0.0f, 1.0f);
+	}
+
+	void StatusBar::Update(float value)
+	{
+		constexpr auto LIFE_START_FADING = 0.2f;
+		constexpr auto LERP_ALPHA		 = 0.3f;
+
+		// Update life.
+		if (Life > 0.0f)
+			Life -= 1.0f;
+
+		// Update opacity.
+		float alpha = std::clamp(Life, 0.0f, LIFE_START_FADING) / LIFE_START_FADING;
+		Opacity = Lerp(0.0f, 1.0f, alpha);
+
+		// Update target value.
+		TargetValue = std::clamp(value, 0.0f, 1.0f);
+
+		// Update value.
+		Value = Lerp(Value, TargetValue, LERP_ALPHA);
+		if (abs(Value - TargetValue) <= EPSILON)
+			Value = TargetValue;
+	}
+
 	void StatusBarsController::Initialize(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Initialize bar values.
-		InitializeStatusBar(AirBar, player.Status.Air, LARA_AIR_MAX);
-		InitializeStatusBar(ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
-		InitializeStatusBar(HealthBar, item.HitPoints, LARA_HEALTH_MAX);
-		InitializeStatusBar(StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
+		AirBar.Initialize(player.Status.Air / LARA_AIR_MAX);
+		ExposureBar.Initialize(player.Status.Exposure / LARA_EXPOSURE_MAX);
+		HealthBar.Initialize(item.HitPoints / LARA_HEALTH_MAX);
+		StaminaBar.Initialize(player.Status.Stamina / LARA_STAMINA_MAX);
 	}
 
 	void StatusBarsController::Update(const ItemInfo& item)
@@ -66,38 +93,12 @@ namespace TEN::Hud
 		*this = {};
 	}
 
-	void StatusBarsController::InitializeStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
-	{
-		float statusValueNorm = std::clamp(statusValue, 0.0f, statusValueMax);
-		bar.Value = statusValueNorm / statusValueMax;
-	}
-
-	void StatusBarsController::UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
-	{
-		// Update life.
-		if (bar.Life > 0.0f)
-			bar.Life -= 1.0f;
-
-		// Update opacity.
-		float alpha = std::clamp(bar.Life, 0.0f, STATUS_BAR_LIFE_START_FADING) / STATUS_BAR_LIFE_START_FADING;
-		bar.Opacity = Lerp(0.0f, 1.0f, alpha);
-
-		// Update target value.
-		float statusValueNorm = std::clamp(statusValue, 0.0f, statusValueMax);
-		bar.TargetValue = statusValueNorm / statusValueMax;
-
-		// Update value.
-		bar.Value = Lerp(bar.Value, bar.TargetValue, STATUS_BAR_VALUE_LERP_ALPHA);
-		if (abs(bar.Value - bar.TargetValue) <= EPSILON)
-			bar.Value = bar.TargetValue;
-	}
-
 	void StatusBarsController::UpdateAirBar(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		UpdateStatusBar(AirBar, player.Status.Air, LARA_AIR_MAX);
+		AirBar.Update(player.Status.Air / LARA_AIR_MAX);
 		
 		// Update life.
 		if (AirBar.Value != AirBar.TargetValue ||
@@ -120,7 +121,7 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		UpdateStatusBar(ExposureBar, player.Status.Exposure, LARA_EXPOSURE_MAX);
+		ExposureBar.Update(player.Status.Exposure / LARA_EXPOSURE_MAX);
 
 		// Update life.
 		if (ExposureBar.Value != ExposureBar.TargetValue ||
@@ -135,7 +136,7 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		UpdateStatusBar(HealthBar, item.HitPoints, LARA_HEALTH_MAX);
+		HealthBar.Update(item.HitPoints / LARA_HEALTH_MAX);
 
 		// Update life.
 		if (HealthBar.Value != HealthBar.TargetValue ||
@@ -153,7 +154,7 @@ namespace TEN::Hud
 			item.HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
 		{
-			HealthBar.Life = 0;// round(STATUS_BAR_LIFE_START_FADING * FPS);
+			HealthBar.Life = 0.0f;
 		}
 	}
 
@@ -162,7 +163,7 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		UpdateStatusBar(StaminaBar, player.Status.Stamina, LARA_STAMINA_MAX);
+		StaminaBar.Update(player.Status.Stamina / LARA_STAMINA_MAX);
 
 		// Update life.
 		if (StaminaBar.Value != StaminaBar.TargetValue ||
