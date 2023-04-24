@@ -565,7 +565,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left))
 	{
-		if ((IsHeld(In::Sprint) || player.Control.TurnRate/*.y*/ <= -LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(*item, *coll)) &&
+		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, false)) &&
 			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
@@ -579,7 +579,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Right))
 	{
-		if ((IsHeld(In::Sprint) || player.Control.TurnRate/*.y*/ >= LARA_SLOW_TURN_RATE_MAX || Context::CanTurnFast(*item, *coll)) &&
+		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, true)) &&
 			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;

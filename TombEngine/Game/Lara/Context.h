@@ -12,7 +12,7 @@ namespace TEN::Player::Context
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanTurn180(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight);
 	bool CanRoll180Running(const ItemInfo& item);
 	bool CanRunForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanRunBackward(const ItemInfo& item, const CollisionInfo& coll);

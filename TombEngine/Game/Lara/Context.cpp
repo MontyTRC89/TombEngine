@@ -126,11 +126,23 @@ namespace TEN::Player::Context
 		return false;
 	}
 
-	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
 		const auto& player = GetLaraInfo(item);
 
-		// Assess player status.
+		// 1) Test player turn rate.
+		if (isGoingRight)
+		{
+			if (player.Control.TurnRate/*.y*/ >= LARA_SLOW_TURN_RATE_MAX)
+				return true;
+		}
+		else
+		{
+			if (player.Control.TurnRate/*.y*/ <= -LARA_SLOW_TURN_RATE_MAX)
+				return true;
+		}
+
+		// 2) Assess player status.
 		if (player.Control.WaterStatus == WaterStatus::Dry &&
 			((player.Control.HandStatus == HandStatus::WeaponReady && player.Control.Weapon.GunType != LaraWeaponType::Torch) ||
 				(player.Control.HandStatus == HandStatus::WeaponDraw && player.Control.Weapon.GunType != LaraWeaponType::Flare)))
