@@ -32,6 +32,18 @@ static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase";
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 
+// Callback points
+static constexpr char ScriptReserved_PreStart[]			= "PRESTART";
+static constexpr char ScriptReserved_PostStart[]		= "POSTSTART";
+static constexpr char ScriptReserved_PreEnd[]			= "PREEND";
+static constexpr char ScriptReserved_PostEnd[]			= "POSTEND";
+static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
+static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
+static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
+static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
+static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
+
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";

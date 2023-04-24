@@ -1191,10 +1191,42 @@ bool SaveGame::Save(int slot)
 	uvb.add_members(unionVec);
 	auto unionVecOffset = uvb.Finish();
 
+	std::vector<std::string> callbackVecPreStart;
+	std::vector<std::string> callbackVecPostStart;
+
+	std::vector<std::string> callbackVecPreEnd;
+	std::vector<std::string> callbackVecPostEnd;
+
+	std::vector<std::string> callbackVecPreSave;
+	std::vector<std::string> callbackVecPostSave;
+
+	std::vector<std::string> callbackVecPreLoad;
+	std::vector<std::string> callbackVecPostLoad;
+
 	std::vector<std::string> callbackVecPreControl;
 	std::vector<std::string> callbackVecPostControl;
-	g_GameScript->GetCallbackStrings(callbackVecPreControl, callbackVecPostControl);
 
+	g_GameScript->GetCallbackStrings(
+		callbackVecPreStart,
+		callbackVecPostStart,
+		callbackVecPreEnd,
+		callbackVecPostEnd,
+		callbackVecPreSave,
+		callbackVecPostSave,
+		callbackVecPreLoad,
+		callbackVecPostLoad,
+		callbackVecPreControl,
+		callbackVecPostControl
+	);
+
+	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
+	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
+	auto stringsCallbackPreEnd = fbb.CreateVectorOfStrings(callbackVecPreEnd);
+	auto stringsCallbackPostEnd = fbb.CreateVectorOfStrings(callbackVecPostEnd);
+	auto stringsCallbackPreSave = fbb.CreateVectorOfStrings(callbackVecPreSave);
+	auto stringsCallbackPostSave = fbb.CreateVectorOfStrings(callbackVecPostSave);
+	auto stringsCallbackPreLoad = fbb.CreateVectorOfStrings(callbackVecPreLoad);
+	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
 	auto stringsCallbackPreControl = fbb.CreateVectorOfStrings(callbackVecPreControl);
 	auto stringsCallbackPostControl = fbb.CreateVectorOfStrings(callbackVecPostControl);
 
@@ -1243,6 +1275,19 @@ bool SaveGame::Save(int slot)
 	}
 
 	sgb.add_script_vars(unionVecOffset);
+
+	sgb.add_callbacks_pre_start(stringsCallbackPreStart);
+	sgb.add_callbacks_post_start(stringsCallbackPostStart);
+
+	sgb.add_callbacks_pre_end(stringsCallbackPreEnd);
+	sgb.add_callbacks_post_end(stringsCallbackPostEnd);
+
+	sgb.add_callbacks_pre_save(stringsCallbackPreSave);
+	sgb.add_callbacks_post_save(stringsCallbackPostSave);
+
+	sgb.add_callbacks_pre_load(stringsCallbackPreLoad);
+	sgb.add_callbacks_post_load(stringsCallbackPostLoad);
+
 	sgb.add_callbacks_pre_control(stringsCallbackPreControl);
 	sgb.add_callbacks_post_control(stringsCallbackPostControl);
 
@@ -2043,6 +2088,16 @@ bool SaveGame::Load(int slot)
 
 	g_GameScript->SetVariables(loadedVars);
 
+	std::vector<std::string> callbacksPreStartVec;
+	auto callbacksPreStartOffsetVec = s->callbacks_pre_start();
+	for (auto const& s : *callbacksPreStartOffsetVec)
+		callbacksPreStartVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPostStartVec;
+	auto callbacksPostStartOffsetVec = s->callbacks_post_start();
+	for (auto const& s : *callbacksPostStartOffsetVec)
+		callbacksPostStartVec.push_back(s->str());
+
 	std::vector<std::string> callbacksPreControlVec;
 	auto callbacksPreControlOffsetVec = s->callbacks_pre_control();
 	for (auto const& s : *callbacksPreControlOffsetVec)
@@ -2053,7 +2108,48 @@ bool SaveGame::Load(int slot)
 	for (auto const& s : *callbacksPostControlOffsetVec)
 		callbacksPostControlVec.push_back(s->str());
 
-	g_GameScript->SetCallbackStrings(callbacksPreControlVec, callbacksPostControlVec);
+	std::vector<std::string> callbacksPreSaveVec;
+	auto callbacksPreSaveOffsetVec = s->callbacks_pre_save();
+	for (auto const& s : *callbacksPreSaveOffsetVec)
+		callbacksPreSaveVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPostSaveVec;
+	auto callbacksPostSaveOffsetVec = s->callbacks_post_save();
+	for (auto const& s : *callbacksPostSaveOffsetVec)
+		callbacksPostSaveVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPreLoadVec;
+	auto callbacksPreLoadOffsetVec = s->callbacks_pre_load();
+	for (auto const& s : *callbacksPreLoadOffsetVec)
+		callbacksPreLoadVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPostLoadVec;
+	auto callbacksPostLoadOffsetVec = s->callbacks_post_load();
+	for (auto const& s : *callbacksPostLoadOffsetVec)
+		callbacksPostLoadVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPreEndVec;
+	auto callbacksPreEndOffsetVec = s->callbacks_pre_end();
+	for (auto const& s : *callbacksPreEndOffsetVec)
+		callbacksPreEndVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPostEndVec;
+	auto callbacksPostEndOffsetVec = s->callbacks_post_end();
+	for (auto const& s : *callbacksPostEndOffsetVec)
+		callbacksPostEndVec.push_back(s->str());
+
+	g_GameScript->SetCallbackStrings(
+		callbacksPreStartVec,
+		callbacksPostStartVec,
+		callbacksPreEndVec,
+		callbacksPostEndVec,
+		callbacksPreSaveVec,
+		callbacksPostSaveVec,
+		callbacksPreLoadVec,
+		callbacksPostLoadVec,
+		callbacksPreControlVec,
+		callbacksPostControlVec
+	);
 
 	return true;
 }

@@ -56,6 +56,17 @@ private:
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
+	void TryCall(std::string const& name, float deltaTime);
+	void TryCall(std::string const& name);
+
+	std::unordered_set<std::string> m_callbacksPreSave;
+	std::unordered_set<std::string> m_callbacksPostSave;
+	std::unordered_set<std::string> m_callbacksPreLoad;
+	std::unordered_set<std::string> m_callbacksPostLoad;
+	std::unordered_set<std::string> m_callbacksPreStart;
+	std::unordered_set<std::string> m_callbacksPostStart;
+	std::unordered_set<std::string> m_callbacksPreEnd;
+	std::unordered_set<std::string> m_callbacksPostEnd;
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
 
@@ -74,6 +85,7 @@ public:
 
 	sol::protected_function_result		CallLevelFunc(const std::string&, sol::variadic_args);
 	sol::protected_function_result		CallLevelFunc(const std::string&, float deltaTime);
+	sol::protected_function_result		CallLevelFunc(const std::string&);
 
 	void								FreeLevelScripts() override;
 
@@ -98,8 +110,29 @@ public:
 	void								SetVariables(const std::vector<SavedVar>& vars) override;
 	void								ResetVariables();
 
-	void								SetCallbackStrings(const std::vector<std::string>& preControl, const std::vector<std::string>& postControl) override;
-	void								GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const override;
+	void								SetCallbackStrings(
+															std::vector<std::string> const & preStart,
+															std::vector<std::string> const & postStart,
+															std::vector<std::string> const & preEnd,
+															std::vector<std::string> const & postEnd,
+															std::vector<std::string> const & preSave,
+															std::vector<std::string> const & postSave, 
+															std::vector<std::string> const & preLoad,   
+															std::vector<std::string> const & postLoad, 
+															std::vector<std::string> const & preControl,   
+															std::vector<std::string> const & posControl) override;
+
+	void								GetCallbackStrings(
+															std::vector<std::string>& preStart,
+															std::vector<std::string>& postStart,
+															std::vector<std::string>& preEnd,
+															std::vector<std::string>& postEnd,
+															std::vector<std::string>& preSave,
+															std::vector<std::string>& postSave,
+															std::vector<std::string>& preLoad,
+															std::vector<std::string>& postLoad,
+															std::vector<std::string>& preControl,
+															std::vector<std::string>& postControl) const override;
 
 	void								InitCallbacks() override;
 	void								OnStart() override;

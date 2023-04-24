@@ -18,6 +18,11 @@ public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
 
+	sol::protected_function_result CallNoFuncs()
+	{
+		return m_handler->CallLevelFunc(m_funcName);
+	}
+
 	sol::protected_function_result Call(sol::variadic_args args)
 	{
 		return m_handler->CallLevelFunc(m_funcName, args);

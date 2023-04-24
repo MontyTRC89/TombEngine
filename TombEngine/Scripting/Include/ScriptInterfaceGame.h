@@ -69,8 +69,29 @@ public:
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;
 	virtual void SetVariables(const std::vector<SavedVar>& vars) = 0;
 
-	virtual void GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const = 0;
-	virtual void SetCallbackStrings(const std::vector<std::string>& preControl, const std::vector<std::string>& postControl) = 0;
+	virtual void GetCallbackStrings(
+		std::vector<std::string>& preStart,
+		std::vector<std::string>& postStart,
+		std::vector<std::string>& preEnd,
+		std::vector<std::string>& postEnd,
+		std::vector<std::string>& preSave,
+		std::vector<std::string>& postSave,
+		std::vector<std::string>& preLoad,
+		std::vector<std::string>& postLoad,
+		std::vector<std::string>& preControl,
+		std::vector<std::string>& postControl) const = 0;
+
+	virtual void SetCallbackStrings(
+		std::vector<std::string> const & preStart,
+		std::vector<std::string> const & postStart,
+		std::vector<std::string> const & preEnd,
+		std::vector<std::string> const & postEnd,
+		std::vector<std::string> const & preSave,
+		std::vector<std::string> const & postSave,
+		std::vector<std::string> const & preLoad,
+		std::vector<std::string> const & postLoad,
+		std::vector<std::string> const & preControl,
+		std::vector<std::string> const & postControl) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;
