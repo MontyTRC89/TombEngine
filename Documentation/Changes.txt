@@ -1,6 +1,7 @@
 Version 1.0.9
 =============
 
+- Add TR1 Cowboy.
 - Add TR3 Wall mounted blade.
 - Add TR3 Claw mutant.
 - Add removable puzzles from puzzle holes and puzzle dones.
@@ -10,6 +11,10 @@ Version 1.0.9
 - Fix spiky wall speed value.
 	- Change speed by giving an OCB number to it or lua (Moveable::SetItemFlags[0]).
 - Fix spiky wall being too slow when triggered.
+
+Lua API changes:
+* Add function String::SetTranslated() 
+* Add function Misc::IsStringDisplaying()
 
 Version 1.0.8
 =============
