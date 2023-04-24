@@ -46,6 +46,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Trap/tr5_laser.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -223,6 +224,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
+		UpdateLasers();
 
 		// Update HUD.
 		g_Hud.Update(*LaraItem);
@@ -421,6 +423,7 @@ void CleanUp()
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
+	RemoveLasers();
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);

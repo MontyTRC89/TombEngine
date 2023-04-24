@@ -4,6 +4,10 @@
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define PI2 6.2831853071795864769252867665590057683943387987502116419498891846
 
+float RandomValue (float2 input) {
+	return frac(sin(dot(input,float2(12.9898,78.233)))*43758.5453123);
+}
+
 float Luma(float3 color)
 {
 	// Use Rec.709 trichromat formula to get perceptive luma value
@@ -47,7 +51,7 @@ float4 TaylorInvSqrt(float4 r)
 }
 
 float SimplexNoise(float3 v)
-{ 
+{
 	const float2 C = float2(1.0/6.0, 1.0/3.0) ;
 	const float4 D = float4(0.0, 0.5, 1.0, 2.0);
 
@@ -121,6 +125,42 @@ float SimplexNoise(float3 v)
 									 dot(p2,x2), dot(p3,x3) ) );
 }
 
+float Noise2D (float2 input)
+{
+	float2 i = floor(input);
+	float2 f = frac(input);
+
+	// Four corners in 2D of a tile
+	float a = RandomValue(i);
+	float b = RandomValue(i + float2(1.0, 0.0));
+	float c = RandomValue(i + float2(0.0, 1.0));
+	float d = RandomValue(i + float2(1.0, 1.0));
+
+	float2 u = f * f * (3.0 - 2.0 * f);
+
+	return lerp(a, b, u.x) +
+							(c - a) * u.y * (1.0 - u.x) +
+							(d - b) * u.x * u.y;
+}
+
+#define OCTAVES 6
+float FractalNoise (float2 input)
+{
+	// Initial values
+	float value = 0.0;
+	float amplitude = .5;
+	float frequency = 0.;
+	//
+	// Loop of octaves
+	for (int i = 0; i < OCTAVES; i++)
+	{
+		value += amplitude * Noise2D(input);
+		input *= 2.;
+		amplitude *= .5;
+	}
+	return value;
+}
+
 float3 NormalNoise(float3 v, float3 i, float3 n)
 {
 //the resulting vector
@@ -141,6 +181,6 @@ float3 NormalNoise(float3 v, float3 i, float3 n)
 
 //returns the perturbed pixel based on the reference pixel
 //and the resulting vector, with a threshold c attenuated by 2/5 times
-	return lerp(v,r,c*.3f);
+	return lerp(v,r,c*.2f);
 }
 #endif // MATH

@@ -29,6 +29,7 @@
 #include "Objects/TR5/Entity/tr5_imp.h"			 // OK
 #include "Objects/TR5/Entity/tr5_lagoon_witch.h" // OK
 #include "Objects/TR5/Entity/tr5_larson.h"		 // OK
+#include "Objects/TR5/Trap/tr5_laser.h"
 #include "Objects/TR5/Entity/tr5_laser_head.h"	 // OK
 #include "Objects/TR5/Entity/tr5_lion.h"		 // OK
 #include "Objects/TR5/Entity/tr5_reaper.h"		 // OK
@@ -922,6 +923,15 @@ static void StartTrap(ObjectInfo *obj)
 		obj->control = ExplosionControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASERS];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitialiseLasers;
+		obj->control = ControlLasers;
+		//obj->drawRoutine = nullptr;
+		//obj->usingDrawAnimatingItem = false;
 	}
 }
 

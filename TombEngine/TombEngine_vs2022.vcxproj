@@ -466,6 +466,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_laser.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
@@ -887,6 +888,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_laser.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
