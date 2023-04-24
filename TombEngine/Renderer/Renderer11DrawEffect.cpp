@@ -69,6 +69,8 @@ BiteInfo EnemyBites[12] =
 	{ 0, -64, 250, 7 }	  // Troops
 };
 
+int scrollLaserUniform = 0;
+
 namespace TEN::Renderer 
 {
 	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
@@ -80,7 +82,9 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
 		bool IsBillboard;
 		bool IsSoftParticle;
+		bool IsTr5Laser;
 	};
+	
 
 	void Renderer11::DrawLasers(RenderView& view)
 	{
@@ -104,7 +108,6 @@ namespace TEN::Renderer
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
 		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ADDITIVE;
-
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
 			for (const auto& [tag, pool] : module.Pools)
@@ -1109,6 +1112,7 @@ namespace TEN::Renderer
 		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
+		currentSpriteBucket.IsTr5Laser = view.spritesToDraw[0].isTr5Laser;
 
 		for (auto& rDrawSprite : view.spritesToDraw)
 		{
@@ -1126,6 +1130,7 @@ namespace TEN::Renderer
 				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
+				currentSpriteBucket.IsTr5Laser = rDrawSprite.isTr5Laser;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
@@ -1237,6 +1242,16 @@ namespace TEN::Renderer
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
+			m_stSprite.IsTr5Laser = spriteBucket.IsTr5Laser ? 1 : 0;
+			if(m_stSprite.IsTr5Laser)
+			{
+				m_stSprite.IsTr5Laser = 1;
+
+				if (scrollLaserUniform > 1024)
+					scrollLaserUniform = -1024;
+
+				m_stSprite.secondsUniform = float(scrollLaserUniform++);
+			}
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1285,7 +1300,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{	
+	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -1301,6 +1316,16 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
+			m_stSprite.IsTr5Laser = 0;
+			if(info->sprite->isTr5Laser)
+			{
+				m_stSprite.IsTr5Laser = 1;
+
+				if (scrollLaserUniform > 1024)
+					scrollLaserUniform = -1024;
+
+				m_stSprite.secondsUniform = float(scrollLaserUniform++);
+			}
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());

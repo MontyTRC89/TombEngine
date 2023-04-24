@@ -6,9 +6,13 @@
 // NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
 // instead of instances
 
+#define FADE_FACTOR .789f
+
 cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
+	float isTr5Laser;
+	float secondsUniform;
 };
 
 struct PixelShaderInput
@@ -51,7 +55,7 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
-
+	
 	DoAlphaTest(output);
 
 	if (IsSoftParticle == 1)
@@ -71,6 +75,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
+	if(isTr5Laser == 1)
+	{
+		output = DoLasers(input.Position, output, input.UV, FADE_FACTOR, secondsUniform);
+	}
+  
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;

@@ -6,7 +6,7 @@
 
 std::vector<LaserStructInfo> Lasers = {};
 
-void InitialiseLasers(short itemNumber)
+void InitializeLasers(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	

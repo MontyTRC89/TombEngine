@@ -928,7 +928,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_LASERS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLasers;
+		obj->Initialize = InitializeLasers;
 		obj->control = ControlLasers;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;

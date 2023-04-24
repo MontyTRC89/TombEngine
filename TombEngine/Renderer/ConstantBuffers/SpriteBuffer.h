@@ -8,4 +8,6 @@ using DirectX::SimpleMath::Vector4;
 struct alignas(16) CSpriteBuffer
 {
 	float IsSoftParticle;
+	float IsTr5Laser;
+	float secondsUniform;
 };

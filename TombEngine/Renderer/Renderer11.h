@@ -618,7 +618,7 @@ namespace TEN::Renderer
 							const Vector4& color, BLEND_MODES blendMode, RenderView& view);
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-							BLEND_MODES blendMode, RenderView& view);
+							BLEND_MODES blendMode, RenderView& view, bool isTr5Laser = false);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);

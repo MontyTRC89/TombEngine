@@ -16,6 +16,6 @@ struct LaserStructInfo
 extern std::vector<LaserStructInfo> Lasers;
 
 void ControlLasers(short itemNumber);
-void InitialiseLasers(short itemNumber);
+void InitializeLasers(short itemNumber);
 void UpdateLasers();
 void RemoveLasers();
