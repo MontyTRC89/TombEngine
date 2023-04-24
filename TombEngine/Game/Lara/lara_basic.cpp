@@ -1666,7 +1666,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Status.Stamina = std::clamp(player.Status.Stamina--, 0, (int)LARA_STAMINA_MAX);
+	player.Status.Stamina = std::clamp(player.Status.Stamina - 1, 0, (int)LARA_STAMINA_MAX);
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_SPRINT_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
