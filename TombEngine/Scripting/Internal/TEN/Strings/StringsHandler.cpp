@@ -77,23 +77,23 @@ void StringsHandler::SetCallbackDrawString(CallbackDrawString cb)
 	m_callbackDrawSring = cb;
 }
 
-bool StringsHandler::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
+bool StringsHandler::SetDisplayString(DisplayStringIDType id, const UserDisplayString& displayString)
 {
-	return m_userDisplayStrings.insert_or_assign(id, ds).second;
+	return m_userDisplayStrings.insert_or_assign(id, displayString).second;
 }
 
-void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> nSeconds)
+void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> numSeconds)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
-	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
-	it->second.m_isInfinite = !nSeconds.has_value();
+	it->second.m_timeRemaining = numSeconds.value_or(0.0f);
+	it->second.m_isInfinite = !numSeconds.has_value();
 }
 
-bool StringsHandler::IsStringDisplaying(DisplayString const& str)
+bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)
 {
-	auto it = m_userDisplayStrings.find(str.GetID());
-	bool endOfLife = 0.0f >= it->second.m_timeRemaining;
-	return it->second.m_isInfinite ? endOfLife : !endOfLife;
+	auto it = m_userDisplayStrings.find(displayString.GetID());
+	bool isAtEndOfLife = (0.0f >= it->second.m_timeRemaining);
+	return (it->second.m_isInfinite ? isAtEndOfLife : !isAtEndOfLife);
 }
 
 void StringsHandler::ProcessDisplayStrings(float deltaTime)
@@ -135,5 +135,3 @@ void StringsHandler::ClearDisplayStrings()
 {
 	m_userDisplayStrings.clear();
 }
-
-

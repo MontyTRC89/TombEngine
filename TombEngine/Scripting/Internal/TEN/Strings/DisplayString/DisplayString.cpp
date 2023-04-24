@@ -167,21 +167,21 @@ DisplayStringIDType DisplayString::GetID() const
 
 void DisplayString::SetPos(int x, int y)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_x = x;
-	s.m_y = y;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_x = x;
+	displayString.m_y = y;
 }
 
 std::tuple<int, int> DisplayString::GetPos() const
 {	
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return std::make_tuple(s.m_x, s.m_y);
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return std::make_tuple(displayString.m_x, displayString.m_y);
 }
 	
 void DisplayString::SetCol(const ScriptColor& color)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_color = color;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_color = color;
 	//todo maybe change getItemCallback to return a ref instead? or move its
 	//todo UserDisplayString object? and then move back?
 	//s_addItemCallback(m_id, s);
@@ -195,35 +195,35 @@ ScriptColor DisplayString::GetCol()
 
 void DisplayString::SetKey(const std::string& key)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_key = key;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_key = key;
 }
 
 std::string DisplayString::GetKey() const
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return s.m_key;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return displayString.m_key;
 }
 
 void DisplayString::SetFlags(const sol::table& flags) 
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 
-	FlagArray f{};
+	auto flagArray = FlagArray {};
 	for (const auto& val : flags)
 	{
 		auto i = val.second.as<size_t>();
-		f[i] = true;
+		flagArray[i] = true;
 	}
 
-	s.m_flags = f;
+	displayString.m_flags = flagArray;
 }
 
 void DisplayString::SetTranslated(bool isTranslated)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 	TENLog(isTranslated ? "Translated string " : "Untranslated string " + std::to_string(isTranslated), LogLevel::Info);
-	s.m_isTranslated = isTranslated;
+	displayString.m_isTranslated = isTranslated;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
