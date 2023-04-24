@@ -12,10 +12,10 @@
 
 using namespace TEN::Renderer;
 
-extern TEN::Renderer::RendererHudBar* g_AirBar;
-extern TEN::Renderer::RendererHudBar* g_ExposureBar;
-extern TEN::Renderer::RendererHudBar* g_HealthBar;
-extern TEN::Renderer::RendererHudBar* g_StaminaBar;
+extern RendererHudBar* g_AirBar;
+extern RendererHudBar* g_ExposureBar;
+extern RendererHudBar* g_HealthBar;
+extern RendererHudBar* g_StaminaBar;
 
 namespace TEN::Hud
 {
