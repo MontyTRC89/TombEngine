@@ -49,11 +49,11 @@ namespace TEN::Entities::Creatures::TR2
 		WORKER_FLAME_ANIM_DEATH = 19
 	};
 
-	void InitialiseWorkerFlamethrower(short itemNumber)
+	void InitializeWorkerFlamethrower(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, WORKER_FLAME_ANIM_IDLE);
 	}
 

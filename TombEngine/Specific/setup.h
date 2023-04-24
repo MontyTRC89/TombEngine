@@ -10,7 +10,7 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
-// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+// Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
 enum class LotType
 {
 	Skeleton,
@@ -52,53 +52,60 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	int nmeshes;
-	int meshIndex;
-	int boneIndex;
-	int frameBase;
+	bool loaded = false; // IsLoaded
+
+	int nmeshes; // BoneCount
+	int meshIndex; // Base index in g_Level.Meshes.
+	int boneIndex; // Base index in g_Level.Bones.
+	int animIndex; // Base index in g_Level.Anims.
+	int frameBase; // Base index in g_Level.Frames.
+
 	LotType LotType;
-	int animIndex;
-	short HitPoints;
-	short pivotLength;
-	short radius;
-	ShadowMode shadowType;
-	short biteOffset;
-	bool loaded;
-	bool intelligent;
-	bool nonLot;
-	bool waterCreature;
-	bool usingDrawAnimatingItem;
 	HitEffect hitEffect;
-	bool undead;
-	bool isPickup;
-	bool isPuzzleHole;
+	ShadowMode shadowType;
+
 	int meshSwapSlot;
+	int pivotLength;
+	int radius;
+	int biteOffset;
+
+	int HitPoints;
+	bool intelligent;	// IsIntelligent
+	bool waterCreature; // IsWaterCreature
+	bool undead;		// IsUndead
+	bool nonLot;		// IsNonLot
+	bool isPickup;		// IsPickup
+	bool isPuzzleHole;	// IsReceptacle
+	bool usingDrawAnimatingItem;
+
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)> initialise;
-	std::function<void(short itemNumber)> control;
+	std::function<void(short itemNumber)>										   Initialize;
+	std::function<void(short itemNumber)>										   control;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
+	std::function<void(ItemInfo* item)>																									 drawRoutine;
+
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
-	std::function<void(ItemInfo* item)> drawRoutine;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
+	std::function<int(short itemNumber)>								   floorBorder;
+	std::function<int(short itemNumber)>								   ceilingBorder;
 
 	/// <summary>
-	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
+	/// ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
 	/// </summary>
-	/// <param name="boneID">the mesh id - 1</param>
-	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
-	void SetBoneRotationFlags(int boneID, int flags)
+	/// <param name="boneNumber:">Mesh number - 1.</param>
+	/// <param name="flags:">JointRotationFlags enum.</param>
+	void SetBoneRotationFlags(int boneNumber, int flags)
 	{
-		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
 	}
 
 	/// <summary>
-	/// Use this to set up a hit effect for the slot based on its value.
+	/// Set up hit effect for object based on its value.
 	/// </summary>
-	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
+	/// <param name="isAlive:">Use if object is alive but not intelligent to set up blood effects.</param>
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
 		// Avoid some objects such as ID_SAS_DYING having None.
@@ -153,6 +160,6 @@ constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];
 
-void InitialiseGameFlags();
-void InitialiseSpecialEffects();
-void InitialiseObjects();
+void InitializeGameFlags();
+void InitializeSpecialEffects();
+void InitializeObjects();

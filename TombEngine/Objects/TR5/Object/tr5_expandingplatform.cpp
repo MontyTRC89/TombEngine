@@ -12,9 +12,9 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseExpandingPlatform(short itemNumber)
+void InitializeExpandingPlatform(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -32,7 +32,7 @@ void InitialiseExpandingPlatform(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 }
 
 bool IsOnExpandingPlatform(int itemNumber, int x, int z)

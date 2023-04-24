@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	void InitialiseWolf(short itemNumber);
+	void InitializeWolf(short itemNumber);
 	void WolfControl(short itemNumber);
 }

@@ -258,11 +258,11 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dSize = spark->size / 4;
 	}
 
-	void InitialiseRomanStatue(short itemNumber)
+	void InitializeRomanStatue(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, STATUE_ANIM_START_JUMP_DOWN);
 		item->Status = ITEM_NOT_ACTIVE;
 		item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
@@ -790,13 +790,11 @@ namespace TEN::Entities::Creatures::TR5
 
 			if (item->Animation.ActiveState == STATUE_STATE_DEATH)
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 54 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
-					item->TouchBits.TestAny())
+				if (TestAnimFrameRange(*item, 55, 73) && item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 40);
 				}
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				else if (TestLastFrame(item))
 				{
 					// Activate trigger on death
 					short roomNumber = item->ItemFlags[2] & 0xFF;
@@ -812,9 +810,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 			else
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_DEATH;
-				item->Animation.ActiveState = STATUE_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				SetAnimation(item, STATUE_ANIM_DEATH);
 			}
 		}
 

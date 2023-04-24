@@ -163,11 +163,11 @@ namespace TEN::Entities::Creatures::TR5
 		return false;
 	}
 
-	void InitialiseImp(short itemNumber)
+	void InitializeImp(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		switch (item.TriggerFlags)
 		{
@@ -393,7 +393,7 @@ namespace TEN::Entities::Creatures::TR5
 			case IMP_STATE_STONE_ATTACK:
 				RotateTowardTarget(*item, ai, IMP_ATTACK_TURN_RATE_MAX);
 				
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 40))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 40))
 					DoImpStoneAttack(item);
 
 				break;

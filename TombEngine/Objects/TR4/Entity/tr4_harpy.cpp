@@ -165,10 +165,10 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseHarpy(short itemNumber)
+	void InitializeHarpy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HARPY_ANIM_IDLE);
 	}
 
@@ -446,8 +446,8 @@ namespace TEN::Entities::TR4
 						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
 						AI.distance < SQUARE(BLOCK(2)) &&
-						item->Animation.AnimNumber == GetAnimNumber(*item, HARPY_ANIM_STINGER_ATTACK) &&
-						item->Animation.FrameNumber > GetFrameNumber(item, 17))
+						item->Animation.AnimNumber == GetAnimIndex(*item, HARPY_ANIM_STINGER_ATTACK) &&
+						item->Animation.FrameNumber > GetFrameIndex(item, 17))
 					)
 				{
 					if (creature->Enemy->IsLara())

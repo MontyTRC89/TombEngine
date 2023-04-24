@@ -18,11 +18,11 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseWraithTrap(short itemNumber)
+	void InitializeWraithTrap(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + 3;
+		item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex;
 		item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 		item.ItemFlags[6] = 0;
 	}
@@ -42,8 +42,6 @@ namespace TEN::Entities::TR4
 				auto color = Vector3(255.0f);
 				TriggerAttackSpark(pos.ToVector3(), color);
 			}
-
-			AnimateItem(&item);
 		}
 	}
 }

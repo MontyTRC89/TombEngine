@@ -10,9 +10,10 @@ namespace TEN::Entities::Effects
 		Demigod3Single = 3,
 		Demigod3Radial = 4,
 		Demigod2 = 5,
-		Mutant = 6,
+		CrocgodMutant = 6,
 		SophiaLeighNormal = 7,
-		SophiaLeighLarge = 8
+		SophiaLeighLarge = 8,
+		ClawMutantPlasma = 9
 	};
 
 	void ControlEnemyMissile(short fxNumber);

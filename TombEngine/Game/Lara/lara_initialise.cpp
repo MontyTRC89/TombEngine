@@ -12,7 +12,7 @@
 
 using namespace TEN::Hud;
 
-void InitialiseLara(bool restore)
+void InitializeLara(bool restore)
 {
 	if (Lara.ItemNumber == NO_ITEM)
 		return;
@@ -39,10 +39,10 @@ void InitialiseLara(bool restore)
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	Lara.WaterSurfaceDist = 100;
+	Lara.Context.WaterSurfaceDist = 100;
 
 	Lara.ExtraAnim = NO_ITEM;
-	Lara.Vehicle = NO_ITEM;
+	Lara.Context.Vehicle = NO_ITEM;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;
@@ -50,17 +50,17 @@ void InitialiseLara(bool restore)
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
-		InitialiseLaraLevelJump(itemNumber, &lBackup);
+		InitializeLaraLevelJump(itemNumber, &lBackup);
 	else
-		InitialiseLaraDefaultInventory();
+		InitializeLaraDefaultInventory();
 
-	InitialiseLaraMeshes(LaraItem);
-	InitialiseLaraAnims(LaraItem);
+	InitializeLaraMeshes(LaraItem);
+	InitializeLaraAnims(LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
-void InitialiseLaraMeshes(ItemInfo* item)
+void InitializeLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -126,7 +126,7 @@ void InitialiseLaraMeshes(ItemInfo* item)
 	lara->RightArm.Locked = false;
 }
 
-void InitialiseLaraAnims(ItemInfo* item)
+void InitializeLaraAnims(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -143,13 +143,13 @@ void InitialiseLaraAnims(ItemInfo* item)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum)
+void InitializeLaraLoad(short itemNum)
 {
 	Lara.ItemNumber = itemNum;
 	LaraItem = &g_Level.Items[itemNum];
 }
 
-void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
+void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup)
 {
 	auto* item = &g_Level.Items[itemNum];
 	auto* lara = GetLaraInfo(item);
@@ -169,10 +169,10 @@ void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
 	lara->Control.HandStatus = lBackup->Control.HandStatus;
 	lara->Control.Weapon = lBackup->Control.Weapon;
 	lara->Flare = lBackup->Flare;
-	DrawFlareMeshes(item);
+	DrawFlareMeshes(*item);
 }
 
-void InitialiseLaraDefaultInventory()
+void InitializeLaraDefaultInventory()
 {
 	if (Objects[ID_FLARE_INV_ITEM].loaded)
 		Lara.Inventory.TotalFlares = 3;

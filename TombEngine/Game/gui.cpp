@@ -1593,7 +1593,7 @@ namespace TEN::Gui
 		Rings[(int)RingTypes::Ammo]->RingActive = false;
 	}
 
-	void GuiController::InitialiseInventory(ItemInfo* item)
+	void GuiController::InitializeInventory(ItemInfo* item)
 	{
 		auto* lara = GetLaraInfo(item);
 
@@ -1820,7 +1820,7 @@ namespace TEN::Gui
 							ClearAllActions();
 							ActionMap[(int)In::Flare].Update(1.0f);
 
-							HandleWeapon(item);
+							HandleWeapon(*item);
 							ClearAllActions();
 						}
 
@@ -2920,7 +2920,7 @@ namespace TEN::Gui
 		if (resetMode)
 			InvMode = InventoryMode::InGame;
 
-		InitialiseInventory(item);
+		InitializeInventory(item);
 		Camera.numberFrames = 2;
 
 		bool exitLoop = false;

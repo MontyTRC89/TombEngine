@@ -45,7 +45,7 @@ namespace TEN::Entities::Creatures::TR2
 		SMAN_ANIM_DEATH = 10
 	};
 
-	void InitialiseSkidooMan(short itemNumber)
+	void InitializeSkidooMan(short itemNumber)
 	{
 		short skidooItemNumber = CreateItem();
 		if (skidooItemNumber != NO_ITEM)
@@ -60,7 +60,7 @@ namespace TEN::Entities::Creatures::TR2
 			skidooItem->Flags = ITEM_INVISIBLE;
 			skidooItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(skidooItemNumber);
+			InitializeItem(skidooItemNumber);
 
 			// The rider remembers his skidoo.
 			riderItem->Data = skidooItemNumber;
@@ -89,7 +89,7 @@ namespace TEN::Entities::Creatures::TR2
 				ItemPushItem(item, laraItem, coll, false, 0);
 		}
 
-		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0.0f)
+		if (Lara.Context.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0.0f)
 			DoDamage(laraItem, 100);
 	}
 
@@ -195,7 +195,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (!creatureInfo->Flags && abs(AI.angle) < SMAN_TARGET_ANGLE && LaraItem->HitPoints > 0)
 			{
-				damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
+				damage = (Lara.Context.Vehicle != NO_ITEM) ? 10 : 50;
 
 				if (ShotLara(item, &AI, SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, SkidooBiteRight, 0, damage))
 					creatureInfo->Flags = 5;
@@ -245,7 +245,7 @@ namespace TEN::Entities::Creatures::TR2
 			DisableEntityAI(itemNumber);
 			item->ObjectNumber = ID_SNOWMOBILE;
 			item->Status = ITEM_DEACTIVATED;
-			InitialiseSkidoo(itemNumber);
+			InitializeSkidoo(itemNumber);
 
 			((SkidooInfo*)item->Data)->Armed = true;
 		}

@@ -69,11 +69,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	const std::array LionDeathAnims = { LION_ANIM_DEATH_1, LION_ANIM_DEATH_2 };
 
-	void InitialiseLion(short itemNumber)
+	void InitializeLion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, LION_ANIM_IDLE);
 	}
 
@@ -211,7 +211,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = LION_ATTACK_TURN_RATE_MAX;
 
 				if (!creature->Flags &&
-					item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_POUNCE_ATTACK_END) &&
+					item->Animation.AnimNumber == GetAnimIndex(*item, LION_ANIM_POUNCE_ATTACK_END) &&
 					item->TouchBits.Test(LionAttackJoints))
 				{
 					DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
@@ -225,7 +225,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = LION_ATTACK_TURN_RATE_MAX;
 
 				if (!creature->Flags &&
-					item->Animation.AnimNumber == GetAnimNumber(*item, LION_ANIM_BITE_ATTACK) &&
+					item->Animation.AnimNumber == GetAnimIndex(*item, LION_ANIM_BITE_ATTACK) &&
 					item->TouchBits.Test(LionAttackJoints))
 				{
 					DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);

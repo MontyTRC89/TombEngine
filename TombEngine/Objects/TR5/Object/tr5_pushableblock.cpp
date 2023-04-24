@@ -15,7 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -40,7 +40,7 @@ namespace TEN::Entities::Generic
 		return (PushableInfo*)item->Data;
 	}
 
-	void InitialisePushableBlock(short itemNumber)
+	void InitializePushableBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->Data = PushableInfo();
@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushable->hasFloorCeiling = true;
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 			height = (ocb & 0x1F) * CLICK(1);
 		}
 		else
@@ -143,7 +143,7 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto* pushable = GetPushableInfo(item);
 
-		Lara.InteractedItem = itemNumber;
+		Lara.Context.InteractedItem = itemNumber;
 
 		auto pos = Vector3i::Zero;
 
@@ -431,11 +431,11 @@ namespace TEN::Entities::Generic
 			lara->Control.HandStatus != HandStatus::Free ||
 			pushableItem->Status == ITEM_INVISIBLE ||
 			pushableItem->TriggerFlags < 0) &&
-			(!lara->Control.IsMoving || lara->InteractedItem != itemNumber))
+			(!lara->Control.IsMoving || lara->Context.InteractedItem != itemNumber))
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
-				lara->NextCornerPos.Position.x != itemNumber)
+				lara->Context.NextCornerPos.Position.x != itemNumber)
 			{
 				if (!pushable->hasFloorCeiling)
 					ObjectCollision(itemNumber, laraItem, coll);
@@ -491,7 +491,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 		
 			pushable->moveX = pushableItem->Pose.Position.x;
 			pushable->moveZ = pushableItem->Pose.Position.z;
@@ -539,7 +539,7 @@ namespace TEN::Entities::Generic
 					laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Busy;
-					lara->NextCornerPos.Position.x = itemNumber;
+					lara->Context.NextCornerPos.Position.x = itemNumber;
 					pushableItem->Pose.Orientation.y = yOrient;
 				}
 				else
@@ -549,19 +549,19 @@ namespace TEN::Entities::Generic
 						SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
-						lara->NextCornerPos.Position.x = itemNumber;
+						lara->Context.NextCornerPos.Position.x = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 					else
 					{
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 				}
 			}
 			else
 			{
-				if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;
@@ -896,13 +896,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::AddBridge(stackIndex);
+				TEN::Collision::Floordata::AddBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}
@@ -914,13 +914,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::RemoveBridge(itemNumber);
+			TEN::Collision::Floordata::RemoveBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::RemoveBridge(stackIndex);
+				TEN::Collision::Floordata::RemoveBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}

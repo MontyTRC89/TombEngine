@@ -12,9 +12,9 @@
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseRaisingBlock(short itemNumber)
+void InitializeRaisingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -34,7 +34,7 @@ void InitialiseRaisingBlock(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)

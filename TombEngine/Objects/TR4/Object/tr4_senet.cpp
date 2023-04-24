@@ -33,7 +33,7 @@ const ObjectCollisionBounds GameStixBounds =
 	)
 };
 
-void InitialiseGameSticks(short itemNumber)
+void InitializeGameSticks(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -433,7 +433,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&
-		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
+		!item->Active || Lara.Control.IsMoving && Lara.Context.InteractedItem == itemNumber)
 	{
 		laraItem->Pose.Orientation.y ^= 0x8000;
 
@@ -453,7 +453,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				return;
 			}
 
-			Lara.InteractedItem = itemNumber;
+			Lara.Context.InteractedItem = itemNumber;
 		}
 
 		laraItem->Pose.Orientation.y ^= 0x8000;
@@ -503,7 +503,7 @@ void ControlGodHead(short itemNumber)
 	}
 }
 
-void InitialiseGamePiece(short itemNumber)
+void InitializeGamePiece(short itemNumber)
 {
 	if (!SenetPiecesNumber[0])
 	{

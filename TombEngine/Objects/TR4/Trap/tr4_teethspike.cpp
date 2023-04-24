@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
 	constexpr auto TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO = 0.95f;
 
-	void InitialiseTeethSpikes(short itemNumber)
+	void InitializeTeethSpikes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 					TriggerBlood(dx, yBottom - (GetRandomControl() % dy), dz, GetRandomControl() << 1, 1);
 				}
 
-				if (LaraItem->HitPoints <= 0 && Lara.Vehicle == NO_ITEM)
+				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_ITEM)
 				{
 					int heightFromFloor = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
 

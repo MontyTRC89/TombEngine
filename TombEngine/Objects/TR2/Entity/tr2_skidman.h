@@ -4,7 +4,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	void InitialiseSkidooMan(short itemNumber);
+	void InitializeSkidooMan(short itemNumber);
 	void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SkidooManControl(short riderNumber);
 }

@@ -47,11 +47,11 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseTroops(short itemNumber)
+	void InitializeTroops(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{
@@ -197,7 +197,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
-			if (Lara.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
 				creature->Mood = MoodType::Escape;
 
 			angle = CreatureTurn(item, creature->MaxTurn);

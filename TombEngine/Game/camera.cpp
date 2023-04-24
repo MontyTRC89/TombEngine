@@ -117,7 +117,7 @@ inline void RumbleFromBounce()
 }
 
 
-void InitialiseCamera()
+void InitializeCamera()
 {
 	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
 
@@ -1563,7 +1563,7 @@ void LookLeftRight(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1602,7 +1602,7 @@ void LookUpDown(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1634,7 +1634,7 @@ void ResetLook(ItemInfo* item)
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&
 			!lara->RightArm.Locked &&
-			lara->Vehicle == NO_ITEM)
+			lara->Context.Vehicle == NO_ITEM)
 		{
 			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
@@ -2074,7 +2074,7 @@ void HandleOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 
 	Lara.Inventory.IsBusy = false;
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	TrInput &= ~IN_LOOK;
 }

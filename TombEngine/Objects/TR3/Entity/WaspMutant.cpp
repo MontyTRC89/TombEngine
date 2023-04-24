@@ -125,11 +125,11 @@ namespace TEN::Entities::Creatures::TR3
 			SpawnWaspMutantVenomSackParticle(itemNumber);
 	}
 
-	void InitialiseWaspMutant(short itemNumber)
+	void InitializeWaspMutant(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, WASP_STATE_IDLE);
 		item.ItemFlags[0] = WASP_VENOM_SACK_LIGHT_POWER;
 	}

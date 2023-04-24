@@ -178,7 +178,7 @@ namespace TEN::Entities::TR4
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 	}
 
-	void InitialiseWraith(short itemNumber)
+	void InitializeWraith(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -205,10 +205,10 @@ namespace TEN::Entities::TR4
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item.Pose);		
-		
-		// HACK: HitPoints stores the wraith's target.
-		auto* target = item.ItemFlags[6] ? &g_Level.Items[item.ItemFlags[6]] : LaraItem;
+		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item.Pose);
+
+		// HACK: HitPoints stores the wraith's target. NOTE: ``auto*`` makes some errors with wraith find its target in Release version. It works without ``*``.
+		auto target = item.ItemFlags[6] ? &g_Level.Items[item.ItemFlags[6]] : LaraItem;
 
 		auto prevPos = item.Pose.Position;
 		int x, y, z, xl, yl, zl;
@@ -274,7 +274,7 @@ namespace TEN::Entities::TR4
 			item.ItemFlags[2] -= velocity;
 			item.Pose.Orientation.y += item.ItemFlags[2];
 		}
-	
+
 		if (abs(angleV) >= item.ItemFlags[3] || angleV > 0 != item.ItemFlags[3] > 0)
 		{
 			if (angleV >= 0)
@@ -312,56 +312,85 @@ namespace TEN::Entities::TR4
 		{
 			hasHitWall = true;
 		}
-		
+
 		// Translate wraith.
 		item.Pose.Position.x += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.y);
 		item.Pose.Position.y += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.x);
 		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
 
 		if (pointColl.RoomNumber != item.RoomNumber)
-		{
 			ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-			for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_ITEM; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
+		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_ITEM; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
+		{
+			auto& targetItem = g_Level.Items[linkItemNumber];
+
+			if (!targetItem.Active)
+				continue;
+
+			if ((item.ObjectNumber == ID_WRAITH1 && targetItem.ObjectNumber == ID_WRAITH2) ||
+				(item.ObjectNumber == ID_WRAITH2 && targetItem.ObjectNumber == ID_WRAITH1) ||
+				(item.ObjectNumber == ID_WRAITH3 && targetItem.ObjectNumber == ID_WRAITH_TRAP))
 			{
-				auto& targetItem = g_Level.Items[linkItemNumber];
-
-				if (!targetItem.Active)
-					continue;
-
-				if ((item.ObjectNumber == ID_WRAITH1 && targetItem.ObjectNumber == ID_WRAITH2) ||
-					(item.ObjectNumber == ID_WRAITH2 && targetItem.ObjectNumber == ID_WRAITH1) ||
-					(item.ObjectNumber == ID_WRAITH3 && targetItem.ObjectNumber == ID_WRAITH_TRAP))
+				if (item.ObjectNumber == ID_WRAITH3 && targetItem.ObjectNumber == ID_WRAITH_TRAP)
 				{
-					if (item.ObjectNumber == ID_WRAITH3 && targetItem.ObjectNumber == ID_WRAITH_TRAP)
-					{
-						x = targetItem.Pose.Position.x - item.Pose.Position.x;
-						y = targetItem.Pose.Position.y;
-						z = targetItem.Pose.Position.z - item.Pose.Position.z;
-						distance = SQUARE(x) + SQUARE(z);
+					x = targetItem.Pose.Position.x - item.Pose.Position.x;
+					y = targetItem.Pose.Position.y;
+					z = targetItem.Pose.Position.z - item.Pose.Position.z;
+					distance = SQUARE(x) + SQUARE(z);
 
-						xl = targetItem.Pose.Position.x - LaraItem->Pose.Position.x;
-						yl = targetItem.Pose.Position.y;
-						zl = targetItem.Pose.Position.z - LaraItem->Pose.Position.z;
-						distancePlayer = SQUARE(xl) + SQUARE(zl);
+					xl = targetItem.Pose.Position.x - LaraItem->Pose.Position.x;
+					yl = targetItem.Pose.Position.y;
+					zl = targetItem.Pose.Position.z - LaraItem->Pose.Position.z;
+					distancePlayer = SQUARE(xl) + SQUARE(zl);
 
-						// Wraith 3 attacks the wraith trap only if it and the player are close enough.
-						if (distance < WRAITH_TRAP_DISTANCE_MAX &&
-							distancePlayer < WRAITH_TRAP_DISTANCE_MAX)
-						{
-							item.ItemFlags[6] = linkItemNumber;
-							targetItem.ItemFlags[6] = 1;
-						}
-
-						break;
-					}
-					else
+					// Wraith 3 attacks the wraith trap only if it and the player are close enough.
+					if (distance < WRAITH_TRAP_DISTANCE_MAX &&
+						distancePlayer < WRAITH_TRAP_DISTANCE_MAX)
 					{
 						item.ItemFlags[6] = linkItemNumber;
 						targetItem.ItemFlags[6] = 1;
 					}
+					else
+					{
+						item.ItemFlags[6] = 0;
+						targetItem.ItemFlags[6] = 0;
+						x = target->Pose.Position.x - item.Pose.Position.x;
+						y = target->Pose.Position.y;
+						z = target->Pose.Position.z - item.Pose.Position.z;
+						distance = SQUARE(x) + SQUARE(z);
+					}
+
+					continue;
 				}
-			}		
+				else if ((item.ObjectNumber == ID_WRAITH1 && targetItem.ObjectNumber == ID_WRAITH2) ||
+					(item.ObjectNumber == ID_WRAITH2 && targetItem.ObjectNumber == ID_WRAITH1))
+				{
+					item.ItemFlags[6] = linkItemNumber;
+					x = target->Pose.Position.x - item.Pose.Position.x;
+					y = target->Pose.Position.y;
+					z = target->Pose.Position.z - item.Pose.Position.z;
+					distance = SQUARE(x) + SQUARE(z);
+				}
+				else
+				{
+					item.ItemFlags[6] = 0;
+					x = target->Pose.Position.x - item.Pose.Position.x;
+					y = target->Pose.Position.y;
+					z = target->Pose.Position.z - item.Pose.Position.z;
+					distance = SQUARE(x) + SQUARE(z);
+				}
+			}
+		}
+		
+		if ((target->ObjectNumber == ID_WRAITH1 && !target->Active) ||
+			(target->ObjectNumber == ID_WRAITH2 && !target->Active))
+		{
+			item.ItemFlags[6] = 0;
+			x = target->Pose.Position.x - item.Pose.Position.x;
+			y = target->Pose.Position.y;
+			z = target->Pose.Position.z - item.Pose.Position.z;
+			distance = SQUARE(x) + SQUARE(z);
 		}
 
 		if (item.ObjectNumber != ID_WRAITH3)
@@ -371,7 +400,7 @@ namespace TEN::Entities::TR4
 			if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			{
 				TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 2, -2, 1, item.RoomNumber);
-				
+
 				item.ItemFlags[1]--;
 				if (item.ItemFlags[1] < -1)
 				{
@@ -439,7 +468,7 @@ namespace TEN::Entities::TR4
 					item.ItemFlags[6] = 0;
 					target->ItemFlags[6] = 0;
 					target = LaraItem;
-				}		
+				}
 			}
 		}
 
@@ -491,15 +520,18 @@ namespace TEN::Entities::TR4
 				if (item.ItemFlags[7])
 				{
 					if (item.ObjectNumber == ID_WRAITH1)
-						SpawnWraithExplosion(item, Vector3(1.0f * UCHAR_MAX, 0.6f * UCHAR_MAX, 0.0f * UCHAR_MAX), 48.0f);					
+						SpawnWraithExplosion(item, Vector3(1.0f * UCHAR_MAX, 0.6f * UCHAR_MAX, 0.0f * UCHAR_MAX), 48.0f);
 					else
-						SpawnWraithExplosion(item, Vector3(0.0f * UCHAR_MAX, 0.5f * UCHAR_MAX, 1.0f * UCHAR_MAX), 48.0f);					
+						SpawnWraithExplosion(item, Vector3(0.0f * UCHAR_MAX, 0.5f * UCHAR_MAX, 1.0f * UCHAR_MAX), 48.0f);
 
 					TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 2, -2, 1, item.RoomNumber);
-					DoDamage(&item, INT_MAX);
-					item.ItemFlags[6] = 0;
+
 					target->ItemFlags[6] = 0;
-					KillItem(item.ItemFlags[6]);
+					target->ItemFlags[7] = 0;
+					item.ItemFlags[6] = 0;
+					target = LaraItem;
+					item.ItemFlags[7] = 0;
+					DoDamage(&item, INT_MAX);
 					KillItem(itemNumber);
 				}
 			}
@@ -515,7 +547,7 @@ namespace TEN::Entities::TR4
 				{
 					target->ItemFlags[7]--;
 				}
-			}						
+			}
 		}
 
 		// Check if WRAITH is below floor or above ceiling and spawn wall effect
@@ -531,7 +563,7 @@ namespace TEN::Entities::TR4
 		{
 			WraithWallEffect(item.Pose.Position, item.Pose.Orientation.y, item.ObjectNumber);
 		}
-		
+
 		// Update WRAITH nodes.
 		auto* wraithPtr = &GetWraithInfo(item);
 
@@ -676,7 +708,7 @@ namespace TEN::Entities::TR4
 				auto* item2 = &g_Level.Items[NextItemActive];
 				if (item2->ObjectNumber == ID_WRAITH3 && !item2->HitPoints)
 					break;
-				
+
 				if (item2->NextActive == NO_ITEM)
 				{
 					FlipEffect = -1;

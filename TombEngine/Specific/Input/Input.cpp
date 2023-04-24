@@ -108,7 +108,7 @@ namespace TEN::Input
 		}
 	};
 
-	void InitialiseEffect()
+	void InitializeEffect()
 	{
 		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
 		OisEffect->direction = Effect::North;
@@ -126,7 +126,7 @@ namespace TEN::Input
 		pConstForce.envelope.fadeLevel = 0;
 	}
 
-	void InitialiseInput(HWND handle)
+	void InitializeInput(HWND handle)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
@@ -166,12 +166,12 @@ namespace TEN::Input
 				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try to initialise vibration interface
+				// Try to initialize vibration interface
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
 				if (OisRumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
-					InitialiseEffect();
+					InitializeEffect();
 				}
 			}
 			catch (OIS::Exception& ex)
@@ -181,7 +181,7 @@ namespace TEN::Input
 		}
 	}
 
-	void DeinitialiseInput()
+	void DeinitializeInput()
 	{
 		if (OisKeyboard)
 			OisInputManager->destroyInputObject(OisKeyboard);
@@ -506,7 +506,7 @@ namespace TEN::Input
 		if (IsClicked(In::Flare))
 		{
 			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
-				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
+				SayNo();
 		}
 
 		// Handle weapon hotkeys.

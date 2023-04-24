@@ -29,6 +29,6 @@ namespace TEN::Entities::TR4
 
 	extern BaboonRespawner BaboonRespawn;
 
-	extern void InitialiseBaboon(short itemNumber);
+	extern void InitializeBaboon(short itemNumber);
 	extern void BaboonControl(short itemNumber);
 }

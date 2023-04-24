@@ -252,7 +252,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			else
 			{
 				if (LaserSight && isFiring)
-					FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
 
@@ -263,7 +263,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
 			if (isFiring && LaserSight)
-				FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+				FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 		}
 		else
 		{

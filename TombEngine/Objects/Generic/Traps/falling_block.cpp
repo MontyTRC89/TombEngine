@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math::Random;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED		= 10;
@@ -24,12 +24,12 @@ constexpr auto FALLINGBLOCK_WIBBLE				= 3;
 constexpr auto FALLINGBLOCK_HEIGHT_TOLERANCE	= 8;
 constexpr auto FALLINGBLOCK_CRUMBLE_DELAY		= 100;
 
-void InitialiseFallingBlock(short itemNumber)
+void InitializeFallingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
 	g_Level.Items[itemNumber].MeshBits = 1;
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 
 	// Set mutators to EulerAngles identity by default.
 	for (auto& mutator : item->Model.Mutators)

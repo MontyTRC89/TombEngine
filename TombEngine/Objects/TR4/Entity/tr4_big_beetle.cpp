@@ -59,11 +59,11 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseBigBeetle(short itemNumber)
+	void InitializeBigBeetle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BBEETLE_ANIM_IDLE);
 	}
 
