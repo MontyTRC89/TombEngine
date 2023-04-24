@@ -33,7 +33,7 @@ namespace TEN::Player::Context
 			return false;
 
 		// 2) Assess point collision and player status.
-		if ((relFloorHeight <= LOWER_FLOOR_BOUND ||					// Floor height is above lower floor bound...
+		if ((relFloorHeight <= LOWER_FLOOR_BOUND ||					// Floor height is above lower floor bound.
 				player.Control.WaterStatus == WaterStatus::Wade) && // OR player is wading.
 			relFloorHeight >= UPPER_FLOOR_BOUND)					// Floor height is below upper floor bound.
 		{
@@ -102,7 +102,7 @@ namespace TEN::Player::Context
 
 		// 4) Assess player status.
 		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
-			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare...
+			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&								   // OR flare is still active.
 			player.Context.Vehicle == NO_ITEM)						   // Not in a vehicle.
 		{
@@ -117,7 +117,7 @@ namespace TEN::Player::Context
 		const auto& player = GetLaraInfo(item);
 
 		// Assess player status.
-		if (player.Control.WaterStatus == WaterStatus::Wade || // Is wading...
+		if (player.Control.WaterStatus == WaterStatus::Wade || // Is wading.
 			TestEnvironment(ENV_FLAG_SWAMP, &item))			   // OR is in swamp.
 		{
 			return true;
@@ -398,30 +398,41 @@ namespace TEN::Player::Context
 		// meaning that for tests called in lara_as functions it will store the wrong radius. -- Sezz 2021.11.05
 		float radius = TestState(item.Animation.ActiveState, CROUCH_STATES) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
 
-		// Assess center point collision.
+		// Get center point collision.
 		auto pointCollCenter = GetCollision(&item, 0, 0.0f, -LARA_HEIGHT / 2);
-		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
-			abs(coll.Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)								// Consider statics overhead detected by GetCollisionInfo().
+		int floorToCeilHeightCenter = abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor);
+
+		// Assess center point collision.
+		if (floorToCeilHeightCenter < LARA_HEIGHT ||					// Floor-to-ceiling height isn't too wide.
+			abs(coll.Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT) // Consider statics overhead detected by GetCollisionInfo().
 		{
 			return true;
 		}
 
 		// TODO: Check whether < or <= and > or >=.
 
-		// Assess front point collision.
+		// Get front point collision.
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, radius, -coll.Setup.Height);
-		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		// Front space is narrow enough.
-			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL && // Front space not too narrow.
-			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT) // Front floor is within upper/lower floor bounds.
+		int floorToCeilHeightFront = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
+		int relFloorHeightFront = abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor);
+
+		// Assess front point collision.
+		if (relFloorHeightFront <= CRAWL_STEPUP_HEIGHT && // Floor is within upper/lower floor bounds.
+			floorToCeilHeightFront < LARA_HEIGHT &&		  // Floor-to-ceiling height isn't too wide.
+			floorToCeilHeightFront > LARA_HEIGHT_CRAWL)	  // Floor-to-ceiling height isn't too narrow.
 		{
 			return true;
 		}
 
-		// Assess back point collision.
+		// Get back point collision.
 		auto pointCollBack = GetCollision(&item, item.Pose.Orientation.y, -radius, -coll.Setup.Height);
-		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&		   // Back space is narrow enough.
-			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&  // Back space not too narrow.
-			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT) // Back floor is within upper/lower floor bounds.
+		int floorToCeilHeightBack = abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor);
+		int relFloorHeightBack = abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor);
+
+		// Assess back point collision.
+		if (relFloorHeightBack <= CRAWL_STEPUP_HEIGHT && // Floor is within upper/lower floor bounds.
+			floorToCeilHeightBack < LARA_HEIGHT &&		  // Floor-to-ceiling height isn't too wide.
+			floorToCeilHeightBack > LARA_HEIGHT_CRAWL)	  // Floor-to-ceiling height isn't too narrow.
 		{
 			return true;
 		}
@@ -435,7 +446,7 @@ namespace TEN::Player::Context
 
 		// Assess player status.
 		if (player.Control.WaterStatus != WaterStatus::Wade &&			 // Player is wading.
-			(player.Control.HandStatus == HandStatus::Free ||			 // Player hands are free...
+			(player.Control.HandStatus == HandStatus::Free ||			 // Player hands are free.
 				!IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
 		{
 			return true;
@@ -764,9 +775,6 @@ namespace TEN::Player::Context
 	{
 		const auto& player = GetLaraInfo(item);
 
-		int vPos = item.Pose.Position.y;
-		auto pointColl = GetCollision(&item, setupData.HeadingAngle, setupData.Distance, -coll.Setup.Height);
-
 		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 		bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
 
@@ -778,11 +786,16 @@ namespace TEN::Player::Context
 		if (TestLaraFacingCorner(&item, setupData.HeadingAngle, setupData.Distance))
 			return false;
 
+		// Get point collision.
+		auto pointColl = GetCollision(&item, setupData.HeadingAngle, setupData.Distance, -coll.Setup.Height);
+		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
+		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
+
 		// 3) Assess point collision.
-		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&									 // Floor is within highest floor bound.
-			((pointColl.Position.Ceiling - vPos) < -(coll.Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
-				((pointColl.Position.Ceiling - vPos) < -coll.Setup.Height &&							// OR ceiling is level with Lara's head...
-					(pointColl.Position.Floor - vPos) >= CLICK(1 / 2.0f))))								// AND there is a drop below.
+		if (relFloorHeight >= -STEPUP_HEIGHT &&								  // Floor is within highest floor bound.
+			(relCeilHeight < -(coll.Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound.
+				(relCeilHeight < -coll.Setup.Height &&						  // OR ceiling is level with Lara's head.
+					relFloorHeight >= CLICK(0.5f))))						  // AND there is a drop below.
 		{
 			return true;
 		}
