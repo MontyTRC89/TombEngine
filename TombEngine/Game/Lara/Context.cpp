@@ -767,11 +767,11 @@ namespace TEN::Player::Context
 		int vPos = item.Pose.Position.y;
 		auto pointColl = GetCollision(&item, setupData.HeadingAngle, setupData.Distance, -coll.Setup.Height);
 
-		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
 		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
+		bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
 
 		// 1) Check for swamp or wade status (if applicable).
-		if (isSwamp || isWading)
+		if (isWading || isInSwamp)
 			return false;
 
 		// 2) Check for corner.

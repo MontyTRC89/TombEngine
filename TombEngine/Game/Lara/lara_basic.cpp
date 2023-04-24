@@ -132,6 +132,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, (PLAYER_RUN_JUMP_TIME / 2) + 4);
 
 	if (item->HitPoints <= 0)
@@ -166,7 +167,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (player.Control.WaterStatus == WaterStatus::Wade)
+		if (isWading)
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		}
@@ -249,6 +250,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_RUN_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
@@ -300,7 +302,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (player.Control.WaterStatus == WaterStatus::Wade)
+		if (isWading)
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		}
@@ -401,8 +403,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = !((isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
+	player.Control.CanLook = !((isWading && isInSwamp) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
 
 	if (item->HitPoints <= 0)
 	{
@@ -566,7 +569,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left))
 	{
 		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, false)) &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -580,7 +583,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	else if (IsHeld(In::Right))
 	{
 		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, true)) &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -759,8 +762,9 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = (isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -768,7 +772,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (player.Control.WaterStatus == WaterStatus::Wade)
+	if (isWading)
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isInSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
 	}
@@ -789,7 +793,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		player.Control.WaterStatus != WaterStatus::Wade)
+		!isWading)
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -880,7 +884,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
 	{
 		if (player.Control.TurnRate/*.y*/ < -LARA_SLOW_MED_TURN_RATE_MAX &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -894,7 +898,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 	{
 		if (player.Control.TurnRate/*.y*/ > LARA_SLOW_MED_TURN_RATE_MAX &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -1010,9 +1014,9 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-
-	player.Control.CanLook = (isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1028,7 +1032,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		if (player.Control.WaterStatus == WaterStatus::Wade && isInSwamp)
+		if (isWading && isInSwamp)
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
@@ -1040,8 +1044,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Back) &&
-		(IsHeld(In::Walk) || player.Control.WaterStatus == WaterStatus::Wade))
+	if (IsHeld(In::Back) && (IsHeld(In::Walk) || isWading))
 	{
 		item->Animation.TargetState = LS_WALK_BACK;
 		return;
@@ -1104,6 +1107,8 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -1124,7 +1129,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		player.Control.WaterStatus != WaterStatus::Wade)
+		!isWading)
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -1379,7 +1384,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	coll->Setup.LowerFloorBound = (player.Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeDown = !isWading;
@@ -1561,9 +1566,10 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	player.Control.CanLook = (isInSwamp && player.Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	player.Control.CanLook = isWading ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -1666,6 +1672,8 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
+
 	player.Status.Stamina = std::clamp(player.Status.Stamina - 1, 0, (int)LARA_STAMINA_MAX);
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_SPRINT_JUMP_TIME);
 
@@ -1717,7 +1725,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (player.Control.WaterStatus == WaterStatus::Wade)
+		if (isWading)
 		{
 			// TODO: Dispatch to wade forward state directly. --Sezz 2021.09.29
 			item->Animation.TargetState = LS_RUN_FORWARD;
