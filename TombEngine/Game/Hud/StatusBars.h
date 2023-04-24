@@ -10,6 +10,8 @@ namespace TEN::Hud
 {
 	struct StatusBar
 	{
+		static constexpr auto LIFE_MAX = 0.75f;
+
 		float Value		  = 0.0f;
 		float TargetValue = 0.0f;
 		float Life		  = 0.0f;
@@ -22,9 +24,6 @@ namespace TEN::Hud
 	class StatusBarsController
 	{
 	private:
-		// Constants
-		static constexpr auto STATUS_BAR_LIFE_MAX = 0.75f;
-
 		// Members
 		StatusBar AirBar	  = {};
 		StatusBar ExposureBar = {};

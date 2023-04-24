@@ -104,7 +104,7 @@ namespace TEN::Hud
 		if (AirBar.Value != AirBar.TargetValue ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
-			AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			AirBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
@@ -112,7 +112,7 @@ namespace TEN::Hud
 		{
 			const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 			if (vehicleItem.ObjectNumber == ID_UPV)
-				AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+				AirBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 	}
 
@@ -127,7 +127,7 @@ namespace TEN::Hud
 		if (ExposureBar.Value != ExposureBar.TargetValue ||
 			(TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) && TestEnvironment(ENV_FLAG_COLD, item.RoomNumber)))
 		{
-			ExposureBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			ExposureBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace TEN::Hud
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
 				player.Control.Weapon.GunType != LaraWeaponType::Torch))   // HACK: Exclude torch.
 		{
-			HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			HealthBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 
 		// Special case for weapon undraw.
@@ -169,7 +169,7 @@ namespace TEN::Hud
 		if (StaminaBar.Value != StaminaBar.TargetValue ||
 			StaminaBar.Value != 1.0f)
 		{
-			StaminaBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			StaminaBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 	}
 
