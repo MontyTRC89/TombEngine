@@ -227,10 +227,7 @@ namespace TEN::Utils
 		for (unsigned int i = 0; i < Bits.size(); i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			if ((packedBits & bit) == bit)
-				Bits[i] = true;
-			else
-				Bits[i] = false;
+			Bits[i] = ((packedBits & bit) == bit);
 		}
 
 		return *this;
@@ -241,10 +238,7 @@ namespace TEN::Utils
 		for (unsigned int i = 0; i < Bits.size(); i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			if (Bits[i] && (packedBits & bit) == bit)
-				Bits[i] = true;
-			else
-				Bits[i] = false;
+			Bits[i] = (Bits[i] && (packedBits & bit) == bit);
 		}
 
 		return *this;

@@ -14,7 +14,7 @@
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Drip

@@ -4,20 +4,18 @@
 #include "Math/Math.h"
 
 using namespace TEN::Math;
-using std::string;
 
 struct LevelCameraInfo
 {
-	short Index = -1;
+	std::string Name  = {};
+	short		Index = -1;
+
 	Vector3i Position	= Vector3i::Zero;
 	int		 RoomNumber = 0;
 	int		 Flags		= 0;
 	int		 Speed		= 1;
-	string	 Name		= "";
 
-	LevelCameraInfo()
-	{
-	}
+	LevelCameraInfo() {}
 
 	LevelCameraInfo(int xPos, int yPos, int zPos)
 	{

@@ -14,7 +14,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
 const ObjectCollisionBounds CeilingTrapDoorBounds =
 {
@@ -47,7 +47,7 @@ static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 void InitialiseTrapDoor(short itemNumber)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 
@@ -126,7 +126,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		trapDoorItem->Status != ITEM_ACTIVE) ||
-		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
+		(laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
 	{
 		if (TestLaraPosition(FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
@@ -153,7 +153,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 			}
 			else
-				laraInfo->InteractedItem =itemNumber;
+				laraInfo->Context.InteractedItem =itemNumber;
 		}
 	}
 	else

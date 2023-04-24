@@ -69,7 +69,7 @@ namespace TEN::Effects::Streamer
 
 	public:
 		// Members
-		std::map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
+		std::unordered_map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
 
 		// Utilities
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
@@ -92,7 +92,7 @@ namespace TEN::Effects::Streamer
 
 	public:
 		// Members
-		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
+		std::unordered_map<int, StreamerModule> Modules = {}; // Key = entity number.
 
 		// Utilities
 		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
