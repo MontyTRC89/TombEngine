@@ -511,9 +511,9 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
-		void InitialiseScreen(int w, int h, HWND handle, bool reset);
-		void InitialiseGameBars();
-		void InitialiseMenuBars(int y);
+		void InitializeScreen(int w, int h, HWND handle, bool reset);
+		void InitializeGameBars();
+		void InitializeMenuBars(int y);
 
 		void DrawAllStrings();
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
@@ -678,7 +678,7 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		void Initialise(int w, int h, bool windowed, HWND handle);
+		void Initialize(int w, int h, bool windowed, HWND handle);
 		void Render();
 		void RenderTitle();
 		void Lock();

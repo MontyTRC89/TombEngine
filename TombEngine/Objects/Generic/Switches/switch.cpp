@@ -24,7 +24,7 @@ void ProcessExplodingSwitchType8(ItemInfo* item)
 	item->MeshBits |= 1 << ((Objects[item->ObjectNumber].nmeshes & 0xFF) - 2);
 }
 
-void InitialiseShootSwitch(short itemNumber)
+void InitializeShootSwitch(short itemNumber)
 {
 	auto* switchItem = &g_Level.Items[itemNumber];
 

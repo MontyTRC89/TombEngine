@@ -13,11 +13,11 @@ namespace TEN::Entities::Creatures::TR5
 		WWISP_STATE_UNK = 1
 	};
 
-	void InitialiseLightingGuide(short itemNumber)
+	void InitializeLightingGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 }

@@ -86,7 +86,7 @@ namespace TEN::Entities::Traps
 		dartItem->Pose.Position.y = item->Pose.Position.y - CLICK(0.9);
 		dartItem->Pose.Position.z = item->Pose.Position.z;
 
-		InitialiseItem(dartItemNumber);
+		InitializeItem(dartItemNumber);
 
 		dartItem->Pose.Orientation.x = item->Pose.Orientation.x - ANGLE(180.0f);
 		dartItem->Pose.Orientation.y = item->Pose.Orientation.y;

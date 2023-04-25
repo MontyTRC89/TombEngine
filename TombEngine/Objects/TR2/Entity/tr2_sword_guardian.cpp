@@ -167,12 +167,12 @@ namespace TEN::Entities::Creatures::TR2
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}
 
-	void InitialiseSwordGuardian(short itemNumber)
+	void InitializeSwordGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SWORD_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 

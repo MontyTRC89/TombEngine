@@ -188,11 +188,11 @@ namespace TEN::Entities::Creatures::TR2
 		return false;
 	}
 
-	void InitialiseSpearGuardian(short itemNumber)
+	void InitializeSpearGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SPEAR_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 

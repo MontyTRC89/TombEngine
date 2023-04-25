@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseJeanYves(short itemNumber)
+	void InitializeJeanYves(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		auto* objectInfo = &Objects[item->ObjectNumber];

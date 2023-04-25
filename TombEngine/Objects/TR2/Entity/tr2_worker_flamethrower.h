@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	void InitialiseWorkerFlamethrower(short itemNumber);
+	void InitializeWorkerFlamethrower(short itemNumber);
 	void WorkerFlamethrower(short itemNumber);
 }

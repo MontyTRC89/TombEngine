@@ -541,7 +541,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBats(RenderView& view)
 	{
-		if (!Objects[ID_LITTLE_BEETLE].loaded)
+		if (!Objects[ID_BATS_EMITTER].loaded)
 		{
 			return;
 		}

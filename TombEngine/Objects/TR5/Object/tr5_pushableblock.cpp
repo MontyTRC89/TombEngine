@@ -40,7 +40,7 @@ namespace TEN::Entities::Generic
 		return (PushableInfo*)item->Data;
 	}
 
-	void InitialisePushableBlock(short itemNumber)
+	void InitializePushableBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->Data = PushableInfo();

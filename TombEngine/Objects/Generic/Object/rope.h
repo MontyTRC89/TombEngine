@@ -45,7 +45,7 @@ namespace TEN::Entities::Generic
 	extern std::vector<ROPE_STRUCT> Ropes;
 	extern int RopeSwing;
 
-	void InitialiseRope(short itemNumber);
+	void InitializeRope(short itemNumber);
 	void PrepareRope(ROPE_STRUCT* rope, Vector3i* pos1, Vector3i* pos2, int length, ItemInfo* item);
 	Vector3i* NormaliseRopeVector(Vector3i* vec);
 	void GetRopePos(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z);

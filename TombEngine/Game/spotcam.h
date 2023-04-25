@@ -56,7 +56,7 @@ extern bool SpotcamOverlay;
 extern bool TrackCameraInit;
 
 void ClearSpotCamSequences();
-void InitialiseSpotCamSequences(bool startFirstSequence);
-void InitialiseSpotCam(short sequence);
+void InitializeSpotCamSequences(bool startFirstSequence);
+void InitializeSpotCam(short sequence);
 void CalculateSpotCameras();
 int Spline(int x, int* knots, int nk);

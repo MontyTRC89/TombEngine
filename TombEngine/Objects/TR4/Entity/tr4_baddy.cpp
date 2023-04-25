@@ -206,11 +206,11 @@ namespace TEN::Entities::TR4
 		MESHSWAPFLAGS_BADDY_GUN = 0x7FC010,
 	};
 
-	void InitialiseBaddy(short itemNumber)
+	void InitializeBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 

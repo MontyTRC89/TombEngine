@@ -24,7 +24,7 @@
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
-void InitialiseExplosion(short itemNumber)
+void InitializeExplosion(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
