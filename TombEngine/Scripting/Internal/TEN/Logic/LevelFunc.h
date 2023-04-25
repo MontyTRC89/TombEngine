@@ -18,19 +18,17 @@ public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
 
-	sol::protected_function_result CallNoFuncs()
+	sol::protected_function_result CallCallback(std::optional<float> deltaTime = std::nullopt)
 	{
-		return m_handler->CallLevelFunc(m_funcName);
+		if (deltaTime)
+			return m_handler->CallLevelFunc(m_funcName, *deltaTime);
+		else
+			return m_handler->CallLevelFunc(m_funcName);
 	}
 
 	sol::protected_function_result Call(sol::variadic_args args)
 	{
 		return m_handler->CallLevelFunc(m_funcName, args);
-	}
-
-	sol::protected_function_result CallDT(float deltaTime)
-	{
-		return m_handler->CallLevelFunc(m_funcName, deltaTime);
 	}
 
 	static void Register(sol::table& parent)

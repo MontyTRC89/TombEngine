@@ -56,8 +56,7 @@ private:
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
 
-	void TryCall(std::string const& name, float deltaTime);
-	void TryCall(std::string const& name);
+	void TryCall(std::string const& name, std::optional<float> deltaTime = std::nullopt);
 
 	std::unordered_set<std::string> m_callbacksPreSave;
 	std::unordered_set<std::string> m_callbacksPostSave;
@@ -69,6 +68,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPostEnd;
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
+
+	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
 	std::vector<std::variant<std::string, uint32_t>> m_savedVarPath;
 
