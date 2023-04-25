@@ -20,7 +20,7 @@ namespace TEN::Collision::Attractors
 		Points = points;
 		RoomNumber = roomNumber;
 
-		if (points.size() > 1)
+		if (points.size() >= 2)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
 			{
@@ -58,7 +58,7 @@ namespace TEN::Collision::Attractors
 
 		if (Points.empty())
 		{
-			TENLog(std::string("GetAttractorCollision(): attractor undefined."), LogLevel::Warning);
+			TENLog("GetAttractorCollision(): attractor undefined.", LogLevel::Warning);
 			return ATTRAC_COLL_DEFAULT;
 		}
 
@@ -95,7 +95,7 @@ namespace TEN::Collision::Attractors
 		// Attractor has no points; return default attractor proximity data.
 		if (Points.empty())
 		{
-			TENLog(std::string("GetTargetData(): attractor points undefined."), LogLevel::Warning);
+			TENLog("GetTargetData(): attractor points undefined.", LogLevel::Warning);
 			return ATTRAC_PROX_DEFAULT;
 		}
 
@@ -134,7 +134,7 @@ namespace TEN::Collision::Attractors
 		// Attractor has no points; return world origin.
 		if (Points.empty())
 		{
-			TENLog(std::string("GetPointAtDistance(): attractor points undefined."), LogLevel::Warning);
+			TENLog("GetPointAtDistance(): attractor points undefined.", LogLevel::Warning);
 			return Vector3::Zero;
 		}
 
@@ -152,7 +152,7 @@ namespace TEN::Collision::Attractors
 			return Points.back();
 		}
 
-		// Find point along attractor line at distance from start.
+		// Find point along attractor at distance from start.
 		float distTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
@@ -180,7 +180,7 @@ namespace TEN::Collision::Attractors
 		// Attractor has no points; return default segment index.
 		if (Points.empty())
 		{
-			TENLog(std::string("GetSegmentIndexAtDistance(): attractor points undefined."), LogLevel::Warning);
+			TENLog("GetSegmentIndexAtDistance(): attractor points undefined.", LogLevel::Warning);
 			return 0;
 		}
 
@@ -219,7 +219,7 @@ namespace TEN::Collision::Attractors
 		// Segment index out of range; return attractor length.
 		if (segmentIndex >= Points.size())
 		{
-			TENLog(std::string("GetDistanceAtPoint(): attractor segment index out of range."), LogLevel::Warning);
+			TENLog("GetDistanceAtPoint(): attractor segment index out of range.", LogLevel::Warning);
 			return Length;
 		}
 
@@ -238,7 +238,7 @@ namespace TEN::Collision::Attractors
 
 			float pointToAttractorThreshold = Geometry::GetDistanceToLine(linePoint, origin, target);
 			if (pointToAttractorThreshold > SQRT_2)
-				TENLog(std::string("GetDistanceAtPoint(): point beyond attractor."), LogLevel::Warning);
+				TENLog("GetDistanceAtPoint(): point beyond attractor.", LogLevel::Warning);
 
 			lineDist += Vector3::Distance(origin, linePoint);
 		}
@@ -256,7 +256,7 @@ namespace TEN::Collision::Attractors
 		Points = points;
 		RoomNumber = roomNumber;
 
-		if (points.size() > 1)
+		if (points.size() >= 2)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
 			{
@@ -295,7 +295,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Draw attractor debug elements.
-		if (Points.size() > 1)
+		if (Points.size() >= 2)
 		{
 			for (int i = 0; i < (Points.size() - 1); i++)
 			{
