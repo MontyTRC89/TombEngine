@@ -22,7 +22,9 @@ using namespace TEN::Renderer;
 
 namespace TEN::Player
 {
-	// TODO: Move these functions somewhere else.
+	// notes:
+	// 1. get shimmy context data (ShimmyData with attractor collisions).
+	// 2. pass to edge movement handler?
 
 	struct EdgeHangAttractorCollisionData
 	{
@@ -31,22 +33,22 @@ namespace TEN::Player
 		std::optional<AttractorCollisionData> Right	 = std::nullopt;
 	};
 
-	bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
-	{
-		return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
-	}
-
 	static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
 	{
 		const auto& player = GetLaraInfo(item);
-		auto& handsAttrac = player.Context.HandsAttractor;
+		const auto& handsAttrac = player.Context.HandsAttractor;
 
-		// Get clamped distance along line.
+		// Get clamped projected distance along attractor.
 		float lineDist = handsAttrac.LineDistance + sideOffset;
-		float lineDistMin = coll.Setup.Radius;
-		float lineDistMax = handsAttrac.Ptr->GetLength() - coll.Setup.Radius;
-		lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
+		if (handsAttrac.Ptr->GetLength() >= (coll.Setup.Radius * 2))
+		{
+			float lineDistMin = coll.Setup.Radius;
+			float lineDistMax = handsAttrac.Ptr->GetLength() - coll.Setup.Radius;
+			lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
+		}
 		
+		// TODO: If beyond attractor end threshold, probe for new attractor
+		// Get points.
 		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
 		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
 		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
@@ -75,7 +77,7 @@ namespace TEN::Player
 		};
 	}
 
-	void HandlePlayerEdgeHang2(ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
+	void HandlePlayerEdgeMovement(ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
 		constexpr auto ORIENT_LERP_ALPHA = 0.5f;
 
@@ -88,38 +90,18 @@ namespace TEN::Player
 			return;
 		}
 
-		// Get edge hang attractor colisions.
-		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, item.Animation.Velocity.z * (isGoingRight ? 1 : -1));
+		// Get edge hang attractor collisions.
+		float offset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
+		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, offset);
+
+		// No hands attractor; return early.
 		if (!edgeAttracColls.Center.has_value())
 		{
 			player.Control.IsHanging = false;
 			return;
 		}
 
-		float length = edgeAttracColls.Center->Ptr->GetLength();
-		auto targetPoint = Vector3::Zero;
-
-		// Determine target point.
-		if (length >= (coll.Setup.Radius * 2))
-		{
-			if (!edgeAttracColls.Left.has_value())
-			{
-				targetPoint = edgeAttracColls.Center->Ptr->GetPointAtDistance(coll.Setup.Radius);
-			}
-			else if (!edgeAttracColls.Right.has_value())
-			{
-				targetPoint = edgeAttracColls.Center->Ptr->GetPointAtDistance(length - coll.Setup.Radius);
-			}
-			else
-			{
-				targetPoint = edgeAttracColls.Center->Proximity.Point;
-			}
-		}
-		else
-		{
-			targetPoint = edgeAttracColls.Center->Proximity.Point;
-		}
-
+		// Calculate heading angle.
 		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Proximity.Point, edgeAttracColls.Right->Proximity.Point);
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
@@ -127,11 +109,20 @@ namespace TEN::Player
 		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
 		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
 
+		// Determine target point (correctly handles positioning at inner bends).
+		auto targetPoint = edgeAttracColls.Center->Proximity.Point;
+		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls.Left->Proximity.Point, player.Context.TargetOrientation) &&
+			!Geometry::IsPointInFront(targetPoint, edgeAttracColls.Right->Proximity.Point, player.Context.TargetOrientation))
+		{
+			targetPoint = (edgeAttracColls.Left->Proximity.Point + edgeAttracColls.Right->Proximity.Point) / 2;
+		}
+
 		// Align position.
 		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
 		auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 		item.Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
 
+		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.HandsAttractor.Set(*edgeAttracColls.Center->Ptr, edgeAttracColls.Center->Proximity.LineDistance);
 	}
@@ -159,7 +150,7 @@ namespace TEN::Player
 			return;
 		}
 
-		HandlePlayerEdgeHang2(*item, *coll, true);
+		HandlePlayerEdgeMovement(*item, *coll, true);
 
 		if (IsHeld(In::Look))
 			LookUpDown(item);
@@ -295,7 +286,7 @@ namespace TEN::Player
 			return;
 		}
 
-		HandlePlayerEdgeHang2(*item, *coll, false);
+		HandlePlayerEdgeMovement(*item, *coll, false);
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
@@ -344,7 +335,7 @@ namespace TEN::Player
 			return;
 		}
 
-		HandlePlayerEdgeHang2(*item, *coll, true);
+		HandlePlayerEdgeMovement(*item, *coll, true);
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
