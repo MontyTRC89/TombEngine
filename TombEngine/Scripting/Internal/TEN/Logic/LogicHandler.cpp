@@ -156,6 +156,10 @@ void LogicHandler::ResetGameTables()
 
 /*** Register a function as a callback.
 @advancedDesc
+This is intended for module/library developers who want their modules to do
+stuff during level start/load/end/save/control phase, but don't want the level
+designer to add calls to OnStart, OnLoad, etc. in their level script.
+
 Possible values for CallbackPoint:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
@@ -175,7 +179,7 @@ Possible values for CallbackPoint:
 	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
 
 The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee whether `MyFunc` will be called before `MyFunc2`, or vice-versa.
+i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
 
 Any returned value will be discarded.
 

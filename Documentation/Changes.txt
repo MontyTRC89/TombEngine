@@ -11,6 +11,13 @@ Version 1.0.9
 	- Change speed by giving an OCB number to it or lua (Moveable::SetItemFlags[0]).
 - Fix spiky wall being too slow when triggered.
 
+Lua API changes:
+- Add the following for use in AddCallback and RemoveCallback:
+	- PRESTART, POSTSTART
+	- PREEND, POSTEND
+	- PRESAVE, POSTSAVE
+	- PRELOAD, POSTLOAD
+
 Version 1.0.8
 =============
 
