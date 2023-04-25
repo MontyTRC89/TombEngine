@@ -7,7 +7,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 
 // -----------------------------
 // TEST FUNCTIONS

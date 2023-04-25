@@ -19,7 +19,7 @@ using namespace TEN::Collision::Attractors;
 using TEN::Renderer::g_Renderer;
 // ---
 
-namespace TEN::Entities::Player::Context
+namespace TEN::Player::Context
 {
 	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
 	{

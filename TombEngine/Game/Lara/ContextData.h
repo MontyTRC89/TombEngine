@@ -6,7 +6,7 @@ namespace TEN::Collision::Attractors { class Attractor; }
 using namespace TEN::Collision::Attractors;
 using namespace TEN::Math;
 
-namespace TEN::Entities::Player::Context
+namespace TEN::Player::Context
 {
 	enum class EdgeType
 	{

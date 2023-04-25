@@ -20,7 +20,7 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 //------
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	// TODO: Move these functions somewhere else.
 

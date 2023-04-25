@@ -40,14 +40,14 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::Attractors;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
-using namespace TEN::Entities::Player;
-using namespace TEN::Collision::Attractors;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Player;
 
 using TEN::Renderer::g_Renderer;
 
