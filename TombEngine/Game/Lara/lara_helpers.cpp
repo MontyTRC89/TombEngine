@@ -1047,12 +1047,14 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 void SetPlayerEdgeHangRelease(ItemInfo& item)
 {
+	constexpr auto CLIMBABLE_WALL_VERTICAL_RELEASE_OFFSET = CLICK(1);
+
 	auto& player = GetLaraInfo(item);
 
 	if (player.Control.IsClimbingLadder)
 	{
 		SetAnimation(&item, LA_FALL_START);
-		item.Pose.Position.y += CLICK(1);
+		item.Pose.Position.y += CLIMBABLE_WALL_VERTICAL_RELEASE_OFFSET;
 	}
 	else
 	{

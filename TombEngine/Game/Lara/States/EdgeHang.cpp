@@ -41,14 +41,18 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 		auto& handsAttrac = player.Context.HandsAttractor;
 
+		// Get clamped distance along line.
 		float lineDist = handsAttrac.LineDistance + sideOffset;
-		auto basePos = item.Pose.Position.ToVector3();
-		auto orient = item.Pose.Orientation;
-
-		// Get points.
+		float lineDistMin = coll.Setup.Radius;
+		float lineDistMax = handsAttrac.Ptr->GetLength() - coll.Setup.Radius;
+		lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
+		
 		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
 		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
 		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
+
+		auto basePos = item.Pose.Position.ToVector3();
+		auto orient = item.Pose.Orientation;
 
 		// Get attractor collisions.
 		auto attracCollCenter = handsAttrac.Ptr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
@@ -312,10 +316,10 @@ namespace TEN::Player
 	// Control: lara_as_shimmy_left()
 	void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto& player = GetLaraInfo(*item);
+		//auto& player = GetLaraInfo(*item);
 
 		//HandlePlayerEdgeHang(*item, *coll);
-		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+		//player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
 
 	// State:	  LS_SHIMMY_RIGHT (31)
@@ -361,10 +365,10 @@ namespace TEN::Player
 	// Control: lara_as_shimmy_right()
 	void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto& player = GetLaraInfo(*item);
+		//auto& player = GetLaraInfo(*item);
 
 		//HandlePlayerEdgeHang(*item, *coll);
-		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+		//player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 
 	// State:	  LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110)
