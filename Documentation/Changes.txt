@@ -16,9 +16,7 @@ Version 1.0.9
 Lua API changes:
 * Add function String::SetTranslated() 
 * Add function Misc::IsStringDisplaying()
-
-Lua API changes:
-- Add the following for use in AddCallback and RemoveCallback:
+* Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART
 	- PREEND, POSTEND
 	- PRESAVE, POSTSAVE
