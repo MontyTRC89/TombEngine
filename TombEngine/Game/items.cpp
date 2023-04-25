@@ -428,7 +428,7 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitialiseFXArray(int allocateMemory)
+void InitializeFXArray(int allocateMemory)
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
@@ -488,7 +488,7 @@ void RemoveActiveItem(short itemNumber, bool killed)
 	}
 }
 
-void InitialiseItem(short itemNumber) 
+void InitializeItem(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -564,8 +564,8 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.clear();
 	}
 
-	if (Objects[item->ObjectNumber].initialise != nullptr)
-		Objects[item->ObjectNumber].initialise(itemNumber);
+	if (Objects[item->ObjectNumber].Initialize != nullptr)
+		Objects[item->ObjectNumber].Initialize(itemNumber);
 }
 
 short CreateItem()
@@ -580,7 +580,7 @@ short CreateItem()
 	return itemNumber;
 }
 
-void InitialiseItemArray(int totalItem)
+void InitializeItemArray(int totalItem)
 {
 	g_Level.Items.clear();
 	g_Level.Items.resize(totalItem);
@@ -616,7 +616,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		spawn->RoomNumber = item->RoomNumber;
 		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
 		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);

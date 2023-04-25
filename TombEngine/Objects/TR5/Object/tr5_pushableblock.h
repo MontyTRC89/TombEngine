@@ -9,7 +9,7 @@ namespace TEN::Entities::Generic
 	struct PushableInfo;
 
 	PushableInfo* GetPushableInfo(ItemInfo* item);
-	void InitialisePushableBlock(short itemNumber);
+	void InitializePushableBlock(short itemNumber);
 
 	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 	void PushableBlockControl(short itemNumber);

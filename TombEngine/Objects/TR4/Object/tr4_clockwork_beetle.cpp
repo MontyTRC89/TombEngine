@@ -319,7 +319,7 @@ void UseClockworkBeetle(short flag)
 			item->RoomNumber = LaraItem->RoomNumber;
 			item->Pose.Position = LaraItem->Pose.Position;
 
-			InitialiseItem(itemNumber);
+			InitializeItem(itemNumber);
 			item->Pose.Orientation.x = 0;
 			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
 			item->Pose.Orientation.z = 0;

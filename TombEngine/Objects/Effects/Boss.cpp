@@ -33,7 +33,7 @@ namespace TEN::Effects::Boss
 		shieldItem.Pose.Orientation = item.Pose.Orientation;
 		shieldItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		shieldItem.Model.Color = color;
 		shieldItem.Collidable = true;
@@ -67,7 +67,7 @@ namespace TEN::Effects::Boss
 		shockwaveItem.RoomNumber = item.RoomNumber;
 		shockwaveItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		auto result = color;
 		result.w = 1.0f;

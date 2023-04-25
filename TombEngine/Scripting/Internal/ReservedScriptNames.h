@@ -70,6 +70,7 @@ static constexpr char ScriptReserved_GetTarget[]			= "GetTarget";
 static constexpr char ScriptReserved_GetColor[]				= "GetColor";
 static constexpr char ScriptReserved_SetColor[]				= "SetColor";
 static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
+static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
@@ -184,6 +185,7 @@ static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
 static constexpr char ScriptReserved_HideString[]					= "HideString";
+static constexpr char ScriptReserved_IsStringDisplaying[]			= "IsStringDisplaying";
 static constexpr char ScriptReserved_SetAmbientTrack[]				= "SetAmbientTrack";
 static constexpr char ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
 static constexpr char ScriptReserved_StopAudioTrack[]				= "StopAudioTrack";

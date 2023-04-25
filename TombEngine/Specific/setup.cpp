@@ -35,7 +35,7 @@ using namespace TEN::Entities::Switches;
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[MAX_STATICS];
 
-void InitialiseGameFlags()
+void InitializeGameFlags()
 {
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
 	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
@@ -59,7 +59,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -67,7 +67,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -75,7 +75,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT3];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -83,7 +83,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT4];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -91,7 +91,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT5];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -99,7 +99,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT6];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -107,7 +107,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT7];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -115,7 +115,7 @@ void ObjectObjects()
 	obj = &Objects[ID_SMASH_OBJECT8];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmashObject;
+		obj->Initialize = InitializeSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
 	}
@@ -123,7 +123,7 @@ void ObjectObjects()
 	obj = &Objects[ID_CRUMBLING_FLOOR];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFallingBlock;
+		obj->Initialize = InitializeFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
 	}
@@ -154,7 +154,7 @@ void ObjectObjects()
 	obj = &Objects[ID_TIGHT_ROPE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTightrope;
+		obj->Initialize = InitializeTightrope;
 		obj->collision = TightropeCollision;
 		obj->drawRoutine = nullptr;
 		
@@ -220,7 +220,7 @@ void ObjectObjects()
 		obj = &Objects[objNum];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseShootSwitch;
+			obj->Initialize = InitializeShootSwitch;
 			obj->control = ControlAnimatingSlots;
 			obj->collision = ShootSwitchCollision;
 		}
@@ -242,7 +242,7 @@ void TrapObjects()
 	obj = &Objects[ID_FALLING_BLOCK];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFallingBlock;
+		obj->Initialize = InitializeFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
 		obj->floor = FallingBlockFloor;
@@ -254,7 +254,7 @@ void TrapObjects()
 	obj = &Objects[ID_FALLING_BLOCK2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseFallingBlock;
+		obj->Initialize = InitializeFallingBlock;
 		obj->collision = FallingBlockCollision;
 		obj->control = FallingBlockControl;
 		obj->floor = FallingBlockFloor;
@@ -266,7 +266,7 @@ void TrapObjects()
 	obj = &Objects[ID_GEN_SLOT2];
 	if (obj->loaded)
 	{
-		/*obj->initialise = InitialiseGenSlot2;
+		/*obj->Initialize = InitializeGenSlot2;
 		obj->control = GenSlot2Control;
 		obj->drawRoutine = DrawGenSlot2;*/
 		obj->usingDrawAnimatingItem = false;
@@ -275,7 +275,7 @@ void TrapObjects()
 	obj = &Objects[ID_PORTAL];
 	if (obj->loaded)
 	{
-		//obj->initialise = InitialisePortal;
+		//obj->Initialize = InitializePortal;
 		//obj->control = PortalControl;        // TODO: found the control procedure !
 		obj->drawRoutine = nullptr;             // go to nullsub_44() !
 		 
@@ -293,7 +293,7 @@ void TrapObjects()
 
 }
 
-void InitialiseSpecialEffects()
+void InitializeSpecialEffects()
 {
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
@@ -323,7 +323,7 @@ void CustomObjects()
 	
 }
 
-void InitialiseObjects()
+void InitializeObjects()
 {
 	AllocTR4Objects();
 	AllocTR5Objects();
@@ -333,7 +333,7 @@ void InitialiseObjects()
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
 		obj = &Objects[i];
-		obj->initialise = nullptr;
+		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
 		obj->floor = nullptr;
@@ -358,13 +358,13 @@ void InitialiseObjects()
 		obj->isPuzzleHole = false;
 	}
 
-	InitialiseEffectsObjects();
-	InitialiseGenericObjects(); // Generic objects
-	InitialiseTR1Objects(); // Standard TR1 objects
-	InitialiseTR2Objects(); // Standard TR2 objects
-	InitialiseTR3Objects(); // Standard TR3 objects
-	InitialiseTR4Objects(); // Standard TR4 objects
-	InitialiseTR5Objects(); // Standard TR5 objects
+	InitializeEffectsObjects();
+	InitializeGenericObjects(); // Generic objects
+	InitializeTR1Objects(); // Standard TR1 objects
+	InitializeTR2Objects(); // Standard TR2 objects
+	InitializeTR3Objects(); // Standard TR3 objects
+	InitializeTR4Objects(); // Standard TR4 objects
+	InitializeTR5Objects(); // Standard TR5 objects
 	ObjectObjects();
 	TrapObjects();
 
@@ -372,7 +372,7 @@ void InitialiseObjects()
 	CustomObjects();
 
 	HairEffect.Initialize();
-	InitialiseSpecialEffects();
+	InitializeSpecialEffects();
 
 	NumRPickups = 0;
 	CurrentSequence = 0;

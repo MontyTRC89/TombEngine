@@ -14,16 +14,16 @@ using std::vector;
 
 extern GameConfiguration g_Configuration;
 
-void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND handle)
+void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND handle)
 {
 	TENLog("Initializing DX11...", LogLevel::Info);
 
 	m_screenWidth = w;
 	m_screenHeight = h;
 	m_windowed = windowed;
-	InitialiseScreen(w, h, handle, false);
+	InitializeScreen(w, h, handle, false);
 
-	// Initialise render states
+	// Initialize render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
@@ -45,7 +45,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", nullptr, blob);
 
-	// Initialise input layout using the first vertex shader
+	// Initialize input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -93,7 +93,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "PS", "ps_4_0", nullptr, blob);
 
-	// Initialise input layout using the first vertex
+	// Initialize input layout using the first vertex
 	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -106,7 +106,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	};
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayoutSprites, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayoutSprites));*/
 	
-	// Initialise constant buffers
+	// Initialize constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 	m_cbItem = CreateConstantBuffer<CItemBuffer>();
 	m_cbStatic = CreateConstantBuffer<CStaticBuffer>();
@@ -230,11 +230,11 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 
-	InitialiseGameBars();
+	InitializeGameBars();
 	initQuad(m_device.Get());
 }
 
-void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool reset)
 {
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
@@ -265,7 +265,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool
 
 	dxgiFactory->MakeWindowAssociation(handle, DXGI_MWA_NO_ALT_ENTER);
 
-	// Initialise the back buffer
+	// Initialize the back buffer
 	m_backBufferTexture = NULL;
 	Utils::throwIfFailed(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast <void**>(&m_backBufferTexture)));
 
@@ -294,7 +294,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool
 	// Bind the back buffer and the depth stencil
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 
-	// Initialise sprites and font
+	// Initialize sprites and font
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_context.Get());
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
@@ -302,14 +302,14 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool
 	SetTextureOrDefault(loadingBarBorder, L"Textures/LoadingBarBorder.png");
 	SetTextureOrDefault(loadingBarInner, L"Textures/LoadingBarInner.png");
 
-	// Initialise buffers
+	// Initialize buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 	m_reflectionCubemap = RenderTargetCube(m_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_D16_UNORM);
 
-	// Initialise viewport
+	// Initialize viewport
 	m_viewport.TopLeftX = 0;
 	m_viewport.TopLeftY = 0;
 	m_viewport.Width = w;

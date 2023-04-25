@@ -256,7 +256,7 @@ namespace Misc
 	static void PlayFlyBy(short flyby)
 	{
 		UseSpotCam = true;
-		InitialiseSpotCam(flyby);
+		InitializeSpotCam(flyby);
 	}
 
 	///Calculate the distance between two positions.

@@ -74,7 +74,7 @@ namespace TEN::Renderer
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
-	void Renderer11::InitialiseMenuBars(int y)
+	void Renderer11::InitializeMenuBars(int y)
 	{
 		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -205,9 +205,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
+			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
 			if (g_MusicVolumeBar == nullptr)
-				InitialiseMenuBars(y);
+				InitializeMenuBars(y);
 
 			// Music volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));

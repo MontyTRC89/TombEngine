@@ -163,7 +163,7 @@ namespace TEN::Entities::Vehicles
 		return (QuadBikeInfo*)quadBikeItem->Data;
 	}
 
-	void InitialiseQuadBike(short itemNumber)
+	void InitializeQuadBike(short itemNumber)
 	{
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
 		quadBikeItem->Data = QuadBikeInfo();

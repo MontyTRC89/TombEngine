@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void InitialiseSpinningBlade(short itemNumber)
+void InitializeSpinningBlade(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	SetAnimation(item, 3);
