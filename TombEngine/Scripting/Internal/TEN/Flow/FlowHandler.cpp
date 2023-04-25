@@ -12,6 +12,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
+#include <winmain.h>
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -425,6 +426,13 @@ bool FlowHandler::DoFlow()
 		}
 		else
 		{
+			// Check if there is at least 1 playable level
+			if (g_GameFlow->GetNumLevels() == 1)
+			{
+				TENLog("Level not found. Please check 'Gameflow.lua' file", LogLevel::Error);
+				WinClose();
+			}
+
 			// Prepare inventory objects table
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{

@@ -271,6 +271,13 @@ unsigned CALLBACK GameMain(void *)
 	else
 		g_Renderer.RenderTitleImage();
 
+	//Check if there is the title in Gameflow.lua
+	TENLog("Number Levels: " + std::to_string(g_GameFlow->GetNumLevels()), LogLevel::Info);
+	if (g_GameFlow->GetNumLevels() == 0)
+	{
+		TENLog("No title found. Please check 'Gameflow.lua' file.", LogLevel::Error);
+		WinClose();
+	}
 
 	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
