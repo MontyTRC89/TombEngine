@@ -454,9 +454,9 @@ static void InitAttractors(ItemInfo& item)
 
 	auto points = std::vector<Vector3>{ Vector3::Zero, Vector3::Zero };
 
-	player.Context.HandsAttractor.DebugAttractor0 = Attractor(AttractorType::Edge, points, item.RoomNumber);
-	player.Context.HandsAttractor.DebugAttractor1 = Attractor(AttractorType::Edge, points, item.RoomNumber);
-	player.Context.HandsAttractor.DebugAttractor2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.DebugAttrac.DebugAttractor1 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+	player.Context.DebugAttrac.DebugAttractor2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 }
 
 // Debug
@@ -486,7 +486,7 @@ static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 		std::reverse(points.begin(), points.end());
 
 	auto attrac = GenerateAttractorFromPoints(points, item.RoomNumber, AttractorType::Edge);
-	player.Context.HandsAttractor.DebugAttractor2 = attrac;
+	player.Context.DebugAttrac.DebugAttractor2 = attrac;
 }
 
 // Debug
@@ -516,28 +516,28 @@ static void SetDebugAttractors(ItemInfo& item)
 	if (KeyMap[OIS::KeyCode::KC_Q])
 	{
 		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		auto pos1 = player.Context.HandsAttractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.HandsAttractor.DebugAttractor0.GetPoints()[1];
-		player.Context.HandsAttractor.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+		auto pos1 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints()[1];
+		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_W])
 	{
-		auto pos0 = player.Context.HandsAttractor.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.HandsAttractor.DebugAttractor0.GetPoints()[0];
+		auto pos0 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints()[0];
 		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.HandsAttractor.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 
 	// Set debug attractor 1.
 	if (KeyMap[OIS::KeyCode::KC_E])
 	{
 		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		auto pos1 = player.Context.HandsAttractor.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.HandsAttractor.DebugAttractor1.GetPoints()[1];
-		player.Context.HandsAttractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+		auto pos1 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints()[1];
+		player.Context.DebugAttrac.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_R])
 	{
-		auto pos0 = player.Context.HandsAttractor.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.HandsAttractor.DebugAttractor1.GetPoints()[0];
+		auto pos0 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints()[0];
 		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.HandsAttractor.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+		player.Context.DebugAttrac.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 
 	// Spawn attractor pentagon.
@@ -559,7 +559,7 @@ void HandleAttractorDebug(ItemInfo& item)
 	auto attrac = GenerateSectorAttractor(pointColl);
 
 	if (attrac.has_value())
-		player.Context.HandsAttractor.DebugAttractor1 = GenerateSectorAttractor(pointColl).value();
+		player.Context.DebugAttrac.DebugAttractor1 = GenerateSectorAttractor(pointColl).value();
 
 	DrawPlayerAttractors(item);
 }

@@ -67,7 +67,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	for (const auto& attracColl : attracColls)
 	{
 		// 1) Check if attractor is edge type.
-		if (!attracColl.AttractorPtr->IsEdge())
+		if (!attracColl.Ptr->IsEdge())
 			continue;
 
 		// 2) Check if edge is within range and in front.
@@ -76,11 +76,11 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// TODO: Test if this works. Redo.
 		// 3) Test if target point is lone corner.
-		if (attracColl.Proximity.DistanceAlongLine <= EPSILON && !hasFoundCorner)
-		/*{
-			hasFoundCorner = true;
-			continue;
-		}*/
+		if (attracColl.Proximity.LineDistance <= EPSILON && !hasFoundCorner)
+		{
+			/*hasFoundCorner = true;
+			continue;*/
+		}
 
 		// 4) Test if edge slope is slippery.
 		if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
@@ -88,7 +88,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// Get point collision off side of edge.
 		auto pointCollOffSide = GetCollision(
-			Vector3i(attracColl.Proximity.Point), attracColl.AttractorPtr->GetRoomNumber(),
+			Vector3i(attracColl.Proximity.Point), attracColl.Ptr->GetRoomNumber(),
 			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 5) Test if edge is too low to the ground.
@@ -151,9 +151,9 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 
 	auto& player = GetLaraInfo(item);
 
-	auto points = player.Context.HandsAttractor.AttractorPtr->GetPoints();
+	auto points = player.Context.HandsAttractor.Ptr->GetPoints();
 	float projectedLineDist = player.Context.HandsAttractor.LineDistance + sideOffset;
-	unsigned int segmentIndex = player.Context.HandsAttractor.AttractorPtr->GetSegmentIndexAtDistance(projectedLineDist);
+	unsigned int segmentIndex = player.Context.HandsAttractor.Ptr->GetSegmentIndexAtDistance(projectedLineDist);
 
 	auto origin = points[segmentIndex];
 	auto target = points[segmentIndex + 1];
@@ -167,7 +167,7 @@ static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemI
 		auto refPoint = Geometry::TranslatePoint(points.front(), direction, sideOffset);
 		edgeAttracColls.Center = GetBestEdgeHangAttractorCollision(item, coll, refPoint, coll.Setup.Radius);
 	}
-	else if (projectedLineDist > player.Context.HandsAttractor.AttractorPtr->GetLength())
+	else if (projectedLineDist > player.Context.HandsAttractor.Ptr->GetLength())
 	{
 
 	}

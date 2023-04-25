@@ -15,8 +15,123 @@
 
 using namespace TEN::Input;
 
+//------Debug
+#include "Renderer/Renderer11.h"
+using namespace TEN::Renderer;
+//------
+
 namespace TEN::Entities::Player
 {
+	// TODO: Move these functions somewhere else.
+
+	struct EdgeHangAttractorCollisionData
+	{
+		std::optional<AttractorCollisionData> Center = std::nullopt;
+		std::optional<AttractorCollisionData> Left	 = std::nullopt;
+		std::optional<AttractorCollisionData> Right	 = std::nullopt;
+	};
+
+	bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
+	{
+		return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
+	}
+
+	static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
+	{
+		const auto& player = GetLaraInfo(item);
+		auto& handsAttrac = player.Context.HandsAttractor;
+
+		float lineDist = handsAttrac.LineDistance + sideOffset;
+		auto basePos = item.Pose.Position.ToVector3();
+		auto orient = item.Pose.Orientation;
+
+		// Get points.
+		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
+		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
+		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
+
+		// Get attractor collisions.
+		auto attracCollCenter = handsAttrac.Ptr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
+		auto attracCollLeft = handsAttrac.Ptr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
+		auto attracCollRight = handsAttrac.Ptr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
+
+		// ----------Debug
+		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
+		g_Renderer.AddLine3D(attracCollCenter.Proximity.Point, attracCollCenter.Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollLeft.Proximity.Point, attracCollLeft.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollRight.Proximity.Point, attracCollRight.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		//------------
+		
+		// Return attractor collisions at three points.
+		return EdgeHangAttractorCollisionData
+		{
+			attracCollCenter,
+			attracCollLeft,
+			attracCollRight
+		};
+	}
+
+	void HandlePlayerEdgeHang2(ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
+	{
+		constexpr auto ORIENT_LERP_ALPHA = 0.5f;
+
+		auto& player = GetLaraInfo(item);
+
+		// No hands attractor; return early.
+		if (player.Context.HandsAttractor.Ptr == nullptr)
+		{
+			player.Control.IsHanging = false;
+			return;
+		}
+
+		// Get edge hang attractor colisions.
+		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, item.Animation.Velocity.z * (isGoingRight ? 1 : -1));
+		if (!edgeAttracColls.Center.has_value())
+		{
+			player.Control.IsHanging = false;
+			return;
+		}
+
+		float length = edgeAttracColls.Center->Ptr->GetLength();
+		auto targetPoint = Vector3::Zero;
+
+		// Determine target point.
+		if (length >= (coll.Setup.Radius * 2))
+		{
+			if (!edgeAttracColls.Left.has_value())
+			{
+				targetPoint = edgeAttracColls.Center->Ptr->GetPointAtDistance(coll.Setup.Radius);
+			}
+			else if (!edgeAttracColls.Right.has_value())
+			{
+				targetPoint = edgeAttracColls.Center->Ptr->GetPointAtDistance(length - coll.Setup.Radius);
+			}
+			else
+			{
+				targetPoint = edgeAttracColls.Center->Proximity.Point;
+			}
+		}
+		else
+		{
+			targetPoint = edgeAttracColls.Center->Proximity.Point;
+		}
+
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls.Left->Proximity.Point, edgeAttracColls.Right->Proximity.Point);
+		auto headingAngle = orient.y - ANGLE(90.0f);
+
+		// Align orientation.
+		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
+		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
+
+		// Align position.
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+		auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
+		item.Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
+
+		player.Control.IsHanging = true;
+		player.Context.HandsAttractor.Set(*edgeAttracColls.Center->Ptr, edgeAttracColls.Center->Proximity.LineDistance);
+	}
+
 	// State:	  LS_HANG_IDLE (10)
 	// Collision: lara_col_hang_idle()
 	void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
@@ -40,10 +155,12 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		HandlePlayerEdgeHang2(*item, *coll, true);
+
 		if (IsHeld(In::Look))
 			LookUpDown(item);
 
-		if (IsHeld(In::Action))
+		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
 			if (TestLaraClimbIdle(item, coll))
 			{
@@ -149,7 +266,7 @@ namespace TEN::Entities::Player
 	// Control: lara_as_hang_idle()
 	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
-		HandlePlayerEdgeHang(*item, *coll);
+		//HandlePlayerEdgeHang(*item, *coll);
 	}
 
 	// State:	  LS_SHIMMY_LEFT (30)
@@ -174,7 +291,9 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action))
+		HandlePlayerEdgeHang2(*item, *coll, false);
+
+		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
 			if (IsHeld(In::Left) || IsHeld(In::LeftStep))
 			{
@@ -195,7 +314,7 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		HandlePlayerEdgeHang(*item, *coll);
+		//HandlePlayerEdgeHang(*item, *coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
 
@@ -221,7 +340,9 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action))
+		HandlePlayerEdgeHang2(*item, *coll, true);
+
+		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
 			if (IsHeld(In::Right) || IsHeld(In::RightStep))
 			{
@@ -242,7 +363,7 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		HandlePlayerEdgeHang(*item, *coll);
+		//HandlePlayerEdgeHang(*item, *coll);
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 

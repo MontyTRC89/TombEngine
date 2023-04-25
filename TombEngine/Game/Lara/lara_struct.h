@@ -1265,6 +1265,7 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
+	bool IsHanging		  = false; // TODO: savegame
 	bool Locked			  = false; // IsLocked
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
@@ -1294,9 +1295,23 @@ struct PlayerStatusData
 
 struct PlayerAttractorData
 {
-	const Attractor* AttractorPtr = nullptr;
-	float LineDistance = 0.0f;
+	const Attractor* Ptr		  = nullptr;
+	float			 LineDistance = 0.0f;
 
+	void Set(const Attractor& attrac, float lineDist)
+	{
+		Ptr = &attrac;
+		LineDistance = lineDist;
+	}
+
+	void Clear()
+	{
+		*this = {};
+	};
+};
+
+struct DebugAttractorData
+{
 	// Debug
 	Attractor			   DebugAttractor0	= {};
 	Attractor			   DebugAttractor1	= {};
@@ -1309,6 +1324,7 @@ struct PlayerContextData
 {
 	PlayerAttractorData HandsAttractor = {};
 	PlayerAttractorData FeetAttractor  = {}; // TODO: For climbable walls.
+	DebugAttractorData	DebugAttrac	   = {};
 
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;

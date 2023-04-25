@@ -21,15 +21,15 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorProximityData
 	{
-		Vector3		 Point			   = Vector3::Zero;
-		float		 Distance		   = 0.0f;
-		float		 DistanceAlongLine = 0.0f;
-		unsigned int SegmentIndex	   = 0;
+		Vector3		 Point		  = Vector3::Zero;
+		float		 Distance	  = 0.0f;
+		float		 LineDistance = 0.0f;
+		unsigned int SegmentIndex = 0;
 	};
 
 	struct AttractorCollisionData
 	{
-		const Attractor* AttractorPtr = nullptr;
+		const Attractor* Ptr = nullptr;
 
 		AttractorProximityData Proximity	= {};
 		short				   HeadingAngle = 0;

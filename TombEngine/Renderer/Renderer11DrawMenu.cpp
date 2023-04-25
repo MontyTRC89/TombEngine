@@ -965,7 +965,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
+				PrintDebugMessage("Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.x, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.z);
 				PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
 				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
