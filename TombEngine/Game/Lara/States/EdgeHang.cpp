@@ -33,25 +33,57 @@ namespace TEN::Player
 		std::optional<AttractorCollisionData> Right	 = std::nullopt;
 	};
 
+	static float ClampAttractorLineDistance(float lineDist, float threshold, float length, const std::vector<Vector3>& points)
+	{
+		if (length >= (threshold * 2))
+		{
+			if (lineDist < 0.0f || lineDist > length)
+			{
+				if (Vector3::Distance(points.front(), points.back()) <= EPSILON)
+				{
+					if (lineDist < 0.0f)
+					{
+						lineDist = length + lineDist;
+					}
+					else
+					{
+						lineDist = lineDist - length;
+					}
+				}
+			}
+			else
+			{
+				if (Vector3::Distance(points.front(), points.back()) > EPSILON)
+				{
+					float lineDistMin = threshold;
+					float lineDistMax = length - threshold;
+					lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
+				}
+			}
+		}
+		
+
+		return lineDist;
+	}
+
 	static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
 	{
 		const auto& player = GetLaraInfo(item);
 		const auto& handsAttrac = player.Context.HandsAttractor;
 
-		// Get clamped projected distance along attractor.
+		auto points = handsAttrac.Ptr->GetPoints();
+
+		// Get clamped projected distances along attractor.
 		float lineDist = handsAttrac.LineDistance + sideOffset;
-		if (handsAttrac.Ptr->GetLength() >= (coll.Setup.Radius * 2))
-		{
-			float lineDistMin = coll.Setup.Radius;
-			float lineDistMax = handsAttrac.Ptr->GetLength() - coll.Setup.Radius;
-			lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
-		}
+		float lineDistCenter = ClampAttractorLineDistance(lineDist, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
+		float lineDistLeft = ClampAttractorLineDistance(lineDist - coll.Setup.Radius, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
+		float lineDistRight = ClampAttractorLineDistance(lineDist + coll.Setup.Radius, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
 		
 		// TODO: If beyond attractor end threshold, probe for new attractor
 		// Get points.
-		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
-		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
-		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
+		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDistCenter);
+		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDistLeft);
+		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDistRight);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
@@ -66,6 +98,9 @@ namespace TEN::Player
 		g_Renderer.AddLine3D(attracCollCenter.Proximity.Point, attracCollCenter.Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
 		g_Renderer.AddLine3D(attracCollLeft.Proximity.Point, attracCollLeft.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 		g_Renderer.AddLine3D(attracCollRight.Proximity.Point, attracCollRight.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+
+		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
+		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta));
 		//------------
 		
 		// Return attractor collisions at three points.

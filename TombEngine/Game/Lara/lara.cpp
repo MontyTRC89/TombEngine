@@ -545,6 +545,15 @@ static void SetDebugAttractors(ItemInfo& item)
 		SpawnAttractorPentagon(item, true);
 	if (KeyMap[OIS::KeyCode::KC_Y])
 		SpawnAttractorPentagon(item, false);
+
+	// Modify pentagon point.
+	if (KeyMap[OIS::KeyCode::KC_U])
+	{
+		auto pos = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		auto points = player.Context.DebugAttrac.DebugAttractor2.GetPoints();
+		points[1] = pos;
+		player.Context.DebugAttrac.DebugAttractor2.Update(points, player.Context.DebugAttrac.DebugAttractor2.GetRoomNumber());
+	}
 }
 
 // Debug
