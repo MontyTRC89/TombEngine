@@ -33,37 +33,35 @@ namespace TEN::Player
 		std::optional<AttractorCollisionData> Right	 = std::nullopt;
 	};
 
+	// TODO: Doesn't always work.
+	// TODO: Get nearest attractors if available?
 	static float ClampAttractorLineDistance(float lineDist, float threshold, float length, const std::vector<Vector3>& points)
 	{
-		if (length >= (threshold * 2))
+		if (length < (threshold * 2))
+			return lineDist;
+
+		// If attractor is looped, wrap around.
+		if (Vector3::Distance(points.front(), points.back()) <= EPSILON)
 		{
 			if (lineDist < 0.0f || lineDist > length)
 			{
-				if (Vector3::Distance(points.front(), points.back()) <= EPSILON)
+				if (lineDist < 0.0f)
 				{
-					if (lineDist < 0.0f)
-					{
-						lineDist = length + lineDist;
-					}
-					else
-					{
-						lineDist = lineDist - length;
-					}
+					return (length + lineDist);
+				}
+				else
+				{
+					return (lineDist - length);
 				}
 			}
-			else
-			{
-				if (Vector3::Distance(points.front(), points.back()) > EPSILON)
-				{
-					float lineDistMin = threshold;
-					float lineDistMax = length - threshold;
-					lineDist = std::clamp(lineDist, lineDistMin, lineDistMax);
-				}
-			}
-		}
-		
 
-		return lineDist;
+			return lineDist;
+		}
+
+		// Clamp distance along attractor according to width.
+		float lineDistMin = threshold;
+		float lineDistMax = length - threshold;
+		return std::clamp(lineDist, lineDistMin, lineDistMax);
 	}
 
 	static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
@@ -71,13 +69,14 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 		const auto& handsAttrac = player.Context.HandsAttractor;
 
+		float length = handsAttrac.Ptr->GetLength();
 		auto points = handsAttrac.Ptr->GetPoints();
 
 		// Get clamped projected distances along attractor.
 		float lineDist = handsAttrac.LineDistance + sideOffset;
-		float lineDistCenter = ClampAttractorLineDistance(lineDist, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
-		float lineDistLeft = ClampAttractorLineDistance(lineDist - coll.Setup.Radius, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
-		float lineDistRight = ClampAttractorLineDistance(lineDist + coll.Setup.Radius, coll.Setup.Radius, handsAttrac.Ptr->GetLength(), points);
+		float lineDistCenter = ClampAttractorLineDistance(lineDist, coll.Setup.Radius, length, points);
+		float lineDistLeft = ClampAttractorLineDistance(lineDist - coll.Setup.Radius, coll.Setup.Radius, length, points);
+		float lineDistRight = ClampAttractorLineDistance(lineDist + coll.Setup.Radius, coll.Setup.Radius, length, points);
 		
 		// TODO: If beyond attractor end threshold, probe for new attractor
 		// Get points.
@@ -118,7 +117,7 @@ namespace TEN::Player
 
 		auto& player = GetLaraInfo(item);
 
-		// No hands attractor; return early.
+		// Check for hands attractor.
 		if (player.Context.HandsAttractor.Ptr == nullptr)
 		{
 			player.Control.IsHanging = false;
@@ -129,8 +128,15 @@ namespace TEN::Player
 		float offset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
 		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, offset);
 
-		// No hands attractor; return early.
+		// Check for center attractor collision.
 		if (!edgeAttracColls.Center.has_value())
+		{
+			player.Control.IsHanging = false;
+			return;
+		}
+
+		// Test segment slope angle.
+		if (edgeAttracColls.Center->SlopeAngle >= SLIPPERY_SLOPE_ANGLE)
 		{
 			player.Control.IsHanging = false;
 			return;
