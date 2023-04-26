@@ -60,7 +60,7 @@ const ObjectCollisionBounds KeyHoleBounds =
 void InitializePuzzleHole(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
-	receptacleItem.ItemFlags[5] = ReusableType::Hole;
+	receptacleItem.ItemFlags[5] = (int)ReusableReceptacleType::Empty;
 }
 
 void InitializePuzzleDone(short itemNumber)
@@ -76,8 +76,8 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& receptacleItem = g_Level.Items[itemNumber];
 	auto& player = GetLaraInfo(*laraItem);
 
-	//Start level with the right object when loading the game.
-	if (receptacleItem.ItemFlags[5] == ReusableType::Done)
+	// Start level with correct object when loading game.
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::Done)
 	{
 		receptacleItem.ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		SetAnimation(receptacleItem, 0);
@@ -237,8 +237,8 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		return;
 	AnimateItem(&receptacleItem);
 
-	//Start level with the right object when loading the game.
-	if (receptacleItem.ItemFlags[5] == ReusableType::Hole)
+	// Start level with correct object when loading game.
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::Empty)
 	{
 		receptacleItem.ObjectNumber = GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 		SetAnimation(receptacleItem, 0);
@@ -246,12 +246,12 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		return;
 	}
 
-	//Activate triggers when startig the level for the first time
-	if (receptacleItem.ItemFlags[5] == ReusableType::None)
+	// Activate triggers when startig level for first time.
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::None)
 	{
 		receptacleItem.ItemFlags[1] = true;
 		TestTriggers(receptacleItem.Pose.Position.x, receptacleItem.Pose.Position.y, receptacleItem.Pose.Position.z, receptacleItem.RoomNumber, false, 0);
-		receptacleItem.ItemFlags[5] = ReusableType::Done;
+		receptacleItem.ItemFlags[5] = (int)ReusableReceptacleType::Done;
 	}
 
 	auto puzzleType = PuzzleType::Normal;
@@ -334,7 +334,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ItemFlags[1] = true;
 
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-		item->ItemFlags[5] = ReusableType::Done;
+		item->ItemFlags[5] = (int)ReusableReceptacleType::Done;
 		SetAnimation(item, 0);
 		item->ResetModelToDefault();	
 	}
@@ -364,7 +364,7 @@ void PuzzleHole(ItemInfo* item, short itemNumber)
 	item->ItemFlags[1] = true;
 
 	item->ObjectNumber = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
-	item->ItemFlags[5] = ReusableType::Hole;
+	item->ItemFlags[5] = (int)ReusableReceptacleType::Empty;
 	SetAnimation(item, 0);
 	item->ResetModelToDefault();
 }
@@ -434,25 +434,25 @@ void DoPuzzle()
 // Keys
 void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* keyHoleItem = &g_Level.Items[itemNumber];
+	auto* player = GetLaraInfo(laraItem);
 
-	auto triggerIndex = GetTriggerIndex(keyHoleItem);
-	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
+	short triggerType = (*(triggerIndexPtr++) >> 8) & 0x3F;
 
-	bool actionReady = (TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM);
+	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 
-	bool laraAvailable = !BinocularRange &&
-						 laraItem->Animation.ActiveState == LS_IDLE &&
-						 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
+	bool isPlayerAvailable = !BinocularRange &&
+							 laraItem->Animation.ActiveState == LS_IDLE &&
+							 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
 
-	bool actionActive = laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber;
+	bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
 
-	if (actionActive || (actionReady && laraAvailable))
+	if (actionActive || (isActionReady && isPlayerAvailable))
 	{
 		if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
 		{
-			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
+			if (!player->Control.IsMoving)
 			{
 				if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
 					return;
@@ -468,32 +468,30 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (g_Gui.GetInventoryItemChosen() != keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
 
-				laraInfo->Context.InteractedItem = itemNumber;
+				player->Context.InteractedItem = itemNumber;
 			}
 
-			if (laraInfo->Context.InteractedItem != itemNumber)
+			if (player->Context.InteractedItem != itemNumber)
 				return;
 
 			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 			{
-			
-					if (triggerType != TRIGGER_TYPES::SWITCH)
-					{
-						RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
-					}
-					else
-					{
-						keyHoleItem->ItemFlags[1] = true;						
-					}
+				if (triggerType != TRIGGER_TYPES::SWITCH)
+				{
+					RemoveObjectFromInventory(GAME_OBJECT_ID(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
+				}
+				else
+				{
+					keyHoleItem->ItemFlags[1] = true;
+				}
 
-					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
 				
-
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraInfo->Control.IsMoving = false;
+				player->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
-				laraInfo->Control.HandStatus = HandStatus::Busy;
+				player->Control.HandStatus = HandStatus::Busy;
 				keyHoleItem->Flags |= TRIGGERED;
 				keyHoleItem->Status = ITEM_ACTIVE;
 			}
@@ -502,10 +500,10 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 
-		if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
+		if (player->Control.IsMoving && player->Context.InteractedItem == itemNumber)
 		{
-			laraInfo->Control.IsMoving = false;
-			laraInfo->Control.HandStatus = HandStatus::Free;
+			player->Control.IsMoving = false;
+			player->Control.HandStatus = HandStatus::Free;
 		}
 	}
 	else

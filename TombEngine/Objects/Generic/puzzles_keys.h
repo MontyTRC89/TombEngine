@@ -3,11 +3,11 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-enum ReusableType
+enum class ReusableReceptacleType
 {
 	None = 0,
 	Done = 1,
-	Hole = 2
+	Empty = 2
 };
 
 // Puzzles
