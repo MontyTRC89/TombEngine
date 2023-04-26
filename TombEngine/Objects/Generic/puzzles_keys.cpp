@@ -156,7 +156,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				}
 			}
 
-			RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(receptacleItem.ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)), 1);
+			RemoveObjectFromInventory(GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)), 1);
 
 			if (puzzleType == PuzzleType::Specfic)
 			{
