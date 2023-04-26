@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-enum class ReusableReceptacleType
+enum class ReusableReceptacleState
 {
 	None = 0,
 	Done = 1,

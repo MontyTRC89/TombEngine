@@ -60,7 +60,7 @@ const ObjectCollisionBounds KeyHoleBounds =
 void InitializePuzzleHole(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
-	receptacleItem.ItemFlags[5] = (int)ReusableReceptacleType::Empty;
+	receptacleItem.ItemFlags[5] = (int)ReusableReceptacleState::Empty;
 }
 
 void InitializePuzzleDone(short itemNumber)
@@ -77,7 +77,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& player = GetLaraInfo(*laraItem);
 
 	// Start level with correct object when loading game.
-	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::Done)
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleState::Done)
 	{
 		receptacleItem.ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		SetAnimation(receptacleItem, 0);
@@ -238,7 +238,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	AnimateItem(&receptacleItem);
 
 	// Start level with correct object when loading game.
-	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::Empty)
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleState::Empty)
 	{
 		receptacleItem.ObjectNumber = GAME_OBJECT_ID(receptacleItem.ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 		SetAnimation(receptacleItem, 0);
@@ -247,11 +247,11 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	}
 
 	// Activate triggers when startig level for first time.
-	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleType::None)
+	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleState::None)
 	{
 		receptacleItem.ItemFlags[1] = true;
 		TestTriggers(receptacleItem.Pose.Position.x, receptacleItem.Pose.Position.y, receptacleItem.Pose.Position.z, receptacleItem.RoomNumber, false, 0);
-		receptacleItem.ItemFlags[5] = (int)ReusableReceptacleType::Done;
+		receptacleItem.ItemFlags[5] = (int)ReusableReceptacleState::Done;
 	}
 
 	auto puzzleType = PuzzleType::Normal;
@@ -334,7 +334,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ItemFlags[1] = true;
 
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-		item->ItemFlags[5] = (int)ReusableReceptacleType::Done;
+		item->ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		SetAnimation(item, 0);
 		item->ResetModelToDefault();	
 	}
@@ -364,7 +364,7 @@ void PuzzleHole(ItemInfo* item, short itemNumber)
 	item->ItemFlags[1] = true;
 
 	item->ObjectNumber = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
-	item->ItemFlags[5] = (int)ReusableReceptacleType::Empty;
+	item->ItemFlags[5] = (int)ReusableReceptacleState::Empty;
 	SetAnimation(item, 0);
 	item->ResetModelToDefault();
 }

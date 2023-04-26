@@ -155,23 +155,23 @@ int SwitchTrigger(short itemNumber, short timer)
 	// Handle reusable receptacles.
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 &&
 		item.ItemFlags[1] != 0 &&
-		(item.ItemFlags[5] == (int)ReusableReceptacleType::Empty || item.ItemFlags[5] == (int)ReusableReceptacleType::None) &&
+		(item.ItemFlags[5] == (int)ReusableReceptacleState::Empty || item.ItemFlags[5] == (int)ReusableReceptacleState::None) &&
 		player.Control.HandStatus != HandStatus::Busy)
 	{
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_ACTIVE;
-		item.ItemFlags[5] = (int)ReusableReceptacleType::Done;
+		item.ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		item.ItemFlags[1] = false;
 		return 1;
 	}
 
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 && 
-		item.ItemFlags[1] != 0 && item.ItemFlags[5] == (int)ReusableReceptacleType::Done &&
+		item.ItemFlags[1] != 0 && item.ItemFlags[5] == (int)ReusableReceptacleState::Done &&
 		player.Control.HandStatus != HandStatus::Busy)
 	{
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_DEACTIVATED;
-		item.ItemFlags[5] = (int)ReusableReceptacleType::Empty;
+		item.ItemFlags[5] = (int)ReusableReceptacleState::Empty;
 		item.ItemFlags[1] = false;
 		return 1;
 	}
