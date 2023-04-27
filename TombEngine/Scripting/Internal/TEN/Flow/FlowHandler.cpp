@@ -12,7 +12,6 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
-#include <winmain.h>
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -264,6 +263,12 @@ void FlowHandler::LoadFlowScript()
 	m_handler.ExecuteScript("Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
+	
+	//Check if there is the title in Gameflow.lua
+	if (Levels.size() == 0)
+		throw TENScriptException("No title and levels found. Please check Gameflow.lua file integrity.");
+	else
+		TENLog("Number Levels: " + std::to_string(g_GameFlow->GetNumLevels()), LogLevel::Info);
 }
 
 char const * FlowHandler::GetString(const char* id) const
@@ -427,11 +432,8 @@ bool FlowHandler::DoFlow()
 		else
 		{
 			// Check if there is at least 1 playable level
-			if (g_GameFlow->GetNumLevels() == 1)
-			{
-				TENLog("Level not found. Please check 'Gameflow.lua' file", LogLevel::Error);
-				WinClose();
-			}
+			if (Levels.size() == 1)
+				TENScriptException("Level not found. Please check Gameflow.lua file integrity.");
 
 			// Prepare inventory objects table
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
