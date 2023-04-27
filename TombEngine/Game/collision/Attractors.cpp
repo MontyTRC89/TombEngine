@@ -35,6 +35,11 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
+	Attractor::~Attractor()
+	{
+		// TODO: Parenting.
+	}
+
 	AttractorType Attractor::GetType() const
 	{
 		return Type;
@@ -90,21 +95,23 @@ namespace TEN::Collision::Attractors
 		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
 		float lineDistFromLastClosestPoint = 0.0f;
 
-		// Find closest attractor point.
+		// Find closest point along attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
 			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
-			float distance = Vector3::Distance(refPoint, closestPoint);
+			float dist = Vector3::Distance(refPoint, closestPoint);
 
 			// Found new closest point; update proximity data.
-			if (distance < attracProx.Distance)
+			if (dist < attracProx.Distance)
 			{
+				lineDistFromLastClosestPoint += Vector3::Distance(origin, closestPoint);
+
 				attracProx.Point = closestPoint;
-				attracProx.Distance = distance;
-				attracProx.LineDistance += lineDistFromLastClosestPoint + Vector3::Distance(origin, closestPoint);
+				attracProx.Distance = dist;
+				attracProx.LineDistance += lineDistFromLastClosestPoint;
 				attracProx.SegmentIndex = i;
 
 				// Restart line distance accumulation since last closest point.
@@ -126,7 +133,7 @@ namespace TEN::Collision::Attractors
 		if (Points.size() == 1)
 			return Points.front();
 
-		// Wrap distance along attractor and clamp point according to length.
+		// Wrap line distance and clamp point according to length.
 		lineDist = GetNormalizedLineDistance(lineDist);
 		if (lineDist <= 0.0f)
 		{

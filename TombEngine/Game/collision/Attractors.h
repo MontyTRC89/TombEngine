@@ -52,6 +52,9 @@ namespace TEN::Collision::Attractors
 		Attractor() {};
 		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
+		// Destructors
+		~Attractor();
+
 		// Getters
 		AttractorType		 GetType() const;
 		std::vector<Vector3> GetPoints() const;
