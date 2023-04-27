@@ -125,6 +125,12 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
 
+		if (!Objects[ID_BAR_BORDER_GRAPHIC].loaded)
+		{
+			TENLog("Missing ID_BAR_BORDER_GRAPHIC slot in level. Bar rendering was skipped.", LogLevel::Warning);
+			return;
+		}
+
 		RendererSprite* borderSprite = &m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
 		m_stHUDBar.BarStartUV = borderSprite->UV[0];
 		m_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);

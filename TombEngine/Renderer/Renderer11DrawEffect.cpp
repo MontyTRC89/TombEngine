@@ -142,6 +142,12 @@ namespace TEN::Renderer
 		if (HelicalLasers.empty())
 			return;
 
+		if (!Objects[ID_DEFAULT_SPRITES].loaded)
+		{
+			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Helical lasers rendering was skipped.", LogLevel::Warning);
+			return;
+		}
+
 		for (const auto& laser : HelicalLasers)
 		{
 			if (laser.Life <= 0.0f)
@@ -189,6 +195,12 @@ namespace TEN::Renderer
 	{
 		if (ElectricityArcs.empty())
 			return;
+
+		if (!Objects[ID_DEFAULT_SPRITES].loaded)
+		{
+			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Electricity rendering was skipped.", LogLevel::Warning);
+			return;
+		}
 
 		for (const auto& arc : ElectricityArcs)
 		{
@@ -380,6 +392,12 @@ namespace TEN::Renderer
 			}
 			else
 			{
+				if (!Objects[ID_SPARK_SPRITE].loaded)
+				{
+					TENLog("Missing ID_SPARK_SPRITE slot in level. Particles rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				auto pos = Vector3(particle.x, particle.y, particle.z);
 				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
 				axis.Normalize();
@@ -405,6 +423,12 @@ namespace TEN::Renderer
 
 			if (splash.isActive) 
 			{
+				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				{
+					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Splashes rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				constexpr float alpha = 360 / NUM_POINTS;
 				byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
 
@@ -465,6 +489,12 @@ namespace TEN::Renderer
 		if (Bubbles.empty())
 			return;
 
+		if (!Objects[ID_DEFAULT_SPRITES].loaded)
+		{
+			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Bubbles rendering was skipped.", LogLevel::Warning);
+			return;
+		}
+
 		for (const auto& bubble : Bubbles)
 		{
 			if (bubble.Life <= 0.0f)
@@ -481,6 +511,12 @@ namespace TEN::Renderer
 	{
 		if (Drips.empty())
 			return;
+
+		if (!Objects[ID_DRIP_SPRITE].loaded)
+		{
+			TENLog("Missing ID_DRIP_SPRITE slot in level. Drips rendering was skipped.", LogLevel::Warning);
+			return;
+		}
 
 		for (const auto& drip : Drips)
 		{
@@ -548,6 +584,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawShockwaves(RenderView& view)
 	{
+
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
@@ -561,6 +598,12 @@ namespace TEN::Renderer
 
 			if (shockwave->life)
 			{
+				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				{
+					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Shockwaves rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				byte color = shockwave->life * 8;
 
 				//int dl = shockwave->outerRad - shockwave->innerRad;
@@ -722,12 +765,20 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBlood(RenderView& view) 
 	{
+
 		for (int i = 0; i < 32; i++) 
 		{
+
 			BLOOD_STRUCT* blood = &Blood[i];
 
 			if (blood->on) 
 			{
+				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				{
+					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Blood rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
@@ -749,6 +800,12 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
+				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				{
+					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Underwater dust rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -759,6 +816,12 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Snow:
+				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				{
+					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Snow rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -769,6 +832,12 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Rain:
+				if (!Objects[ID_DRIP_SPRITE].loaded)
+				{
+					TENLog("Missing ID_DRIP_SPRITE slot in level. Rain rendering was skipped.", LogLevel::Warning);
+					return;
+				}
+
 				Vector3 v;
 				p.Velocity.Normalize(v);
 
@@ -1456,10 +1525,17 @@ namespace TEN::Renderer
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
 
+
 		for (const auto& smoke : SmokeParticles) 
 		{
 			if (!smoke.active)
 				continue;
+
+			if (!Objects[ID_SMOKE_SPRITES].loaded)
+			{
+				TENLog("Missing ID_SMOKE_SPRITES slot in level. Smoke rendering was skipped.", LogLevel::Warning);
+				return;
+			}
 
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
@@ -1479,6 +1555,13 @@ namespace TEN::Renderer
 		{
 			SparkParticle& s = SparkParticles[i];
 			if (!s.active) continue;
+
+			if (!Objects[ID_SPARK_SPRITE].loaded)
+			{
+				TENLog("Missing ID_SPARK_SPRITE slot in level. Sparks particles rendering was skipped.", LogLevel::Warning);
+				return;
+			}
+
 			Vector3 v;
 			s.velocity.Normalize(v);
 
@@ -1499,6 +1582,12 @@ namespace TEN::Renderer
 		{
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
+
+			if (!Objects[ID_EXPLOSION_SPRITES].loaded)
+			{
+				TENLog("Missing ID_EXPLOSION_SPRITES slot in level. Explosion particles rendering was skipped.", LogLevel::Warning);
+				return;
+			}
 			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
@@ -1507,9 +1596,14 @@ namespace TEN::Renderer
 	{
 		using namespace TEN::Effects;
 
-		for(SimpleParticle& s : simpleParticles)
+		for (SimpleParticle& s : simpleParticles)
 		{
-			if(!s.active) continue;
+			if (!Objects[s.sequence].loaded)
+			{
+				TENLog("Missing sprite slot " + std::to_string(s.sequence) + " in level. Rendering was skipped.", LogLevel::Warning);
+				continue;
+			}
+			if (!s.active) continue;
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
