@@ -410,6 +410,13 @@ bool FlowHandler::DoFlow()
 
 	while (DoTheGame)
 	{
+		// Check if called level exists in a script
+		if (CurrentLevel >= Levels.size())
+		{
+			TENLog("Level not found. Please check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
+			CurrentLevel = 0;
+		}
+		
 		// First we need to fill some legacy variables in PCTomb5.exe
 		Level* level = Levels[CurrentLevel];
 
