@@ -438,10 +438,6 @@ bool FlowHandler::DoFlow()
 		}
 		else
 		{
-			// Check if there is at least 1 playable level
-			if (Levels.size() == 1)
-				throw TENScriptException("No title and levels found. Please check Gameflow.lua file integrity.");
-
 			// Prepare inventory objects table
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
