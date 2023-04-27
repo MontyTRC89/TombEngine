@@ -33,37 +33,6 @@ namespace TEN::Player
 		std::optional<AttractorCollisionData> Right	 = std::nullopt;
 	};
 
-	// TODO: Doesn't always work.
-	// TODO: Get nearest attractors if available?
-	static float ClampAttractorLineDistance(float lineDist, float threshold, float length, const std::vector<Vector3>& points)
-	{
-		if (length < (threshold * 2))
-			return lineDist;
-
-		// If attractor is looped, wrap around.
-		if (Vector3::Distance(points.front(), points.back()) <= EPSILON)
-		{
-			if (lineDist < 0.0f || lineDist > length)
-			{
-				if (lineDist < 0.0f)
-				{
-					return (length + lineDist);
-				}
-				else
-				{
-					return (lineDist - length);
-				}
-			}
-
-			return lineDist;
-		}
-
-		// Clamp distance along attractor according to width.
-		float lineDistMin = threshold;
-		float lineDistMax = length - threshold;
-		return std::clamp(lineDist, lineDistMin, lineDistMax);
-	}
-
 	static EdgeHangAttractorCollisionData GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll, float sideOffset = 0.0f)
 	{
 		const auto& player = GetLaraInfo(item);
@@ -74,15 +43,12 @@ namespace TEN::Player
 
 		// Get clamped projected distances along attractor.
 		float lineDist = handsAttrac.LineDistance + sideOffset;
-		float lineDistCenter = ClampAttractorLineDistance(lineDist, coll.Setup.Radius, length, points);
-		float lineDistLeft = ClampAttractorLineDistance(lineDist - coll.Setup.Radius, coll.Setup.Radius, length, points);
-		float lineDistRight = ClampAttractorLineDistance(lineDist + coll.Setup.Radius, coll.Setup.Radius, length, points);
-		
+
 		// TODO: If beyond attractor end threshold, probe for new attractor
 		// Get points.
-		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDistCenter);
-		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDistLeft);
-		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDistRight);
+		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
+		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
+		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
@@ -165,7 +131,7 @@ namespace TEN::Player
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.HandsAttractor.Set(*edgeAttracColls.Center->Ptr, edgeAttracColls.Center->Proximity.LineDistance);
+		player.Context.HandsAttractor.Set(*edgeAttracColls.Center->AttractorPtr, edgeAttracColls.Center->Proximity.LineDistance);
 	}
 
 	// State:	  LS_HANG_IDLE (10)

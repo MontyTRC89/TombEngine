@@ -67,7 +67,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 	for (const auto& attracColl : attracColls)
 	{
 		// 1) Check if attractor is edge type.
-		if (!attracColl.Ptr->IsEdge())
+		if (!attracColl.AttractorPtr->IsEdge())
 			continue;
 
 		// 2) Check if edge is within range and in front.
@@ -88,7 +88,7 @@ static std::optional<AttractorCollisionData> GetBestEdgeHangAttractorCollision(c
 
 		// Get point collision off side of edge.
 		auto pointCollOffSide = GetCollision(
-			Vector3i(attracColl.Proximity.Point), attracColl.Ptr->GetRoomNumber(),
+			Vector3i(attracColl.Proximity.Point), attracColl.AttractorPtr->GetRoomNumber(),
 			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 5) Test if edge is too low to the ground.

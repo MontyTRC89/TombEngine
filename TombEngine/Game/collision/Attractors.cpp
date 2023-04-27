@@ -78,7 +78,7 @@ namespace TEN::Collision::Attractors
 		// Create new attractor collision.
 		auto attracColl = ATTRAC_COLL_DEFAULT;
 
-		attracColl.Ptr = this;
+		attracColl.AttractorPtr = this;
 		attracColl.Proximity = attracProx;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
@@ -95,7 +95,7 @@ namespace TEN::Collision::Attractors
 		// Attractor has no points; return default attractor proximity data.
 		if (Points.empty())
 		{
-			TENLog("GetTargetData(): attractor points undefined.", LogLevel::Warning);
+			TENLog("GetProximityData(): attractor points undefined.", LogLevel::Warning);
 			return ATTRAC_PROX_DEFAULT;
 		}
 
@@ -103,9 +103,8 @@ namespace TEN::Collision::Attractors
 		if (Points.size() == 1)
 			return AttractorProximityData{ Points.front(), Vector3::Distance(refPoint, Points.front()), 0 };
 
-		auto closestPoint = Points.front();
-		float closestDist = INFINITY;
-		unsigned int segmentIndex = 0;
+		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
+		float distFromLastClosestPoint = 0.0f;
 
 		// Find closest point on attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
@@ -113,20 +112,28 @@ namespace TEN::Collision::Attractors
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			auto closestLinePoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
-			float distance = Vector3::Distance(refPoint, closestLinePoint);
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
+			float distance = Vector3::Distance(refPoint, closestPoint);
 
-			if (distance < closestDist)
+			// Found new closest point; update proximity data.
+			if (distance < attracProx.Distance)
 			{
-				closestPoint = closestLinePoint;
-				closestDist = distance;
-				segmentIndex = i;
+				attracProx.Point = closestPoint;
+				attracProx.Distance = distance;
+				attracProx.LineDistance += distFromLastClosestPoint + Vector3::Distance(origin, closestPoint);
+				attracProx.SegmentIndex = i;
+
+				// Restart line distance accumulation since last closest point.
+				distFromLastClosestPoint = Vector3::Distance(closestPoint, target);
+				continue;
 			}
+
+			// Accumulate line distance since last closest point.
+			distFromLastClosestPoint += Vector3::Distance(origin, target);
 		}
 
 		// Return attractor proximity data.
-		float distFromStart = GetDistanceAtPoint(closestPoint, segmentIndex);
-		return AttractorProximityData{ closestPoint, closestDist, distFromStart, segmentIndex };
+		return attracProx;
 	}
 
 	Vector3 Attractor::GetPointAtDistance(float lineDist) const
@@ -142,7 +149,8 @@ namespace TEN::Collision::Attractors
 		if (Points.size() == 1)
 			return Points.front();
 
-		// Clamp point according to attractor length.
+		// Wrap distance along attractor and clamp point according to attractor length.
+		lineDist = GetNormalizedLineDistance(lineDist);
 		if (lineDist <= 0.0f)
 		{
 			return Points.front();
@@ -188,7 +196,8 @@ namespace TEN::Collision::Attractors
 		if (Points.size() == 1)
 			return 0;
 
-		// Clamp segment index according to attractor length.
+		// Wrap distance along attractor and clamp segment index according to attractor length.
+		lineDist = GetNormalizedLineDistance(lineDist);
 		if (lineDist <= 0.0f)
 		{
 			return 0;
@@ -212,38 +221,6 @@ namespace TEN::Collision::Attractors
 
 		// FAILSAFE: Return last segment index.
 		return (Points.size() - 1);
-	}
-
-	float Attractor::GetDistanceAtPoint(const Vector3& linePoint, unsigned int segmentIndex) const 
-	{
-		// Segment index out of range; return attractor length.
-		if (segmentIndex >= Points.size())
-		{
-			TENLog("GetDistanceAtPoint(): attractor segment index out of range.", LogLevel::Warning);
-			return Length;
-		}
-
-		// Calculate distance along attractor to point.
-		float lineDist = 0.0f;
-		for (int i = 0; i <= segmentIndex; i++)
-		{
-			const auto& origin = Points[i];
-			const auto& target = Points[i + 1];
-
-			if (i != segmentIndex)
-			{
-				lineDist += Vector3::Distance(origin, target);
-				continue;
-			}
-
-			float pointToAttractorThreshold = Geometry::GetDistanceToLine(linePoint, origin, target);
-			if (pointToAttractorThreshold > SQRT_2)
-				TENLog("GetDistanceAtPoint(): point beyond attractor.", LogLevel::Warning);
-
-			lineDist += Vector3::Distance(origin, linePoint);
-		}
-
-		return lineDist;
 	}
 
 	bool Attractor::IsEdge() const
@@ -327,6 +304,28 @@ namespace TEN::Collision::Attractors
 			g_Renderer.AddSphere(Points.front(), SPHERE_SCALE, COLOR_YELLOW);
 			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
 		}
+	}
+
+	float Attractor::GetNormalizedLineDistance(float lineDist) const
+	{
+		// Line distance is within bounds; return unmodified line distance.
+		if (lineDist >= 0.0f || lineDist <= Length)
+			return lineDist;
+
+		// Attractor is looped; wrap line distance.
+		if (IsLooped())
+			return (lineDist + (Length * ((lineDist >= 0.0f) ? -1 : 1)));
+		
+		// Clamp line distance.
+		return std::clamp(lineDist, 0.0f, Length);
+	}
+
+	bool Attractor::IsLooped() const
+	{
+		if (Points.empty() || Points.size() <= 2)
+			return false;
+
+		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
 	}
 
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
