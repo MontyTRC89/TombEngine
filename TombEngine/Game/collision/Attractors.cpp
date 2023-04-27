@@ -136,7 +136,7 @@ namespace TEN::Collision::Attractors
 		{
 			return Points.back();
 		}
-		//
+		
 		// Find point at distance along attractor.
 		float lineDistTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
