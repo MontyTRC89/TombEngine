@@ -16,6 +16,8 @@ namespace TEN::Collision::Attractors
 {
 	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
+		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
+
 		Type = type;
 		Points = points;
 		RoomNumber = roomNumber;
@@ -54,14 +56,6 @@ namespace TEN::Collision::Attractors
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const
 	{
-		static const auto ATTRAC_COLL_DEFAULT = AttractorCollisionData{};
-
-		if (Points.empty())
-		{
-			TENLog("GetAttractorCollision(): attractor undefined.", LogLevel::Warning);
-			return ATTRAC_COLL_DEFAULT;
-		}
-
 		// Get attractor proximity data.
 		auto attracProx = GetProximityData(refPoint);
 
@@ -76,7 +70,7 @@ namespace TEN::Collision::Attractors
 		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
 
 		// Create new attractor collision.
-		auto attracColl = ATTRAC_COLL_DEFAULT;
+		auto attracColl = AttractorCollisionData{};
 
 		attracColl.AttractorPtr = this;
 		attracColl.Proximity = attracProx;
@@ -90,15 +84,6 @@ namespace TEN::Collision::Attractors
 
 	AttractorProximityData Attractor::GetProximityData(const Vector3& refPoint) const
 	{
-		static const auto ATTRAC_PROX_DEFAULT = AttractorProximityData{};
-
-		// Attractor has no points; return default attractor proximity data.
-		if (Points.empty())
-		{
-			TENLog("GetProximityData(): attractor points undefined.", LogLevel::Warning);
-			return ATTRAC_PROX_DEFAULT;
-		}
-
 		// Attractor is single point; return simple attractor proximity data.
 		if (Points.size() == 1)
 			return AttractorProximityData{ Points.front(), Vector3::Distance(refPoint, Points.front()), 0 };
@@ -138,13 +123,6 @@ namespace TEN::Collision::Attractors
 
 	Vector3 Attractor::GetPointAtDistance(float lineDist) const
 	{
-		// Attractor has no points; return world origin.
-		if (Points.empty())
-		{
-			TENLog("GetPointAtDistance(): attractor points undefined.", LogLevel::Warning);
-			return Vector3::Zero;
-		}
-
 		// Attractor is single point; return it.
 		if (Points.size() == 1)
 			return Points.front();
@@ -185,13 +163,6 @@ namespace TEN::Collision::Attractors
 
 	unsigned int Attractor::GetSegmentIndexAtDistance(float lineDist) const
 	{
-		// Attractor has no points; return default segment index.
-		if (Points.empty())
-		{
-			TENLog("GetSegmentIndexAtDistance(): attractor points undefined.", LogLevel::Warning);
-			return 0;
-		}
-
 		// Attractor is single point; return default segment index.
 		if (Points.size() == 1)
 			return 0;
@@ -322,7 +293,7 @@ namespace TEN::Collision::Attractors
 
 	bool Attractor::IsLooped() const
 	{
-		if (Points.empty() || Points.size() <= 2)
+		if (Points.size() <= 2)
 			return false;
 
 		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
@@ -440,12 +411,6 @@ namespace TEN::Collision::Attractors
 	
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)
 	{
-		static const auto DEFAULT_ATTRACTOR = Attractor{};
-
-		// No points; return default.
-		if (points.empty())
-			return DEFAULT_ATTRACTOR;
-
 		// Add point to create loop (if applicable).
 		if (isClosedLoop)
 			points.push_back(points.front());
