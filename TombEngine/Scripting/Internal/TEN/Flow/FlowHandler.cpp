@@ -268,7 +268,7 @@ void FlowHandler::LoadFlowScript()
 	if (Levels.size() == 0)
 		throw TENScriptException("No title and levels found. Please check Gameflow.lua file integrity.");
 	else
-		TENLog("Number Levels: " + std::to_string(g_GameFlow->GetNumLevels()), LogLevel::Info);
+		TENLog("Number Levels: " + std::to_string(Levels.size()) , LogLevel::Info);
 }
 
 char const * FlowHandler::GetString(const char* id) const
