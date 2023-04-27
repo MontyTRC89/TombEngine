@@ -160,7 +160,7 @@ namespace TEN::Math::Geometry
 
 		auto lineDirection = linePoint1 - linePoint0;
 
-		// Calculate alpha from 2D projection of line.
+		// Calculate alpha from 2D projection of line on Y axis.
 		auto lineDirection2D = Vector3(lineDirection.x, 0.0f, lineDirection.z);
 		float alpha = lineDirection2D.Dot(origin - linePoint0) / lineDirection2D.Dot(lineDirection2D);
 
@@ -174,7 +174,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		// Return point on line perpendicular to vertical axis.
+		// Return point on line perpendicular to Y axis.
 		return (linePoint0 + (lineDirection * alpha));
 	}
 

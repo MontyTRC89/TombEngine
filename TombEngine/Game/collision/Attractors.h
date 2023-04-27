@@ -61,7 +61,7 @@ namespace TEN::Collision::Attractors
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
 		AttractorProximityData GetProximityData(const Vector3& refPoint) const;
-		Vector3				   GetPointAtDistance(float lineDist) const;
+		Vector3				   GetPointAtLineDistance(float lineDist) const;
 		unsigned int		   GetSegmentIndexAtDistance(float lineDist) const; // TODO: Maybe unnecessary.
 
 		// Inquirers

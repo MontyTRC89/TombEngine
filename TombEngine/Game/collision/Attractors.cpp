@@ -120,7 +120,7 @@ namespace TEN::Collision::Attractors
 		return attracProx;
 	}
 
-	Vector3 Attractor::GetPointAtDistance(float lineDist) const
+	Vector3 Attractor::GetPointAtLineDistance(float lineDist) const
 	{
 		// Single point exists; return it.
 		if (Points.size() == 1)
@@ -136,26 +136,26 @@ namespace TEN::Collision::Attractors
 		{
 			return Points.back();
 		}
-
+		//
 		// Find point at distance along attractor.
-		float distTravelled = 0.0f;
+		float lineDistTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingDist = lineDist - distTravelled;
+			float remainingLineDist = lineDist - lineDistTravelled;
 
 			// Found correct segment.
-			if (remainingDist <= segmentLength)
+			if (remainingLineDist <= segmentLength)
 			{
-				float alpha = remainingDist / segmentLength;
-				auto pointOnLine = Vector3::Lerp(origin, target, alpha);
-				return pointOnLine;
+				float alpha = remainingLineDist / segmentLength;
+				auto point = Vector3::Lerp(origin, target, alpha);
+				return point;
 			}
 
-			distTravelled += segmentLength;
+			lineDistTravelled += segmentLength;
 		}
 
 		return Points.back();

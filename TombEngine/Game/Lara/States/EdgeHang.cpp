@@ -46,9 +46,9 @@ namespace TEN::Player
 
 		// TODO: If beyond attractor end threshold, probe for new attractor
 		// Get points.
-		auto pointCenter = handsAttrac.Ptr->GetPointAtDistance(lineDist);
-		auto pointLeft = handsAttrac.Ptr->GetPointAtDistance(lineDist - coll.Setup.Radius);
-		auto pointRight = handsAttrac.Ptr->GetPointAtDistance(lineDist + coll.Setup.Radius);
+		auto pointCenter = handsAttrac.Ptr->GetPointAtLineDistance(lineDist);
+		auto pointLeft = handsAttrac.Ptr->GetPointAtLineDistance(lineDist - coll.Setup.Radius);
+		auto pointRight = handsAttrac.Ptr->GetPointAtLineDistance(lineDist + coll.Setup.Radius);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;

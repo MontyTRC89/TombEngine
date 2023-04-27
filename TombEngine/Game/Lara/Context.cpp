@@ -325,8 +325,8 @@ namespace TEN::Player::Context
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttractorPtr->GetPointAtDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttractorPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->AttractorPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
