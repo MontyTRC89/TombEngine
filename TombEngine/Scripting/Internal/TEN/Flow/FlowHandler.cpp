@@ -279,7 +279,7 @@ char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{
-		return "String .";
+		return "String not found.";
 	}
 	else
 	{
