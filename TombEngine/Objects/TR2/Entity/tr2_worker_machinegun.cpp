@@ -13,14 +13,32 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerMachineGunBite = BiteInfo(Vector3(0.0f, 308.0f, 32.0f), 9);
+	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3i(0, 380, 37), 9);
+
+	// TODO
+	enum WorkerMachineGunState
+	{
+
+	};
+
+	// TODO
+	enum WorkerMachineGunAnim
+	{
+
+	};
 
 	void InitializeWorkerMachineGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
 		InitializeCreature(itemNumber);
 		SetAnimation(item, 12);
+	}
+
+	static void Shoot(ItemInfo* item, CreatureInfo* creature, AI_INFO* ai, const EulerAngles& extraTorsoRot)
+	{
+		ShotLara(item, ai, WorkerMachineGunBite, extraTorsoRot.y, 30);
+		creature->MuzzleFlash[0].Bite = WorkerMachineGunBite;
+		creature->MuzzleFlash[0].Delay = 2;
 	}
 
 	void WorkerMachineGunControl(short itemNumber)
@@ -35,6 +53,9 @@ namespace TEN::Entities::Creatures::TR2
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -191,13 +212,19 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (creature->Flags)
-					creature->Flags--;
-				else
+				if (item->Animation.AnimNumber == GetAnimIndex(*item, 2))
 				{
-					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon = 1;
-					creature->Flags = 5;
+					if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+						Shoot(item, creature, &AI, extraTorsoRot);
+					else if (item->Animation.FrameNumber == GetFrameIndex(item, 6))
+						Shoot(item, creature, &AI, extraTorsoRot);
+					else if (item->Animation.FrameNumber == GetFrameIndex(item, 12))
+						Shoot(item, creature, &AI, extraTorsoRot);
+				}
+				else if (item->Animation.AnimNumber == GetAnimIndex(*item, 21) &&
+					item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				{
+					Shoot(item, creature, &AI, extraTorsoRot);
 				}
 
 				if (item->Animation.TargetState != 1 &&
@@ -215,14 +242,14 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (creature->Flags)
-					creature->Flags--;
-				else
-				{
-					ShotLara(item, &AI, WorkerMachineGunBite, extraTorsoRot.y, 30);
-					creature->FiredWeapon = 1;
-					creature->Flags = 5;
-				}
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+					Shoot(item, creature, &AI, extraTorsoRot);
+				else if (item->Animation.FrameNumber == GetFrameIndex(item, 2))
+					Shoot(item, creature, &AI, extraTorsoRot);
+				else if (item->Animation.FrameNumber == GetFrameIndex(item, 6))
+					Shoot(item, creature, &AI, extraTorsoRot);
+				else if (item->Animation.FrameNumber == GetFrameIndex(item, 12))
+					Shoot(item, creature, &AI, extraTorsoRot);
 
 				break;
 			}

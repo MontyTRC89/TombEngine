@@ -21,7 +21,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SILENCER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto SILENCER_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
-	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
+	const auto SilencerGunBite = CreatureBiteInfo(Vector3(-10, 360, 60), 10);
 
 	enum SilencerState
 	{
@@ -86,6 +86,9 @@ namespace TEN::Entities::Creatures::TR2
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -279,9 +282,11 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					extraHeadRot.y = AI.angle;
 
-				if (!creature->Flags)
+				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
 					ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE);
+					creature->MuzzleFlash[0].Bite = SilencerGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 
@@ -298,11 +303,14 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					extraHeadRot.y = AI.angle;
 
-				if (item->Animation.RequiredState == NO_STATE)
+				if (item->Animation.RequiredState == NO_STATE &&
+					(item->Animation.AnimNumber == GetAnimIndex(*item, SILENCER_ANIM_RUN_FORWARD_SHOOT_LEFT) && item->Animation.FrameNumber == GetFrameIndex(item, 1) ||
+					item->Animation.AnimNumber == GetAnimIndex(*item, SILENCER_ANIM_RUN_FORWARD_SHOOT_RIGHT) && item->Animation.FrameNumber == GetFrameIndex(item, 3)))
 				{
 					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE))
 						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
-
+					creature->MuzzleFlash[0].Bite = SilencerGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 					item->Animation.RequiredState = SILENCER_STATE_RUN_SHOOT;
 				}
 

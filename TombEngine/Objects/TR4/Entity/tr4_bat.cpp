@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 
 	constexpr auto BAT_ANGLE = ANGLE(20.0f);
 
-	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
+	const auto BatBite = CreatureBiteInfo(Vector3i(0, 16, 45), 4);
 
 	enum BatState
 	{

@@ -115,7 +115,7 @@ void ControlMissile(short fxNumber)
 		EffectNewRoom(fxNumber, pointColl.RoomNumber);
 
 	if (fx.objectNumber == ID_KNIFETHROWER_KNIFE)
-		fx.pos.Orientation.z += ANGLE(3.0f); // Update knife rotation over time.
+		fx.pos.Orientation.z += ANGLE(30.0f); // Update knife rotation over time.
 
 	switch (fx.objectNumber)
 	{

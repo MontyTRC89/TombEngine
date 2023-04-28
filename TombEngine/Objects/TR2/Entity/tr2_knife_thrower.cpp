@@ -11,6 +11,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/missile.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -24,8 +25,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	// TODO: Ranges.
 
-	const auto KnifeBiteLeft  = BiteInfo(Vector3::Zero, 5);
-	const auto KnifeBiteRight = BiteInfo(Vector3::Zero, 8);
+	const auto KnifeBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 5);
+	const auto KnifeBiteRight = CreatureBiteInfo(Vector3i::Zero, 8);
 
 	enum KnifeThrowerState
 	{
@@ -70,55 +71,23 @@ namespace TEN::Entities::Creatures::TR2
 		KTHROWER_ANIM_DEATH = 23
 	};
 
-	void KnifeControl(short fxNumber)
-	{
-		auto* fx = &EffectList[fxNumber];
-
-		if (fx->counter <= 0)
-		{
-			KillEffect(fxNumber);
-			return;
-		}
-		else
-			fx->counter--;
-
-		int speed = fx->speed * phd_cos(fx->pos.Orientation.x);
-		fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
-		fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
-		fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
-
-		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
-
-		if (fx->pos.Position.y >= probe.Position.Floor ||
-			fx->pos.Position.y <= probe.Position.Ceiling)
-		{
-			KillEffect(fxNumber);
-			return;
-		}
-
-		if (probe.RoomNumber != fx->roomNumber)
-			EffectNewRoom(fxNumber, probe.RoomNumber);
-
-		fx->pos.Orientation.z += ANGLE(30.0f);
-
-		if (ItemNearLara(fx->pos.Position, 200))
-		{
-			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
-
-			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-			fx->speed = LaraItem->Animation.Velocity.z;
-			fx->frameNumber = fx->counter = 0;
-
-			DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);
-			SoundEffect(SFX_TR2_CRUNCH2, &fx->pos);
-			KillEffect(fxNumber);
-		}
-	}
-
 	short ThrowKnife(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	{
-		short fxNumber = 0;
-		// TODO: add fx parameters
+		short fxNumber = CreateNewEffect(roomNumber);
+		if (fxNumber != NO_ITEM)
+		{
+			auto* fx = &EffectList[fxNumber];
+			fx->objectNumber = ID_KNIFETHROWER_KNIFE;
+			fx->pos.Position.x = x;
+			fx->pos.Position.y = y;
+			fx->pos.Position.z = z;
+			fx->speed = velocity;
+			fx->pos.Orientation.y = yRot;
+			fx->fallspeed = 0;
+			fx->flag2 = KNIFE_PROJECTILE_DAMAGE;
+			fx->color = Vector4::One;
+			ShootAtLara(*fx);
+		}
 		return fxNumber;
 	}
 
@@ -264,7 +233,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteLeft, 100, torso, ThrowKnife);
 					creature->Flags = 1;
 				}
 
@@ -276,7 +245,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteRight, 100, torso, ThrowKnife);
 					creature->Flags = 1;
 				}
 
@@ -288,8 +257,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
-					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteLeft, 100, torso, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteRight, 100, torso, ThrowKnife);
 					creature->Flags = 1;
 				}
 

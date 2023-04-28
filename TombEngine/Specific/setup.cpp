@@ -17,7 +17,6 @@
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
@@ -43,254 +42,6 @@ void InitializeGameFlags()
 	FlipEffect = -1;
 	FlipStatus = 0;
 	Camera.underwater = false;
-}
-
-void ObjectObjects()
-{
-	ObjectInfo* obj;
-
-	obj = &Objects[ID_CAMERA_TARGET];
-	if (obj->loaded)
-	{
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT1];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT2];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT3];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT4];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT5];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT6];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT7];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_SMASH_OBJECT8];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeSmashObject;
-		obj->collision = ObjectCollision;
-		obj->control = SmashObjectControl;
-	}
-
-	obj = &Objects[ID_CRUMBLING_FLOOR];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-	}
-
-	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
-	{
-		InitKeyHole(obj, objNum);
-	}
-
-	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
-	{
-		InitPuzzleHole(obj, objNum);
-	}
-
-	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
-	{
-		InitPuzzleDone(obj, objNum);
-	}
-	
-	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
-	{
-		InitAnimating(obj, objNum);
-	}
-
-	InitAnimating(obj, ID_LASERHEAD_BASE);
-	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
-
-	obj = &Objects[ID_TIGHT_ROPE];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeTightrope;
-		obj->collision = TightropeCollision;
-		obj->drawRoutine = nullptr;
-		
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_PARALLEL_BARS];
-	if (obj->loaded)
-	{
-		obj->collision = HorizontalBarCollision;
-	}
-
-	obj = &Objects[ID_EARTHQUAKE];
-	if (obj->loaded)
-	{
-		obj->drawRoutine = nullptr;
-	}
-
-	obj = &Objects[ID_HIGH_OBJECT2];
-	if (obj->loaded)
-	{
-		obj->drawRoutine = nullptr;
-		obj->control = HighObject2Control;
-	}
-
-	obj = &Objects[ID_LENS_FLARE];
-	if (obj->loaded)
-	{
-		//obj->drawRoutine = DrawLensFlare;
-		
-	}
-
-	obj = &Objects[ID_WATERFALLMIST];
-	if (obj->loaded)
-	{
-		obj->control = ControlWaterfallMist;
-		obj->drawRoutine = nullptr;
-	}
-
-	for (int objNum = ID_WATERFALL1; objNum <= ID_WATERFALL6; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->control = nullptr;
-		}
-	}
-
-	obj = &Objects[ID_WATERFALLSS1];
-	if (obj->loaded)
-	{
-		obj->control = nullptr;
-	}
-
-	obj = &Objects[ID_WATERFALLSS2];
-	if (obj->loaded)
-	{
-		obj->control = nullptr;
-	}
-
-	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->Initialize = InitializeShootSwitch;
-			obj->control = ControlAnimatingSlots;
-			obj->collision = ShootSwitchCollision;
-		}
-	}
-}
-
-void TrapObjects()
-{
-	ObjectInfo* obj;
-	obj = &Objects[ID_KILL_ALL_TRIGGERS];
-	if (obj->loaded)
-	{
-		obj->control = KillAllCurrentItems;
-		obj->drawRoutine = nullptr;
-		obj->HitPoints = 0;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FALLING_BLOCK];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
-		obj->floorBorder = FallingBlockFloorBorder;
-		obj->ceilingBorder = FallingBlockCeilingBorder;
-	}
-
-	obj = &Objects[ID_FALLING_BLOCK2];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
-		obj->floorBorder = FallingBlockFloorBorder;
-		obj->ceilingBorder = FallingBlockCeilingBorder;
-	}
-
-	obj = &Objects[ID_GEN_SLOT2];
-	if (obj->loaded)
-	{
-		/*obj->Initialize = InitializeGenSlot2;
-		obj->control = GenSlot2Control;
-		obj->drawRoutine = DrawGenSlot2;*/
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_PORTAL];
-	if (obj->loaded)
-	{
-		//obj->Initialize = InitializePortal;
-		//obj->control = PortalControl;        // TODO: found the control procedure !
-		obj->drawRoutine = nullptr;             // go to nullsub_44() !
-		 
-		obj->usingDrawAnimatingItem = false;
-	}
-	
-	obj = &Objects[ID_TRIGGER_TRIGGERER];
-	if (obj->loaded)
-	{
-		obj->control = ControlTriggerTriggerer;
-		obj->drawRoutine = nullptr;
-		
-		obj->usingDrawAnimatingItem = false;
-	}
-
 }
 
 void InitializeSpecialEffects()
@@ -352,7 +103,6 @@ void InitializeObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
 		obj->LotType = LotType::Basic;
-		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
@@ -365,8 +115,6 @@ void InitializeObjects()
 	InitializeTR3Objects(); // Standard TR3 objects
 	InitializeTR4Objects(); // Standard TR4 objects
 	InitializeTR5Objects(); // Standard TR5 objects
-	ObjectObjects();
-	TrapObjects();
 
 	// User defined objects
 	CustomObjects();
