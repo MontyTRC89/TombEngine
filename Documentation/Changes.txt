@@ -18,8 +18,9 @@ Version 1.0.9
 - Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
 - Add reusable keys for key holes
 	- Employed by setting the trigger type as "Switch" for key hole.
-- Allow Animation to be played by setting OCB to keyholes.
-	- +ve OCB will play the animation according to the OCB number.
+- Allow key hole Animation to be played via OCB number.
+	- Default 0 OCB will play Lara use key animation. 
+	- Any positive OCB number will play the animation according to the OCB number.
 - Add log reports if title level or other levels don't exist.
 
 Lua API changes:
