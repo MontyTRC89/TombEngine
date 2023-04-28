@@ -237,45 +237,47 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string&
 
 sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, float deltaTime)
 {
-	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call(deltaTime);
+	auto func = m_levelFuncs_luaFunctions[name];
+	auto funcResult = func.call(deltaTime);
 
-	if (!r.valid())
+	if (!funcResult.valid())
 	{
-		sol::error err = r;
+		sol::error err = funcResult;
 		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 
-	return r;
+	return funcResult;
 }
 
-sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
+sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, sol::variadic_args va)
 {
-	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call(va);
-	if (!r.valid())
+	auto func = m_levelFuncs_luaFunctions[name];
+	auto funcResult = func.call(va);
+
+	if (!funcResult.valid())
 	{
-		sol::error err = r;
+		sol::error err = funcResult;
 		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 
-	return r;
+	return funcResult;
 }
 
-sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & name)
+sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name)
 {
-	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call();
-	if (!r.valid())
+	auto func = m_levelFuncs_luaFunctions[name];
+	auto funcResult = func.call();
+
+	if (!funcResult.valid())
 	{
-		sol::error err = r;
+		sol::error err = funcResult;
 		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 
-	return r;
+	return funcResult;
 }
 
-bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value)
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value)
 {
 	if (sol::type::lua_nil == value.get_type())
 	{
@@ -344,10 +346,8 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
 
-	for (auto & [first, second] : m_callbacks)
-	{
+	for (auto& [first, second] : m_callbacks)
 		second->clear();
-	}
 
 	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
 	auto currentLoaded = currentPackage.get<sol::table>("loaded");
@@ -702,9 +702,9 @@ void LogicHandler::GetCallbackStrings(
 	std::vector<std::string>& preControl,
 	std::vector<std::string>& postControl) const
 {
-	auto populateWith = [](std::vector<std::string>& dest, std::unordered_set<std::string> const & src)
+	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
 	{
-		for (auto const& s : src)
+		for (const auto& s : src)
 			dest.push_back(s);
 	};
 
@@ -724,23 +724,22 @@ void LogicHandler::GetCallbackStrings(
 	populateWith(postControl, m_callbacksPostControl);
 }
 
-
 void LogicHandler::SetCallbackStrings(	
-	std::vector<std::string> const& preStart,
-	std::vector<std::string> const& postStart,
-	std::vector<std::string> const& preEnd,
-	std::vector<std::string> const& postEnd,
-	std::vector<std::string> const& preSave,
-	std::vector<std::string> const& postSave,
-	std::vector<std::string> const& preLoad,
-	std::vector<std::string> const& postLoad,
-	std::vector<std::string> const& preControl,
-	std::vector<std::string> const& postControl)
+	const std::vector<std::string>& preStart,
+	const std::vector<std::string>& postStart,
+	const std::vector<std::string>& preEnd,
+	const std::vector<std::string>& postEnd,
+	const std::vector<std::string>& preSave,
+	const std::vector<std::string>& postSave,
+	const std::vector<std::string>& preLoad,
+	const std::vector<std::string>& postLoad,
+	const std::vector<std::string>& preControl,
+	const std::vector<std::string>& postControl)
 {
-	auto populateWith = [](std::unordered_set<std::string>& dest, std::vector<std::string> const & src)
+	auto populateWith = [](std::unordered_set<std::string>& dest, const std::vector<std::string>& src)
 	{
-		for (auto const& s : src)
-			dest.insert(s);
+		for (const auto& string : src)
+			dest.insert(string);
 	};
 
 	populateWith(m_callbacksPreStart, preStart);
@@ -760,7 +759,7 @@ void LogicHandler::SetCallbackStrings(
 }
 
 template <typename R, char const * S, typename mapType>
-std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
+std::unique_ptr<R> GetByName(const std::string& type, const std::string& name, const mapType& map)
 {
 	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ErrorMode::Terminate);
 	return std::make_unique<R>(map.at(name), false);
@@ -874,12 +873,16 @@ void LogicHandler::OnLoad()
 
 void LogicHandler::TryCall(std::string const& name, std::optional<float> deltaTime)
 {
-	auto func = m_handler.GetState()->script("return " + name);
+	auto funcResult = m_handler.GetState()->script("return " + name);
 
-	if (!func.valid())
+	if (!funcResult.valid())
+	{
 		ScriptAssertF(false, "Callback {} not valid", name);
+	}
 	else 
-		func.get<LevelFunc>().CallCallback(deltaTime);
+	{
+		funcResult.get<LevelFunc>().CallCallback(deltaTime);
+	}
 }
 
 void LogicHandler::OnControlPhase(float deltaTime)
@@ -1025,16 +1028,16 @@ and provides the delta time (a float representing game time since last call) via
 
 void LogicHandler::InitCallbacks()
 {
-	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
+	auto assignCB = [this](sol::protected_function& func, const std::string& luaFunc)
+	{
 		auto state = m_handler.GetState();
 		std::string fullName = std::string{ ScriptReserved_LevelFuncs } + "." + luaFunc;
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName
-			+ ". Defaulting to no " + fullName + " behaviour."};
+		std::string msg{ "Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour." };
 
-		if(!theData.valid())
+		if (!theData.valid())
 		{
 			TENLog(msg);
 			return;
@@ -1044,9 +1047,8 @@ void LogicHandler::InitCallbacks()
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
-		if (!func.valid()) {
+		if (!func.valid())
 			TENLog(msg);
-		}
 	};
 
 	assignCB(m_onStart, ScriptReserved_OnStart);

@@ -1169,11 +1169,13 @@ bool SaveGame::Save(int slot)
 				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
 			}
 			break;
+
 			case SavedVarType::Rotation:
 			{
 				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
 			}
 			break;
+
 			case SavedVarType::Color:
 			{
 				Save::colorTableBuilder ctb{ fbb };
@@ -1183,6 +1185,7 @@ bool SaveGame::Save(int slot)
 				putDataInVec(Save::VarUnion::color, offset);
 			}
 			break;
+
 			}
 		}
 	}
@@ -1191,20 +1194,20 @@ bool SaveGame::Save(int slot)
 	uvb.add_members(unionVec);
 	auto unionVecOffset = uvb.Finish();
 
-	std::vector<std::string> callbackVecPreStart;
-	std::vector<std::string> callbackVecPostStart;
+	std::vector<std::string> callbackVecPreStart = {};
+	std::vector<std::string> callbackVecPostStart = {};
 
-	std::vector<std::string> callbackVecPreEnd;
-	std::vector<std::string> callbackVecPostEnd;
+	std::vector<std::string> callbackVecPreEnd = {};
+	std::vector<std::string> callbackVecPostEnd = {};
 
-	std::vector<std::string> callbackVecPreSave;
-	std::vector<std::string> callbackVecPostSave;
+	std::vector<std::string> callbackVecPreSave = {};
+	std::vector<std::string> callbackVecPostSave = {};
 
-	std::vector<std::string> callbackVecPreLoad;
-	std::vector<std::string> callbackVecPostLoad;
+	std::vector<std::string> callbackVecPreLoad = {};
+	std::vector<std::string> callbackVecPostLoad = {};
 
-	std::vector<std::string> callbackVecPreControl;
-	std::vector<std::string> callbackVecPostControl;
+	std::vector<std::string> callbackVecPreControl = {};
+	std::vector<std::string> callbackVecPostControl = {};
 
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
@@ -1216,8 +1219,7 @@ bool SaveGame::Save(int slot)
 		callbackVecPreLoad,
 		callbackVecPostLoad,
 		callbackVecPreControl,
-		callbackVecPostControl
-	);
+		callbackVecPostControl);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -2036,7 +2038,7 @@ bool SaveGame::Load(int slot)
 	auto theVec = s->script_vars();
 	if (theVec)
 	{
-		for (auto const& var : *(theVec->members()))
+		for (const auto& var : *(theVec->members()))
 		{
 			if (var->u_type() == Save::VarUnion::num)
 			{
@@ -2055,10 +2057,8 @@ bool SaveGame::Load(int slot)
 				auto tab = var->u_as_tab()->keys_vals();
 				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
 
-				for (auto const& p : *tab)
-				{
+				for (const auto& p : *tab)
 					std::get<IndexTable>(loadedTab).push_back(std::make_pair(p->key(), p->val()));
-				}
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
@@ -2082,7 +2082,6 @@ bool SaveGame::Load(int slot)
 			{
 				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
 			}
-
 		}
 	}
 
@@ -2090,9 +2089,10 @@ bool SaveGame::Load(int slot)
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
-		std::vector<std::string> callbacksVec;
+		auto callbacksVec = std::vector<std::string>{};
 		auto callbacksOffsetVec = std::invoke(callbackFunc, s);
-		for (auto const& e : *callbacksOffsetVec)
+
+		for (const auto& e : *callbacksOffsetVec)
 			callbacksVec.push_back(e->str());
 
 		return callbacksVec;
@@ -2123,8 +2123,7 @@ bool SaveGame::Load(int slot)
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
 		callbacksPreControlVec,
-		callbacksPostControlVec
-	);
+		callbacksPostControlVec);
 
 	return true;
 }

@@ -82,16 +82,16 @@ public:
 		std::vector<std::string>& postControl) const = 0;
 
 	virtual void SetCallbackStrings(
-		std::vector<std::string> const & preStart,
-		std::vector<std::string> const & postStart,
-		std::vector<std::string> const & preEnd,
-		std::vector<std::string> const & postEnd,
-		std::vector<std::string> const & preSave,
-		std::vector<std::string> const & postSave,
-		std::vector<std::string> const & preLoad,
-		std::vector<std::string> const & postLoad,
-		std::vector<std::string> const & preControl,
-		std::vector<std::string> const & postControl) = 0;
+		const std::vector<std::string>& preStart,
+		const std::vector<std::string>& postStart,
+		const std::vector<std::string>& preEnd,
+		const std::vector<std::string>& postEnd,
+		const std::vector<std::string>& preSave,
+		const std::vector<std::string>& postSave,
+		const std::vector<std::string>& preLoad,
+		const std::vector<std::string>& postLoad,
+		const std::vector<std::string>& preControl,
+		const std::vector<std::string>& postControl) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;
