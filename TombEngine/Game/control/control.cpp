@@ -271,7 +271,6 @@ unsigned CALLBACK GameMain(void *)
 	else
 		g_Renderer.RenderTitleImage();
 
-
 	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
 
