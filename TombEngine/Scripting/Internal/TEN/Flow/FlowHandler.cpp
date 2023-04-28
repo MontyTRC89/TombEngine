@@ -264,19 +264,27 @@ void FlowHandler::LoadFlowScript()
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
-	//Check if there is the title in Gameflow.lua
-	if (Levels.size() == 0)
-		throw TENScriptException("No title and levels found. Please check Gameflow.lua file integrity.");
+	// Check if levels exist in Gameflow.lua.
+	if (Levels.empty())
+	{
+		throw TENScriptException("No levels found. Check Gameflow.lua file integrity.");
+	}
 	else
-		TENLog("Number Levels: " + std::to_string(Levels.size()) , LogLevel::Info);
+	{
+		TENLog("Level count: " + std::to_string(Levels.size()), LogLevel::Info);
+	}
 }
 
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	{
 		return "String not found.";
+	}
 	else
+	{
 		return m_translationsMap.at(string(id)).at(0).c_str();
+	}
 }
 
 Settings* FlowHandler::GetSettings()
