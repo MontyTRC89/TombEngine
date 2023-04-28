@@ -279,7 +279,7 @@ char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{
-		return "String not found.";
+		return "String .";
 	}
 	else
 	{
@@ -418,10 +418,10 @@ bool FlowHandler::DoFlow()
 
 	while (DoTheGame)
 	{
-		// Check if called level exists in a script
+		// Check if called level exists in script.
 		if (CurrentLevel >= Levels.size())
 		{
-			TENLog("Level not found. Please check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
+			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
 			CurrentLevel = 0;
 		}
 		
