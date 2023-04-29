@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			(laraItem->Status || laraItem->Animation.IsAirborne) &&
 			laraItem->Animation.Velocity.y > 0 &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
-			switchItem->Animation.ActiveState == SWITCH_OFF)
+			switchItem->Animation.ActiveState != SWITCH_OFF)
 		{
 			if (TestLaraPosition(JumpSwitchBounds, switchItem, laraItem))
 			{
