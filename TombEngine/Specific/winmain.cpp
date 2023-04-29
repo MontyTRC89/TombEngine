@@ -402,30 +402,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	else
 		WindowsHandle = App.WindowHandle;
 
-	// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	try
+	{
+		// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-	// Initialize the renderer
-	g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
+		// Initialize the renderer
+		g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
-	// Initialize audio
-	Sound_Init();
+		// Initialize audio
+		Sound_Init();
 
-	// Initialize input
-	InitializeInput(App.WindowHandle);
+		// Initialize input
+		InitializeInput(App.WindowHandle);
 
-	// Load level if specified in command line
-	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
-	
-	App.bNoFocus = false;
-	App.isInScene = false;
+		// Load level if specified in command line
+		CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 
-	UpdateWindow(WindowsHandle);
-	ShowWindow(WindowsHandle, nShowCmd);
+		App.bNoFocus = false;
+		App.isInScene = false;
 
-	SetCursor(NULL);
-	ShowCursor(FALSE);
-	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
+		UpdateWindow(WindowsHandle);
+		ShowWindow(WindowsHandle, nShowCmd);
+
+		SetCursor(NULL);
+		ShowCursor(FALSE);
+		hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error during game initialization: " + std::string(ex.what()), LogLevel::Error);
+		WinClose();
+		exit(EXIT_FAILURE);
+	}
 
 	DoTheGame = true;
 
