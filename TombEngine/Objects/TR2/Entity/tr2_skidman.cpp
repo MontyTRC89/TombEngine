@@ -216,7 +216,7 @@ namespace TEN::Entities::Creatures::TR2
 				
 				ShotLara(skidoo, &AI, SkidooBiteLeft, 0, damage);
 				auto jointPos = GetJointPosition(skidoo, SkidooBiteSmokeLeft);
-				TriggerGunSmokeParticles(jointPos.x, jointPos.y, jointPos.z, 0, 0, 0, 1, LaraWeaponType::Snowmobile, 16, skidoo->RoomNumber);
+				SpawnGunSmokeParticles(jointPos.ToVector3(), Vector3::Zero, skidoo->RoomNumber, 1, LaraWeaponType::Snowmobile, 16);
 				creatureInfo->MuzzleFlash[0].Bite = SkidooBiteLeft;
 				creatureInfo->MuzzleFlash[0].Delay = 1;
 				creatureInfo->MuzzleFlash[0].SwitchToMuzzle2 = true;
@@ -225,7 +225,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				ShotLara(skidoo, &AI, SkidooBiteRight, 0, damage);
 				jointPos = GetJointPosition(skidoo, SkidooBiteSmokeRight);
-				TriggerGunSmokeParticles(jointPos.x, jointPos.y, jointPos.z, 0, 0, 0, 1, LaraWeaponType::Snowmobile, 16, skidoo->RoomNumber);
+				SpawnGunSmokeParticles(jointPos.ToVector3(), Vector3::Zero, skidoo->RoomNumber, 1, LaraWeaponType::Snowmobile, 16);
 				creatureInfo->MuzzleFlash[1].Bite = SkidooBiteRight;
 				creatureInfo->MuzzleFlash[1].Delay = 1;
 				creatureInfo->MuzzleFlash[1].SwitchToMuzzle2 = true;

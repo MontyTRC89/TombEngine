@@ -2,10 +2,10 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 
+struct CreatureBiteInfo;
 struct CreatureInfo;
 struct ItemInfo;
 struct LOTInfo;
-struct CreatureBiteInfo;
 
 enum class JumpDistance
 {
@@ -111,7 +111,7 @@ void InitializeCreature(short itemNumber);
 bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
-bool CreatureAnimation(short itemNumber, short angle, short tilt);
+bool CreatureAnimation(short itemNumber, short headingAngle, short tiltAngle);
 void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction);
 void InitializeItemBoxData();
