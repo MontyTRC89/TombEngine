@@ -34,15 +34,9 @@ constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
-constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
-constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
-
 constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
 	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
-
-constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
-constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
 
 struct OLD_CAMERA
 {
@@ -94,58 +88,7 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
-void DoLookAround(ItemInfo& item, bool invertVerticalAxis)
-{
-	auto& player = GetLaraInfo(item);
-
-	Camera.type = CameraType::Look;
-
-	// Determine vertical axis coefficient.
-	float vAxisCoeff = 0.0f;
-	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Vertical || player.Control.Look.Mode == LookMode::Free))
-	{
-		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
-	}
-
-	// Determine horizontal axis coefficient.
-	float hAxisCoeff = 0.0f;
-	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Horizontal || player.Control.Look.Mode == LookMode::Free))
-	{
-		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	}
-
-	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
-	if (BinocularRange)
-		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
-
-	// Modulate turn rates.
-	player.Control.Look.TurnRate = EulerAngles(
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis),
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false),
-		0);
-
-	// Apply turn rates.
-	player.Control.Look.Orientation += player.Control.Look.TurnRate;
-	player.Control.Look.Orientation = EulerAngles(
-		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
-		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
-		0);
-
-	// Visually adapt head and torso orientations.
-	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
-	if (player.Control.HandStatus != HandStatus::Busy &&
-		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Context.Vehicle == NO_ITEM)
-	{
-		player.ExtraTorsoRot = player.ExtraHeadRot;
-	}
-
-	ClearLookAroundActions(item);
-}
-
-void ClearLookAroundActions(const ItemInfo& item)
+static void ClearLookAroundActions(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
@@ -174,31 +117,89 @@ void ClearLookAroundActions(const ItemInfo& item)
 	}
 }
 
+void DoLookAround(ItemInfo& item, bool invertXAxis)
+{
+	constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
+	constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
+
+	auto& player = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
+	auto axisCoeff = Vector2::Zero;
+
+	// Determine X axis coefficient.
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	{
+		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+	}
+
+	// Determine Y axis coefficient.
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+	{
+		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+	}
+
+	// Define turn rate.
+	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
+	if (BinocularRange)
+		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
+
+	// Modulate turn rates.
+	player.Control.Look.TurnRate = EulerAngles(
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.x, invertXAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.y, false),
+		0);
+
+	// Apply turn rates.
+	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	player.Control.Look.Orientation = EulerAngles(
+		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
+		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
+		0);
+
+	// Visually adapt head and torso orientations.
+	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
+	if (player.Control.HandStatus != HandStatus::Busy &&
+		!player.LeftArm.Locked && !player.RightArm.Locked &&
+		player.Context.Vehicle == NO_ITEM)
+	{
+		player.ExtraTorsoRot = player.ExtraHeadRot;
+	}
+
+	ClearLookAroundActions(item);
+}
+
 void DoThumbstickCamera()
 {
+	constexpr auto VERTICAL_CONSTRAINT_ANGLE   = ANGLE(120.0f);
+	constexpr auto HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
+
 	if (!g_Configuration.EnableThumbstickCameraControl)
 		return;
 
-	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
-		Camera.target.y == OldCam.target.y &&
-		Camera.target.z == OldCam.target.z))
+	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
 	{
-		float xAxisCoeff = AxisMap[InputAxis::CameraHorizontal];
-		float yAxisCoeff = AxisMap[InputAxis::CameraVertical];
+		auto axisCoeff = Vector2(
+			AxisMap[InputAxis::CameraHorizontal],
+			AxisMap[InputAxis::CameraVertical]);
 
-		Camera.targetAngle = THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * xAxisCoeff;
-		Camera.targetElevation = ANGLE(-10.0f) + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * xAxisCoeff);
+		Camera.targetAngle = VERTICAL_CONSTRAINT_ANGLE * axisCoeff.y;
+		Camera.targetElevation = ANGLE(-10.0f) + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.x);
 	}
 }
 
 static float GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
-	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.5f); // TODO
+	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
 	constexpr auto VERTICAL_OFFSET_MONKEY_SWING	  = BLOCK(0.25f);
 	constexpr auto VERTICAL_OFFSET_TREADING_WATER = BLOCK(0.5f);
 
 	const auto& player = GetLaraInfo(item);
+
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
 
 	float verticalOffset = -coll.Setup.Height;
 	if (player.Control.IsMonkeySwinging)
@@ -208,6 +209,10 @@ static float GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionIn
 	else if (player.Control.WaterStatus == WaterStatus::TreadWater)
 	{
 		verticalOffset += VERTICAL_OFFSET_TREADING_WATER;
+	}
+	else if (isInSwamp)
+	{
+		verticalOffset = -VERTICAL_OFFSET_SWAMP;
 	}
 	else
 	{
@@ -221,16 +226,13 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// TODO:
-	// - Set modes in remaining states.
-
 	constexpr auto POS_LERP_ALPHA = 0.25f;
 	constexpr auto COLL_PUSH	  = BLOCK(0.25f) - BLOCK(1 / 16.0f);
 
-	// Calculate key offsets.
 	float verticalOffset = GetLookCameraVerticalOffset(item, coll);
 	auto pivotPosOffset = Vector3(0.0f, verticalOffset, 0.0f);
-	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(3.0f / 4));
+
+	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
 	float lookAtPosDist = BLOCK(0.5f);
 
 	// Define absolute camera orientation.
@@ -239,8 +241,15 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 		EulerAngles(0, Camera.targetAngle, 0);
 	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
+	// TODO: Goes to the centre in swamps for some reason.
+	// Determine base position.
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
+	auto basePos = isInSwamp ?
+		Vector3i(item.Pose.Position.x, g_Level.Rooms[item.RoomNumber].maxceiling, item.Pose.Position.z) :
+		item.Pose.Position;
+
 	// Define landmarks.
-	auto pivotPos = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, pivotPosOffset.z, pivotPosOffset.y, pivotPosOffset.x); // TODO: Use overload from ladder branch.
+	auto pivotPos = Geometry::TranslatePoint(basePos, item.Pose.Orientation.y, pivotPosOffset);
 	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealPosDist);
 	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, lookAtPosDist);
 
@@ -252,9 +261,6 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	LOSAndReturnTarget(&origin, &target, 0);
 	CameraCollisionBounds(&target, COLL_PUSH, true);
 	ItemsCollideCamera();
-
-	// Doesn't seem necessary? Can use player's room number.
-	//auto lookAt = GameVector(lookAtPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, BLOCK(3, 8)).RoomNumber);
 
 	// Smoothly update camera position.
 	MoveCamera(&target, Camera.speed);
