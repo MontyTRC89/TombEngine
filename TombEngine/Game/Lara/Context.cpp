@@ -250,6 +250,7 @@ namespace TEN::Player::Context
 			if (!attracColl.IsIntersected || !attracColl.IsInFront)
 				continue;
 
+			// TODO: Accuracy.
 			// 3) Test if target point is attractor end.
 			if (!hasEnd &&
 				(attracColl.Proximity.LineDistance <= EPSILON ||
@@ -283,8 +284,7 @@ namespace TEN::Player::Context
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int edgeHeight = attracColl.Proximity.Point.y;
-			int relEdgeHeight = edgeHeight - vPos;
+			int relEdgeHeight = attracColl.Proximity.Point.y - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
@@ -351,7 +351,7 @@ namespace TEN::Player::Context
 		if (!player.Control.CanClimbLadder)
 			return std::nullopt;
 
-		// 2) Test for valid ledge at climbable wall.
+		// 2) Test for valid ledge on climbable wall.
 		if (!TestValidLedge(&item, &coll, true))
 			return std::nullopt;
 
@@ -375,7 +375,7 @@ namespace TEN::Player::Context
 		float probeHeight = -(coll.Setup.Height + abs(item.Animation.Velocity.y));
 		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
-		// 5) Test if edge is on a wall.
+		// 5) Test if edge is on wall.
 		if (edgeHeight < pointCollFront.Position.Floor && // Edge is above floor.
 			edgeHeight > pointCollFront.Position.Ceiling) // Edge is below ceiling.
 		{

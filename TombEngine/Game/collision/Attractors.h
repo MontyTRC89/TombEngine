@@ -75,7 +75,7 @@ namespace TEN::Collision::Attractors
 		void DrawDebug() const;
 
 	private:
-		float GetNormalizedLineDistance(float lineDist) const;
+		float NormalizeLineDistance(float lineDist) const;
 		bool  IsLooped() const;
 	};
 

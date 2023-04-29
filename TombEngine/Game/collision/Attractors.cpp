@@ -134,7 +134,7 @@ namespace TEN::Collision::Attractors
 			return Points.front();
 
 		// Wrap line distance and clamp point according to length.
-		lineDist = GetNormalizedLineDistance(lineDist);
+		lineDist = NormalizeLineDistance(lineDist);
 		if (lineDist <= 0.0f)
 		{
 			return Points.front();
@@ -165,6 +165,7 @@ namespace TEN::Collision::Attractors
 			lineDistTravelled += segmentLength;
 		}
 
+		// FAILSAFE: Return end point.
 		return Points.back();
 	}
 
@@ -175,7 +176,7 @@ namespace TEN::Collision::Attractors
 			return 0;
 
 		// Wrap distance along attractor and clamp point according to length.
-		lineDist = GetNormalizedLineDistance(lineDist);
+		lineDist = NormalizeLineDistance(lineDist);
 		if (lineDist <= 0.0f)
 		{
 			return 0;
@@ -254,25 +255,29 @@ namespace TEN::Collision::Attractors
 		{
 			for (int i = 0; i < (Points.size() - 1); i++)
 			{
-				auto orient = Geometry::GetOrientToPoint(Points[i], Points[i + 1]);
+				const auto& origin = Points[i];
+				const auto& target = Points[i + 1];
+
+				// Draw main line.
+				g_Renderer.AddLine3D(origin, target, COLOR_YELLOW);
+
+				auto orient = Geometry::GetOrientToPoint(origin, target);
 				orient.y += ANGLE(90.0f);
 				auto direction = orient.ToDirection();
 
-				auto labelPos = ((Points[i] + Points[i + 1]) / 2) + LABEL_OFFSET;
+				// Draw indicator lines.
+				g_Renderer.AddLine3D(origin, Points[i] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(target, target + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+
+				auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
 				auto labelPos2D = g_Renderer.GetScreenSpacePosition(labelPos);
 
-				// Draw main line.
-				g_Renderer.AddLine3D(Points[i], Points[i + 1], COLOR_YELLOW);
-
-				// Draw indicator lines.
-				g_Renderer.AddLine3D(Points[i], Points[i] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(Points[i + 1], Points[i + 1] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(Points.front(), Points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(Points.back(), Points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-
 				// Draw label.
-				g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
+				g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
 			}
+
+			g_Renderer.AddLine3D(Points.front(), Points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddLine3D(Points.back(), Points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 		}
 		else if (Points.size() == 1)
 		{
@@ -280,11 +285,11 @@ namespace TEN::Collision::Attractors
 
 			// Draw sphere and label.
 			g_Renderer.AddSphere(Points.front(), SPHERE_SCALE, COLOR_YELLOW);
-			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0);
+			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
 		}
 	}
 
-	float Attractor::GetNormalizedLineDistance(float lineDist) const
+	float Attractor::NormalizeLineDistance(float lineDist) const
 	{
 		// Line distance is within bounds; return unmodified line distance.
 		if (lineDist >= 0.0f || lineDist <= Length)
