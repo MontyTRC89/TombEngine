@@ -231,6 +231,11 @@ namespace TEN::Entities::Vehicles
 		// GianC.- Obsolete,  flag is now set inside FireHarpoon
 		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230)));
 		FireHarpoon(*laraItem, &harpoonPose);
+
+		if (UPV->Flags & UPV_FLAG_SURFACE)
+		SoundEffect(SFX_TR4_HARPOON_FIRE_DRY, &harpoonPose, SoundEnvironment::Always);
+		
+		else
 		SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &harpoonPose, SoundEnvironment::Always);
 
 		//harpoon->ItemFlags[0] = 1;
