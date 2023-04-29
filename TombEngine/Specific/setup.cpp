@@ -119,14 +119,6 @@ void ObjectObjects()
 		obj->control = SmashObjectControl;
 	}
 
-	obj = &Objects[ID_CRUMBLING_FLOOR];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-	}
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -213,17 +205,6 @@ void ObjectObjects()
 	{
 		obj->control = nullptr;
 	}
-
-	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->Initialize = InitializeShootSwitch;
-			obj->control = ControlAnimatingSlots;
-			obj->collision = ShootSwitchCollision;
-		}
-	}
 }
 
 void TrapObjects()
@@ -237,30 +218,6 @@ void TrapObjects()
 		obj->drawRoutine = nullptr;
 		obj->HitPoints = 0;
 		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FALLING_BLOCK];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
-		obj->floorBorder = FallingBlockFloorBorder;
-		obj->ceilingBorder = FallingBlockCeilingBorder;
-	}
-
-	obj = &Objects[ID_FALLING_BLOCK2];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeFallingBlock;
-		obj->collision = FallingBlockCollision;
-		obj->control = FallingBlockControl;
-		obj->floor = FallingBlockFloor;
-		obj->ceiling = FallingBlockCeiling;
-		obj->floorBorder = FallingBlockFloorBorder;
-		obj->ceilingBorder = FallingBlockCeilingBorder;
 	}
 
 	obj = &Objects[ID_GEN_SLOT2];

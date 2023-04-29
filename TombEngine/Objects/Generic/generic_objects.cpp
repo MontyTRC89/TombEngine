@@ -23,6 +23,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/turn_switch.h"
 #include "Objects/Generic/Switches/AirlockSwitch.h"
+#include "Objects/Generic/Switches/switch.h"
 
 // Doors
 #include "Objects/Generic/Doors/generic_doors.h"
@@ -34,6 +35,7 @@
 
 // Traps
 #include "Objects/Generic/Traps/dart_emitter.h"
+#include "Objects/Generic/Traps/falling_block.h"
 
 /// Necessary import
 #include "Specific/setup.h"
@@ -256,6 +258,17 @@ void StartSwitches(ObjectInfo* object)
 		object->control = FullBlockSwitchControl;
 		object->SetupHitEffect(true);
 	}
+
+	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
+	{
+		object = &Objects[objNum];
+		if (object->loaded)
+		{
+			object->Initialize = InitializeShootSwitch;
+			object->control = ControlAnimatingSlots;
+			object->collision = ShootSwitchCollision;
+		}
+	}
 }
 
 void StartDoors(ObjectInfo* object)
@@ -392,6 +405,38 @@ void StartTraps(ObjectInfo* object)
 		object->collision = PickupCollision;
 		object->usingDrawAnimatingItem = true;
 		object->isPickup = true;
+	}
+
+	object = &Objects[ID_FALLING_BLOCK];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
+		object->floor = FallingBlockFloor;
+		object->ceiling = FallingBlockCeiling;
+		object->floorBorder = FallingBlockFloorBorder;
+		object->ceilingBorder = FallingBlockCeilingBorder;
+	}
+
+	object = &Objects[ID_FALLING_BLOCK2];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
+		object->floor = FallingBlockFloor;
+		object->ceiling = FallingBlockCeiling;
+		object->floorBorder = FallingBlockFloorBorder;
+		object->ceilingBorder = FallingBlockCeilingBorder;
+	}
+
+	object = &Objects[ID_CRUMBLING_FLOOR];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
 	}
 }
 
