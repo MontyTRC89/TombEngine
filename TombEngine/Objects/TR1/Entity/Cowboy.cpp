@@ -51,7 +51,7 @@ namespace TEN::Entities::Creatures::TR1
 		COWBOY_ANIM_IDLE
 	};
 
-	void InitialiseCowboy(short itemNumber)
+	void InitializeCowboy(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
