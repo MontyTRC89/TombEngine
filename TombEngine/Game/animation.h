@@ -8,9 +8,9 @@ enum GAME_OBJECT_ID : short;
 class EulerAngles;
 class Pose;
 class Vector3i;
+struct CreatureBiteInfo;
 struct ItemInfo;
 struct ObjectInfo;
-struct CreatureBiteInfo;
 
 // NOTES:
 // animNumber: Relative animation number.

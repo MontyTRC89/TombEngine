@@ -18,8 +18,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto COWBOY_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto COWBOY_RUN_TURN_RATE_MAX	 = ANGLE(6.0f);
 
-	const auto CowboyGunLeft  = BiteInfo(Vector3(1.0f, 200.0f, 40.0f), 5);
-	const auto CowboyGunRight = BiteInfo(Vector3(-1.0f, 200.0f, 40.0f), 8);
+	const auto CowboyGunLeft  = CreatureBiteInfo(Vector3(1.0f, 200.0f, 40.0f), 5);
+	const auto CowboyGunRight = CreatureBiteInfo(Vector3(-1.0f, 200.0f, 40.0f), 8);
 
 	enum CowboyState
 	{
