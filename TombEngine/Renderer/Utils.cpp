@@ -1,12 +1,14 @@
 #include "framework.h"
-#include "Utils.h"
-#include <winerror.h>
-#include <iostream>
-#include <wrl/client.h>
-#include <d3dcompiler.h>
 
-#include <locale>
 #include <codecvt>
+#include <d3dcompiler.h>
+#include <locale>
+#include <iostream>
+#include <winerror.h>
+#include <wrl/client.h>
+
+#include "Renderer/Utils.h"
+#include "Specific/trutils.h"
 
 namespace TEN::Renderer::Utils
 {
@@ -59,7 +61,10 @@ namespace TEN::Renderer::Utils
 				throw std::runtime_error(error);
 			} 
 			else
+			{
+				TENLog("Error while compiling shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Error);
 				throwIfFailed(res);
+			}
 		}
 
 		ComPtr<ID3D11VertexShader> shader;
