@@ -209,7 +209,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			return 1;
 		}
 	}
-	else if (item.Status != 0)
+	else if (item.Status != ITEM_NOT_ACTIVE)
 	{
 		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
 			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&
