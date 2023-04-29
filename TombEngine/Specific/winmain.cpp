@@ -397,7 +397,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!App.WindowHandle)
 	{
 		TENLog("Unable To Create Window. Error: " + std::to_string(GetLastError()), LogLevel::Error);
-		return false;
+		return 0;
 	}
 	else
 		WindowsHandle = App.WindowHandle;
