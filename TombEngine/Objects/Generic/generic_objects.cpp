@@ -3,10 +3,11 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Utils/object_helper.h"
 
-#include "Game/pickup/pickup.h"
+// Necessary import
 #include "Game/collision/collide_item.h"
-
 #include "Game/effects/effects.h"
+#include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 
 // Objects
 #include "Objects/Generic/Object/generic_trapdoor.h"
@@ -40,13 +41,10 @@
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Objects/Generic/Traps/falling_block.h"
 
-/// Necessary import
-#include "Game/Setup.h"
-
-using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
-using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Traps;
 
 static void StartObject(ObjectInfo* object)
 {
@@ -262,9 +260,9 @@ void StartSwitches(ObjectInfo* object)
 		object->SetupHitEffect(true);
 	}
 
-	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
+	for (int objectID = ID_SHOOT_SWITCH1; objectID <= ID_SHOOT_SWITCH4; objectID++)
 	{
-		object = &Objects[objNum];
+		object = &Objects[objectID];
 		if (object->loaded)
 		{
 			object->Initialize = InitializeShootSwitch;
@@ -273,20 +271,14 @@ void StartSwitches(ObjectInfo* object)
 		}
 	}
 
-	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
-	{
-		InitKeyHole(object, objNum);
-	}
+	for (int objectID = ID_KEY_HOLE1; objectID <= ID_KEY_HOLE16; objectID++)
+		InitKeyHole(object, objectID);
 
-	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
-	{
-		InitPuzzleHole(object, objNum);
-	}
+	for (int objectID = ID_PUZZLE_HOLE1; objectID <= ID_PUZZLE_HOLE16; objectID++)
+		InitPuzzleHole(object, objectID);
 
-	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
-	{
-		InitPuzzleDone(object, objNum);
-	}
+	for (int objectID = ID_PUZZLE_DONE1; objectID <= ID_PUZZLE_DONE16; objectID++)
+		InitPuzzleDone(object, objectID);
 }
 
 void StartDoors(ObjectInfo* object)
@@ -459,9 +451,7 @@ void StartTraps(ObjectInfo* object)
 
 	object = &Objects[ID_PARALLEL_BARS];
 	if (object->loaded)
-	{
 		object->collision = HorizontalBarCollision;
-	}
 }
 
 void StartServiceObjects(ObjectInfo* object)
@@ -485,9 +475,7 @@ void StartServiceObjects(ObjectInfo* object)
 
 	object = &Objects[ID_EARTHQUAKE];
 	if (object->loaded)
-	{
 		object->drawRoutine = nullptr;
-	}
 
 	object = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (object->loaded)
@@ -514,10 +502,8 @@ void StartServiceObjects(ObjectInfo* object)
 		object->drawRoutine = nullptr;
 	}
 
-	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
-	{
-		InitAnimating(object, objNum);
-	}
+	for (int objectID = ID_ANIMATING1; objectID <= ID_ANIMATING128; objectID++)
+		InitAnimating(object, objectID);
 }
 
 void InitializeGenericObjects()

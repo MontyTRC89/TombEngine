@@ -7,8 +7,8 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
-#include "Specific/level.h"
 #include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 

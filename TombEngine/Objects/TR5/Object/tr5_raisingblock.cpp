@@ -3,10 +3,10 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
-#include "Game/control/control.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
 #include "Objects/objectslist.h"

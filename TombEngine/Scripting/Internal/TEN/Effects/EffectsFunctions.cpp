@@ -21,7 +21,6 @@
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
-#include "Specific/clock.h"
 
 /***
 Functions to generate effects.

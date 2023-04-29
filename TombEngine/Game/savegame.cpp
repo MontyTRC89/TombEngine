@@ -27,21 +27,21 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 
+using namespace flatbuffers;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Entities::Generic;
-using namespace TEN::Collision::Floordata;
-using namespace flatbuffers;
 
 namespace Save = TEN::Save;
 

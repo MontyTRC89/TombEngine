@@ -44,26 +44,26 @@
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "Objects/TR5/Object/tr5_twoblockplatform.h"
-#include "Objects/TR5/Object/tr5_raisingblock.h"
-#include "Objects/TR5/Object/tr5_expandingplatform.h"
 #include "Objects/TR5/Object/tr5_bodypart.h"
-#include "Objects/TR5/Object/tr5_teleporter.h"
+#include "Objects/TR5/Object/tr5_expandingplatform.h"
+#include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_genslot.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
+#include "Objects/TR5/Object/tr5_teleporter.h"
+#include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
-#include "Objects/TR5/Trap/tr5_ventilator.h"
-#include "Objects/TR5/Trap/tr5_zip_line.h"
-#include "Objects/TR5/Trap/tr5_romehammer.h"
-#include "Objects/TR5/Trap/tr5_fallingceiling.h"
 #include "Objects/TR5/Trap/tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_wreckingball.h"
+#include "Objects/TR5/Trap/tr5_zip_line.h"
 
 // Switches
 #include "Objects/TR5/Switch/tr5_crowdove_switch.h"
