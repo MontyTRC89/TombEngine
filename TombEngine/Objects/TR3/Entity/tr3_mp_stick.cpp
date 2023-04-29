@@ -18,8 +18,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
-	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
+	const auto MPStickBite1 = CreatureBiteInfo(Vector3i(247, 10, 11), 13);
+	const auto MPStickBite2 = CreatureBiteInfo(Vector3i(0, 0, 100), 6);
 	const auto MPStickPunchAttackJoints = std::vector<unsigned int>{ 10, 13 };
 	const auto MPStickKickAttackJoints  = std::vector<unsigned int>{ 5, 6 };
 

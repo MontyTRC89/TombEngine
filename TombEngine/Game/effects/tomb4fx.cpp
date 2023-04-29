@@ -335,6 +335,11 @@ void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed)
 	}
 }
 
+void ThrowFire(int itemNum, const CreatureBiteInfo& bite, Vector3i speed)
+{
+	ThrowFire(itemNum, bite.BoneID, bite.Position, speed);
+}
+
 void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color)
 {
 	auto* item = &g_Level.Items[itemNum];
@@ -343,9 +348,13 @@ void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Ve
 	{
 		auto* spark = SetupPoisonSpark(color);
 		AttachAndCreateSpark(spark, item, meshIndex, offset, speed);
-
 		spark->flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
+}
+
+void ThrowPoison(int itemNum, const CreatureBiteInfo& bite, Vector3i speed, Vector3 color)
+{
+	ThrowPoison(itemNum, bite.BoneID, bite.Position, speed, color);
 }
 
 void UpdateFireProgress()

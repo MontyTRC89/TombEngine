@@ -10,6 +10,7 @@ class Pose;
 class Vector3i;
 struct ItemInfo;
 struct ObjectInfo;
+struct CreatureBiteInfo;
 
 // NOTES:
 // animNumber: Relative animation number.
@@ -145,6 +146,9 @@ void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i   GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
 Vector3i   GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i   GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
+Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
+
 Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
 Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);
 float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);

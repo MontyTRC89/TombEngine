@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
-bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, int damage)
+bool ShotLara(ItemInfo* item, AI_INFO* AI, const CreatureBiteInfo& gun, short extraRotation, int damage)
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
@@ -79,9 +79,10 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
+	// TODO: Remove the -128 and fix the Ricochet effect going on the floor ! TokyoSU: 28/04/2023
 	auto pos = GameVector(
 		LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
-		LaraItem->Floor,
+		LaraItem->Floor - 128,
 		LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
 		LaraItem->RoomNumber);
 

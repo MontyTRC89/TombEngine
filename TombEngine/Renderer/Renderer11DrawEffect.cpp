@@ -50,24 +50,6 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
-
-BiteInfo EnemyBites[12] =
-{
-	{ 20, -95, 240, 13 },
-	{ 48, 0, 180, -11 },
-	{ -48, 0, 180, 14 },
-	{ -48, 5, 225, 14 },
-	{ 15, -60, 195, 13 },
-	{ -30, -65, 250, 18 },
-	{ 0, -110, 480, 13 },
-	{ -20, -80, 190, -10 },
-	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 }, // Baddy 2
-	{ 20, -60, 400, 7 },  // SAS
-	{ 0, -64, 250, 7 }	  // Troops
-};
-
 namespace TEN::Renderer 
 {
 	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
@@ -840,7 +822,6 @@ namespace TEN::Renderer
 				zOffset = 92;
 				rotationX = -14560;
 				break;
-
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
@@ -925,74 +906,87 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto* room : view.roomsToDraw)
 		{
-			for (auto item : room->ItemsToDraw)
+			for (auto* item : room->ItemsToDraw)
 			{
 				// Does the item need gunflash?
-				ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-				ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
+				auto* nativeItem = &g_Level.Items[item->ItemNumber];
+				auto* obj = &Objects[nativeItem->ObjectNumber];
 
-				if (obj->biteOffset == -1)
+				if (!nativeItem->IsCreature())
 					continue;
-
-				if (nativeItem->Data.is<CreatureInfo>())
-				{
-					auto* creature = GetCreatureInfo(nativeItem);
-					if (!creature->FiredWeapon)
-						continue;
-				}
-				else
-					continue;
-
-				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
-				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+				auto* creature = GetCreatureInfo(nativeItem);
+				auto const& room_item = m_rooms[nativeItem->RoomNumber];
 
 				m_stStatic.Color = Vector4::One;
-				m_stStatic.AmbientLight = room.AmbientLight;
+				m_stStatic.AmbientLight = room_item.AmbientLight;
 				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+
 				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
-				 
 				SetBlendMode(BLENDMODE_ADDITIVE);
-				
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				BiteInfo* bites[2] = {
-					&EnemyBites[obj->biteOffset],
-					&EnemyBites[obj->biteOffset + 1]
-				};
-
-				int numBites = (bites[0]->meshNum < 0) + 1;
-
-				for (int k = 0; k < numBites; k++)
+				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
 				{
-					int joint = abs(bites[k]->meshNum);
-
-					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
-
-					for (auto& flashBucket : flashMesh->Buckets)
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
+					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
-
 						if (flashBucket.Polygons.size() == 0)
 							continue;
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(bites[k]->Position);
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[0].Bite.Position.ToVector3());
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[joint] * item->World;
-						world = rotationX * world;
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[0].Bite.BoneID] * item->World;
 						world = offset * world;
-						world = rotationZ * world;
+						if (creature->MuzzleFlash[0].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[0].ApplyZRotation)
+							world = rotationZ * world;
 
 						m_stStatic.World = world;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+					}
+				}
 
+				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
+				{
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
+					for (RendererBucket& flashBucket : flashMoveable->Buckets)
+					{
+						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+							continue;
+						if (flashBucket.Polygons.size() == 0)
+							continue;
+
+						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[1].Bite.Position.ToVector3());
+						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[1].Bite.BoneID] * item->World;
+						world = offset * world;
+						if (creature->MuzzleFlash[1].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[1].ApplyZRotation)
+							world = rotationZ * world;
+
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
@@ -1000,7 +994,6 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(BLENDMODE_OPAQUE);
-
 	}
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 

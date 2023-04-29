@@ -6,6 +6,7 @@
 
 enum class LaraWeaponType;
 struct ItemInfo;
+struct CreatureBiteInfo;
 
 enum BodyPartFlags
 {
@@ -234,7 +235,9 @@ void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
 void TriggerPilotFlame(int itemNum, int nodeIndex);
 void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed);
+void ThrowFire(int itemNum, const CreatureBiteInfo& bite, Vector3i speed);
 void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color);
+void ThrowPoison(int itemNum, const CreatureBiteInfo& bite, Vector3i speed, Vector3 color);
 void UpdateFireProgress();
 void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);

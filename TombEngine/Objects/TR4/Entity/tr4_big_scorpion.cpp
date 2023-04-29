@@ -26,11 +26,9 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(1.35));
 	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(BLOCK(2));
 
-	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
-	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
+	const auto BigScorpionBite1 = CreatureBiteInfo(Vector3i::Zero, 8);
+	const auto BigScorpionBite2 = CreatureBiteInfo(Vector3i::Zero, 23);
 	const auto BigScorpionAttackJoints = std::vector<unsigned int>{ 8, 20, 21, 23, 24 };
-
-	int CutSeqNum;
 
 	enum BigScorpionState
 	{
@@ -87,7 +85,6 @@ namespace TEN::Entities::TR4
 			{
 				if (item->TriggerFlags > 0 && item->TriggerFlags < 7)
 				{
-					CutSeqNum = 4;
 					SetAnimation(item, BSCORPION_ANIM_DEATH);
 					item->Status = ITEM_INVISIBLE;
 					creature->MaxTurn = 0;
@@ -113,11 +110,6 @@ namespace TEN::Entities::TR4
 				{
 					SetAnimation(item, BSCORPION_ANIM_DEATH);
 				}
-			}
-			else if (CutSeqNum == 4)
-			{
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1;
-				item->Status = ITEM_INVISIBLE;
 			}
 			else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH && item->Status == ITEM_INVISIBLE)
 				item->Status = ITEM_ACTIVE;
@@ -287,10 +279,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if (!CutSeqNum)
-			CreatureAnimation(itemNumber, angle, 0);
-
-		auto radius = Vector2(object->radius, object->radius * 1.33f);
-		AlignEntityToSurface(item, radius);
+		CreatureAnimation(itemNumber, angle, 0);
+		AlignEntityToSurface(item, Vector2(object->radius, object->radius * 1.33f));
 	}
 }
