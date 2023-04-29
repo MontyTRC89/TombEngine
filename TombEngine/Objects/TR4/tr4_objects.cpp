@@ -754,6 +754,15 @@ namespace TEN::Entities
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
 		}
+
+		for (int objNum = ID_WATERFALL1; objNum <= ID_WATERFALL6; objNum++)
+		{
+			obj = &Objects[objNum];
+			if (obj->loaded)
+			{
+				obj->control = nullptr;
+			}
+		}
 	}
 
 	static void StartTrap(ObjectInfo* obj)

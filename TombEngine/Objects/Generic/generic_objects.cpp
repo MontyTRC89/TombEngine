@@ -1,9 +1,12 @@
 #include "framework.h"
 #include "Objects/Generic/generic_objects.h"
 #include "Objects/Generic/Object/objects.h"
+#include "Objects/Utils/object_helper.h"
 
 #include "Game/pickup/pickup.h"
 #include "Game/collision/collide_item.h"
+
+#include "Game/effects/effects.h"
 
 // Objects
 #include "Objects/Generic/Object/generic_trapdoor.h"
@@ -143,6 +146,12 @@ static void StartObject(ObjectInfo* object)
 		object->ceiling = BridgeCeiling<4>;
 		object->floorBorder = BridgeFloorBorder<4>;
 		object->ceilingBorder = BridgeCeilingBorder<4>;
+	}
+
+	object = &Objects[ID_PARALLEL_BARS];
+	if (object->loaded)
+	{
+		object->collision = HorizontalBarCollision;
 	}
 }
 
@@ -440,6 +449,77 @@ void StartTraps(ObjectInfo* object)
 	}
 }
 
+void StartServiceObjects(ObjectInfo* object)
+{
+	object = &Objects[ID_CAMERA_TARGET];
+	if (object->loaded)
+	{
+		object->drawRoutine = nullptr;
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_TIGHT_ROPE];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeTightrope;
+		object->collision = TightropeCollision;
+		object->drawRoutine = nullptr;
+
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_EARTHQUAKE];
+	if (object->loaded)
+	{
+		object->drawRoutine = nullptr;
+	}
+
+	object = &Objects[ID_KILL_ALL_TRIGGERS];
+	if (object->loaded)
+	{
+		object->control = KillAllCurrentItems;
+		object->drawRoutine = nullptr;
+		object->HitPoints = 0;
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_TRIGGER_TRIGGERER];
+	if (object->loaded)
+	{
+		object->control = ControlTriggerTriggerer;
+		object->drawRoutine = nullptr;
+
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_WATERFALLMIST];
+	if (object->loaded)
+	{
+		object->control = ControlWaterfallMist;
+		object->drawRoutine = nullptr;
+	}
+
+	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
+	{
+		InitKeyHole(object, objNum);
+	}
+
+	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
+	{
+		InitPuzzleHole(object, objNum);
+	}
+
+	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
+	{
+		InitPuzzleDone(object, objNum);
+	}
+
+	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
+	{
+		InitAnimating(object, objNum);
+	}
+}
+
 void InitializeGenericObjects()
 {
 	ObjectInfo* objToInit = nullptr;
@@ -447,4 +527,5 @@ void InitializeGenericObjects()
 	StartObject(objToInit);
 	StartSwitches(objToInit);
 	StartDoors(objToInit);
+	StartServiceObjects(objToInit);
 }

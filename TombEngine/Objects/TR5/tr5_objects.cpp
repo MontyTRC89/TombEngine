@@ -626,6 +626,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->SetupHitEffect(true);
 	}
 
+	InitAnimating(obj, ID_LASERHEAD_BASE);
+	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
+
 	obj = &Objects[ID_AUTOGUN];
 	if (obj->loaded)
 	{
@@ -786,10 +789,26 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
+	obj = &Objects[ID_HIGH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+		obj->control = HighObject2Control;
+	}
+
 	obj = &Objects[ID_GEN_SLOT1];
 	if (obj->loaded)
 	{
 		obj->control = GenSlot1Control;
+	}
+
+	obj = &Objects[ID_GEN_SLOT2];
+	if (obj->loaded)
+	{
+		/*obj->Initialize = InitializeGenSlot2;
+		obj->control = GenSlot2Control;
+		obj->drawRoutine = DrawGenSlot2;*/
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
@@ -800,6 +819,35 @@ static void StartObject(ObjectInfo *obj)
 			obj->drawRoutine = nullptr;
 			obj->collision = AIPickupCollision;
 		}
+	}
+
+	obj = &Objects[ID_PORTAL];
+	if (obj->loaded)
+	{
+		//obj->Initialize = InitializePortal;
+		//obj->control = PortalControl;        // TODO: found the control procedure !
+		obj->drawRoutine = nullptr;             // go to nullsub_44() !
+
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LENS_FLARE];
+	if (obj->loaded)
+	{
+		//obj->drawRoutine = DrawLensFlare;
+
+	}
+
+	obj = &Objects[ID_WATERFALLSS1];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
+	}
+
+	obj = &Objects[ID_WATERFALLSS2];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
 	}
 }
 
