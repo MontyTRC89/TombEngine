@@ -67,8 +67,7 @@ namespace TEN::Entities::Switches
 		{
 			auto bounds = GameBoundingBox(switchItem);
 
-			// Big and giant buttons can't be unpushed
-
+			// NOTE: Big and giant buttons can't be unpushed.
 			if ((switchItem->TriggerFlags == SWT_BIG_BUTTON || switchItem->TriggerFlags == SWT_GIANT_BUTTON) &&
 				switchItem->Animation.ActiveState == SWITCH_ON)
 			{
