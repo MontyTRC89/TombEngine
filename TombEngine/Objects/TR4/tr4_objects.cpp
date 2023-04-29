@@ -7,7 +7,7 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 
 // Creatures

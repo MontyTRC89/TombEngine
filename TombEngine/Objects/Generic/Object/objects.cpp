@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Game/items.h"
-#include "Game/effects/effects.h"
+
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
-#include "Specific/setup.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
+#include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Sound/sound.h"
-#include "Game/collision/collide_item.h"
-#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Input;
 

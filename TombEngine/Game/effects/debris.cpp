@@ -2,11 +2,11 @@
 #include "Game/effects/debris.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 #include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
-#include <Game/effects/tomb4fx.h>
 
 using std::vector;
 using namespace TEN::Renderer;

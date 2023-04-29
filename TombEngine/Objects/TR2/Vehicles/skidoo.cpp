@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -13,12 +14,11 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/simple_particle.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;

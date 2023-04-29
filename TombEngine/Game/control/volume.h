@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
-#include "Specific/setup.h"
 
 struct CollisionSetup;
 

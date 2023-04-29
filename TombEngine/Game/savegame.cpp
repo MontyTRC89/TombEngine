@@ -18,6 +18,7 @@
 #include "Game/misc.h"
 #include "Game/spotcam.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/puzzles_keys.h"
@@ -26,14 +27,13 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
-#include "ScriptInterfaceLevel.h"
-#include "ScriptInterfaceGame.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;

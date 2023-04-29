@@ -3,11 +3,12 @@
 
 #include <filesystem>
 #include <regex>
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"

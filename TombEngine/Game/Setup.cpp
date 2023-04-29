@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"

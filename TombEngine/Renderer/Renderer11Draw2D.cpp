@@ -5,8 +5,8 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;

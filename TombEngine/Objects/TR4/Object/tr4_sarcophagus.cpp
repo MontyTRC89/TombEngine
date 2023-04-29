@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "tr4_sarcophagus.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
+#include "Objects/TR4/Object/tr4_sarcophagus.h"
+
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/items.h"
 #include "Game/pickup/pickup.h"
-#include "Specific/setup.h"
-#include "Game/Hud/Hud.h"
-#include "Game/collision/collide_item.h"
+#include "Game/Setup.h"
+#include "Specific/level.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 

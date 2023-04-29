@@ -16,7 +16,7 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"

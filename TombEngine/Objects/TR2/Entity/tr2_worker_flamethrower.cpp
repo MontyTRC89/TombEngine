@@ -12,7 +12,7 @@
 #include "Game/missile.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 
 namespace TEN::Entities::Creatures::TR2

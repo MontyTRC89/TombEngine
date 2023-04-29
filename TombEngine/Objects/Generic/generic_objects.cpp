@@ -41,7 +41,7 @@
 #include "Objects/Generic/Traps/falling_block.h"
 
 /// Necessary import
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
