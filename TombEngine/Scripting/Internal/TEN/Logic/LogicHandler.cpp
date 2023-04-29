@@ -49,6 +49,24 @@ static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 	{ScriptReserved_PostEnd, CallbackPoint::PostEnd},
 };
 
+enum class LevelEndReason
+{
+	LevelComplete,
+	LoadGame,
+	ExitToTitle,
+	Death,
+	Other
+};
+
+static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
+{
+	{ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete},
+	{ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame},
+	{ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle},
+	{ScriptReserved_EndReasonDeath, LevelEndReason::Death},
+	{ScriptReserved_EndReasonOther, LevelEndReason::Other},
+};
+
 static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
@@ -128,6 +146,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
 
+	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_EndReason, kLevelEndReasons);
 	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
@@ -235,48 +254,6 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string&
 	return sol::nil;
 }
 
-sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, float deltaTime)
-{
-	auto func = m_levelFuncs_luaFunctions[name];
-	auto funcResult = func.call(deltaTime);
-
-	if (!funcResult.valid())
-	{
-		sol::error err = funcResult;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-
-	return funcResult;
-}
-
-sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, sol::variadic_args va)
-{
-	auto func = m_levelFuncs_luaFunctions[name];
-	auto funcResult = func.call(va);
-
-	if (!funcResult.valid())
-	{
-		sol::error err = funcResult;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-
-	return funcResult;
-}
-
-sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name)
-{
-	auto func = m_levelFuncs_luaFunctions[name];
-	auto funcResult = func.call();
-
-	if (!funcResult.valid())
-	{
-		sol::error err = funcResult;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-
-	return funcResult;
-}
-
 bool LogicHandler::SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value)
 {
 	if (sol::type::lua_nil == value.get_type())
@@ -382,7 +359,6 @@ void LogicHandler::FreeLevelScripts()
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
-	m_preSave = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
@@ -836,90 +812,84 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 	}
 }
 
-static void doCallback(const sol::protected_function& func, std::optional<float> deltaTime = std::nullopt)
-{
-	auto r = deltaTime.has_value() ? func(deltaTime) : func();
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssert(false, err.what(), ErrorMode::Terminate);
-	}
-}
 
 void LogicHandler::OnStart()
 {
 	for (auto& name : m_callbacksPreStart)
-		TryCall(name);
+		CallLevelFuncByName(name);
 
 	if (m_onStart.valid())
-		doCallback(m_onStart);
+		CallLevelFunc(m_onStart);
 
 	for (auto& name : m_callbacksPostStart)
-		TryCall(name);
+		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnLoad()
 {
 	for (auto& name : m_callbacksPreLoad)
-		TryCall(name);
+		CallLevelFuncByName(name);
 
 	if (m_onLoad.valid())
-		doCallback(m_onLoad);
+		CallLevelFunc(m_onLoad);
 
 	for (auto& name : m_callbacksPostLoad)
-		TryCall(name);
-}
-
-void LogicHandler::TryCall(std::string const& name, std::optional<float> deltaTime)
-{
-	auto funcResult = m_handler.GetState()->script("return " + name);
-
-	if (!funcResult.valid())
-	{
-		ScriptAssertF(false, "Callback {} not valid", name);
-	}
-	else 
-	{
-		funcResult.get<LevelFunc>().CallCallback(deltaTime);
-	}
+		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnControlPhase(float deltaTime)
 {
 	for (auto& name : m_callbacksPreControl)
-		TryCall(name, deltaTime);
+		CallLevelFuncByName(name, deltaTime);
 
 	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
 	if (m_onControlPhase.valid())
-		doCallback(m_onControlPhase, deltaTime);
+		CallLevelFunc(m_onControlPhase, deltaTime);
 
 	for (auto& name : m_callbacksPostControl)
-		TryCall(name, deltaTime);
+		CallLevelFuncByName(name, deltaTime);
 }
 
 void LogicHandler::OnSave()
 {
 	for (auto& name : m_callbacksPreSave)
-		TryCall(name);
+		CallLevelFuncByName(name);
 
 	if (m_onSave.valid())
-		doCallback(m_onSave);
+		CallLevelFunc(m_onSave);
 
 	for (auto& name : m_callbacksPostSave)
-		TryCall(name);
+		CallLevelFuncByName(name);
 }
 
-void LogicHandler::OnEnd()
+void LogicHandler::OnEnd(GameStatus reason)
 {
+	auto endReason{LevelEndReason::Other};
+
+	switch (reason)
+	{
+	case GameStatus::LaraDead:
+		endReason = LevelEndReason::Death;
+		break;
+	case GameStatus::LevelComplete:
+		endReason = LevelEndReason::LevelComplete;
+		break;
+	case GameStatus::ExitToTitle:
+		endReason = LevelEndReason::ExitToTitle;
+		break;
+	case GameStatus::LoadGame:
+		endReason = LevelEndReason::LoadGame;
+		break;
+	}
+
 	for (auto& name : m_callbacksPreEnd)
-		TryCall(name);
+		CallLevelFuncByName(name, endReason);
 
 	if(m_onEnd.valid())
-		doCallback(m_onEnd);
+		CallLevelFunc(m_onEnd, endReason);
 
 	for (auto& name : m_callbacksPostEnd)
-		TryCall(name);
+		CallLevelFuncByName(name, endReason);
 }
 
 /*** Special tables

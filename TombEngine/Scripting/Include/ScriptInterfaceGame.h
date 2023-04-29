@@ -56,7 +56,7 @@ public:
 	virtual void OnLoad() = 0;
 	virtual void OnControlPhase(float deltaTime) = 0;
 	virtual void OnSave() = 0;
-	virtual void OnEnd() = 0;
+	virtual void OnEnd(GameStatus reason) = 0;
 	virtual void ShortenTENCalls() = 0;
 
 	virtual void FreeLevelScripts() = 0;

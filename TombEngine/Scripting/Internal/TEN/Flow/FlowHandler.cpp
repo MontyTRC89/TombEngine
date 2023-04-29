@@ -464,6 +464,7 @@ bool FlowHandler::DoFlow()
 			DoTheGame = false;
 			break;
 		case GameStatus::ExitToTitle:
+		case GameStatus::LaraDead:
 			CurrentLevel = 0;
 			break;
 		case GameStatus::NewGame:

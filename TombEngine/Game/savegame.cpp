@@ -1194,20 +1194,20 @@ bool SaveGame::Save(int slot)
 	uvb.add_members(unionVec);
 	auto unionVecOffset = uvb.Finish();
 
-	std::vector<std::string> callbackVecPreStart = {};
-	std::vector<std::string> callbackVecPostStart = {};
+	std::vector<std::string> callbackVecPreStart;
+	std::vector<std::string> callbackVecPostStart;
 
-	std::vector<std::string> callbackVecPreEnd = {};
-	std::vector<std::string> callbackVecPostEnd = {};
+	std::vector<std::string> callbackVecPreEnd;
+	std::vector<std::string> callbackVecPostEnd;
 
-	std::vector<std::string> callbackVecPreSave = {};
-	std::vector<std::string> callbackVecPostSave = {};
+	std::vector<std::string> callbackVecPreSave;
+	std::vector<std::string> callbackVecPostSave;
 
-	std::vector<std::string> callbackVecPreLoad = {};
-	std::vector<std::string> callbackVecPostLoad = {};
+	std::vector<std::string> callbackVecPreLoad;
+	std::vector<std::string> callbackVecPostLoad;
 
-	std::vector<std::string> callbackVecPreControl = {};
-	std::vector<std::string> callbackVecPostControl = {};
+	std::vector<std::string> callbackVecPreControl;
+	std::vector<std::string> callbackVecPostControl;
 
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,

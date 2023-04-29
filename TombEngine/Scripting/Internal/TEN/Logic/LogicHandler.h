@@ -49,14 +49,11 @@ private:
 	// "LevelFuncs.MyLevel.CoolFuncs"
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};
 
-	sol::protected_function m_onStart{};
-	sol::protected_function m_onLoad{};
-	sol::protected_function m_onControlPhase{};
-	sol::protected_function m_preSave{};
-	sol::protected_function m_onSave{};
-	sol::protected_function m_onEnd{};
-
-	void TryCall(const std::string& name, std::optional<float> deltaTime = std::nullopt);
+	sol::protected_function	m_onStart{};
+	sol::protected_function	m_onLoad{};
+	sol::protected_function	m_onControlPhase{};
+	sol::protected_function	m_onSave{};
+	sol::protected_function	m_onEnd{};
 
 	std::unordered_set<std::string> m_callbacksPreSave;
 	std::unordered_set<std::string> m_callbacksPostSave;
@@ -84,9 +81,38 @@ private:
 public:	
 	LogicHandler(sol::state* lua, sol::table& parent);
 
-	sol::protected_function_result CallLevelFunc(const std::string&, sol::variadic_args);
-	sol::protected_function_result CallLevelFunc(const std::string&, float deltaTime);
-	sol::protected_function_result CallLevelFunc(const std::string&);
+	template <typename ... Ts> sol::protected_function_result CallLevelFuncBase(const sol::protected_function & func, Ts ... vs)
+	{
+		auto funcResult = func.call(vs...);
+		return funcResult;
+	}
+
+	template <typename ... Ts> sol::protected_function_result CallLevelFuncByName(const std::string& name, Ts ... vs)
+	{
+		auto func = m_levelFuncs_luaFunctions[name];
+		auto funcResult = CallLevelFuncBase(func, vs...);
+
+		if (!funcResult.valid())
+		{
+			sol::error err = funcResult;
+			ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+		}
+
+		return funcResult;
+	}
+
+	template <typename ... Ts> sol::protected_function_result CallLevelFunc(const sol::protected_function & func, Ts ... vs)
+	{
+		auto funcResult = CallLevelFuncBase(func, vs...);
+
+		if (!funcResult.valid())
+		{
+			sol::error err = funcResult;
+			ScriptAssertF(false, "Could not execute function: {}", err.what());
+		}
+
+		return funcResult;
+	}
 
 	void FreeLevelScripts() override;
 
@@ -138,5 +164,5 @@ public:
 	void OnLoad() override;
 	void OnControlPhase(float deltaTime) override;
 	void OnSave() override;
-	void OnEnd() override;
+	void OnEnd(GameStatus reason) override;
 };
