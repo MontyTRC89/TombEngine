@@ -223,17 +223,19 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* harpoon = FireHarpoon(*laraItem);
-
-		if (harpoon == nullptr)
-			return;
+		// FireHarpoon(*laraItem, nullptr);
+		// GianC.- Use this if the code misbehaves. It shoots the harpoon from pos 0 (under Lara)
 
 		auto UPV = GetUPVInfo(UPVItem);
-		harpoon->Pose.Position = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
-		harpoon->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
+		//auto orient = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
+		// GianC.- Obsolete,  flag is now set inside FireHarpoon
+		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230)));
+		FireHarpoon(*laraItem, &harpoonPose);
+		SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &harpoonPose, SoundEnvironment::Always);
 
-		harpoon->ItemFlags[0] = 1;
-		UPV->HarpoonLeft = !UPV->HarpoonLeft;	
+		//harpoon->ItemFlags[0] = 1;
+		//GianC.- Obsolete, flag is now set inside FireHarpoon 
+		UPV->HarpoonLeft = !UPV->HarpoonLeft;
 	}
 
 	static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)

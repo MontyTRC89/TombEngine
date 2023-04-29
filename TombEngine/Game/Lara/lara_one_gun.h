@@ -34,7 +34,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 
-ItemInfo* FireHarpoon(ItemInfo& laraItem);
+void FireHarpoon(ItemInfo& laraItem, Pose* pos);
 void HarpoonBoltControl(short itemNumber);
 void FireGrenade(ItemInfo& laraItem);
 void GrenadeControl(short itemNumber);
