@@ -21,6 +21,7 @@ Version 1.0.9
 	- Default 0 OCB will play Lara use key animation. 
 	- Any positive OCB number will play the animation according to the OCB number.
 - Add log reports if title level or other levels don't exist.
+- Add Better error handling for missing font and/or shaders.
 
 Lua API changes:
 * Add function String::SetTranslated() 
