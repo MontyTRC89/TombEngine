@@ -1189,6 +1189,7 @@ bool SaveGame::Save(int slot)
 			}
 		}
 	}
+
 	auto unionVec = fbb.CreateVector(varsVec);
 	Save::UnionVecBuilder uvb{ fbb };
 	uvb.add_members(unionVec);

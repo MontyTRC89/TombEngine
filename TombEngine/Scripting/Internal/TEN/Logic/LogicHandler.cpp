@@ -184,14 +184,16 @@ Possible values for CallbackPoint:
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
 
-	PREEND -- will be called immediately before OnEnd
-	POSTEND -- will be called immediately after OnEnd
 
 	PRESAVE -- will be called immediately before OnSave
 	POSTSAVE -- will be called immediately after OnSave
 
 	PRELOAD -- will be called immediately before OnLoad
 	POSTLOAD -- will be called immediately after OnLoad
+
+	-- These take a LevelEndReason arg, like OnEnd
+	PREEND -- will be called immediately before OnEnd
+	POSTEND -- will be called immediately after OnEnd
 
 	-- These take functions which accepts a deltaTime argument
 	PRECONTROLPHASE -- will be called immediately before OnControlPhase
@@ -992,7 +994,20 @@ __The order of loading is as follows:__
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
 @tfield function OnSave Will be called when the player saves the game, just *before* data is saved
-@tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
+@tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
+
+	EXITTOTITLE
+	LEVELCOMPLETE
+	LOADGAME
+	DEATH
+	OTHER
+
+For example:
+	LevelFuncs.OnEnd = function(reason)
+		if(reason == TEN.Logic.EndReason.DEATH) then
+			print("death")
+		end
+	end
 @table LevelFuncs
 */
 
