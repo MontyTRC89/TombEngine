@@ -1,10 +1,8 @@
 #pragma once
 #include <SimpleMath.h>
+#include "ShaderLight.h"
+#include <Renderer/ConstantBuffers/ShaderFogBulb.h>
 
-namespace TEN
-{
-	namespace Renderer
-	{
 		using DirectX::SimpleMath::Matrix;
 		using DirectX::SimpleMath::Vector3;
 		using DirectX::SimpleMath::Vector2;
@@ -36,6 +34,7 @@ namespace TEN
 
 			alignas(4) float NearPlane;
 			alignas(4) float FarPlane;
+
+			alignas(4) int NumFogBulbs;
+			ShaderFogBulb FogBulbs[32];
 		};
-	}
-}

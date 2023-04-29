@@ -29,8 +29,8 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen : SHEEN;
-	float Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 Fog : TEXCOORD3;
 	uint InstanceID : SV_InstanceID;
 };
 
@@ -60,17 +60,29 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.Position = mul(worldPosition, ViewProjection);
 	output.Color = float4(col, input.Color.w);
 	output.Color *= StaticMeshes[InstanceID].Color;
-
-	// Apply distance fog
-	float4 d = length(CamPositionWS - worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-
 	output.PositionCopy = output.Position;
 	output.Sheen = input.Effects.w;
 	output.InstanceID = InstanceID;
+
+	// Apply fog
+	output.Fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	if (FogMaxDistance != 0)
+	{
+		float d = length(CamPositionWS.xyz - output.WorldPosition);
+		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+		output.Fog.xyz = FogColor.xyz * fogFactor;
+		output.Fog.w = fogFactor;
+	}
+
+	for (int i = 0; i < NumFogBulbs; i++)
+	{
+		float fogFactor = DoFogBulb(output.WorldPosition, FogBulbs[i]);
+		output.Fog.xyz += FogBulbs[i].Color * fogFactor;
+		output.Fog.w += fogFactor;
+	}
+
+	output.Fog = saturate(output.Fog);
 
 	return output;
 }
@@ -103,7 +115,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	output.Color = DoFog(output.Color, FogColor, input.Fog);
+	output.Color = DoFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
 
 	return output;
 }

@@ -1,28 +1,5 @@
 #include "./Math.hlsli"
 
-#define LT_SUN		0
-#define LT_POINT	1
-#define LT_SPOT		2
-#define LT_SHADOW	3
-
-#define MAX_LIGHTS_PER_ROOM	48
-#define MAX_LIGHTS_PER_ITEM	8
-#define SPEC_FACTOR 64
-
-struct ShaderLight
-{
-	float3 Position;
-	unsigned int Type;
-	float3 Color;
-	float Intensity;
-	float3 Direction;
-	float In;
-	float Out;
-	float InRange;
-	float OutRange;
-	float Padding;
-};
-
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 {
     if ((strength <= 0.0))
@@ -208,6 +185,96 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 		return (color*intensity*d);
 	}
 	return float3(0, 0, 0);
+}
+
+float DoFogBulb(float3 pos, ShaderFogBulb bulb)
+{
+	// We find the intersection points p0 and p1 between the sphere of the fog bulb and the ray from camera to vertex.
+	// The magnitude of (p2 - p1) is used as the fog factor.
+	// We need to consider different cases for getting the correct points.
+	// We use the geometric solution as in legacy engines. An analytic solution also exists.
+
+	float3 p0;
+	float3 p1;
+
+	p0 = p1 = float3(0, 0, 0);
+
+	float3 LV = bulb.Position - CamPositionWS;
+	float L = length(LV);
+	float VD = length(pos - bulb.Position);
+	float3 P = normalize(pos - CamPositionWS);
+	float PZ = length(pos - CamPositionWS);
+
+	if (L < bulb.Radius)
+	{
+		// Camera is INSIDE the bulb
+
+		if (VD < bulb.Radius)
+		{
+			// Vertex is INSIDE the bulb
+
+			p0 = CamPositionWS;
+			p1 = pos;
+		}
+		else
+		{
+			// Vertex is OUTSIDE the bulb
+
+			float Tca = dot(LV, P);
+			float d2 = L * L - Tca * Tca;
+			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+			float t1 = Tca + Thc;
+
+			p0 = CamPositionWS;
+			p1 = CamPositionWS + P * t1;
+		}
+	}
+	else
+	{
+		// Camera is OUTSIDE the bulb
+
+		if (VD < bulb.Radius)
+		{
+			// Vertex is INSIDE the bulb
+
+			float Tca = dot(LV, P);
+			float d2 = L * L - Tca * Tca;
+			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+			float t0 = Tca - Thc;
+
+			p0 = CamPositionWS + P * t0;
+			p1 = pos;
+		}
+		else
+		{
+			// Vertex is OUTSIDE the bulb
+
+			float Tca = dot(LV, P);
+
+			if (Tca > 0 && PZ * PZ > Tca * Tca)
+			{
+				float d2 = L * L - Tca * Tca;
+				if (d2 < bulb.Radius * bulb.Radius)
+				{
+					float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+
+					float t0 = Tca + Thc;
+					float t1 = Tca - Thc;
+
+					p0 = CamPositionWS + P * t0;
+					p1 = CamPositionWS + P * t1;
+				}
+				else
+				{
+					p0 = p1 = float3(0, 0, 0);
+				}
+			}
+		}
+	}
+
+	float fog = pow(length(p1 - p0) / (2 * bulb.Radius), 1.5f);
+
+	return fog;
 }
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen, const ShaderLight lights[MAX_LIGHTS_PER_ITEM], int numLights)

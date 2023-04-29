@@ -43,9 +43,6 @@ void DoAlphaTest(float4 inputColor)
 
 float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 {
-	if (FogMaxDistance == 0)
-		return sourceColor;
-
 	switch (BlendMode)
 	{
 		case BLENDMODE_ADDITIVE:

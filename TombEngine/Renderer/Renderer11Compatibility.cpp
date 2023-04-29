@@ -397,6 +397,16 @@ namespace TEN::Renderer
 						light->Type = LIGHT_TYPE_SPOT;
 						light->Luma = Luma(light->Color);
 					}
+					else if (oldLight->type == LIGHT_TYPE_FOG_BULB)
+					{
+						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
+						light->Intensity = oldLight->intensity;
+						light->In = oldLight->in;
+						light->Out = oldLight->out;
+						light->Type = LIGHT_TYPE_FOG_BULB;
+						light->Luma = Luma(light->Color);
+					} 
 
 					// Monty's temp variables for sorting
 					light->LocalIntensity = 0;

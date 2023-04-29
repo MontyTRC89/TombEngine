@@ -4,6 +4,40 @@
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define PI2 6.2831853071795864769252867665590057683943387987502116419498891846
 
+#define LT_SUN		0
+#define LT_POINT	1
+#define LT_SPOT		2
+#define LT_SHADOW	3
+
+#define MAX_LIGHTS_PER_ROOM	48
+#define MAX_LIGHTS_PER_ITEM	8
+#define MAX_FOG_BULBS	32
+#define SPEC_FACTOR 64
+
+struct ShaderLight
+{
+	float3 Position;
+	unsigned int Type;
+	float3 Color;
+	float Intensity;
+	float3 Direction;
+	float In;
+	float Out;
+	float InRange;
+	float OutRange;
+	float Padding;
+};
+
+struct ShaderFogBulb
+{
+	float3 Position;
+	float Density;
+	float3 Color;
+	float Radius;
+	float4 Padding1;
+	float4 Padding2;
+};
+
 float Luma(float3 color)
 {
 	// Use Rec.709 trichromat formula to get perceptive luma value

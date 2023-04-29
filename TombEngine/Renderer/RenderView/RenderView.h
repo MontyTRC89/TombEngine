@@ -8,6 +8,7 @@
 #include "Specific/memory/LinearArrayBuffer.h"
 #include "RendererSprites.h"
 #include "RendererTransparentFace.h"
+#include "Renderer/Structures/RendererFogBulb.h"
 
 namespace TEN::Renderer 
 {
@@ -51,6 +52,7 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		std::vector<RendererRoom*> roomsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
+		std::vector<RendererFogBulb> FogBulbsToDraw;
 		std::vector<RendererSpriteToDraw> spritesToDraw;
 		std::vector<RendererStatic*> StaticsToDraw;
 		std::map<int, std::vector<RendererStatic*>> SortedStatics;

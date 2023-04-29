@@ -1400,7 +1400,7 @@ namespace TEN::Renderer
 	{
 		ResetDebugVariables();
 		m_Locked = false;
-
+		 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
@@ -1466,8 +1466,18 @@ namespace TEN::Renderer
 		else
 		{
 			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogColor = Vector4(0, 0, 0, 0);
 		}
-
+		   
+		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
+		{
+			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
+			cameraConstantBuffer.FogBulbs[i].Density = view.FogBulbsToDraw[i].Density;
+			cameraConstantBuffer.FogBulbs[i].Radius = view.FogBulbsToDraw[i].Radius;
+			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
+		}     
+		cameraConstantBuffer.NumFogBulbs = view.FogBulbsToDraw.size();
+ 
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());

@@ -5,6 +5,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 
+#include <Math/Math.h>
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Game/Gui.h"
@@ -15,6 +16,8 @@
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Renderer/Structures/RendererLight.h"
+#include "RenderView/RenderView.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/MiscBuffer.h"
@@ -31,7 +34,6 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
-#include "RenderView/RenderView.h"
 #include "Specific/level.h"
 #include "ConstantBuffer/ConstantBuffer.h"
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
@@ -41,7 +43,6 @@
 #include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
-#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
 #include "Renderer/VertexBuffer/VertexBuffer.h"

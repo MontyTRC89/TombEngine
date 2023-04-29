@@ -62,6 +62,33 @@ namespace TEN::Renderer
 			{
 				return a->ObjectNumber < b->ObjectNumber;
 			});
+
+		// Collect fog bulbs
+		renderView.FogBulbsToDraw.clear();
+		for (auto room : renderView.roomsToDraw)
+		{  
+			for (RendererLight light : room->Lights)
+			{
+				if (light.Type == LIGHT_TYPE_FOG_BULB)
+				{
+					RendererFogBulb bulb;
+					bulb.Position = light.Position;
+					bulb.Density = light.Intensity;
+					bulb.Color = light.Color;
+					bulb.Radius = light.Out;
+					renderView.FogBulbsToDraw.push_back(bulb);
+					if (renderView.FogBulbsToDraw.size() == MAX_FOG_BULBS)
+					{
+						break;
+					}
+				}
+			}
+			if (renderView.FogBulbsToDraw.size() == MAX_FOG_BULBS)
+			{
+				break;
+			}
+		}
+		
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

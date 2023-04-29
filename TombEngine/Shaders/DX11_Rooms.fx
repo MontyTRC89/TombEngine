@@ -3,9 +3,9 @@
 #include "./VertexEffects.hlsli"
 #include "./Blending.hlsli"
 #include "./Math.hlsli"
-#include "./ShaderLight.hlsli"
 #include "./AnimatedTextures.hlsli"
 #include "./Shadows.hlsli"
+#include "./ShaderLight.hlsli"
 
 cbuffer RoomBuffer : register(b5)
 {
@@ -27,8 +27,8 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
 	float3x3 TBN : TBN;
-	float Fog : FOG;
 	float4 PositionCopy : TEXCOORD1;
+	float4 Fog : TEXCOORD2;
 };
 
 Texture2D Texture : register(t0);
@@ -90,12 +90,25 @@ PixelShaderInput VS(VertexShaderInput input)
     float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
 	output.TBN = TBN;
 
-	// Apply distance fog
-	float d = length(CamPositionWS.xyz - output.WorldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+	// Apply fog
+	output.Fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	
+	if (FogMaxDistance != 0)
+	{
+		float d = length(CamPositionWS.xyz - output.WorldPosition);
+		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+		output.Fog.xyz = FogColor.xyz * fogFactor;
+		output.Fog.w = fogFactor;
+	}
+
+	for (int i = 0; i < NumFogBulbs; i++)
+	{
+		float fogFactor = DoFogBulb(output.WorldPosition, FogBulbs[i]);
+		output.Fog.xyz += FogBulbs[i].Color * fogFactor;
+		output.Fog.w += fogFactor;
+	}
+
+	output.Fog = saturate(output.Fog);
 
 	return output;
 }
@@ -191,7 +204,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	output.Color = DoFog(output.Color, FogColor, input.Fog);
+	output.Color = DoFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
 
 	return output;
 }
