@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.Velocity.y = 0;
 				laraItem->Animation.IsAirborne = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
-				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);
