@@ -25,7 +25,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
-#include "Quad/RenderQuad.h"
+#include "Objects/Utils/object_helper.h"
+#include "Renderer/Quad/RenderQuad.h"
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -142,11 +143,8 @@ namespace TEN::Renderer
 		if (HelicalLasers.empty())
 			return;
 
-		if (!Objects[ID_DEFAULT_SPRITES].loaded)
-		{
-			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Helical lasers rendering was skipped.", LogLevel::Warning);
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Helical lasers rendering", "ID_DEFAULT_SPRITES"))
 			return;
-		}
 
 		for (const auto& laser : HelicalLasers)
 		{
@@ -196,11 +194,8 @@ namespace TEN::Renderer
 		if (ElectricityArcs.empty())
 			return;
 
-		if (!Objects[ID_DEFAULT_SPRITES].loaded)
-		{
-			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Electricity rendering was skipped.", LogLevel::Warning);
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Electricity rendering", "ID_DEFAULT_SPRITES"))
 			return;
-		}
 
 		for (const auto& arc : ElectricityArcs)
 		{
@@ -392,11 +387,8 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				if (!Objects[ID_SPARK_SPRITE].loaded)
-				{
-					TENLog("Missing ID_SPARK_SPRITE slot in level. Particles rendering was skipped.", LogLevel::Warning);
-					return;
-				}
+				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering", "ID_SPARK_SPRITE"))
+					continue;
 
 				auto pos = Vector3(particle.x, particle.y, particle.z);
 				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
@@ -421,65 +413,62 @@ namespace TEN::Renderer
 		{
 			auto& splash = Splashes[i];
 
-			if (splash.isActive) 
+			if (!splash.isActive)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering", "ID_DEFAULT_SPRITES"))
+				return;
+
+			constexpr float alpha = 360 / NUM_POINTS;
+			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
+
+			if (!splash.isRipple) 
 			{
-				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				if (splash.heightSpeed < 0 && splash.height < 1024) 
 				{
-					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Splashes rendering was skipped.", LogLevel::Warning);
-					return;
+					float multiplier = splash.height / 1024.0f;
+					color = (float)color * multiplier;
 				}
+			}
 
-				constexpr float alpha = 360 / NUM_POINTS;
-				byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
+			float innerRadius = splash.innerRad;
+			float outerRadius = splash.outerRad;
+			float xInner;
+			float zInner;
+			float xOuter;
+			float zOuter;
+			float x2Inner;
+			float z2Inner;
+			float x2Outer;
+			float z2Outer;
+			float yInner = splash.y;
+			float yOuter = splash.y - splash.height;
 
-				if (!splash.isRipple) 
-				{
-					if (splash.heightSpeed < 0 && splash.height < 1024) 
-					{
-						float multiplier = splash.height / 1024.0f;
-						color = (float)color * multiplier;
-					}
-				}
-
-				float innerRadius = splash.innerRad;
-				float outerRadius = splash.outerRad;
-				float xInner;
-				float zInner;
-				float xOuter;
-				float zOuter;
-				float x2Inner;
-				float z2Inner;
-				float x2Outer;
-				float z2Outer;
-				float yInner = splash.y;
-				float yOuter = splash.y - splash.height;
-
-				for (int i = 0; i < NUM_POINTS; i++) 
-				{
-					xInner = innerRadius * sin(alpha * i * PI / 180);
-					zInner = innerRadius * cos(alpha * i * PI / 180);
-					xOuter = outerRadius * sin(alpha * i * PI / 180);
-					zOuter = outerRadius * cos(alpha * i * PI / 180);
-					xInner += splash.x;
-					zInner += splash.z;
-					xOuter += splash.x;
-					zOuter += splash.z;
-					int j = (i + 1) % NUM_POINTS;
-					x2Inner = innerRadius * sin(alpha * j * PI / 180);
-					x2Inner += splash.x;
-					z2Inner = innerRadius * cos(alpha * j * PI / 180);
-					z2Inner += splash.z;
-					x2Outer = outerRadius * sin(alpha * j * PI / 180);
-					x2Outer += splash.x;
-					z2Outer = outerRadius * cos(alpha * j * PI / 180);
-					z2Outer += splash.z;
-					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
-								Vector3(xOuter, yOuter, zOuter), 
-								Vector3(x2Outer, yOuter, z2Outer), 
-								Vector3(x2Inner, yInner, z2Inner), 
-								Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
-				}
+			for (int i = 0; i < NUM_POINTS; i++) 
+			{
+				xInner = innerRadius * sin(alpha * i * PI / 180);
+				zInner = innerRadius * cos(alpha * i * PI / 180);
+				xOuter = outerRadius * sin(alpha * i * PI / 180);
+				zOuter = outerRadius * cos(alpha * i * PI / 180);
+				xInner += splash.x;
+				zInner += splash.z;
+				xOuter += splash.x;
+				zOuter += splash.z;
+				int j = (i + 1) % NUM_POINTS;
+				x2Inner = innerRadius * sin(alpha * j * PI / 180);
+				x2Inner += splash.x;
+				z2Inner = innerRadius * cos(alpha * j * PI / 180);
+				z2Inner += splash.z;
+				x2Outer = outerRadius * sin(alpha * j * PI / 180);
+				x2Outer += splash.x;
+				z2Outer = outerRadius * cos(alpha * j * PI / 180);
+				z2Outer += splash.z;
+				AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+							Vector3(xOuter, yOuter, zOuter), 
+							Vector3(x2Outer, yOuter, z2Outer), 
+							Vector3(x2Inner, yInner, z2Inner), 
+							Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
+							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 			}
 		}
 	}
@@ -489,11 +478,8 @@ namespace TEN::Renderer
 		if (Bubbles.empty())
 			return;
 
-		if (!Objects[ID_DEFAULT_SPRITES].loaded)
-		{
-			TENLog("Missing ID_DEFAULT_SPRITES slot in level. Bubbles rendering was skipped.", LogLevel::Warning);
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Bubbles rendering", "ID_DEFAULT_SPRITES"))
 			return;
-		}
 
 		for (const auto& bubble : Bubbles)
 		{
@@ -512,11 +498,8 @@ namespace TEN::Renderer
 		if (Drips.empty())
 			return;
 
-		if (!Objects[ID_DRIP_SPRITE].loaded)
-		{
-			TENLog("Missing ID_DRIP_SPRITE slot in level. Drips rendering was skipped.", LogLevel::Warning);
+		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drips rendering", "ID_DRIP_SPRITE"))
 			return;
-		}
 
 		for (const auto& drip : Drips)
 		{
@@ -584,7 +567,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawShockwaves(RenderView& view)
 	{
-
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
@@ -596,188 +578,178 @@ namespace TEN::Renderer
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
-			if (shockwave->life)
+			if (!shockwave->life)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Shockwaves rendering", "ID_DEFAULT_SPRITES"))
+				return;
+
+			byte color = shockwave->life * 8;
+
+			shockwave->yRot += shockwave->yRot / FPS;
+
+			auto rotMatrix =
+				Matrix::CreateRotationY(shockwave->yRot / 4) *
+				Matrix::CreateRotationZ(shockwave->zRot) *
+				Matrix::CreateRotationX(shockwave->xRot);
+
+			auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
+
+			// Inner circle
+			if (shockwave->style == (int)ShockwaveStyle::Normal)
 			{
-				if (!Objects[ID_DEFAULT_SPRITES].loaded)
+				angle = PI / 32.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 8.0f;
+			}
+			else
+			{
+				angle = PI / 16.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 4.0f;
+			}
+
+			float x1 = (shockwave->innerRad * c);
+			float z1 = (shockwave->innerRad * s);
+			float x4 = (shockwave->outerRad * c);
+			float z4 = (shockwave->outerRad * s);
+
+			auto p1 = Vector3(x1, 0, z1);
+			auto p4 = Vector3(x4, 0, z4);
+
+			p1 = Vector3::Transform(p1, rotMatrix);
+			p4 = Vector3::Transform(p4, rotMatrix);
+
+			if (shockwave->fadeIn == true)
+			{
+				if (shockwave->sr < shockwave->r)
 				{
-					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Shockwaves rendering was skipped.", LogLevel::Warning);
-					return;
-				}
-
-				byte color = shockwave->life * 8;
-
-				//int dl = shockwave->outerRad - shockwave->innerRad;
-
-				shockwave->yRot += shockwave->yRot / FPS;
-
-				auto rotMatrix =
-					Matrix::CreateRotationY(shockwave->yRot / 4) *
-					Matrix::CreateRotationZ(shockwave->zRot) *
-					Matrix::CreateRotationX(shockwave->xRot);
-
-				auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
-
-				// Inner circle
-				if (shockwave->style == (int)ShockwaveStyle::Normal)
-				{
-					angle = PI / 32.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 8.0f;
-				}
-				else
-				{
-					angle = PI / 16.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 4.0f;
-				}
-
-				float x1 = (shockwave->innerRad * c);
-				float z1 = (shockwave->innerRad * s);
-				float x4 = (shockwave->outerRad * c);
-				float z4 = (shockwave->outerRad * s);
-
-				auto p1 = Vector3(x1, 0, z1);
-				auto p4 = Vector3(x4, 0, z4);
-
-				p1 = Vector3::Transform(p1, rotMatrix);
-				p4 = Vector3::Transform(p4, rotMatrix);
-
-				if (shockwave->fadeIn == true)
-				{
-					if (shockwave->sr < shockwave->r)
-					{
-						shockwave->sr += shockwave->r / 18;
-						r = shockwave->sr * shockwave->life / 255.0f;
-					}
-					else
-					{
-						r = shockwave->r * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sg < shockwave->g)
-					{
-						shockwave->sg += shockwave->g / 18;
-						g = shockwave->sg * shockwave->life / 255.0f;
-					}
-					else
-					{
-						g = shockwave->g * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sb < shockwave->b)
-					{
-						shockwave->sb += shockwave->b / 18;
-						b = shockwave->sb * shockwave->life / 255.0f;
-					}
-					else
-					{
-						b = shockwave->b * shockwave->life / 255.0f;
-					}
-
-					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
-						shockwave->fadeIn = false;
-
+					shockwave->sr += shockwave->r / 18;
+					r = shockwave->sr * shockwave->life / 255.0f;
 				}
 				else
 				{
 					r = shockwave->r * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sg < shockwave->g)
+				{
+					shockwave->sg += shockwave->g / 18;
+					g = shockwave->sg * shockwave->life / 255.0f;
+				}
+				else
+				{
 					g = shockwave->g * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sb < shockwave->b)
+				{
+					shockwave->sb += shockwave->b / 18;
+					b = shockwave->sb * shockwave->life / 255.0f;
+				}
+				else
+				{
 					b = shockwave->b * shockwave->life / 255.0f;
 				}
 
-				for (int j = 0; j < 16; j++)
+				if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+					shockwave->fadeIn = false;
+
+			}
+			else
+			{
+				r = shockwave->r * shockwave->life / 255.0f;
+				g = shockwave->g * shockwave->life / 255.0f;
+				b = shockwave->b * shockwave->life / 255.0f;
+			}
+
+			for (int j = 0; j < 16; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+
+				float x2 = (shockwave->innerRad * c);
+				float z2 = (shockwave->innerRad * s);
+
+				float x3 = (shockwave->outerRad * c);
+				float z3 = (shockwave->outerRad * s);
+
+				auto p2 = Vector3(x2, 0, z2);
+				auto p3 = Vector3(x3, 0, z3);
+
+				p2 = Vector3::Transform(p2, rotMatrix);
+				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
-					c = cos(angle);
-					s = sin(angle);
+					angle -= PI / 8.0f;
 
-					float x2 = (shockwave->innerRad * c);
-					float z2 = (shockwave->innerRad * s);
-
-					float x3 = (shockwave->outerRad * c);
-					float z3 = (shockwave->outerRad * s);
-
-					auto p2 = Vector3(x2, 0, z2);
-					auto p3 = Vector3(x3, 0, z3);
-
-					p2 = Vector3::Transform(p2, rotMatrix);
-					p3 = Vector3::Transform(p3, rotMatrix);
-
-					if (shockwave->style == (int)ShockwaveStyle::Normal)
-					{
-						angle -= PI / 8.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Knockback)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p4,
-							pos + p3,
-							pos + p2,
-							pos + p1,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-					}
-
-					p1 = p2;
-					p4 = p3;
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
 				}
+				else if (shockwave->style == (int)ShockwaveStyle::Sophia)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+				}
+				else if (shockwave->style == (int)ShockwaveStyle::Knockback)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p4,
+						pos + p3,
+						pos + p2,
+						pos + p1,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+				}
+
+				p1 = p2;
+				p4 = p3;
 			}
 		}
 	}
 
 	void Renderer11::DrawBlood(RenderView& view) 
 	{
-
 		for (int i = 0; i < 32; i++) 
 		{
-
 			BLOOD_STRUCT* blood = &Blood[i];
 
 			if (blood->on) 
 			{
-				if (!Objects[ID_DEFAULT_SPRITES].loaded)
-				{
-					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Blood rendering was skipped.", LogLevel::Warning);
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering", "ID_DEFAULT_SPRITES"))
 					return;
-				}
 
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
@@ -800,11 +772,9 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
-				if (!Objects[ID_DEFAULT_SPRITES].loaded)
-				{
-					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Underwater dust rendering was skipped.", LogLevel::Warning);
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater dust rendering", "ID_DEFAULT_SPRITES"))
 					return;
-				}
 
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
@@ -816,11 +786,9 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Snow:
-				if (!Objects[ID_DEFAULT_SPRITES].loaded)
-				{
-					TENLog("Missing ID_DEFAULT_SPRITES slot in level. Snow rendering was skipped.", LogLevel::Warning);
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering", "ID_DEFAULT_SPRITES"))
 					return;
-				}
 
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
@@ -832,11 +800,9 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Rain:
-				if (!Objects[ID_DRIP_SPRITE].loaded)
-				{
-					TENLog("Missing ID_DRIP_SPRITE slot in level. Rain rendering was skipped.", LogLevel::Warning);
+
+				if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering", "ID_DRIP_SPRITE"))
 					return;
-				}
 
 				Vector3 v;
 				p.Velocity.Normalize(v);
@@ -1525,17 +1491,13 @@ namespace TEN::Renderer
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
 
-
 		for (const auto& smoke : SmokeParticles) 
 		{
 			if (!smoke.active)
 				continue;
 
-			if (!Objects[ID_SMOKE_SPRITES].loaded)
-			{
-				TENLog("Missing ID_SMOKE_SPRITES slot in level. Smoke rendering was skipped.", LogLevel::Warning);
+			if (!CheckIfSlotExists(ID_SMOKE_SPRITES, "Smoke rendering", "ID_SMOKE_SPRITES"))
 				return;
-			}
 
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
@@ -1556,11 +1518,8 @@ namespace TEN::Renderer
 			SparkParticle& s = SparkParticles[i];
 			if (!s.active) continue;
 
-			if (!Objects[ID_SPARK_SPRITE].loaded)
-			{
-				TENLog("Missing ID_SPARK_SPRITE slot in level. Sparks particles rendering was skipped.", LogLevel::Warning);
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering", "ID_SPARK_SPRITE"))
 				return;
-			}
 
 			Vector3 v;
 			s.velocity.Normalize(v);
@@ -1583,12 +1542,11 @@ namespace TEN::Renderer
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
 
-			if (!Objects[ID_EXPLOSION_SPRITES].loaded)
-			{
-				TENLog("Missing ID_EXPLOSION_SPRITES slot in level. Explosion particles rendering was skipped.", LogLevel::Warning);
+			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering", "ID_EXPLOSION_SPRITES"))
 				return;
-			}
-			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
+
+			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
+				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -1598,12 +1556,11 @@ namespace TEN::Renderer
 
 		for (SimpleParticle& s : simpleParticles)
 		{
-			if (!Objects[s.sequence].loaded)
-			{
-				TENLog("Missing sprite slot " + std::to_string(s.sequence) + " in level. Rendering was skipped.", LogLevel::Warning);
-				continue;
-			}
 			if (!s.active) continue;
+
+			if (!CheckIfSlotExists(s.sequence, "Particle rendering", "Sprite ID " + std::to_string(s.sequence)))
+				continue;
+
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
 		}
 	}

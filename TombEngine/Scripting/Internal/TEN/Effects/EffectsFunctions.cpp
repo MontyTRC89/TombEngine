@@ -11,6 +11,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -134,11 +135,8 @@ namespace Effects
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
 	{
-		if (!Objects[ID_DEFAULT_SPRITES].loaded)
-		{
-			TENLog("Can't spawn a particle because sprites are not loaded for this level.", LogLevel::Error);
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function", "ID_DEFAULT_SPRITES"))
 			return;
-		}
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
 

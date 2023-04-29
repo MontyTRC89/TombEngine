@@ -6,7 +6,7 @@
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName);
 bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName = "NOT_SET", const std::string& requiredName = "NOT_SET");
-void CheckIfSlotExists(int requiredObj, const std::string& baseName, const std::string& requiredName);
+bool CheckIfSlotExists(int requiredObj, const std::string& baseName, const std::string& requiredName);
 
 void InitSmashObject(ObjectInfo* object, int objectNumber);
 void InitKeyHole(ObjectInfo* object, int objectNumber);

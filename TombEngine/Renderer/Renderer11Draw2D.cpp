@@ -6,6 +6,7 @@
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
+#include "Objects/Utils/object_helper.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
@@ -106,6 +107,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering", "ID_BAR_BORDER_GRAPHIC"))
+			return;
+
 		unsigned int strides = sizeof(RendererVertex);
 		unsigned int offset = 0;
 	
@@ -124,12 +128,6 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-
-		if (!Objects[ID_BAR_BORDER_GRAPHIC].loaded)
-		{
-			TENLog("Missing ID_BAR_BORDER_GRAPHIC slot in level. Bar rendering was skipped.", LogLevel::Warning);
-			return;
-		}
 
 		RendererSprite* borderSprite = &m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
 		m_stHUDBar.BarStartUV = borderSprite->UV[0];
