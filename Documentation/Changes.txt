@@ -15,7 +15,7 @@ Version 1.0.9
 	- Employed by setting the trigger type as "Switch" for key hole.
 - Allow Animation to be played by setting OCB to keyholes.
 	- +ve OCB will play the animation according to the OCB number.
-
+- Add warnings about missing sprite slots in runtime instead of crashing the engine.
 
 Lua API changes:
 * Add function String::SetTranslated() 
