@@ -44,17 +44,8 @@ namespace TEN::Entities::Switches
 
 		if (!TriggerActive(switchItem) && !(switchItem->Flags & IFLAG_INVISIBLE))
 		{
-			if (switchItem->ObjectNumber == ID_JUMP_SWITCH)
-			{
-				switchItem->Animation.TargetState = SWITCH_OFF;
-				switchItem->Timer = 0;
-				AnimateItem(switchItem);
-			}
-			else
-			{
-				switchItem->Animation.TargetState = SWITCH_ON;
-				switchItem->Timer = 0;
-			}
+			switchItem->Animation.TargetState = SWITCH_OFF;
+			switchItem->Timer = 0;
 		}
 
 		AnimateItem(switchItem);
@@ -70,71 +61,76 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->Status == ITEM_NOT_ACTIVE &&
-			!(switchItem->Flags & 0x100) &&
+			!(switchItem->Flags & ONESHOT) &&
 			switchItem->TriggerFlags >= 0 ||
 			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			auto bounds = GameBoundingBox(switchItem);
 
-			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_OFF)
-				return;
+			// Big and giant buttons can't be unpushed
 
-			SwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25);
-			SwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25);
+			if ((switchItem->TriggerFlags == SWT_BIG_BUTTON || switchItem->TriggerFlags == SWT_GIANT_BUTTON) &&
+				switchItem->Animation.ActiveState == SWITCH_ON)
+			{
+				return;
+			}
+
+			SwitchBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25f);
+			SwitchBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25f);
 
 			switch (switchItem->TriggerFlags)
 			{
 				default:
 					SwitchPos.z = bounds.Z1 - 128;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_BIG_LEVER:
 					SwitchPos.z = bounds.Z1 - 64;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_SMALL_LEVER:
 					SwitchPos.z = bounds.Z1 - 112;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_SMALL_BUTTON:
 					SwitchPos.z = bounds.Z1 - 156;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_BIG_BUTTON:
 					SwitchPos.z = bounds.Z1 - 256;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_GIANT_BUTTON:
 					SwitchPos.z = bounds.Z1 - 384;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_VALVE:
 					SwitchPos.z = bounds.Z1 - 112;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_WALL_HOLE:
 					SwitchPos.z = bounds.Z1 - 196;
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.2f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 
 				case SWT_CUSTOM:
 					SwitchPos.z = bounds.Z1 - switchItem->ItemFlags[6];
-					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5);
+					SwitchBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.5f);
 					SwitchBounds.BoundingBox.Z2 = bounds.Z2;
 					break;
 			}
@@ -194,15 +190,15 @@ namespace TEN::Entities::Switches
 							break;
 					}
 
-					if (switchItem->Animation.ActiveState == SWITCH_OFF)
+					if (switchItem->Animation.ActiveState == SWITCH_ON)
 					{
 						SetAnimation(laraItem, offAnim);
-						switchItem->Animation.TargetState = SWITCH_ON;
+						switchItem->Animation.TargetState = SWITCH_OFF;
 					}
 					else
 					{
 						SetAnimation(laraItem, onAnim);
-						switchItem->Animation.TargetState = SWITCH_OFF;
+						switchItem->Animation.TargetState = SWITCH_ON;
 					}
 
 					ResetPlayerFlex(laraItem);

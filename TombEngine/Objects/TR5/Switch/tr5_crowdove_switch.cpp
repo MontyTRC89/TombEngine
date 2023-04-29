@@ -113,12 +113,12 @@ namespace TEN::Entities::Switches
 		}
 		else if (item->ItemFlags[0] == 0)
 		{
-			if (item->Animation.ActiveState == SWITCH_OFF)
-				item->Animation.TargetState = SWITCH_ON;
+			if (item->Animation.ActiveState == SWITCH_ON)
+				item->Animation.TargetState = SWITCH_OFF;
 
 			AnimateItem(item);
 
-			if (item->Animation.ActiveState == SWITCH_OFF)
+			if (item->Animation.ActiveState == SWITCH_ON)
 				item->Pose.Orientation.y += ANGLE(90.0f);
 		}
 	}

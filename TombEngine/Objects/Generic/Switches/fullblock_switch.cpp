@@ -43,7 +43,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||
 			switchItem->Status ||
-			switchItem->Flags & 0x100 ||
+			switchItem->Flags & ONESHOT ||
 			CurrentSequence >= 3) &&
 			(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem !=itemNumber))
 		{
@@ -94,7 +94,7 @@ namespace TEN::Entities::Switches
 			if (CurrentSequence >= 4)
 			{
 				switchItem->ItemFlags[0] = 0;
-				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				if (++CurrentSequence >= 7)

@@ -59,7 +59,7 @@ namespace TEN::Entities::Switches
 		}
 		else if (switchItem->Animation.ActiveState)
 		{
-			if (switchItem->Animation.ActiveState == SWITCH_ON)
+			if (switchItem->Animation.ActiveState == SWITCH_OFF)
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
@@ -67,7 +67,7 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(RailSwitchPos2, switchItem, laraItem))
 					{
-						switchItem->Animation.TargetState = SWITCH_OFF;
+						switchItem->Animation.TargetState = SWITCH_ON;
 						flag = 1;
 					}
 					else
@@ -113,7 +113,7 @@ namespace TEN::Entities::Switches
 					laraItem->Animation.ActiveState = LS_LEVERSWITCH_PUSH;
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Busy;
-					switchItem->Animation.TargetState = SWITCH_ON;
+					switchItem->Animation.TargetState = SWITCH_OFF;
 					switchItem->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNumber);

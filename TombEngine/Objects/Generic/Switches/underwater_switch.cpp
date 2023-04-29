@@ -80,8 +80,8 @@ namespace TEN::Entities::Switches
 		{
 			if (TestLaraPosition(UnderwaterSwitchBounds, switchItem, laraItem))
 			{
-				if (switchItem->Animation.ActiveState == SWITCH_ON ||
-					switchItem->Animation.ActiveState == SWITCH_OFF)
+				if (switchItem->Animation.ActiveState == SWITCH_OFF ||
+					switchItem->Animation.ActiveState == SWITCH_ON)
 				{
 					if (MoveLaraPosition(UnderwaterSwitchPos, switchItem, laraItem))
 					{
@@ -95,7 +95,7 @@ namespace TEN::Entities::Switches
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 						lara->Control.HandStatus = HandStatus::Busy;
-						switchItem->Animation.TargetState = switchItem->Animation.ActiveState != SWITCH_ON;
+						switchItem->Animation.TargetState = switchItem->Animation.ActiveState != SWITCH_OFF;
 						switchItem->Status = ITEM_ACTIVE;
 
 						AddActiveItem(itemNumber);
@@ -118,7 +118,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
 			lara->Control.WaterStatus == WaterStatus::Underwater &&
 			lara->Control.HandStatus == HandStatus::Free &&
-			switchItem->Animation.ActiveState == SWITCH_OFF) ||
+			switchItem->Animation.ActiveState == SWITCH_ON) ||
 			(lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber))
 		{
 			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
@@ -150,7 +150,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.Velocity.y = 0;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;
-				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);

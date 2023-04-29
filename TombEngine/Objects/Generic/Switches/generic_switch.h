@@ -7,8 +7,8 @@ namespace TEN::Entities::Switches
 {
 	enum SwitchStatus
 	{
-		SWITCH_OFF,
-		SWITCH_ON
+		SWITCH_ON,
+		SWITCH_OFF
 	};
 	
 	void SwitchControl(short itemNumber);

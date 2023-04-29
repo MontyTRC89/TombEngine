@@ -59,7 +59,7 @@ namespace TEN::Entities::Switches
 			switchItem->ItemFlags[0] == 0) ||
 			(laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
 		{
-			if (switchItem->Animation.ActiveState == SWITCH_ON)
+			if (switchItem->Animation.ActiveState == SWITCH_OFF)
 			{
 				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
@@ -72,7 +72,7 @@ namespace TEN::Entities::Switches
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
 							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
-							switchItem->Animation.TargetState = SWITCH_OFF;
+							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else
 							laraInfo->Context.InteractedItem = itemNumber;
@@ -101,7 +101,7 @@ namespace TEN::Entities::Switches
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
 							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
-							switchItem->Animation.TargetState = SWITCH_ON;
+							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
 							laraInfo->Context.InteractedItem = itemNumber;

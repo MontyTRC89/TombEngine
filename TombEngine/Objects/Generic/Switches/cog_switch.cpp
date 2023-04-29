@@ -93,7 +93,7 @@ namespace TEN::Entities::Switches
 						lara->Context.InteractedItem = targetItemNum;
 
 						AddActiveItem(itemNum);
-						switchItem->Animation.TargetState = SWITCH_ON;
+						switchItem->Animation.TargetState = SWITCH_OFF;
 						switchItem->Status = ITEM_ACTIVE;
 
 						if ((door != nullptr) && (!switchItem->TriggerFlags))
@@ -127,12 +127,12 @@ namespace TEN::Entities::Switches
 
 		AnimateItem(switchItem);
 
-		if (switchItem->Animation.ActiveState == SWITCH_ON)
+		if (switchItem->Animation.ActiveState == SWITCH_OFF)
 		{
-			if (switchItem->Animation.TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
+			if (switchItem->Animation.TargetState == SWITCH_OFF && !(TrInput & IN_ACTION))
 			{
 				LaraItem->Animation.TargetState = LS_COGWHEEL_UNGRAB;
-				switchItem->Animation.TargetState = SWITCH_OFF;
+				switchItem->Animation.TargetState = SWITCH_ON;
 			}
 
 			if (LaraItem->Animation.AnimNumber == LA_COGWHEEL_PULL)
@@ -152,7 +152,7 @@ namespace TEN::Entities::Switches
 			if ((switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
 				&& (LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE))
 			{
-				switchItem->Animation.ActiveState = SWITCH_OFF;
+				switchItem->Animation.ActiveState = SWITCH_ON;
 				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
@@ -163,7 +163,7 @@ namespace TEN::Entities::Switches
 			{
 				//If Lara is repeating the PULL animation (because player dropped after the frame check).
 				//do the wheel animation again.
-				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 			}
 		}
 	}
