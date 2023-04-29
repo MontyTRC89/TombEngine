@@ -147,12 +147,6 @@ static void StartObject(ObjectInfo* object)
 		object->floorBorder = BridgeFloorBorder<4>;
 		object->ceilingBorder = BridgeCeilingBorder<4>;
 	}
-
-	object = &Objects[ID_PARALLEL_BARS];
-	if (object->loaded)
-	{
-		object->collision = HorizontalBarCollision;
-	}
 }
 
 void StartSwitches(ObjectInfo* object)
@@ -277,6 +271,21 @@ void StartSwitches(ObjectInfo* object)
 			object->control = ControlAnimatingSlots;
 			object->collision = ShootSwitchCollision;
 		}
+	}
+
+	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
+	{
+		InitKeyHole(object, objNum);
+	}
+
+	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
+	{
+		InitPuzzleHole(object, objNum);
+	}
+
+	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
+	{
+		InitPuzzleDone(object, objNum);
 	}
 }
 
@@ -447,6 +456,12 @@ void StartTraps(ObjectInfo* object)
 		object->collision = FallingBlockCollision;
 		object->control = FallingBlockControl;
 	}
+
+	object = &Objects[ID_PARALLEL_BARS];
+	if (object->loaded)
+	{
+		object->collision = HorizontalBarCollision;
+	}
 }
 
 void StartServiceObjects(ObjectInfo* object)
@@ -497,21 +512,6 @@ void StartServiceObjects(ObjectInfo* object)
 	{
 		object->control = ControlWaterfallMist;
 		object->drawRoutine = nullptr;
-	}
-
-	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
-	{
-		InitKeyHole(object, objNum);
-	}
-
-	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
-	{
-		InitPuzzleHole(object, objNum);
-	}
-
-	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
-	{
-		InitPuzzleDone(object, objNum);
 	}
 
 	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
