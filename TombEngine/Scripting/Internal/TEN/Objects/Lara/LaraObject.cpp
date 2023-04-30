@@ -158,6 +158,21 @@ void LaraObject::UndrawWeapon()
 	}
 }
 
+/// Lara will draw her weapon if it is not drawn and throw away a flare if she is currently holding one.
+// @function LaraObject:UndrawWeapon
+// @usage
+// Lara:DrawWeapon()
+void LaraObject::DrawWeapon()
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->Control.HandStatus == HandStatus::Free ||
+		lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+	{
+		lara->Control.HandStatus = HandStatus::WeaponDraw;
+	}
+}
+
 /// Lara will throw away the torch if she currently holds one in her hand.
 // @function LaraObject:ThrowAwayTorch
 // @usage
@@ -183,6 +198,17 @@ HandStatus LaraObject::GetHandStatus() const
 {
 	auto* lara = GetLaraInfo(m_item);
 	return  HandStatus{ lara->Control.HandStatus };
+}
+
+/// Set actual hand status of Lara
+// @function LaraObject:SetHandStatus
+// @usage
+// Lara:SetHandStatus(2)
+// @treturn int hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
+void LaraObject::SetHandStatus(short num) const
+{
+	auto* lara = GetLaraInfo(m_item);
+	lara->Control.HandStatus == HandStatus{ num };
 }
 
 //todo make these into enums - Squidshire 18/11/2022
