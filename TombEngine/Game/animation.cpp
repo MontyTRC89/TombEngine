@@ -531,14 +531,7 @@ const AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 const AnimFrame& GetBestFrame(const ItemInfo& item)
 {
 	auto frameData = GetFrameInterpData(item);
-	if (frameData.Alpha <= 0.5f)
-	{
-		return *frameData.FramePtr0;
-	}
-	else
-	{
-		return *frameData.FramePtr1;
-	}
+	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1;
 }
 
 int GetAnimNumber(const ItemInfo& item)
@@ -584,10 +577,7 @@ int GetFrameCount(int animIndex)
 		return 0;
 
 	const auto& anim = GetAnimData(animIndex);
-
-	int end = anim.frameEnd;
-	int base = anim.frameBase;
-	return (end - base);
+	return (anim.frameEnd - anim.frameBase);
 }
 
 int GetNextAnimState(ItemInfo* item)
