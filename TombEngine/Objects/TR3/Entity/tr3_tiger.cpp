@@ -34,7 +34,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto TIGER_PLAYER_ALERT_VELOCITY = 10.0f;
 
-	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
+	const auto TigerBite = CreatureBiteInfo(Vector3i(19, -13, 3), 26);
 	const auto TigerSwipeAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 	const auto TigerBiteAttackJoints  = std::vector<unsigned int>{ 22, 25, 26 };
 

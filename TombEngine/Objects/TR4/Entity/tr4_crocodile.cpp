@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
+	const auto CrocodileBite = CreatureBiteInfo(Vector3i(0, -100, 500), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };
 
 	enum CrocodileState
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
-
+		auto head = EulerAngles::Zero, torso = EulerAngles::Zero;
 		short angle = 0;
 		short boneAngle = 0;
 		AI_INFO AI;
@@ -298,28 +298,26 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		OBJECT_BONES boneRot;
 		if (item->Animation.ActiveState == CROC_STATE_IDLE || item->Animation.ActiveState == CROC_STATE_BITE_ATTACK || item->Animation.ActiveState == CROC_STATE_WATER_BITE_ATTACK)
 		{
-			boneRot.bone0 = AI.angle / 3;
-			boneRot.bone1 = AI.angle / 2;
-			boneRot.bone2 = 0;
-			boneRot.bone3 = 0;
+			head.y = AI.angle / 3;
+			head.x = AI.angle / 2;
+			torso.y = 0;
+			torso.x = 0;
 		}
 		else
 		{
-			boneRot.bone0 = boneAngle;
-			boneRot.bone1 = boneAngle;
-			boneRot.bone2 = -boneAngle;
-			boneRot.bone3 = -boneAngle;
+			head.y = boneAngle;
+			head.x = boneAngle;
+			torso.y = -boneAngle;
+			torso.x = -boneAngle;
 		}
 
 		CreatureTilt(item, 0);
-		CreatureJoint(item, 0, boneRot.bone0);
-		CreatureJoint(item, 1, boneRot.bone1);
-		CreatureJoint(item, 2, boneRot.bone2);
-		CreatureJoint(item, 3, boneRot.bone3);
-
+		CreatureJoint(item, 0, head.y);
+		CreatureJoint(item, 1, head.x);
+		CreatureJoint(item, 2, torso.y);
+		CreatureJoint(item, 3, torso.x);
 		CreatureAnimation(itemNumber, angle, 0);
 
 		if (item->Animation.ActiveState < CROC_STATE_SWIM_FORWARD)

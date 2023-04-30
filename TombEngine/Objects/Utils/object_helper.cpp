@@ -20,19 +20,20 @@ void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::s
 bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName, const std::string& requiredName)
 {
 	// Check if the object has at least 1 animation with more than 1 frame.
-	const auto& anim = g_Level.Anims[object.animIndex];
+	const auto& anim = GetAnimData(object.animIndex);
 	if ((anim.frameEnd - anim.frameBase) > 1)
 		return true;
 
 	// Use slot if loaded.
-	if (Objects[requiredObject].loaded)
+	const auto& requiredObj = Objects[requiredObject];
+	if (requiredObj.loaded)
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
-		const auto& anim = g_Level.Anims[Objects[requiredObject].animIndex];
+		const auto& anim = GetAnimData(requiredObj.animIndex);
 		if ((anim.frameEnd - anim.frameBase) > 1)
 		{
-			object.animIndex = Objects[requiredObject].animIndex;
-			object.frameBase = Objects[requiredObject].frameBase;
+			object.animIndex = requiredObj.animIndex;
+			object.frameBase = requiredObj.frameBase;
 			return true;
 		}
 		else

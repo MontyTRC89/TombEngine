@@ -27,14 +27,14 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	BiteInfo QuadBikeEffectsPositions[6] =
+	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		{ -56, -32, -380, 0	},
-		{ 56, -32, -380, 0 },
-		{ -8, 180, -48, 3 },
-		{ 8, 180, -48, 4 },
-		{ 90, 180, -32, 6 },
-		{ -90, 180, -32, 7 }
+		CreatureBiteInfo(Vector3i(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3i(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3i(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3i(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
 	};
 	const vector<VehicleMountType> QuadBikeMountTypes =
 	{
@@ -1207,8 +1207,7 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i].meshNum, Vector3i(QuadBikeEffectsPositions[i].Position));
-
+				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i]);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
 				if (quadBikeItem->Animation.Velocity.z > 32)
 				{

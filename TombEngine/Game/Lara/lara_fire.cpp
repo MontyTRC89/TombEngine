@@ -280,7 +280,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		BLOCK(8),
 		3,
 		0,
-		0,
+		2,
 		0,
 		SFX_TR4_UZI_FIRE,
 		0
@@ -781,6 +781,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
+// TODO: Include snowmobile gun in GetAmmo(), otherwise the player won't be able to shoot while controlling it. -- TokyoSU 2023.04.21
 FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
 {
 	auto& player = *GetLaraInfo(&laraItem);
