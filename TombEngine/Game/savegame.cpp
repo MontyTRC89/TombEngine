@@ -1541,8 +1541,10 @@ bool SaveGame::Load(int slot)
 			creature->Alerted = savedCreature->alerted();
 			creature->LOT.CanJump = savedCreature->can_jump();
 			creature->LOT.CanMonkey = savedCreature->can_monkey();
+
 			if (savedCreature->enemy() >= 0)
 				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
+
 			creature->Flags = savedCreature->flags();
 			creature->Friendly = savedCreature->friendly();
 			creature->HeadLeft = savedCreature->head_left();
@@ -1554,8 +1556,10 @@ bool SaveGame::Load(int slot)
 			creature->LOT.IsAmphibious = savedCreature->is_amphibious();
 			creature->LOT.IsJumping = savedCreature->is_jumping();
 			creature->LOT.IsMonkeying = savedCreature->is_monkeying();
+
 			for (int j = 0; j < 4; j++)
 				creature->JointRotation[j] = savedCreature->joint_rotation()->Get(j);
+
 			creature->JumpAhead = savedCreature->jump_ahead();
 			creature->MaxTurn = savedCreature->maximum_turn();
 			creature->MonkeySwingAhead = savedCreature->monkey_swing_ahead();

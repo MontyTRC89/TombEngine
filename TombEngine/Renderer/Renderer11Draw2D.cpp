@@ -184,7 +184,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarBorder, SAMPLER_LINEAR_CLAMP);
 
 		m_stHUDBar.BarStartUV = Vector2::Zero;
 		m_stHUDBar.BarScale = Vector2::One;
@@ -211,7 +211,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
 		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
 
-		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarInner, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
