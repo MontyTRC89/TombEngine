@@ -261,7 +261,7 @@ void AnimatingControl(short itemNumber)
 	item->Status = ITEM_ACTIVE;
 	AnimateItem(item);
 
-	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
+	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

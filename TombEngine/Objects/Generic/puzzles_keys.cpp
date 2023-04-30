@@ -66,9 +66,10 @@ void InitializePuzzleHole(short itemNumber)
 void InitializePuzzleDone(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
+	const auto& anim = GetAnimData(receptacleItem);
 
 	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
+	receptacleItem.Animation.FrameNumber = anim.frameBase + anim.frameEnd;
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

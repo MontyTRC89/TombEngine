@@ -526,7 +526,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 		else
 			return;
 
-		undoFrame = GetAnimData(item).frameEnd + g_Level.Anims[undoAnim].frameBase - item->Animation.FrameNumber;
+		undoFrame = GetAnimData(item).frameEnd + GetAnimData(undoAnim).frameBase - item->Animation.FrameNumber;
 
 		if (TrInput & undoInput && lara->Control.TightropeControl.OnCount == 0)
 		{
