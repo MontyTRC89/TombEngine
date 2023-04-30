@@ -72,6 +72,11 @@ namespace TEN::Entities::Creatures::TR1
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
+		if (creature.MuzzleFlash[1].Delay != 0)
+			creature.MuzzleFlash[1].Delay--;
+
 		if (item.HitPoints <= 0)
 		{
 			if (item.Animation.ActiveState != COWBOY_STATE_DEATH)
@@ -193,12 +198,16 @@ namespace TEN::Entities::Creatures::TR1
 					if (!(creature.Flags & 1) && item.Animation.FrameNumber == GetFrameIndex(&item, 2))
 					{
 						ShotLara(&item, &ai, CowboyGunLeft, extraHeadRot.y, COWBOY_SHOT_DAMAGE);
+						creature.MuzzleFlash[0].Bite = CowboyGunLeft;
+						creature.MuzzleFlash[0].Delay = 2;
 						creature.Flags |= 1;
 					}
 
 					if (!(creature.Flags & 2) && item.Animation.FrameNumber == GetFrameIndex(&item, 10))
 					{
 						ShotLara(&item, &ai, CowboyGunRight, extraHeadRot.y, COWBOY_SHOT_DAMAGE);
+						creature.MuzzleFlash[1].Bite = CowboyGunRight;
+						creature.MuzzleFlash[1].Delay = 2;
 						creature.Flags |= 2;
 					}
 				}
