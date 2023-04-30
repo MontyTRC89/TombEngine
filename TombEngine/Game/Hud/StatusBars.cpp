@@ -21,7 +21,8 @@ namespace TEN::Hud
 {
 	void StatusBar::Initialize(float value)
 	{
-		Value = std::clamp(value, 0.0f, 1.0f);
+		Value =
+		TargetValue = std::clamp(value, 0.0f, 1.0f);
 	}
 
 	void StatusBar::Update(float value)

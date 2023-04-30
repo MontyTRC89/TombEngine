@@ -6,6 +6,7 @@
 #include <d3d9types.h>
 
 #include <Math/Math.h>
+#include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Game/Gui.h"
@@ -382,9 +383,9 @@ namespace TEN::Renderer
 		Texture2D m_skyTexture;
 		Texture2D m_whiteTexture;
 		RendererSprite m_whiteSprite;
-		Texture2D loadingBarBorder;
-		Texture2D loadingBarInner;
-		Texture2D loadingScreenTexture;
+		Texture2D m_loadingBarBorder;
+		Texture2D m_loadingBarInner;
+		Texture2D m_loadingScreenTexture;
 
 		VertexBuffer m_roomsVertexBuffer;
 		IndexBuffer m_roomsIndexBuffer;
@@ -513,6 +514,7 @@ namespace TEN::Renderer
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
 		void InitializeScreen(int w, int h, HWND handle, bool reset);
+		void InitializeCommonTextures();
 		void InitializeGameBars();
 		void InitializeMenuBars(int y);
 

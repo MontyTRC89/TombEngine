@@ -17,7 +17,6 @@
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
@@ -142,7 +141,7 @@ void ObjectObjects()
 	{
 		InitPuzzleDone(obj, objNum);
 	}
-	
+
 	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
 	{
 		InitAnimating(obj, objNum);
@@ -157,7 +156,7 @@ void ObjectObjects()
 		obj->Initialize = InitializeTightrope;
 		obj->collision = TightropeCollision;
 		obj->drawRoutine = nullptr;
-		
+
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -184,7 +183,7 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		//obj->drawRoutine = DrawLensFlare;
-		
+
 	}
 
 	obj = &Objects[ID_WATERFALLMIST];
@@ -230,6 +229,7 @@ void ObjectObjects()
 void TrapObjects()
 {
 	ObjectInfo* obj;
+
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
@@ -278,16 +278,16 @@ void TrapObjects()
 		//obj->Initialize = InitializePortal;
 		//obj->control = PortalControl;        // TODO: found the control procedure !
 		obj->drawRoutine = nullptr;             // go to nullsub_44() !
-		 
+
 		obj->usingDrawAnimatingItem = false;
 	}
-	
+
 	obj = &Objects[ID_TRIGGER_TRIGGERER];
 	if (obj->loaded)
 	{
 		obj->control = ControlTriggerTriggerer;
 		obj->drawRoutine = nullptr;
-		
+
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -352,7 +352,6 @@ void InitializeObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
 		obj->LotType = LotType::Basic;
-		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;

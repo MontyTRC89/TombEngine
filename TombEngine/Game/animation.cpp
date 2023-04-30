@@ -664,6 +664,16 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOff
 	return GetJointPosition(*item, jointIndex, relOffset);
 }
 
+Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite)
+{
+	return GetJointPosition(item, bite.BoneID, bite.Position);
+}
+
+Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite)
+{
+	return GetJointPosition(item, bite.BoneID, bite.Position);
+}
+
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 {
 	const auto& object = Objects[objectID];

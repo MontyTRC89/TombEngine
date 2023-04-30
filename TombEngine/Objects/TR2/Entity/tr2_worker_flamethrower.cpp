@@ -26,7 +26,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto WORKER_FLAME_RUN_TURN_RATE_MAX  = ANGLE(10.0f);
 
 	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
-	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
+	const auto WorkerFlamethrowerBite = CreatureBiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
 	enum WorkerFlamethrowerState
 	{
@@ -70,8 +70,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
-		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.meshNum, Vector3i(WorkerFlamethrowerBite.Position));
-
+		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.BoneID, WorkerFlamethrowerBite.Position);
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != WORKER_FLAME_STATE_DEATH)
@@ -82,12 +81,12 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != WORKER_FLAME_STATE_ATTACK && item->Animation.ActiveState != WORKER_FLAME_STATE_WALK_FORWARD_ATTACK)
 			{
 				TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-				TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.meshNum);
+				TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.BoneID);
 			}
 			else
 			{
 				TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-				ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, WorkerFlamethrowerOffset, WorkerFlamethrowerOffset);
+				ThrowFire(itemNumber, WorkerFlamethrowerBite.BoneID, WorkerFlamethrowerOffset, WorkerFlamethrowerOffset);
 			}
 
 			AI_INFO AI;

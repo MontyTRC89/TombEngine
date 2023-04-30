@@ -24,19 +24,17 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_ALERT_RANGE  = SQUARE(BLOCK(1));
 	constexpr auto GUARD_WALK_RANGE	  = SQUARE(BLOCK(3));
 	constexpr auto GUARD_ATTACK_RANGE = SQUARE(BLOCK(4));
-
 	constexpr auto GUARD_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto GUARD_RUN_TURN_RATE_MAX	= ANGLE(10.0f);
-
 	constexpr auto GUARD_LARA_ANGLE_FOR_DEATH2 = ANGLE(67.5f);
-	
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
-
 	constexpr auto GUARD_HEAD_MESH = 14;
 
-	const auto SwatGunBite		  = BiteInfo(Vector3(80.0f, 200.0f, 13.0f), 0);
-	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
-	const auto ArmedMafia2GunBite = BiteInfo(Vector3(-50.0f, 220.0f, 60.0f), 13);
+	const auto SwatGunBite				= CreatureBiteInfo(Vector3i(16, 240, 90), 13);
+	const auto MafiaGunBite				= CreatureBiteInfo(Vector3i(16, 270, 90), 13);
+	const auto SniperGunBite			= CreatureBiteInfo(Vector3i(0, 480, 110), 13);
+	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
+	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3i(16, 200, 60), 13);
 
 	// TODO: Revise names of enum elements.
 
@@ -327,17 +325,13 @@ namespace TEN::Entities::Creatures::TR5
 		bool canJump1block = CanCreatureJump(*item, JumpDistance::Block1);
 		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
 
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, SwatGunBite.meshNum, Vector3i(SwatGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-			creature->FiredWeapon--;
-		}
-
 		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->Enemy = LaraItem;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
@@ -578,23 +572,28 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0)
 				{
-					creature->FiredWeapon = 2;
-					creature->Flags = 1;
-
-					if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
-						ShotLara(item, &AI, SwatGunBite, torsoX, 30);
+					if (item->ObjectNumber == ID_MAFIA)
+					{
+						if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
+							ShotLara(item, &AI, MafiaGunBite, torsoX, 30);
+						else
+							ShotLara(item, &AI, MafiaGunBite, torsoX, 10);
+						creature->MuzzleFlash[0].Bite = MafiaGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
+					}
 					else
-						ShotLara(item, &AI, SwatGunBite, torsoX, 10);
-				
-					// TODO: just for testing energy arcs
-					/*pos1.x = SwatGunBite.x;
-					pos1.y = SwatGunBite.y;
-					pos1.z = SwatGunBite.z;
-					GetJointPosition(item, &pos1, SwatGunBite.meshNum);
-					TriggerEnergyArc(&pos1, (Vector3i*)& LaraItem->pos, 192, 128, 192, 256, 150, 256, 0, ENERGY_ARC_STRAIGHT_LINE);*/
-
+					{
+						if (item->Animation.ActiveState == GUARD_STATE_SINGLE_FIRE_ATTACK)
+							ShotLara(item, &AI, SwatGunBite, torsoX, 30);
+						else
+							ShotLara(item, &AI, SwatGunBite, torsoX, 10);
+						creature->MuzzleFlash[0].Bite = SwatGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
+					}
+					
+					creature->Flags = 1;
 				}
 
 				break;
@@ -1018,12 +1017,8 @@ namespace TEN::Entities::Creatures::TR5
 		short joint1 = 0;
 		short joint2 = 0;
 
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, SniperGunBite.meshNum, Vector3i(SniperGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-			creature->FiredWeapon--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints > 0)
 		{
@@ -1079,13 +1074,11 @@ namespace TEN::Entities::Creatures::TR5
 				if (!creature->Flags)
 				{
 					ShotLara(item, &AI, SniperGunBite, joint0, 100);
-					creature->FiredWeapon = 2;
+					creature->MuzzleFlash[0].Bite = SniperGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 
-				break;
-
-			default:
 				break;
 			}
 		}
@@ -1171,25 +1164,21 @@ namespace TEN::Entities::Creatures::TR5
 			canJump2Sectors = false;
 		}
 
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, ArmedMafia2GunBite.meshNum, Vector3i(ArmedMafia2GunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
-			creature->FiredWeapon--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
+		if (creature->MuzzleFlash[1].Delay != 0)
+			creature->MuzzleFlash[1].Delay--;
+
+		if (item->AIBits)
+			GetAITarget(creature);
+		else
+			creature->Enemy = LaraItem;
 
 		AI_INFO AI;
-		ZeroMemory(&AI, sizeof(AI_INFO));
+		CreatureAIInfo(item, &AI);
 
 		if (item->HitPoints > 0)
 		{
-			if (item->AIBits)
-				GetAITarget(creature);
-			else
-				creature->Enemy = LaraItem;
-
-			CreatureAIInfo(item, &AI);
-
 			AI_INFO laraAI;
 			if (creature->Enemy == LaraItem)
 			{
@@ -1329,11 +1318,19 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += AI.angle;
 			
-				if (!creature->Flags)
+				if (!(creature->Flags & 1) && item->Animation.FrameNumber == GetFrameIndex(item, 2))
 				{
-					ShotLara(item, &AI, ArmedMafia2GunBite, laraAI.angle / 2, 35);
-					creature->Flags = 1;
-					creature->FiredWeapon = 2;
+					ShotLara(item, &AI, ArmedMafia2GunRightBite, laraAI.angle / 2, 25);
+					creature->MuzzleFlash[1].Bite = ArmedMafia2GunRightBite;
+					creature->MuzzleFlash[1].Delay = 2;
+					creature->Flags |= 1;
+				}
+				if (!(creature->Flags & 2) && item->Animation.FrameNumber == GetFrameIndex(item, 6))
+				{
+					ShotLara(item, &AI, ArmedMafia2GunLeftBite, laraAI.angle / 2, 25);
+					creature->MuzzleFlash[0].Bite = ArmedMafia2GunLeftBite;
+					creature->MuzzleFlash[0].Delay = 2;
+					creature->Flags |= 2;
 				}
 			
 				break;
@@ -1528,9 +1525,6 @@ namespace TEN::Entities::Creatures::TR5
 				item->Animation.ActiveState = 22;
 				creature->MaxTurn = 0;
 				break;
-
-			default:
-				return;
 			}
 		}
 	}
