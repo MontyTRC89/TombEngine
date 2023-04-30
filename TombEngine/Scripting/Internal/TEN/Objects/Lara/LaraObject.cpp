@@ -162,13 +162,14 @@ void LaraObject::UndrawWeapon()
 // @function LaraObject:UndrawWeapon
 // @usage
 // Lara:DrawWeapon()
-void LaraObject::DrawWeapon()
+void LaraObject::DrawWeapon(LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(m_item);
 
 	if (lara->Control.HandStatus == HandStatus::Free ||
 		lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 	{
+		lara->Control.Weapon.RequestGunType = weaponType;
 		lara->Control.HandStatus = HandStatus::WeaponDraw;
 	}
 }

@@ -52,7 +52,7 @@ public:
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
 	int GetAmmoCount() const;
 	void UndrawWeapon();
-	void DrawWeapon();
+	void DrawWeapon(LaraWeaponType weaponType);
 	void ThrowAwayTorch();
 	bool TorchIsLit() const;
 	static void Register(sol::table & parent);
