@@ -126,8 +126,8 @@ void RemoveLasers()
 			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 6, item->Model.Color.x, item->Model.Color.y, item->Model.Color.z);
 
 
-			//The next line makes the effect flicker as soon Lara steps in. Yay!
-			laser.Color.w = Random::GenerateFloat(1.0f, 0.8f);
+			//The next line makes the effect flicker as soon Lara steps in. Yay! - moving it into collision code.
+			//laser.Color.w = Random::GenerateFloat(1.0f, 0.8f);
 
 
 			//including sound later. Bzzz
