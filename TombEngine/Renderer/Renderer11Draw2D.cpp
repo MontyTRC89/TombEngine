@@ -107,7 +107,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
-		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering", "ID_BAR_BORDER_GRAPHIC"))
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
 			return;
 
 		unsigned int strides = sizeof(RendererVertex);

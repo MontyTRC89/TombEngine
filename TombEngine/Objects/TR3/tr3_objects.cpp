@@ -216,8 +216,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_MESHSWAP_MONKEY_KEY, "ID_MONKEY", "ID_MESHSWAP_MONKEY_KEY");
-		CheckIfSlotExists(ID_MESHSWAP_MONKEY_MEDIPACK, "ID_MONKEY", "ID_MESHSWAP_MONKEY_MEDIPACK");
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_KEY, GetObjectName(ID_MONKEY));
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_MEDIPACK, GetObjectName(ID_MONKEY));
 		obj->Initialize = InitializeMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
@@ -267,7 +267,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SHIVA_STATUE, "ID_SHIVA", "ID_SHIVA_STATUE");
+		CheckIfSlotExists(ID_SHIVA_STATUE, GetObjectName(ID_SHIVA));
 		obj->Initialize = InitializeShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;

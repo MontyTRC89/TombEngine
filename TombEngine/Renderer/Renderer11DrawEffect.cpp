@@ -125,7 +125,7 @@ namespace TEN::Renderer
 		if (HelicalLasers.empty())
 			return;
 
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Helical lasers rendering", "ID_DEFAULT_SPRITES"))
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Helical lasers rendering"))
 			return;
 
 		for (const auto& laser : HelicalLasers)
@@ -176,7 +176,7 @@ namespace TEN::Renderer
 		if (ElectricityArcs.empty())
 			return;
 
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Electricity rendering", "ID_DEFAULT_SPRITES"))
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Electricity rendering"))
 			return;
 
 		for (const auto& arc : ElectricityArcs)
@@ -369,7 +369,7 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering", "ID_SPARK_SPRITE"))
+				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
 					continue;
 
 				auto pos = Vector3(particle.x, particle.y, particle.z);
@@ -398,7 +398,7 @@ namespace TEN::Renderer
 			if (!splash.isActive)
 				continue;
 
-			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering", "ID_DEFAULT_SPRITES"))
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering"))
 				return;
 
 			constexpr float alpha = 360 / NUM_POINTS;
@@ -460,7 +460,7 @@ namespace TEN::Renderer
 		if (Bubbles.empty())
 			return;
 
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Bubbles rendering", "ID_DEFAULT_SPRITES"))
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Bubbles rendering"))
 			return;
 
 		for (const auto& bubble : Bubbles)
@@ -480,7 +480,7 @@ namespace TEN::Renderer
 		if (Drips.empty())
 			return;
 
-		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drips rendering", "ID_DRIP_SPRITE"))
+		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drips rendering"))
 			return;
 
 		for (const auto& drip : Drips)
@@ -563,7 +563,7 @@ namespace TEN::Renderer
 			if (!shockwave->life)
 				continue;
 
-			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Shockwaves rendering", "ID_DEFAULT_SPRITES"))
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Shockwaves rendering"))
 				return;
 
 			byte color = shockwave->life * 8;
@@ -730,7 +730,7 @@ namespace TEN::Renderer
 
 			if (blood->on) 
 			{
-				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering", "ID_DEFAULT_SPRITES"))
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
 					return;
 
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
@@ -755,7 +755,7 @@ namespace TEN::Renderer
 			{
 			case WeatherType::None:
 
-				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater dust rendering", "ID_DEFAULT_SPRITES"))
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater dust rendering"))
 					return;
 
 				AddSpriteBillboard(
@@ -769,7 +769,7 @@ namespace TEN::Renderer
 
 			case WeatherType::Snow:
 
-				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering", "ID_DEFAULT_SPRITES"))
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering"))
 					return;
 
 				AddSpriteBillboard(
@@ -783,7 +783,7 @@ namespace TEN::Renderer
 
 			case WeatherType::Rain:
 
-				if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering", "ID_DRIP_SPRITE"))
+				if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering"))
 					return;
 
 				Vector3 v;
@@ -1489,7 +1489,7 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
-			if (!CheckIfSlotExists(ID_SMOKE_SPRITES, "Smoke rendering", "ID_SMOKE_SPRITES"))
+			if (!CheckIfSlotExists(ID_SMOKE_SPRITES, "Smoke rendering"))
 				return;
 
 			AddSpriteBillboard(
@@ -1511,7 +1511,7 @@ namespace TEN::Renderer
 			SparkParticle& s = SparkParticles[i];
 			if (!s.active) continue;
 
-			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering", "ID_SPARK_SPRITE"))
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering"))
 				return;
 
 			Vector3 v;
@@ -1535,7 +1535,7 @@ namespace TEN::Renderer
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
 
-			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering", "ID_EXPLOSION_SPRITES"))
+			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering"))
 				return;
 
 			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
@@ -1551,7 +1551,7 @@ namespace TEN::Renderer
 		{
 			if (!s.active) continue;
 
-			if (!CheckIfSlotExists(s.sequence, "Particle rendering", "Sprite ID " + std::to_string(s.sequence)))
+			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
 				continue;
 
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);

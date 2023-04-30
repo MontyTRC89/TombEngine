@@ -741,7 +741,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;

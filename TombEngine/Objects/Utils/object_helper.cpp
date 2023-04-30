@@ -49,12 +49,12 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::s
 	return false;
 }
 
-bool CheckIfSlotExists(int requiredObject, const std::string& baseName, const std::string& requiredName)
+bool CheckIfSlotExists(GAME_OBJECT_ID requiredObj, const std::string& baseName)
 {
-	bool result = Objects[requiredObject].loaded;
+	bool result = Objects[requiredObj].loaded;
 
 	if (!result)
-		TENLog("Slot " + requiredName + " not loaded. " + baseName + " may not work.", LogLevel::Warning);
+		TENLog("Slot " + GetObjectName(requiredObj) + " not loaded. " + baseName + " may not work.", LogLevel::Warning);
 
 	return result;
 }

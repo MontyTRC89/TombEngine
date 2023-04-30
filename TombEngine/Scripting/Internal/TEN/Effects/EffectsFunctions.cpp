@@ -135,7 +135,7 @@ namespace Effects
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
 	{
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function", "ID_DEFAULT_SPRITES"))
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function"))
 			return;
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
