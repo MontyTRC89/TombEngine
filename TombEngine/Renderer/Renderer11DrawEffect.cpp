@@ -69,7 +69,7 @@ BiteInfo EnemyBites[12] =
 	{ 0, -64, 250, 7 }	  // Troops
 };
 
-int scrollLaserUniform = 0;
+long scrollLaserUniform = 0;
 
 namespace TEN::Renderer 
 {
@@ -82,14 +82,13 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
 		bool IsBillboard;
 		bool IsSoftParticle;
-		bool IsTr5Laser;
+		int renderType;
 	};
 	
-
 	void Renderer11::DrawLasers(RenderView& view)
 	{
 		if (Lasers.empty())
-		return;
+			return;
 
 		for (const auto& laser : Lasers)
 		{
@@ -100,7 +99,7 @@ namespace TEN::Renderer
 					laser.vert3[i], laser.vert4[i],
 					laser.Color, laser.Color,
 					laser.Color, laser.Color,
-					BLENDMODE_ADDITIVE, view);
+					BLENDMODE_ADDITIVE, view, (int)RenderType::TR5LASER);
 			}
 		}
 	}
@@ -1112,7 +1111,7 @@ namespace TEN::Renderer
 		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
-		currentSpriteBucket.IsTr5Laser = view.spritesToDraw[0].isTr5Laser;
+		currentSpriteBucket.renderType = view.spritesToDraw[0].renderType;
 
 		for (auto& rDrawSprite : view.spritesToDraw)
 		{
@@ -1130,7 +1129,7 @@ namespace TEN::Renderer
 				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
-				currentSpriteBucket.IsTr5Laser = rDrawSprite.isTr5Laser;
+				currentSpriteBucket.renderType = rDrawSprite.renderType;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
@@ -1242,13 +1241,10 @@ namespace TEN::Renderer
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
-			m_stSprite.IsTr5Laser = spriteBucket.IsTr5Laser ? 1 : 0;
-			if(m_stSprite.IsTr5Laser)
+			m_stSprite.renderType = spriteBucket.renderType;
+			if(m_stSprite.renderType == (int)RenderType::TR5LASER)
 			{
-				m_stSprite.IsTr5Laser = 1;
-
-				if (scrollLaserUniform > 1024)
-					scrollLaserUniform = -1024;
+				m_stSprite.renderType = (int)RenderType::TR5LASER;
 
 				m_stSprite.secondsUniform = float(scrollLaserUniform++);
 			}
@@ -1316,13 +1312,10 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			m_stSprite.IsTr5Laser = 0;
-			if(info->sprite->isTr5Laser)
+			m_stSprite.renderType = (int)RenderType::NONE;
+			if(info->sprite->renderType == (int)RenderType::TR5LASER)
 			{
-				m_stSprite.IsTr5Laser = 1;
-
-				if (scrollLaserUniform > 1024)
-					scrollLaserUniform = -1024;
+				m_stSprite.renderType = (int)RenderType::TR5LASER;
 
 				m_stSprite.secondsUniform = float(scrollLaserUniform++);
 			}

@@ -11,8 +11,8 @@
 cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
-	float isTr5Laser;
 	float secondsUniform;
+	float renderType;
 };
 
 struct PixelShaderInput
@@ -38,7 +38,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4 worldPosition = float4(input.Position, 1.0f);
 
 	output.Position = mul(worldPosition, ViewProjection);
-	output.PositionCopy = output.Position;	
+	output.PositionCopy = output.Position;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
@@ -55,7 +55,7 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
-	
+
 	DoAlphaTest(output);
 
 	if (IsSoftParticle == 1)
@@ -75,11 +75,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	if(isTr5Laser == 1)
+	if (renderType == 1)
 	{
 		output = DoLasers(input.Position, output, input.UV, FADE_FACTOR, secondsUniform);
 	}
-  
+
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;

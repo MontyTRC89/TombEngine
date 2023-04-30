@@ -28,6 +28,12 @@ namespace TEN::Renderer
 		Vector3 ConstrainAxis;
 		Vector3 LookAtAxis;
 		bool SoftParticle;
-		bool isTr5Laser;
+		int renderType;
+	};
+
+	enum RenderType
+	{
+		NONE = 0,
+		TR5LASER = 1
 	};
 }

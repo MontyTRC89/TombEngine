@@ -8,7 +8,7 @@ struct LaserStructInfo
 	std::array<Vector3, LASER_BEAM_COUNT> vert2 = {};
 	std::array<Vector3, LASER_BEAM_COUNT> vert3 = {};
 	std::array<Vector3, LASER_BEAM_COUNT> vert4 = {};
-	Vector4 Color = Vector4(255, 0, 0, 0.8f);
+	Vector4 Color = Vector4::Zero;
 	short Rand[18];
 	int life = INFINITE;
 };

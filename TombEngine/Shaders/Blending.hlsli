@@ -52,107 +52,141 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 
 	switch (BlendMode)
 	{
-		case BLENDMODE_ADDITIVE:
-		case BLENDMODE_SCREEN:
-		case BLENDMODE_LIGHTEN:
-			fogColor.xyz *= Luma(sourceColor.xyz);
-			break;
+	case BLENDMODE_ADDITIVE:
+	case BLENDMODE_SCREEN:
+	case BLENDMODE_LIGHTEN:
+		fogColor.xyz *= Luma(sourceColor.xyz);
+		break;
 
-		case BLENDMODE_SUBTRACTIVE:
-		case BLENDMODE_EXCLUDE:
-			fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
-			break;
+	case BLENDMODE_SUBTRACTIVE:
+	case BLENDMODE_EXCLUDE:
+		fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+		break;
 
-		case BLENDMODE_ALPHABLEND:
-			fogColor.w = sourceColor.w;
-			break;
+	case BLENDMODE_ALPHABLEND:
+		fogColor.w = sourceColor.w;
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 
 	if (fogColor.w > sourceColor.w)
 		fogColor.w = sourceColor.w;
-	
+
 	float4 result = lerp(sourceColor, fogColor, value);
 	return result;
 }
 
 float4 DoLasers(float3 input, float4 output, float2 UV, float fade_factor, float timeUniform)
 {
-	float2 noiseTexture = input.xy/UV;
-	noiseTexture *=  UV.x/UV.y;
-	float noiseValue = fractalNoise(noiseTexture*3.f-timeUniform);
+	float2 noiseTexture = (input.xy) / (UV );
+	noiseTexture *= (UV.x ) / (UV.y );
+	//float2 noiseTexture = (input.xy * 242) / (UV*242);
+	//noiseTexture *= (UV.x * 242) / (UV.y * 242);
+	float noiseValue = FractalNoise(noiseTexture * 8.f - timeUniform);
 
 	float4 color = output;
-	float gradL = smoothstep(0.0, 0.25, UV.x);
-  float gradR = 1.0 - smoothstep(0.75, 1.0, UV.x);
-  float gradT = smoothstep(0.0, 0.25, UV.y);
-  float gradB = 1.0 - smoothstep(0.75, 1.0, UV.y);
-  
-	float distortion = timeUniform/1024;
+	float gradL = smoothstep(0.0, 0.75, UV.x);
+	float gradR = smoothstep(1.0, 0.0, UV.x);
 
-  float3 noisix = SimplexNoise
+	float gradT = smoothstep(0.0, 1.0, UV.y);//U
+	float gradB =  smoothstep(1.0, 0.0, UV.y);//O
+
+
+	float distortion = timeUniform / 1024;
+
+
+	float3 noisix = SimplexNoise
 	(
-		SimplexNoise(float3(input.r*distortion,input.g,input.b))
+		SimplexNoise(float3(input.r * distortion, input.g, input.b))
 	);
 	float3 shadowx = SimplexNoise
 	(
-		cos(SimplexNoise(sin(timeUniform+input.rgb*200)))
+		cos(SimplexNoise(sin(timeUniform + input.rgb * 400)))
 	);
 
-  noisix.x = noisix.x > 0.9 ? 0.1 : noisix.x;
-  noisix.y = noisix.y > 0.9 ? 0.1 : noisix.y;
-  noisix.z = noisix.z > 0.9 ? 0.1 : noisix.z;
-  color.rgb *= noisix;
-  color.rgb -= noisix;
-  
-  float fade0 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING,BLENDING), float2(gradL, gradT)));
-  float fade1 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING,BLENDING), float2(gradL, gradB)));
-  float fade2 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING,BLENDING), float2(gradR, gradB)));
-  float fade3 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING,BLENDING), float2(gradR, gradT)));
-  
-  float fadeL = fade_factor * fade_factor * (1.0 - gradL);
-  float fadeB = 1.75f*fade_factor * fade_factor * (1.0 - gradB);
-  float fadeR = fade_factor * fade_factor * (1.0 - gradR);
-  float fadeT = 1.75f*fade_factor * fade_factor * (1.0 - gradT);
-  
-  float fade = max(
-    max(max(fade0, fade1), max(fade2, fade3)),
-    max(max(fadeL, fadeR), max(fadeB, fadeT)));
-    
-  float scale = 1.0 - fade; 
-  
-  color *= scale;
+	noisix.x = noisix.x > 0.9 ? 0.7 : noisix.x;
+	noisix.y = noisix.y > 0.9 ? 0.7 : noisix.y;
+	noisix.z = noisix.z > 0.9 ? 0.7 : noisix.z;
+	color.rgb *= noisix + 1.3f;
+	color.rgb -= noisix + .2f;
+
+
+
+	float frequency = 0.1;
+	float amplitude = 0.8;
+	float persistence = 0.5;
+
+	float noiseValue2 = 0;
+	float noiseValue3 = 0;
+
+
+	float2 uv84 = (UV * 2.4);// +timeUniform * 0.05;//mehr is höher oben           *2,5
+	uv84.y = (uv84.y - 1.3);// bei - je höher desto tiefer
+	uv84.x = (uv84.x / 1.3);// bei - je höher desto tiefer
+	float2 uv85 = (UV / 2.4);// +timeUniform * 0.05;// /                           /1.0f
+
+	noiseValue2 = AnimatedNebula(uv84, timeUniform * 0.1f);
+
+
+	frequency = 2.5;//2
+	amplitude = 0.2;
+	persistence = 4.7; 
+
+	float2 uv83 = UV * 8;
+	uv83.y = (UV.y + (timeUniform * 0.02));//Rising texture
+	noiseValue3 = nebularNoise(uv83, frequency, amplitude, persistence);
+
+	noiseValue2 += AnimatedNebula(UV/2, timeUniform * 0.05f);
+	
+	color.a *= noiseValue + .01f;
+	color.r *= noiseValue;
+	color.gb *= noiseValue;
+	color.rgb -= shadowx + .1f;
+
+	color.a *= noiseValue2 + 0.9f ;// +.7f;
+	color.a *= noiseValue3 + 2.0f;// +.7f; 1.5
+
+
+
+
+	float fade0 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradL, gradT)));
+	float fade1 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradL, gradB)));
+	float fade2 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradB)));
+	float fade3 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradT)));
+
+	float fadeL = 1.40f * fade_factor * fade_factor * (1.0 - gradL);
+	float fadeB =  fade_factor * fade_factor * (1.0 - gradB);
+	float fadeR = 1.40f * fade_factor * fade_factor * (1.0 - gradR);
+	float fadeT = fade_factor * fade_factor * (1.0 - gradT);
+
+
+	float fade = max(
+		max(max(fade0, fade1), max(fade2, fade3)),
+		max(max(fadeL, fadeR), max(fadeB, fadeT)));
+
+	float scale = 1.0 - fade;
+
+	color *= scale;
 	float decayFactor = 1;
-	if(UV.y>.5f && UV.y<.75f)
+	if (UV.y > .5f && UV.y < 1)
 	{
-		decayFactor = UV.y/2;
+		decayFactor = UV.y / 2;
 	}
-	if(UV.y<.5f && UV.y>.25f)
+	if (UV.y < .5f && UV.y>0)
 	{
-		decayFactor = (1-UV.y)/2;
+		decayFactor = (1 - UV.y) / 2;
 	}
-
-	//Initial decay factor for Lasers
 	color *= decayFactor;
-  color.rgb -= shadowx;
-  color.rgb = smoothstep(ZERO,EIGHT_FIVE,color.rgb);
 
-	//Add fractal noise effect
-	color.a *= noiseValue+.1f;
-	color.r *= 2*noiseValue;
-	color.gb -= noiseValue;
+	color.rgb = smoothstep(ZERO, EIGHT_FIVE, color.rgb); //war rgb
 
-	//Add shadow that moves diagonally
-	noiseValue = 0;
-	float2 uv8 = UV*8+timeUniform*0.1f;
-	matrix <float, 2, 2> transformationMatrix = {1.6f,  0.6f, -1.2f,  1.6f};
-	noiseValue  = 0.5000*Noise2D( uv8 ); uv8 = mul(uv8, transformationMatrix);
-	noiseValue += 0.2500*Noise2D( uv8 ); uv8 = mul(uv8, transformationMatrix);
-	noiseValue += 0.1250*Noise2D( uv8 ); uv8 = mul(uv8, transformationMatrix);
-	noiseValue += 0.0625*Noise2D( uv8 ); uv8 = mul(uv8, transformationMatrix);
-	color.rgb = max(color.rgb-noiseValue,0);
+	if (output.r)
+		color.r = max(color.r - noiseValue2, color.r - noiseValue3);//nur r
+
+	if (output.g)
+		color.g = max(color.g - noiseValue2, color.g - noiseValue3);//nur r
 
 	return color;
 }

@@ -3,6 +3,7 @@
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define PI2 6.2831853071795864769252867665590057683943387987502116419498891846
+#define OCTAVES 6
 
 float Luma(float3 color)
 {
@@ -119,6 +120,140 @@ float SimplexNoise(float3 v)
 	m = m * m;
 	return 105.0 * dot( m*m, float4( dot(p0,x0), dot(p1,x1), 
 									 dot(p2,x2), dot(p3,x3) ) );
+}
+
+float2 gradient2D(float2 p)
+{
+	float angle = 2 * 3.14159265359 * frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+	return normalize(float2(cos(angle), sin(angle)));
+}
+
+float nebularNoise(float2 uv, float frequency, float amplitude, float persistence)
+{
+
+	float noiseValue = 0.0;
+	float scale = 1.0;
+	float range = 1.0;
+	float2 p = uv * frequency;
+
+
+	float2 floorP = floor(p);
+	float2 fracP = frac(p);
+	float4 v = float4(0.0, 1.0, 0.0, 1.0);
+
+	float2 bl = floorP;
+	float2 br = bl + float2(1.0, 0.0);
+	float2 tl = bl + float2(0.0, 1.0);
+	float2 tr = bl + float2(1.0, 1.0);
+
+	float2 v1 = fracP;
+	float2 v2 = v1 - float2(1.0, 0.0);
+	float2 v3 = v1 - float2(0.0, 1.0);
+	float2 v4 = v1 - float2(1.0, 1.0);
+
+	float dot1 = dot(gradient2D(bl), v1);
+	float dot2 = dot(gradient2D(br), v2);
+	float dot3 = dot(gradient2D(tl), v3);
+	float dot4 = dot(gradient2D(tr), v4);
+
+	float u = smoothstep(0.0, 1.0, v1.x);
+	float2 a = lerp(float2(dot1, dot3), float2(dot2, dot4), u);
+
+	float k = smoothstep(0.0, 1.0, v1.y);
+	float b = lerp(a.x, a.y, k);
+
+	noiseValue += b * scale / range;
+
+	range += amplitude;
+	scale *= persistence;
+	p *= 2.0;
+
+	return noiseValue;
+}
+
+float Noise(float2 p)
+{
+	return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float PerlinNoise(float2 p)
+{
+	float2 i = floor(p);
+	float2 f = frac(p);
+
+	float a = Noise(i);
+	float b = Noise(i + float2(1.0, 0.0));
+	float c = Noise(i + float2(0.0, 1.0));
+	float d = Noise(i + float2(1.0, 1.0));
+
+	float2 u = f * f * (3.0 - 2.0 * f);
+
+	return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
+}
+
+float4 AnimatedNebula(float2 uv, float time)
+{
+	// Scale the UV coordinates
+	float2 scaledUV = uv;
+
+	// Apply horizontal mirroring
+	scaledUV.y = abs(scaledUV.y);
+
+	// Generate a noise value using Perlin noise
+	float noiseValue = PerlinNoise(scaledUV.xy + time);
+
+	// Apply turbulence to the noise value
+	float turbulence = noiseValue * 0.9;
+	float2 distortedUV = scaledUV + turbulence;
+
+	// Interpolate between two main colors based on the distorted UV coordinates
+	float4 color1 = float4(0.2, 0.4, 0.8, 0.0);
+	float4 color2 = float4(0.6, 0.1, 0.5, 0.0);
+	float4 interpolatedColor = lerp(color1, color2, saturate(distortedUV.y));
+
+	// Add some brightness flickering based on the noise value
+	interpolatedColor *= 1.0 + noiseValue * 1.3;
+
+	return interpolatedColor;
+}
+
+float RandomValue(float2 input) {
+	return frac(sin(dot(input, float2(12.9898, 78.233))) * 43758.5453123);
+}
+
+float Noise2D(float2 input)
+{
+	float2 i = floor(input);
+	float2 f = frac(input);
+
+	// Four corners in 2D of a tile
+	float a = RandomValue(i);
+	float b = RandomValue(i + float2(1.0, 0.0));
+	float c = RandomValue(i + float2(0.0, 1.0));
+	float d = RandomValue(i + float2(1.0, 1.0));
+
+	float2 u = f * f * (3.0 - 2.0 * f);
+
+	return lerp(a, b, u.x) +
+		(c - a) * u.y * (1.0 - u.x) +
+		(d - b) * u.x * u.y;
+}
+
+float FractalNoise(float2 input)
+{
+	// Initial values
+	float value = 0.0;
+	float amplitude = .5;
+	float frequency = 0.;
+	//
+	// Loop of octaves
+	for (int i = 0; i < OCTAVES; i++)
+	{
+		value += amplitude * Noise2D(input);
+		input *= 2.;
+		amplitude *= .5;
+	}
+	return value;
 }
 
 float3 NormalNoise(float3 v, float3 i, float3 n)

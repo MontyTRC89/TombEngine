@@ -32,7 +32,7 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
-		spr.isTr5Laser = false;
+		spr.renderType = (int)RenderType::NONE;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -67,7 +67,7 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
-		spr.isTr5Laser = false;
+		spr.renderType = (int)RenderType::NONE;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -102,7 +102,7 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
-		spr.isTr5Laser = false;
+		spr.renderType = (int)RenderType::NONE;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -146,7 +146,7 @@ namespace TEN::Renderer
 		spr.BlendMode = blendMode;
 		spr.pos = (vertex0 + vertex1 + vertex2 + vertex3) / 4.0f;
 		spr.SoftParticle = isSoftParticle;
-		spr.isTr5Laser = false;
+		spr.renderType = (int)RenderType::NONE;
 
 		view.spritesToDraw.push_back(spr);
 	}
@@ -159,7 +159,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-									BLEND_MODES blendMode, RenderView& view, bool isTr5Laser)
+									BLEND_MODES blendMode, RenderView& view, int renderType)
 	{
 		if (m_Locked)
 			return;
@@ -179,7 +179,7 @@ namespace TEN::Renderer
 		sprite.BlendMode = blendMode;
 		sprite.pos = (vertex0 + vertex1 + vertex2 + vertex3) / 4.0f;
 		sprite.SoftParticle = false;
-		sprite.isTr5Laser = isTr5Laser;
+		sprite.renderType = renderType;
 
 		view.spritesToDraw.push_back(sprite);
 	}
