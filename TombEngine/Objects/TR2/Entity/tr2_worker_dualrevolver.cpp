@@ -35,13 +35,14 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
+
 		if (creature->MuzzleFlash[1].Delay != 0)
 			creature->MuzzleFlash[1].Delay--;
 
@@ -51,16 +52,18 @@ namespace TEN::Entities::Creatures::TR2
 				SetAnimation(item, 32);
 		}
 		else if (LaraItem->HitPoints <= 0)
+		{
 			item->Animation.TargetState = 2;
+		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -68,30 +71,38 @@ namespace TEN::Entities::Creatures::TR2
 			case 2:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				if (creature->Mood == MoodType::Attack || LaraItem->HitPoints > 0)
 				{
-					if (Targetable(item, &AI))
+					if (Targetable(item, &ai))
 					{
-						if (AI.distance <= pow(SECTOR(3), 2))
+						if (ai.distance <= pow(SECTOR(3), 2))
+						{
 							item->Animation.TargetState = 9;
+						}
 						else
+						{
 							item->Animation.TargetState = 3;
+						}
 					}
 					else
 					{
 						switch (creature->Mood)
 						{
 						case MoodType::Attack:
-							if (AI.distance > pow(SECTOR(20), 2) || !AI.ahead)
+							if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
+							{
 								item->Animation.TargetState = 4;
+							}
 							else
+							{
 								item->Animation.TargetState = 3;
+							}
 
 							break;
 
@@ -104,7 +115,7 @@ namespace TEN::Entities::Creatures::TR2
 							break;
 
 						default:
-							if (!AI.ahead)
+							if (!ai.ahead)
 								item->Animation.TargetState = 3;
 
 							break;
@@ -112,125 +123,155 @@ namespace TEN::Entities::Creatures::TR2
 					}
 				}
 				else
+				{
 					item->Animation.TargetState = 1;
+				}
 
 				break;
 
 			case 3:
 				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
 				{
-					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
+					if (ai.distance < pow(SECTOR(3), 2) || ai.zoneNumber != ai.enemyZone)
+					{
 						item->Animation.TargetState = 1;
+					}
 					else
 					{
-						if (AI.angle >= 0)
+						if (ai.angle >= 0)
+						{
 							item->Animation.TargetState = 6;
+						}
 						else
+						{
 							item->Animation.TargetState = 5;
+						}
 					}
 				}
 
 				if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = 4;
+				}
 				else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Stalk)
 				{
-					if (AI.distance > pow(SECTOR(20), 2) || !AI.ahead)
+					if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
 						item->Animation.TargetState = 4;
 				}
 				else if (LaraItem->HitPoints > 0)
 				{
-					if (AI.ahead)
+					if (ai.ahead)
 						item->Animation.TargetState = 1;
 				}
 				else
+				{
 					item->Animation.TargetState = 2;
+				}
 
 				break;
 
 			case 4:
 				creature->MaxTurn = ANGLE(6.0f);
-				tilt = angle / 4;
+				tiltAngle = headingAngle / 4;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
 				{
-					if (AI.zoneNumber == AI.enemyZone)
+					if (ai.zoneNumber == ai.enemyZone)
 					{
-						if (AI.angle >= 0)
+						if (ai.angle >= 0)
+						{
 							item->Animation.TargetState = 6;
+						}
 						else
+						{
 							item->Animation.TargetState = 5;
+						}
 					}
 					else
+					{
 						item->Animation.TargetState = 3;
+					}
 				}
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (AI.ahead && AI.distance < pow(SECTOR(20), 2))
+					if (ai.ahead && ai.distance < pow(SECTOR(20), 2))
 						item->Animation.TargetState = 3;
 				}
 				else if (LaraItem->HitPoints > 0)
+				{
 					item->Animation.TargetState = 1;
+				}
 				else
+				{
 					item->Animation.TargetState = 2;
+				}
 
 				break;
 
 			case 5:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = 7;
+				}
 				else
+				{
 					item->Animation.TargetState = 3;
+				}
 
 				break;
 
 			case 6:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = 8;
+				}
 				else
+				{
 					item->Animation.TargetState = 3;
+				}
 
 				break;
 
 			case 7:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
-					ShotLara(item, &AI, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
+					ShotLara(item, &ai, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
 					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteLeft;
 					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
@@ -239,15 +280,15 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 8:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
-					ShotLara(item, &AI, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
+					ShotLara(item, &ai, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
 					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteRight;
 					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
@@ -258,30 +299,34 @@ namespace TEN::Entities::Creatures::TR2
 			case 9:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = 10;
+				}
 				else
+				{
 					item->Animation.TargetState = 1;
+				}
 
 				break;
 
 			case 10:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
-					ShotLara(item, &AI, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
-					ShotLara(item, &AI, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
+					ShotLara(item, &ai, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
+					ShotLara(item, &ai, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
 					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteLeft;
 					creature->MuzzleFlash[0].Delay = 1;
 					creature->MuzzleFlash[1].Bite = WorkerDualGunBiteRight;
@@ -293,11 +338,11 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureTilt(item, tilt);
+		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, extraTorsoRot.y);
 		CreatureJoint(item, 1, extraTorsoRot.x);
 		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureJoint(item, 3, extraHeadRot.x);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }
