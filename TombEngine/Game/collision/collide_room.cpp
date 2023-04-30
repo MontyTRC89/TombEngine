@@ -403,7 +403,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
-	auto floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	auto floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	short aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
 
@@ -470,7 +470,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
 	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
 
@@ -531,7 +531,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
 	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
 
@@ -597,7 +597,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
 	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
 
@@ -658,7 +658,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	floorNormal = Geometry::GetFloorNormal(collResult.FloorTilt);
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
 	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
 
