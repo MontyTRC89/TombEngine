@@ -54,7 +54,10 @@ bool CheckIfSlotExists(GAME_OBJECT_ID requiredObj, const std::string& baseName)
 	bool result = Objects[requiredObj].loaded;
 
 	if (!result)
-		TENLog("Slot " + GetObjectName(requiredObj) + " not loaded. " + baseName + " may not work.", LogLevel::Warning);
+	{
+		TENLog("Slot " + GetObjectName(requiredObj) + " (" + std::to_string(requiredObj) + ") not loaded. " + 
+				baseName + " may not work.", LogLevel::Warning);
+	}
 
 	return result;
 }
