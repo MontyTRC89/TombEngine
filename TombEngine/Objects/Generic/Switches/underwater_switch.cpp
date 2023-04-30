@@ -90,7 +90,7 @@ namespace TEN::Entities::Switches
 
 						do
 						{
-							AnimateLara(laraItem);
+							AnimateItem(laraItem);
 						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
@@ -119,14 +119,14 @@ namespace TEN::Entities::Switches
 			lara->Control.WaterStatus == WaterStatus::Underwater &&
 			lara->Control.HandStatus == HandStatus::Free &&
 			switchItem->Animation.ActiveState == SWITCH_OFF) ||
-			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
+			(lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber))
 		{
 			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
 					doInteraction = true;
 				else
-					lara->InteractedItem = itemNumber;
+					lara->Context.InteractedItem = itemNumber;
 			}
 			else
 			{
@@ -137,7 +137,7 @@ namespace TEN::Entities::Switches
 					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
 						doInteraction = true;
 					else
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 				}
 
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);

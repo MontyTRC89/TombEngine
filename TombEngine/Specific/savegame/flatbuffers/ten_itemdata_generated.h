@@ -760,7 +760,8 @@ struct CreatureT : public flatbuffers::NativeTable {
   bool hurt_by_lara = false;
   int32_t tosspad = 0;
   int32_t location_ai = 0;
-  int32_t fired_weapon = 0;
+  int32_t weapon_delay1 = 0;
+  int32_t weapon_delay2 = 0;
   int32_t mood = 0;
   int32_t enemy = 0;
   int32_t ai_target_number = 0;
@@ -791,16 +792,17 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HURT_BY_LARA = 26,
     VT_TOSSPAD = 28,
     VT_LOCATION_AI = 30,
-    VT_FIRED_WEAPON = 32,
-    VT_MOOD = 34,
-    VT_ENEMY = 36,
-    VT_AI_TARGET_NUMBER = 38,
-    VT_FLAGS = 40,
-    VT_CAN_JUMP = 42,
-    VT_CAN_MONKEY = 44,
-    VT_IS_AMPHIBIOUS = 46,
-    VT_IS_JUMPING = 48,
-    VT_IS_MONKEYING = 50
+    VT_WEAPON_DELAY1 = 32,
+    VT_WEAPON_DELAY2 = 34,
+    VT_MOOD = 36,
+    VT_ENEMY = 38,
+    VT_AI_TARGET_NUMBER = 40,
+    VT_FLAGS = 42,
+    VT_CAN_JUMP = 44,
+    VT_CAN_MONKEY = 46,
+    VT_IS_AMPHIBIOUS = 48,
+    VT_IS_JUMPING = 50,
+    VT_IS_MONKEYING = 52
   };
   int32_t maximum_turn() const {
     return GetField<int32_t>(VT_MAXIMUM_TURN, 0);
@@ -844,8 +846,11 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t location_ai() const {
     return GetField<int32_t>(VT_LOCATION_AI, 0);
   }
-  int32_t fired_weapon() const {
-    return GetField<int32_t>(VT_FIRED_WEAPON, 0);
+  int32_t weapon_delay1() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY1, 0);
+  }
+  int32_t weapon_delay2() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY2, 0);
   }
   int32_t mood() const {
     return GetField<int32_t>(VT_MOOD, 0);
@@ -891,7 +896,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HURT_BY_LARA) &&
            VerifyField<int32_t>(verifier, VT_TOSSPAD) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_AI) &&
-           VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY1) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY2) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
            VerifyField<int32_t>(verifier, VT_AI_TARGET_NUMBER) &&
@@ -954,8 +960,11 @@ struct CreatureBuilder {
   void add_location_ai(int32_t location_ai) {
     fbb_.AddElement<int32_t>(Creature::VT_LOCATION_AI, location_ai, 0);
   }
-  void add_fired_weapon(int32_t fired_weapon) {
-    fbb_.AddElement<int32_t>(Creature::VT_FIRED_WEAPON, fired_weapon, 0);
+  void add_weapon_delay1(int32_t weapon_delay1) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY1, weapon_delay1, 0);
+  }
+  void add_weapon_delay2(int32_t weapon_delay2) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY2, weapon_delay2, 0);
   }
   void add_mood(int32_t mood) {
     fbb_.AddElement<int32_t>(Creature::VT_MOOD, mood, 0);
@@ -1011,7 +1020,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1026,7 +1036,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
   builder_.add_ai_target_number(ai_target_number);
   builder_.add_enemy(enemy);
   builder_.add_mood(mood);
-  builder_.add_fired_weapon(fired_weapon);
+  builder_.add_weapon_delay2(weapon_delay2);
+  builder_.add_weapon_delay1(weapon_delay1);
   builder_.add_location_ai(location_ai);
   builder_.add_tosspad(tosspad);
   builder_.add_joint_rotation(joint_rotation);
@@ -1070,7 +1081,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1097,7 +1109,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
       hurt_by_lara,
       tosspad,
       location_ai,
-      fired_weapon,
+      weapon_delay1,
+      weapon_delay2,
       mood,
       enemy,
       ai_target_number,
@@ -1527,8 +1540,6 @@ struct KayakT : public flatbuffers::NativeTable {
   bool turn = false;
   bool forward = false;
   bool true_water = false;
-  int32_t current_start_wake = 0;
-  int32_t wake_shade = 0;
   int32_t flags = 0;
 };
 
@@ -1548,9 +1559,7 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TURN = 20,
     VT_FORWARD = 22,
     VT_TRUE_WATER = 24,
-    VT_CURRENT_START_WAKE = 26,
-    VT_WAKE_SHADE = 28,
-    VT_FLAGS = 30
+    VT_FLAGS = 26
   };
   int32_t turn_rate() const {
     return GetField<int32_t>(VT_TURN_RATE, 0);
@@ -1585,12 +1594,6 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool true_water() const {
     return GetField<uint8_t>(VT_TRUE_WATER, 0) != 0;
   }
-  int32_t current_start_wake() const {
-    return GetField<int32_t>(VT_CURRENT_START_WAKE, 0);
-  }
-  int32_t wake_shade() const {
-    return GetField<int32_t>(VT_WAKE_SHADE, 0);
-  }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
   }
@@ -1607,8 +1610,6 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TURN) &&
            VerifyField<uint8_t>(verifier, VT_FORWARD) &&
            VerifyField<uint8_t>(verifier, VT_TRUE_WATER) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_START_WAKE) &&
-           VerifyField<int32_t>(verifier, VT_WAKE_SHADE) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
@@ -1654,12 +1655,6 @@ struct KayakBuilder {
   void add_true_water(bool true_water) {
     fbb_.AddElement<uint8_t>(Kayak::VT_TRUE_WATER, static_cast<uint8_t>(true_water), 0);
   }
-  void add_current_start_wake(int32_t current_start_wake) {
-    fbb_.AddElement<int32_t>(Kayak::VT_CURRENT_START_WAKE, current_start_wake, 0);
-  }
-  void add_wake_shade(int32_t wake_shade) {
-    fbb_.AddElement<int32_t>(Kayak::VT_WAKE_SHADE, wake_shade, 0);
-  }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(Kayak::VT_FLAGS, flags, 0);
   }
@@ -1687,13 +1682,9 @@ inline flatbuffers::Offset<Kayak> CreateKayak(
     bool turn = false,
     bool forward = false,
     bool true_water = false,
-    int32_t current_start_wake = 0,
-    int32_t wake_shade = 0,
     int32_t flags = 0) {
   KayakBuilder builder_(_fbb);
   builder_.add_flags(flags);
-  builder_.add_wake_shade(wake_shade);
-  builder_.add_current_start_wake(current_start_wake);
   builder_.add_old_pos(old_pos);
   builder_.add_water_height(water_height);
   builder_.add_left_right_count(left_right_count);
@@ -2731,7 +2722,8 @@ inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_functi
   { auto _e = hurt_by_lara(); _o->hurt_by_lara = _e; }
   { auto _e = tosspad(); _o->tosspad = _e; }
   { auto _e = location_ai(); _o->location_ai = _e; }
-  { auto _e = fired_weapon(); _o->fired_weapon = _e; }
+  { auto _e = weapon_delay1(); _o->weapon_delay1 = _e; }
+  { auto _e = weapon_delay2(); _o->weapon_delay2 = _e; }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
   { auto _e = ai_target_number(); _o->ai_target_number = _e; }
@@ -2765,7 +2757,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _hurt_by_lara = _o->hurt_by_lara;
   auto _tosspad = _o->tosspad;
   auto _location_ai = _o->location_ai;
-  auto _fired_weapon = _o->fired_weapon;
+  auto _weapon_delay1 = _o->weapon_delay1;
+  auto _weapon_delay2 = _o->weapon_delay2;
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
   auto _ai_target_number = _o->ai_target_number;
@@ -2791,7 +2784,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
       _hurt_by_lara,
       _tosspad,
       _location_ai,
-      _fired_weapon,
+      _weapon_delay1,
+      _weapon_delay2,
       _mood,
       _enemy,
       _ai_target_number,
@@ -2986,8 +2980,6 @@ inline void Kayak::UnPackTo(KayakT *_o, const flatbuffers::resolver_function_t *
   { auto _e = turn(); _o->turn = _e; }
   { auto _e = forward(); _o->forward = _e; }
   { auto _e = true_water(); _o->true_water = _e; }
-  { auto _e = current_start_wake(); _o->current_start_wake = _e; }
-  { auto _e = wake_shade(); _o->wake_shade = _e; }
   { auto _e = flags(); _o->flags = _e; }
 }
 
@@ -3010,8 +3002,6 @@ inline flatbuffers::Offset<Kayak> CreateKayak(flatbuffers::FlatBufferBuilder &_f
   auto _turn = _o->turn;
   auto _forward = _o->forward;
   auto _true_water = _o->true_water;
-  auto _current_start_wake = _o->current_start_wake;
-  auto _wake_shade = _o->wake_shade;
   auto _flags = _o->flags;
   return TEN::Save::CreateKayak(
       _fbb,
@@ -3026,8 +3016,6 @@ inline flatbuffers::Offset<Kayak> CreateKayak(flatbuffers::FlatBufferBuilder &_f
       _turn,
       _forward,
       _true_water,
-      _current_start_wake,
-      _wake_shade,
       _flags);
 }
 

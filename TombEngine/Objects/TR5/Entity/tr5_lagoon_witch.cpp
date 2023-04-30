@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
-	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
+	const auto LagoonWitchBite = CreatureBiteInfo(Vector3i::Zero, 7);
 	const auto LagoonWitchAttackJoints = std::vector<unsigned int>{ 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
@@ -36,10 +36,10 @@ namespace TEN::Entities::Creatures::TR5
 		WITCH_ANIM_DEATH = 7
 	};
 
-	void InitialiseLagoonWitch(short itemNumber)
+	void InitializeLagoonWitch(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 1);
 		item->Pose.Position.y += CLICK(2);
 	}

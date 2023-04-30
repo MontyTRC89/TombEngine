@@ -16,7 +16,7 @@ namespace TEN::Entities::TR4
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(BLOCK(0.66f));
 
-	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
+	const auto HammerheadBite = CreatureBiteInfo(Vector3i::Zero, 12);
 	const auto HammerheadBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	enum HammerheadState
@@ -54,11 +54,11 @@ namespace TEN::Entities::TR4
 		HAMMERHEAD_ANIM_KILL = 19
 	};
 
-	void InitialiseHammerhead(short itemNumber)
+	void InitializeHammerhead(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HAMMERHEAD_ANIM_IDLE);
 	}
 

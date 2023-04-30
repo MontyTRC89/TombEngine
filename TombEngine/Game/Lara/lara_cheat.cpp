@@ -62,7 +62,7 @@ void LaraCheatyBits(ItemInfo* item)
 		static bool dbFlyCheat = true;
 		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
-			if (lara->Vehicle == NO_ITEM)
+			if (lara->Context.Vehicle == NO_ITEM)
 			{
 				LaraCheatGetStuff(item);
 				DelsGiveLaraItemsCheat(item);
@@ -77,12 +77,12 @@ void LaraCheatyBits(ItemInfo* item)
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
-					ResetLaraFlex(item);
+					ResetPlayerFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
 					lara->Control.Count.Death = 0;
-					lara->PoisonPotency = 0;
-					lara->Air = LARA_AIR_MAX;
-					lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+					lara->Status.Air = LARA_AIR_MAX;
+					lara->Status.Poison = 0;
+					lara->Status.Stamina = LARA_STAMINA_MAX;
 				}
 			}
 			else
@@ -117,7 +117,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Pistol];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;

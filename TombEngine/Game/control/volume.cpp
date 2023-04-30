@@ -173,7 +173,7 @@ namespace TEN::Control::Volumes
 
 		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
-		if (item.IsLara() || item.Index == Lara.Vehicle)
+		if (item.IsLara() || item.Index == Lara.Context.Vehicle)
 		{
 			TestVolumes(item.RoomNumber, box, VolumeActivatorFlags::Player, itemNumber);
 		}
@@ -187,7 +187,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	void InitialiseNodeScripts()
+	void InitializeNodeScripts()
 	{
 		static const std::string nodeScriptPath = "Scripts/Engine/NodeCatalogs/";
 

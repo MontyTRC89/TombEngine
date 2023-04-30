@@ -19,7 +19,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
+	const auto HydraBite = CreatureBiteInfo(Vector3i::Zero, 11);
 
 	enum HydraState
 	{
@@ -39,11 +39,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	};
 
-	void InitialiseHydra(short itemNumber)
+	void InitializeHydra(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (item->TriggerFlags == 1)

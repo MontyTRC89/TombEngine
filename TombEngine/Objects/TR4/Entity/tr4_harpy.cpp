@@ -30,11 +30,11 @@ namespace TEN::Entities::TR4
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
 	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
-	const auto HarpyBite1	= BiteInfo(Vector3::Zero, 4);
-	const auto HarpyBite2	= BiteInfo(Vector3::Zero, 2);
-	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
-	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
-	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
+	const auto HarpyBite1	= CreatureBiteInfo(Vector3i::Zero, 4);
+	const auto HarpyBite2	= CreatureBiteInfo(Vector3i::Zero, 2);
+	const auto HarpyBite3	= CreatureBiteInfo(Vector3i::Zero, 15);
+	const auto HarpyAttack1 = CreatureBiteInfo(Vector3i(0, 128, 0), 2);
+	const auto HarpyAttack2 = CreatureBiteInfo(Vector3i(0, 128, 0), 4);
 	const auto HarpySwoopAttackJoints   = std::vector<unsigned int>{ 2, 4, 15 };
 	const auto HarpyStingerAttackJoints = std::vector<unsigned int>{ 2, 4 };
 
@@ -105,8 +105,8 @@ namespace TEN::Entities::TR4
 	{
 		item->ItemFlags[0]++;
 
-		auto rh = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position));
-		auto lr = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack2.Position));
+		auto rh = GetJointPosition(item, HarpyAttack1);
+		auto lr = GetJointPosition(item, HarpyAttack2);
 
 		int sG = (GetRandomControl() & 0x7F) + 32;
 		int sR = sG;
@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 			{
-				auto pos3 = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
+				auto pos3 = GetJointPosition(item, HarpyAttack1.BoneID, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
 				auto orient = Geometry::GetOrientToPoint(lr.ToVector3(), rh.ToVector3());
 				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
@@ -157,7 +157,7 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 			{
-				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack2.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
+				auto pos3 = GetJointPosition(item, HarpyAttack2.BoneID, Vector3i(HarpyAttack2.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(lr.ToVector3(), rh.ToVector3());
 				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
@@ -165,10 +165,10 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseHarpy(short itemNumber)
+	void InitializeHarpy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HARPY_ANIM_IDLE);
 	}
 
@@ -446,12 +446,12 @@ namespace TEN::Entities::TR4
 						creature->Enemy != nullptr &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= BLOCK(1) &&
 						AI.distance < SQUARE(BLOCK(2)) &&
-						item->Animation.AnimNumber == GetAnimNumber(*item, HARPY_ANIM_STINGER_ATTACK) &&
-						item->Animation.FrameNumber > GetFrameNumber(item, 17))
+						item->Animation.AnimNumber == GetAnimIndex(*item, HARPY_ANIM_STINGER_ATTACK) &&
+						item->Animation.FrameNumber > GetFrameIndex(item, 17))
 					)
 				{
 					if (creature->Enemy->IsLara())
-						GetLaraInfo(creature->Enemy)->PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+						GetLaraInfo(creature->Enemy)->Status.Poison += HARPY_STINGER_POISON_POTENCY;
 
 					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
 					CreatureEffect2(item, HarpyBite3, 10, -1, DoBloodSplat);

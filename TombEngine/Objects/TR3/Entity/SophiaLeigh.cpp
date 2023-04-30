@@ -63,9 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	const auto SophiaLeighStaffBite = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
-	const auto SophiaLeighLeftBite	= BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
-	const auto SophiaLeighRightBite = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
+	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3i(-28, 56, 356), 10);
+	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3i(-72, 48, 356), 10);
+	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3i(16, 48, 304), 10);
 
 	struct SophiaData
 	{
@@ -218,11 +218,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerSophiaLeightLight(ItemInfo& item, const Vector3& pos)
 	{
-		if ((item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameNumber(&item, 6)) ||
-			 item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameNumber(&item, 3)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 39) && item.Animation.FrameNumber < GetFrameNumber(&item, 47)) ||
-			(item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameNumber(&item, 14) && item.Animation.FrameNumber < GetFrameNumber(&item, 18)))
+		if ((item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameIndex(&item, 6)) ||
+			 item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameIndex(&item, 3)) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
 				item.ItemFlags[1]++;
 		}
-		else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameNumber(&item, 3) && item.ItemFlags[1] > 0)
+		else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -243,7 +243,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
+	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
 		if (fxNumber == NO_ITEM)
@@ -253,7 +253,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto boltType = isBoltLarge ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
 
-		fx.pos.Position = GetJointPosition(&item, bite.meshNum, bite.Position);
+		fx.pos.Position = GetJointPosition(&item, bite);
 		fx.pos.Orientation.x = item.Pose.Orientation.x + data->torsoXAngle;
 
 		if (enemy->IsLara())
@@ -410,7 +410,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
 			{
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -425,7 +425,7 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
+			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
 				// Charged state.
@@ -470,7 +470,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 36))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -489,7 +489,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
@@ -602,7 +602,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
 			{
-				if (item.Animation.FrameNumber == GetFrameNumber(&item, 0))
+				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -619,7 +619,7 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimNumber(item, SOPHIALEIGH_ANIM_SUMMON) &&
+			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
 					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
 			{
 				// Charged state.
@@ -663,7 +663,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 36))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -682,7 +682,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameNumber(&item, 14))
+			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
@@ -692,11 +692,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialiseSophiaLeigh(short itemNumber)
+	void InitializeSophiaLeigh(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		CheckForRequiredObjects(item);						// ItemFlags[0] is used.
 		item.ItemFlags[1] = 0;								// Light timer (for smoothing).
 		item.ItemFlags[4] = 0;								// Charged state (true or false).

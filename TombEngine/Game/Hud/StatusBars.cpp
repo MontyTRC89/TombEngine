@@ -12,20 +12,50 @@
 
 using namespace TEN::Renderer;
 
-extern TEN::Renderer::RendererHudBar* g_AirBar;
-extern TEN::Renderer::RendererHudBar* g_HealthBar;
-extern TEN::Renderer::RendererHudBar* g_SprintBar;
+extern RendererHudBar* g_AirBar;
+extern RendererHudBar* g_ExposureBar;
+extern RendererHudBar* g_HealthBar;
+extern RendererHudBar* g_StaminaBar;
 
 namespace TEN::Hud
 {
+	void StatusBar::Initialize(float value)
+	{
+		Value =
+		TargetValue = std::clamp(value, 0.0f, 1.0f);
+	}
+
+	void StatusBar::Update(float value)
+	{
+		constexpr auto LIFE_START_FADING = 0.2f;
+		constexpr auto LERP_ALPHA		 = 0.3f;
+
+		// Update life.
+		if (Life > 0.0f)
+			Life -= 1.0f;
+
+		// Update opacity.
+		float alpha = std::clamp(Life, 0.0f, LIFE_START_FADING) / LIFE_START_FADING;
+		Opacity = Lerp(0.0f, 1.0f, alpha);
+
+		// Update target value.
+		TargetValue = std::clamp(value, 0.0f, 1.0f);
+
+		// Update value.
+		Value = Lerp(Value, TargetValue, LERP_ALPHA);
+		if (abs(Value - TargetValue) <= EPSILON)
+			Value = TargetValue;
+	}
+
 	void StatusBarsController::Initialize(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Initialize bar values.
-		this->InitializeStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
-		this->InitializeStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
-		this->InitializeStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);
+		AirBar.Initialize(player.Status.Air / LARA_AIR_MAX);
+		ExposureBar.Initialize(player.Status.Exposure / LARA_EXPOSURE_MAX);
+		HealthBar.Initialize(item.HitPoints / LARA_HEALTH_MAX);
+		StaminaBar.Initialize(player.Status.Stamina / LARA_STAMINA_MAX);
 	}
 
 	void StatusBarsController::Update(const ItemInfo& item)
@@ -34,12 +64,13 @@ namespace TEN::Hud
 
 		// Update flash.
 		if ((GameTimer % (int)round(FLASH_INTERVAL * FPS)) == 0)
-			this->DoFlash = !DoFlash;
+			DoFlash = !DoFlash;
 
 		// Update bars.
-		this->UpdateAirBar(item);
-		this->UpdateHealthBar(item);
-		this->UpdateSprintBar(item);
+		UpdateAirBar(item);
+		UpdateExposureBar(item);
+		UpdateHealthBar(item);
+		UpdateStaminaBar(item);
 	}
 
 	void StatusBarsController::Draw(const ItemInfo& item) const
@@ -49,12 +80,13 @@ namespace TEN::Hud
 			return;
 
 		const auto& player = GetLaraInfo(item);
-		bool isPoisoned = (player.PoisonPotency != 0);
+		bool isPoisoned = (player.Status.Poison != 0);
 
 		// Draw bars.
-		this->DrawAirBar();
-		this->DrawHealthBar(isPoisoned);
-		this->DrawSprintBar();
+		DrawAirBar();
+		DrawExposureBar();
+		DrawHealthBar(isPoisoned);
+		DrawStaminaBar();
 	}
 
 	void StatusBarsController::Clear()
@@ -62,51 +94,41 @@ namespace TEN::Hud
 		*this = {};
 	}
 
-	void StatusBarsController::InitializeStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
-	{
-		float statusValueNorm = std::clamp(statusValue, 0.0f, statusValueMax);
-		bar.Value = statusValueNorm / statusValueMax;
-	}
-
-	void StatusBarsController::UpdateStatusBar(StatusBar& bar, float statusValue, float statusValueMax)
-	{
-		// Update life.
-		if (bar.Life > 0.0f)
-			bar.Life -= 1.0f;
-
-		// Update opacity.
-		float alpha = std::clamp(bar.Life, 0.0f, STATUS_BAR_LIFE_START_FADING) / STATUS_BAR_LIFE_START_FADING;
-		bar.Opacity = Lerp(0.0f, 1.0f, alpha);
-
-		// Update target value.
-		float statusValueNorm = std::clamp(statusValue, 0.0f, statusValueMax);
-		bar.TargetValue = statusValueNorm / statusValueMax;
-
-		// Update value.
-		bar.Value = Lerp(bar.Value, bar.TargetValue, STATUS_BAR_VALUE_LERP_ALPHA);
-		if (abs(bar.Value - bar.TargetValue) <= EPSILON)
-			bar.Value = bar.TargetValue;
-	}
-
 	void StatusBarsController::UpdateAirBar(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->AirBar, player.Air, LARA_AIR_MAX);
+		AirBar.Update(player.Status.Air / LARA_AIR_MAX);
 		
 		// Update life.
 		if (AirBar.Value != AirBar.TargetValue ||
 			player.Control.WaterStatus == WaterStatus::Underwater)
 		{
-			this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			AirBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 
 		// HACK: Special case for UPV as it sets player.Control.WaterStatus to WaterStatus::Dry.
-		if (player.Vehicle != NO_ITEM)
+		if (player.Context.Vehicle != NO_ITEM)
 		{
-			if (g_Level.Items[player.Vehicle].ObjectNumber == ID_UPV)
-				this->AirBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
+			if (vehicleItem.ObjectNumber == ID_UPV)
+				AirBar.Life = round(StatusBar::LIFE_MAX * FPS);
+		}
+	}
+
+	void StatusBarsController::UpdateExposureBar(const ItemInfo& item)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		// Update generic data.
+		ExposureBar.Update(player.Status.Exposure / LARA_EXPOSURE_MAX);
+
+		// Update life.
+		if (ExposureBar.Value != ExposureBar.TargetValue ||
+			(TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) && TestEnvironment(ENV_FLAG_COLD, item.RoomNumber)))
+		{
+			ExposureBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 	}
 
@@ -115,40 +137,40 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->HealthBar, item.HitPoints, LARA_HEALTH_MAX);
+		HealthBar.Update(item.HitPoints / LARA_HEALTH_MAX);
 
 		// Update life.
 		if (HealthBar.Value != HealthBar.TargetValue ||
-			item.HitPoints <= LARA_HEALTH_CRITICAL || player.PoisonPotency != 0 ||
+			item.HitPoints <= LARA_HEALTH_CRITICAL || player.Status.Poison != 0 ||
 			(player.Control.HandStatus == HandStatus::WeaponDraw &&
 				player.Control.Weapon.GunType != LaraWeaponType::Flare) || // HACK: Exclude flare.
 			(player.Control.HandStatus == HandStatus::WeaponReady &&
-				player.Control.Weapon.GunType != LaraWeaponType::Torch)) // HACK: Exclude torch.
+				player.Control.Weapon.GunType != LaraWeaponType::Torch))   // HACK: Exclude torch.
 		{
-			this->HealthBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			HealthBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 
 		// Special case for weapon undraw.
 		if (HealthBar.Value == HealthBar.TargetValue &&
-			item.HitPoints > LARA_HEALTH_CRITICAL && player.PoisonPotency == 0 &&
+			item.HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0 &&
 			player.Control.HandStatus == HandStatus::WeaponUndraw)
 		{
-			this->HealthBar.Life = 0;// round(STATUS_BAR_LIFE_START_FADING * FPS);
+			HealthBar.Life = 0.0f;
 		}
 	}
 
-	void StatusBarsController::UpdateSprintBar(const ItemInfo& item)
+	void StatusBarsController::UpdateStaminaBar(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 
 		// Update generic data.
-		this->UpdateStatusBar(this->SprintBar, player.SprintEnergy, LARA_SPRINT_ENERGY_MAX);
+		StaminaBar.Update(player.Status.Stamina / LARA_STAMINA_MAX);
 
 		// Update life.
-		if (SprintBar.Value != SprintBar.TargetValue ||
-			SprintBar.Value != 1.0f)
+		if (StaminaBar.Value != StaminaBar.TargetValue ||
+			StaminaBar.Value != 1.0f)
 		{
-			this->SprintBar.Life = round(STATUS_BAR_LIFE_MAX * FPS);
+			StaminaBar.Life = round(StatusBar::LIFE_MAX * FPS);
 		}
 	}
 
@@ -168,7 +190,18 @@ namespace TEN::Hud
 		if (AirBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
+		DrawStatusBar(AirBar.Value, CRITICAL_VALUE, *g_AirBar, TEXTURE_ID, 0, false);
+	}
+	
+	void StatusBarsController::DrawExposureBar() const
+	{
+		constexpr auto TEXTURE_ID	  = ID_SFX_BAR_TEXTURE;
+		constexpr auto CRITICAL_VALUE = LARA_EXPOSURE_CRITICAL / LARA_EXPOSURE_MAX;
+
+		if (ExposureBar.Life <= 0.0f)
+			return;
+
+		DrawStatusBar(ExposureBar.Value, CRITICAL_VALUE, *g_ExposureBar, TEXTURE_ID, 0, false);
 	}
 
 	void StatusBarsController::DrawHealthBar(bool isPoisoned) const
@@ -179,17 +212,17 @@ namespace TEN::Hud
 		if (HealthBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
+		DrawStatusBar(HealthBar.Value, CRITICAL_VALUE, *g_HealthBar, TEXTURE_ID, GlobalCounter, isPoisoned);
 	}
 
-	void StatusBarsController::DrawSprintBar() const
+	void StatusBarsController::DrawStaminaBar() const
 	{
 		constexpr auto TEXTURE_ID	  = ID_DASH_BAR_TEXTURE;
 		constexpr auto CRITICAL_VALUE = 0;
 
-		if (SprintBar.Life <= 0.0f)
+		if (StaminaBar.Life <= 0.0f)
 			return;
 
-		this->DrawStatusBar(SprintBar.Value, CRITICAL_VALUE, *g_SprintBar, TEXTURE_ID, 0, false);
+		DrawStatusBar(StaminaBar.Value, CRITICAL_VALUE, *g_StaminaBar, TEXTURE_ID, 0, false);
 	}
 }

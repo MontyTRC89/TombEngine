@@ -252,9 +252,9 @@ namespace TEN::Entities::TR4
 		MoveItemBack(item, SECTOR(2));
 	}
 
-	void InitialiseCrocgod(short itemNumber)
+	void InitializeCrocgod(short itemNumber)
 	{
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		auto* item = &g_Level.Items[itemNumber];
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
@@ -271,7 +271,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		OBJECT_BONES mutantJoint;
+		auto head = EulerAngles::Zero, torso = EulerAngles::Zero;
 		int frameNumber;
 		short angle = 0;
 		short headY = 0;
@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 		AI_INFO AI;
 		MutantAIFix(item, &AI);
 
-		RotateHeadToTarget(item, creature, 9, headY);
+		RotateHeadToTarget(item, creature, 9, head.y);
 		GetCreatureMood(item, &AI, true);
 		CreatureMood(item, &AI, true);
 
@@ -350,14 +350,16 @@ namespace TEN::Entities::TR4
 		}
 
 		if (item->Animation.ActiveState != MUTANT_STATE_LOCUST_ATTACK_1)
-			mutantJoint = OBJECT_BONES(headY, AI.xAngle, true);
-		else
-			mutantJoint = OBJECT_BONES(0);
+		{
+			head.x = AI.xAngle;
+			torso.x = AI.xAngle;
+			torso.y = AI.angle;
+		}
 
-		CreatureJoint(item, 0, mutantJoint.bone0);
-		CreatureJoint(item, 1, mutantJoint.bone1);
-		CreatureJoint(item, 2, mutantJoint.bone2);
-		CreatureJoint(item, 3, mutantJoint.bone3);
+		CreatureJoint(item, 0, head.y);
+		CreatureJoint(item, 1, head.x);
+		CreatureJoint(item, 2, torso.y);
+		CreatureJoint(item, 3, torso.x);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

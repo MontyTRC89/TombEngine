@@ -4,9 +4,9 @@
 #include "Game/items.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseBridge(short itemNumber);
+void InitializeBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);
 
 template <int tilt>

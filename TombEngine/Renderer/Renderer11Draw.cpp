@@ -10,7 +10,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
@@ -541,7 +541,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBats(RenderView& view)
 	{
-		if (!Objects[ID_LITTLE_BEETLE].loaded)
+		if (!Objects[ID_BATS_EMITTER].loaded)
 		{
 			return;
 		}
@@ -1512,6 +1512,7 @@ namespace TEN::Renderer
 		DrawElectricity(view);
 		DrawHelicalLasers(view);
 		DrawRopes(view);
+		DrawStreamers(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);

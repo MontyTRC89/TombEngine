@@ -33,7 +33,7 @@ const auto ZipLineMountBasis = ObjectCollisionBounds
 	)
 };
 
-void InitialiseZipLine(short itemNumber)
+void InitializeZipLine(short itemNumber)
 {
 	auto& zipLineItem = g_Level.Items[itemNumber];
 	zipLineItem.Data = GameVector();
@@ -140,7 +140,7 @@ void ControlZipLine(short itemNumber)
 			if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
 			{
 				laraItem->Animation.TargetState = LS_JUMP_FORWARD;
-				AnimateLara(laraItem);
+				AnimateItem(laraItem);
 				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.Velocity.y = zipLineItem->Animation.Velocity.y / 4;
 				laraItem->Animation.Velocity.z = zipLineItem->Animation.Velocity.y;

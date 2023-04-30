@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseSpinningBlade(short itemNumber);
+void InitializeSpinningBlade(short itemNumber);
 void SpinningBladeControl(short itemNumber);

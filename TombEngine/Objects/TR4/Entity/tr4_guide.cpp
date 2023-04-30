@@ -18,8 +18,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
-	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
-	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
+	const auto GuideBite1 = CreatureBiteInfo(Vector3i(0, 20, 180), 18);
+	const auto GuideBite2 = CreatureBiteInfo(Vector3i(30, 80, 50), 15);
 	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
 	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
 	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
@@ -92,11 +92,11 @@ namespace TEN::Entities::TR4
 		GUIDE_ANIM_ACTIVATE_TRAP_CROUCHING = 69
 	};
 
-	void InitialiseGuide(short itemNumber)
+	void InitializeGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, GUIDE_ANIM_IDLE);
 		item->SetMeshSwapFlags(GuideRightHandSwapJoints);
 	}
@@ -119,7 +119,7 @@ namespace TEN::Entities::TR4
 		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
-			auto pos = GetJointPosition(item, GuideBite1.meshNum, Vector3i(GuideBite1.Position));
+			auto pos = GetJointPosition(item, GuideBite1);
 			TriggerFireFlame(pos.x, pos.y - 20, pos.z, FlameType::Trail);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
@@ -479,7 +479,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			pos1 = GetJointPosition(item, GuideBite2.meshNum, Vector3i(GuideBite2.Position));
+			pos1 = GetJointPosition(item, GuideBite2);
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			random = GetRandomControl();
 

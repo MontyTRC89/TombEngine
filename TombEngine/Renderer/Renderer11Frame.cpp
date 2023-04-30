@@ -756,8 +756,7 @@ namespace TEN::Renderer
 		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
 		{
 			FX_INFO *fx = &EffectList[fxNum];
-
-			if (fx->objectNumber < 0)
+			if (fx->objectNumber < 0 || fx->color.w <= 0)
 				continue;
 
 			ObjectInfo *obj = &Objects[fx->objectNumber];

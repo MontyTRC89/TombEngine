@@ -628,12 +628,25 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 	return -1;
 }
 
+bool IsSoundEffectPlaying(int effectID)
+{
+	int channelIndex = Sound_EffectIsPlaying(effectID, nullptr);
+
+	if (channelIndex == -1)
+		return false;
+
+	return (SoundSlot[channelIndex].EffectID == effectID);
+}
+
 // Gets the distance to the source.
 
 float Sound_DistanceToListener(Pose *position)
 {
-	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
+	// Assume sound is 2D menu sound.
+	if (!position)
+		return 0.0f;
+
+	return Sound_DistanceToListener(position->Position.ToVector3());
 }
 float Sound_DistanceToListener(Vector3 position)
 {
@@ -778,9 +791,9 @@ void Sound_UpdateScene()
 		Camera.mikePos.y,
 		Camera.mikePos.z);
 	auto laraVel = BASS_3DVECTOR(					// Vel
-		Lara.WaterCurrentPull.x,
-		Lara.WaterCurrentPull.y,
-		Lara.WaterCurrentPull.z);
+		Lara.Context.WaterCurrentPull.x,
+		Lara.Context.WaterCurrentPull.y,
+		Lara.Context.WaterCurrentPull.z);
 	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
 	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
 	BASS_Set3DPosition(&mikePos,
@@ -790,7 +803,7 @@ void Sound_UpdateScene()
 	BASS_Apply3D();
 }
 
-// Initialise BASS engine and also prepare all sound data.
+// Initialize BASS engine and also prepare all sound data.
 // Called once on engine start-up.
 
 void Sound_Init()
@@ -802,7 +815,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	// Initialise BASS_FX plugin
+	// Initialize BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;
@@ -829,7 +842,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Starting 3D mixdown", true))
 		return;
 
-	// Initialise channels and tracks array
+	// Initialize channels and tracks array
 	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
@@ -882,7 +895,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, NULL, SoundEnvironment::Always);
+	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 }
 
 void PlaySecretTrack()

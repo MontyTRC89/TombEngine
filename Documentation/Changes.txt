@@ -1,12 +1,76 @@
+Version 1.0.9
+=============
+
+* Fix cold bar triggered in non-water rooms.
+* Fix spiky wall speed value and change it via OCB number or Lua (Moveable::SetItemFlags[0]).
+* Fix bats emitter crashing the game if little beetle object does not exist in wad.
+* Fix gunflash rendering and position for entities.
+* Fix snowmobile driver crashing the game.
+* Fix knifethrower not throwing knife.
+* Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Add TR1 cowboy.
+* Add TR3 wall mounted blade.
+* Add TR3 claw mutant.
+* Add removable puzzles from puzzle holes and puzzle dones.
+	- Employed by setting the trigger type as "Switch" for either puzzle hole or puzzle done.
+	- Can be mixed with puzzle done and puzzle holes of the same or different type.
+* Add reusable keys for key holes.
+	- Employed by setting the trigger type as "Switch" for key hole.
+* Allow key hole animation to be played via OCB number.
+	- Default OCB 0 will play Lara use key animation. 
+	- Any positive OCB number will play the animation according to the OCB number.
+* Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
+* Add log reports if title level or other levels don't exist.
+* Add better error handling for missing font, sprites or shaders.
+
+Lua API changes:
+* Add function String::SetTranslated() 
+* Add function Misc::IsStringDisplaying()
+
 Version 1.0.8
 =============
 
-* Fix Sophia's charge ring drawing below floor.
 * Fix bubbles phasing through ceilings.
-* Fix TR5 imp collision handling and animations.
 * Fix object camera not clearing at level end.
-* Fix hardcoded double-breathing Lara sfx.
+* Fix double breath sound effect when coming up for air.
+* Fix flickering hair.
+* Fix harpoon gun triggering water and dry sounds when shooting and reholstering.
+* Fix Z-fighting in inventory rendering.
+* Fix transparent objects not displaying correctly in the Inventory.
+* Fix dozy cheat always giving uzi weapons even if not present in WAD.
+* Fix player getting launched when landing close to an edge.
+* Fix player going through trapdoor/bridge while climbing up a climbable wall.
+* Fix TR3 Sophia's charge ring drawing below floor.
+* Fix TR5 imp collision handling and animations:
+	- OCB 1: Climbs up to player when triggered.
+	- OCB 2: Starts rolling on the floor when triggered.
+	- OCB 3: Will throw stones at player.
+	- Imp is also scared of of the player if holding a lit torch.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
+* Fix and improve wraith tails.
+* Add dedicated WRAITH_TRAP object with enhanced effects.
+	- OCB 0: Effect disabled.
+	- OCB 1: Effect enabled.
 * Add TR1 slamming doors.
+* Add TR3 mutant wasp (AI_MODIFY object won't allow it to land, the wasp will always fly).
+* Add TR3 Corpse
+	- OCB 0: used for coprses targeted by the compsognathus dinosaur. 
+	- OCB 1: used for corpses hung in the air to be used as piranha bait. Will fall when shot.
+	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr3_Compsognathus_Cadavar.wad2
+* Add cold exposure bar (employed by setting the "cold" flag in water rooms in Tomb Editor).
+* Add water wakes for vehicles.
+* Restored light effect nullmeshes (color, electrical, pulse, and strobe):
+	- Select the light color as object tint in the OCB menu in Tomb Editor.
+	- ELECTRICAL_LIGHT:
+		- Can have multiple meshes. Add mesh number to OCB to be renderd with the light.
+		- OCB + (mesh number): Light behaves like a neon light.
+		- OCB – (mesh number): Light flickers.
+* Restored inventory compass.
+* Allow dynamic segment count for hair object.
+
+Lua API changes:
+* Add function Misc::IsSoundPlaying() 
+* Add function DisplayString::SetFlags()
 
 Version 1.0.7
 =============

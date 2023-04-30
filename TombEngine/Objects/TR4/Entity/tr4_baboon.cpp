@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
-	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
+	const auto BaboonBite = CreatureBiteInfo(Vector3i(10, 10, 11), 4);
 	const auto BaboonAttackJoints	   = std::vector<unsigned int>{ 11, 12 };
 	const auto BaboonAttackRightJoints = std::vector<unsigned int>{ 1, 2, 3, 5, 8, 9 };
 	const auto BaboonJumpAttackJoints  = std::vector<unsigned int>{ 3, 4, 8 };
@@ -232,13 +232,13 @@ namespace TEN::Entities::TR4
 		UpdateRespawnedBaboon(itemNumber);
 	}
 
-	void InitialiseBaboon(short itemNumber)
+	void InitializeBaboon(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		if (!Objects[ID_BABOON_NORMAL].loaded)
 			TENLog("Failed to assign ID_BABOON_INV|ID_BABOON_SILENT animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BABOON_ANIM_SIT_IDLE);
 
 		if (item->ObjectNumber == ID_BABOON_SILENT && item->TriggerFlags != 0)

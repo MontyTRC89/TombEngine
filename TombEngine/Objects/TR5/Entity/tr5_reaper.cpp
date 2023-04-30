@@ -12,11 +12,11 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseReaper(short itemNumber)
+	void InitializeReaper(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 1);
 	}
 

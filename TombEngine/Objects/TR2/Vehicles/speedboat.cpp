@@ -17,19 +17,10 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> SpeedboatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
 	constexpr auto SPEEDBOAT_RADIUS = 500;
 	constexpr auto SPEEDBOAT_FRONT = 750;
 	constexpr auto SPEEDBOAT_BACK = -700;
@@ -54,9 +45,19 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
-	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
-	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE * 1.2f, 0.0f, SPEEDBOAT_FRONT / 8);
+
+	constexpr auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.25f / 2);
+	constexpr auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	constexpr auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
+
+	const std::vector<VehicleMountType> SpeedboatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
 
 	enum SpeedboatState
 	{
@@ -93,12 +94,66 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_DEATH = 18
 	};
 
+	static void SpawnSpeedboatBoatMist(const Vector3& pos, float velocity, short angle)
+	{
+		auto& mist = *GetFreeParticle();
+
+		mist.on = true;
+		mist.sR = 0;
+		mist.sG = 0;
+		mist.sB = 0;
+
+		mist.dR = 64;
+		mist.dG = 64;
+		mist.dB = 64;
+
+		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
+		mist.fadeToBlack = 12;
+		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
+		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.extras = 0;
+		mist.dynamic = -1;
+
+		mist.x = pos.x + ((GetRandomControl() & 15) - 8);
+		mist.y = pos.y + ((GetRandomControl() & 15) - 8);
+		mist.z = pos.z + ((GetRandomControl() & 15) - 8);
+		int zv = velocity * phd_cos(angle) / 4;
+		int xv = velocity * phd_sin(angle) / 4;
+		mist.xVel = xv + ((GetRandomControl() & 127) - 64);
+		mist.yVel = 0;
+		mist.zVel = zv + ((GetRandomControl() & 127) - 64);
+		mist.friction = 3;
+
+		if (GetRandomControl() & 1)
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			mist.rotAng = GetRandomControl() & 4095;
+
+			if (GetRandomControl() & 1)
+				mist.rotAdd = -(GetRandomControl() & 15) - 16;
+			else
+				mist.rotAdd = (GetRandomControl() & 15) + 16;
+		}
+		else
+		{
+			mist.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+		}
+
+		mist.scalar = 3;
+		mist.gravity = mist.maxYvel = 0;
+
+		float size = (GetRandomControl() & 7) + (velocity / 2) + 16;
+		mist.size =
+		mist.sSize = size / 4;
+		mist.dSize = size;
+	}
+
 	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem)
 	{
 		return (SpeedboatInfo*)speedboatItem->Data;
 	}
 
-	void InitialiseSpeedboat(short itemNumber)
+	void InitializeSpeedboat(short itemNumber)
 	{
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		speedboatItem->Data = SpeedboatInfo();
@@ -110,7 +165,7 @@ namespace TEN::Entities::Vehicles
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -121,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			lara->Context.Vehicle = itemNumber;
 			DoSpeedboatMount(speedboatItem, laraItem, mountType);
 
 			if (g_Level.Items[itemNumber].Status != ITEM_ACTIVE)
@@ -139,28 +194,20 @@ namespace TEN::Entities::Vehicles
 		switch (mountType)
 		{
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IDLE;
-			laraItem->Animation.ActiveState = SPEEDBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_IDLE);
 			break;
 
 		case VehicleMountType::Left:
-			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_MOUNT_LEFT;
-			laraItem->Animation.ActiveState = SPEEDBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_LEFT);
 			break;
 
 		case VehicleMountType::Right:
-			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_MOUNT_RIGHT;
-			laraItem->Animation.ActiveState = SPEEDBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_RIGHT);
 			break;
 
 		default:
 		case VehicleMountType::Jump:
-			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_MOUNT_JUMP;
-			laraItem->Animation.ActiveState = SPEEDBOAT_STATE_MOUNT;
-			laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOUNT;
+			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_JUMP);
 			break;
 		} 
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -216,7 +263,7 @@ namespace TEN::Entities::Vehicles
 
 		if ((laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT ||
 			laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_RIGHT) &&
-			TestLastFrame(laraItem, laraItem->Animation.AnimNumber))
+			TestLastFrame(laraItem))
 		{
 			if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT)
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
@@ -229,7 +276,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.Velocity.y = -50;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			lara->Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
+			lara->Context.Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -246,8 +293,7 @@ namespace TEN::Entities::Vehicles
 			}
 			laraItem->Pose.Position.y = y;
 
-			speedboatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex;
-			speedboatItem->Animation.FrameNumber = g_Level.Anims[speedboatItem->Animation.AnimNumber].frameBase;
+			SetAnimation(*speedboatItem, SPEEDBOAT_ANIM_MOUNT_LEFT);
 		}
 	}
 
@@ -258,7 +304,7 @@ namespace TEN::Entities::Vehicles
 		{
 			auto* item = &g_Level.Items[itemNumber2];
 
-			if (item->ObjectNumber == ID_SPEEDBOAT && itemNumber2 != itemNumber && Lara.Vehicle != itemNumber2)
+			if (item->ObjectNumber == ID_SPEEDBOAT && itemNumber2 != itemNumber && Lara.Context.Vehicle != itemNumber2)
 			{
 				int x = item->Pose.Position.x - speedboatItem->Pose.Position.x;
 				int z = item->Pose.Position.z - speedboatItem->Pose.Position.z;
@@ -521,7 +567,7 @@ namespace TEN::Entities::Vehicles
 		{
 			newVelocity = (speedboatItem->Pose.Position.z - old.z) * phd_cos(speedboatItem->Pose.Orientation.y) + (speedboatItem->Pose.Position.x - old.x) * phd_sin(speedboatItem->Pose.Orientation.y);
 
-			if (lara->Vehicle == itemNumber && speedboatItem->Animation.Velocity.z > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity.z - 10)
+			if (lara->Context.Vehicle == itemNumber && speedboatItem->Animation.Velocity.z > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity.z - 10)
 			{
 				DoDamage(laraItem, speedboatItem->Animation.Velocity.z);
 				SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
@@ -652,27 +698,21 @@ namespace TEN::Entities::Vehicles
 		{
 			if (laraItem->Animation.ActiveState != SPEEDBOAT_STATE_DEATH)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SPEEDBOAT_STATE_DEATH;
+				SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_DEATH);
 			}
 		}
 		else if (speedboatItem->Pose.Position.y < speedboat->Water - CLICK(0.5f) && speedboatItem->Animation.Velocity.y > 0)
 		{
 			if (laraItem->Animation.ActiveState != SPEEDBOAT_STATE_FALL)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_LEAP_START;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SPEEDBOAT_STATE_FALL;
+				SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_LEAP_START);
 			}
 		}
 		else if (collide)
 		{
 			if (laraItem->Animation.ActiveState != SPEEDBOAT_STATE_HIT)
 			{
-				laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SPEEDBOAT_STATE_HIT;
+				SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, collide);
 			}
 		}
 		else
@@ -777,7 +817,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(speedboatItem);
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			TestTriggers(speedboatItem, true);
 			TestTriggers(speedboatItem, false);
@@ -790,7 +830,7 @@ namespace TEN::Entities::Vehicles
 		bool drive = false;
 		bool idle = !speedboatItem->Animation.Velocity.z;
 
-		if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
+		if (lara->Context.Vehicle == itemNumber && laraItem->HitPoints > 0)
 		{
 			switch (laraItem->Animation.ActiveState)
 			{
@@ -854,13 +894,13 @@ namespace TEN::Entities::Vehicles
 		if (!zRot && abs(speedboatItem->Pose.Orientation.z) < 4)
 			speedboatItem->Pose.Orientation.z = 0;
 
-		if (lara->Vehicle == itemNumber)
+		if (lara->Context.Vehicle == itemNumber)
 		{
 			SpeedboatAnimation(speedboatItem, laraItem, collide);
 
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
@@ -870,10 +910,7 @@ namespace TEN::Entities::Vehicles
 			AnimateItem(laraItem);
 
 			if (laraItem->HitPoints > 0)
-			{
-				speedboatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
-				speedboatItem->Animation.FrameNumber = g_Level.Anims[speedboatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
-			}
+				SyncVehicleAnimation(*speedboatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
 			Camera.targetDistance = SECTOR(2);
@@ -898,14 +935,37 @@ namespace TEN::Entities::Vehicles
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 		}
 
+		auto pos1 = GetJointPosition(speedboatItem, 0, Vector3i(-100, 130, -500));
+		auto pos2 = GetJointPosition(speedboatItem, 0, Vector3i(100, 130, -500));
+
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
-			auto room = probe.Block->RoomBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
+			auto room = probe.Block->GetRoomNumberBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
 			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-				TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+			{
+				if (speedboatItem->TriggerFlags == 1)
+				{
+					SpawnSpeedboatBoatMist(
+						pos1.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+
+					SpawnSpeedboatBoatMist(
+						pos2.ToVector3(),
+						abs(speedboatItem->Animation.Velocity.z),
+						speedboatItem->Pose.Orientation.y + ANGLE(180.0f));
+				}
+				else
+				{
+					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+				}
+				
+				int waterHeight = GetWaterHeight(speedboatItem);
+				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
+			}
 		}
 
-		if (lara->Vehicle != itemNumber)
+		if (lara->Context.Vehicle != itemNumber)
 			return;
 
 		DoSpeedboatDismount(speedboatItem, laraItem);

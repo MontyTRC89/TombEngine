@@ -68,7 +68,7 @@ void ClearSpotCamSequences()
 		SpotCam[i] = {};
 }
 
-void InitialiseSpotCamSequences(bool startFirstSequence)
+void InitializeSpotCamSequences(bool startFirstSequence)
 {
 	TrackCameraInit = false;
 
@@ -105,12 +105,12 @@ void InitialiseSpotCamSequences(bool startFirstSequence)
 
 	if (startFirstSequence)
 	{
-		InitialiseSpotCam(0);
+		InitializeSpotCam(0);
 		UseSpotCam = true;
 	}
 }
 
-void InitialiseSpotCam(short Sequence)
+void InitializeSpotCam(short Sequence)
 {
 	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
@@ -125,7 +125,7 @@ void InitialiseSpotCam(short Sequence)
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	Camera.bounce = 0;
 
@@ -139,7 +139,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamLoopCnt = 0;
 	Lara.Control.Locked = false;
 
-	LaraAir = Lara.Air;
+	LaraAir = Lara.Status.Air;
 
 	InitialCameraPosition.x = Camera.pos.x;
 	InitialCameraPosition.y = Camera.pos.y;
@@ -362,7 +362,7 @@ void CalculateSpotCameras()
 	if (Lara.Control.Locked)
 	{
 		LaraItem->HitPoints = LaraHealth;
-		Lara.Air = LaraAir;
+		Lara.Status.Air = LaraAir;
 	}
 
 	s = &SpotCam[FirstCamera];

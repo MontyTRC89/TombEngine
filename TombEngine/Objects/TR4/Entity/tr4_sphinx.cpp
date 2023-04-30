@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SPHINX_WALK_TURN_ANGLE = ANGLE(3.0f);
 	constexpr auto SPHINX_RUN_TURN_ANGLE  = ANGLE(0.33f);
 
-	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
+	const auto SphinxBite = CreatureBiteInfo(Vector3i::Zero, 6);
 	const auto SphinxAttackJoints = std::vector<unsigned int>{ 6 };
 
 	enum SphinxState
@@ -58,11 +58,11 @@ namespace TEN::Entities::TR4
 		SPHINX_ANIM_WALK_BACK_TO_IDLE = 15
 	};
 
-	void InitialiseSphinx(short itemNumber)
+	void InitializeSphinx(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, SPHINX_ANIM_REST);
 	}
 

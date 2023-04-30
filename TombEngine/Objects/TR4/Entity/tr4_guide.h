@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseGuide(short itemNumber);
+	void InitializeGuide(short itemNumber);
 	void GuideControl(short itemNumber);
 }

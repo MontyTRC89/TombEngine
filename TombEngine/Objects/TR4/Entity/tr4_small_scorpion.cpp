@@ -23,8 +23,8 @@ namespace TEN::Entities::TR4
 
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(0.31));
 
-	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
-	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
+	const auto SmallScorpionBite1 = CreatureBiteInfo(Vector3i::Zero, 0);
+	const auto SmallScorpionBite2 = CreatureBiteInfo(Vector3i::Zero, 23);
 	const auto SmallScorpionAttackJoints = std::vector<unsigned int>{ 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
@@ -52,11 +52,11 @@ namespace TEN::Entities::TR4
 		SSCORPION_ANIM_FLAT_2 = 7,
 	};
 
-	void InitialiseSmallScorpion(short itemNumber)
+	void InitializeSmallScorpion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 
@@ -163,7 +163,7 @@ namespace TEN::Entities::TR4
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
 							short rotation;
-							BiteInfo biteInfo;
+							CreatureBiteInfo biteInfo;
 
 							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 							else
 							{
 								if (creature->Enemy->IsLara())
-									GetLaraInfo(creature->Enemy)->PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
+									GetLaraInfo(creature->Enemy)->Status.Poison += SMALL_SCORPION_STINGER_POISON_POTENCY;
 
 								DoDamage(creature->Enemy, SMALL_SCORPION_STINGER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);

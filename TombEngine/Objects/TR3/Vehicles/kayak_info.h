@@ -19,9 +19,6 @@ namespace TEN::Entities::Vehicles
 		bool Forward = false;
 		bool TrueWater = false;
 
-		int CurrentStartWake = 0;
-		int WakeShade = 0;
-
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

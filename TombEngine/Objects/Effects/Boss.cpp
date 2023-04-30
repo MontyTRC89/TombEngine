@@ -33,12 +33,12 @@ namespace TEN::Effects::Boss
 		shieldItem.Pose.Orientation = item.Pose.Orientation;
 		shieldItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		shieldItem.Model.Color = color;
 		shieldItem.Collidable = true;
 		shieldItem.ItemFlags[0] = 2;
-		shieldItem.Model.Mutator[0].Scale = Vector3(2.0f); // Scale model by factor of 2.
+		shieldItem.Model.Mutators[0].Scale = Vector3(2.0f); // Scale model by factor of 2.
 		shieldItem.Status = ITEM_ACTIVE;
 
 		AddActiveItem(itemNumber);
@@ -67,14 +67,14 @@ namespace TEN::Effects::Boss
 		shockwaveItem.RoomNumber = item.RoomNumber;
 		shockwaveItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		auto result = color;
 		result.w = 1.0f;
 		shockwaveItem.Model.Color = result;
-		shockwaveItem.Collidable = false;					 // No collision for this entity.
-		shockwaveItem.ItemFlags[0] = 70;						 // Timer before clearing; will fade out, then get destroyed.
-		shockwaveItem.Model.Mutator[0].Scale = Vector3::Zero; // Start without scale.
+		shockwaveItem.Collidable = false;					   // No collision for this entity.
+		shockwaveItem.ItemFlags[0] = 70;					   // Timer before clearing; will fade out, then get destroyed.
+		shockwaveItem.Model.Mutators[0].Scale = Vector3::Zero; // Start without scale.
 		shockwaveItem.Status = ITEM_ACTIVE;
 
 		AddActiveItem(itemNumber);
@@ -124,7 +124,7 @@ namespace TEN::Effects::Boss
 			}
 		}
 
-		item.Model.Mutator[0].Scale += Vector3::One;
+		item.Model.Mutators[0].Scale += Vector3::One;
 		UpdateItemRoom(itemNumber);
 	}
 
@@ -151,7 +151,7 @@ namespace TEN::Effects::Boss
 		}
 
 		item.Pose.Orientation.y += ANGLE(5.0f);
-		item.Model.Mutator[0].Scale += Vector3(0.5f);
+		item.Model.Mutators[0].Scale += Vector3(0.5f);
 		UpdateItemRoom(itemNumber);
 	}
 

@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
-bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, int damage)
+bool ShotLara(ItemInfo* item, AI_INFO* AI, const CreatureBiteInfo& gun, short extraRotation, int damage)
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
@@ -79,13 +79,14 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
+	// TODO: Remove -128 and fix ricochet effect going on floor. -- TokyoSU 2023.04.28
 	auto pos = GameVector(
 		LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
-		LaraItem->Floor,
+		LaraItem->Floor - 128,
 		LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
 		LaraItem->RoomNumber);
 
-	Ricochet(Pose(pos.x, pos.y, pos.z));
+	Ricochet(Pose(pos.ToVector3i()));
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
@@ -101,11 +102,11 @@ short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	return -1;
 }
 
-bool Targetable(ItemInfo* item, AI_INFO* AI)
+bool Targetable(ItemInfo* item, AI_INFO* ai)
 {
 	// Discard it entity is not a creature (only creatures can use Targetable())
 	// or if the target is not visible.
-	if (!item->IsCreature() || !AI->ahead || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
+	if (!item->IsCreature() || !ai->ahead || ai->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
 	auto* creature = GetCreatureInfo(item);
@@ -118,8 +119,8 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
 		return false;
 
-	auto& bounds = GetBestFrame(item)->boundingBox;
-	auto& boundsTarget = GetBestFrame(enemy)->boundingBox;
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	const auto& boundsTarget = GetBestFrame(*enemy).BoundingBox;
 
 	auto origin = GameVector(
 		item->Pose.Position.x,
@@ -134,9 +135,9 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	return LOS(&origin, &target);
 }
 
-bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
+bool TargetVisible(ItemInfo* item, AI_INFO* ai, float maxAngleInDegrees)
 {
-	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
+	if (!item->IsCreature() || ai->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
 	// Check just in case.
@@ -148,10 +149,10 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
 	if (enemy == nullptr || enemy->HitPoints == 0)
 		return false;
 
-	short angle = AI->angle - creature->JointRotation[2];
+	short angle = ai->angle - creature->JointRotation[2];
 	if (angle > ANGLE(-maxAngleInDegrees) && angle < ANGLE(maxAngleInDegrees))
 	{
-		auto& bounds = GetBestFrame(enemy)->boundingBox;
+		const auto& bounds = GetBestFrame(*enemy).BoundingBox;
 
 		auto origin = GameVector(
 			item->Pose.Position.x,

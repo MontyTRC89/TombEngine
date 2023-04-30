@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR5
 	const auto AutoGunClosedHatchJoints	= std::vector<unsigned int>{ 10 };
 	const auto AutoGunFlashJoints		= std::vector<unsigned int>{ 8 };
 
-	void InitialiseAutoGuns(short itemNumber)
+	void InitializeAutoGuns(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = std::array<short, 4>();

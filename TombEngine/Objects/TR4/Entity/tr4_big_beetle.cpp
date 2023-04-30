@@ -21,7 +21,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
-	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
+	const auto BigBeetleBite = CreatureBiteInfo(Vector3i::Zero, 12);
 	const auto BigBeetleAttackJoints = std::vector<unsigned int>{ 5, 6 };
 
 	enum BigBeetleState
@@ -59,11 +59,11 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseBigBeetle(short itemNumber)
+	void InitializeBigBeetle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BBEETLE_ANIM_IDLE);
 	}
 

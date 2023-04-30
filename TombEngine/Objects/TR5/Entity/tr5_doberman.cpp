@@ -16,7 +16,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
+	const auto DobermanBite = CreatureBiteInfo(Vector3i(0, 30, 141), 20);
 
 	enum DobermanState
 	{
@@ -58,7 +58,7 @@ namespace TEN::Entities::Creatures::TR5
 		DOBERMAN_ANIM_RUN_STOP = 20,
 	};
 
-	void InitialiseDoberman(short itemNumber)
+	void InitializeDoberman(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

@@ -79,7 +79,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LARA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLaraLoad;
+		obj->Initialize = InitializeLaraLoad;
 		obj->shadowType = ShadowMode::Lara;
 		obj->HitPoints = 1000;
 		obj->usingDrawAnimatingItem = false;
@@ -89,7 +89,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -105,11 +105,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -125,11 +124,10 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD1", "ID_SWAT");
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
@@ -147,11 +145,10 @@ static void StartEntity(ObjectInfo *obj)
 		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SWAT_PLUS", "ID_SWAT"))
 			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SWAT_PLUS", "ID_GUARD1");
 
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -168,11 +165,10 @@ static void StartEntity(ObjectInfo *obj)
 		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_MAFIA", "ID_SWAT"))
 			AssignObjectAnimations(*obj, ID_GUARD1, "ID_MAFIA", "ID_GUARD1");
 
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -190,7 +186,7 @@ static void StartEntity(ObjectInfo *obj)
 		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_SCIENTIST", "ID_SWAT"))
 			AssignObjectAnimations(*obj, ID_GUARD1, "ID_SCIENTIST", "ID_GUARD1");
 
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -211,11 +207,10 @@ static void StartEntity(ObjectInfo *obj)
 		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD2", "ID_SWAT"))
 			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD2", "ID_GUARD1");
 
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -233,11 +228,10 @@ static void StartEntity(ObjectInfo *obj)
 		if (!AssignObjectAnimations(*obj, ID_SWAT, "ID_GUARD3", "ID_SWAT"))
 			AssignObjectAnimations(*obj, ID_GUARD1, "ID_GUARD3", "ID_GUARD1");
 
-		obj->initialise = InitialiseGuard;
+		obj->Initialize = InitializeGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -252,7 +246,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_ATTACK_SUB];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSubmarine;
+		obj->Initialize = InitializeSubmarine;
 		obj->collision = CreatureCollision;
 		obj->control = SubmarineControl;
 		obj->shadowType = ShadowMode::All;
@@ -270,14 +264,13 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_CHEF];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseChef;
+		obj->Initialize = InitializeChef;
 		obj->control = ControlChef;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 0;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -288,7 +281,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LION];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLion;
+		obj->Initialize = InitializeLion;
 		obj->collision = CreatureCollision;
 		obj->control = LionControl;
 		obj->shadowType = ShadowMode::All;
@@ -304,7 +297,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_DOBERMAN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseDoberman;
+		obj->Initialize = InitializeDoberman;
 		obj->collision = CreatureCollision;
 		obj->control = DobermanControl;
 		obj->shadowType = ShadowMode::All;
@@ -319,7 +312,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_HUSKIE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTr5Dog;
+		obj->Initialize = InitializeTr5Dog;
 		obj->collision = CreatureCollision;
 		obj->control = Tr5DogControl;
 		obj->shadowType = ShadowMode::All;
@@ -334,7 +327,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_REAPER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseReaper;
+		obj->Initialize = InitializeReaper;
 		obj->collision = CreatureCollision;
 		obj->control = ReaperControl;
 		obj->shadowType = ShadowMode::All;
@@ -350,11 +343,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_MAFIA2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseMafia2;
+		obj->Initialize = InitializeMafia2;
 		obj->collision = CreatureCollision;
 		obj->control = Mafia2Control;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 7;
 		obj->HitPoints = 26;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -370,11 +362,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_PIERRE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLarson;
+		obj->Initialize = InitializeLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 1;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -388,11 +379,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LARSON];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLarson;
+		obj->Initialize = InitializeLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 3;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -406,11 +396,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_CYBORG];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCyborg;
+		obj->Initialize = InitializeCyborg;
 		obj->collision = CreatureCollision;
 		obj->control = CyborgControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 5;
 		obj->HitPoints = 50;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -426,11 +415,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SNIPER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSniper;
+		obj->Initialize = InitializeSniper;
 		obj->collision = CreatureCollision;
 		obj->control = SniperControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 6;
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -444,12 +432,11 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD_LASER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseHeavyGuard;
+		obj->Initialize = InitializeHeavyGuard;
 		obj->collision = CreatureCollision;
 		obj->control = HeavyGuardControl;
-		obj->shadowType = ShadowMode::All;
 		obj->HitRoutine = HeavyGuardHit;
-		obj->biteOffset = 0;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
@@ -463,14 +450,13 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_HYDRA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseHydra;
+		obj->Initialize = InitializeHydra;
 		obj->collision = CreatureCollision;
 		obj->control = HydraControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 30;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 1024;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -481,7 +467,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_IMP];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseImp;
+		obj->Initialize = InitializeImp;
 		obj->collision = CreatureCollision;
 		obj->control = ImpControl;
 		obj->shadowType = ShadowMode::All;
@@ -498,11 +484,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_WILLOWISP];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLightingGuide;
+		obj->Initialize = InitializeLightingGuide;
 		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = nullptr;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->radius = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
@@ -516,11 +501,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_BROWN_BEAST];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseBrownBeast;
+		obj->Initialize = InitializeBrownBeast;
 		obj->collision = CreatureCollision;
 		obj->control = ControlBrowsBeast;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 341;
@@ -533,11 +517,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LAGOON_WITCH];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLagoonWitch;
+		obj->Initialize = InitializeLagoonWitch;
 		obj->collision = CreatureCollision;
 		obj->control = LagoonWitchControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -552,11 +535,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_INVISIBLE_GHOST];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseInvisibleGhost;
+		obj->Initialize = InitializeInvisibleGhost;
 		obj->collision = CreatureCollision;
 		obj->control = InvisibleGhostControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -571,7 +553,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->initialise = InitialiseLittleRats;
+		obj->Initialize = InitializeLittleRats;
 		obj->control = LittleRatsControl;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -580,7 +562,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->initialise = InitialiseLittleBats;
+		obj->Initialize = InitializeLittleBats;
 		obj->control = LittleBatsControl;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -589,7 +571,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->initialise = InitialiseSpiders;
+		obj->Initialize = InitializeSpiders;
 		obj->control = SpidersEmitterControl;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -597,11 +579,10 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GLADIATOR];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGladiator;
+		obj->Initialize = InitializeGladiator;
 		obj->control = ControlGladiator;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 20;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -616,12 +597,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj = &Objects[ID_ROMAN_GOD1 + i];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseRomanStatue;
+			obj->Initialize = InitializeRomanStatue;
 			obj->collision = CreatureCollision;
 			obj->control = RomanStatueControl;
 			obj->HitRoutine = RomanStatueHit;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 0;
 			obj->HitPoints = 300;
 			obj->pivotLength = 50;
 			obj->radius = 256;
@@ -636,7 +616,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_LASERHEAD];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGuardian;
+		obj->Initialize = InitializeGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = ControlGuardian;
 		obj->explodableMeshbits = 6;
@@ -649,7 +629,7 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_AUTOGUN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseAutoGuns;
+		obj->Initialize = InitializeAutoGuns;
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
 		obj->undead = true;
@@ -681,7 +661,7 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTwoBlocksPlatform;
+		obj->Initialize = InitializeTwoBlocksPlatform;
 		obj->control = TwoBlocksPlatformControl;
 		obj->floor = TwoBlocksPlatformFloor;
 		obj->ceiling = TwoBlocksPlatformCeiling;
@@ -695,7 +675,7 @@ static void StartObject(ObjectInfo *obj)
 		obj = &Objects[objectNumber];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseRaisingBlock;
+			obj->Initialize = InitializeRaisingBlock;
 			obj->control = ControlRaisingBlock;
 			obj->floor = RaisingBlockFloor;
 			obj->ceiling = RaisingBlockCeiling;
@@ -708,7 +688,7 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_EXPANDING_PLATFORM];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseExpandingPlatform;
+		obj->Initialize = InitializeExpandingPlatform;
 		obj->control = ControlExpandingPlatform;
 		obj->floor = ExpandingPlatformFloor;
 		obj->ceiling = ExpandingPlatformCeiling;
@@ -721,8 +701,10 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->control = ElectricalLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
+		obj->Initialize = InitializeElectricalLight;
+		obj->meshSwapSlot = ID_ELECTRICAL_LIGHT;
+		//obj->drawRoutine = nullptr;
+		//obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];
@@ -735,9 +717,7 @@ static void StartObject(ObjectInfo *obj)
 
 	obj = &Objects[ID_STROBE_LIGHT];
 	if (obj->loaded)
-	{
 		obj->control = StrobeLightControl;
-	}
 
 	obj = &Objects[ID_COLOR_LIGHT];
 	if (obj->loaded)
@@ -762,7 +742,7 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_SMOKE_EMITTER_BLACK];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmokeEmitter;
+		obj->Initialize = InitializeSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
@@ -771,7 +751,7 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_SMOKE_EMITTER_WHITE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmokeEmitter;
+		obj->Initialize = InitializeSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
@@ -780,7 +760,7 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_SMOKE_EMITTER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmokeEmitter;
+		obj->Initialize = InitializeSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
@@ -789,21 +769,19 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TELEPORTER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTeleporter;
+		obj->Initialize = InitializeTeleporter;
 		obj->control = ControlTeleporter;
 		obj->drawRoutine = nullptr;
 	}
 
 	obj = &Objects[ID_LARA_START_POS];
 	if (obj->loaded)
-	{
 		obj->drawRoutine = nullptr;
-	}
 
 	obj = &Objects[ID_HIGH_OBJECT1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseHighObject1;
+		obj->Initialize = InitializeHighObject1;
 		obj->control = ControlHighObject1;
 		obj->collision = ObjectCollision;
 	}
@@ -830,7 +808,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_ZIPLINE_HANDLE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseZipLine;
+		obj->Initialize = InitializeZipLine;
 		obj->collision = ZipLineCollision;
 		obj->control = ControlZipLine;
 		obj->SetupHitEffect(true);
@@ -839,7 +817,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_PROPELLER_H];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseVentilator;
+		obj->Initialize = InitializeVentilator;
 		obj->control = VentilatorControl;
 		obj->SetupHitEffect(true);
 	}
@@ -847,7 +825,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_PROPELLER_V];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseVentilator;
+		obj->Initialize = InitializeVentilator;
 		obj->control = VentilatorControl;
 		obj->SetupHitEffect(true);
 	}
@@ -861,7 +839,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_ROME_HAMMER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseRomeHammer;
+		obj->Initialize = InitializeRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
 		obj->SetupHitEffect(true);
@@ -886,7 +864,7 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseClassicRollingBall;
+		obj->Initialize = InitializeClassicRollingBall;
 		obj->control = ClassicRollingBallControl;
 		obj->collision = ClassicRollingBallCollision;
 		obj->SetupHitEffect(true);
@@ -897,14 +875,14 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->collision = ClassicRollingBallCollision;
 		obj->control = ClassicRollingBallControl;
-		obj->initialise = InitialiseClassicRollingBall;
+		obj->Initialize = InitializeClassicRollingBall;
 		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGenSlot3;
+		obj->Initialize = InitializeGenSlot3;
 		obj->collision = HybridCollision;
 		obj->control = AnimatingControl;
 	}
@@ -913,14 +891,14 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_GEN_SLOT4];
 	if (obj->loaded)
 	{
-		//obj->initialise = InitialiseGenSlot4;
+		//obj->Initialize = InitializeGenSlot4;
 		//obj->control = GenSlot4Control;
 	}
 
 	obj = &Objects[ID_EXPLOSION];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseExplosion;
+		obj->Initialize = InitializeExplosion;
 		obj->control = ExplosionControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
@@ -932,7 +910,7 @@ static void StartSwitch(ObjectInfo *obj)
 	obj = &Objects[ID_RAISING_COG];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseRaisingCog;
+		obj->Initialize = InitializeRaisingCog;
 		obj->control = RaisingCogControl;
 		obj->SetupHitEffect(true);
 	}
@@ -940,7 +918,7 @@ static void StartSwitch(ObjectInfo *obj)
 	obj = &Objects[ID_CROWDOVE_SWITCH];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCrowDoveSwitch;
+		obj->Initialize = InitializeCrowDoveSwitch;
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
 		obj->SetupHitEffect(true);
@@ -949,7 +927,7 @@ static void StartSwitch(ObjectInfo *obj)
 	obj = &Objects[ID_WRECKING_BALL];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWreckingBall;
+		obj->Initialize = InitializeWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
 		obj->SetupHitEffect(true);
@@ -1017,7 +995,7 @@ static void StartPickup(ObjectInfo *obj)
 	InitPickup(obj, ID_DIARY_ITEM);
 }
 
-void InitialiseTR5Objects()
+void InitializeTR5Objects()
 {
 	ObjectInfo* objectPtr = nullptr;
 	StartEntity(objectPtr);

@@ -17,12 +17,13 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/footprint.h"
-#include "Game/effects/hair.h"
+#include "Game/effects/Footprint.h"
+#include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Gui.h"
@@ -64,14 +65,16 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -81,7 +84,7 @@ int GameTimer       = 0;
 int GlobalCounter   = 0;
 int Wibble          = 0;
 
-bool InitialiseGame;
+bool InitializeGame;
 bool DoTheGame;
 bool JustLoaded;
 bool ThreadEnded;
@@ -194,6 +197,7 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		StreamerEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -267,7 +271,6 @@ unsigned CALLBACK GameMain(void *)
 	else
 		g_Renderer.RenderTitleImage();
 
-
 	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
 
@@ -291,18 +294,18 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots, and cameras.
-	InitialiseFXArray(true);
-	InitialiseCamera();
-	InitialiseSpotCamSequences(isTitle);
-	InitialiseHair();
-	InitialiseItemBoxData();
+	HairEffect.Initialize();
+	InitializeFXArray(true);
+	InitializeCamera();
+	InitializeSpotCamSequences(isTitle);
+	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitialiseScripting(levelIndex, loadGame);
-	InitialiseNodeScripts();
+	InitializeScripting(levelIndex, loadGame);
+	InitializeNodeScripts();
 
 	// Initialize game variables and optionally load game.
-	InitialiseOrLoadGame(loadGame);
+	InitializeOrLoadGame(loadGame);
 
 	// Prepare title menu, if necessary.
 	if (isTitle)
@@ -409,6 +412,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
 	ClearDrips();
@@ -433,7 +437,7 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitialiseScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, bool loadGame)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
@@ -460,7 +464,7 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
-void DeInitialiseScripting(int levelIndex)
+void DeInitializeScripting(int levelIndex)
 {
 	g_GameScript->OnEnd();
 	g_GameScript->FreeLevelScripts();
@@ -470,7 +474,7 @@ void DeInitialiseScripting(int levelIndex)
 		g_GameScript->ResetScripts(true);
 }
 
-void InitialiseOrLoadGame(bool loadGame)
+void InitializeOrLoadGame(bool loadGame)
 {
 	RequiredStartPos = false;
 
@@ -490,7 +494,7 @@ void InitialiseOrLoadGame(bool loadGame)
 		Camera.target.y = LaraItem->Pose.Position.y;
 		Camera.target.z = LaraItem->Pose.Position.z;
 
-		InitialiseGame = false;
+		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
@@ -500,12 +504,12 @@ void InitialiseOrLoadGame(bool loadGame)
 		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
 
-		if (InitialiseGame)
+		if (InitializeGame)
 		{
 			// Clear all game info as well.
 			Statistics.Game = {};
 			GameTimer = 0;
-			InitialiseGame = false;
+			InitializeGame = false;
 
 			TENLog("Starting new game.", LogLevel::Info);
 		}
@@ -575,7 +579,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex)
 {
-	DeInitialiseScripting(levelIndex);
+	DeInitializeScripting(levelIndex);
 
 	StopAllSounds();
 	StopSoundTracks();

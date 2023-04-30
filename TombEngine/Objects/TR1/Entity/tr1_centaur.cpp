@@ -29,8 +29,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
-	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
-	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
+	const auto CentaurRocketBite = CreatureBiteInfo(Vector3(11, 415, 41), 13);
+	const auto CentaurRearBite	 = CreatureBiteInfo(Vector3(50, 30, 0), 5);
 	const auto CentaurAttackJoints = std::vector<unsigned int>{ 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState

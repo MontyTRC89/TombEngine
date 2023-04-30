@@ -5,6 +5,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 
+#include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Game/Gui.h"
@@ -51,6 +52,7 @@
 #include "Renderer/Structures/RendererDoor.h"
 
 class EulerAngles;
+struct AnimFrameInterpData;
 struct CAMERA_INFO;
 struct RendererRectangle;
 
@@ -81,7 +83,6 @@ namespace TEN::Renderer
 			| /   \ |
 			3-------4
 		*/
-
 		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
@@ -381,9 +382,9 @@ namespace TEN::Renderer
 		Texture2D m_skyTexture;
 		Texture2D m_whiteTexture;
 		RendererSprite m_whiteSprite;
-		Texture2D loadingBarBorder;
-		Texture2D loadingBarInner;
-		Texture2D loadingScreenTexture;
+		Texture2D m_loadingBarBorder;
+		Texture2D m_loadingBarInner;
+		Texture2D m_loadingScreenTexture;
 
 		VertexBuffer m_roomsVertexBuffer;
 		IndexBuffer m_roomsIndexBuffer;
@@ -492,8 +493,7 @@ namespace TEN::Renderer
 		
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate,
-		                     int mask, bool useObjectWorldRotation = false);
+		void UpdateAnimation(RendererItem* item, RendererObject& obj, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation = false);
 		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
@@ -512,9 +512,10 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
-		void InitialiseScreen(int w, int h, HWND handle, bool reset);
-		void InitialiseGameBars();
-		void InitialiseMenuBars(int y);
+		void InitializeScreen(int w, int h, HWND handle, bool reset);
+		void InitializeCommonTextures();
+		void InitializeGameBars();
+		void InitializeMenuBars(int y);
 
 		void DrawAllStrings();
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
@@ -573,6 +574,7 @@ namespace TEN::Renderer
 		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
+		void DrawStreamers(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
@@ -599,21 +601,25 @@ namespace TEN::Renderer
 		void ResetDebugVariables();
 		float CalculateFrameRate();
 
-		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
-		                        Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
-		void AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
-		                                   float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis,
-										   bool softParticles, RenderView& view);
-		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
-		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
-												 bool softParticles, RenderView& view);
-		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
-		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
-		void AddQuad(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1,
-			Vector4 c2, Vector4 c3, Vector4 c4, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,
-			bool softParticles, RenderView& view);
-		void AddColoredQuad(Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, BLEND_MODES blendMode, RenderView& view);
-		void AddColoredQuad(Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 c1, Vector4 c2, Vector4 c3, Vector4 c4, BLEND_MODES blendMode, RenderView& view);
+		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
+		                        Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view);
+		void AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
+		                                   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
+										   bool isSoftParticle, RenderView& view);
+		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
+		                                         float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
+												 bool isSoftParticle, RenderView& view);
+		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+					 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
+					 RenderView& view);
+		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+					 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
+					 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view);
+		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+							const Vector4& color, BLEND_MODES blendMode, RenderView& view);
+		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
+							BLEND_MODES blendMode, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
@@ -674,7 +680,7 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		void Initialise(int w, int h, bool windowed, HWND handle);
+		void Initialize(int w, int h, bool windowed, HWND handle);
 		void Render();
 		void RenderTitle();
 		void Lock();

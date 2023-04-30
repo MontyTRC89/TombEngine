@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
-	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
+	const auto SkeletonBite = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
 	const auto SkeletonSwordAttackJoints = std::vector<unsigned int>{ 15, 16 };
 
 	enum SkeletonState
@@ -112,10 +112,10 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_FALLING = 48
 	};
 
-	void InitialiseSkeleton(short itemNumber)
+	void InitializeSkeleton(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		// OCBs: Check cases 0 to 3.
 		switch (item->TriggerFlags)

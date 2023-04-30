@@ -27,10 +27,10 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TONY_TURN_RATE_MAX = ANGLE(2.0f);
 
 	constexpr auto TONY_EXPLOSION_COUNT_MAX = 60;
-	constexpr auto TONY_EFFECT_COLOR		= Vector4(0.8f, 0.4f, 0.0f, 0.5f);
+	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
-	const auto TonyLeftHandBite	 = BiteInfo(Vector3::Zero, 10);
-	const auto TonyRightHandBite = BiteInfo(Vector3::Zero, 13);
+	const auto TonyLeftHandBite	 = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto TonyRightHandBite = CreatureBiteInfo(Vector3i::Zero, 13);
 
 	// I can't set it to the TonyFlame struct since the control of the
 	// flame use fxNumber as argument or that FX_INFO have no void* to hold custom data.
@@ -343,11 +343,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialiseTony(short itemNumber)
+	void InitializeTony(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		CheckForRequiredObjects(item);
 
 		item.ItemFlags[1] = 0; // Attack type.
@@ -604,7 +604,7 @@ namespace TEN::Entities::Creatures::TR3
 					torsoY = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 40))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 40))
 				{
 					TriggerFireBall(item, TonyFlameType::CeilingLeftHand, nullptr, item->RoomNumber, 0, 0);
 					TriggerFireBall(item, TonyFlameType::CeilingRightHand, nullptr, item->RoomNumber, 0, 0);
@@ -621,7 +621,7 @@ namespace TEN::Entities::Creatures::TR3
 					torsoY = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 28))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 28))
 					TriggerFireBall(item, TonyFlameType::InFront, nullptr, item->RoomNumber, item->Pose.Orientation.y, 0);
 
 				break;
@@ -629,7 +629,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TONY_STATE_FLIPMAP:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 56))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 56))
 				{
 					item->ItemFlags[3] = 2;
 					SpawnShockwaveExplosion(*item, TONY_EFFECT_COLOR);
@@ -643,7 +643,7 @@ namespace TEN::Entities::Creatures::TR3
 			item->Animation.ActiveState == TONY_STATE_SHOOT_RIGHT_HAND ||
 			item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 		{
-			int bright = GetCurrentRelativeFrameNumber(item);
+			int bright = GetFrameNumber(item);
 			if (bright > 16)
 				bright = 16;
 
@@ -654,14 +654,14 @@ namespace TEN::Entities::Creatures::TR3
 			g = (g * bright) / 16;
 			b = (b * bright) / 16;
 
-			auto handPos = GetJointPosition(item, TonyLeftHandBite.meshNum);
+			auto handPos = GetJointPosition(item, TonyLeftHandBite);
 			TriggerTonyFlame(itemNumber, 13);
 			TriggerDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
 
 			if (item->Animation.ActiveState == TONY_STATE_SHOOT_CEILING ||
 				item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 			{
-				handPos = GetJointPosition(item, TonyRightHandBite.meshNum);
+				handPos = GetJointPosition(item, TonyRightHandBite);
 				TriggerTonyFlame(itemNumber, 14);
 				TriggerDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
 			}

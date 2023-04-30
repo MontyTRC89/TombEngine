@@ -62,12 +62,6 @@ namespace TEN::Effects::Items
 		item->Effect.Count = timeout;
 	}
 
-	void ItemSetAsCadaver(ItemInfo* item, int timeout)
-	{
-		item->Effect.Type = EffectType::Cadaver;
-		item->Effect.Count = timeout;
-	}
-
 	void LavaBurn(ItemInfo* item)
 	{
 		if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
@@ -101,17 +95,17 @@ namespace TEN::Effects::Items
 		switch (item->Animation.AnimNumber)
 		{
 		case LA_STAND_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_STAND_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameIndex(ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
 		case LA_CROUCH_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_CROUCH_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameIndex(ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
 		case LA_CRAWL_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_CRAWL_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameIndex(ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
 

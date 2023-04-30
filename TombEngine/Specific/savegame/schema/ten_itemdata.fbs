@@ -33,7 +33,8 @@ table Creature {
 	hurt_by_lara: bool;
 	tosspad: int32;
 	location_ai: int32;
-	fired_weapon: int32;
+	weapon_delay1: int32;
+	weapon_delay2: int32;
 	mood: int32;
 	enemy: int32;
 	ai_target_number: int32;
@@ -86,22 +87,16 @@ table Jeep {
 
 table Kayak {
 	turn_rate: int32;
-
 	velocity: int32;
 	front_vertical_velocity: int32;
 	left_vertical_velocity: int32;
 	right_vertical_velocity: int32;
-
 	left_right_count: int32;
 	water_height: int32;
 	old_pos: Position;
 	turn: bool;
 	forward: bool;
 	true_water: bool;
-
-	current_start_wake: int32;
-	wake_shade: int32;
-
 	flags: int32;
 }
 

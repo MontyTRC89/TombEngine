@@ -288,7 +288,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter(short itemNumber)
+	void InitializeFlameEmitter(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -321,7 +321,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter2(short itemNumber)
+	void InitializeFlameEmitter2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -366,7 +366,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter3(short itemNumber)
+	void InitializeFlameEmitter3(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -579,13 +579,13 @@ namespace TEN::Entities::Effects
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
-				Lara.InteractedItem = itemNumber;
+				Lara.Context.InteractedItem = itemNumber;
 			}
 
 			item->Pose.Orientation.y = oldYrot;
 		}
 
-		if (Lara.InteractedItem == itemNumber &&
+		if (Lara.Context.InteractedItem == itemNumber &&
 			item->Status != ITEM_ACTIVE &&
 			laraItem->Animation.ActiveState == LS_MISC_CONTROL)
 		{

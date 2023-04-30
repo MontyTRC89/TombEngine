@@ -30,8 +30,6 @@
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
-using std::string;
-using std::vector;
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
@@ -39,8 +37,8 @@ using namespace TEN::Input;
 char* LevelDataPtr;
 bool IsLevelLoading;
 bool LoadedSuccessfully;
-vector<int> MoveablesIds;
-vector<int> StaticObjectsIds;
+std::vector<int> MoveablesIds;
+std::vector<int> StaticObjectsIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -163,7 +161,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitialiseItemArray(NUM_ITEMS);
+	InitializeItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -171,7 +169,7 @@ void LoadItems()
 		{
 			auto* item = &g_Level.Items[i];
 
-			item->Data = ITEM_DATA{};
+			item->Data = ItemData{};
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();
 			item->Pose.Position.x = ReadInt32();
@@ -184,15 +182,15 @@ void LoadItems()
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();
-
-			g_GameScriptEntities->AddName(item->Name, i);
-			g_GameScriptEntities->TryAddColliding(i);
+			
+			g_GameScriptEntities->AddName(item->Name, (short)i);
+			g_GameScriptEntities->TryAddColliding((short)i);
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
-			InitialiseItem(i);
+			InitializeItem(i);
 	}
 }
 
@@ -329,21 +327,21 @@ void LoadObjects()
 	{
 		auto* frame = &g_Level.Frames[i];
 
-		frame->boundingBox.X1 = ReadInt16();
-		frame->boundingBox.X2 = ReadInt16();
-		frame->boundingBox.Y1 = ReadInt16();
-		frame->boundingBox.Y2 = ReadInt16();
-		frame->boundingBox.Z1 = ReadInt16();
-		frame->boundingBox.Z2 = ReadInt16();
-		frame->offsetX = ReadInt16();
-		frame->offsetY = ReadInt16();
-		frame->offsetZ = ReadInt16();
+		frame->BoundingBox.X1 = ReadInt16();
+		frame->BoundingBox.X2 = ReadInt16();
+		frame->BoundingBox.Y1 = ReadInt16();
+		frame->BoundingBox.Y2 = ReadInt16();
+		frame->BoundingBox.Z1 = ReadInt16();
+		frame->BoundingBox.Z2 = ReadInt16();
+
+		// NOTE: Braces are necessary to ensure correct value init order.
+		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };
 
 		int numAngles = ReadInt16();
-		frame->angles.resize(numAngles);
+		frame->BoneOrientations.resize(numAngles);
 		for (int j = 0; j < numAngles; j++)
 		{
-			auto* q = &frame->angles[j];
+			auto* q = &frame->BoneOrientations[j];
 			q->x = ReadFloat();
 			q->y = ReadFloat();
 			q->z = ReadFloat();
@@ -370,7 +368,7 @@ void LoadObjects()
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
-	InitialiseObjects();
+	InitializeObjects();
 
 	int numStatics = ReadInt32();
 	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
@@ -787,14 +785,15 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
+			// NOTE: Braces are necessary to ensure correct value init order.
 			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Box    = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
@@ -1084,7 +1083,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			if (SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
 
-			InitialiseGame = true;
+			InitializeGame = true;
 			SystemNameHash = 0;
 		}
 
@@ -1122,7 +1121,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		LoadBoxes();
 
-		//InitialiseLOTarray(true);
+		//InitializeLOTarray(true);
 
 		LoadAnimatedTextures();
 		g_Renderer.UpdateProgress(70);
@@ -1137,9 +1136,9 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialise the game
-		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
+		// Initialize the game
+		InitializeGameFlags();
+		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

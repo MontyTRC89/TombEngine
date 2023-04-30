@@ -33,7 +33,6 @@ public:
 	// New animation flag table
 	Animations			Anims{};
 
-	// Selected language set
 	std::vector<Level*>	Levels;
 
 	FlowHandler(sol::state* lua, sol::table & parent);
