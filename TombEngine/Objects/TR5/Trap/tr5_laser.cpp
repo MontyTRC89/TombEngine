@@ -19,7 +19,7 @@ void InitializeLasers(short itemNumber)
 	if (item->TriggerFlags >= 0)
 	{
 		width = item->TriggerFlags * BLOCK(1);
-		item->Model.Color = laser.Color = Vector4(240.0f, 0.0f, 0.0f, 0.0f);
+		laser.Color = item->Model.Color;// Vector4(240.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else
 	{
