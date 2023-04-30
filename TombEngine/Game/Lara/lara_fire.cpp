@@ -338,7 +338,7 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 
 	default:
 		player.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
-		playerLeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
+		player.LeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }

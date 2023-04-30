@@ -507,10 +507,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 	}
-	
-	bool flag = false;
-	GameBoundingBox* plinth = nullptr;
+
 	item->Pose.Orientation.x = 0;
+	const GameBoundingBox* plinthBounds = nullptr;
+	bool flag = false;
+
 	switch (triggerFlags)
 	{
 	// Pick up from hole in wall.
@@ -598,19 +599,19 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 4:
 	case 7:
 	case 8:
-		plinth = FindPlinth(item);
+		plinthBounds = FindPlinth(item);
 
-		if (!plinth)
+		if (plinthBounds == nullptr)
 		{
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
 
-		PlinthPickUpBounds.BoundingBox.X1 = plinth->X1;
-		PlinthPickUpBounds.BoundingBox.X2 = plinth->X2;
+		PlinthPickUpBounds.BoundingBox.X1 = plinthBounds->X1;
+		PlinthPickUpBounds.BoundingBox.X2 = plinthBounds->X2;
 		PlinthPickUpBounds.BoundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
-		PlinthPickUpBounds.BoundingBox.Z2 = plinth->Z2 + 320;
-		PlinthPickUpPosition.z = -200 - plinth->Z2;
+		PlinthPickUpBounds.BoundingBox.Z2 = plinthBounds->Z2 + 320;
+		PlinthPickUpPosition.z = -200 - plinthBounds->Z2;
 
 		// HACK: Until we refactor a way plinth collision is detected, this must be here
 		// to prevent false positives with two stacked plinths -- Lwmte, 16.06.22
@@ -1021,7 +1022,7 @@ void PickupControl(short itemNumber)
 	}
 }
 
-GameBoundingBox* FindPlinth(ItemInfo* item)
+const GameBoundingBox* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
@@ -1066,9 +1067,13 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 	}
 
 	if (itemNumber == NO_ITEM)
+	{
 		return nullptr;
+	}
 	else
+	{
 		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
+	}
 }
 
 void InitializePickup(short itemNumber)
