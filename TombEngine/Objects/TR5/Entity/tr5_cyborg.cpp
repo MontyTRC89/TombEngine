@@ -36,7 +36,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto CYBORG_DISTURBANCE_VELOCITY = 20.0f;
 
-	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
+	const auto CyborgGunBite = CreatureBiteInfo(Vector3i(-32, 240, 50), 18);
 	const auto CyborgJoints = std::vector<unsigned int>{ 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 	enum CyborgState
@@ -175,13 +175,8 @@ namespace TEN::Entities::Creatures::TR5
 			canJump2blocks = false;
 		}
 
-		// Fire weapon.
-		if (creature.FiredWeapon)
-		{
-			auto pos = GetJointPosition(&item, CyborgGunBite.meshNum, Vector3i(CyborgGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature.FiredWeapon + 10, 192, 128, 32);
-			creature.FiredWeapon--;
-		}
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
 
 		if (item.AIBits)
 			GetAITarget(&creature);
@@ -577,13 +572,11 @@ namespace TEN::Entities::Creatures::TR5
 					item.Animation.FrameNumber < GetAnimData(item).frameBase + 16 &&
 					((byte)item.Animation.FrameNumber - (byte)GetAnimData(item).frameBase) & 1)
 				{
-					creature.FiredWeapon = 1;
 					ShotLara(&item, &AI, CyborgGunBite, joint0, CYBORG_GUN_ATTACK_DAMAGE);
+					creature.MuzzleFlash[0].Bite = CyborgGunBite;
+					creature.MuzzleFlash[0].Delay = 1;
 				}
 
-				break;
-
-			default:
 				break;
 			}
 		}

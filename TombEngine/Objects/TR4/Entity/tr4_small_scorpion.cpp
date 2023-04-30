@@ -23,8 +23,8 @@ namespace TEN::Entities::TR4
 
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(0.31));
 
-	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
-	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
+	const auto SmallScorpionBite1 = CreatureBiteInfo(Vector3i::Zero, 0);
+	const auto SmallScorpionBite2 = CreatureBiteInfo(Vector3i::Zero, 23);
 	const auto SmallScorpionAttackJoints = std::vector<unsigned int>{ 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
@@ -163,7 +163,7 @@ namespace TEN::Entities::TR4
 							item->Animation.FrameNumber < GetAnimData(item).frameBase + 32)
 						{
 							short rotation;
-							BiteInfo biteInfo;
+							CreatureBiteInfo biteInfo;
 
 							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)

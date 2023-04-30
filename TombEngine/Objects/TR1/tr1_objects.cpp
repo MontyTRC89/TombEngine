@@ -9,6 +9,7 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR1/Entity/Cowboy.h" // OK
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -16,8 +17,8 @@
 #include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
 #include "Objects/TR1/Entity/tr1_wolf.h" // OK
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
-#include "Objects/TR1/Entity/tr1_centaur.h"
-#include "Objects/TR1/Entity/tr1_winged_mutant.h"
+#include "Objects/TR1/Entity/tr1_centaur.h" // OK
+#include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps
@@ -156,7 +157,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WingedMutantControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->hitEffect = HitEffect::Blood;
 		obj->pivotLength = 150;
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->HitPoints = 50;
@@ -164,6 +164,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(2, ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_COWBOY];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitialiseCowboy;
+		obj->control = CowboyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 150;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
 }

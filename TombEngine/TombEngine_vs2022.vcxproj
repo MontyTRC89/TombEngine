@@ -280,6 +280,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Objects\Sink.h" />
+    <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
@@ -633,6 +634,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
+    <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
@@ -714,6 +716,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />

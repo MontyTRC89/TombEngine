@@ -19,7 +19,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
+	const auto HydraBite = CreatureBiteInfo(Vector3i::Zero, 11);
 
 	enum HydraState
 	{

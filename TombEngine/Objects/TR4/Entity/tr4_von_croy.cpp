@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto VON_CROY_FLAG_JUMP = 6;
 
-	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
+	const auto VonCroyBite = CreatureBiteInfo(Vector3i(0, 35, 130), 18);
 	const auto VonCroyKnifeSwapJoints = std::vector<unsigned int>{ 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];

@@ -44,10 +44,10 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
-	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
-	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
-	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
+	const auto SethBite1   = CreatureBiteInfo(Vector3i(0, 220, 50), 17);
+	const auto SethBite2   = CreatureBiteInfo(Vector3i(0, 220, 50), 13);
+	const auto SethAttack1 = CreatureBiteInfo(Vector3i(-16, 200, 32), 13);
+	const auto SethAttack2 = CreatureBiteInfo(Vector3i(16, 200, 32), 17);
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
@@ -493,8 +493,8 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[0]++;
 
-		auto pos1 = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position));
-		auto pos2 = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position));
+		auto pos1 = GetJointPosition(item, SethAttack1);
+		auto pos2 = GetJointPosition(item, SethAttack2);
 
 		int sparkR = 64;
 		int sparkG = Random::GenerateInt(64, 192);
@@ -542,13 +542,13 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
+				auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				auto pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+				auto pos = GetJointPosition(item, SethAttack2.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 			}
@@ -579,11 +579,11 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
+					auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 					SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 
-					pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+					pos = GetJointPosition(item, SethAttack2.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 					orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 					SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 				}
@@ -624,14 +624,11 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+				auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 1);
 			}
 
-			break;
-
-		default:
 			break;
 		}
 	}

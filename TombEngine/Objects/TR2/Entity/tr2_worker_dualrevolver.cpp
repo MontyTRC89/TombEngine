@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerDualGunBiteLeft  = BiteInfo(Vector3(-2.0f, 275.0f, 23.0f), 6);
-	const auto WorkerDualGunBiteRight = BiteInfo(Vector3(2.0f, 275.0f, 23.0f), 10);
+	const auto WorkerDualGunBiteLeft  = CreatureBiteInfo(Vector3i(-2, 340, 23), 6);
+	const auto WorkerDualGunBiteRight = CreatureBiteInfo(Vector3i(2, 340, 23), 10);
 
 	// TODO
 	enum WorkerDualGunState
@@ -39,6 +39,11 @@ namespace TEN::Entities::Creatures::TR2
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
+		if (creature->MuzzleFlash[1].Delay != 0)
+			creature->MuzzleFlash[1].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -223,9 +228,11 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
 					ShotLara(item, &AI, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
+					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteLeft;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 
@@ -238,9 +245,11 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0 && TestAnimFrame(*item, 0))
 				{
 					ShotLara(item, &AI, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
+					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteRight;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 
@@ -269,10 +278,14 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
 					ShotLara(item, &AI, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
 					ShotLara(item, &AI, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
+					creature->MuzzleFlash[0].Bite = WorkerDualGunBiteLeft;
+					creature->MuzzleFlash[0].Delay = 1;
+					creature->MuzzleFlash[1].Bite = WorkerDualGunBiteRight;
+					creature->MuzzleFlash[1].Delay = 1;
 					creature->Flags = 1;
 				}
 
