@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (hitItem->ObjectNumber != ID_LARA)
 				{
 					if (hitItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
-						hitItem->ObjectNumber <= ID_SMASH_OBJECT8)
+						hitItem->ObjectNumber <= ID_SMASH_OBJECT16)
 					{
 						ExplodeItemNode(hitItem, 0, 0, 128);
 						SmashObject(objOnLos);
