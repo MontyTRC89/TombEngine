@@ -337,6 +337,10 @@ namespace Misc
 	//@function Log
 	//@tparam string message to be displayed within the Log
 	//@tparam Misc.LogLevel log level to be displayed
+	// Must be one of:
+	// ERROR
+	// WARNING
+	// INFO
 	//@usage
 	//Log('test info log', LogLevel.INFO)
 	//Log('test error log', LogLevel.ERROR)
