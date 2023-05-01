@@ -333,6 +333,10 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
+	/// Writing messages within the Log file
+	//@function Log
+	//@tparam string message to be displayed within the Log
+	//@tparam Misc.LogLevel log level to be displayed
 	static void Log(std::string const& message,LogLevel const& level)
 	{
 		TENLog(message, level, LogConfig::All, true);
@@ -402,6 +406,6 @@ namespace Misc
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
-		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LogLevele, kLogLevel);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LogLevel, kLogLevel);
 	}
 }
