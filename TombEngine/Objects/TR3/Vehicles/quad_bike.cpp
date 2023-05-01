@@ -36,7 +36,8 @@ namespace TEN::Entities::Vehicles
 		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
 		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
 	};
-	const vector<VehicleMountType> QuadBikeMountTypes =
+
+	const std::vector<VehicleMountType> QuadBikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
