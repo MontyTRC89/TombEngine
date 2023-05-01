@@ -86,6 +86,9 @@ namespace TEN::Gui
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
 	{
+		constexpr auto DELAY		 = 0.1f;
+		constexpr auto INITIAL_DELAY = 0.4f;
+
 		auto oppositeAction = In::None;
 		switch (actionID)
 		{
@@ -107,7 +110,7 @@ namespace TEN::Gui
 		}
 
 		bool isActionLocked = (oppositeAction == In::None) ? false : IsHeld(oppositeAction);
-		return (IsPulsed(actionID, 0.1f, 0.4f) && !isActionLocked);
+		return (IsPulsed(actionID, DELAY, INITIAL_DELAY) && !isActionLocked);
 	}
 
 	bool GuiController::GuiIsSelected() const
@@ -122,16 +125,13 @@ namespace TEN::Gui
 
 	bool GuiController::CanSelect() const
 	{
+		// Holding Deselect safely cancels input.
 		if (IsHeld(In::Deselect))
 			return false;
 
-		if (GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
-		{
+		// Avoid Action release interference when entering inventory.
+		if (GetActionTimeActive(In::Action) < TimeInInventory)
 			return true;
-		}
 
 		return false;
 	}
@@ -1601,16 +1601,25 @@ namespace TEN::Gui
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
 		UseItem = false;
+		TimeInInventory = 0.0f;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
+		{
 			Ammo.AmountShotGunAmmo1 = -1;
+		}
 		else
+		{
 			Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].GetCount() / 6;
+		}
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].HasInfinite())
+		{
 			Ammo.AmountShotGunAmmo2 = -1;
+		}
 		else
+		{
 			Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
+		}
 		
 		Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
@@ -1633,7 +1642,9 @@ namespace TEN::Gui
 			if (LastInvItem != NO_ITEM)
 			{
 				if (IsItemInInventory(LastInvItem))
+				{
 					SetupObjectListStartPosition(LastInvItem);
+				}
 				else
 				{
 					if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN_3L)
@@ -2929,6 +2940,8 @@ namespace TEN::Gui
 			if (ThreadEnded)
 				return false;
 
+			TimeInInventory += 1.0f;
+
 			OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 			UpdateInputActions(item);
@@ -3001,6 +3014,7 @@ namespace TEN::Gui
 
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
+		TimeInInventory = 0.0f;
 
 		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
@@ -3082,6 +3096,11 @@ namespace TEN::Gui
 	short GuiController::GetLoadSaveSelection()
 	{
 		return SelectedSaveSlot;
+	}
+
+	float GuiController::GetTimeInInventory()
+	{
+		return TimeInInventory;
 	}
 
 	LoadResult GuiController::DoLoad()
