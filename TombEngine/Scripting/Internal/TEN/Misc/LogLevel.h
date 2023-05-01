@@ -16,7 +16,7 @@ The following constants are inside LogLevel.
 	WARNING
 	INFO
 
-@section Misc.LogLeve
+@section Misc.LogLevel
 */
 
 /*** Table of LogLevel ID constants (for use with Log command).
