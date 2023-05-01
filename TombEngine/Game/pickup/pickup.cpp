@@ -21,13 +21,13 @@
 #include "Game/pickup/pickup_misc_items.h"
 #include "Game/pickup/pickup_weapon.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Generic;

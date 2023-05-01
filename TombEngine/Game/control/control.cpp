@@ -36,6 +36,7 @@
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
@@ -54,7 +55,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/winmain.h"
 
 using namespace std::chrono;
