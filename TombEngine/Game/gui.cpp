@@ -35,6 +35,7 @@ namespace TEN::Gui
 	constexpr int LINE_HEIGHT = 25;
 	constexpr int PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
 	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
+	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 	constexpr int VOLUME_MAX = 100;
 
@@ -130,7 +131,7 @@ namespace TEN::Gui
 			return false;
 
 		// Avoid Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Action) < TimeInInventory)
+		if (GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
@@ -178,7 +179,11 @@ namespace TEN::Gui
 
 	void GuiController::SetInventoryMode(InventoryMode mode)
 	{
-		InvMode = mode;
+		if (mode != InvMode)
+		{
+			TimeInMenu = 0.0f;
+			InvMode = mode;
+		}
 	}
 
 	void GuiController::SetInventoryItemChosen(int number)
@@ -228,7 +233,7 @@ namespace TEN::Gui
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
 
-		TimeInInventory++;
+		TimeInMenu++;
 
 		// Stuff for credits goes here!
 
@@ -890,6 +895,7 @@ namespace TEN::Gui
 		static const int numStatisticsOptions = 0;
 		static const int numOptionsOptions	  = 2;
 
+		TimeInMenu++;
 		UpdateInputActions(item);
 
 		switch (MenuToDisplay)
@@ -948,7 +954,7 @@ namespace TEN::Gui
 		{
 			if (MenuToDisplay == Menu::Pause)
 			{
-				InvMode = InventoryMode::None;
+				SetInventoryMode(InventoryMode::None);
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				return InventoryResult::None;
 			}
@@ -981,7 +987,7 @@ namespace TEN::Gui
 					break;
 
 				case PauseMenuOption::ExitToTitle:
-					InvMode = InventoryMode::None;
+					SetInventoryMode(InventoryMode::None);
 					return InventoryResult::ExitToTitle;
 					break;
 				}
@@ -1603,7 +1609,6 @@ namespace TEN::Gui
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
 		UseItem = false;
-		TimeInInventory = 0.0f;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
 		{
@@ -2323,20 +2328,20 @@ namespace TEN::Gui
 
 					case MenuType::Load:
 						// fill_up_savegames_array // Maybe not?
-						InvMode = InventoryMode::Load;
+						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
 						// fill_up_savegames_array
-						InvMode = InventoryMode::Save;
+						SetInventoryMode(InventoryMode::Save);
 						break;
 
 					case MenuType::Examine:
-						InvMode = InventoryMode::Examine;
+						SetInventoryMode(InventoryMode::Examine);
 						break;
 
 					case MenuType::Statistics:
-						InvMode = InventoryMode::Statistics;
+						SetInventoryMode(InventoryMode::Statistics);
 						break;
 
 					case MenuType::Ammo1:
@@ -2368,7 +2373,7 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Diary:
-						InvMode = InventoryMode::Diary;
+						SetInventoryMode(InventoryMode::Diary);
 						lara->Inventory.Diary.CurrentPage = 1;
 						break;
 					}
@@ -2931,7 +2936,7 @@ namespace TEN::Gui
 		g_Renderer.DumpGameScene();
 
 		if (resetMode)
-			InvMode = InventoryMode::InGame;
+			SetInventoryMode(InventoryMode::InGame);
 
 		InitializeInventory(item);
 		Camera.numberFrames = 2;
@@ -2942,12 +2947,10 @@ namespace TEN::Gui
 			if (ThreadEnded)
 				return false;
 
-			TimeInInventory += 1.0f;
-
-			OBJLIST_SPACING = PHD_CENTER_X / 2;
+			TimeInMenu++;
+			GameTimer++;
 
 			UpdateInputActions(item);
-			GameTimer++;
 
 			if (IsClicked(In::Option))
 			{
@@ -2988,7 +2991,7 @@ namespace TEN::Gui
 					exitLoop = !resetMode;
 
 					if (resetMode)
-						InvMode = InventoryMode::InGame;
+						SetInventoryMode(InventoryMode::InGame);
 
 					break;
 
@@ -3003,7 +3006,7 @@ namespace TEN::Gui
 				{
 					exitLoop = !resetMode;
 					if (resetMode)
-						InvMode = InventoryMode::InGame;
+						SetInventoryMode(InventoryMode::InGame);
 				}
 
 				break;
@@ -3016,7 +3019,6 @@ namespace TEN::Gui
 
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
-		TimeInInventory = 0.0f;
 
 		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
@@ -3027,30 +3029,30 @@ namespace TEN::Gui
 		AlterFOV(LastFOV);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
-		InvMode = InventoryMode::None;
+		SetInventoryMode(InventoryMode::None);
 
 		return doLoad;
 	}
 
 	void GuiController::DoStatisticsMode()
 	{
-		InvMode = InventoryMode::Statistics;
+		SetInventoryMode(InventoryMode::Statistics);
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::InGame;
+			SetInventoryMode(InventoryMode::InGame);
 		}
 	}
 
 	void GuiController::DoExamineMode()
 	{
-		this->InvMode = InventoryMode::Examine;
+		SetInventoryMode(InventoryMode::Examine);
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			this->InvMode = InventoryMode::None;
+			SetInventoryMode(InventoryMode::None);
 		}
 	}
 
@@ -3072,7 +3074,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		this->InvMode = InventoryMode::Diary;
+		SetInventoryMode(InventoryMode::Diary);
 
 		if (GuiIsPulsed(In::Right) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
@@ -3091,18 +3093,13 @@ namespace TEN::Gui
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::None;
+			SetInventoryMode(InventoryMode::None);
 		}
 	}
 
 	short GuiController::GetLoadSaveSelection()
 	{
 		return SelectedSaveSlot;
-	}
-
-	float GuiController::GetTimeInInventory()
-	{
-		return TimeInInventory;
 	}
 
 	LoadResult GuiController::DoLoad()
