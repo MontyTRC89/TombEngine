@@ -130,7 +130,7 @@ namespace TEN::Input
 	extern const char* g_KeyNames[];
 
 	extern std::vector<InputAction> ActionMap;
-	extern vector<QueueState>		ActionQueue;
+	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 

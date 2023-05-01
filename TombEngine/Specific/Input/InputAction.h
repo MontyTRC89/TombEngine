@@ -1,7 +1,5 @@
 #pragma once
 
-using std::vector;
-
 namespace TEN::Input
 {
 	typedef enum class ActionID
