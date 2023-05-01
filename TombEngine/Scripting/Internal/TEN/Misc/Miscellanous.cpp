@@ -337,6 +337,10 @@ namespace Misc
 	//@function Log
 	//@tparam string message to be displayed within the Log
 	//@tparam Misc.LogLevel log level to be displayed
+	//@usage
+	//Log('test info log', LogLevel.INFO)
+	//Log('test error log', LogLevel.ERROR)
+	//Log('test warning log', LogLevel.WARNING)
 	static void Log(std::string const& message,LogLevel const& level)
 	{
 		TENLog(message, level, LogConfig::All, true);
