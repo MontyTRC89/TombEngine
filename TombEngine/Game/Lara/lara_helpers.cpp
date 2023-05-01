@@ -998,6 +998,9 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	if (item->HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0)
 		return;
 
+	if (item->HitPoints == 0)
+		return;
+
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
 		Rumble(POWER, DELAY);
