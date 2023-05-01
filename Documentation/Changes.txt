@@ -8,6 +8,7 @@ Version 1.0.9
 * Fix snowmobile driver crashing the game.
 * Fix knifethrower not throwing knife.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Fix inventory input interference when entering inventory via puzzle.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
