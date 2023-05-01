@@ -228,6 +228,8 @@ namespace TEN::Gui
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
 
+		TimeInInventory++;
+
 		// Stuff for credits goes here!
 
 		switch (MenuToDisplay)
@@ -281,8 +283,8 @@ namespace TEN::Gui
 			}
 		}
 		else if (MenuToDisplay == Menu::Title ||
-			MenuToDisplay == Menu::SelectLevel ||
-			MenuToDisplay == Menu::Options)
+				 MenuToDisplay == Menu::SelectLevel ||
+				 MenuToDisplay == Menu::Options)
 		{
 			if (GuiIsPulsed(In::Forward))
 			{
