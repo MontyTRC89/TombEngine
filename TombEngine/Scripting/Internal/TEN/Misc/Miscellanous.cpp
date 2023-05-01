@@ -336,7 +336,7 @@ namespace Misc
 	/// Writing messages within the Log file
 	//@function Log
 	//@tparam string message to be displayed within the Log
-	//@tparam Misc.LogLevel logLevel to be displayed
+	//@tparam Misc.LogLevel logLevel log level to be displayed
 	// Must be one of:
 	// ERROR
 	// WARNING
