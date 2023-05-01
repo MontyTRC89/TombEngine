@@ -12,7 +12,6 @@ Constants for LogLevel IDs.
 
 The following constants are inside LogLevel.
 
-	ERROR
 	WARNING
 	INFO
 
@@ -25,7 +24,6 @@ The following constants are inside LogLevel.
 
 static const std::unordered_map<std::string, LogLevel> kLogLevel
 {
-	{"ERROR", LogLevel::Error},
 	{"WARNING", LogLevel::Warning},
 	{"INFO", LogLevel::Info},
 };
