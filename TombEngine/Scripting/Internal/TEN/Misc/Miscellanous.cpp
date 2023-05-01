@@ -343,7 +343,6 @@ namespace Misc
 	// INFO
 	//@usage
 	//Log('test info log', LogLevel.INFO)
-	//Log('test error log', LogLevel.ERROR)
 	//Log('test warning log', LogLevel.WARNING)
 	static void Log(std::string const& message,LogLevel const& level)
 	{
