@@ -96,7 +96,7 @@ namespace TEN::Input
 		void Update(float value);
 		void Clear();
 
-		void PrintDebugInfo() const;
+		void DrawDebug() const;
 
 	private:
 		// Helpers

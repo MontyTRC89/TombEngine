@@ -92,7 +92,7 @@ namespace TEN::Input
 	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
 	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
 
-	// TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
+	// TODO: Not needed since BRAKE is explicitly associated with dismounts anyway.
 	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
 	enum InputAxis
