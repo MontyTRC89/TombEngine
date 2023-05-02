@@ -46,12 +46,12 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->ObjectNumber == ID_JUMP_SWITCH)
 			{
-				switchItem->Animation.TargetState = SWITCH_OFF;
+				switchItem->Animation.TargetState = SWITCH_ON;
 				AnimateItem(switchItem);
 			}
 			else
 			{
-				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 			}
 
 			switchItem->Timer = 0;
