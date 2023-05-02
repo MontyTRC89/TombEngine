@@ -15,10 +15,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;

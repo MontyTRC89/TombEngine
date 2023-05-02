@@ -8,12 +8,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
@@ -400,9 +400,21 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
 	const auto& animObject = Objects[animObjectID];
-	const auto& anim = GetAnimData(animObject, animNumber);
-
 	int animIndex = animObject.animIndex + animNumber;
+
+	// Animation is missing; return early.
+	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
+	{
+		TENLog(
+			std::string("Attempted to set missing animation ") + std::to_string(animNumber) +
+			(animObjectID == item.ObjectNumber ? std::string() : std::string(" from object ") + GetObjectName(animObjectID)) +
+			std::string(" for object ") + GetObjectName(item.ObjectNumber),
+			LogLevel::Warning);
+
+		return;
+	}
+
+	const auto& anim = GetAnimData(animObject, animNumber);
 	int frameIndex = anim.frameBase + frameNumber;
 
 	// Animation already set; return early.
@@ -410,18 +422,6 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		item.Animation.AnimNumber == animIndex &&
 		item.Animation.FrameNumber == frameIndex)
 	{
-		return;
-	}
-
-	// Animation is missing; return early.
-	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
-	{
-		TENLog(
-			std::string("Attempted to set missing animation ") + std::to_string(animNumber) +
-			std::string(" from object ") + std::to_string(animObjectID) +
-			std::string(" for object ") + std::to_string(item.ObjectNumber),
-			LogLevel::Warning);
-
 		return;
 	}
 

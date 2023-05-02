@@ -8,10 +8,10 @@
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Effects/Boss.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Effects::Electricity;
