@@ -414,6 +414,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
 	DisableSmokeParticles();
