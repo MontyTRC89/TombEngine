@@ -9,6 +9,7 @@
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Vec2/Vec2.h"
 #include "Rotation/Rotation.h"
 #include "Color/Color.h"
 #include "LevelFunc.h"
@@ -113,7 +114,8 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		break;
 	case sol::type::userdata:
 	{
-		if (value.is<Vec3>() ||
+		if (value.is<Vec2>() ||
+			value.is<Vec3>() ||
 			value.is<Rotation>() ||
 			value.is<ScriptColor>())
 		{
@@ -406,6 +408,11 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
+				else if (vars[second].index() == int(SavedVarType::Vec2))
+				{
+					auto theVec = Vec2{ std::get<int(SavedVarType::Vec2)>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
 					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
@@ -631,7 +638,11 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 				case sol::type::userdata:
 				{
-					if (second.is<Vec3>())
+					if (second.is<Vec2>())
+					{
+						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, nVars, vars));
+					}
+					else if (second.is<Vec3>())
 					{
 						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
 					}

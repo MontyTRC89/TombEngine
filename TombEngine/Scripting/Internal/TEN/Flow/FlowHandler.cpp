@@ -9,6 +9,7 @@
 #include "Game/Gui.h"
 #include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
+#include "Vec2/Vec2.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
@@ -194,6 +195,7 @@ Specify which translations in the strings table correspond to which languages.
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
+	Vec2::Register(parent);
 	Vec3::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);

@@ -103,6 +103,11 @@ Save::Position FromPHD(Pose const& src)
 	};
 }
 
+Save::Vector2 FromVector2(Vector2i vec)
+{
+	return Save::Vector2(vec.x, vec.y);
+}
+
 Save::Vector3 FromVector3(Vector3 vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
@@ -128,6 +133,11 @@ EulerAngles ToEulerAngles(const Save::Vector3* vec)
 	return EulerAngles(short(vec->x()), short(vec->y()), short(vec->z()));
 }
 
+Vector2i ToVector2i(const Save::Vector2* vec)
+{
+	return Vector2i(int(vec->x()), int(vec->y()));
+}
+
 Vector3i ToVector3i(const Save::Vector3* vec)
 {
 	return Vector3i(int(vec->x()), int(vec->y()), int(vec->z()));
@@ -148,10 +158,10 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
-#define SaveVec(Type, Data, TableBuilder, UnionType) \
+#define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
 				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
-				Save::Vector3 saveVec = FromVector3(data); \
+				SaveType saveVec = ConversionFunc(data); \
 				vtb.add_vec(&saveVec); \
 				auto vecOffset = vtb.Finish(); \
 				putDataInVec(UnionType, vecOffset);
@@ -1162,15 +1172,20 @@ bool SaveGame::Save(int slot)
 		{
 			switch (SavedVarType(s.index()))
 			{
+			case SavedVarType::Vec2:
+			{
+				SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
+			}
+			break;
 			case SavedVarType::Vec3:
 			{
-				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3);
+				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 			}
 			break;
 
 			case SavedVarType::Rotation:
 			{
-				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation);
+				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
 			}
 			break;
 
@@ -2063,6 +2078,13 @@ bool SaveGame::Load(int slot)
 
 				for (const auto& p : *tab)
 					std::get<IndexTable>(loadedTab).push_back(std::make_pair(p->key(), p->val()));
+			}
+			else if (var->u_type() == Save::VarUnion::vec2)
+			{
+				auto stored = var->u_as_vec2()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
+				loadedVars.push_back(v);
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
