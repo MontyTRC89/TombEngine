@@ -6,16 +6,16 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/effects/simple_particle.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 

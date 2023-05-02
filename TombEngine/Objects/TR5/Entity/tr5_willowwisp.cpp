@@ -3,8 +3,8 @@
 
 #include "Game/control/box.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {

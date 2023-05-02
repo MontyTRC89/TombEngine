@@ -3,9 +3,9 @@
 
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;

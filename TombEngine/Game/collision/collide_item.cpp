@@ -14,11 +14,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 using namespace TEN::Renderer;

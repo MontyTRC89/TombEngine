@@ -10,11 +10,11 @@
 #include "Game/spotcam.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Hair;
 using namespace TEN::Math;

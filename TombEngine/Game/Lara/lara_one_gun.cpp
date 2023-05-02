@@ -21,6 +21,7 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -28,7 +29,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;

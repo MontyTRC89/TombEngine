@@ -10,10 +10,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Object/Corpse.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 using namespace TEN::Entities::TR3;

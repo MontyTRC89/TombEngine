@@ -12,8 +12,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;

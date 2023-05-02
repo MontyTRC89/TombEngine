@@ -9,11 +9,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 

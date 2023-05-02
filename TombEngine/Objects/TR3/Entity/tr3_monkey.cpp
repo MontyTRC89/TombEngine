@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 

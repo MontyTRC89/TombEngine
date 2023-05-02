@@ -5,7 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/missile.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 
 // Creatures

@@ -1,16 +1,16 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 
-#include "Specific/level.h"
+#include "Game/animation.h"
 #include "Game/control/control.h"
-#include "Specific/setup.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Sound/sound.h"
-#include "Game/Lara/lara.h"
-#include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Math;
 

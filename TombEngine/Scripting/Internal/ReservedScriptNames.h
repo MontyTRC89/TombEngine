@@ -32,6 +32,23 @@ static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase";
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 
+static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
+static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
+static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
+static constexpr char ScriptReserved_EndReasonDeath[]			= "DEATH";
+static constexpr char ScriptReserved_EndReasonOther[]			= "OTHER";
+
+// Callback points
+static constexpr char ScriptReserved_PreStart[]			= "PRESTART";
+static constexpr char ScriptReserved_PostStart[]		= "POSTSTART";
+static constexpr char ScriptReserved_PreEnd[]			= "PREEND";
+static constexpr char ScriptReserved_PostEnd[]			= "POSTEND";
+static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
+static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
+static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
+static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
+static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -249,6 +266,7 @@ static constexpr char ScriptReserved_RoomFlagID[]				= "RoomFlagID";
 static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
+static constexpr char ScriptReserved_EndReason[]				= "EndReason";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";

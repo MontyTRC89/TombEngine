@@ -9,10 +9,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
-#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
