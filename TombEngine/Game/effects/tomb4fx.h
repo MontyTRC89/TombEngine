@@ -5,8 +5,8 @@
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
-struct ItemInfo;
 struct CreatureBiteInfo;
+struct ItemInfo;
 
 enum BodyPartFlags
 {
@@ -233,11 +233,11 @@ int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
-void TriggerPilotFlame(int itemNum, int nodeIndex);
-void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed);
-void ThrowFire(int itemNum, const CreatureBiteInfo& bite, Vector3i speed);
-void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color);
-void ThrowPoison(int itemNum, const CreatureBiteInfo& bite, Vector3i speed, Vector3 color);
+void TriggerPilotFlame(int itemNumber, int nodeIndex);
+void ThrowFire(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel);
+void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel);
+void ThrowPoison(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, const Vector3& color);
+void ThrowPoison(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, const Vector3& color);
 void UpdateFireProgress();
 void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);

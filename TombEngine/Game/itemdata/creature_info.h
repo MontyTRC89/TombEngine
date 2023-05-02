@@ -73,7 +73,7 @@ struct LOTInfo
 
 struct CreatureBiteInfo
 {
-	Vector3i Position = Vector3i::Zero;
+	Vector3i Position = Vector3i::Zero; // TODO: Change back to Vector3.
 	int		 BoneID	  = -1;
 
 	CreatureBiteInfo() {}
@@ -91,7 +91,7 @@ struct CreatureBiteInfo
 	}
 };
 
-struct CreatureMuzzleflashInfo
+struct CreatureMuzzleFlashInfo
 {
 	CreatureBiteInfo Bite = {};
 
@@ -101,23 +101,23 @@ struct CreatureMuzzleflashInfo
 	bool ApplyZRotation	 = true;  // Applies Y axis rotation for muzzleflash (required for creatures).
 	bool UseSmoke		 = true;  // Determines if CreatureAnimation calls TriggerGunSmokeParticles().
 
-	CreatureMuzzleflashInfo() {}
+	CreatureMuzzleFlashInfo() {}
 
-	CreatureMuzzleflashInfo(const Vector3i& pos, int boneID, int delay, bool changeToMuzzle2 = false)
+	CreatureMuzzleFlashInfo(const Vector3i& pos, int boneID, int delay, bool changeToMuzzle2 = false)
 	{
 		Bite = CreatureBiteInfo(pos, boneID);
 		Delay = delay;
 		SwitchToMuzzle2 = changeToMuzzle2;
 	}
 
-	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false)
+	CreatureMuzzleFlashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false)
 	{
 		Bite = bite;
 		Delay = delay;
 		SwitchToMuzzle2 = changeToMuzzle2;
 	}
 
-	CreatureMuzzleflashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false, bool applyXRot = true, bool applyZRot = true)
+	CreatureMuzzleFlashInfo(const CreatureBiteInfo& bite, int delay, bool changeToMuzzle2 = false, bool applyXRot = true, bool applyZRot = true)
 	{
 		Bite = bite;
 		Delay = delay;
@@ -152,7 +152,7 @@ struct CreatureInfo
 	bool MonkeySwingAhead = false;
 	bool ReachedGoal	  = false;
 
-	CreatureMuzzleflashInfo MuzzleFlash[2];
+	CreatureMuzzleFlashInfo MuzzleFlash[2];
 	short Tosspad	  = 0;
 	short LocationAI  = 0;
 	short Flags		  = 0;

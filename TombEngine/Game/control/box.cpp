@@ -16,7 +16,7 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
@@ -35,7 +35,8 @@ constexpr auto FEELER_DISTANCE = CLICK(2);
 constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
 constexpr auto CREATURE_JOINT_ROTATION_MAX = ANGLE(70.0f);
-constexpr auto GUN_EFFECT_CREATURE_YSHIFT = 75;
+
+constexpr auto CREATURE_GUN_EFFECT_VERTICAL_OFFSET = 75;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 constexpr int HIGH_PRIO_RANGE = 8;
@@ -726,44 +727,47 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	return angle;
 }
 
-static void PlayGunEffectForCreature(ItemInfo* item, const CreatureMuzzleflashInfo& muzzleFlash)
+static void SpawnCreatureGunEffect(const ItemInfo& item, const CreatureMuzzleFlashInfo& muzzleFlash)
 {
-	if (muzzleFlash.Delay == 0) return;
-	auto muzzleNewpos = muzzleFlash.Bite;
-	auto pos = GetJointPosition(item, muzzleNewpos);
+	if (muzzleFlash.Delay == 0)
+		return;
+
+	auto muzzlePos = muzzleFlash.Bite;
+	auto pos = GetJointPosition(item, muzzlePos);
 	TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
+
 	if (muzzleFlash.UseSmoke)
 	{
-		// NOTE: Fix the smoke position,
-		// avoiding creating new variable in CreatureMuzzleflashInfo for a smoke biteInfo
-		muzzleNewpos.Position.y -= GUN_EFFECT_CREATURE_YSHIFT;
-		auto smokePos = GetJointPosition(item, muzzleNewpos);
-		TriggerGunSmokeParticles(smokePos.x, smokePos.y, smokePos.z, 0, 0, 0, 1, LaraWeaponType::Pistol, 12, item->RoomNumber);
+		muzzlePos.Position.y -= CREATURE_GUN_EFFECT_VERTICAL_OFFSET;
+		auto smokePos = GetJointPosition(item, muzzlePos);
+		SpawnGunSmokeParticles(smokePos.ToVector3(), Vector3::Zero, item.RoomNumber, 1, LaraWeaponType::Pistol, 12);
 	}
 }
 
-bool CreatureAnimation(short itemNumber, short angle, short tilt)
+bool CreatureAnimation(short itemNumber, short headingAngle, short tiltAngle)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	if (!item->IsCreature())
+	auto& item = g_Level.Items[itemNumber];
+	if (!item.IsCreature())
 		return false;
-	auto* creature = GetCreatureInfo(item);
-	PlayGunEffectForCreature(item, creature->MuzzleFlash[0]);
-	PlayGunEffectForCreature(item, creature->MuzzleFlash[1]);
 
-	auto prevPos = item->Pose.Position;
+	auto& creature = *GetCreatureInfo(&item);
 
-	AnimateItem(item);
-	ProcessSectorFlags(item);
-	CreatureHealth(item);
+	SpawnCreatureGunEffect(item, creature.MuzzleFlash[0]);
+	SpawnCreatureGunEffect(item, creature.MuzzleFlash[1]);
 
-	if (item->Status == ITEM_DEACTIVATED)
+	auto prevPos = item.Pose.Position;
+
+	AnimateItem(&item);
+	ProcessSectorFlags(&item);
+	CreatureHealth(&item);
+
+	if (item.Status == ITEM_DEACTIVATED)
 	{
 		CreatureDie(itemNumber, false);
 		return false;
 	}
 
-	return CreaturePathfind(item, prevPos, angle, tilt);
+	return CreaturePathfind(&item, prevPos, headingAngle, tiltAngle);
 }
 
 void CreatureHealth(ItemInfo* item)

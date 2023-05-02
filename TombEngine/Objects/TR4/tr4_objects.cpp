@@ -5,9 +5,9 @@
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 
 // Creatures
@@ -753,6 +753,13 @@ namespace TEN::Entities
 			obj->control = WraithTrapControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
+		}
+
+		for (int objectID = ID_WATERFALL1; objectID <= ID_WATERFALL6; objectID++)
+		{
+			obj = &Objects[objectID];
+			if (obj->loaded)
+				obj->control = nullptr;
 		}
 	}
 
