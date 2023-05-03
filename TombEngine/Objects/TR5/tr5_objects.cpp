@@ -56,15 +56,15 @@
 #include "tr5_genslot.h"
 
 // Traps
-#include "tr5_ventilator.h"
-#include "tr5_zip_line.h"
 #include "Objects/Effects/tr5_electricity.h"
-#include "tr5_romehammer.h"
-#include "tr5_fallingceiling.h"
-#include "tr5_rollingball.h"
-#include "tr5_explosion.h"
-#include "tr5_wreckingball.h"
-#include "tr5_laser.h"
+#include "Objects/TR5/Object/tr5_rollingball.h"
+#include "Objects/TR5/Trap/tr5_laser.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
+#include "Objects/TR5/Trap/tr5_zip_line.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_wreckingball.h"
 
 // Switches
 #include "tr5_crowdove_switch.h"
@@ -74,6 +74,7 @@
 
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Traps::TR5;
 
 static void StartEntity(ObjectInfo *obj)
 {
