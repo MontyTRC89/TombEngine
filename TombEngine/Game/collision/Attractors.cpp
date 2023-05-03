@@ -133,8 +133,10 @@ namespace TEN::Collision::Attractors
 		if (Points.size() == 1)
 			return Points.front();
 		
-		// Wrap line distance and clamp point according to length.
+		// Normalize distance along attractor.
 		lineDist = NormalizeLineDistance(lineDist);
+
+		// Clamp point.
 		if (lineDist <= 0.0f)
 		{
 			return Points.front();
@@ -158,8 +160,7 @@ namespace TEN::Collision::Attractors
 			if (remainingLineDist <= segmentLength)
 			{
 				float alpha = remainingLineDist / segmentLength;
-				auto point = Vector3::Lerp(origin, target, alpha);
-				return point;
+				return Vector3::Lerp(origin, target, alpha);
 			}
 
 			lineDistTravelled += segmentLength;
@@ -175,8 +176,10 @@ namespace TEN::Collision::Attractors
 		if (Points.size() <= 2)
 			return 0;
 
-		// Wrap distance along attractor and clamp point according to length.
+		// Normalize distance along attractor.
 		lineDist = NormalizeLineDistance(lineDist);
+
+		// Clamp segment index.
 		if (lineDist <= 0.0f)
 		{
 			return 0;
@@ -326,20 +329,21 @@ namespace TEN::Collision::Attractors
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			auto attracProximity = attrac.GetProximityData(refPoint);
-			if (attracProximity.Distance <= range)
-				nearbyAttracPtrMap.insert({ attracProximity.Distance, &attrac });
+			float dist = attrac.GetProximityData(refPoint).Distance;
+			if (dist <= range)
+				nearbyAttracPtrMap.insert({ dist, &attrac });
 		}
 
+		// TODO: Check if it actually has search depth of 2.
 		// Get attractors in neighboring rooms (search depth of 2).
 		for (const int& subRoomNumber : room.neighbors)
 		{
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				auto attracProx = attrac.GetProximityData(refPoint);
-				if (attracProx.Distance <= range)
-					nearbyAttracPtrMap.insert({ attracProx.Distance, &attrac });
+				float dist = attrac.GetProximityData(refPoint).Distance;
+				if (dist <= range)
+					nearbyAttracPtrMap.insert({ dist, &attrac });
 			}
 		}
 
@@ -356,11 +360,12 @@ namespace TEN::Collision::Attractors
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 		nearbyAttracPtrs.reserve(COUNT_MAX);
 
-		// Move pointers into vector.
+		// Move attractor pointers into capped vector.
 		auto it = nearbyAttracPtrMap.begin();
 		for (int i = 0; i < COUNT_MAX && it != nearbyAttracPtrMap.end(); i++, it++)
 			nearbyAttracPtrs.push_back(std::move(it->second));
 
+		// Return attractor pointers (sorted by distance).
 		return nearbyAttracPtrs;
 	}
 
