@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
 
-#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
