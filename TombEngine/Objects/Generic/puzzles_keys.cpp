@@ -484,7 +484,14 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					keyHoleItem->ItemFlags[1] = true;
 				}
 
-				laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				if (keyHoleItem->TriggerFlags == 0)
+				{
+					laraItem->Animation.AnimNumber = LA_USE_KEY;
+				}
+				else
+				{
+					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
