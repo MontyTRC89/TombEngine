@@ -365,7 +365,7 @@ namespace TEN::Collision::Attractors
 		for (int i = 0; i < COUNT_MAX && it != nearbyAttracPtrMap.end(); i++, it++)
 			nearbyAttracPtrs.push_back(std::move(it->second));
 
-		// Return attractor pointers (sorted by distance).
+		// Return attractor pointers sorted by distance.
 		return nearbyAttracPtrs;
 	}
 
@@ -402,9 +402,9 @@ namespace TEN::Collision::Attractors
 		auto attracColls = std::vector<AttractorCollisionData>{};
 		attracColls.reserve(attracPtrs.size());
 
-		for (const auto* attrac : attracPtrs)
+		for (const auto* attracPtr : attracPtrs)
 		{
-			auto attracColl = attrac->GetCollision(basePos, orient, refPoint, range);
+			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 
@@ -422,9 +422,9 @@ namespace TEN::Collision::Attractors
 		auto attracColls = std::vector<AttractorCollisionData>{};
 		attracColls.reserve(attracPtrs.size());
 
-		for (const auto* attrac : attracPtrs)
+		for (const auto* attracPtr : attracPtrs)
 		{
-			auto attracColl = attrac->GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
+			auto attracColl = attracPtr->GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
 			attracColls.push_back(attracColl);
 		}
 
