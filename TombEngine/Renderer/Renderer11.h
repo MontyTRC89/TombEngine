@@ -516,7 +516,7 @@ namespace TEN::Renderer
 		void InitializeMenuBars(int y);
 
 		void DrawAllStrings();
-		void DrawLasers(RenderView& view);
+		void DrawLaserBarriers(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, bool transparent);
 		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);

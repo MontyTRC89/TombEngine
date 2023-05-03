@@ -87,12 +87,12 @@ namespace TEN::Renderer
 		int renderType;
 	};
 	
-	void Renderer11::DrawLasers(RenderView& view)
+	void Renderer11::DrawLaserBarriers(RenderView& view)
 	{
-		if (Lasers.empty())
+		if (LaserBarriers.empty())
 			return;
 
-		for (const auto& laser : Lasers)
+		for (const auto& laser : LaserBarriers)
 		{
 			for (int i = 0; i < 3; i++)
 			{

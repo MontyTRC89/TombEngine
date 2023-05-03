@@ -1513,7 +1513,7 @@ namespace TEN::Renderer
 		DrawHelicalLasers(view);
 		DrawRopes(view);
 		DrawStreamers(view);
-		DrawLasers(view);
+		DrawLaserBarriers(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);

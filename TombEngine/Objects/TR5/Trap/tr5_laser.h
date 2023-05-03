@@ -4,7 +4,7 @@ namespace TEN::Traps::TR5
 {
 	constexpr auto LASER_BEAM_COUNT = 3;
 
-	struct LaserStructInfo
+	struct LaserBarrier
 	{
 		std::array<Vector3, LASER_BEAM_COUNT> vert1 = {};
 		std::array<Vector3, LASER_BEAM_COUNT> vert2 = {};
@@ -13,13 +13,13 @@ namespace TEN::Traps::TR5
 
 		Vector4 Color = Vector4::Zero;
 		short Rand[18];
-		int life = INFINITY;
 	};
 
-	extern std::vector<LaserStructInfo> Lasers;
+	extern std::vector<LaserBarrier> LaserBarriers;
 
-	void InitializeLasers(short itemNumber);
-	void ControlLasers(short itemNumber);
-	void UpdateLasers();
-	void ClearLasers();
+	void InitializeLaserBarriers(short itemNumber);
+	void ControlLaserBarriers(short itemNumber);
+	void CollideLaserBarriers();
+	void UpdateLaserBarriers();
+	void ClearLaserBarriers();
 }

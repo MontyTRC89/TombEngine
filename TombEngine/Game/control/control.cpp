@@ -225,7 +225,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
-		UpdateLasers();
+		UpdateLaserBarriers();
 
 		// Update HUD.
 		g_Hud.Update(*LaraItem);
@@ -424,7 +424,7 @@ void CleanUp()
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
-	ClearLasers();
+	ClearLaserBarriers();
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
