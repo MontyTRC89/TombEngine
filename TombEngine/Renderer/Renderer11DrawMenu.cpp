@@ -36,11 +36,11 @@ namespace TEN::Renderer
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
-	constexpr auto MenuVerticalNarrowLineSpacing = 25;
+	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 15;
+	constexpr auto MenuVerticalTop = 11;
 	constexpr auto MenuVerticalDisplaySettings = 200;
 	constexpr auto MenuVerticalOtherSettings = 150;
 	constexpr auto MenuVerticalBottomCenter = 400;
@@ -272,12 +272,16 @@ namespace TEN::Renderer
 					GetNextBlockPosition(&y);
 			}
 
+            // Defaults
+            AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+            GetNextLinePosition(&y);
+
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 19));
 			break;
 		}
 	}

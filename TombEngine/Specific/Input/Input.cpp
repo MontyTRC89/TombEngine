@@ -94,6 +94,13 @@ namespace TEN::Input
 		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 
+    auto XInputBindings = std::vector<int>
+    {
+        XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
+        /*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+        KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+    };
+
 	// Input bindings. These are primitive mappings to actions.
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
@@ -166,13 +173,17 @@ namespace TEN::Input
 				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try to initialize vibration interface
+				// Try to initialize vibration interface.
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
 				if (OisRumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitializeEffect();
 				}
+                
+                // If controller is XInput and default bindings were successfully assigned, save configuration.
+                if (ApplyDefaultXInputBindings())
+                    SaveConfiguration();
 			}
 			catch (OIS::Exception& ex)
 			{
@@ -809,4 +820,39 @@ namespace TEN::Input
 	{
 		return (IsDirectionActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
 	}
+
+    void ApplyBindings(const std::vector<int> bindings)
+    {
+        for (int i = 0; i < bindings.size(); i++)
+        {
+            if (i >= KEY_COUNT)
+                break;
+
+            KeyboardLayout[1][i] = bindings[i];
+        }
+    }
+
+    bool ApplyDefaultXInputBindings()
+    {
+        if (!OisGamepad)
+            return false;
+
+        for (int i = 0; i < KEY_COUNT; i++)
+            if (KeyboardLayout[1][i] != KC_UNASSIGNED && KeyboardLayout[1][i] != KeyboardLayout[0][i])
+                return false;
+
+        if (OisGamepad->vendor().find("XBOX") != string::npos ||
+            OisGamepad->vendor().find("XBox") != string::npos ||
+            OisGamepad->vendor().find("xbox") != string::npos)
+        {
+            ApplyBindings(XInputBindings);
+        }
+        else
+            return false;
+
+        for (int i = 0; i < KEY_COUNT; i++)
+            g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
+
+        return true;
+    }
 }
