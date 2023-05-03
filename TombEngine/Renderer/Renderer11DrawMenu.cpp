@@ -272,9 +272,9 @@ namespace TEN::Renderer
 					GetNextBlockPosition(&y);
 			}
 
-            // Defaults
-            AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
-            GetNextLinePosition(&y);
+			// Defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			GetNextLinePosition(&y);
 
 			// Apply
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));

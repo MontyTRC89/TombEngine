@@ -642,14 +642,14 @@ namespace TEN::Gui
 
 			if (GuiIsSelected())
 			{
-                // Defaults.
-                if (SelectedOption == (OptionCount - 2))
-                {
-                    SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-                    memset(KeyboardLayout[1], 0, KEY_COUNT * sizeof(short));
-                    ApplyDefaultXInputBindings();
-                    return;
-                }
+				// Defaults.
+				if (SelectedOption == (OptionCount - 2))
+				{
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+					memset(KeyboardLayout[1], 0, KEY_COUNT * sizeof(short));
+					ApplyDefaultXInputBindings();
+					return;
+				}
 
 				// Apply.
 				if (SelectedOption == (OptionCount - 1))

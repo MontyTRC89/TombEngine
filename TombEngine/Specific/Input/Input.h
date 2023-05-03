@@ -12,38 +12,38 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
-    enum XInputButtons
-    {
-        XB_START = MAX_KEYBOARD_KEYS,
-        XB_SELECT,
-        XB_LSTICK,
-        XB_RSTICK,
-        XB_LSHIFT,
-        XB_RSHIFT,
-        XB_UNUSED1,
-        XB_UNUSED2,
-        XB_A,
-        XB_B,
-        XB_X,
-        XB_Y,
-        XB_LOGO,
-        XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS,
-        XB_AXIS_X_NEG,
-        XB_AXIS_Y_POS,
-        XB_AXIS_Y_NEG,
-        XB_AXIS_Z_POS,
-        XB_AXIS_Z_NEG,
-        XB_AXIS_W_POS,
-        XB_AXIS_W_NEG,
-        XB_AXIS_LTRIGGER_NEG,
-        XB_AXIS_LTRIGGER_POS,
-        XB_AXIS_RTRIGGER_NEG,
-        XB_AXIS_RTRIGGER_POS,
-        XB_DPAD_UP,
-        XB_DPAD_DOWN,
-        XB_DPAD_LEFT,
-        XB_DPAD_RIGHT
-    };
+	enum XInputButtons
+	{
+		XB_START = MAX_KEYBOARD_KEYS,
+		XB_SELECT,
+		XB_LSTICK,
+		XB_RSTICK,
+		XB_LSHIFT,
+		XB_RSHIFT,
+		XB_UNUSED1,
+		XB_UNUSED2,
+		XB_A,
+		XB_B,
+		XB_X,
+		XB_Y,
+		XB_LOGO,
+		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS,
+		XB_AXIS_X_NEG,
+		XB_AXIS_Y_POS,
+		XB_AXIS_Y_NEG,
+		XB_AXIS_Z_POS,
+		XB_AXIS_Z_NEG,
+		XB_AXIS_W_POS,
+		XB_AXIS_W_NEG,
+		XB_AXIS_LTRIGGER_NEG,
+		XB_AXIS_LTRIGGER_POS,
+		XB_AXIS_RTRIGGER_NEG,
+		XB_AXIS_RTRIGGER_POS,
+		XB_DPAD_UP,
+		XB_DPAD_DOWN,
+		XB_DPAD_LEFT,
+		XB_DPAD_RIGHT
+	};
 
 	enum InputKey
 	{
@@ -199,6 +199,6 @@ namespace TEN::Input
 	bool IsWakeActionHeld();
 	bool IsOpticActionHeld();
 
-    void ApplyBindings(const std::vector<int> bindings);
-    bool ApplyDefaultXInputBindings();
+	void ApplyBindings(const std::vector<int> bindings);
+	bool ApplyDefaultXInputBindings();
 }
