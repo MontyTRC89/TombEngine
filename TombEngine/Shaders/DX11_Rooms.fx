@@ -203,8 +203,16 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
+	
+	float4 fog = float4(0, 0, 0, 0);
+	for (int i = 0; i < NumFogBulbs; i++)
+	{
+		float fogFactor = DoFogBulb(input.WorldPosition, FogBulbs[i]);
+		fog.xyz += FogBulbs[i].Color * fogFactor;
+		fog.w += fogFactor;
+	}
 
-	output.Color = DoFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
+	output.Color = DoFog(output.Color, float4(fog.xyz, 1.0f), fog.w);
 
 	return output;
 }

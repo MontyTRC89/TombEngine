@@ -25,7 +25,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
+		{ 
 			RendererRoom* room = &m_rooms[i];
 
 			room->ItemsToDraw.clear();
@@ -55,7 +55,7 @@ namespace TEN::Renderer
 			room->ClipBounds.bottom = (1.0f - room->ViewPort.y) * m_screenHeight * 0.5f;
 			room->ClipBounds.right = (room->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
-		}
+		} 
 
 		// Sort statics for doing instancing later
 		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
@@ -70,7 +70,7 @@ namespace TEN::Renderer
 			for (RendererLight light : room->Lights)
 			{
 				if (light.Type == LIGHT_TYPE_FOG_BULB)
-				{
+				{                                        
 					RendererFogBulb bulb;
 					bulb.Position = light.Position;
 					bulb.Density = light.Intensity;

@@ -199,17 +199,18 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 
 	p0 = p1 = float3(0, 0, 0);
 
-	float3 LV = bulb.Position - CamPositionWS;
-	float L = length(LV);
-	float VD = length(pos - bulb.Position);
-	float3 P = normalize(pos - CamPositionWS);
-	float PZ = length(pos - CamPositionWS);
+	float3 bulbToCamera = bulb.Position - CamPositionWS;
+	float bulbToCameraDistance = length(bulbToCamera);
+	float3 bulbToVertex = pos - bulb.Position;
+	float bulbToVertexDistance = length(bulbToVertex);
+	float3 cameraToVertexDirection = normalize(pos - CamPositionWS);
+	float cameraToVertexDistance = length(pos - CamPositionWS);
 
-	if (L < bulb.Radius)
+	if (bulbToCameraDistance < bulb.Radius)
 	{
 		// Camera is INSIDE the bulb
 
-		if (VD < bulb.Radius)
+		if (bulbToVertexDistance < bulb.Radius)
 		{
 			// Vertex is INSIDE the bulb
 
@@ -220,59 +221,75 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		{
 			// Vertex is OUTSIDE the bulb
 
-			float Tca = dot(LV, P);
-			float d2 = L * L - Tca * Tca;
+			float Tca = dot(bulbToCamera, cameraToVertexDirection);
+			float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
 			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
 			float t1 = Tca + Thc;
 
 			p0 = CamPositionWS;
-			p1 = CamPositionWS + P * t1;
+			p1 = CamPositionWS + cameraToVertexDirection * t1;
 		}
 	}
 	else
 	{
 		// Camera is OUTSIDE the bulb
 
-		if (VD < bulb.Radius)
+		if (bulbToVertexDistance < bulb.Radius)
 		{
 			// Vertex is INSIDE the bulb
 
-			float Tca = dot(LV, P);
-			float d2 = L * L - Tca * Tca;
+			float Tca = dot(bulbToCamera, cameraToVertexDirection);
+			float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
 			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
 			float t0 = Tca - Thc;
 
-			p0 = CamPositionWS + P * t0;
+			p0 = CamPositionWS + cameraToVertexDirection * t0;
 			p1 = pos;
 		}
 		else
 		{
 			// Vertex is OUTSIDE the bulb
 
-			float Tca = dot(LV, P);
+			float Tca = dot(bulbToCamera, cameraToVertexDirection);
 
-			if (Tca > 0 && PZ * PZ > Tca * Tca)
+			if (Tca > 0 && cameraToVertexDistance * cameraToVertexDistance > Tca * Tca)
 			{
-				float d2 = L * L - Tca * Tca;
+				float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
 				if (d2 < bulb.Radius * bulb.Radius)
 				{
 					float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
 
-					float t0 = Tca + Thc;
-					float t1 = Tca - Thc;
+					float t0 = Tca - Thc;
+					float t1 = Tca + Thc;
 
-					p0 = CamPositionWS + P * t0;
-					p1 = CamPositionWS + P * t1;
+					p0 = CamPositionWS + cameraToVertexDirection * t0;
+					p1 = CamPositionWS + cameraToVertexDirection * t1;
 				}
 				else
 				{
-					p0 = p1 = float3(0, 0, 0);
+					return 0;
 				}
+			}
+			else
+			{
+				return 0;
 			}
 		}
 	}
 
-	float fog = pow(length(p1 - p0) / (2 * bulb.Radius), 1.5f);
+	float transmittance = 1.0f;
+	float stepSize = 8.0f;
+	int stepCount = length(p1 - p0) / stepSize;
+	float3 samplePosition = p0;
+	float extinctionCoef = 1.0f / stepSize / 20.0f;
+
+	// transmittance is e^(-(density * step * extinction)^2)
+	for (int i = 0; i < stepCount; i++) 
+	{
+		transmittance *= 1.0f / exp(pow(bulb.Density * extinctionCoef * stepSize, 2.0f));
+	}
+
+	float fog = 1.0f - transmittance;
 
 	return fog;
 }
