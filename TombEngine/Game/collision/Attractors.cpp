@@ -132,7 +132,7 @@ namespace TEN::Collision::Attractors
 		// Single point exists; return it.
 		if (Points.size() == 1)
 			return Points.front();
-
+		
 		// Wrap line distance and clamp point according to length.
 		lineDist = NormalizeLineDistance(lineDist);
 		if (lineDist <= 0.0f)
@@ -291,8 +291,8 @@ namespace TEN::Collision::Attractors
 
 	float Attractor::NormalizeLineDistance(float lineDist) const
 	{
-		// Line distance is within bounds; return unmodified line distance.
-		if (lineDist >= 0.0f || lineDist <= Length)
+		// Line distance within bounds; return unmodified line distance.
+		if (lineDist >= 0.0f && lineDist <= Length)
 			return lineDist;
 
 		// Attractor is looped; wrap line distance.
@@ -302,15 +302,17 @@ namespace TEN::Collision::Attractors
 			return (lineDist + (Length * sign));
 		}
 		
-		// Clamp line distance.
+		// Attractor is not looped; clamp line distance.
 		return std::clamp(lineDist, 0.0f, Length);
 	}
 
 	bool Attractor::IsLooped() const
 	{
+		// Too few points; loop not possible.
 		if (Points.size() <= 2)
 			return false;
 
+		// Test if start and end points occupy roughly the same position.
 		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
 	}
 
