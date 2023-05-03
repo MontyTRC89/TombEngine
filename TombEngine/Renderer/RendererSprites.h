@@ -6,12 +6,6 @@ namespace TEN::Renderer
 	struct RenderView;
 	struct RendererSprite;
 
-	enum class SpriteRenderType
-	{
-		Default,
-		LaserBarrier
-	};
-
 	struct RendererSpriteToDraw
 	{
 		RENDERER_SPRITE_TYPE Type;
@@ -35,5 +29,11 @@ namespace TEN::Renderer
 		Vector3 LookAtAxis;
 		bool SoftParticle;
 		int renderType;
+	};
+
+	enum RenderType
+	{
+		NONE = 0,
+		TR5LASER = 1
 	};
 }

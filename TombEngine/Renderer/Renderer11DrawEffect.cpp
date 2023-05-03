@@ -41,7 +41,6 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
-using namespace TEN::Traps::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -70,8 +69,7 @@ BiteInfo EnemyBites[12] =
 	{ 0, -64, 250, 7 }	  // Troops
 };
 
-// TODO: No global.
-float scrollLaserUniform = 0.0f;
+long scrollLaserUniform = 0;
 
 namespace TEN::Renderer 
 {
@@ -101,7 +99,7 @@ namespace TEN::Renderer
 					laser.vert3[i], laser.vert4[i],
 					laser.Color, laser.Color,
 					laser.Color, laser.Color,
-					BLENDMODE_ADDITIVE, view, SpriteRenderType::LaserBarrier);
+					BLENDMODE_ADDITIVE, view, (int)RenderType::TR5LASER);
 			}
 		}
 	}
@@ -1210,13 +1208,9 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
-			}
 			else
-			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
-			}
 
 			m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
 			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
@@ -1248,13 +1242,12 @@ namespace TEN::Renderer
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			m_stSprite.renderType = spriteBucket.renderType;
-
-			if (m_stSprite.renderType == (int)SpriteRenderType::LaserBarrier)
+			if(m_stSprite.renderType == (int)RenderType::TR5LASER)
 			{
-				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = scrollLaserUniform++;
-			}
+				m_stSprite.renderType = (int)RenderType::TR5LASER;
 
+				m_stSprite.secondsUniform = float(scrollLaserUniform++);
+			}
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1263,13 +1256,9 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
-			}
 			else
-			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
-			}
 
 			m_primitiveBatch->Begin();
 
@@ -1323,14 +1312,13 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			m_stSprite.renderType = (int)SpriteRenderType::Default;
-
-			if (info->sprite->renderType == (int)SpriteRenderType::LaserBarrier)
+			m_stSprite.renderType = (int)RenderType::NONE;
+			if(info->sprite->renderType == (int)RenderType::TR5LASER)
 			{
-				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = scrollLaserUniform++;
-			}
+				m_stSprite.renderType = (int)RenderType::TR5LASER;
 
+				m_stSprite.secondsUniform = float(scrollLaserUniform++);
+			}
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
