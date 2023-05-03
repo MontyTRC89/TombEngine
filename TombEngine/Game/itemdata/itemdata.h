@@ -35,7 +35,7 @@ struct ItemInfo;
 
 class ItemData
 {
-	std::variant <
+	std::variant<
 		std::nullptr_t,
 		char,
 		short,

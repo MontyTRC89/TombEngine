@@ -80,6 +80,7 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Traps::TR5;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -423,7 +424,7 @@ void CleanUp()
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
-	RemoveLasers();
+	ClearLasers();
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
