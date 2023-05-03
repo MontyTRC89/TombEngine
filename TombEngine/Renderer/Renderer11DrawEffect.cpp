@@ -71,7 +71,7 @@ BiteInfo EnemyBites[12] =
 };
 
 // TODO: No global.
-float scrollLaserUniform = 0.0f;
+long scrollLaserUniform = 0;
 
 namespace TEN::Renderer 
 {
@@ -1252,7 +1252,7 @@ namespace TEN::Renderer
 			if (m_stSprite.renderType == (int)SpriteRenderType::LaserBarrier)
 			{
 				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = scrollLaserUniform++;
+				m_stSprite.secondsUniform = (float)scrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
@@ -1328,7 +1328,7 @@ namespace TEN::Renderer
 			if (info->sprite->renderType == (int)SpriteRenderType::LaserBarrier)
 			{
 				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = scrollLaserUniform++;
+				m_stSprite.secondsUniform = (float)scrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
