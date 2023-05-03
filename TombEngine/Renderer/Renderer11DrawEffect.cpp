@@ -71,7 +71,7 @@ BiteInfo EnemyBites[12] =
 };
 
 // TODO: No global.
-long scrollLaserUniform = 0;
+long ScrollLaserUniform = 0;
 
 namespace TEN::Renderer 
 {
@@ -82,8 +82,10 @@ namespace TEN::Renderer
 		RendererSprite* Sprite;
 		BLEND_MODES BlendMode;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
-		bool IsBillboard;
-		bool IsSoftParticle;
+
+		bool IsBillboard	= false;
+		bool IsSoftParticle = false;
+
 		int renderType;
 	};
 	
@@ -92,15 +94,15 @@ namespace TEN::Renderer
 		if (LaserBarriers.empty())
 			return;
 
-		for (const auto& laser : LaserBarriers)
+		for (const auto& barrier : LaserBarriers)
 		{
-			for (int i = 0; i < 3; i++)
+			for (const auto& beam : barrier.Beams)
 			{
 				AddColoredQuad(
-					laser.vert1[i], laser.vert2[i],
-					laser.vert3[i], laser.vert4[i],
-					laser.Color, laser.Color,
-					laser.Color, laser.Color,
+					beam.VertexPoints[0], beam.VertexPoints[1],
+					beam.VertexPoints[2], beam.VertexPoints[3],
+					barrier.Color, barrier.Color,
+					barrier.Color, barrier.Color,
 					BLENDMODE_ADDITIVE, view, SpriteRenderType::LaserBarrier);
 			}
 		}
@@ -1252,7 +1254,7 @@ namespace TEN::Renderer
 			if (m_stSprite.renderType == (int)SpriteRenderType::LaserBarrier)
 			{
 				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = (float)scrollLaserUniform++;
+				m_stSprite.secondsUniform = (float)ScrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
@@ -1328,7 +1330,7 @@ namespace TEN::Renderer
 			if (info->sprite->renderType == (int)SpriteRenderType::LaserBarrier)
 			{
 				m_stSprite.renderType = (int)SpriteRenderType::LaserBarrier;
-				m_stSprite.secondsUniform = (float)scrollLaserUniform++;
+				m_stSprite.secondsUniform = (float)ScrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());

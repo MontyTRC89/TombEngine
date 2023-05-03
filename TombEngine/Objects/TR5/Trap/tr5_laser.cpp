@@ -16,6 +16,8 @@ namespace TEN::Traps::TR5
 
 	void InitializeLaserBarriers(short itemNumber)
 	{
+		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
+
 		auto& item = g_Level.Items[itemNumber];
 
 		auto barrier = LaserBarrier{};
@@ -49,29 +51,26 @@ namespace TEN::Traps::TR5
 		int lH = yAdd / 2;
 		height = -yAdd;
 
+		auto basePos = item.Pose.Position.ToVector3();
+
 		// Set vertex positions.
-		for (int i = 0; i < 3; i++)
+		int i = 0;
+		barrier.Beams.resize(BEAM_COUNT);
+		for (auto& beam : barrier.Beams)
 		{
 			int hAdd = (lH / 2) * (i - 1);
 
-			barrier.vert1[i].x = item.Pose.Position.x + xAdd;
-			barrier.vert1[i].y = item.Pose.Position.y + (height - lH + hAdd);
-			barrier.vert1[i].z = item.Pose.Position.z + zAdd;
-			barrier.vert2[i].x = item.Pose.Position.x + (-xAdd);
-			barrier.vert2[i].y = item.Pose.Position.y + (height - lH + hAdd);
-			barrier.vert2[i].z = item.Pose.Position.z + (-zAdd);
-			barrier.vert3[i].x = item.Pose.Position.x + (-xAdd);
-			barrier.vert3[i].y = item.Pose.Position.y + (height + lH + hAdd);
-			barrier.vert3[i].z = item.Pose.Position.z + (-zAdd);
-			barrier.vert4[i].x = item.Pose.Position.x + xAdd;
-			barrier.vert4[i].y = item.Pose.Position.y + (height + lH + hAdd);
-			barrier.vert4[i].z = item.Pose.Position.z + zAdd;
+			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
+			{
+				basePos + Vector3(xAdd, height - lH + hAdd, zAdd),
+				basePos + Vector3(-xAdd, height - lH + hAdd, -zAdd),
+				basePos + Vector3(-xAdd, height + lH + hAdd, -zAdd),
+				basePos + Vector3(xAdd, height + lH + hAdd, zAdd)
+			};
 
 			height -= yAdd * 3;
+			i++;
 		}
-
-		for (int i = 0; i < 18; i++)
-			barrier.Rand[i] = short(GetRandomControl() << 1);
 
 		LaserBarriers.push_back(barrier);
 	}
