@@ -31,11 +31,12 @@ namespace TEN::Collision::Attractors
 	{
 		const Attractor* AttractorPtr = nullptr;
 
-		AttractorProximityData Proximity = {};
-		short HeadingAngle	= 0;
-		short SlopeAngle	= 0;
-		bool  IsIntersected = false;
-		bool  IsInFront		= false;
+		AttractorProximityData Proximity	= {};
+		short				   HeadingAngle	= 0;
+		short				   SlopeAngle	= 0;
+
+		bool IsIntersected = false;
+		bool IsInFront	   = false;
 	};
 
 	class Attractor
@@ -65,11 +66,11 @@ namespace TEN::Collision::Attractors
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
 		AttractorProximityData GetProximityData(const Vector3& refPoint) const;
 		Vector3				   GetPointAtLineDistance(float lineDist) const;
-		unsigned int		   GetSegmentIndexAtDistance(float lineDist) const; // TODO: Maybe unnecessary.
+		unsigned int		   GetSegmentIndexAtDistance(float lineDist) const;
 
 		// Inquirers
-		bool IsLooped() const;
 		bool IsEdge() const;
+		bool IsLooped() const;
 
 		// Helpers
 		void Update(const std::vector<Vector3>& points, int roomNumber);

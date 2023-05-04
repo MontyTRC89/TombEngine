@@ -3,7 +3,6 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-#include "Game/Lara/lara.h"
 #include "lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -11,6 +10,10 @@
 
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
+
+//------debug
+#include "Game/Lara/lara.h"
+//------
 
 namespace TEN::Collision::Attractors
 {
@@ -210,6 +213,16 @@ namespace TEN::Collision::Attractors
 		return (Type == AttractorType::Edge);
 	}
 
+	bool Attractor::IsLooped() const
+	{
+		// Too few points; loop not possible.
+		if (Points.size() <= 2)
+			return false;
+
+		// Test if start and end points occupy roughly the same position.
+		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
+	}
+
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to update invalid attractor.");
@@ -309,14 +322,28 @@ namespace TEN::Collision::Attractors
 		return std::clamp(lineDist, 0.0f, Length);
 	}
 
-	bool Attractor::IsLooped() const
+	// Fake version.
+	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
-		// Too few points; loop not possible.
-		if (Points.size() <= 2)
-			return false;
+		constexpr auto RANGE	 = BLOCK(5);
+		constexpr auto COUNT_MAX = 32;
 
-		// Test if start and end points occupy roughly the same position.
-		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
+		auto& player = GetLaraInfo(item);
+
+		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
+		for (auto& attrac : player.Context.DebugAttrac.SectorAttractors)
+		{
+			if (nearbyAttracPtrs.size() >= COUNT_MAX)
+				return nearbyAttracPtrs;
+
+			nearbyAttracPtrs.push_back(&attrac);
+			attrac.DrawDebug();
+		}
+
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor0);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor1);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor2);
+		return nearbyAttracPtrs;
 	}
 
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
@@ -324,6 +351,17 @@ namespace TEN::Collision::Attractors
 		constexpr auto COUNT_MAX = 32;
 
 		auto nearbyAttracPtrMap = std::multimap<float, const Attractor*>{};
+
+		// --------------debug
+		// Get debug attractors.
+		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
+		for (const auto* attracPtr : debugAttracPtrs)
+		{
+			float dist = attracPtr->GetProximityData(refPoint).Distance;
+			if (dist <= range)
+				nearbyAttracPtrMap.insert({ dist, attracPtr });
+		}
+		// --------------
 
 		// Get attractors in current room.
 		const auto& room = g_Level.Rooms[roomNumber];
@@ -369,30 +407,6 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
-	// Fake version.
-	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
-	{
-		constexpr auto RANGE	 = BLOCK(5);
-		constexpr auto COUNT_MAX = 32;
-
-		auto& player = GetLaraInfo(item);
-
-		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		for (auto& attrac : player.Context.DebugAttrac.SectorAttractors)
-		{
-			if (nearbyAttracPtrs.size() >= COUNT_MAX)
-				return nearbyAttracPtrs;
-
-			nearbyAttracPtrs.push_back(&attrac);
-			attrac.DrawDebug();
-		}
-		
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor0);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor1);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor2);
-		return nearbyAttracPtrs;
-	}
-
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)
 	{
@@ -412,22 +426,7 @@ namespace TEN::Collision::Attractors
 	
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range)
 	{
-		// TODO: This call will do actual probing. For now, using debug attractors.
-		//return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, range);
-		
-		// Get debug attractor pointers.
-		auto attracPtrs = GetDebugAttractorPtrs(item);
-
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(attracPtrs.size());
-
-		for (const auto* attracPtr : attracPtrs)
-		{
-			auto attracColl = attracPtr->GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, refPoint, range);
-			attracColls.push_back(attracColl);
-		}
-
-		return attracColls;
+		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, range);
 	}
 	
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)

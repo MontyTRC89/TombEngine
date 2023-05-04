@@ -510,34 +510,40 @@ static void SetDebugAttractors(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
-	auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+	auto basePos = item.Pose.Position.ToVector3();
 
-	// Set debug attractor 0.
-	if (KeyMap[OIS::KeyCode::KC_Q])
-	{
-		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		auto pos1 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints()[1];
-		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
-	}
-	if (KeyMap[OIS::KeyCode::KC_W])
-	{
-		auto pos0 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints()[0];
-		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
-	}
+	auto relOffset = Vector3(0.0f, -CLICK(5), LARA_RADIUS);
+	auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+	auto offset = Vector3::Transform(relOffset, rotMatrix);
+
+	auto attracPoint = basePos + offset;
 
 	// Set debug attractor 1.
 	if (KeyMap[OIS::KeyCode::KC_E])
 	{
-		auto pos0 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-		auto pos1 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints()[1];
+		auto pos0 = attracPoint;
+		auto pos1 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints().back();
 		player.Context.DebugAttrac.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 	if (KeyMap[OIS::KeyCode::KC_R])
 	{
-		auto pos0 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints()[0];
-		auto pos1 = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
+		auto pos0 = player.Context.DebugAttrac.DebugAttractor1.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor1.GetPoints().front();
+		auto pos1 = attracPoint;
 		player.Context.DebugAttrac.DebugAttractor1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+	}
+
+	// Set debug attractor 0.
+	if (KeyMap[OIS::KeyCode::KC_Q])
+	{
+		auto pos0 = attracPoint;
+		auto pos1 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints().back();
+		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+	}
+	if (KeyMap[OIS::KeyCode::KC_W])
+	{
+		auto pos0 = player.Context.DebugAttrac.DebugAttractor0.GetPoints().empty() ? Vector3::Zero : player.Context.DebugAttrac.DebugAttractor0.GetPoints().front();
+		auto pos1 = attracPoint;
+		player.Context.DebugAttrac.DebugAttractor0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 	}
 
 	// Spawn attractor pentagon.
