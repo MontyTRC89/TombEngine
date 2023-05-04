@@ -48,7 +48,7 @@ namespace TEN::Collision::Attractors
 		return Type;
 	}
 
-	std::vector<Vector3> Attractor::GetPoints() const
+	const std::vector<Vector3>& Attractor::GetPoints() const
 	{
 		return Points;
 	}

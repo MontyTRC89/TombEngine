@@ -33,10 +33,10 @@ namespace TEN::Player
 		AttractorCollisionData Right  = {};
 	};
 
-	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll, const Attractor& currentAttrac,
-																				 const Vector3& refPoint)
+	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																					 const Attractor& currentAttrac, const Vector3& refPoint)
 	{
-		constexpr auto CONNECT_DIST_THRESHOLD = 10.0f;
+		constexpr auto CONNECT_DIST_THRESHOLD = BLOCK(1 / 64.0f);
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, refPoint, CONNECT_DIST_THRESHOLD);
@@ -77,72 +77,76 @@ namespace TEN::Player
 																						float sideOffset = 0.0f)
 	{
 		const auto& player = GetLaraInfo(item);
-		const auto& handsAttrac = player.Context.HandsAttractor;
+		const auto& currentAttrac = player.Context.HandsAttractor;
 
-		float length = handsAttrac.Ptr->GetLength();
-		auto points = handsAttrac.Ptr->GetPoints();
+		const auto& points = currentAttrac.Ptr->GetPoints();
+		float length = currentAttrac.Ptr->GetLength();
 
-		// Get projected distances along attractor.
-		float lineDist = handsAttrac.LineDistance + sideOffset;
-		float distLeft = lineDist - coll.Setup.Radius;
-		float distRight = lineDist + coll.Setup.Radius;
+		// Calculate projected distances along attractor.
+		float lineDistCenter = currentAttrac.LineDistance + sideOffset;
+		float lineDistLeft = lineDistCenter - coll.Setup.Radius;
+		float lineDistRight = lineDistCenter + coll.Setup.Radius;
+
+		bool isLooped = currentAttrac.Ptr->IsLooped();
 
 		// TODO: Horrible, organise later.
 		// Get connecting attractors just in case.
-		auto connectingAttracCollCenter = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.Ptr, (lineDist <= 0.0f) ? points.front() : points.back());
+		auto connectingAttracCollCenter = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.Ptr, (lineDistCenter <= 0.0f) ? points.front() : points.back());
 		auto connectingAttracCollLeft = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.Ptr, points.front());
 		auto connectingAttracCollRight = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.Ptr, points.back());
 
 		// Get points.
-		auto pointCenter = handsAttrac.Ptr->GetPointAtLineDistance(lineDist);
-		if (!handsAttrac.Ptr->IsLooped() && connectingAttracCollCenter.has_value())
+		auto pointCenter = currentAttrac.Ptr->GetPointAtLineDistance(lineDistCenter);
+		if (!isLooped && connectingAttracCollCenter.has_value())
 		{
 			// Get point at connecting attractor.
-			if (lineDist <= 0.0f)
+			if (lineDistCenter <= 0.0f)
 			{
-				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDist;
+				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDistCenter;
 				pointCenter = connectingAttracCollCenter->AttractorPtr->GetPointAtLineDistance(transitLineDist);
 			}
-			else if (lineDist >= length)
+			else if (lineDistCenter >= length)
 			{
-				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDist - length);
+				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDistCenter - length);
 				pointCenter = connectingAttracCollCenter->AttractorPtr->GetPointAtLineDistance(transitLineDist);
 			}
 		}
-		else if (!handsAttrac.Ptr->IsLooped())
+		else if (!isLooped)
 		{
 			// Get point within boundary of current attractor.
-			if (distLeft <= 0.0f && !connectingAttracCollLeft.has_value() )
+			if (lineDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
 			{
-				pointCenter = handsAttrac.Ptr->GetPointAtLineDistance(coll.Setup.Radius);
+				pointCenter = currentAttrac.Ptr->GetPointAtLineDistance(coll.Setup.Radius);
 			}
-			else if (distRight >= length&& !connectingAttracCollRight.has_value())
+			else if (lineDistRight >= length&& !connectingAttracCollRight.has_value())
 			{
-				pointCenter = handsAttrac.Ptr->GetPointAtLineDistance(length - coll.Setup.Radius);
+				pointCenter = currentAttrac.Ptr->GetPointAtLineDistance(length - coll.Setup.Radius);
 			}
+
+			// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
 		}
 
-		auto pointLeft = ((distLeft <= 0.0f) && !handsAttrac.Ptr->IsLooped() && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->AttractorPtr->GetPointAtLineDistance(connectingAttracCollLeft->Proximity.LineDistance + distLeft) :
-			handsAttrac.Ptr->GetPointAtLineDistance(distLeft);
-		auto pointRight = ((distRight >= length) && !handsAttrac.Ptr->IsLooped() && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->AttractorPtr->GetPointAtLineDistance(connectingAttracCollRight->Proximity.LineDistance + (distRight - length)) :
-			handsAttrac.Ptr->GetPointAtLineDistance(distRight);
+		auto pointLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
+			connectingAttracCollLeft->AttractorPtr->GetPointAtLineDistance(connectingAttracCollLeft->Proximity.LineDistance + lineDistLeft) :
+			currentAttrac.Ptr->GetPointAtLineDistance(lineDistLeft);
+		auto pointRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
+			connectingAttracCollRight->AttractorPtr->GetPointAtLineDistance(connectingAttracCollRight->Proximity.LineDistance + (lineDistRight - length)) :
+			currentAttrac.Ptr->GetPointAtLineDistance(lineDistRight);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
 
 		// Get attractor collisions.
-		auto attracCollCenter = handsAttrac.Ptr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
-		if ((lineDist <= 0.0f || lineDist >= length) && connectingAttracCollCenter.has_value())
+		auto attracCollCenter = currentAttrac.Ptr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
+		if ((lineDistCenter <= 0.0f || lineDistCenter >= length) && connectingAttracCollCenter.has_value())
 			attracCollCenter = connectingAttracCollCenter->AttractorPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
 
-		auto attracCollLeft = ((distLeft <= 0.0f) && !handsAttrac.Ptr->IsLooped() && connectingAttracCollLeft.has_value()) ?
+		auto attracCollLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
 			connectingAttracCollLeft->AttractorPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
-			handsAttrac.Ptr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
-		auto attracCollRight = ((distRight >= length) && !handsAttrac.Ptr->IsLooped() && connectingAttracCollRight.has_value()) ?
+			currentAttrac.Ptr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
+		auto attracCollRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
 			connectingAttracCollRight->AttractorPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
-			handsAttrac.Ptr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
+			currentAttrac.Ptr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);

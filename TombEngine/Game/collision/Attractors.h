@@ -57,10 +57,10 @@ namespace TEN::Collision::Attractors
 		~Attractor();
 
 		// Getters
-		AttractorType		 GetType() const;
-		std::vector<Vector3> GetPoints() const;
-		int					 GetRoomNumber() const;
-		float				 GetLength() const;
+		AttractorType				GetType() const;
+		const std::vector<Vector3>& GetPoints() const;
+		int							GetRoomNumber() const;
+		float						GetLength() const;
 
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;

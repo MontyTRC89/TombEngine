@@ -260,7 +260,7 @@ namespace TEN::Player::Context
 				hasEnd = true;
 
 				// 3.1) Test for loop seam.
-				auto points = attracColl.AttractorPtr->GetPoints();
+				const auto& points = attracColl.AttractorPtr->GetPoints();
 				if (Vector3::Distance(points[0], points.back()) > EPSILON)
 					continue;
 			}
