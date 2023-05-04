@@ -334,7 +334,7 @@ namespace Misc
 	}
 
 	/// Writing messages within the Log file
-	//@function Log
+	//@function PrintLog
 	//@tparam string message to be displayed within the Log
 	//@tparam Misc.LogLevel logLevel log level to be displayed
 	//@tparam[opt] bool allowSpam true allows spamming of the message
@@ -342,10 +342,15 @@ namespace Misc
 	// INFO
 	// WARNING
 	// ERROR
+	// 
 	//@usage
 	//PrintLog('test info log', LogLevel.INFO)
 	//PrintLog('test warning log', LogLevel.WARNING)
 	//PrintLog('test error log', LogLevel.ERROR)
+	// 
+	// For native Lua handling of errors, see the official guide
+	//<a href="https://www.lua.org/pil/8.3.html">Error management</a>
+	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
 	static void PrintLog(std::string const& message,LogLevel const& level, bool allowSpam = false)
 	{
 		TENLog(message, level, LogConfig::All, allowSpam);
