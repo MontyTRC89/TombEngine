@@ -1,7 +1,9 @@
 #pragma once
 
-namespace TEN { namespace Math { class Vector2i; } }
 namespace sol { class state; }
+namespace TEN::Math { class Vector2i; }
+
+using namespace TEN::Math;
 
 class Vec2
 {
@@ -10,9 +12,9 @@ public:
 	int y = 0;
 
 	Vec2(int x, int y);
-	Vec2(const TEN::Math::Vector2i& pos);
+	Vec2(const Vector2i& pos);
 
-	operator TEN::Math::Vector2i() const;
+	operator Vector2i() const;
 
 	[[nodiscard]] std::string ToString() const;
 
