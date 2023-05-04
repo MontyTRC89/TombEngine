@@ -337,15 +337,18 @@ namespace Misc
 	//@function Log
 	//@tparam string message to be displayed within the Log
 	//@tparam Misc.LogLevel logLevel log level to be displayed
+	//@tparam[opt] bool allowSpam true allows spamming of the message
 	// Must be one of:
-	// WARNING
 	// INFO
+	// WARNING
+	// ERROR
 	//@usage
 	//Log('test info log', LogLevel.INFO)
 	//Log('test warning log', LogLevel.WARNING)
-	static void Log(std::string const& message,LogLevel const& level)
+	//Log('test error log', LogLevel.ERROR)
+	static void PrintLog(std::string const& message,LogLevel const& level, bool allowSpam = false)
 	{
-		TENLog(message, level, LogConfig::All, true);
+		TENLog(message, level, LogConfig::All, allowSpam);
 	}
 
 	void Register(sol::state * state, sol::table & parent)
@@ -407,11 +410,11 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
-		tableMisc.set_function(ScriptReserved_Log, &Log);
+		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
-		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LogLevel, kLogLevel);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LevelLog, kLevelLog);
 	}
 }

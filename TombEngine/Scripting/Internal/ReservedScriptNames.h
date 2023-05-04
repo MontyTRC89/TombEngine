@@ -238,7 +238,7 @@ static constexpr char ScriptReserved_GetWeaponType[]				= "GetWeaponType";
 static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
-static constexpr char ScriptReserved_PrintLog[]							= "PrintLog";
+static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
@@ -246,7 +246,7 @@ static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
 static constexpr char ScriptReserved_CameraType[]				= "CameraType";
-static constexpr char ScriptReserved_LevelLog[]				  = "LevelLog";
+static constexpr char ScriptReserved_LevelLog[]					= "LevelLog";
 static constexpr char ScriptReserved_RoomFlagID[]				= "RoomFlagID";
 static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
