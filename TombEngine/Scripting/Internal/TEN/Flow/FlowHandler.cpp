@@ -1,17 +1,18 @@
 #include "framework.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+
 #include <filesystem>
 
-#include "FlowHandler.h"
-#include "ReservedScriptNames.h"
-#include "Sound/sound.h"
-#include "Game/savegame.h"
-#include "Flow/InventoryItem/InventoryItem.h"
 #include "Game/Gui.h"
-#include "Logic/LevelFunc.h"
-#include "Vec3/Vec3.h"
-#include "Vec2/Vec2.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Game/savegame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
+#include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Sound/sound.h"
 #include "Specific/trutils.h"
 
 /***
@@ -21,10 +22,6 @@ scripts too.
 @tentable Flow 
 @pragma nostrip
 */
-
-using std::string;
-using std::vector;
-using std::unordered_map;
 
 ScriptInterfaceGame* g_GameScript;
 ScriptInterfaceObjectsHandler* g_GameScriptEntities;
@@ -285,7 +282,7 @@ char const * FlowHandler::GetString(const char* id) const
 	}
 	else
 	{
-		return m_translationsMap.at(string(id)).at(0).c_str();
+		return m_translationsMap.at(std::string(id)).at(0).c_str();
 	}
 }
 
@@ -478,6 +475,7 @@ bool FlowHandler::DoFlow()
 				TENLog(msg, LogLevel::Error, LogConfig::All);
 				status = GameStatus::ExitToTitle;
 			}
+
 			loadFromSavegame = false;
 		}
 
@@ -486,15 +484,18 @@ bool FlowHandler::DoFlow()
 		case GameStatus::ExitGame:
 			DoTheGame = false;
 			break;
+
 		case GameStatus::ExitToTitle:
 		case GameStatus::LaraDead:
 			CurrentLevel = 0;
 			break;
+
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
 			InitializeGame = true;
 			break;
+
 		case GameStatus::LoadGame:
 			// Load the header of the savegame for getting the level to load
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
@@ -503,13 +504,18 @@ bool FlowHandler::DoFlow()
 			CurrentLevel = header.Level;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
-
 			break;
+
 		case GameStatus::LevelComplete:
 			if (LevelComplete >= Levels.size())
+			{
 				CurrentLevel = 0; // TODO: final credits
+			}
 			else
+			{
 				CurrentLevel = LevelComplete;
+			}
+
 			LevelComplete = 0;
 			break;
 		}
@@ -523,4 +529,3 @@ bool FlowHandler::IsLevelSelectEnabled() const
 {
 	return LevelSelect;
 }
-
