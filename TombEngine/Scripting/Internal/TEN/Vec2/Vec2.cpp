@@ -30,8 +30,8 @@ void Vec2::Register(sol::table& parent)
 
 Note that since the engine uses integers instead of floating-point
 numbers, this will be less accurate at smaller lengths.
-@tparam int length the new length to set the vector to.
-@function Vec3:GetNormalised
+@tparam float length the new length to set the vector to.
+@function Vec2:ToLength
 */
 		ScriptReserved_ToLength, &Vec2::ToLength,
 
@@ -95,7 +95,7 @@ Vec2 UnaryMinusVec2(const Vec2& vector)
 	return Vec2(vector.x * -1, vector.y * -1);
 }
 
-void Vec2::ToLength(int newLength)
+void Vec2::ToLength(float newLength)
 {
 	float length = sqrt(SQUARE(x) + SQUARE(y));
 	x = (int)round((x / length) * newLength);

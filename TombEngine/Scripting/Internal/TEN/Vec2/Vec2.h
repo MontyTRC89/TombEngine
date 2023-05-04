@@ -16,7 +16,7 @@ public:
 
 	[[nodiscard]] std::string ToString() const;
 
-	void ToLength(int newLength);
+	void ToLength(float newLength);
 
 	static void Register(sol::table&);
 };
