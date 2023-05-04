@@ -3,8 +3,8 @@
 #include <string>
 
 /***
-Constants for LogLevel IDs.
-@enum Misc.LogLevel
+Constants for LevelLog IDs.
+@enum Misc.LevelLog
 @pragma nostrip
 */
 
@@ -16,10 +16,10 @@ The following constants are inside LogLevel.
 	WARNING
 	ERROR
 
-@section Misc.LogLevel
+@section Misc.LevelLog
 */
 
-/*** Table of LogLevel ID constants (for use with Log command).
+/*** Table of LevelLog ID constants (for use with PrintLog() command).
 @table CONSTANT_STRING_HERE
 */
 
