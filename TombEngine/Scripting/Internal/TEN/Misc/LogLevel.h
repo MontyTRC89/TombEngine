@@ -8,9 +8,9 @@ Constants for LevelLog IDs.
 @pragma nostrip
 */
 
-/*** Misc.LogLevel constants.
+/*** Misc.LevelLog constants.
 
-The following constants are inside LogLevel.
+The following constants are inside LevelLog.
 
 	INFO
 	WARNING
