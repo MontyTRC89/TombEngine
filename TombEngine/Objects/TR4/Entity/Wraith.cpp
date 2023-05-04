@@ -13,7 +13,6 @@
 #include "Game/people.h"
 #include "Game/room.h"
 #include "Math/Math.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR4/Entity/WraithInfo.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"

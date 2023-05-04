@@ -10,11 +10,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/missile.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -24,8 +25,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	// TODO: Ranges.
 
-	const auto KnifeBiteLeft  = BiteInfo(Vector3::Zero, 5);
-	const auto KnifeBiteRight = BiteInfo(Vector3::Zero, 8);
+	const auto KnifeBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 5);
+	const auto KnifeBiteRight = CreatureBiteInfo(Vector3i::Zero, 8);
 
 	enum KnifeThrowerState
 	{
@@ -70,55 +71,25 @@ namespace TEN::Entities::Creatures::TR2
 		KTHROWER_ANIM_DEATH = 23
 	};
 
-	void KnifeControl(short fxNumber)
+	short ThrowKnife(int x, int y, int z, float vel, short yRot, int roomNumber)
 	{
-		auto* fx = &EffectList[fxNumber];
+		int fxNumber = CreateNewEffect(roomNumber);
+		if (fxNumber == NO_ITEM)
+			return fxNumber;
 
-		if (fx->counter <= 0)
-		{
-			KillEffect(fxNumber);
-			return;
-		}
-		else
-			fx->counter--;
+		auto& fx = EffectList[fxNumber];
 
-		int speed = fx->speed * phd_cos(fx->pos.Orientation.x);
-		fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
-		fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
-		fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
+		fx.objectNumber = ID_KNIFETHROWER_KNIFE;
+		fx.pos.Position.x = x;
+		fx.pos.Position.y = y;
+		fx.pos.Position.z = z;
+		fx.speed = vel;
+		fx.pos.Orientation.y = yRot;
+		fx.fallspeed = 0;
+		fx.flag2 = KNIFE_PROJECTILE_DAMAGE;
+		fx.color = Vector4::One;
+		ShootAtLara(fx);
 
-		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
-
-		if (fx->pos.Position.y >= probe.Position.Floor ||
-			fx->pos.Position.y <= probe.Position.Ceiling)
-		{
-			KillEffect(fxNumber);
-			return;
-		}
-
-		if (probe.RoomNumber != fx->roomNumber)
-			EffectNewRoom(fxNumber, probe.RoomNumber);
-
-		fx->pos.Orientation.z += ANGLE(30.0f);
-
-		if (ItemNearLara(fx->pos.Position, 200))
-		{
-			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
-
-			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-			fx->speed = LaraItem->Animation.Velocity.z;
-			fx->frameNumber = fx->counter = 0;
-
-			DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);
-			SoundEffect(SFX_TR2_CRUNCH2, &fx->pos);
-			KillEffect(fxNumber);
-		}
-	}
-
-	short ThrowKnife(int x, int y, int z, short velocity, short yRot, short roomNumber)
-	{
-		short fxNumber = 0;
-		// TODO: add fx parameters
 		return fxNumber;
 	}
 
@@ -127,10 +98,10 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
-		short torso = 0;
-		short head = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		short extraTorsoRot = 0;
+		short extraHeadRot = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -139,157 +110,195 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case KTHROWER_STATE_IDLE:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					extraHeadRot = ai.angle;
 
 				if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
-				else if (Targetable(item, &AI))
+				}
+				else if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_IDLE_KNIFE_ATTACK_START;
+				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (!AI.ahead || AI.distance > pow(SECTOR(6), 2))
+					if (!ai.ahead || ai.distance > pow(BLOCK(6), 2))
 						item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
+				else if (ai.ahead && ai.distance < pow(BLOCK(4), 2))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+				}
 				else
+				{
 					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
 			case KTHROWER_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					extraHeadRot = ai.angle;
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
-				else if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
+					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
+				}
+				else if (Targetable(item, &ai))
+				{
+					if (ai.distance < pow(BLOCK(2.5f), 2) || ai.zoneNumber != ai.enemyZone)
+					{
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
+					}
 					else if (Random::TestProbability(1 / 2.0f))
+					{
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START;
+					}
 					else
+					{
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START;
+					}
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
+					if (ai.ahead && ai.distance < pow(BLOCK(6), 2))
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
 				}
-				else if (!AI.ahead || AI.distance > pow(SECTOR(4), 2))
+				else if (!ai.ahead || ai.distance > pow(BLOCK(4), 2))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
+				}
 
 				break;
 
 			case KTHROWER_STATE_RUN_FORWARD:
-				tilt = angle / 3;
 				creature->MaxTurn = ANGLE(6.0f);
+				tiltAngle = headingAngle / 3;
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					extraHeadRot = ai.angle;
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
+					if (ai.ahead && ai.distance < pow(BLOCK(6), 2))
+					{
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
+					}
 					else
+					{
 						item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+					}
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
+				else if (ai.ahead && ai.distance < pow(BLOCK(4), 2))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+				}
 
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START:
 				creature->Flags = 0;
 
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_CONTINUE;
+				}
 				else
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+				}
 
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START:
 				creature->Flags = 0;
 
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_CONTINUE;
+				}
 				else
+				{
 					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
+				}
 
 				break;
 
 			case KTHROWER_STATE_IDLE_KNIFE_ATTACK_START:
 				creature->Flags = 0;
 
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
+				{
 					item->Animation.TargetState = KTHROWER_STATE_IDLE_KNIFE_ATTACK_CONTINUE;
+				}
 				else
+				{
 					item->Animation.TargetState = KTHROWER_STATE_IDLE;
+				}
 
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_CONTINUE:
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteLeft, 100, extraTorsoRot, ThrowKnife);
 					creature->Flags = 1;
 				}
 
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_CONTINUE:
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteRight, 100, extraTorsoRot, ThrowKnife);
 					creature->Flags = 1;
 				}
 
 				break;
 
 			case KTHROWER_STATE_IDLE_KNIFE_ATTACK_CONTINUE:
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					extraTorsoRot = ai.angle;
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
-					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteLeft, 100, extraTorsoRot, ThrowKnife);
+					CreatureEffect2(item, KnifeBiteRight, 100, extraTorsoRot, ThrowKnife);
 					creature->Flags = 1;
 				}
 
@@ -297,9 +306,9 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torso);
-		CreatureJoint(item, 1, head);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureTilt(item, tiltAngle);
+		CreatureJoint(item, 0, extraTorsoRot);
+		CreatureJoint(item, 1, extraHeadRot);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }

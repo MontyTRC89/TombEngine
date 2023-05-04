@@ -12,10 +12,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -27,8 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto FLAMETHROWER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
-	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
-	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
+	const auto FlamethrowerBite = CreatureBiteInfo(Vector3i(0, 340, 64), 7);
 
 	// TODO
 	enum FlamethrowerState
@@ -64,10 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
-
-		auto pos = GetJointPosition(item, FlamethrowerBite.meshNum, Vector3i(FlamethrowerBite.Position));
-
+		auto pos = GetJointPosition(item, FlamethrowerBite);
 		int randomInt = GetRandomControl();
+
 		if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 6, 24 - ((randomInt / 16) & 3), 16 - ((randomInt / 64) & 3), randomInt & 3);
@@ -308,10 +306,10 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 
 				if (creature->Flags < 40)
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
+					ThrowFire(itemNumber, FlamethrowerBite, Vector3i(0, creature->Flags * 1.5f, 0));
 				else
 				{
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (Random::GenerateInt() & 63) + 12, 0));
+					ThrowFire(itemNumber, FlamethrowerBite, Vector3i(0, (Random::GenerateInt() & 63) + 12, 0));
 					if (realEnemy)
 					{
 						/*code*/
@@ -342,10 +340,10 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 
 				if (creature->Flags < 40)
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
+					ThrowFire(itemNumber, FlamethrowerBite, Vector3i(0, creature->Flags * 1.5f, 0));
 				else
 				{
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (GetRandomControl() & 63) + 12, 0));
+					ThrowFire(itemNumber, FlamethrowerBite, Vector3i(0, (GetRandomControl() & 63) + 12, 0));
 					if (realEnemy)
 					{
 						/*code*/

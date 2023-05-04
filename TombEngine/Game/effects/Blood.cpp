@@ -3,9 +3,9 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 

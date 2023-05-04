@@ -4,9 +4,11 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
+
+#include "Game/missile.h"
 
 // Creatures
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
@@ -145,7 +147,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -163,7 +164,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -181,7 +181,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -197,7 +196,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 25;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -314,10 +312,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
-
-	obj = &Objects[ID_KNIFETHROWER_KNIFE];
-	if (obj->loaded)
-		obj->control = KnifeControl;
 
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
@@ -478,22 +472,23 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::SnowmobileGun;
 		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SNOWMOBILE_GUN, "ID_SNOWMOBILE_DRIVER", "ID_SNOWMOBILE_GUN");
 		obj->Initialize = InitializeSkidooMan;
 		obj->control = SkidooManControl;
-		obj->HitPoints = 1;
 		obj->SetupHitEffect(true);
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
-	
+	InitProjectile(obj, ControlMissile, ID_KNIFETHROWER_KNIFE);
 }
 
 static void StartTrap(ObjectInfo* obj)

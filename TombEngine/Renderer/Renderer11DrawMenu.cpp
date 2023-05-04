@@ -8,11 +8,11 @@
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -840,7 +840,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetLoadingScreen(std::wstring& fileName)
 	{
-		SetTextureOrDefault(loadingScreenTexture, fileName);
+		SetTextureOrDefault(m_loadingScreenTexture, fileName);
 	}
 
 	void Renderer11::RenderLoadingScreen(float percentage)
@@ -861,9 +861,9 @@ namespace TEN::Renderer
 			ResetScissor();
 
 			// Draw the full screen background
-			if (loadingScreenTexture.Texture)
+			if (m_loadingScreenTexture.Texture)
 				DrawFullScreenQuad(
-					loadingScreenTexture.ShaderResourceView.Get(),
+					m_loadingScreenTexture.ShaderResourceView.Get(),
 					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)

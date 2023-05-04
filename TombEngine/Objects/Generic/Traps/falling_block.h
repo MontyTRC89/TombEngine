@@ -4,6 +4,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
+void InitializeFallingBlock(short itemNumber);
 void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void FallingBlockControl(short itemNumber);
 std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z);

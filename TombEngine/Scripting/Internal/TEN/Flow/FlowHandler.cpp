@@ -263,14 +263,28 @@ void FlowHandler::LoadFlowScript()
 	m_handler.ExecuteScript("Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
+	
+	// Check if levels exist in Gameflow.lua.
+	if (Levels.empty())
+	{
+		throw TENScriptException("No levels found. Check Gameflow.lua file integrity.");
+	}
+	else
+	{
+		TENLog("Level count: " + std::to_string(Levels.size()), LogLevel::Info);
+	}
 }
 
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	{
 		return "String not found.";
+	}
 	else
+	{
 		return m_translationsMap.at(string(id)).at(0).c_str();
+	}
 }
 
 Settings* FlowHandler::GetSettings()
@@ -404,6 +418,13 @@ bool FlowHandler::DoFlow()
 
 	while (DoTheGame)
 	{
+		// Check if called level exists in script.
+		if (CurrentLevel >= Levels.size())
+		{
+			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
+			CurrentLevel = 0;
+		}
+		
 		// First we need to fill some legacy variables in PCTomb5.exe
 		Level* level = Levels[CurrentLevel];
 
@@ -464,6 +485,7 @@ bool FlowHandler::DoFlow()
 			DoTheGame = false;
 			break;
 		case GameStatus::ExitToTitle:
+		case GameStatus::LaraDead:
 			CurrentLevel = 0;
 			break;
 		case GameStatus::NewGame:

@@ -12,16 +12,16 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPGunBite = BiteInfo(Vector3(0.0f, 160.0f, 40.0f), 13);
+	const auto MPGunBite = CreatureBiteInfo(Vector3i(0, 225, 50), 13);
 
 	enum MPGunState
 	{
@@ -67,13 +67,8 @@ namespace TEN::Entities::Creatures::TR3
 		short head = 0;
 		auto extraTorsoRot = EulerAngles::Zero;
 
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, MPGunBite.meshNum, Vector3i(MPGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
-
-			creature->FiredWeapon--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
@@ -98,14 +93,14 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.angle > -ANGLE(45.0f) &&
-						AI.angle < ANGLE(45.0f))
+					if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
 					{
 						head = AI.angle;
 						extraTorsoRot.y = AI.angle;
 						ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32);
+						creature->MuzzleFlash[0].Bite = MPGunBite;
+						creature->MuzzleFlash[0].Delay = 2;
 						SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
-						creature->FiredWeapon = 1;
 					}
 				}
 			}
@@ -330,6 +325,12 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				{
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 1;
+				}
+
 				if (item->Animation.RequiredState == MPGUN_STATE_WAIT)
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
 
@@ -346,6 +347,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -368,6 +371,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -391,6 +396,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WALK;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 				else if (item->HitStatus && Random::TestProbability(0.25f) && cover)
 				{
@@ -418,6 +425,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WALK;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 
 				if (AI.distance < pow(SECTOR(1.5f), 2))
@@ -461,6 +470,8 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32) || Random::TestProbability(1 / 8.0f))
 						item->Animation.TargetState = MPGUN_STATE_CROUCHED;
+					creature->MuzzleFlash[0].Bite = MPGunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 				}
 
 				break;

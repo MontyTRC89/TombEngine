@@ -14,9 +14,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -54,8 +54,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(-5, 200, 50), 11);
+	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
@@ -330,6 +330,9 @@ namespace TEN::Entities::TR4
 		// TODO: better add a second control routine for baddy 2 instead of mixing them?
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
+
 		bool roll = false;
 		bool jump = false;
 
@@ -418,14 +421,6 @@ namespace TEN::Entities::TR4
 		}
 
 		item->ItemFlags[1] = item->RoomNumber;
-
-		// Handle baddy firing.
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
-			creature->FiredWeapon--;
-		}
 
 		CollisionResult probe;
 
@@ -1158,13 +1153,13 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				creature->FiredWeapon = 1;
-
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
-				
+
 				if (!ShotLara(item, &AI, BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
+				creature->MuzzleFlash[0].Bite = BaddyGunBite;
+				creature->MuzzleFlash[0].Delay = 2;
 
 				break;
 

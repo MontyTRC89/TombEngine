@@ -8,14 +8,14 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
 
-	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
+	const auto SharkBite = CreatureBiteInfo(Vector3i(17, -22, 344), 12);
 	const auto SharkBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	void SharkControl(short itemNumber)

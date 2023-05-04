@@ -8,15 +8,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
+	const auto DobermanBite = CreatureBiteInfo(Vector3i(0, 30, 141), 20);
 
 	enum DobermanState
 	{

@@ -3,10 +3,10 @@
 
 #include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Objects/EulerAngles.h"
 #include "Math/Objects/Pose.h"
 #include "Objects/game_object_ids.h"
-#include "Specific/setup.h"
 
 //namespace TEN::Math
 //{

@@ -20,10 +20,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
@@ -50,7 +50,7 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3(8.0f, 230.0f, 40.0f),
 	};
 
-	const auto HeavyGuardHeadBite = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
+	const auto HeavyGuardHeadBite = CreatureBiteInfo(Vector3(0, -200, 0), 2);
 
 	enum HeavyGuardState
 	{

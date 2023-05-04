@@ -10,10 +10,10 @@
 #include "Game/effects/Bubble.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
@@ -115,7 +115,7 @@ void ControlMissile(short fxNumber)
 		EffectNewRoom(fxNumber, pointColl.RoomNumber);
 
 	if (fx.objectNumber == ID_KNIFETHROWER_KNIFE)
-		fx.pos.Orientation.z += ANGLE(3.0f); // Update knife rotation over time.
+		fx.pos.Orientation.z += ANGLE(30.0f); // Update knife rotation over time.
 
 	switch (fx.objectNumber)
 	{

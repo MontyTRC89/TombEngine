@@ -9,14 +9,14 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;
 
-	const auto WorkerShotgunBite = BiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
+	const auto WorkerShotgunBite = CreatureBiteInfo(Vector3i(0, 350, 40), 9);
 
 	// TODO
 	enum ShotgunWorkerState
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	};
 
-	void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BiteInfo bite, short angleY, int damage)
+	void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, const CreatureBiteInfo& bite, short angleY, int damage)
 	{
 		for (int i = 0; i < WORKER_SHOTGUN_NUM_SHOTS; i++)
 			ShotLara(item, info, bite, angleY, damage);
@@ -57,12 +57,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, WorkerShotgunBite.meshNum, Vector3i(WorkerShotgunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
-			creature->FiredWeapon--;
-		}
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		if (item->HitPoints <= 0)
 		{
@@ -202,10 +198,11 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0)
 				{
 					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, extraTorsoRot.y, 25);
-					creature->FiredWeapon = 2;
+					creature->MuzzleFlash[0].Bite = WorkerShotgunBite;
+					creature->MuzzleFlash[0].Delay = 2;
 					creature->Flags = 1;
 				}
 
@@ -224,10 +221,11 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags)
+				if (creature->Flags == 0)
 				{
+					creature->MuzzleFlash[0].Bite = WorkerShotgunBite;
+					creature->MuzzleFlash[0].Delay = 1;
 					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, extraTorsoRot.y, 25);
-					creature->FiredWeapon = 2;
 					creature->Flags = 1;
 				}
 

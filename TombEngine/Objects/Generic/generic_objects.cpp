@@ -1,9 +1,13 @@
 #include "framework.h"
 #include "Objects/Generic/generic_objects.h"
 #include "Objects/Generic/Object/objects.h"
+#include "Objects/Utils/object_helper.h"
 
-#include "Game/pickup/pickup.h"
+// Necessary import
 #include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 
 // Objects
 #include "Objects/Generic/Object/generic_trapdoor.h"
@@ -23,6 +27,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Switches/turn_switch.h"
 #include "Objects/Generic/Switches/AirlockSwitch.h"
+#include "Objects/Generic/Switches/switch.h"
 
 // Doors
 #include "Objects/Generic/Doors/generic_doors.h"
@@ -34,14 +39,12 @@
 
 // Traps
 #include "Objects/Generic/Traps/dart_emitter.h"
+#include "Objects/Generic/Traps/falling_block.h"
 
-/// Necessary import
-#include "Specific/setup.h"
-
-using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;
-using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Traps;
 
 static void StartObject(ObjectInfo* object)
 {
@@ -256,6 +259,26 @@ void StartSwitches(ObjectInfo* object)
 		object->control = FullBlockSwitchControl;
 		object->SetupHitEffect(true);
 	}
+
+	for (int objectID = ID_SHOOT_SWITCH1; objectID <= ID_SHOOT_SWITCH4; objectID++)
+	{
+		object = &Objects[objectID];
+		if (object->loaded)
+		{
+			object->Initialize = InitializeShootSwitch;
+			object->control = ControlAnimatingSlots;
+			object->collision = ShootSwitchCollision;
+		}
+	}
+
+	for (int objectID = ID_KEY_HOLE1; objectID <= ID_KEY_HOLE16; objectID++)
+		InitKeyHole(object, objectID);
+
+	for (int objectID = ID_PUZZLE_HOLE1; objectID <= ID_PUZZLE_HOLE16; objectID++)
+		InitPuzzleHole(object, objectID);
+
+	for (int objectID = ID_PUZZLE_DONE1; objectID <= ID_PUZZLE_DONE16; objectID++)
+		InitPuzzleDone(object, objectID);
 }
 
 void StartDoors(ObjectInfo* object)
@@ -393,6 +416,94 @@ void StartTraps(ObjectInfo* object)
 		object->usingDrawAnimatingItem = true;
 		object->isPickup = true;
 	}
+
+	object = &Objects[ID_FALLING_BLOCK];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
+		object->floor = FallingBlockFloor;
+		object->ceiling = FallingBlockCeiling;
+		object->floorBorder = FallingBlockFloorBorder;
+		object->ceilingBorder = FallingBlockCeilingBorder;
+	}
+
+	object = &Objects[ID_FALLING_BLOCK2];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
+		object->floor = FallingBlockFloor;
+		object->ceiling = FallingBlockCeiling;
+		object->floorBorder = FallingBlockFloorBorder;
+		object->ceilingBorder = FallingBlockCeilingBorder;
+	}
+
+	object = &Objects[ID_CRUMBLING_FLOOR];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeFallingBlock;
+		object->collision = FallingBlockCollision;
+		object->control = FallingBlockControl;
+	}
+
+	object = &Objects[ID_PARALLEL_BARS];
+	if (object->loaded)
+		object->collision = HorizontalBarCollision;
+}
+
+void StartServiceObjects(ObjectInfo* object)
+{
+	object = &Objects[ID_CAMERA_TARGET];
+	if (object->loaded)
+	{
+		object->drawRoutine = nullptr;
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_TIGHT_ROPE];
+	if (object->loaded)
+	{
+		object->Initialize = InitializeTightrope;
+		object->collision = TightropeCollision;
+		object->drawRoutine = nullptr;
+
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_EARTHQUAKE];
+	if (object->loaded)
+		object->drawRoutine = nullptr;
+
+	object = &Objects[ID_KILL_ALL_TRIGGERS];
+	if (object->loaded)
+	{
+		object->control = KillAllCurrentItems;
+		object->drawRoutine = nullptr;
+		object->HitPoints = 0;
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_TRIGGER_TRIGGERER];
+	if (object->loaded)
+	{
+		object->control = ControlTriggerTriggerer;
+		object->drawRoutine = nullptr;
+
+		object->usingDrawAnimatingItem = false;
+	}
+
+	object = &Objects[ID_WATERFALLMIST];
+	if (object->loaded)
+	{
+		object->control = ControlWaterfallMist;
+		object->drawRoutine = nullptr;
+	}
+
+	for (int objectID = ID_ANIMATING1; objectID <= ID_ANIMATING128; objectID++)
+		InitAnimating(object, objectID);
 }
 
 void InitializeGenericObjects()
@@ -402,4 +513,5 @@ void InitializeGenericObjects()
 	StartObject(objToInit);
 	StartSwitches(objToInit);
 	StartDoors(objToInit);
+	StartServiceObjects(objToInit);
 }

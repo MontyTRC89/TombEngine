@@ -8,13 +8,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 int NumberLosRooms;
 short LosRooms[20];

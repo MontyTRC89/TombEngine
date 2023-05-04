@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
 
-#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
@@ -242,7 +241,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->biteOffset = 0;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();

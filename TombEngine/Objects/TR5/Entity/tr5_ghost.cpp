@@ -7,13 +7,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
+	const auto InvisibleGhostBite = CreatureBiteInfo(Vector3i::Zero, 17);
 
 	void InitializeInvisibleGhost(short itemNumber)
 	{

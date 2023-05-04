@@ -3,9 +3,9 @@
 
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
@@ -855,26 +855,32 @@ namespace TEN::Collision::Floordata
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->AddBridge(itemNumber);
 
-		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
-		while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+		if (Objects[item.ObjectNumber].floorBorder != nullptr)
 		{
-			const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-			if (!roomAbove)
-				break;
+			int floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+			{
+				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
+				if (!roomAbove.has_value())
+					break;
 
-			floor = &GetFloorSide(*roomAbove, x, z);
-			floor->AddBridge(itemNumber);
+				floor = &GetFloorSide(*roomAbove, x, z);
+				floor->AddBridge(itemNumber);
+			}
 		}
-
-		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
-		while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+		
+		if (Objects[item.ObjectNumber].ceilingBorder != nullptr)
 		{
-			const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-			if (!roomBelow)
-				break;
+			int ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+			{
+				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
+				if (!roomBelow.has_value())
+					break;
 
-			floor = &GetFloorSide(*roomBelow, x, z);
-			floor->AddBridge(itemNumber);
+				floor = &GetFloorSide(*roomBelow, x, z);
+				floor->AddBridge(itemNumber);
+			}
 		}
 	}
 
@@ -884,29 +890,35 @@ namespace TEN::Collision::Floordata
 		x += item.Pose.Position.x;
 		z += item.Pose.Position.z;
 
-		auto floor = &GetFloorSide(item.RoomNumber, x, z);
+		auto* floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->RemoveBridge(itemNumber);
 
-		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
-		while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+		if (Objects[item.ObjectNumber].floorBorder != nullptr)
 		{
-			const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-			if (!roomAbove)
-				break;
+			int floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+			{
+				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
+				if (!roomAbove.has_value())
+					break;
 
-			floor = &GetFloorSide(*roomAbove, x, z);
-			floor->RemoveBridge(itemNumber);
+				floor = &GetFloorSide(*roomAbove, x, z);
+				floor->RemoveBridge(itemNumber);
+			}
 		}
 
-		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
-		while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+		if (Objects[item.ObjectNumber].ceilingBorder != nullptr)
 		{
-			const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-			if (!roomBelow)
-				break;
+			int ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+			{
+				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
+				if (!roomBelow.has_value())
+					break;
 
-			floor = &GetFloorSide(*roomBelow, x, z);
-			floor->RemoveBridge(itemNumber);
+				floor = &GetFloorSide(*roomBelow, x, z);
+				floor->RemoveBridge(itemNumber);
+			}
 		}
 	}
 
@@ -923,17 +935,20 @@ namespace TEN::Collision::Floordata
 		auto bounds = GameBoundingBox(item);
 		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
-		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
+		auto pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case.
 
-		static float distance;
+		float distance = 0.0f;
 		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
+		{
 			return std::optional{ item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1) };
+		}
 		else
+		{
 			return std::nullopt;
+		}
 	}
 
-	// Gets bridge min or max height regardless of actual X/Z world position
-
+	// Gets bridge min or max height regardless of actual X/Z world position.
 	int GetBridgeBorder(int itemNumber, bool bottom)
 	{
 		auto item = &g_Level.Items[itemNumber];
@@ -946,6 +961,7 @@ namespace TEN::Collision::Floordata
 	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
 	{
 		auto item = &g_Level.Items[itemNumber];
+		if (!Objects[item->ObjectNumber].loaded) return;
 
 		// Force removal if object was killed
 		if (item->Flags & IFLAG_KILLED)
@@ -972,10 +988,10 @@ namespace TEN::Collision::Floordata
 		{
 			for (int z = 0; z < room->zSize; z++)
 			{
-				auto pX = room->x + (x * BLOCK(1)) + BLOCK(0.5f);
-				auto pZ = room->z + (z * BLOCK(1)) + BLOCK(0.5f);
-				auto offX = pX - item->Pose.Position.x;
-				auto offZ = pZ - item->Pose.Position.z;
+				float pX = room->x + (x * BLOCK(1)) + BLOCK(0.5f);
+				float pZ = room->z + (z * BLOCK(1)) + BLOCK(0.5f);
+				float offX = pX - item->Pose.Position.x;
+				float offZ = pZ - item->Pose.Position.z;
 
 				// Clean previous bridge state
 				RemoveBridge(itemNumber, offX, offZ);

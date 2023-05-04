@@ -80,7 +80,7 @@ namespace TEN::Input
 	// Globals
 	RumbleData				 RumbleInfo  = {};
 	std::vector<InputAction> ActionMap	 = {};
-	vector<QueueState>		 ActionQueue = {};
+	std::vector<QueueState>	 ActionQueue = {};
 	std::vector<bool>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
@@ -215,13 +215,20 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			if (ActionQueue[i] == QueueState::None)
-				continue;
+			switch (ActionQueue[i])
+			{
+			default:
+			case QueueState::None:
+				break;
 
-			if (ActionQueue[i] == QueueState::Push)
+			case QueueState::Push:
 				ActionMap[i].Update(true);
-			else
+				break;
+
+			case QueueState::Clear:
 				ActionMap[i].Clear();
+				break;
+			}
 		}
 	}
 
@@ -247,7 +254,7 @@ namespace TEN::Input
 
 	int WrapSimilarKeys(int source)
 	{
-		// Merge right and left Ctrl, Shift, and Alt.
+		// Merge right/left Ctrl, Shift, and Alt.
 
 		switch (source)
 		{
@@ -459,7 +466,7 @@ namespace TEN::Input
 
 	void SolveActionCollisions()
 	{
-		// Block simultaneous LEFT+RIGHT actions.
+		// Block simultaneous Left+Right actions.
 		if (IsHeld(In::Left) && IsHeld(In::Right))
 		{
 			ClearAction(In::Left);
@@ -469,7 +476,7 @@ namespace TEN::Input
 
 	void HandlePlayerHotkeys(ItemInfo* item)
 	{
-		static const vector<int> unavailableFlareStates =
+		static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
 		{
 			LS_CRAWL_FORWARD,
 			LS_CRAWL_TURN_LEFT,
@@ -497,15 +504,19 @@ namespace TEN::Input
 				//ActionMap[(int)In::Look].Clear();
 			}
 			else
+			{
 				ClearAction(In::SwitchTarget);
+			}
 		}
 		else
+		{
 			ClearAction(In::SwitchTarget);
+		}
 
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
-			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
+			if (TestState(item->Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
 				SayNo();
 		}
 
@@ -668,9 +679,7 @@ namespace TEN::Input
 		}
 
 		if (applyQueue)
-		{
 			ApplyActionQueue();
-		}
 
 		// Additional handling.
 		HandlePlayerHotkeys(item);

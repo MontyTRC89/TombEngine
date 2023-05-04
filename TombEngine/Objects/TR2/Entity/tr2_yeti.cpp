@@ -8,16 +8,16 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
-	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
+	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3i(12, 101, 19), 13);
+	const auto YetiBiteRight = CreatureBiteInfo(Vector3i(12, 101, 19), 10);
 	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
 	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 
