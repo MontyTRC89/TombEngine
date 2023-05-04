@@ -25,7 +25,7 @@ The following constants are inside LogLevel.
 
 static const std::unordered_map<std::string, LogLevel> kLevelLog
 {
-	{"INFO", LogLevel::Info},
-	{"WARNING", LogLevel::Warning},
-	{"ERROR",LogLevel::Error}
+	{ScriptReserved_LogLevelInfo, LogLevel::Info},
+	{ScriptReserved_LogLevelWarning, LogLevel::Warning},
+	{ScriptReserved_LogLevelError,LogLevel::Error}
 };

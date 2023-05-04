@@ -257,5 +257,10 @@ static constexpr char ScriptReserved_GameVars[]		= "GameVars";
 static constexpr char ScriptReserved_LevelFuncs[]	= "LevelFuncs";
 static constexpr char ScriptReserved_Engine[]		= "Engine";
 
+// Constants
+static constexpr char ScriptReserved_LogLevelInfo[] = "INFO";
+static constexpr char ScriptReserved_LogLevelWarning[] = "WARNING";
+static constexpr char ScriptReserved_LogLevelError[] = "ERROR";
+
 // Internal
 static constexpr char ScriptReserved_LaraObject[]				= "LaraObject";
