@@ -14,6 +14,7 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace OIS;
@@ -838,21 +839,24 @@ namespace TEN::Input
 			return false;
 
 		for (int i = 0; i < KEY_COUNT; i++)
+		{
 			if (KeyboardLayout[1][i] != KC_UNASSIGNED && KeyboardLayout[1][i] != KeyboardLayout[0][i])
-			return false;
+				return false;
+		}
 
-		if (OisGamepad->vendor().find("XBOX") != string::npos ||
-			OisGamepad->vendor().find("XBox") != string::npos ||
-			OisGamepad->vendor().find("xbox") != string::npos)
+		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
+		if (vendor.find("xbox") != string::npos || vendor.find("xinput") != string::npos)
 		{
 			ApplyBindings(XInputBindings);
+
+			for (int i = 0; i < KEY_COUNT; i++)
+				g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
+
+			return true;
 		}
 		else
+		{
 			return false;
-
-		for (int i = 0; i < KEY_COUNT; i++)
-			g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
-
-		return true;
+		}
 	}
 }
