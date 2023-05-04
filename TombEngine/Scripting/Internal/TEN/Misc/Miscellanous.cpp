@@ -343,9 +343,9 @@ namespace Misc
 	// WARNING
 	// ERROR
 	//@usage
-	//Log('test info log', LogLevel.INFO)
-	//Log('test warning log', LogLevel.WARNING)
-	//Log('test error log', LogLevel.ERROR)
+	//PrintLog('test info log', LogLevel.INFO)
+	//PrintLog('test warning log', LogLevel.WARNING)
+	//PrintLog('test error log', LogLevel.ERROR)
 	static void PrintLog(std::string const& message,LogLevel const& level, bool allowSpam = false)
 	{
 		TENLog(message, level, LogConfig::All, allowSpam);
