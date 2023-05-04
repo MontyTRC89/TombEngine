@@ -68,6 +68,7 @@ namespace TEN::Collision::Attractors
 		unsigned int		   GetSegmentIndexAtDistance(float lineDist) const; // TODO: Maybe unnecessary.
 
 		// Inquirers
+		bool IsLooped() const;
 		bool IsEdge() const;
 
 		// Helpers
@@ -76,7 +77,6 @@ namespace TEN::Collision::Attractors
 
 	private:
 		float NormalizeLineDistance(float lineDist) const;
-		bool  IsLooped() const;
 	};
 
 	// Temp

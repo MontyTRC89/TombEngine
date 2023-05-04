@@ -380,8 +380,7 @@ namespace TEN::Collision::Attractors
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 		for (auto& attrac : player.Context.DebugAttrac.SectorAttractors)
 		{
-			assertion(nearbyAttracPtrs.size() <= COUNT_MAX, "Nearby attractor pointer collection overflow.");
-			if (nearbyAttracPtrs.size() == COUNT_MAX)
+			if (nearbyAttracPtrs.size() >= COUNT_MAX)
 				return nearbyAttracPtrs;
 
 			nearbyAttracPtrs.push_back(&attrac);
