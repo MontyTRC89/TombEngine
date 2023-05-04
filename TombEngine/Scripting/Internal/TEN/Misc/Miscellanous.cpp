@@ -347,6 +347,8 @@ namespace Misc
 	//PrintLog('test info log', LogLevel.INFO)
 	//PrintLog('test warning log', LogLevel.WARNING)
 	//PrintLog('test error log', LogLevel.ERROR)
+	// -- spammed message
+	// PrintLog('test spam log', LogLevel.INFO, true)
 	// 
 	// For native Lua handling of errors, see the official guide
 	//<a href="https://www.lua.org/pil/8.3.html">Error management</a>
