@@ -52,7 +52,6 @@ namespace TEN::Collision::Attractors
 
 	public:
 		// Constructors
-		Attractor() {};
 		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
