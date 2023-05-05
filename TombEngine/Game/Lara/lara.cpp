@@ -490,16 +490,6 @@ static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 }
 
 // Debug
-static void DrawPlayerAttractors(const ItemInfo& item)
-{
-	const auto& player = GetLaraInfo(item);
-
-	auto attracPtrs = GetDebugAttractorPtrs(item);
-	for (const auto* attrac : attracPtrs)
-		attrac->DrawDebug();
-}
-
-// Debug
 #include <ois/OISKeyboard.h>
 #include "Specific/Input/Input.h"
 using namespace TEN::Input;
@@ -576,7 +566,11 @@ void HandleAttractorDebug(ItemInfo& item)
 	if (attrac.has_value())
 		player.Context.DebugAttrac.DebugAttractor1 = GenerateSectorAttractor(pointColl).value();
 
-	DrawPlayerAttractors(item);
+	// TODO: Dedicated debug page.
+	// Draw debug.
+	auto attracColls = GetAttractorCollisions(item, item.Pose.Position.ToVector3(), BLOCK(5));
+	for (const auto& attracColl : attracColls)
+		attracColl.AttractorPtr->DrawDebug();
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)

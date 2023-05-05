@@ -68,9 +68,12 @@ namespace TEN::Collision::Attractors
 		// Get proximity data.
 		auto attracProx = GetProximityData(refPoint);
 
+		// Derive segment origin and target.
+		const auto& origin = Points[attracProx.SegmentIndex];
+		const auto& target = Points[attracProx.SegmentIndex + 1];
+
 		// Calculate angles.
-		auto attracOrient = (Points.size() == 1) ?
-			orient : Geometry::GetOrientToPoint(Points[attracProx.SegmentIndex], Points[attracProx.SegmentIndex + 1]);
+		auto attracOrient = (Points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
 		short headingAngle = attracOrient.y - ANGLE(90.0f);
 		short slopeAngle = attracOrient.x;
 
@@ -78,7 +81,7 @@ namespace TEN::Collision::Attractors
 		bool isIntersected = (attracProx.Distance <= range);
 		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
 
-		// Create and return new collision data.
+		// Create and return attractor collision data.
 		auto attracColl = AttractorCollisionData{};
 		attracColl.AttractorPtr = this;
 		attracColl.Proximity = attracProx;
@@ -91,12 +94,18 @@ namespace TEN::Collision::Attractors
 
 	AttractorProximityData Attractor::GetProximityData(const Vector3& refPoint) const
 	{
-		// Single point exists; return simple proximity data.
-		if (Points.size() == 1)
-			return AttractorProximityData{ Points.front(), Vector3::Distance(refPoint, Points.front()), 0 };
-
 		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
 		float lineDistFromLastClosestPoint = 0.0f;
+
+		// Single point exists; return simple proximity data.
+		if (Points.size() == 1)
+		{
+			attracProx.Point = Points.front();
+			attracProx.Distance = Vector3::Distance(refPoint, Points.front());
+			attracProx.LineDistance = 0.0f;
+			attracProx.SegmentIndex = 0;
+			return attracProx;
+		}
 
 		// Find closest point along attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
@@ -307,18 +316,18 @@ namespace TEN::Collision::Attractors
 
 	float Attractor::NormalizeLineDistance(float lineDist) const
 	{
-		// Line distance within bounds; return unmodified line distance.
+		// Line distance within bounds; return unmodified distance along attractor.
 		if (lineDist >= 0.0f && lineDist <= Length)
 			return lineDist;
 
-		// Attractor is looped; wrap line distance.
+		// Attractor looped; wrap distance along attractor.
 		if (IsLooped())
 		{
 			int sign = -std::copysign(1, lineDist);
 			return (lineDist + (Length * sign));
 		}
 		
-		// Attractor is not looped; clamp line distance.
+		// Attractor not looped; clamp distance along attractor.
 		return std::clamp(lineDist, 0.0f, Length);
 	}
 
