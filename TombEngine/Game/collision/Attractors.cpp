@@ -3,17 +3,14 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-#include "lara_helpers.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
-
-//------debug
-#include "Game/Lara/lara.h"
-//------
 
 namespace TEN::Collision::Attractors
 {
@@ -38,9 +35,23 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
+	// TODO: Also dereference player held by attractor when player is destroyed.
 	Attractor::~Attractor()
 	{
-		// TODO: Parenting.
+		// Dereference current attractor held by players.
+		for (auto& [entityID, entity] : AttachedPlayers)
+		{
+			if (!entity.IsLara())
+				continue;
+
+			auto& player = GetLaraInfo(entity);
+
+			if (player.Context.HandsAttractor.AttracPtr == this)
+				player.Context.HandsAttractor.AttracPtr = nullptr;
+
+			if (player.Context.FeetAttractor.AttracPtr == this)
+				player.Context.FeetAttractor.AttracPtr = nullptr;
+		}
 	}
 
 	AttractorType Attractor::GetType() const
@@ -83,7 +94,7 @@ namespace TEN::Collision::Attractors
 
 		// Create and return attractor collision data.
 		auto attracColl = AttractorCollisionData{};
-		attracColl.AttractorPtr = this;
+		attracColl.AttracPtr = this;
 		attracColl.Proximity = attracProx;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
@@ -230,6 +241,22 @@ namespace TEN::Collision::Attractors
 
 		// Test if start and end points occupy roughly the same position.
 		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
+	}
+
+	void Attractor::AttachPlayer(ItemInfo& entity)
+	{
+		if (!entity.IsLara())
+			return;
+
+		AttachedPlayers.insert({ entity.Index, entity });
+	}
+
+	void Attractor::DetachPlayer(ItemInfo& entity)
+	{
+		if (!entity.IsLara())
+			return;
+
+		AttachedPlayers.erase(entity.Index);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)

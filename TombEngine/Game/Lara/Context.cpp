@@ -243,7 +243,7 @@ namespace TEN::Player::Context
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
-			if (!attracColl.AttractorPtr->IsEdge())
+			if (!attracColl.AttracPtr->IsEdge())
 				continue;
 
 			// 2) Check if edge is within range and in front.
@@ -254,13 +254,13 @@ namespace TEN::Player::Context
 			// 3) Test if target point is attractor end.
 			if (!hasEnd &&
 				(attracColl.Proximity.LineDistance <= EPSILON ||
-					(attracColl.AttractorPtr->GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
+					(attracColl.AttracPtr->GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
 
 				// 3.1) Test for loop seam.
-				const auto& points = attracColl.AttractorPtr->GetPoints();
+				const auto& points = attracColl.AttracPtr->GetPoints();
 				if (Vector3::Distance(points[0], points.back()) > EPSILON)
 					continue;
 			}
@@ -275,7 +275,7 @@ namespace TEN::Player::Context
 
 			// Get point collision off side of edge.
 			auto pointCollOffSide = GetCollision(
-				Vector3i(attracColl.Proximity.Point), attracColl.AttractorPtr->GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Point), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough off the ground.
@@ -325,14 +325,14 @@ namespace TEN::Player::Context
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->AttractorPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttractorPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttracPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->AttracPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchData
 		{
-			attracColl->AttractorPtr,
+			attracColl->AttracPtr,
 			EDGE_TYPE,
 			attracColl->Proximity.Point,
 			attracColl->Proximity.LineDistance,

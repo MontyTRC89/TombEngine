@@ -189,7 +189,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 
-	player.Context.HandsAttractor.Ptr = catchData.AttractorPtr;
+	player.Context.HandsAttractor.AttracPtr = catchData.AttractorPtr;
 	player.Context.HandsAttractor.LineDistance = catchData.DistanceAlongLine;
 }
 

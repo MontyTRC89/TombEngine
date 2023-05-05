@@ -1295,12 +1295,12 @@ struct PlayerStatusData
 
 struct PlayerAttractorData
 {
-	const Attractor* Ptr		  = nullptr;
+	const Attractor* AttracPtr	  = nullptr;
 	float			 LineDistance = 0.0f;
 
 	void Set(const Attractor& attrac, float lineDist)
 	{
-		Ptr = &attrac;
+		AttracPtr = &attrac;
 		LineDistance = lineDist;
 	}
 

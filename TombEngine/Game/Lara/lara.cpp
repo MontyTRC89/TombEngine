@@ -570,7 +570,7 @@ void HandleAttractorDebug(ItemInfo& item)
 	// Draw debug.
 	auto attracColls = GetAttractorCollisions(item, item.Pose.Position.ToVector3(), BLOCK(5));
 	for (const auto& attracColl : attracColls)
-		attracColl.AttractorPtr->DrawDebug();
+		attracColl.AttracPtr->DrawDebug();
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)

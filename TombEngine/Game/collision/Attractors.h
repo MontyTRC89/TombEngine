@@ -29,7 +29,7 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorCollisionData
 	{
-		const Attractor* AttractorPtr = nullptr;
+		const Attractor* AttracPtr = nullptr;
 
 		AttractorProximityData Proximity	= {};
 		short				   HeadingAngle	= 0;
@@ -47,6 +47,8 @@ namespace TEN::Collision::Attractors
 		std::vector<Vector3> Points		= {};
 		int					 RoomNumber = 0;
 		float				 Length		= 0.0f;
+
+		std::unordered_map<int, ItemInfo&> AttachedPlayers = {};
 
 	public:
 		// Constructors
@@ -73,6 +75,8 @@ namespace TEN::Collision::Attractors
 		bool IsLooped() const;
 
 		// Helpers
+		void AttachPlayer(ItemInfo& entity);
+		void DetachPlayer(ItemInfo& entity);
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void DrawDebug() const;
 
