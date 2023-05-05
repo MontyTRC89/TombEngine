@@ -207,10 +207,18 @@ namespace TEN::Control::Volumes
 		TENLog("Loading node scripts...", LogLevel::Info);
 
 		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
-		for (const auto& file : nodeCatalogs)
-			g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
 
-		TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
+        if (!nodeCatalogs.empty())
+        {
+            for (const auto& file : nodeCatalogs)
+                g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
+
+            TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
+        }
+        else
+        {
+            TENLog("No node catalogs were found.", LogLevel::Warning);
+        }
 
 		unsigned int nodeCount = 0;
 		for (const auto& set : g_Level.EventSets)
