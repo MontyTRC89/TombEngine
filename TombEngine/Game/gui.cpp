@@ -646,8 +646,7 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 2))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memset(KeyboardLayout[1], 0, KEY_COUNT * sizeof(short));
-					ApplyDefaultXInputBindings();
+					ApplyDefaultBindings();
 					return;
 				}
 

@@ -182,7 +182,8 @@ namespace TEN::Input
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
-	bool ApplyDefaultXInputBindings();
+    void ApplyDefaultBindings();
+    bool ApplyDefaultXInputBindings();
 
 	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
 	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
