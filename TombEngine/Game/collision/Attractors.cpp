@@ -35,7 +35,6 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
-	// TODO: Also dereference player held by attractor when player is destroyed.
 	Attractor::~Attractor()
 	{
 		// Dereference current attractor held by players.

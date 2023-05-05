@@ -1341,6 +1341,12 @@ struct PlayerContextData
 
 struct LaraInfo
 {
+	~LaraInfo()
+	{
+		//Context.HandsAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
+		//Context.FeetAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
+	}
+
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};

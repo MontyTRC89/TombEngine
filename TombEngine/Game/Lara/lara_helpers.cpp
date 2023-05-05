@@ -189,6 +189,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 	short targetYOrient = (catchData.Type == Context::EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
 	player.Context.TargetOrientation = EulerAngles(0, targetYOrient, 0);
 
+	// Set attractor attachment.
+	//catchData.AttractorPtr->AttachPlayer(item);
 	player.Context.HandsAttractor.AttracPtr = catchData.AttractorPtr;
 	player.Context.HandsAttractor.LineDistance = catchData.DistanceAlongLine;
 }
@@ -1064,7 +1066,11 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
+
+	//player.Context.HandsAttractor.AttracPtr->DetachPlayer(item);
+	//player.Context.FeetAttractor.AttracPtr->DetachPlayer(item);
 	player.Context.HandsAttractor.Clear();
+	player.Context.FeetAttractor.Clear();
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)

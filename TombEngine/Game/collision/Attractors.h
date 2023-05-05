@@ -52,6 +52,7 @@ namespace TEN::Collision::Attractors
 
 	public:
 		// Constructors
+		Attractor() {}; // TODO: Remove. This ctor is for debug only.
 		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
