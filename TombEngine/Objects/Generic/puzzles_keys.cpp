@@ -231,6 +231,10 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
 	auto triggerIndex = GetTriggerIndex(&receptacleItem);
+
+	if (triggerIndex == 0)
+		return;
+
 	int triggerType = (*(triggerIndex++) >> 8) & 0x3F;
 
 	if (triggerType != TRIGGER_TYPES::SWITCH)
@@ -327,6 +331,10 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
 	auto triggerIndex = GetTriggerIndex(item);
+
+	if (triggerIndex == 0)
+		return;
+
 	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
@@ -438,6 +446,10 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	auto* player = GetLaraInfo(laraItem);
 
 	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
+
+	if (triggerIndexPtr == 0)
+		return;
+
 	short triggerType = (*(triggerIndexPtr++) >> 8) & 0x3F;
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
@@ -485,7 +497,14 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					keyHoleItem->ItemFlags[1] = true;
 				}
 
-				laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				if (keyHoleItem->TriggerFlags == 0)
+				{
+					laraItem->Animation.AnimNumber = LA_USE_KEY;
+				}
+				else
+				{
+					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;

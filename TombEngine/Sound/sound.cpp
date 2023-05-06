@@ -136,7 +136,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 
 	// Create actual sample
 	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
-	delete uncompBuffer;
+	delete[] uncompBuffer;
 
 	return true;
 }
