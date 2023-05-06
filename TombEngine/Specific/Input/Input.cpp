@@ -14,6 +14,7 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace OIS;
@@ -90,7 +91,13 @@ namespace TEN::Input
 	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
+		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+	};
+	auto XInputBindings = std::vector<int>
+	{
+		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
 		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 
@@ -100,11 +107,11 @@ namespace TEN::Input
 	{
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
 		},
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
 		}
 	};
 
@@ -166,13 +173,21 @@ namespace TEN::Input
 				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try to initialize vibration interface
+				// Try to initialize vibration interface.
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
 				if (OisRumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitializeEffect();
 				}
+
+				// If controller is XInput and default bindings were successfully assigned, save configuration.
+                if (ApplyDefaultXInputBindings())
+                {
+                    g_Configuration.EnableRumble = (OisRumble != nullptr);
+                    g_Configuration.EnableThumbstickCameraControl = true;
+                    SaveConfiguration();
+                }
 			}
 			catch (OIS::Exception& ex)
 			{
@@ -731,6 +746,50 @@ namespace TEN::Input
 		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
 
 		RumbleInfo = {};
+	}
+
+	static void ApplyBindings(const std::vector<int>& bindings)
+	{
+		for (int i = 0; i < bindings.size(); i++)
+		{
+			if (i >= KEY_COUNT)
+				break;
+
+			KeyboardLayout[1][i] = bindings[i];
+		}
+	}
+
+    void ApplyDefaultBindings()
+    {
+        ApplyBindings(DefaultBindings);
+        ApplyDefaultXInputBindings();
+    }
+
+	bool ApplyDefaultXInputBindings()
+	{
+		if (!OisGamepad)
+			return false;
+
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			if (KeyboardLayout[1][i] != KC_UNASSIGNED && KeyboardLayout[1][i] != KeyboardLayout[0][i])
+				return false;
+		}
+
+		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
+		if (vendor.find("xbox") != string::npos || vendor.find("xinput") != string::npos)
+		{
+			ApplyBindings(XInputBindings);
+
+			for (int i = 0; i < KEY_COUNT; i++)
+				g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	void ClearAction(ActionID actionID)
