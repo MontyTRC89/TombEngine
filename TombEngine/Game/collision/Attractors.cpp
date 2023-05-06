@@ -33,6 +33,8 @@ namespace TEN::Collision::Attractors
 				Length += Vector3::Distance(origin, target);
 			}
 		}
+
+		AttachedPlayers = {};
 	}
 
 	Attractor::~Attractor()

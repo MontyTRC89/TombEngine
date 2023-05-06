@@ -97,33 +97,36 @@ namespace TEN::Player
 
 		// Get points.
 		auto pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistCenter);
-		if (!isLooped && connectingAttracCollCenter.has_value())
+		if (!isLooped)
 		{
-			// Get point at connecting attractor.
-			if (lineDistCenter <= 0.0f)
+			if (connectingAttracCollCenter.has_value())
 			{
-				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDistCenter;
-				pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
+				// Get point at connecting attractor.
+				if (lineDistCenter <= 0.0f)
+				{
+					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDistCenter;
+					pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
+				}
+				else if (lineDistCenter >= length)
+				{
+					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDistCenter - length);
+					pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
+				}
 			}
-			else if (lineDistCenter >= length)
+			else
 			{
-				float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDistCenter - length);
-				pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
-			}
-		}
-		else if (!isLooped)
-		{
-			// Get point within boundary of current attractor.
-			if (lineDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
-			{
-				pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(coll.Setup.Radius);
-			}
-			else if (lineDistRight >= length&& !connectingAttracCollRight.has_value())
-			{
-				pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(length - coll.Setup.Radius);
-			}
+				// Get point within boundary of current attractor.
+				if (lineDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
+				{
+					pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(coll.Setup.Radius);
+				}
+				else if (lineDistRight >= length && !connectingAttracCollRight.has_value())
+				{
+					pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(length - coll.Setup.Radius);
+				}
 
-			// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
+				// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
+			}
 		}
 
 		auto pointLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?

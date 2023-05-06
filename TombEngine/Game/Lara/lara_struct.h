@@ -1343,8 +1343,11 @@ struct LaraInfo
 {
 	~LaraInfo()
 	{
-		//Context.HandsAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
-		//Context.FeetAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
+		/*if (Context.HandsAttractor.AttracPtr != nullptr)
+			Context.HandsAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
+
+		if (Context.FeetAttractor.AttracPtr != nullptr)
+			Context.FeetAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);*/
 	}
 
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
