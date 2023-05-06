@@ -70,6 +70,7 @@ public:
 
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;
 	virtual void SetVariables(const std::vector<SavedVar>& vars) = 0;
+	virtual void SetGameVariablesOnly(const std::vector<SavedVar>& vars) = 0;
 
 	virtual void GetCallbackStrings(
 		std::vector<std::string>& preStart,

@@ -1,10 +1,16 @@
 #pragma once
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Specific/IO/ChunkId.h"
-#include "Specific/IO/ChunkReader.h"
-#include "Specific/IO/ChunkWriter.h"
-#include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
+#include <chrono>
+#include <filesystem>
+
+namespace TEN
+{
+	namespace Save
+	{
+		struct SaveGame;
+	}
+}
 
 constexpr auto SAVEGAME_MAX = 16;
 
@@ -36,6 +42,7 @@ struct SaveGameHeader
 	int Timer;
 	int Count;
 	bool Present;
+	std::filesystem::file_time_type Modified;
 };
 
 extern GameStats Statistics;
@@ -52,6 +59,8 @@ public:
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
+	static void LoadLuaVarsOnly(int slot, bool gameVarsOnly = false);
 };
 
 void LoadSavegameInfos();
+int GetMostRecentSave();

@@ -304,7 +304,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeNodeScripts();
 
 	// Initialize game variables and optionally load game.
-	InitializeOrLoadGame(loadGame);
+	InitializeOrLoadGame(loadGame, isTitle);
 
 	// Prepare title menu, if necessary.
 	if (isTitle)
@@ -474,7 +474,7 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 		g_GameScript->ResetScripts(true);
 }
 
-void InitializeOrLoadGame(bool loadGame)
+void InitializeOrLoadGame(bool loadGame, bool isTitle)
 {
 	RequiredStartPos = false;
 
@@ -501,6 +501,15 @@ void InitializeOrLoadGame(bool loadGame)
 	}
 	else
 	{
+		if(isTitle)
+		{
+			LoadSavegameInfos();
+			int mostRecentSave = GetMostRecentSave();
+			if(SavegameInfos[mostRecentSave].Present)
+			{
+				SaveGame::LoadLuaVarsOnly(mostRecentSave, true);
+			}
+		}
 		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
 

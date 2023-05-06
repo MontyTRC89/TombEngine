@@ -15,6 +15,7 @@ public:
 	std::string	IntroImagePath{};
 	int	SelectedLevelForNewGame{ 0 };
 	int SelectedSaveGame{ 0 };
+	int MostRecentSaveGame{ 0 };
 	bool EnableLoadSave{ true };
 	int TotalNumberOfSecrets{ 0 };
 	std::string	TitleScreenImagePath{};

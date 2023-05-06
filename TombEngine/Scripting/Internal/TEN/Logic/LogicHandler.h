@@ -76,6 +76,9 @@ private:
 
 	void ResetLevelTables();
 	void ResetGameTables();
+
+	void HashSavedVars(const std::vector<SavedVar>& vars, std::unordered_map<uint32_t, sol::table>& solTables);
+
 	LuaHandler m_handler;
 
 public:	
@@ -135,6 +138,8 @@ public:
 
 	void GetVariables(std::vector<SavedVar>& vars) override;
 	void SetVariables(const std::vector<SavedVar>& vars) override;
+	void SetGameVariablesOnly(const std::vector<SavedVar>& vars) override;
+
 	void ResetVariables();
 
 	void SetCallbackStrings(const std::vector<std::string>& preStart,

@@ -92,7 +92,7 @@ void UpdateShatters();
 
 void CleanUp();
 
-void InitializeOrLoadGame(bool loadGame);
+void InitializeOrLoadGame(bool loadGame, bool isTitle);
 void InitializeScripting(int levelIndex, bool loadGame);
 void DeInitializeScripting(int levelIndex);
 

@@ -79,6 +79,23 @@ void LoadSavegameInfos()
 	}
 }
 
+int GetMostRecentSave()
+{
+	int result = 0;
+	int i = 0;
+	std::filesystem::file_time_type MostRecent;
+	for(auto & elem : SavegameInfos)
+	{
+		if(elem.Present && elem.Modified > MostRecent)
+		{
+			MostRecent = elem.Modified;
+			result = i;
+		}
+		++i;
+	}
+	return result;
+}
+
 Pose ToPHD(const Save::Position* src)
 {
 	Pose dest;
@@ -1326,7 +1343,7 @@ bool SaveGame::Save(int slot)
 	return true;
 }
 
-bool SaveGame::Load(int slot)
+static std::unique_ptr<char[]> MakeBufferForLoading(int slot)
 {
 	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
@@ -1339,6 +1356,92 @@ bool SaveGame::Load(int slot)
 	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
 	file.read(buffer.get(), length);
 	file.close();
+
+	return buffer;
+}
+
+static void LoadLuaVarsInternal(const Save::SaveGame* save, bool gameVarsOnly = false)
+{
+	std::vector<SavedVar> loadedVars;
+
+	auto theVec = save->script_vars();
+	if (theVec)
+	{
+		for (const auto& var : *(theVec->members()))
+		{
+			if (var->u_type() == Save::VarUnion::num)
+			{
+				loadedVars.push_back(var->u_as_num()->scalar());
+			}
+			else if (var->u_type() == Save::VarUnion::boolean)
+			{
+				loadedVars.push_back(var->u_as_boolean()->scalar());
+			}
+			else if (var->u_type() == Save::VarUnion::str)
+			{
+				loadedVars.push_back(var->u_as_str()->str()->str());
+			}
+			else if (var->u_type() == Save::VarUnion::tab)
+			{
+				auto tab = var->u_as_tab()->keys_vals();
+				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+
+				for (const auto& p : *tab)
+					std::get<IndexTable>(loadedTab).push_back(std::make_pair(p->key(), p->val()));
+			}
+			else if (var->u_type() == Save::VarUnion::vec2)
+			{
+				auto stored = var->u_as_vec2()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::vec3)
+			{
+				auto stored = var->u_as_vec3()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::rotation)
+			{
+				auto stored = var->u_as_rotation()->vec();
+				SavedVar v;
+				v.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(v);
+			}
+			else if (var->u_type() == Save::VarUnion::color)
+			{
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
+			}
+			else if (var->u_type() == Save::VarUnion::funcName)
+			{
+				loadedVars.push_back(FuncName{ var->u_as_funcName()->str()->str() });
+			}
+		}
+	}
+
+	if (gameVarsOnly)
+	{
+		g_GameScript->SetGameVariablesOnly(loadedVars);
+	}
+	else
+	{
+		g_GameScript->SetVariables(loadedVars);
+	}
+}
+
+void SaveGame::LoadLuaVarsOnly(int slot, bool gameVarsOnly)
+{
+	auto buffer = MakeBufferForLoading(slot);
+	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+	LoadLuaVarsInternal(s, gameVarsOnly);
+}
+
+
+bool SaveGame::Load(int slot)
+{
+	auto buffer = MakeBufferForLoading(slot);
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
@@ -2054,66 +2157,7 @@ bool SaveGame::Load(int slot)
 		AlternatePendulum.rope = rope;
 	}
 
-	std::vector<SavedVar> loadedVars;
-
-	auto unionVec = s->script_vars();
-	if (unionVec)
-	{
-		for (const auto& var : *(unionVec->members()))
-		{
-			if (var->u_type() == Save::VarUnion::num)
-			{
-				loadedVars.push_back(var->u_as_num()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::boolean)
-			{
-				loadedVars.push_back(var->u_as_boolean()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::str)
-			{
-				loadedVars.push_back(var->u_as_str()->str()->str());
-			}
-			else if (var->u_type() == Save::VarUnion::tab)
-			{
-				auto tab = var->u_as_tab()->keys_vals();
-				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
-
-				for (const auto& pair : *tab)
-					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
-			}
-			else if (var->u_type() == Save::VarUnion::vec2)
-			{
-				auto stored = var->u_as_vec2()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::vec3)
-			{
-				auto stored = var->u_as_vec3()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::rotation)
-			{
-				auto stored = var->u_as_rotation()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::color)
-			{
-				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
-			}
-			else if (var->u_type() == Save::VarUnion::funcName)
-			{
-				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
-			}
-		}
-	}
-
-	g_GameScript->SetVariables(loadedVars);
+	LoadLuaVarsInternal(s);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -2180,6 +2224,8 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	header->Level = s->header()->level();
 	header->Timer = s->header()->timer();
 	header->Count = s->header()->count();
+
+	header->Modified = std::filesystem::last_write_time(fileName);
 
 	return true;
 }

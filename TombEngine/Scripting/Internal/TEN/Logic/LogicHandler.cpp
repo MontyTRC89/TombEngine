@@ -368,15 +368,9 @@ void LogicHandler::FreeLevelScripts()
 	m_handler.GetState()->collect_garbage();
 }
 
-//Used when loading
-void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
+void LogicHandler::HashSavedVars(const std::vector<SavedVar>& vars, std::unordered_map<uint32_t, sol::table>& solTables)
 {
-	ResetGameTables();
-	ResetLevelTables();
-
-	std::unordered_map<uint32_t, sol::table> solTables;
-
-	for(std::size_t i = 0; i < vars.size(); ++i)
+		for(std::size_t i = 0; i < vars.size(); ++i)
 	{
 		if (std::holds_alternative<IndexTable>(vars[i]))
 		{
@@ -442,6 +436,17 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 			}
 		}
 	}
+}
+
+//Used when loading
+void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
+{
+	ResetGameTables();
+	ResetLevelTables();
+
+	std::unordered_map<uint32_t, sol::table> solTables;
+
+	HashSavedVars(vars, solTables);
 	
 	auto rootTable = solTables[0];
 
@@ -453,6 +458,28 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	for (auto& [first, second] : gameVars)
 	{
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
+	}
+}
+
+void LogicHandler::SetGameVariablesOnly(std::vector<SavedVar> const & vars)
+{
+	ResetGameTables();
+
+	std::unordered_map<uint32_t, sol::table> solTables;
+
+	HashSavedVars(vars, solTables);
+	
+	if (solTables[0].valid())
+	{
+		sol::table gameVars = solTables[0][ScriptReserved_GameVars];
+		for (auto& [first, second] : gameVars)
+		{
+			(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
+		}
+	}
+	else
+	{
+		TENLog("Failed to load game vars - was the save made with an older version of the engine?", LogLevel::Error);
 	}
 }
 
