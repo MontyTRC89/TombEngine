@@ -34,13 +34,13 @@ namespace TEN::Collision::Attractors
 			}
 		}
 
-		AttachedPlayers = {};
+		//AttachedPlayers = {};
 	}
 
 	Attractor::~Attractor()
 	{
 		// Dereference current attractor held by players.
-		for (auto& [entityID, entity] : AttachedPlayers)
+		/*for (auto& [entityID, entity] : AttachedPlayers)
 		{
 			if (!entity.IsLara())
 				continue;
@@ -52,7 +52,7 @@ namespace TEN::Collision::Attractors
 
 			if (player.Context.FeetAttractor.AttracPtr == this)
 				player.Context.FeetAttractor.AttracPtr = nullptr;
-		}
+		}*/
 	}
 
 	AttractorType Attractor::GetType() const
@@ -249,7 +249,7 @@ namespace TEN::Collision::Attractors
 		if (!entity.IsLara())
 			return;
 
-		AttachedPlayers.insert({ entity.Index, entity });
+		//AttachedPlayers.insert({ entity.Index, entity });
 	}
 
 	void Attractor::DetachPlayer(ItemInfo& entity)
@@ -257,7 +257,7 @@ namespace TEN::Collision::Attractors
 		if (!entity.IsLara())
 			return;
 
-		AttachedPlayers.erase(entity.Index);
+		//AttachedPlayers.erase(entity.Index);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)

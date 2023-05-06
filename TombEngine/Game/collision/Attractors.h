@@ -48,7 +48,8 @@ namespace TEN::Collision::Attractors
 		int					 RoomNumber = 0;
 		float				 Length		= 0.0f;
 
-		std::unordered_map<int, ItemInfo&> AttachedPlayers = {};
+		// TODO: Crashes on init.
+		//std::unordered_map<int, ItemInfo&> AttachedPlayers = {};
 
 	public:
 		// Constructors
