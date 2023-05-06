@@ -547,7 +547,7 @@ namespace TEN::Gui
 
 	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
-		static const int numControlSettingsOptions = KEY_COUNT + 1;
+		static const int numControlSettingsOptions = KEY_COUNT + 2;
 
 		OptionCount = numControlSettingsOptions;
 		CurrentSettings.WaitingForKey = false;
@@ -561,7 +561,7 @@ namespace TEN::Gui
 		}
 
 		if (GuiIsSelected() &&
-			SelectedOption <= (numControlSettingsOptions - 2))
+			SelectedOption <= (numControlSettingsOptions - 3))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			CurrentSettings.WaitingForKey = true;
@@ -642,6 +642,14 @@ namespace TEN::Gui
 
 			if (GuiIsSelected())
 			{
+				// Defaults.
+				if (SelectedOption == (OptionCount - 2))
+				{
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+					ApplyDefaultBindings();
+					return;
+				}
+
 				// Apply.
 				if (SelectedOption == (OptionCount - 1))
 				{
