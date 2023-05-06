@@ -27,6 +27,7 @@ Version 1.0.9
 * Add better error handling for missing font, sprites or shaders.
 
 Lua API changes:
+* Add class Vec2
 * Add function String::SetTranslated() 
 * Add function Misc::IsStringDisplaying()
 * Add the following for use in AddCallback and RemoveCallback:
