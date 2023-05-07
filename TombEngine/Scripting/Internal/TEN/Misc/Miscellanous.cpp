@@ -22,6 +22,7 @@
 #include "ScriptAssert.h"
 #include "ActionIDs.h"
 #include "CameraTypes.h"
+#include "LogLevel.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -332,6 +333,31 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
+	/// Writing messages within the Log file
+	//@function PrintLog
+	//@tparam string message to be displayed within the Log
+	//@tparam Misc.LogLevel logLevel log level to be displayed
+	//@tparam[opt] bool allowSpam true allows spamming of the message
+	// Must be one of:
+	// INFO
+	// WARNING
+	// ERROR
+	// 
+	//@usage
+	//PrintLog('test info log', LogLevel.INFO)
+	//PrintLog('test warning log', LogLevel.WARNING)
+	//PrintLog('test error log', LogLevel.ERROR)
+	// -- spammed message
+	// PrintLog('test spam log', LogLevel.INFO, true)
+	// 
+	// For native Lua handling of errors, see the official guide
+	//<a href="https://www.lua.org/pil/8.3.html">Error management</a>
+	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
+	static void PrintLog(std::string const& message,LogLevel const& level, TypeOrNil<bool> allowSpam)
+	{
+		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
+	}
+
 	void Register(sol::state * state, sol::table & parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
@@ -391,9 +417,11 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LevelLog, kLevelLog);
 	}
 }
