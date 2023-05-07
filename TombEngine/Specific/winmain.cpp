@@ -245,6 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	std::string assetDir{};
 
 	// Parse command line arguments
 	for (int i = 1; i < argc; i++)
@@ -264,6 +265,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		else if (ArgEquals(argv[i], "hash") && argc > (i + 1))
 		{
 			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
+		}
+		else if (ArgEquals(argv[i], "assetdir") && argc > (i + 1))
+		{
+			assetDir = TEN::Utils::ToString(argv[i + 1]);
+			//replace all backslashes with forward slashes:
+			std::replace(assetDir.begin(), assetDir.end(), '\\', '/');
+			//add a trailing slash if it's not there:
+			if (assetDir.back() != '/')
+				assetDir += '/';
 		}
 	}
 	LocalFree(argv);
@@ -288,11 +298,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   std::to_string(ver[2]));
 	TENLog(windowName, LogLevel::Info);
 
+	SaveGame::SetSaveDirLocation(assetDir);
+	SetAudioDirLocation(assetDir);
+
 	// Collect numbered tracks
 	EnumerateLegacyTracks();
 
-	// Initialize the new scripting system
-	ScriptInterfaceState::Init();
+	// Initialize the scripting system
+	ScriptInterfaceState::Init(assetDir);
 
 	// Initialize scripting
 	try 
@@ -314,6 +327,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//should be moved to LogicHandler or vice versa to make this stuff
 		//less fragile (squidshire, 16/09/22)
 		g_GameScript->ShortenTENCalls();
+		g_GameFlow->SetAssetDir(assetDir);
 		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)

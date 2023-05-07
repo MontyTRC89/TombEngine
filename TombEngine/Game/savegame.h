@@ -45,13 +45,14 @@ class SaveGame
 {
 private:
 	static FileStream* m_stream;
+	static std::string m_fullSaveDir;
 	
 public:
 	static int LastSaveGame;
+	static void SetSaveDirLocation(std::string_view dir);
 
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
+	static void LoadSavegameInfos();
 };
-
-void LoadSavegameInfos();

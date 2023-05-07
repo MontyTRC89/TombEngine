@@ -51,20 +51,21 @@ GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::m_stream;
+std::string SaveGame::m_fullSaveDir;
 int SaveGame::LastSaveGame;
 
-void LoadSavegameInfos()
+void SaveGame::LoadSavegameInfos()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 		SavegameInfos[i].Present = false;
 
-	if (!std::filesystem::exists(SAVEGAME_PATH))
+	if (!std::filesystem::exists(m_fullSaveDir))
 		return;
 
 	// try to load the savegame
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(i);
+		auto fileName = m_fullSaveDir + "savegame." + std::to_string(i);
 		auto savegamePtr = fopen(fileName.c_str(), "rb");
 
 		if (savegamePtr == NULL)
@@ -169,7 +170,7 @@ Vector4 ToVector4(const Save::Vector4* vec)
 
 bool SaveGame::Save(int slot)
 {
-	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
+	auto fileName = m_fullSaveDir + "savegame." + std::to_string(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -1315,8 +1316,8 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
-	if (!std::filesystem::exists(SAVEGAME_PATH))
-		std::filesystem::create_directory(SAVEGAME_PATH);
+	if (!std::filesystem::exists(m_fullSaveDir))
+		std::filesystem::create_directory(m_fullSaveDir);
 
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
@@ -1326,9 +1327,14 @@ bool SaveGame::Save(int slot)
 	return true;
 }
 
+void SaveGame::SetSaveDirLocation(std::string_view dirLocation)
+{
+	m_fullSaveDir = std::string{ dirLocation } + SAVEGAME_PATH;
+}
+
 bool SaveGame::Load(int slot)
 {
-	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	auto fileName = m_fullSaveDir + "savegame." + std::to_string(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -2158,7 +2164,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	auto fileName = m_fullSaveDir + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);

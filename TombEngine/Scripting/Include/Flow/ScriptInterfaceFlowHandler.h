@@ -22,6 +22,8 @@ public:
 
 	virtual ~ScriptInterfaceFlowHandler() = default;
 	virtual void LoadFlowScript() = 0;
+	virtual void SetAssetDir(std::string_view assetDir) = 0;
+	virtual std::string_view GetAssetDir() = 0;
 	virtual int	GetNumLevels() const = 0;
 	virtual char const* GetString(const char* id) const = 0;
 	virtual bool IsFlyCheatEnabled() const = 0;

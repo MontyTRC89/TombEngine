@@ -3,6 +3,7 @@
 #include "LuaHandler.h"
 #include "Logic/LogicHandler.h"
 #include "Color/Color.h"
+#include <string_view>
 #include "Flow/Level/FlowLevel.h"
 #include "Settings/Settings.h"
 #include "Flow/Animations/Animations.h"
@@ -18,6 +19,8 @@ private:
 	std::vector<std::string> m_languageNames;
 
 	std::map<short, short>			m_itemsMap;
+
+	std::string m_assetDir;
 
 	LuaHandler m_handler;
 
@@ -38,6 +41,8 @@ public:
 	FlowHandler(sol::state* lua, sol::table & parent);
 	~FlowHandler() override;
 
+	std::string_view	GetAssetDir() override;
+	void				SetAssetDir(std::string_view assetDir) override;
 	void				AddLevel(Level const& level);
 	void				LoadFlowScript();
 	char const*			GetString(const char* id) const;

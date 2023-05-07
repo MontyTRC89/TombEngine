@@ -215,6 +215,16 @@ FlowHandler::~FlowHandler()
 		delete lev;
 }
 
+std::string_view FlowHandler::GetAssetDir()
+{
+	return m_assetDir;
+}
+
+void FlowHandler::SetAssetDir(std::string_view assetDir)
+{
+	m_assetDir = assetDir;
+}
+
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
 {
 	m_languageNames = std::move(src);
@@ -257,9 +267,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript("Scripts/Gameflow.lua");
-	m_handler.ExecuteScript("Scripts/Strings.lua");
-	m_handler.ExecuteScript("Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_assetDir + "Scripts/Gameflow.lua");
+	m_handler.ExecuteScript(m_assetDir + "Scripts/Strings.lua");
+	m_handler.ExecuteScript(m_assetDir + "Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -316,7 +326,7 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	for (int i = 0; i < Levels.size(); i++)
 	{
 		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
-		if (level == lcFilename && std::filesystem::exists(fileName))
+		if (level == lcFilename && std::filesystem::exists(std::string{ GetAssetDir() } + fileName))
 			return i;
 	}
 
