@@ -100,7 +100,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			if (!isFrameBased && item.IsLara())
 			{
 				auto& player = GetLaraInfo(item);
-				//test
+				//test2
 				if (player.Control.HandStatus != HandStatus::Special)
 					player.Control.HandStatus = HandStatus::Free;
 			}
