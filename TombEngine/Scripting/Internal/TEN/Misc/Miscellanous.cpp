@@ -353,9 +353,9 @@ namespace Misc
 	// For native Lua handling of errors, see the official guide
 	//<a href="https://www.lua.org/pil/8.3.html">Error management</a>
 	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
-	static void PrintLog(std::string const& message,LogLevel const& level, bool allowSpam = false)
+	static void PrintLog(std::string const& message,LogLevel const& level, TypeOrNil<bool> allowSpam)
 	{
-		TENLog(message, level, LogConfig::All, allowSpam);
+		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
 	void Register(sol::state * state, sol::table & parent)
