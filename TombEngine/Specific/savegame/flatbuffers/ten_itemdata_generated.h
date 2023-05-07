@@ -103,6 +103,8 @@ struct ShortArray;
 struct ShortArrayBuilder;
 struct ShortArrayT;
 
+struct Vector2;
+
 struct Vector3;
 
 struct Vector4;
@@ -555,6 +557,34 @@ FLATBUFFERS_STRUCT_END(Position, 24);
 
 struct Position::Traits {
   using type = Position;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector2 FLATBUFFERS_FINAL_CLASS {
+ private:
+  float x_;
+  float y_;
+
+ public:
+  struct Traits;
+  Vector2()
+      : x_(0),
+        y_(0) {
+  }
+  Vector2(float _x, float _y)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)) {
+  }
+  float x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  float y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector2, 8);
+
+struct Vector2::Traits {
+  using type = Vector2;
 };
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {

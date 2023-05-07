@@ -4,9 +4,9 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #include "Game/missile.h"
 
@@ -395,7 +395,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, GetObjectName(ID_SWORD_GUARDIAN));
 		obj->Initialize = InitializeSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
@@ -413,7 +413,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, GetObjectName(ID_SPEAR_GUARDIAN));
 		obj->Initialize = InitializeSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
@@ -431,7 +431,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_DRAGON_FRONT));
 		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -446,7 +446,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
+		CheckIfSlotExists(ID_MARCO_BARTOLI, GetObjectName(ID_DRAGON_BACK));
 		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -457,7 +457,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_MARCO_BARTOLI));
 		obj->Initialize = InitializeBartoli;
 		obj->control = BartoliControl;
 	}
@@ -479,7 +479,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SNOWMOBILE_GUN, "ID_SNOWMOBILE_DRIVER", "ID_SNOWMOBILE_GUN");
+		CheckIfSlotExists(ID_SNOWMOBILE_GUN, GetObjectName(ID_SNOWMOBILE_DRIVER));
 		obj->Initialize = InitializeSkidooMan;
 		obj->control = SkidooManControl;
 		obj->SetupHitEffect(true);
