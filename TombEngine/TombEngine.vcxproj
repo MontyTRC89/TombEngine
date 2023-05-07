@@ -78,6 +78,7 @@
       <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ForcedIncludeFiles>framework.h</ForcedIncludeFiles>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +94,7 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)Code\Specific\savegame\schema\
 CALL gen.bat
 md "$(TargetDir)\Shaders" 
 xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
@@ -107,7 +108,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;WIN32_LEAN_AND_MEAN;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code\;$(ProjectDir)Resources\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -128,6 +129,8 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <StringPooling>true</StringPooling>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>framework.h</ForcedIncludeFiles>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,7 +148,7 @@ xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
 xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)Code\Specific\savegame\schema\
 CALL gen.bat</Command>
     </PreBuildEvent>
     <PreBuildEvent>
@@ -601,6 +604,7 @@ CALL gen.bat</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">framework.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">framework.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">framework.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Code\Game\animation.cpp" />
     <ClCompile Include="Code\Game\camera.cpp" />
