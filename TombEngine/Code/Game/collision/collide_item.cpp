@@ -15,7 +15,7 @@
 #include "Game/Setup.h"
 #include <Math/Math.h>
 #include "Renderer/Renderer11.h"
-#include "ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Math;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 static const std::unordered_map<std::string, ErrorMode> kErrorModes {
 	{"SILENT", ErrorMode::Silent},

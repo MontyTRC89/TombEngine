@@ -1,6 +1,6 @@
 #include "InventoryHandler.h"
-#include "ReservedScriptNames.h"
-#include "pickup.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Game/pickup/pickup.h"
 
 /***
 Inventory manipulation

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Game/Lara/lara_struct.h"
-#include "Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 static const std::unordered_map<std::string, LaraWeaponType> LaraWeaponTypeMap
 {

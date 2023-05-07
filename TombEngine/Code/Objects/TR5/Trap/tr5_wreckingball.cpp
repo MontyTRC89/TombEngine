@@ -13,7 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "tr5_light.h"
+#include "Objects/TR5/Light/tr5_light.h"
 
 using namespace TEN::Effects::Environment;
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Game/camera.h"
-#include "Frustum.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/Frustum.h"
+#include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
 #include "Specific/memory/LinearArrayBuffer.h"
-#include "RendererSprites.h"
-#include "RendererTransparentFace.h"
+#include "Renderer/RendererSprites.h"
+#include "Renderer/RendererTransparentFace.h"
 
 namespace TEN::Renderer 
 {

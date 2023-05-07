@@ -1,11 +1,11 @@
 #include "Game/effects/debris.h"
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 #include "StaticObject.h"
-#include "Vec3/Vec3.h"
-#include "Rotation/Rotation.h"
-#include "Color/Color.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 /***
 Statics
 

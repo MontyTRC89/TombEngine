@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Color/Color.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 
 namespace sol {
 	class state;

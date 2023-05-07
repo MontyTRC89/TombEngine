@@ -13,11 +13,6 @@
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
 #include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 template <typename S> using callbackSetName = std::function<bool(std::string const&, S identifier)>;
 using callbackRemoveName = std::function<bool(std::string const&)>;

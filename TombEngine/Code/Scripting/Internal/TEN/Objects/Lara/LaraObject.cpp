@@ -8,7 +8,7 @@
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /***
 Class for extra Lara-only functions.

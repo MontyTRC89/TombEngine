@@ -1,8 +1,8 @@
 #include "AIObject.h"
-#include "ScriptAssert.h"
-#include "Vec3/Vec3.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /***
 AI object

@@ -1,5 +1,5 @@
 #include "Objects/TR2/Entity/tr2_sword_guardian.h"
-#include "collision/collide_room.h"
+#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Flow/SkyLayer/SkyLayer.h"
-#include "Flow/Mirror/Mirror.h"
-#include "Flow/Fog/Fog.h"
-#include "ScriptInterfaceLevel.h"
-#include "Flow/InventoryItem/InventoryItem.h"
+#include "Scripting/Internal/TEN/Flow/SkyLayer/SkyLayer.h"
+#include "Scripting/Internal/TEN/Flow/Mirror/Mirror.h"
+#include "Scripting/Internal/TEN/Flow/Fog/Fog.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 
 static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 {

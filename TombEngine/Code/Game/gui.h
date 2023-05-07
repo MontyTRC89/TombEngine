@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Game/GuiObjects.h"
-#include "LanguageScript.h"
+#include "Scripting/Internal/LanguageScript.h"
 #include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"

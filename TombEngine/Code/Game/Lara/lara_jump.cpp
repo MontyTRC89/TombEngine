@@ -9,7 +9,7 @@
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_slide.h"
 #include "Game/Setup.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"

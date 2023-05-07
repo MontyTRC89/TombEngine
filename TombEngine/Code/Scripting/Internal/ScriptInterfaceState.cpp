@@ -1,12 +1,12 @@
-#include "ScriptInterfaceState.h"
-#include "Logic/LogicHandler.h"
-#include "Flow/FlowHandler.h"
-#include "Objects/ObjectsHandler.h"
-#include "Strings/StringsHandler.h"
-#include "Inventory/InventoryHandler.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
+#include "Scripting/Internal/TEN/Strings/StringsHandler.h"
+#include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 #include "ReservedScriptNames.h"
-#include "Misc/Miscellanous.h"
-#include "Effects/EffectsFunctions.h"
+#include "Scripting/Internal/TEN/Misc/Miscellanous.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;

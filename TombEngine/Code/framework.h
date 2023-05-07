@@ -70,6 +70,10 @@
 
 #include <SimpleMath.h>
 
+// resources include
+
+#include <resource.h>
+
 //#include <Math/Math.h> // TODO
 
 using namespace DirectX;

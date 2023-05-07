@@ -1,10 +1,9 @@
 #include "Specific/configuration.h"
 
 #include <CommCtrl.h>
-#include <resource.h>
 #include "Renderer/Renderer11.h"
-#include "LanguageScript.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"

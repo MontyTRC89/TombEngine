@@ -1,10 +1,10 @@
 #pragma once
 
-#include "LuaHandler.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Objects/Moveable/MoveableObject.h"
-#include "Objects/Static/StaticObject.h"
-#include "Objects/AIObject/AIObject.h"
+#include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Objects/AIObject/AIObject.h"
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {

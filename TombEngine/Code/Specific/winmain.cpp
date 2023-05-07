@@ -7,17 +7,12 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
-#include "LanguageScript.h"
-#include "ScriptInterfaceState.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 #include <CommCtrl.h>
 #include <shellapi.h>
-#include <process.h>
-#include <resource.h>
-#include <iostream>
-#include <codecvt>
-#include <filesystem>
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;

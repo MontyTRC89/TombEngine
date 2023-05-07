@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Game/Gui.h"
-#include "Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
 using namespace TEN::Gui;
 

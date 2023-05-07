@@ -1,5 +1,5 @@
 #include "Game/pickup/pickup_weapon.h"
-#include "lara_fire.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
 #include "Game/pickup/pickup_ammo.h"
