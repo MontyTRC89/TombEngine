@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Miscellanous.h"
+#include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -10,18 +10,19 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
-#include "ReservedScriptNames.h"
-#include "LuaHandler.h"
-#include "ScriptUtil.h"
+#include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Misc/ActionIDs.h"
+#include "Scripting/Internal/TEN/Misc/CameraTypes.h"
+#include "Scripting/Internal/TEN/Misc/LevelLog.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
-#include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Vec3/Vec3.h"
-#include "ScriptAssert.h"
-#include "ActionIDs.h"
-#include "CameraTypes.h"
+#include "Specific/level.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -79,7 +80,7 @@ namespace Misc
 	//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
 	static void FadeOut(TypeOrNil<float> speed)
 	{
-		SetScreenFadeOut(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
+		SetScreenFadeOut(USE_IF_HAVE(float, speed, 1.0f) / (float)FPS);
 	}
 
 	///Do a full-screen fade-in from black.
@@ -87,7 +88,7 @@ namespace Misc
 	//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
 	static void FadeIn(TypeOrNil<float> speed)
 	{
-		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
+		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / (float)FPS);
 	}
 
 	///Check if fade out is complete and screen is completely black.
@@ -144,7 +145,7 @@ namespace Misc
 	//@function PlayAudioTrack
 	//@tparam string name of track (without file extension) to play
 	//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
-	static void PlayAudioTrack(std::string const& trackName, TypeOrNil<bool> looped)
+	static void PlayAudioTrack(const std::string& trackName, TypeOrNil<bool> looped)
 	{
 		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
 		PlaySoundTrack(trackName, mode);
@@ -153,7 +154,7 @@ namespace Misc
 	///Set and play an ambient track
 	//@function SetAmbientTrack
 	//@tparam string name of track (without file extension) to play
-	static void SetAmbientTrack(std::string const& trackName)
+	static void SetAmbientTrack(const std::string& trackName)
 	{
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
@@ -332,7 +333,32 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-	void Register(sol::state * state, sol::table & parent)
+	/// Writing messages within the Log file
+	//@function PrintLog
+	//@tparam string message to be displayed within the Log
+	//@tparam Misc.LogLevel logLevel log level to be displayed
+	//@tparam[opt] bool allowSpam true allows spamming of the message
+	// Must be one of:
+	// INFO
+	// WARNING
+	// ERROR
+	// 
+	//@usage
+	//PrintLog('test info log', LogLevel.INFO)
+	//PrintLog('test warning log', LogLevel.WARNING)
+	//PrintLog('test error log', LogLevel.ERROR)
+	// -- spammed message
+	// PrintLog('test spam log', LogLevel.INFO, true)
+	// 
+	// For native Lua handling of errors, see the official guide
+	//<a href="https://www.lua.org/pil/8.3.html">Error management</a>
+	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
+	static void PrintLog(const std::string& message, const LogLevel& level, TypeOrNil<bool> allowSpam)
+	{
+		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
+	}
+
+	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, tableMisc);
@@ -391,9 +417,11 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };
-		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, kActionIDs);
-		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, kCameraType);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, CAMERA_TYPE);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LogLevel, LOG_LEVEL);
 	}
 }

@@ -7,7 +7,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;

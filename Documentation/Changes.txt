@@ -7,7 +7,10 @@ Version 1.0.9
 * Fix gunflash rendering and position for entities.
 * Fix snowmobile driver crashing the game.
 * Fix knifethrower not throwing knife.
+* Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Fix inventory input interference when entering inventory via puzzle.
+* Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
@@ -22,10 +25,17 @@ Version 1.0.9
 * Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
 * Add log reports if title level or other levels don't exist.
 * Add better error handling for missing font, sprites or shaders.
+* Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
 
 Lua API changes:
+* Add class Vec2
 * Add function String::SetTranslated() 
 * Add function Misc::IsStringDisplaying()
+* Add the following for use in AddCallback and RemoveCallback:
+	- PRESTART, POSTSTART
+	- PREEND, POSTEND
+	- PRESAVE, POSTSAVE
+	- PRELOAD, POSTLOAD
 
 Version 1.0.8
 =============

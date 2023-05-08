@@ -5,11 +5,11 @@
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
-#include "Objects/Effects/enemy_missile.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
+#include "Objects/Effects/enemy_missile.h"
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Math;

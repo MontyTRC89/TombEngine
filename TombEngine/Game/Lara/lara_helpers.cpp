@@ -13,13 +13,13 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #include "Objects/TR2/Vehicles/skidoo.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -996,6 +996,9 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	const auto& player = GetLaraInfo(*item);
 
 	if (item->HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0)
+		return;
+
+	if (item->HitPoints == 0)
 		return;
 
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);

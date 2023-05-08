@@ -17,11 +17,11 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/people.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
