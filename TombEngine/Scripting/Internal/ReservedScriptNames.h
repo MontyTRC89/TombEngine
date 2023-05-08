@@ -264,7 +264,7 @@ static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
 static constexpr char ScriptReserved_CameraType[]				= "CameraType";
-static constexpr char ScriptReserved_LevelLog[]					= "LevelLog";
+static constexpr char ScriptReserved_LogLevel[]					= "LogLevel";
 static constexpr char ScriptReserved_RoomFlagID[]				= "RoomFlagID";
 static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
@@ -277,9 +277,9 @@ static constexpr char ScriptReserved_LevelFuncs[]	= "LevelFuncs";
 static constexpr char ScriptReserved_Engine[]		= "Engine";
 
 // Constants
-static constexpr char ScriptReserved_LogLevelInfo[] = "INFO";
-static constexpr char ScriptReserved_LogLevelWarning[] = "WARNING";
-static constexpr char ScriptReserved_LogLevelError[] = "ERROR";
+static constexpr char ScriptReserved_LogLevelInfo[]		= "INFO";
+static constexpr char ScriptReserved_LogLevelWarning[]	= "WARNING";
+static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 
 // Internal
-static constexpr char ScriptReserved_LaraObject[]				= "LaraObject";
+static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
