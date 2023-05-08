@@ -27,8 +27,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{ 
 			RendererRoom* room = &m_rooms[i];
-
-			room->ItemsToDraw.clear();
+			                         
+			room->ItemsToDraw.clear();        
 			room->EffectsToDraw.clear();
 			room->TransparentFacesToDraw.clear();
 			room->StaticsToDraw.clear();
@@ -46,7 +46,7 @@ namespace TEN::Renderer
 
 		GetVisibleRooms(NO_ROOM, renderView.camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 
-		m_invalidateCache = false;
+		m_invalidateCache = false; 
 
 		// Prepae the real DX scissor test rectangle
 		for (auto room : renderView.roomsToDraw)
@@ -65,9 +65,9 @@ namespace TEN::Renderer
 
 		// Collect fog bulbs
 		renderView.FogBulbsToDraw.clear();
-		for (auto room : renderView.roomsToDraw)
+		for (auto room : m_rooms)     
 		{  
-			for (RendererLight light : room->Lights)
+			for (RendererLight light : room.Lights)
 			{
 				if (light.Type == LIGHT_TYPE_FOG_BULB)
 				{                                        

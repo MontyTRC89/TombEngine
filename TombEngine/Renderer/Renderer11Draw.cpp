@@ -54,7 +54,7 @@ namespace TEN::Renderer
 			for (auto& i : room->ItemsToDraw) 
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
-
+				 
 				// Skip everything that isn't alive or a vehicle.
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
@@ -1477,18 +1477,18 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
 		}     
 		cameraConstantBuffer.NumFogBulbs = view.FogBulbsToDraw.size();
- 
+		     
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
-
+		    
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 
 		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);
-		DrawStatics(view, false);
+		DrawStatics(view, false);                               
 		DrawEffects(view, false);
 		DrawGunShells(view);
 		DrawBats(view);

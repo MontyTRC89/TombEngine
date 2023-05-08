@@ -75,14 +75,13 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 		output.Fog.w = fogFactor;
 	}
 
+	output.Fog = float4(0, 0, 0, 0);
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
 		float fogFactor = DoFogBulb(output.WorldPosition, FogBulbs[i]);
-		output.Fog.xyz += FogBulbs[i].Color * fogFactor;
+		output.Fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
 		output.Fog.w += fogFactor;
 	}
-
-	output.Fog = saturate(output.Fog);
 
 	return output;
 }
@@ -115,15 +114,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	float4 fog = float4(0, 0, 0, 0);
-	for (int i = 0; i < NumFogBulbs; i++)
-	{
-		float fogFactor = DoFogBulb(input.WorldPosition, FogBulbs[i]);
-		fog.xyz += FogBulbs[i].Color * fogFactor;
-		fog.w += fogFactor;
-	}
-
-	output.Color = DoFog(output.Color, float4(fog.xyz, 1.0f), fog.w);
+	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w);
+	output.Color.xyz = saturate(output.Color.xyz);
+	output.Color.xyz += saturate(input.Fog.xyz);
 
 	return output;
 }

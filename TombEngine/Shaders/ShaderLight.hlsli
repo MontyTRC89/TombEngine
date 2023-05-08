@@ -277,19 +277,17 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		}
 	}
 
-	float transmittance = 1.0f;
-	float stepSize = 8.0f;
+	float fog = 0;
+	float stepSize = 16.0f;
 	int stepCount = length(p1 - p0) / stepSize;
 	float3 samplePosition = p0;
-	float extinctionCoef = 1.0f / stepSize / 20.0f;
-
-	// transmittance is e^(-(density * step * extinction)^2)
-	for (int i = 0; i < stepCount; i++) 
+	for (int i = 0; i < stepCount; i++)
 	{
-		transmittance *= 1.0f / exp(pow(bulb.Density * extinctionCoef * stepSize, 2.0f));
+		float noise = SimplexNoise(samplePosition / 512);
+		noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
+		fog += bulb.Density * 0.0007f * noise;
+		samplePosition += cameraToVertexDirection.xyz * stepSize;
 	}
-
-	float fog = 1.0f - transmittance;
 
 	return fog;
 }
