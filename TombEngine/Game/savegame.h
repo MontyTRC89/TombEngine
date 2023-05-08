@@ -49,6 +49,7 @@ private:
 	
 public:
 	static int LastSaveGame;
+	// Sets the location of the save dir's containing folder, NOT the save dir itself
 	static void SetSaveDirLocation(std::string_view dir);
 
 	static bool Load(int slot);

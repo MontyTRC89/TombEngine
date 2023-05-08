@@ -321,13 +321,31 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	if (fileName.empty())
 		return -1;
 
-	auto lcFilename = TEN::Utils::ToLower(fileName);
+	auto fileNameWithForwardSlashes = fileName;
+	std::replace(fileNameWithForwardSlashes.begin(), fileNameWithForwardSlashes.end(), '\\', '/');
+	auto lcFilename = TEN::Utils::ToLower(fileNameWithForwardSlashes);
+
+	auto fullPath = std::string{ GetAssetDir() } + fileNameWithForwardSlashes;
 
 	for (int i = 0; i < Levels.size(); i++)
 	{
-		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
-		if (level == lcFilename && std::filesystem::exists(std::string{ GetAssetDir() } + fileName))
+		// was a relative path given? 
+		auto lcLevelNameFromFlow = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
+		std::replace(lcLevelNameFromFlow.begin(), lcLevelNameFromFlow.end(), '\\', '/');
+
+		auto relativePathGiven = lcLevelNameFromFlow == lcFilename && std::filesystem::exists(fullPath);
+		if (relativePathGiven)
+		{
 			return i;
+		}
+
+		// was a full, absolute path given?
+		auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(std::string{ GetAssetDir() } + lcLevelNameFromFlow);
+		bool absolutePathGiven = lcFullLevelPathFromFlow == lcFilename && std::filesystem::exists(fileName);
+		if (absolutePathGiven)
+		{
+			return i;
+		}
 	}
 
 	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
