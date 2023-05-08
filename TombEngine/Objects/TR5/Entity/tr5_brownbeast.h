@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseBrownBeast(short itemNumber);
+	void InitializeBrownBeast(short itemNumber);
 	void ControlBrowsBeast(short itemNumber);
 }

@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseExplosion(short itemNumber);
+void InitializeExplosion(short itemNumber);
 void ExplosionControl(short itemNumber);

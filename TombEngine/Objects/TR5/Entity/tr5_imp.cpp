@@ -10,10 +10,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
@@ -33,8 +33,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto IMP_HEAD_MESH_SWAP_INTERVAL = 16;
 
-	const auto ImpLeftHandBite	= BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 7);
-	const auto ImpRightHandBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
+	const auto ImpLeftHandBite	= CreatureBiteInfo(Vector3i(0, 100, 0), 7);
+	const auto ImpRightHandBite = CreatureBiteInfo(Vector3i(0, 100, 0), 9);
 	const auto ImpHeadMeshSwapJoints = std::vector<unsigned int>{ 10 };
 	
 	enum ImpState
@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	static void DoImpStoneAttack(ItemInfo* item)
 	{
-		auto pos1 = GetJointPosition(item, ImpRightHandBite.meshNum);
+		auto pos1 = GetJointPosition(item, ImpRightHandBite);
 		auto pos2 = GetJointPosition(LaraItem, LM_HEAD);
 		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
@@ -163,11 +163,11 @@ namespace TEN::Entities::Creatures::TR5
 		return false;
 	}
 
-	void InitialiseImp(short itemNumber)
+	void InitializeImp(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		switch (item.TriggerFlags)
 		{
@@ -344,7 +344,7 @@ namespace TEN::Entities::Creatures::TR5
 			case IMP_STATE_ATTACK_1:
 				creature->MaxTurn = 0;
 
-				if (!(creature->Flags & 1) && item->TouchBits.Test(ImpRightHandBite.meshNum))
+				if (!(creature->Flags & 1) && item->TouchBits.Test(ImpRightHandBite.BoneID))
 				{
 					DoDamage(creature->Enemy, IMP_ATTACK_DAMAGE);
 					CreatureEffect2(item, ImpRightHandBite, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -356,14 +356,14 @@ namespace TEN::Entities::Creatures::TR5
 			case IMP_STATE_JUMP_ATTACK:
 				RotateTowardTarget(*item, ai, IMP_ATTACK_TURN_RATE_MAX);
 
-				if (!(creature->Flags & 1) && item->TouchBits.Test(ImpRightHandBite.meshNum))
+				if (!(creature->Flags & 1) && item->TouchBits.Test(ImpRightHandBite.BoneID))
 				{
 					DoDamage(creature->Enemy, IMP_ATTACK_DAMAGE);
 					CreatureEffect(item, ImpRightHandBite, DoBloodSplat);
 					creature->Flags |= 1;
 				}
 
-				if (!(creature->Flags & 2) && item->TouchBits.Test(ImpLeftHandBite.meshNum))
+				if (!(creature->Flags & 2) && item->TouchBits.Test(ImpLeftHandBite.BoneID))
 				{
 					DoDamage(creature->Enemy, IMP_ATTACK_DAMAGE);
 					CreatureEffect(item, ImpLeftHandBite, DoBloodSplat);
@@ -393,7 +393,7 @@ namespace TEN::Entities::Creatures::TR5
 			case IMP_STATE_STONE_ATTACK:
 				RotateTowardTarget(*item, ai, IMP_ATTACK_TURN_RATE_MAX);
 				
-				if (item->Animation.FrameNumber == GetFrameNumber(item, 40))
+				if (item->Animation.FrameNumber == GetFrameIndex(item, 40))
 					DoImpStoneAttack(item);
 
 				break;

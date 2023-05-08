@@ -12,10 +12,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -35,9 +35,9 @@ namespace TEN::Entities::TR4
 	constexpr auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
 	constexpr auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
 	
-	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
-	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
-	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
+	const auto AhmetBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 16);
+	const auto AhmetBiteRight = CreatureBiteInfo(Vector3i::Zero, 22);
+	const auto AhmetBiteJaw	  = CreatureBiteInfo(Vector3i::Zero, 11);
 	const auto AhmetSwipeAttackLeftJoints  = std::vector<unsigned int>{ 14, 15, 16, 17 };
 	const auto AhmetSwipeAttackRightJoints = std::vector<unsigned int>{ 20, 21, 22, 23 };
 
@@ -103,11 +103,11 @@ namespace TEN::Entities::TR4
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 	}
 
-	void InitialiseAhmet(short itemNumber)
+	void InitializeAhmet(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, AHMET_ANIM_IDLE);
 		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
 		item->ItemFlags[1] = (item->Pose.Position.y * 4) / SECTOR(1);
@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				SetAnimation(item, AHMET_ANIM_DEATH);
-				Lara.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
+				Lara.Context.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
 			}
 			
 			TriggerAhmetDeathEffect(item);

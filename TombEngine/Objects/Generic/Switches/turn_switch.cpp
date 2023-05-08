@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/turn_switch.h"
-#include "Game/control/control.h"
-#include "Specific/Input/Input.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Sound/sound.h"
-#include "Specific/setup.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
-#include "Specific/level.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -64,7 +65,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.IsAirborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(TurnSwitchBoundsA, switchItem, laraItem))
 			{
@@ -81,7 +82,7 @@ namespace TEN::Entities::Switches
 					doSwitch = -1;
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 			}
 			else
 			{
@@ -98,9 +99,9 @@ namespace TEN::Entities::Switches
 						doSwitch = 1;
 					}
 					else
-						laraInfo->InteractedItem = itemNumber;
+						laraInfo->Context.InteractedItem = itemNumber;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -115,7 +116,7 @@ namespace TEN::Entities::Switches
 			short ItemNos[8];
 
 			laraInfo->Control.IsMoving = false;
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraItem->Animation.ActiveState = LA_REACH;
 

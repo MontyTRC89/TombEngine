@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR4
 {
-    void InitialiseMapper(short itemNumber)
+    void InitializeMapper(short itemNumber)
     {
         g_Level.Items[itemNumber].MeshBits = -3;
     }

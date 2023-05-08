@@ -20,10 +20,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
@@ -50,7 +50,7 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3(8.0f, 230.0f, 40.0f),
 	};
 
-	const auto HeavyGuardHeadBite = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
+	const auto HeavyGuardHeadBite = CreatureBiteInfo(Vector3(0, -200, 0), 2);
 
 	enum HeavyGuardState
 	{
@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void InitialiseHeavyGuard(short itemNumber)
+	void InitializeHeavyGuard(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -248,7 +248,7 @@ namespace TEN::Entities::Creatures::TR5
 					int frame = item.Animation.FrameNumber;
 					int frameStart = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 
-					if (frame == GetFrameNumber(&item, 48) || frame == GetFrameNumber(&item, 15))
+					if (frame == GetFrameIndex(&item, 48) || frame == GetFrameIndex(&item, 15))
 					{
 						short roomNumber = item.RoomNumber;
 						GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber),
@@ -387,7 +387,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (Targetable(&item, &ai) &&
 					laraAI.angle < ANGLE(33.0f) && laraAI.angle > ANGLE(-33.0f))
 				{
-					if (item.Animation.FrameNumber >= GetFrameNumber(&item, 29))
+					if (item.Animation.FrameNumber >= GetFrameIndex(&item, 29))
 						item.Animation.TargetState = HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_RIGHT;
 					else
 						item.Animation.TargetState = HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT;
@@ -473,7 +473,7 @@ namespace TEN::Entities::Creatures::TR5
 						item.Pose.Orientation.y -= HEAVY_GUARD_IDLE_TURN_RATE_MAX;
 				}
 
-				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 17))
+				if (TestAnimFrame(item, 17))
 				{
 					FireHeavyGuardRaygun(item, false, false);
 					FireHeavyGuardRaygun(item, true, false);
@@ -500,7 +500,7 @@ namespace TEN::Entities::Creatures::TR5
 				torsoOrient.x = ai.xAngle / 2;
 				torsoOrient.y = laraAI.angle / 2;
 
-				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 18))
+				if (TestAnimFrame(item, 18))
 				{
 					FireHeavyGuardRaygun(item, false, false);
 					item.ItemFlags[1] = -16;

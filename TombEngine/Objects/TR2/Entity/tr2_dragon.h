@@ -6,6 +6,6 @@ namespace TEN::Entities::Creatures::TR2
 {
 	void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DragonControl(short backNumber);
-	void InitialiseBartoli(short itemNumber);
+	void InitializeBartoli(short itemNumber);
 	void BartoliControl(short itemNumber);
 }

@@ -13,10 +13,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -96,11 +96,11 @@ namespace TEN::Entities::TR4
 		DEMIGOD_ANIM_RUN_OVER_DEATH = 27
 	};
 
-	void InitialiseDemigod(short itemNumber)
+	void InitializeDemigod(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		/*if (g_Level.NumItems > 0)
@@ -721,7 +721,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.Velocity.z = 2;
 						LaraItem->Animation.Velocity.y = 1;
 
-						ResetLaraFlex(LaraItem);
+						ResetPlayerFlex(LaraItem);
 						LaraItem->HitStatus = true;
 						Lara.Control.HandStatus = HandStatus::Free;
 					}

@@ -6,9 +6,9 @@
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -25,7 +25,7 @@ namespace TEN::Entities::Traps::TR1
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 
-	void InitialiseDamoclesSword(short itemNumber)
+	void InitializeDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

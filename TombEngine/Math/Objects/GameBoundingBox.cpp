@@ -3,10 +3,10 @@
 
 #include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Objects/EulerAngles.h"
 #include "Math/Objects/Pose.h"
 #include "Objects/game_object_ids.h"
-#include "Specific/setup.h"
 
 //namespace TEN::Math
 //{
@@ -32,9 +32,13 @@
 	{
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)
+		{
 			*this = frameData.FramePtr0->BoundingBox;
+		}
 		else
+		{
 			*this = frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
+		}
 	}
 
 	int GameBoundingBox::GetWidth() const

@@ -39,7 +39,7 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_UNDERWATERDUST,
 		SPR_BLOOD,
 		SPR_EMPTY1,
-		SPR_UNKNOWN1,
+		SPR_BUBBLE_CLUSTER,
 		SPR_EMPTY2,
 		SPR_BACKGROUND,
 		SPR_GUI_UPLEFT,

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseMapper(short itemNumber);
+	void InitializeMapper(short itemNumber);
 	void MapperControl(short itemNumber);
 }

@@ -49,15 +49,24 @@ private:
 	// "LevelFuncs.MyLevel.CoolFuncs"
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};
 
-	sol::protected_function m_onStart{};
-	sol::protected_function m_onLoad{};
-	sol::protected_function m_onControlPhase{};
-	sol::protected_function m_preSave{};
-	sol::protected_function m_onSave{};
-	sol::protected_function m_onEnd{};
+	sol::protected_function	m_onStart{};
+	sol::protected_function	m_onLoad{};
+	sol::protected_function	m_onControlPhase{};
+	sol::protected_function	m_onSave{};
+	sol::protected_function	m_onEnd{};
 
+	std::unordered_set<std::string> m_callbacksPreSave;
+	std::unordered_set<std::string> m_callbacksPostSave;
+	std::unordered_set<std::string> m_callbacksPreLoad;
+	std::unordered_set<std::string> m_callbacksPostLoad;
+	std::unordered_set<std::string> m_callbacksPreStart;
+	std::unordered_set<std::string> m_callbacksPostStart;
+	std::unordered_set<std::string> m_callbacksPreEnd;
+	std::unordered_set<std::string> m_callbacksPostEnd;
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
+
+	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
 	std::vector<std::variant<std::string, uint32_t>> m_savedVarPath;
 
@@ -72,39 +81,88 @@ private:
 public:	
 	LogicHandler(sol::state* lua, sol::table& parent);
 
-	sol::protected_function_result		CallLevelFunc(const std::string&, sol::variadic_args);
-	sol::protected_function_result		CallLevelFunc(const std::string&, float deltaTime);
+	template <typename ... Ts> sol::protected_function_result CallLevelFuncBase(const sol::protected_function & func, Ts ... vs)
+	{
+		auto funcResult = func.call(vs...);
+		return funcResult;
+	}
+
+	template <typename ... Ts> sol::protected_function_result CallLevelFuncByName(const std::string& name, Ts ... vs)
+	{
+		auto func = m_levelFuncs_luaFunctions[name];
+		auto funcResult = CallLevelFuncBase(func, vs...);
+
+		if (!funcResult.valid())
+		{
+			sol::error err = funcResult;
+			ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+		}
+
+		return funcResult;
+	}
+
+	template <typename ... Ts> sol::protected_function_result CallLevelFunc(const sol::protected_function & func, Ts ... vs)
+	{
+		auto funcResult = CallLevelFuncBase(func, vs...);
+
+		if (!funcResult.valid())
+		{
+			sol::error err = funcResult;
+			ScriptAssertF(false, "Could not execute function: {}", err.what());
+		}
+
+		return funcResult;
+	}
 
 	void FreeLevelScripts() override;
 
-	void								LogPrint(sol::variadic_args args);
-	bool								SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value);
+	void LogPrint(sol::variadic_args args);
+	bool SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value);
 
-	void								AddCallback(CallbackPoint point, const LevelFunc& levelFunc);
-	void								RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc);
+	void AddCallback(CallbackPoint point, const LevelFunc& levelFunc);
+	void RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc);
 
 	void ResetScripts(bool clearGameVars) override;
 	void ShortenTENCalls() override;
 
 	sol::object GetLevelFuncsMember(sol::table tab, const std::string& name);
 
-	void								ExecuteScriptFile(const std::string& luaFilename) override;
-	void								ExecuteString(const std::string& command) override;
-	void								ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) override;
+	void ExecuteScriptFile(const std::string& luaFilename) override;
+	void ExecuteString(const std::string& command) override;
+	void ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) override;
 
 	void ExecuteFunction(const std::string& name, short idOne, short idTwo) override;
 
-	void								GetVariables(std::vector<SavedVar>& vars) override;
-	void								SetVariables(const std::vector<SavedVar>& vars) override;
-	void								ResetVariables();
+	void GetVariables(std::vector<SavedVar>& vars) override;
+	void SetVariables(const std::vector<SavedVar>& vars) override;
+	void ResetVariables();
 
-	void								SetCallbackStrings(const std::vector<std::string>& preControl, const std::vector<std::string>& postControl) override;
-	void								GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const override;
+	void SetCallbackStrings(const std::vector<std::string>& preStart,
+							const std::vector<std::string>& postStart,
+							const std::vector<std::string>& preEnd,
+							const std::vector<std::string>& postEnd,
+							const std::vector<std::string>& preSave,
+							const std::vector<std::string>& postSave, 
+							const std::vector<std::string>& preLoad,   
+							const std::vector<std::string>& postLoad, 
+							const std::vector<std::string>& preControl,   
+							const std::vector<std::string>& posControl) override;
 
-	void								InitCallbacks() override;
-	void								OnStart() override;
-	void								OnLoad() override;
-	void								OnControlPhase(float deltaTime) override;
-	void								OnSave() override;
-	void								OnEnd() override;
+	void GetCallbackStrings(std::vector<std::string>& preStart,
+							std::vector<std::string>& postStart,
+							std::vector<std::string>& preEnd,
+							std::vector<std::string>& postEnd,
+							std::vector<std::string>& preSave,
+							std::vector<std::string>& postSave,
+							std::vector<std::string>& preLoad,
+							std::vector<std::string>& postLoad,
+							std::vector<std::string>& preControl,
+							std::vector<std::string>& postControl) const override;
+
+	void InitCallbacks() override;
+	void OnStart() override;
+	void OnLoad() override;
+	void OnControlPhase(float deltaTime) override;
+	void OnSave() override;
+	void OnEnd(GameStatus reason) override;
 };

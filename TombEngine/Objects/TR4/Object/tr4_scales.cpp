@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr4_scales.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Specific/setup.h"
-#include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
+#include "Objects/TR4/Object/tr4_scales.h"
+
 #include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/control.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/tomb4fx.h"
-#include "tr4_ahmet.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
+#include "Objects/TR4/Entity/tr4_ahmet.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/collision/collide_item.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Effects::Drip;
 using namespace TEN::Entities::Switches;
@@ -50,7 +51,7 @@ void ScalesControl(short itemNumber)
 			return;
 		}
 
-		if (RespawnAhmet(Lara.InteractedItem))
+		if (RespawnAhmet(Lara.Context.InteractedItem))
 		{
 			short itemNos[8];
 			int sw = GetSwitchTrigger(item, itemNos, 0);

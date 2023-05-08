@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	void InitialiseYeti(short itemNumber);
+	void InitializeYeti(short itemNumber);
 	void YetiControl(short itemNumber);
 }

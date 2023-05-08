@@ -17,11 +17,11 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/people.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SAS_WALK_RANGE  = SQUARE(BLOCK(2));
 	constexpr auto SAS_SHOOT_RANGE = SQUARE(BLOCK(3));
 
-	const auto SasGunBite = BiteInfo(Vector3(0.0f, 550.0f, 84.0f), 7);
+	const auto SasGunBite = CreatureBiteInfo(Vector3i(0, 420, 80), 7);
 
 	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
 	const auto SasDragBounds = ObjectCollisionBounds
@@ -104,15 +104,15 @@ namespace TEN::Entities::TR4
 		SAS_ANIM_BLIND_TO_STAND = 29
 	};
 
-	void InitialiseSas(short itemNumber)
+	void InitializeSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SAS_ANIM_STAND);
 	}
 
-	void InitialiseInjuredSas(short itemNumber)
+	void InitializeInjuredSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -145,13 +145,8 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 
-		// Handle SAS firing.
-		if (creature.FiredWeapon)
-		{
-			auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
-			creature.FiredWeapon--;
-		}
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
 
 		if (item.HitPoints > 0)
 		{
@@ -180,7 +175,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(&item, &AI, !creature.Enemy->IsLara());
 
 			// Vehicle handling
-			if (Lara.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
 				creature.Mood = MoodType::Escape;
 
 			CreatureMood(&item, &AI, !creature.Enemy->IsLara());
@@ -208,7 +203,7 @@ namespace TEN::Entities::TR4
 					else
 						item.Pose.Orientation.y += ANGLE(10.0f);
 				}
-				else if (item.AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
+				else if (item.AIBits & MODIFY || Lara.Context.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) < ANGLE(2.0f))
 						item.Pose.Orientation.y += AI.angle;
@@ -232,7 +227,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item.AIBits & PATROL1 &&
 					item.AIBits != MODIFY &&
-					Lara.Vehicle == NO_ITEM)
+					Lara.Context.Vehicle == NO_ITEM)
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 					joint2 = 0;
@@ -302,7 +297,7 @@ namespace TEN::Entities::TR4
 					creature.Mood == MoodType::Bored ||
 					!AI.ahead ||
 					item.AIBits & MODIFY ||
-					Lara.Vehicle != NO_ITEM)
+					Lara.Context.Vehicle != NO_ITEM)
 				{
 					item.Animation.TargetState = SAS_STATE_IDLE;
 				}
@@ -318,7 +313,7 @@ namespace TEN::Entities::TR4
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 				}
-				else if (Lara.Vehicle != NO_ITEM &&
+				else if (Lara.Context.Vehicle != NO_ITEM &&
 					(item.AIBits == MODIFY ||
 						!item.AIBits))
 				{
@@ -366,7 +361,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint2 = AI.angle;
 
-				if (Lara.Vehicle != NO_ITEM)
+				if (Lara.Context.Vehicle != NO_ITEM)
 				{
 					if (item.AIBits == MODIFY || !item.AIBits)
 					{
@@ -522,14 +517,15 @@ namespace TEN::Entities::TR4
 					joint1 = AI.xAngle;
 				}
 
-				if (creature.Flags)
+				if (creature.Flags != 0)
 				{
 					creature.Flags -= 1;
 				}
 				else
 				{
 					ShotLara(&item, &AI, SasGunBite, joint0, SAS_SHOT_DAMAGE);
-					creature.FiredWeapon = 3;
+					creature.MuzzleFlash[0].Bite = SasGunBite;
+					creature.MuzzleFlash[0].Delay = 2;
 					creature.Flags = 5;
 				}
 
@@ -539,9 +535,6 @@ namespace TEN::Entities::TR4
 				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F)) // TODO: This is a probabliity of roughly 0.998f.
 					item.Animation.TargetState = SAS_STATE_WAIT;
 
-				break;
-
-			default:
 				break;
 			}
 
@@ -607,14 +600,14 @@ namespace TEN::Entities::TR4
 			player.Control.HandStatus == HandStatus::Free &&
 			!laraItem->Animation.IsAirborne &&
 			!(item.Flags & IFLAG_ACTIVATION_MASK)) ||
-			player.Control.IsMoving && player.InteractedItem == itemNumber)
+			player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(SasDragBounds, &item, laraItem))
 			{
 				if (MoveLaraPosition(SasDragBodyPosition, &item, laraItem))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Control.IsMoving = false;
@@ -625,7 +618,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					player.InteractedItem = itemNumber;
+					player.Context.InteractedItem = itemNumber;
 				}
 			}
 		}
@@ -659,7 +652,7 @@ namespace TEN::Entities::TR4
 		grenadeItem->ObjectNumber = ID_GRENADE;
 		grenadeItem->RoomNumber = item.RoomNumber;
 
-		auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
+		auto pos = GetJointPosition(&item, SasGunBite);
 		grenadeItem->Pose.Position = pos;
 
 		auto floorHeight = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
@@ -672,7 +665,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		grenadeItem->Pose.Orientation = EulerAngles(
 			angle1 + item.Pose.Orientation.x,

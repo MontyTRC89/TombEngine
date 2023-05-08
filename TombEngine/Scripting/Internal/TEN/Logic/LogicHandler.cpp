@@ -9,6 +9,7 @@
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Vec2/Vec2.h"
 #include "Rotation/Rotation.h"
 #include "Color/Color.h"
 #include "LevelFunc.h"
@@ -23,14 +24,48 @@ Saving data, triggering functions, and callbacks for level-specific scripts.
 
 enum class CallbackPoint
 {
+	PreStart,
+	PostStart,
+	PreLoad,
+	PostLoad,
 	PreControl,
 	PostControl,
+	PreSave,
+	PostSave,
+	PreEnd,
+	PostEnd
 };
 
 static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 {
-	{"PRECONTROLPHASE", CallbackPoint::PreControl},
-	{"POSTCONTROLPHASE", CallbackPoint::PostControl},
+	{ScriptReserved_PreStart, CallbackPoint::PreStart},
+	{ScriptReserved_PostStart, CallbackPoint::PostStart},
+	{ScriptReserved_PreLoad, CallbackPoint::PreLoad},
+	{ScriptReserved_PostLoad, CallbackPoint::PostLoad},
+	{ScriptReserved_PreControlPhase, CallbackPoint::PreControl},
+	{ScriptReserved_PostControlPhase, CallbackPoint::PostControl},
+	{ScriptReserved_PostSave, CallbackPoint::PostSave},
+	{ScriptReserved_PreSave, CallbackPoint::PreSave},
+	{ScriptReserved_PreEnd, CallbackPoint::PreEnd},
+	{ScriptReserved_PostEnd, CallbackPoint::PostEnd},
+};
+
+enum class LevelEndReason
+{
+	LevelComplete,
+	LoadGame,
+	ExitToTitle,
+	Death,
+	Other
+};
+
+static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
+{
+	{ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete},
+	{ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame},
+	{ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle},
+	{ScriptReserved_EndReasonDeath, LevelEndReason::Death},
+	{ScriptReserved_EndReasonOther, LevelEndReason::Other},
 };
 
 static constexpr char const* strKey = "__internal_name";
@@ -81,7 +116,8 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 
 	case sol::type::userdata:
 	{
-		if (value.is<Vec3>() ||
+		if (value.is<Vec2>() ||
+			value.is<Vec3>() ||
 			value.is<Rotation>() ||
 			value.is<ScriptColor>())
 		{
@@ -115,7 +151,19 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
 
+	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_EndReason, kLevelEndReasons);
 	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
+
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreLoad, &m_callbacksPreLoad));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostLoad, &m_callbacksPostLoad));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreControl, &m_callbacksPreControl));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostControl, &m_callbacksPostControl));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreSave, &m_callbacksPreSave));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostSave, &m_callbacksPostSave));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreEnd, &m_callbacksPreEnd));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
 
 	LevelFunc::Register(table_logic);
 
@@ -132,12 +180,32 @@ void LogicHandler::ResetGameTables()
 
 /*** Register a function as a callback.
 @advancedDesc
+This is intended for module/library developers who want their modules to do
+stuff during level start/load/end/save/control phase, but don't want the level
+designer to add calls to OnStart, OnLoad, etc. in their level script.
+
 Possible values for CallbackPoint:
+	-- These take functions which accept no arguments
+	PRESTART -- will be called immediately before OnStart
+	POSTSTART -- will be called immediately after OnStart
+
+
+	PRESAVE -- will be called immediately before OnSave
+	POSTSAVE -- will be called immediately after OnSave
+
+	PRELOAD -- will be called immediately before OnLoad
+	POSTLOAD -- will be called immediately after OnLoad
+
+	-- These take a LevelEndReason arg, like OnEnd
+	PREEND -- will be called immediately before OnEnd
+	POSTEND -- will be called immediately after OnEnd
+
+	-- These take functions which accepts a deltaTime argument
 	PRECONTROLPHASE -- will be called immediately before OnControlPhase
 	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
 
 The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee whether `MyFunc` will be called before `MyFunc2`, or vice-versa.
+i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
 
 Any returned value will be discarded.
 
@@ -150,16 +218,8 @@ Any returned value will be discarded.
 */
 void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
-	switch(point)
-	{
-	case CallbackPoint::PreControl:
-		m_callbacksPreControl.insert(levelFunc.m_funcName);
-		break;
-
-	case CallbackPoint::PostControl:
-		m_callbacksPostControl.insert(levelFunc.m_funcName);
-		break;
-	}
+	auto it = m_callbacks.find(point);
+	it->second->insert(levelFunc.m_funcName);
 }
 
 /*** Deregister a function as a callback.
@@ -173,16 +233,8 @@ Will have no effect if the function was not registered as a callback
 */
 void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
-	switch(point)
-	{
-	case CallbackPoint::PreControl:
-		m_callbacksPreControl.erase(levelFunc.m_funcName);
-		break;
-
-	case CallbackPoint::PostControl:
-		m_callbacksPostControl.erase(levelFunc.m_funcName);
-		break;
-	}
+	auto it = m_callbacks.find(point);
+	it->second->erase(levelFunc.m_funcName);
 }
 
 void LogicHandler::ResetLevelTables()
@@ -207,33 +259,6 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string&
 	}
 
 	return sol::nil;
-}
-
-sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, float deltaTime)
-{
-	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call(deltaTime);
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-
-	return r;
-}
-
-sol::protected_function_result LogicHandler::CallLevelFunc(const std::string& name, sol::variadic_args va)
-{
-	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	auto r = f.call(va);
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-
-	return r;
 }
 
 bool LogicHandler::SetLevelFuncsMember(sol::table tab, const std::string& name, sol::object value)
@@ -305,8 +330,8 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
 
-	m_callbacksPreControl.clear();
-	m_callbacksPostControl.clear();
+	for (auto& [first, second] : m_callbacks)
+		second->clear();
 
 	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
 	auto currentLoaded = currentPackage.get<sol::table>("loaded");
@@ -341,7 +366,6 @@ void LogicHandler::FreeLevelScripts()
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
-	m_preSave = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
@@ -387,27 +411,32 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
+				else if (vars[second].index() == int(SavedVarType::Vec2))
+				{
+					auto vec2 = Vec2{ std::get<int(SavedVarType::Vec2)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
+				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
-					solTables[i][vars[first]] = theVec;
+					auto vec2 = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto theVec = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
-					solTables[i][vars[first]] = theVec;
+					auto vec2 = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
-					auto theCol = D3DCOLOR{std::get<int(SavedVarType::Color)>(vars[second]) };
-					solTables[i][vars[first]] = ScriptColor{theCol};
+					auto color = D3DCOLOR{ std::get<int(SavedVarType::Color)>(vars[second]) };
+					solTables[i][vars[first]] = ScriptColor{color};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
-					LevelFunc fnh;
-					fnh.m_funcName = std::get<FuncName>(vars[second]).name;
-					fnh.m_handler = this;
-					solTables[i][vars[first]] = fnh;
+					LevelFunc levelFunc;
+					levelFunc.m_funcName = std::get<FuncName>(vars[second]).name;
+					levelFunc.m_handler = this;
+					solTables[i][vars[first]] = levelFunc;
 				}
 				else
 				{
@@ -605,7 +634,11 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 
 				case sol::type::userdata:
 				{
-					if (second.is<Vec3>())
+					if (second.is<Vec2>())
+					{
+						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, numVars, vars));
+					}
+					else if (second.is<Vec3>())
 					{
 						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, numVars, vars));
 					}
@@ -642,22 +675,72 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 	populate(tab);
 }
 
-void LogicHandler::GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const
+void LogicHandler::GetCallbackStrings(	
+	std::vector<std::string>& preStart,
+	std::vector<std::string>& postStart,
+	std::vector<std::string>& preEnd,
+	std::vector<std::string>& postEnd,
+	std::vector<std::string>& preSave,
+	std::vector<std::string>& postSave,
+	std::vector<std::string>& preLoad,
+	std::vector<std::string>& postLoad,
+	std::vector<std::string>& preControl,
+	std::vector<std::string>& postControl) const
 {
-	for (auto const& string : m_callbacksPreControl)
-		preControl.push_back(string);
+	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
+	{
+		for (const auto& s : src)
+			dest.push_back(s);
+	};
 
-	for (auto const& string : m_callbacksPostControl)
-		postControl.push_back(string);
+	populateWith(preStart, m_callbacksPreStart);
+	populateWith(postStart, m_callbacksPostStart);
+
+	populateWith(preEnd, m_callbacksPreEnd);
+	populateWith(postEnd, m_callbacksPostEnd);
+
+	populateWith(preSave, m_callbacksPreSave);
+	populateWith(postSave, m_callbacksPostSave);
+
+	populateWith(preLoad, m_callbacksPreLoad);
+	populateWith(postLoad, m_callbacksPostLoad);
+
+	populateWith(preControl, m_callbacksPreControl);
+	populateWith(postControl, m_callbacksPostControl);
 }
 
-void LogicHandler::SetCallbackStrings(const std::vector<std::string>& preControl, const std::vector<std::string>& postControl)
+void LogicHandler::SetCallbackStrings(	
+	const std::vector<std::string>& preStart,
+	const std::vector<std::string>& postStart,
+	const std::vector<std::string>& preEnd,
+	const std::vector<std::string>& postEnd,
+	const std::vector<std::string>& preSave,
+	const std::vector<std::string>& postSave,
+	const std::vector<std::string>& preLoad,
+	const std::vector<std::string>& postLoad,
+	const std::vector<std::string>& preControl,
+	const std::vector<std::string>& postControl)
 {
-	for (auto const& string : preControl)
-		m_callbacksPreControl.insert(string);
+	auto populateWith = [](std::unordered_set<std::string>& dest, const std::vector<std::string>& src)
+	{
+		for (const auto& string : src)
+			dest.insert(string);
+	};
 
-	for (auto const& string : postControl)
-		m_callbacksPostControl.insert(string);
+	populateWith(m_callbacksPreStart, preStart);
+	populateWith(m_callbacksPostStart, postStart);
+
+	populateWith(m_callbacksPreEnd, preEnd);
+	populateWith(m_callbacksPostEnd, postEnd);
+
+	populateWith(m_callbacksPreSave, preSave);
+	populateWith(m_callbacksPostSave, postSave);
+
+	populateWith(m_callbacksPreLoad, preLoad);
+	populateWith(m_callbacksPostLoad, postLoad);
+
+	populateWith(m_callbacksPreControl, preControl);
+	populateWith(m_callbacksPostControl, postControl);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -738,62 +821,87 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 	}
 }
 
-static void doCallback(const sol::protected_function& func, std::optional<float> deltaTime = std::nullopt)
-{
-	auto r = deltaTime.has_value() ? func(deltaTime) : func();
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssert(false, err.what(), ErrorMode::Terminate);
-	}
-}
 
 void LogicHandler::OnStart()
 {
+	for (auto& name : m_callbacksPreStart)
+		CallLevelFuncByName(name);
+
 	if (m_onStart.valid())
-		doCallback(m_onStart);
+		CallLevelFunc(m_onStart);
+
+	for (auto& name : m_callbacksPostStart)
+		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnLoad()
 {
+	for (auto& name : m_callbacksPreLoad)
+		CallLevelFuncByName(name);
+
 	if (m_onLoad.valid())
-		doCallback(m_onLoad);
+		CallLevelFunc(m_onLoad);
+
+	for (auto& name : m_callbacksPostLoad)
+		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnControlPhase(float deltaTime)
 {
-	auto tryCall = [this, deltaTime](const std::string& name)
-	{
-		auto func = m_handler.GetState()->script("return " + name);
-
-		if (!func.valid())
-			ScriptAssertF(false, "Callback {} not valid", name);
-		else 
-			func.get<LevelFunc>().CallDT(deltaTime);
-	};
-
 	for (auto& name : m_callbacksPreControl)
-		tryCall(name);
+		CallLevelFuncByName(name, deltaTime);
 
 	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
 	if (m_onControlPhase.valid())
-		doCallback(m_onControlPhase, deltaTime);
+		CallLevelFunc(m_onControlPhase, deltaTime);
 
 	for (auto& name : m_callbacksPostControl)
-		tryCall(name);
+		CallLevelFuncByName(name, deltaTime);
 }
 
 void LogicHandler::OnSave()
 {
+	for (auto& name : m_callbacksPreSave)
+		CallLevelFuncByName(name);
+
 	if (m_onSave.valid())
-		doCallback(m_onSave);
+		CallLevelFunc(m_onSave);
+
+	for (auto& name : m_callbacksPostSave)
+		CallLevelFuncByName(name);
 }
 
-void LogicHandler::OnEnd()
+void LogicHandler::OnEnd(GameStatus reason)
 {
-	if (m_onEnd.valid())
-		doCallback(m_onEnd);
+	auto endReason{LevelEndReason::Other};
+
+	switch (reason)
+	{
+	case GameStatus::LaraDead:
+		endReason = LevelEndReason::Death;
+		break;
+
+	case GameStatus::LevelComplete:
+		endReason = LevelEndReason::LevelComplete;
+		break;
+
+	case GameStatus::ExitToTitle:
+		endReason = LevelEndReason::ExitToTitle;
+		break;
+
+	case GameStatus::LoadGame:
+		endReason = LevelEndReason::LoadGame;
+		break;
+	}
+
+	for (auto& name : m_callbacksPreEnd)
+		CallLevelFuncByName(name, endReason);
+
+	if(m_onEnd.valid())
+		CallLevelFunc(m_onEnd, endReason);
+
+	for (auto& name : m_callbacksPostEnd)
+		CallLevelFuncByName(name, endReason);
 }
 
 /*** Special tables
@@ -896,21 +1004,33 @@ __The order of loading is as follows:__
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
 @tfield function OnSave Will be called when the player saves the game, just *before* data is saved
-@tfield function OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. 
+@tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
+
+	EXITTOTITLE
+	LEVELCOMPLETE
+	LOADGAME
+	DEATH
+	OTHER
+
+For example:
+	LevelFuncs.OnEnd = function(reason)
+		if(reason == TEN.Logic.EndReason.DEATH) then
+			print("death")
+		end
+	end
 @table LevelFuncs
 */
 
 void LogicHandler::InitCallbacks()
 {
-	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc)
+	auto assignCB = [this](sol::protected_function& func, const std::string& luaFunc)
 	{
 		auto state = m_handler.GetState();
 		std::string fullName = std::string{ ScriptReserved_LevelFuncs } + "." + luaFunc;
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName
-			+ ". Defaulting to no " + fullName + " behaviour."};
+		std::string msg{ "Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour." };
 
 		if (!theData.valid())
 		{

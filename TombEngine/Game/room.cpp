@@ -8,7 +8,7 @@
 #include "Game/items.h"
 #include "Renderer/Renderer11.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Renderer;
 
 byte FlipStatus = 0;
