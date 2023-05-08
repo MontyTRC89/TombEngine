@@ -35,8 +35,9 @@ namespace TEN::Collision::Attractors
 		short				   HeadingAngle	= 0;
 		short				   SlopeAngle	= 0;
 
-		bool IsIntersected = false;
-		bool IsInFront	   = false;
+		bool IsIntersected	 = false;
+		bool IsFacingForward = false;
+		bool IsInFront		 = false;
 	};
 
 	class Attractor

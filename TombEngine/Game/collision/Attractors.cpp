@@ -77,6 +77,8 @@ namespace TEN::Collision::Attractors
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const
 	{
+		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+
 		// Get proximity data.
 		auto attracProx = GetProximityData(refPoint);
 
@@ -91,6 +93,7 @@ namespace TEN::Collision::Attractors
 
 		// Determine inquiries.
 		bool isIntersected = (attracProx.Distance <= range);
+		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
 		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
 
 		// Create and return attractor collision data.
@@ -100,6 +103,7 @@ namespace TEN::Collision::Attractors
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
 		attracColl.IsIntersected = isIntersected;
+		attracColl.IsFacingForward = isFacingForward;
 		attracColl.IsInFront = isInFront;
 		return attracColl;
 	}

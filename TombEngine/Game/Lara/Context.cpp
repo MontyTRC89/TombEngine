@@ -246,12 +246,23 @@ namespace TEN::Player::Context
 			if (!attracColl.AttracPtr->IsEdge())
 				continue;
 
-			// 2) Check if edge is within range and in front.
-			if (!attracColl.IsIntersected || !attracColl.IsInFront)
+			// 2) Check if edge is within range.
+			if (!attracColl.IsIntersected )
 				continue;
 
+			// 3) Test if edge slope is slippery.
+			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
+				continue;
+
+			// 4) Test catch angle.
+			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
+				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
 			// TODO: Accuracy.
-			// 3) Test if target point is attractor end.
+			// 5) Test if target point is attractor end.
 			if (!hasEnd &&
 				(attracColl.Proximity.LineDistance <= EPSILON ||
 					(attracColl.AttracPtr->GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
@@ -264,14 +275,6 @@ namespace TEN::Player::Context
 				if (Vector3::Distance(points[0], points.back()) > EPSILON)
 					continue;
 			}
-
-			// 4) Test catch angle.
-			if (!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-					continue;
-
-			// 5) Test if edge slope is slippery.
-			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
-				continue;
 
 			// Get point collision off side of edge.
 			auto pointCollOffSide = GetCollision(
