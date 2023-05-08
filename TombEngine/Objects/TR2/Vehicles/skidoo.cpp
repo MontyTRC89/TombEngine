@@ -61,6 +61,8 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
 
+	constexpr auto IN_SKIDOO_FIRE = IN_DRAW;
+
 	const std::vector<VehicleMountType> SkidooMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -218,8 +220,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				lara->Control.HandStatus = HandStatus::Free;
+
 				if (skidoo->Armed)
 					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				SetLaraVehicle(laraItem, nullptr);
 			}
 			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF &&
@@ -249,8 +253,10 @@ namespace TEN::Entities::Vehicles
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				if (skidoo->Armed)
 					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				skidooItem->Collidable = false;
 				skidooItem->Flags |= IFLAG_INVISIBLE;
 
@@ -666,18 +672,15 @@ namespace TEN::Entities::Vehicles
 		FindNewTarget(*laraItem, weapon);
 		AimWeapon(*laraItem, lara->RightArm, weapon);
 
-		if (IsHeld(In::DrawWeapon) && !skidooItem->ItemFlags[0])
+		if (TrInput & IN_SKIDOO_FIRE && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
-				0
-			);
+				0);
 
 			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
 			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
-			//lara->LeftArm.GunFlash = 1;
-			//lara->RightArm.GunFlash = 1;
 			SoundEffect(weapon.SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}
