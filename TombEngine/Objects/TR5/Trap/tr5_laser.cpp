@@ -109,8 +109,6 @@ namespace TEN::Traps::TR5
 			}
 			
 			barrier.On = true;
-
-			SoundEffect(SFX_TR5_DOOR_BEAM, &item->Pose);
 		}
 
 		CollideLaserBarriers(itemNumber);
@@ -119,6 +117,8 @@ namespace TEN::Traps::TR5
 		{
 			LaserBarrierLight(itemNumber, 150, 31);			
 		}
+
+		SoundEffect(SFX_TR5_DOOR_BEAM, &item->Pose);
 	}
 
 	void CollideLaserBarriers(short itemNumber)
