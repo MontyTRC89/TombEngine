@@ -9,5 +9,6 @@ namespace TEN::Renderer
 		float Density;
 		Vector3 Color;
 		float Radius;
+		int Distance;
 	};
 }

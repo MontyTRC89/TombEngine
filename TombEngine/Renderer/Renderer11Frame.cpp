@@ -65,6 +65,7 @@ namespace TEN::Renderer
 
 		// Collect fog bulbs
 		renderView.FogBulbsToDraw.clear();
+		vector<RendererFogBulb> tempFogBulbs;
 		for (auto room : m_rooms)     
 		{  
 			for (RendererLight light : room.Lights)
@@ -76,19 +77,25 @@ namespace TEN::Renderer
 					bulb.Density = light.Intensity;
 					bulb.Color = light.Color;
 					bulb.Radius = light.Out;
-					renderView.FogBulbsToDraw.push_back(bulb);
-					if (renderView.FogBulbsToDraw.size() == MAX_FOG_BULBS)
-					{
-						break;
-					}
+					bulb.Distance = (int)(renderView.camera.WorldPosition - bulb.Position).Length();
+					tempFogBulbs.push_back(bulb);
 				}
-			}
-			if (renderView.FogBulbsToDraw.size() == MAX_FOG_BULBS)
-			{
-				break;
 			}
 		}
 		
+		std::sort(
+			tempFogBulbs.begin(),
+			tempFogBulbs.end(),
+			[](RendererFogBulb a, RendererFogBulb b)
+			{
+				return a.Distance < b.Distance;
+			}
+		);
+
+		for (int i = 0; i < std::min(MAX_FOG_BULBS, (int)tempFogBulbs.size()); i++)
+		{
+			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+		}
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

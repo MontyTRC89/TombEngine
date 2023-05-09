@@ -95,6 +95,10 @@ PixelShaderInput VS(VertexShaderInput input)
 		float fogFactor = DoFogBulb(output.WorldPosition, FogBulbs[i]);
 		output.Fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
 		output.Fog.w += fogFactor;
+		if (output.Fog.w >= 1.0f)
+		{
+			break;
+		}
 	}
 
 	return output;
