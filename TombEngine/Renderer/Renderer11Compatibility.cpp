@@ -389,7 +389,7 @@ namespace TEN::Renderer
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
 						light->Intensity = oldLight->intensity;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
-						light->In = oldLight->length;
+						light->In = oldLight->length;     
 						light->Out = oldLight->cutoff;
 						light->InRange = oldLight->in;
 						light->OutRange = oldLight->out;
@@ -398,9 +398,9 @@ namespace TEN::Renderer
 						light->Luma = Luma(light->Color);
 					}
 					else if (oldLight->type == LIGHT_TYPE_FOG_BULB)
-					{
+					{  
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
-						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 						light->Intensity = oldLight->intensity;
  			 			light->In = oldLight->in;
 						light->Out = oldLight->out;

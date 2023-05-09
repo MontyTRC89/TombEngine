@@ -278,16 +278,20 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 	}
 
 	float fog = 0;
-	float stepSize = 16.0f;
+	float stepSize = 64.0f;
 	int stepCount = length(p1 - p0) / stepSize;
 	float3 samplePosition = p0;
 	for (int i = 0; i < stepCount; i++)
 	{
 		float noise = SimplexNoise(samplePosition / 512);
 		noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
-		fog += bulb.Density * 0.0007f * noise;
+		fog += bulb.Density * 0.003f * noise;
 		samplePosition += cameraToVertexDirection.xyz * stepSize;
 	}
+
+	//float noise = SimplexNoise(pos);
+	//noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
+	//fog = 1.0f / exp(pow(length(p1 - p0) * bulb.Density * , 2))
 
 	return fog;
 }

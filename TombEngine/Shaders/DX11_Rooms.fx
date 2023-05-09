@@ -203,7 +203,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 
 	output.Color.xyz = output.Color.xyz * lighting;
-	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w);
+	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.5f;
 	output.Color.xyz = saturate(output.Color.xyz);
 	output.Color.xyz += saturate(input.Fog.xyz);
 

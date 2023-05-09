@@ -1488,7 +1488,7 @@ namespace TEN::Renderer
 		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);
-		DrawStatics(view, false);                               
+		DrawStatics(view, false);
 		DrawEffects(view, false);
 		DrawGunShells(view);
 		DrawBats(view);
