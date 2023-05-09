@@ -12,7 +12,7 @@ cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
 	float secondsUniform;
-	float renderType;
+	int IsRenderType;
 };
 
 struct PixelShaderInput
@@ -75,9 +75,10 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	if (renderType == 1)
+	if (IsRenderType == 1)
 	{
 		output = DoLasers(input.Position, output, input.UV, FADE_FACTOR, secondsUniform);
+		return output;
 	}
 
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);

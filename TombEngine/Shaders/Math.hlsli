@@ -122,20 +122,18 @@ float SimplexNoise(float3 v)
 									 dot(p2,x2), dot(p3,x3) ) );
 }
 
-float2 gradient2D(float2 p)
+float2 Gradient2D(float2 p)
 {
 	float angle = 2 * 3.14159265359 * frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
 	return normalize(float2(cos(angle), sin(angle)));
 }
 
-float nebularNoise(float2 uv, float frequency, float amplitude, float persistence)
+float NebularNoise(float2 uv, float frequency, float amplitude, float persistence)
 {
-
 	float noiseValue = 0.0;
 	float scale = 1.0;
 	float range = 1.0;
 	float2 p = uv * frequency;
-
 
 	float2 floorP = floor(p);
 	float2 fracP = frac(p);
@@ -151,10 +149,10 @@ float nebularNoise(float2 uv, float frequency, float amplitude, float persistenc
 	float2 v3 = v1 - float2(0.0, 1.0);
 	float2 v4 = v1 - float2(1.0, 1.0);
 
-	float dot1 = dot(gradient2D(bl), v1);
-	float dot2 = dot(gradient2D(br), v2);
-	float dot3 = dot(gradient2D(tl), v3);
-	float dot4 = dot(gradient2D(tr), v4);
+	float dot1 = dot(Gradient2D(bl), v1);
+	float dot2 = dot(Gradient2D(br), v2);
+	float dot3 = dot(Gradient2D(tl), v3);
+	float dot4 = dot(Gradient2D(tr), v4);
 
 	float u = smoothstep(0.0, 1.0, v1.x);
 	float2 a = lerp(float2(dot1, dot3), float2(dot2, dot4), u);

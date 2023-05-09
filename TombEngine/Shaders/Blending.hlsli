@@ -126,7 +126,7 @@ float4 DoLasers(float3 input, float4 output, float2 UV, float fade_factor, float
 
 	float2 uv83 = UV * 8;
 	uv83.y = (UV.y + (timeUniform * 0.02));
-	noiseValue3 = nebularNoise(uv83, frequency, amplitude, persistence);
+	noiseValue3 = NebularNoise(uv83, frequency, amplitude, persistence);
 
 	noiseValue2 += AnimatedNebula(UV/2, timeUniform * 0.05f);
 	

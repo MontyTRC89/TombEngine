@@ -225,7 +225,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
-		UpdateLaserBarriers();
 
 		// Update HUD.
 		g_Hud.Update(*LaraItem);

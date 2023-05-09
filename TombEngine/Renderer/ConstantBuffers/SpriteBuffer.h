@@ -9,5 +9,5 @@ struct alignas(16) CSpriteBuffer
 {
 	float IsSoftParticle;
 	float secondsUniform;
-	float renderType;
+	int IsRenderType;
 };
