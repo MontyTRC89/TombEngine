@@ -87,8 +87,8 @@ float4 DoLasers(float3 input, float4 output, float2 UV, float fade_factor, float
 	float4 color = output;
 	float gradL = smoothstep(0.0, 1.0, UV.x);
 	float gradR = smoothstep(1.0, 0.0, UV.x);
-	float gradT = smoothstep(0.0, 1.0, UV.y);
-	float gradB =  smoothstep(1.0, 0.0, UV.y);
+	float gradT = smoothstep(0.0, 0.25, UV.y);
+	float gradB = 1.0 - smoothstep(0.75, 1.0, UV.y);
 
 	float distortion = timeUniform / 1024;
 
@@ -146,9 +146,9 @@ float4 DoLasers(float3 input, float4 output, float2 UV, float fade_factor, float
 	float fade3 = fade_factor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradT)));
 
 	float fadeL = 1.40f * fade_factor * fade_factor * (1.0 - gradL);
-	float fadeB =  fade_factor * fade_factor * (1.0 - gradB);
+	float fadeB = 2.75f * fade_factor * fade_factor * (1.0 - gradB);
 	float fadeR = 1.40f * fade_factor * fade_factor * (1.0 - gradR);
-	float fadeT = fade_factor * fade_factor * (1.0 - gradT);
+	float fadeT = 2.75f * fade_factor * fade_factor * (1.0 - gradT);
 
 	float fade = max(
 		max(max(fade0, fade1), max(fade2, fade3)),
@@ -162,7 +162,7 @@ float4 DoLasers(float3 input, float4 output, float2 UV, float fade_factor, float
 	{
 		decayFactor = UV.y / 2;
 	}
-	if (UV.y < .5f && UV.y>0)
+	if (UV.y < .5f && UV.y > 0)
 	{
 		decayFactor = (1 - UV.y) / 2;
 	}
