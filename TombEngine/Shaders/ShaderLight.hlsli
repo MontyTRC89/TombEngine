@@ -285,7 +285,11 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 	{
 		float noise = SimplexNoise(samplePosition / 512);
 		noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
-		fog += bulb.Density * 0.003f * noise;
+		fog += bulb.Density * 0.004f * noise;
+		if (fog >= 1.0f)
+		{
+			break;
+		}
 		samplePosition += cameraToVertexDirection.xyz * stepSize;
 	}
 
