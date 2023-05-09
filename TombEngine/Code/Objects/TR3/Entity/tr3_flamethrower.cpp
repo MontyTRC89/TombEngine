@@ -1,4 +1,6 @@
+#include "framework.h"
 #include "Objects/TR3/Entity/tr3_flamethrower.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/box.h"
@@ -61,6 +63,7 @@ namespace TEN::Entities::Creatures::TR3
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
 		auto pos = GetJointPosition(item, FlamethrowerBite);
 		int randomInt = GetRandomControl();
 

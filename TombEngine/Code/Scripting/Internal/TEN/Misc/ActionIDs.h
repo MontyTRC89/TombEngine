@@ -1,6 +1,8 @@
 #pragma once
-
 #include "Specific/Input/InputAction.h"
+
+#include <string>
+#include <unordered_map>
 
 using namespace TEN::Input;
 
@@ -39,23 +41,23 @@ The following constants are inside ActionID.
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, ActionID> kActionIDs
+static const std::unordered_map<std::string, ActionID> ACTION_IDS
 {
-	{"FORWARD", ActionID::Forward},
-	{"BACK", ActionID::Back},
-	{"LEFT", ActionID::Left},
-	{"RIGHT", ActionID::Right},
-	{"CROUCH", ActionID::Crouch},
-	{"SPRINT", ActionID::Sprint},
-	{"WALK", ActionID::Walk},
-	{"JUMP", ActionID::Jump},
-	{"ACTION", ActionID::Action},
-	{"DRAW", ActionID::DrawWeapon},
-	{"FLARE", ActionID::Flare},
-	{"LOOK", ActionID::Look},
-	{"ROLL", ActionID::Roll},
-	{"INVENTORY", ActionID::Option},
-	{"PAUSE", ActionID::Pause},
-	{"STEPLEFT", ActionID::LeftStep},
-	{"STEPRIGHT", ActionID::RightStep}
+	{ "FORWARD", ActionID::Forward },
+	{ "BACK", ActionID::Back },
+	{ "LEFT", ActionID::Left },
+	{ "RIGHT", ActionID::Right },
+	{ "CROUCH", ActionID::Crouch },
+	{ "SPRINT", ActionID::Sprint },
+	{ "WALK", ActionID::Walk },
+	{ "JUMP", ActionID::Jump },
+	{ "ACTION", ActionID::Action },
+	{ "DRAW", ActionID::DrawWeapon },
+	{ "FLARE", ActionID::Flare},
+	{ "LOOK", ActionID::Look },
+	{ "ROLL", ActionID::Roll },
+	{ "INVENTORY", ActionID::Option },
+	{ "PAUSE", ActionID::Pause },
+	{ "STEPLEFT", ActionID::LeftStep },
+	{ "STEPRIGHT", ActionID::RightStep }
 };

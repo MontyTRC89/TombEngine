@@ -551,7 +551,9 @@ CALL gen.bat</Command>
     <ClInclude Include="Code\Scripting\Internal\TEN\Logic\LogicHandler.h" />
     <ClInclude Include="Code\Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Code\Scripting\Internal\TEN\Misc\CameraTypes.h" />
-    <ClInclude Include="Code\Scripting\Internal\TEN\Misc\Miscellanous.h" />
+    <ClInclude Include="Code\Scripting\Internal\TEN\Misc\LevelLog.h" />
+    <ClInclude Include="Code\Scripting\Internal\TEN\Misc\LogLevel.h" />
+    <ClInclude Include="Code\Scripting\Internal\TEN\Misc\Miscellaneous.h" />
     <ClInclude Include="Code\Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
     <ClInclude Include="Code\Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />
     <ClInclude Include="Code\Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
@@ -952,7 +954,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Code\Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="Code\Scripting\Internal\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="Code\Scripting\Internal\TEN\Logic\LogicHandler.cpp" />
-    <ClCompile Include="Code\Scripting\Internal\TEN\Misc\Miscellanous.cpp" />
+    <ClCompile Include="Code\Scripting\Internal\TEN\Misc\Miscellaneous.cpp" />
     <ClCompile Include="Code\Scripting\Internal\TEN\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="Code\Scripting\Internal\TEN\Objects\Camera\CameraObject.cpp" />
     <ClCompile Include="Code\Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />

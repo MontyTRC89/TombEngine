@@ -1,4 +1,6 @@
+#include "framework.h"
 #include "Objects/TR3/Entity/Lizard.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
@@ -72,10 +74,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnLizardGas(int itemNumber, const CreatureBiteInfo& bite, int speed)
 	{
-		static constexpr auto numPoisonThrows = 2;
+		constexpr auto THROW_COUNT = 2;
 
-		for (int i = 0; i < numPoisonThrows; i++)
+		for (int i = 0; i < THROW_COUNT; i++)
 			ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 2), Vector3(0.0f, 1.0f, 0.0f));
+
 		ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 1), Vector3(0.0f, 1.0f, 0.0f));
 	}
 

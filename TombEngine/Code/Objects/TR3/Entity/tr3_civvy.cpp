@@ -1,4 +1,6 @@
+#include "framework.h"
 #include "Objects/TR3/Entity/tr3_civvy.h"
+
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -34,7 +36,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	const auto CivvyBiteLeft = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 10);
 	const auto CivvyBiteRight = CreatureBiteInfo(Vector3i::Zero, 13);
 	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };
   
