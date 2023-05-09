@@ -30,7 +30,6 @@
 #include "Renderer/Quad/RenderQuad.h"
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Objects/TR5/Trap/tr5_laser.h"
 
 using namespace TEN::Effects::Blood;
