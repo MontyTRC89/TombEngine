@@ -95,15 +95,30 @@ namespace TEN::Traps::TR5
 				return;
 			}
 
-			item->Model.Color.w = 0.8f;
-			barrier.Color.w = 0.8f;
+			//brightness fade in and distortion
+			if (item->Model.Color.w < 1.0f)
+				item->Model.Color.w += 0.02f;
+
+			if (barrier.Color.w < 1.0f)
+				barrier.Color.w += 0.02f;
+
+			if (item->Model.Color.w > 8.0f)
+			{
+				barrier.Color.w = 0.8f;
+				item->Model.Color.w = 0.8f;
+			}
+			
 			barrier.On = true;
 
 			SoundEffect(SFX_TR5_DOOR_BEAM, &item->Pose);
 		}
 
 		CollideLaserBarriers(itemNumber);
-		LaserBarrierLight(itemNumber, 150, 31);
+
+		if (item->Model.Color.w >= 0.8f)
+		{
+			LaserBarrierLight(itemNumber, 150, 31);			
+		}
 	}
 
 	void CollideLaserBarriers(short itemNumber)
@@ -143,9 +158,9 @@ namespace TEN::Traps::TR5
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 				}
 
-				barrier.Color.w = Random::GenerateFloat(1.0f, 0.5f);
+				barrier.Color.w = Random::GenerateFloat(1.0f, 0.7f);
 				LaserBarrierLight(itemNumber, 255, 100);
-			}
+			}		
 		}
 	}
 
