@@ -8,13 +8,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
-	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);
+	const auto EagleBite = CreatureBiteInfo(Vector3i(15, 46, 21), 6);
+	const auto CrowBite	 = CreatureBiteInfo(Vector3i(2, 10, 60), 14);
 
 	enum EagleOrCrowState
 	{

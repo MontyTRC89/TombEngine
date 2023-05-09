@@ -32,8 +32,8 @@ namespace TEN::Entities::Traps
 		SetAnimation(item, WALL_MOUNTED_BLADE_ANIM_IDLE);
 
 		// Used for GenericSphereBoxCollision.
-		item.ItemFlags[0] = WALL_MOUNTED_BLADE_JOINT;
-		item.ItemFlags[3] = WALL_MOUNTED_BLADE_HARM_DAMAGE;
+		item.ItemFlags[0] = WALL_MOUNTED_BLADE_JOINT; // Damaging mesh joint.
+		item.ItemFlags[3] = 0; // Set the Damage initially to 0 to avoid player being damaged when the blade is disabled.
 		item.ItemFlags[4] = 1; // NOTE: avoid the blade pushing lara in GenericSphereBoxCollision() !
 	}
 

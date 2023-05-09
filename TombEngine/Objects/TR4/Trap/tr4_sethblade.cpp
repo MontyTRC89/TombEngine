@@ -4,8 +4,8 @@
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {

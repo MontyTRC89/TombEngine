@@ -9,13 +9,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
+	const auto ChefBite = CreatureBiteInfo(Vector3i(0, 200, 0), 13);
 
 	// TODO
 	enum ChefState

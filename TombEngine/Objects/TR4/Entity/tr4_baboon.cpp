@@ -12,8 +12,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
-	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
+	const auto BaboonBite = CreatureBiteInfo(Vector3i(10, 10, 11), 4);
 	const auto BaboonAttackJoints	   = std::vector<unsigned int>{ 11, 12 };
 	const auto BaboonAttackRightJoints = std::vector<unsigned int>{ 1, 2, 3, 5, 8, 9 };
 	const auto BaboonJumpAttackJoints  = std::vector<unsigned int>{ 3, 4, 8 };

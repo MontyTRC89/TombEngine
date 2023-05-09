@@ -10,10 +10,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	// TODO: Ranges.
 
-	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
+	const auto GladiatorBite = CreatureBiteInfo(Vector3i::Zero, 16);
 	const auto GladiatorAttackJoints = std::vector<unsigned int>{ 13, 14 };
 
 	enum GladiatorState

@@ -77,7 +77,7 @@ int DrawPhase(bool isTitle);
 GameStatus ControlPhase(int numFrames);
 GameStatus DoLevel(int levelIndex, bool loadGame = false);
 GameStatus DoGameLoop(int levelIndex);
-void EndGameLoop(int levelIndex);
+void EndGameLoop(int levelIndex, GameStatus reason);
 
 GameStatus HandleMenuCalls(bool isTitle);
 GameStatus HandleGlobalInputEvents(bool isTitle);

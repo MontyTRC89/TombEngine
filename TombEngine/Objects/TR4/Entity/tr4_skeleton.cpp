@@ -14,11 +14,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
-	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
+	const auto SkeletonBite = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
 	const auto SkeletonSwordAttackJoints = std::vector<unsigned int>{ 15, 16 };
 
 	enum SkeletonState

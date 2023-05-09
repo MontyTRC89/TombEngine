@@ -36,6 +36,7 @@
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
@@ -55,7 +56,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/winmain.h"
 
 using namespace std::chrono;
@@ -126,7 +126,6 @@ GameStatus ControlPhase(int numFrames)
 {
 	auto time1 = std::chrono::high_resolution_clock::now();
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 	bool isTitle = (CurrentLevel == 0);
 
 	RegeneratePickups();
@@ -273,7 +272,6 @@ unsigned CALLBACK GameMain(void *)
 	else
 		g_Renderer.RenderTitleImage();
 
-
 	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
 
@@ -418,6 +416,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
 	DisableSmokeParticles();
@@ -468,9 +467,9 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
-void DeInitializeScripting(int levelIndex)
+void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
-	g_GameScript->OnEnd();
+	g_GameScript->OnEnd(reason);
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -566,6 +565,7 @@ GameStatus DoGameLoop(int levelIndex)
 		else
 		{
 			if (result == GameStatus::ExitToTitle ||
+				result == GameStatus::LaraDead ||
 				result == GameStatus::LoadGame ||
 				result == GameStatus::LevelComplete)
 			{
@@ -577,13 +577,13 @@ GameStatus DoGameLoop(int levelIndex)
 		Sound_UpdateScene();
 	}
 
-	EndGameLoop(levelIndex);
+	EndGameLoop(levelIndex, result);
 	return result;
 }
 
-void EndGameLoop(int levelIndex)
+void EndGameLoop(int levelIndex, GameStatus reason)
 {
-	DeInitializeScripting(levelIndex);
+	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
 	StopSoundTracks();
@@ -681,7 +681,7 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
 		Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
 	{
-		return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
+		return GameStatus::LaraDead; // Maybe do game over menu like some PSX versions have??
 	}
 
 	// Has level been completed?

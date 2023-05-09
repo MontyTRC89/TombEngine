@@ -7,8 +7,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Entity/PunaBoss.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Creatures::TR3;

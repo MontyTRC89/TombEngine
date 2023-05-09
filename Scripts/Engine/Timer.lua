@@ -277,7 +277,7 @@ Timer = {
 
 	--- Get the total time for a timer.
 	-- This is the amount of time the timer will start with, as well as when starting a new loop
-	-- @function myTimer:GetRemainingTime
+	-- @function myTimer:GetTotalTime
 	-- @treturn float the timer's total time
 	GetTotalTime = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].totalTime

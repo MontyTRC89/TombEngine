@@ -10,16 +10,16 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
+	const auto HydraBite = CreatureBiteInfo(Vector3i::Zero, 11);
 
 	enum HydraState
 	{

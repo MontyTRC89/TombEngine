@@ -33,7 +33,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
 	constexpr auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
 
-	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
+	const auto NatlaGunBite = CreatureBiteInfo(Vector3i(5, 220, 7), 4);
 
 	enum NatlaState
 	{

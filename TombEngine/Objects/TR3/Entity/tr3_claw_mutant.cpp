@@ -5,11 +5,11 @@
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
-#include "Objects/Effects/enemy_missile.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
+#include "Objects/Effects/enemy_missile.h"
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
@@ -35,9 +35,9 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CLAW_MUTANT_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
 
-	const auto ClawMutantLeftBite  = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 7);
-	const auto ClawMutantRightBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 4);
-	const auto ClawMutantTailBite  = BiteInfo(Vector3(-32.0f, -16.0f, -119.0f), 13);
+	const auto ClawMutantLeftBite  = CreatureBiteInfo(Vector3i(19, -13, 3), 7);
+	const auto ClawMutantRightBite = CreatureBiteInfo(Vector3i(19, -13, 3), 4);
+	const auto ClawMutantTailBite  = CreatureBiteInfo(Vector3i(-32, -16, -119), 13);
 
 	enum ClawMutantState
 	{
@@ -164,7 +164,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& fx = EffectList[plasmaBall];
 
-		auto jointPos = GetJointPosition(item, ClawMutantTailBite.meshNum, ClawMutantTailBite.Position);
+		auto jointPos = GetJointPosition(item, ClawMutantTailBite.BoneID, ClawMutantTailBite.Position);
 		auto orient = Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
 
 		fx.pos.Position = jointPos;
@@ -207,14 +207,14 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void DamageTargetWithClaw(ItemInfo& source, ItemInfo& target)
 	{
-		if (source.ItemFlags[5] == 0 && source.TouchBits.Test(ClawMutantLeftBite.meshNum))
+		if (source.ItemFlags[5] == 0 && source.TouchBits.Test(ClawMutantLeftBite.BoneID))
 		{
 			DoDamage(&target, CLAW_MUTANT_CLAW_ATTACK_DAMAGE / 2);
 			CreatureEffect2(&source, ClawMutantLeftBite, 10, source.Pose.Orientation.y, DoBloodSplat);
 			source.ItemFlags[5] = 1;
 		}
 
-		if (source.ItemFlags[6] == 0 && source.TouchBits.Test(ClawMutantRightBite.meshNum))
+		if (source.ItemFlags[6] == 0 && source.TouchBits.Test(ClawMutantRightBite.BoneID))
 		{
 			DoDamage(&target, CLAW_MUTANT_CLAW_ATTACK_DAMAGE / 2);
 			CreatureEffect2(&source, ClawMutantRightBite, 10, source.Pose.Orientation.y, DoBloodSplat);

@@ -18,8 +18,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto COWBOY_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto COWBOY_RUN_TURN_RATE_MAX	 = ANGLE(6.0f);
 
-	const auto CowboyGunLeft  = BiteInfo(Vector3(1.0f, 200.0f, 40.0f), 5);
-	const auto CowboyGunRight = BiteInfo(Vector3(-1.0f, 200.0f, 40.0f), 8);
+	const auto CowboyGunLeft  = CreatureBiteInfo(Vector3(1.0f, 200.0f, 40.0f), 5);
+	const auto CowboyGunRight = CreatureBiteInfo(Vector3(-1.0f, 200.0f, 40.0f), 8);
 
 	enum CowboyState
 	{
@@ -71,6 +71,11 @@ namespace TEN::Entities::Creatures::TR1
 		short tiltAngle = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
+		if (creature.MuzzleFlash[1].Delay != 0)
+			creature.MuzzleFlash[1].Delay--;
 
 		if (item.HitPoints <= 0)
 		{
@@ -193,12 +198,16 @@ namespace TEN::Entities::Creatures::TR1
 					if (!(creature.Flags & 1) && item.Animation.FrameNumber == GetFrameIndex(&item, 2))
 					{
 						ShotLara(&item, &ai, CowboyGunLeft, extraHeadRot.y, COWBOY_SHOT_DAMAGE);
+						creature.MuzzleFlash[0].Bite = CowboyGunLeft;
+						creature.MuzzleFlash[0].Delay = 2;
 						creature.Flags |= 1;
 					}
 
 					if (!(creature.Flags & 2) && item.Animation.FrameNumber == GetFrameIndex(&item, 10))
 					{
 						ShotLara(&item, &ai, CowboyGunRight, extraHeadRot.y, COWBOY_SHOT_DAMAGE);
+						creature.MuzzleFlash[1].Bite = CowboyGunRight;
+						creature.MuzzleFlash[1].Delay = 2;
 						creature.Flags |= 2;
 					}
 				}
