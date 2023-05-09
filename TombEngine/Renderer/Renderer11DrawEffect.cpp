@@ -1286,7 +1286,7 @@ namespace TEN::Renderer
 
 			if (m_stSprite.IsRenderType == SpriteRenderType::LaserBarrier)
 			{
-				m_stSprite.secondsUniform = (float)ScrollLaserUniform++;
+				m_stSprite.SecondsUniform = (float)ScrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
@@ -1361,7 +1361,7 @@ namespace TEN::Renderer
 
 			if (info->sprite->renderType == SpriteRenderType::LaserBarrier)
 			{
-				m_stSprite.secondsUniform = (float)ScrollLaserUniform++;
+				m_stSprite.SecondsUniform = (float)ScrollLaserUniform++;
 			}
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
