@@ -73,12 +73,16 @@ namespace TEN::Renderer
 				if (light.Type == LIGHT_TYPE_FOG_BULB)
 				{                                        
 					RendererFogBulb bulb;
-					bulb.Position = light.Position;
-					bulb.Density = light.Intensity;
-					bulb.Color = light.Color;
-					bulb.Radius = light.Out;
-					bulb.Distance = (int)(renderView.camera.WorldPosition - bulb.Position).Length();
-					tempFogBulbs.push_back(bulb);
+
+					if (renderView.camera.Frustum.SphereInFrustum(light.Position, light.Out))
+					{
+						bulb.Position = light.Position;
+						bulb.Density = light.Intensity;
+						bulb.Color = light.Color;
+						bulb.Radius = light.Out;
+						bulb.Distance = (int)(renderView.camera.WorldPosition - bulb.Position).Length();
+						tempFogBulbs.push_back(bulb);
+					}		
 				}
 			}
 		}
