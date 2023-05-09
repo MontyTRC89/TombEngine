@@ -419,10 +419,10 @@ void CleanUp()
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
+    ClearLaserBarriers();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
-	ClearLaserBarriers();
 
 	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
