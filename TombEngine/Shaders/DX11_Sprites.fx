@@ -78,7 +78,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	if (IsRenderType == 1)
 	{
 		output = DoLasers(input.Position, output, input.UV, FADE_FACTOR, secondsUniform);
-		return output;
 	}
 
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
