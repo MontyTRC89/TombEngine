@@ -419,7 +419,7 @@ void CleanUp()
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
-    ClearLaserBarriers();
+	ClearLaserBarriers();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
