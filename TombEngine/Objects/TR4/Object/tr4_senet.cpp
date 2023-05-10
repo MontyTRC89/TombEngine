@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "tr4_senet.h"
+#include "Objects/TR4/Object/tr4_senet.h"
+
 #include "Sound/sound.h"
 #include "Game/items.h"
 #include "Game/control/control.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_struct.h"
@@ -33,7 +34,7 @@ const ObjectCollisionBounds GameStixBounds =
 	)
 };
 
-void InitialiseGameSticks(short itemNumber)
+void InitializeGameSticks(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -503,7 +504,7 @@ void ControlGodHead(short itemNumber)
 	}
 }
 
-void InitialiseGamePiece(short itemNumber)
+void InitializeGamePiece(short itemNumber)
 {
 	if (!SenetPiecesNumber[0])
 	{

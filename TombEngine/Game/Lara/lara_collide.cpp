@@ -11,10 +11,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 

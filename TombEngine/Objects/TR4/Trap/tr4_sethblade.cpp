@@ -4,8 +4,8 @@
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 		SETHBLADE_ANIM_IDLE = 1
 	};
 
-	void InitialiseSethBlade(short itemNumber)
+	void InitializeSethBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

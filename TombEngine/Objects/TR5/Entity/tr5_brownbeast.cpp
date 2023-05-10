@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -19,8 +19,8 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto BROWN_BEAST_ATTACK_DAMAGE = 150;
 
-	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
-	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
+	const auto BrownBeastBite1 = CreatureBiteInfo(Vector3i::Zero, 16);
+	const auto BrownBeastBite2 = CreatureBiteInfo(Vector3i::Zero, 22);
 	const auto BrownBeastAttackJoints1 = std::vector<unsigned int>{ 14, 15, 16, 17 };
 	const auto BrownBeastAttackJoints2 = std::vector<unsigned int>{ 20, 21, 22, 23 };
 
@@ -36,11 +36,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	};
 
-	void InitialiseBrownBeast(short itemNumber)
+	void InitializeBrownBeast(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 

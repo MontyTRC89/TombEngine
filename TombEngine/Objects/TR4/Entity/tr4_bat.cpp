@@ -3,14 +3,14 @@
 
 #include "Game/control/box.h"
 #include "Game/control/control.h"
-#include "Game/effects/effects.h"
-#include "Game/misc.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
+#include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 
 	constexpr auto BAT_ANGLE = ANGLE(20.0f);
 
-	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
+	const auto BatBite = CreatureBiteInfo(Vector3i(0, 16, 45), 4);
 
 	enum BatState
 	{
@@ -52,11 +52,11 @@ namespace TEN::Entities::TR4
 		return (item->TouchBits.ToPackedBits() >= 0);
 	}
 
-	void InitialiseBat(short itemNumber)
+	void InitializeBat(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BAT_ANIM_IDLE);
 	}
 

@@ -5,9 +5,9 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 
 	};
 
-	void InitialiseJeanYves(short itemNumber)
+	void InitializeJeanYves(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		auto* objectInfo = &Objects[item->ObjectNumber];

@@ -24,7 +24,7 @@ namespace TEN::Entities::Generic
 	std::vector<ROPE_STRUCT> Ropes;
 	int RopeSwing = 0;
 
-	void InitialiseRope(short itemNumber)
+	void InitializeRope(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		short roomNumber = item->RoomNumber;

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseChef(short itemNumber);
+	void InitializeChef(short itemNumber);
 	void ControlChef(short itemNumber);
 }

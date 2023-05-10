@@ -10,10 +10,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
-	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
+	const auto KnightTemplarBite = CreatureBiteInfo(Vector3i::Zero, 11);
 	const auto KnightTemplarSwordAttackJoints = std::vector<unsigned int>{ 10, 11 };
 
 	enum KnightTemplarState
@@ -57,11 +57,11 @@ namespace TEN::Entities::TR4
 		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2 = 12
 	};
 
-	void InitialiseKnightTemplar(short itemNumber)
+	void InitializeKnightTemplar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, KTEMPLAR_ANIM_IDLE);
 		item->MeshBits &= 0xF7FF;
 	}

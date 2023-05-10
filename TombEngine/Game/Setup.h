@@ -1,16 +1,16 @@
 #pragma once
 #include "Objects/objectslist.h"
+#include "Game/control/box.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
-enum class ZoneType;
 struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
-// Custom LOT definition for Creature. Used in InitialiseSlot() in lot.cpp.
+// Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
 enum class LotType
 {
 	Skeleton,
@@ -23,7 +23,8 @@ enum class LotType
 	Flyer,
 	Blockable, // For large creatures such as trex and shiva.
 	Spider,    // Only 2 block vault allowed.
-	Ape		   // Only 2 block vault allowed.
+	Ape,	   // Only 2 block vault allowed.
+	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
 enum JointRotationFlags
@@ -67,7 +68,6 @@ struct ObjectInfo
 	int meshSwapSlot;
 	int pivotLength;
 	int radius;
-	int biteOffset;
 
 	int HitPoints;
 	bool intelligent;	// IsIntelligent
@@ -80,7 +80,7 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)>										   initialise;
+	std::function<void(short itemNumber)>										   Initialize;
 	std::function<void(short itemNumber)>										   control;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 
@@ -160,6 +160,6 @@ constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];
 
-void InitialiseGameFlags();
-void InitialiseSpecialEffects();
-void InitialiseObjects();
+void InitializeGameFlags();
+void InitializeSpecialEffects();
+void InitializeObjects();

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	void InitialiseMPStick(short itemNumber);
+	void InitializeMPStick(short itemNumber);
 	void MPStickControl(short itemNumber);
 }

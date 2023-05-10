@@ -18,13 +18,13 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
@@ -84,15 +84,16 @@ namespace TEN::Entities::Vehicles
 	#define UPV_LEAN_RATE ANGLE(0.6f)
 	#define UPV_LEAN_MAX  ANGLE(10.0f)
 
-	BiteInfo UPVBites[6] =
+	const CreatureBiteInfo UPVBites[6] =
 	{
-		{ 0, 0, 0, 3 },
-		{ 0, 96, 256, 0 },
-		{ -128, 0, 64, 1 },
-		{ 0, 0, -64, 1 },
-		{ 128, 0, 64, 2 },
-		{ 0, 0, -64, 2 }
+		CreatureBiteInfo(Vector3i(0, 0, 0), 3),
+		CreatureBiteInfo(Vector3i(0, 96, 256), 0),
+		CreatureBiteInfo(Vector3i(-128, 0, 64), 1),
+		CreatureBiteInfo(Vector3i(0, 0, -64), 1),
+		CreatureBiteInfo(Vector3i(128, 0, 64), 2),
+		CreatureBiteInfo(Vector3i(0, 0, -64), 2)
 	};
+
 	const std::vector<VehicleMountType> UPVMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -161,7 +162,7 @@ namespace TEN::Entities::Vehicles
 		return (UPVInfo*)UPVItem->Data;
 	}
 
-	void UPVInitialise(short itemNumber)
+	void UPVInitialize(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();
@@ -223,7 +224,7 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* harpoon = FireHarpoon(laraItem);
+		auto* harpoon = FireHarpoon(*laraItem);
 
 		if (harpoon == nullptr)
 			return;
@@ -304,7 +305,7 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position)).ToVector3();
+				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE]).ToVector3();
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
 				auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
@@ -322,7 +323,7 @@ namespace TEN::Entities::Vehicles
 		for (int lp = 0; lp < 2; lp++)
 		{
 			int random = 31 - (GetRandomControl() & 3);
-			auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum, Vector3i(
+			auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_FRONT_LIGHT].BoneID, Vector3i(
 				UPVBites[UPV_BITE_FRONT_LIGHT].Position.x,
 				UPVBites[UPV_BITE_FRONT_LIGHT].Position.y,
 				(int)UPVBites[UPV_BITE_FRONT_LIGHT].Position.z << (lp * 6)

@@ -21,13 +21,13 @@
 #include "Game/pickup/pickup_misc_items.h"
 #include "Game/pickup/pickup_weapon.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Generic;
@@ -301,10 +301,10 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(*laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
-			DrawFlareMeshes(laraItem);
+			DrawFlareMeshes(*laraItem);
 			KillItem(pickupItemNumber);
 
 			pickupItem->Pose.Orientation = prevOrient;
@@ -315,7 +315,7 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(*laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			KillItem(pickupItemNumber);
@@ -1071,7 +1071,7 @@ GameBoundingBox* FindPlinth(ItemInfo* item)
 		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
 }
 
-void InitialisePickup(short itemNumber)
+void InitializePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1130,7 +1130,7 @@ void InitialisePickup(short itemNumber)
 	}
 }
 
-void InitialiseSearchObject(short itemNumber)
+void InitializeSearchObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)

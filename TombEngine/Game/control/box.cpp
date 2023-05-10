@@ -7,6 +7,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
+#include "Game/effects/smoke.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -15,12 +16,14 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/winmain.h"
+
+using namespace TEN::Effects::Smoke;
 
 constexpr auto ESCAPE_DIST = SECTOR(5);
 constexpr auto STALK_DIST = SECTOR(3);
@@ -33,6 +36,8 @@ constexpr auto FEELER_DISTANCE = CLICK(2);
 constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
 constexpr auto CREATURE_JOINT_ROTATION_MAX = ANGLE(70.0f);
+
+constexpr auto CREATURE_GUN_EFFECT_VERTICAL_OFFSET = 75;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 constexpr int HIGH_PRIO_RANGE = 8;
@@ -586,15 +591,15 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.meshNum, Vector3i(bite.Position));
+	auto pos = GetJointPosition(item, bite);
 	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
-short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
+short CreatureEffect(ItemInfo* item, const CreatureBiteInfo& bite, std::function<CreatureEffectFunction> func)
 {
-	auto pos = GetJointPosition(item, bite.meshNum, Vector3i(bite.Position));
+	auto pos = GetJointPosition(item, bite);
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
 
@@ -731,26 +736,47 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	return angle;
 }
 
-bool CreatureAnimation(short itemNumber, short angle, short tilt)
+static void SpawnCreatureGunEffect(const ItemInfo& item, const CreatureMuzzleFlashInfo& muzzleFlash)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	if (muzzleFlash.Delay == 0)
+		return;
 
-	if (!item->IsCreature())
+	auto muzzlePos = muzzleFlash.Bite;
+	auto pos = GetJointPosition(item, muzzlePos);
+	TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
+
+	if (muzzleFlash.UseSmoke)
+	{
+		muzzlePos.Position.y -= CREATURE_GUN_EFFECT_VERTICAL_OFFSET;
+		auto smokePos = GetJointPosition(item, muzzlePos);
+		SpawnGunSmokeParticles(smokePos.ToVector3(), Vector3::Zero, item.RoomNumber, 1, LaraWeaponType::Pistol, 12);
+	}
+}
+
+bool CreatureAnimation(short itemNumber, short headingAngle, short tiltAngle)
+{
+	auto& item = g_Level.Items[itemNumber];
+	if (!item.IsCreature())
 		return false;
 
-	auto prevPos = item->Pose.Position;
+	auto& creature = *GetCreatureInfo(&item);
 
-	AnimateItem(item);
-	ProcessSectorFlags(item);
-	CreatureHealth(item);
+	SpawnCreatureGunEffect(item, creature.MuzzleFlash[0]);
+	SpawnCreatureGunEffect(item, creature.MuzzleFlash[1]);
 
-	if (item->Status == ITEM_DEACTIVATED)
+	auto prevPos = item.Pose.Position;
+
+	AnimateItem(&item);
+	ProcessSectorFlags(&item);
+	CreatureHealth(&item);
+
+	if (item.Status == ITEM_DEACTIVATED)
 	{
 		CreatureDie(itemNumber, false);
 		return false;
 	}
 
-	return CreaturePathfind(item, prevPos, angle, tilt);
+	return CreaturePathfind(&item, prevPos, headingAngle, tiltAngle);
 }
 
 void CreatureHealth(ItemInfo* item)
@@ -1084,7 +1110,7 @@ bool CreatureActive(short itemNumber)
 	return true;
 }
 
-void InitialiseCreature(short itemNumber) 
+void InitializeCreature(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -2076,7 +2102,24 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
-void InitialiseItemBoxData()
+void AdjustStopperFlag(ItemInfo* item, int direction)
+{
+	int x = item->Pose.Position.x;
+	int z = item->Pose.Position.z;
+
+	auto* room = &g_Level.Rooms[item->RoomNumber];
+	auto* floor = GetSector(room, x - room->x, z - room->z);
+	floor->Stopper = !floor->Stopper;
+
+	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
+	z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
+	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
+
+	floor = GetSector(room, x - room->x, z - room->z);
+	floor->Stopper = !floor->Stopper;
+}
+
+void InitializeItemBoxData()
 {
 	for (auto& room : g_Level.Rooms)
 	{

@@ -5,7 +5,7 @@ class Pose;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseDemigod(short itemNumber);
+	void InitializeDemigod(short itemNumber);
 	void DemigodControl(short itemNumber);
 	void TriggerDemigodMissile(Pose* pose, short roomNumber, int flags);
 	void DoDemigodEffects(short itemNumber);

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSphinx(short itemNumber);
+	void InitializeSphinx(short itemNumber);
 	void SphinxControl(short itemNumber);
 }

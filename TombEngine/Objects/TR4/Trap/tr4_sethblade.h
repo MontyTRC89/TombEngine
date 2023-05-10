@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSethBlade(short itemNumber);
+	void InitializeSethBlade(short itemNumber);
 	void SethBladeControl(short itemNumber);
 }

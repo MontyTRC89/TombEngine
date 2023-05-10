@@ -11,26 +11,25 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
-	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
-	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
+	const auto HorsemanBite1 = CreatureBiteInfo(Vector3i::Zero, 6);
+	const auto HorsemanBite2 = CreatureBiteInfo(Vector3i::Zero, 14);
+	const auto HorsemanBite3 = CreatureBiteInfo(Vector3i::Zero, 10);
 	const auto HorsemanAxeAttackJoints	   = std::vector<unsigned int>{ 5, 6 };
 	const auto HorsemanKickAttackJoints	   = std::vector<unsigned int>{ 14 };
 	const auto HorsemanMountedAttackJoints = std::vector<unsigned int>{ 5, 6, 10 };
 	const auto HorsemanShieldAttackJoints  = std::vector<unsigned int>{ 10 };
-
-	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
-	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
-	const auto HorseBite3 = BiteInfo(Vector3::Zero, 19);
+	const auto HorseBite1 = CreatureBiteInfo(Vector3i::Zero, 13);
+	const auto HorseBite2 = CreatureBiteInfo(Vector3i::Zero, 17);
+	const auto HorseBite3 = CreatureBiteInfo(Vector3i::Zero, 19);
 
 	enum HorsemanState
 	{
@@ -119,7 +118,7 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	void InitialiseHorse(short itemNumber)
+	void InitializeHorse(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -128,11 +127,11 @@ namespace TEN::Entities::TR4
 		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 	}
 
-	void InitialiseHorseman(short itemNumber)
+	void InitializeHorseman(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HORSEMAN_ANIM_IDLE);
 		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}

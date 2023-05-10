@@ -13,12 +13,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -288,7 +288,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter(short itemNumber)
+	void InitializeFlameEmitter(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -321,7 +321,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter2(short itemNumber)
+	void InitializeFlameEmitter2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -366,7 +366,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter3(short itemNumber)
+	void InitializeFlameEmitter3(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

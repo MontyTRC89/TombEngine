@@ -48,7 +48,7 @@ namespace TEN::Entities::Generic
 	};
 
 	// Main functions
-	void InitialisePushableBlock(int itemNumber);
+	void InitializePushableBlock(int itemNumber);
 	void PushableBlockControl(int itemNumber);
 	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
@@ -62,7 +62,7 @@ namespace TEN::Entities::Generic
 	void PushablesManageSounds(int itemNumber);
 	
 	// General functions
-	void InitialisePushablesGeneral();
+	void InitializePushablesGeneral();
 	void DeactivationPushablesRoutine(int itemNumber);
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
 	int GetPushableHeight(ItemInfo& item);

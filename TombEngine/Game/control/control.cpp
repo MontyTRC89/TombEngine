@@ -36,6 +36,7 @@
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
@@ -54,7 +55,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/winmain.h"
 
 using namespace std::chrono;
@@ -74,7 +74,7 @@ using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -84,7 +84,7 @@ int GameTimer       = 0;
 int GlobalCounter   = 0;
 int Wibble          = 0;
 
-bool InitialiseGame;
+bool InitializeGame;
 bool DoTheGame;
 bool JustLoaded;
 bool ThreadEnded;
@@ -124,7 +124,6 @@ GameStatus ControlPhase(int numFrames)
 {
 	auto time1 = std::chrono::high_resolution_clock::now();
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 	bool isTitle = (CurrentLevel == 0);
 
 	RegeneratePickups();
@@ -271,7 +270,6 @@ unsigned CALLBACK GameMain(void *)
 	else
 		g_Renderer.RenderTitleImage();
 
-
 	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
 
@@ -296,17 +294,17 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitialiseFXArray(true);
-	InitialiseCamera();
-	InitialiseSpotCamSequences(isTitle);
-	InitialiseItemBoxData();
+	InitializeFXArray(true);
+	InitializeCamera();
+	InitializeSpotCamSequences(isTitle);
+	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitialiseScripting(levelIndex, loadGame);
-	InitialiseNodeScripts();
+	InitializeScripting(levelIndex, loadGame);
+	InitializeNodeScripts();
 
 	// Initialize game variables and optionally load game.
-	InitialiseOrLoadGame(loadGame);
+	InitializeOrLoadGame(loadGame);
 
 	// Prepare title menu, if necessary.
 	if (isTitle)
@@ -416,6 +414,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
 	DisableSmokeParticles();
@@ -438,7 +437,7 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitialiseScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, bool loadGame)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
@@ -465,9 +464,9 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
-void DeInitialiseScripting(int levelIndex)
+void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
-	g_GameScript->OnEnd();
+	g_GameScript->OnEnd(reason);
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -475,7 +474,7 @@ void DeInitialiseScripting(int levelIndex)
 		g_GameScript->ResetScripts(true);
 }
 
-void InitialiseOrLoadGame(bool loadGame)
+void InitializeOrLoadGame(bool loadGame)
 {
 	RequiredStartPos = false;
 
@@ -495,7 +494,7 @@ void InitialiseOrLoadGame(bool loadGame)
 		Camera.target.y = LaraItem->Pose.Position.y;
 		Camera.target.z = LaraItem->Pose.Position.z;
 
-		InitialiseGame = false;
+		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
@@ -505,12 +504,12 @@ void InitialiseOrLoadGame(bool loadGame)
 		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
 
-		if (InitialiseGame)
+		if (InitializeGame)
 		{
 			// Clear all game info as well.
 			Statistics.Game = {};
 			GameTimer = 0;
-			InitialiseGame = false;
+			InitializeGame = false;
 
 			TENLog("Starting new game.", LogLevel::Info);
 		}
@@ -563,6 +562,7 @@ GameStatus DoGameLoop(int levelIndex)
 		else
 		{
 			if (result == GameStatus::ExitToTitle ||
+				result == GameStatus::LaraDead ||
 				result == GameStatus::LoadGame ||
 				result == GameStatus::LevelComplete)
 			{
@@ -574,13 +574,13 @@ GameStatus DoGameLoop(int levelIndex)
 		Sound_UpdateScene();
 	}
 
-	EndGameLoop(levelIndex);
+	EndGameLoop(levelIndex, result);
 	return result;
 }
 
-void EndGameLoop(int levelIndex)
+void EndGameLoop(int levelIndex, GameStatus reason)
 {
-	DeInitialiseScripting(levelIndex);
+	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
 	StopSoundTracks();
@@ -678,7 +678,7 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
 		Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
 	{
-		return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
+		return GameStatus::LaraDead; // Maybe do game over menu like some PSX versions have??
 	}
 
 	// Has level been completed?

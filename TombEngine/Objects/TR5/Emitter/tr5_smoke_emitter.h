@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseSmokeEmitter(short itemNumber);
+void InitializeSmokeEmitter(short itemNumber);
 void SmokeEmitterControl(short itemNumber);

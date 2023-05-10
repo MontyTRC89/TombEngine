@@ -29,7 +29,7 @@ class Moveable : public NamedBase<Moveable, short>
 public:
 	using IdentifierType = short;
 
-	Moveable(short num, bool alreadyInitialised = true);
+	Moveable(short num, bool alreadyInitialized = true);
 	~Moveable();
 	Moveable& operator=(Moveable const& other) = delete;
 	Moveable(Moveable const& other) = delete;
@@ -92,7 +92,7 @@ public:
 	void SetLocationAI(short value);
 
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
-	void SetMeshVisible(int meshId, bool visible);
+	void SetMeshVisible(int meshId, bool isVisible);
 	void ShatterMesh(int meshId);
 
 	[[nodiscard]] bool GetMeshSwapped(int meshId) const;
@@ -102,11 +102,11 @@ public:
 	[[nodiscard]] bool GetHitStatus() const;
 
 	[[nodiscard]] bool GetActive() const;
-	void SetActive(bool active);
+	void SetActive(bool isActive);
 
 	std::unique_ptr<Room> GetRoom() const;
 	[[nodiscard]] int GetRoomNumber() const;
-	void SetRoomNumber(short room);
+	void SetRoomNumber(int roomNumber);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
@@ -114,7 +114,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
-	void SetVisible(bool visible);
+	void SetVisible(bool isVisible);
 	void Explode();
 	void Shatter();
 
@@ -137,7 +137,7 @@ protected:
 
 private:
 	short m_num;
-	bool m_initialised;
+	bool m_initialized;
 
 	bool MeshExists(int number) const;
 };

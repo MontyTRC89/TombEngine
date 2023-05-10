@@ -8,7 +8,7 @@ struct ROOM_INFO;
 
 namespace TEN::Entities::Doors
 {
-	void InitialiseDoor(short itemNumber);
+	void InitializeDoor(short itemNumber);
 	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoorControl(short itemNumber);
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* door);

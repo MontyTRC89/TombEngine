@@ -1,23 +1,24 @@
 #include "framework.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/Lara/lara_flare.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara.h"
+
 #include "Game/animation.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
-#include "Sound/sound.h"
-#include "Objects/Effects/flame_emitters.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/los.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
+#include "Objects/Effects/flame_emitters.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Effects;
+using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
@@ -130,7 +131,7 @@ namespace TEN::Entities::Generic
 				else if (lara->LeftArm.FrameNumber == 12)
 				{
 					laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
-					CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, true);
+					CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, true);
 				}
 			}
 		}
@@ -150,7 +151,7 @@ namespace TEN::Entities::Generic
 			else if (lara->LeftArm.FrameNumber == 36)
 			{
 				laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
-				CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, false);
+				CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, false);
 			}
 		}
 		else if (lara->Torch.State == TorchState::JustLit)
@@ -189,7 +190,7 @@ namespace TEN::Entities::Generic
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			CreateFlare(*laraItem, ID_FLARE_ITEM, false);
 
 		lara->Control.HandStatus = HandStatus::WeaponReady;
 		lara->Control.Weapon.RequestGunType = LaraWeaponType::Torch;

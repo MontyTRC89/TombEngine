@@ -8,13 +8,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 int NumberLosRooms;
 short LosRooms[20];
@@ -252,7 +252,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			else
 			{
 				if (LaserSight && isFiring)
-					FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
 
@@ -263,7 +263,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
 			if (isFiring && LaserSight)
-				FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+				FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 		}
 		else
 		{

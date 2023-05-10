@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
 	constexpr auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
 
-	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
+	const auto RaptorBite = CreatureBiteInfo(Vector3i(0, 66, 318), 22);
 	const auto RaptorAttackJoints = std::vector<unsigned int>{ 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState

@@ -7,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -16,15 +16,15 @@
 int SlotsUsed;
 std::vector<CreatureInfo*> ActiveCreatures;
 
-void InitialiseLOTarray(int itemNumber)
+void InitializeLOTarray(int itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	if (!creature->LOT.Initialised)
+	if (!creature->LOT.Initialized)
 	{
 		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
-		creature->LOT.Initialised = true;
+		creature->LOT.Initialized = true;
 	}
 }
 
@@ -35,7 +35,7 @@ bool EnableEntityAI(short itemNum, bool always, bool makeTarget)
 	if (item->IsCreature())
 		return true;
 
-	InitialiseSlot(itemNum, makeTarget);
+	InitializeSlot(itemNum, makeTarget);
 	ActiveCreatures.push_back(item->Data);
 
 	return item->IsCreature();
@@ -55,14 +55,14 @@ void DisableEntityAI(short itemNumber)
 	item->Data = nullptr;
 }
 
-void InitialiseSlot(short itemNumber, bool makeTarget)
+void InitializeSlot(short itemNumber, bool makeTarget)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
 	item->Data = CreatureInfo();
 	auto* creature = GetCreatureInfo(item);
 
-	InitialiseLOTarray(itemNumber);
+	InitializeLOTarray(itemNumber);
 	creature->ItemNumber = itemNumber;
 	creature->Mood = MoodType::Bored;
 	creature->JointRotation[0] = 0;
@@ -144,6 +144,12 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
 
+			break;
+
+		case LotType::SnowmobileGun:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		// Can climb.

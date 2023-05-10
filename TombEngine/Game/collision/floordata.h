@@ -158,7 +158,7 @@ class FloorInfo
 		void RemoveBridge(int itemNumber);
 };
 
-namespace TEN::Floordata
+namespace TEN::Collision::Floordata
 {
 	// TODO: Use normals natively.
 	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);

@@ -14,9 +14,9 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
@@ -155,7 +155,7 @@ void DrawLeftPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
-		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
+		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
@@ -171,7 +171,7 @@ void DrawRightPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
-		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
 		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else

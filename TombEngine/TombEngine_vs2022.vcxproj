@@ -230,6 +230,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\savegame.h" />
+    <ClInclude Include="Game\Setup.h" />
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
@@ -280,6 +281,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Objects\Sink.h" />
+    <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
@@ -329,6 +331,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_fish_emitter.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_flamethrower.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
@@ -343,6 +346,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\tr3_objects.h" />
     <ClInclude Include="Objects\TR3\Trap\ElectricCleaner.h" />
     <ClInclude Include="Objects\TR3\Trap\train.h" />
+    <ClInclude Include="Objects\TR3\Trap\WallMountedBlade.h" />
     <ClInclude Include="Objects\TR3\Vehicles\big_gun.h" />
     <ClInclude Include="Objects\TR3\Vehicles\big_gun_info.h" />
     <ClInclude Include="Objects\TR3\Vehicles\kayak.h" />
@@ -584,7 +588,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\RGBAColor8Byte.h" />
     <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
-    <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
@@ -631,6 +634,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
+    <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
@@ -665,6 +669,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
+    <ClCompile Include="Game\Setup.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Interpolation.cpp" />
@@ -712,6 +717,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
@@ -759,6 +765,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_fish_emitter.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_flamethrower.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_monkey.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_claw_mutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_raptor.cpp" />
@@ -772,6 +779,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
     <ClCompile Include="Objects\TR3\Trap\ElectricCleaner.cpp" />
     <ClCompile Include="Objects\TR3\Trap\train.cpp" />
+    <ClCompile Include="Objects\TR3\Trap\WallMountedBlade.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\minecart.cpp" />
@@ -961,7 +969,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Specific\IO\Streams.cpp" />
     <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\trutils.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
   </ItemGroup>

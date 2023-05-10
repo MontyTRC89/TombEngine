@@ -1,6 +1,6 @@
 #pragma once
-#include "LogicHandler.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 
 // Why do we need this class?
 // We need a way to save and load functions in a way that remembers exactly what "path" they have in the LevelFuncs table hierarchy.
@@ -18,14 +18,14 @@ public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
 
-	sol::protected_function_result Call(sol::variadic_args args)
+	template <typename ... Ts> sol::protected_function_result CallCallback(Ts ... vs)
 	{
-		return m_handler->CallLevelFunc(m_funcName, args);
+		return m_handler->CallLevelFuncByName(m_funcName, vs...);
 	}
 
-	sol::protected_function_result CallDT(float deltaTime)
+	sol::protected_function_result Call(sol::variadic_args args)
 	{
-		return m_handler->CallLevelFunc(m_funcName, deltaTime);
+		return m_handler->CallLevelFuncByName(m_funcName, args);
 	}
 
 	static void Register(sol::table& parent)

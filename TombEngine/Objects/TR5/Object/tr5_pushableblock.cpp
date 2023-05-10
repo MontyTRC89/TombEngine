@@ -2,21 +2,21 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #include "Game/animation.h"
-#include "Game/items.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Sound/sound_effects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -83,7 +83,7 @@ namespace TEN::Entities::Generic
 
 	// Main functions
 
-	void InitialisePushableBlock(int itemNumber)
+	void InitializePushableBlock(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = PushableInfo();
@@ -95,7 +95,7 @@ namespace TEN::Entities::Generic
 		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UsesRoomCollision = true;
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 		}
 		else
 		{
@@ -783,7 +783,7 @@ namespace TEN::Entities::Generic
 
 	// General functions
 
-	void InitialisePushablesGeneral()
+	void InitializePushablesGeneral()
 	{
 		// To execute on level start and on level loading.
 
@@ -1159,9 +1159,9 @@ namespace TEN::Entities::Generic
 		if (pushable.UsesRoomCollision)
 		{
 			if (addBridge)
-				TEN::Floordata::AddBridge(itemNumber);
+				TEN::Collision::Floordata::AddBridge(itemNumber);
 			else
-				TEN::Floordata::RemoveBridge(itemNumber);
+				TEN::Collision::Floordata::RemoveBridge(itemNumber);
 		}
 
 		if (pushable.StackUpperItem == NO_ITEM)
@@ -1175,9 +1175,9 @@ namespace TEN::Entities::Generic
 			if (pushableLinked.UsesRoomCollision)
 			{
 				if (addBridge)
-					TEN::Floordata::AddBridge(pushableLinkedItem.Index);
+					TEN::Collision::Floordata::AddBridge(pushableLinkedItem.Index);
 				else
-					TEN::Floordata::RemoveBridge(pushableLinkedItem.Index);
+					TEN::Collision::Floordata::RemoveBridge(pushableLinkedItem.Index);
 			}
 
 			pushableLinkedItem = g_Level.Items[pushableLinked.StackUpperItem];
