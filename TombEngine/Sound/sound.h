@@ -145,7 +145,7 @@ extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 extern int SecretSoundIndex;
 
 // Sets the location of the audio dir's containing folder, NOT the audio dir itself
-void SetAudioDirLocation(std::string_view dirLocation);
+void SetAudioDirLocation(const std::string& dirLocation);
 bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);

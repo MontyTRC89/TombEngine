@@ -1031,7 +1031,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	auto assetDir = std::string{ g_GameFlow->GetAssetDir() };
+	auto assetDir = g_GameFlow->GetAssetDir();
 	auto levelPath = assetDir + level->FileName;
 	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
