@@ -18,14 +18,16 @@ namespace TEN::Traps::TR5
 
 	std::vector<LaserBarrier> LaserBarriers = {};
 
+	// TODO: Simplify.
 	void InitializeLaserBarriers(short itemNumber)
 	{
 		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
+
 		auto& item = g_Level.Items[itemNumber];
 
 		auto barrier = LaserBarrier{};
 
-		barrier.lethal = item.TriggerFlags;
+		barrier.Lethal = item.TriggerFlags;
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		barrier.Color = item.Model.Color;
 		barrier.Color.w = 0.0f;
@@ -80,86 +82,99 @@ namespace TEN::Traps::TR5
 
 		LaserBarriers.push_back(barrier);
 	}
-	
+
+	// TODO: Make it a line of light.
+	static void SpawnLaserBarrierLight(int itemNumber, float lightIntensity, float amplitude)
+	{
+		for (const auto& barrier : LaserBarriers)
+		{
+			auto& item = g_Level.Items[itemNumber];
+
+			float intensity = lightIntensity - Random::GenerateFloat(0.0f, amplitude);
+			TriggerDynamicLight(
+				item.Pose.Position.x,
+				item.Pose.Position.y,
+				item.Pose.Position.z,
+				8,
+				intensity * (item.Model.Color.x / 2),
+				intensity * (item.Model.Color.y / 2),
+				intensity * (item.Model.Color.z / 2));
+		}
+	}
+
 	void ControlLaserBarriers(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
 		for (auto& barrier : LaserBarriers)
 		{
-			if (!TriggerActive(item))
+			if (!TriggerActive(&item))
 			{
-				item->Model.Color.w = 0.0f;
+				barrier.IsActive = false;
 				barrier.Color.w = 0.0f;
-				barrier.On = false;
+				item.Model.Color.w = 0.0f;
 				return;
 			}
 
-			//brightness fade in and distortion
-			if (item->Model.Color.w < 1.0f)
-				item->Model.Color.w += 0.02f;
+			// Brightness fade-in and distortion.
+			if (item.Model.Color.w < 1.0f)
+				item.Model.Color.w += 0.02f;
 
 			if (barrier.Color.w < 1.0f)
 				barrier.Color.w += 0.02f;
 
-			if (item->Model.Color.w > 8.0f)
+			if (item.Model.Color.w > 8.0f)
 			{
 				barrier.Color.w = 0.8f;
-				item->Model.Color.w = 0.8f;
+				item.Model.Color.w = 0.8f;
 			}
 			
-			barrier.On = true;
+			barrier.IsActive = true;
 		}
 
 		CollideLaserBarriers(itemNumber);
 
-		if (item->Model.Color.w >= 0.8f)
-		{
-			LaserBarrierLight(itemNumber, 150, 31);			
-		}
+		if (item.Model.Color.w >= 0.8f)
+			SpawnLaserBarrierLight(itemNumber, 150, 31);			
 
-		SoundEffect(SFX_TR5_DOOR_BEAM, &item->Pose);
+		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
 	void CollideLaserBarriers(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
 		for (auto& barrier : LaserBarriers)
 		{
-			auto corner1 = barrier.Beams[2].VertexPoints[0];
-			auto corner2 = barrier.Beams[2].VertexPoints[1];
+			auto point0 = barrier.Beams.back().VertexPoints[0];
+			auto point1 = barrier.Beams.back().VertexPoints[1];
+			auto point2 = barrier.Beams.front().VertexPoints[2];
+			auto point3 = barrier.Beams.front().VertexPoints[3];
 
-			auto corner3 = barrier.Beams[0].VertexPoints[2];
-			auto corner4 = barrier.Beams[0].VertexPoints[3];
+			// Calculate bounding box center.
+			barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
 
-			// Calculate center of the bounding box
-			barrier.BoundingBox.Center = (corner1 + corner2 + corner3 + corner4) / 4.0f;
-
-			// Calculate relative dimensions of the bounding box
-			auto halfWidth = std::abs(corner1.x - corner2.x) / 2.0f;
-			auto halfHeight = std::abs(corner1.y - corner3.y) / 2.0f;
-			auto halfDepth = std::abs(corner1.z - corner3.z) / 2.0f;
+			// Calculate relative bounding box dimensions.
+			float halfWidth = std::abs(point0.x - point1.x) / 2;
+			float halfHeight = std::abs(point0.y - point2.y) / 2;
+			float halfDepth = std::abs(point0.z - point2.z) / 2;
 			barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
 
-			auto itemBBox = GameBoundingBox(LaraItem);
-			auto itemBounds = itemBBox.ToBoundingOrientedBox(LaraItem->Pose);
-
-			if (barrier.BoundingBox.Intersects(itemBounds))
+			auto box = GameBoundingBox(LaraItem).ToBoundingOrientedBox(LaraItem->Pose);
+			if (barrier.BoundingBox.Intersects(box))
 			{
-				if (barrier.lethal > 0 && LaraItem->Effect.Type != EffectType::Smoke && LaraItem->HitPoints > 0)
+				if (barrier.Lethal > 0 &&
+					LaraItem->HitPoints > 0 && LaraItem->Effect.Type != EffectType::Smoke)
 				{
 					ItemRedLaserBurn(LaraItem, 2 * FPS);
 					DoDamage(LaraItem, MAXINT);
 				}
 
-				if (barrier.lethal < 0)
-				{
-					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
-				}
+				if (barrier.Lethal < 0)
+					TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
-				barrier.Color.w = Random::GenerateFloat(1.0f, 0.7f);
-				LaserBarrierLight(itemNumber, 255, 100);
+				barrier.Color.w = Random::GenerateFloat(0.7f, 1.0f);
+				SpawnLaserBarrierLight(itemNumber, 255, 100);
 			}		
 		}
 	}
@@ -167,26 +182,5 @@ namespace TEN::Traps::TR5
 	void ClearLaserBarriers()
 	{
 		LaserBarriers.clear();
-	}
-
-	void LaserBarrierLight(short itemNumber, int lightIntensity, int amplitude)
-	{
-		for (auto& barrier : LaserBarriers)
-		{
-			auto* item = &g_Level.Items[itemNumber];
-
-			int intensity = 0;
-
-			intensity = lightIntensity - (Random::GenerateInt(0, amplitude));
-
-			TriggerDynamicLight(
-				item->Pose.Position.x,
-				item->Pose.Position.y,
-				item->Pose.Position.z,
-				8,
-				(intensity * (item->Model.Color.x / 2)),
-				(intensity * (item->Model.Color.y / 2)),
-				(intensity * (item->Model.Color.z / 2)));
-		}
 	}
 }
