@@ -1,5 +1,8 @@
 #pragma once
 
+struct CollisionInfo;
+struct ItemInfo;
+
 namespace TEN::Traps::TR5
 {
 	struct LaserBarrierBeam
@@ -15,14 +18,15 @@ namespace TEN::Traps::TR5
 		BoundingOrientedBox			  BoundingBox = {};
 		Vector4						  Color		  = Vector4::Zero;
 
-		bool IsActive = false; // TODO: Might be unnecessary.
+		bool IsActive = false;
 		int	Lethal; // TODO: Rename.
 	};
 
-	extern std::vector<LaserBarrier> LaserBarriers;
+	extern std::unordered_map<int, LaserBarrier> LaserBarriers;
 
-	void InitializeLaserBarriers(short itemNumber);
-	void ControlLaserBarriers(short itemNumber);
-	void CollideLaserBarriers(short itemNumber);
+	void InitializeLaserBarrier(short itemNumber);
+	void ControlLaserBarrier(short itemNumber);
+	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
+
 	void ClearLaserBarriers();
 }

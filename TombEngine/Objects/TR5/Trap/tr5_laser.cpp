@@ -5,6 +5,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
@@ -16,10 +17,10 @@ namespace TEN::Traps::TR5
 	// - Negative OCB gives not lethal and activates a heavy trigger, positive OCB lethal.
 	// - OCB value defines the width in blocks.
 
-	std::vector<LaserBarrier> LaserBarriers = {};
+	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
 	// TODO: Simplify.
-	void InitializeLaserBarriers(short itemNumber)
+	void InitializeLaserBarrier(short itemNumber)
 	{
 		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
 
@@ -80,103 +81,106 @@ namespace TEN::Traps::TR5
 			i++;
 		}
 
-		LaserBarriers.push_back(barrier);
+		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
 	// TODO: Make it a line of light.
-	static void SpawnLaserBarrierLight(int itemNumber, float lightIntensity, float amplitude)
+	static void SpawnLaserBarrierLight(const ItemInfo& item, float intensity, float amplitude)
 	{
-		for (const auto& barrier : LaserBarriers)
-		{
-			auto& item = g_Level.Items[itemNumber];
-
-			float intensity = lightIntensity - Random::GenerateFloat(0.0f, amplitude);
-			TriggerDynamicLight(
-				item.Pose.Position.x,
-				item.Pose.Position.y,
-				item.Pose.Position.z,
-				8,
-				intensity * (item.Model.Color.x / 2),
-				intensity * (item.Model.Color.y / 2),
-				intensity * (item.Model.Color.z / 2));
-		}
+		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
+		TriggerDynamicLight(
+			item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z,
+			8,
+			intensityNorm * (item.Model.Color.x / 2),
+			intensityNorm * (item.Model.Color.y / 2),
+			intensityNorm * (item.Model.Color.z / 2));
 	}
 
-	void ControlLaserBarriers(short itemNumber)
+	void ControlLaserBarrier(short itemNumber)
 	{
+		constexpr auto LIGHT_INTENSITY = 150.0f;
+		constexpr auto LIGHT_AMPLITUDE = 31.0f;
+
+		if (!LaserBarriers.count(itemNumber))
+			return;
+
 		auto& item = g_Level.Items[itemNumber];
+		auto& barrier = LaserBarriers.at(itemNumber);
 
-		for (auto& barrier : LaserBarriers)
+		if (!TriggerActive(&item))
 		{
-			if (!TriggerActive(&item))
-			{
-				barrier.IsActive = false;
-				barrier.Color.w = 0.0f;
-				item.Model.Color.w = 0.0f;
-				return;
-			}
-
-			// Brightness fade-in and distortion.
-			if (item.Model.Color.w < 1.0f)
-				item.Model.Color.w += 0.02f;
-
-			if (barrier.Color.w < 1.0f)
-				barrier.Color.w += 0.02f;
-
-			if (item.Model.Color.w > 8.0f)
-			{
-				barrier.Color.w = 0.8f;
-				item.Model.Color.w = 0.8f;
-			}
-			
-			barrier.IsActive = true;
+			barrier.IsActive = false;
+			barrier.Color.w = 0.0f;
+			item.Model.Color.w = 0.0f;
+			return;
 		}
 
-		CollideLaserBarriers(itemNumber);
+		// Brightness fade-in and distortion.
+		if (item.Model.Color.w < 1.0f)
+			item.Model.Color.w += 0.02f;
+
+		if (barrier.Color.w < 1.0f)
+			barrier.Color.w += 0.02f;
+
+		if (item.Model.Color.w > 8.0f)
+		{
+			barrier.Color.w = 0.8f;
+			item.Model.Color.w = 0.8f;
+		}
+			
+		barrier.IsActive = true;
 
 		if (item.Model.Color.w >= 0.8f)
-			SpawnLaserBarrierLight(itemNumber, 150, 31);			
+			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
-	void CollideLaserBarriers(short itemNumber)
+	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
+		constexpr auto LIGHT_INTENSITY = 255.0f;
+		constexpr auto LIGHT_AMPLITUDE = 100.0f;
+
+		if (!LaserBarriers.count(itemNumber))
+			return;
+
 		auto& item = g_Level.Items[itemNumber];
+		auto& barrier = LaserBarriers.at(itemNumber);
 
-		for (auto& barrier : LaserBarriers)
+		if (!barrier.IsActive)
+			return;
+
+		// Determine points.
+		auto point0 = barrier.Beams.back().VertexPoints[0];
+		auto point1 = barrier.Beams.back().VertexPoints[1];
+		auto point2 = barrier.Beams.front().VertexPoints[2];
+		auto point3 = barrier.Beams.front().VertexPoints[3];
+
+		// Update bounding box center.
+		barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
+
+		// Calculate and update relative bounding box dimensions.
+		float halfWidth = std::abs(point0.x - point1.x) / 2;
+		float halfHeight = std::abs(point0.y - point2.y) / 2;
+		float halfDepth = std::abs(point0.z - point2.z) / 2;
+		barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
+
+		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
+		if (barrier.BoundingBox.Intersects(playerBox))
 		{
-			auto point0 = barrier.Beams.back().VertexPoints[0];
-			auto point1 = barrier.Beams.back().VertexPoints[1];
-			auto point2 = barrier.Beams.front().VertexPoints[2];
-			auto point3 = barrier.Beams.front().VertexPoints[3];
-
-			// Calculate bounding box center.
-			barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
-
-			// Calculate relative bounding box dimensions.
-			float halfWidth = std::abs(point0.x - point1.x) / 2;
-			float halfHeight = std::abs(point0.y - point2.y) / 2;
-			float halfDepth = std::abs(point0.z - point2.z) / 2;
-			barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
-
-			auto box = GameBoundingBox(LaraItem).ToBoundingOrientedBox(LaraItem->Pose);
-			if (barrier.BoundingBox.Intersects(box))
+			if (barrier.Lethal > 0 &&
+				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
-				if (barrier.Lethal > 0 &&
-					LaraItem->HitPoints > 0 && LaraItem->Effect.Type != EffectType::Smoke)
-				{
-					ItemRedLaserBurn(LaraItem, 2 * FPS);
-					DoDamage(LaraItem, MAXINT);
-				}
+				ItemRedLaserBurn(playerItem, 2.0f * FPS);
+				DoDamage(playerItem, MAXINT);
+			}
 
-				if (barrier.Lethal < 0)
-					TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
+			if (barrier.Lethal < 0)
+				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
-				barrier.Color.w = Random::GenerateFloat(0.7f, 1.0f);
-				SpawnLaserBarrierLight(itemNumber, 255, 100);
-			}		
-		}
+			barrier.Color.w = Random::GenerateFloat(0.7f, 1.0f);
+			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
+		}		
 	}
 
 	void ClearLaserBarriers()

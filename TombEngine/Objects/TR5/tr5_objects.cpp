@@ -957,8 +957,9 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_LASER_BARRIER];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeLaserBarriers;
-		obj->control = ControlLaserBarriers;
+		obj->Initialize = InitializeLaserBarrier;
+		obj->control = ControlLaserBarrier;
+		obj->collision = CollideLaserBarrier;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

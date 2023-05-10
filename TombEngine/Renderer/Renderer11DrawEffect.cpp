@@ -77,7 +77,7 @@ namespace TEN::Renderer
 		if (LaserBarriers.empty())
 			return;
 
-		for (const auto& barrier : LaserBarriers)
+		for (const auto& [entityID, barrier] : LaserBarriers)
 		{
 			for (const auto& beam : barrier.Beams)
 			{
