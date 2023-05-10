@@ -11,8 +11,7 @@
 cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
-	float SecondsUniform;
-	int IsRenderType;
+	int RenderType;
 };
 
 struct PixelShaderInput
@@ -75,9 +74,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	if (IsRenderType == 1)
+	if (RenderType == 1)
 	{
-		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, SecondsUniform);
+		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
 	}
 
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
