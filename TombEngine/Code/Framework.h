@@ -5,76 +5,67 @@
 #include <algorithm>
 #include <array>
 #include <deque>
+#include <execution>
+#include <filesystem>
+#include <fstream>
 #include <functional>
+#include <future>
+#include <iostream>
+#include <locale>
 #include <map>
 #include <memory>
 #include <optional>
-#include <set>
-#include <sol.hpp>
-#include <stdint.h>
-#include <stdio.h>
-#include <filesystem>
-#include <stdlib.h>
-#include <string>
-#include <vector>
-#include <unordered_set>
-#include <variant>
-#include <thread>
-#include <stdexcept>
-#include <string_view>
 #include <random>
 #include <regex>
-#include <iostream>
-#include <fstream>
-#include <future>
-#include <execution>
+#include <set>
+#include <sol.hpp>
 #include <stack>
+#include <stdexcept>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <string_view>
+#include <thread>
 #include <tuple>
-#include <locale>
+#include <unordered_set>
+#include <variant>
+#include <vector>
 
-#include <codecvt>	// TODO: remove this and everything that relies on it
+#include <codecvt>	// TODO: Remove this and everything that relies on it.
 
 // DX includes
-
-#include <d3d11.h>
-#include <d3dcompiler.h>
-#include <d3d9types.h>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
 #include <CommonStates.h>
-#include <SpriteFont.h>
+#include <d3d11.h>
+#include <d3d9types.h>
+#include <d3dcompiler.h>
+#include <DDSTextureLoader.h>
 #include <PrimitiveBatch.h>
+#include <SpriteFont.h>
+#include <WICTextureLoader.h>
 
 // WRL includes
-
 #include <wrl/client.h>
 
 // BASS includes
-
 #include <bass.h>
 #include <bass_fx.h>
 
 // OIS includes
-
 #include <OISKeyboard.h>
 
 // zlib includes
-
 #include <zlib.h>
 
-// debug include
-
-#include <Game/debug/debug.h>
-
 // DXTK includes
-
 #include <SimpleMath.h>
 
-// resources include
+// Resource includes
+//#include "Math/Math.h" // TODO
+#include "resource.h"
 
-#include <resource.h>
-
-//#include <Math/Math.h> // TODO
+// Debug includes
+#include "Game/debug/debug.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
