@@ -259,7 +259,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (enemy->IsLara())
 		{
 			const auto& player = *GetLaraInfo(enemy);
-			if (player.Control.IsInLowPosition)
+			if (player.Control.IsLow)
 				fx.pos.Orientation.x -= SOPHIALEIGH_LASER_DECREASE_XANGLE_IF_LARA_CROUCH;
 		}
 

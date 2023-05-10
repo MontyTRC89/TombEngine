@@ -396,8 +396,8 @@ bool SaveGame::Save(int slot)
 	control.add_run_jump_queued(Lara.Control.IsRunJumpQueued);
 	control.add_can_look(Lara.Control.CanLook);
 	control.add_count(countOffset);
-	control.add_keep_low(Lara.Control.IsInLowSpace);
-	control.add_is_low(Lara.Control.IsInLowPosition);
+	control.add_keep_low(Lara.Control.KeepLow);
+	control.add_is_low(Lara.Control.IsLow);
 	control.add_can_climb_ladder(Lara.Control.CanClimbLadder);
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
@@ -1822,10 +1822,10 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
-	Lara.Control.IsInLowPosition = s->lara()->control()->is_low();
+	Lara.Control.IsLow = s->lara()->control()->is_low();
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
-	Lara.Control.IsInLowSpace = s->lara()->control()->keep_low();
+	Lara.Control.KeepLow = s->lara()->control()->keep_low();
 	Lara.Control.CanLook = s->lara()->control()->can_look();
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
 	Lara.Control.IsRunJumpQueued = s->lara()->control()->run_jump_queued();

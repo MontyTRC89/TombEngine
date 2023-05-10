@@ -1132,7 +1132,145 @@ struct DiaryInfo
 	unsigned int CurrentPage			= 0;
 };
 
-struct LaraInventoryData
+struct LaraCountData
+{
+	unsigned int Pose			= 0;
+	unsigned int PositionAdjust = 0;
+	unsigned int Run			= 0;
+	unsigned int Death			= 0;
+};
+
+struct RopeControlData
+{
+	byte Segment = 0;
+	byte Direction = 0;
+
+	short ArcFront = 0;
+	short ArcBack = 0;
+
+	short LastX = 0;
+	short MaxXForward = 0;
+	short MaxXBackward = 0;
+
+	int DFrame = 0;
+	int Frame = 0;
+	unsigned short FrameRate = 0;
+
+	unsigned short Y = 0;
+	int Ptr = 0;
+	int Offset = 0;
+	int DownVel = 0;
+	byte Flag = 0;
+	int Count = 0;
+};
+
+struct SubsuitControlData
+{
+	short XRot = 0;
+	short DXRot = 0;
+	int Velocity[2] = {};
+	int VerticalVelocity = 0;
+
+	// TODO: These appear to be unused.
+	short XRotVel = 0;
+	unsigned short HitCount = 0;
+};
+
+// TODO: Give tightrope a property for difficulty?
+// TODO: Remove old tightrope functionality.
+struct TightropeControlData
+{
+#if NEW_TIGHTROPE
+	short		 TightropeItem	 = 0;
+	bool		 CanDismount	 = false;
+	float		 Balance		 = 0.0f;
+	unsigned int TimeOnTightrope = 0;
+#else // !NEW_TIGHTROPE
+	unsigned int OnCount;
+	byte Off;
+	byte Fall;
+#endif
+};
+
+struct WeaponControlData
+{
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
+
+	bool UziLeft  = false;
+	bool UziRight = false;
+
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
+};
+
+struct PlayerControlData
+{
+	short MoveAngle = 0;
+	short TurnRate	= 0;
+
+	HandStatus	  HandStatus	= {};
+	WaterStatus	  WaterStatus	= {};
+	JumpDirection JumpDirection = {};
+	LaraCountData Count			= {};
+
+	RopeControlData		 Rope	   = {};
+	SubsuitControlData	 Subsuit   = {};
+	TightropeControlData Tightrope = {};
+	WeaponControlData	 Weapon	   = {};
+
+	bool IsClimbingLadder = false;
+	bool IsLocked		  = false;
+	bool IsLow			  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool IsRunJumpQueued  = false;
+	bool KeepLow		  = false;
+
+	bool CanClimbLadder = false;
+	bool CanLook		= false;
+	bool CanMonkeySwing = false;
+};
+
+struct PlayerContextData
+{
+	int			ProjectedFloorHeight = 0;
+	float		CalcJumpVelocity	 = 0;
+	Pose		NextCornerPos		 = Pose::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+	int InteractedItem = 0; // Item number.
+	int Vehicle		   = 0; // Item number.
+};
+
+// TODO: Refactor status handling to use floats.
+struct PlayerStatusData
+{
+	int Air		 = 0;
+	int Exposure = 0;
+	int Poison	 = 0;
+	int Stamina	 = 0;
+};
+
+struct PlayerEffectData
+{
+	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
+	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
+};
+
+struct PlayerInventoryData
 {
 	bool IsBusy	 = false;
 	bool OldBusy = false;
@@ -1167,153 +1305,15 @@ struct LaraInventoryData
 	int ExaminesCombo[NUM_EXAMINES * 2] = {};
 };
 
-struct LaraCountData
-{
-	unsigned int Pose			= 0;
-	unsigned int PositionAdjust = 0;
-	unsigned int Run			= 0;
-	unsigned int Death			= 0;
-};
-
-struct WeaponControlData
-{
-	LaraWeaponType GunType		  = LaraWeaponType::None;
-	LaraWeaponType RequestGunType = LaraWeaponType::None;
-	LaraWeaponType LastGunType	  = LaraWeaponType::None;
-	HolsterInfo	   HolsterInfo	  = {};
-	
-	short WeaponItem = -1;
-	bool  HasFired	 = false;
-	bool  Fired		 = false;
-
-	bool UziLeft  = false;
-	bool UziRight = false;
-
-	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
-	unsigned int NumShotsFired = 0;
-	float		 Interval	   = 0.0f;
-	float		 Timer		   = 0.0f;
-};
-
-struct RopeControlData
-{
-	byte Segment = 0;
-	byte Direction = 0;
-
-	short ArcFront = 0;
-	short ArcBack = 0;
-
-	short LastX = 0;
-	short MaxXForward = 0;
-	short MaxXBackward = 0;
-
-	int DFrame = 0;
-	int Frame = 0;
-	unsigned short FrameRate = 0;
-
-	unsigned short Y = 0;
-	int Ptr = 0;
-	int Offset = 0;
-	int DownVel = 0;
-	byte Flag = 0;
-	int Count = 0;
-};
-
-// TODO: Give tightrope a property for difficulty?
-// TODO: Remove old tightrope functionality.
-struct TightropeControlData
-{
-#if NEW_TIGHTROPE
-	short		 TightropeItem	 = 0;
-	bool		 CanDismount	 = false;
-	float		 Balance		 = 0.0f;
-	unsigned int TimeOnTightrope = 0;
-#else // !NEW_TIGHTROPE
-	unsigned int OnCount;
-	byte Off;
-	byte Fall;
-#endif
-};
-
-struct SubsuitControlData
-{
-	short XRot = 0;
-	short DXRot = 0;
-	int Velocity[2] = {};
-	int VerticalVelocity = 0;
-
-	// TODO: These appear to be unused.
-	short XRotVel = 0;
-	unsigned short HitCount = 0;
-};
-
-struct LaraControlData
-{
-	short MoveAngle = 0;
-	short TurnRate	= 0;
-
-	HandStatus	  HandStatus	= {};
-	WaterStatus	  WaterStatus	= {};
-	JumpDirection JumpDirection = {};
-	LaraCountData Count			= {};
-
-	RopeControlData		 Rope	   = {};
-	SubsuitControlData	 Subsuit   = {};
-	TightropeControlData Tightrope = {};
-	WeaponControlData	 Weapon	   = {};
-
-	bool IsClimbingLadder = false;
-	bool IsLocked		  = false;
-	bool IsMonkeySwinging = false;
-	bool IsMoving		  = false;
-	bool IsRunJumpQueued  = false;
-	bool IsInLowPosition  = false;
-	bool IsInLowSpace	  = false;
-
-	bool CanClimbLadder = false;
-	bool CanLook		= false;
-	bool CanMonkeySwing = false;
-};
-
-// TODO: Refactor status handling to use floats.
-struct PlayerStatusData
-{
-	int Air		 = 0;
-	int Exposure = 0;
-	int Poison	 = 0;
-	int Stamina	 = 0;
-};
-
-struct PlayerContextData
-{
-	int			ProjectedFloorHeight = 0;
-	float		CalcJumpVelocity	 = 0;
-	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero;
-
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
-
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
-};
-
-struct PlayerEffectData
-{
-	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
-	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
-};
-
 struct LaraInfo
 {
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
-	LaraControlData	  Control	= {};
-	PlayerContextData Context	= {};
-	PlayerStatusData  Status	= {};
-	PlayerEffectData  Effect	= {};
-	LaraInventoryData Inventory = {};
+	PlayerControlData	Control	  = {};
+	PlayerContextData	Context	  = {};
+	PlayerStatusData	Status	  = {};
+	PlayerEffectData	Effect	  = {};
+	PlayerInventoryData Inventory = {};
 
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};

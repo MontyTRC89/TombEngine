@@ -534,7 +534,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		if ((IsHeld(In::DrawWeapon) && player.Control.Weapon.LastGunType != LaraWeaponType::None) ||
 			player.Control.Weapon.RequestGunType != player.Control.Weapon.GunType)
 		{
-			if (player.Control.IsInLowPosition && 
+			if (player.Control.IsLow && 
 				player.Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && 
 				player.Control.Weapon.RequestGunType != LaraWeaponType::Flare && 
 				player.Control.Weapon.RequestGunType != LaraWeaponType::Torch)

@@ -71,7 +71,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset lean.
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
-		(!lara->Control.IsInLowPosition && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
+		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		ResetPlayerLean(item, 1 / 6.0f);
 	}
@@ -88,7 +88,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate = 0;
 
-	lara->Control.IsInLowPosition = false;
+	lara->Control.IsLow = false;
 	lara->Control.IsMonkeySwinging = false;
 }
 

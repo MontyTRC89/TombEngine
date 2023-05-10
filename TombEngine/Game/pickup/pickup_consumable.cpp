@@ -11,7 +11,7 @@ struct ConsumablePickupInfo
 {
 	GAME_OBJECT_ID ObjectID;
 	// Pointer to array of consumable in question
-	int LaraInventoryData::* Count;
+	int PlayerInventoryData::* Count;
 	// How many of the item to give the player if the caller
 	// does not specify; i.e. default amount per pickup
 	int Amount;
@@ -20,9 +20,9 @@ struct ConsumablePickupInfo
 static constexpr std::array<ConsumablePickupInfo, 3> kConsumables =
 {
 	{
-		{ ID_SMALLMEDI_ITEM, &LaraInventoryData::TotalSmallMedipacks, 1 },
-		{ ID_BIGMEDI_ITEM, &LaraInventoryData::TotalLargeMedipacks, 1 },
-		{ ID_FLARE_INV_ITEM, &LaraInventoryData::TotalFlares, 12 }
+		{ ID_SMALLMEDI_ITEM, &PlayerInventoryData::TotalSmallMedipacks, 1 },
+		{ ID_BIGMEDI_ITEM, &PlayerInventoryData::TotalLargeMedipacks, 1 },
+		{ ID_FLARE_INV_ITEM, &PlayerInventoryData::TotalFlares, 12 }
 	}
  };
 
