@@ -89,7 +89,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.5f;
+	output.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.33f;
 	output.xyz = saturate(output.xyz);
 	output.xyz += saturate(input.Fog.xyz);
 

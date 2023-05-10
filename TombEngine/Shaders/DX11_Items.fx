@@ -5,7 +5,7 @@
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
 #include "./AnimatedTextures.hlsli"
-#include "./Shadows.hlsli"
+//#include "./Shadows.hlsli"
 
 #define MAX_BONES 32
 
@@ -136,7 +136,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
-	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.5f;
+	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.33f;
 	output.Color.xyz = saturate(output.Color.xyz);
 	output.Color.xyz += saturate(input.Fog.xyz);
 	

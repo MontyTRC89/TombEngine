@@ -308,7 +308,7 @@ namespace TEN::Renderer
 			return;
 		}
 
-		m_context->PSSetSamplers(registerType, 1, &samplerState);
+		m_context->PSSetSamplers(static_cast<UINT>(registerType), 1, &samplerState);
 	}
 
 	void Renderer11::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)
