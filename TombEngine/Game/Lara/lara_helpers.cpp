@@ -50,7 +50,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && Context::CanStrikeAfkPose(*item, *coll) &&
+	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && CanStrikeAfkPose(*item, *coll) &&
 		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
@@ -328,7 +328,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		if (Context::CanStepUp(*item, *coll))
+		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -337,7 +337,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (Context::CanStepDown(*item, *coll))
+		else if (CanStepDown(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -498,23 +498,23 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll)
 {
-	if (IsHeld(In::Forward) && Context::CanJumpForward(item, coll))
+	if (IsHeld(In::Forward) && CanJumpForward(item, coll))
 	{
 		return JumpDirection::Forward;
 	}
-	else if (IsHeld(In::Back) && Context::CanJumpBackward(item, coll))
+	else if (IsHeld(In::Back) && CanJumpBackward(item, coll))
 	{
 		return JumpDirection::Back;
 	}
-	else if (IsHeld(In::Left) && Context::CanJumpLeft(item, coll))
+	else if (IsHeld(In::Left) && CanJumpLeft(item, coll))
 	{
 		return JumpDirection::Left;
 	}
-	else if (IsHeld(In::Right) && Context::CanJumpRight(item, coll))
+	else if (IsHeld(In::Right) && CanJumpRight(item, coll))
 	{
 		return JumpDirection::Right;
 	}
-	else if (Context::CanJumpUp(item, coll))
+	else if (CanJumpUp(item, coll))
 	{
 		return JumpDirection::Up;
 	}

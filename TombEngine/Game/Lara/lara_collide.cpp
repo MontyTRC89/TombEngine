@@ -84,7 +84,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
-				if (Context::CanSlide(*item, *coll))
+				if (CanSlide(*item, *coll))
 				{
 					SetLaraSlideAnimation(item, coll);
 				}

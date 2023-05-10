@@ -210,13 +210,13 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -237,7 +237,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -267,23 +267,23 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
-		if (!IsHeld(In::Sprint) && Context::CanRunJumpForward(*item, *coll))
+		if (!IsHeld(In::Sprint) && CanRunJumpForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
 		}
 
-		player.Control.IsRunJumpQueued = Context::CanQueueRunningJump(*item, *coll);
+		player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		Context::CanRoll180Running(*item))
+		CanRoll180Running(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
-	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
+	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -348,13 +348,13 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -390,7 +390,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -446,7 +446,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Jump) && Context::CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
 	{
 		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
 		if (jumpDirection != JumpDirection::None)
@@ -459,7 +459,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 	{
-		if (IsHeld(In::Walk) || Context::CanTurn180(*item, *coll))
+		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
 		{
 			item->Animation.TargetState = LS_TURN_180;
 		}
@@ -471,7 +471,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
+	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -490,20 +490,20 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (Context::CanWadeForward(*item, *coll))
+		if (CanWadeForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkForward(*item, *coll))
+			if (CanWalkForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
-		else if (Context::CanRunForward(*item, *coll))
+		else if (CanRunForward(*item, *coll))
 		{
 			if (IsHeld(In::Sprint))
 			{
@@ -519,20 +519,20 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
-		if (Context::CanWadeBackward(*item, *coll))
+		if (CanWadeBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WALK_BACK;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkBackward(*item, *coll))
+			if (CanWalkBackward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
 		}
-		else if (Context::CanRunBackward(*item, *coll))
+		else if (CanRunBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -541,7 +541,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
-		if (Context::CanSidestepLeft(*item, *coll))
+		if (CanSidestepLeft(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_LEFT;
 		}
@@ -554,7 +554,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
-		if (Context::CanSidestepRight(*item, *coll))
+		if (CanSidestepRight(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_RIGHT;
 		}
@@ -568,7 +568,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left))
 	{
-		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, false)) &&
+		if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, false)) &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
@@ -582,7 +582,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Right))
 	{
-		if ((IsHeld(In::Sprint) || Context::CanTurnFast(*item, *coll, true)) &&
+		if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, true)) &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
@@ -596,7 +596,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: Without animation blending, the AFK state's movement lock will be rather obnoxious. -- Sezz 2021.10.31
-	if (Context::CanStrikeAfkPose(*item, *coll))
+	if (CanStrikeAfkPose(*item, *coll))
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
@@ -631,13 +631,13 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 	return;
 	}*/
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -648,7 +648,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -670,7 +670,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	if (Context::CanStrikeAfkPose(*item, *coll))
+	if (CanStrikeAfkPose(*item, *coll))
 	{
 		if (IsHeld(In::Roll))
 		{
@@ -740,7 +740,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -749,7 +749,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -781,7 +781,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
 	}
 
-	if (IsHeld(In::Jump) && Context::CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
 	{
 		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
 		if (jumpDirection != JumpDirection::None)
@@ -799,7 +799,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
+	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -818,20 +818,20 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (Context::CanWadeForward(*item, *coll))
+		if (CanWadeForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkForward(*item, *coll))
+			if (CanWalkForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
-		else if (Context::CanRunForward(*item, *coll))
+		else if (CanRunForward(*item, *coll))
 		{
 			if (IsHeld(In::Sprint))
 			{
@@ -847,20 +847,20 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
-		if (Context::CanWadeBackward(*item, *coll))
+		if (CanWadeBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WALK_BACK;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkBackward(*item, *coll))
+			if (CanWalkBackward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
 		}
-		else if (Context::CanRunBackward(*item, *coll))
+		else if (CanRunBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -869,13 +869,13 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Swamps.
 	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
-		Context::CanSidestepLeft(*item, *coll))
+		CanSidestepLeft(*item, *coll))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)) &&
-		Context::CanSidestepRight(*item, *coll))
+		CanSidestepRight(*item, *coll))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -967,7 +967,7 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1001,7 +1001,7 @@ void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1079,13 +1079,13 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1094,7 +1094,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1117,7 +1117,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
 
-	if (IsHeld(In::Jump) && Context::CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
 	{
 		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
 		if (jumpDirection != JumpDirection::None)
@@ -1135,7 +1135,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
+	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1154,20 +1154,20 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (Context::CanWadeForward(*item, *coll))
+		if (CanWadeForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkForward(*item, *coll))
+			if (CanWalkForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
-		else if (Context::CanRunForward(*item, *coll))
+		else if (CanRunForward(*item, *coll))
 		{
 			if (IsHeld(In::Sprint))
 			{
@@ -1183,20 +1183,20 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
-		if (Context::CanWadeBackward(*item, *coll))
+		if (CanWadeBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WALK_BACK;
 			return;
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (Context::CanWalkBackward(*item, *coll))
+			if (CanWalkBackward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
 		}
-		else if (Context::CanRunBackward(*item, *coll))
+		else if (CanRunBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -1205,13 +1205,13 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Swamps.
 	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
-		Context::CanSidestepLeft(*item, *coll))
+		CanSidestepLeft(*item, *coll))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)) &&
-		Context::CanSidestepRight(*item, *coll))
+		CanSidestepRight(*item, *coll))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1303,13 +1303,13 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1327,7 +1327,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(*item, *coll) || isWading)
+	if (CanPerformStep(*item, *coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1399,13 +1399,13 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1423,7 +1423,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(*item, *coll) || isWading)
+	if (CanPerformStep(*item, *coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1484,7 +1484,7 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1498,7 +1498,7 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1539,13 +1539,13 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1553,7 +1553,7 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1659,7 +1659,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (Context::CanPerformStep(*item, *coll) || isWading)
+	if (CanPerformStep(*item, *coll) || isWading)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1691,7 +1691,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
-		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && Context::CanSprintJumpForward(*item, *coll))
+		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && CanSprintJumpForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -1702,10 +1702,10 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		player.Control.IsRunJumpQueued = Context::CanQueueRunningJump(*item, *coll);
+		player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	if (IsHeld(In::Crouch) && Context::CanCrouch(*item, *coll))
+	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1769,13 +1769,13 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1811,7 +1811,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (TestAndDoLaraLadderClimb(item, coll))
 		return;
 
-	if (Context::CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1851,7 +1851,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	LaraDeflectEdgeJump(item, coll);
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
@@ -1862,7 +1862,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;

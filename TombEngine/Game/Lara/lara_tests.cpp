@@ -271,7 +271,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
-	if (Context::CanGrabMonkeySwing(*item, *coll))
+	if (CanGrabMonkeySwing(*item, *coll))
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEY);
 		ResetPlayerFlex(item);
@@ -335,7 +335,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
-	if (Context::CanGrabMonkeySwing(*item, *coll))
+	if (CanGrabMonkeySwing(*item, *coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
 		item->Animation.Velocity.z = 0;

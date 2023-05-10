@@ -146,13 +146,13 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);
 
-	if (Context::CanFallFromMonkeySwing(*item, *coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanPerformMonkeyStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -224,13 +224,13 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (Context::CanFallFromMonkeySwing(*item, *coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanPerformMonkeyStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -296,13 +296,13 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (Context::CanFallFromMonkeySwing(*item, *coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanPerformMonkeyStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -371,13 +371,13 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (Context::CanFallFromMonkeySwing(*item, *coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanPerformMonkeyStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -446,13 +446,13 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (Context::CanFallFromMonkeySwing(*item, *coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanPerformMonkeyStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;

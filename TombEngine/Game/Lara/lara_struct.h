@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/Lara/PlayerContext.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -8,6 +9,8 @@ struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
 namespace TEN::Renderer { struct RendererMesh; };
+
+using namespace TEN::Player;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -1240,21 +1243,6 @@ struct PlayerControlData
 	bool CanMonkeySwing = false;
 };
 
-struct PlayerContextData
-{
-	int			ProjectedFloorHeight = 0;
-	float		CalcJumpVelocity	 = 0;
-	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero;
-
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
-
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
-};
-
 // TODO: Refactor status handling to use floats.
 struct PlayerStatusData
 {
@@ -1308,8 +1296,8 @@ struct LaraInfo
 {
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
+	PlayerContext		Context	  = PlayerContext();
 	PlayerControlData	Control	  = {};
-	PlayerContextData	Context	  = {};
 	PlayerStatusData	Status	  = {};
 	PlayerEffectData	Effect	  = {};
 	PlayerInventoryData Inventory = {};

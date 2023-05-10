@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Player::Context
+namespace TEN::Player
 {
 	struct GroundMovementSetupData
 	{

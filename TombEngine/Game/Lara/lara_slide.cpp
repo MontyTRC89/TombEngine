@@ -38,7 +38,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll);
 
@@ -68,7 +68,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && Context::CanPerformSlideJump(*item, *coll))
+		if (TrInput & IN_JUMP && CanPerformSlideJump(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -109,19 +109,19 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);
@@ -147,7 +147,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
 
@@ -177,7 +177,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && Context::CanPerformSlideJump(*item, *coll))
+		if (TrInput & IN_JUMP && CanPerformSlideJump(*item, *coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -214,19 +214,19 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (CanFall(*item, *coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);

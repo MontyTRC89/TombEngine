@@ -21,9 +21,11 @@ void InitializeLara(bool restore)
 	if (restore)
 		memcpy(&lBackup, &Lara, sizeof(LaraInfo));
 
-	short itemNumber = Lara.ItemNumber;
+	int itemNumber = Lara.ItemNumber;
 
 	LaraItem->Data = &Lara;
+	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
+
 	LaraItem->Collidable = false;
 	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
 	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
@@ -50,9 +52,13 @@ void InitializeLara(bool restore)
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
+	{
 		InitializeLaraLevelJump(itemNumber, &lBackup);
+	}
 	else
+	{
 		InitializeLaraDefaultInventory();
+	}
 
 	InitializeLaraMeshes(LaraItem);
 	InitializeLaraAnims(LaraItem);

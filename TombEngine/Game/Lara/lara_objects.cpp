@@ -366,7 +366,7 @@ void lara_as_tightrope_walk(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (Context::CanDismountTightrope(*item, *coll))
+	if (CanDismountTightrope(*item, *coll))
 	{
 		item->Animation.TargetState = LS_TIGHTROPE_DISMOUNT;
 		DoLaraTightropeBalanceRegen(item);

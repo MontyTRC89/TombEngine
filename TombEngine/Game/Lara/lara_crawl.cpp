@@ -72,7 +72,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 		{
@@ -80,13 +80,13 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
-		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && Context::CanCrouchToCrawl(*item, *coll))
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -118,7 +118,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = Context::IsInLowSpace(*item, *coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
 	player.ExtraTorsoRot = EulerAngles::Zero;
@@ -131,14 +131,14 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		player.Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -146,7 +146,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -183,7 +183,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = Context::IsInLowSpace(*item, *coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -199,7 +199,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		item->Pose.Position = coll->Setup.PrevPosition;
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		player.Control.HandStatus = HandStatus::Free;
@@ -207,7 +207,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -221,7 +221,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -248,15 +248,15 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
-		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && Context::CanCrouchToCrawl(*item, *coll))
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -303,15 +303,15 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
-		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && Context::CanCrouchToCrawl(*item, *coll))
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -349,9 +349,9 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && Context::CanCrouchToCrawl(*item, *coll))
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -408,7 +408,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 		{
@@ -416,7 +416,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if ((IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll)) ||
+		if ((IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll)) ||
 			((IsHeld(In::DrawWeapon) || IsHeld(In::Flare)) &&
 				!IsStandingWeapon(item, player.Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
@@ -437,7 +437,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 
-			if (Context::CanCrawlForward(*item, *coll))
+			if (CanCrawlForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_FORWARD;
 				return;
@@ -452,7 +452,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 
-			if (Context::CanCrawlBackward(*item, *coll))
+			if (CanCrawlBackward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_BACK;
 				return;
@@ -486,7 +486,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0.0;
 	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = Context::IsInLowSpace(*item, *coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
 	player.ExtraTorsoRot.x = 0;
@@ -501,13 +501,13 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -515,7 +515,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -547,9 +547,9 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerCrawlFlex(*item);
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -576,7 +576,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = Context::IsInLowSpace(*item, *coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
 	player.ExtraTorsoRot.x = 0;
@@ -595,13 +595,13 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -609,7 +609,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -642,7 +642,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerCrawlFlex(*item);
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Back))
 		{
@@ -665,7 +665,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = Context::IsInLowSpace(*item, *coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
@@ -682,13 +682,13 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 
-	if (Context::CanFall(*item, *coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (Context::CanSlide(*item, *coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -696,7 +696,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (Context::CanPerformStep(*item, *coll))
+	if (CanPerformStep(*item, *coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -722,21 +722,21 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
-		if (IsHeld(In::Forward) && Context::CanCrawlForward(*item, *coll))
+		if (IsHeld(In::Forward) && CanCrawlForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
-		if (IsHeld(In::Back) && Context::CanCrawlBackward(*item, *coll))
+		if (IsHeld(In::Back) && CanCrawlBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_BACK;
 			return;
@@ -782,21 +782,21 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Sprint) && Context::CanCrouchRoll(*item, *coll))
+		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
-		if (IsHeld(In::Forward) && Context::CanCrawlForward(*item, *coll))
+		if (IsHeld(In::Forward) && CanCrawlForward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
-		if (IsHeld(In::Back) && Context::CanCrawlBackward(*item, *coll))
+		if (IsHeld(In::Back) && CanCrawlBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CRAWL_BACK;
 			return;
@@ -834,7 +834,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && Context::CanCrouch(*item, *coll))
+	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CRAWL_IDLE;
 		return;

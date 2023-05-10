@@ -8,6 +8,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
@@ -15,8 +16,17 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
-namespace TEN::Player::Context
+namespace TEN::Player
 {
+	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		ItemPtr = &item;
+		PlayerPtr = &player;
+		CollPtr = &coll;
+	}
+
 	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;
@@ -858,7 +868,7 @@ namespace TEN::Player::Context
 		auto& player = GetLaraInfo(item);
 
 		// Test if running jump is immediately possible.
-		if (Context::CanRunJumpForward(item, coll))
+		if (CanRunJumpForward(item, coll))
 			return IsRunJumpQueueableState(item.Animation.TargetState);
 
 		// Get point collision.

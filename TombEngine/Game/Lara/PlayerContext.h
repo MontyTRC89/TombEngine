@@ -1,11 +1,43 @@
 #pragma once
 #include "Game/Lara/PlayerContextData.h"
+#include "Math/Math.h"
 
 struct CollisionInfo;
 struct ItemInfo;
+struct LaraInfo;
 
-namespace TEN::Player::Context
+using namespace TEN::Math;
+
+namespace TEN::Player
 {
+	class PlayerContext
+	{
+	private:
+		// Parent pointers
+		const ItemInfo*		 ItemPtr = nullptr;
+		const LaraInfo*		 PlayerPtr = nullptr;
+		const CollisionInfo* CollPtr = nullptr;
+
+	public:
+		// Members
+		int			ProjectedFloorHeight = 0;
+		float		CalcJumpVelocity	 = 0;
+		Pose		NextCornerPos		 = Pose::Zero;
+		EulerAngles TargetOrientation	 = EulerAngles::Zero;
+
+		int		 WaterSurfaceDist	= 0;
+		short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+		Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+		int InteractedItem = 0; // Item number.
+		int Vehicle		   = 0; // Item number.
+
+		PlayerContext() {};
+		PlayerContext(const ItemInfo& item, const CollisionInfo& coll);
+
+		// TODO: Move all functions here.
+	};
+
 	// Ground movement contexts
 	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);

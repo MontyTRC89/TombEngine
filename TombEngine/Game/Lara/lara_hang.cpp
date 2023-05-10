@@ -132,7 +132,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
-		if (TrInput & IN_JUMP && Context::CanPerformLedgeJump(*item, *coll))
+		if (TrInput & IN_JUMP && CanPerformLedgeJump(*item, *coll))
 		{
 			if (TrInput & IN_BACK)
 				item->Animation.TargetState = LS_JUMP_FORWARD;
