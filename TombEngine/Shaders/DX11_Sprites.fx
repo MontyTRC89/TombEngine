@@ -77,7 +77,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	if (IsRenderType == 1)
 	{
-		output = DoLasers(input.Position, output, input.UV, FADE_FACTOR, SecondsUniform);
+		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, SecondsUniform);
 	}
 
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
