@@ -1294,7 +1294,6 @@ struct PlayerInventoryData
 	bool HasLasersight = false;
 	bool HasSilencer   = false; // TODO: Unused.
 
-	// TODO: Convert to bools.
 	int Puzzles[NUM_PUZZLES]			= {};
 	int Keys[NUM_KEYS]					= {};
 	int Pickups[NUM_PICKUPS]			= {};
