@@ -50,7 +50,7 @@ private:
 public:
 	static int LastSaveGame;
 	// Sets the location of the save dir's containing folder, NOT the save dir itself
-	static void SetSaveDirLocation(std::string_view dir);
+	static void SetSaveDirLocation(const std::string & dir);
 
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);

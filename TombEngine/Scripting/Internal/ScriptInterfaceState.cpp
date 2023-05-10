@@ -37,11 +37,11 @@ ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
 	return new StringsHandler(&s_solState, s_rootTable);
 }
 
-void ScriptInterfaceState::Init(std::string_view assetsDir)
+void ScriptInterfaceState::Init(const std::string & assetsDir)
 {
 	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine, sol::lib::table, sol::lib::string, sol::lib::debug);
 
-	s_solState.script("package.path=\"" + std::string{assetsDir} + "Scripts/?.lua\"");
+	s_solState.script("package.path=\"" + assetsDir + "Scripts/?.lua\"");
 	s_solState.set_exception_handler(lua_exception_handler);
 
 	s_rootTable = sol::table{ s_solState.lua_state(), sol::create };

@@ -41,9 +41,9 @@ static std::string AudioFullDir;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
-void SetAudioDirLocation(std::string_view dirLocation)
+void SetAudioDirLocation(const std::string& dirLocation)
 {
-	AudioFullDir = std::string{ dirLocation } + TRACKS_PATH;
+	AudioFullDir = dirLocation + TRACKS_PATH;
 }
 
 void SetVolumeMusic(int vol) 

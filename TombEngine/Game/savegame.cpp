@@ -1327,9 +1327,9 @@ bool SaveGame::Save(int slot)
 	return true;
 }
 
-void SaveGame::SetSaveDirLocation(std::string_view dirLocation)
+void SaveGame::SetSaveDirLocation(const std::string & dirLocation)
 {
-	m_fullSaveDir = std::string{ dirLocation } + SAVEGAME_PATH;
+	m_fullSaveDir = dirLocation + SAVEGAME_PATH;
 }
 
 bool SaveGame::Load(int slot)
