@@ -97,6 +97,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
 		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ADDITIVE;
+
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
 			for (const auto& [tag, pool] : module.Pools)
