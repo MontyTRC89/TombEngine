@@ -593,12 +593,12 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClInclude Include="Code\Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Code\Specific\trutils.h" />
     <ClInclude Include="Code\Specific\winmain.h" />
-    <ClInclude Include="Code\framework.h" />
+    <ClInclude Include="Code\Framework.h" />
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="Resources\targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Code\framework.cpp">
+    <ClCompile Include="Code\Framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">framework.h</PrecompiledHeaderFile>
