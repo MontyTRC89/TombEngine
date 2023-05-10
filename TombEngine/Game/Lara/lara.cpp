@@ -944,7 +944,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.IsInLowPosition = false;
+	lara->Control.IsLow = false;
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
@@ -1016,7 +1016,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.IsInLowPosition = false;
+	lara->Control.IsLow = false;
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
