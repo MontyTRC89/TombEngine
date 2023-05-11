@@ -18,8 +18,9 @@ namespace TEN::Traps::TR5
 		BoundingOrientedBox			  BoundingBox = {};
 		Vector4						  Color		  = Vector4::Zero;
 
-		bool IsActive = false;
-		int	Lethal; // TODO: Rename.
+		bool IsActive		  = false;
+		bool IsLethal		  = false;
+		bool IsHeavyActivator = false;
 	};
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers;
