@@ -178,7 +178,7 @@ namespace TEN::Traps::TR5
 			if (barrier.Lethal < 0)
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
-			barrier.Color.w = Random::GenerateFloat(0.7f, 1.0f);
+			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 		}		
 	}
