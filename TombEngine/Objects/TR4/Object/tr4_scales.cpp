@@ -41,7 +41,7 @@ void ScalesControl(short itemNumber)
 
 	if (item->Animation.ActiveState == 1 || item->ItemFlags[1])
 	{
-		if (Objects[item->ObjectNumber].animIndex)
+		if (true/*Objects[item->ObjectNumber].animIndex*/) // TODO: Check. Not clear what the intent is.
 		{
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;

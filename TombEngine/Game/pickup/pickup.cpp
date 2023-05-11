@@ -1225,12 +1225,14 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 					item->Status = ITEM_ACTIVE;
 				}
 
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+				item->Animation.AnimNumber = 1;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				AnimateItem(item);
 			}
 			else
+			{
 				lara->Context.InteractedItem = itemNumber;
+			}
 		}
 		else if (lara->Control.IsMoving && lara->Context.InteractedItem ==  itemNumber)
 		{

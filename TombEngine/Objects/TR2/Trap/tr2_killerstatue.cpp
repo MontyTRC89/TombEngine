@@ -13,7 +13,7 @@ void InitializeKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+	item->Animation.AnimNumber = 3;
 	item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	item->Animation.ActiveState = 1;
 }

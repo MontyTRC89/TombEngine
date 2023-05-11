@@ -567,12 +567,12 @@ namespace TEN::Renderer
 			return;
 
 		const auto& object = Objects[objectNumber];
-		if (object.animIndex != -1)
+		if (!object.Animations.empty())
 		{
 			auto frameData = AnimFrameInterpData
 			{
-				&g_Level.Frames[GetAnimData(object, object.animIndex).FramePtr],
-				&g_Level.Frames[GetAnimData(object, object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object, 0).FramePtr],
+				&g_Level.Frames[GetAnimData(object, 0).FramePtr],
 				0.0f
 			};
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
@@ -614,10 +614,14 @@ namespace TEN::Renderer
 			auto scaleMatrix = Matrix::CreateScale(scale);
 			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
 
-			if (object.animIndex != -1)
+			if (!object.Animations.empty())
+			{
 				m_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
+			}
 			else
+			{
 				m_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
+			}
 
 			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.Color = Vector4::One;

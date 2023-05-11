@@ -39,7 +39,7 @@ bool IsLevelLoading;
 bool LoadedSuccessfully;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
-LEVEL g_Level;
+LevelData g_Level;
 
 unsigned char ReadUInt8()
 {
@@ -342,7 +342,6 @@ void LoadObjects()
 		object.boneIndex = ReadInt32();
 		object.frameBase = ReadInt32();
 
-		//object.animIndex = 0;
 		object.Animations.resize(ReadInt32());
 		for (auto& anim : object.Animations)
 		{

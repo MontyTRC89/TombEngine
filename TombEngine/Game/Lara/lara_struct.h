@@ -1080,8 +1080,8 @@ struct CarriedWeaponInfo
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
 	Ammo				  Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType		  SelectedAmmo							  = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
-	LaraWeaponTypeCarried WeaponMode							  = LaraWeaponTypeCarried::WTYPE_MISSING;
+	WeaponAmmoType		  SelectedAmmo = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo

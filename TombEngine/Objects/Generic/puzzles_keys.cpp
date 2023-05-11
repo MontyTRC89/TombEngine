@@ -349,7 +349,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	else
 	{
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.AnimNumber = 0;
 		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 		item->Animation.ActiveState = GetAnimData(item).ActiveState;
 		item->Animation.TargetState = GetAnimData(item).ActiveState;

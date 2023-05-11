@@ -47,11 +47,10 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 
 	case LaraWeaponType::HK:
 	{
-		// Animate upper body if Lara is shooting from shoulder OR if Lara is standing still/turning
-		int baseAnim = Objects[GetWeaponObjectID(weapon)].animIndex;
-		if (player.RightArm.AnimNumber - baseAnim == 0 ||
-			player.RightArm.AnimNumber - baseAnim == 2 ||
-			player.RightArm.AnimNumber - baseAnim == 4)
+		// Animate upper body if player is shooting from shoulder or standing still/turning.
+		if (player.RightArm.AnimNumber == 0 ||
+			player.RightArm.AnimNumber == 2 ||
+			player.RightArm.AnimNumber == 4)
 		{
 			return true;
 		}
@@ -225,8 +224,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// HACK: Mask head and torso when taking out a flare.
 			if (!Lara.Control.IsLow &&
-				tempItem.Animation.AnimNumber > (Objects[ID_FLARE_ANIM].animIndex + 1) &&
-				tempItem.Animation.AnimNumber < (Objects[ID_FLARE_ANIM].animIndex + 4))
+				tempItem.Animation.AnimNumber > 1 &&
+				tempItem.Animation.AnimNumber < 4)
 			{
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}

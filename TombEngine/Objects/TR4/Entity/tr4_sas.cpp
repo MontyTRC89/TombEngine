@@ -118,12 +118,12 @@ namespace TEN::Entities::TR4
 
 		if (item.TriggerFlags)
 		{
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex;
+			item.Animation.AnimNumber = 0;
 			item.Animation.TargetState = item.Animation.ActiveState = 1;
 		}
 		else
 		{
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + 3;
+			item.Animation.AnimNumber = 3;
 			item.Animation.TargetState = item.Animation.ActiveState = 4;
 		}
 
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				joint2 = angle;
 
-				if (item.Animation.AnimNumber == Objects[item.ObjectNumber].animIndex + SAS_ANIM_WALK_TO_STAND)
+				if (item.Animation.AnimNumber == SAS_ANIM_WALK_TO_STAND)
 				{
 					if (abs(AI.angle) < ANGLE(10.0f))
 						item.Pose.Orientation.y += AI.angle;

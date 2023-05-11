@@ -448,15 +448,15 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 		if (weaponType == LaraWeaponType::RocketLauncher)
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 1;
+			weaponItemPtr->Animation.AnimNumber = 1;
 		}
 		else if (weaponType == LaraWeaponType::GrenadeLauncher)
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 0;
+			weaponItemPtr->Animation.AnimNumber = 0;
 		}
 		else
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 1;
+			weaponItemPtr->Animation.AnimNumber = 1;
 		}
 
 		weaponItemPtr->Animation.FrameNumber = GetAnimData(*weaponItemPtr).frameBase;

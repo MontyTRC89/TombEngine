@@ -124,7 +124,6 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
 		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;

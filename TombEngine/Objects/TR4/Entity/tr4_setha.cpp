@@ -299,7 +299,7 @@ namespace TEN::Entities::TR4
 			case SETH_STATE_POUNCE_ATTACK:
 				if (canJump)
 				{
-					if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_START) &&
+					if (item->Animation.AnimNumber == SETH_ANIM_POUNCE_ATTACK_START &&
 						item->Animation.FrameNumber == GetAnimData(item).frameBase)
 					{
 						creature.MaxTurn = 0;
@@ -311,7 +311,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_END))
+						if (item->Animation.AnimNumber == SETH_ANIM_POUNCE_ATTACK_END)
 						{
 							if (item->TouchBits.Test(SethPounceAttackJoints1))
 							{
@@ -339,7 +339,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SETH_STATE_HARD_RECOIL:
-				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_HARD_RECOIL_START) &&
+				if (item->Animation.AnimNumber == SETH_ANIM_HARD_RECOIL_START &&
 					item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 				{
 					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
@@ -414,7 +414,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SETH_STATE_HOVER:
-				if (item->Animation.AnimNumber != (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_IDLE_TO_HOVER))
+				if (item->Animation.AnimNumber != SETH_ANIM_IDLE_TO_HOVER)
 				{
 					item->Animation.IsAirborne = false;
 					creature.MaxTurn = 0;

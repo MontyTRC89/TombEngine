@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (dx >= 50 || dz >= 50 ||
-				item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
+				item->Animation.AnimNumber != 0)
 			{
 				if (AI.distance > pow(SECTOR(2), 2) && abs(AI.angle) > ANGLE(2.8f))
 					item->Animation.TargetState = SPHINX_STATE_IDLE;

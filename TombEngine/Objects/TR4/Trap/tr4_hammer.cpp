@@ -78,7 +78,7 @@ namespace TEN::Entities::TR4
             }
             else
             {
-                item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMER_ANIM_ACTIVATED;
+                item->Animation.AnimNumber = HAMMER_ANIM_ACTIVATED;
                 item->Animation.FrameNumber = GetAnimData(item).frameBase;
                 item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
                 item->Animation.TargetState = HAMMER_STATE_ACTIVE;

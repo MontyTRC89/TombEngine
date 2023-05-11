@@ -241,7 +241,7 @@ namespace TEN::Entities::TR4
 	
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_IDLE;
+			item->Animation.AnimNumber = BADDY_ANIM_STAND_IDLE;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_IDLE;
 			item->Animation.ActiveState = BADDY_STATE_IDLE;
@@ -251,7 +251,7 @@ namespace TEN::Entities::TR4
 		// OCB: jump right
 		if (ocb == 1)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_RIGHT;
+			item->Animation.AnimNumber = BADDY_ANIM_STAND_TO_JUMP_RIGHT;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_JUMP_RIGHT;
 			item->Animation.ActiveState = BADDY_STATE_JUMP_RIGHT;
@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 		// OCB: jump left
 		if (ocb == 2)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_ROLL_LEFT;
+			item->Animation.AnimNumber = BADDY_ANIM_STAND_TO_ROLL_LEFT;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_ROLL_LEFT;
 			item->Animation.ActiveState = BADDY_STATE_ROLL_LEFT;
@@ -271,7 +271,7 @@ namespace TEN::Entities::TR4
 		// OCB: crouch
 		if (ocb == 3)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
+			item->Animation.AnimNumber = BADDY_ANIM_CROUCH;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
@@ -281,7 +281,7 @@ namespace TEN::Entities::TR4
 		// OCB: climb up 4 or 6 clicks 
 		if (ocb == 4)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
+			item->Animation.AnimNumber = BADDY_ANIM_CLIMB_4_STEPS;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
@@ -293,7 +293,7 @@ namespace TEN::Entities::TR4
 		// OCB: crouch and jump in train levels?
 		if (ocb > 100)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
+			item->Animation.AnimNumber = BADDY_ANIM_CROUCH;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
@@ -469,14 +469,14 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_MONKEY_GRAB:
 			case BADDY_STATE_MONKEY_IDLE:
 			case BADDY_STATE_MONKEY_FORWARD:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_MONKEY_TO_FREEFALL;
+				item->Animation.AnimNumber = BADDY_ANIM_MONKEY_TO_FREEFALL;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BADDY_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity.z = 0;
 				break;
 
 			default:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_DEATH;
+				item->Animation.AnimNumber = BADDY_ANIM_STAND_DEATH;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BADDY_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
@@ -684,7 +684,7 @@ namespace TEN::Entities::TR4
 					currentCreature->MaxTurn = 0;
 					currentCreature->LOT.IsJumping = true;
 
-					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD;
+					item->Animation.AnimNumber = BADDY_ANIM_STAND_TO_JUMP_FORWARD;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 
@@ -1218,7 +1218,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_SOMERSAULT:
-				if (item->Animation.AnimNumber == (Objects[objectNumber].animIndex + BADDY_ANIM_SOMERSAULT_END))
+				if (item->Animation.AnimNumber == BADDY_ANIM_SOMERSAULT_END)
 				{
 					ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 					break;
@@ -1235,7 +1235,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] >= 0)
 					break;
 
-				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD)
+				if (item->Animation.AnimNumber != BADDY_ANIM_STAND_TO_JUMP_FORWARD)
 					item->ItemFlags[0] += 2;
 				
 				break;

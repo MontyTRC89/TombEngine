@@ -69,7 +69,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (item->Animation.ActiveState != BARRACUDA_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + BARRACUDA_ANIM_DEATH_START;
+				item->Animation.AnimNumber = BARRACUDA_ANIM_DEATH_START;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BARRACUDA_STATE_DEATH;
 			}

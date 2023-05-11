@@ -271,7 +271,7 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.ActiveState != HORSEMAN_STATE_DEATH)
 				{
-					item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + HORSEMAN_ANIM_DEATH;
+					item->Animation.AnimNumber = HORSEMAN_ANIM_DEATH;
 					item->Animation.ActiveState = HORSEMAN_STATE_DEATH;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 
@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 				item->HitPoints = 100;
 				item->AIBits = 0;
 				item->ItemFlags[1] = 0;
-				item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + HORSEMAN_ANIM_FALL_OFF_HORSE_START;
+				item->Animation.AnimNumber =HORSEMAN_ANIM_FALL_OFF_HORSE_START;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = HORSEMAN_STATE_FALL_OFF_HORSE;
 				creature->Enemy = nullptr;
@@ -524,7 +524,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
-					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + HORSE_ANIM_REAR;
+					horseItem->Animation.AnimNumber = HORSE_ANIM_REAR;
 					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
 					horseItem->Animation.ActiveState = HORSE_STATE_REAR;
 				}
@@ -607,7 +607,7 @@ namespace TEN::Entities::TR4
 					creature->ReachedGoal = false;
 					creature->Enemy = nullptr;
 
-					item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + HORSEMAN_ANIM_MOUNT_HORSE;
+					item->Animation.AnimNumber = HORSEMAN_ANIM_MOUNT_HORSE;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = HORSEMAN_STATE_MOUNT_HORSE;
 
@@ -714,10 +714,10 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (item->Animation.AnimNumber == Objects[ID_HORSEMAN].animIndex + HORSEMAN_ANIM_MOUNTED_SPRINT &&
+				if (item->Animation.AnimNumber == HORSEMAN_ANIM_MOUNTED_SPRINT &&
 					item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
-					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + HORSE_ANIM_SPRINT;
+					horseItem->Animation.AnimNumber = HORSE_ANIM_SPRINT;
 					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
 				}
 

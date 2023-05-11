@@ -668,7 +668,7 @@ bool SaveGame::Save(int slot)
 		Save::ItemBuilder serializedItem{ fbb };
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
-		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
+		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
@@ -1534,7 +1534,7 @@ bool SaveGame::Load(int slot)
 		item->Animation.ActiveState = savedItem->active_state();
 		item->Animation.RequiredState = savedItem->required_state();
 		item->Animation.TargetState = savedItem->target_state();
-		item->Animation.AnimNumber = obj->animIndex + savedItem->anim_number();
+		item->Animation.AnimNumber = savedItem->anim_number();
 		item->Animation.FrameNumber = savedItem->frame_number();
 
 		// Hit points
@@ -1585,7 +1585,7 @@ bool SaveGame::Load(int slot)
 			(item->Status == ITEM_ACTIVE || item->Status == ITEM_DEACTIVATED))
 		{
 			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
+			item->Animation.AnimNumber = savedItem->anim_number();
 		}
 
 		if (obj->floor != nullptr)

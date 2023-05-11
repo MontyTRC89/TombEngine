@@ -46,13 +46,13 @@ namespace TEN::Entities::TR3
 		if (item.TriggerFlags == 1)
 		{
 			item.ItemFlags[1] = (int)CorpseFlags::Hanging;
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + CORPSE_ANIM_HANGING;
+			item.Animation.AnimNumber = CORPSE_ANIM_HANGING;
 			item.Animation.ActiveState = CORPSE_STATE_HANGING;
 		}
 		else
 		{
 			item.ItemFlags[1] = (int)CorpseFlags::Lying;
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + CORPSE_ANIM_LYING;
+			item.Animation.AnimNumber = CORPSE_ANIM_LYING;
 			item.Animation.ActiveState = CORPSE_STATE_LYING;
 		}
 
@@ -107,7 +107,7 @@ namespace TEN::Entities::TR3
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity = Vector3::Zero;
 				item.Animation.TargetState = CORPSE_STATE_LANDING;
-				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + CORPSE_ANIM_LANDING;
+				item.Animation.AnimNumber = CORPSE_ANIM_LANDING;
 				AlignEntityToSurface(&item, Vector2(Objects[item.ObjectNumber].radius));
 
 				item.ItemFlags[1] = (int)CorpseFlags::Lying;
@@ -158,7 +158,7 @@ namespace TEN::Entities::TR3
 			if (target.ItemFlags[1] == (int)CorpseFlags::Hanging)
 			{
 				target.ItemFlags[1] = (int)CorpseFlags::Falling;
-				target.Animation.AnimNumber = Objects[target.ObjectNumber].animIndex + CORPSE_ANIM_FALLING;
+				target.Animation.AnimNumber = CORPSE_ANIM_FALLING;
 				target.Animation.ActiveState = CORPSE_STATE_FALLING;
 			}
 

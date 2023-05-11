@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 
 		item->Animation.TargetState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
 		item->Animation.ActiveState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
-		item->Animation.AnimNumber = objectInfo->animIndex;
+		item->Animation.AnimNumber = 0;
 		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
@@ -64,7 +64,7 @@ namespace TEN::Entities::TR4
 				Lara.HighestLocation = 3;
 
 			int state = (GetRandomControl() & 3) + 4 * Lara.HighestLocation;
-			int animNumber = Objects[item->ObjectNumber].animIndex + state;
+			int animNumber = state;
 			state++;
 
 			item->Animation.AnimNumber = animNumber;

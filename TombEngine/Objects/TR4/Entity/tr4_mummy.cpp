@@ -133,12 +133,12 @@ namespace TEN::Entities::TR4
 								item->Animation.ActiveState == MUMMY_STATE_WALK_FORWARD_SWIPE_ATTACK)
 							{
 								item->Animation.ActiveState = MUMMY_STATE_ARMS_UP_RECOIL;
-								item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_UP_RECOIL;
+								item->Animation.AnimNumber = MUMMY_ANIM_ARMS_UP_RECOIL;
 							}
 							else
 							{
 								item->Animation.ActiveState = MUMMY_STATE_RECOIL;
-								item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_RECOIL;
+								item->Animation.AnimNumber = MUMMY_ANIM_RECOIL;
 							}
 
 							item->Animation.FrameNumber = GetAnimData(item).frameBase;
@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 						{
 							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 
-							if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT))
+							if (item->Animation.AnimNumber == MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
 								CreatureEffect2(item, MummyBite1, 5, -1, DoBloodSplat);
 							else
 								CreatureEffect2(item, MummyBite2, 5, -1, DoBloodSplat);

@@ -371,7 +371,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			if (item->Animation.ActiveState != HYDRA_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
+				item->Animation.AnimNumber = 15;
 				item->Animation.ActiveState = HYDRA_STATE_DEATH;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			}

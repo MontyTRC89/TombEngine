@@ -213,9 +213,9 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int animIndex = item->Animation.AnimNumber - Objects[item->ObjectNumber].animIndex;
+		int animNumber = item->Animation.AnimNumber;
 
-		if (animIndex == DEMIGOD2_ANIM_SINGLE_PROJECTILE_ATTACK)
+		if (animNumber == DEMIGOD2_ANIM_SINGLE_PROJECTILE_ATTACK)
 		{
 			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 			{
@@ -230,7 +230,7 @@ namespace TEN::Entities::TR4
 					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
-		else if (animIndex == DEMIGOD3_ANIM_SINGLE_PROJECTILE_ATTACK)
+		else if (animNumber == DEMIGOD3_ANIM_SINGLE_PROJECTILE_ATTACK)
 		{
 			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 			{
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
 					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
-		else if (animIndex == DEMIGOD3_ANIM_RADIAL_PROJECTILE_ATTACK)
+		else if (animNumber == DEMIGOD3_ANIM_RADIAL_PROJECTILE_ATTACK)
 		{
 			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
@@ -359,13 +359,13 @@ namespace TEN::Entities::TR4
 				if (item->Animation.ActiveState == DEMIGOD_STATE_WALK_FORWARD ||
 					item->Animation.ActiveState == DEMIGOD_STATE_RUN_FORWARD)
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DEMIGOD_ANIM_RUN_OVER_DEATH;
+					item->Animation.AnimNumber = DEMIGOD_ANIM_RUN_OVER_DEATH;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = DEMIGOD_STATE_RUN_OVER_DEATH;
 				}
 				else
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DEMIGOD_ANIM_DEATH;
+					item->Animation.AnimNumber = DEMIGOD_ANIM_DEATH;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = DEMIGOD_STATE_DEATH;
 				}
@@ -573,7 +573,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
 
-				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
+				if (item->Animation.AnimNumber == DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= ANGLE(7.0f))
 						item->Pose.Orientation.y += ANGLE(7.0f);
@@ -645,7 +645,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
 
-				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
+				if (item->Animation.AnimNumber == DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= ANGLE(7.0f))
 						item->Pose.Orientation.y += ANGLE(7.0f);

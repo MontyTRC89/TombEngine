@@ -88,7 +88,7 @@ namespace TEN::Entities::Switches
 	{
 		ItemInfo* switchItem = &g_Level.Items[itemNumber];
 
-		if (switchItem->Animation.AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
+		if (switchItem->Animation.AnimNumber != 2 ||
 			CurrentSequence >= 3 ||
 			switchItem->ItemFlags[0])
 		{

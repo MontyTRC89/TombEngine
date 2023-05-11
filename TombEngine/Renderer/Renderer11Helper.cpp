@@ -171,7 +171,7 @@ namespace TEN::Renderer
 		// Copy meshswaps
 		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
 
-		if (obj->animIndex == -1)
+		if (obj->Animations.empty())
 			return;
 
 		// Apply extra rotations

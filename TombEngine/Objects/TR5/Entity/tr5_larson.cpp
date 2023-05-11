@@ -372,9 +372,9 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			// Death.
 			if (item->ObjectNumber == ID_PIERRE)
-				item->Animation.AnimNumber = Objects[ID_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
+				item->Animation.AnimNumber = ANIMATION_TR5_PIERRE_DIE;
 			else
-				item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
+				item->Animation.AnimNumber = ANIMATION_TR5_LARSON_DIE;
 
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;

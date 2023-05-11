@@ -88,8 +88,7 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
-// LevelData
-struct LEVEL
+struct LevelData
 {
 	// Object data
 	int					  NumItems = 0;
@@ -137,7 +136,7 @@ struct LEVEL
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
 extern bool IsLevelLoading;
-extern LEVEL g_Level;
+extern LevelData g_Level;
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream);
 FILE* FileOpen(const char* fileName);

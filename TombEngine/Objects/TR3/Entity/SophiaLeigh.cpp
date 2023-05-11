@@ -408,7 +408,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->MaxTurn = 0;
 			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
-			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
+			if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_START)
 			{
 				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{
@@ -600,7 +600,7 @@ namespace TEN::Entities::Creatures::TR3
 		case SOPHIALEIGH_STATE_SUMMON:
 			creature->MaxTurn = 0;
 
-			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
+			if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_START)
 			{
 				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 				{

@@ -305,7 +305,7 @@ namespace TEN::Entities::TR4
 			case AHMET_STATE_JUMP_BITE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START))
+				if (item->Animation.AnimNumber == AHMET_ANIM_JUMP_SWIPE_ATTACK_START)
 				{
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
@@ -320,7 +320,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if (!(creature->Flags & 1) &&
-						item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE))
+						item->Animation.AnimNumber == AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE)
 					{
 						if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + 11) &&
 							item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
@@ -337,7 +337,7 @@ namespace TEN::Entities::TR4
 			case AHMET_STATE_JUMP_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START))
+				if (item->Animation.AnimNumber == AHMET_ANIM_JUMP_SWIPE_ATTACK_START)
 				{
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
@@ -347,7 +347,9 @@ namespace TEN::Entities::TR4
 							item->Pose.Orientation.y -= ANGLE(5.0f);
 					}
 					else
+					{
 						item->Pose.Orientation.y += AI.angle;
+					}
 				}
 				else
 				{

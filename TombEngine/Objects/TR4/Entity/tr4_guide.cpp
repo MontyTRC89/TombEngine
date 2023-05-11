@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 				192 - ((random >> 6) & 0x1F),
 				random & 0x3F);
 
-			if (item->Animation.AnimNumber == (object->animIndex + GUIDE_ANIM_LIGHTING_TORCH))
+			if (item->Animation.AnimNumber == GUIDE_ANIM_LIGHTING_TORCH)
 			{
 				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 32 &&
 					item->Animation.FrameNumber < GetAnimData(item).frameBase + 42)
@@ -630,7 +630,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = GUIDE_STATE_ACTIVATE_TRAP_CROUCHING;
 			else
 			{
-				if (item->Animation.AnimNumber != (object->animIndex + GUIDE_ANIM_IDLE_CROUCH) &&
+				if (item->Animation.AnimNumber != GUIDE_ANIM_IDLE_CROUCH &&
 					item->Animation.FrameNumber == (GetAnimData(item).frameEnd - 20))
 				{
 					TestTriggers(item, true);

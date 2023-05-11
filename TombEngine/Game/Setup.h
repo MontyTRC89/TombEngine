@@ -79,7 +79,6 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	int animIndex; // Base index in g_Level.Anims. Deprecated.
 	std::vector<AnimData> Animations = {};
 
 	std::function<void(short itemNumber)>										   Initialize;

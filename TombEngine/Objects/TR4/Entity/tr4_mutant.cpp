@@ -257,7 +257,7 @@ namespace TEN::Entities::TR4
 		InitializeCreature(itemNumber);
 
 		auto* item = &g_Level.Items[itemNumber];
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
+		item->Animation.AnimNumber = MUTANT_ANIM_APPEAR;
 		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 		item->Animation.ActiveState = MUTANT_STATE_APPEAR;
 		item->Animation.TargetState = MUTANT_STATE_APPEAR;

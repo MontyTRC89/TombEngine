@@ -1088,7 +1088,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			if (item->Animation.ActiveState != SNIPER_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_SNIPER].animIndex + 5;
+				item->Animation.AnimNumber = 5;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = SNIPER_STATE_DEATH;
 			}
@@ -1254,7 +1254,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						if (canJump1Sector || canJump2Sectors)
 						{
-							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
+							item->Animation.AnimNumber = 41;
 							item->Animation.FrameNumber = GetAnimData(item).frameBase;
 							item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 							creature->MaxTurn = 0;
@@ -1376,7 +1376,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (canJump1Sector || canJump2Sectors)
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
+						item->Animation.AnimNumber = 41;
 						item->Animation.FrameNumber = GetAnimData(item).frameBase;
 						item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 						creature->MaxTurn = 0;
@@ -1412,7 +1412,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1Sector || canJump2Sectors)
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 50;
+					item->Animation.AnimNumber = 50;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 					creature->MaxTurn = 0;
@@ -1456,13 +1456,13 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
+					item->Animation.AnimNumber = 16;
 					item->Animation.ActiveState = MAFIA2_STATE_DEATH_2;
 					item->Pose.Orientation.y += AI.angle - ANGLE(18.0f);
 				}
 				else
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
+					item->Animation.AnimNumber = 11;
 					item->Animation.ActiveState = MAFIA2_STATE_DEATH_1;
 					item->Pose.Orientation.y += AI.angle;
 				}
@@ -1486,41 +1486,41 @@ namespace TEN::Entities::Creatures::TR5
 			switch (CreatureVault(itemNumber, angle, 2, CLICK(2)) + 4)
 			{
 			case 0:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 38;
+				item->Animation.AnimNumber = 38;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 23;
 				break;
 
 			case 1:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 39;
+				item->Animation.AnimNumber = 39;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 24;
 				creature->MaxTurn = 0;
 				break;
 
 			case 2:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 40;
+				item->Animation.AnimNumber = 40;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 25;
 				creature->MaxTurn = 0;
 				break;
 
 			case 6:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
+				item->Animation.AnimNumber = 35;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 20;
 				creature->MaxTurn = 0;
 				break;
 
 			case 7:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
+				item->Animation.AnimNumber = 36;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 21;
 				creature->MaxTurn = 0;
 				break;
 
 			case 8:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
+				item->Animation.AnimNumber = 37;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 22;
 				creature->MaxTurn = 0;

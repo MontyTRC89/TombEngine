@@ -56,12 +56,12 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags == 1)
 		{
 			item->Animation.TargetState = item->Animation.ActiveState = TROOP_STATE_ATTACKED_BY_SCORPION;
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
+			item->Animation.AnimNumber = 27;
 		}
 		else
 		{
 			item->Animation.TargetState = item->Animation.ActiveState = TROOP_STATE_IDLE;
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
+			item->Animation.AnimNumber = 12;
 		}
 
 		item->Animation.FrameNumber = GetAnimData(item).frameBase;
@@ -99,9 +99,9 @@ namespace TEN::Entities::TR4
 					creature->Enemy->ObjectNumber == ID_BIG_SCORPION &&
 					item->ItemFlags[0] < 80)
 				{
-					if (creature->Enemy->Animation.AnimNumber == Objects[ID_BIG_SCORPION].animIndex + 6)
+					if (creature->Enemy->Animation.AnimNumber == 6)
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
+						item->Animation.AnimNumber = 23;
 
 						if (item->Animation.ActiveState == TROOP_STATE_ATTACKED_BY_SCORPION)
 							item->Animation.FrameNumber = GetAnimData(item).frameBase + 37;
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
+					item->Animation.AnimNumber = 19;
 					item->Animation.ActiveState = TROOP_STATE_DEATH;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				}
@@ -207,7 +207,7 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 				joint2 = rot;
 
-				if (item->Animation.AnimNumber == object->animIndex + 17)
+				if (item->Animation.AnimNumber == 17)
 				{
 					if (abs(AI.angle) >= ANGLE(10.0f))
 					{
@@ -458,7 +458,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.ActiveState != TROOP_STATE_FLASHED &&
 					item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
+					item->Animation.AnimNumber = 28;
 					item->Animation.ActiveState = TROOP_STATE_FLASHED;
 					item->Animation.FrameNumber = GetAnimData(item).frameBase + (GetRandomControl() & 7);
 					creature->MaxTurn = 0;

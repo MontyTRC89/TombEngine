@@ -81,10 +81,10 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 
-		if (item->Animation.AnimNumber == object->animIndex ||
-			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
-			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
-			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
+		if (item->Animation.AnimNumber == 0 ||
+			item->Animation.AnimNumber == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
+			item->Animation.AnimNumber == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
+			item->Animation.AnimNumber == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
 			if (Random::TestProbability(1 / 2.0f))
 			{

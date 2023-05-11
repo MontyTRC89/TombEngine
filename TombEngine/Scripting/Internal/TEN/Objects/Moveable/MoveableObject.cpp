@@ -1179,7 +1179,7 @@ void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshI
 void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
 {
 	m_item->Animation.AnimObjectID = objectID;
-	m_item->Animation.AnimNumber = Objects[objectID].animIndex + animNumber;
+	m_item->Animation.AnimNumber = animNumber;
 	m_item->Animation.ActiveState = stateID;
 	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
 	AnimateItem(m_item);

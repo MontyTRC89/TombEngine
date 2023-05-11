@@ -484,7 +484,7 @@ void ClassicRollingBallControl(short itemNum)
 			}
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+			item->Animation.AnimNumber = 0;
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = GetAnimData(item).ActiveState; 
 			item->Animation.TargetState = GetAnimData(item).ActiveState;
