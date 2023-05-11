@@ -14,8 +14,7 @@ using namespace TEN::Effects::Items;
 namespace TEN::Traps::TR5
 {
 	// NOTES:
-	// - Negative OCB gives not lethal and activates a heavy trigger, positive OCB lethal.
-	// - OCB value defines the width in blocks.
+	// - OCB defines width in blocks. Positive value = lethal, negative value = heavy activator.
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
@@ -28,7 +27,9 @@ namespace TEN::Traps::TR5
 
 		auto barrier = LaserBarrier{};
 
-		barrier.Lethal = item.TriggerFlags;
+		barrier.IsLethal = (item.TriggerFlags > 0);
+		barrier.IsHeavyActivator = (item.TriggerFlags < 0);
+
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		barrier.Color = item.Model.Color;
 		barrier.Color.w = 0.0f;
@@ -51,8 +52,8 @@ namespace TEN::Traps::TR5
 
 		item.Pose.Position.y = pointColl.Position.Floor;
 
-		item.ItemFlags[0] = short(item.Pose.Position.y - pointColl.Position.Ceiling);
-		short height = item.ItemFlags[0];
+		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
+		int height = item.ItemFlags[0];
 		int yAdd = height / 8;
 
 		int zAdd = abs((width * phd_cos(item.Pose.Orientation.y)) / 2);
@@ -81,6 +82,20 @@ namespace TEN::Traps::TR5
 			i++;
 		}
 
+		// Determine bounding box points.
+		auto point0 = barrier.Beams.back().VertexPoints[0];
+		auto point1 = barrier.Beams.back().VertexPoints[1];
+		auto point2 = barrier.Beams.front().VertexPoints[2];
+		auto point3 = barrier.Beams.front().VertexPoints[3];
+
+		// Calculate bounding box center.
+		barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
+
+		// Calculate bounding box extents.
+		float halfWidth = std::abs(point0.x - point1.x) / 2;
+		float halfHeight = std::abs(point0.y - point2.y) / 2;
+		barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, 1.0f);
+
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
@@ -98,8 +113,9 @@ namespace TEN::Traps::TR5
 
 	void ControlLaserBarrier(short itemNumber)
 	{
-		constexpr auto LIGHT_INTENSITY = 150.0f;
-		constexpr auto LIGHT_AMPLITUDE = 31.0f;
+		constexpr auto OPACITY_THRESHOLD = 0.8f;
+		constexpr auto LIGHT_INTENSITY	 = 150.0f;
+		constexpr auto LIGHT_AMPLITUDE	 = 31.0f;
 
 		if (!LaserBarriers.count(itemNumber))
 			return;
@@ -109,23 +125,24 @@ namespace TEN::Traps::TR5
 
 		if (!TriggerActive(&item))
 		{
-			barrier.IsActive = false;
+			item.Model.Color.w =
 			barrier.Color.w = 0.0f;
-			item.Model.Color.w = 0.0f;
+			barrier.IsActive = false;
 			return;
 		}
 
-		// Brightness fade-in and distortion.
+		// Update opacity for fade-in.
 		if (item.Model.Color.w < 1.0f)
 			item.Model.Color.w += 0.02f;
 
 		if (barrier.Color.w < 1.0f)
 			barrier.Color.w += 0.02f;
 
+		// TODO: Unusual. Try it differently.
 		if (item.Model.Color.w > 8.0f)
 		{
-			barrier.Color.w = 0.8f;
-			item.Model.Color.w = 0.8f;
+			item.Model.Color.w =
+			barrier.Color.w = OPACITY_THRESHOLD;
 		}
 			
 		barrier.IsActive = true;
@@ -138,6 +155,8 @@ namespace TEN::Traps::TR5
 
 	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
+		constexpr auto OPACITY_MAX	   = 1.0f;
+		constexpr auto OPACITY_MIN	   = 0.7f;
 		constexpr auto LIGHT_INTENSITY = 255.0f;
 		constexpr auto LIGHT_AMPLITUDE = 100.0f;
 
@@ -150,35 +169,20 @@ namespace TEN::Traps::TR5
 		if (!barrier.IsActive)
 			return;
 
-		// Determine points.
-		auto point0 = barrier.Beams.back().VertexPoints[0];
-		auto point1 = barrier.Beams.back().VertexPoints[1];
-		auto point2 = barrier.Beams.front().VertexPoints[2];
-		auto point3 = barrier.Beams.front().VertexPoints[3];
-
-		// Update bounding box center.
-		barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
-
-		// Calculate and update relative bounding box dimensions.
-		float halfWidth = std::abs(point0.x - point1.x) / 2;
-		float halfHeight = std::abs(point0.y - point2.y) / 2;
-		float halfDepth = std::abs(point0.z - point2.z) / 2;
-		barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
-
 		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
 		if (barrier.BoundingBox.Intersects(playerBox))
 		{
-			if (barrier.Lethal > 0 &&
+			if (barrier.IsLethal &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
 				ItemRedLaserBurn(playerItem, 2.0f * FPS);
 				DoDamage(playerItem, MAXINT);
 			}
 
-			if (barrier.Lethal < 0)
+			if (barrier.IsHeavyActivator)
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
-			barrier.Color.w = Random::GenerateFloat(0.7f, 1.0f);
+			barrier.Color.w = Random::GenerateFloat(OPACITY_MIN, OPACITY_MAX);
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 		}		
 	}
