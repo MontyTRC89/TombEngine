@@ -69,7 +69,7 @@ namespace TEN::Renderer
 		bool IsBillboard	= false;
 		bool IsSoftParticle = false;
 
-		SpriteRenderType IsRenderType;
+		SpriteRenderType RenderType;
 	};
 	
 	void Renderer11::DrawLaserBarriers(RenderView& view)
@@ -1147,7 +1147,7 @@ namespace TEN::Renderer
 		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
-		currentSpriteBucket.IsRenderType = view.spritesToDraw[0].renderType;
+		currentSpriteBucket.RenderType = view.spritesToDraw[0].renderType;
 
 		for (auto& rDrawSprite : view.spritesToDraw)
 		{
@@ -1156,7 +1156,7 @@ namespace TEN::Renderer
 			if (rDrawSprite.Sprite != currentSpriteBucket.Sprite || 
 				rDrawSprite.BlendMode != currentSpriteBucket.BlendMode ||
 				rDrawSprite.SoftParticle != currentSpriteBucket.IsSoftParticle ||
-				rDrawSprite.renderType != currentSpriteBucket.IsRenderType ||
+				rDrawSprite.renderType != currentSpriteBucket.RenderType ||
 				currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE || 
 				isBillboard != currentSpriteBucket.IsBillboard)
 			{
@@ -1166,12 +1166,12 @@ namespace TEN::Renderer
 				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
-				currentSpriteBucket.IsRenderType = rDrawSprite.renderType;
+				currentSpriteBucket.RenderType = rDrawSprite.renderType;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
 			//HACK: prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.IsRenderType) 
+			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
 			{
 				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
@@ -1283,12 +1283,7 @@ namespace TEN::Renderer
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
-			m_stSprite.IsRenderType = spriteBucket.IsRenderType;
-
-			if (m_stSprite.IsRenderType == SpriteRenderType::LaserBarrier)
-			{
-				m_stSprite.SecondsUniform = (float)ScrollLaserUniform++;
-			}
+			m_stSprite.RenderType = spriteBucket.RenderType;
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
@@ -1358,12 +1353,7 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			m_stSprite.IsRenderType = SpriteRenderType::Default;
-
-			if (info->sprite->renderType == SpriteRenderType::LaserBarrier)
-			{
-				m_stSprite.SecondsUniform = (float)ScrollLaserUniform++;
-			}
+			m_stSprite.RenderType = SpriteRenderType::Default;
 
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
