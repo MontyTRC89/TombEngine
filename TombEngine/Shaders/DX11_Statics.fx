@@ -54,31 +54,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = float4(col, input.Color.w);
 	output.Color *= Color;
 
-	// Apply fog
-	output.Fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	output.Fog = DoFogForVertex(worldPosition);
 
-	if (FogMaxDistance != 0)
-	{
-		float d = length(CamPositionWS.xyz - output.WorldPosition);
-		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-		output.Fog.xyz = FogColor.xyz * fogFactor;
-		output.Fog.w = fogFactor;
-	}
-
-	output.Fog = float4(0, 0, 0, 0);
-	for (int i = 0; i < NumFogBulbs; i++)
-	{
-		float fogFactor = DoFogBulb(output.WorldPosition, FogBulbs[i]);
-		output.Fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
-		output.Fog.w += fogFactor;
-		if (output.Fog.w >= 1.0f)
-		{
-			break;
-		}
-	}
-	
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
+
 	return output;
 }
 
@@ -107,9 +87,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	output.Color.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.5f;
-	output.Color.xyz = saturate(output.Color.xyz);
-	output.Color.xyz += saturate(input.Fog.xyz);
+	output.Color = CombinePixelColorWithFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
 
 	return output;
 }

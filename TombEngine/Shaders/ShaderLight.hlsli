@@ -283,7 +283,42 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		}
 	}
 
-	return (length(p1 - p0) / (bulb.Density * 100.0f) / 255.0f);
+	float noise = SimplexNoise(pos / 1024.0f);
+	noise *= sin(((Frame % 256) / 256.0f) * (PI2));
+	noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
+	return (length(p1 - p0) * bulb.Density / 100.0f * noise / 255.0f);
+}
+
+float4 DoFogForVertex(float3 pos)
+{
+	// Apply fog
+	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	if (FogMaxDistance != 0)
+	{
+		float d = length(CamPositionWS.xyz - pos);
+		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+		fog.xyz = FogColor.xyz * fogFactor;
+		fog.w = fogFactor;
+	}
+
+	if (fog.w >= 1.0f)
+	{
+		return fog;
+	}
+
+	for (int i = 0; i < NumFogBulbs; i++)
+	{
+		float fogFactor = DoFogBulb(pos, FogBulbs[i]);
+		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
+		fog.w += fogFactor;
+		if (fog.w >= 1.0f)
+		{
+			break;
+		}
+	}
+
+	return fog;
 }
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen, const ShaderLight lights[MAX_LIGHTS_PER_ITEM], int numLights)

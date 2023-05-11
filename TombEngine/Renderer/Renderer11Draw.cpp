@@ -1484,7 +1484,7 @@ namespace TEN::Renderer
 		    
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
-
+		  
 		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);

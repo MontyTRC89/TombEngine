@@ -58,24 +58,7 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.Color = Sprites[InstanceID].Color;
 	output.UV = float2(Sprites[InstanceID].UV[0][input.PolyIndex], Sprites[InstanceID].UV[1][input.PolyIndex]);
 
-	// Apply fog
-	output.Fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	if (FogMaxDistance != 0)
-	{
-		float d = length(CamPositionWS.xyz - worldPosition);
-		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-		output.Fog.xyz = FogColor.xyz * fogFactor;
-		output.Fog.w = fogFactor;
-	}
-
-	output.Fog = float4(0, 0, 0, 0);
-	for (int i = 0; i < NumFogBulbs; i++)
-	{
-		float fogFactor = DoFogBulb(worldPosition, FogBulbs[i]);
-		output.Fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
-		output.Fog.w += fogFactor;
-	}
+	output.Fog = DoFogForVertex(worldPosition);
 
 	return output;
 }
@@ -119,9 +102,7 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output.xyz -= float3(input.Fog.w, input.Fog.w, input.Fog.w) * 0.33f;
-	output.xyz = saturate(output.xyz);
-	output.xyz += saturate(input.Fog.xyz);
+	output = CombinePixelColorWithFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog.w);
 
 	return output;
 }

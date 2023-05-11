@@ -71,4 +71,38 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 	return result;
 }
 
+float4 CombinePixelColorWithFog(float4 sourceColor, float4 fogColor, float value)
+{
+	switch (BlendMode)
+	{
+	case BLENDMODE_ADDITIVE:
+	case BLENDMODE_SCREEN:
+	case BLENDMODE_LIGHTEN:
+		fogColor.xyz *= Luma(sourceColor);
+		break;
+
+	case BLENDMODE_SUBTRACTIVE:
+	case BLENDMODE_EXCLUDE:
+		fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+		break;
+
+	case BLENDMODE_ALPHABLEND:
+		fogColor.w = sourceColor.w;
+		break;
+
+	default:
+		sourceColor.xyz -= float3(value, value, value) * 0.25f;
+		sourceColor.xyz = saturate(sourceColor.xyz);
+		sourceColor.xyz += saturate(fogColor.xyz);
+
+		return sourceColor;
+	}
+
+	if (fogColor.w > sourceColor.w)
+		fogColor.w = sourceColor.w;
+
+	float4 result = lerp(sourceColor, fogColor, value);
+	return result;
+}
+
 #endif // BLENDINGSHADER
