@@ -28,7 +28,11 @@ namespace TEN::Traps::TR5
 
 		auto barrier = LaserBarrier{};
 
-		barrier.Lethal = item.TriggerFlags;
+		if (item.TriggerFlags > 0)
+		{
+			barrier.IsLethal = true;
+		}
+
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		barrier.Color = item.Model.Color;
 		barrier.Color.w = 0.0f;
@@ -168,14 +172,14 @@ namespace TEN::Traps::TR5
 		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
 		if (barrier.BoundingBox.Intersects(playerBox))
 		{
-			if (barrier.Lethal > 0 &&
+			if (barrier.IsLethal == true &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
 				ItemRedLaserBurn(playerItem, 2.0f * FPS);
 				DoDamage(playerItem, MAXINT);
 			}
 
-			if (barrier.Lethal < 0)
+			if (barrier.IsLethal == false)
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
