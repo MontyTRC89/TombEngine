@@ -1436,7 +1436,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->flags = 2058;
 	spark->scalar = 3;
 	spark->gravity = 0;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 7) + 63;
 	spark->sSize = size >> 1;

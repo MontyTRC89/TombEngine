@@ -44,7 +44,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||
 			switchItem->Status ||
-			switchItem->Flags & 0x100 ||
+			switchItem->Flags & ONESHOT ||
 			CurrentSequence >= 3) &&
 			(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem !=itemNumber))
 		{

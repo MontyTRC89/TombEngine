@@ -420,6 +420,10 @@ table boolTable {
 	scalar: bool;
 }
 
+table vec2Table {
+	vec: Vector2;
+}
+
 table vec3Table {
 	vec: Vector3;
 }
@@ -441,6 +445,7 @@ union VarUnion {
 	tab: ScriptTable,
 	num: doubleTable,
 	boolean: boolTable,
+	vec2: vec2Table,
 	vec3: vec3Table,
 	rotation: rotationTable,
 	color: colorTable,

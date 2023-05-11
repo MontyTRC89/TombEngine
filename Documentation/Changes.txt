@@ -25,8 +25,10 @@ Version 1.0.9
 * Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
 * Add log reports if title level or other levels don't exist.
 * Add better error handling for missing font, sprites or shaders.
+* Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
 
 Lua API changes:
+* Add class Vec2
 * Add function String::SetTranslated() 
 * Add function Misc::IsStringDisplaying()
 * Add the following for use in AddCallback and RemoveCallback:

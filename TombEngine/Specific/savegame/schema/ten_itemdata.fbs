@@ -180,6 +180,11 @@ table ShortArray {
     arr: [short];
 }
 
+struct Vector2 {
+	x: float;
+	y: float;
+}
+
 struct Vector3 {
 	x: float;
 	y: float;

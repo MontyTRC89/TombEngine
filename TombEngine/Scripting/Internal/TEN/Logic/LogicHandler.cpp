@@ -9,6 +9,7 @@
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
+#include "Vec2/Vec2.h"
 #include "Rotation/Rotation.h"
 #include "Color/Color.h"
 #include "LevelFunc.h"
@@ -113,7 +114,8 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		break;
 	case sol::type::userdata:
 	{
-		if (value.is<Vec3>() ||
+		if (value.is<Vec2>() ||
+			value.is<Vec3>() ||
 			value.is<Rotation>() ||
 			value.is<ScriptColor>())
 		{
@@ -406,27 +408,32 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
+				else if (vars[second].index() == int(SavedVarType::Vec2))
+				{
+					auto vec2 = Vec2{ std::get<int(SavedVarType::Vec2)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
+				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto theVec = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
-					solTables[i][vars[first]] = theVec;
+					auto vec2 = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto theVec = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
-					solTables[i][vars[first]] = theVec;
+					auto vec2 = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
-					auto theCol = D3DCOLOR{std::get<int(SavedVarType::Color)>(vars[second]) };
-					solTables[i][vars[first]] = ScriptColor{theCol};
+					auto color = D3DCOLOR{ std::get<int(SavedVarType::Color)>(vars[second]) };
+					solTables[i][vars[first]] = ScriptColor{color};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
-					LevelFunc fnh;
-					fnh.m_funcName = std::get<FuncName>(vars[second]).name;
-					fnh.m_handler = this;
-					solTables[i][vars[first]] = fnh;
+					LevelFunc levelFunc;
+					levelFunc.m_funcName = std::get<FuncName>(vars[second]).name;
+					levelFunc.m_handler = this;
+					solTables[i][vars[first]] = levelFunc;
 				}
 				else
 				{
@@ -440,9 +447,7 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 
 	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
 	for (auto& [first, second] : levelVars)
-	{
 		(*m_handler.GetState())[ScriptReserved_LevelVars][first] = second;
-	}
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
 	for (auto& [first, second] : gameVars)
@@ -450,7 +455,6 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 	}
 }
-
 
 template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom & var, MapType & varsMap, size_t & nVars, std::vector<SavedVar> & vars)
 {
@@ -491,10 +495,11 @@ std::string LogicHandler::GetRequestedPath() const
 			};
 		}
 	}
+
 	return path;
 }
 
-//Used when saving
+// Used when saving
 void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 	sol::table tab{ *m_handler.GetState(), sol::create };
@@ -631,7 +636,11 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 				case sol::type::userdata:
 				{
-					if (second.is<Vec3>())
+					if (second.is<Vec2>())
+					{
+						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, nVars, vars));
+					}
+					else if (second.is<Vec3>())
 					{
 						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
 					}
