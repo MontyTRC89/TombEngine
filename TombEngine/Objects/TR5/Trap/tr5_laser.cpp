@@ -16,9 +16,13 @@ namespace TEN::Traps::TR5
 	// NOTES:
 	// - OCB defines width in blocks. Positive value = lethal, negative value = heavy activator.
 
+	// TODO:
+	// - Simplify the over-complicated init function.
+	// - Moving bounding box and beam points along with the laser barrier entity.
+	// - Randomize opacity pulse for each barrier entity.
+
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
-	// TODO: Simplify.
 	void InitializeLaserBarrier(short itemNumber)
 	{
 		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
@@ -99,7 +103,7 @@ namespace TEN::Traps::TR5
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
-	// TODO: Make it a line of light.
+	// TODO: Make it a line of light once engine allows it. -- Sezz 2023.05.11
 	static void SpawnLaserBarrierLight(const ItemInfo& item, float intensity, float amplitude)
 	{
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
@@ -138,7 +142,6 @@ namespace TEN::Traps::TR5
 		if (barrier.Color.w < 1.0f)
 			barrier.Color.w += 0.02f;
 
-		// TODO: Unusual. Try it differently.
 		if (item.Model.Color.w > 8.0f)
 		{
 			item.Model.Color.w =
