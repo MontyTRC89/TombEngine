@@ -7,12 +7,12 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Hud;
 
-void InitialiseLara(bool restore)
+void InitializeLara(bool restore)
 {
 	if (Lara.ItemNumber == NO_ITEM)
 		return;
@@ -50,17 +50,17 @@ void InitialiseLara(bool restore)
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
-		InitialiseLaraLevelJump(itemNumber, &lBackup);
+		InitializeLaraLevelJump(itemNumber, &lBackup);
 	else
-		InitialiseLaraDefaultInventory();
+		InitializeLaraDefaultInventory();
 
-	InitialiseLaraMeshes(LaraItem);
-	InitialiseLaraAnims(LaraItem);
+	InitializeLaraMeshes(LaraItem);
+	InitializeLaraAnims(LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
-void InitialiseLaraMeshes(ItemInfo* item)
+void InitializeLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -126,7 +126,7 @@ void InitialiseLaraMeshes(ItemInfo* item)
 	lara->RightArm.Locked = false;
 }
 
-void InitialiseLaraAnims(ItemInfo* item)
+void InitializeLaraAnims(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -143,13 +143,13 @@ void InitialiseLaraAnims(ItemInfo* item)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum)
+void InitializeLaraLoad(short itemNum)
 {
 	Lara.ItemNumber = itemNum;
 	LaraItem = &g_Level.Items[itemNum];
 }
 
-void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
+void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup)
 {
 	auto* item = &g_Level.Items[itemNum];
 	auto* lara = GetLaraInfo(item);
@@ -172,7 +172,7 @@ void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
 	DrawFlareMeshes(*item);
 }
 
-void InitialiseLaraDefaultInventory()
+void InitializeLaraDefaultInventory()
 {
 	if (Objects[ID_FLARE_INV_ITEM].loaded)
 		Lara.Inventory.TotalFlares = 3;

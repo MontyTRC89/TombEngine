@@ -12,13 +12,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
@@ -165,7 +165,7 @@ namespace TEN::Entities::Vehicles
 		return (MinecartInfo*)minecartItem->Data;
 	}
 
-	void InitialiseMinecart(short itemNumber)
+	void InitializeMinecart(short itemNumber)
 	{
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();

@@ -5,9 +5,10 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
-#include "Specific/setup.h"
+#include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Effects::Environment;
@@ -21,7 +22,7 @@ TEN::Renderer::RendererHudBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
-	void Renderer11::InitialiseGameBars()
+	void Renderer11::InitializeGameBars()
 	{
 		constexpr auto AIR_BAR_POS		= Vector2(630.0f, 30.0f);
 		constexpr auto EXPOSURE_BAR_POS = Vector2(630.0f, 70.0f);
@@ -108,6 +109,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+			return;
+
 		unsigned int strides = sizeof(RendererVertex);
 		unsigned int offset = 0;
 	
@@ -186,7 +190,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarBorder, SAMPLER_LINEAR_CLAMP);
 
 		m_stHUDBar.BarStartUV = Vector2::Zero;
 		m_stHUDBar.BarScale = Vector2::One;
@@ -213,7 +217,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
 		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
 
-		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarInner, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}

@@ -2,18 +2,18 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #include "Game/animation.h"
-#include "Game/items.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
@@ -40,7 +40,7 @@ namespace TEN::Entities::Generic
 		return (PushableInfo*)item->Data;
 	}
 
-	void InitialisePushableBlock(short itemNumber)
+	void InitializePushableBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->Data = PushableInfo();

@@ -12,10 +12,10 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
+	const auto DragonMouthBite = CreatureBiteInfo(Vector3i(35, 171, 1168), 12);
 	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR2
 			explosionItem->Animation.Velocity.y = 0.0f;
 			explosionItem->Animation.Velocity.z = 0.0f;
 
-			InitialiseItem(ExplosionIndex);
+			InitializeItem(ExplosionIndex);
 			AddActiveItem(ExplosionIndex);
 
 			explosionItem->Status = ITEM_ACTIVE;
@@ -138,7 +138,7 @@ namespace TEN::Entities::Creatures::TR2
 			dragonBack->Pose.Orientation.z = 0;
 			dragonBack->RoomNumber = item->RoomNumber;
 
-			InitialiseItem(boneBack);
+			InitializeItem(boneBack);
 
 			auto* dragonFront = &g_Level.Items[boneFront];
 
@@ -148,7 +148,7 @@ namespace TEN::Entities::Creatures::TR2
 			dragonFront->Pose.Orientation.z = 0;
 			dragonFront->RoomNumber = item->RoomNumber;
 
-			InitialiseItem(boneFront);
+			InitializeItem(boneFront);
 
 			dragonFront->MeshBits = 0xFF3FFFFF;
 		}
@@ -445,7 +445,7 @@ namespace TEN::Entities::Creatures::TR2
 			ItemNewRoom(backItemNumber, item->RoomNumber);
 	}
 
-	void InitialiseBartoli(short itemNumber)
+	void InitializeBartoli(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -465,7 +465,7 @@ namespace TEN::Entities::Creatures::TR2
 			back->Status = ITEM_INVISIBLE;
 			back->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(backItem);
+			InitializeItem(backItem);
 			back->MeshBits = 0x1FFFFF;
 
 			item->Data = backItem;
@@ -479,7 +479,7 @@ namespace TEN::Entities::Creatures::TR2
 			front->Status = ITEM_INVISIBLE;
 			front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(frontItem);
+			InitializeItem(frontItem);
 
 			back->Data = frontItem;
 
@@ -526,7 +526,7 @@ namespace TEN::Entities::Creatures::TR2
 					front->RoomNumber = item->RoomNumber;
 					front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-					InitialiseItem(frontItem);
+					InitializeItem(frontItem);
 					AddActiveItem(frontItem);
 					front->Status = ITEM_ACTIVE;
 				}

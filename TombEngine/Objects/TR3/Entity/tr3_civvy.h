@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	void InitialiseCivvy(short itemNumber);
+	void InitializeCivvy(short itemNumber);
 	void CivvyControl(short itemNumber);
 }

@@ -9,13 +9,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
+	const auto ChefBite = CreatureBiteInfo(Vector3i(0, 200, 0), 13);
 
 	// TODO
 	enum ChefState
@@ -37,11 +37,11 @@ namespace TEN::Entities::Creatures::TR5
 		CHEF_ANIM_DEATH = 16
 	};
 
-	void InitialiseChef(short itemNumber)
+	void InitializeChef(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);

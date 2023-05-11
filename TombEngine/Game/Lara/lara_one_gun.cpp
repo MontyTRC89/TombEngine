@@ -21,6 +21,7 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -28,7 +29,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
@@ -593,7 +593,7 @@ ItemInfo* FireHarpoon(ItemInfo& laraItem)
 		item.RoomNumber = laraItem.RoomNumber;
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	item.Pose.Orientation = EulerAngles(
 		player.LeftArm.Orientation.x + laraItem.Pose.Orientation.x,
@@ -709,7 +709,7 @@ void FireGrenade(ItemInfo& laraItem)
 		}
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	grenadeItem.Pose.Orientation = EulerAngles(
 		laraItem.Pose.Orientation.x + player.LeftArm.Orientation.x + ANGLE(180.0f),
@@ -892,7 +892,7 @@ void FireRocket(ItemInfo& laraItem)
 			2, LaraWeaponType::RocketLauncher, 32);
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	rocketItem.Pose.Orientation = EulerAngles(
 		laraItem.Pose.Orientation.x + player.LeftArm.Orientation.x,
@@ -1009,7 +1009,7 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 		boltItem.Pose.Position = pos->Position;
 		boltItem.RoomNumber = laraItem.RoomNumber;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		boltItem.Pose.Orientation = pos->Orientation;
 	}
@@ -1028,7 +1028,7 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 			boltItem.RoomNumber = laraItem.RoomNumber;
 		}
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		boltItem.Pose.Orientation.x = player.LeftArm.Orientation.x + laraItem.Pose.Orientation.x;
 		boltItem.Pose.Orientation.z = 0;
@@ -1370,11 +1370,11 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	else if (type == ProjectileType::FragGrenade)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0.
-		int renadeItemNumber = CreateItem();
-		if (renadeItemNumber == NO_ITEM)
+		int grenadeItemNumber = CreateItem();
+		if (grenadeItemNumber == NO_ITEM)
 			return true;
 
-		auto& grenadeItem = g_Level.Items[renadeItemNumber];
+		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
 
 		grenadeItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		grenadeItem.ObjectNumber = ID_GRENADE;
@@ -1384,7 +1384,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 			projectile.Pose.Position.y - CLICK(1),
 			Random::GenerateInt(0, BLOCK(0.5f)) + projectile.Pose.Position.z - CLICK(1));
 
-		InitialiseItem(renadeItemNumber);
+		InitializeItem(grenadeItemNumber);
 
 		grenadeItem.Pose.Orientation = EulerAngles(
 			Random::GenerateAngle(0, ANGLE(90.0f)) + ANGLE(45.0f),
@@ -1396,7 +1396,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
 		grenadeItem.Animation.RequiredState = NO_STATE;
 
-		AddActiveItem(renadeItemNumber);
+		AddActiveItem(grenadeItemNumber);
 
 		grenadeItem.Status = ITEM_INVISIBLE;
 		grenadeItem.ItemFlags[3] = 1;

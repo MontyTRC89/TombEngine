@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseBurningFloor(short itemNumber);
+void InitializeBurningFloor(short itemNumber);
 void BurningFloorControl(short itemNumber);

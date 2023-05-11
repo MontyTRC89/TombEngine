@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto CrowDovePos = Vector3i(0, 0, -400);
 
-	void InitialiseCrowDoveSwitch(short itemNumber)
+	void InitializeCrowDoveSwitch(short itemNumber)
 	{
 		g_Level.Items[itemNumber].MeshBits = 3;
 	}

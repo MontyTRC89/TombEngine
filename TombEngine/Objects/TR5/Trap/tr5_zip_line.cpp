@@ -7,10 +7,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -33,7 +33,7 @@ const auto ZipLineMountBasis = ObjectCollisionBounds
 	)
 };
 
-void InitialiseZipLine(short itemNumber)
+void InitializeZipLine(short itemNumber)
 {
 	auto& zipLineItem = g_Level.Items[itemNumber];
 	zipLineItem.Data = GameVector();

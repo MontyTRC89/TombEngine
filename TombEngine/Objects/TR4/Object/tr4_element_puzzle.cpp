@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseElementPuzzle(short itemNumber)
+	void InitializeElementPuzzle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

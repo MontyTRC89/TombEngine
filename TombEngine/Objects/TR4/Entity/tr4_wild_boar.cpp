@@ -9,9 +9,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 	constexpr auto WILD_BOAR_ATTACK_RANGE = SQUARE(CLICK(1));
 
-	const auto WildBoarBite = BiteInfo(Vector3::Zero, 14);
+	const auto WildBoarBite = CreatureBiteInfo(Vector3i::Zero, 14);
 
 	enum WildBoarState
 	{
@@ -45,11 +45,11 @@ namespace TEN::Entities::TR4
 		BOAR_ANIM_RUN_FORWARD_TO_IDLE = 8
 	};
 
-	void InitialiseWildBoar(short itemNumber)
+	void InitializeWildBoar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BOAR_ANIM_IDLE);
 	}
 

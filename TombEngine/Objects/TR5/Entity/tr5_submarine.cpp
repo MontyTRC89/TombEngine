@@ -12,22 +12,22 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseSubmarine(short itemNumber)
+	void InitializeSubmarine(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)
@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
 		spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
 		spark->friction = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLE_CLUSTER;
 		spark->maxYvel = 0;
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 1;
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		torpedoItem->Pose.Position = pos1;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		torpedoItem->Pose.Orientation.x = 0;
 		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;

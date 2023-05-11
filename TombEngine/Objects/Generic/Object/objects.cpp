@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Game/items.h"
-#include "Game/effects/effects.h"
+
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
-#include "Sound/sound.h"
-#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -223,7 +224,7 @@ void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	}*/
 }
 
-void InitialiseTightrope(short itemNumber)
+void InitializeTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
@@ -243,7 +244,7 @@ void InitialiseTightrope(short itemNumber)
 		tightropeItem->Pose.Position.z -= CLICK(1);
 }
 
-void InitialiseAnimating(short itemNumber)
+void InitializeAnimating(short itemNumber)
 {
 	/*auto* item = &g_Level.Items[itemNumber];
 	item->ActiveState = 0;

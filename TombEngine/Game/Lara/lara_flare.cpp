@@ -12,11 +12,11 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -141,7 +141,7 @@ void UndrawFlare(ItemInfo& laraItem)
 				player.Control.Weapon.GunType = player.Control.Weapon.LastGunType;
 				player.Control.HandStatus = HandStatus::Free;
 
-				InitialiseNewWeapon(laraItem);
+				InitializeNewWeapon(laraItem);
 
 				player.TargetEntity = nullptr;
 				player.LeftArm.Locked =
@@ -197,7 +197,7 @@ void UndrawFlare(ItemInfo& laraItem)
 			player.Control.Weapon.GunType = player.Control.Weapon.LastGunType;
 			player.Control.HandStatus = HandStatus::Free;
 
-			InitialiseNewWeapon(laraItem);
+			InitializeNewWeapon(laraItem);
 
 			player.TargetEntity = nullptr;
 			player.LeftArm.Locked =
@@ -347,7 +347,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 		flareItem.RoomNumber = laraItem.RoomNumber;
 	}
 
-	InitialiseItem(itemNumber);
+	InitializeItem(itemNumber);
 
 	flareItem.Pose.Orientation.x = 0;
 	flareItem.Pose.Orientation.z = 0;

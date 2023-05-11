@@ -104,6 +104,7 @@
 #define STRING_CONTROLS_V_SLOW			"controls_slow"
 #define STRING_CONTROLS_V_BRAKE			"controls_brake"
 #define STRING_CONTROLS_V_FIRE			"controls_fire"
+#define STRING_CONTROLS_DEFAULTS        "controls_defaults"
 #define STRING_TITLE_ITEMS				"items"
 #define STRING_TITLE_PUZZLES			"puzzles"
 #define STRING_TITLE_SETTINGS			"settings"

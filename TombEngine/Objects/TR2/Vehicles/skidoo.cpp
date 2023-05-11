@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -13,12 +14,11 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/simple_particle.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
@@ -60,6 +60,8 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
+
+	constexpr auto IN_SKIDOO_FIRE = IN_DRAW;
 
 	const std::vector<VehicleMountType> SkidooMountTypes =
 	{
@@ -117,7 +119,7 @@ namespace TEN::Entities::Vehicles
 		return (SkidooInfo*)skidooItem->Data;
 	}
 
-	void InitialiseSkidoo(short itemNumber)
+	void InitializeSkidoo(short itemNumber)
 	{
 		auto* skidooItem = &g_Level.Items[itemNumber];
 		skidooItem->Data = SkidooInfo{};
@@ -128,9 +130,6 @@ namespace TEN::Entities::Vehicles
 			AddActiveItem(itemNumber);
 			skidooItem->Status = ITEM_ACTIVE;
 		}
-
-		if (skidooItem->ObjectNumber == ID_SNOWMOBILE_GUN)
-			skidoo->Armed = true;
 
 		skidoo->MomentumAngle = skidooItem->Pose.Orientation.y;
 	}
@@ -204,6 +203,7 @@ namespace TEN::Entities::Vehicles
 	bool TestSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
+		auto* skidoo = GetSkidooInfo(skidooItem);
 
 		if (lara->Context.Vehicle != NO_ITEM)
 		{
@@ -220,6 +220,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				lara->Control.HandStatus = HandStatus::Free;
+
+				if (skidoo->Armed)
+					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				SetLaraVehicle(laraItem, nullptr);
 			}
 			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF &&
@@ -248,6 +252,11 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.IsAirborne = true;
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
 				lara->Control.HandStatus = HandStatus::Free;
+				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
+				if (skidoo->Armed)
+					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				skidooItem->Collidable = false;
 				skidooItem->Flags |= IFLAG_INVISIBLE;
 
@@ -663,21 +672,17 @@ namespace TEN::Entities::Vehicles
 		FindNewTarget(*laraItem, weapon);
 		AimWeapon(*laraItem, lara->RightArm, weapon);
 
-		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
+		if (TrInput & IN_SKIDOO_FIRE && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
-				0
-			);
+				0);
 
-			if ((int)FireWeapon(LaraWeaponType::Pistol, *lara->TargetEntity, *laraItem, angles) +
-				(int)FireWeapon(LaraWeaponType::Pistol, *lara->TargetEntity, *laraItem, angles))
-			{
-				skidoo->FlashTimer = 2;
-				SoundEffect(weapon.SampleNum, &laraItem->Pose);
-				skidooItem->ItemFlags[0] = 4;
-			}
+			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
+			SoundEffect(weapon.SampleNum, &laraItem->Pose);
+			skidooItem->ItemFlags[0] = 4;
 		}
 
 		if (skidooItem->ItemFlags[0])

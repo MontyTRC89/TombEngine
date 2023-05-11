@@ -3,11 +3,12 @@
 
 #include <filesystem>
 #include <regex>
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
@@ -135,7 +136,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 
 	// Create actual sample
 	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
-	delete uncompBuffer;
+	delete[] uncompBuffer;
 
 	return true;
 }
@@ -803,7 +804,7 @@ void Sound_UpdateScene()
 	BASS_Apply3D();
 }
 
-// Initialise BASS engine and also prepare all sound data.
+// Initialize BASS engine and also prepare all sound data.
 // Called once on engine start-up.
 
 void Sound_Init()
@@ -815,7 +816,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	// Initialise BASS_FX plugin
+	// Initialize BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;
@@ -842,7 +843,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Starting 3D mixdown", true))
 		return;
 
-	// Initialise channels and tracks array
+	// Initialize channels and tracks array
 	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
