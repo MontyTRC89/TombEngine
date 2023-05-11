@@ -547,7 +547,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_ROPE_IDLE;
 			item->Animation.ActiveState = LS_ROPE_IDLE;
 			item->Animation.AnimNumber = LA_JUMP_UP_TO_ROPE_END;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 		}
 
 		if (TrInput & IN_JUMP)

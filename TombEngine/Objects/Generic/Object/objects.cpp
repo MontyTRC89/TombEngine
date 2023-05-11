@@ -99,7 +99,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 			{
 				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				laraInfo->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
 				laraInfo->Control.Tightrope.Balance = 0;
@@ -147,7 +147,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 			laraItem->Animation.Velocity.y = false;
 			laraItem->Animation.IsAirborne = false;
 
@@ -244,7 +244,7 @@ void AnimatingControl(short itemNumber)
 	item->Status = ITEM_ACTIVE;
 	AnimateItem(item);
 
-	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
+	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

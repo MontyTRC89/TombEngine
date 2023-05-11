@@ -449,7 +449,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (creature->Flags != 1 && item->TouchBits.Test(MPStickKickAttackJoints) &&
-						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+						item->Animation.FrameNumber > GetAnimData(item).frameBase + 8)
 					{
 						DoDamage(creature->Enemy, 150);
 						CreatureEffect(item, MPStickBite2, DoBloodSplat);
@@ -460,7 +460,7 @@ namespace TEN::Entities::Creatures::TR3
 				else
 				{
 					if (!creature->Flags != 1 && creature->Enemy &&
-						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+						item->Animation.FrameNumber > GetAnimData(item).frameBase + 8)
 					{
 						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
