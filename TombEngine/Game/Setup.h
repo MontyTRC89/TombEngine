@@ -58,7 +58,6 @@ struct ObjectInfo
 	int nmeshes; // BoneCount
 	int meshIndex; // Base index in g_Level.Meshes.
 	int boneIndex; // Base index in g_Level.Bones.
-	int animIndex; // Base index in g_Level.Anims.
 	int frameBase; // Base index in g_Level.Frames.
 
 	LotType LotType;
@@ -79,6 +78,9 @@ struct ObjectInfo
 	bool usingDrawAnimatingItem;
 
 	DWORD explodableMeshbits;
+
+	int animIndex; // Base index in g_Level.Anims. Deprecated.
+	std::vector<AnimData> Animations = {};
 
 	std::function<void(short itemNumber)>										   Initialize;
 	std::function<void(short itemNumber)>										   control;

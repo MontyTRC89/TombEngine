@@ -476,7 +476,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_SPRINT)
 		{
 			item->Animation.TargetState = LS_ROPE_SWING;
-			lara->Control.Rope.DFrame = (GetAnimData(LA_ROPE_SWING).frameBase + 32) << 8;
+			lara->Control.Rope.DFrame = (GetAnimData(*item, LA_ROPE_SWING).frameBase + 32) << 8;
 			lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
 		else if (TrInput & IN_FORWARD && lara->Control.Rope.Segment > 4)
@@ -540,7 +540,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = lara->Control.Rope.Frame >> 8;
 
 		if (!(TrInput & IN_SPRINT) &&
-			item->Animation.FrameNumber == GetAnimData(LA_ROPE_SWING).frameBase + 32 &&
+			item->Animation.FrameNumber == GetAnimData(*item, LA_ROPE_SWING).frameBase + 32 &&
 			lara->Control.Rope.MaxXBackward < 6750 &&
 			lara->Control.Rope.MaxXForward < 6750)
 		{
@@ -553,7 +553,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_JUMP)
 			JumpOffRope(item);
 	}
-	else if (item->Animation.FrameNumber == GetAnimData(LA_ROPE_IDLE_TO_SWING).frameBase + 15)
+	else if (item->Animation.FrameNumber == GetAnimData(*item, LA_ROPE_IDLE_TO_SWING).frameBase + 15)
 		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.y, 128);
 }
 

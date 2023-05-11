@@ -349,18 +349,22 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto& player = *GetLaraInfo(&laraItem);
+	auto& player = GetLaraInfo(laraItem);
+	auto animObjectID = GetWeaponObjectID(weaponType);
+	auto& animObjectNumber = Objects[animObjectID];
 
 	player.Control.HandStatus = HandStatus::WeaponReady;
-	player.TargetEntity = nullptr;
 	player.LeftArm.Orientation =
 	player.RightArm.Orientation = EulerAngles::Zero;
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = animObjectID;
 	player.LeftArm.FrameBase =
-	player.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	player.RightArm.FrameBase = animObjectNumber.frameBase;
+	player.TargetEntity = nullptr;
 }
 
 void FireShotgun(ItemInfo& laraItem)

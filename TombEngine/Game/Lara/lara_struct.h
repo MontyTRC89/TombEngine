@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 #include "Objects/objectslist.h"
 
 using namespace TEN::Math;
@@ -1085,9 +1086,10 @@ struct CarriedWeaponInfo
 
 struct ArmInfo
 {
-	int AnimNumber	= 0;
-	int FrameNumber = 0;
-	int FrameBase	= 0;
+	GAME_OBJECT_ID AnimObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+	int			   AnimNumber	= 0;
+	int			   FrameNumber	= 0;
+	int			   FrameBase	= 0;
 
 	EulerAngles Orientation = EulerAngles::Zero;
 	bool		Locked		= false;

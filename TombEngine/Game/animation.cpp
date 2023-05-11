@@ -349,23 +349,19 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 
 bool TestAnimNumber(const ItemInfo& item, int animNumber)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (item.Animation.AnimNumber == (object.animIndex + animNumber));
+	return (item.Animation.AnimNumber == animNumber);
 }
 
 bool TestLastFrame(ItemInfo* item, int animNumber)
 {
-	const auto& object = Objects[item->Animation.AnimObjectID];
-
 	if (animNumber == NO_ANIM)
-		animNumber = item->Animation.AnimNumber - object.animIndex;
+		animNumber = item->Animation.AnimNumber;
 
 	// Animation to test doesn't match; return early.
-	int animIndex = object.animIndex + animNumber;
-	if (item->Animation.AnimNumber != animIndex)
+	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	const auto& anim = GetAnimData(object, animNumber);
+	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber);
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
@@ -400,10 +396,20 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
 	const auto& animObject = Objects[animObjectID];
-	int animIndex = animObject.animIndex + animNumber;
+	const auto& anim = GetAnimData(animObject, animNumber);
 
-	// Animation is missing; return early.
-	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
+	int frameIndex = anim.frameBase + frameNumber;
+
+	// Animation already set; return early.
+	if (item.Animation.AnimObjectID == animObjectID &&
+		item.Animation.AnimNumber == animNumber &&
+		item.Animation.FrameNumber == frameIndex)
+	{
+		return;
+	}
+
+	// Animation missing; return early.
+	if (animNumber < 0 || animNumber >= animObject.Animations.size())
 	{
 		TENLog(
 			"Attempted to set missing animation " + std::to_string(animNumber) +
@@ -414,19 +420,8 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		return;
 	}
 
-	const auto& anim = GetAnimData(animObject, animNumber);
-	int frameIndex = anim.frameBase + frameNumber;
-
-	// Animation already set; return early.
-	if (item.Animation.AnimObjectID == animObjectID &&
-		item.Animation.AnimNumber == animIndex &&
-		item.Animation.FrameNumber == frameIndex)
-	{
-		return;
-	}
-
 	item.Animation.AnimObjectID = animObjectID;
-	item.Animation.AnimNumber = animIndex;
+	item.Animation.AnimNumber = animNumber;
 	item.Animation.FrameNumber = frameIndex;
 	item.Animation.ActiveState =
 	item.Animation.TargetState = anim.ActiveState;
@@ -442,11 +437,6 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 	SetAnimation(*item, item->ObjectNumber, animNumber, frameNumber);
 }
 
-const AnimData& GetAnimData(int animIndex)
-{
-	return g_Level.Anims[animIndex];
-}
-
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
 {
 	const auto& object = Objects[objectID];
@@ -455,21 +445,20 @@ const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
 
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
-	return g_Level.Anims[object.animIndex + animNumber];
+	return object.Animations[animNumber];
 }
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
 	if (animNumber == NO_ANIM)
-		return GetAnimData(item.Animation.AnimNumber);
+		animNumber = item.Animation.AnimNumber;
 
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return GetAnimData(object, animNumber);
+	return GetAnimData(item.Animation.AnimObjectID, animNumber);
 }
 
 const AnimData& GetAnimData(const ItemInfo* item, int animNumber)
 {
-	return (GetAnimData(*item, animNumber));
+	return GetAnimData(*item, animNumber);
 }
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
@@ -500,12 +489,7 @@ const AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNum
 
 const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
-	const auto& object = Objects[objectID];
-
-	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
-
-	const auto& anim = GetAnimData(object, animNumber);
+	const auto& anim = GetAnimData(objectID, animNumber);
 
 	// Get and clamp frame count.
 	unsigned int frameCount = anim.frameEnd - anim.frameBase;
@@ -536,14 +520,12 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 
 int GetAnimNumber(const ItemInfo& item)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (item.Animation.AnimNumber - object.animIndex);
+	return item.Animation.AnimNumber;
 }
 
 int GetAnimIndex(const ItemInfo& item, int animNumber)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (object.animIndex + animNumber);
+	return animNumber;
 }
 
 int GetFrameNumber(const ItemInfo& item)
@@ -559,24 +541,22 @@ int GetFrameNumber(ItemInfo* item)
 
 int GetFrameIndex(ItemInfo* item, int frameNumber)
 {
-	int animNumber = item->Animation.AnimNumber - Objects[item->Animation.AnimObjectID].animIndex;
+	int animNumber = item->Animation.AnimNumber;
 	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
 }
 
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
+	const auto& anim = GetAnimData(objectID, animNumber);
 
 	return (anim.frameBase + frameNumber);
 }
 
 int GetFrameCount(int animIndex)
 {
-	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
-		return 0;
+	// TODO: Can't exist anymore.
+	const auto& anim = GetAnimData(ID_LARA, animIndex);
 
-	const auto& anim = GetAnimData(animIndex);
 	return (anim.frameEnd - anim.frameBase);
 }
 
@@ -587,10 +567,9 @@ int GetNextAnimState(ItemInfo* item)
 
 int GetNextAnimState(int objectID, int animNumber)
 {
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
+	const auto& anim = GetAnimData((GAME_OBJECT_ID)objectID, animNumber);
+	const auto& nextAnim = GetAnimData((GAME_OBJECT_ID)objectID, anim.JumpAnimNum);
 
-	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
 	return nextAnim.ActiveState;
 }
 
@@ -642,9 +621,13 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
+		{
 			outPose.Orientation.y += angle;
+		}
 		else
+		{
 			outPose.Orientation.y -= rotation;
+		}
 	}
 	else
 	{

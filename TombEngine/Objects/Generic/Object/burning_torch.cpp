@@ -76,6 +76,7 @@ namespace TEN::Entities::Generic
 
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
+		auto& animObject = Objects[ID_LARA_TORCH_ANIM];
 
 		if (lara->Torch.State == TorchState::Holding)
 		{
@@ -170,7 +171,7 @@ namespace TEN::Entities::Generic
 		if (lara->Flare.ControlLeft)
 			lara->Control.HandStatus = HandStatus::WeaponReady;
 
-		lara->LeftArm.FrameBase = GetAnimData(lara->LeftArm.AnimNumber).FramePtr;
+		lara->LeftArm.FrameBase = GetAnimData(animObject, lara->LeftArm.AnimNumber).FramePtr;
 
 		if (lara->Torch.IsLit)
 		{
@@ -188,6 +189,7 @@ namespace TEN::Entities::Generic
 	{
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
+		auto& animObject = Objects[ID_LARA_TORCH_ANIM];
 
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 			CreateFlare(*laraItem, ID_FLARE_ITEM, false);
@@ -196,12 +198,13 @@ namespace TEN::Entities::Generic
 		lara->Control.Weapon.RequestGunType = LaraWeaponType::Torch;
 		lara->Control.Weapon.GunType = LaraWeaponType::Torch;
 		lara->Flare.ControlLeft = true;
-		lara->LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
+		lara->LeftArm.AnimNumber = animObject.animIndex;
 		lara->LeftArm.Locked = false;
+		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
 		lara->LeftArm.FrameNumber = 0;
-		lara->LeftArm.FrameBase = GetAnimData(lara->LeftArm.AnimNumber).FramePtr;
+		lara->LeftArm.FrameBase = GetAnimData(animObject, lara->LeftArm.AnimNumber).FramePtr;
 
-		laraItem->Model.MeshIndex[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
+		laraItem->Model.MeshIndex[LM_LHAND] = animObject.meshIndex + LM_LHAND;
 	}
 
 	void TorchControl(short itemNumber)

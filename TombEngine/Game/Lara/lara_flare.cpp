@@ -281,27 +281,28 @@ void DrawFlare(ItemInfo& laraItem)
 void SetFlareArm(ItemInfo& laraItem, int armFrame)
 {
 	auto& player = *GetLaraInfo(&laraItem);
-	int flareAnimNumber = Objects[ID_FLARE_ANIM].animIndex;
+	auto& animObject = Objects[ID_FLARE_ANIM];
 
+	int flareAnimNumber = 0;
 	if (armFrame >= 95)
 	{
-		flareAnimNumber += 4;
+		flareAnimNumber = 4;
 	}
 	else if (armFrame >= 72)
 	{
-		flareAnimNumber += 3;
+		flareAnimNumber = 3;
 	}
 	else if (armFrame >= 33)
 	{
-		flareAnimNumber += 2;
+		flareAnimNumber = 2;
 	}
 	else if (armFrame >= 1)
 	{
-		flareAnimNumber += 1;
+		flareAnimNumber = 1;
 	}
 
 	player.LeftArm.AnimNumber = flareAnimNumber;
-	player.LeftArm.FrameBase = GetAnimData(flareAnimNumber).FramePtr;
+	player.LeftArm.FrameBase = GetAnimData(animObject, flareAnimNumber).FramePtr;
 }
 
 void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)

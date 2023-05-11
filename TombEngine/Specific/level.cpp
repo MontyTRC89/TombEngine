@@ -282,29 +282,6 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int numAnimations = ReadInt32();
-	TENLog("Num animations: " + std::to_string(numAnimations), LogLevel::Info);
-
-	g_Level.Anims.resize(numAnimations);
-	for (int i = 0; i < numAnimations; i++)
-	{
-		auto* anim = &g_Level.Anims[i];
-
-		anim->FramePtr = ReadInt32();
-		anim->Interpolation = ReadInt32();
-		anim->ActiveState = ReadInt32();
-		anim->VelocityStart = ReadVector3();
-		anim->VelocityEnd = ReadVector3();
-		anim->frameBase = ReadInt32();
-		anim->frameEnd = ReadInt32();
-		anim->JumpAnimNum = ReadInt32();
-		anim->JumpFrameNum = ReadInt32();
-		anim->NumStateDispatches = ReadInt32();
-		anim->StateDispatchIndex = ReadInt32();
-		anim->NumCommands = ReadInt32();
-		anim->CommandIndex = ReadInt32();
-	}
-
 	int numChanges = ReadInt32();
 	g_Level.Changes.resize(numChanges);
 	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
@@ -354,17 +331,37 @@ void LoadObjects()
 
 	for (int i = 0; i < numModels; i++)
 	{
-		int objNum = ReadInt32();
-		MoveablesIds.push_back(objNum);
+		int objectID = ReadInt32();
+		MoveablesIds.push_back(objectID);
 
-		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = ReadInt32();
-		Objects[objNum].meshIndex = ReadInt32();
-		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = ReadInt32();
-		Objects[objNum].animIndex = ReadInt32();
+		auto& object = Objects[objectID];
 
-		Objects[objNum].loaded = true;
+		object.loaded = true;
+		object.nmeshes = ReadInt32();
+		object.meshIndex = ReadInt32();
+		object.boneIndex = ReadInt32();
+		object.frameBase = ReadInt32();
+
+		//object.animIndex = 0;
+		object.Animations.resize(ReadInt32());
+		for (auto& anim : object.Animations)
+		{
+			anim.FramePtr = ReadInt32();
+			anim.Interpolation = ReadInt32();
+			anim.ActiveState = ReadInt32();
+			anim.VelocityStart = ReadVector3();
+			anim.VelocityEnd = ReadVector3();
+			anim.frameBase = ReadInt32();
+			anim.frameEnd = ReadInt32();
+			anim.JumpAnimNum = ReadInt32();
+			anim.JumpFrameNum = ReadInt32();
+			anim.NumStateDispatches = ReadInt32();
+			anim.StateDispatchIndex = ReadInt32();
+			anim.NumCommands = ReadInt32();
+			anim.CommandIndex = ReadInt32();
+		}
+
+		Objects[objectID].loaded = true;
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
@@ -850,7 +847,6 @@ void FreeLevel()
 	MoveablesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
-	g_Level.Anims.resize(0);
 	g_Level.Changes.resize(0);
 	g_Level.Ranges.resize(0);
 	g_Level.Commands.resize(0);

@@ -139,7 +139,7 @@ void InitializeLaraAnims(ItemInfo* item)
 	else
 	{
 		lara->Control.WaterStatus = WaterStatus::Dry;
-		SetAnimation(item, LA_STAND_SOLID);
+		SetAnimation(item, LA_STAND_IDLE);
 	}
 }
 

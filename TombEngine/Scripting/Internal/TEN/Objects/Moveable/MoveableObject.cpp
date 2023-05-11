@@ -804,7 +804,7 @@ void Moveable::SetStateNumber(int stateNumber)
 
 int Moveable::GetAnimNumber() const
 {
-	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->Animation.AnimNumber;
 }
 
 void Moveable::SetAnimNumber(int animNumber)

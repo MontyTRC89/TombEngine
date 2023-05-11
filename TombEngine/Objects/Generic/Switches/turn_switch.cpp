@@ -139,7 +139,7 @@ namespace TEN::Entities::Switches
 				if (!TriggerActive(&g_Level.Items[ItemNos[0]]))
 				{
 					g_Level.Items[ItemNos[0]].Animation.AnimNumber = Objects[g_Level.Items[ItemNos[0]].ObjectNumber].animIndex;
-					g_Level.Items[ItemNos[0]].Animation.FrameNumber = GetAnimData(g_Level.Items[ItemNos[0]].Animation.AnimNumber).frameBase;
+					g_Level.Items[ItemNos[0]].Animation.FrameNumber = GetAnimData(g_Level.Items[ItemNos[0]], g_Level.Items[ItemNos[0]].Animation.AnimNumber).frameBase;
 				}
 			}
 		}

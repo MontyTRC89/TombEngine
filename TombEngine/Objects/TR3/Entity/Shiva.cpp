@@ -272,7 +272,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		const auto& object = Objects[item->ObjectNumber];
+		/*const */auto& object = Objects[item->ObjectNumber];
 		auto& creature = *GetCreatureInfo(item);
 
 		short headingAngle = 0;

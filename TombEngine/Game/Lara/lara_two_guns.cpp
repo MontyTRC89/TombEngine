@@ -89,7 +89,7 @@ static void SetArmInfo(const ItemInfo& laraItem, ArmInfo& arm, int frame)
 	}
 
 	arm.FrameNumber = frame;
-	arm.FrameBase = GetAnimData(arm.AnimNumber).FramePtr;
+	arm.FrameBase = GetAnimData(arm.AnimObjectID, arm.AnimNumber).FramePtr;
 }
 
 static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)

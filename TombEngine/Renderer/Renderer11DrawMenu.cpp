@@ -571,8 +571,8 @@ namespace TEN::Renderer
 		{
 			auto frameData = AnimFrameInterpData
 			{
-				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
-				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object, object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object, object.animIndex).FramePtr],
 				0.0f
 			};
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);

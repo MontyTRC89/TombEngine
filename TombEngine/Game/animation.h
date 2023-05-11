@@ -14,7 +14,7 @@ struct ObjectInfo;
 
 // NOTES:
 // animNumber: Relative animation number.
-// animIndex:  Index of animation in giant g_Level.Anims vector.
+// animIndex:  Index of animation in giant g_Level.Anims vector. Temporary.
 
 constexpr auto NO_STATE = -1;
 constexpr auto NO_ANIM	= -1;
@@ -115,7 +115,6 @@ void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
-const AnimData& GetAnimData(int animIndex); // Deprecated.
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);

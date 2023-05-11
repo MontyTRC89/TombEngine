@@ -136,6 +136,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		ArmInfo* leftArm = &Lara.LeftArm;
 		ArmInfo* rightArm = &Lara.RightArm;
 
+		auto& leftArmAnimObject = Objects[Lara.LeftArm.AnimObjectID];
+		auto& leftArmAnim = GetAnimData(leftArmAnimObject, Lara.LeftArm.AnimNumber);
+		auto& leftArmFrame = g_Level.Frames[(Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber) - leftArmAnim.frameBase];
+		
+		auto& rightArmAnimObject = Objects[Lara.RightArm.AnimObjectID];
+		auto& rightArmAnim = GetAnimData(rightArmAnimObject, Lara.RightArm.AnimNumber);
+		auto& rightArmFrame = g_Level.Frames[(Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber) - rightArmAnim.frameBase];
+
 		// HACK: Back guns are handled differently.
 		switch (Lara.Control.Weapon.GunType)
 		{
@@ -152,13 +160,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			auto shotgunFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber],
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber],
-				0.0f
-			};
-
+			auto& frame = g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
+			auto shotgunFrameData = AnimFrameInterpData{ &frame, &frame, 0.0f };
 			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
 
 			// Right arm
@@ -166,13 +169,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber],
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber],
-				0.0f
-			};
-
+			frame = g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
+			shotgunFrameData = AnimFrameInterpData{ &frame, &frame, 0.0f };
 			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
 		}
 
@@ -182,24 +180,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		{
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto revolverFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - GetAnimData(Lara.LeftArm.AnimNumber).frameBase],
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - GetAnimData(Lara.LeftArm.AnimNumber).frameBase],
-				0.0f
-			};
-
+			auto revolverFrameData = AnimFrameInterpData{ &leftArmFrame, &leftArmFrame, 0.0f };
 			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - GetAnimData(Lara.RightArm.AnimNumber).frameBase],
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - GetAnimData(Lara.RightArm.AnimNumber).frameBase],
-				0.0f
-			};
-
+			revolverFrameData = AnimFrameInterpData{ &rightArmFrame, &rightArmFrame, 0.0f };
 			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
 		}
 
@@ -212,12 +198,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto pistolFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - GetAnimData(Lara.LeftArm.AnimNumber).frameBase],
-				&g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - GetAnimData(Lara.LeftArm.AnimNumber).frameBase],
-				0.0f
-			};
+			auto pistolFrameData = AnimFrameInterpData{ &leftArmFrame, &leftArmFrame, 0.0f };
 
 			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
 			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);
@@ -225,12 +206,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFrameData = AnimFrameInterpData
-			{
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - GetAnimData(Lara.RightArm.AnimNumber).frameBase],
-				&g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - GetAnimData(Lara.RightArm.AnimNumber).frameBase],
-				0.0f
-			};
+			pistolFrameData = AnimFrameInterpData{ &rightArmFrame, &rightArmFrame, 0.0f };
 			
 			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
 			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);

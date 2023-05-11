@@ -109,7 +109,7 @@ public:
 	void SetRoomNumber(int roomNumber);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
-	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
+	void AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID);
 
 	void EnableItem();
 	void DisableItem();
