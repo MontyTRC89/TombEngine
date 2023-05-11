@@ -1307,6 +1307,8 @@ struct PlayerEffectData
 
 struct LaraInfo
 {
+	static constexpr auto TARGET_COUNT_MAX = 8;
+
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};
@@ -1319,12 +1321,15 @@ struct LaraInfo
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
-	EulerAngles ExtraHeadRot	= {};
-	EulerAngles ExtraTorsoRot	= {};
+	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
+	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
+	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
-	EulerAngles TargetArmOrient = EulerAngles::Zero;
-	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
+
+	ItemInfo*								TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
 	int		 HitFrame	  = 0;		 // Frame index.
