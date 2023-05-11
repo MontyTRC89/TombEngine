@@ -479,7 +479,7 @@ namespace TEN::Renderer
 				moveable.Id = MoveablesIds[i];
 				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 				moveable.ShadowType = obj->shadowType;
-				                                      
+				                                       
 				for (int j = 0; j < obj->nmeshes; j++)
 				{              
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols

@@ -91,7 +91,7 @@ float4 CombinePixelColorWithFog(float4 sourceColor, float4 fogColor, float value
 		break;
 
 	default:
-		sourceColor.xyz -= float3(value, value, value) * 0.25f;
+		sourceColor.xyz -= float3(value, value, value) * 0.4f;
 		sourceColor.xyz = saturate(sourceColor.xyz);
 		sourceColor.xyz += saturate(fogColor.xyz);
 
