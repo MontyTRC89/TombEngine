@@ -1220,19 +1220,12 @@ struct RopeControlData
 };
 
 // TODO: Give tightrope a property for difficulty?
-// TODO: Remove old tightrope functionality.
 struct TightropeControlData
 {
-#if NEW_TIGHTROPE
 	short		 TightropeItem	 = 0;
 	bool		 CanDismount	 = false;
 	float		 Balance		 = 0.0f;
 	unsigned int TimeOnTightrope = 0;
-#else // !NEW_TIGHTROPE
-	unsigned int OnCount;
-	byte Off;
-	byte Fall;
-#endif
 };
 
 struct SubsuitControlData
