@@ -284,7 +284,7 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 	}
 
 	float noise = SimplexNoise(pos / 1024.0f);
-	noise *= sin(((Frame % 256) / 256.0f) * (PI2));
+	//noise *= sin(((Frame % 256) / 128.0f) * (PI2));
 	noise = saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
 	return (length(p1 - p0) * bulb.Density / 100.0f * noise / 255.0f);
 }
