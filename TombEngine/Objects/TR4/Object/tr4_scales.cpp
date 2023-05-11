@@ -162,10 +162,10 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 	
-	if (laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 44 &&
-		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 72 ||
-		laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 51 &&
-		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 74)
+	if ((laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 44 &&
+		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 72) ||
+		(laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 51 &&
+		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 74))
 	{
 		auto pos = GetJointPosition(laraItem, LM_LHAND).ToVector3();
 		auto velocity = Vector3(0.0f, Random::GenerateFloat(32.0f, 64.0f), 0.0f);

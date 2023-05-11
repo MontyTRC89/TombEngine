@@ -121,12 +121,12 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
 const AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_ANIM); // Deprecated.
 
-	  AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
-const AnimFrame&		  GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
-const AnimFrame*		  GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
-const AnimFrame*		  GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame*		  GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&		  GetBestFrame(const ItemInfo& item);
+AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
+const AnimFrame&	GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
+const AnimFrame*	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
+const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
+const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
+const AnimFrame&	GetBestFrame(const ItemInfo& item);
 
 int GetAnimNumber(const ItemInfo& item);
 int GetAnimIndex(const ItemInfo& item, int animNumber);
