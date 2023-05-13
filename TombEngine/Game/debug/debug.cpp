@@ -5,10 +5,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-void InitTENLog()
+void InitTENLog(const std::string & logDirContainingDir)
 {
 	// "true" means that we create a new log file each time we run the game.
-	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Logs/TENLog.txt", true);
+	auto logPath = logDirContainingDir + "Logs/TENLog.txt";
+	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath, true);
 
 	std::shared_ptr<spdlog::logger> logger;
 

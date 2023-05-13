@@ -17,6 +17,11 @@ namespace TEN::Utils
 		return string;
 	}
 
+	std::string ToString(const std::wstring& string)
+	{
+		return ToString(string.c_str());
+	}
+
 	std::string ToString(const wchar_t* string)
 	{
         auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();

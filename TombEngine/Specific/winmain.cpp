@@ -288,7 +288,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	memset(&App, 0, sizeof(WINAPP));
 	
 	// Initialize logging
-	InitTENLog();
+	InitTENLog(assetDir);
 
 	// Indicate version
 	auto ver = GetProductOrFileVersion(false);
