@@ -245,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	std::string assetDir{};
+	std::string gameDir{};
 
 	// Parse command line arguments
 	for (int i = 1; i < argc; i++)
@@ -266,14 +266,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
 		}
-		else if (ArgEquals(argv[i], "assetdir") && argc > (i + 1))
+		else if (ArgEquals(argv[i], "gamedir") && argc > (i + 1))
 		{
-			assetDir = TEN::Utils::ToString(argv[i + 1]);
+			gameDir = TEN::Utils::ToString(argv[i + 1]);
 			//replace all backslashes with forward slashes:
-			std::replace(assetDir.begin(), assetDir.end(), '\\', '/');
+			std::replace(gameDir.begin(), gameDir.end(), '\\', '/');
 			//add a trailing slash if it's not there:
-			if (assetDir.back() != '/')
-				assetDir += '/';
+			if (gameDir.back() != '/')
+				gameDir += '/';
 		}
 	}
 	LocalFree(argv);
@@ -288,7 +288,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	memset(&App, 0, sizeof(WINAPP));
 	
 	// Initialize logging
-	InitTENLog(assetDir);
+	InitTENLog(gameDir);
 
 	// Indicate version
 	auto ver = GetProductOrFileVersion(false);
@@ -298,14 +298,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   std::to_string(ver[2]));
 	TENLog(windowName, LogLevel::Info);
 
-	SaveGame::SetSaveDirLocation(assetDir);
-	SetAudioDirLocation(assetDir);
+	SaveGame::AddGameDirToSavePath(gameDir);
+	AddGameDirToAudioPath(gameDir);
 
 	// Collect numbered tracks
 	EnumerateLegacyTracks();
 
 	// Initialize the scripting system
-	ScriptInterfaceState::Init(assetDir);
+	ScriptInterfaceState::Init(gameDir);
 
 	// Initialize scripting
 	try 
@@ -327,7 +327,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//should be moved to LogicHandler or vice versa to make this stuff
 		//less fragile (squidshire, 16/09/22)
 		g_GameScript->ShortenTENCalls();
-		g_GameFlow->SetAssetDir(assetDir);
+		g_GameFlow->SetGameDir(gameDir);
 		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)

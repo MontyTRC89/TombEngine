@@ -49,8 +49,7 @@ private:
 	
 public:
 	static int LastSaveGame;
-	// Sets the location of the save dir's containing folder, NOT the save dir itself
-	static void SetSaveDirLocation(const std::string & dir);
+	static void AddGameDirToSavePath(const std::string & dir);
 
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);

@@ -20,7 +20,7 @@ private:
 
 	std::map<short, short>			m_itemsMap;
 
-	std::string m_assetDir;
+	std::string m_gameDir;
 
 	LuaHandler m_handler;
 
@@ -41,8 +41,8 @@ public:
 	FlowHandler(sol::state* lua, sol::table & parent);
 	~FlowHandler() override;
 
-	std::string	GetAssetDir() override;
-	void		SetAssetDir(const std::string& assetDir) override;
+	std::string	GetGameDir() override;
+	void		SetGameDir(const std::string& assetDir) override;
 	void		AddLevel(Level const& level);
 	void		LoadFlowScript();
 	char const*	GetString(const char* id) const;

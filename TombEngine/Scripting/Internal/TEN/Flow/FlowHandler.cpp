@@ -215,14 +215,14 @@ FlowHandler::~FlowHandler()
 		delete lev;
 }
 
-std::string FlowHandler::GetAssetDir()
+std::string FlowHandler::GetGameDir()
 {
-	return m_assetDir;
+	return m_gameDir;
 }
 
-void FlowHandler::SetAssetDir(const std::string& assetDir)
+void FlowHandler::SetGameDir(const std::string& assetDir)
 {
-	m_assetDir = assetDir;
+	m_gameDir = assetDir;
 }
 
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
@@ -267,9 +267,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript(m_assetDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_assetDir + "Scripts/Strings.lua");
-	m_handler.ExecuteScript(m_assetDir + "Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -325,21 +325,21 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	std::replace(fileNameWithForwardSlashes.begin(), fileNameWithForwardSlashes.end(), '\\', '/');
 	auto lcFilename = TEN::Utils::ToLower(fileNameWithForwardSlashes);
 
-	auto fullPath = GetAssetDir() + fileNameWithForwardSlashes;
-	auto requestePath = std::filesystem::path{ fileName };
-	bool isAbsolute = requestePath.is_absolute();
+	auto fullPath = GetGameDir() + fileNameWithForwardSlashes;
+	auto requestedPath = std::filesystem::path{ fileName };
+	bool isAbsolute = requestedPath.is_absolute();
 	if(!isAbsolute)
 	{
-		requestePath = std::filesystem::path{ GetAssetDir() + fileName };
+		requestedPath = std::filesystem::path{ GetGameDir() + fileName };
 	}
 
-	if (std::filesystem::exists(requestePath))
+	if (std::filesystem::exists(requestedPath))
 	{
 		if (isAbsolute)
 		{
 			for (int i = 0; i < Levels.size(); i++)
 			{
-				auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(GetAssetDir() + GetLevel(i)->FileName);
+				auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(GetGameDir() + GetLevel(i)->FileName);
 				std::replace(lcFullLevelPathFromFlow.begin(), lcFullLevelPathFromFlow.end(), '\\', '/');
 				if (lcFullLevelPathFromFlow == lcFilename)
 					return i;

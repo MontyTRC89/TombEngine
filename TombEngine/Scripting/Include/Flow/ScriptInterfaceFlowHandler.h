@@ -22,8 +22,8 @@ public:
 
 	virtual ~ScriptInterfaceFlowHandler() = default;
 	virtual void LoadFlowScript() = 0;
-	virtual void SetAssetDir(const std::string & assetDir) = 0;
-	virtual std::string GetAssetDir() = 0;
+	virtual void SetGameDir(const std::string & assetDir) = 0;
+	virtual std::string GetGameDir() = 0;
 	virtual int	GetNumLevels() const = 0;
 	virtual char const* GetString(const char* id) const = 0;
 	virtual bool IsFlyCheatEnabled() const = 0;

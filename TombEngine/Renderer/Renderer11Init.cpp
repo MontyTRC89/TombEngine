@@ -19,8 +19,7 @@ extern GameConfiguration g_Configuration;
 
 static std::wstring GetAssetPath(const wchar_t * fileName)
 {
-	const auto assetDirW = TEN::Utils::ToWString(g_GameFlow->GetAssetDir());
-	return assetDirW + fileName;
+	return TEN::Utils::ToWString(g_GameFlow->GetGameDir()) + fileName;
 }
 
 void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND handle)
