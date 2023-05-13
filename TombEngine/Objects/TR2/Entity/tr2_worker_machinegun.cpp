@@ -253,7 +253,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item->Animation.AnimNumber == GetAnimIndex(*item, 2))
+				if (item->Animation.AnimNumber == 2)
 				{
 					if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
 					{
@@ -268,7 +268,7 @@ namespace TEN::Entities::Creatures::TR2
 						ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 					}
 				}
-				else if (item->Animation.AnimNumber == GetAnimIndex(*item, 21) &&
+				else if (item->Animation.AnimNumber == 21 &&
 					item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);

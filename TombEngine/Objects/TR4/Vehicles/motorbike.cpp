@@ -1141,7 +1141,7 @@ namespace TEN::Entities::Vehicles
 		lara->HitDirection = -1;
 
 		// Sync vehicle with player animation.
-		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
+		SetAnimation(*motorbikeItem, laraItem->Animation.AnimNumber, GetFrameNumber(laraItem));
 
 		motorbikeItem->HitPoints = 1;
 		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?

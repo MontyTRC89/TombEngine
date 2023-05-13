@@ -127,9 +127,6 @@ const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame&	GetBestFrame(const ItemInfo& item);
 
-int GetAnimNumber(const ItemInfo& item);
-int GetAnimIndex(const ItemInfo& item, int animNumber);
-
 int GetFrameNumber(const ItemInfo& item);
 int GetFrameNumber(ItemInfo* item); // Deprecated.
 int GetFrameIndex(ItemInfo* item, int frameNumber);

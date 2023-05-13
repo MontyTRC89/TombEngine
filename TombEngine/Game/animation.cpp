@@ -518,16 +518,6 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
 }
 
-int GetAnimNumber(const ItemInfo& item)
-{
-	return item.Animation.AnimNumber;
-}
-
-int GetAnimIndex(const ItemInfo& item, int animNumber)
-{
-	return animNumber;
-}
-
 int GetFrameNumber(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
