@@ -50,17 +50,19 @@ struct AnimData
 	int ActiveState	  = 0;
 	int Interpolation = 0;
 
-	int FramePtr  = 0; // g_Level.Frames base index.
+	// TODO: Remove in animation refactors tier 5.
+	int FramePtr  = 0; // g_Level.Frames base index?
 	int frameBase = 0; // g_Level.Frames start index.
 	int frameEnd  = 0; // g_Level.Frames end index.
 
+	//std::vector<AnimFrame>		   Frames	  = {}; // TODO: Animation refactors tier 5.
+	std::vector<StateDispatchData> Dispatches = {};
+	
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0; // g_Level.Frames index.
 	int NumCommands		= 0;
 	int CommandIndex	= 0;
 
-	std::vector<StateDispatchData> Dispatches = {};
-	
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;

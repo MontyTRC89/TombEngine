@@ -335,7 +335,8 @@ void LoadObjects()
 		object.frameBase = ReadInt32();
 
 		// Load animations.
-		object.Animations.resize(ReadInt32());
+		int animCount = ReadInt32();
+		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
 			anim.FramePtr = ReadInt32();
@@ -351,7 +352,8 @@ void LoadObjects()
 			anim.CommandIndex = ReadInt32();
 
 			// Load state dispatches.
-			anim.Dispatches.resize(ReadInt32());
+			int dispatchCount = ReadInt32();
+			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
 				dispatch.TargetState = ReadInt32();
