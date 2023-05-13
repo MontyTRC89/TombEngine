@@ -319,12 +319,14 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 	if (anim.Dispatches.empty())
 		return false;
 
+	// If input target state not set, use entity's target state.
 	if (!targetState.has_value())
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
+		// Target states don't match; continue.
 		if (dispatch.TargetState != targetState.value())
 			continue;
 
@@ -332,8 +334,8 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 		for (const auto& range : dispatch.Ranges)
 		{
 			// Check if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.StartFrame &&
-				item->Animation.FrameNumber <= range.EndFrame)
+			if (item->Animation.FrameNumber >= range.FrameRange.first &&
+				item->Animation.FrameNumber <= range.FrameRange.second)
 			{
 				return true;
 			}
@@ -572,6 +574,7 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	// Iterate over animation's state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
+		// Target states don't match; continue.
 		if (dispatch.TargetState != item->Animation.TargetState)
 			continue;
 
@@ -579,8 +582,8 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 		for (const auto& range : dispatch.Ranges)
 		{
 			// Set new animation if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.StartFrame &&
-				item->Animation.FrameNumber <= range.EndFrame)
+			if (item->Animation.FrameNumber >= range.FrameRange.first &&
+				item->Animation.FrameNumber <= range.FrameRange.second)
 			{
 				item->Animation.AnimNumber = range.LinkAnimNumber;
 				item->Animation.FrameNumber = range.LinkFrameNumber;

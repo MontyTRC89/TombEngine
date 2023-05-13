@@ -293,10 +293,9 @@ void LoadObjects()
 	
 	struct TempDispatchRangeData
 	{
-		int StartFrame		= 0;
-		int EndFrame		= 0;
 		int LinkAnimNumber	= 0;
 		int LinkFrameNumber = 0;
+		std::pair<int, int> FrameRange = {};
 	};
 
 	int dispatchCount = ReadInt32();
@@ -318,8 +317,8 @@ void LoadObjects()
 	for (int i = 0; i < dispatchRangeCount; i++)
 	{
 		auto tempDispatchRange = TempDispatchRangeData{};
-		tempDispatchRange.StartFrame = ReadInt32();
-		tempDispatchRange.EndFrame = ReadInt32();
+		tempDispatchRange.FrameRange.first = ReadInt32();
+		tempDispatchRange.FrameRange.second = ReadInt32();
 		tempDispatchRange.LinkAnimNumber = ReadInt32();
 		tempDispatchRange.LinkFrameNumber = ReadInt32();
 
@@ -407,7 +406,13 @@ void LoadObjects()
 
 				auto dispatch = StateDispatchData{};
 				dispatch.TargetState = tempDispatch.TargetState;
+
 				dispatch.Ranges.resize(tempDispatch.NumberRanges);
+				 if (tempDispatch.NumberRanges > 1)
+				 {
+					 TENLog("hhh " + std::to_string(dispatch.TargetState), LogLevel::Info);
+					 TENLog("I SCREAM " + std::to_string(tempDispatch.NumberRanges), LogLevel::Info);
+				 }
 
 				for (int k = 0; k < tempDispatch.NumberRanges; k++)
 				{
@@ -416,8 +421,8 @@ void LoadObjects()
 					auto dispatchRange = StateDispatchRangeData{};
 					dispatchRange.LinkAnimNumber = tempDispatchRange.LinkAnimNumber;
 					dispatchRange.LinkFrameNumber = tempDispatchRange.LinkFrameNumber;
-					dispatchRange.StartFrame = tempDispatchRange.StartFrame;
-					dispatchRange.EndFrame = tempDispatchRange.EndFrame;
+					dispatchRange.FrameRange.first = tempDispatchRange.FrameRange.first;
+					dispatchRange.FrameRange.second = tempDispatchRange.FrameRange.second;
 
 					dispatch.Ranges[k] = dispatchRange;
 				}
