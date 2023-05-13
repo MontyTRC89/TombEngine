@@ -311,7 +311,7 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(ItemInfo* item, int targetState)
+bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 {
 	const auto& anim = GetAnimData(*item);
 
@@ -319,7 +319,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (!targetState.has_value())
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -327,7 +327,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	{
 		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
 		
-		if (dispatch.TargetState != targetState)
+		if (dispatch.TargetState != targetState.value())
 			continue;
 
 		// Iterate over dispatch frame ranges.
@@ -352,16 +352,16 @@ bool TestAnimNumber(const ItemInfo& item, int animNumber)
 	return (item.Animation.AnimNumber == animNumber);
 }
 
-bool TestLastFrame(ItemInfo* item, int animNumber)
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (!animNumber.has_value())
 		animNumber = item->Animation.AnimNumber;
 
 	// Animation to test doesn't match; return early.
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber);
+	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber.value());
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
@@ -448,15 +448,15 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 	return object.Animations[animNumber];
 }
 
-const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
+const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (!animNumber.has_value())
 		animNumber = item.Animation.AnimNumber;
 
-	return GetAnimData(item.Animation.AnimObjectID, animNumber);
+	return GetAnimData(item.Animation.AnimObjectID, animNumber.value());
 }
 
-const AnimData& GetAnimData(const ItemInfo* item, int animNumber)
+const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber)
 {
 	return GetAnimData(*item, animNumber);
 }

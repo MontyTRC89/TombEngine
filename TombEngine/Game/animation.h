@@ -103,9 +103,9 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
+bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
 bool TestAnimNumber(const ItemInfo& item, int animNumber);
-bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
 
@@ -122,8 +122,8 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 // Getters
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
-const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
-const AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_ANIM); // Deprecated.
+const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
+const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 const AnimFrame&	GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
