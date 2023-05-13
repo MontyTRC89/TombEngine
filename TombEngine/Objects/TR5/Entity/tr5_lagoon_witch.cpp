@@ -64,7 +64,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				item->Animation.ActiveState = WITCH_STATE_DEATH;
 				item->Animation.AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->HitPoints = 0;
 			}
 		}
@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!creature->Flags &&
 					item->TouchBits.Test(LagoonWitchAttackJoints) &&
-					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
+					item->Animation.FrameNumber > GetAnimData(item).frameBase + 29)
 				{
 					DoDamage(creature->Enemy, LAGOON_WITCH_ATTACK_DAMAGE);
 					CreatureEffect2(item, LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
