@@ -39,8 +39,8 @@ struct AnimFrame
 
 struct StateDispatchRangeData
 {
-	int LinkAnimNumber	= 0;
-	int LinkFrameNumber = 0; // g_Level.Frames index.
+	int NextAnimNumber	= 0;
+	int NextFrameNumber = 0; // g_Level.Frames index.
 	std::pair<int, int> FrameRange = {};
 };
 
@@ -59,8 +59,8 @@ struct AnimData
 	int frameBase = 0; // g_Level.Frames start index.
 	int frameEnd  = 0; // g_Level.Frames end index.
 
-	int LinkAnimNumber	= 0;
-	int LinkFrameNumber = 0; // g_Level.Frames index.
+	int NextAnimNumber	= 0;
+	int NextFrameNumber = 0; // g_Level.Frames index.
 	int NumCommands		= 0;
 	int CommandIndex	= 0;
 

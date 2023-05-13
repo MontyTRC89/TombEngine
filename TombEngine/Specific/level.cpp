@@ -293,8 +293,8 @@ void LoadObjects()
 	
 	struct TempDispatchRangeData
 	{
-		int LinkAnimNumber	= 0;
-		int LinkFrameNumber = 0;
+		int NextAnimNumber	= 0;
+		int NextFrameNumber = 0;
 		std::pair<int, int> FrameRange = {};
 	};
 
@@ -319,8 +319,8 @@ void LoadObjects()
 		auto tempDispatchRange = TempDispatchRangeData{};
 		tempDispatchRange.FrameRange.first = ReadInt32();
 		tempDispatchRange.FrameRange.second = ReadInt32();
-		tempDispatchRange.LinkAnimNumber = ReadInt32();
-		tempDispatchRange.LinkFrameNumber = ReadInt32();
+		tempDispatchRange.NextAnimNumber = ReadInt32();
+		tempDispatchRange.NextFrameNumber = ReadInt32();
 
 		tempDispatchRanges.push_back(tempDispatchRange);
 	}
@@ -388,8 +388,8 @@ void LoadObjects()
 			anim.VelocityEnd = ReadVector3();
 			anim.frameBase = ReadInt32();
 			anim.frameEnd = ReadInt32();
-			anim.LinkAnimNumber = ReadInt32();
-			anim.LinkFrameNumber = ReadInt32();
+			anim.NextAnimNumber = ReadInt32();
+			anim.NextFrameNumber = ReadInt32();
 
 			// Temp
 			int dispatchCount = ReadInt32();
@@ -419,8 +419,8 @@ void LoadObjects()
 					const auto tempDispatchRange = tempDispatchRanges[tempDispatch.RangeIndex + k];
 
 					auto dispatchRange = StateDispatchRangeData{};
-					dispatchRange.LinkAnimNumber = tempDispatchRange.LinkAnimNumber;
-					dispatchRange.LinkFrameNumber = tempDispatchRange.LinkFrameNumber;
+					dispatchRange.NextAnimNumber = tempDispatchRange.NextAnimNumber;
+					dispatchRange.NextFrameNumber = tempDispatchRange.NextFrameNumber;
 					dispatchRange.FrameRange.first = tempDispatchRange.FrameRange.first;
 					dispatchRange.FrameRange.second = tempDispatchRange.FrameRange.second;
 
