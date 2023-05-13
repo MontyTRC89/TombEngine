@@ -39,38 +39,43 @@ struct AnimFrame
 
 struct StateDispatchData
 {
-	int TargetState	 = NO_STATE;
+	int TargetState	 = 0;
 	int NumberRanges = 0;
 	int RangeIndex	 = 0;
 };
 
 struct StateDispatchRangeData
 {
-	int StartFrame	 = 0;		// g_Level.Frames base index.
-	int EndFrame	 = 0;		// g_Level.Frames end index.
-	int LinkAnimNum	 = NO_ANIM; // g_Level.Anims index.
-	int LinkFrameNum = NO_ANIM; // g_Level.Frames index.
+	int LinkAnimNumber	= 0;
+	int LinkFrameNumber = 0; // g_Level.Frames base index.
+	int StartFrame		= 0; // g_Level.Frames start index.
+	int EndFrame		= 0; // g_Level.Frames end index.
 };
 
 struct AnimData
 {
-	int FramePtr	  = 0; // g_Level.Frames base index.
-	int Interpolation = 0;
 	int ActiveState	  = 0;
+	int Interpolation = 0;
 
+	int LinkAnimNumber	= 0;
+	int LinkFrameNumber = 0; // g_Level.Frames index.
+	int NumCommands		= 0;
+	int CommandIndex	= 0;
+
+	int FramePtr  = 0; // g_Level.Frames base index.
+	int frameBase = 0; // g_Level.Frames start index.
+	int frameEnd  = 0; // g_Level.Frames end index.
+
+	std::vector<StateDispatchData>		Dispatches	   = {};
+	std::vector<StateDispatchRangeData> DispatchRanges = {};
+	// ----deprecated
+	int NumStateDispatches = 0;
+	int StateDispatchIndex = 0;
+	// ----
+	
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
-
-	int frameBase = 0; // g_Level.Frames base index.
-	int frameEnd  = 0; // g_Level.Frames end index.
-
-	int JumpAnimNum		   = NO_ANIM; // g_Level.Anims index.
-	int JumpFrameNum	   = 0;		  // g_Level.Frames index.
-	int NumStateDispatches = 0;
-	int StateDispatchIndex = 0;
-	int NumCommands		   = 0;
-	int CommandIndex	   = 0;
 };
 
 struct AnimFrameInterpData

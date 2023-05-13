@@ -284,11 +284,22 @@ void LoadObjects()
 
 	int numChanges = ReadInt32();
 	g_Level.Changes.resize(numChanges);
-	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
+	for (int i = 0; i < numChanges; i++)
+	{
+		g_Level.Changes[i].TargetState = ReadInt32();
+		g_Level.Changes[i].NumberRanges = ReadInt32();
+		g_Level.Changes[i].RangeIndex = ReadInt32();
+	}
 
 	int numRanges = ReadInt32();
 	g_Level.Ranges.resize(numRanges);
-	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * numRanges);
+	for (int i = 0; i < numRanges; i++)
+	{
+		g_Level.Ranges[i].StartFrame = ReadInt32();
+		g_Level.Ranges[i].EndFrame = ReadInt32();
+		g_Level.Ranges[i].LinkAnimNumber = ReadInt32();
+		g_Level.Ranges[i].LinkFrameNumber = ReadInt32();
+	}
 
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
@@ -352,8 +363,8 @@ void LoadObjects()
 			anim.VelocityEnd = ReadVector3();
 			anim.frameBase = ReadInt32();
 			anim.frameEnd = ReadInt32();
-			anim.JumpAnimNum = ReadInt32();
-			anim.JumpFrameNum = ReadInt32();
+			anim.LinkAnimNumber = ReadInt32();
+			anim.LinkFrameNumber = ReadInt32();
 			anim.NumStateDispatches = ReadInt32();
 			anim.StateDispatchIndex = ReadInt32();
 			anim.NumCommands = ReadInt32();

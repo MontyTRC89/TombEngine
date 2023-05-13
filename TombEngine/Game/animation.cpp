@@ -196,8 +196,8 @@ void AnimateItem(ItemInfo* item)
 	{
 		PerformAnimCommands(*item, false);
 
-		item->Animation.AnimNumber = animPtr->JumpAnimNum;
-		item->Animation.FrameNumber = animPtr->JumpFrameNum;
+		item->Animation.AnimNumber = animPtr->LinkAnimNumber;
+		item->Animation.FrameNumber = animPtr->LinkFrameNumber;
 
 		animPtr = &GetAnimData(*item);
 
@@ -558,7 +558,7 @@ int GetNextAnimState(ItemInfo* item)
 int GetNextAnimState(int objectID, int animNumber)
 {
 	const auto& anim = GetAnimData((GAME_OBJECT_ID)objectID, animNumber);
-	const auto& nextAnim = GetAnimData((GAME_OBJECT_ID)objectID, anim.JumpAnimNum);
+	const auto& nextAnim = GetAnimData((GAME_OBJECT_ID)objectID, anim.LinkAnimNumber);
 
 	return nextAnim.ActiveState;
 }
@@ -590,8 +590,8 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 			if (item->Animation.FrameNumber >= range.StartFrame &&
 				item->Animation.FrameNumber <= range.EndFrame)
 			{
-				item->Animation.AnimNumber = range.LinkAnimNum;
-				item->Animation.FrameNumber = range.LinkFrameNum;
+				item->Animation.AnimNumber = range.LinkAnimNumber;
+				item->Animation.FrameNumber = range.LinkFrameNumber;
 				return true;
 			}
 		}
