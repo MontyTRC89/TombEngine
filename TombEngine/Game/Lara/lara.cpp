@@ -444,6 +444,20 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+
+	//-----debug
+	static unsigned int objectID = 0;
+	if (objectID > 5000)
+		objectID = 0;
+	if (IsClicked(In::Action))
+		objectID++;
+	else if (IsClicked(In::Walk))
+		objectID--;
+
+	const auto& object = Objects[objectID];
+	g_Renderer.PrintDebugMessage("Anim count: %d %d", objectID, object.Animations.size());
+	//-----
+
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);

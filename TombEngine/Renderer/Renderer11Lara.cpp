@@ -132,9 +132,6 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 
-		ArmInfo* leftArm = &Lara.LeftArm;
-		ArmInfo* rightArm = &Lara.RightArm;
-
 		auto& leftArmAnimObject = Objects[Lara.LeftArm.AnimObjectID];
 		auto& leftArmAnim = GetAnimData(leftArmAnimObject, Lara.LeftArm.AnimNumber);
 		auto& leftArmFrame = g_Level.Frames[(Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber) - leftArmAnim.frameBase];
