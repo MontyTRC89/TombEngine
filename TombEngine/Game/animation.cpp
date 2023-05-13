@@ -179,7 +179,7 @@ void AnimateItem(ItemInfo* item)
 
 	const auto* animPtr = &GetAnimData(*item);
 
-	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
+	if (!animPtr->Dispatches.empty() && GetStateDispatch(item, *animPtr))
 	{
 		animPtr = &GetAnimData(*item);
 
@@ -316,25 +316,21 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 	const auto& anim = GetAnimData(*item);
 
 	// No dispatches; return early.
-	if (anim.NumStateDispatches <= 0)
+	if (anim.Dispatches.empty())
 		return false;
 
 	if (!targetState.has_value())
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
-	for (int i = 0; i < anim.NumStateDispatches; i++)
+	for (const auto& dispatch : anim.Dispatches)
 	{
-		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
-		
 		if (dispatch.TargetState != targetState.value())
 			continue;
 
-		// Iterate over dispatch frame ranges.
-		for (int j = 0; j < dispatch.NumberRanges; j++)
+		// Iterate over dispatch ranges.
+		for (const auto& range : dispatch.Ranges)
 		{
-			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-
 			// Check if current frame is within dispatch range.
 			if (item->Animation.FrameNumber >= range.StartFrame &&
 				item->Animation.FrameNumber <= range.EndFrame)
@@ -570,22 +566,18 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 		return false;
 
 	// No dispatches; return early.
-	if (anim.NumStateDispatches <= 0)
+	if (anim.Dispatches.empty())
 		return false;
 
 	// Iterate over animation's state dispatches.
-	for (int i = 0; i < anim.NumStateDispatches; i++)
+	for (const auto& dispatch : anim.Dispatches)
 	{
-		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
-
 		if (dispatch.TargetState != item->Animation.TargetState)
 			continue;
 
-		// Iterate over dispatch frame ranges.
-		for (int j = 0; j < dispatch.NumberRanges; j++)
+		// Iterate over dispatch ranges.
+		for (const auto& range : dispatch.Ranges)
 		{
-			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-
 			// Set new animation if current frame is within dispatch range.
 			if (item->Animation.FrameNumber >= range.StartFrame &&
 				item->Animation.FrameNumber <= range.EndFrame)

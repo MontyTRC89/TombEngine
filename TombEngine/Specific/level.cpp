@@ -282,24 +282,50 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int numChanges = ReadInt32();
-	g_Level.Changes.resize(numChanges);
-	for (int i = 0; i < numChanges; i++)
+	// Temporary until level compiler is updated.
+	// -----------------------
+	struct TempDispatchData
 	{
-		g_Level.Changes[i].TargetState = ReadInt32();
-		g_Level.Changes[i].NumberRanges = ReadInt32();
-		g_Level.Changes[i].RangeIndex = ReadInt32();
+		int TargetState	 = 0;
+		int NumberRanges = 0;
+		int RangeIndex	 = 0;
+	};
+	
+	struct TempDispatchRangeData
+	{
+		int StartFrame		= 0;
+		int EndFrame		= 0;
+		int LinkAnimNumber	= 0;
+		int LinkFrameNumber = 0;
+	};
+
+	int dispatchCount = ReadInt32();
+	auto tempDispatches = std::vector<TempDispatchData>{};
+	tempDispatches.reserve(dispatchCount);
+	for (int i = 0; i < dispatchCount; i++)
+	{
+		auto tempDispatch = TempDispatchData{};
+		tempDispatch.TargetState = ReadInt32();
+		tempDispatch.NumberRanges = ReadInt32();
+		tempDispatch.RangeIndex = ReadInt32();
+
+		tempDispatches.push_back(tempDispatch);
 	}
 
-	int numRanges = ReadInt32();
-	g_Level.Ranges.resize(numRanges);
-	for (int i = 0; i < numRanges; i++)
+	int dispatchRangeCount = ReadInt32();
+	auto tempDispatchRanges = std::vector<TempDispatchRangeData>{};
+	tempDispatchRanges.reserve(dispatchCount);
+	for (int i = 0; i < dispatchRangeCount; i++)
 	{
-		g_Level.Ranges[i].StartFrame = ReadInt32();
-		g_Level.Ranges[i].EndFrame = ReadInt32();
-		g_Level.Ranges[i].LinkAnimNumber = ReadInt32();
-		g_Level.Ranges[i].LinkFrameNumber = ReadInt32();
+		auto tempDispatchRange = TempDispatchRangeData{};
+		tempDispatchRange.StartFrame = ReadInt32();
+		tempDispatchRange.EndFrame = ReadInt32();
+		tempDispatchRange.LinkAnimNumber = ReadInt32();
+		tempDispatchRange.LinkFrameNumber = ReadInt32();
+
+		tempDispatchRanges.push_back(tempDispatchRange);
 	}
+	// -----------------------
 
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
@@ -365,10 +391,39 @@ void LoadObjects()
 			anim.frameEnd = ReadInt32();
 			anim.LinkAnimNumber = ReadInt32();
 			anim.LinkFrameNumber = ReadInt32();
-			anim.NumStateDispatches = ReadInt32();
-			anim.StateDispatchIndex = ReadInt32();
+
+			// Temp
+			int dispatchCount = ReadInt32();
+			int oldDispatchIndex = ReadInt32();
+
 			anim.NumCommands = ReadInt32();
 			anim.CommandIndex = ReadInt32();
+
+			// Temp
+			anim.Dispatches.resize(dispatchCount);
+			for (int j = 0; j < dispatchCount; j++)
+			{
+				const auto& tempDispatch = tempDispatches[oldDispatchIndex + j];
+
+				auto dispatch = StateDispatchData{};
+				dispatch.TargetState = tempDispatch.TargetState;
+				dispatch.Ranges.resize(tempDispatch.NumberRanges);
+
+				for (int k = 0; k < tempDispatch.NumberRanges; k++)
+				{
+					const auto tempDispatchRange = tempDispatchRanges[tempDispatch.RangeIndex + k];
+
+					auto dispatchRange = StateDispatchRangeData{};
+					dispatchRange.LinkAnimNumber = tempDispatchRange.LinkAnimNumber;
+					dispatchRange.LinkFrameNumber = tempDispatchRange.LinkFrameNumber;
+					dispatchRange.StartFrame = tempDispatchRange.StartFrame;
+					dispatchRange.EndFrame = tempDispatchRange.EndFrame;
+
+					dispatch.Ranges[k] = dispatchRange;
+				}
+
+				anim.Dispatches[j] = dispatch;
+			}
 		}
 
 		Objects[objectID].loaded = true;
@@ -857,8 +912,6 @@ void FreeLevel()
 	MoveablesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
-	g_Level.Changes.resize(0);
-	g_Level.Ranges.resize(0);
 	g_Level.Commands.resize(0);
 	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);

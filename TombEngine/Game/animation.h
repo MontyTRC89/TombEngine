@@ -37,13 +37,6 @@ struct AnimFrame
 	std::vector<Quaternion> BoneOrientations = {};
 };
 
-struct StateDispatchData
-{
-	int TargetState	 = 0;
-	int NumberRanges = 0;
-	int RangeIndex	 = 0;
-};
-
 struct StateDispatchRangeData
 {
 	int LinkAnimNumber	= 0;
@@ -52,26 +45,27 @@ struct StateDispatchRangeData
 	int EndFrame		= 0; // g_Level.Frames end index.
 };
 
+struct StateDispatchData
+{
+	int TargetState = 0;
+	std::vector<StateDispatchRangeData> Ranges = {};
+};
+
 struct AnimData
 {
 	int ActiveState	  = 0;
 	int Interpolation = 0;
+
+	int FramePtr  = 0; // g_Level.Frames base index.
+	int frameBase = 0; // g_Level.Frames start index.
+	int frameEnd  = 0; // g_Level.Frames end index.
 
 	int LinkAnimNumber	= 0;
 	int LinkFrameNumber = 0; // g_Level.Frames index.
 	int NumCommands		= 0;
 	int CommandIndex	= 0;
 
-	int FramePtr  = 0; // g_Level.Frames base index.
-	int frameBase = 0; // g_Level.Frames start index.
-	int frameEnd  = 0; // g_Level.Frames end index.
-
-	std::vector<StateDispatchData>		Dispatches	   = {};
-	std::vector<StateDispatchRangeData> DispatchRanges = {};
-	// ----deprecated
-	int NumStateDispatches = 0;
-	int StateDispatchIndex = 0;
-	// ----
+	std::vector<StateDispatchData> Dispatches = {};
 	
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
