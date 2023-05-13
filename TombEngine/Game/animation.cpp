@@ -330,15 +330,11 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 		if (dispatch.TargetState != targetState.value())
 			continue;
 
-		// Iterate over dispatch ranges.
-		for (const auto& range : dispatch.Ranges)
+		// Check if current frame is within dispatch range.
+		if (item->Animation.FrameNumber >= dispatch.FrameRange.first &&
+			item->Animation.FrameNumber <= dispatch.FrameRange.second)
 		{
-			// Check if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.FrameRange.first &&
-				item->Animation.FrameNumber <= range.FrameRange.second)
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -578,17 +574,13 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 		if (dispatch.TargetState != item->Animation.TargetState)
 			continue;
 
-		// Iterate over dispatch ranges.
-		for (const auto& range : dispatch.Ranges)
+		// Set new animation if current frame is within dispatch range.
+		if (item->Animation.FrameNumber >= dispatch.FrameRange.first &&
+			item->Animation.FrameNumber <= dispatch.FrameRange.second)
 		{
-			// Set new animation if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.FrameRange.first &&
-				item->Animation.FrameNumber <= range.FrameRange.second)
-			{
-				item->Animation.AnimNumber = range.NextAnimNumber;
-				item->Animation.FrameNumber = range.NextFrameNumber;
-				return true;
-			}
+			item->Animation.AnimNumber = dispatch.NextAnimNumber;
+			item->Animation.FrameNumber = dispatch.NextFrameNumber;
+			return true;
 		}
 	}
 

@@ -37,17 +37,12 @@ struct AnimFrame
 	std::vector<Quaternion> BoneOrientations = {};
 };
 
-struct StateDispatchRangeData
+struct StateDispatchData
 {
+	int TargetState		= 0;
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0; // g_Level.Frames index.
 	std::pair<int, int> FrameRange = {};
-};
-
-struct StateDispatchData
-{
-	int TargetState = 0;
-	std::vector<StateDispatchRangeData> Ranges = {};
 };
 
 struct AnimData

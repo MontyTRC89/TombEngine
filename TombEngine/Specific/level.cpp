@@ -399,7 +399,7 @@ void LoadObjects()
 			anim.CommandIndex = ReadInt32();
 
 			// Temp
-			anim.Dispatches.resize(dispatchCount);
+			anim.Dispatches.reserve(dispatchCount);
 			for (int j = 0; j < dispatchCount; j++)
 			{
 				const auto& tempDispatch = tempDispatches[oldDispatchIndex + j];
@@ -407,27 +407,16 @@ void LoadObjects()
 				auto dispatch = StateDispatchData{};
 				dispatch.TargetState = tempDispatch.TargetState;
 
-				dispatch.Ranges.resize(tempDispatch.NumberRanges);
-				 if (tempDispatch.NumberRanges > 1)
-				 {
-					 TENLog("hhh " + std::to_string(dispatch.TargetState), LogLevel::Info);
-					 TENLog("I SCREAM " + std::to_string(tempDispatch.NumberRanges), LogLevel::Info);
-				 }
-
 				for (int k = 0; k < tempDispatch.NumberRanges; k++)
 				{
-					const auto tempDispatchRange = tempDispatchRanges[tempDispatch.RangeIndex + k];
+					const auto& tempDispatchRange = tempDispatchRanges[tempDispatch.RangeIndex + k];
 
-					auto dispatchRange = StateDispatchRangeData{};
-					dispatchRange.NextAnimNumber = tempDispatchRange.NextAnimNumber;
-					dispatchRange.NextFrameNumber = tempDispatchRange.NextFrameNumber;
-					dispatchRange.FrameRange.first = tempDispatchRange.FrameRange.first;
-					dispatchRange.FrameRange.second = tempDispatchRange.FrameRange.second;
-
-					dispatch.Ranges[k] = dispatchRange;
+					dispatch.NextAnimNumber = tempDispatchRange.NextAnimNumber;
+					dispatch.NextFrameNumber = tempDispatchRange.NextFrameNumber;
+					dispatch.FrameRange.first = tempDispatchRange.FrameRange.first;
+					dispatch.FrameRange.second = tempDispatchRange.FrameRange.second;
+					anim.Dispatches.push_back(dispatch);
 				}
-
-				anim.Dispatches[j] = dispatch;
 			}
 		}
 
