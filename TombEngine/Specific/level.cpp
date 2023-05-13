@@ -282,50 +282,6 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	// Temporary until level compiler is updated.
-	// -----------------------
-	struct TempDispatchData
-	{
-		int TargetState	 = 0;
-		int NumberRanges = 0;
-		int RangeIndex	 = 0;
-	};
-	
-	struct TempDispatchRangeData
-	{
-		int NextAnimNumber	= 0;
-		int NextFrameNumber = 0;
-		std::pair<int, int> FrameRange = {};
-	};
-
-	int dispatchCount = ReadInt32();
-	auto tempDispatches = std::vector<TempDispatchData>{};
-	tempDispatches.reserve(dispatchCount);
-	for (int i = 0; i < dispatchCount; i++)
-	{
-		auto tempDispatch = TempDispatchData{};
-		tempDispatch.TargetState = ReadInt32();
-		tempDispatch.NumberRanges = ReadInt32();
-		tempDispatch.RangeIndex = ReadInt32();
-
-		tempDispatches.push_back(tempDispatch);
-	}
-
-	int dispatchRangeCount = ReadInt32();
-	auto tempDispatchRanges = std::vector<TempDispatchRangeData>{};
-	tempDispatchRanges.reserve(dispatchCount);
-	for (int i = 0; i < dispatchRangeCount; i++)
-	{
-		auto tempDispatchRange = TempDispatchRangeData{};
-		tempDispatchRange.FrameRange.first = ReadInt32();
-		tempDispatchRange.FrameRange.second = ReadInt32();
-		tempDispatchRange.NextAnimNumber = ReadInt32();
-		tempDispatchRange.NextFrameNumber = ReadInt32();
-
-		tempDispatchRanges.push_back(tempDispatchRange);
-	}
-	// -----------------------
-
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
 	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
@@ -378,6 +334,7 @@ void LoadObjects()
 		object.boneIndex = ReadInt32();
 		object.frameBase = ReadInt32();
 
+		// Load animations.
 		object.Animations.resize(ReadInt32());
 		for (auto& anim : object.Animations)
 		{
@@ -390,33 +347,18 @@ void LoadObjects()
 			anim.frameEnd = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-
-			// Temp
-			int dispatchCount = ReadInt32();
-			int oldDispatchIndex = ReadInt32();
-
 			anim.NumCommands = ReadInt32();
 			anim.CommandIndex = ReadInt32();
 
-			// Temp
-			anim.Dispatches.reserve(dispatchCount);
-			for (int j = 0; j < dispatchCount; j++)
+			// Load state dispatches.
+			anim.Dispatches.resize(ReadInt32());
+			for (auto& dispatch : anim.Dispatches)
 			{
-				const auto& tempDispatch = tempDispatches[oldDispatchIndex + j];
-
-				auto dispatch = StateDispatchData{};
-				dispatch.TargetState = tempDispatch.TargetState;
-
-				for (int k = 0; k < tempDispatch.NumberRanges; k++)
-				{
-					const auto& tempDispatchRange = tempDispatchRanges[tempDispatch.RangeIndex + k];
-
-					dispatch.NextAnimNumber = tempDispatchRange.NextAnimNumber;
-					dispatch.NextFrameNumber = tempDispatchRange.NextFrameNumber;
-					dispatch.FrameRange.first = tempDispatchRange.FrameRange.first;
-					dispatch.FrameRange.second = tempDispatchRange.FrameRange.second;
-					anim.Dispatches.push_back(dispatch);
-				}
+				dispatch.TargetState = ReadInt32();
+				dispatch.NextAnimNumber = ReadInt32();
+				dispatch.NextFrameNumber = ReadInt32();
+				dispatch.FrameRange.first = ReadInt32();
+				dispatch.FrameRange.second = ReadInt32();
 			}
 		}
 
