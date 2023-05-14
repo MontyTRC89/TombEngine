@@ -1,10 +1,10 @@
 #pragma once
-
-// Last generated on 18/11/2022
-
-#include "game_object_ids.h"
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
+
+#include "Objects/game_object_ids.h"
+
+// Last generated on 2022.11.18
 
 /***
 Constants for object IDs.
@@ -1188,7 +1188,9 @@ Table of constants.
 @table PickupConstants
 */
 
-static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
+// TODO: Keys should be IDs, not name strings.
+static const std::unordered_map<std::string, GAME_OBJECT_ID> OBJECT_ID_NAME_MAP
+{
 	{ "LARA", ID_LARA },
 	{ "LARA_EXTRA_ANIMS", ID_LARA_EXTRA_ANIMS },
 	{ "PISTOLS_ANIM", ID_PISTOLS_ANIM },

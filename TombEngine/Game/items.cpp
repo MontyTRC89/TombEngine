@@ -647,14 +647,15 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 
 const std::string& GetObjectName(GAME_OBJECT_ID objectID)
 {
-	for (auto it = kObjIDs.begin(); it != kObjIDs.end(); ++it)
+	static const auto UNKNOWN_OBJECT = std::string("UNKNOWN_OBJECT");
+
+	for (const auto& [name, id] : OBJECT_ID_NAME_MAP)
 	{
-		if (it->second == objectID)
-			return it->first;
+		if (id == objectID)
+			return name;
 	}
 
-	static const std::string unknownSlot = "UNKNOWN_SLOT";
-	return unknownSlot;
+	return UNKNOWN_OBJECT;
 }
 
 std::vector<int> FindAllItems(GAME_OBJECT_ID objectID)
