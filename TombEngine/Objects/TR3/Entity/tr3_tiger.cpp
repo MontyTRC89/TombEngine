@@ -226,7 +226,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TIGER_STATE_RUN_SWIPE_ATTACK:
 				if (!creature->Flags && item->TouchBits.Test(TigerSwipeAttackJoints))
 				{
-					if (TestAnimNumber(*item, TIGER_ANIM_RUN_SWIPE_ATTACK) &&
+					if (item->Animation.AnimNumber == TIGER_ANIM_RUN_SWIPE_ATTACK &&
 						TestAnimFrameRange(*item, 6, 15))
 					{
 						DoDamage(creature->Enemy, TIGER_SWIPE_ATTACK_DAMAGE);

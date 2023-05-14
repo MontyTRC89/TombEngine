@@ -341,11 +341,6 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 	return false;
 }
 
-bool TestAnimNumber(const ItemInfo& item, int animNumber)
-{
-	return (item.Animation.AnimNumber == animNumber);
-}
-
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 {
 	if (!animNumber.has_value())
@@ -365,6 +360,7 @@ bool TestAnimFrame(const ItemInfo& item, int frameStart)
 	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
 }
 
+// NOTE: Parameters are relative frame numbers.
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
 {
 	const auto& anim = GetAnimData(item);

@@ -808,7 +808,7 @@ namespace TEN::Entities::Vehicles
 			if (!(TrInput & KAYAK_IN_BACK))
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_PADDLE_BACK))
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_PADDLE_BACK)
 			{
 				if (frame == 8)
 				{
@@ -839,7 +839,7 @@ namespace TEN::Entities::Vehicles
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
-			else if (TestAnimNumber(*laraItem, KAYAK_ANIM_HOLD_PADDLE_LEFT))
+			else if (laraItem->Animation.AnimNumber == KAYAK_ANIM_HOLD_PADDLE_LEFT)
 			{
 				if (kayak->Velocity >= 0)
 				{
@@ -875,7 +875,7 @@ namespace TEN::Entities::Vehicles
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
-			else if (TestAnimNumber(*laraItem, KAYAK_ANIM_HOLD_PADDLE_RIGHT))
+			else if (laraItem->Animation.AnimNumber == KAYAK_ANIM_HOLD_PADDLE_RIGHT)
 			{
 				if (kayak->Velocity >= 0)
 				{
@@ -904,7 +904,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_MOUNT_LEFT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_GET_PADDLE) &&
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_GET_PADDLE &&
 				frame == 24 &&
 				!(kayak->Flags & 0x80))
 			{
@@ -916,7 +916,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) &&
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_DISMOUNT_START &&
 				frame == 27 &&
 				kayak->Flags & 0x80)
 			{
@@ -929,7 +929,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_LEFT) &&
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_DISMOUNT_LEFT &&
 				frame == 83)
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
@@ -950,7 +950,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_RIGHT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_RIGHT) &&
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_DISMOUNT_RIGHT &&
 				frame == 83)
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));

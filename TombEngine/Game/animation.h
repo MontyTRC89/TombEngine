@@ -94,7 +94,6 @@ void AnimateItem(ItemInfo* item);
 
 // Inquirers
 bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
-bool TestAnimNumber(const ItemInfo& item, int animNumber);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);

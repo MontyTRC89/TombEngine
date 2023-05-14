@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->TouchBits.Test(BrownBeastAttackJoints1))
 				{
-					if (TestAnimNumber(*item, 8))
+					if (item->Animation.AnimNumber == 8)
 					{
 						if (TestAnimFrameRange(*item, 20, 24))
 						{
@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR5
 						}
 					}
 
-					if (TestAnimNumber(*item, 2))
+					if (item->Animation.AnimNumber == 2)
 					{
 						if (TestAnimFrameRange(*item, 7, 15))
 						{
@@ -166,7 +166,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (!item->TouchBits.Test(BrownBeastAttackJoints2))
 					break;
 
-				if (TestAnimNumber(*item, 8))
+				if (item->Animation.AnimNumber == 8)
 				{
 					if (TestAnimFrameRange(*item, 14, 19))
 					{
@@ -177,7 +177,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (TestAnimNumber(*item, 2))
+				if (item->Animation.AnimNumber == 2)
 				{
 					if (TestAnimFrameRange(*item, 34, 42))
 					{

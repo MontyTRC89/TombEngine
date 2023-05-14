@@ -185,10 +185,14 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case LIZARD_STATE_WALK_FORWARD:
-				if (TestAnimNumber(item, LIZARD_ANIM_SLIDE_1) || TestAnimNumber(item, LIZARD_ANIM_SLIDE_2))
+				if (item.Animation.AnimNumber == LIZARD_ANIM_SLIDE_1 || item.Animation.AnimNumber == LIZARD_ANIM_SLIDE_2)
+				{
 					creature.MaxTurn = 0;
+				}
 				else
+				{
 					creature.MaxTurn = LIZARD_WALK_TURN_RATE_MAX;
+				}
 
 				if (creature.Mood == MoodType::Escape)
 				{
