@@ -287,6 +287,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	auto& player = *GetLaraInfo(&laraItem);
 
 	player.TargetEntity = nullptr;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(player.Control.Weapon.GunType);
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =
@@ -300,8 +302,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	{
 	case LaraWeaponType::Pistol:
 	case LaraWeaponType::Uzi:
+		player.LeftArm.FrameBase =
 		player.RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		player.LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawPistolMeshes(laraItem, player.Control.Weapon.GunType);
@@ -314,8 +316,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	case LaraWeaponType::GrenadeLauncher:
 	case LaraWeaponType::HarpoonGun:
 	case LaraWeaponType::RocketLauncher:
+		player.LeftArm.FrameBase =
 		player.RightArm.FrameBase = Objects[GetWeaponObjectID(player.Control.Weapon.GunType)].frameBase;
-		player.LeftArm.FrameBase = Objects[GetWeaponObjectID(player.Control.Weapon.GunType)].frameBase;
 
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawShotgunMeshes(laraItem, player.Control.Weapon.GunType);
@@ -323,8 +325,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 		break;
 
 	case LaraWeaponType::Flare:
+		player.LeftArm.FrameBase =
 		player.RightArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
-		player.LeftArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
 
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(laraItem);
@@ -332,8 +334,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 		break;
 
 	default:
+		player.LeftArm.FrameBase =
 		player.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
-		player.LeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }
@@ -554,8 +556,8 @@ void HandleWeapon(ItemInfo& laraItem)
 
 				player.Control.Weapon.GunType = player.Control.Weapon.RequestGunType;
 				InitializeNewWeapon(laraItem);
-				player.RightArm.FrameNumber = 0;
 				player.LeftArm.FrameNumber = 0;
+				player.RightArm.FrameNumber = 0;
 				player.Control.HandStatus = HandStatus::WeaponDraw;
 			}
 			else
