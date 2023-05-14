@@ -128,8 +128,8 @@ int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
 
 int GetFrameCount(int animIndex);
 
-int	 GetNextAnimState(ItemInfo* item);
-int	 GetNextAnimState(int objectID, int animNumber);
+int	 GetNextAnimState(const ItemInfo& item);
+int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 
 void ClampRotation(Pose& outPose, short angle, short rotation); 

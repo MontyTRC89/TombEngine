@@ -540,15 +540,15 @@ int GetFrameCount(int animIndex)
 	return (anim.frameEnd - anim.frameBase);
 }
 
-int GetNextAnimState(ItemInfo* item)
+int GetNextAnimState(const ItemInfo& item)
 {
-	return GetNextAnimState(item->Animation.AnimObjectID, item->Animation.AnimNumber);
+	return GetNextAnimState(item.Animation.AnimObjectID, item.Animation.AnimNumber);
 }
 
-int GetNextAnimState(int objectID, int animNumber)
+int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 {
-	const auto& anim = GetAnimData((GAME_OBJECT_ID)objectID, animNumber);
-	const auto& nextAnim = GetAnimData((GAME_OBJECT_ID)objectID, anim.NextAnimNumber);
+	const auto& anim = GetAnimData(objectID, animNumber);
+	const auto& nextAnim = GetAnimData(objectID, anim.NextAnimNumber);
 
 	return nextAnim.ActiveState;
 }

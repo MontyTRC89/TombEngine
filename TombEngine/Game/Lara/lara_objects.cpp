@@ -40,7 +40,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item))
-		item->Animation.TargetState = GetNextAnimState(item);
+		item->Animation.TargetState = GetNextAnimState(*item);
 }
 
 // State:		LS_PICKUP_FLARE (67)
