@@ -283,29 +283,28 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		}
 	}
 
-	float noise = SimplexNoise(pos / 1024.0f);
-	//noise *= sin(((Frame % 256) / 128.0f) * (PI2));
-	noise = 1.0f; // saturate((noise * 0.5 + 0.5) * 0.5 + 0.5); // clamp noise to 0.5 to 1.0
-	return (length(p1 - p0) * bulb.Density / 100.0f * noise / 255.0f);
+	float d = 1.0f / max(14, ((90.0F - bulb.Density) * 0.8F + 0.2F));
+	float fog = length(p1 - p0) * d / 255.0f;
+
+	return fog;
 }
 
-float4 DoFogForVertex(float3 pos)
+float DoDistanceFogForVertex(float3 pos)
 {
-	// Apply fog
-	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float fog = 0.0f;
 
-	if (FogMaxDistance != 0)
+	if (FogMaxDistance > 0.0f)
 	{
 		float d = length(CamPositionWS.xyz - pos);
-		float fogFactor = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-		fog.xyz = FogColor.xyz * fogFactor;
-		fog.w = fogFactor;
+		fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
 	}
 
-	if (fog.w >= 1.0f)
-	{
-		return fog;
-	}
+	return fog;
+}
+
+float4 DoFogBulbsForVertex(float3 pos)
+{
+	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
@@ -321,7 +320,8 @@ float4 DoFogForVertex(float3 pos)
 	return fog;
 }
 
-float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen, const ShaderLight lights[MAX_LIGHTS_PER_ITEM], int numLights)
+float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen, 
+	const ShaderLight lights[MAX_LIGHTS_PER_ITEM], int numLights, float fogBulbsDensity)
 {
 	float3 diffuse = 0;
 	float3 shadow  = 0;
@@ -358,10 +358,16 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	float3 ambTex = saturate(ambient - shadow) * tex;
 	float3 combined = ambTex + diffuse + spec;
 
-	return (combined * vertex);
+	combined -= float3(fogBulbsDensity, fogBulbsDensity, fogBulbsDensity);
+
+	return saturate(combined * vertex);
 }
 
-float3 StaticLight(float3 vertex, float3 tex)
+float3 StaticLight(float3 vertex, float3 tex, float fogBulbsDensity)
 {
-	return saturate(tex * vertex);
+	float3 result = tex * vertex;
+
+	result -= float3(fogBulbsDensity, fogBulbsDensity, fogBulbsDensity);
+
+	return saturate(result);
 }

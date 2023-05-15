@@ -14,7 +14,8 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float4 PositionCopy: TEXCOORD2;
-	float4 Fog : TEXCOORD3;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 };
 
 struct InstancedSprite
@@ -58,7 +59,8 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.Color = Sprites[InstanceID].Color;
 	output.UV = float2(Sprites[InstanceID].UV[0][input.PolyIndex], Sprites[InstanceID].UV[1][input.PolyIndex]);
 
-	output.Fog = DoFogForVertex(worldPosition);
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
 }
@@ -102,7 +104,15 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output = CombinePixelColorWithFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog.w);
+	/*lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	lighting = saturate(lighting);
+	output.Color.xyz = output.Color.xyz * lighting;
+	output.Color.xyz += saturate(input.FogBulbs.xyz);
+
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+
+
+	output = CombinePixelColorWithFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog.w);*/
 
 	return output;
 }

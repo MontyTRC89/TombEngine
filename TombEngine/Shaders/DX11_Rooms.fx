@@ -28,7 +28,8 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 	float3x3 TBN : TBN;
 	float4 PositionCopy : TEXCOORD1;
-	float4 Fog : TEXCOORD2;
+	float4 FogBulbs : TEXCOORD2;
+	float DistanceFog : FOG;
 };
 
 Texture2D Texture : register(t0);
@@ -90,7 +91,8 @@ PixelShaderInput VS(VertexShaderInput input)
     float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
 	output.TBN = TBN;
 
-	output.Fog = DoFogForVertex(output.WorldPosition);
+	output.FogBulbs = DoFogBulbsForVertex(output.WorldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(output.WorldPosition);
 
 	return output;
 }
@@ -183,21 +185,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-	
-	float4 fog = float4(0, 0, 0, 0);
-	for (int i = 0; i < NumFogBulbs; i++)
-	{
-		float fogFactor = DoFogBulb(input.WorldPosition, FogBulbs[i]);
-		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
-		fog.w += fogFactor;
-		if (fog.w >= 1.0f)
-		{
-			break;
-		}
-	}
 
+	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	lighting = saturate(lighting);
 	output.Color.xyz = output.Color.xyz * lighting;
-	output.Color = CombinePixelColorWithFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
+
+	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
 	return output;
 }

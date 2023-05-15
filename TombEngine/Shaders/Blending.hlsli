@@ -41,7 +41,7 @@ void DoAlphaTest(float4 inputColor)
 	}
 }
 
-float4 DoFog(float4 sourceColor, float4 fogColor, float value)
+float4 DoDistanceFogForPixel(float4 sourceColor, float4 fogColor, float value)
 {
 	switch (BlendMode)
 	{
@@ -71,7 +71,7 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 	return result;
 }
 
-float4 CombinePixelColorWithFog(float4 sourceColor, float4 fogColor, float value)
+float4 DoFogBulbsForPixel(float4 sourceColor, float4 fogColor)
 {
 	switch (BlendMode)
 	{
@@ -91,17 +91,17 @@ float4 CombinePixelColorWithFog(float4 sourceColor, float4 fogColor, float value
 		break;
 
 	default:
-		sourceColor.xyz -= float3(value, value, value) * 0.4f;
-		sourceColor.xyz = saturate(sourceColor.xyz);
-		sourceColor.xyz += saturate(fogColor.xyz);
+		break;
 
-		return sourceColor;
 	}
 
 	if (fogColor.w > sourceColor.w)
 		fogColor.w = sourceColor.w;
 
-	float4 result = lerp(sourceColor, fogColor, value);
+	float4 result = sourceColor;
+
+	result.xyz += saturate(fogColor.xyz);
+
 	return result;
 }
 

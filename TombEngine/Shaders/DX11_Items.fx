@@ -30,7 +30,8 @@ struct PixelShaderInput
 	float Sheen: SHEEN;
 	float3x3 TBN: TBN;
 	float4 PositionCopy: TEXCOORD2;
-	float4 Fog : TEXCOORD3;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 	unsigned int Bone: BONE;
 };
 
@@ -78,7 +79,8 @@ PixelShaderInput VS(VertexShaderInput input)
     output.Sheen = input.Effects.w;
 	output.Bone = input.Bone;
 
-	output.Fog = DoFogForVertex(worldPosition);
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
 }
@@ -106,16 +108,17 @@ PixelShaderOutput PS(PixelShaderInput input)
 			normal, 
 			input.Sheen,
 			ItemLights, 
-			NumItemLights) :
-		StaticLight(input.Color.xyz, tex.xyz);
+			NumItemLights,
+			input.FogBulbs.w) :
+		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
 	output.Color = saturate(float4(color, tex.w));
+	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-	
-	output.Color = CombinePixelColorWithFog(output.Color, float4(input.Fog.xyz, 1.0f), input.Fog.w);
-	
+
 	return output;
 }
