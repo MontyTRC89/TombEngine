@@ -310,7 +310,7 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
-		for (const auto* room : view.roomsToDraw)
+		for (const auto* room : view.RoomsToDraw)
 		{
 			for (const auto* itemToDraw : room->ItemsToDraw)
 			{
@@ -513,14 +513,14 @@ namespace TEN::Renderer
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
-			gameCamera.camera.WorldPosition.x,
-			gameCamera.camera.WorldPosition.y,
-			gameCamera.camera.WorldPosition.z,
+			gameCamera.Camera.WorldPosition.x,
+			gameCamera.Camera.WorldPosition.y,
+			gameCamera.Camera.WorldPosition.z,
 			1.0f);
 		auto cameraDirection = Vector4(
-			gameCamera.camera.WorldDirection.x,
-			gameCamera.camera.WorldDirection.y,
-			gameCamera.camera.WorldDirection.z,
+			gameCamera.Camera.WorldDirection.x,
+			gameCamera.Camera.WorldDirection.y,
+			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
 		// If point is behind camera, return invalid screen space position.
@@ -528,7 +528,7 @@ namespace TEN::Renderer
 			return INVALID_2D_POSITION;
 
 		// Calculate clip space coords.
-		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
 
 		// Calculate normalized device coords.
 		point /= point.w;

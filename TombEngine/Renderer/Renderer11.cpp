@@ -275,10 +275,10 @@ namespace TEN::Renderer
 
 	void Renderer11::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
 	{
-		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, texture->ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)
+		switch (samplerType)  
 		{
 		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
@@ -308,7 +308,7 @@ namespace TEN::Renderer
 			return;
 		}
 
-		m_context->PSSetSamplers(static_cast<UINT>(registerType), 1, &samplerState);
+		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
 	void Renderer11::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)

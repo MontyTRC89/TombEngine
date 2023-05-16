@@ -49,7 +49,7 @@ namespace TEN::Renderer
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
-		for (auto& room : renderView.roomsToDraw) 
+		for (auto& room : renderView.RoomsToDraw) 
 		{
 			for (auto& i : room->ItemsToDraw) 
 			{
@@ -1016,8 +1016,8 @@ namespace TEN::Renderer
 	void Renderer11::DrawSortedFaces(RenderView& view)
 	{
 		std::for_each(std::execution::par_unseq,
-					  view.roomsToDraw.begin(),
-					  view.roomsToDraw.end(),
+					  view.RoomsToDraw.begin(),
+					  view.RoomsToDraw.end(),
 					  [](RendererRoom* room)
 					  {
 						  std::sort(
@@ -1031,9 +1031,9 @@ namespace TEN::Renderer
 					  }
 		);
 
-		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
+		for (int r = view.RoomsToDraw.size() - 1; r >= 0; r--)
 		{
-			RendererRoom& room = *view.roomsToDraw[r];
+			RendererRoom& room = *view.RoomsToDraw[r];
 
 			m_transparentFacesVertices.clear();
 			m_transparentFacesIndices.clear();
@@ -1272,7 +1272,7 @@ namespace TEN::Renderer
 			m_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_stRoom.AmbientColor = info->room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.lightsToDraw);
+			BindRoomLights(view.LightsToDraw);
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
@@ -1446,7 +1446,7 @@ namespace TEN::Renderer
 		m_context->OMSetRenderTargets(2, &m_pRenderViews[0],
 		                              m_renderTarget.DepthStencilView.Get());
 
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		// The camera constant buffer contains matrices, camera position, fog values and other 
@@ -1466,7 +1466,7 @@ namespace TEN::Renderer
 		else
 		{
 			cameraConstantBuffer.FogMaxDistance = 0;
-			cameraConstantBuffer.FogColor = Vector4(0, 0, 0, 0);
+			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 		   
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
@@ -1579,7 +1579,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		// Opaque geometry
@@ -1615,7 +1615,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto room : view.RoomsToDraw)
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
@@ -1650,7 +1650,7 @@ namespace TEN::Renderer
 
 		if (g_Configuration.ShadowType != ShadowMode::None)
 		{
-			for (auto room : renderView.roomsToDraw)
+			for (auto room : renderView.RoomsToDraw)
 				for (auto itemToDraw : room->ItemsToDraw)
 					RenderShadowMap(itemToDraw, renderView);
 		}
@@ -1908,7 +1908,7 @@ namespace TEN::Renderer
 		{
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-			for (auto room : view.roomsToDraw)
+			for (auto room : view.RoomsToDraw)
 			{
 				for (auto& msh : view.StaticsToDraw)
 				{
@@ -2010,10 +2010,10 @@ namespace TEN::Renderer
 		}
 
 		m_numRoomsTransparentPolygons = 0;
-		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
+		for (int i = view.RoomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
-			RendererRoom* room = view.roomsToDraw[index];
+			RendererRoom* room = view.RoomsToDraw[index];
 			m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
 
 			BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
@@ -2027,7 +2027,7 @@ namespace TEN::Renderer
 			m_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_stRoom.AmbientColor = room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.lightsToDraw);
+			BindRoomLights(view.LightsToDraw);
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
 			 
 			SetScissor(room->ClipBounds);
@@ -2162,9 +2162,9 @@ namespace TEN::Renderer
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
-		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
+		for (int k = 0; k < renderView.RoomsToDraw.size(); k++)
 		{
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->RoomNumber];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
 			{
 				anyOutsideRooms = true;

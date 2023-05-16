@@ -906,7 +906,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto* room : view.roomsToDraw)
+		for (auto* room : view.RoomsToDraw)
 		{
 			for (auto* item : room->ItemsToDraw)
 			{
@@ -1020,7 +1020,7 @@ namespace TEN::Renderer
 
 		if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 		{
-			Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+			Vector3 cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
 			spriteMatrix = scale * Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 		}
 		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
@@ -1050,13 +1050,13 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSprites(RenderView& view)
 	{
-		if (view.spritesToDraw.empty())
+		if (view.SpritesToDraw.empty())
 			return;
 
 		// Sort sprites by sprite and blend mode for faster batching.
 		std::sort(
-			view.spritesToDraw.begin(),
-			view.spritesToDraw.end(),
+			view.SpritesToDraw.begin(),
+			view.SpritesToDraw.end(),
 			[](RendererSpriteToDraw& rDrawSprite0, RendererSpriteToDraw& rDrawSprite1)
 			{
 				if (rDrawSprite0.Sprite != rDrawSprite1.Sprite)
@@ -1078,12 +1078,12 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteBucket> spriteBuckets;
 		RendererSpriteBucket currentSpriteBucket;
 
-		currentSpriteBucket.Sprite = view.spritesToDraw[0].Sprite;
-		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
-		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
-		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
+		currentSpriteBucket.Sprite = view.SpritesToDraw[0].Sprite;
+		currentSpriteBucket.BlendMode = view.SpritesToDraw[0].BlendMode;
+		currentSpriteBucket.IsBillboard = view.SpritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+		currentSpriteBucket.IsSoftParticle = view.SpritesToDraw[0].SoftParticle;
 
-		for (auto& rDrawSprite : view.spritesToDraw)
+		for (auto& rDrawSprite : view.SpritesToDraw)
 		{
 			bool isBillboard = rDrawSprite.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
@@ -1113,12 +1113,12 @@ namespace TEN::Renderer
 				face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
 				face.info.blendMode = rDrawSprite.BlendMode;
 
-				for (int j = 0; j < view.roomsToDraw.size(); j++)
+				for (int j = 0; j < view.RoomsToDraw.size(); j++)
 				{
-					short roomNumber = view.roomsToDraw[j]->RoomNumber;
+					short roomNumber = view.RoomsToDraw[j]->RoomNumber;
 					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(rDrawSprite.pos), roomNumber))
 					{
-						view.roomsToDraw[j]->TransparentFacesToDraw.push_back(face);
+						view.RoomsToDraw[j]->TransparentFacesToDraw.push_back(face);
 						break;
 					}
 				}
@@ -1350,7 +1350,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto room : view.RoomsToDraw)
 		{
 			for (auto effect : room->EffectsToDraw)
 			{

@@ -48,12 +48,12 @@ namespace TEN::Renderer
 
 	struct RenderView
 	{
-		RenderViewCamera camera;
-		D3D11_VIEWPORT viewport;
-		std::vector<RendererRoom*> roomsToDraw;
-		std::vector<RendererLight*> lightsToDraw;
+		RenderViewCamera Camera;
+		D3D11_VIEWPORT Viewport;
+		std::vector<RendererRoom*> RoomsToDraw;
+		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererFogBulb> FogBulbsToDraw;
-		std::vector<RendererSpriteToDraw> spritesToDraw;
+		std::vector<RendererSpriteToDraw> SpritesToDraw;
 		std::vector<RendererStatic*> StaticsToDraw;
 		std::map<int, std::vector<RendererStatic*>> SortedStatics;
 

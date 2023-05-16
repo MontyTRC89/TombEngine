@@ -104,15 +104,8 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	/*lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
-	lighting = saturate(lighting);
-	output.Color.xyz = output.Color.xyz * lighting;
-	output.Color.xyz += saturate(input.FogBulbs.xyz);
-
-	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
-
-
-	output = CombinePixelColorWithFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog.w);*/
+	output = DoFogBulbsForPixel(output, float4(input.FogBulbs.xyz, 1.0f));
+	output = DoDistanceFogForPixel(output, FogColor, input.DistanceFog);
 
 	return output;
 }
