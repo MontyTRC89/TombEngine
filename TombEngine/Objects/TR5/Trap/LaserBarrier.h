@@ -14,9 +14,9 @@ namespace TEN::Traps::TR5
 
 	struct LaserBarrier
 	{
-		std::vector<LaserBarrierBeam> Beams		  = {};
-		BoundingOrientedBox			  BoundingBox = {};
 		Vector4						  Color		  = Vector4::Zero;
+		BoundingOrientedBox			  BoundingBox = {};
+		std::vector<LaserBarrierBeam> Beams		  = {};
 
 		bool IsActive		  = false;
 		bool IsLethal		  = false;

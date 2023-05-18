@@ -16,6 +16,8 @@ namespace TEN::Traps::TR5
 	// TODO:
 	// - Simplify overcomplicated translation function.
 	// - Randomize opacity pulses for each barrier.
+	// - Make SpawnLaserBarrierLight() spawn a line of light once engine allows it.
+	// - Make beam counts an attribute once attributes are implemented.
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
@@ -24,11 +26,10 @@ namespace TEN::Traps::TR5
 		auto pointColl = GetCollision(&item);
 
 		item.Pose.Position.y = pointColl.Position.Floor;
-
 		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
-		short height = item.ItemFlags[0];
-		int yAdd = height / 8;
 
+		int height = item.ItemFlags[0];
+		int yAdd = height / 8;
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y, width / 2);
 
@@ -58,7 +59,7 @@ namespace TEN::Traps::TR5
 
 	void InitializeLaserBarrier(short itemNumber)
 	{
-		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
+		constexpr auto BEAM_COUNT = 3;
 
 		auto& item = g_Level.Items[itemNumber];
 
@@ -76,7 +77,6 @@ namespace TEN::Traps::TR5
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
-	// TODO: Make it a line of light once engine allows it. -- Sezz 2023.05.11
 	static void SpawnLaserBarrierLight(const ItemInfo& item, float intensity, float amplitude)
 	{
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
@@ -169,7 +169,9 @@ namespace TEN::Traps::TR5
 				DoDamage(playerItem, MAXINT);
 			}
 			else if (barrier.IsHeavyActivator)
+			{
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
+			}
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
