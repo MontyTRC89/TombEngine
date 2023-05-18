@@ -33,8 +33,9 @@ struct ShaderFogBulb
 	float3 Position;
 	float Density;
 	float3 Color;
-	float Radius;
-	float4 Padding1;
+	float SquaredRadius;
+	float3 FogBulbToCameraVector;
+	float SquaredCameraToFogBulbDistance;
 	float4 Padding2;
 };
 

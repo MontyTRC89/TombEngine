@@ -205,18 +205,16 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 
 	p0 = p1 = float3(0, 0, 0);
 
-	float3 bulbToCamera = bulb.Position - CamPositionWS;
-	float bulbToCameraDistance = length(bulbToCamera);
 	float3 bulbToVertex = pos - bulb.Position;
-	float bulbToVertexDistance = length(bulbToVertex);
+	float bulbToVertexSquaredDistance = pow(pos.x - bulb.Position.x, 2) + pow(pos.y - bulb.Position.y, 2) + pow(pos.z - bulb.Position.z, 2);
 	float3 cameraToVertexDirection = normalize(pos - CamPositionWS);
-	float cameraToVertexDistance = length(pos - CamPositionWS);
-
-	if (bulbToCameraDistance < bulb.Radius)
+	float cameraToVertexSquaredDistance = pow(pos.x - CamPositionWS.x, 2) + pow(pos.y - CamPositionWS.y, 2) + pow(pos.z - CamPositionWS.z, 2);
+		
+	if (bulb.SquaredCameraToFogBulbDistance < bulb.SquaredRadius)
 	{
 		// Camera is INSIDE the bulb
 
-		if (bulbToVertexDistance < bulb.Radius)
+		if (bulbToVertexSquaredDistance < bulb.SquaredRadius)
 		{
 			// Vertex is INSIDE the bulb
 
@@ -227,9 +225,9 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		{
 			// Vertex is OUTSIDE the bulb
 
-			float Tca = dot(bulbToCamera, cameraToVertexDirection);
-			float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
-			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+			float Tca = dot(bulb.FogBulbToCameraVector, cameraToVertexDirection);
+			float d2 = bulb.SquaredCameraToFogBulbDistance - Tca * Tca;
+			float Thc = sqrt(bulb.SquaredRadius - d2);
 			float t1 = Tca + Thc;
 
 			p0 = CamPositionWS;
@@ -240,13 +238,13 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 	{
 		// Camera is OUTSIDE the bulb
 
-		if (bulbToVertexDistance < bulb.Radius)
+		if (bulbToVertexSquaredDistance < bulb.SquaredRadius)
 		{
 			// Vertex is INSIDE the bulb
 
-			float Tca = dot(bulbToCamera, cameraToVertexDirection);
-			float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
-			float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+			float Tca = dot(bulb.FogBulbToCameraVector, cameraToVertexDirection);
+			float d2 = bulb.SquaredCameraToFogBulbDistance - Tca * Tca;
+			float Thc = sqrt(bulb.SquaredRadius - d2);
 			float t0 = Tca - Thc;
 
 			p0 = CamPositionWS + cameraToVertexDirection * t0;
@@ -256,14 +254,14 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		{
 			// Vertex is OUTSIDE the bulb
 
-			float Tca = dot(bulbToCamera, cameraToVertexDirection);
+			float Tca = dot(bulb.FogBulbToCameraVector, cameraToVertexDirection);
 
-			if (Tca > 0 && cameraToVertexDistance * cameraToVertexDistance > Tca * Tca)
+			if (Tca > 0 && cameraToVertexSquaredDistance > Tca * Tca)
 			{
-				float d2 = bulbToCameraDistance * bulbToCameraDistance - Tca * Tca;
-				if (d2 < bulb.Radius * bulb.Radius)
+				float d2 = bulb.SquaredCameraToFogBulbDistance - Tca * Tca;
+				if (d2 < bulb.SquaredRadius)
 				{
-					float Thc = sqrt(bulb.Radius * bulb.Radius - d2);
+					float Thc = sqrt(bulb.SquaredRadius - d2);
 
 					float t0 = Tca - Thc;
 					float t1 = Tca + Thc;
@@ -283,8 +281,7 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 		}
 	}
 
-	float d = 1.0f / max(14, ((90.0F - bulb.Density) * 0.8F + 0.2F));
-	float fog = length(p1 - p0) * d / 255.0f;
+	float fog = length(p1 - p0) * bulb.Density / 255.0f;
 
 	return fog;
 }
@@ -305,7 +302,7 @@ float DoDistanceFogForVertex(float3 pos)
 float4 DoFogBulbsForVertex(float3 pos)
 {
 	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
+	
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
 		float fogFactor = DoFogBulb(pos, FogBulbs[i]);

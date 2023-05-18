@@ -80,7 +80,9 @@ namespace TEN::Renderer
 						bulb.Density = light.Intensity;
 						bulb.Color = light.Color;
 						bulb.Radius = light.Out;
-						bulb.Distance = (int)(renderView.Camera.WorldPosition - bulb.Position).Length();
+						bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
+						bulb.Distance = bulb.FogBulbToCameraVector.Length();
+
 						tempFogBulbs.push_back(bulb);
 					}		
 				}

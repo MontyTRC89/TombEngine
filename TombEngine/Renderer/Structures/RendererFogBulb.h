@@ -9,6 +9,7 @@ namespace TEN::Renderer
 		float Density;
 		Vector3 Color;
 		float Radius;
-		int Distance;
+		float Distance;
+		Vector3 FogBulbToCameraVector;
 	};
 }
