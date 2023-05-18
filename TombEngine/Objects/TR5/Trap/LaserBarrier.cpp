@@ -17,7 +17,6 @@ namespace TEN::Traps::TR5
 	// item.ItemFlags[0] = barrier height.
 	
 	// TODO:
-	// - Simplify overcomplicated translation function.
 	// - Randomize opacity pulses for each barrier.
 	// - Make SpawnLaserBarrierLight() spawn a line of light once engine allows it.
 	// - Make beam counts an attribute once attributes are implemented.
@@ -69,6 +68,21 @@ namespace TEN::Traps::TR5
 
 			beamOffset.y -= beamStepHeight;
 		}
+
+		// Determine bounding box reference points.
+		auto point0 = Beams.back().VertexPoints[0];
+		auto point1 = Beams.back().VertexPoints[1];
+		auto point2 = Beams.front().VertexPoints[2];
+		auto point3 = Beams.front().VertexPoints[3];
+
+		// Update bounding box center.
+		BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
+
+		// Calculate and update bounding box extents.
+		float halfWidth = std::abs(point0.x - point1.x) / 2;
+		float halfHeight = std::abs(point0.y - point2.y) / 2;
+		float halfDepth = std::abs(point0.z - point2.z) / 2;
+		BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
 	}
 
 	void InitializeLaserBarrier(short itemNumber)
@@ -151,21 +165,6 @@ namespace TEN::Traps::TR5
 
 		if (!barrier.IsActive)
 			return;
-
-		// Determine points.
-		auto point0 = barrier.Beams.back().VertexPoints[0];
-		auto point1 = barrier.Beams.back().VertexPoints[1];
-		auto point2 = barrier.Beams.front().VertexPoints[2];
-		auto point3 = barrier.Beams.front().VertexPoints[3];
-
-		// Update bounding box center.
-		barrier.BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
-
-		// Calculate and update relative bounding box dimensions.
-		float halfWidth = std::abs(point0.x - point1.x) / 2;
-		float halfHeight = std::abs(point0.y - point2.y) / 2;
-		float halfDepth = std::abs(point0.z - point2.z) / 2;
-		barrier.BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
 
 		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
 		if (barrier.BoundingBox.Intersects(playerBox))
