@@ -1,5 +1,5 @@
 #pragma once
-#include "Math//Math.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math;
 
