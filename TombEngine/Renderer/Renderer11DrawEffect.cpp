@@ -514,10 +514,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawUnderwaterBloodParticles(RenderView& view)
 	{
-		if (UnderwaterBloodParticles.empty())
+		if (UnderwaterBloodClouds.empty())
 			return;
 
-		for (const auto& uwBlood : UnderwaterBloodParticles)
+		for (const auto& uwBlood : UnderwaterBloodClouds)
 		{
 			if (uwBlood.Life <= 0.0f)
 				continue;
@@ -534,7 +534,7 @@ namespace TEN::Renderer
 			color /= UCHAR_MAX;
 
 			AddSpriteBillboard(
-				&m_sprites[uwBlood.SpriteIndex],
+				&m_sprites[uwBlood.SpriteID],
 				uwBlood.Position,
 				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BLENDMODE_ADDITIVE, true, view);
 		}
@@ -1024,7 +1024,7 @@ namespace TEN::Renderer
 			float height = drip.Scale * Random::GenerateFloat(4.0f, 12.0f);
 
 			AddSpriteBillboardConstrained(
-				&m_sprites[drip.SpriteIndex],
+				&m_sprites[drip.SpriteID],
 				drip.Position,
 				drip.Color, 0.5f, 1.0f, Vector2(width, height), BLENDMODE_ALPHABLEND, axis, true, view);
 		}
@@ -1038,7 +1038,7 @@ namespace TEN::Renderer
 				continue;
 
 			AddSpriteBillboard(
-				&m_sprites[mist.SpriteIndex],
+				&m_sprites[mist.SpriteID],
 				mist.Position,
 				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale, mist.Scale), BLENDMODE_ALPHABLEND, true, view);
 		}
@@ -1053,7 +1053,7 @@ namespace TEN::Renderer
 
 			// TODO: Try setting soft particle to true.
 			AddQuad(
-				&m_sprites[stain.SpriteIndex],
+				&m_sprites[stain.SpriteID],
 				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
 				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, true, view);
 		}

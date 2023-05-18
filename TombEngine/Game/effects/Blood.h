@@ -7,7 +7,9 @@ namespace TEN::Effects::Blood
 {
 	struct BloodDrip
 	{
-		unsigned int SpriteIndex   = 0;
+		static constexpr auto LIFE_START_FADING = 0.5f;
+
+		unsigned int SpriteID	   = 0;
 		bool		 CanSpawnStain = false;
 
 		Vector3 Position   = Vector3::Zero;
@@ -24,7 +26,11 @@ namespace TEN::Effects::Blood
 
 	struct BloodStain
 	{
-		unsigned int SpriteIndex = 0;
+		static constexpr auto LIFE_MAX			= 5.0f * 60.0f;
+		static constexpr auto LIFE_START_FADING = 30.0f;
+		static constexpr auto SURFACE_OFFSET	= 4;
+
+		unsigned int SpriteID = 0;
 
 		Vector3	Position	  = Vector3::Zero;
 		int		RoomNumber	  = 0;
@@ -48,7 +54,7 @@ namespace TEN::Effects::Blood
 	
 	struct BloodMist
 	{
-		unsigned int SpriteIndex   = 0;
+		unsigned int SpriteID = 0;
 
 		Vector3 Position	  = Vector3::Zero;
 		int		RoomNumber	  = 0;
@@ -70,7 +76,7 @@ namespace TEN::Effects::Blood
 
 	struct UnderwaterBlood
 	{
-		unsigned int SpriteIndex = 0;
+		unsigned int SpriteID = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
@@ -85,30 +91,27 @@ namespace TEN::Effects::Blood
 	extern std::vector<BloodDrip>		BloodDrips;
 	extern std::vector<BloodStain>		BloodStains;
 	extern std::vector<BloodMist>		BloodMists;
-	extern std::vector<UnderwaterBlood> UnderwaterBloodParticles;
+	extern std::vector<UnderwaterBlood> UnderwaterBloodClouds;
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count);
-
-	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);
+	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec = 0.0f);
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl);
 	void SpawnBloodStainPool(ItemInfo& item);
-
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
-
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size);
 	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);
 
 	void UpdateBloodDrips();
 	void UpdateBloodStains();
 	void UpdateBloodMists();
-	void UpdateUnderwaterBloodParticles();
+	void UpdateUnderwaterBloodClouds();
 
 	void ClearBloodDrips();
 	void ClearBloodStains();
 	void ClearBloodMists();
-	void ClearUnderwaterBloodParticles();
+	void ClearUnderwaterBloodClouds();
 
 	void DrawBloodDebug();
 }

@@ -208,7 +208,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBloodDrips();
 		UpdateBloodMists();
 		UpdateBloodStains();
-		UpdateUnderwaterBloodParticles();
+		UpdateUnderwaterBloodClouds();
 		UpdateFootprints();
 		UpdateRipples();
 		UpdateSplashes();
@@ -227,7 +227,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
-		UpdateUnderwaterBloodParticles();
+		UpdateUnderwaterBloodClouds();
 
 		// Update HUD.
 		g_Hud.Update(*LaraItem);
@@ -422,14 +422,14 @@ void CleanUp()
 	ClearBloodMists();
 	ClearBloodStains();
 	ClearBubbles();
-	ClearUnderwaterBloodParticles();
+	ClearUnderwaterBloodClouds();
 	ClearBubbles();
 	ClearFootprints();
 	ClearDrips();
 	ClearFootprints();
 	ClearRipples();
 	DisableSparkParticles();
-	ClearUnderwaterBloodParticles();
+	ClearUnderwaterBloodClouds();
 	DisableDebris();
 	DisableSmokeParticles();
 
