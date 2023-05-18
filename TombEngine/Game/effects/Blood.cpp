@@ -106,7 +106,7 @@ namespace TEN::Effects::Blood
 		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
 
 		// Spawn decorative drips.
-		for (int i = 0; i < count * 6; i++)
+		for (int i = 0; i < (count * 6); i++)
 		{
 			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
 			auto velocity = Random::GenerateDirectionInCone(-direction, SPRAY_SEMIANGLE) * length;
@@ -128,13 +128,13 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec)
 	{
-		constexpr auto COUNT_MAX		= 192;
-		constexpr auto OPACITY_MAX		= 0.8f;
-		constexpr auto SPRITE_INDEX_MAX = 7; // TODO: Dehardcode index range.
+		constexpr auto COUNT_MAX	 = 192;
+		constexpr auto OPACITY_MAX	 = 0.8f;
+		constexpr auto SPRITE_ID_MAX = 7; // TODO: Dehardcode ID range.
 
 		auto& stain = GetNewEffect(BloodStains, COUNT_MAX);
 
-		stain.SpriteID = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, SPRITE_INDEX_MAX);
+		stain.SpriteID = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, SPRITE_ID_MAX);
 		stain.Position = pos;
 		stain.RoomNumber = roomNumber;
 		stain.Orientation2D = Random::GenerateAngle();
@@ -238,7 +238,7 @@ namespace TEN::Effects::Blood
 		constexpr auto LIFE_MIN		= 8.0f;
 		constexpr auto SPAWN_RADIUS = BLOCK(0.25f);
 
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater blood sprite missing."))
 			return;
 
 		auto& uwBlood = GetNewEffect(UnderwaterBloodClouds, COUNT_MAX);
