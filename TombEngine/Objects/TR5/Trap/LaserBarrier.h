@@ -29,5 +29,5 @@ namespace TEN::Traps::TR5
 	void ControlLaserBarrier(short itemNumber);
 	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 
-	void ClearLaserBarriers();
+	void ClearLaserBarrierEffects();
 }

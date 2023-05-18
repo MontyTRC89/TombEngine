@@ -26,11 +26,11 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/Quad/RenderQuad.h"
 #include "Renderer/RendererSprites.h"
+#include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
-#include "Objects/TR5/Trap/tr5_laser.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;

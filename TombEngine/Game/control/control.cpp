@@ -44,10 +44,10 @@
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Objects/TR5/Trap/tr5_laser.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -419,7 +419,7 @@ void CleanUp()
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
-	ClearLaserBarriers();
+	ClearLaserBarrierEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();

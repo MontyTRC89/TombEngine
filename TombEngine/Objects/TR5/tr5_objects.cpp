@@ -57,8 +57,8 @@
 
 // Traps
 #include "Objects/Effects/tr5_electricity.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
-#include "Objects/TR5/Trap/tr5_laser.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_zip_line.h"
 #include "Objects/TR5/Trap/tr5_romehammer.h"

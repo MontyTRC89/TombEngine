@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Trap/tr5_laser.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -49,7 +49,6 @@ namespace TEN::Traps::TR5
 
 		// Set vertex positions.
 		int i = 0;
-
 		for (auto& beam : barrier.Beams)
 		{
 			int hAdd = (lH / 2) * (i - 1);
@@ -188,7 +187,7 @@ namespace TEN::Traps::TR5
 		}		
 	}
 
-	void ClearLaserBarriers()
+	void ClearLaserBarrierEffects()
 	{
 		LaserBarriers.clear();
 	}
