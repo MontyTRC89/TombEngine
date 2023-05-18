@@ -15,9 +15,57 @@ namespace TEN::Traps::TR5
 {
 	// TODO:
 	// - Simplify over-complicated translation function.
-	// - Randomize opacity pulse for each barrier.
+	// - Randomize opacity pulses for each barrier.
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
+
+	static void TranslateLaserBarrier(ItemInfo& item, LaserBarrier& barrier)
+	{
+		int width = abs(item.TriggerFlags) * BLOCK(1);
+
+		int xAdd = 0;
+		if (!(item.TriggerFlags & 1))
+		{
+			xAdd = (width / 2) - BLOCK(0.5);
+
+			item.Pose.Position.z += xAdd * phd_cos(item.Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
+			item.Pose.Position.x += xAdd * phd_sin(item.Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
+		}
+
+		auto pointColl = GetCollision(&item);
+
+		item.Pose.Position.y = pointColl.Position.Floor;
+
+		item.ItemFlags[0] = short(item.Pose.Position.y - pointColl.Position.Ceiling);
+		short height = item.ItemFlags[0];
+		int yAdd = height / 8;
+
+		int zAdd = abs((width * phd_cos(item.Pose.Orientation.y)) / 2);
+		xAdd = abs((width * phd_sin(item.Pose.Orientation.y)) / 2);
+		int lH = yAdd / 2;
+		height = -yAdd;
+
+		auto basePos = item.Pose.Position.ToVector3();
+
+		// Set vertex positions.
+		int i = 0;
+
+		for (auto& beam : barrier.Beams)
+		{
+			int hAdd = (lH / 2) * (i - 1);
+
+			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
+			{
+				basePos + Vector3(xAdd, height - lH + hAdd, zAdd),
+				basePos + Vector3(-xAdd, height - lH + hAdd, -zAdd),
+				basePos + Vector3(-xAdd, height + lH + hAdd, -zAdd),
+				basePos + Vector3(xAdd, height + lH + hAdd, zAdd)
+			};
+
+			height -= yAdd * 3;
+			i++;
+		}
+	}
 
 	void InitializeLaserBarrier(short itemNumber)
 	{
@@ -35,7 +83,7 @@ namespace TEN::Traps::TR5
 		barrier.Color.w = 0.0f;
 		barrier.Beams.resize(BEAM_COUNT);
 
-		CalculateLaserBarrierVertex(&item, &barrier);
+		TranslateLaserBarrier(item, barrier);
 
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
@@ -50,54 +98,6 @@ namespace TEN::Traps::TR5
 			intensityNorm * (item.Model.Color.x / 2),
 			intensityNorm * (item.Model.Color.y / 2),
 			intensityNorm * (item.Model.Color.z / 2));
-	}
-
-	void CalculateLaserBarrierVertex(ItemInfo* item, LaserBarrier* barrier)
-	{
-		int width = abs(item->TriggerFlags) * BLOCK(1);
-
-		int xAdd = 0;
-		if (!(item->TriggerFlags & 1))
-		{
-			xAdd = (width / 2) - BLOCK(0.5);
-
-			item->Pose.Position.z += xAdd * phd_cos(item->Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
-			item->Pose.Position.x += xAdd * phd_sin(item->Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
-		}
-
-		auto pointColl = GetCollision(item);
-
-		item->Pose.Position.y = pointColl.Position.Floor;
-
-		item->ItemFlags[0] = short(item->Pose.Position.y - pointColl.Position.Ceiling);
-		short height = item->ItemFlags[0];
-		int yAdd = height / 8;
-
-		int zAdd = abs((width * phd_cos(item->Pose.Orientation.y)) / 2);
-		xAdd = abs((width * phd_sin(item->Pose.Orientation.y)) / 2);
-		int lH = yAdd / 2;
-		height = -yAdd;
-
-		auto basePos = item->Pose.Position.ToVector3();
-
-		// Set vertex positions.
-		int i = 0;
-
-		for (auto& beam : barrier->Beams)
-		{
-			int hAdd = (lH / 2) * (i - 1);
-
-			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
-			{
-					basePos + Vector3(xAdd, height - lH + hAdd, zAdd),
-					basePos + Vector3(-xAdd, height - lH + hAdd, -zAdd),
-					basePos + Vector3(-xAdd, height + lH + hAdd, -zAdd),
-					basePos + Vector3(xAdd, height + lH + hAdd, zAdd)
-			};
-
-		height -= yAdd * 3;
-		i++;
-		}
 	}
 
 	void ControlLaserBarrier(short itemNumber)
@@ -139,9 +139,7 @@ namespace TEN::Traps::TR5
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
-
-		//Calculate vertex positions for every loop, so that builders can make the laser move.
-		CalculateLaserBarrierVertex(&item, &barrier);
+		TranslateLaserBarrier(item, barrier);
 	}
 
 	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
