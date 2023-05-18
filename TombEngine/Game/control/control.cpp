@@ -47,6 +47,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -79,6 +80,7 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Traps::TR5;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -417,6 +419,7 @@ void CleanUp()
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
+	ClearLaserBarrierEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
