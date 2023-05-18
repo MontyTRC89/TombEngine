@@ -14,34 +14,24 @@ using namespace TEN::Effects::Items;
 namespace TEN::Traps::TR5
 {
 	// TODO:
-	// - Simplify over-complicated translation function.
+	// - Simplify overcomplicated translation function.
 	// - Randomize opacity pulses for each barrier.
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
 	static void TranslateLaserBarrier(ItemInfo& item, LaserBarrier& barrier)
 	{
-		int width = abs(item.TriggerFlags) * BLOCK(1);
-
-		int xAdd = 0;
-		if (!(item.TriggerFlags & 1))
-		{
-			xAdd = (width / 2) - BLOCK(0.5);
-
-			item.Pose.Position.z += xAdd * phd_cos(item.Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
-			item.Pose.Position.x += xAdd * phd_sin(item.Pose.Orientation.y + ANGLE(TO_RAD(180.0f))) / 16384;
-		}
-
 		auto pointColl = GetCollision(&item);
 
 		item.Pose.Position.y = pointColl.Position.Floor;
 
-		item.ItemFlags[0] = short(item.Pose.Position.y - pointColl.Position.Ceiling);
+		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
 		short height = item.ItemFlags[0];
 		int yAdd = height / 8;
 
-		int zAdd = abs((width * phd_cos(item.Pose.Orientation.y)) / 2);
-		xAdd = abs((width * phd_sin(item.Pose.Orientation.y)) / 2);
+		int width = abs(item.TriggerFlags) * BLOCK(1);
+		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y, width / 2);
+
 		int lH = yAdd / 2;
 		height = -yAdd;
 
@@ -55,10 +45,10 @@ namespace TEN::Traps::TR5
 
 			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
 			{
-				basePos + Vector3(xAdd, height - lH + hAdd, zAdd),
-				basePos + Vector3(-xAdd, height - lH + hAdd, -zAdd),
-				basePos + Vector3(-xAdd, height + lH + hAdd, -zAdd),
-				basePos + Vector3(xAdd, height + lH + hAdd, zAdd)
+				basePos + Vector3(offset.x, height - lH + hAdd, offset.z),
+				basePos + Vector3(-offset.x, height - lH + hAdd, -offset.z),
+				basePos + Vector3(-offset.x, height + lH + hAdd, -offset.z),
+				basePos + Vector3(offset.x, height + lH + hAdd, offset.z)
 			};
 
 			height -= yAdd * 3;
@@ -83,7 +73,6 @@ namespace TEN::Traps::TR5
 		barrier.Beams.resize(BEAM_COUNT);
 
 		TranslateLaserBarrier(item, barrier);
-
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
@@ -137,8 +126,8 @@ namespace TEN::Traps::TR5
 		if (item.Model.Color.w >= 0.8f)
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 
-		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 		TranslateLaserBarrier(item, barrier);
+		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
 	void CollideLaserBarrier(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
