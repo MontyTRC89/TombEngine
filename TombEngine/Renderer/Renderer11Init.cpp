@@ -17,7 +17,7 @@ using std::vector;
 
 extern GameConfiguration g_Configuration;
 
-static std::wstring GetAssetPath(const wchar_t * fileName)
+static std::wstring GetAssetPath(const wchar_t* fileName)
 {
 	return TEN::Utils::ToWString(g_GameFlow->GetGameDir()) + fileName;
 }
@@ -325,14 +325,14 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 void Renderer11::InitializeCommonTextures()
 {
-	// Initialize font
-	const auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
+	// Initialize font.
+	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
 	if (!std::filesystem::exists(fontPath))
-		throw std::runtime_error("Font not found, path " + TEN::Utils::ToString(fontPath) + " is missing.");
+		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), fontPath.c_str());
 
-	// Initialize common textures
+	// Initialize common textures.
 	SetTextureOrDefault(m_logo, GetAssetPath(L"Textures/Logo.png"));
 	SetTextureOrDefault(m_loadingBarBorder, GetAssetPath(L"Textures/LoadingBarBorder.png"));
 	SetTextureOrDefault(m_loadingBarInner, GetAssetPath(L"Textures/LoadingBarInner.png"));

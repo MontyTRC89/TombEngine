@@ -1,9 +1,10 @@
 #pragma once
+#include <string_view>
+
 #include "LanguageScript.h"
 #include "LuaHandler.h"
 #include "Logic/LogicHandler.h"
 #include "Color/Color.h"
-#include <string_view>
 #include "Flow/Level/FlowLevel.h"
 #include "Settings/Settings.h"
 #include "Flow/Animations/Animations.h"
@@ -38,7 +39,7 @@ public:
 
 	std::vector<Level*>	Levels;
 
-	FlowHandler(sol::state* lua, sol::table & parent);
+	FlowHandler(sol::state* lua, sol::table& parent);
 	~FlowHandler() override;
 
 	std::string	GetGameDir() override;
@@ -46,21 +47,21 @@ public:
 	void		AddLevel(Level const& level);
 	void		LoadFlowScript();
 	char const*	GetString(const char* id) const;
-	void		SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
-	void		SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
-	void		SetAnimations(Animations const & src);
-	void		SetSettings(Settings const & src);
+	void		SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src);
+	void		SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src);
+	void		SetAnimations(const Animations& src);
+	void		SetSettings(const Settings& src);
 	Settings*	GetSettings();
 	Level*		GetLevel(int id);
 	Level*		GetCurrentLevel();
-	int			GetLevelNumber(std::string const& flieName);
+	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);
-	void		SetIntroImagePath(std::string const& path);
-	void		SetTitleScreenImagePath(std::string const& path);
+	void		SetIntroImagePath(const std::string& path);
+	void		SetTitleScreenImagePath(const std::string& path);
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool flyCheat);

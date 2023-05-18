@@ -230,7 +230,7 @@ void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && 
 	m_languageNames = std::move(src);
 }
 
-void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src)
+void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
 	m_translationsMap = std::move(src);
 }
@@ -250,12 +250,12 @@ void FlowHandler::AddLevel(Level const& level)
 	Levels.push_back(new Level{ level });
 }
 
-void FlowHandler::SetIntroImagePath(std::string const& path)
+void FlowHandler::SetIntroImagePath(const std::string& path)
 {
 	IntroImagePath = path;
 }
 
-void FlowHandler::SetTitleScreenImagePath(std::string const& path)
+void FlowHandler::SetTitleScreenImagePath(const std::string& path)
 {
 	TitleScreenImagePath = path;
 }
@@ -316,32 +316,31 @@ int	FlowHandler::GetNumLevels() const
 	return Levels.size();
 }
 
-int FlowHandler::GetLevelNumber(std::string const& fileName)
+int FlowHandler::GetLevelNumber(const std::string& fileName)
 {
 	if (fileName.empty())
 		return -1;
 
 	auto fileNameWithForwardSlashes = fileName;
 	std::replace(fileNameWithForwardSlashes.begin(), fileNameWithForwardSlashes.end(), '\\', '/');
-	auto lcFilename = TEN::Utils::ToLower(fileNameWithForwardSlashes);
 
-	auto fullPath = GetGameDir() + fileNameWithForwardSlashes;
 	auto requestedPath = std::filesystem::path{ fileName };
 	bool isAbsolute = requestedPath.is_absolute();
-	if(!isAbsolute)
-	{
+	if (!isAbsolute)
 		requestedPath = std::filesystem::path{ GetGameDir() + fileName };
-	}
 
 	if (std::filesystem::exists(requestedPath))
 	{
+		auto lcFileName = TEN::Utils::ToLower(fileNameWithForwardSlashes);
+
 		if (isAbsolute)
 		{
 			for (int i = 0; i < Levels.size(); i++)
 			{
 				auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(GetGameDir() + GetLevel(i)->FileName);
 				std::replace(lcFullLevelPathFromFlow.begin(), lcFullLevelPathFromFlow.end(), '\\', '/');
-				if (lcFullLevelPathFromFlow == lcFilename)
+
+				if (lcFullLevelPathFromFlow == lcFileName)
 					return i;
 			}
 		}
@@ -352,11 +351,10 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 				auto lcLevelNameFromFlow = TEN::Utils::ToLower(GetLevel(i)->FileName);
 				std::replace(lcLevelNameFromFlow.begin(), lcLevelNameFromFlow.end(), '\\', '/');
 
-				if (lcLevelNameFromFlow == lcFilename)
+				if (lcLevelNameFromFlow == lcFileName)
 					return i;
 			}
 		}
-
 	}
 	else
 	{
