@@ -21,6 +21,9 @@ namespace TEN::Traps::TR5
 		bool IsActive		  = false;
 		bool IsLethal		  = false;
 		bool IsHeavyActivator = false;
+
+		void Initialize(const ItemInfo& item);
+		void Update(const ItemInfo& item);
 	};
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers;

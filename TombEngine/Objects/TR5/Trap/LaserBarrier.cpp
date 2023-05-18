@@ -24,41 +24,55 @@ namespace TEN::Traps::TR5
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
-	static void TranslateLaserBarrier(ItemInfo& item, LaserBarrier& barrier)
+	void LaserBarrier::Initialize(const ItemInfo& item)
 	{
-		int width = abs(item.TriggerFlags) * BLOCK(1);
-		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y + ANGLE(90.0f), width / 2);
-		auto basePos = item.Pose.Position.ToVector3();
+		constexpr auto BEAM_COUNT = 3;
 
-		// TODO: Simplify.
-		int heightOffset = item.ItemFlags[0];
-		int heightStep = heightOffset / 8;
-		int halfHeightStep = heightStep / 2;
+		Color = item.Model.Color;
+		Color.w = 0.0f;
+		Beams.resize(BEAM_COUNT);
+		IsLethal = (item.TriggerFlags > 0);
+		IsHeavyActivator = (item.TriggerFlags <= 0);
+		Update(item);
+	}
+
+	void LaserBarrier::Update(const ItemInfo& item)
+	{
+		// Calculate dimension values.
+		int halfWidth = (abs(item.TriggerFlags) * BLOCK(1)) / 2;
+		int barrierHeight = item.ItemFlags[0];
+		int beamHeight = BLOCK(0.5f);
+		int beamStepHeight = barrierHeight / Beams.size();
+
+		// Determine beam vertex base.
+		auto basePos = item.Pose.Position.ToVector3();
+		auto rotMatrix = EulerAngles(0, item.Pose.Orientation.y + ANGLE(90.0f), 0).ToRotationMatrix();
+		auto baseVertices = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
+		{
+			basePos + Vector3::Transform(Vector3(halfWidth, -beamHeight / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(-halfWidth, -beamHeight / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(-halfWidth, beamHeight / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(halfWidth, beamHeight / 2, 0.0f), rotMatrix)
+		};
 
 		// Set vertex positions.
-		heightOffset = -heightStep;
-		int i = 0;
-		for (auto& beam : barrier.Beams)
+		auto beamOffset = Vector3(0.0f, -beamHeight, 0.0f);
+		for (auto& beam : Beams)
 		{
-			int hAdd = (halfHeightStep / 2) * (i - 1);
-
 			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
 			{
-				basePos + Vector3(offset.x, heightOffset - halfHeightStep + hAdd, offset.z),
-				basePos + Vector3(-offset.x, heightOffset - halfHeightStep + hAdd, -offset.z),
-				basePos + Vector3(-offset.x, heightOffset + halfHeightStep + hAdd, -offset.z),
-				basePos + Vector3(offset.x, heightOffset + halfHeightStep + hAdd, offset.z)
+				baseVertices[0] + beamOffset,
+				baseVertices[1] + beamOffset,
+				baseVertices[2] + beamOffset,
+				baseVertices[3] + beamOffset
 			};
 
-			heightOffset -= heightStep * 3;
-			i++;
+			beamOffset.y -= beamStepHeight;
 		}
 	}
 
 	void InitializeLaserBarrier(short itemNumber)
 	{
-		constexpr auto BEAM_COUNT = 3;
-
 		auto& item = g_Level.Items[itemNumber];
 
 		// Initialize barrier height.
@@ -67,14 +81,7 @@ namespace TEN::Traps::TR5
 
 		// Initialize barrier effect.
 		auto barrier = LaserBarrier{};
-
-		barrier.Color = item.Model.Color;
-		barrier.Color.w = 0.0f;
-		barrier.Beams.resize(BEAM_COUNT);
-		barrier.IsLethal = (item.TriggerFlags > 0);
-		barrier.IsHeavyActivator = (item.TriggerFlags <= 0);
-		TranslateLaserBarrier(item, barrier);
-
+		barrier.Initialize(item);
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
@@ -123,11 +130,11 @@ namespace TEN::Traps::TR5
 		}
 			
 		barrier.IsActive = true;
+		barrier.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
 			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE);
 
-		TranslateLaserBarrier(item, barrier);
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
