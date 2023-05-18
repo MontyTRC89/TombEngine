@@ -13,6 +13,9 @@ using namespace TEN::Effects::Items;
 
 namespace TEN::Traps::TR5
 {
+	// NOTES:
+	// item.ItemFlags[0] = barrier height.
+	
 	// TODO:
 	// - Simplify overcomplicated translation function.
 	// - Randomize opacity pulses for each barrier.
@@ -23,11 +26,6 @@ namespace TEN::Traps::TR5
 
 	static void TranslateLaserBarrier(ItemInfo& item, LaserBarrier& barrier)
 	{
-		auto pointColl = GetCollision(&item);
-
-		item.Pose.Position.y = pointColl.Position.Floor;
-		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
-
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y + ANGLE(90.0f), width / 2);
 		auto basePos = item.Pose.Position.ToVector3();
@@ -63,17 +61,20 @@ namespace TEN::Traps::TR5
 
 		auto& item = g_Level.Items[itemNumber];
 
+		// Initialize barrier height.
+		auto pointColl = GetCollision(&item);
+		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
+
+		// Initialize barrier effect.
 		auto barrier = LaserBarrier{};
 
-		barrier.IsLethal = (item.TriggerFlags > 0);
-		barrier.IsHeavyActivator = (item.TriggerFlags <= 0);
-
-		int width = abs(item.TriggerFlags) * BLOCK(1);
 		barrier.Color = item.Model.Color;
 		barrier.Color.w = 0.0f;
 		barrier.Beams.resize(BEAM_COUNT);
-
+		barrier.IsLethal = (item.TriggerFlags > 0);
+		barrier.IsHeavyActivator = (item.TriggerFlags <= 0);
 		TranslateLaserBarrier(item, barrier);
+
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
