@@ -6,11 +6,11 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Ripple;
 
@@ -100,7 +100,7 @@ void ClearRats()
 	}
 }
 
-void InitialiseLittleRats(short itemNumber)
+void InitializeLittleRats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

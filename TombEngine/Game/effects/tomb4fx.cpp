@@ -16,11 +16,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -28,7 +28,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -209,14 +209,17 @@ void TriggerGlobalFireFlame()
 	spark->dSize = spark->size;
 }
 
-void TriggerPilotFlame(int itemNum, int nodeIndex)
+void TriggerPilotFlame(int itemNumber, int nodeIndex)
 {
-	auto* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	int dx = Camera.pos.x - item->Pose.Position.x;
 	int dz = Camera.pos.z - item->Pose.Position.z;
-	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+	if (dx < -BLOCK(16) || dx > BLOCK(16) ||
+		dz < -BLOCK(16) || dz > BLOCK(16))
+	{
 		return;
+	}
 
 	auto* spark = GetFreeParticle();
 
@@ -235,7 +238,7 @@ void TriggerPilotFlame(int itemNum, int nodeIndex)
 	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->extras = 0;
 	spark->dynamic = -1;
-	spark->fxObj = itemNum;
+	spark->fxObj = itemNumber;
 
 	spark->x = (GetRandomControl() & 31) - 16;
 	spark->y = (GetRandomControl() & 31) - 16;
@@ -297,7 +300,7 @@ Particle* SetupFireSpark()
 	return spark;
 }
 
-void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i speed)
+void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i vel)
 {
 	auto pos1 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset);
 
@@ -305,7 +308,7 @@ void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset + speed);
+	auto pos2 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset + vel);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
 
@@ -328,30 +331,39 @@ void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector
 	spark->on = 1;
 }
 
-void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed)
+void ThrowFire(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel)
 {
-	auto* item = &g_Level.Items[itemNum];
+	auto& item = g_Level.Items[itemNumber];
 
 	for (int i = 0; i < 3; i++)
 	{
-		auto* spark = SetupFireSpark();
-		AttachAndCreateSpark(spark, item, meshIndex, offset, speed);
+		auto& spark = *SetupFireSpark();
+		AttachAndCreateSpark(&spark, &item, meshIndex, offset, vel);
 
-		spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		spark.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color)
+void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel)
 {
-	auto* item = &g_Level.Items[itemNum];
+	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel);
+}
+
+void ThrowPoison(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, const Vector3& color)
+{
+	auto* item = &g_Level.Items[itemNumber];
 
 	for (int i = 0; i < 2; i++)
 	{
 		auto* spark = SetupPoisonSpark(color);
-		AttachAndCreateSpark(spark, item, meshIndex, offset, speed);
-
+		AttachAndCreateSpark(spark, item, meshIndex, offset, vel);
 		spark->flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
+}
+
+void ThrowPoison(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, const Vector3& color)
+{
+	ThrowPoison(itemNumber, bite.BoneID, bite.Position, vel, color);
 }
 
 void UpdateFireProgress()
@@ -952,7 +964,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->on = 1;
+		spark->on = true;
 		spark->sR = 112;
 		spark->sG = (GetRandomControl() & 0x1F) + -128;
 		spark->sB = (GetRandomControl() & 0x1F) + -128;
@@ -989,9 +1001,9 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
 		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
 
-		int wh = GetWaterHeight(x, y, z, item->RoomNumber);
-		if (wh != NO_HEIGHT)
-			SomeSparkEffect(x, wh, z, 8);
+		int waterHeight = GetWaterHeight(x, y, z, item->RoomNumber);
+		if (waterHeight != NO_HEIGHT)
+			SomeSparkEffect(x, waterHeight, z, 8);
 	}
 	else
 	{
@@ -1036,8 +1048,8 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
-	KillItem(lara->Vehicle);
+	ExplodingDeath(lara->Context.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	KillItem(lara->Context.Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
@@ -1304,7 +1316,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->flags = 2058;
 	spark->scalar = 3;
 	spark->gravity = 0;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 7) + 63;
 	spark->sSize = size >> 1;

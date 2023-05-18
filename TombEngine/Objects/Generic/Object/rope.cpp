@@ -24,7 +24,7 @@ namespace TEN::Entities::Generic
 	std::vector<ROPE_STRUCT> Ropes;
 	int RopeSwing = 0;
 
-	void InitialiseRope(short itemNumber)
+	void InitializeRope(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		short roomNumber = item->RoomNumber;
@@ -189,8 +189,8 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Animation.AnimNumber = LA_REACH_TO_ROPE_SWING;
 					laraItem->Animation.ActiveState = LS_ROPE_SWING;
-					laraInfo->Control.Rope.Frame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
-					laraInfo->Control.Rope.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
+					laraInfo->Control.Rope.Frame = GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 32 << 8;
+					laraInfo->Control.Rope.DFrame = GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 60 << 8;
 				}
 				else
 				{
@@ -198,7 +198,7 @@ namespace TEN::Entities::Generic
 					laraItem->Animation.ActiveState = LS_ROPE_IDLE;
 				}
 
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				laraItem->Animation.Velocity.y = 0;
 				laraItem->Animation.IsAirborne = false;
 
@@ -526,7 +526,7 @@ namespace TEN::Entities::Generic
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
 				Lara.Control.Rope.MaxXBackward = 0;
-				int frame = 15 * Lara.Control.Rope.MaxXForward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				int frame = 15 * Lara.Control.Rope.MaxXForward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47 << 8;
 
 				if (frame > Lara.Control.Rope.DFrame)
 				{
@@ -541,7 +541,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX < 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = 15 * Lara.Control.Rope.MaxXBackward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				Lara.Control.Rope.DFrame = 15 * Lara.Control.Rope.MaxXBackward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47 << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXBackward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -558,7 +558,7 @@ namespace TEN::Entities::Generic
 				Lara.Control.Rope.Direction = 1;
 				Lara.Control.Rope.MaxXForward = 0;
 
-				int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.Control.Rope.MaxXBackward / 18000 + 17 << 8;
+				int frame = GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXBackward / 18000 + 17 << 8;
 				if (frame < Lara.Control.Rope.DFrame)
 				{
 					Lara.Control.Rope.DFrame = frame;
@@ -572,7 +572,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX > 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.Control.Rope.MaxXForward / 18000 + 17 << 8;
+				Lara.Control.Rope.DFrame = GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXForward / 18000 + 17 << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXForward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -641,14 +641,14 @@ namespace TEN::Entities::Generic
 
 			Lara.Control.HandStatus = HandStatus::Free;
 
-			if (item->Animation.FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
+			if (item->Animation.FrameNumber - GetAnimData(*item, LA_ROPE_SWING).frameBase > 42)
 				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_1;
-			else if (item->Animation.FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
+			else if (item->Animation.FrameNumber - GetAnimData(*item, LA_ROPE_SWING).frameBase > 21)
 				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_2;
 			else
 				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_3;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = LS_REACH;
 			item->Animation.TargetState = LS_REACH;
 			Lara.Control.Rope.Ptr = -1;
@@ -712,10 +712,10 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 			{
 				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &LaraItem->Pose);
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				Lara.Control.Rope.Flag = 0;
 				++Lara.Control.Rope.Segment;
 				Lara.Control.Rope.Offset = 0;

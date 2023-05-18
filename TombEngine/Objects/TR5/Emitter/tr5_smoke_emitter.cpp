@@ -15,7 +15,7 @@
 
 using namespace TEN::Effects::Bubble;
 
-void InitialiseSmokeEmitter(short itemNumber)
+void InitializeSmokeEmitter(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

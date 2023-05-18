@@ -6,7 +6,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 
-void InitialiseSmashObject(short itemNumber)
+void InitializeSmashObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	item->Flags = 0;

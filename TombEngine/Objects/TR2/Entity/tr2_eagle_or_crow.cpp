@@ -8,13 +8,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
-	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);
+	const auto EagleBite = CreatureBiteInfo(Vector3i(15, 46, 21), 6);
+	const auto CrowBite	 = CreatureBiteInfo(Vector3i(2, 10, 60), 14);
 
 	enum EagleOrCrowState
 	{
@@ -32,22 +32,22 @@ namespace TEN::Entities::Creatures::TR2
 
 	};
 
-	void InitialiseEagle(short itemNumber)
+	void InitializeEagle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->ObjectNumber == ID_CROW)
 		{
 			item->Animation.AnimNumber = Objects[ID_CROW].animIndex + 14;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = item->Animation.TargetState = 7;
 		}
 		else
 		{
 			item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 5;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = item->Animation.TargetState = 2;
 		}
 	}
@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 8;
 
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 4;
 				item->Animation.Velocity.z = 0;
 				item->Animation.IsAirborne = true;

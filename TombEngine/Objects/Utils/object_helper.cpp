@@ -20,19 +20,20 @@ void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::s
 bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName, const std::string& requiredName)
 {
 	// Check if the object has at least 1 animation with more than 1 frame.
-	const auto& anim = g_Level.Anims[object.animIndex];
+	const auto& anim = GetAnimData(object.animIndex);
 	if ((anim.frameEnd - anim.frameBase) > 1)
 		return true;
 
 	// Use slot if loaded.
-	if (Objects[requiredObject].loaded)
+	const auto& requiredObj = Objects[requiredObject];
+	if (requiredObj.loaded)
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
-		const auto& anim = g_Level.Anims[Objects[requiredObject].animIndex];
+		const auto& anim = GetAnimData(requiredObj.animIndex);
 		if ((anim.frameEnd - anim.frameBase) > 1)
 		{
-			object.animIndex = Objects[requiredObject].animIndex;
-			object.frameBase = Objects[requiredObject].frameBase;
+			object.animIndex = requiredObj.animIndex;
+			object.frameBase = requiredObj.frameBase;
 			return true;
 		}
 		else
@@ -48,10 +49,17 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::s
 	return false;
 }
 
-void CheckIfSlotExists(int requiredObject, const std::string& baseName, const std::string& requiredName)
+bool CheckIfSlotExists(GAME_OBJECT_ID requiredObj, const std::string& baseName)
 {
-	if (!Objects[requiredObject].loaded)
-		TENLog("Slot " + requiredName + " not loaded. " + baseName + " may work incorrectly or crash.", LogLevel::Warning);
+	bool result = Objects[requiredObj].loaded;
+
+	if (!result)
+	{
+		TENLog("Slot " + GetObjectName(requiredObj) + " (" + std::to_string(requiredObj) + ") not loaded. " + 
+				baseName + " may not work.", LogLevel::Warning);
+	}
+
+	return result;
 }
 
 void InitSmashObject(ObjectInfo* object, int objectNumber)
@@ -59,7 +67,7 @@ void InitSmashObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseSmashObject;
+		object->Initialize = InitializeSmashObject;
 		object->collision = ObjectCollision;
 		object->control = SmashObjectControl;
 		object->SetupHitEffect(true);
@@ -81,6 +89,7 @@ void InitPuzzleHole(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->Initialize = InitializePuzzleHole;
 		object->collision = PuzzleHoleCollision;
 		object->control = AnimatingControl;
 		object->isPuzzleHole = true;
@@ -93,6 +102,7 @@ void InitPuzzleDone(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
+		object->Initialize = InitializePuzzleDone;
 		object->collision = PuzzleDoneCollision;
 		object->control = AnimatingControl;
 		object->SetupHitEffect(true);
@@ -104,7 +114,7 @@ void InitAnimating(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseAnimating;
+		object->Initialize = InitializeAnimating;
 		object->control = AnimatingControl;
 		object->collision = ObjectCollision;
 		object->SetupHitEffect(true);
@@ -116,7 +126,7 @@ void InitPickup(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePickup;
+		object->Initialize = InitializePickup;
 		object->collision = PickupCollision;
 		object->control = PickupControl;
 		object->isPickup = true;
@@ -129,7 +139,7 @@ void InitPickup(ObjectInfo* object, int objectNumber, std::function<ControlFunct
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePickup;
+		object->Initialize = InitializePickup;
 
 		object->collision = PickupCollision;
 		object->control = (func != nullptr) ? func : PickupControl;
@@ -157,7 +167,7 @@ void InitProjectile(ObjectInfo* object, std::function<InitFunction> func, int ob
 	object = &Objects[objectNumber];
 	if (object->loaded || noLoad)
 	{
-		object->initialise = nullptr;
+		object->Initialize = nullptr;
 		object->collision = nullptr;
 		object->control = func;
 	}
@@ -168,7 +178,7 @@ void InitSearchObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialiseSearchObject;
+		object->Initialize = InitializeSearchObject;
 		object->collision = SearchObjectCollision;
 		object->control = SearchObjectControl;
 	}
@@ -179,7 +189,7 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 	object = &Objects[objectNumber];
 	if (object->loaded)
 	{
-		object->initialise = InitialisePushableBlock;
+		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
 		object->floor = PushableBlockFloor;

@@ -13,7 +13,7 @@ namespace TEN::Entities::TR3
 		Falling = (1 << 2)
 	};
 
-	void InitialiseCorpse(short itemNumber);
+	void InitializeCorpse(short itemNumber);
 	void CorpseControl(short itemNumber);
 	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 }

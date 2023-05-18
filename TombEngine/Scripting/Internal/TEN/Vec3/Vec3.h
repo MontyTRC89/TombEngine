@@ -1,36 +1,33 @@
 #pragma once
 
-class Vector3i;
-
-namespace sol {
-	class state;
-}
-
-class Pose;
 class GameVector;
+class Pose;
+class Vector3i;
+namespace sol { class state; }
 
-class Vec3 {
+class Vec3
+{
 public:
-	int x;
-	int y;
-	int z;
+	int x = 0;
+	int y = 0;
+	int z = 0;
 
 	Vec3(int x, int y, int z);
-	Vec3(Pose const& pos);
-	Vec3(Vector3i const& pos);
+	Vec3(const Pose& pose);
+	Vec3(const Vector3i& pos);
 
 	operator Vector3i() const;
 
 	[[nodiscard]] std::string ToString() const;
 
-	void ToLength(int newLength);
-	void StoreInPHDPos(Pose& pos) const;
-	void StoreInGameVector(GameVector& vec) const;
+	void ToLength(float newLength);
+	void StoreInPose(Pose& pos) const;
+	void StoreInGameVector(GameVector& vector) const;
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 };
 
-Vec3 AddVec3s(Vec3 const& one, Vec3 const& two);
-Vec3 SubtractVec3s(Vec3 const& one, Vec3 const& two);
-Vec3 MultiplyVec3Number(Vec3 const& one, double const & two);
-Vec3 UnaryMinusVec3(Vec3 const& one);
+Vec3 AddVec3s(const Vec3& vector0, const Vec3& vector1);
+Vec3 SubtractVec3s(const Vec3& vector0, const Vec3& vector1);
+Vec3 MultiplyVec3Number(const Vec3& vector, float scale);
+Vec3 UnaryMinusVec3(const Vec3& vector);

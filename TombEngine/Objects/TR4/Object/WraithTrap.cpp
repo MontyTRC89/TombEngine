@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "WraithTrap.h"
+#include "Objects/TR4/Object/WraithTrap.h"
 
 #include "Game/animation.h"
 #include "Game/control/control.h"
@@ -10,7 +10,7 @@
 #include "Game/items.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
@@ -18,12 +18,11 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseWraithTrap(short itemNumber)
+	void InitializeWraithTrap(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + 3;
-		item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+		SetAnimation(item, 0);
 		item.ItemFlags[6] = 0;
 	}
 
@@ -42,8 +41,6 @@ namespace TEN::Entities::TR4
 				auto color = Vector3(255.0f);
 				TriggerAttackSpark(pos.ToVector3(), color);
 			}
-
-			AnimateItem(&item);
 		}
 	}
 }

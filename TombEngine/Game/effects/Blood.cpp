@@ -5,10 +5,11 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Utils/object_helper.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Floordata;
@@ -240,8 +241,11 @@ namespace TEN::Effects::Blood
 	
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
 	{
-		constexpr auto LIFE_MAX = 8.5f;
-		constexpr auto LIFE_MIN = 8.0f;
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
+			return;
+
+		constexpr auto LIFE_MAX		= 8.5f;
+		constexpr auto LIFE_MIN		= 8.0f;
 		constexpr auto SPAWN_RADIUS = BLOCK(0.25f);
 
 		auto& uwBlood = GetNewEffect(UnderwaterBloodParticles, UW_BLOOD_COUNT_MAX);

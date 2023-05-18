@@ -21,7 +21,7 @@ using namespace TEN::Effects::Environment;
 
 static short WreckingBallData[2] = { 0, 0 };
 
-void InitialiseWreckingBall(short itemNumber)
+void InitializeWreckingBall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -233,7 +233,7 @@ void WreckingBallControl(short itemNumber)
 			--item->TriggerFlags;
 		else if (!item->Animation.ActiveState)
 			item->Animation.TargetState = 1;
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		else if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 		{
 			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];

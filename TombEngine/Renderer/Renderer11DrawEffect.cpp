@@ -24,11 +24,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Quad/RenderQuad.h"
+#include "Objects/Utils/object_helper.h"
+#include "Renderer/Quad/RenderQuad.h"
 #include "Renderer/RendererSprites.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -49,24 +50,7 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
-BiteInfo EnemyBites[12] =
-{
-	{ 20, -95, 240, 13 },
-	{ 48, 0, 180, -11 },
-	{ -48, 0, 180, 14 },
-	{ -48, 5, 225, 14 },
-	{ 15, -60, 195, 13 },
-	{ -30, -65, 250, 18 },
-	{ 0, -110, 480, 13 },
-	{ -20, -80, 190, -10 },
-	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 }, // Baddy 2
-	{ 20, -60, 400, 7 },  // SAS
-	{ 0, -64, 250, 7 }	  // Troops
-};
-
-namespace TEN::Renderer
+namespace TEN::Renderer 
 {
 	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 
@@ -140,6 +124,9 @@ namespace TEN::Renderer
 		if (HelicalLasers.empty())
 			return;
 
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Helical lasers rendering"))
+			return;
+
 		for (const auto& laser : HelicalLasers)
 		{
 			if (laser.Life <= 0.0f)
@@ -186,6 +173,9 @@ namespace TEN::Renderer
 	void Renderer11::DrawElectricity(RenderView& view)
 	{
 		if (ElectricityArcs.empty())
+			return;
+
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Electricity rendering"))
 			return;
 
 		for (const auto& arc : ElectricityArcs)
@@ -378,6 +368,9 @@ namespace TEN::Renderer
 			}
 			else
 			{
+				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
+					continue;
+
 				auto pos = Vector3(particle.x, particle.y, particle.z);
 				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
 				axis.Normalize();
@@ -401,24 +394,28 @@ namespace TEN::Renderer
 		{
 			auto& splash = Splashes[i];
 
-			if (splash.isActive)
+			if (!splash.isActive)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering"))
+				return;
+
+			constexpr float alpha = 360 / NUM_POINTS;
+			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
+
+			if (!splash.isRipple) 
 			{
-				constexpr float alpha = 360 / NUM_POINTS;
-				byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
-
-				if (!splash.isRipple)
+				if (splash.heightSpeed < 0 && splash.height < 1024) 
 				{
-					if (splash.heightSpeed < 0 && splash.height < 1024)
-					{
-						float multiplier = splash.height / 1024.0f;
-						color = (float)color * multiplier;
-					}
+					float multiplier = splash.height / 1024.0f;
+					color = (float)color * multiplier;
 				}
+			}
 
-				float innerRadius = splash.innerRad;
-				float outerRadius = splash.outerRad;
-				float yInner = splash.y;
-				float yOuter = splash.y - splash.height;
+			float innerRadius = splash.innerRad;
+			float outerRadius = splash.outerRad;
+			float yInner = splash.y;
+			float yOuter = splash.y - splash.height;
 
 				for (int i = 0; i < NUM_POINTS; i++)
 				{
@@ -456,6 +453,9 @@ namespace TEN::Renderer
 		if (Bubbles.empty())
 			return;
 
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Bubbles rendering"))
+			return;
+
 		for (const auto& bubble : Bubbles)
 		{
 			if (bubble.Life <= 0.0f)
@@ -471,6 +471,9 @@ namespace TEN::Renderer
 	void Renderer11::DrawDrips(RenderView& view)
 	{
 		if (Drips.empty())
+			return;
+
+		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drips rendering"))
 			return;
 
 		for (const auto& drip : Drips)
@@ -550,163 +553,164 @@ namespace TEN::Renderer
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
-			if (shockwave->life)
+			if (!shockwave->life)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Shockwaves rendering"))
+				return;
+
+			byte color = shockwave->life * 8;
+
+			shockwave->yRot += shockwave->yRot / FPS;
+
+			auto rotMatrix =
+				Matrix::CreateRotationY(shockwave->yRot / 4) *
+				Matrix::CreateRotationZ(shockwave->zRot) *
+				Matrix::CreateRotationX(shockwave->xRot);
+
+			auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
+
+			// Inner circle
+			if (shockwave->style == (int)ShockwaveStyle::Normal)
 			{
-				byte color = shockwave->life * 8;
+				angle = PI / 32.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 8.0f;
+			}
+			else
+			{
+				angle = PI / 16.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 4.0f;
+			}
 
-				//int dl = shockwave->outerRad - shockwave->innerRad;
+			float x1 = (shockwave->innerRad * c);
+			float z1 = (shockwave->innerRad * s);
+			float x4 = (shockwave->outerRad * c);
+			float z4 = (shockwave->outerRad * s);
 
-				shockwave->yRot += shockwave->yRot / FPS;
+			auto p1 = Vector3(x1, 0, z1);
+			auto p4 = Vector3(x4, 0, z4);
 
-				auto rotMatrix =
-					Matrix::CreateRotationY(shockwave->yRot / 4) *
-					Matrix::CreateRotationZ(shockwave->zRot) *
-					Matrix::CreateRotationX(shockwave->xRot);
+			p1 = Vector3::Transform(p1, rotMatrix);
+			p4 = Vector3::Transform(p4, rotMatrix);
 
-				auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
-
-				// Inner circle
-				if (shockwave->style == (int)ShockwaveStyle::Normal)
+			if (shockwave->fadeIn == true)
+			{
+				if (shockwave->sr < shockwave->r)
 				{
-					angle = PI / 32.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 8.0f;
-				}
-				else
-				{
-					angle = PI / 16.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 4.0f;
-				}
-
-				float x1 = (shockwave->innerRad * c);
-				float z1 = (shockwave->innerRad * s);
-				float x4 = (shockwave->outerRad * c);
-				float z4 = (shockwave->outerRad * s);
-
-				auto p1 = Vector3(x1, 0, z1);
-				auto p4 = Vector3(x4, 0, z4);
-
-				p1 = Vector3::Transform(p1, rotMatrix);
-				p4 = Vector3::Transform(p4, rotMatrix);
-
-				if (shockwave->fadeIn == true)
-				{
-					if (shockwave->sr < shockwave->r)
-					{
-						shockwave->sr += shockwave->r / 18;
-						r = shockwave->sr * shockwave->life / 255.0f;
-					}
-					else
-					{
-						r = shockwave->r * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sg < shockwave->g)
-					{
-						shockwave->sg += shockwave->g / 18;
-						g = shockwave->sg * shockwave->life / 255.0f;
-					}
-					else
-					{
-						g = shockwave->g * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sb < shockwave->b)
-					{
-						shockwave->sb += shockwave->b / 18;
-						b = shockwave->sb * shockwave->life / 255.0f;
-					}
-					else
-					{
-						b = shockwave->b * shockwave->life / 255.0f;
-					}
-
-					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
-						shockwave->fadeIn = false;
-
+					shockwave->sr += shockwave->r / 18;
+					r = shockwave->sr * shockwave->life / 255.0f;
 				}
 				else
 				{
 					r = shockwave->r * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sg < shockwave->g)
+				{
+					shockwave->sg += shockwave->g / 18;
+					g = shockwave->sg * shockwave->life / 255.0f;
+				}
+				else
+				{
 					g = shockwave->g * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sb < shockwave->b)
+				{
+					shockwave->sb += shockwave->b / 18;
+					b = shockwave->sb * shockwave->life / 255.0f;
+				}
+				else
+				{
 					b = shockwave->b * shockwave->life / 255.0f;
 				}
 
-				for (int j = 0; j < 16; j++)
+				if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+					shockwave->fadeIn = false;
+
+			}
+			else
+			{
+				r = shockwave->r * shockwave->life / 255.0f;
+				g = shockwave->g * shockwave->life / 255.0f;
+				b = shockwave->b * shockwave->life / 255.0f;
+			}
+
+			for (int j = 0; j < 16; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+
+				float x2 = (shockwave->innerRad * c);
+				float z2 = (shockwave->innerRad * s);
+
+				float x3 = (shockwave->outerRad * c);
+				float z3 = (shockwave->outerRad * s);
+
+				auto p2 = Vector3(x2, 0, z2);
+				auto p3 = Vector3(x3, 0, z3);
+
+				p2 = Vector3::Transform(p2, rotMatrix);
+				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
-					c = cos(angle);
-					s = sin(angle);
+					angle -= PI / 8.0f;
 
-					float x2 = (shockwave->innerRad * c);
-					float z2 = (shockwave->innerRad * s);
-
-					float x3 = (shockwave->outerRad * c);
-					float z3 = (shockwave->outerRad * s);
-
-					auto p2 = Vector3(x2, 0, z2);
-					auto p3 = Vector3(x3, 0, z3);
-
-					p2 = Vector3::Transform(p2, rotMatrix);
-					p3 = Vector3::Transform(p3, rotMatrix);
-
-					if (shockwave->style == (int)ShockwaveStyle::Normal)
-					{
-						angle -= PI / 8.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Knockback)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p4,
-							pos + p3,
-							pos + p2,
-							pos + p1,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-					}
-
-					p1 = p2;
-					p4 = p3;
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
 				}
+				else if (shockwave->style == (int)ShockwaveStyle::Sophia)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+				}
+				else if (shockwave->style == (int)ShockwaveStyle::Knockback)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p4,
+						pos + p3,
+						pos + p2,
+						pos + p1,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+				}
+
+				p1 = p2;
+				p4 = p3;
 			}
 		}
 	}
@@ -721,6 +725,10 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater dust rendering"))
+					return;
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -731,6 +739,10 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Snow:
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering"))
+					return;
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -741,6 +753,10 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Rain:
+
+				if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering"))
+					return;
+
 				Vector3 v;
 				p.Velocity.Normalize(v);
 
@@ -812,7 +828,6 @@ namespace TEN::Renderer
 				zOffset = 92;
 				rotationX = -14560;
 				break;
-
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
@@ -897,52 +912,33 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto* room : view.roomsToDraw)
 		{
-			for (auto item : room->ItemsToDraw)
+			for (auto* item : room->ItemsToDraw)
 			{
 				// Does the item need gunflash?
-				ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-				ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
+				auto* nativeItem = &g_Level.Items[item->ItemNumber];
+				auto* obj = &Objects[nativeItem->ObjectNumber];
 
-				if (obj->biteOffset == -1)
+				if (!nativeItem->IsCreature())
 					continue;
-
-				if (nativeItem->Data.is<CreatureInfo>())
-				{
-					auto* creature = GetCreatureInfo(nativeItem);
-					if (!creature->FiredWeapon)
-						continue;
-				}
-				else
-					continue;
-
-				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
-				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+				auto* creature = GetCreatureInfo(nativeItem);
+				auto const& room_item = m_rooms[nativeItem->RoomNumber];
 
 				m_stStatic.Color = Vector4::One;
-				m_stStatic.AmbientLight = room.AmbientLight;
+				m_stStatic.AmbientLight = room_item.AmbientLight;
 				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
-				 
-				SetBlendMode(BLENDMODE_ADDITIVE);
 
+				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+				SetBlendMode(BLENDMODE_ADDITIVE);
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				BiteInfo* bites[2] = {
-					&EnemyBites[obj->biteOffset],
-					&EnemyBites[obj->biteOffset + 1]
-				};
-
-				int numBites = (bites[0]->meshNum < 0) + 1;
-
-				for (int k = 0; k < numBites; k++)
+				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
 				{
-					int joint = abs(bites[k]->meshNum);
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
 
-					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
-
-					for (auto& flashBucket : flashMesh->Buckets)
+					for (RendererBucket& flashBucket : flashMoveable->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
@@ -952,19 +948,53 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(bites[k]->Position);
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[0].Bite.Position.ToVector3());
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[joint] * item->World;
-						world = rotationX * world;
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[0].Bite.BoneID] * item->World;
 						world = offset * world;
-						world = rotationZ * world;
+						if (creature->MuzzleFlash[0].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[0].ApplyZRotation)
+							world = rotationZ * world;
 
 						m_stStatic.World = world;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+					}
+				}
 
+				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
+				{
+					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
+					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
+					for (RendererBucket& flashBucket : flashMoveable->Buckets)
+					{
+						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+							continue;
+						if (flashBucket.Polygons.size() == 0)
+							continue;
+
+						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[1].Bite.Position.ToVector3());
+						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+
+						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[1].Bite.BoneID] * item->World;
+						world = offset * world;
+						if (creature->MuzzleFlash[1].ApplyXRotation)
+							world = rotationX * world;
+						if (creature->MuzzleFlash[1].ApplyZRotation)
+							world = rotationZ * world;
+
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
@@ -1481,6 +1511,9 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
+			if (!CheckIfSlotExists(ID_SMOKE_SPRITES, "Smoke rendering"))
+				return;
+
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
 				smoke.position,
@@ -1499,6 +1532,10 @@ namespace TEN::Renderer
 		{
 			SparkParticle& s = SparkParticles[i];
 			if (!s.active) continue;
+
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering"))
+				return;
+
 			Vector3 v;
 			s.velocity.Normalize(v);
 
@@ -1520,6 +1557,9 @@ namespace TEN::Renderer
 			if (!explosion.active)
 				continue;
 
+			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering"))
+				return;
+
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + explosion.sprite],
 				explosion.pos,
@@ -1534,6 +1574,9 @@ namespace TEN::Renderer
 		for (const auto& particle : simpleParticles)
 		{
 			if (!particle.active)
+				continue;
+
+			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
 				continue;
 
 			AddSpriteBillboard(

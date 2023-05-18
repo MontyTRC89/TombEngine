@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -17,12 +18,11 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -144,10 +144,10 @@ bool ItemInfo::IsCreature() const
 
 void ItemInfo::ResetModelToDefault()
 {
-	this->Model.BaseMesh = Objects[this->ObjectNumber].meshIndex;
+	Model.BaseMesh = Objects[ObjectNumber].meshIndex;
 
-	for (int i = 0; i < this->Model.MeshIndex.size(); i++)
-		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
+		Model.MeshIndex[i] = Model.BaseMesh + i;
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -196,7 +196,9 @@ void KillItem(short const itemNumber)
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
+		{
 			NextItemActive = item->NextActive;
+		}
 		else
 		{
 			short linkNumber;
@@ -213,7 +215,9 @@ void KillItem(short const itemNumber)
 		if (item->RoomNumber != NO_ROOM)
 		{
 			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
+			{
 				g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
+			}
 			else
 			{
 				short linkNumber;
@@ -229,7 +233,7 @@ void KillItem(short const itemNumber)
 		}
 
 		if (item == Lara.TargetEntity)
-			Lara.TargetEntity = NULL;
+			Lara.TargetEntity = nullptr;
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
@@ -242,7 +246,9 @@ void KillItem(short const itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
+		{
 			item->Flags |= IFLAG_KILLED;
+		}
 	}
 }
 
@@ -422,7 +428,7 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitialiseFXArray(int allocateMemory)
+void InitializeFXArray(int allocateMemory)
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
@@ -482,19 +488,13 @@ void RemoveActiveItem(short itemNumber, bool killed)
 	}
 }
 
-void InitialiseItem(short itemNumber) 
+void InitializeItem(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-
+	SetAnimation(item, 0);
 	item->Animation.RequiredState = NO_STATE;
-	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-
-	item->Animation.Velocity.y = 0;
-	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity = Vector3::Zero;
 
 	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
 		item->ItemFlags[i] = 0;
@@ -516,7 +516,9 @@ void InitialiseItem(short itemNumber)
 		item->MeshBits = 1;
 	}
 	else
+	{
 		item->MeshBits = ALL_JOINT_BITS;
+	}
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
@@ -527,7 +529,9 @@ void InitialiseItem(short itemNumber)
 		item->Status = ITEM_INVISIBLE;
 	}
 	else if (Objects[item->ObjectNumber].intelligent)
+	{
 		item->Status = ITEM_INVISIBLE;
+	}
 
 	if ((item->Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
 	{
@@ -560,8 +564,8 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.clear();
 	}
 
-	if (Objects[item->ObjectNumber].initialise != nullptr)
-		Objects[item->ObjectNumber].initialise(itemNumber);
+	if (Objects[item->ObjectNumber].Initialize != nullptr)
+		Objects[item->ObjectNumber].Initialize(itemNumber);
 }
 
 short CreateItem()
@@ -576,7 +580,7 @@ short CreateItem()
 	return itemNumber;
 }
 
-void InitialiseItemArray(int totalItem)
+void InitializeItemArray(int totalItem)
 {
 	g_Level.Items.clear();
 	g_Level.Items.resize(totalItem);
@@ -612,7 +616,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		spawn->RoomNumber = item->RoomNumber;
 		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
 		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);

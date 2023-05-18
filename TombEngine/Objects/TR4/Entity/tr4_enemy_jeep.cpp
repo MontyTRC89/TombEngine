@@ -12,10 +12,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			InitialiseItem(grenadeItemNumber);
+			InitializeItem(grenadeItemNumber);
 
 			grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
 			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
@@ -62,7 +62,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseEnemyJeep(short itemNumber)
+	void InitializeEnemyJeep(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -212,7 +212,7 @@ namespace TEN::Entities::TR4
 				if (height4 > (item->Floor + CLICK(2)) && item->Animation.ActiveState != 5)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = 5;
 					item->Animation.TargetState = 1;
 					item->ItemFlags[1] = 0;
@@ -253,7 +253,7 @@ namespace TEN::Entities::TR4
 				if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.TargetState = 2;
 					item->Animation.ActiveState = 2;
 

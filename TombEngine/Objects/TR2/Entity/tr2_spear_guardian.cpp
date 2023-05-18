@@ -9,10 +9,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -34,8 +34,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
 
-	const auto SpearGuardianBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
-	const auto SpearGuardianBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
+	const auto SpearGuardianBiteLeft  = CreatureBiteInfo(Vector3i(0, 0, 920), 11);
+	const auto SpearGuardianBiteRight = CreatureBiteInfo(Vector3i(0, 0, 920), 18);
 
 	enum SpearGuardianState
 	{
@@ -108,7 +108,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		if (!(creature.Flags & 1) && item.TouchBits.Test(SpearGuardianBiteRight.meshNum))
+		if (!(creature.Flags & 1) && item.TouchBits.Test(SpearGuardianBiteRight.BoneID))
 		{
 			DoDamage(creature.Enemy, damage);
 			CreatureEffect(&item, SpearGuardianBiteRight, DoBloodSplat);
@@ -116,7 +116,7 @@ namespace TEN::Entities::Creatures::TR2
 			SoundEffect(SFX_TR2_CRUNCH2, &item.Pose);
 		}
 
-		if (!(creature.Flags & 2) && item.TouchBits.Test(SpearGuardianBiteLeft.meshNum))
+		if (!(creature.Flags & 2) && item.TouchBits.Test(SpearGuardianBiteLeft.BoneID))
 		{
 			DoDamage(creature.Enemy, damage);
 			CreatureEffect(&item, SpearGuardianBiteLeft, DoBloodSplat);
@@ -188,11 +188,11 @@ namespace TEN::Entities::Creatures::TR2
 		return false;
 	}
 
-	void InitialiseSpearGuardian(short itemNumber)
+	void InitializeSpearGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SPEAR_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 

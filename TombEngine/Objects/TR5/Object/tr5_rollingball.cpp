@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "tr5_rollingball.h"
-#include "Game/collision/sphere.h"
+#include "Objects/TR5/Object/tr5_rollingball.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/setup.h"
-#include "Sound/sound.h"
-#include "Game/effects/effects.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
-#include "Game/items.h"
-#include "Game/collision/collide_item.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
@@ -484,16 +485,16 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState; 
-			item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.ActiveState = GetAnimData(item).ActiveState; 
+			item->Animation.TargetState = GetAnimData(item).ActiveState;
 			item->Animation.RequiredState = NO_STATE;
 			RemoveActiveItem(itemNum);
 		}
 	}
 }
 
-void InitialiseClassicRollingBall(short itemNum)
+void InitializeClassicRollingBall(short itemNum)
 {
 	ItemInfo *item;
 	GameVector* old;

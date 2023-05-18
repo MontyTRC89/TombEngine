@@ -68,7 +68,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseLocust(short itemNumber)
+	void InitializeLocust(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

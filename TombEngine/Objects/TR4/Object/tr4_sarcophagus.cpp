@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "tr4_sarcophagus.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
+#include "Objects/TR4/Object/tr4_sarcophagus.h"
+
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/items.h"
 #include "Game/pickup/pickup.h"
-#include "Specific/setup.h"
-#include "Game/Hud/Hud.h"
-#include "Game/collision/collide_item.h"
+#include "Game/Setup.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -36,7 +36,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		sarcItem->Status != ITEM_ACTIVE ||
-		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 	{
 		if (TestLaraPosition(SarcophagusBounds, sarcItem, laraItem))
 		{
@@ -44,22 +44,22 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				sarcItem->Flags |= IFLAG_ACTIVATION_MASK;
 
 				AddActiveItem(itemNumber);
 				sarcItem->Status = ITEM_ACTIVE;
 
 				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
+				ResetPlayerFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-				laraInfo->InteractedItem = itemNumber;
+				laraInfo->Context.InteractedItem = itemNumber;
 		}
 		else if (laraInfo->Control.IsMoving)
 		{
-			if (laraInfo->InteractedItem == itemNumber)
+			if (laraInfo->Context.InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;
@@ -67,7 +67,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		}
 	}
 	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-			 laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+			 laraItem->Animation.FrameNumber != GetAnimData(*laraItem, LA_PICKUP_SARCOPHAGUS).frameBase + 113)
 	{
 		ObjectCollision(itemNumber, laraItem, coll);
 	}

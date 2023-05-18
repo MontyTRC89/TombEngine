@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseVonCroy(short itemNumber);
+	void InitializeVonCroy(short itemNumber);
 	void VonCroyControl(short itemNumber);
 }

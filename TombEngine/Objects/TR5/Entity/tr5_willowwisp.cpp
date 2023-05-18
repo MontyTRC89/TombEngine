@@ -3,8 +3,8 @@
 
 #include "Game/control/box.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -13,11 +13,11 @@ namespace TEN::Entities::Creatures::TR5
 		WWISP_STATE_UNK = 1
 	};
 
-	void InitialiseLightingGuide(short itemNumber)
+	void InitializeLightingGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 }

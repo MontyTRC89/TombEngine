@@ -7,9 +7,9 @@
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Random.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 #include "ScriptInterfaceLevel.h"
 

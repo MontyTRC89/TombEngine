@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseBat(short itemNumber);
+	void InitializeBat(short itemNumber);
 	void BatControl(short itemNumber);
 }
