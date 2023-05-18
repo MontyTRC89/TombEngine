@@ -13,13 +13,12 @@ using namespace TEN::Effects::Items;
 
 namespace TEN::Traps::TR5
 {
-	// NOTES:
-	// - Negative OCB gives not lethal and activates a heavy trigger, positive OCB lethal.
-	// - OCB value defines the width in blocks.
+	// TODO:
+	// - Simplify over-complicated translation function.
+	// - Randomize opacity pulse for each barrier.
 
 	extern std::unordered_map<int, LaserBarrier> LaserBarriers = {};
 
-	// TODO: Simplify.
 	void InitializeLaserBarrier(short itemNumber)
 	{
 		constexpr auto BEAM_COUNT = 3; // TODO: Make beam counts an attribute.
@@ -28,15 +27,12 @@ namespace TEN::Traps::TR5
 
 		auto barrier = LaserBarrier{};
 
-		if (item.TriggerFlags > 0)
-		{
-			barrier.IsLethal = true;
-		}
+		barrier.IsLethal = (item.TriggerFlags > 0);
+		barrier.IsHeavyActivator = (item.TriggerFlags <= 0);
 
 		int width = abs(item.TriggerFlags) * BLOCK(1);
 		barrier.Color = item.Model.Color;
 		barrier.Color.w = 0.0f;
-	
 		barrier.Beams.resize(BEAM_COUNT);
 
 		CalculateLaserBarrierVertex(&item, &barrier);
@@ -44,7 +40,7 @@ namespace TEN::Traps::TR5
 		LaserBarriers.insert({ itemNumber, barrier });
 	}
 
-	// TODO: Make it a line of light.
+	// TODO: Make it a line of light once engine allows it. -- Sezz 2023.05.11
 	static void SpawnLaserBarrierLight(const ItemInfo& item, float intensity, float amplitude)
 	{
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
@@ -130,6 +126,7 @@ namespace TEN::Traps::TR5
 		if (barrier.Color.w < 1.0f)
 			barrier.Color.w += 0.02f;
 
+		// TODO: Weird.
 		if (item.Model.Color.w > 8.0f)
 		{
 			barrier.Color.w = 0.8f;
@@ -179,14 +176,13 @@ namespace TEN::Traps::TR5
 		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
 		if (barrier.BoundingBox.Intersects(playerBox))
 		{
-			if (barrier.IsLethal == true &&
+			if (barrier.IsLethal &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
 				ItemRedLaserBurn(playerItem, 2.0f * FPS);
 				DoDamage(playerItem, MAXINT);
 			}
-
-			if (barrier.IsLethal == false)
+			else if (barrier.IsHeavyActivator)
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
