@@ -28,31 +28,31 @@ namespace TEN::Traps::TR5
 		item.Pose.Position.y = pointColl.Position.Floor;
 		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
 
-		int height = item.ItemFlags[0];
-		int yAdd = height / 8;
 		int width = abs(item.TriggerFlags) * BLOCK(1);
-		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y, width / 2);
-
-		int lH = yAdd / 2;
-		height = -yAdd;
-
+		auto offset = Geometry::TranslatePoint(Vector3::Zero, item.Pose.Orientation.y + ANGLE(90.0f), width / 2);
 		auto basePos = item.Pose.Position.ToVector3();
 
+		// TODO: Simplify.
+		int heightOffset = item.ItemFlags[0];
+		int heightStep = heightOffset / 8;
+		int halfHeightStep = heightStep / 2;
+
 		// Set vertex positions.
+		heightOffset = -heightStep;
 		int i = 0;
 		for (auto& beam : barrier.Beams)
 		{
-			int hAdd = (lH / 2) * (i - 1);
+			int hAdd = (halfHeightStep / 2) * (i - 1);
 
 			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
 			{
-				basePos + Vector3(offset.x, height - lH + hAdd, offset.z),
-				basePos + Vector3(-offset.x, height - lH + hAdd, -offset.z),
-				basePos + Vector3(-offset.x, height + lH + hAdd, -offset.z),
-				basePos + Vector3(offset.x, height + lH + hAdd, offset.z)
+				basePos + Vector3(offset.x, heightOffset - halfHeightStep + hAdd, offset.z),
+				basePos + Vector3(-offset.x, heightOffset - halfHeightStep + hAdd, -offset.z),
+				basePos + Vector3(-offset.x, heightOffset + halfHeightStep + hAdd, -offset.z),
+				basePos + Vector3(offset.x, heightOffset + halfHeightStep + hAdd, offset.z)
 			};
 
-			height -= yAdd * 3;
+			heightOffset -= heightStep * 3;
 			i++;
 		}
 	}
