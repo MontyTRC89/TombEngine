@@ -16,7 +16,7 @@ Version 1.0.9
 * Add TR3 claw mutant.
 * Add TR5 lasers
 	- Choose colour for the lasers via tint menu.
-	- Laser OCB means width of the laser.
+	- Laser OCB means width of the laser in sectors.
 	- Negative OCB laser will trigger heavy trigger.
 	- Positive OCB kills lara.
 * Add removable puzzles from puzzle holes and puzzle dones.
