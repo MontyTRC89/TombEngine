@@ -81,9 +81,6 @@ namespace TEN::Renderer
 		{
 			for (const auto& beam : barrier.Beams)
 			{
-				if (!barrier.IsActive)
-					return;
-
 				AddColoredQuad(
 					beam.VertexPoints[0], beam.VertexPoints[1],
 					beam.VertexPoints[2], beam.VertexPoints[3],
