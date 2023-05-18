@@ -1,4 +1,7 @@
 #pragma once
+#include "Math//Math.h"
+
+using namespace TEN::Math;
 
 struct CollisionInfo;
 struct ItemInfo;
@@ -8,6 +11,7 @@ namespace TEN::Traps::TR5
 	struct LaserBarrierBeam
 	{
 		static constexpr auto VERTEX_COUNT = 4;
+		static constexpr auto HEIGHT	   = BLOCK(0.4f);
 
 		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
 	};

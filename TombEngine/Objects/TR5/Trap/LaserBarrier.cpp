@@ -25,11 +25,12 @@ namespace TEN::Traps::TR5
 
 	void LaserBarrier::Initialize(const ItemInfo& item)
 	{
-		constexpr auto BEAM_COUNT = 3;
+		float barrierHeight = item.ItemFlags[0];
+		int beamCount = std::max((int)floor((barrierHeight / 2) / LaserBarrierBeam::HEIGHT), 1);
 
 		Color = item.Model.Color;
 		Color.w = 0.0f;
-		Beams.resize(BEAM_COUNT);
+		Beams.resize(beamCount);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
 		Update(item);
@@ -38,33 +39,29 @@ namespace TEN::Traps::TR5
 	void LaserBarrier::Update(const ItemInfo& item)
 	{
 		// Calculate dimension values.
-		int halfWidth = (abs(item.TriggerFlags) * BLOCK(1)) / 2;
-		int barrierHeight = item.ItemFlags[0];
-		int beamHeight = BLOCK(0.5f);
-		int beamStepHeight = barrierHeight / Beams.size();
+		float barrierHalfWidth = (abs(item.TriggerFlags) * BLOCK(1)) / 2;
+		float barrierHeight = item.ItemFlags[0];
+		float beamStepHeight = barrierHeight / Beams.size();
 
 		// Determine beam vertex base.
 		auto basePos = item.Pose.Position.ToVector3();
 		auto rotMatrix = EulerAngles(0, item.Pose.Orientation.y + ANGLE(90.0f), 0).ToRotationMatrix();
 		auto baseVertices = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
 		{
-			basePos + Vector3::Transform(Vector3(halfWidth, -beamHeight / 2, 0.0f), rotMatrix),
-			basePos + Vector3::Transform(Vector3(-halfWidth, -beamHeight / 2, 0.0f), rotMatrix),
-			basePos + Vector3::Transform(Vector3(-halfWidth, beamHeight / 2, 0.0f), rotMatrix),
-			basePos + Vector3::Transform(Vector3(halfWidth, beamHeight / 2, 0.0f), rotMatrix)
+			basePos + Vector3::Transform(Vector3(barrierHalfWidth, -LaserBarrierBeam::HEIGHT / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(-barrierHalfWidth, -LaserBarrierBeam::HEIGHT / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(-barrierHalfWidth, LaserBarrierBeam::HEIGHT / 2, 0.0f), rotMatrix),
+			basePos + Vector3::Transform(Vector3(barrierHalfWidth, LaserBarrierBeam::HEIGHT / 2, 0.0f), rotMatrix)
 		};
 
 		// Set vertex positions.
-		auto beamOffset = Vector3(0.0f, -beamHeight, 0.0f);
+		auto beamOffset = Vector3(0.0f, -LaserBarrierBeam::HEIGHT, 0.0f);
 		for (auto& beam : Beams)
 		{
-			beam.VertexPoints = std::array<Vector3, LaserBarrierBeam::VERTEX_COUNT>
-			{
-				baseVertices[0] + beamOffset,
-				baseVertices[1] + beamOffset,
-				baseVertices[2] + beamOffset,
-				baseVertices[3] + beamOffset
-			};
+			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
+
+			for (int i = 0; i < beam.VertexPoints.size(); i++)
+				beam.VertexPoints[i] = baseVertices[i] + beamOffset;
 
 			beamOffset.y -= beamStepHeight;
 		}
@@ -75,14 +72,12 @@ namespace TEN::Traps::TR5
 		auto point2 = Beams.front().VertexPoints[2];
 		auto point3 = Beams.front().VertexPoints[3];
 
-		// Update bounding box center.
+		// Update bounding box.
 		BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
-
-		// Calculate and update bounding box extents.
-		float halfWidth = std::abs(point0.x - point1.x) / 2;
-		float halfHeight = std::abs(point0.y - point2.y) / 2;
-		float halfDepth = std::abs(point0.z - point2.z) / 2;
-		BoundingBox.Extents = Vector3(halfWidth, halfHeight, halfDepth);
+		BoundingBox.Extents = Vector3(
+			std::abs(point0.x - point1.x) / 2,
+			std::abs(point0.y - point2.y) / 2,
+			std::abs(point0.z - point2.z) / 2);
 	}
 
 	void InitializeLaserBarrier(short itemNumber)
@@ -91,7 +86,8 @@ namespace TEN::Traps::TR5
 
 		// Initialize barrier height.
 		auto pointColl = GetCollision(&item);
-		item.ItemFlags[0] = item.Pose.Position.y - pointColl.Position.Ceiling;
+		float barrierHeight = item.Pose.Position.y - pointColl.Position.Ceiling;
+		item.ItemFlags[0] = barrierHeight;
 
 		// Initialize barrier effect.
 		auto barrier = LaserBarrier{};
