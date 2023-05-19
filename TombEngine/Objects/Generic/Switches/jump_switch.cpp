@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			(laraItem->Status || laraItem->Animation.IsAirborne) &&
 			laraItem->Animation.Velocity.y > 0 &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
-			switchItem->Animation.ActiveState == SWITCH_OFF)
+			!switchItem->Animation.ActiveState)
 		{
 			if (TestLaraPosition(JumpSwitchBounds, switchItem, laraItem))
 			{
@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;
 				laraItem->Animation.Velocity.y = 0;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.IsAirborne = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				switchItem->Animation.TargetState = SWITCH_ON;

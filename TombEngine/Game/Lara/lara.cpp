@@ -179,7 +179,11 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_tightrope_fall,//122
 	lara_as_tightrope_fall,//123
 	lara_as_null,//124
+#ifdef NEW_TIGHTROPE
 	lara_as_tightrope_dismount,//125
+#else // !NEW_TIGHTROPE
+	lara_as_null,//125
+#endif
 	lara_as_switch_on,//126
 	lara_as_null,//127
 	lara_as_horizontal_bar_swing,//128

@@ -182,8 +182,8 @@ int SwitchTrigger(short itemNumber, short timer)
 	// Handle switches.
 	if (item.Status == ITEM_DEACTIVATED)
 	{
-		if (((item.Animation.ActiveState == SWITCH_OFF && item.ObjectNumber != ID_JUMP_SWITCH) ||
-			 (item.Animation.ActiveState == SWITCH_ON && item.ObjectNumber == ID_JUMP_SWITCH)) &&
+		if (((item.Animation.ActiveState == 0 && item.ObjectNumber != ID_JUMP_SWITCH) ||
+				(item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH)) &&
 			timer > 0)
 		{
 			item.Timer = timer;
@@ -195,7 +195,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			return 1;
 		}
 	
-		if (item.TriggerFlags >= 0 || item.Animation.ActiveState != SWITCH_OFF)
+		if (item.TriggerFlags >= 0 || item.Animation.ActiveState != 0)
 		{
 			RemoveActiveItem(itemNumber);
 
@@ -211,7 +211,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			return 1;
 		}
 	}
-	else if (item.Status != ITEM_NOT_ACTIVE)
+	else if (item.Status != 0)
 	{
 		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
 			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&

@@ -153,7 +153,7 @@ void VentilatorControl(short itemNumber)
 		if (item->Animation.ActiveState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				return;
 		}
 		else
@@ -162,7 +162,7 @@ void VentilatorControl(short itemNumber)
 
 	int speed = 0;
 	if (item->Animation.ActiveState == 1)
-		speed = GetAnimData(item).frameEnd - item->Animation.FrameNumber;
+		speed = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
 	else
 		speed = 128;
 

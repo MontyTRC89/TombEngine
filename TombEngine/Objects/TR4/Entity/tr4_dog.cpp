@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

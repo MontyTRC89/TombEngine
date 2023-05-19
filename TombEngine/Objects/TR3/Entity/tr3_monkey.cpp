@@ -347,7 +347,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
-					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
+					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
 				{
 					if (creature->Enemy->RoomNumber == NO_ROOM ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
@@ -382,7 +382,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH &&
-					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
+					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
 				{
 					item->AIBits = 0;
 

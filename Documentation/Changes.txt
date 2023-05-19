@@ -14,11 +14,6 @@ Version 1.0.9
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
-* Add TR5 lasers
-	- Choose colour for the lasers via tint menu.
-	- Laser OCB means width of the laser in sectors.
-	- Negative OCB laser will trigger heavy trigger.
-	- Positive OCB kills Lara.
 * Add removable puzzles from puzzle holes and puzzle dones.
 	- Employed by setting the trigger type as "Switch" for either puzzle hole or puzzle done.
 	- Can be mixed with puzzle done and puzzle holes of the same or different type.
@@ -33,8 +28,8 @@ Version 1.0.9
 * Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
 
 Lua API changes:
-* Add Vec2 class.
-* Add function String::SetTranslated()
+* Add class Vec2
+* Add function String::SetTranslated() 
 * Add function Misc::IsStringDisplaying()
 * Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART

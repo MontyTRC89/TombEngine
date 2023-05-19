@@ -814,7 +814,7 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return (m_item->Animation.FrameNumber - GetAnimData(*m_item).frameBase);
+	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
 Vec3 Moveable::GetVelocity() const
@@ -835,15 +835,15 @@ void Moveable::SetVelocity(Vec3 velocity)
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
-	const auto& anim = GetAnimData(*m_item);
-
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
+	auto frameCount = fEnd - fBase;
 	
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
 	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
 	{
-		m_item->Animation.FrameNumber = frameNumber + anim.frameBase;
+		m_item->Animation.FrameNumber = frameNumber + fBase;
 	}
 	else
 	{
@@ -1168,19 +1168,18 @@ bool Moveable::MeshExists(int index) const
 	return true;
 }
 
-// Attach camera and camera target to object mesh.
+//Attach camera and camera target to a mesh of an object.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
 	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
 		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
 }
 
-// Borrow animtaion and state ID from object.
-void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
+//Borrow an animtaion and state id from an object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
 {
-	m_item->Animation.AnimObjectID = objectID;
-	m_item->Animation.AnimNumber = Objects[objectID].animIndex + animNumber;
+	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
 	m_item->Animation.ActiveState = stateID;
-	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
+	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 	AnimateItem(m_item);
 }

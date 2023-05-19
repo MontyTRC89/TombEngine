@@ -126,7 +126,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		if (laraItem.Animation.AnimNumber == LA_STAND_IDLE)
 		{
 			laraItem.Animation.AnimNumber = LA_DISCARD_FLARE;
-			flareFrame = armFrame + GetAnimData(laraItem).frameBase;
+			flareFrame = armFrame + g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 			laraItem.Animation.FrameNumber = flareFrame;
 			player.Flare.Frame = flareFrame;
 		}
@@ -135,7 +135,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		{
 			player.Flare.ControlLeft = false;
 
-			if (flareFrame >= (GetAnimData(laraItem).frameBase + 31)) // 31 = Last frame.
+			if (flareFrame >= (g_Level.Anims[laraItem.Animation.AnimNumber].frameBase + 31)) // 31 = Last frame.
 			{
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 				player.Control.Weapon.GunType = player.Control.Weapon.LastGunType;
@@ -146,8 +146,8 @@ void UndrawFlare(ItemInfo& laraItem)
 				player.TargetEntity = nullptr;
 				player.LeftArm.Locked =
 				player.RightArm.Locked = false;
-				SetAnimation(laraItem, LA_STAND_IDLE);
-				player.Flare.Frame = GetAnimData(laraItem).frameBase;
+				SetAnimation(&laraItem, LA_STAND_IDLE);
+				player.Flare.Frame = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 				return;
 			}
 
@@ -281,27 +281,27 @@ void DrawFlare(ItemInfo& laraItem)
 void SetFlareArm(ItemInfo& laraItem, int armFrame)
 {
 	auto& player = *GetLaraInfo(&laraItem);
-	int flareAnimNumber = Objects[ID_FLARE_ANIM].animIndex;
+	int flareAnimNum = Objects[ID_FLARE_ANIM].animIndex;
 
 	if (armFrame >= 95)
 	{
-		flareAnimNumber += 4;
+		flareAnimNum += 4;
 	}
 	else if (armFrame >= 72)
 	{
-		flareAnimNumber += 3;
+		flareAnimNum += 3;
 	}
 	else if (armFrame >= 33)
 	{
-		flareAnimNumber += 2;
+		flareAnimNum += 2;
 	}
 	else if (armFrame >= 1)
 	{
-		flareAnimNumber += 1;
+		flareAnimNum += 1;
 	}
 
-	player.LeftArm.AnimNumber = flareAnimNumber;
-	player.LeftArm.FrameBase = GetAnimData(flareAnimNumber).FramePtr;
+	player.LeftArm.AnimNumber = flareAnimNum;
+	player.LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
 void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)

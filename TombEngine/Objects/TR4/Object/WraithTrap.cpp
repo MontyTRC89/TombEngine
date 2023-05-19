@@ -22,7 +22,8 @@ namespace TEN::Entities::TR4
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(item, 0);
+		item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex;
+		item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 		item.ItemFlags[6] = 0;
 	}
 

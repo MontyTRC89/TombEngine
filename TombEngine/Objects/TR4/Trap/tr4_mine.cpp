@@ -97,7 +97,7 @@ namespace TEN::Entities::TR4
 		if (mineItem->TriggerFlags && !mineItem->ItemFlags[3])
 		{
 			if (laraItem->Animation.AnimNumber != LA_DETONATOR_USE ||
-				laraItem->Animation.FrameNumber < GetAnimData(laraItem).frameBase + 57)
+				laraItem->Animation.FrameNumber < g_Level.Anims[laraItem->Animation.AnimNumber].frameBase + 57)
 			{
 				if (TestBoundsCollide(mineItem, laraItem, 512))
 				{
@@ -111,7 +111,7 @@ namespace TEN::Entities::TR4
 					KillItem(itemNumber);
 
 					laraItem->Animation.AnimNumber = LA_MINE_DEATH;
-					laraItem->Animation.FrameNumber = GetAnimData(*mineItem).frameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[mineItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.ActiveState = LS_DEATH;
 					laraItem->Animation.Velocity.z = 0;
 

@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR5
 				case HEAVY_GUARD_STATE_FALL_START:
 				{
 					int frame = item.Animation.FrameNumber;
-					int frameStart = GetAnimData(item).frameBase;
+					int frameStart = g_Level.Anims[item.Animation.AnimNumber].frameBase;
 
 					if (frame == GetFrameIndex(&item, 48) || frame == GetFrameIndex(&item, 15))
 					{
@@ -406,7 +406,7 @@ namespace TEN::Entities::Creatures::TR5
 			case HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT:
 				headOrient.y = laraAI.angle;
 
-				if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
 				{
 					if (item.Animation.ActiveState == HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT)
 						FireHeavyGuardRaygun(item, false, false);

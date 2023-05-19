@@ -263,7 +263,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.ActiveState == BABOON_STATE_WALK)
 			{
-				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					BaboonRespawnFunction(itemNumber);
 			}
 			else if (item->Animation.ActiveState != BABOON_ACTIVATE_SWITCH)
@@ -486,7 +486,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				item->HitPoints = NOT_TARGETABLE;
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 212)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
 				{
 					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))

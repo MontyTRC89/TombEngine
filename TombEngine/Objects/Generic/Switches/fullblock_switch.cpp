@@ -44,7 +44,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||
 			switchItem->Status ||
-			switchItem->Flags & ONESHOT ||
+			switchItem->Flags & 0x100 ||
 			CurrentSequence >= 3) &&
 			(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem !=itemNumber))
 		{
@@ -64,7 +64,7 @@ namespace TEN::Entities::Switches
 				}
 
 				laraItem->Animation.TargetState = LS_IDLE;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);

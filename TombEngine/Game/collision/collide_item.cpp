@@ -171,7 +171,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
-					// TODO: This is awful and we need a better system.
+					/*this is awful*/
 					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
 					{
 						itemNumber = item->NextItem;
@@ -182,12 +182,14 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						itemNumber = item->NextItem;
 						continue;
 					}
+					/*we need a better system*/
 
 					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
 					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
-					auto bounds = GetBestFrame(*item).BoundingBox;
+					// TODO: Don't modify object animation data!!!
+					auto& bounds = GetBestFrame(*item).BoundingBox;
 
 					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
 						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
@@ -201,7 +203,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						int rx = (dx * cosY) - (dz * sinY);
 						int rz = (dz * cosY) + (dx * sinY);
 
-						// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
 						if (item->ObjectNumber == ID_TURN_SWITCH)
 						{
 							bounds.X1 = -CLICK(1);
@@ -230,7 +231,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 								int rx = (dx * cosY) - (dz * sinY);
 								int rz = (dz * cosY) + (dx * sinY);
 
-								// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
 								if (item->ObjectNumber == ID_TURN_SWITCH)
 								{
 									bounds.X1 = -CLICK(1);

@@ -136,7 +136,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
-				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -158,7 +158,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (item->TouchBits & 0x2000)
 					{
-						if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 						{
 							DoDamage(creature->Enemy, 80);
 							CreatureEffect2(item, ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);

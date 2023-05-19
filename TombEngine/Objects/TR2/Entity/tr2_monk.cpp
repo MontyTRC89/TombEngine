@@ -46,7 +46,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 9)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 9;
 			}
 		}

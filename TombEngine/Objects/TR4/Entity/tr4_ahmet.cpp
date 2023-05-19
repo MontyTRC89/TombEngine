@@ -137,9 +137,9 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState == AHMET_STATE_DEATH)
 			{
 				// Don't clear.
-				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					item->Animation.FrameNumber = (GetAnimData(item).frameEnd - 1);
+					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1);
 					item->Collidable = false;
 				}
 			}
@@ -284,7 +284,7 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 
 				if (!(creature->Flags & 1) &&
-					item->Animation.FrameNumber > (GetAnimData(item).frameBase + 7) &&
+					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
 					item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 				{
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
@@ -292,7 +292,7 @@ namespace TEN::Entities::TR4
 					creature->Flags |= 1;
 				}
 				else if (!(creature->Flags & 2) &&
-					item->Animation.FrameNumber > (GetAnimData(item).frameBase + 32) &&
+					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
 					item->TouchBits.Test(AhmetSwipeAttackRightJoints))
 				{
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
@@ -322,7 +322,7 @@ namespace TEN::Entities::TR4
 					if (!(creature->Flags & 1) &&
 						item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE))
 					{
-						if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + 11) &&
+						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
 							item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 						{
 							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
@@ -352,7 +352,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if (!(creature->Flags & 1) &&
-						item->Animation.FrameNumber > (GetAnimData(item).frameBase + 14) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
 						item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
@@ -360,7 +360,7 @@ namespace TEN::Entities::TR4
 						creature->Flags |= 1;
 					}
 					else if (!(creature->Flags & 2) &&
-						item->Animation.FrameNumber > (GetAnimData(item).frameBase + 22) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
 						item->TouchBits.Test(AhmetSwipeAttackRightJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
@@ -384,7 +384,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->Animation.ActiveState != AHMET_STATE_DEATH ||
-			item->Animation.FrameNumber != GetAnimData(item).frameEnd)
+			item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			return false;
 		}

@@ -78,6 +78,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 		laraInfo->Control.HandStatus != HandStatus::Free) &&
 		(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem !=itemNumber))
 	{
+#ifdef NEW_TIGHTROPE
 		if (laraItem->Animation.ActiveState == LS_TIGHTROPE_WALK &&
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
@@ -88,6 +89,19 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 					laraInfo->Control.Tightrope.CanDismount = true;
 			}
 		}
+
+#else // !NEW_TIGHTROPE
+		if (laraItem->Animation.ActiveState == LS_TIGHTROPE_WALK &&
+		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
+		   !laraInfo->Control.Tightrope.Off)
+		{
+			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			{
+				if (abs(item->Pose.Position.x - laraItem->Pose.Position.x) + abs(item->Pose.Position.z - laraItem->Pose.Position.z) < 640)
+					laraInfo->tightRopeOff = true;
+			}
+		}
+#endif
 	}
 	else
 	{
@@ -99,18 +113,22 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 			{
 				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
+#ifdef NEW_TIGHTROPE
 				laraInfo->Control.Tightrope.Balance = 0;
 				laraInfo->Control.Tightrope.CanDismount = false;
 				laraInfo->Control.Tightrope.TightropeItem = itemNumber;
 				laraInfo->Control.Tightrope.TimeOnTightrope = 0;
+#else // !NEW_TIGHTROPE
+				laraInfo->Control.Tightrope.OnCount = 60;
+				laraInfo->Control.Tightrope.Off = 0;
+				laraInfo->Control.Tightrope.Fall = 0;
+#endif
 			}
 			else
-			{
 				laraInfo->Context.InteractedItem = itemNumber;
-			}
 
 			tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
 		}
@@ -147,7 +165,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
-			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraItem->Animation.Velocity.y = false;
 			laraItem->Animation.IsAirborne = false;
 
@@ -244,7 +262,7 @@ void AnimatingControl(short itemNumber)
 	item->Status = ITEM_ACTIVE;
 	AnimateItem(item);
 
-	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
+	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

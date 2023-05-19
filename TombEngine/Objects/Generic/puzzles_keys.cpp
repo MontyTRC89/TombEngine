@@ -65,10 +65,9 @@ void InitializePuzzleHole(short itemNumber)
 void InitializePuzzleDone(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
-	const auto& anim = GetAnimData(receptacleItem);
 
 	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = anim.frameBase + anim.frameEnd;
+	receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -175,7 +174,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			ResetPlayerFlex(laraItem);
-			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+			laraItem->Animation.FrameNumber = GetAnimData(*laraItem, laraItem->Animation.AnimNumber).frameBase;
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = itemNumber;
@@ -350,9 +349,9 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	{
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
-		item->Animation.ActiveState = GetAnimData(item).ActiveState;
-		item->Animation.TargetState = GetAnimData(item).ActiveState;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 		item->Animation.RequiredState = NO_STATE;
 		item->ResetModelToDefault();
 
@@ -507,7 +506,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				player->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
 				player->Control.HandStatus = HandStatus::Busy;

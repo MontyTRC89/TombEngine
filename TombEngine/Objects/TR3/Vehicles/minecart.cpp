@@ -310,11 +310,11 @@ namespace TEN::Entities::Vehicles
 							{
 								if (item->ObjectNumber == ID_MINECART_SWITCH)
 								{
-									if (item->Animation.FrameNumber == GetAnimData(item).frameBase &&
+									if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 										(laraItem->Animation.ActiveState == MINECART_STATE_SWIPE &&
 											TestAnimNumber(*laraItem, MINECART_ANIM_SWIPE_WRENCH)))
 									{
-										int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
+										int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 										if (frame >= 12 && frame <= 22)
 										{
 											SoundEffect(SFX_TR3_VEHICLE_MINECART_WRENCH, &item->Pose, SoundEnvironment::Always);

@@ -309,7 +309,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!(GlobalCounter & 3))
 				{
-					frame = ((GetAnimData(item).frameBase - item->Animation.FrameNumber) / 8) + 1;
+					frame = ((g_Level.Anims[item->Animation.AnimNumber].frameBase - item->Animation.FrameNumber) / 8) + 1;
 					if (frame > 16)
 						frame = 16;
 
@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case 3:
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
 					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));
 					auto pos2 = GetJointPosition(item, 10, Vector3i(0, 144, 40));
@@ -373,10 +373,10 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
 				item->Animation.ActiveState = HYDRA_STATE_DEATH;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 
-			if (!((item->Animation.FrameNumber - GetAnimData(item).frameBase) & 7))
+			if (!((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) & 7))
 			{
 				if (item->ItemFlags[3] < 12)
 				{

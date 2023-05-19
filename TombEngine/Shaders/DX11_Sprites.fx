@@ -6,12 +6,9 @@
 // NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
 // instead of instances
 
-#define FADE_FACTOR .789f
-
 cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
-	int RenderType;
 };
 
 struct PixelShaderInput
@@ -37,7 +34,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4 worldPosition = float4(input.Position, 1.0f);
 
 	output.Position = mul(worldPosition, ViewProjection);
-	output.PositionCopy = output.Position;
+	output.PositionCopy = output.Position;	
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
@@ -72,11 +69,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 		float fade = (sceneDepth - particleDepth) * 1024.0f;
 		output.w = min(output.w, fade);
-	}
-
-	if (RenderType == 1)
-	{
-		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
 	}
 
 	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);

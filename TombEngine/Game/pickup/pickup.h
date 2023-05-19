@@ -20,7 +20,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void RegeneratePickups();
 void DropPickups(ItemInfo* item);
 void CollectMultiplePickups(int itemNumber);
-const GameBoundingBox* FindPlinth(ItemInfo* item);
+GameBoundingBox* FindPlinth(ItemInfo* item);
 
 void PickupControl(short itemNumber);
 

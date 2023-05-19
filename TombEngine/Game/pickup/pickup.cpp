@@ -449,7 +449,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						}
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
@@ -507,11 +507,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 	}
-
-	item->Pose.Orientation.x = 0;
-	const GameBoundingBox* plinthBounds = nullptr;
+	
 	bool flag = false;
-
+	GameBoundingBox* plinth = nullptr;
+	item->Pose.Orientation.x = 0;
 	switch (triggerFlags)
 	{
 	// Pick up from hole in wall.
@@ -599,19 +598,19 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 4:
 	case 7:
 	case 8:
-		plinthBounds = FindPlinth(item);
+		plinth = FindPlinth(item);
 
-		if (plinthBounds == nullptr)
+		if (!plinth)
 		{
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
 
-		PlinthPickUpBounds.BoundingBox.X1 = plinthBounds->X1;
-		PlinthPickUpBounds.BoundingBox.X2 = plinthBounds->X2;
+		PlinthPickUpBounds.BoundingBox.X1 = plinth->X1;
+		PlinthPickUpBounds.BoundingBox.X2 = plinth->X2;
 		PlinthPickUpBounds.BoundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
-		PlinthPickUpBounds.BoundingBox.Z2 = plinthBounds->Z2 + 320;
-		PlinthPickUpPosition.z = -200 - plinthBounds->Z2;
+		PlinthPickUpBounds.BoundingBox.Z2 = plinth->Z2 + 320;
+		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
 		// HACK: Until we refactor a way plinth collision is detected, this must be here
 		// to prevent false positives with two stacked plinths -- Lwmte, 16.06.22
@@ -776,7 +775,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		ResetPlayerFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -1022,7 +1021,7 @@ void PickupControl(short itemNumber)
 	}
 }
 
-const GameBoundingBox* FindPlinth(ItemInfo* item)
+GameBoundingBox* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
@@ -1067,13 +1066,9 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 	}
 
 	if (itemNumber == NO_ITEM)
-	{
 		return nullptr;
-	}
 	else
-	{
 		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
-	}
 }
 
 void InitializePickup(short itemNumber)
@@ -1212,7 +1207,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 			{
 				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;
@@ -1226,7 +1221,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 				}
 
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				AnimateItem(item);
 			}
 			else
@@ -1251,7 +1246,7 @@ void SearchObjectControl(short itemNumber)
 	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
 		AnimateItem(item);
 
-	int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)

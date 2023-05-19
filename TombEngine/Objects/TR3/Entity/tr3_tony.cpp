@@ -502,7 +502,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != TONY_STATE_DEATH)
 				SetAnimation(item, TONY_ANIM_DEATH);
 
-			int frameEnd = GetAnimData(*object, TONY_ANIM_DEATH).frameEnd;
+			int frameEnd = g_Level.Anims[object->animIndex + TONY_ANIM_DEATH].frameEnd;
 			if (item->Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.
