@@ -518,6 +518,7 @@ namespace TEN::Renderer
 		void InitializeMenuBars(int y);
 
 		void DrawAllStrings();
+		void DrawLaserBarriers(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, bool transparent);
 		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
@@ -602,24 +603,24 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-		                        Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view);
+					 Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-		                                   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
-										   bool isSoftParticle, RenderView& view);
+					 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
+					 bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-		                                         float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
-												 bool isSoftParticle, RenderView& view);
+					 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
+					 bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 					 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
 					 RenderView& view);
 		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 					 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
-					 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view);
+					 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							const Vector4& color, BLEND_MODES blendMode, RenderView& view);
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-							BLEND_MODES blendMode, RenderView& view);
+							BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);

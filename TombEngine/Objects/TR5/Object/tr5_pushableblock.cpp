@@ -210,7 +210,7 @@ namespace TEN::Entities::Generic
 			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -256,7 +256,7 @@ namespace TEN::Entities::Generic
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				// Check if pushable is about to fall.
 				if (pushable->canFall)
@@ -301,7 +301,7 @@ namespace TEN::Entities::Generic
 			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -343,7 +343,7 @@ namespace TEN::Entities::Generic
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				if (IsHeld(In::Action))
 				{

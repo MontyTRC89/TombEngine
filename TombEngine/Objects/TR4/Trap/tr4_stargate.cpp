@@ -65,8 +65,8 @@ namespace TEN::Entities::Traps
 
 		if (TestCollision(item, laraItem) &&
 			TriggerActive(item) &&
-			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 && // Hardcoded frame range.
-			item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 60)
+			item->Animation.FrameNumber > GetAnimData(item).frameBase + 20 && // Hardcoded frame range.
+			item->Animation.FrameNumber < GetAnimData(item).frameBase + 60)
 		{
 			// Blades deal damage cumulatively.
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
