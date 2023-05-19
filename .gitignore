@@ -1,11 +1,8 @@
 enc_temp_folder/
 Build/
-TombEngine/CustomObjects/
 TombEngine/x64/
 TombEngine/Debug/
-TombEngine/Release
-TombEngine/Legacy Engine Objects
-x64/
+TombEngine/Release/
 packages/
 .vs/
 .vsconfig

@@ -37,7 +37,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -49,7 +49,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -74,15 +74,18 @@
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\ois</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
+    <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\ois</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)-x64</TargetName>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -98,6 +101,9 @@
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)-x64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,7 +150,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -236,7 +242,7 @@ CALL gen.bat</Command>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -1035,7 +1041,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -1417,9 +1425,13 @@ CALL gen.bat</Command>
   <ItemGroup>
     <None Include="Shaders\DX11_InstancedStatics.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
