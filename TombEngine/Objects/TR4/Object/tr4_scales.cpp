@@ -33,7 +33,7 @@ void ScalesControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+	if (item->Animation.FrameNumber != GetAnimData(item).frameEnd)
 	{
 		AnimateItem(item);
 		return;
@@ -131,15 +131,15 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (TestLaraPosition(ScalesBounds, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Pose.Orientation.y = rotY;
 			}
-			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
+			else if (laraItem->Animation.FrameNumber == GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 51)
 			{
 				SoundEffect(SFX_TR4_POUR_WATER, &laraItem->Pose);
 				item->Pose.Orientation.y = rotY;
 			}
-			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+			else if (laraItem->Animation.FrameNumber == GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 74)
 			{
 				AddActiveItem(itemNumber);
 				item->Status = ITEM_ACTIVE;
@@ -162,10 +162,10 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 	
-	if (laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
-		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
-		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
-		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+	if ((laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 44 &&
+		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_LOW).frameBase + 72) ||
+		(laraItem->Animation.FrameNumber >= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 51 &&
+		laraItem->Animation.FrameNumber <= GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 74))
 	{
 		auto pos = GetJointPosition(laraItem, LM_LHAND).ToVector3();
 		auto velocity = Vector3(0.0f, Random::GenerateFloat(32.0f, 64.0f), 0.0f);

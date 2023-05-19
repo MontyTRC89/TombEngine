@@ -16,7 +16,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (LaraItem->Animation.AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
-		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].frameBase;
+		short fb = GetAnimData(ID_LARA, LA_MECHANICAL_BEETLE_USE).frameBase;
 
 		if (LaraItem->Animation.FrameNumber < fb + 14)
 		{

@@ -170,7 +170,7 @@ namespace TEN::Entities::Generic
 		if (lara->Flare.ControlLeft)
 			lara->Control.HandStatus = HandStatus::WeaponReady;
 
-		lara->LeftArm.FrameBase = g_Level.Anims[lara->LeftArm.AnimNumber].FramePtr;
+		lara->LeftArm.FrameBase = GetAnimData(lara->LeftArm.AnimNumber).FramePtr;
 
 		if (lara->Torch.IsLit)
 		{
@@ -199,7 +199,7 @@ namespace TEN::Entities::Generic
 		lara->LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		lara->LeftArm.Locked = false;
 		lara->LeftArm.FrameNumber = 0;
-		lara->LeftArm.FrameBase = g_Level.Anims[lara->LeftArm.AnimNumber].FramePtr;
+		lara->LeftArm.FrameBase = GetAnimData(lara->LeftArm.AnimNumber).FramePtr;
 
 		laraItem->Model.MeshIndex[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 	}
@@ -357,7 +357,7 @@ namespace TEN::Entities::Generic
 				}
 
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				lara->Flare.ControlLeft = false;
 				lara->LeftArm.Locked = true;
 				lara->Context.InteractedItem = itemNumber;
@@ -372,7 +372,7 @@ namespace TEN::Entities::Generic
 			if (laraItem->Animation.AnimNumber >= LA_TORCH_LIGHT_1 &&
 				laraItem->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if ((laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase) == 40)
+				if ((laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase) == 40)
 				{
 					TestTriggers(torchItem, true, torchItem->Flags & IFLAG_ACTIVATION_MASK);
 					torchItem->Flags |= CODE_BITS;

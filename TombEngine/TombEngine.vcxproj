@@ -593,6 +593,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h" />
+    <ClInclude Include="Objects\TR5\Trap\LaserBarrier.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
@@ -1022,6 +1023,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\LaserBarrier.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
