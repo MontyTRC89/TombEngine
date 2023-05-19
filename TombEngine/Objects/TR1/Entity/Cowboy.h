@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	void InitialiseCowboy(short itemNumber);
+	void InitializeCowboy(short itemNumber);
 	void CowboyControl(short itemNumber);
 }

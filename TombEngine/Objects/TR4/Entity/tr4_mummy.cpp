@@ -141,7 +141,7 @@ namespace TEN::Entities::TR4
 								item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_RECOIL;
 							}
 
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+							item->Animation.FrameNumber = GetAnimData(item).frameBase;
 							item->Pose.Orientation.y += AI.angle;
 						}
 					}
@@ -200,7 +200,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = 0;
 
-					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 						item->TriggerFlags = 0;
 				}
 				else
@@ -282,8 +282,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.Test(MummySwipeAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase &&
+							item->Animation.FrameNumber < GetAnimData(item).frameEnd)
 						{
 							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 
