@@ -52,6 +52,7 @@ namespace TEN::Effects::Blood
 		};
 	}
 
+	// TODO: Ceilings.
 	static bool TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, BloodStain::VERTEX_COUNT>& vertexPoints)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
@@ -167,7 +168,7 @@ namespace TEN::Effects::Blood
 		stain.DelayTime = std::round(delayInSec * FPS);
 	}
 
-	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl)
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool onFloor)
 	{
 		// Can't spawn stain; return early.
 		if (!drip.CanSpawnStain)
@@ -177,8 +178,11 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			return;
 
-		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BloodStain::SURFACE_OFFSET, drip.Position.z);
-		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
+		auto pos = Vector3(
+			drip.Position.x,
+			(onFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling) - BloodStain::SURFACE_OFFSET,
+			drip.Position.z);
+		auto normal = GetSurfaceNormal(onFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, true);
 		float scale = drip.Scale * 4;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
@@ -328,7 +332,14 @@ namespace TEN::Effects::Blood
 			else if (drip.Position.y >= pointColl.Position.Floor)
 			{
 				drip.Life = 0.0f;
-				SpawnBloodStainFromDrip(drip, pointColl);
+				SpawnBloodStainFromDrip(drip, pointColl, true);
+			}
+			
+			// Hit ceiling; spawn stain.
+			else if (drip.Position.y >= pointColl.Position.Ceiling)
+			{
+				drip.Life = 0.0f;
+				SpawnBloodStainFromDrip(drip, pointColl, false);
 			}
 
 			// Update life.

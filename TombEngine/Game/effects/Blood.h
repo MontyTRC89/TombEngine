@@ -97,7 +97,7 @@ namespace TEN::Effects::Blood
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count);
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec = 0.0f);
-	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl);
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool onFloor);
 	void SpawnBloodStainPool(ItemInfo& item);
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
