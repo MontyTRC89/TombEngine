@@ -959,16 +959,14 @@ enum class JumpDirection
 
 struct Ammo
 {
-	using CountType = int;
-
 private:
-	CountType Count		 = 0;
-	bool	  IsInfinite = false;
+	unsigned int Count		= 0;
+	bool		 IsInfinite = false;
 
 public:
-	static CountType Clamp(int value)
+	static unsigned int Clamp(long value)
 	{
-		return std::clamp(value, 0, INT_MAX);
+		return std::clamp<unsigned int>(value, 0, UINT_MAX);
 	}
 
 	bool HasInfinite() const
@@ -976,7 +974,7 @@ public:
 		return IsInfinite;
 	}
 
-	CountType GetCount() const
+	unsigned int GetCount() const
 	{
 		return Count;
 	}
@@ -1013,15 +1011,15 @@ public:
 		return temp;
 	}
 
-	Ammo& operator =(int value)
+	Ammo& operator =(unsigned int value)
 	{
-		Count = Clamp(value);
+		Count = value;
 		return *this;
 	}
 
-	bool operator ==(int value)
+	bool operator ==(unsigned int value)
 	{
-		return (Count == Clamp(value));
+		return (Count == value);
 	}
 
 	Ammo& operator =(Ammo& ammo)
@@ -1031,30 +1029,30 @@ public:
 		return *this;
 	}
 
-	Ammo operator +(int value)
+	Ammo operator +(unsigned int value)
 	{
 		auto temp = *this;
 		temp += value;
 		return temp;
 	}
 
-	Ammo operator -(int value)
+	Ammo operator -(unsigned int value)
 	{
 		auto temp = *this;
 		temp -= value;
 		return temp;
 	}
 
-	Ammo& operator +=(int value)
+	Ammo& operator +=(unsigned int value)
 	{
-		int temp = Count + value;
+		long temp = Count + value;
 		Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(int value)
+	Ammo& operator -=(unsigned int value)
 	{
-		int temp = Count - value;
+		long temp = Count - value;
 		Count = Clamp(temp);
 		return *this;
 	}

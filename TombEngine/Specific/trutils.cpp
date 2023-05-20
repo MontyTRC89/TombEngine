@@ -30,8 +30,6 @@ namespace TEN::Utils
 		auto wString = std::wstring(size, 0);
 		MultiByteToWideChar(CP_UTF8, 0, cString, (int)strlen(cString), &wString[0], size);
 		return wString;
-
-		return std::wstring();
 	}
 
 	std::wstring ToWString(const char* source)
