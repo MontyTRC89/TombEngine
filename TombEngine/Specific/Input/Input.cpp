@@ -182,12 +182,12 @@ namespace TEN::Input
 				}
 
 				// If controller is XInput and default bindings were successfully assigned, save configuration.
-                if (ApplyDefaultXInputBindings())
-                {
-                    g_Configuration.EnableRumble = (OisRumble != nullptr);
-                    g_Configuration.EnableThumbstickCameraControl = true;
-                    SaveConfiguration();
-                }
+				if (ApplyDefaultXInputBindings())
+				{
+					g_Configuration.EnableRumble = (OisRumble != nullptr);
+					g_Configuration.EnableThumbstickCameraControl = true;
+					SaveConfiguration();
+				}
 			}
 			catch (OIS::Exception& ex)
 			{
@@ -759,11 +759,11 @@ namespace TEN::Input
 		}
 	}
 
-    void ApplyDefaultBindings()
-    {
-        ApplyBindings(DefaultBindings);
-        ApplyDefaultXInputBindings();
-    }
+	void ApplyDefaultBindings()
+	{
+		ApplyBindings(DefaultBindings);
+		ApplyDefaultXInputBindings();
+	}
 
 	bool ApplyDefaultXInputBindings()
 	{
