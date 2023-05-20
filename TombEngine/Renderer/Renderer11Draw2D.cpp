@@ -5,8 +5,9 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
+#include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -106,6 +107,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+			return;
+
 		unsigned int strides = sizeof(RendererVertex);
 		unsigned int offset = 0;
 	

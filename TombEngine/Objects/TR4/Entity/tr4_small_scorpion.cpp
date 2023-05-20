@@ -9,9 +9,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -159,8 +159,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.Test(SmallScorpionAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 20 &&
+							item->Animation.FrameNumber < GetAnimData(item).frameBase + 32)
 						{
 							short rotation;
 							CreatureBiteInfo biteInfo;

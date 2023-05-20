@@ -7,9 +7,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.ActiveState <= 3 &&
 			!creature->Flags &&
 			item->TouchBits & 0x9470 &&
-			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
+			item->Animation.FrameNumber > GetAnimData(item).frameBase + 18)
 		{
 			DoDamage(creature->Enemy, 400);
 			CreatureEffect2(item, InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);

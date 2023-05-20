@@ -12,10 +12,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -242,7 +242,7 @@ namespace TEN::Entities::Creatures::TR5
 					roomItemNumber = item2->NextItem;
 					if (roomItemNumber == NO_ITEM)
 					{
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = GetAnimData(item).frameBase;
 						item->Animation.ActiveState = item->Animation.TargetState;
 						break;
 					}
@@ -366,7 +366,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += laraAI.angle;
 				}
 
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			}
 		}
 		else
@@ -536,7 +536,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -564,8 +564,8 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (creature->Flags)
 					{
-						if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 10 &&
-							(item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
+						if (item->Animation.FrameNumber < GetAnimData(item).frameBase + 10 &&
+							(item->Animation.FrameNumber - GetAnimData(item).frameBase) & 1)
 						{
 							creature->Flags = 0;
 						}
@@ -740,13 +740,13 @@ namespace TEN::Entities::Creatures::TR5
 			case GUARD_STATE_STAND_UP:
 			case GUARD_STATE_AWAKE_FROM_SLEEP:
 				creature->MaxTurn = 0;
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					TestTriggers(item, true);
 					break;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 44)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 44)
 				{
 					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
@@ -776,7 +776,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					currentItem->MeshBits = -3;
 				}
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				else if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->Pose.Orientation.y -= ANGLE(90.0f);
 			
 				break;
@@ -824,7 +824,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			case GUARD_STATE_INSERT_CODE:
 				creature->MaxTurn = 0;
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 39)
 					TestTriggers(item, true);
 			
 				break;
@@ -840,7 +840,7 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					currentItem->MeshBits = 0x1FFF;
 					item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
@@ -850,17 +850,17 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
+					if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 32)
 						currentItem->MeshBits = 16381;
-					else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 74)
+					else if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 74)
 						currentItem->MeshBits = 278461;
-					else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
+					else if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 120)
 						currentItem->MeshBits = 802621;
-					else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 157)
+					else if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 157)
 						currentItem->MeshBits = 819001;
-					else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 190)
+					else if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 190)
 						currentItem->MeshBits = 17592121;
-					else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					else if (item->Animation.FrameNumber == GetAnimData(item).frameBase + GetAnimData(item).frameEnd)
 					{
 						currentItem->MeshBits = 0x1FFF;
 						TestTriggers(item, true);
@@ -905,7 +905,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = GUARD_STATE_IDLE;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 39)
 					TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, enemy->RoomNumber, true);
 
 				break;
@@ -1089,7 +1089,7 @@ namespace TEN::Entities::Creatures::TR5
 			if (item->Animation.ActiveState != SNIPER_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[ID_SNIPER].animIndex + 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = SNIPER_STATE_DEATH;
 			}
 		}
@@ -1255,7 +1255,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (canJump1Sector || canJump2Sectors)
 						{
 							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+							item->Animation.FrameNumber = GetAnimData(item).frameBase;
 							item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 							creature->MaxTurn = 0;
 
@@ -1289,10 +1289,10 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
+				if (item->Animation.FrameNumber != GetAnimData(item).frameBase + 16 ||
 					!item->TestMeshSwapFlags(9216))
 				{
-					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 						item->Pose.Orientation.y += -ANGLE(180.0f);
 				}
 				else
@@ -1377,7 +1377,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (canJump1Sector || canJump2Sectors)
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = GetAnimData(item).frameBase;
 						item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 						creature->MaxTurn = 0;
 
@@ -1413,7 +1413,7 @@ namespace TEN::Entities::Creatures::TR5
 				else if (canJump1Sector || canJump2Sectors)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 50;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 					creature->MaxTurn = 0;
 
@@ -1437,7 +1437,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 16 &&
 					item->TestMeshSwapFlags(9216))
 				{
 					item->SetMeshSwapFlags(128);
@@ -1467,7 +1467,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += AI.angle;
 				}
 
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			}
 		}
 
@@ -1487,41 +1487,41 @@ namespace TEN::Entities::Creatures::TR5
 			{
 			case 0:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 38;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 23;
 				break;
 
 			case 1:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 39;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 24;
 				creature->MaxTurn = 0;
 				break;
 
 			case 2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 40;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 25;
 				creature->MaxTurn = 0;
 				break;
 
 			case 6:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 20;
 				creature->MaxTurn = 0;
 				break;
 
 			case 7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 21;
 				creature->MaxTurn = 0;
 				break;
 
 			case 8:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 22;
 				creature->MaxTurn = 0;
 				break;

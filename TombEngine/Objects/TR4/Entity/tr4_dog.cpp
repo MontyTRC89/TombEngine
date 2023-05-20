@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

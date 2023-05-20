@@ -11,9 +11,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -262,7 +262,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_KILL_TROOP:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->TriggerFlags++;
 
 				if ((creature->Enemy != nullptr && creature->Enemy->HitPoints <= 0) ||

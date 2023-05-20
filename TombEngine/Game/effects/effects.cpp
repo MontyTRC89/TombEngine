@@ -17,13 +17,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -741,7 +741,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;

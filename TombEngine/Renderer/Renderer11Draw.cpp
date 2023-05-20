@@ -18,6 +18,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
@@ -27,7 +28,6 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Entities::Generic;
@@ -1525,6 +1525,7 @@ namespace TEN::Renderer
 		DrawHelicalLasers(view);
 		DrawRopes(view);
 		DrawStreamers(view);
+		DrawLaserBarriers(view);
 
 		// Here is where we actually output sprites
 		DrawSprites(view);

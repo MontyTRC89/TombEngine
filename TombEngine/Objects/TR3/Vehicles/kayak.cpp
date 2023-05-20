@@ -11,12 +11,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -618,7 +618,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_KAYAK_LARA_ANIMS, KAYAK_ANIM_IDLE_DEATH);
 		}
 
-		int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
 
 		switch (laraItem->Animation.ActiveState)
 		{

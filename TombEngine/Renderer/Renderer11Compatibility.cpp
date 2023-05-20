@@ -8,11 +8,11 @@
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Renderer
 {

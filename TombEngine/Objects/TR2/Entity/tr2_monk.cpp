@@ -7,9 +7,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -46,7 +46,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 9)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 9;
 			}
 		}

@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -13,12 +14,11 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/simple_particle.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
@@ -60,6 +60,8 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
+
+	constexpr auto IN_SKIDOO_FIRE = IN_DRAW;
 
 	const std::vector<VehicleMountType> SkidooMountTypes =
 	{
@@ -218,8 +220,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				lara->Control.HandStatus = HandStatus::Free;
+
 				if (skidoo->Armed)
 					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				SetLaraVehicle(laraItem, nullptr);
 			}
 			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF &&
@@ -249,8 +253,10 @@ namespace TEN::Entities::Vehicles
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				if (skidoo->Armed)
 					lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
+
 				skidooItem->Collidable = false;
 				skidooItem->Flags |= IFLAG_INVISIBLE;
 
@@ -666,18 +672,15 @@ namespace TEN::Entities::Vehicles
 		FindNewTarget(*laraItem, weapon);
 		AimWeapon(*laraItem, lara->RightArm, weapon);
 
-		if (IsHeld(In::DrawWeapon) && !skidooItem->ItemFlags[0])
+		if (TrInput & IN_SKIDOO_FIRE && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
-				0
-			);
+				0);
 
 			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
 			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
-			//lara->LeftArm.GunFlash = 1;
-			//lara->RightArm.GunFlash = 1;
 			SoundEffect(weapon.SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}

@@ -10,11 +10,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Objects/Effects/Boss.h"
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "misc.h"
 #include "setup.h"
 #include "lara_helpers.h"
@@ -721,7 +721,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != SOPHIALEIGH_STATE_DEATH)
 				SetAnimation(&item, SOPHIALEIGH_ANIM_DEATH);
 
-			int frameEnd = g_Level.Anims[object.animIndex + SOPHIALEIGH_ANIM_DEATH].frameEnd;
+			int frameEnd = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.

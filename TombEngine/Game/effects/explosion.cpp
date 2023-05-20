@@ -4,8 +4,8 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 

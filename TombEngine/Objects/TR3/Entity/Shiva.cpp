@@ -10,12 +10,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -290,7 +290,7 @@ namespace TEN::Entities::Creatures::TR3
 				item->ItemFlags[3] = 1;
 			}
 
-			int frameEnd = g_Level.Anims[object.animIndex + SHIVA_ANIM_DEATH].frameEnd - 1;
+			int frameEnd = GetAnimData(object, SHIVA_ANIM_DEATH).frameEnd - 1;
 			if (item->Animation.FrameNumber >= frameEnd)
 			{
 				// Block frame until mesh is swapped.
