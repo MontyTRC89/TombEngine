@@ -4,7 +4,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
 #include "Math/Math.h"
-#include "Utils.h"
+#include "Renderer/Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"

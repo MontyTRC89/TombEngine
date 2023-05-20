@@ -2,12 +2,13 @@
 #include <vector>
 #include <d3d11.h>
 #include <SimpleMath.h>
+
 #include "Game/camera.h"
-#include "Frustum.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/Frustum.h"
+#include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/RendererSprites.h"
+#include "Renderer/RendererTransparentFace.h"
 #include "Specific/memory/LinearArrayBuffer.h"
-#include "RendererSprites.h"
-#include "RendererTransparentFace.h"
 
 namespace TEN::Renderer 
 {

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/Blood.h"

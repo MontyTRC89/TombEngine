@@ -11,7 +11,7 @@
 #include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;

@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "StringsHandler.h"
 
-#include "ScriptAssert.h"
-#include "Flow/FlowHandler.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 #include "Renderer/Renderer11Enums.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /***
 On-screen strings.
