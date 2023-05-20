@@ -196,7 +196,6 @@ xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
 xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <Message>Generating savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
@@ -311,7 +310,6 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(TargetDir)Shaders\"
 xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
 
 xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
