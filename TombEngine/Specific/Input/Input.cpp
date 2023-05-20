@@ -784,6 +784,9 @@ namespace TEN::Input
 			for (int i = 0; i < KEY_COUNT; i++)
 				g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
 
+			// Additionally turn on thumbstick camera and vibration.
+			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;
+
 			return true;
 		}
 		else
