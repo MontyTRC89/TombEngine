@@ -357,7 +357,7 @@ namespace TEN::Renderer
 			return;
 		}
 
-		for (int i = 0; i < (int)room.Statics.size(); i++)
+		for (int i = 0; i < room.Statics.size(); i++)
 		{
 			auto* mesh = &room.Statics[i];
 			MESH_INFO* nativeMesh = &r->mesh[i];

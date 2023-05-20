@@ -29,7 +29,7 @@ void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
 
-	for (int i = 0; i < (int)g_Level.Rooms.size(); i++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
 
@@ -131,7 +131,7 @@ int IsRoomOutside(int x, int y, int z)
 	if (OutsideRoomTable[xTable][zTable].empty())
 		return NO_ROOM;
 
-	for (int i = 0; i < (int)OutsideRoomTable[xTable][zTable].size(); i++)
+	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		short roomNumber = OutsideRoomTable[xTable][zTable][i];
 		auto* room = &g_Level.Rooms[roomNumber];
@@ -257,7 +257,7 @@ std::set<int> GetRoomList(int roomNumber)
 
 void InitializeNeighborRoomList()
 {
-	for (int i = 0; i < (int)g_Level.Rooms.size(); i++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
 

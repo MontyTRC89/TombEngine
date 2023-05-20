@@ -379,7 +379,7 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 
 	std::unordered_map<uint32_t, sol::table> solTables;
 
-	for(int i = 0; i < (int)vars.size(); ++i)
+	for(int i = 0; i < vars.size(); ++i)
 	{
 		if (std::holds_alternative<IndexTable>(vars[i]))
 		{

@@ -1703,7 +1703,7 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
-		for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
+		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
@@ -2050,7 +2050,7 @@ namespace TEN::Renderer
 					if (DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
-						for (int j = 0; j < (int)bucket.Polygons.size(); j++)
+						for (int j = 0; j < bucket.Polygons.size(); j++)
 						{
 							RendererPolygon* p = &bucket.Polygons[j];
 
@@ -2114,7 +2114,7 @@ namespace TEN::Renderer
 
 								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
-									if (j >= (int)m_stAnimated.Textures.size())
+									if (j >= m_stAnimated.Textures.size())
 									{
 										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
 										break;
@@ -2153,7 +2153,7 @@ namespace TEN::Renderer
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
-		for (int k = 0; k < (int)renderView.roomsToDraw.size(); k++)
+		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
 		{
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->RoomNumber];
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
@@ -2271,7 +2271,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
 				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
@@ -2328,7 +2328,7 @@ namespace TEN::Renderer
 			if (DoesBlendModeRequireSorting(bucket.BlendMode))
 			{
 				// Collect transparent faces
-				for (int j = 0; j < (int)bucket.Polygons.size(); j++)
+				for (int j = 0; j < bucket.Polygons.size(); j++)
 				{
 					RendererPolygon* p = &bucket.Polygons[j];
 

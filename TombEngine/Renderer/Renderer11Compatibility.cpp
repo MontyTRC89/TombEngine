@@ -75,7 +75,7 @@ namespace TEN::Renderer
 			TENLog("Generated " + std::to_string(m_animatedTextureSets.size()) + " animated texture sets.", LogLevel::Info);
 
 		m_roomTextures.resize(g_Level.RoomTextures.size());
-		for (int i = 0; i < (int)g_Level.RoomTextures.size(); i++)
+		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
@@ -104,7 +104,7 @@ namespace TEN::Renderer
 			TENLog("Generated " + std::to_string(m_roomTextures.size()) + " room texture atlases.", LogLevel::Info);
 
 		m_moveablesTextures.resize(g_Level.MoveablesTextures.size());
-		for (int i = 0; i < (int)g_Level.MoveablesTextures.size(); i++)
+		for (int i = 0; i < g_Level.MoveablesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
@@ -162,7 +162,7 @@ namespace TEN::Renderer
 			TENLog("Generated " + std::to_string(m_staticsTextures.size()) + " static mesh texture atlases.", LogLevel::Info);
 
 		m_spritesTextures.resize(g_Level.SpritesTextures.size());
-		for (int i = 0; i < (int)g_Level.SpritesTextures.size(); i++)
+		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.SpritesTextures[i];
 			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size());
@@ -197,7 +197,7 @@ namespace TEN::Renderer
 
 		TENLog("Preparing room data...", LogLevel::Info);
 
-		for (int i = 0; i < (int)g_Level.Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
 			ROOM_INFO& room = g_Level.Rooms[i];
 
@@ -224,7 +224,7 @@ namespace TEN::Renderer
 			{
 				r->Doors.resize((int)room.doors.size());
 
-				for (int l = 0; l < (int)room.doors.size(); l++)
+				for (int l = 0; l < room.doors.size(); l++)
 				{
 					RendererDoor* door = &r->Doors[l];
 					ROOM_DOOR* oldDoor = &room.doors[l];
@@ -302,7 +302,7 @@ namespace TEN::Renderer
 					newPoly.Normal = n;
 					
 					int baseVertices = lastVertex;
-					for (int k = 0; k < (int)poly.indices.size(); k++)
+					for (int k = 0; k < poly.indices.size(); k++)
 					{
 						RendererVertex* vertex = &m_roomsVertices[lastVertex];
 						int index = poly.indices[k];
@@ -364,7 +364,7 @@ namespace TEN::Renderer
 			{
 				r->Lights.resize(room.lights.size());
 
-				for (int l = 0; l < (int)room.lights.size(); l++)
+				for (int l = 0; l < room.lights.size(); l++)
 				{
 					RendererLight* light = &r->Lights[l];
 					ROOM_LIGHT* oldLight = &room.lights[l];
@@ -453,7 +453,7 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < (int)MoveablesIds.size(); i++)
+		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
 			ObjectInfo* obj = &Objects[objNum];
@@ -474,7 +474,7 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < (int)MoveablesIds.size(); i++)
+		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
 			ObjectInfo *obj = &Objects[objNum];
@@ -614,7 +614,7 @@ namespace TEN::Renderer
 							bonesToCheck[0] = jointBone->Parent->Index;
 							bonesToCheck[1] = j;
 
-							for (int b1 = 0; b1 < (int)jointMesh->Buckets.size(); b1++)
+							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
 								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
 
@@ -629,7 +629,7 @@ namespace TEN::Renderer
 										RendererMesh *skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
 										RendererBone *skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
 
-										for (int b2 = 0; b2 < (int)skinMesh->Buckets.size(); b2++)
+										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
 											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
@@ -698,7 +698,7 @@ namespace TEN::Renderer
 										// Link first 4 vertices.
 										if (currentVertex->OriginalIndex < 4)
 										{
-											for (int b2 = 0; b2 < (int)parentMesh->Buckets.size(); b2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
 												auto* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
@@ -734,7 +734,7 @@ namespace TEN::Renderer
 										auto* parentMesh = moveable.ObjectMeshes[j - 1];
 										auto* parentBone = moveable.LinearizedBones[j - 1];
 
-										for (int b2 = 0; b2 < (int)parentMesh->Buckets.size(); b2++)
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
 											auto* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
@@ -776,7 +776,7 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < (int)StaticObjectsIds.size(); i++)
+		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			int objNum = StaticObjectsIds[i];
 			STATIC_INFO* obj = &StaticObjects[objNum];
@@ -794,7 +794,7 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < (int)StaticObjectsIds.size(); i++)
+		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
@@ -826,7 +826,7 @@ namespace TEN::Renderer
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());
 
-		for (int i = 0; i < (int)g_Level.Sprites.size(); i++)
+		for (int i = 0; i < g_Level.Sprites.size(); i++)
 		{
 			SPRITE *oldSprite = &g_Level.Sprites[i];
 			m_sprites[i] = RendererSprite();
@@ -841,7 +841,7 @@ namespace TEN::Renderer
 			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
 		}
 
-		for (int i = 0; i < (int)MoveablesIds.size(); i++)
+		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			ObjectInfo *obj = &Objects[MoveablesIds[i]];
 
@@ -875,10 +875,10 @@ namespace TEN::Renderer
 			return mesh;
 
 		mesh->Positions.resize(meshPtr->positions.size());
-		for (int i = 0; i < (int)meshPtr->positions.size(); i++)
+		for (int i = 0; i < meshPtr->positions.size(); i++)
 			mesh->Positions[i] = meshPtr->positions[i];
 
-		for (int n = 0; n < (int)meshPtr->buckets.size(); n++)
+		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
 			BUCKET* levelBucket = &meshPtr->buckets[n];
 			RendererBucket bucket{};
