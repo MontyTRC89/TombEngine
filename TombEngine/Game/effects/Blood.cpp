@@ -77,7 +77,7 @@ namespace TEN::Effects::Blood
 		return true;
 	}
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, float lifeInSec, float scale, bool canSpawnStain)
 	{
 		constexpr auto COUNT_MAX   = 256;
 		constexpr auto GRAVITY_MAX = 15.0f;
@@ -93,7 +93,7 @@ namespace TEN::Effects::Blood
 		drip.CanSpawnStain = canSpawnStain;
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
-		drip.Velocity = velocity;
+		drip.Velocity = vel;
 		drip.Color = BLOOD_COLOR_RED;
 		drip.Life = std::round(lifeInSec * FPS);
 		drip.LifeStartFading = std::round(BloodDrip::LIFE_START_FADING * FPS);
@@ -102,38 +102,38 @@ namespace TEN::Effects::Blood
 		drip.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
 	}
 
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count)
 	{
-		constexpr auto LIFE_MAX			  = 5.0f;
-		constexpr auto SPRAY_VELOCITY_MAX = 45.0f;
-		constexpr auto SPRAY_VELOCITY_MIN = 15.0f;
-		constexpr auto SPRAY_SEMIANGLE	  = 50.0f;
+		constexpr auto LIFE_MAX		   = 5.0f;
+		constexpr auto SPRAY_VEL_MAX   = 45.0f;
+		constexpr auto SPRAY_VEL_MIN   = 15.0f;
+		constexpr auto SPRAY_SEMIANGLE = 50.0f;
 
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
 		// Spawn mist.
-		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
+		SpawnBloodMistCloud(pos, roomNumber, dir, count * 4);
 
 		// Spawn decorative drips.
 		for (int i = 0; i < (count * 6); i++)
 		{
-			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
-			auto velocity = Random::GenerateDirectionInCone(-direction, SPRAY_SEMIANGLE) * length;
+			float length = Random::GenerateFloat(SPRAY_VEL_MIN, SPRAY_VEL_MAX);
+			auto vel = Random::GenerateDirectionInCone(-dir, SPRAY_SEMIANGLE) * length;
 			float scale = length * 0.1f;
 
-			SpawnBloodDrip(pos, roomNumber, velocity, BloodDrip::LIFE_START_FADING, scale, false);
+			SpawnBloodDrip(pos, roomNumber, vel, BloodDrip::LIFE_START_FADING, scale, false);
 		}
 
 		// Spawn special drips capable of creating stains.
 		for (int i = 0; i < count; i++)
 		{
-			float length = Random::GenerateFloat(SPRAY_VELOCITY_MIN, SPRAY_VELOCITY_MAX);
-			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, SPRAY_SEMIANGLE) * length;
+			float length = Random::GenerateFloat(SPRAY_VEL_MIN, SPRAY_VEL_MAX);
+			auto vel = baseVel + Random::GenerateDirectionInCone(dir, SPRAY_SEMIANGLE) * length;
 			float scale = length * 0.5f;
 
-			SpawnBloodDrip(pos, roomNumber, velocity, LIFE_MAX, scale, true);
+			SpawnBloodDrip(pos, roomNumber, vel, LIFE_MAX, scale, true);
 		}
 	}
 
@@ -204,7 +204,7 @@ namespace TEN::Effects::Blood
 		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, SCALE_RATE, DELAY_TIME);
 	}
 	
-	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& dir)
 	{
 		constexpr auto COUNT_MAX	 = 256;
 		constexpr auto LIFE_MAX		 = 0.75f;
@@ -232,7 +232,7 @@ namespace TEN::Effects::Blood
 		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
-		mist.Velocity = Random::GenerateDirectionInCone(direction, SEMIANGLE) * Random::GenerateFloat(0.0f, VEL_MAX);
+		mist.Velocity = Random::GenerateDirectionInCone(dir, SEMIANGLE) * Random::GenerateFloat(0.0f, VEL_MAX);
 		mist.Color = BLOOD_COLOR_RED;
 		mist.Life =
 		mist.LifeMax = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
@@ -246,14 +246,14 @@ namespace TEN::Effects::Blood
 		mist.Rotation = Random::GenerateAngle(-ROT_MAX, ROT_MAX);
 	}
 
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
 	{
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
 		for (int i = 0; i < count; i++)
-			SpawnBloodMist(pos, roomNumber, direction);
+			SpawnBloodMist(pos, roomNumber, dir);
 	}
 	
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
