@@ -388,7 +388,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSplashes(RenderView& view)
 	{
-		constexpr size_t NUM_POINTS = 9;
+		constexpr auto NUM_POINTS = 9;
 
 		for (int i = 0; i < MAX_SPLASHES; i++)
 		{
@@ -417,33 +417,35 @@ namespace TEN::Renderer
 			float yInner = splash.y;
 			float yOuter = splash.y - splash.height;
 
-				for (int i = 0; i < NUM_POINTS; i++)
-				{
-					float xInner = innerRadius * sin(alpha * i * RADIAN);
-					float zInner = innerRadius * cos(alpha * i * RADIAN);
-					float xOuter = outerRadius * sin(alpha * i * RADIAN);
-					float zOuter = outerRadius * cos(alpha * i * RADIAN);
-					xInner += splash.x;
-					zInner += splash.z;
-					xOuter += splash.x;
-					zOuter += splash.z;
-					int j = (i + 1) % NUM_POINTS;
-					float x2Inner = innerRadius * sin(alpha * j * RADIAN);
-					x2Inner += splash.x;
-					float z2Inner = innerRadius * cos(alpha * j * RADIAN);
-					z2Inner += splash.z;
-					float x2Outer = outerRadius * sin(alpha * j * RADIAN);
-					x2Outer += splash.x;
-					float z2Outer = outerRadius * cos(alpha * j * RADIAN);
-					z2Outer += splash.z;
-					AddQuad(
-						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
-						Vector3(xOuter, yOuter, zOuter),
-						Vector3(x2Outer, yOuter, z2Outer),
-						Vector3(x2Inner, yInner, z2Inner),
-						Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f),
-						0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
-				}
+			for (int i = 0; i < NUM_POINTS; i++)
+			{
+				float xInner = innerRadius * sin(alpha * i * RADIAN);
+				float zInner = innerRadius * cos(alpha * i * RADIAN);
+				float xOuter = outerRadius * sin(alpha * i * RADIAN);
+				float zOuter = outerRadius * cos(alpha * i * RADIAN);
+
+				xInner += splash.x;
+				zInner += splash.z;
+				xOuter += splash.x;
+				zOuter += splash.z;
+
+				int j = (i + 1) % NUM_POINTS;
+				float x2Inner = innerRadius * sin(alpha * j * RADIAN);
+				x2Inner += splash.x;
+				float z2Inner = innerRadius * cos(alpha * j * RADIAN);
+				z2Inner += splash.z;
+				float x2Outer = outerRadius * sin(alpha * j * RADIAN);
+				x2Outer += splash.x;
+				float z2Outer = outerRadius * cos(alpha * j * RADIAN);
+				z2Outer += splash.z;
+
+				AddQuad(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+					Vector3(xOuter, yOuter, zOuter),
+					Vector3(x2Outer, yOuter, z2Outer),
+					Vector3(x2Inner, yInner, z2Inner),
+					Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f),
+					0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 			}
 		}
 	}
@@ -524,9 +526,13 @@ namespace TEN::Renderer
 
 			auto color = Vector4::Zero;
 			if (uwBlood.Init)
+			{
 				color = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, UCHAR_MAX);
+			}
 			else
+			{
 				color = Vector4(uwBlood.Life / 2, 0, uwBlood.Life / 16, UCHAR_MAX);
+			}
 
 			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
 			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
@@ -1051,11 +1057,10 @@ namespace TEN::Renderer
 			if (stain.Life <= 0.0f)
 				continue;
 
-			// TODO: Try setting soft particle to true.
 			AddQuad(
 				&m_sprites[stain.SpriteID],
 				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
-				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, true, view);
+				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view);
 		}
 	}
 
@@ -1576,7 +1581,7 @@ namespace TEN::Renderer
 			if (!particle.active)
 				continue;
 
-			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
+			if (!CheckIfSlotExists(particle.sequence, "Particle rendering"))
 				continue;
 
 			AddSpriteBillboard(

@@ -29,6 +29,7 @@ namespace TEN::Effects::Blood
 		static constexpr auto LIFE_MAX			= 5.0f * 60.0f;
 		static constexpr auto LIFE_START_FADING = 30.0f;
 		static constexpr auto SURFACE_OFFSET	= 4;
+		static constexpr auto VERTEX_COUNT		= 4;
 
 		unsigned int SpriteID = 0;
 
@@ -40,7 +41,7 @@ namespace TEN::Effects::Blood
 		Vector4	ColorStart	  = Vector4::Zero;
 		Vector4	ColorEnd	  = Vector4::Zero;
 
-		std::array<Vector3, 4> VertexPoints = {};
+		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
@@ -101,7 +102,7 @@ namespace TEN::Effects::Blood
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size);
-	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);
+	void SpawnUnderwaterBloodGroup(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);
 
 	void UpdateBloodDrips();
 	void UpdateBloodStains();

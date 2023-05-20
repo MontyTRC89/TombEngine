@@ -183,11 +183,6 @@ struct ParticleDynamic
 	byte Pad[2];
 };
 
-#define MAX_NODE 23
-#define MAX_DYNAMICS 64
-#define MAX_SPLASHES 8
-#define NUM_EFFECTS 256
-
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class

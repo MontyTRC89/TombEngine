@@ -23,7 +23,6 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
