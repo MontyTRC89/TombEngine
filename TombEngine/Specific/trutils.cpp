@@ -23,14 +23,13 @@ namespace TEN::Utils
 		return converter.to_bytes(std::wstring(string));
 	}
 
-	// TODO: Sort out x64 compiler errors.
 	std::wstring ToWString(const std::string& string)
 	{
-		/*auto cString = string.c_str();
-		int size = MultiByteToWideChar(CP_UTF8, 0, cString, string.size(), nullptr, 0);
+		auto cString = string.c_str();
+		int size = MultiByteToWideChar(CP_UTF8, 0, cString, (int)string.size(), nullptr, 0);
 		auto wString = std::wstring(size, 0);
-		MultiByteToWideChar(CP_UTF8, 0, cString, strlen(cString), &wString[0], size);
-		return wString;*/
+		MultiByteToWideChar(CP_UTF8, 0, cString, (int)strlen(cString), &wString[0], size);
+		return wString;
 
 		return std::wstring();
 	}
