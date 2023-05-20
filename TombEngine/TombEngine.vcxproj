@@ -83,7 +83,7 @@
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)-x64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -103,7 +103,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)-x64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,10 +140,17 @@
     <PreBuildEvent>
       <Command>CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
-md "$(TargetDir)\Shaders" 
-xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
-xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
-      <Message>Generating savegame flatbuffer and copying shaders to output...</Message>
+
+md "$(TargetDir)\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(TargetDir)Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
+
+xcopy /Y /D  "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
+      <Message>Generating savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -181,10 +188,17 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
-md "$(TargetDir)\Shaders" 
-xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
-xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
-      <Message>Generating savegame flatbuffer and copying shaders to output...</Message>
+
+md "$(TargetDir)\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(TargetDir)Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
+
+xcopy /Y /D  "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
+      <Message>Generating savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -226,16 +240,25 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(TargetDir)\Shaders" 
-xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
-xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)Specific\savegame\schema\
-CALL gen.bat</Command>
+CALL gen.bat
+
+md "$(TargetDir)\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(TargetDir)Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
+
+xcopy /Y /D  "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer...</Message>
+      <Message>Generating savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -276,16 +299,25 @@ CALL gen.bat</Command>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(TargetDir)\Shaders" 
-xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
-xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)Specific\savegame\schema\
-CALL gen.bat</Command>
+CALL gen.bat
+
+md "$(TargetDir)\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(TargetDir)Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)Shaders\HUD\"
+
+xcopy /Y /D  "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y /D  "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer...</Message>
+      <Message>Generating savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

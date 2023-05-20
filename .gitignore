@@ -6,7 +6,6 @@ TombEngine/Release/
 packages/
 .vs/
 .vsconfig
-*.dll
 *.dmp
 *.id0
 *.id1
