@@ -230,8 +230,8 @@ void CollectMultiplePickups(int itemNumber)
 
 		// HACK: Exclude flares and torches from pickup batches.
 		bool hasFlareOrTorch = false;
-		if (currentItem->ObjectNumber == ID_FLARE_ITEM ||
-			currentItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
+		if ((currentItem->ObjectNumber == ID_FLARE_ITEM && currentItem->Active) ||
+			 currentItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
 		{
 			if (count > 0)
 				continue;
@@ -295,32 +295,19 @@ void DoPickup(ItemInfo* laraItem)
 		lara->Context.InteractedItem = NO_ITEM;
 		return;
 	}
-	else if (pickupItem->ObjectNumber == ID_FLARE_ITEM)
+	else if (pickupItem->ObjectNumber == ID_FLARE_ITEM && pickupItem->Active)
 	{
+		lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+		lara->Control.Weapon.GunType = LaraWeaponType::Flare;
+		InitializeNewWeapon(*laraItem);
+		lara->Control.HandStatus = HandStatus::Special;
+		lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
+		KillItem(pickupItemNumber);
+
 		if (laraItem->Animation.ActiveState == LA_UNDERWATER_PICKUP_FLARE)
 		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
-			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitializeNewWeapon(*laraItem);
-			lara->Control.HandStatus = HandStatus::Special;
-			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			DrawFlareMeshes(*laraItem);
-			KillItem(pickupItemNumber);
-
 			pickupItem->Pose.Orientation = prevOrient;
-			lara->Context.InteractedItem = NO_ITEM;
-			return;
-		}
-		else if (laraItem->Animation.ActiveState == LS_PICKUP_FLARE)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
-			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitializeNewWeapon(*laraItem);
-			lara->Control.HandStatus = HandStatus::Special;
-			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
-			KillItem(pickupItemNumber);
-			lara->Context.InteractedItem = NO_ITEM;
-			return;
 		}
 	}
 	else
@@ -361,7 +348,9 @@ void DoPickup(ItemInfo* laraItem)
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
 					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
-					 laraItem->Animation.ActiveState == LS_HOLE)
+					 laraItem->Animation.ActiveState == LS_HOLE ||
+					 laraItem->Animation.ActiveState == LS_PICKUP_FLARE ||
+					 laraItem->Animation.ActiveState == LA_UNDERWATER_PICKUP_FLARE)
 			{
 				if (g_GameFlow->IsMassPickupEnabled())
 				{
@@ -413,7 +402,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	auto lara = GetLaraInfo(laraItem);
 
-	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+	if (item->ObjectNumber == ID_FLARE_ITEM && item->Active && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;
 
 	item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
