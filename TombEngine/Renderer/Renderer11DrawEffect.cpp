@@ -1029,7 +1029,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrained(
 				&m_sprites[drip.SpriteID],
 				drip.Position,
-				drip.Color, 0.5f, 1.0f, Vector2(width, height), BLENDMODE_ALPHABLEND, axis, true, view);
+				drip.Color, 0.5f, 1.0f, drip.Size, BLENDMODE_ALPHABLEND, axis, true, view);
 		}
 	}
 
@@ -1043,7 +1043,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&m_sprites[mist.SpriteID],
 				mist.Position,
-				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale, mist.Scale), BLENDMODE_ALPHABLEND, true, view);
+				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale), BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 
