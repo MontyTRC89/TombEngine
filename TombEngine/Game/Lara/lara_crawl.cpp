@@ -45,7 +45,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	AlignLaraToSurface(item);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_PICKUP_FLARE)
 		return;
 
 	if (item->HitPoints <= 0)

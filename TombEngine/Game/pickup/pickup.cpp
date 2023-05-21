@@ -456,8 +456,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && 
-		(g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
+	if (!(TrInput & IN_ACTION) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
 		BinocularRange ||
 		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
@@ -716,6 +715,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)
 				{
 					laraItem->Animation.TargetState = LS_CROUCH_IDLE;
+					lara->Control.HandStatus = HandStatus::Free;
 				}
 				else
 				{
