@@ -104,14 +104,12 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
 	{
-		constexpr auto LIFE_MAX		   = 5.0f;
 		constexpr auto WIDTH_MAX	   = 4.0f;
 		constexpr auto WIDTH_MIN	   = WIDTH_MAX / 4;
 		constexpr auto HEIGHT_MAX	   = WIDTH_MAX * 2;
 		constexpr auto HEIGHT_MIN	   = WIDTH_MAX;
 		constexpr auto VEL_MAX		   = 45.0f;
 		constexpr auto VEL_MIN		   = 15.0f;
-		constexpr auto SCALE_COEFF	   = 0.3f;
 		constexpr auto DRIP_COUNT_MULT = 6;
 		constexpr auto MIST_COUNT_MULT = 4;
 		constexpr auto CONE_SEMIANGLE  = 50.0f;
@@ -121,22 +119,22 @@ namespace TEN::Effects::Blood
 			return;
 
 		// Spawn drips.
-		for (int i = 0; i < (baseCount * DRIP_COUNT_MULT); i++)
+		unsigned int count = baseCount * DRIP_COUNT_MULT;
+		for (int i = 0; i < count; i++)
 		{
 			float vel = Random::GenerateFloat(VEL_MIN, VEL_MAX);
 			auto velVector = Random::GenerateDirectionInCone(dir, CONE_SEMIANGLE) * vel;
-
-			float scale = vel * SCALE_COEFF;
 			auto size = Vector2(
 				Random::GenerateFloat(WIDTH_MIN, WIDTH_MAX),
 				Random::GenerateFloat(HEIGHT_MIN, HEIGHT_MAX));
-
 			bool canSpawnStain = (i < baseCount);
+
 			SpawnBloodDrip(pos, roomNumber, velVector, size, BloodDrip::LIFE_START_FADING, canSpawnStain);
 		}
 
 		// Spawn mists.
-		SpawnBloodMistGroup(pos, roomNumber, dir, baseCount * MIST_COUNT_MULT);
+		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
+		SpawnBloodMistGroup(pos, roomNumber, dir, mistCount);
 	}
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec)
@@ -184,8 +182,7 @@ namespace TEN::Effects::Blood
 			drip.Position.x,
 			(isOnFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling) - BloodStain::SURFACE_OFFSET,
 			drip.Position.z);
-		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, true);
-
+		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, isOnFloor);
 		float scale = ((drip.Size.x + drip.Size.y) / 2) * 4;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
@@ -384,7 +381,7 @@ namespace TEN::Effects::Blood
 				if (stain.Scale >= (stain.ScaleMax * 0.8f))
 				{
 					stain.ScaleRate *= 0.2f;
-					if (abs(stain.ScaleRate) <= FLT_EPSILON)
+					if (abs(stain.ScaleRate) <= EPSILON)
 						stain.ScaleRate = 0.0f;
 				}
 
