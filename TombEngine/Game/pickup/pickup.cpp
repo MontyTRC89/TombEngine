@@ -415,7 +415,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				{
 					if (MoveLaraPosition(PickUpPositionUW, item, laraItem))
 					{
-						if (item->ObjectNumber == ID_FLARE_ITEM)
+						if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)
 						{
 							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP_FLARE;
 							laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
@@ -692,7 +692,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 				break;
 
-			if (item->ObjectNumber == ID_FLARE_ITEM)
+			if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)
 			{
 				laraItem->Animation.AnimNumber = LA_CROUCH_PICKUP_FLARE;
 				laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
@@ -713,7 +713,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 					break;
 
-				if (item->ObjectNumber == ID_FLARE_ITEM)
+				if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)
 				{
 					laraItem->Animation.TargetState = LS_CROUCH_IDLE;
 				}
@@ -732,7 +732,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					break;
 				}
 
-				if (item->ObjectNumber == ID_FLARE_ITEM)
+				if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)
 				{
 					laraItem->Animation.AnimNumber = LA_PICKUP;
 					laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
