@@ -54,7 +54,7 @@ FIRE_LIST Fires[MAX_FIRE_LIST];
 // Temporary wrapper for the old blood spawning function.
 void TriggerBlood(int x, int y, int z, int direction, int num)
 {
-	SpawnBloodMistCloud(Vector3(x, y, z), 0, Vector3::Zero, num);
+	SpawnBloodMistGroup(Vector3(x, y, z), 0, Vector3::Zero, num);
 }
 
 int GetFreeFireSpark()

@@ -15,11 +15,11 @@ namespace TEN::Effects::Blood
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
+		Vector2 Size	   = Vector2::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
-		float Scale			  = 0.0f;
 		float Opacity		  = 0.0f;
 		float Gravity		  = 0.0f;
 	};
@@ -94,13 +94,13 @@ namespace TEN::Effects::Blood
 	extern std::vector<BloodMist>		BloodMists;
 	extern std::vector<UnderwaterBlood> UnderwaterBloodClouds;
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, float lifeInSec, float scale, bool canSpawnStain);
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& di, const Vector3& baseVel, unsigned int count);
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& siz, float lifeInSec, bool canSpawnStain);
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& di, const Vector3& baseVel, unsigned int baseCount);
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec = 0.0f);
-	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool onFloor);
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool isOnFloor);
 	void SpawnBloodStainPool(ItemInfo& item);
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& dir);
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count);
+	void SpawnBloodMistGroup(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count);
 	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size);
 	void SpawnUnderwaterBloodGroup(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count);
 

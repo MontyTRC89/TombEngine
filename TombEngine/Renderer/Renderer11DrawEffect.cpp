@@ -1026,9 +1026,6 @@ namespace TEN::Renderer
 			auto axis = -drip.Velocity;
 			axis.Normalize();
 
-			float width = drip.Scale * Random::GenerateFloat(1.0f, 3.0f);
-			float height = drip.Scale * Random::GenerateFloat(4.0f, 12.0f);
-
 			AddSpriteBillboardConstrained(
 				&m_sprites[drip.SpriteID],
 				drip.Position,

@@ -77,7 +77,7 @@ namespace TEN::Effects::Blood
 		return true;
 	}
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, float lifeInSec, float scale, bool canSpawnStain)
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain)
 	{
 		constexpr auto COUNT_MAX   = 256;
 		constexpr auto GRAVITY_MAX = 15.0f;
@@ -93,48 +93,50 @@ namespace TEN::Effects::Blood
 		drip.CanSpawnStain = canSpawnStain;
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
+		drip.Size = size;
 		drip.Velocity = vel;
 		drip.Color = BLOOD_COLOR_RED;
 		drip.Life = std::round(lifeInSec * FPS);
 		drip.LifeStartFading = std::round(BloodDrip::LIFE_START_FADING * FPS);
 		drip.Opacity = 1.0f;
-		drip.Scale = scale;
 		drip.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
 	}
 
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count)
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
 	{
 		constexpr auto LIFE_MAX		   = 5.0f;
-		constexpr auto SPRAY_VEL_MAX   = 45.0f;
-		constexpr auto SPRAY_VEL_MIN   = 15.0f;
-		constexpr auto SPRAY_SEMIANGLE = 50.0f;
+		constexpr auto WIDTH_MAX	   = 4.0f;
+		constexpr auto WIDTH_MIN	   = WIDTH_MAX / 4;
+		constexpr auto HEIGHT_MAX	   = WIDTH_MAX * 2;
+		constexpr auto HEIGHT_MIN	   = WIDTH_MAX;
+		constexpr auto VEL_MAX		   = 45.0f;
+		constexpr auto VEL_MIN		   = 15.0f;
+		constexpr auto SCALE_COEFF	   = 0.3f;
+		constexpr auto DRIP_COUNT_MULT = 6;
+		constexpr auto MIST_COUNT_MULT = 4;
+		constexpr auto CONE_SEMIANGLE  = 50.0f;
 
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		// Spawn mist.
-		SpawnBloodMistCloud(pos, roomNumber, dir, count * 4);
-
-		// Spawn decorative drips.
-		for (int i = 0; i < (count * 6); i++)
+		// Spawn drips.
+		for (int i = 0; i < (baseCount * DRIP_COUNT_MULT); i++)
 		{
-			float length = Random::GenerateFloat(SPRAY_VEL_MIN, SPRAY_VEL_MAX);
-			auto vel = Random::GenerateDirectionInCone(-dir, SPRAY_SEMIANGLE) * length;
-			float scale = length * 0.1f;
+			float vel = Random::GenerateFloat(VEL_MIN, VEL_MAX);
+			auto velVector = Random::GenerateDirectionInCone(dir, CONE_SEMIANGLE) * vel;
 
-			SpawnBloodDrip(pos, roomNumber, vel, BloodDrip::LIFE_START_FADING, scale, false);
+			float scale = vel * SCALE_COEFF;
+			auto size = Vector2(
+				Random::GenerateFloat(WIDTH_MIN, WIDTH_MAX),
+				Random::GenerateFloat(HEIGHT_MIN, HEIGHT_MAX));
+
+			bool canSpawnStain = (i < baseCount);
+			SpawnBloodDrip(pos, roomNumber, velVector, size, BloodDrip::LIFE_START_FADING, canSpawnStain);
 		}
 
-		// Spawn special drips capable of creating stains.
-		for (int i = 0; i < count; i++)
-		{
-			float length = Random::GenerateFloat(SPRAY_VEL_MIN, SPRAY_VEL_MAX);
-			auto vel = baseVel + Random::GenerateDirectionInCone(dir, SPRAY_SEMIANGLE) * length;
-			float scale = length * 0.5f;
-
-			SpawnBloodDrip(pos, roomNumber, vel, LIFE_MAX, scale, true);
-		}
+		// Spawn mists.
+		SpawnBloodMistGroup(pos, roomNumber, dir, baseCount * MIST_COUNT_MULT);
 	}
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec)
@@ -168,7 +170,7 @@ namespace TEN::Effects::Blood
 		stain.DelayTime = std::round(delayInSec * FPS);
 	}
 
-	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool onFloor)
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool isOnFloor)
 	{
 		// Can't spawn stain; return early.
 		if (!drip.CanSpawnStain)
@@ -180,10 +182,11 @@ namespace TEN::Effects::Blood
 
 		auto pos = Vector3(
 			drip.Position.x,
-			(onFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling) - BloodStain::SURFACE_OFFSET,
+			(isOnFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling) - BloodStain::SURFACE_OFFSET,
 			drip.Position.z);
-		auto normal = GetSurfaceNormal(onFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, true);
-		float scale = drip.Scale * 4;
+		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, true);
+
+		float scale = ((drip.Size.x + drip.Size.y) / 2) * 4;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
 		SpawnBloodStain(pos, drip.RoomNumber, normal, scale, scaleRate);
@@ -246,7 +249,7 @@ namespace TEN::Effects::Blood
 		mist.Rotation = Random::GenerateAngle(-ROT_MAX, ROT_MAX);
 	}
 
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
+	void SpawnBloodMistGroup(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
 	{
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
@@ -321,7 +324,10 @@ namespace TEN::Effects::Blood
 				drip.Life = 0.0f;
 
 				if (drip.CanSpawnStain)
-					SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, drip.Scale * 5);
+				{
+					float scale = ((drip.Size.x + drip.Size.y) / 2) * 5;
+					SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, scale);
+				}
 			}
 			// Hit wall or ceiling; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
