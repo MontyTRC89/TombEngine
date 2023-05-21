@@ -245,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	std::string gameDir{};
+	std::string gameDir = "../../";
 
 	// Parse command line arguments.
 	for (int i = 1; i < argc; i++)
@@ -268,7 +268,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "gamedir") && argc > (i + 1))
 		{
-			gameDir = TEN::Utils::ToString(argv[i + 1]);
+			gameDir = gameDir + TEN::Utils::ToString(argv[i + 1]);
 
 			// Replace all backslashes with forward slashes.
 			std::replace(gameDir.begin(), gameDir.end(), '\\', '/');
