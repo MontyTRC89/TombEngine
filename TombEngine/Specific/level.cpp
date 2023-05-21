@@ -1031,23 +1031,26 @@ unsigned int _stdcall LoadLevel(void* data)
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
+	auto assetDir = g_GameFlow->GetGameDir();
+	auto levelPath = assetDir + level->FileName;
+	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
+	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(level->FileName.c_str());
+		filePtr = FileOpen(levelPath.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
+			throw std::exception{ (std::string{ "Unable to read level file: " } + levelPath).c_str() };
 
 		char header[4];
 		unsigned char version[4];

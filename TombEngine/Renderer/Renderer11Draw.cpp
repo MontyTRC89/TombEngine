@@ -106,7 +106,7 @@ namespace TEN::Renderer
 		else 
 		{
 			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
-			m_stShadowMap.NumSpheres = nearestSpheres.size();
+			m_stShadowMap.NumSpheres = (int)nearestSpheres.size();
 		}
 	}
 
@@ -527,7 +527,7 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
 
-						if (bucket->Polygons.size() == 0)
+						if (bucket->Polygons.empty())
 							continue;
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
@@ -728,7 +728,7 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
 
-						if (bucket->Polygons.size() == 0)
+						if (bucket->Polygons.empty())
 							continue;
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
@@ -1031,7 +1031,7 @@ namespace TEN::Renderer
 					  }
 		);
 
-		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
+		for (int r = (int)view.roomsToDraw.size() - 1; r >= 0; r--)
 		{
 			RendererRoom& room = *view.roomsToDraw[r];
 
@@ -1314,10 +1314,10 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_CCW);
 
-		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
+		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, (int)m_transparentFacesIndices.size());
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1376,7 +1376,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1702,10 +1702,10 @@ namespace TEN::Renderer
 		m_stItem.Color = item->Color;
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-		{
 			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
-		}
+
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
@@ -1744,10 +1744,10 @@ namespace TEN::Renderer
 			m_stItem.Color = info->color;
 			m_stItem.AmbientLight = info->item->AmbientLight;
 			memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-			{
+
+			for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
 				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
-			}
+
 			BindMoveableLights(info->item->LightsToDraw, info->item->RoomNumber, info->item->PrevRoomNumber, info->item->LightFade);
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
@@ -1766,7 +1766,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 
 		int drawnVertices = 0;
-		int size = m_transparentFacesIndices.size();
+		int size = (int)m_transparentFacesIndices.size();
 
 		while (drawnVertices < size)
 		{
@@ -1924,13 +1924,13 @@ namespace TEN::Renderer
 							if (DoesBlendModeRequireSorting(bucket.BlendMode))
 							{
 								// Collect transparent faces
-								for (int j = 0; j < bucket.Polygons.size(); j++)
+								for (int j = 0; j < (int)bucket.Polygons.size(); j++)
 								{
 									RendererPolygon* p = &bucket.Polygons[j];
 
 									// As polygon distance, for moveables, we use the averaged distance
-									Vector3 centre = Vector3::Transform(p->centre, msh->World);
-									int distance = (centre - cameraPosition).Length();
+									auto centre = Vector3::Transform(p->centre, msh->World);
+									float distance = (centre - cameraPosition).Length();
 
 									RendererTransparentFace face;
 									face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
@@ -2001,7 +2001,7 @@ namespace TEN::Renderer
 		}
 
 		m_numRoomsTransparentPolygons = 0;
-		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
+		for (int i = (int)view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];

@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (lizardList.size() == 1)
 			return lizardList[0];
 		else
-			return lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
+			return lizardList[Random::GenerateInt(0, (int)lizardList.size() - 1)];
 	}
 
 	static bool IsLizardActiveNearby(const ItemInfo& item, bool isInitializing = false)

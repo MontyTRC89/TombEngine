@@ -88,7 +88,7 @@ namespace TEN::Control::Volumes
 
 			VolumeState* entryPtr = nullptr;
 
-			for (int j = volume.StateQueue.size() - 1; j >= 0; j--)
+			for (int j = (int)volume.StateQueue.size() - 1; j >= 0; j--)
 			{
 				auto& candidate = volume.StateQueue[j];
 
@@ -201,7 +201,7 @@ namespace TEN::Control::Volumes
 				nodeCatalogs.push_back(path.path().filename().string());
 		}
 
-		if (nodeCatalogs.size() == 0)
+		if (nodeCatalogs.empty())
 			return;
 
 		TENLog("Loading node scripts...", LogLevel::Info);

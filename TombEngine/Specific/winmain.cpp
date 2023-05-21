@@ -36,7 +36,7 @@ bool DebugMode = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
-// Indicates to hybrid graphics systems to prefer the discrete part by default
+// Indicates to hybrid graphics systems to prefer discrete part by default.
 extern "C"
 {
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -239,14 +239,15 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	// Process command line arguments
+	// Process command line arguments.
 	bool setup = false;
 	std::string levelFile = {};
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	std::string gameDir{};
 
-	// Parse command line arguments
+	// Parse command line arguments.
 	for (int i = 1; i < argc; i++)
 	{
 		if (ArgEquals(argv[i], "setup"))
@@ -265,36 +266,56 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
 		}
+		else if (ArgEquals(argv[i], "gamedir") && argc > (i + 1))
+		{
+			gameDir = TEN::Utils::ToString(argv[i + 1]);
+
+			// Replace all backslashes with forward slashes.
+			std::replace(gameDir.begin(), gameDir.end(), '\\', '/');
+
+			// Add trailing slash if missing.
+			if (gameDir.back() != '/')
+				gameDir += '/';
+		}
 	}
 	LocalFree(argv);
 
-	// Hide console window if mode isn't debug
+	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
 	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
-	// Clear Application Structure
+	// Clear Application Structure.
 	memset(&App, 0, sizeof(WINAPP));
 	
-	// Initialize logging
-	InitTENLog();
+	// Initialize logging.
+	InitTENLog(gameDir);
 
-	// Indicate version
+	// Indicate version.
 	auto ver = GetProductOrFileVersion(false);
 	auto windowName = (std::string("Starting TombEngine version ") +
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]));
+					   std::to_string(ver[2]) + " " +
+#ifdef _WIN64
+					   "(64-bit)"
+#else
+					   "(32-bit)"
+#endif
+					   );
 	TENLog(windowName, LogLevel::Info);
 
-	// Collect numbered tracks
+	SaveGame::AddGameDirToSavePath(gameDir);
+	AddGameDirToAudioPath(gameDir);
+
+	// Collect numbered tracks.
 	EnumerateLegacyTracks();
 
-	// Initialize the new scripting system
-	ScriptInterfaceState::Init();
+	// Initialize scripting system.
+	ScriptInterfaceState::Init(gameDir);
 
-	// Initialize scripting
+	// Initialize scripting.
 	try 
 	{
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
@@ -314,6 +335,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//should be moved to LogicHandler or vice versa to make this stuff
 		//less fragile (squidshire, 16/09/22)
 		g_GameScript->ShortenTENCalls();
+		g_GameFlow->SetGameDir(gameDir);
 		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)
@@ -324,16 +346,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	// Disable DPI scaling on Windows 8.1+ systems
+	// Disable DPI scaling on Windows 8.1+ systems.
 	DisableDpiAwareness();
 
-	// Setup main window
+	// Set up main window.
 	INITCOMMONCONTROLSEX commCtrlInit;
 	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
 	InitCommonControlsEx(&commCtrlInit);
 
-	// Initialize main window
+	// Initialize main window.
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	App.WindowClass.lpszMenuName = NULL;
@@ -346,17 +368,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.cbWndExtra = 0;
 	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
 
-	// Register main window
+	// Register main window.
 	if (!RegisterClass(&App.WindowClass))
 	{
 		TENLog("Unable To Register Window Class", LogLevel::Error);
 		return 0;
 	}
 
-	// Create the renderer and enumerate adapters and video modes
+	// Create renderer and enumerate adapters and video modes.
 	g_Renderer.Create();
 
-	// Load configuration and optionally show the setup dialog
+	// Load configuration and optionally show setup dialog.
 	InitDefaultConfiguration();
 	if (setup || !LoadConfiguration())
 	{
@@ -369,7 +391,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LoadConfiguration();
 	}
 
-	// Setup window dimensions
+	// Set up window dimensions.
 	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
@@ -377,13 +399,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Rect.bottom = g_Configuration.Height;
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
-	// Make window handle
+	// Make window handle.
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
 		g_GameFlow->GetString(STRING_WINDOW_TITLE),
 		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
-		CW_USEDEFAULT, // TODO: change this to center of screen !!!
+		CW_USEDEFAULT, // TODO: change this to center of screen!
 		CW_USEDEFAULT,
 		Rect.right - Rect.left,
 		Rect.bottom - Rect.top,
@@ -400,7 +422,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 	else
+	{
 		WindowsHandle = App.WindowHandle;
+	}
 
 	try
 	{

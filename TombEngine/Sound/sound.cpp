@@ -37,8 +37,14 @@ int SecretSoundIndex = 5;
 constexpr int LegacyLoopingTrackMin = 98;
 constexpr int LegacyLoopingTrackMax = 111;
 
+static std::string FullAudioDir;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
+
+void AddGameDirToAudioPath(const std::string& gameDir)
+{
+	FullAudioDir = gameDir + TRACKS_PATH;
+}
 
 void SetVolumeMusic(int vol) 
 {
@@ -338,7 +344,7 @@ void FreeSamples()
 
 void EnumerateLegacyTracks()
 {
-	auto dir = std::filesystem::path(TRACKS_PATH);
+	auto dir = std::filesystem::path{ FullAudioDir };
 	if (std::filesystem::exists(dir))
 	{
 		try {
@@ -408,13 +414,13 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 		break;
 	}
 
-	auto fullTrackName = TRACKS_PATH + track + ".ogg";
+	auto fullTrackName = FullAudioDir + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
-		fullTrackName = TRACKS_PATH + track + ".mp3";
+		fullTrackName = FullAudioDir + track + ".mp3";
 		if (!std::filesystem::exists(fullTrackName))
 		{
-			fullTrackName = TRACKS_PATH + track + ".wav";
+			fullTrackName = FullAudioDir + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
 				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);

@@ -32,6 +32,7 @@ Version 1.0.9
 * Add log reports if title level or other levels don't exist.
 * Add better error handling for missing font, sprites or shaders.
 * Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
+* Add 64-bit TEN exe.
 
 Lua API changes:
 * Add Vec2 class.
