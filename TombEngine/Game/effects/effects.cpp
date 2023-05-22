@@ -1076,9 +1076,13 @@ short DoBloodSplat(int x, int y, int z, short speed, short direction, short room
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		SpawnUnderwaterBlood(Vector3(x, y, z), probedRoomNumber, speed);
+	{
+		UnderwaterBlood.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
+	}
 	else
+	{
 		TriggerBlood(x, y, z, direction >> 4, speed);
+	}
 
 	return 0;
 }

@@ -463,7 +463,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto baseVelocity = Vector3::Transform(item->Animation.Velocity, rotMatrix);
 
 		unsigned int numBloodDrips = Random::GenerateInt(1, 3);
-		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, Vector3::Up, baseVelocity, numBloodDrips);
+		SpawnBloodSplat(pos.ToVector3(), item->RoomNumber, Vector3::Up, baseVelocity, numBloodDrips);
 	}
 	dbBlood = KeyMap[OIS::KC_B] ? false : true;
 

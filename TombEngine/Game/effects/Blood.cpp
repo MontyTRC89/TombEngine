@@ -21,10 +21,11 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
+	UnderwaterBloodEffectController UnderwaterBlood = {};
+
 	std::vector<BloodDrip>		 BloodDrips			   = {};
 	std::vector<BloodStain>		 BloodStains		   = {};
 	std::vector<BloodMist>		 BloodMists			   = {};
-	std::vector<UnderwaterBlood> UnderwaterBloodClouds = {};
 
 	static std::array<Vector3, BloodStain::VERTEX_COUNT> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal,
 																				   float scale)
@@ -102,7 +103,7 @@ namespace TEN::Effects::Blood
 		drip.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
 	}
 
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
+	void SpawnBloodSplat(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
 	{
 		constexpr auto WIDTH_MAX	   = 4.0f;
 		constexpr auto WIDTH_MIN	   = WIDTH_MAX / 4;
@@ -134,7 +135,7 @@ namespace TEN::Effects::Blood
 
 		// Spawn mists.
 		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
-		SpawnBloodMistGroup(pos, roomNumber, dir, mistCount);
+		SpawnBloodMists(pos, roomNumber, dir, mistCount);
 	}
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec)
@@ -168,7 +169,7 @@ namespace TEN::Effects::Blood
 		stain.DelayTime = std::round(delayInSec * FPS);
 	}
 
-	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl, bool isOnFloor)
+	void SpawnBloodStain(const BloodDrip& drip, const CollisionResult& pointColl, bool isOnFloor)
 	{
 		// Can't spawn stain; return early.
 		if (!drip.CanSpawnStain)
@@ -189,9 +190,9 @@ namespace TEN::Effects::Blood
 		SpawnBloodStain(pos, drip.RoomNumber, normal, scale, scaleRate);
 	}
 
-	void SpawnBloodStainPool(ItemInfo& item)
+	void SpawnBloodStain(ItemInfo& item)
 	{
-		constexpr auto SCALE_RATE = 0.4f;
+		constexpr auto SCALAR	  = 0.4f;
 		constexpr auto DELAY_TIME = 5.0f;
 
 		auto pointColl = GetCollision(&item);
@@ -199,9 +200,9 @@ namespace TEN::Effects::Blood
 		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
 
 		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		float scaleMax = box.Extents.x + box.Extents.z;
+		float sizeMax = box.Extents.x + box.Extents.z;
 
-		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, SCALE_RATE, DELAY_TIME);
+		SpawnBloodStain(pos, item.RoomNumber, normal, sizeMax, SCALAR, DELAY_TIME);
 	}
 	
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& dir)
@@ -228,7 +229,7 @@ namespace TEN::Effects::Blood
 
 		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
 
-		mist.SpriteID = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
+		mist.SpriteID = Objects[ID_SMOKE_SPRITES].meshIndex;
 		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
@@ -246,7 +247,7 @@ namespace TEN::Effects::Blood
 		mist.Rotation = Random::GenerateAngle(-ROT_MAX, ROT_MAX);
 	}
 
-	void SpawnBloodMistGroup(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
+	void SpawnBloodMists(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
 	{
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
@@ -256,7 +257,37 @@ namespace TEN::Effects::Blood
 			SpawnBloodMist(pos, roomNumber, dir);
 	}
 	
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float size)
+	const std::vector<UnderwaterBloodEffectParticle>& UnderwaterBloodEffectController::GetParticles()
+	{
+		return Particles;
+	}
+
+	void UnderwaterBloodEffectParticle::Update()
+	{
+		constexpr auto PART_SIZE_MAX = BLOCK(0.25f);
+
+		if (Life <= 0.0f)
+			return;
+
+		// Update size.
+		if (Size < PART_SIZE_MAX)
+			Size += 4.0f;
+
+		// Update life.
+		if (Init == 0.0f)
+		{
+			Life -= 3.0f;
+		}
+		else if (Init < Life)
+		{
+			Init += 4.0f;
+
+			if (Init >= Life)
+				Init = 0.0f;
+		}
+	}
+
+	void UnderwaterBloodEffectController::Spawn(const Vector3& pos, int roomNumber, float size, unsigned int count)
 	{
 		constexpr auto COUNT_MAX	= 512;
 		constexpr auto LIFE_MAX		= 8.5f;
@@ -267,26 +298,35 @@ namespace TEN::Effects::Blood
 		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater blood sprite missing."))
 			return;
 
-		auto& uwBlood = GetNewEffect(UnderwaterBloodClouds, COUNT_MAX);
-
 		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
 
-		uwBlood.SpriteID = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		uwBlood.Position = Random::GeneratePointInSphere(sphere);
-		uwBlood.RoomNumber = roomNumber;
-		uwBlood.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
-		uwBlood.Init = 1.0f;
-		uwBlood.Size = size;
+		for (int i = 0; i > count; i++)
+		{
+			auto& part = GetNewEffect(Particles, COUNT_MAX);
+
+			part.SpriteID = Objects[ID_DEFAULT_SPRITES].meshIndex;
+			part.Position = Random::GeneratePointInSphere(sphere);
+			part.RoomNumber = roomNumber;
+			part.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
+			part.Init = 1.0f;
+			part.Size = size;
+		}
 	}
 
-	void SpawnUnderwaterBloodGroup(const Vector3& pos, int roomNumber, float sizeMax, unsigned int count)
+	void UnderwaterBloodEffectController::Update()
 	{
-		// Underwater; return early.
-		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+		if (Particles.empty())
 			return;
 
-		for (int i = 0; i < count; i++)
-			SpawnUnderwaterBlood(pos, roomNumber, sizeMax);
+		for (auto& part : Particles)
+			part.Update();
+
+		ClearInactiveEffects(Particles);
+	}
+
+	void UnderwaterBloodEffectController::Clear()
+	{
+		Particles.clear();
 	}
 
 	void UpdateBloodDrips()
@@ -323,7 +363,7 @@ namespace TEN::Effects::Blood
 				if (drip.CanSpawnStain)
 				{
 					float scale = ((drip.Size.x + drip.Size.y) / 2) * 5;
-					SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, scale);
+					UnderwaterBlood.Spawn(drip.Position, drip.RoomNumber, scale);
 				}
 			}
 			// Hit wall or ceiling; deactivate.
@@ -335,14 +375,14 @@ namespace TEN::Effects::Blood
 			else if (drip.Position.y >= pointColl.Position.Floor)
 			{
 				drip.Life = 0.0f;
-				SpawnBloodStainFromDrip(drip, pointColl, true);
+				SpawnBloodStain(drip, pointColl, true);
 			}
 			
 			// Hit ceiling; spawn stain.
 			else if (drip.Position.y >= pointColl.Position.Ceiling)
 			{
 				drip.Life = 0.0f;
-				SpawnBloodStainFromDrip(drip, pointColl, false);
+				SpawnBloodStain(drip, pointColl, false);
 			}
 
 			// Update life.
@@ -445,44 +485,6 @@ namespace TEN::Effects::Blood
 		ClearInactiveEffects(BloodMists);
 	}
 
-	void UpdateUnderwaterBloodClouds()
-	{
-		constexpr auto UW_BLOOD_SIZE_MAX = BLOCK(0.25f);
-
-		if (UnderwaterBloodClouds.empty())
-			return;
-
-		for (auto& uwBlood : UnderwaterBloodClouds)
-		{
-			if (uwBlood.Life <= 0.0f)
-				continue;
-
-			// Update size.
-			if (uwBlood.Size < UW_BLOOD_SIZE_MAX)
-				uwBlood.Size += 4.0f;
-
-			// Update life.
-			if (uwBlood.Init == 0.0f)
-			{
-				uwBlood.Life -= 3.0f;
-			}
-			else if (uwBlood.Init < uwBlood.Life)
-			{
-				uwBlood.Init += 4.0f;
-
-				if (uwBlood.Init >= uwBlood.Life)
-					uwBlood.Init = 0.0f;
-			}
-		}
-
-		ClearInactiveEffects(UnderwaterBloodClouds);
-	}
-
-	void ClearUnderwaterBloodClouds()
-	{
-		UnderwaterBloodClouds.clear();
-	}
-	
 	void ClearBloodMists()
 	{
 		BloodMists.clear();
@@ -503,6 +505,6 @@ namespace TEN::Effects::Blood
 		g_Renderer.PrintDebugMessage("Blood drip count: %d ", BloodDrips.size());
 		g_Renderer.PrintDebugMessage("Blood stain count: %d ", BloodStains.size());
 		g_Renderer.PrintDebugMessage("Blood mist count: %d ", BloodMists.size());
-		g_Renderer.PrintDebugMessage("UW. blood count: %d ", UnderwaterBloodClouds.size());
+		g_Renderer.PrintDebugMessage("UW. blood count: %d ", UnderwaterBlood.GetParticles().size());
 	}
 }

@@ -540,22 +540,22 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawUnderwaterBloodParticles(RenderView& view)
 	{
-		if (UnderwaterBloodClouds.empty())
+		if (UnderwaterBlood.GetParticles().empty())
 			return;
 
-		for (const auto& uwBlood : UnderwaterBloodClouds)
+		for (const auto& part : UnderwaterBlood.GetParticles())
 		{
-			if (uwBlood.Life <= 0.0f)
+			if (part.Life <= 0.0f)
 				continue;
 
 			auto color = Vector4::Zero;
-			if (uwBlood.Init)
+			if (part.Init)
 			{
-				color = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, UCHAR_MAX);
+				color = Vector4(part.Init / 2, 0, part.Init / 16, UCHAR_MAX);
 			}
 			else
 			{
-				color = Vector4(uwBlood.Life / 2, 0, uwBlood.Life / 16, UCHAR_MAX);
+				color = Vector4(part.Life / 2, 0, part.Life / 16, UCHAR_MAX);
 			}
 
 			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
@@ -564,9 +564,9 @@ namespace TEN::Renderer
 			color /= UCHAR_MAX;
 
 			AddSpriteBillboard(
-				&m_sprites[uwBlood.SpriteID],
-				uwBlood.Position,
-				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BLENDMODE_ADDITIVE, true, view);
+				&m_sprites[part.SpriteID],
+				part.Position,
+				color, 0.0f, 1.0f, Vector2(part.Size, part.Size) * 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 

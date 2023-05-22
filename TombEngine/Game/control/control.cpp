@@ -201,6 +201,7 @@ GameStatus ControlPhase(int numFrames)
 
 		// Update effects.
 		StreamerEffect.Update();
+		UnderwaterBlood.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -210,7 +211,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBloodDrips();
 		UpdateBloodMists();
 		UpdateBloodStains();
-		UpdateUnderwaterBloodClouds();
 		UpdateFootprints();
 		UpdateRipples();
 		UpdateSplashes();
@@ -229,7 +229,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
-		UpdateUnderwaterBloodClouds();
 
 		// Update HUD.
 		g_Hud.Update(*LaraItem);
@@ -420,11 +419,11 @@ void CleanUp()
 
 	// Clear effects.
 	StreamerEffect.Clear();
+	UnderwaterBlood.Clear();
 	ClearBloodDrips();
 	ClearBloodMists();
 	ClearBloodStains();
 	ClearBubbles();
-	ClearUnderwaterBloodClouds();
 	ClearBubbles();
 	ClearFootprints();
 	ClearDrips();
@@ -433,7 +432,6 @@ void CleanUp()
 	ClearLaserBarrierEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
-	ClearUnderwaterBloodClouds();
 	DisableDebris();
 
 	// Clear swarm enemies.

@@ -93,8 +93,8 @@ namespace TEN::Entities::TR4
 
 				unsigned int numBloodDrips = 5;
 				auto baseVelocity = item->Pose.Orientation.ToDirection() * (item->Animation.Velocity.Length() + 20);
-				SpawnBloodDripSpray(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, baseVelocity, numBloodDrips);
-				SpawnBloodStainPool(*item);
+				SpawnBloodSplat(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, baseVelocity, numBloodDrips);
+				SpawnBloodStain(*item);
 			}
 		}
 		else
