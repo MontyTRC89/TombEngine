@@ -540,10 +540,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawUnderwaterBloodParticles(RenderView& view)
 	{
-		if (UnderwaterBlood.GetParticles().empty())
+		if (UnderwaterBloodEffect.GetParticles().empty())
 			return;
 
-		for (const auto& part : UnderwaterBlood.GetParticles())
+		for (const auto& part : UnderwaterBloodEffect.GetParticles())
 		{
 			if (part.Life <= 0.0f)
 				continue;
@@ -1042,46 +1042,46 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBloodDrips(RenderView& view)
 	{
-		for (const auto& drip : BloodDrips)
+		for (const auto& part : BloodDripEffect.GetParticles())
 		{
-			if (drip.Life <= 0.0f)
+			if (part.Life <= 0.0f)
 				continue;
 
-			auto axis = -drip.Velocity;
+			auto axis = -part.Velocity;
 			axis.Normalize();
 
 			AddSpriteBillboardConstrained(
-				&m_sprites[drip.SpriteID],
-				drip.Position,
-				drip.Color, 0.5f, 1.0f, drip.Size, BLENDMODE_ALPHABLEND, axis, true, view);
+				&m_sprites[part.SpriteID],
+				part.Position,
+				part.Color, 0.5f, 1.0f, part.Size, BLENDMODE_ALPHABLEND, axis, true, view);
 		}
 	}
 
 	void Renderer11::DrawBloodMists(RenderView& view)
 	{
-		for (const auto& mist : BloodMists)
+		for (const auto& part : BloodMistEffect.GetParticles())
 		{
-			if (mist.Life <= 0.0f)
+			if (part.Life <= 0.0f)
 				continue;
 
 			AddSpriteBillboard(
-				&m_sprites[mist.SpriteID],
-				mist.Position,
-				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale), BLENDMODE_ALPHABLEND, true, view);
+				&m_sprites[part.SpriteID],
+				part.Position,
+				part.Color, TO_RAD(part.Orientation2D), 1.0f, Vector2(part.Size), BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 
 	void Renderer11::DrawBloodStains(RenderView& view)
 	{
-		for (const auto& stain : BloodStains)
+		for (const auto& part : BloodStainEffect.GetParticles())
 		{
-			if (stain.Life <= 0.0f)
+			if (part.Life <= 0.0f)
 				continue;
 
 			AddQuad(
-				&m_sprites[stain.SpriteID],
-				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
-				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view);
+				&m_sprites[part.SpriteID],
+				part.VertexPoints[0], part.VertexPoints[1], part.VertexPoints[2], part.VertexPoints[3],
+				part.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view);
 		}
 	}
 

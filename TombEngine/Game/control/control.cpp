@@ -200,23 +200,22 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		BloodDripEffect.Update();
+		BloodMistEffect.Update();
+		BloodStainEffect.Update();
 		StreamerEffect.Update();
-		UnderwaterBlood.Update();
+		UnderwaterBloodEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
 		UpdateBubbles();
 		UpdateDebris();
 		UpdateGunShells();
-		UpdateBloodDrips();
-		UpdateBloodMists();
-		UpdateBloodStains();
 		UpdateFootprints();
 		UpdateRipples();
 		UpdateSplashes();
 		UpdateElectricityArcs();
 		UpdateHelicalLasers();
-		//UpdateDrips(); // TODO: Check what this was.
 		UpdateRats();
 		UpdateRipples();
 		UpdateBats();
@@ -418,11 +417,11 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	BloodDripEffect.Clear();
+	BloodMistEffect.Clear();
+	BloodStainEffect.Clear();
 	StreamerEffect.Clear();
-	UnderwaterBlood.Clear();
-	ClearBloodDrips();
-	ClearBloodMists();
-	ClearBloodStains();
+	UnderwaterBloodEffect.Clear();
 	ClearBubbles();
 	ClearBubbles();
 	ClearFootprints();

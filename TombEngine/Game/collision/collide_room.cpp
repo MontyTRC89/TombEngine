@@ -114,7 +114,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 }
 
 // Overload used to quickly get point/room collision parameters at a given item's position.
-CollisionResult GetCollision(ItemInfo* item)
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	auto newRoomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
@@ -125,7 +125,7 @@ CollisionResult GetCollision(ItemInfo* item)
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
 

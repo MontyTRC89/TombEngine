@@ -28,17 +28,12 @@
 	}
 
 	// TODO: This shouldn't be a method. Make it a function in animation.cpp.
-	GameBoundingBox::GameBoundingBox(ItemInfo* item)
+	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		auto frameData = GetFrameInterpData(*item);
-		if (frameData.Alpha == 0.0f)
-		{
-			*this = frameData.FramePtr0->BoundingBox;
-		}
-		else
-		{
-			*this = frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
-		}
+		*this = (frameData.Alpha == 0.0f) ?
+			frameData.FramePtr0->BoundingBox :
+			frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
 	}
 
 	int GameBoundingBox::GetWidth() const

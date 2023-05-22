@@ -1074,10 +1074,10 @@ void UpdateSplashes()
 
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
-	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
+	int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 	{
-		UnderwaterBlood.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
+		UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
 	}
 	else
 	{

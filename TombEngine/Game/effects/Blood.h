@@ -5,7 +5,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Blood
 {
-	struct BloodDrip
+	struct BloodDripEffectParticle
 	{
 		static constexpr auto LIFE_START_FADING = 0.5f;
 
@@ -22,9 +22,29 @@ namespace TEN::Effects::Blood
 		float LifeStartFading = 0.0f;
 		float Opacity		  = 0.0f;
 		float Gravity		  = 0.0f;
+
+		void Update();
 	};
 
-	struct BloodStain
+	class BloodDripEffectController
+	{
+	private:
+		// Members
+		std::vector<BloodDripEffectParticle> Particles;
+
+	public:
+		// Getters
+		const std::vector<BloodDripEffectParticle>& GetParticles();
+
+		// Spawners
+		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain);
+
+		// Utilities
+		void Update();
+		void Clear();
+	};
+
+	struct BloodStainEffectParticle
 	{
 		static constexpr auto LIFE_MAX			= 5.0f * 60.0f;
 		static constexpr auto LIFE_START_FADING = 30.0f;
@@ -45,15 +65,40 @@ namespace TEN::Effects::Blood
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
-		float Scale			  = 0.0f;
-		float ScaleMax		  = 0.0f;
-		float ScaleRate		  = 0.0f;
+		float Size			  = 0.0f;
+		float SizeMax		  = 0.0f;
+		float Scalar		  = 0.0f;
 		float Opacity		  = 0.0f;
 		float OpacityMax	  = 0.0f;
 		float DelayTime		  = 0.0f;
+
+		void Update();
+
+		std::array<Vector3, BloodStainEffectParticle::VERTEX_COUNT> GetVertexPoints();
+		bool														TestSurface();
+	};
+
+	class BloodStainEffectController
+	{
+	private:
+		// Members
+		std::vector<BloodStainEffectParticle> Particles = {};
+
+	public:
+		// Spawners
+		const std::vector<BloodStainEffectParticle>& GetParticles();
+
+		// Spawners
+		void Spawn(const Vector3& pos, int roomNumber, const Vector3& normal, float sizeMax, float scalar, float delayInSec = 0.0f);
+		void Spawn(const BloodDripEffectParticle& drip, const CollisionResult& pointColl, bool isOnFloor);
+		void Spawn(const ItemInfo& item);
+
+		// Utilities
+		void Update();
+		void Clear();
 	};
 	
-	struct BloodMist
+	struct BloodMistEffectParticle
 	{
 		unsigned int SpriteID = 0;
 
@@ -65,14 +110,34 @@ namespace TEN::Effects::Blood
 		
 		float Life		 = 0.0f;
 		float LifeMax	 = 0.0f;
-		float Scale		 = 0.0f;
-		float ScaleMax	 = 0.0f;
-		float ScaleMin	 = 0.0f;
+		float Size		 = 0.0f;
+		float SizeMax	 = 0.0f;
+		float SizeMin	 = 0.0f;
 		float Opacity	 = 0.0f;
 		float OpacityMax = 0.0f;
 		float Gravity	 = 0.0f;
 		float Friction	 = 0.0f;
 		short Rotation	 = 0;
+
+		void Update();
+	};
+
+	class BloodMistEffectController
+	{
+	private:
+		// Members
+		std::vector<BloodMistEffectParticle> Particles = {};
+
+	public:
+		// Spawners
+		const std::vector<BloodMistEffectParticle>& GetParticles();
+
+		// Spawners
+		void Spawn(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count = 1);
+
+		// Utilities
+		void Update();
+		void Clear();
 	};
 
 	// TODO: Copy approach from ripple effect.
@@ -110,28 +175,12 @@ namespace TEN::Effects::Blood
 		void Clear();
 	};
 
-	extern UnderwaterBloodEffectController UnderwaterBlood;
+	extern BloodDripEffectController	   BloodDripEffect;
+	extern BloodStainEffectController	   BloodStainEffect;
+	extern BloodMistEffectController	   BloodMistEffect;
+	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
 
-	extern std::vector<BloodDrip>		BloodDrips;
-	extern std::vector<BloodStain>		BloodStains;
-	extern std::vector<BloodMist>		BloodMists;
-
-	void SpawnBloodSplat(const Vector3& pos, int roomNumber, const Vector3& di, const Vector3& baseVel, unsigned int baseCount);
-
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& siz, float lifeInSec, bool canSpawnStain);
-	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayInSec = 0.0f);
-	void SpawnBloodStain(const BloodDrip& drip, const CollisionResult& pointColl, bool isOnFloor);
-	void SpawnBloodStain(ItemInfo& item);
-	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& dir);
-	void SpawnBloodMists(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count);
-
-	void UpdateBloodDrips();
-	void UpdateBloodStains();
-	void UpdateBloodMists();
-
-	void ClearBloodDrips();
-	void ClearBloodStains();
-	void ClearBloodMists();
+	void SpawnBleedEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
 
 	void DrawBloodDebug();
 }
