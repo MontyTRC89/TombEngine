@@ -245,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	std::string gameDir = "../../";
+	std::string gameDir{};
 
 	// Parse command line arguments.
 	for (int i = 1; i < argc; i++)
@@ -268,17 +268,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "gamedir") && argc > (i + 1))
 		{
-			gameDir = gameDir + TEN::Utils::ToString(argv[i + 1]);
-
-			// Replace all backslashes with forward slashes.
-			std::replace(gameDir.begin(), gameDir.end(), '\\', '/');
-
-			// Add trailing slash if missing.
-			if (gameDir.back() != '/')
-				gameDir += '/';
+			gameDir = TEN::Utils::ToString(argv[i + 1]);
 		}
 	}
 	LocalFree(argv);
+
+	// Construct asset directory.
+	gameDir = ConstructAssetDirectory(gameDir);
 
 	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
@@ -286,7 +282,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
-	// Clear Application Structure.
+	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
 	
 	// Initialize logging.
@@ -306,13 +302,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   );
 	TENLog(windowName, LogLevel::Info);
 
-	SaveGame::AddGameDirToSavePath(gameDir);
-	AddGameDirToAudioPath(gameDir);
-
-	// Collect numbered tracks.
-	EnumerateLegacyTracks();
-
-	// Initialize scripting system.
+	// Initialize savegame and scripting systems.
+	SaveGame::Init(gameDir);
 	ScriptInterfaceState::Init(gameDir);
 
 	// Initialize scripting.
@@ -435,7 +426,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
 		// Initialize audio
-		Sound_Init();
+		Sound_Init(gameDir);
 
 		// Initialize input
 		InitializeInput(App.WindowHandle);

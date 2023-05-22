@@ -189,7 +189,7 @@ namespace TEN::Control::Volumes
 
 	void InitializeNodeScripts()
 	{
-		static const std::string nodeScriptPath = "Scripts/Engine/NodeCatalogs/";
+		std::string nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
 
 		if (!std::filesystem::exists(nodeScriptPath))
 			return;

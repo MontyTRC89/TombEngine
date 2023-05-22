@@ -2,9 +2,78 @@
 #include "Specific/trutils.h"
 
 #include <codecvt>
+#include <filesystem>
 
 namespace TEN::Utils
 {
+	std::string ConstructAssetDirectory(std::string customDirectory)
+	{
+		static const int searchDepth = 2;
+		static const std::string upDir = "../";
+		static const std::string testPath = "Scripts/Gameflow.lua";
+
+		if (!customDirectory.empty())
+		{
+			// Replace all backslashes with forward slashes.
+			std::replace(customDirectory.begin(), customDirectory.end(), '\\', '/');
+
+			// Add trailing slash if missing.
+			if (customDirectory.back() != '/')
+				customDirectory += '/';
+		}
+
+		// Wrap directory depth searching into try-catch block to avoid crashes if we get too
+		// shallow directory level (e.g. if user have placed executable in a disk root folder).
+
+		try
+		{
+			// First, search custom directory, if exists, only then try own (empty) subdirectory.
+
+			for (int useCustomSubdirectory = 1; useCustomSubdirectory >= 0; useCustomSubdirectory--)
+			{
+				// Quickly exit if no custom directory specified.
+
+				if (useCustomSubdirectory && customDirectory.empty())
+					continue;
+
+				for (int depth = 0; depth < searchDepth + 1; depth++)
+				{
+					auto result = useCustomSubdirectory ? customDirectory : std::string{};
+					bool isAbsolute = useCustomSubdirectory && std::filesystem::path(result).is_absolute();
+
+					if (isAbsolute)
+					{
+						// Custom directory may be specified as absolute. In such case, it makes no sense
+						// to search for assets on extra depth levels, since user never would expect that.
+
+						if (depth > 0)
+							break;
+					}
+					else
+					{
+						// Add upward directory levels, according to current depth.
+
+						for (int level = 0; level < depth; level++)
+							result = upDir + result;
+					}
+
+					// Look if provided test path / file exists in current folder. If it is,
+					// it means this is a valid asset folder.
+
+					auto testDir = result + (useCustomSubdirectory ? "/" : "") + testPath;
+					if (std::filesystem::exists(testDir))
+						return result;
+				}
+			}
+		}
+		catch (std::exception ex)
+		{
+			return std::string{}; // Use exe path if any error is encountered.
+		}
+
+		return std::string{}; // Use exe path if no any assets were found.
+	}
+
 	std::string ToUpper(std::string string)
 	{
 		std::transform(string.begin(), string.end(), string.begin(), [](unsigned char c) { return std::toupper(c); });
