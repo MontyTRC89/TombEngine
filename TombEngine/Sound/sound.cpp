@@ -29,7 +29,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)ReverbType::Count] =    // Reverb 
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-const std::string TRACKS_PATH = "Audio\\";
+const  std::string TRACKS_PATH = "Audio/";
+static std::string FullAudioDirectory;
 
 std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
@@ -339,16 +340,18 @@ void FreeSamples()
 
 void EnumerateLegacyTracks()
 {
-	auto dir = std::filesystem::path(TRACKS_PATH);
+	auto dir = std::filesystem::path{ FullAudioDirectory };
 	if (std::filesystem::exists(dir))
 	{
-		try {
-			// capture three-digit filenames, or those which start with three digits.
+		try 
+		{
+			// Capture three-digit filenames, or those which start with three digits.
+
 			std::regex upToThreeDigits("\\\\((\\d{1,3})[^\\.]*)");
 			std::smatch result;
 			for (const auto& file : std::filesystem::directory_iterator{ dir })
 			{
-				std::string fileName = file.path().string();
+				std::string fileName = file.path().filename().string();
 				auto bResult = std::regex_search(fileName, result, upToThreeDigits);
 				if (!result.empty())
 				{
@@ -409,13 +412,13 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 		break;
 	}
 
-	auto fullTrackName = TRACKS_PATH + track + ".ogg";
+	auto fullTrackName = FullAudioDirectory + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
-		fullTrackName = TRACKS_PATH + track + ".mp3";
+		fullTrackName = FullAudioDirectory + track + ".mp3";
 		if (!std::filesystem::exists(fullTrackName))
 		{
-			fullTrackName = TRACKS_PATH + track + ".wav";
+			fullTrackName = FullAudioDirectory + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
 				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);
@@ -808,8 +811,12 @@ void Sound_UpdateScene()
 // Initialize BASS engine and also prepare all sound data.
 // Called once on engine start-up.
 
-void Sound_Init()
+void Sound_Init(const std::string& gameDirectory)
 {
+	// Initialize and collect soundtrack paths.
+	FullAudioDirectory = gameDirectory + TRACKS_PATH;
+	EnumerateLegacyTracks();
+
 	if (!g_Configuration.EnableSound)
 		return;
 
@@ -817,7 +824,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	// Initialize BASS_FX plugin
+	// Initialize BASS_FX plugin.
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;

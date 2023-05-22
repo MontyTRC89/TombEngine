@@ -17,6 +17,11 @@ using std::vector;
 
 extern GameConfiguration g_Configuration;
 
+static std::wstring GetAssetPath(const wchar_t* fileName)
+{
+	return TEN::Utils::ToWString(g_GameFlow->GetGameDir()) + fileName;
+}
+
 void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND handle)
 {
 	TENLog("Initializing DX11...", LogLevel::Info);
@@ -34,7 +39,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	ComPtr<ID3D10Blob> blob;
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 	   
-	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", nullptr, blob);
+	m_vsRooms = Utils::compileVertexShader(m_device.Get(),GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
 
 	// Initialize input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -53,36 +58,37 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	};
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 
-	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
-	m_psRooms = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_1", nullptr, blob);
-	m_vsItems = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psItems = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsStatics = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psStatics = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Statics.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsHairs = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psHairs = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsSky = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Sky.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psSky = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Sky.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsSolid = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Solid.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psSolid = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Solid.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsInventory = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Inventory.fx", "VS", "vs_4_0",nullptr, blob);
-	m_psInventory = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsFullScreenQuad = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0",nullptr, blob);
-	m_psFullScreenQuad = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsShadowMap = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsHUD = Utils::compileVertexShader(m_device.Get(), L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", nullptr, blob);
-	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, blob);
-	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
-	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedStatics.fx", "PS", "ps_4_0", nullptr, blob);
-	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "VS", "vs_4_0", nullptr, blob);
-	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_InstancedSprites.fx", "PS", "ps_4_0", nullptr, blob);
+	// TODO: If shader loading moves to a less hardcoded system we should take the opportunity to apply GetAssetPath more gracefully - squidshire 13/05/2023
+	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
+	m_psRooms = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
+	m_vsItems = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psItems = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsStatics = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psStatics = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsHairs = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psHairs = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsSky = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psSky = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsSolid = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psSolid = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsInventory = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "VS", "vs_4_0",nullptr, blob);
+	m_psInventory = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsFullScreenQuad = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "VS", "vs_4_0",nullptr, blob);
+	m_psFullScreenQuad = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsShadowMap = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsHUD = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_VS_HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
+	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSColored", "ps_4_0", nullptr, blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
+	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
 
 	// Initialize input layout using the first vertex
 	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
@@ -319,18 +325,18 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 void Renderer11::InitializeCommonTextures()
 {
-	// Initialize font
-	auto fontName = L"Textures/Font.spritefont";
-	if (!std::filesystem::exists(fontName))
-		throw std::runtime_error("Font not found, path " + TEN::Utils::ToString(fontName) + " is missing.");
-	else
-		m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
+	// Initialize font.
+	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
+	if (!std::filesystem::exists(fontPath))
+		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 
-	// Initialize common textures
-	SetTextureOrDefault(m_logo, L"Textures/Logo.png");
-	SetTextureOrDefault(m_loadingBarBorder, L"Textures/LoadingBarBorder.png");
-	SetTextureOrDefault(m_loadingBarInner, L"Textures/LoadingBarInner.png");
-	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
+	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), fontPath.c_str());
+
+	// Initialize common textures.
+	SetTextureOrDefault(m_logo, GetAssetPath(L"Textures/Logo.png"));
+	SetTextureOrDefault(m_loadingBarBorder, GetAssetPath(L"Textures/LoadingBarBorder.png"));
+	SetTextureOrDefault(m_loadingBarInner, GetAssetPath(L"Textures/LoadingBarInner.png"));
+	SetTextureOrDefault(m_whiteTexture, GetAssetPath(L"Textures/WhiteSprite.png"));
 
 	m_whiteSprite.Height = m_whiteTexture.Height;
 	m_whiteSprite.Width = m_whiteTexture.Width;

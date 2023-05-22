@@ -26,9 +26,10 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/Quad/RenderQuad.h"
 #include "Renderer/RendererSprites.h"
+#include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Blood;
@@ -41,12 +42,13 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
+using namespace TEN::Traps::TR5;
 
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
+extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
@@ -59,9 +61,31 @@ namespace TEN::Renderer
 		RendererSprite* Sprite;
 		BLEND_MODES BlendMode;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
-		bool IsBillboard;
-		bool IsSoftParticle;
+
+		bool IsBillboard	= false;
+		bool IsSoftParticle = false;
+
+		SpriteRenderType RenderType;
 	};
+	
+	void Renderer11::DrawLaserBarriers(RenderView& view)
+	{
+		if (LaserBarriers.empty())
+			return;
+
+		for (const auto& [entityID, barrier] : LaserBarriers)
+		{
+			for (const auto& beam : barrier.Beams)
+			{
+				AddColoredQuad(
+					beam.VertexPoints[0], beam.VertexPoints[1],
+					beam.VertexPoints[2], beam.VertexPoints[3],
+					barrier.Color, barrier.Color,
+					barrier.Color, barrier.Color,
+					BLENDMODE_ADDITIVE, view, SpriteRenderType::LaserBarrier);
+			}
+		}
+	}
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
@@ -1141,6 +1165,7 @@ namespace TEN::Renderer
 		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
 		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
+		currentSpriteBucket.RenderType = view.spritesToDraw[0].renderType;
 
 		for (auto& rDrawSprite : view.spritesToDraw)
 		{
@@ -1149,6 +1174,7 @@ namespace TEN::Renderer
 			if (rDrawSprite.Sprite != currentSpriteBucket.Sprite || 
 				rDrawSprite.BlendMode != currentSpriteBucket.BlendMode ||
 				rDrawSprite.SoftParticle != currentSpriteBucket.IsSoftParticle ||
+				rDrawSprite.renderType != currentSpriteBucket.RenderType ||
 				currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE || 
 				isBillboard != currentSpriteBucket.IsBillboard)
 			{
@@ -1158,10 +1184,12 @@ namespace TEN::Renderer
 				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
+				currentSpriteBucket.RenderType = rDrawSprite.renderType;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode))
+			//HACK: prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects
+			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
 			{
 				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
@@ -1236,16 +1264,20 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			}
 			else
+			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
+			}
 
 			m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
 			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 			BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
 			// Draw sprites with instancing.
-			DrawInstancedTriangles(4, spriteBucket.SpritesToDraw.size(), 0);
+			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
 
 			m_numSpritesDrawCalls++;
 		}
@@ -1269,6 +1301,8 @@ namespace TEN::Renderer
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
+			m_stSprite.RenderType = spriteBucket.RenderType;
+
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1277,9 +1311,13 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			}
 			else
+			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
+			}
 
 			m_primitiveBatch->Begin();
 
@@ -1324,8 +1362,8 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
-
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, (int)m_transparentFacesVertices.size());
+		  
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1333,6 +1371,8 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
+			m_stSprite.RenderType = SpriteRenderType::Default;
+
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1345,7 +1385,7 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
-		DrawTriangles(m_transparentFacesVertices.size(), 0);
+		DrawTriangles((int)m_transparentFacesVertices.size(), 0);
 
 		m_numTransparentDrawCalls++;
 		m_numSpritesTransparentDrawCalls++;
