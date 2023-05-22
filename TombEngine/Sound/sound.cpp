@@ -346,7 +346,7 @@ void EnumerateLegacyTracks()
 		{
 			// Capture three-digit filenames, or those which start with three digits.
 
-			std::regex upToThreeDigits("\\\\((\\d{1,3})[^\\.]*)");
+			std::regex upToThreeDigits("((\\d{1,3})[^\\.]*)");
 			std::smatch result;
 			for (const auto& file : std::filesystem::directory_iterator{ dir })
 			{
