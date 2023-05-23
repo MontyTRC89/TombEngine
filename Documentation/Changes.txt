@@ -12,6 +12,7 @@ Version 1.0.9
 * Fix inventory input interference when entering inventory via puzzle.
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
+* Fix grenade firing angle.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
