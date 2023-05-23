@@ -399,7 +399,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX)
+	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2.0f))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
