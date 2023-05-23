@@ -51,7 +51,7 @@ GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::StreamPtr;
-std::string SaveGame::FullSaveDir;
+std::string SaveGame::FullSaveDirectory;
 int SaveGame::LastSaveGame;
 
 void SaveGame::LoadSavegameInfos()
@@ -59,13 +59,13 @@ void SaveGame::LoadSavegameInfos()
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 		SavegameInfos[i].Present = false;
 
-	if (!std::filesystem::exists(FullSaveDir))
+	if (!std::filesystem::exists(FullSaveDirectory))
 		return;
 
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = FullSaveDir + "savegame." + std::to_string(i);
+		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
 		auto savegamePtr = fopen(fileName.c_str(), "rb");
 
 		if (savegamePtr == nullptr)
@@ -168,9 +168,14 @@ Vector4 ToVector4(const Save::Vector4* vec)
 				auto vecOffset = vtb.Finish(); \
 				putDataInVec(UnionType, vecOffset);
 
+void SaveGame::Init(const std::string& gameDirectory)
+{
+	FullSaveDirectory = gameDirectory + SAVEGAME_PATH;
+}
+
 bool SaveGame::Save(int slot)
 {
-	auto fileName = FullSaveDir + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -1316,8 +1321,8 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
-	if (!std::filesystem::exists(FullSaveDir))
-		std::filesystem::create_directory(FullSaveDir);
+	if (!std::filesystem::exists(FullSaveDirectory))
+		std::filesystem::create_directory(FullSaveDirectory);
 
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
@@ -1327,14 +1332,9 @@ bool SaveGame::Save(int slot)
 	return true;
 }
 
-void SaveGame::AddGameDirToSavePath(const std::string& dirLocation)
-{
-	FullSaveDir = dirLocation + SAVEGAME_PATH;
-}
-
 bool SaveGame::Load(int slot)
 {
-	auto fileName = FullSaveDir + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -2164,7 +2164,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = FullSaveDir + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
