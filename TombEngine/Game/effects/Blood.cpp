@@ -11,6 +11,9 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
 
+// temp
+#include "lara.h"
+
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -525,6 +528,60 @@ namespace TEN::Effects::Blood
 		// Spawn mists.
 		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
 		BloodMistEffect.Spawn(pos, roomNumber, dir, mistCount);
+	}
+
+	short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
+	{
+		int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
+		if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
+		{
+			UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
+		}
+		else
+		{
+			TriggerBlood(x, y, z, direction >> 4, speed);
+		}
+
+		return 0;
+	}
+
+	void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			DoBloodSplat(
+				x + 256 - (GetRandomControl() * 512 / 0x8000),
+				y + 256 - (GetRandomControl() * 512 / 0x8000),
+				z + 256 - (GetRandomControl() * 512 / 0x8000),
+				speed, direction, roomNumber);
+		}
+	}
+
+	// Temporary wrapper for the old blood spawning function.
+	void TriggerBlood(int x, int y, int z, int direction, int num)
+	{
+		BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, num);
+	}
+
+	void TriggerLaraBlood()
+	{
+		int node = 1;
+
+		for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
+		{
+			if (node & LaraItem->TouchBits.ToPackedBits())
+			{
+				auto vec = GetJointPosition(LaraItem, 
+					i,
+					Vector3i(
+						(GetRandomControl() & 31) - 16,
+						(GetRandomControl() & 31) - 16,
+						(GetRandomControl() & 31) - 16));
+				DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
+			}
+
+			node <<= 1;
+		}
 	}
 
 	void DrawBloodDebug()

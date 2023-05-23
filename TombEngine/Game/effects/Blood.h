@@ -182,5 +182,10 @@ namespace TEN::Effects::Blood
 
 	void SpawnBleedEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
 
+	short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
+	void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
+	void TriggerBlood(int x, int y, int z, int unk, int num);
+	void TriggerLaraBlood();
+
 	void DrawBloodDebug();
 }

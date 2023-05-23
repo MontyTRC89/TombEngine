@@ -1,6 +1,9 @@
 #pragma once
+#include "Game/effects/Blood.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
+
+using namespace TEN::Effects::Blood;
 
 enum GAME_OBJECT_ID : short;
 enum class LaraWeaponType;
@@ -248,9 +251,6 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
-void TriggerLaraBlood();
-short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
-void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);

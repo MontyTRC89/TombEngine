@@ -1072,54 +1072,6 @@ void UpdateSplashes()
 	}
 }
 
-short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
-{
-	int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
-	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-	{
-		UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
-	}
-	else
-	{
-		TriggerBlood(x, y, z, direction >> 4, speed);
-	}
-
-	return 0;
-}
-
-void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-		DoBloodSplat(
-			x + 256 - (GetRandomControl() * 512 / 0x8000),
-			y + 256 - (GetRandomControl() * 512 / 0x8000),
-			z + 256 - (GetRandomControl() * 512 / 0x8000),
-			speed, direction, roomNumber);
-	}
-}
-
-void TriggerLaraBlood()
-{
-	int node = 1;
-
-	for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
-	{
-		if (node & LaraItem->TouchBits.ToPackedBits())
-		{
-			auto vec = GetJointPosition(LaraItem, 
-				i,
-				Vector3i(
-					(GetRandomControl() & 31) - 16,
-					(GetRandomControl() & 31) - 16,
-					(GetRandomControl() & 31) - 16));
-			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
-		}
-
-		node <<= 1;
-	}
-}
-
 void Ricochet(Pose& pose)
 {
 	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;

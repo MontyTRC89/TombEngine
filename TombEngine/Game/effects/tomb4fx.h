@@ -164,7 +164,6 @@ extern char LaserSightCol;
 
 extern int NextFireSpark;
 extern int NextSmokeSpark;
-extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
@@ -181,9 +180,6 @@ extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-
-// TODO: Temp. compatibility wrapper.
-void TriggerBlood(int x, int y, int z, int unk, int num);
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
 int GetFreeFireSpark();

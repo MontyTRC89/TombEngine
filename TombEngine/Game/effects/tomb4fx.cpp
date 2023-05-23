@@ -6,7 +6,6 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/Drip.h"
@@ -22,7 +21,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
@@ -50,12 +48,6 @@ SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
-
-// Temporary wrapper for the old blood spawning function.
-void TriggerBlood(int x, int y, int z, int direction, int num)
-{
-	BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, num);
-}
 
 int GetFreeFireSpark()
 {
