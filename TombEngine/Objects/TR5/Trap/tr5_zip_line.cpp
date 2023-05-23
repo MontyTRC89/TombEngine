@@ -125,18 +125,9 @@ void ControlZipLine(short itemNumber)
 		if (pointColl.RoomNumber != zipLineItem->RoomNumber)
 			ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-		// "Parent" player to zip line.
-		if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
-			laraItem->Pose.Position = zipLineItem->Pose.Position;
-
 		if (pointColl.Position.Floor <= (vPos + CLICK(1)) || pointColl.Position.Ceiling >= (vPos - CLICK(1)))
-		{
-			// Whizz sound.
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose);
-		}
-		// Dismount.
-		else
-		{
+		{ 
+			// Dismount.
 			if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
 			{
 				laraItem->Animation.TargetState = LS_JUMP_FORWARD;
@@ -150,6 +141,15 @@ void ControlZipLine(short itemNumber)
 			RemoveActiveItem(itemNumber);
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
 			zipLineItem->Flags -= IFLAG_INVISIBLE;
+		}
+		else
+		{
+			// "Parent" player to zip line.
+			if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
+				laraItem->Pose.Position = zipLineItem->Pose.Position;
+
+			// Whizz sound.
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose);
 		}
 	}
 }
