@@ -20,8 +20,12 @@
 
 using namespace TEN::Math;
 
-constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
-constexpr auto FLARE_LIGHT_COLOR = Vector3(0.8f, 0.43f, 0.3f);
+constexpr auto FLARE_START_DELAY  = 0.25f * FPS;
+constexpr auto FLARE_END_DELAY    = 3.0f  * FPS;
+constexpr auto FLARE_DEATH_DELAY  = 1.0f  * FPS;
+constexpr auto FLARE_LIFE_MAX     = 60.0f * FPS;
+constexpr auto FLARE_LIGHT_COLOR  = Vector3(0.9f, 0.5f, 0.3f);
+constexpr auto FLARE_LIGHT_RADIUS = 9;
 
 void FlareControl(short itemNumber)
 {
@@ -423,35 +427,37 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	auto lightPos = Random::GeneratePointInSphere(sphere);
 
 	bool spawnChaff = false;
-	bool isEnding = (flareLife > (FLARE_LIFE_MAX - 90));
-	bool isDying  = (flareLife > (FLARE_LIFE_MAX - 5));
 
-	if (isDying)
+	bool isStarting = (flareLife <= FLARE_START_DELAY);
+	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - FLARE_END_DELAY));
+	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
+
+	float intensity  = Random::GenerateFloat(0.9f, 1.0f);
+	float multiplier = 1.0f;
+
+	if (isStarting)
 	{
-		int falloff = (1.0f - (flareLife / FLARE_LIFE_MAX)) * 6;
-		auto color = FLARE_LIGHT_COLOR * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(9 / 10.0f);
+		multiplier += 0.8f * (1.0f - (float)flareLife / FLARE_START_DELAY);
+	}
+	else if (isDying)
+	{
+		multiplier = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
+		spawnChaff = Random::TestProbability(1 / 10.0f);
 	}
 	else if (isEnding)
 	{
-		float multiplier = Random::GenerateFloat(0.05f, 1.0f);
-		int falloff = multiplier * 8;
-		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(2 / 5.0f);
+		multiplier = Random::GenerateFloat(0.8f, 1.0f);
+		spawnChaff = Random::TestProbability(2 / 10.0f);
 	}
 	else
 	{
-		float multiplier = Random::GenerateFloat(0.6f, 0.8f);
-		int falloff = (1.0f - (flareLife / FLARE_LIFE_MAX)) * 8;
-		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(3 / 10.0f);
+		spawnChaff = Random::TestProbability(4 / 10.0f);
 	}
+
+	int falloff = intensity * multiplier * FLARE_LIGHT_RADIUS;
+	auto color  = (FLARE_LIGHT_COLOR * intensity * std::clamp(multiplier, 0.0f, 1.0f)) * UCHAR_MAX;
+
+	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
 
 	return ((isDying || isEnding) ? spawnChaff : true);
 }
