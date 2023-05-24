@@ -7,6 +7,7 @@ Version 1.0.9
 * Fix gunflash rendering and position for entities.
 * Fix snowmobile driver crashing the game.
 * Fix knifethrower not throwing knife.
+* Fix classic rollingball rolling in place into some closed doors.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
 * Fix inventory input interference when entering inventory via puzzle.
