@@ -75,7 +75,6 @@ namespace TEN::Effects::Blood
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, true);
 		}
-
 		// Hit ceiling; spawn 
 		else if (Position.y >= pointColl.Position.Ceiling)
 		{

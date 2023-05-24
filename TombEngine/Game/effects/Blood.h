@@ -74,8 +74,8 @@ namespace TEN::Effects::Blood
 
 		void Update();
 
-		std::array<Vector3, BloodStainEffectParticle::VERTEX_COUNT> GetVertexPoints();
-		bool														TestSurface();
+		std::array<Vector3, VERTEX_COUNT> GetVertexPoints();
+		bool							  TestSurface();
 	};
 
 	class BloodStainEffectController
