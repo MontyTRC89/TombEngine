@@ -442,7 +442,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	// Define light multiplier and chaff spawn status.
 	if (isStarting)
 	{
-		mult += 0.8f * (1.0f - ((float)flareLife / START_DELAY));
+		mult -= 0.5f * (1.0f - ((float)flareLife / START_DELAY));
 	}
 	else if (isDying)
 	{
