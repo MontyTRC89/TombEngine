@@ -44,14 +44,15 @@ extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 class SaveGame 
 {
 private:
-	static FileStream* m_stream;
+	static FileStream* StreamPtr;
+	static std::string FullSaveDirectory;
 	
 public:
 	static int LastSaveGame;
 
+	static void Init(const std::string& dir);
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
+	static void LoadSavegameInfos();
 };
-
-void LoadSavegameInfos();

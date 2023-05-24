@@ -392,7 +392,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() == 0)
+		if (r->mesh.empty())
 		{
 			return;
 		}
@@ -426,7 +426,7 @@ namespace TEN::Renderer
 
 			auto& obj = *m_staticObjects[mesh->ObjectNumber];
 
-			if (obj.ObjectMeshes.size() == 0)
+			if (obj.ObjectMeshes.empty())
 			{
 				continue;
 			}
@@ -522,7 +522,7 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				RendererRoom& currentRoom = m_rooms[roomToCheck];
-				int numLights = currentRoom.Lights.size();
+				int numLights = (int)currentRoom.Lights.size();
 
 				for (int j = 0; j < numLights; j++)
 				{

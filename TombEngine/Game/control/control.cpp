@@ -452,7 +452,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	// Run level script if it exists.
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
+		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
