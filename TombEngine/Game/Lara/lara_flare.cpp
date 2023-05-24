@@ -21,7 +21,7 @@
 using namespace TEN::Math;
 
 constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
-constexpr auto FLARE_LIGHT_COLOR = Vector3(0.8f, 0.43f, 0.3f);
+constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;
 
 void FlareControl(short itemNumber)
 {
@@ -395,7 +395,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX)
+	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -416,42 +416,60 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 
 bool DoFlareLight(const Vector3i& pos, int flareLife)
 {
+	constexpr auto START_DELAY				 = 0.25f * FPS;
+	constexpr auto END_DELAY				 = 3.0f  * FPS;
+	constexpr auto INTENSITY_MAX			 = 1.0f;
+	constexpr auto INTENSITY_MIN			 = 0.9f;
+	constexpr auto CHAFF_SPAWN_CHANCE		 = 4 / 10.0f;
+	constexpr auto CHAFF_SPAWN_ENDING_CHANCE = CHAFF_SPAWN_CHANCE / 2;
+	constexpr auto CHAFF_SPAWN_DYING_CHANCE	 = CHAFF_SPAWN_CHANCE / 4;
+	constexpr auto LIGHT_RADIUS				 = 9.0f;
+	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
+	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
+	constexpr auto LIGHT_COLOR				 = Vector3(0.9f, 0.5f, 0.3f);
+
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return false;
 
-	auto sphere = BoundingSphere(pos.ToVector3() - Vector3(0, BLOCK(1 / 8.0f), 0), BLOCK(1 / 16.0f));
-	auto lightPos = Random::GeneratePointInSphere(sphere);
+	// Determine flare progress.
+	bool isStarting = (flareLife <= START_DELAY);
+	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - END_DELAY));
+	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
 
 	bool spawnChaff = false;
-	bool isEnding = (flareLife > (FLARE_LIFE_MAX - 90));
-	bool isDying  = (flareLife > (FLARE_LIFE_MAX - 5));
+	float mult = 1.0f;
 
-	if (isDying)
+	// Define light multiplier and chaff spawn status.
+	if (isStarting)
 	{
-		int falloff = (1.0f - (flareLife / FLARE_LIFE_MAX)) * 6;
-		auto color = FLARE_LIGHT_COLOR * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(9 / 10.0f);
+		mult -= 0.5f * (1.0f - ((float)flareLife / START_DELAY));
+	}
+	else if (isDying)
+	{
+		mult = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_DYING_CHANCE);
 	}
 	else if (isEnding)
 	{
-		float multiplier = Random::GenerateFloat(0.05f, 1.0f);
-		int falloff = multiplier * 8;
-		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(2 / 5.0f);
+		mult = Random::GenerateFloat(0.8f, 1.0f);
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_ENDING_CHANCE);
 	}
 	else
 	{
-		float multiplier = Random::GenerateFloat(0.6f, 0.8f);
-		int falloff = (1.0f - (flareLife / FLARE_LIFE_MAX)) * 8;
-		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
-
-		spawnChaff = Random::TestProbability(3 / 10.0f);
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_CHANCE);
 	}
 
+	// Determine light position.
+	auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
+	auto lightPos = Random::GeneratePointInSphere(sphere);
+
+	// Calculate color.
+	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
+	float falloff = intensity * mult * LIGHT_RADIUS;
+	auto color = (LIGHT_COLOR * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
+
+	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
+
+	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);
 }
