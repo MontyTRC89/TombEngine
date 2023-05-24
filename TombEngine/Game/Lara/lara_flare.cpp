@@ -395,7 +395,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2.0f))
+	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -425,12 +425,13 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	constexpr auto CHAFF_SPAWN_DYING_CHANCE	 = CHAFF_SPAWN_CHANCE / 4;
 	constexpr auto LIGHT_RADIUS				 = 9.0f;
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
-	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, BLOCK(1 / 8.0f), 0.0f);
+	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
 	constexpr auto LIGHT_COLOR				 = Vector3(0.9f, 0.5f, 0.3f);
 
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return false;
 
+	// Determine flare progress.
 	bool isStarting = (flareLife <= START_DELAY);
 	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - END_DELAY));
 	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
@@ -438,9 +439,10 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	bool spawnChaff = false;
 	float mult = 1.0f;
 
+	// Define light multiplier and chaff spawn status.
 	if (isStarting)
 	{
-		mult += 0.8f * (1.0f - (float)flareLife / START_DELAY);
+		mult += 0.8f * (1.0f - ((float)flareLife / START_DELAY));
 	}
 	else if (isDying)
 	{
@@ -457,14 +459,17 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 		spawnChaff = Random::TestProbability(CHAFF_SPAWN_CHANCE);
 	}
 
-	auto sphere = BoundingSphere(pos.ToVector3() - LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
+	// Determine light position.
+	auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
 	auto lightPos = Random::GeneratePointInSphere(sphere);
 
+	// Calculate color.
 	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
 	float falloff = intensity * mult * LIGHT_RADIUS;
 	auto color = (LIGHT_COLOR * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
 
 	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
 
+	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);
 }
