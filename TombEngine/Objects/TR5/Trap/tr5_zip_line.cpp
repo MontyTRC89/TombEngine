@@ -25,7 +25,7 @@ const auto ZipLineMountBasis = ObjectCollisionBounds
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-CLICK(1), CLICK(1),
-		CLICK(1), CLICK(2)
+		 CLICK(1), CLICK(2)
 	),
 	std::pair(
 		EulerAngles(0, ANGLE(-25.0f), 0),
@@ -84,72 +84,72 @@ void ControlZipLine(short itemNumber)
 	auto* zipLineItem = &g_Level.Items[itemNumber];
 	auto* laraItem = LaraItem;
 
-	if (zipLineItem->Status == ITEM_ACTIVE)
+	if (zipLineItem->Status != ITEM_ACTIVE)
+		return;
+
+	if (!(zipLineItem->Flags & IFLAG_INVISIBLE))
 	{
-		if (!(zipLineItem->Flags & IFLAG_INVISIBLE))
-		{
-			auto* prevPos = (GameVector*)zipLineItem->Data;
+		auto* prevPos = (GameVector*)zipLineItem->Data;
 
-			zipLineItem->Pose.Position = prevPos->ToVector3i();
+		zipLineItem->Pose.Position = prevPos->ToVector3i();
 
-			if (prevPos->RoomNumber != zipLineItem->RoomNumber)
-				ItemNewRoom(itemNumber, prevPos->RoomNumber);
+		if (prevPos->RoomNumber != zipLineItem->RoomNumber)
+			ItemNewRoom(itemNumber, prevPos->RoomNumber);
 
-			zipLineItem->Status = ITEM_NOT_ACTIVE;
-			SetAnimation(zipLineItem, 0);
+		zipLineItem->Status = ITEM_NOT_ACTIVE;
+		SetAnimation(zipLineItem, 0);
 
-			RemoveActiveItem(itemNumber);
-			return;
-		}
+		RemoveActiveItem(itemNumber);
+		return;
+	}
 
-		if (zipLineItem->Animation.ActiveState == 1)
-		{
-			AnimateItem(zipLineItem);
-			return;
-		}
-
+	if (zipLineItem->Animation.ActiveState == 1)
+	{
 		AnimateItem(zipLineItem);
+		return;
+	}
 
-		// Accelerate.
-		if (zipLineItem->Animation.Velocity.y < ZIP_LINE_VELOCITY_MAX)
-			zipLineItem->Animation.Velocity.y += ZIP_LINE_VELOCITY_ACCEL;
+	AnimateItem(zipLineItem);
 
-		// Translate.
-		auto headingOrient = EulerAngles(ZIP_LINE_STEEPNESS_ANGLE, zipLineItem->Pose.Orientation.y, 0);
-		TranslateItem(zipLineItem, headingOrient, zipLineItem->Animation.Velocity.y);
+	// Accelerate.
+	if (zipLineItem->Animation.Velocity.y < ZIP_LINE_VELOCITY_MAX)
+		zipLineItem->Animation.Velocity.y += ZIP_LINE_VELOCITY_ACCEL;
 
-		int vPos = zipLineItem->Pose.Position.y + CLICK(0.25f);
-		auto pointColl = GetCollision(zipLineItem, zipLineItem->Pose.Orientation.y, zipLineItem->Animation.Velocity.y);
+	// Translate.
+	auto headingOrient = EulerAngles(ZIP_LINE_STEEPNESS_ANGLE, zipLineItem->Pose.Orientation.y, 0);
+	TranslateItem(zipLineItem, headingOrient, zipLineItem->Animation.Velocity.y);
+
+	int vPos = zipLineItem->Pose.Position.y + CLICK(0.25f);
+	auto pointColl = GetCollision(zipLineItem, zipLineItem->Pose.Orientation.y, zipLineItem->Animation.Velocity.y);
 		
-		// Update zip line room number.
-		if (pointColl.RoomNumber != zipLineItem->RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.RoomNumber);
+	// Update zip line room number.
+	if (pointColl.RoomNumber != zipLineItem->RoomNumber)
+		ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-		if (pointColl.Position.Floor <= (vPos + CLICK(1)) || pointColl.Position.Ceiling >= (vPos - CLICK(1)))
-		{ 
-			// Dismount.
-			if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
-			{
-				laraItem->Animation.TargetState = LS_JUMP_FORWARD;
-				AnimateItem(laraItem);
-				laraItem->Animation.IsAirborne = true;
-				laraItem->Animation.Velocity.y = zipLineItem->Animation.Velocity.y / 4;
-				laraItem->Animation.Velocity.z = zipLineItem->Animation.Velocity.y;
-			}
-
-			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Pose);
-			RemoveActiveItem(itemNumber);
-			zipLineItem->Status = ITEM_NOT_ACTIVE;
-			zipLineItem->Flags -= IFLAG_INVISIBLE;
-		}
-		else
+	if (pointColl.Position.Floor <= (vPos + CLICK(1)) || pointColl.Position.Ceiling >= (vPos - CLICK(1)))
+	{ 
+		// Dismount.
+		if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
 		{
-			// "Parent" player to zip line.
-			if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
-				laraItem->Pose.Position = zipLineItem->Pose.Position;
-
-			// Whizz sound.
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose);
+			laraItem->Animation.TargetState = LS_JUMP_FORWARD;
+			AnimateItem(laraItem);
+			laraItem->Animation.IsAirborne = true;
+			laraItem->Animation.Velocity.y = zipLineItem->Animation.Velocity.y / 4;
+			laraItem->Animation.Velocity.z = zipLineItem->Animation.Velocity.y;
 		}
+
+		SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Pose);
+		RemoveActiveItem(itemNumber);
+		zipLineItem->Status = ITEM_NOT_ACTIVE;
+		zipLineItem->Flags -= IFLAG_INVISIBLE;
+	}
+	else
+	{
+		// "Parent" player to zip line.
+		if (laraItem->Animation.ActiveState == LS_ZIP_LINE)
+			laraItem->Pose.Position = zipLineItem->Pose.Position;
+
+		// Whizz sound.
+		SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose);
 	}
 }
