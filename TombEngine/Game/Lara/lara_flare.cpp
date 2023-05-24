@@ -20,12 +20,8 @@
 
 using namespace TEN::Math;
 
-constexpr auto FLARE_START_DELAY  = 0.25f * FPS;
-constexpr auto FLARE_END_DELAY    = 3.0f  * FPS;
-constexpr auto FLARE_DEATH_DELAY  = 1.0f  * FPS;
-constexpr auto FLARE_LIFE_MAX     = 60.0f * FPS;
-constexpr auto FLARE_LIGHT_COLOR  = Vector3(0.9f, 0.5f, 0.3f);
-constexpr auto FLARE_LIGHT_RADIUS = 9;
+constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
+constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;
 
 void FlareControl(short itemNumber)
 {
@@ -399,7 +395,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX)
+	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -420,44 +416,60 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 
 bool DoFlareLight(const Vector3i& pos, int flareLife)
 {
+	constexpr auto START_DELAY				 = 0.25f * FPS;
+	constexpr auto END_DELAY				 = 3.0f  * FPS;
+	constexpr auto INTENSITY_MAX			 = 1.0f;
+	constexpr auto INTENSITY_MIN			 = 0.9f;
+	constexpr auto CHAFF_SPAWN_CHANCE		 = 4 / 10.0f;
+	constexpr auto CHAFF_SPAWN_ENDING_CHANCE = CHAFF_SPAWN_CHANCE / 2;
+	constexpr auto CHAFF_SPAWN_DYING_CHANCE	 = CHAFF_SPAWN_CHANCE / 4;
+	constexpr auto LIGHT_RADIUS				 = 9.0f;
+	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
+	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
+	constexpr auto LIGHT_COLOR				 = Vector3(0.9f, 0.5f, 0.3f);
+
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return false;
 
-	auto sphere = BoundingSphere(pos.ToVector3() - Vector3(0, BLOCK(1 / 8.0f), 0), BLOCK(1 / 16.0f));
-	auto lightPos = Random::GeneratePointInSphere(sphere);
-
-	bool spawnChaff = false;
-
-	bool isStarting = (flareLife <= FLARE_START_DELAY);
-	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - FLARE_END_DELAY));
+	// Determine flare progress.
+	bool isStarting = (flareLife <= START_DELAY);
+	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - END_DELAY));
 	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
 
-	float intensity  = Random::GenerateFloat(0.9f, 1.0f);
-	float multiplier = 1.0f;
+	bool spawnChaff = false;
+	float mult = 1.0f;
 
+	// Define light multiplier and chaff spawn status.
 	if (isStarting)
 	{
-		multiplier += 0.8f * (1.0f - (float)flareLife / FLARE_START_DELAY);
+		mult -= 0.5f * (1.0f - ((float)flareLife / START_DELAY));
 	}
 	else if (isDying)
 	{
-		multiplier = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
-		spawnChaff = Random::TestProbability(1 / 10.0f);
+		mult = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_DYING_CHANCE);
 	}
 	else if (isEnding)
 	{
-		multiplier = Random::GenerateFloat(0.8f, 1.0f);
-		spawnChaff = Random::TestProbability(2 / 10.0f);
+		mult = Random::GenerateFloat(0.8f, 1.0f);
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_ENDING_CHANCE);
 	}
 	else
 	{
-		spawnChaff = Random::TestProbability(4 / 10.0f);
+		spawnChaff = Random::TestProbability(CHAFF_SPAWN_CHANCE);
 	}
 
-	int falloff = intensity * multiplier * FLARE_LIGHT_RADIUS;
-	auto color  = (FLARE_LIGHT_COLOR * intensity * std::clamp(multiplier, 0.0f, 1.0f)) * UCHAR_MAX;
+	// Determine light position.
+	auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
+	auto lightPos = Random::GeneratePointInSphere(sphere);
 
-	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
+	// Calculate color.
+	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
+	float falloff = intensity * mult * LIGHT_RADIUS;
+	auto color = (LIGHT_COLOR * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
 
+	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
+
+	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);
 }
