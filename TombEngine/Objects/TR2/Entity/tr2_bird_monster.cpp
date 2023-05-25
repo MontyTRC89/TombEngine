@@ -7,9 +7,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -21,8 +21,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto BIRD_MONSTER_WALK_TURN_RATE_MAX = ANGLE(4.0f);
 
-	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
-	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
+	const auto BirdMonsterBiteLeft	= CreatureBiteInfo(Vector3i(0, 224, 0), 19);
+	const auto BirdMonsterBiteRight = CreatureBiteInfo(Vector3i(0, 224, 0), 22);
 	const auto BirdMonsterAttackLeftJoints  = std::vector<unsigned int>{ 18, 19 };
 	const auto BirdMonsterAttackRightJoints = std::vector<unsigned int>{ 21, 22 };
 

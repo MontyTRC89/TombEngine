@@ -1,18 +1,23 @@
 #include "framework.h"
-#include "Vec3.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+
 #include "Math/Math.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+
+using namespace TEN::Math;
 
 /***
-Represents a 3-dimensional vector.
+Represents a 3D vector.
 @tenprimitive Vec3
 @pragma nostrip
 */
 
-void Vec3::Register(sol::table & parent)
+void Vec3::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<Vec3(int, int, int)>;
-	parent.new_usertype<Vec3>(ScriptReserved_Vec3,
+
+	parent.new_usertype<Vec3>(
+		ScriptReserved_Vec3,
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Vec3::ToString,
@@ -28,8 +33,8 @@ numbers, this will be less accurate at smaller lengths.
 For example, if you have the vector (100, 600, 700) and set it to
 the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
 However, this function would return it as (0, 1, 1).
-@tparam int length the new length to set the vector to.
-@function Vec3:GetNormalised
+@tparam float length the new length to set the vector to.
+@function Vec3:ToLength
 */
 		ScriptReserved_ToLength, &Vec3::ToLength,
 
@@ -55,28 +60,28 @@ However, this function would return it as (0, 1, 1).
 @treturn Vec3 A Vec3 object.
 @function Vec3
 */
-Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
+Vec3::Vec3(int aX, int aY, int aZ) : x{ aX }, y{ aY }, z{ aZ }
 {
 }
 
-Vec3::Vec3(Pose const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
+Vec3::Vec3(const Pose& pose) : x{ pose.Position.x }, y{ pose.Position.y }, z{ pose.Position.z }
 {
 }
 
-Vec3::Vec3(Vector3i const& pos) : x{pos.x}, y{pos.y}, z{pos.z}
+Vec3::Vec3(const Vector3i& pos) : x{ pos.x }, y{ pos.y }, z{ pos.z }
 {
 }
 
 Vec3::operator Vector3i() const
 {
-	return Vector3i{ x, y, z };
+	return Vector3i(x, y, z);
 };
 
-void Vec3::StoreInPHDPos(Pose& pos) const
+void Vec3::StoreInPose(Pose& pose) const
 {
-	pos.Position.x = x;
-	pos.Position.y = y;
-	pos.Position.z = z;
+	pose.Position.x = x;
+	pose.Position.y = y;
+	pose.Position.z = z;
 }
 
 void Vec3::StoreInGameVector(GameVector& pos) const
@@ -86,7 +91,6 @@ void Vec3::StoreInGameVector(GameVector& pos) const
 	pos.z = z;
 }
 
-
 /*** Metafunction; use tostring(myVector)
 @tparam Vec3 Vec3 this Vec3
 @treturn string A string showing the x, y, and z values of the Vec3
@@ -94,34 +98,33 @@ void Vec3::StoreInGameVector(GameVector& pos) const
 */
 std::string Vec3::ToString() const
 {
-	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+	return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
 }
 
-Vec3 AddVec3s(Vec3 const & one, Vec3 const & two)
+Vec3 AddVec3s(const Vec3& vector0, const Vec3& vector1)
 {
-	return Vec3{ one.x + two.x, one.y + two.y, one.z + two.z };
+	return Vec3(vector0.x + vector1.x, vector0.y + vector1.y, vector0.z + vector1.z);
 }
 
-Vec3 SubtractVec3s(Vec3 const & one, Vec3 const & two)
+Vec3 SubtractVec3s(const Vec3& vector0, const Vec3& vector1)
 {
-	return Vec3{ one.x - two.x, one.y - two.y, one.z - two.z };
+	return Vec3(vector0.x - vector1.x, vector0.y - vector1.y, vector0.z - vector1.z);
 }
 
-Vec3 MultiplyVec3Number(Vec3 const& one, double const & two)
+Vec3 MultiplyVec3Number(const Vec3& vector, float scale)
 {
-	return Vec3{ static_cast<int>(one.x * two), static_cast<int>(one.y * two), static_cast<int>(one.z * two) };
+	return Vec3(int(vector.x * scale), int(vector.y * scale), int(vector.z * scale));
 }
 
-Vec3 UnaryMinusVec3(Vec3 const& one)
+Vec3 UnaryMinusVec3(const Vec3& vector)
 {
-	return Vec3{ one.x * -1, one.y * -1, one.z * -1 };
+	return Vec3(vector.x * -1, vector.y * -1, vector.z * -1);
 }
 
-void Vec3::ToLength(int newLength)
+void Vec3::ToLength(float newLength)
 {
-	auto len = sqrt(x * x + y * y + z * z);
-	x = static_cast<int>(round((x / len) * newLength));
-	y = static_cast<int>(round((y / len) * newLength));
-	z = static_cast<int>(round((z / len) * newLength));
+	float length = sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+	x = (int)round((x / length) * newLength);
+	y = (int)round((y / length) * newLength);
+	z = (int)round((z / length) * newLength);
 }
-

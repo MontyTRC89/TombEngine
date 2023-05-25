@@ -420,6 +420,10 @@ table boolTable {
 	scalar: bool;
 }
 
+table vec2Table {
+	vec: Vector2;
+}
+
 table vec3Table {
 	vec: Vector3;
 }
@@ -441,6 +445,7 @@ union VarUnion {
 	tab: ScriptTable,
 	num: doubleTable,
 	boolean: boolTable,
+	vec2: vec2Table,
 	vec3: vec3Table,
 	rotation: rotationTable,
 	color: colorTable,
@@ -516,6 +521,17 @@ table SaveGame {
 	volumes: [Volume];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
+	//at the moment there is no real reason to save the pre_start and
+	//post_start callbacks as OnStart will have already be called when a save
+	//is loaded, but we'll store them anyway for completeness
+	callbacks_pre_start: [string];
+	callbacks_post_start: [string];
+	callbacks_pre_end: [string];
+	callbacks_post_end: [string];
+	callbacks_pre_save: [string];
+	callbacks_post_save: [string];
+	callbacks_pre_load: [string];
+	callbacks_post_load: [string];
 	callbacks_pre_control: [string];
 	callbacks_post_control: [string];
 	}

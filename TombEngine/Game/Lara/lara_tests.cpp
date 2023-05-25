@@ -22,7 +22,7 @@
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using std::vector;
 
 // -----------------------------
@@ -1098,19 +1098,6 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
-
-#ifndef NEW_TIGHTROPE
-void GetTightropeFallOff(ItemInfo* item, int regularity)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (item->HitPoints <= 0 || item->HitStatus)
-		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
-
-	if (!lara->Control.Tightrope.Fall && !(GetRandomControl() & regularity))
-		lara->Control.Tightrope.Fall = 2 - ((GetRandomControl() & 0xF) != 0);
-}
-#endif
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
 {

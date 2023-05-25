@@ -9,504 +9,417 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
 #include "Game/savegame.h"
-#include "Math/Random.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 #include "Sound/sound.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
-struct PistolDef
+struct WeaponAnimData
 {
-	short ObjectNumber;
-	int Draw1Anim2;
-	int Draw1Anim;
-	int Draw2Anim;
-	int RecoilAnim;
+	GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+
+	int Draw1Anim2 = 0;
+	int Draw1Anim  = 0;
+	int Draw2Anim  = 0;
+	int RecoilAnim = 0;
 };
 
-PistolDef PistolsTable[4] =
+static WeaponAnimData GetWeaponAnimData(LaraWeaponType weaponType)
 {
-	{ ID_LARA, 0, 0, 0, 0 },
-	{ ID_PISTOLS_ANIM, 4, 5, 13, 24 },
-	{ ID_REVOLVER_ANIM , 7, 8, 15, 29 },
-	{ ID_UZI_ANIM, 4, 5, 13, 24 }
-};
-
-void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
-{
-	auto* lara = GetLaraInfo(laraItem);
-	auto* weapon = &Weapons[(int)weaponType];
-	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
-
-	int fired = false;
-
-	if (laraItem->MeshBits.TestAny())
+	static const auto DEFAULT_WEAPON_ANIM_DATA = WeaponAnimData{ ID_LARA, 0, 0, 0, 0 };
+	static const auto ANIM_DATA_MAP			   = std::unordered_map<LaraWeaponType, WeaponAnimData>
 	{
-		if (lara->LeftArm.GunSmoke)
-		{
-			auto offset = Vector3i::Zero;
-			switch (weaponType)
-			{
-			case LaraWeaponType::Pistol:
-				offset = Vector3i(4, 128, 40);
-				break;
+		{ LaraWeaponType::None, WeaponAnimData{ ID_LARA, 0, 0, 0, 0 } },
+		{ LaraWeaponType::Pistol, WeaponAnimData{ ID_PISTOLS_ANIM, 4, 5, 13, 24 } },
+		{ LaraWeaponType::Revolver, WeaponAnimData{ ID_REVOLVER_ANIM , 7, 8, 15, 29 } },
+		{ LaraWeaponType::Uzi, WeaponAnimData{ ID_UZI_ANIM, 4, 5, 13, 24 } }
+	};
 
-			case LaraWeaponType::Revolver:
-				offset = Vector3i(16, 160, 56);
-				break;
+	auto it = ANIM_DATA_MAP.find(weaponType);
+	return ((it != ANIM_DATA_MAP.end()) ? it->second : DEFAULT_WEAPON_ANIM_DATA);
+}
 
-			case LaraWeaponType::Uzi:
-				offset = Vector3i(8, 140, 48);
-				break;
-			}
+static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType, bool isRightWeapon)
+{
+	switch (weaponType)
+	{
+	case LaraWeaponType::Pistol:
+		return Vector3i(isRightWeapon ? -16 : 4, 128, 40);
 
-			auto pos = GetJointPosition(laraItem, LM_LHAND, offset);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
-		}
+	case LaraWeaponType::Revolver:
+		return Vector3i(isRightWeapon ? -32 : 16, 160, 56);
 
-		if (lara->RightArm.GunSmoke)
-		{
-			auto offset = Vector3i::Zero;
-			switch (weaponType)
-			{
-			case LaraWeaponType::Pistol:
-				offset = Vector3i(-16, 128, 40);
-				break;
+	case LaraWeaponType::Uzi:
+		return Vector3i(isRightWeapon ? -16 : 8, 140, 48);
 
-			case LaraWeaponType::Revolver:
-				offset = Vector3i(-32, 160, 56);
-				break;
+	default:
+		return Vector3i::Zero;
+	}
+}
 
-			case LaraWeaponType::Uzi:
-				offset = Vector3i(-16, 140, 48);
-				break;
-			}
+static void SetArmInfo(const ItemInfo& laraItem, ArmInfo& arm, int frame)
+{
+	const auto& player = GetLaraInfo(laraItem);
+	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
 
-			auto pos = GetJointPosition(laraItem, LM_RHAND, offset);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->RightArm.GunSmoke);
-		}
+	int animBase = Objects[(int)weaponAnimData.ObjectID].animIndex;
+
+	if (frame < weaponAnimData.Draw1Anim)
+	{
+		arm.AnimNumber = animBase;
+	}
+	else if (frame < weaponAnimData.Draw2Anim)
+	{
+		arm.AnimNumber = animBase + 1;
+	}
+	else if (frame < weaponAnimData.RecoilAnim)
+	{
+		arm.AnimNumber = animBase + 2;
+	}
+	else
+	{
+		arm.AnimNumber = animBase + 3;
 	}
 
-	// Shooting action for right arm.
-	int frameRight = lara->RightArm.FrameNumber;  // frame number of DRAW_END?
-	if ((TrInput & IN_ACTION && !lara->TargetEntity) || lara->RightArm.Locked)
+	arm.FrameNumber = frame;
+	arm.FrameBase = GetAnimData(arm.AnimNumber).FramePtr;
+}
+
+static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
+{
+	auto& player = GetLaraInfo(laraItem);
+
+	player.Control.HandStatus = HandStatus::WeaponReady;
+	player.TargetEntity = nullptr;
+	player.LeftArm.FrameBase =
+	player.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = 0;
+	player.LeftArm.Orientation =
+	player.RightArm.Orientation = EulerAngles::Zero;
+	player.LeftArm.Locked =
+	player.RightArm.Locked = false;
+}
+
+static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& hasFired, bool isRightWeapon)
+{
+	auto& player = GetLaraInfo(laraItem);
+	auto& arm = isRightWeapon ? player.RightArm : player.LeftArm;
+	auto& uziBool = isRightWeapon ? player.Control.Weapon.UziRight : player.Control.Weapon.UziLeft;
+	const auto& weapon = Weapons[(int)weaponType];
+	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
+
+	// Spawn weapon smoke.
+	if (laraItem.MeshBits.TestAny() && arm.GunSmoke)
 	{
-		// POINT ARMS FORWARD
-		// at or beyond (2) DRAW_END start frame AND before (0) SHOOT_START end frame...
-		if ((frameRight >= 0) && (frameRight < p->Draw1Anim2))
+		auto relOffset = GetWeaponSmokeRelOffset(weaponType, isRightWeapon);
+		auto pos = GetJointPosition(&laraItem, isRightWeapon ? LM_RHAND : LM_LHAND, relOffset);
+		TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, arm.GunSmoke);
+	}
+
+	int frame = arm.FrameNumber;
+
+	// Wind animation forward.
+	if ((IsHeld(In::Action) && !player.TargetEntity) || arm.Locked)
+	{
+		// At or beyond DRAW_END (2) start frame AND before SHOOT_START (0) end frame; increment toward SHOOT_START (0) end frame.
+		if (frame >= 0 && frame < weaponAnimData.Draw1Anim2)
 		{
-			// ...increment toward (0) SHOOT_START end frame
-			frameRight++;
+			frame++;
 		}
-		// at (0) SHOOT_START end frame
-		else if (frameRight == p->Draw1Anim2)
+		// At SHOOT_START (0) end frame.
+		else if (frame == weaponAnimData.Draw1Anim2)
 		{
-			// actually shoot, bang bang
-			if (TrInput & IN_ACTION)
+			// Shoot weapon.
+			if (IsHeld(In::Action))
 			{
-				if (weaponType != LaraWeaponType::Revolver)
+				// HACK: Special case for revolver.
+				bool canShoot = (weaponType == LaraWeaponType::Revolver) ? isRightWeapon : true;
+				if (canShoot)
 				{
-					auto rightArmOrient = EulerAngles(
-						lara->RightArm.Orientation.x,
-						lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
-						0
-					);
+					// HACK: Revolver, a right weapon, uses the left arm's orientation.
+					auto armOrient = (weaponType == LaraWeaponType::Revolver) ?
+						EulerAngles(
+							player.LeftArm.Orientation.x,
+							player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
+							0) :
+						EulerAngles(
+							arm.Orientation.x,
+							arm.Orientation.y + laraItem.Pose.Orientation.y,
+							0);
 
-					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, rightArmOrient) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, *player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
 					{
-						lara->RightArm.GunSmoke = 28;
-
-						TriggerGunShell(1, ID_GUNSHELL, weaponType); // Right Hand
-
-						lara->RightArm.GunFlash = weapon->FlashTime;
-
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
-						SoundEffect(weapon->SampleNum, &laraItem->Pose);
-						fired = true;
+						arm.GunSmoke = 28;
+						TriggerGunShell(isRightWeapon ? true : false, ID_GUNSHELL, weaponType);
+						arm.GunFlash = weapon.FlashTime;
 
 						if (weaponType == LaraWeaponType::Uzi)
-							lara->Control.Weapon.UziRight = true;
+							uziBool = true;
+
+						if (!hasFired)
+						{
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 0.9f, 0.3f);
+							SoundEffect(weapon.SampleNum, &laraItem.Pose);
+							hasFired = true;
+						}
 
 						Statistics.Game.AmmoUsed++;
 					}
 				}
 
-				// go to (3) SHOOT_CONTINUE start frame
-				frameRight = p->RecoilAnim;
+				// Go to SHOOT_CONTINUE (3) start frame.
+				frame = weaponAnimData.RecoilAnim;
 			}
-			else if (lara->Control.Weapon.UziRight)
+			else
 			{
-				SoundEffect(weapon->SampleNum + 1, &laraItem->Pose);
-				lara->Control.Weapon.UziRight = false;
+				if (uziBool)
+				{
+					SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
+					uziBool = false;
+				}
 			}
 		}
-		// at or beyond (3) SHOOT_CONTINUE start frame
-		else if (frameRight >= p->RecoilAnim)
+		// At or beyond SHOOT_CONTINUE (3) start frame; increment toward SHOOT_CONTINUE (3) end frame to finish recoil before allowing to shoot again.
+		else if (frame >= weaponAnimData.RecoilAnim)
 		{
 			if (weaponType == LaraWeaponType::Uzi)
 			{
-				SoundEffect(weapon->SampleNum, &laraItem->Pose);
-				lara->Control.Weapon.UziRight = true;
+				SoundEffect(weapon.SampleNum, &laraItem.Pose);
+				uziBool = true;
 			}
 
-			// increment toward (3) SHOOT_CONTINUE end frame (finish recoil before allowing to shoot again)
-			frameRight++;
+			frame++;
 
-			// at (3) SHOOT_CONTINUE end frame, go to (0) START_SHOOT end frame
-			if (frameRight == (p->RecoilAnim + weapon->RecoilFrame))
-				frameRight = p->Draw1Anim2;
+			// At SHOOT_CONTINUE (3) end frame; go to START_SHOOT (0) end frame.
+			if (frame == (weaponAnimData.RecoilAnim + weapon.RecoilFrame))
+				frame = weaponAnimData.Draw1Anim2;
 		}
 	}
-	// HAS LET GO OF ACTION
+	// Wind animation backward.
 	else
 	{
-		// let (3) SHOOT_CONTINUE finish
-		if ((frameRight >= p->RecoilAnim) && (frameRight < p->RecoilAnim + weapon->RecoilFrame))
-			frameRight++;
-		// at (3) SHOOT_CONTINUE end frame, go to (0) START_SHOOT end frame
-		if (frameRight == (p->RecoilAnim + weapon->RecoilFrame))
-			frameRight = p->Draw1Anim2;
-		// go back to ready stance
-		else if ((frameRight > 0) && (frameRight <= p->Draw1Anim2))
-			frameRight--;
+		// Let SHOOT_CONTINUE (3) finish.
+		if (frame >= weaponAnimData.RecoilAnim && frame < (weaponAnimData.RecoilAnim + weapon.RecoilFrame))
+			frame++;
 
-		if (lara->Control.Weapon.UziRight)
+		// At SHOOT_CONTINUE (3) end frame; go to START_SHOOT (0) end frame.
+		if (frame == (weaponAnimData.RecoilAnim + weapon.RecoilFrame))
 		{
-			SoundEffect(weapon->SampleNum + 1, &laraItem->Pose);
-			lara->Control.Weapon.UziRight = false;
+			frame = weaponAnimData.Draw1Anim2;
+		}
+		// Go back to "ready" stance.
+		else if ((frame > 0) && (frame <= weaponAnimData.Draw1Anim2))
+		{
+			frame--;
+		}
+
+		if (uziBool)
+		{
+			SoundEffect(weapon.SampleNum + 1, &laraItem.Pose);
+			uziBool = false;
 		}
 	}
 
-	SetArmInfo(laraItem, lara->RightArm, frameRight);
-
-	// Shooting for left arm.
-	int frameLeft = lara->LeftArm.FrameNumber;
-	if ((TrInput & IN_ACTION && !lara->TargetEntity) || lara->LeftArm.Locked)
-	{
-		if ((frameLeft >= 0) && (frameLeft < p->Draw1Anim2))
-			frameLeft++;
-		else if (frameLeft == p->Draw1Anim2)
-		{
-			if (TrInput & IN_ACTION)
-			{
-				auto leftArmOrient = EulerAngles(
-					lara->LeftArm.Orientation.x,
-					lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
-					0
-				);
-
-				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, leftArmOrient) != FireWeaponType::NoAmmo)
-				{
-					if (weaponType == LaraWeaponType::Revolver)
-					{
-						lara->RightArm.GunSmoke = 28;
-						lara->RightArm.GunFlash = weapon->FlashTime;
-					}
-					else
-					{
-						lara->LeftArm.GunSmoke = 28;
-						TriggerGunShell(0, ID_GUNSHELL, weaponType); // Left hand
-						lara->LeftArm.GunFlash = weapon->FlashTime;
-					}
-
-					if (!fired)
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
-						SoundEffect(weapon->SampleNum, &laraItem->Pose);
-						fired = true;
-					}
-
-					if (weaponType == LaraWeaponType::Uzi)
-						lara->Control.Weapon.UziLeft = true;
-
-					Statistics.Game.AmmoUsed++;
-				}
-
-				frameLeft = p->RecoilAnim;
-			}
-			else if (lara->Control.Weapon.UziLeft)
-			{
-				SoundEffect(weapon->SampleNum + 1, &laraItem->Pose);
-				lara->Control.Weapon.UziLeft = false;
-			}
-		}
-		else if (frameLeft >= p->RecoilAnim)
-		{
-			if (weaponType == LaraWeaponType::Uzi)
-			{
-				SoundEffect(weapon->SampleNum, &laraItem->Pose);
-				lara->Control.Weapon.UziLeft = true;
-			}
-
-			frameLeft++;
-
-			if (frameLeft == (p->RecoilAnim + weapon->RecoilFrame))
-				frameLeft = p->Draw1Anim2;
-		}
-	}
-	else       																// Havent GOT a LOCK ON..
-	{
-		if ((frameLeft >= p->RecoilAnim) && (frameLeft < p->RecoilAnim + weapon->RecoilFrame))
-			frameLeft++;
-		if (frameLeft == (p->RecoilAnim + weapon->RecoilFrame))
-			frameLeft = p->Draw1Anim2;
-		else if ((frameLeft > 0) && (frameLeft <= p->Draw1Anim2))
-			frameLeft--;
-
-		if (lara->Control.Weapon.UziLeft)
-		{
-			SoundEffect(weapon->SampleNum + 1, &laraItem->Pose);
-			lara->Control.Weapon.UziLeft = false;
-		}
-	}
-
-	if (fired) // Rumble gamepad only once if any of the hands fired.
-	{
-		float power = weaponType == LaraWeaponType::Uzi ? GenerateFloat(0.1f, 0.3f) : 1.0f;
-		Rumble(power, 0.1f);
-	}
-
-	SetArmInfo(laraItem, lara->LeftArm, frameLeft);
+	SetArmInfo(laraItem, arm, frame);
 }
 
-void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
+static int AnimateWeaponUndraw(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRightWeapon)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto& player = GetLaraInfo(laraItem);
+	auto& arm = isRightWeapon ? player.RightArm : player.LeftArm;
+	const auto& weapon = Weapons[(int)weaponType];
+	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
+
+	int frame = arm.FrameNumber;
+
+	// Finish recoil anim before reholstering weapon.
+	if (frame >= weaponAnimData.RecoilAnim && frame < (weaponAnimData.RecoilAnim + weapon.RecoilFrame))
+		frame++;
+
+	if (frame == (weaponAnimData.RecoilAnim + weapon.RecoilFrame))
+	{
+		frame = weaponAnimData.Draw1Anim2;
+	}
+	else if (frame > 0 && frame < weaponAnimData.Draw1Anim)
+	{
+		arm.Orientation -= arm.Orientation / frame;
+		frame--;
+	}
+	else if (frame == 0)
+	{
+		arm.Orientation = EulerAngles::Zero;
+		frame = weaponAnimData.RecoilAnim - 1;
+	}
+	else if (frame > weaponAnimData.Draw1Anim && frame < weaponAnimData.RecoilAnim)
+	{
+		frame--;
+
+		if (frame == (weaponAnimData.Draw2Anim - 1))
+		{
+			UndrawPistolMesh(laraItem, weaponType, isRightWeapon);
+			SoundEffect(SFX_TR4_LARA_HOLSTER, &laraItem.Pose);
+		}
+	}
+
+	SetArmInfo(laraItem, arm, frame);
+	return frame;
+}
+
+void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
+{
+	auto& lara = *GetLaraInfo(&laraItem);
 	auto& weapon = Weapons[(int)weaponType];
 
 	FindNewTarget(laraItem, weapon);
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 		LaraTargetInfo(laraItem, weapon);
 
-	AimWeapon(laraItem, lara->LeftArm, weapon);
-	AimWeapon(laraItem, lara->RightArm, weapon);
+	AimWeapon(laraItem, lara.LeftArm, weapon);
+	AimWeapon(laraItem, lara.RightArm, weapon);
 
-	if (lara->LeftArm.Locked && !lara->RightArm.Locked)
+	if (lara.LeftArm.Locked && !lara.RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->LeftArm.Orientation.x / 2;
-		lara->ExtraTorsoRot.y = lara->LeftArm.Orientation.y / 2;
+		lara.ExtraTorsoRot = lara.LeftArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
-			lara->ExtraHeadRot = lara->ExtraTorsoRot;
+			lara.ExtraHeadRot = lara.ExtraTorsoRot;
 	}
-	else if (!lara->LeftArm.Locked && lara->RightArm.Locked)
+	else if (!lara.LeftArm.Locked && lara.RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->RightArm.Orientation.x / 2;
-		lara->ExtraTorsoRot.y = lara->RightArm.Orientation.y / 2;
+		lara.ExtraTorsoRot = lara.RightArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
-			lara->ExtraHeadRot = lara->ExtraTorsoRot;
+			lara.ExtraHeadRot = lara.ExtraTorsoRot;
 	}
-	else if (lara->LeftArm.Locked && lara->RightArm.Locked)
+	else if (lara.LeftArm.Locked && lara.RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
-		lara->ExtraTorsoRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
+		lara.ExtraTorsoRot = (lara.LeftArm.Orientation + lara.RightArm.Orientation) / 4;
 
 		if (Camera.oldType != CameraType::Look)
-			lara->ExtraHeadRot = lara->ExtraTorsoRot;
+			lara.ExtraHeadRot = lara.ExtraTorsoRot;
 	}
 
 	AnimatePistols(laraItem, weaponType);
-	
-	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
+
+	if (lara.LeftArm.GunFlash || lara.RightArm.GunFlash)
 	{
-		auto pos = GetJointPosition(laraItem, 
-			(lara->LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND,
-			Vector3i(
-				(byte)GetRandomControl() - 128,
-				(GetRandomControl() & 0x7F) - 63,
-				(byte)GetRandomControl() - 128
-			));
-		TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+		auto basePos = GetJointPosition(&laraItem, (lara.LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND).ToVector3();
+		auto sphere = BoundingSphere(basePos, BLOCK(1 / 8.0f));
+		auto lightPos = Random::GeneratePointInSphere(sphere);
+
+		TriggerDynamicLight(
+			lightPos.x, lightPos.y, lightPos.z,
+			Random::GenerateFloat(8.0f, 11.0f),
+			(GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
 
-void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
+void AnimatePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	bool hasFired = false;
+	AnimateWeapon(laraItem, weaponType, hasFired, true);
+	AnimateWeapon(laraItem, weaponType, hasFired, false);
 
-	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Orientation = EulerAngles::Zero;
-	lara->RightArm.Orientation = EulerAngles::Zero;
-	lara->LeftArm.FrameNumber = 0;
-	lara->RightArm.FrameNumber = 0;
-	lara->TargetEntity = nullptr;
-	lara->LeftArm.Locked = false;
-	lara->RightArm.Locked = false;
-	lara->LeftArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
-	lara->RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	// If either weapon has fired, rumble gamepad.
+	if (hasFired)
+	{
+		float power = (weaponType == LaraWeaponType::Uzi) ? Random::GenerateFloat(0.1f, 0.3f) : 1.0f;
+		Rumble(power, 0.1f);
+	}
 }
 
-void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
+void DrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
-	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
+	auto& player = GetLaraInfo(laraItem);
+	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
 
-	int frame = lara->LeftArm.FrameNumber + 1;
+	int frame = player.LeftArm.FrameNumber + 1;
 
-	if (frame < p->Draw1Anim || frame > p->RecoilAnim - 1)
-		frame = p->Draw1Anim;
-	else if (frame == p->Draw2Anim)
+	if (frame < weaponAnimData.Draw1Anim || frame > (weaponAnimData.RecoilAnim - 1))
+	{
+		frame = weaponAnimData.Draw1Anim;
+	}
+	else if (frame == weaponAnimData.Draw2Anim)
 	{
 		DrawPistolMeshes(laraItem, weaponType);
-		SoundEffect(SFX_TR4_LARA_DRAW, &laraItem->Pose);
+		SoundEffect(SFX_TR4_LARA_DRAW, &laraItem.Pose);
 	}
-	else if (frame == p->RecoilAnim - 1)
+	else if (frame == (weaponAnimData.RecoilAnim - 1))
 	{
 		ReadyPistols(laraItem, weaponType);
 		frame = 0;
 	}
 
-	SetArmInfo(laraItem, lara->RightArm, frame);
-	SetArmInfo(laraItem, lara->LeftArm, frame);
+	SetArmInfo(laraItem, player.RightArm, frame);
+	SetArmInfo(laraItem, player.LeftArm, frame);
 }
 
-void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
+void UndrawPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
-	auto* weapon = &Weapons[(int)weaponType];
-	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
+	auto& player = GetLaraInfo(laraItem);
+	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
 
-	int frameLeft = lara->LeftArm.FrameNumber;
+	int frameLeft = AnimateWeaponUndraw(laraItem, weaponType, false);
+	int frameRight = AnimateWeaponUndraw(laraItem, weaponType, true);
 
-	// Finish recoil anim before reholstering weapon.
-	if ((frameLeft >= p->RecoilAnim) && (frameLeft < p->RecoilAnim + weapon->RecoilFrame))
-		frameLeft++;
-
-	if (frameLeft == (p->RecoilAnim + weapon->RecoilFrame))
-		frameLeft = p->Draw1Anim2;
-	else if (frameLeft > 0 && frameLeft < p->Draw1Anim)
+	if (frameLeft == weaponAnimData.Draw1Anim &&
+		frameRight == weaponAnimData.Draw1Anim)
 	{
-		lara->LeftArm.Orientation.x -= lara->LeftArm.Orientation.x / frameLeft;
-		lara->LeftArm.Orientation.y -= lara->LeftArm.Orientation.y / frameLeft;
-		frameLeft--;
-	}
-	else if (frameLeft == 0)
-	{
-		lara->LeftArm.Orientation = EulerAngles::Zero;
-		frameLeft = p->RecoilAnim - 1;
-	}
-	else if (frameLeft > p->Draw1Anim && (frameLeft < p->RecoilAnim))
-	{
-		frameLeft--;
-
-		if (frameLeft == p->Draw2Anim - 1)
-		{
-			UndrawPistolMeshLeft(laraItem, weaponType);
-			SoundEffect(SFX_TR4_LARA_HOLSTER, &laraItem->Pose);
-		}
+		player.Control.HandStatus = HandStatus::Free;
+		player.TargetEntity = nullptr;
+		player.LeftArm.FrameNumber =
+		player.RightArm.FrameNumber = 0;
+		player.LeftArm.Locked =
+		player.RightArm.Locked = false;
 	}
 
-	SetArmInfo(laraItem, lara->LeftArm, frameLeft);
-
-	int frameRight = lara->RightArm.FrameNumber;
-
-	if ((frameRight >= p->RecoilAnim) && (frameRight < p->RecoilAnim + weapon->RecoilFrame))
-		frameRight++;
-
-	if (frameRight == (p->RecoilAnim + weapon->RecoilFrame))
-		frameRight = p->Draw1Anim2;
-	else if (frameRight > 0 && frameRight < p->Draw1Anim)
+	if (!IsHeld(In::Look))
 	{
-		lara->RightArm.Orientation.x -= lara->RightArm.Orientation.x / frameRight;
-		lara->RightArm.Orientation.y -= lara->RightArm.Orientation.y / frameRight;
-		frameRight--;
-	}
-	else if (frameRight == 0)
-	{
-		lara->RightArm.Orientation = EulerAngles::Zero;
-		frameRight = p->RecoilAnim - 1;
-	}
-	else if (frameRight > p->Draw1Anim && (frameRight < p->RecoilAnim))
-	{
-		frameRight--;
-
-		if (frameRight == p->Draw2Anim - 1)
-		{
-			UndrawPistolMeshRight(laraItem, weaponType);
-			SoundEffect(SFX_TR4_LARA_HOLSTER, &laraItem->Pose);
-		}
-	}
-
-	SetArmInfo(laraItem, lara->RightArm, frameRight);
-
-	if (frameLeft == p->Draw1Anim && frameRight == p->Draw1Anim)
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		lara->LeftArm.FrameNumber = 0;
-		lara->RightArm.FrameNumber = 0;
-		lara->TargetEntity = nullptr;
-		lara->RightArm.Locked = false;
-		lara->LeftArm.Locked = false;
-	}
-
-	if (!(TrInput & IN_LOOK))
-	{
-		lara->ExtraHeadRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
-		lara->ExtraTorsoRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
+		player.ExtraHeadRot = (player.LeftArm.Orientation + player.RightArm.Orientation) / 4;
+		player.ExtraTorsoRot = (player.LeftArm.Orientation + player.RightArm.Orientation) / 4;
 	}
 }
 
-void SetArmInfo(ItemInfo* laraItem, ArmInfo& arm, int frame)
+void DrawPistolMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
-	const auto& pistols = PistolsTable[(int)lara->Control.Weapon.GunType];
+	auto& player = GetLaraInfo(laraItem);
 
-	int animBase = Objects[(int)pistols.ObjectNumber].animIndex;
+	if (weaponType != LaraWeaponType::Revolver)
+		player.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 
-	if (frame < pistols.Draw1Anim)
-		arm.AnimNumber = animBase;
-	else if (frame < pistols.Draw2Anim)
-		arm.AnimNumber = animBase + 1;
-	else if (frame < pistols.RecoilAnim)
-		arm.AnimNumber = animBase + 2;
+	player.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+
+	laraItem.Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(laraItem, weaponType)].meshIndex + LM_RHAND;
+	if (weaponType != LaraWeaponType::Revolver)
+		laraItem.Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(laraItem, weaponType)].meshIndex + LM_LHAND;
+}
+
+void UndrawPistolMesh(ItemInfo& laraItem, LaraWeaponType weaponType, bool isRightWeapon)
+{
+	auto& player = GetLaraInfo(laraItem);
+	auto& holster = isRightWeapon ? player.Control.Weapon.HolsterInfo.RightHolster : player.Control.Weapon.HolsterInfo.LeftHolster;
+
+	// HACK: Special case for revolver.
+	if (!isRightWeapon && weaponType == LaraWeaponType::Revolver)
+		return;
+
+	int jointIndex = isRightWeapon ? LM_RHAND : LM_LHAND;
+	laraItem.Model.MeshIndex[jointIndex] = laraItem.Model.BaseMesh + jointIndex;
+
+	if (player.Weapons[(int)weaponType].Present)
+	{
+		holster = GetWeaponHolsterSlot(weaponType);
+	}
 	else
-		arm.AnimNumber = animBase + 3;
-
-	arm.FrameNumber = frame;
-	arm.FrameBase = g_Level.Anims[arm.AnimNumber].FramePtr;
-}
-
-void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	if (weaponType != LaraWeaponType::Revolver)
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
-
-	lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
-
-	laraItem->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(laraItem, weaponType)].meshIndex + LM_RHAND;
-	if (weaponType != LaraWeaponType::Revolver)
-		laraItem->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(laraItem, weaponType)].meshIndex + LM_LHAND;
-}
-
-void UndrawPistolMeshRight(ItemInfo* laraItem, LaraWeaponType weaponType)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
-	if (lara->Weapons[(int)weaponType].Present)
-		lara->Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(weaponType);
-	else
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
-}
-
-void UndrawPistolMeshLeft(ItemInfo* laraItem, LaraWeaponType weaponType)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	if (weaponType != LaraWeaponType::Revolver)
 	{
-		laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
-
-		if (lara->Weapons[(int)weaponType].Present)
-			lara->Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(weaponType);
-		else
-			lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		holster = HolsterSlot::Empty;
 	}
 }

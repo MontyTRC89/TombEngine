@@ -14,7 +14,7 @@ void GenSlot1Control(short itemNumber)
 
 	if (TriggerActive(item) && !item->TriggerFlags)
 	{
-		int df = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		int df = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 		if (df == 10 || df == 11)
 		{
@@ -61,7 +61,7 @@ void GenSlot1Control(short itemNumber)
 	}
 }
 
-void InitialiseGenSlot3(short itemNumber)
+void InitializeGenSlot3(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -69,7 +69,7 @@ void InitialiseGenSlot3(short itemNumber)
 		item->MeshBits = item->TriggerFlags;
 }
 
-void InitialiseGenSlot4(short itemNumber)
+void InitializeGenSlot4(short itemNumber)
 {
 	/*ItemInfo* item = &g_Level.Items[itemNumber];
 

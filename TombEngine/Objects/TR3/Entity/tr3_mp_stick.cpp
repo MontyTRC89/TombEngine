@@ -9,17 +9,17 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
-	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
+	const auto MPStickBite1 = CreatureBiteInfo(Vector3i(247, 10, 11), 13);
+	const auto MPStickBite2 = CreatureBiteInfo(Vector3i(0, 0, 100), 6);
 	const auto MPStickPunchAttackJoints = std::vector<unsigned int>{ 10, 13 };
 	const auto MPStickKickAttackJoints  = std::vector<unsigned int>{ 5, 6 };
 
@@ -56,11 +56,11 @@ namespace TEN::Entities::Creatures::TR3
 		MPSTICK_ANIM_VAULT_4_STEPS_DOWN = 30
 	};
 
-	void InitialiseMPStick(short itemNumber)
+	void InitializeMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
 
@@ -449,7 +449,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (creature->Flags != 1 && item->TouchBits.Test(MPStickKickAttackJoints) &&
-						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+						item->Animation.FrameNumber > GetAnimData(item).frameBase + 8)
 					{
 						DoDamage(creature->Enemy, 150);
 						CreatureEffect(item, MPStickBite2, DoBloodSplat);
@@ -460,7 +460,7 @@ namespace TEN::Entities::Creatures::TR3
 				else
 				{
 					if (!creature->Flags != 1 && creature->Enemy &&
-						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+						item->Animation.FrameNumber > GetAnimData(item).frameBase + 8)
 					{
 						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{

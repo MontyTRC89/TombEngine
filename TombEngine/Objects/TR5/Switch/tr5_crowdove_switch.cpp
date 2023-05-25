@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto CrowDovePos = Vector3i(0, 0, -400);
 
-	void InitialiseCrowDoveSwitch(short itemNumber)
+	void InitializeCrowDoveSwitch(short itemNumber)
 	{
 		g_Level.Items[itemNumber].MeshBits = 3;
 	}
@@ -63,7 +63,7 @@ namespace TEN::Entities::Switches
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 					AddActiveItem(itemNumber);
 

@@ -13,10 +13,10 @@
 #include "Game/Lara/lara_monkey.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
@@ -104,6 +104,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->Context.ProjectedFloorHeight - item->Pose.Position.y);
+	item->Pose.Orientation.Lerp(lara->Context.TargetOrientation, 0.4f);
 
 	item->Animation.TargetState = LS_IDLE;
 }

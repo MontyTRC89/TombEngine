@@ -9,7 +9,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	GuardianInfo& GetGuardianInfo(ItemInfo& item);
 
-	void InitialiseGuardian(short itemNumber);
+	void InitializeGuardian(short itemNumber);
 	void ControlGuardian(short itemNumber);
 
 	void DoGuardianLaserAttack(ItemInfo* item);

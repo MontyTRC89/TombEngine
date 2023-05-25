@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	void BigGunInitialise(short itemNumber);
+	void BigGunInitialize(short itemNumber);
 	static bool BigGunTestMount(ItemInfo* bigGunItem, ItemInfo* laraItem);
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem);
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

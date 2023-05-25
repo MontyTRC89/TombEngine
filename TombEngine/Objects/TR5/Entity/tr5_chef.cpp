@@ -9,13 +9,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
+	const auto ChefBite = CreatureBiteInfo(Vector3i(0, 200, 0), 13);
 
 	// TODO
 	enum ChefState
@@ -37,11 +37,11 @@ namespace TEN::Entities::Creatures::TR5
 		CHEF_ANIM_DEATH = 16
 	};
 
-	void InitialiseChef(short itemNumber)
+	void InitializeChef(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
@@ -136,7 +136,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -158,7 +158,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (item->TouchBits & 0x2000)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
 						{
 							DoDamage(creature->Enemy, 80);
 							CreatureEffect2(item, ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);

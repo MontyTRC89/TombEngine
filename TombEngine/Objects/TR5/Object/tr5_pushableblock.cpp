@@ -2,20 +2,20 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #include "Game/animation.h"
-#include "Game/items.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -40,7 +40,7 @@ InteractionBasis PushableBlockBounds =
 		return (PushableInfo*)item->Data;
 	}
 
-	void InitialisePushableBlock(short itemNumber)
+	void InitializePushableBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->Data = PushableInfo();
@@ -82,7 +82,7 @@ InteractionBasis PushableBlockBounds =
 		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushable->hasFloorCeiling = true;
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 			height = (ocb & 0x1F) * CLICK(1);
 		}
 		else
@@ -210,7 +210,7 @@ InteractionBasis PushableBlockBounds =
 			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -256,7 +256,7 @@ InteractionBasis PushableBlockBounds =
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				// Check if pushable is about to fall.
 				if (pushable->canFall)
@@ -301,7 +301,7 @@ InteractionBasis PushableBlockBounds =
 			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -343,7 +343,7 @@ InteractionBasis PushableBlockBounds =
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				if (IsHeld(In::Action))
 				{
@@ -896,13 +896,13 @@ InteractionBasis PushableBlockBounds =
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::AddBridge(stackIndex);
+				TEN::Collision::Floordata::AddBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}
@@ -914,13 +914,13 @@ InteractionBasis PushableBlockBounds =
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::RemoveBridge(itemNumber);
+			TEN::Collision::Floordata::RemoveBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::RemoveBridge(stackIndex);
+				TEN::Collision::Floordata::RemoveBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}

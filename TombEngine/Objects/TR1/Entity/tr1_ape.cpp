@@ -8,9 +8,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
-	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
+	const auto ApeBite = CreatureBiteInfo(Vector3i(0, -19, 75), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, ApeDeathAnims.size() - 1)]);
+				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, (int)ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{

@@ -1,20 +1,21 @@
 #include "framework.h"
-#include "tr5_raisingblock.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Game/collision/collide_room.h"
+#include "Objects/TR5/Object/tr5_raisingblock.h"
+
 #include "Game/animation.h"
-#include "Game/control/control.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Setup.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
-#include "Game/camera.h"
-#include "Game/collision/floordata.h"
+#include "Specific/level.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseRaisingBlock(short itemNumber)
+void InitializeRaisingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -34,7 +35,7 @@ void InitialiseRaisingBlock(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 }
 
 void ControlRaisingBlock(short itemNumber)

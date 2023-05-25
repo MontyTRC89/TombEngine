@@ -22,7 +22,7 @@ extern int NextBat;
 extern BatData Bats[NUM_BATS];
 
 short GetNextBat();
-void InitialiseLittleBats(short itemNumber);
+void InitializeLittleBats(short itemNumber);
 void LittleBatsControl(short itemNumber);
 void TriggerLittleBat(ItemInfo* item);
 void UpdateBats();

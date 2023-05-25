@@ -198,10 +198,10 @@ namespace TEN::Entities::TR4
 				if (laraItem->Animation.AnimNumber == LA_WATERSKIN_POUR_LOW && LaraItem->ItemFlags[2] == flags)
 				{
 					laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				}
 
-				if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74 &&
+				if (laraItem->Animation.FrameNumber == GetAnimData(*laraItem, LA_WATERSKIN_POUR_HIGH).frameBase + 74 &&
 					LaraItem->ItemFlags[2] == flags)
 				{
 					if (!puzzleItem->TriggerFlags)
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
 				laraItem->Animation.IsAirborne)
 			{
 				if (laraItem->Animation.AnimNumber != LA_TORCH_LIGHT_3 ||
-					g_Level.Anims[LA_TORCH_LIGHT_3].frameBase + 16 ||
+					GetAnimData(*laraItem, LA_TORCH_LIGHT_3).frameBase + 16 ||
 					puzzleItem->ItemFlags[0] != 2)
 				{
 					ElementPuzzleDoCollision(itemNumber, laraItem, coll);
@@ -274,7 +274,7 @@ namespace TEN::Entities::TR4
 				if (TestPlayerEntityInteract(puzzleItem, laraItem, ElementPuzzleBounds))
 				{
 					laraItem->Animation.AnimNumber = (abs(puzzleItem->Pose.Position.y- laraItem->Pose.Position.y) >> 8) + LA_TORCH_LIGHT_3;
-					laraItem->Animation.FrameNumber = g_Level.Anims[puzzleItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(puzzleItem).frameBase;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraInfo->Flare.ControlLeft = false;
 					laraInfo->LeftArm.Locked = true;
@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void InitialiseElementPuzzle(short itemNumber)
+	void InitializeElementPuzzle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

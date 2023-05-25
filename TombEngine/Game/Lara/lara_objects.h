@@ -33,10 +33,11 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll);
 void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll);
 void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll);
 
-// Tightrope
-#ifdef NEW_TIGHTROPE
+// ---------
+// TIGHTROPE
+// ---------
+
 void lara_as_tightrope_dismount(ItemInfo* item, CollisionInfo* coll);
-#endif
 void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_as_tightrope_walk(ItemInfo* item, CollisionInfo* coll);
 void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll);

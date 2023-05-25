@@ -11,11 +11,11 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
@@ -24,9 +24,9 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TRIBESMAN_DART_DAMAGE = -25; // NOTE: Negative value gives poison.
 
-	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
-	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
-	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
+	const auto TribesmanAxeBite	  = CreatureBiteInfo(Vector3i(0, 56, 265), 13);
+	const auto TribesmanDartBite1 = CreatureBiteInfo(Vector3i(0, 0, -200), 13);
+	const auto TribesmanDartBite2 = CreatureBiteInfo(Vector3i(8, 40, -248), 13);
 	const auto TribesmanAxeAttackJoints	 = std::vector<unsigned int>{ 13 };
 	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
 
@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TRIBESMAN_STATE_RUN_AXE_ATTACK_HIGH:
 				item->ItemFlags[0] = 1;
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				creature->Flags = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if (creature->Enemy->IsLara())
 				{
@@ -371,13 +371,13 @@ namespace TEN::Entities::Creatures::TR3
 		dartItem->ObjectNumber = ID_DARTS;
 		dartItem->RoomNumber = item->RoomNumber;
 
-		auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
+		auto pos1 = GetJointPosition(item, TribesmanDartBite1);
 		auto pos2 = GetJointPosition(LaraItem, LM_TORSO);
 		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 		dartItem->Pose.Position = pos1;
 
-		InitialiseItem(dartItemNumber);
+		InitializeItem(dartItemNumber);
 
 		dartItem->Pose.Orientation = orient;
 		dartItem->Animation.Velocity.z = CLICK(1);
@@ -389,7 +389,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		pos1 = Vector3i(TribesmanDartBite2.Position);
 		pos1.z += 96;
-		pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
+		pos1 = GetJointPosition(item, TribesmanDartBite2.BoneID, pos1);
 
 		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
 		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
@@ -655,7 +655,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Pose.Orientation.y += ANGLE(2.0f);
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 15)
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 					TribesmanShotDart(item);

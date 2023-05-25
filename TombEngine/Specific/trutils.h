@@ -3,8 +3,10 @@
 namespace TEN::Utils
 {
 	// String utilities
+	std::string ConstructAssetDirectory(std::string customDirectory);
 	std::string ToUpper(std::string string);
 	std::string ToLower(std::string string);
+	std::string ToString(const std::wstring& string);
 	std::string ToString(const wchar_t* string);
 	std::wstring ToWString(const std::string& string);
 	std::wstring ToWString(const char* string);

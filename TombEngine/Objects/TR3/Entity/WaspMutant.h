@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-    void InitialiseWaspMutant(short itemNumber);
+    void InitializeWaspMutant(short itemNumber);
     void WaspMutantControl(short itemNumber);
 }

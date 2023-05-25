@@ -12,6 +12,39 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
+	enum XInputButtons
+	{
+		XB_START = MAX_KEYBOARD_KEYS,
+		XB_SELECT,
+		XB_LSTICK,
+		XB_RSTICK,
+		XB_LSHIFT,
+		XB_RSHIFT,
+		XB_UNUSED1,
+		XB_UNUSED2,
+		XB_A,
+		XB_B,
+		XB_X,
+		XB_Y,
+		XB_LOGO,
+		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS,
+		XB_AXIS_X_NEG,
+		XB_AXIS_Y_POS,
+		XB_AXIS_Y_NEG,
+		XB_AXIS_Z_POS,
+		XB_AXIS_Z_NEG,
+		XB_AXIS_W_POS,
+		XB_AXIS_W_NEG,
+		XB_AXIS_LTRIGGER_NEG,
+		XB_AXIS_LTRIGGER_POS,
+		XB_AXIS_RTRIGGER_NEG,
+		XB_AXIS_RTRIGGER_POS,
+		XB_DPAD_UP,
+		XB_DPAD_DOWN,
+		XB_DPAD_LEFT,
+		XB_DPAD_RIGHT
+	};
+
 	enum InputKey
 	{
 		KEY_FORWARD,
@@ -92,7 +125,7 @@ namespace TEN::Input
 	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
 	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
 
-	// TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
+	// TODO: Not needed since BRAKE is explicitly associated with dismounts anyway.
 	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
 	enum InputAxis
@@ -130,18 +163,18 @@ namespace TEN::Input
 	extern const char* g_KeyNames[];
 
 	extern std::vector<InputAction> ActionMap;
-	extern vector<QueueState>		ActionQueue;
+	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
 	// Legacy input bit fields.
-	extern int DbInput; // Debounce: is input clicked?
-	extern int TrInput; // Throttle: is input held?
+	extern int DbInput; // Debounce input.
+	extern int TrInput; // Throttle input.
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
-	void InitialiseInput(HWND handle);
-	void DeinitialiseInput();
+	void InitializeInput(HWND handle);
+	void DeinitializeInput();
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
 	void ApplyActionQueue();
@@ -149,6 +182,8 @@ namespace TEN::Input
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
+    void ApplyDefaultBindings();
+    bool ApplyDefaultXInputBindings();
 
 	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
 	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12

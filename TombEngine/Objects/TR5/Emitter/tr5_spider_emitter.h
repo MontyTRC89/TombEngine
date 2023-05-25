@@ -20,6 +20,6 @@ extern SpiderData Spiders[NUM_SPIDERS];
 
 short GetNextSpider();
 void ClearSpiders();
-void InitialiseSpiders(short itemNumber);
+void InitializeSpiders(short itemNumber);
 void SpidersEmitterControl(short itemNumber);
 void UpdateSpiders();

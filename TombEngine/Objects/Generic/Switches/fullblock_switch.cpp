@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
-#include "Specific/Input/Input.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Specific/setup.h"
-#include "Game/collision/collide_item.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Game/animation.h"
-#include "Game/items.h"
 
 using namespace TEN::Input;
 
@@ -43,7 +44,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||
 			switchItem->Status ||
-			switchItem->Flags & 0x100 ||
+			switchItem->Flags & ONESHOT ||
 			CurrentSequence >= 3) &&
 			(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem !=itemNumber))
 		{
@@ -63,7 +64,7 @@ namespace TEN::Entities::Switches
 				}
 
 				laraItem->Animation.TargetState = LS_IDLE;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);

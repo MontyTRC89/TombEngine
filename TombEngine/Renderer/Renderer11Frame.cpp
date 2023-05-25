@@ -9,9 +9,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "RenderView/RenderView.h"
 
 using namespace TEN::Math;
@@ -352,7 +352,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() == 0)
+		if (r->mesh.empty())
 		{
 			return;
 		}
@@ -386,7 +386,7 @@ namespace TEN::Renderer
 
 			auto& obj = *m_staticObjects[mesh->ObjectNumber];
 
-			if (obj.ObjectMeshes.size() == 0)
+			if (obj.ObjectMeshes.empty())
 			{
 				continue;
 			}
@@ -482,7 +482,7 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				RendererRoom& currentRoom = m_rooms[roomToCheck];
-				int numLights = currentRoom.Lights.size();
+				int numLights = (int)currentRoom.Lights.size();
 
 				for (int j = 0; j < numLights; j++)
 				{
@@ -756,8 +756,7 @@ namespace TEN::Renderer
 		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
 		{
 			FX_INFO *fx = &EffectList[fxNum];
-
-			if (fx->objectNumber < 0)
+			if (fx->objectNumber < 0 || fx->color.w <= 0)
 				continue;
 
 			ObjectInfo *obj = &Objects[fx->objectNumber];

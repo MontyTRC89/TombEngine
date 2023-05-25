@@ -16,6 +16,7 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
@@ -26,7 +27,6 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
@@ -161,7 +161,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitialiseItemArray(NUM_ITEMS);
+	InitializeItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -190,7 +190,7 @@ void LoadItems()
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
-			InitialiseItem(i);
+			InitializeItem(i);
 	}
 }
 
@@ -368,7 +368,7 @@ void LoadObjects()
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
-	InitialiseObjects();
+	InitializeObjects();
 
 	int numStatics = ReadInt32();
 	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
@@ -1031,23 +1031,26 @@ unsigned int _stdcall LoadLevel(void* data)
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
+	auto assetDir = g_GameFlow->GetGameDir();
+	auto levelPath = assetDir + level->FileName;
+	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
+	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(level->FileName.c_str());
+		filePtr = FileOpen(levelPath.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
+			throw std::exception{ (std::string{ "Unable to read level file: " } + levelPath).c_str() };
 
 		char header[4];
 		unsigned char version[4];
@@ -1083,7 +1086,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			if (SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
 
-			InitialiseGame = true;
+			InitializeGame = true;
 			SystemNameHash = 0;
 		}
 
@@ -1121,7 +1124,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		LoadBoxes();
 
-		//InitialiseLOTarray(true);
+		//InitializeLOTarray(true);
 
 		LoadAnimatedTextures();
 		g_Renderer.UpdateProgress(70);
@@ -1136,9 +1139,9 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialise the game
-		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
+		// Initialize the game
+		InitializeGameFlags();
+		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

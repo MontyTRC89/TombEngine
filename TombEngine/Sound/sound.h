@@ -171,7 +171,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 void  SetVolumeMusic(int vol);
 void  SetVolumeFX(int vol);
 
-void  Sound_Init();
+void  Sound_Init(const std::string& gameDirectory);
 void  Sound_DeInit();
 bool  Sound_CheckBASSError(const char* message, bool verbose, ...);
 void  Sound_UpdateScene();

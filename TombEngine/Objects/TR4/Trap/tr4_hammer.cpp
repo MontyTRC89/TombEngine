@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr4_element_puzzle.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Sound/sound.h"
+#include "Objects/TR4/Trap/tr4_hammer.h"
+
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include <Game/effects/debris.h>
+#include "Specific/level.h"
 
 constexpr auto RIGHT_HAMMER_BITS = ((1 << 5) | (1 << 6) | (1 << 7));
 constexpr auto LEFT_HAMMER_BITS = ((1 << 8) | (1 << 9) | (1 << 10));
@@ -43,7 +44,7 @@ namespace TEN::Entities::TR4
     void HammerControl(short itemNumber)
     {
         auto* item = &g_Level.Items[itemNumber];
-        int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+        int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
         item->ItemFlags[3] = HAMMER_HIT_DAMAGE;
 
         if (!TriggerActive(item))
@@ -78,7 +79,7 @@ namespace TEN::Entities::TR4
             else
             {
                 item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMER_ANIM_ACTIVATED;
-                item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+                item->Animation.FrameNumber = GetAnimData(item).frameBase;
                 item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
                 item->Animation.TargetState = HAMMER_STATE_ACTIVE;
                 item->ItemFlags[2] = HAMMER_OCB4_INTERVAL;

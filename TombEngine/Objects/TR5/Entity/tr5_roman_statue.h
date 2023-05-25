@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseRomanStatue(short itemNumber);
+	void InitializeRomanStatue(short itemNumber);
 	void RomanStatueControl(short itemNumber);
 	void RomanStatueHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject);;

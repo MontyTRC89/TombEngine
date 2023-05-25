@@ -15,13 +15,14 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/puzzles_keys.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
@@ -82,7 +83,8 @@ bool GetKeyTrigger(ItemInfo* item)
 	return true;
 }
 
-int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
+// NOTE: attatchedToSwitch parameter unused.
+int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitch)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
@@ -95,14 +97,14 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 		return 0;
 
 	trigger += 2;
-	short* current = itemNos;
+	short* currentPtr = itemNumbersPtr;
 	int k = 0;
 
 	do
 	{
 		if (TRIG_BITS(*trigger) == TO_OBJECT && item != &g_Level.Items[*trigger & VALUE_BITS])
 		{
-			current[k] = *trigger & VALUE_BITS;
+			currentPtr[k] = *trigger & VALUE_BITS;
 			++k;
 		}
 
@@ -121,10 +123,67 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 int SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
+	const auto& player = Lara;
 
+	// Handle reusable receptacles.
+	if (item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16 &&
+		item.ItemFlags[1] != 0)
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_ACTIVE;
+		item.ItemFlags[1] = false;
+	
+		return 1;
+	}
+
+	if (item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16 &&
+		item.ItemFlags[1] != 0)
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_DEACTIVATED;
+		item.ItemFlags[1] = false;
+	
+		return 1;
+	}
+
+	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) ||
+		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
+	{
+		return 0;
+	}
+
+	// Handle reusable receptacles.
+	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 &&
+		item.ItemFlags[1] != 0 &&
+		(item.ItemFlags[5] == (int)ReusableReceptacleState::Empty || item.ItemFlags[5] == (int)ReusableReceptacleState::None) &&
+		player.Control.HandStatus != HandStatus::Busy)
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_ACTIVE;
+		item.ItemFlags[5] = (int)ReusableReceptacleState::Done;
+		item.ItemFlags[1] = false;
+		return 1;
+	}
+
+	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 && 
+		item.ItemFlags[1] != 0 && item.ItemFlags[5] == (int)ReusableReceptacleState::Done &&
+		player.Control.HandStatus != HandStatus::Busy)
+	{
+		item.Flags |= IFLAG_ACTIVATION_MASK;
+		item.Status = ITEM_DEACTIVATED;
+		item.ItemFlags[5] = (int)ReusableReceptacleState::Empty;
+		item.ItemFlags[1] = false;
+		return 1;
+	}
+
+	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16)
+		return 0;
+
+	// Handle switches.
 	if (item.Status == ITEM_DEACTIVATED)
 	{
-		if ((!item.Animation.ActiveState && item.ObjectNumber != ID_JUMP_SWITCH || item.Animation.ActiveState == 1 && item.ObjectNumber == ID_JUMP_SWITCH) &&
+		if (((item.Animation.ActiveState == SWITCH_OFF && item.ObjectNumber != ID_JUMP_SWITCH) ||
+			 (item.Animation.ActiveState == SWITCH_ON && item.ObjectNumber == ID_JUMP_SWITCH)) &&
 			timer > 0)
 		{
 			item.Timer = timer;
@@ -135,14 +194,15 @@ int SwitchTrigger(short itemNumber, short timer)
 
 			return 1;
 		}
-    
-		if (item.TriggerFlags >= 0 || item.Animation.ActiveState)
+	
+		if (item.TriggerFlags >= 0 || item.Animation.ActiveState != SWITCH_OFF)
 		{
 			RemoveActiveItem(itemNumber);
 
 			item.Status = ITEM_NOT_ACTIVE;
 			if (!item.ItemFlags[0] == 0)
 				item.Flags |= ONESHOT;
+
 			return 1;
 		}
 		else
@@ -151,7 +211,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			return 1;
 		}
 	}
-	else if (item.Status)
+	else if (item.Status != ITEM_NOT_ACTIVE)
 	{
 		if (item.ObjectNumber == ID_AIRLOCK_SWITCH &&
 			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&
@@ -170,15 +230,18 @@ int SwitchTrigger(short itemNumber, short timer)
 	return 0;
 }
 
-int KeyTrigger(short itemNum)
+int KeyTrigger(short itemNumber)
 {
-	ItemInfo* item = &g_Level.Items[itemNum];
-	int oldkey;
+	auto* item = &g_Level.Items[itemNumber];
+	const auto& player = Lara;
 
-	if ((item->Status != ITEM_ACTIVE || Lara.Control.HandStatus == HandStatus::Busy) && (!KeyTriggerActive || Lara.Control.HandStatus != HandStatus::Busy))
+	if ((item->Status != ITEM_ACTIVE || player.Control.HandStatus == HandStatus::Busy) &&
+		(!KeyTriggerActive || player.Control.HandStatus != HandStatus::Busy))
+	{
 		return -1;
+	}
 
-	oldkey = KeyTriggerActive;
+	int oldkey = KeyTriggerActive;
 
 	if (!oldkey)
 		item->Status = ITEM_DEACTIVATED;
@@ -188,9 +251,9 @@ int KeyTrigger(short itemNum)
 	return oldkey;
 }
 
-bool PickupTrigger(short itemNum)
+bool PickupTrigger(short itemNumber)
 {
-	ItemInfo* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (((item->Flags & IFLAG_CLEAR_BODY) && (item->Flags & IFLAG_KILLED)) ||
 		item->Status != ITEM_INVISIBLE || 
@@ -200,7 +263,7 @@ bool PickupTrigger(short itemNum)
 		return false;
 	}
 
-	KillItem(itemNum);
+	KillItem(itemNumber);
 	item->Flags |= IFLAG_CLEAR_BODY;
 
 	return true;
@@ -237,6 +300,7 @@ void RefreshCamera(short type, short* data)
 			}
 			else
 				targetOk = 0;
+
 			break;
 
 		case TO_TARGET:
@@ -250,7 +314,7 @@ void RefreshCamera(short type, short* data)
 
 	if (Camera.item)
 		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
-			Camera.item = NULL;
+			Camera.item = nullptr;
 
 	if (Camera.number == -1 && Camera.timer > 0)
 		Camera.timer = -1;
@@ -498,8 +562,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 	short targetType = 0;
 	short trigger = 0;
 
-	ItemInfo* item = NULL;
-	ItemInfo* cameraItem = NULL;
+	ItemInfo* item = nullptr;
+	ItemInfo* cameraItem = nullptr;
 
 	do
 	{
@@ -642,7 +706,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 						UseSpotCam = true;
 						if (LastSpotCamSequence != value)
 							TrackCameraInit = false;
-						InitialiseSpotCam(value);
+						InitializeSpotCam(value);
 					}
 				}
 			}
@@ -761,12 +825,12 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 		FlipEffect = newEffect;
 }
 
-void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags)
+void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
-	auto roomNum = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNum);
+	auto roomNumber = item->RoomNumber;
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, heavy, heavyFlags);
+	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)

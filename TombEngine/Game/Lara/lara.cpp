@@ -42,7 +42,7 @@
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -178,12 +178,8 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_tightrope_walk,//121
 	lara_as_tightrope_fall,//122
 	lara_as_tightrope_fall,//123
-	lara_void_func,//124
-#ifdef NEW_TIGHTROPE
+	lara_as_null,//124
 	lara_as_tightrope_dismount,//125
-#else // !NEW_TIGHTROPE
-	lara_void_func,//125
-#endif
 	lara_as_switch_on,//126
 	lara_void_func,//127
 	lara_as_horizontal_bar_swing,//128
@@ -247,6 +243,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//186
 	lara_void_func,//187
 	lara_void_func,//188
+	lara_as_use_puzzle,//189
 };
 
 std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -440,6 +437,7 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_void_func,//186
 	lara_void_func,//187
 	lara_void_func,//188
+	lara_default_col,//189
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -766,17 +764,17 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
 						auto pointColl = GetCollision(item, 0, 0, CLICK(1));
-						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
-					}
-				}
 
-				if (isCold)
-				{
-					lara->Status.Exposure--;
-					if (lara->Status.Exposure <= 0)
-					{
-						lara->Status.Exposure = 0;
-						item->HitPoints -= 10;
+						isCold = isCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber);
+						if (isCold)
+						{
+							lara->Status.Exposure--;
+							if (lara->Status.Exposure <= 0)
+							{
+								lara->Status.Exposure = 0;
+								item->HitPoints -= 10;
+							}
+						}
 					}
 				}
 				else
@@ -925,7 +923,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Handle weapons.
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	// Handle breath.
 	LaraBreath(item);
@@ -1003,7 +1001,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, LARA_RADIUS);
 
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1092,7 +1090,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, 0);
 
-	HandleWeapon(item);
+	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1128,7 +1126,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 			lara->Control.WaterStatus = WaterStatus::Dry;
 		}
 
-		InitialiseLaraMeshes(item);
+		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
 	}

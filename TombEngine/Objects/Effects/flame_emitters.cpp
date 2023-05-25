@@ -13,12 +13,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -288,7 +288,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter(short itemNumber)
+	void InitializeFlameEmitter(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -321,7 +321,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter2(short itemNumber)
+	void InitializeFlameEmitter2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -366,7 +366,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void InitialiseFlameEmitter3(short itemNumber)
+	void InitializeFlameEmitter3(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -576,7 +576,7 @@ namespace TEN::Entities::Effects
 				}
 
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
 				Lara.Context.InteractedItem = itemNumber;
@@ -591,7 +591,7 @@ namespace TEN::Entities::Effects
 		{
 			if (laraItem->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && laraItem->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase == 40)
+				if (laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase == 40)
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 

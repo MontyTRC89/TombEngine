@@ -6,15 +6,15 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-void InitialiseKillerStatue(short itemNumber)
+void InitializeKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	item->Animation.ActiveState = 1;
 }
 

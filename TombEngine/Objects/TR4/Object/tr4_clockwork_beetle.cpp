@@ -16,7 +16,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (LaraItem->Animation.AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
-		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].frameBase;
+		short fb = GetAnimData(ID_LARA, LA_MECHANICAL_BEETLE_USE).frameBase;
 
 		if (LaraItem->Animation.FrameNumber < fb + 14)
 		{
@@ -319,7 +319,7 @@ void UseClockworkBeetle(short flag)
 			item->RoomNumber = LaraItem->RoomNumber;
 			item->Pose.Position = LaraItem->Pose.Position;
 
-			InitialiseItem(itemNumber);
+			InitializeItem(itemNumber);
 			item->Pose.Orientation.x = 0;
 			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
 			item->Pose.Orientation.z = 0;

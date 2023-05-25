@@ -10,6 +10,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
@@ -27,7 +28,6 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -449,7 +449,7 @@ namespace TEN::Renderer
 			// AddLine3D(v1, v2, Vector4::One);
 		}
 
-		return moveable.ObjectMeshes.size();
+		return (int)moveable.ObjectMeshes.size();
 	}
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)

@@ -9,10 +9,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
-#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -88,7 +88,7 @@ namespace TEN::Control::Volumes
 
 			VolumeState* entryPtr = nullptr;
 
-			for (int j = volume.StateQueue.size() - 1; j >= 0; j--)
+			for (int j = (int)volume.StateQueue.size() - 1; j >= 0; j--)
 			{
 				auto& candidate = volume.StateQueue[j];
 
@@ -187,9 +187,9 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	void InitialiseNodeScripts()
+	void InitializeNodeScripts()
 	{
-		static const std::string nodeScriptPath = "Scripts/Engine/NodeCatalogs/";
+		std::string nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
 
 		if (!std::filesystem::exists(nodeScriptPath))
 			return;
@@ -201,16 +201,24 @@ namespace TEN::Control::Volumes
 				nodeCatalogs.push_back(path.path().filename().string());
 		}
 
-		if (nodeCatalogs.size() == 0)
+		if (nodeCatalogs.empty())
 			return;
 
 		TENLog("Loading node scripts...", LogLevel::Info);
 
 		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
-		for (const auto& file : nodeCatalogs)
-			g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
 
-		TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
+        if (!nodeCatalogs.empty())
+        {
+            for (const auto& file : nodeCatalogs)
+                g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
+
+            TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
+        }
+        else
+        {
+            TENLog("No node catalogs were found.", LogLevel::Warning);
+        }
 
 		unsigned int nodeCount = 0;
 		for (const auto& set : g_Level.EventSets)
