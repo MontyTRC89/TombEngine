@@ -17,8 +17,8 @@ using namespace TEN::Math;
 
 namespace TEN::Traps::TR5
 {
-	const auto ZipLineMountedOffset = Vector3i(0, 0, 371);
-	const auto ZipLineMountBasis = ObjectCollisionBounds
+	const auto ZipLineInteractOffset = Vector3i(0, 0, 371);
+	const auto ZipLineInteractBasis = ObjectCollisionBounds
 	{
 		GameBoundingBox(
 			-BLOCK(0.25f), BLOCK(0.25f),
@@ -52,9 +52,9 @@ namespace TEN::Traps::TR5
 			player.Control.HandStatus == HandStatus::Free) ||
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 		{
-			if (TestLaraPosition(ZipLineMountBasis, &zipLineItem, laraItem))
+			if (TestLaraPosition(ZipLineInteractBasis, &zipLineItem, laraItem))
 			{
-				if (MoveLaraPosition(ZipLineMountedOffset, &zipLineItem, laraItem))
+				if (MoveLaraPosition(ZipLineInteractOffset, &zipLineItem, laraItem))
 				{
 					SetAnimation(laraItem, LaraAnim::LA_ZIPLINE_MOUNT);
 					ResetPlayerFlex(laraItem);
