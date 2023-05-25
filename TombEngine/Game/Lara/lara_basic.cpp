@@ -750,7 +750,6 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	ShiftItem(item, coll);
-	ResetPlayerLean(item);
 
 	if (TestLaraStep(item, coll))
 	{

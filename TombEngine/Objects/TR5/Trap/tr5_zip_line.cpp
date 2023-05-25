@@ -23,14 +23,12 @@ const auto ZipLineMountedOffset = Vector3i(0, 0, 371);
 const auto ZipLineMountBasis = ObjectCollisionBounds
 {
 	GameBoundingBox(
+		-BLOCK(0.25f), BLOCK(0.25f),
 		-CLICK(1), CLICK(1),
-		-CLICK(1), CLICK(1),
-		 CLICK(1), CLICK(2)
-	),
+		BLOCK(0.25f), BLOCK(0.5f)),
 	std::pair(
-		EulerAngles(0, ANGLE(-25.0f), 0),
-		EulerAngles(0, ANGLE(25.0f), 0)
-	)
+		EulerAngles(ANGLE(-10.0f), ANGLE(-25.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(25.0f), ANGLE(10.0f)))
 };
 
 void InitializeZipLine(short itemNumber)
