@@ -17,10 +17,6 @@ using namespace TEN::Math;
 
 namespace TEN::Traps::TR5
 {
-	constexpr auto ZIP_LINE_VELOCITY_ACCEL = 5.0f;
-	constexpr auto ZIP_LINE_VELOCITY_MAX   = 100.0f;
-	constexpr auto ZIP_LINE_SLOPE_ANGLE	   = -ANGLE(11.25f);
-
 	const auto ZipLineMountedOffset = Vector3i(0, 0, 371);
 	const auto ZipLineMountBasis = ObjectCollisionBounds
 	{
@@ -89,6 +85,10 @@ namespace TEN::Traps::TR5
 
 	void ControlZipLine(short itemNumber)
 	{
+		constexpr auto VEL_ACCEL   = 5.0f;
+		constexpr auto VEL_MAX	   = 100.0f;
+		constexpr auto SLOPE_ANGLE = -ANGLE(11.25f);
+
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
 
@@ -120,11 +120,11 @@ namespace TEN::Traps::TR5
 		AnimateItem(&zipLineItem);
 
 		// Accelerate.
-		if (zipLineItem.Animation.Velocity.y < ZIP_LINE_VELOCITY_MAX)
-			zipLineItem.Animation.Velocity.y += ZIP_LINE_VELOCITY_ACCEL;
+		if (zipLineItem.Animation.Velocity.y < VEL_MAX)
+			zipLineItem.Animation.Velocity.y += VEL_ACCEL;
 
 		// Translate.
-		auto headingOrient = EulerAngles(ZIP_LINE_SLOPE_ANGLE, zipLineItem.Pose.Orientation.y, 0);
+		auto headingOrient = EulerAngles(SLOPE_ANGLE, zipLineItem.Pose.Orientation.y, 0);
 		TranslateItem(&zipLineItem, headingOrient, zipLineItem.Animation.Velocity.y);
 
 		int vPos = zipLineItem.Pose.Position.y + CLICK(0.25f);
