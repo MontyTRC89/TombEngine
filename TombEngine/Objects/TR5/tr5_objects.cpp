@@ -859,7 +859,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeZipLine;
-		obj->collision = ZipLineCollision;
+		obj->collision = CollideZipLine;
 		obj->control = ControlZipLine;
 		obj->SetupHitEffect(true);
 	}
