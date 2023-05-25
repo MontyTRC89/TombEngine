@@ -48,32 +48,40 @@ void ZipLineCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (zipLineItem.Status != ITEM_NOT_ACTIVE)
 		return;
 
-	if (!IsHeld(In::Action) ||
-		laraItem->Animation.ActiveState != LS_IDLE ||
-		laraItem->Animation.IsAirborne ||
-		player.Control.HandStatus != HandStatus::Free)
+	if ((IsHeld(In::Action) &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		!laraItem->Animation.IsAirborne &&
+		player.Control.HandStatus == HandStatus::Free) ||
+		(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 	{
-		return;
-	}
+		if (TestLaraPosition(ZipLineMountBasis, &zipLineItem, laraItem))
+		{
+			if (MoveLaraPosition(ZipLineMountedOffset, &zipLineItem, laraItem))
+			{
+				SetAnimation(laraItem, LaraAnim::LA_ZIPLINE_MOUNT);
+				ResetPlayerFlex(laraItem);
+				player.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Busy;
 
-	if (TestLaraPosition(ZipLineMountBasis, &zipLineItem, laraItem))
-	{
-		AlignLaraPosition(ZipLineMountedOffset, &zipLineItem, laraItem);
-		player.Control.HandStatus = HandStatus::Busy;
+				if (laraItem->Animation.ActiveState == LS_GRABBING)
+				{
+					if (!zipLineItem.Active)
+						AddActiveItem(itemNumber);
 
-		laraItem->Animation.TargetState = LS_ZIP_LINE;
-		do
-			AnimateItem(laraItem);
-		while (laraItem->Animation.ActiveState != LS_GRABBING);
-
-		if (!zipLineItem.Active)
-			AddActiveItem(itemNumber);
-
-		zipLineItem.Status = ITEM_ACTIVE;
-		zipLineItem.Flags |= IFLAG_INVISIBLE;
-
-		player.Control.IsMoving = false;
-		player.Control.HandStatus = HandStatus::Busy;
+					zipLineItem.Status = ITEM_ACTIVE;
+					zipLineItem.Flags |= IFLAG_INVISIBLE;
+				}
+			}
+			else
+			{
+				player.Context.InteractedItem = itemNumber;
+			}
+		}
+		else if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
+		{
+			player.Control.IsMoving = false;
+			player.Control.HandStatus = HandStatus::Free;
+		}
 	}
 }
 
