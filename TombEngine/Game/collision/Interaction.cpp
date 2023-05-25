@@ -43,36 +43,35 @@ using namespace TEN::Math;
 		OrientConstraint = orientConstraint;
 	};
 
-	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
-							   const GameBoundingBox& boundsExtension)
+	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const GameBoundingBox& boundsExtension) const
 	{
 		// Avoid overriding active interactions. NOTE: For now, can only check offset blending status.
 		if (entityFrom.OffsetBlend.IsActive)
 			return false;
 
-		auto orientConstraintAverage = (basis.OrientConstraint.first + basis.OrientConstraint.second) / 2;
+		auto orientConstraintAverage = (OrientConstraint.first + OrientConstraint.second) / 2;
 		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation - orientConstraintAverage); // TODO: Check sign.
 
 		// TODO: May interfere with pickups?
-		// Check whether entityFrom is aligned toward entityTo.
+		// Test if entityFrom is aligned toward entityTo.
 		if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
 			return false;
 
-		// Check whether entityFrom's orientation is within interaction constraint.
+		// Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
-		if (deltaOrient.x < basis.OrientConstraint.first.x || deltaOrient.x > basis.OrientConstraint.second.x ||
-			deltaOrient.y < basis.OrientConstraint.first.y || deltaOrient.y > basis.OrientConstraint.second.y ||
-			deltaOrient.z < basis.OrientConstraint.first.z || deltaOrient.z > basis.OrientConstraint.second.z)
+		if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
+			deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
+			deltaOrient.z < OrientConstraint.first.z || deltaOrient.z > OrientConstraint.second.z)
 		{
 			return false;
 		}
 
 		auto direction = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
-		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but Transpose() equivalent and faster.
+		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
 		auto relPos = Vector3::Transform(direction, rotMatrix);
 
-		// Check whether entityFrom is inside interaction bounds.
-		auto bounds = basis.Bounds + boundsExtension; // TODO: Make this static to optimise?
+		// Test if entityFrom is inside interaction bounds.
+		auto bounds = Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
 			relPos.z < bounds.Z1 || relPos.z > bounds.Z2)
@@ -101,31 +100,31 @@ using namespace TEN::Math;
 
 	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity)
 	{
-		auto& lara = *GetLaraInfo(&playerEntity);
+		auto& player = GetLaraInfo(playerEntity);
 
 		// Check if already aligning.
-		if (lara.Control.IsMoving)
+		if (player.Control.IsMoving)
 			return;
 
 		// Check water status.
-		if (lara.Control.WaterStatus == WaterStatus::Underwater ||
-			lara.Control.WaterStatus == WaterStatus::TreadWater)
+		if (player.Control.WaterStatus == WaterStatus::Underwater ||
+			player.Control.WaterStatus == WaterStatus::TreadWater)
 		{
 			return;
 		}
 
-		float distance = Vector3i::Distance(playerEntity.Pose.Position, entity.Pose.Position);
-		bool doAlignAnim = ((distance - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
+		float dist = Vector3i::Distance(playerEntity.Pose.Position, entity.Pose.Position);
+		bool doAlignAnim = ((dist - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
 
 		// Skip animating if very close to the object.
 		if (!doAlignAnim)
 			return;
 
 		short headingAngle = Geometry::GetOrientToPoint(playerEntity.Pose.Position.ToVector3(), entity.Pose.Position.ToVector3()).y;
-		int direction = GetQuadrant(headingAngle - playerEntity.Pose.Orientation.y);
+		int cardinalDir = GetQuadrant(headingAngle - playerEntity.Pose.Orientation.y);
 
 		// Set appropriate animation.
-		switch (direction)
+		switch (cardinalDir)
 		{
 		default:
 		case NORTH:
@@ -145,8 +144,8 @@ using namespace TEN::Math;
 			break;
 		}
 
-		lara.Control.HandStatus = HandStatus::Busy;
-		lara.Control.IsMoving = true;
-		lara.Control.Count.PositionAdjust = 0;
+		player.Control.HandStatus = HandStatus::Busy;
+		player.Control.IsMoving = true;
+		player.Control.Count.PositionAdjust = 0;
 	}
 //}

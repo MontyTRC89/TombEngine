@@ -219,13 +219,13 @@ namespace TEN::Entities::Generic
 		auto ladderBounds = GameBoundingBox(&ladderItem);
 		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
-		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))
+		/*if (LadderMountTopFrontBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 			return LadderMountType::TopFront;
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopBackBasis, boundsExtension))
+		if (LadderMountTopBackBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 			return LadderMountType::TopBack;*/
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
+		if (LadderMountFrontBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 		{
 			if (laraItem.Animation.IsAirborne && laraItem.Animation.Velocity.y > 0.0f)
 			{
@@ -244,13 +244,13 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
+		if (LadderMountBackBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 			return LadderMountType::Back;
 
-		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountLeftBasis, boundsExtension))
+		/*if (LadderMountLeftBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 			return LadderMountType::Left;*/
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
+		if (LadderMountRightBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 			return LadderMountType::Right;
 
 		return LadderMountType::None;
