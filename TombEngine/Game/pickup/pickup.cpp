@@ -338,9 +338,7 @@ void DoPickup(ItemInfo* laraItem)
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
 					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
-					 laraItem->Animation.ActiveState == LS_HOLE ||
-					 laraItem->Animation.ActiveState == LS_PICKUP_FLARE ||
-					 laraItem->Animation.ActiveState == LA_UNDERWATER_PICKUP_FLARE)
+					 laraItem->Animation.ActiveState == LS_HOLE)
 			{
 				if (g_GameFlow->IsMassPickupEnabled())
 				{
