@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Trap/tr5_zip_line.h"
+#include "Objects/TR5/Trap/ZipLine.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
@@ -13,6 +13,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 namespace TEN::Traps::TR5
 {
