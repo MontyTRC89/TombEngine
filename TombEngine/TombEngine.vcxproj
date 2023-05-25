@@ -637,7 +637,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
-    <ClInclude Include="Objects\TR5\Trap\tr5_zip_line.h" />
+    <ClInclude Include="Objects\TR5\Trap\ZipLine.h" />
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Objects\Utils\object_helper.h" />
@@ -1067,7 +1067,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
-    <ClCompile Include="Objects\TR5\Trap\tr5_zip_line.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\ZipLine.cpp" />
     <ClCompile Include="Objects\Utils\object_helper.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
