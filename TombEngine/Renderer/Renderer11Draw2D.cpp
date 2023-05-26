@@ -395,7 +395,7 @@ namespace TEN::Renderer
 		};
 
 		// Transform vertices.
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D + ANGLE(180.0f))); // +180 deg because TEN world is upside-down.
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D + ANGLE(180.0f))); // NOTE: +Y is down.
 		for (auto& vertexPoint : vertexPoints)
 		{
 			// Rotate.
