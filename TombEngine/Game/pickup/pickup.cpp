@@ -1253,26 +1253,6 @@ void SearchObjectControl(short itemNumber)
 			item->MeshBits = 2;
 		}
 	}
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT4)
-	{
-		item->MeshBits = FlipStats[0] != 0 ? 48 : 9;
-
-		if (frameNumber >= 45 && frameNumber <= 131)
-			item->MeshBits |= FlipStats[0] != 0 ? 4 : 2;
-			
-		if (item->ItemFlags[1] != -1)
-		{
-			auto* item2 = &g_Level.Items[item->ItemFlags[1]];
-
-			if (Objects[item2->ObjectNumber].isPickup)
-			{
-				if (FlipStats[0])
-					item2->Status = ITEM_NOT_ACTIVE;
-				else
-					item2->Status = ITEM_INVISIBLE;
-			}
-		}
-	}
 
 	if (frameNumber == SearchCollectFrames[objectNumber])
 	{
