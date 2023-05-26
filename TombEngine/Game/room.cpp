@@ -245,9 +245,9 @@ std::set<int> GetRoomList(int roomNumber)
 	for (size_t i = 0; i < room->doors.size(); i++)
 		roomNumberList.insert(room->doors[i].room);
 
-	for (int roomNumber : roomNumberList)
+	for (int r : roomNumberList)
 	{
-		room = &g_Level.Rooms[roomNumber];
+		room = &g_Level.Rooms[r];
 		for (size_t j = 0; j < room->doors.size(); j++)
 			roomNumberList.insert(room->doors[j].room);
 	}

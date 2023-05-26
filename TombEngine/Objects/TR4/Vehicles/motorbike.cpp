@@ -1144,7 +1144,7 @@ namespace TEN::Entities::Vehicles
 		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 		motorbikeItem->HitPoints = 1;
-		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
+		motorbikeItem->Flags = IFLAG_KILLED; // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
 		motorbike->Revs = 0;
 	}
 

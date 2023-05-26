@@ -148,8 +148,6 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
-
-	Random::TestProbability(1 / 2.0f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace
@@ -940,7 +938,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		for (int p = 0; p < 3; p++)
 		{
 			// Prepare test data.
-			float distance = 0.0f;
+			float d = 0.0f;
 
 			// Determine horizontal probe coordinates.
 			auto eX = x;
@@ -1044,14 +1042,14 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < 4; i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], d))
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (d < closestDistance[p])
 					{
 						closestPlane[p] = plane[i];
-						closestDistance[p] = distance;
+						closestDistance[p] = d;
 						auto normal = closestPlane[p].Normal();
 						result[p] = FROM_RAD(atan2(normal.x, normal.z));
 						hitBridge = true;
@@ -1096,18 +1094,18 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], d))
 						continue;
 
 					// Intersection point is out of block bounds, discard.
-					auto cPoint = ray.position + ray.direction * distance;
+					auto cPoint = ray.position + ray.direction * d;
 					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (d < closestDistance[p])
 					{
-						closestDistance[p] = distance;
+						closestDistance[p] = d;
 						closestPlane[p] = plane[i];
 
 						// Store according rotation.
