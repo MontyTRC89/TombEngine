@@ -488,7 +488,7 @@ bool SaveGame::Save(int slot)
 	lara.add_status(statusOffset);
 	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
-	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
+	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
 	lara.add_vehicle(Lara.Context.Vehicle);
 	lara.add_water_current_active(Lara.Context.WaterCurrentActive);
@@ -556,7 +556,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_alerted(creature->Alerted);
 			creatureBuilder.add_can_jump(creature->LOT.CanJump);
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
-			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
+			creatureBuilder.add_enemy(creature->Enemy == nullptr ? -1 : creature->Enemy->Index);
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
