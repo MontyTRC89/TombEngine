@@ -1318,7 +1318,7 @@ struct LaraInfo
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 
-	ItemInfo*								TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
+	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
 	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
 	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
 
