@@ -4,11 +4,6 @@
 
 namespace TEN::Renderer 
 {
-	void AddSpriteScreenSpace()
-	{
-
-	}
-
 	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
