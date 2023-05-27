@@ -792,6 +792,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 											 (int)VolumeActivatorFlags::Moveable | 
 											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
 
+				if (!((int)set.Activators & activatorType))
+					continue;
+
 				switch (trigger & TIMER_BITS)
 				{
 				case 0:
