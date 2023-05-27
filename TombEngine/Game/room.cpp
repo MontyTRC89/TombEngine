@@ -227,29 +227,28 @@ Vector3i GetRoomCenter(int roomNumber)
 	auto center = Vector3i(
 		room->x + halfLength,
 		room->minfloor + halfHeight,
-		room->z + halfDepth
-	);
+		room->z + halfDepth);
 	return center;
 }
 
 std::set<int> GetRoomList(int roomNumber)
 {
-	std::set<int> roomNumberList;
+	auto roomNumberList = std::set<int>{};
 
 	if (g_Level.Rooms.size() <= roomNumber)
 		return roomNumberList;
 
 	roomNumberList.insert(roomNumber);
 
-	auto* room = &g_Level.Rooms[roomNumber];
-	for (size_t i = 0; i < room->doors.size(); i++)
-		roomNumberList.insert(room->doors[i].room);
+	auto* roomPtr = &g_Level.Rooms[roomNumber];
+	for (size_t i = 0; i < roomPtr->doors.size(); i++)
+		roomNumberList.insert(roomPtr->doors[i].room);
 
 	for (int roomNumber : roomNumberList)
 	{
-		room = &g_Level.Rooms[roomNumber];
-		for (size_t j = 0; j < room->doors.size(); j++)
-			roomNumberList.insert(room->doors[j].room);
+		roomPtr = &g_Level.Rooms[roomNumber];
+		for (size_t j = 0; j < roomPtr->doors.size(); j++)
+			roomNumberList.insert(roomPtr->doors[j].room);
 	}
 
 	return roomNumberList;
@@ -259,12 +258,12 @@ void InitializeNeighborRoomList()
 {
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		auto* room = &g_Level.Rooms[i];
+		auto& room = g_Level.Rooms[i];
 
-		room->neighbors.clear();
+		room.neighbors.clear();
 
 		auto roomNumberList = GetRoomList(i);
 		for (int roomNumber : roomNumberList)
-			room->neighbors.push_back(roomNumber);
+			room.neighbors.push_back(roomNumber);
 	}
 }

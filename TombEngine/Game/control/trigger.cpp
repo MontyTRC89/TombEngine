@@ -116,8 +116,6 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitc
 	} while (true);
 
 	return k;
-
-	return 0;
 }
 
 int SwitchTrigger(short itemNumber, short timer)
@@ -221,10 +219,6 @@ int SwitchTrigger(short itemNumber, short timer)
 		}
 
 		return ((item.Flags & ONESHOT) >> 8);
-	}
-	else
-	{
-		return 0;
 	}
 
 	return 0;
