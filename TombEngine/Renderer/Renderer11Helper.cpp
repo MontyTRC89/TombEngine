@@ -28,6 +28,7 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
 
@@ -509,7 +510,7 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
@@ -523,20 +524,18 @@ namespace TEN::Renderer
 			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
-		// If point is behind camera, return invalid screen space position.
+		// Point is behind camera; return nullopt.
 		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_2D_POSITION;
+			return std::nullopt;
 
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
 
-		// Calculate normalized device coords.
+		// Calculate NDC.
 		point /= point.w;
 
-		// Calculate and return screen space position.
-		return Vector2(
-			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+		// Calculate and return 2D position.
+		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
