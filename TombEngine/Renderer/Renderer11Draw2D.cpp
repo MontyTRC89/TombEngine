@@ -381,8 +381,14 @@ namespace TEN::Renderer
 	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
 										 const Vector4& color, const Vector2& size)
 	{
-		constexpr auto VERTEX_COUNT	 = 4;
-		constexpr auto UV_CONSTRAINT = std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
+		constexpr auto VERTEX_COUNT	  = 4;
+		constexpr auto UV_CONSTRAINTS = std::array<Vector2, VERTEX_COUNT>
+		{
+			Vector2(0.0f),
+			Vector2(1.0f, 0.0f),
+			Vector2(1.0f),
+			Vector2(0.0f, 1.0f)
+		};
 
 		// Calculate vertex base.
 		auto halfSize = size / 2;
@@ -407,32 +413,14 @@ namespace TEN::Renderer
 			vertexPoint = TEN::Utils::Convert2DPositionToNDC(vertexPoint);
 		}
 
-		g_Renderer.PrintDebugMessage("%.3f, %.3f", vertexPoints[0].x, vertexPoints[0].y);
-
 		// Define renderer vertices.
 		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
-
-		// Vertex 0
-		vertices[0].Position = Vector3(vertexPoints[0]);
-		vertices[0].UV = UV_CONSTRAINT.first;
-		vertices[0].Color = color;
-
-		// Vertex 1
-		vertices[1].Position = Vector3(vertexPoints[1]);
-		vertices[1].UV.x = UV_CONSTRAINT.second.x;
-		vertices[1].UV.y = UV_CONSTRAINT.first.y;
-		vertices[1].Color = color;
-
-		// Vertex 2
-		vertices[2].Position = Vector3(vertexPoints[2]);
-		vertices[2].UV = UV_CONSTRAINT.second;
-		vertices[2].Color = color;
-
-		// Vertex 3
-		vertices[3].Position = Vector3(vertexPoints[3]);
-		vertices[3].UV.x = UV_CONSTRAINT.first.x;
-		vertices[3].UV.y = UV_CONSTRAINT.second.y;
-		vertices[3].Color = color;
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			vertices[i].Position = Vector3(vertexPoints[i]);
+			vertices[i].UV = UV_CONSTRAINTS[i];
+			vertices[i].Color = color;
+		}
 
 		SetBlendMode(BLENDMODE_ALPHABLEND);
 
