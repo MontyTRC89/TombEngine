@@ -51,6 +51,7 @@
 #include "Renderer/RenderTarget2D/RenderTarget2D.h"
 #include "Renderer/Structures/RendererDoor.h"
 
+enum GAME_OBJECT_ID : short;
 class EulerAngles;
 struct AnimFrameInterpData;
 struct CAMERA_INFO;
@@ -726,9 +727,12 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 
-		Vector2i GetScreenResolution() const;
-		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
-		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		Vector2i			   GetScreenResolution() const;
+		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
+		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+
+		void DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
+								 const Vector4& color, const Vector2& size);
 	};
 
 	extern Renderer11 g_Renderer;
