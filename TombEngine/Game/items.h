@@ -146,7 +146,7 @@ struct ItemInfo
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?
-	uint8_t AIBits; // AIObjectType enum.
+	unsigned char AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
 

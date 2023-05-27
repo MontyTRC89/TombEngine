@@ -62,9 +62,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short tilt = 0;
 		short head = 0;
-		short neck = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;

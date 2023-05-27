@@ -176,7 +176,6 @@ namespace TEN::Entities::Vehicles
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
-		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)

@@ -159,9 +159,7 @@ namespace TEN::Entities::Effects
 						byte falloff = 10 - (GetRandomControl() & 1);
 
 						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-							10 - (GetRandomControl() & 1),
-							(GetRandomControl() & 0x3F) + 192,
-							(GetRandomControl() & 0x1F) + 96, 0);
+							falloff, r, g, 0);
 					}
 				}
 

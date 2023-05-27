@@ -942,7 +942,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
-			int waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetWaterHeight(UPVItem);
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 

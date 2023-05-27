@@ -319,7 +319,6 @@ namespace TEN::Entities::TR4
 			creature->Enemy = nullptr;
 
 		auto* enemyItem = creature->Enemy;
-		auto* object = &Objects[ID_BADDY1];
 
 		short angle = 0;
 		short tilt = 0;

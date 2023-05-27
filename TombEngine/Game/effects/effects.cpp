@@ -1169,7 +1169,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
-	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)

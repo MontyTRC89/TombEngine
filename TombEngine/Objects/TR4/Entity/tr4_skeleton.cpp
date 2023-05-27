@@ -206,7 +206,6 @@ namespace TEN::Entities::TR4
 		bool jumpRight = false;
 
 		short angle = 0;
-		short tilt = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
