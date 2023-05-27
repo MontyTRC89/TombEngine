@@ -29,8 +29,8 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::s
 	if (requiredObj.loaded)
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
-		const auto& anim = GetAnimData(requiredObj.animIndex);
-		if ((anim.frameEnd - anim.frameBase) > 1)
+		const auto& newAnim = GetAnimData(requiredObj.animIndex);
+		if ((newAnim.frameEnd - newAnim.frameBase) > 1)
 		{
 			object.animIndex = requiredObj.animIndex;
 			object.frameBase = requiredObj.frameBase;
