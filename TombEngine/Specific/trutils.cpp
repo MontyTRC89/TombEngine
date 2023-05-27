@@ -118,13 +118,6 @@ namespace TEN::Utils
 		return std::wstring(buffer);
 	}
 
-	std::wstring ToWString(const char* source)
-	{
-		wchar_t buffer[UCHAR_MAX];
-		std::mbstowcs(buffer, source, UCHAR_MAX);
-		return std::wstring(buffer);
-	}
-
 	std::vector<std::string> SplitString(const std::string& string)
 	{
 		auto strings = std::vector<std::string>{};
