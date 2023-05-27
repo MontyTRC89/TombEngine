@@ -469,6 +469,15 @@ GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponTy
 	}
 }
 
+static void ClearPlayerTargets(ItemInfo& playerItem)
+{
+	auto& player = GetLaraInfo(playerItem);
+
+	player.TargetEntity = nullptr;
+	player.TargetList.fill(nullptr);
+	player.LastTargets.fill(nullptr);
+}
+
 void HandleWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -647,6 +656,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		break;
 
 	case HandStatus::WeaponUndraw:
+		ClearPlayerTargets(laraItem);
 		laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 
 		switch (player.Control.Weapon.GunType)
