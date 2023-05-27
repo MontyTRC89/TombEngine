@@ -898,13 +898,13 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Get item bounds and current rotation.
 	auto bounds = GameBoundingBox(item);
-	auto c = phd_cos(coll->Setup.ForwardAngle);
-	auto s = phd_sin(coll->Setup.ForwardAngle);
+	float cosForwardAngle = phd_cos(coll->Setup.ForwardAngle);
+	float sinForwardAngle = phd_sin(coll->Setup.ForwardAngle);
 
 	// Origin test position should be slightly in front of origin, because otherwise misfire may occur near block corners for split angles.
 	auto frontalOffset = coll->Setup.Radius * 0.3f;
-	auto x = item->Pose.Position.x + frontalOffset * s;
-	auto z = item->Pose.Position.z + frontalOffset * c;
+	auto x = item->Pose.Position.x + frontalOffset * sinForwardAngle;
+	auto z = item->Pose.Position.z + frontalOffset * cosForwardAngle;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
@@ -919,7 +919,6 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Do a two-pass surface test for all possible planes in a block.
 	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
-
 	for (int h = 0; h < 2; h++)
 	{
 		// Use either bottom or top Y point to test.
@@ -938,7 +937,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		for (int p = 0; p < 3; p++)
 		{
 			// Prepare test data.
-			float d = 0.0f;
+			float dist = 0.0f;
 
 			// Determine horizontal probe coordinates.
 			auto eX = x;
@@ -961,8 +960,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
 			auto frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
-			auto ffpX = eX + frontFloorProbeOffset * s;
-			auto ffpZ = eZ + frontFloorProbeOffset * c;
+			auto ffpX = eX + frontFloorProbeOffset * sinForwardAngle;
+			auto ffpZ = eZ + frontFloorProbeOffset * cosForwardAngle;
 
 			// Calculate block min/max points to filter out out-of-bounds checks.
 			float minX = floor(ffpX / BLOCK(1)) * BLOCK(1) - 1.0f;
@@ -994,8 +993,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
 			auto floorProbeOffset = coll->Setup.Radius * 0.3f;
-			auto fpX = eX + floorProbeOffset * s;
-			auto fpZ = eZ + floorProbeOffset * c;
+			auto fpX = eX + floorProbeOffset * sinForwardAngle;
+			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point.
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
@@ -1042,14 +1041,14 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < 4; i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], d))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (d < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
 						closestPlane[p] = plane[i];
-						closestDistance[p] = d;
+						closestDistance[p] = dist;
 						auto normal = closestPlane[p].Normal();
 						result[p] = FROM_RAD(atan2(normal.x, normal.z));
 						hitBridge = true;
@@ -1094,18 +1093,18 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], d))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Intersection point is out of block bounds, discard.
-					auto cPoint = ray.position + ray.direction * d;
+					auto cPoint = ray.position + ray.direction * dist;
 					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (d < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
-						closestDistance[p] = d;
+						closestDistance[p] = dist;
 						closestPlane[p] = plane[i];
 
 						// Store according rotation.
