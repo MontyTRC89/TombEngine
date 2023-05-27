@@ -187,12 +187,6 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 	return float3(0, 0, 0);
 }
 
-float rand_1_05(in float2 uv)
-{
-	float2 noise = (frac(sin(dot(uv, float2(12.9898, 78.233) * 2.0)) * 43758.5453));
-	return abs(noise.x + noise.y) * 0.5;
-}
-
 float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 {
 	// We find the intersection points p0 and p1 between the sphere of the fog bulb and the ray from camera to vertex.

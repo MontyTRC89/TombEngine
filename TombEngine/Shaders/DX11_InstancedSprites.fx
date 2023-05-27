@@ -104,8 +104,10 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output = DoFogBulbsForPixel(output, float4(input.FogBulbs.xyz, 1.0f));
-	output = DoDistanceFogForPixel(output, FogColor, input.DistanceFog);
+	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	output.xyz = saturate(output.xyz);
+
+	output = DoDistanceFogForPixel(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.DistanceFog);
 
 	return output;
 }
