@@ -18,7 +18,6 @@ using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 

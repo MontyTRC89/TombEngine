@@ -9,13 +9,14 @@ Version 1.0.9
 * Fix knifethrower not throwing knife.
 * Fix classic rollingball rolling in place into some closed doors.
 * Fix zipline not working properly.
+* Fix missing heavytrigger checks for node events activated from classic triggers.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
-* Fix search object4 hardcoded meshswap via room flipmapping.
 * Fix inventory input interference when entering inventory via puzzle.
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
 * Fix grenade firing angle.
+* Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
