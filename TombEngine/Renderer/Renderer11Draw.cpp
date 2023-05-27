@@ -38,7 +38,6 @@ extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 namespace TEN::Renderer
 {
 	using namespace std::chrono;
-	using namespace TEN::Renderer;
 
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
@@ -368,7 +367,7 @@ namespace TEN::Renderer
 					1.0f,
 					{ 32,
 					Vector3::Distance(pos1, pos2) },
-					BLENDMODE_ALPHATEST,
+					BLENDMODE_ALPHABLEND,
 					d, false, view);
 			}
 		}
