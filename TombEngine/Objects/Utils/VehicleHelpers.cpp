@@ -236,7 +236,7 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						int waterHeight = GetWaterHeight(vehicleItem);
+						waterHeight = GetWaterHeight(vehicleItem);
 						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
 
 						//SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);

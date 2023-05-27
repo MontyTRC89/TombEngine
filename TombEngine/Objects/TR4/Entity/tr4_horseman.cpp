@@ -320,8 +320,6 @@ namespace TEN::Entities::TR4
 				laraAI.distance = pow(deltaX, 2) + pow(deltaZ, 2);
 			}
 
-			short tilt = 0;
-
 			if (item->HitStatus &&
 				laraAI.angle < ANGLE(67.5f) &&
 				laraAI.angle > -ANGLE(67.5f) &&

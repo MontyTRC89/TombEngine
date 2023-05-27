@@ -155,7 +155,6 @@ namespace TEN::Entities::Vehicles
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)

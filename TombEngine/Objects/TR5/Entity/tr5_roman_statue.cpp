@@ -731,18 +731,11 @@ namespace TEN::Entities::Creatures::TR5
 
 					for (int i = 0; i < 4; i++)
 					{
-						byte r = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32;
-						byte g = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 16;
-						byte b = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32;
-
 						if (i == 0)
 						{
-							TriggerDynamicLight(
-								pos2.x, pos2.y, pos2.z,
-								8,
-								0,
-								(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32,
-								(deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 64);
+							byte g = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 32;
+							byte b = (deltaFrame * ((GetRandomControl() & 0x3F) + 128)) / 64;
+							TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 8, 0, g, b);
 						}
 
 						auto* arc = RomanStatueData.EnergyArcs[i];

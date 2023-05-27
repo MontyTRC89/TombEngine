@@ -224,8 +224,7 @@ void ClearLOT(LOTInfo* LOT)
 	LOT->TargetBox = NO_BOX;
 	LOT->RequiredBox = NO_BOX;
 
-	auto* node = LOT->Node.data();
-	for(auto& node : LOT->Node) 
+	for (auto& node : LOT->Node) 
 	{
 		node.exitBox = NO_BOX;
 		node.nextExpansion = NO_BOX;

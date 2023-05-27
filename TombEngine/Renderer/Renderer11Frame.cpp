@@ -68,7 +68,6 @@ namespace TEN::Renderer
 		m_numCheckPortalCalls++;
 
 		RendererRoom* room = &m_rooms[parentRoomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[parentRoomNumber];
 
 		int  zClip = 0;
 		Vector4 p[4];
@@ -190,7 +189,6 @@ namespace TEN::Renderer
 		m_numGetVisibleRoomsCalls++;
 
 		RendererRoom* room = &m_rooms[to];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[to];
 
 		if (!room->Visited)
 		{
@@ -440,7 +438,6 @@ namespace TEN::Renderer
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 		
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
 
 		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;

@@ -971,7 +971,6 @@ namespace TEN::Renderer
 			{
 				// Does the item need gunflash?
 				auto* nativeItem = &g_Level.Items[item->ItemNumber];
-				auto* obj = &Objects[nativeItem->ObjectNumber];
 
 				if (!nativeItem->IsCreature())
 					continue;
@@ -1443,7 +1442,6 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;

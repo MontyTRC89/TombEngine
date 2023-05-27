@@ -68,16 +68,6 @@ namespace InventoryHandler
 		SetInventoryCount(slot, count);
 	}
 
-	static void InventoryCombine(int slot1, int slot2)
-	{
-
-	}
-
-	static void InventorySeparate(int slot)
-	{
-
-	}
-
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table table_inventory{ state->lua_state(), sol::create };
