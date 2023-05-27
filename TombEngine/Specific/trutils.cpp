@@ -168,11 +168,11 @@ namespace TEN::Utils
             1.0f - ((pos2D.y * 2) / SCREEN_SPACE_RES.y));
     }
 
-    Vector2 ConvertNDCTo2DPosition(const Vector2& pos2D)
+    Vector2 ConvertNDCTo2DPosition(const Vector2& ndc)
     {
         return Vector2(
-            ((pos2D.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-            ((1.0f - pos2D.y) * SCREEN_SPACE_RES.y) / 2);
+            ((ndc.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+            ((1.0f - ndc.y) * SCREEN_SPACE_RES.y) / 2);
     }
 
     std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
