@@ -1432,18 +1432,15 @@ namespace TEN::Renderer
 
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
-		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		                                 1.0f, 0);
+		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
-		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
+		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		ID3D11RenderTargetView* m_pRenderViews[2]; 
 		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
 		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
-		m_context->OMSetRenderTargets(2, &m_pRenderViews[0],
-		                              m_renderTarget.DepthStencilView.Get());
+		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
@@ -1467,7 +1464,9 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogMaxDistance = 0;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
-		   
+
+		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
+
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
 		{
 			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
@@ -1476,16 +1475,15 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
 			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
 			cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
-		}     
-		cameraConstantBuffer.NumFogBulbs = view.FogBulbsToDraw.size();
-		     
+		}
+		
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
-		    
+		
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
-		  
+		
 		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);
