@@ -257,6 +257,8 @@ static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
+static constexpr char ScriptReserved_DrawSprite[]					= "DrawSprite";
+static constexpr char ScriptReserved_DrawSpriteExample[]			= "DrawSpriteExample";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

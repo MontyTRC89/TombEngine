@@ -18,12 +18,14 @@
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-
+#include "Renderer/Renderer11.h"
+#include <Color/Color.h>
 /***
 Functions that don't fit in the other modules.
 @tentable Misc 
@@ -32,6 +34,7 @@ Functions that don't fit in the other modules.
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 
 namespace Misc 
 {
@@ -358,6 +361,37 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	static void DrawSprite(GAME_OBJECT_ID objNum, unsigned int spriteIndex, const Vec2& pos, float orient2D, ScriptColor color, const Vec2& size)
+	{
+		TENLog("--Test DrawSprite--", LogLevel::Info);
+		TENLog("GAME_OBJECT_ID: " + objNum, LogLevel::Info);
+		TENLog("spriteIndex: " + std::to_string(spriteIndex), LogLevel::Info);
+		TENLog("Pos x " + std::to_string(pos.x), LogLevel::Info);
+		TENLog("Pos y " + std::to_string(pos.y), LogLevel::Info);
+		TENLog("orient2D " + std::to_string(orient2D), LogLevel::Info);
+		TENLog("Color:", LogLevel::Info);
+		TENLog("R: " + std::to_string(color.GetR()), LogLevel::Info);
+		TENLog("G: " + std::to_string(color.GetG()), LogLevel::Info);
+		TENLog("B: " + std::to_string(color.GetB()), LogLevel::Info);
+		TENLog("A: " + std::to_string(color.GetA()), LogLevel::Info);
+		TENLog("Size x " + std::to_string(size.x), LogLevel::Info);
+		TENLog("Size y " + std::to_string(size.y), LogLevel::Info);
+		TENLog("--Test DrawSprite--", LogLevel::Info);
+		auto orient2 = ANGLE(orient2D);
+		auto color2 = Vector4(color.GetR(), color.GetG() , color.GetB(), color.GetA());
+		g_Renderer.DrawSpriteIn2DSpace(objNum, spriteIndex, Vector2(pos.x,pos.y), orient2, color2, Vector2(size.x,size.y));
+
+	}
+
+	static void DrawSpriteExample()
+	{
+		TENLog("--Test DrawSprite--", LogLevel::Info);
+		float orient2D = 0.0;
+		auto orient2 = ANGLE(orient2D);
+		auto pos2 = SCREEN_SPACE_RES / 3;
+		g_Renderer.DrawSpriteIn2DSpace(ID_SKY_GRAPHICS, 1, pos2, orient2, Vector4(1.0f, 1.0f, 1.0f, 0.5f), Vector2(300.0f));
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
@@ -418,6 +452,8 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
+		tableMisc.set_function(ScriptReserved_DrawSprite, &DrawSprite);
+		tableMisc.set_function(ScriptReserved_DrawSpriteExample, &DrawSpriteExample);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
