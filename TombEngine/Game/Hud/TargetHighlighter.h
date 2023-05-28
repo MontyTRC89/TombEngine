@@ -6,17 +6,19 @@ namespace TEN::Hud
 {
 	struct TargetHighlightData
 	{
+	private:
 		struct SegmentData
 		{
-			Vector3 Offset2D			= Vector3::Zero;
-			short	OrientationOffset2D = 0;
+			Vector3 Offset2D	   = Vector3::Zero;
+			short	OrientOffset2D = 0;
 		};
 
+	public:
 		static constexpr auto SEGMENT_COUNT		= 4;
 		static constexpr auto RADIUS_SCALAR_MAX = 10.0f;
-		static constexpr auto COLOR_GREEN		= Vector4(0.1f, 1.0f, 0.1f, 1.0f);
-		static constexpr auto COLOR_RED			= Vector4(1.0f, 0.1f, 0.1f, 1.0f);
-		static constexpr auto COLOR_GRAY		= Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		static constexpr auto COLOR_GREEN		= Vector4(0.1f, 1.0f, 0.1f, 9.0f);
+		static constexpr auto COLOR_RED			= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
+		static constexpr auto COLOR_GRAY		= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
 
 		bool IsActive  = false;
 		bool IsPrimary = false;

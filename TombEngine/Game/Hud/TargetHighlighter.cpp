@@ -14,17 +14,17 @@ namespace TEN::Hud
 {
 	static float GetTargetHighlightSize(float dist)
 	{
-		constexpr auto DIST_MAX					 = BLOCK(10);
-		constexpr auto TARGET_HIGHLIGHT_SIZE_MAX = 150.0f;
-		constexpr auto TARGET_HIGHLIGHT_SIZE_MIN = TARGET_HIGHLIGHT_SIZE_MAX / 5;
+		constexpr auto DIST_MAX			  = BLOCK(10);
+		constexpr auto HIGHLIGHT_SIZE_MAX = 150.0f;
+		constexpr auto HIGHLIGHT_SIZE_MIN = HIGHLIGHT_SIZE_MAX / 5;
 
 		auto distAlpha = dist / DIST_MAX;
-		return Lerp(TARGET_HIGHLIGHT_SIZE_MAX, TARGET_HIGHLIGHT_SIZE_MIN, distAlpha);
+		return Lerp(HIGHLIGHT_SIZE_MAX, HIGHLIGHT_SIZE_MIN, distAlpha);
 	}
 
 	bool TargetHighlightData::IsOffscreen() const
 	{
-		float screenEdgeThreshold = ((Size * 2) * RadiusScalar) * SQRT_2;
+		float screenEdgeThreshold = ((Size * 2) * (RadiusScalar + 1.0f)) * SQRT_2;
 
 		return (Position2D.x <= -screenEdgeThreshold ||
 				Position2D.y <= -screenEdgeThreshold ||
@@ -35,28 +35,18 @@ namespace TEN::Hud
 	void TargetHighlightData::Update(const Vector3& cameraPos, bool isActive)
 	{
 		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
-		constexpr auto OPACITY_MAX			= 0.9f;
 		constexpr auto ROT					= ANGLE(2.0f);
 		constexpr auto RADIUS_ALPHA_PRIMARY = 0.5f;
-		constexpr auto COLOR_LERP_ALPHA		= 0.3f;
-		constexpr auto SIZE_LERP_ALPHA		= 0.3f;
+		constexpr auto MORPH_LERP_ALPHA		= 0.3f;
 		constexpr auto ORIENT_LERP_ALPHA	= 0.1f;
 		constexpr auto RADIUS_LERP_ALPHA	= 0.2f;
 
 		// Update active status.
 		IsActive = isActive;
 
-		// Update size.
-		if (IsActive)
-		{
-			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetTargetHighlightSize(dist);
-			Size = Lerp(Size, sizeTarget, SIZE_LERP_ALPHA);
-		}
-		else
-		{
-			Size = Lerp(Size, 0.0f, SIZE_LERP_ALPHA);
-		}
+		// Update 2D position.
+		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
+		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
 
 		// Update 2D orientation.
 		if (IsPrimary)
@@ -65,21 +55,30 @@ namespace TEN::Hud
 		}
 		else
 		{
+			// TODO: Inaccurate.
 			short closestCardinalAngle = (Orientation2D / ANGLE(90.0f)) * ANGLE(90.0f);
 			Orientation2D = (short)round(Lerp(Orientation2D, closestCardinalAngle, ORIENT_LERP_ALPHA));
+		}
+
+		// Update color.
+		ColorTarget.w = IsActive ? ColorTarget.w : 0.0f;
+		Color = Vector4::Lerp(Color, ColorTarget, MORPH_LERP_ALPHA);
+
+		// Update size.
+		if (IsActive)
+		{
+			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
+			float sizeTarget = GetTargetHighlightSize(dist);
+			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
+		}
+		else
+		{
+			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
 		}
 
 		// Update radius scalar.
 		RadiusScalarTarget = IsActive ? (IsPrimary ? RADIUS_ALPHA_PRIMARY : 0.0f) : RADIUS_SCALAR_MAX;
 		RadiusScalar = Lerp(RadiusScalar, RadiusScalarTarget, RADIUS_LERP_ALPHA);
-
-		// Update 2D position.
-		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
-		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
-
-		// Update color.
-		ColorTarget.w = IsActive ? ColorTarget.w : 0.0f;
-		Color = Vector4::Lerp(Color, ColorTarget, COLOR_LERP_ALPHA);
 	}
 
 	void TargetHighlighterController::SetPrimary(std::vector<int> entityIds)
@@ -147,17 +146,16 @@ namespace TEN::Hud
 			// Find highlight.
 			auto it = TargetHighlights.find(entityID);
 
-			// Add new active highlight.
-			if (it == TargetHighlights.end())
-			{
-				AddTargetHighlight(entityID, pos);
-			}
 			// Update existing active highlight.
-			else
+			if (it != TargetHighlights.end() && it->second.IsActive)
 			{
 				auto& highlight = it->second;
-				if (highlight.IsActive)
-					highlight.Update(pos, true);
+				highlight.Update(pos, true);
+			}
+			// Add new active highlight.
+			else
+			{
+				AddTargetHighlight(entityID, pos);
 			}
 		}
 
