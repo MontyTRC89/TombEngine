@@ -395,8 +395,15 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[(int)mode].Channel);
-	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0 && position == 0)
-		return;
+	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0)
+	{
+		// Same track is incoming with zero playhead, ignore it.
+		if (position == 0)
+			return;
+
+		// Same track is incoming with different playhead, restart it with a new position.
+		StopSoundTrack(mode, SOUND_XFADETIME_CUTSOUND);
+	}
 
 	switch (mode)
 	{
