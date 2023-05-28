@@ -139,7 +139,7 @@ extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
 extern LEVEL g_Level;
 
-inline std::future<bool> level_load_ft;
+inline std::future<bool> LevelLoadFut;
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream);
 FILE* FileOpen(const char* fileName);

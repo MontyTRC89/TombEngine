@@ -1273,9 +1273,9 @@ bool LoadLevelFile(int levelIndex)
 	CleanUp();
 	FreeLevel();
 	
-	level_load_ft = std::async(std::launch::async, LoadLevel, levelIndex);
+	LevelLoadFut = std::async(std::launch::async, LoadLevel, levelIndex);
 
-	return level_load_ft.get();
+	return LevelLoadFut.get();
 }
 
 void LoadSprites()
