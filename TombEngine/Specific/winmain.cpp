@@ -146,7 +146,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 	{
 		// make sure we suspend the game (if focus is removed) only if the level is not being loaded
 		
-		if (!LevelLoadFut.valid())
+		if (!LevelLoadTask.valid())
 		{
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
