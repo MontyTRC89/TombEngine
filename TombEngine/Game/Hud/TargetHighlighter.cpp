@@ -33,7 +33,7 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void TargetHighlightData::Update(const Vector3& cameraPos, float range, bool isActive)
+	void TargetHighlightData::Update(const Vector3& cameraPos, bool isActive)
 	{
 		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
 		constexpr auto ROT					= ANGLE(2.0f);
