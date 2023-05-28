@@ -381,14 +381,12 @@ namespace TEN::Renderer
 	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
 										 const Vector4& color, const Vector2& size)
 	{
+		if (!CheckIfSlotExists(spriteID, "Screen sprite rendering"))
+			return;
+
 		constexpr auto VERTEX_COUNT	  = 4;
-		constexpr auto UV_CONSTRAINTS = std::array<Vector2, VERTEX_COUNT>
-		{
-			Vector2(0.0f),
-			Vector2(1.0f, 0.0f),
-			Vector2(1.0f),
-			Vector2(0.0f, 1.0f)
-		};
+
+		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex + spriteIndex];
 
 		// Calculate vertex base.
 		auto halfSize = size / 2;
@@ -418,7 +416,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < vertices.size(); i++)
 		{
 			vertices[i].Position = Vector3(vertexPoints[i]);
-			vertices[i].UV = UV_CONSTRAINTS[i];
+			vertices[i].UV = spritePtr.UV[i];
 			vertices[i].Color = color;
 		}
 
@@ -427,12 +425,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
-		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex + spriteIndex];
-		auto* texturePtr = spritePtr.Texture->ShaderResourceView.Get();
-		m_context->PSSetShaderResources(0, 1, &texturePtr);
-
-		auto* sampler = m_states->AnisotropicClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
+		BindTexture(TEXTURE_COLOR_MAP, spritePtr.Texture, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
