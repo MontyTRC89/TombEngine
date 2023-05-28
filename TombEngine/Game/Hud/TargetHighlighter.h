@@ -4,7 +4,7 @@ struct ItemInfo;
 
 namespace TEN::Hud
 {
-	struct TargetHighlightData
+	struct CrosshairData
 	{
 	private:
 		struct SegmentData
@@ -42,7 +42,7 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
-		std::unordered_map<int, TargetHighlightData> TargetHighlights = {}; // Key = entity ID.
+		std::unordered_map<int, CrosshairData> Crosshairs = {}; // Key = entity ID.
 
 	public:
 		// Setters
@@ -60,7 +60,7 @@ namespace TEN::Hud
 	private:
 		// Helpers
 		std::vector<int>	 GetTargetEntityIds(const ItemInfo& playerItem);
-		TargetHighlightData& GetNewTargetHighlight(int entityID);
+		CrosshairData& GetNewTargetHighlight(int entityID);
 		void				 AddTargetHighlight(int entityID, const Vector3& pos);
 		void				 ClearInactiveTargetHighlights();
 

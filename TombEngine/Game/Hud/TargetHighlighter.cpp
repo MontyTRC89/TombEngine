@@ -13,17 +13,17 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
-	static float GetTargetHighlightSize(float dist)
+	static float GetCrosshairSize(float dist)
 	{
 		constexpr auto RANGE			  = BLOCK(10);
-		constexpr auto HIGHLIGHT_SIZE_MAX = SCREEN_SPACE_RES.y * 0.25f;
-		constexpr auto HIGHLIGHT_SIZE_MIN = HIGHLIGHT_SIZE_MAX / 5;
+		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.25f;
+		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
 
 		auto distAlpha = dist / RANGE;
-		return Lerp(HIGHLIGHT_SIZE_MAX, HIGHLIGHT_SIZE_MIN, distAlpha);
+		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, distAlpha);
 	}
 
-	bool TargetHighlightData::IsOffscreen() const
+	bool CrosshairData::IsOffscreen() const
 	{
 		float screenEdgeThreshold = ((Size * 2) * (RadiusScalar + 1.0f)) * SQRT_2; // TODO: Check.
 
@@ -33,7 +33,7 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void TargetHighlightData::Update(const Vector3& cameraPos, bool isActive)
+	void CrosshairData::Update(const Vector3& cameraPos, bool isActive)
 	{
 		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
 		constexpr auto ROT					= ANGLE(2.0f);
@@ -69,7 +69,7 @@ namespace TEN::Hud
 		if (IsActive)
 		{
 			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetTargetHighlightSize(dist);
+			float sizeTarget = GetCrosshairSize(dist);
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
 		}
 		else
@@ -84,19 +84,21 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::SetPrimary(std::vector<int> entityIds)
 	{
-		// No highlights to set; return early.
-		if (TargetHighlights.empty() || entityIds.empty())
+		// No crosshairs to set; return early.
+		if (Crosshairs.empty() || entityIds.empty())
 			return;
 
-		// Set highlights as primary.
+		// Set crosshairs as primary.
 		for (int entityID : entityIds)
 		{
-			// Matching highlight; continue.
-			if (!TargetHighlights.count(entityID))
+			// Matching crosshair; continue.
+			if (!Crosshairs.count(entityID))
 				continue;
 
-			auto& highlight = TargetHighlights.at(entityID);
-			highlight.IsPrimary = true;
+			auto& crosshair = Crosshairs.at(entityID);
+
+			crosshair.IsPrimary = true;
+			crosshair.ColorTarget = CrosshairData::COLOR_GREEN;
 		}
 	}
 
@@ -107,20 +109,21 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::SetPeripheral(std::vector<int> entityIds)
 	{
-		// No highlights to set; return early.
-		if (TargetHighlights.empty() || entityIds.empty())
+		// No crosshairs to set; return early.
+		if (Crosshairs.empty() || entityIds.empty())
 			return;
 
-		// Set highlights as peripheral.
+		// Set crosshairs as peripheral.
 		for (int entityID : entityIds)
 		{
-			// Matching highlight; continue.
-			if (!TargetHighlights.count(entityID))
+			// Matching crosshair; continue.
+			if (!Crosshairs.count(entityID))
 				continue;
 
-			auto& highlight = TargetHighlights.at(entityID);
-			highlight.IsPrimary = false;
-			highlight.ColorTarget = TargetHighlightData::COLOR_GRAY;
+			auto& crosshair = Crosshairs.at(entityID);
+
+			crosshair.IsPrimary = false;
+			crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
 		}
 	}
 
@@ -131,36 +134,36 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(std::vector<int> entityIds)
 	{
-		// No highlights to update; return early.
-		if (TargetHighlights.empty() && entityIds.empty())
+		// No crosshairs to update; return early.
+		if (Crosshairs.empty() && entityIds.empty())
 			return;
 
-		// Update active highlights.
+		// Update active crosshairs.
 		for (int entityID : entityIds)
 		{
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
-			// Find highlight.
-			auto it = TargetHighlights.find(entityID);
+			// Find crosshair.
+			auto it = Crosshairs.find(entityID);
 
-			// Update existing active highlight.
-			if (it != TargetHighlights.end() && it->second.IsActive)
+			// Update existing active crosshair.
+			if (it != Crosshairs.end() && it->second.IsActive)
 			{
-				auto& highlight = it->second;
-				highlight.Update(pos, true);
+				auto& crosshair = it->second;
+				crosshair.Update(pos, true);
 			}
-			// Add new active highlight.
+			// Add new active crosshair.
 			else
 			{
 				AddTargetHighlight(entityID, pos);
 			}
 		}
 
-		// Update inactive highlights.
-		for (auto& [entityID, highlight] : TargetHighlights)
+		// Update inactive crosshairs.
+		for (auto& [entityID, crosshair] : Crosshairs)
 		{
-			// Find absent highlights.
+			// Find absent crosshairs.
 			auto it = std::find(entityIds.begin(), entityIds.end(), entityID);
 			if (it != entityIds.end())
 				continue;
@@ -169,8 +172,8 @@ namespace TEN::Hud
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
-			// Update inactive highlight.
-			highlight.Update(pos, false);
+			// Update inactive crosshair.
+			crosshair.Update(pos, false);
 		}
 
 		ClearInactiveTargetHighlights();
@@ -182,11 +185,11 @@ namespace TEN::Hud
 
 		auto entityIds = GetTargetEntityIds(playerItem);
 
-		// Determine peripheral highlight entity IDs.
+		// Determine peripheral entity IDs.
 		auto peripheralEntityIds = entityIds;
 		if (player.TargetEntity != nullptr)
 		{
-			// Set primary highlight.
+			// Set primary crosshair.
 			int primaryEntityID = player.TargetEntity->Index;
 			SetPrimary(primaryEntityID);
 
@@ -196,10 +199,10 @@ namespace TEN::Hud
 				peripheralEntityIds.erase(it);
 		}
 
-		// Set peripheral highlights.
+		// Set peripheral crosshairs.
 		SetPeripheral(peripheralEntityIds);
 
-		// Update highlights.
+		// Update crosshairs.
 		Update(entityIds);
 	}
 
@@ -207,23 +210,23 @@ namespace TEN::Hud
 	{
 		DrawDebug();
 
-		if (TargetHighlights.empty())
+		if (Crosshairs.empty())
 			return;
 
-		for (const auto& [entityID, highlight] : TargetHighlights)
+		for (const auto& [entityID, crosshair] : Crosshairs)
 		{
-			if (highlight.IsOffscreen())
+			if (crosshair.IsOffscreen())
 				continue;
 
 			g_Renderer.DrawSpriteIn2DSpace(
 				ID_DEFAULT_SPRITES, 18,
-				highlight.Position2D, highlight.Orientation2D, highlight.Color, Vector2(highlight.Size));
+				crosshair.Position2D, crosshair.Orientation2D, crosshair.Color, Vector2(crosshair.Size));
 		}
 	}
 
 	void TargetHighlighterController::Clear()
 	{
-		TargetHighlights.clear();
+		Crosshairs.clear();
 	}
 
 	std::vector<int> TargetHighlighterController::GetTargetEntityIds(const ItemInfo& playerItem)
@@ -245,33 +248,33 @@ namespace TEN::Hud
 		return entityIds;
 	}
 
-	TargetHighlightData& TargetHighlighterController::GetNewTargetHighlight(int entityID)
+	CrosshairData& TargetHighlighterController::GetNewTargetHighlight(int entityID)
 	{
 		constexpr auto COUNT_MAX = 16;
 
-		// Clear smallest highlight if map is full.
-		if (TargetHighlights.size() >= COUNT_MAX)
+		// Clear smallest crosshair if map is full.
+		if (Crosshairs.size() >= COUNT_MAX)
 		{
 			int key = 0;
 			float smallestSize = INFINITY;
 			
-			for (auto& [entityID, highlight] : TargetHighlights)
+			for (auto& [entityID, crosshair] : Crosshairs)
 			{
-				if (highlight.Size < smallestSize)
+				if (crosshair.Size < smallestSize)
 				{
 					key = entityID;
-					smallestSize = highlight.Size;
+					smallestSize = crosshair.Size;
 				}
 			}
 
-			TargetHighlights.erase(key);
+			Crosshairs.erase(key);
 		}
 
-		// Return new target highlight.
-		TargetHighlights.insert({ entityID, {} });
-		auto& highlight = TargetHighlights.at(entityID);
-		highlight = {};
-		return highlight;
+		// Return new crosshair.
+		Crosshairs.insert({ entityID, {} });
+		auto& crosshair = Crosshairs.at(entityID);
+		crosshair = {};
+		return crosshair;
 	}
 
 	void TargetHighlighterController::AddTargetHighlight(int entityID, const Vector3& pos)
@@ -282,29 +285,29 @@ namespace TEN::Hud
 		if (!pos2D.has_value())
 			return;
 
-		// Create new target highlight.
-		auto& highlight = GetNewTargetHighlight(entityID);
+		// Create new crosshair.
+		auto& crosshair = GetNewTargetHighlight(entityID);
 
-		highlight.IsActive = true;
-		highlight.IsPrimary = false;
-		highlight.Position2D = pos2D.value();
-		highlight.Orientation2D = 0;
-		highlight.Color = TargetHighlightData::COLOR_GRAY;
-		highlight.Color.w = 0.0f;
-		highlight.ColorTarget = TargetHighlightData::COLOR_GRAY;
-		highlight.Size = SIZE_DEFAULT;
-		highlight.RadiusScalar = TargetHighlightData::RADIUS_SCALAR_MAX;
-		highlight.RadiusScalarTarget = 0.0f;
+		crosshair.IsActive = true;
+		crosshair.IsPrimary = false;
+		crosshair.Position2D = pos2D.value();
+		crosshair.Orientation2D = 0;
+		crosshair.Color = CrosshairData::COLOR_GRAY;
+		crosshair.Color.w = 0.0f;
+		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
+		crosshair.Size = SIZE_DEFAULT;
+		crosshair.RadiusScalar = CrosshairData::RADIUS_SCALAR_MAX;
+		crosshair.RadiusScalarTarget = 0.0f;
 	}
 
 	void TargetHighlighterController::ClearInactiveTargetHighlights()
 	{
-		for (auto it = TargetHighlights.begin(); it != TargetHighlights.end();)
+		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
 		{
-			// Clear highlight if inactive and size is near 0.
+			// Clear crosshair if inactive and size is near 0.
 			if (!it->second.IsActive && (it->second.Size <= EPSILON))
 			{
-				it = TargetHighlights.erase(it);
+				it = Crosshairs.erase(it);
 			}
 			else
 			{
@@ -318,11 +321,11 @@ namespace TEN::Hud
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
-		for (const auto& [entityID, highlight] : TargetHighlights)
-			highlight.IsPrimary ? primaryCount++ : peripheralCount++;
+		for (const auto& [entityID, crosshair] : Crosshairs)
+			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 
-		g_Renderer.PrintDebugMessage("Highlights: %d", TargetHighlights.size());
-		g_Renderer.PrintDebugMessage("Primary highlights: %d", primaryCount);
-		g_Renderer.PrintDebugMessage("Peripheral highlights: %d", peripheralCount);
+		g_Renderer.PrintDebugMessage("Highlights: %d", Crosshairs.size());
+		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
+		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
 }
