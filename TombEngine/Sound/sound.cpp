@@ -395,7 +395,7 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[(int)mode].Channel);
-	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0)
+	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0 && position == 0)
 		return;
 
 	switch (mode)
