@@ -37,14 +37,18 @@ namespace TEN::Hud
 		constexpr auto INVALID_2D_POS = Vector2(FLT_MAX); // TODO: Set inactive instead.
 		constexpr auto OPACITY_MAX	  = 0.9f;
 		constexpr auto ROT			  = ANGLE(2.0f);
-		constexpr auto LERP_ALPHA	  = 0.2f;
+		constexpr auto LERP_ALPHA	  = 0.3f;
 
 		// Update active status.
 		IsActive = isActive;
 
 		// Update size.
-		float dist = Vector3::Distance(Camera.pos.ToVector3(), pos);
-		float sizeTarget = GetTargetHighlightSize(dist);
+		float sizeTarget = 0.0;
+		if (IsActive)
+		{
+			float dist = Vector3::Distance(Camera.pos.ToVector3(), pos);
+			sizeTarget = GetTargetHighlightSize(dist);
+		}
 		Size = Lerp(Size, sizeTarget, LERP_ALPHA);
 
 		// Update 2D orientation.
@@ -272,9 +276,6 @@ namespace TEN::Hud
 		if (!pos2D.has_value())
 			return;
 
-		float dist = Vector3::Distance(Camera.pos.ToVector3(), pos);
-		auto size = GetTargetHighlightSize(dist);
-
 		// Create new target highlight.
 		auto& highlight = GetNewTargetHighlight(entityID);
 
@@ -283,7 +284,7 @@ namespace TEN::Hud
 		highlight.Position2D = pos2D.value();
 		highlight.Orientation2D = 0;
 		highlight.Color = TargetHighlightData::COLOR_GRAY;
-		highlight.Size = size;
+		highlight.Size = SCREEN_SPACE_RES.x / 2;
 		highlight.OpacityTarget = 0.0f;
 		highlight.Radius = RADIUS_MAX;
 		highlight.RadiusTarget = 0.0f;
@@ -293,7 +294,7 @@ namespace TEN::Hud
 	{
 		for (auto it = TargetHighlights.begin(); it != TargetHighlights.end();)
 		{
-			if (!it->second.IsActive && (it->second.Color.w <= EPSILON))
+			if (!it->second.IsActive && (it->second.Size <= EPSILON))
 			{
 				it = TargetHighlights.erase(it);
 			}

@@ -4,14 +4,23 @@ struct ItemInfo;
 
 namespace TEN::Hud
 {
+	// TODO
+	struct TargetHighlightSegmentData
+	{
+		Vector3 Offset = Vector3::Zero;
+	};
+
 	struct TargetHighlightData
 	{
+		static constexpr auto SEGMENT_COUNT_MAX = 4;
 		static constexpr auto COLOR_GREEN = Vector4(0.1f, 1.0f, 0.1f, 1.0f);
 		static constexpr auto COLOR_RED	  = Vector4(1.0f, 0.1f, 0.1f, 1.0f);
 		static constexpr auto COLOR_GRAY  = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		bool IsActive  = false;
 		bool IsPrimary = false;
+
+		std::vector<TargetHighlightSegmentData> Segments = {};
 
 		Vector2 Position2D	  = Vector2::Zero;
 		short	Orientation2D = 0;
