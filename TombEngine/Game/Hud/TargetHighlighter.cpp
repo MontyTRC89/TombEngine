@@ -219,7 +219,7 @@ namespace TEN::Hud
 				continue;
 
 			g_Renderer.DrawSpriteIn2DSpace(
-				ID_DEFAULT_SPRITES, 18,
+				(GAME_OBJECT_ID)1380, 0,
 				crosshair.Position2D, crosshair.Orientation2D, crosshair.Color, Vector2(crosshair.Size));
 		}
 	}
