@@ -12,6 +12,7 @@ Version 1.0.9
 * Fix missing heavytrigger checks for node events activated from classic triggers.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Fix soundtrack position not restoring if same track is already playing.
 * Fix inventory input interference when entering inventory via puzzle.
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
