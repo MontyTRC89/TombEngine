@@ -4,36 +4,36 @@ struct ItemInfo;
 
 namespace TEN::Hud
 {
-	// TODO
-	struct TargetHighlightSegmentData
-	{
-		Vector3 Offset = Vector3::Zero;
-	};
-
 	struct TargetHighlightData
 	{
-		static constexpr auto SEGMENT_COUNT_MAX = 4;
-		static constexpr auto COLOR_GREEN = Vector4(0.1f, 1.0f, 0.1f, 1.0f);
-		static constexpr auto COLOR_RED	  = Vector4(1.0f, 0.1f, 0.1f, 1.0f);
-		static constexpr auto COLOR_GRAY  = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		struct SegmentData
+		{
+			Vector3 Offset2D			= Vector3::Zero;
+			short	OrientationOffset2D = 0;
+		};
+
+		static constexpr auto SEGMENT_COUNT		= 4;
+		static constexpr auto RADIUS_SCALAR_MAX = 10.0f;
+		static constexpr auto COLOR_GREEN		= Vector4(0.1f, 1.0f, 0.1f, 1.0f);
+		static constexpr auto COLOR_RED			= Vector4(1.0f, 0.1f, 0.1f, 1.0f);
+		static constexpr auto COLOR_GRAY		= Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		bool IsActive  = false;
 		bool IsPrimary = false;
-
-		std::vector<TargetHighlightSegmentData> Segments = {};
 
 		Vector2 Position2D	  = Vector2::Zero;
 		short	Orientation2D = 0;
 		Vector4 Color		  = Vector4::Zero;
 		Vector4 ColorTarget	  = Vector4::Zero;
 
-		float Size			= 0.0f;
-		float OpacityTarget = 0.0f;
-		float Radius		= 0.0f;
-		float RadiusTarget	= 0.0f;
+		float Size				 = 0.0f;
+		float RadiusScalar		 = 0.0f;
+		float RadiusScalarTarget = 0.0f;
+
+		std::array<SegmentData, SEGMENT_COUNT> Segments = {}; // TODO
 
 		bool IsOffscreen() const;
-		void Update(const Vector3& pos, bool isActive);
+		void Update(const Vector3& cameraPos, bool isActive);
 	};
 
 	class TargetHighlighterController

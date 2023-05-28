@@ -24,7 +24,7 @@ namespace TEN::Hud
 
 	bool TargetHighlightData::IsOffscreen() const
 	{
-		float screenEdgeThreshold = ((Size * 2) + Radius) * SQRT_2;
+		float screenEdgeThreshold = ((Size * 2) * RadiusScalar) * SQRT_2;
 
 		return (Position2D.x <= -screenEdgeThreshold ||
 				Position2D.y <= -screenEdgeThreshold ||
@@ -32,24 +32,31 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void TargetHighlightData::Update(const Vector3& pos, bool isActive)
+	void TargetHighlightData::Update(const Vector3& cameraPos, bool isActive)
 	{
-		constexpr auto INVALID_2D_POS = Vector2(FLT_MAX); // TODO: Set inactive instead.
-		constexpr auto OPACITY_MAX	  = 0.9f;
-		constexpr auto ROT			  = ANGLE(2.0f);
-		constexpr auto LERP_ALPHA	  = 0.3f;
+		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
+		constexpr auto OPACITY_MAX			= 0.9f;
+		constexpr auto ROT					= ANGLE(2.0f);
+		constexpr auto RADIUS_ALPHA_PRIMARY = 0.5f;
+		constexpr auto COLOR_LERP_ALPHA		= 0.3f;
+		constexpr auto SIZE_LERP_ALPHA		= 0.3f;
+		constexpr auto ORIENT_LERP_ALPHA	= 0.1f;
+		constexpr auto RADIUS_LERP_ALPHA	= 0.2f;
 
 		// Update active status.
 		IsActive = isActive;
 
 		// Update size.
-		float sizeTarget = 0.0;
 		if (IsActive)
 		{
-			float dist = Vector3::Distance(Camera.pos.ToVector3(), pos);
-			sizeTarget = GetTargetHighlightSize(dist);
+			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
+			float sizeTarget = GetTargetHighlightSize(dist);
+			Size = Lerp(Size, sizeTarget, SIZE_LERP_ALPHA);
 		}
-		Size = Lerp(Size, sizeTarget, LERP_ALPHA);
+		else
+		{
+			Size = Lerp(Size, 0.0f, SIZE_LERP_ALPHA);
+		}
 
 		// Update 2D orientation.
 		if (IsPrimary)
@@ -59,28 +66,32 @@ namespace TEN::Hud
 		else
 		{
 			short closestCardinalAngle = (Orientation2D / ANGLE(90.0f)) * ANGLE(90.0f);
-			Orientation2D = (short)round(Lerp(Orientation2D, closestCardinalAngle, LERP_ALPHA));
+			Orientation2D = (short)round(Lerp(Orientation2D, closestCardinalAngle, ORIENT_LERP_ALPHA));
 		}
 
+		// Update radius scalar.
+		RadiusScalarTarget = IsActive ? (IsPrimary ? RADIUS_ALPHA_PRIMARY : 0.0f) : RADIUS_SCALAR_MAX;
+		RadiusScalar = Lerp(RadiusScalar, RadiusScalarTarget, RADIUS_LERP_ALPHA);
+
 		// Update 2D position.
-		auto pos2D = g_Renderer.Get2DPosition(pos);
+		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
 		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
 
-		// Update color and opacity.
-		OpacityTarget = IsActive ? OpacityTarget : 0.0f;
-		ColorTarget.w = OpacityTarget;
-		Color = Vector4::Lerp(Color, ColorTarget, LERP_ALPHA);
+		// Update color.
+		ColorTarget.w = IsActive ? ColorTarget.w : 0.0f;
+		Color = Vector4::Lerp(Color, ColorTarget, COLOR_LERP_ALPHA);
 	}
 
 	void TargetHighlighterController::SetPrimary(std::vector<int> entityIds)
 	{
+		// No highlights to set; return early.
 		if (TargetHighlights.empty() || entityIds.empty())
 			return;
 
-		// Set entity highlights as primary.
-		for (const int& entityID : entityIds)
+		// Set highlights as primary.
+		for (int entityID : entityIds)
 		{
-			// Entity not targeted; continue.
+			// Matching highlight; continue.
 			if (!TargetHighlights.count(entityID))
 				continue;
 
@@ -98,13 +109,14 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::SetPeripheral(std::vector<int> entityIds)
 	{
+		// No highlights to set; return early.
 		if (TargetHighlights.empty() || entityIds.empty())
 			return;
 
-		// Set entity highlights as peripheral.
-		for (const int& entityID : entityIds)
+		// Set highlights as peripheral.
+		for (int entityID : entityIds)
 		{
-			// Entity not targeted; continue.
+			// Matching highlight; continue.
 			if (!TargetHighlights.count(entityID))
 				continue;
 
@@ -122,16 +134,17 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(std::vector<int> entityIds)
 	{
+		// No highlights to update; return early.
 		if (TargetHighlights.empty() && entityIds.empty())
 			return;
 
 		// Update active highlights.
-		for (const int& entityID : entityIds)
+		for (int entityID : entityIds)
 		{
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
-			// Find entity highlight.
+			// Find highlight.
 			auto it = TargetHighlights.find(entityID);
 
 			// Add new active highlight.
@@ -151,16 +164,13 @@ namespace TEN::Hud
 		// Update inactive highlights.
 		for (auto& [entityID, highlight] : TargetHighlights)
 		{
-			// Find absent entity highlights.
+			// Find absent highlights.
 			auto it = std::find(entityIds.begin(), entityIds.end(), entityID);
 			if (it != entityIds.end())
 				continue;
 
 			const auto& item = g_Level.Items[entityID];
-			if (item.HitPoints <= 0)
-				continue;
-
-			auto pos = item.Pose.Position.ToVector3();
+			auto pos = GetJointPosition(item, 0).ToVector3();
 
 			// Update inactive highlight.
 			auto& highlight = TargetHighlights.at(entityID);
@@ -210,7 +220,7 @@ namespace TEN::Hud
 				continue;
 
 			g_Renderer.DrawSpriteIn2DSpace(
-				ID_BINOCULAR_GRAPHIC, 0,
+				ID_DEFAULT_SPRITES, 18,
 				highlight.Position2D, highlight.Orientation2D, highlight.Color, Vector2(highlight.Size));
 		}
 	}
@@ -243,22 +253,22 @@ namespace TEN::Hud
 	{
 		constexpr auto COUNT_MAX = 16;
 
-		// Clear smallest target highlight if map is full.
+		// Clear smallest highlight if map is full.
 		if (TargetHighlights.size() >= COUNT_MAX)
 		{
-			int entityIDKey = 0;
+			int key = 0;
 			float smallestSize = INFINITY;
 			
 			for (auto& [entityID, highlight] : TargetHighlights)
 			{
 				if (highlight.Size < smallestSize)
 				{
-					entityIDKey = entityID;
+					key = entityID;
 					smallestSize = highlight.Size;
 				}
 			}
 
-			TargetHighlights.erase(entityIDKey);
+			TargetHighlights.erase(key);
 		}
 
 		// Return new target highlight.
@@ -270,7 +280,7 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::AddTargetHighlight(int entityID, const Vector3& pos)
 	{
-		constexpr auto RADIUS_MAX = BLOCK(1);
+		constexpr auto SIZE_DEFAULT = SCREEN_SPACE_RES.x / 2;
 
 		auto pos2D = g_Renderer.Get2DPosition(pos);
 		if (!pos2D.has_value())
@@ -284,16 +294,18 @@ namespace TEN::Hud
 		highlight.Position2D = pos2D.value();
 		highlight.Orientation2D = 0;
 		highlight.Color = TargetHighlightData::COLOR_GRAY;
-		highlight.Size = SCREEN_SPACE_RES.x / 2;
-		highlight.OpacityTarget = 0.0f;
-		highlight.Radius = RADIUS_MAX;
-		highlight.RadiusTarget = 0.0f;
+		highlight.Color.w = 0.0f;
+		highlight.ColorTarget = TargetHighlightData::COLOR_GRAY;
+		highlight.Size = SIZE_DEFAULT;
+		highlight.RadiusScalar = TargetHighlightData::RADIUS_SCALAR_MAX;
+		highlight.RadiusScalarTarget = 0.0f;
 	}
 
 	void TargetHighlighterController::ClearInactiveTargetHighlights()
 	{
 		for (auto it = TargetHighlights.begin(); it != TargetHighlights.end();)
 		{
+			// Clear highlight if inactive and size is near 0.
 			if (!it->second.IsActive && (it->second.Size <= EPSILON))
 			{
 				it = TargetHighlights.erase(it);
@@ -313,7 +325,7 @@ namespace TEN::Hud
 		for (const auto& [entityID, highlight] : TargetHighlights)
 			highlight.IsPrimary ? primaryCount++ : peripheralCount++;
 
-		g_Renderer.PrintDebugMessage("Total highlights: %d", TargetHighlights.size());
+		g_Renderer.PrintDebugMessage("Highlights: %d", TargetHighlights.size());
 		g_Renderer.PrintDebugMessage("Primary highlights: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral highlights: %d", peripheralCount);
 	}
