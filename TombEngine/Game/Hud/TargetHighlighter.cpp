@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/items.h"
+#include "Game/lara/lara_fire.h"
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -14,17 +15,17 @@ namespace TEN::Hud
 {
 	static float GetTargetHighlightSize(float dist)
 	{
-		constexpr auto DIST_MAX			  = BLOCK(10);
-		constexpr auto HIGHLIGHT_SIZE_MAX = 150.0f;
+		constexpr auto RANGE			  = BLOCK(10);
+		constexpr auto HIGHLIGHT_SIZE_MAX = SCREEN_SPACE_RES.y * 0.25f;
 		constexpr auto HIGHLIGHT_SIZE_MIN = HIGHLIGHT_SIZE_MAX / 5;
 
-		auto distAlpha = dist / DIST_MAX;
+		auto distAlpha = dist / RANGE;
 		return Lerp(HIGHLIGHT_SIZE_MAX, HIGHLIGHT_SIZE_MIN, distAlpha);
 	}
 
 	bool TargetHighlightData::IsOffscreen() const
 	{
-		float screenEdgeThreshold = ((Size * 2) * (RadiusScalar + 1.0f)) * SQRT_2;
+		float screenEdgeThreshold = ((Size * 2) * (RadiusScalar + 1.0f)) * SQRT_2; // TODO: Check.
 
 		return (Position2D.x <= -screenEdgeThreshold ||
 				Position2D.y <= -screenEdgeThreshold ||
@@ -32,7 +33,7 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void TargetHighlightData::Update(const Vector3& cameraPos, bool isActive)
+	void TargetHighlightData::Update(const Vector3& cameraPos, float range, bool isActive)
 	{
 		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
 		constexpr auto ROT					= ANGLE(2.0f);
@@ -95,9 +96,7 @@ namespace TEN::Hud
 				continue;
 
 			auto& highlight = TargetHighlights.at(entityID);
-
 			highlight.IsPrimary = true;
-			highlight.ColorTarget = TargetHighlightData::COLOR_GREEN;
 		}
 	}
 
@@ -120,7 +119,6 @@ namespace TEN::Hud
 				continue;
 
 			auto& highlight = TargetHighlights.at(entityID);
-
 			highlight.IsPrimary = false;
 			highlight.ColorTarget = TargetHighlightData::COLOR_GRAY;
 		}

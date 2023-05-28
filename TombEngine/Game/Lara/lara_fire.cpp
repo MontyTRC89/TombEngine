@@ -282,6 +282,15 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
+// TODO: Use map like in GetWeaponAnimData();
+const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
+{
+	if ((int)weaponType < 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+		return Weapons[0];
+
+	return (Weapons[(int)weaponType]);
+}
+
 void InitializeNewWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -554,7 +563,7 @@ void HandleWeapon(ItemInfo& laraItem)
 					(player.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						player.Control.WaterStatus == WaterStatus::Dry ||
 						(player.Control.WaterStatus == WaterStatus::Wade &&
-							player.Context.WaterSurfaceDist > -Weapons[(int)player.Control.Weapon.GunType].GunHeight))))
+							player.Context.WaterSurfaceDist > -GetWeaponInfo(player.Control.Weapon.GunType).GunHeight))))
 			{
 				if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 				{
@@ -595,7 +604,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		else if (player.Control.Weapon.GunType != LaraWeaponType::HarpoonGun &&
 			player.Control.WaterStatus != WaterStatus::Dry &&
 			(player.Control.WaterStatus != WaterStatus::Wade ||
-				player.Context.WaterSurfaceDist < -Weapons[(int)player.Control.Weapon.GunType].GunHeight))
+				player.Context.WaterSurfaceDist < -GetWeaponInfo(player.Control.Weapon.GunType).GunHeight))
 		{
 			player.Control.HandStatus = HandStatus::WeaponUndraw;
 		}
@@ -801,7 +810,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	if (!ammo.HasInfinite())
 		ammo--;
 
-	const auto& weapon = Weapons[(int)weaponType];
+	const auto& weapon = GetWeaponInfo(weaponType);
 
 	auto wobbledArmOrient = EulerAngles(
 		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
