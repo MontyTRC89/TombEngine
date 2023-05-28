@@ -167,11 +167,11 @@ namespace TEN::Hud
 			if (it != entityIds.end())
 				continue;
 
+			// Get position.
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
 			// Update inactive highlight.
-			auto& highlight = TargetHighlights.at(entityID);
 			highlight.Update(pos, false);
 		}
 
