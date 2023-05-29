@@ -17,7 +17,7 @@ namespace TEN::Hud
 	static float GetCrosshairSize(float dist)
 	{
 		constexpr auto DIST_RANGE		  = BLOCK(10);
-		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.1f;
+		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
 		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
 
 		auto distAlpha = dist / DIST_RANGE;
@@ -38,6 +38,7 @@ namespace TEN::Hud
 	{
 		constexpr auto INVALID_2D_POS			= Vector2(FLT_MAX);
 		constexpr auto ROT						= ANGLE(2.0f);
+		constexpr auto SIZE_SCALAR_PERIPHERAL	= 0.7f;
 		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f * SQRT_2;
 		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f * SQRT_2;
 		constexpr auto MORPH_LERP_ALPHA			= 0.3f;
@@ -72,7 +73,7 @@ namespace TEN::Hud
 		if (IsActive)
 		{
 			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetCrosshairSize(dist);
+			float sizeTarget = GetCrosshairSize(dist) * (IsPrimary ? 1.0f : SIZE_SCALAR_PERIPHERAL);
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
 		}
 		else
