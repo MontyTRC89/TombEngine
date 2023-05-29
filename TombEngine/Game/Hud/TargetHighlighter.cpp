@@ -198,16 +198,14 @@ namespace TEN::Hud
 			if (entityPtr == nullptr)
 				continue;
 
-			int entityID = entityPtr->Index;
-
 			// Set crosshair as primary or peripheral.
-			if (player.TargetEntity != nullptr && entityID == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr && entityPtr->Index == player.TargetEntity->Index)
 			{
-				SetPrimary(entityID);
+				SetPrimary(entityPtr->Index);
 			}
 			else
 			{
-				SetPeripheral(entityID);
+				SetPeripheral(entityPtr->Index);
 			}
 
 			// Collect entity ID.
