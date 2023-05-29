@@ -323,6 +323,9 @@ namespace TEN::Collision::Floordata
 		return normal;
 	}
 
+	// Given absolute x and z coordinates, find what "quadrant" of a tile they
+	// refer to. e.g [-512, 74] refers to a point on the left edge of a tile,
+	// and a little beyond half-way towards the front edge.
 	Vector2i GetSectorPoint(int x, int z)
 	{
 		const auto xPoint = x % BLOCK(1) - BLOCK(1) / 2;
@@ -331,6 +334,13 @@ namespace TEN::Collision::Floordata
 		return Vector2i{xPoint, yPoint};
 	}
 
+	// Given absolute coordinates and a room number, locate the floor tile (in
+	// this room) that these coordinates refer to. If the coordinates refer to
+	// a tile OUTSIDE of this room, get the "closest" tile to them that IS in
+	// the room.
+	//
+	// For example, if the tile is in a room northwest of the room specified by
+	// roomNumber, we would return [x = 0, room.zSize-1].
 	Vector2i GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
@@ -365,16 +375,28 @@ namespace TEN::Collision::Floordata
 		return room.floor[room.zSize * pos.x + pos.y];
 	}
 
+
+	// Get FloorInfo of the closest tile in the room indexed by roomNumber to
+	// coordinates [x, z]. If those coordinates ARE in the room, we'll get the
+	// tile itself. Otherwise, we'll get room's "closest" tile to the target
+	// tile.
 	FloorInfo& GetFloor(int roomNumber, int x, int z)
 	{
 		return GetFloor(roomNumber, GetRoomPosition(roomNumber, x, z));
 	}
 
+	// Return the FloorInfo referred to by x and z inputs, or the closest
+	// FloorInfo we CAN get, by traversing wall portals.
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
 	{
+		// Get the closest FloorInfo in the current room.
 		auto floor = &GetFloor(roomNumber, x, z);
 
+		// Does this FloorInfo refer to a wall portal?
 		auto roomSide = floor->GetRoomNumberAtSide();
+		// If so, get the closest FloorInfo from the room on the other side of
+		// the portal. Repeat until we get a FloorInfo that does not hold a
+		// portal.
 		while (roomSide)
 		{
 			roomNumber = *roomSide;
@@ -385,6 +407,9 @@ namespace TEN::Collision::Floordata
 		if (sideRoomNumber)
 			*sideRoomNumber = roomNumber;
 
+		// We now either have the FloorInfo of the tile, or, if there was no
+		// direct line from the original roomNumber, the closest tile we could
+		// get.
 		return *floor;
 	}
 
