@@ -316,7 +316,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
-	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
 		m_stItem.BoneLightModes[k] = GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;

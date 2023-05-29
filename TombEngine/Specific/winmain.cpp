@@ -142,9 +142,11 @@ void WinProcMsg()
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
 {
-	if (wParam == 8)
+	if (wParam == WM_KILLFOCUS)
 	{
-		if (!IsLevelLoading)
+		// make sure we suspend the game (if focus is removed) only if the level is not being loaded
+		
+		if (!LevelLoadTask.valid())
 		{
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
@@ -152,7 +154,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 			if (g_Renderer.IsFullsScreen())
 			{
-				SetCursor(0);
+				SetCursor(nullptr);
 				ShowCursor(false);
 			}
 			else
