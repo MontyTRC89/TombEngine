@@ -34,11 +34,12 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void CrosshairData::Update(const Vector3& cameraPos, bool isActive)
+	void CrosshairData::Update(const Vector3& cameraPos, bool doPulse, bool isActive)
 	{
 		constexpr auto INVALID_2D_POS			= Vector2(FLT_MAX);
 		constexpr auto ROT						= ANGLE(2.0f);
-		constexpr auto SIZE_SCALAR_PERIPHERAL	= 0.7f;
+		constexpr auto SCALE_PERIPHERAL			= 0.7f;
+		constexpr auto SCALE_PULSE				= 1.1;
 		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f * SQRT_2;
 		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f * SQRT_2;
 		constexpr auto MORPH_LERP_ALPHA			= 0.3f;
@@ -72,9 +73,12 @@ namespace TEN::Hud
 		// Update size.
 		if (IsActive)
 		{
+			float targetScale = (IsPrimary ? 1.0f : SCALE_PERIPHERAL);
+			float scale = (doPulse ? SCALE_PULSE : 1.0f);
 			float dist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetCrosshairSize(dist) * (IsPrimary ? 1.0f : SIZE_SCALAR_PERIPHERAL);
-			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
+			float sizeTarget = GetCrosshairSize(dist) * targetScale;
+
+			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA) * scale;
 		}
 		else
 		{
@@ -165,7 +169,7 @@ namespace TEN::Hud
 			if (it != Crosshairs.end() && it->second.IsActive)
 			{
 				auto& crosshair = it->second;
-				crosshair.Update(pos, true);
+				crosshair.Update(pos, item.HitStatus, true);
 			}
 			// Add new active crosshair.
 			else
@@ -187,7 +191,7 @@ namespace TEN::Hud
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
 			// Update inactive crosshair.
-			crosshair.Update(pos, false);
+			crosshair.Update(pos, item.HitStatus, false);
 		}
 
 		ClearInactiveCrosshairs();

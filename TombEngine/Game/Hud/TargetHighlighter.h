@@ -33,7 +33,7 @@ namespace TEN::Hud
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
 		bool IsOffscreen() const;
-		void Update(const Vector3& cameraPos, bool isActive);
+		void Update(const Vector3& cameraPos, bool doPulse, bool isActive);
 	};
 
 	class TargetHighlighterController
