@@ -17,7 +17,7 @@ namespace TEN::Hud
 	static float GetCrosshairSize(float dist)
 	{
 		constexpr auto DIST_RANGE		  = BLOCK(10);
-		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.25f;
+		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.1f;
 		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
 
 		auto distAlpha = dist / DIST_RANGE;
@@ -38,8 +38,8 @@ namespace TEN::Hud
 	{
 		constexpr auto INVALID_2D_POS			= Vector2(FLT_MAX);
 		constexpr auto ROT						= ANGLE(2.0f);
-		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f;
-		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f;
+		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f * SQRT_2;
+		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f * SQRT_2;
 		constexpr auto MORPH_LERP_ALPHA			= 0.3f;
 		constexpr auto ORIENT_LERP_ALPHA		= 0.1f;
 		constexpr auto RADIUS_LERP_ALPHA		= 0.2f;
@@ -90,7 +90,7 @@ namespace TEN::Hud
 		{
 			// Update position offsets.
 			auto offset2D = Vector2((Size / 2) * RadiusScalar, 0.0f);
-			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segment.OrientOffset2D));
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segment.OrientOffset2D - ANGLE(45.0f)));
 			segment.PosOffset2D = TEN::Utils::GetAspectCorrect2DPosition(Vector2::Transform(offset2D, rotMatrix));
 		}
 	}
@@ -286,7 +286,7 @@ namespace TEN::Hud
 	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
 	{
 		constexpr auto SIZE_START		   = SCREEN_SPACE_RES.x / 2;
-		constexpr auto RADIUS_SCALAR_START = 1.5f;
+		constexpr auto RADIUS_SCALAR_START = 1.5f * SQRT_2;
 		constexpr auto ANGLE_STEP		   = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos2D = g_Renderer.Get2DPosition(pos);
@@ -310,7 +310,7 @@ namespace TEN::Hud
 		for (auto& segment : crosshair.Segments)
 		{
 			auto offset2D = Vector2((crosshair.Size / 2) * crosshair.RadiusScalar, 0.0f);
-			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(crosshair.Orientation2D + segment.OrientOffset2D));
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(crosshair.Orientation2D + segment.OrientOffset2D - ANGLE(45.0f)));
 
 			segment.OrientOffset2D = angleOffset;
 			segment.PosOffset2D = TEN::Utils::GetAspectCorrect2DPosition(Vector2::Transform(offset2D, rotMatrix));
