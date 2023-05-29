@@ -15,16 +15,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
-	static float GetCrosshairSize(float cameraDist)
-	{
-		constexpr auto RANGE			  = BLOCK(10);
-		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
-		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
-
-		auto alpha = cameraDist / RANGE;
-		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
-	}
-
 	Vector2 CrosshairData::Get2DPositionOffset(short segmentOrient2D) const
 	{
 		float offsetDist = (Size / 2) * RadiusScalar;
@@ -42,6 +32,16 @@ namespace TEN::Hud
 				Position2D.y <= -screenEdgeThreshold ||
 				Position2D.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+	}
+
+	static float GetCrosshairSize(float cameraDist)
+	{
+		constexpr auto RANGE			  = BLOCK(10);
+		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
+		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
+
+		auto alpha = cameraDist / RANGE;
+		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
 	}
 
 	void CrosshairData::Update(const Vector3& cameraPos, bool doPulse, bool isActive)
@@ -116,23 +116,23 @@ namespace TEN::Hud
 	void TargetHighlighterController::SetPrimary(int entityID)
 	{
 		auto it = Crosshairs.find(entityID);
-		if (it != Crosshairs.end())
-		{
-			auto& crosshair = it->second;
-			crosshair. IsPrimary = true;
-			crosshair. ColorTarget = CrosshairData::COLOR_GREEN;
-		}
+		if (it == Crosshairs.end())
+			return;
+
+		auto& crosshair = it->second;
+		crosshair.IsPrimary = true;
+		crosshair.ColorTarget = CrosshairData::COLOR_GREEN;
 	}
 
 	void TargetHighlighterController::SetPeripheral(int entityID)
 	{
 		auto it = Crosshairs.find(entityID);
-		if (it != Crosshairs.end())
-		{
-			auto& crosshair = it->second;
-			crosshair. IsPrimary = false;
-			crosshair. ColorTarget = CrosshairData::COLOR_GRAY;
-		}
+		if (it == Crosshairs.end())
+			return;
+
+		auto& crosshair = it->second;
+		crosshair.IsPrimary = false;
+		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
 	}
 
 	void TargetHighlighterController::Update(std::vector<int> entityIds)
@@ -149,20 +149,20 @@ namespace TEN::Hud
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
 
-			// Find crosshair at entity ID key.
-			auto it = Crosshairs.find(entityID);
-
 			// Update existing active crosshair.
-			if (it != Crosshairs.end() && it->second.IsActive)
+			auto it = Crosshairs.find(entityID);
+			if (it != Crosshairs.end())
 			{
 				auto& crosshair = it->second;
-				crosshair.Update(pos, item.HitStatus, true);
+				if (crosshair.IsActive)
+				{
+					crosshair.Update(pos, item.HitStatus, true);
+					continue;
+				}
 			}
+
 			// Add new active crosshair.
-			else
-			{
-				AddCrosshair(entityID, pos);
-			}
+			AddCrosshair(entityID, pos);
 		}
 
 		// Update inactive crosshairs.

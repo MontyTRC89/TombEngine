@@ -56,7 +56,6 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::optional<CrosshairData&> GetCrosshair(int entityID);
 		CrosshairData& GetNewCrosshair(int entityID);
 		void		   AddCrosshair(int entityID, const Vector3& pos);
 		void		   ClearInactiveCrosshairs();
