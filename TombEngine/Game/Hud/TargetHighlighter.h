@@ -9,16 +9,15 @@ namespace TEN::Hud
 	private:
 		struct SegmentData
 		{
-			Vector3 Offset2D	   = Vector3::Zero;
+			Vector2 PosOffset2D	   = Vector2::Zero;
 			short	OrientOffset2D = 0;
 		};
 
 	public:
-		static constexpr auto SEGMENT_COUNT		= 4;
-		static constexpr auto RADIUS_SCALAR_MAX = 10.0f;
-		static constexpr auto COLOR_GREEN		= Vector4(0.1f, 1.0f, 0.1f, 9.0f);
-		static constexpr auto COLOR_RED			= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
-		static constexpr auto COLOR_GRAY		= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
+		static constexpr auto SEGMENT_COUNT = 4;
+		static constexpr auto COLOR_GREEN	= Vector4(0.1f, 1.0f, 0.1f, 9.0f);
+		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
+		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
 
 		bool IsActive  = false;
 		bool IsPrimary = false;
@@ -28,11 +27,10 @@ namespace TEN::Hud
 		Vector4 Color		  = Vector4::Zero;
 		Vector4 ColorTarget	  = Vector4::Zero;
 
-		float Size				 = 0.0f;
-		float RadiusScalar		 = 0.0f;
-		float RadiusScalarTarget = 0.0f;
+		float Size		   = 0.0f;
+		float RadiusScalar = 0.0f;
 
-		std::array<SegmentData, SEGMENT_COUNT> Segments = {}; // TODO
+		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
 		bool IsOffscreen() const;
 		void Update(const Vector3& cameraPos, bool isActive);

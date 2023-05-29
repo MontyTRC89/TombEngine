@@ -7,6 +7,7 @@
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -25,7 +26,7 @@ namespace TEN::Hud
 
 	bool CrosshairData::IsOffscreen() const
 	{
-		float screenEdgeThreshold = ((Size * 2) * (RadiusScalar + 1.0f)) * SQRT_2; // TODO: Check.
+		float screenEdgeThreshold = ((Size * RadiusScalar) * 2) * SQRT_2; // TODO: Check.
 
 		return (Position2D.x <= -screenEdgeThreshold ||
 				Position2D.y <= -screenEdgeThreshold ||
@@ -35,12 +36,13 @@ namespace TEN::Hud
 
 	void CrosshairData::Update(const Vector3& cameraPos, bool isActive)
 	{
-		constexpr auto INVALID_2D_POS		= Vector2(FLT_MAX);
-		constexpr auto ROT					= ANGLE(2.0f);
-		constexpr auto RADIUS_ALPHA_PRIMARY = 0.5f;
-		constexpr auto MORPH_LERP_ALPHA		= 0.3f;
-		constexpr auto ORIENT_LERP_ALPHA	= 0.1f;
-		constexpr auto RADIUS_LERP_ALPHA	= 0.2f;
+		constexpr auto INVALID_2D_POS			= Vector2(FLT_MAX);
+		constexpr auto ROT						= ANGLE(2.0f);
+		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f;
+		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f;
+		constexpr auto MORPH_LERP_ALPHA			= 0.3f;
+		constexpr auto ORIENT_LERP_ALPHA		= 0.1f;
+		constexpr auto RADIUS_LERP_ALPHA		= 0.2f;
 
 		// Update active status.
 		IsActive = isActive;
@@ -61,6 +63,7 @@ namespace TEN::Hud
 			Orientation2D = (short)round(Lerp(Orientation2D, closestCardinalAngle, ORIENT_LERP_ALPHA));
 		}
 
+		// TODO: Go grey when inactive.
 		// Update color.
 		ColorTarget.w = IsActive ? ColorTarget.w : 0.0f;
 		Color = Vector4::Lerp(Color, ColorTarget, MORPH_LERP_ALPHA);
@@ -77,9 +80,19 @@ namespace TEN::Hud
 			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
 		}
 
+		// TODO: Shrink when inactive.
 		// Update radius scalar.
-		RadiusScalarTarget = IsActive ? (IsPrimary ? RADIUS_ALPHA_PRIMARY : 0.0f) : RADIUS_SCALAR_MAX;
-		RadiusScalar = Lerp(RadiusScalar, RadiusScalarTarget, RADIUS_LERP_ALPHA);
+		float radiusScalarTarget = (IsPrimary ? RADIUS_SCALAR_PRIMARY : RADIUS_SCALAR_PERIPHERAL);
+		RadiusScalar = Lerp(RadiusScalar, radiusScalarTarget, RADIUS_LERP_ALPHA);
+
+		// Update segments.
+		for (auto& segment : Segments)
+		{
+			// Update position offsets.
+			auto offset2D = Vector2((Size / 2) * RadiusScalar, 0.0f);
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segment.OrientOffset2D));
+			segment.PosOffset2D = TEN::Utils::GetAspectCorrect2DPosition(Vector2::Transform(offset2D, rotMatrix));
+		}
 	}
 
 	void TargetHighlighterController::SetPrimary(std::vector<int> entityIds)
@@ -226,9 +239,13 @@ namespace TEN::Hud
 			if (crosshair.IsOffscreen())
 				continue;
 
-			g_Renderer.DrawSpriteIn2DSpace(
-				ID_CROSSHAIR_SEGMENT, 0,
-				crosshair.Position2D, crosshair.Orientation2D, crosshair.Color, Vector2(crosshair.Size));
+			for (const auto& segment : crosshair.Segments)
+			{
+				g_Renderer.DrawSpriteIn2DSpace(
+					ID_CROSSHAIR_SEGMENT, 0,
+					crosshair.Position2D + segment.PosOffset2D, crosshair.Orientation2D + segment.OrientOffset2D,
+					crosshair.Color, Vector2(crosshair.Size / 2));
+			}
 		}
 	}
 
@@ -268,7 +285,9 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
 	{
-		constexpr auto SIZE_DEFAULT = SCREEN_SPACE_RES.x / 2;
+		constexpr auto SIZE_START		   = SCREEN_SPACE_RES.x / 2;
+		constexpr auto RADIUS_SCALAR_START = 1.5f;
+		constexpr auto ANGLE_STEP		   = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos2D = g_Renderer.Get2DPosition(pos);
 		if (!pos2D.has_value())
@@ -284,9 +303,20 @@ namespace TEN::Hud
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
-		crosshair.Size = SIZE_DEFAULT;
-		crosshair.RadiusScalar = CrosshairData::RADIUS_SCALAR_MAX;
-		crosshair.RadiusScalarTarget = 0.0f;
+		crosshair.Size = SIZE_START;
+		crosshair.RadiusScalar = RADIUS_SCALAR_START;
+
+		short angleOffset = 0;
+		for (auto& segment : crosshair.Segments)
+		{
+			auto offset2D = Vector2((crosshair.Size / 2) * crosshair.RadiusScalar, 0.0f);
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(crosshair.Orientation2D + segment.OrientOffset2D));
+
+			segment.OrientOffset2D = angleOffset;
+			segment.PosOffset2D = TEN::Utils::GetAspectCorrect2DPosition(Vector2::Transform(offset2D, rotMatrix));
+
+			angleOffset += ANGLE_STEP;
+		}
 	}
 
 	void TargetHighlighterController::ClearInactiveCrosshairs()
