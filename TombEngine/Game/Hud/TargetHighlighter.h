@@ -59,10 +59,9 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::vector<int>	 GetTargetEntityIds(const ItemInfo& playerItem);
-		CrosshairData& GetNewTargetHighlight(int entityID);
-		void				 AddTargetHighlight(int entityID, const Vector3& pos);
-		void				 ClearInactiveTargetHighlights();
+		CrosshairData& GetNewCrosshair(int entityID);
+		void		   AddCrosshair(int entityID, const Vector3& pos);
+		void		   ClearInactiveCrosshairs();
 
 		void DrawDebug() const;
 	};

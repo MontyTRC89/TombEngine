@@ -15,11 +15,11 @@ namespace TEN::Hud
 {
 	static float GetCrosshairSize(float dist)
 	{
-		constexpr auto RANGE			  = BLOCK(10);
+		constexpr auto DIST_RANGE		  = BLOCK(10);
 		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.25f;
 		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
 
-		auto distAlpha = dist / RANGE;
+		auto distAlpha = dist / DIST_RANGE;
 		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, distAlpha);
 	}
 
@@ -91,12 +91,11 @@ namespace TEN::Hud
 		// Set crosshairs as primary.
 		for (int entityID : entityIds)
 		{
-			// Matching crosshair; continue.
+			// No crosshair at entity ID key; continue.
 			if (!Crosshairs.count(entityID))
 				continue;
 
 			auto& crosshair = Crosshairs.at(entityID);
-
 			crosshair.IsPrimary = true;
 			crosshair.ColorTarget = CrosshairData::COLOR_GREEN;
 		}
@@ -116,12 +115,11 @@ namespace TEN::Hud
 		// Set crosshairs as peripheral.
 		for (int entityID : entityIds)
 		{
-			// Matching crosshair; continue.
+			// No crosshair at entity ID key; continue.
 			if (!Crosshairs.count(entityID))
 				continue;
 
 			auto& crosshair = Crosshairs.at(entityID);
-
 			crosshair.IsPrimary = false;
 			crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
 		}
@@ -134,6 +132,8 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(std::vector<int> entityIds)
 	{
+		constexpr auto TARGET_BONE_ID = 0;
+
 		// No crosshairs to update; return early.
 		if (Crosshairs.empty() && entityIds.empty())
 			return;
@@ -142,9 +142,9 @@ namespace TEN::Hud
 		for (int entityID : entityIds)
 		{
 			const auto& item = g_Level.Items[entityID];
-			auto pos = GetJointPosition(item, 0).ToVector3();
+			auto pos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
 
-			// Find crosshair.
+			// Find crosshair at entity ID key.
 			auto it = Crosshairs.find(entityID);
 
 			// Update existing active crosshair.
@@ -156,14 +156,14 @@ namespace TEN::Hud
 			// Add new active crosshair.
 			else
 			{
-				AddTargetHighlight(entityID, pos);
+				AddCrosshair(entityID, pos);
 			}
 		}
 
 		// Update inactive crosshairs.
 		for (auto& [entityID, crosshair] : Crosshairs)
 		{
-			// Find absent crosshairs.
+			// Find crosshairs at absent entity ID keys.
 			auto it = std::find(entityIds.begin(), entityIds.end(), entityID);
 			if (it != entityIds.end())
 				continue;
@@ -176,14 +176,22 @@ namespace TEN::Hud
 			crosshair.Update(pos, false);
 		}
 
-		ClearInactiveTargetHighlights();
+		ClearInactiveCrosshairs();
 	}
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
 		const auto& player = GetLaraInfo(playerItem);
 
-		auto entityIds = GetTargetEntityIds(playerItem);
+		// Get target entity IDs.
+		auto entityIds = std::vector<int>{};
+		for (const auto* targetPtr : player.TargetList)
+		{
+			if (targetPtr == nullptr)
+				continue;
+
+			entityIds.push_back((int)targetPtr->Index);
+		}
 
 		// Determine peripheral entity IDs.
 		auto peripheralEntityIds = entityIds;
@@ -219,55 +227,36 @@ namespace TEN::Hud
 				continue;
 
 			g_Renderer.DrawSpriteIn2DSpace(
-				(GAME_OBJECT_ID)1380, 0,
+				ID_CROSSHAIR_SEGMENT, 0,
 				crosshair.Position2D, crosshair.Orientation2D, crosshair.Color, Vector2(crosshair.Size));
 		}
 	}
 
 	void TargetHighlighterController::Clear()
 	{
-		Crosshairs.clear();
+		*this = {};
 	}
 
-	std::vector<int> TargetHighlighterController::GetTargetEntityIds(const ItemInfo& playerItem)
-	{
-		if (!playerItem.IsLara())
-			return {};
-
-		auto& player = GetLaraInfo(playerItem);
-
-		auto entityIds = std::vector<int>{};
-		for (const auto* targetPtr : player.TargetList)
-		{
-			if (targetPtr == nullptr)
-				continue;
-
-			entityIds.push_back((int)targetPtr->Index);
-		}
-
-		return entityIds;
-	}
-
-	CrosshairData& TargetHighlighterController::GetNewTargetHighlight(int entityID)
+	CrosshairData& TargetHighlighterController::GetNewCrosshair(int entityID)
 	{
 		constexpr auto COUNT_MAX = 16;
 
 		// Clear smallest crosshair if map is full.
 		if (Crosshairs.size() >= COUNT_MAX)
 		{
-			int key = 0;
+			int entityIDKey = 0;
 			float smallestSize = INFINITY;
 			
 			for (auto& [entityID, crosshair] : Crosshairs)
 			{
 				if (crosshair.Size < smallestSize)
 				{
-					key = entityID;
+					entityIDKey = entityID;
 					smallestSize = crosshair.Size;
 				}
 			}
 
-			Crosshairs.erase(key);
+			Crosshairs.erase(entityIDKey);
 		}
 
 		// Return new crosshair.
@@ -277,7 +266,7 @@ namespace TEN::Hud
 		return crosshair;
 	}
 
-	void TargetHighlighterController::AddTargetHighlight(int entityID, const Vector3& pos)
+	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
 	{
 		constexpr auto SIZE_DEFAULT = SCREEN_SPACE_RES.x / 2;
 
@@ -286,7 +275,7 @@ namespace TEN::Hud
 			return;
 
 		// Create new crosshair.
-		auto& crosshair = GetNewTargetHighlight(entityID);
+		auto& crosshair = GetNewCrosshair(entityID);
 
 		crosshair.IsActive = true;
 		crosshair.IsPrimary = false;
@@ -300,7 +289,7 @@ namespace TEN::Hud
 		crosshair.RadiusScalarTarget = 0.0f;
 	}
 
-	void TargetHighlighterController::ClearInactiveTargetHighlights()
+	void TargetHighlighterController::ClearInactiveCrosshairs()
 	{
 		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
 		{
@@ -324,7 +313,7 @@ namespace TEN::Hud
 		for (const auto& [entityID, crosshair] : Crosshairs)
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 
-		g_Renderer.PrintDebugMessage("Highlights: %d", Crosshairs.size());
+		g_Renderer.PrintDebugMessage("Crosshairs: %d", Crosshairs.size());
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
