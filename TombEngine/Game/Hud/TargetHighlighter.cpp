@@ -17,9 +17,11 @@ namespace TEN::Hud
 {
 	Vector2 CrosshairData::Get2DPositionOffset(short segmentOrient2D) const
 	{
+		constexpr auto ANGLE_OFFSET = ANGLE(-45.0f);
+
 		float offsetDist = (Size / 2) * RadiusScalar;
 		auto posOffset2D = Vector2(offsetDist, 0.0f);
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segmentOrient2D - ANGLE(45.0f)));
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segmentOrient2D + ANGLE_OFFSET));
 
 		return GetAspectCorrect2DPosition(Vector2::Transform(posOffset2D, rotMatrix));
 	}
