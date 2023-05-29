@@ -280,6 +280,71 @@ float DoFogBulb(float3 pos, ShaderFogBulb bulb)
 	return fog;
 }
 
+float DoFogBulbForSky(float3 pos, ShaderFogBulb bulb)
+{
+	// We find the intersection points p0 and p1 between the sphere of the fog bulb and the ray from camera to vertex.
+	// The magnitude of (p2 - p1) is used as the fog factor.
+	// We need to consider different cases for getting the correct points.
+	// We use the geometric solution as in legacy engines. An analytic solution also exists.
+
+	float3 p0;
+	float3 p1;
+
+	p0 = p1 = float3(0, 0, 0);
+
+	float3 cameraToVertexDirection = normalize(pos - CamPositionWS);
+	
+	if (bulb.SquaredCameraToFogBulbDistance < bulb.SquaredRadius)
+	{
+		// Camera is INSIDE the bulb
+
+		// Vertex is ALWAYS OUTSIDE the bulb
+
+		float Tca = dot(bulb.FogBulbToCameraVector, cameraToVertexDirection);
+		float d2 = bulb.SquaredCameraToFogBulbDistance - Tca * Tca;
+		float Thc = sqrt(bulb.SquaredRadius - d2);
+		float t1 = Tca + Thc;
+
+		p0 = CamPositionWS;
+		p1 = CamPositionWS + cameraToVertexDirection * t1;
+	}
+	else
+	{
+		// Camera is OUTSIDE the bulb
+
+		// Vertex is ALWAYS OUTSIDE the bulb
+
+		float Tca = dot(bulb.FogBulbToCameraVector, cameraToVertexDirection);
+
+		if (Tca > 0)
+		{
+			float d2 = bulb.SquaredCameraToFogBulbDistance - Tca * Tca;
+			if (d2 < bulb.SquaredRadius)
+			{
+				float Thc = sqrt(bulb.SquaredRadius - d2);
+
+				float t0 = Tca - Thc;
+				float t1 = Tca + Thc;
+
+				p0 = CamPositionWS + cameraToVertexDirection * t0;
+				p1 = CamPositionWS + cameraToVertexDirection * t1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	float fog = length(p1 - p0) * bulb.Density / 255.0f;
+
+	return fog;
+}
+
 float DoDistanceFogForVertex(float3 pos)
 {
 	float fog = 0.0f;
@@ -300,6 +365,24 @@ float4 DoFogBulbsForVertex(float3 pos)
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
 		float fogFactor = DoFogBulb(pos, FogBulbs[i]);
+		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
+		fog.w += fogFactor;
+		if (fog.w >= 1.0f)
+		{
+			break;
+		}
+	}
+
+	return fog;
+}
+
+float4 DoFogBulbsForSky(float3 pos)
+{
+	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	for (int i = 0; i < NumFogBulbs; i++)
+	{
+		float fogFactor = DoFogBulbForSky(pos, FogBulbs[i]);
 		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
 		fog.w += fogFactor;
 		if (fog.w >= 1.0f)
