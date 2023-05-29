@@ -197,7 +197,7 @@ namespace TEN::Hud
 
 			int entityID = entityPtr->Index;
 
-			// Set crosshairs as primary or peripheral.
+			// Set crosshair as primary or peripheral.
 			if (player.TargetEntity != nullptr && entityID == player.TargetEntity->Index)
 			{
 				SetPrimary(entityID);
