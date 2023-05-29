@@ -17,7 +17,7 @@ namespace TEN::Hud
 {
 	Vector2 CrosshairData::Get2DPositionOffset(short orientOffset2D) const
 	{
-		constexpr auto ANGLE_OFFSET = ANGLE(-45.0f);
+		constexpr auto ANGLE_OFFSET = ANGLE(-360.0f / (CrosshairData::SEGMENT_COUNT * 2));
 
 		float offsetDist = (Size / 2) * RadiusScalar;
 		auto relPosOffset2D = Vector2(offsetDist, 0.0f);
