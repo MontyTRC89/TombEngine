@@ -15,15 +15,16 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
-	Vector2 CrosshairData::Get2DPositionOffset(short segmentOrient2D) const
+	Vector2 CrosshairData::Get2DPositionOffset(short orientOffset2D) const
 	{
 		constexpr auto ANGLE_OFFSET = ANGLE(-45.0f);
 
 		float offsetDist = (Size / 2) * RadiusScalar;
-		auto posOffset2D = Vector2(offsetDist, 0.0f);
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + segmentOrient2D + ANGLE_OFFSET));
+		auto relPosOffset2D = Vector2(offsetDist, 0.0f);
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + orientOffset2D + ANGLE_OFFSET));
 
-		return GetAspectCorrect2DPosition(Vector2::Transform(posOffset2D, rotMatrix));
+		auto posOffset2D = Vector2::Transform(relPosOffset2D, rotMatrix);
+		return GetAspectCorrect2DPosition(posOffset2D);
 	}
 
 	bool CrosshairData::IsOffscreen() const

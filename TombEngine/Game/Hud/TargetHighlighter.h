@@ -32,7 +32,7 @@ namespace TEN::Hud
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
-		Vector2 Get2DPositionOffset(short segmentOrient2D) const;
+		Vector2 Get2DPositionOffset(short orientOffset2D) const;
 		bool	IsOffscreen() const;
 		void	Update(const Vector3& cameraPos, bool doPulse, bool isActive);
 	};
