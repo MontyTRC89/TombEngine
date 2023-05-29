@@ -32,8 +32,9 @@ namespace TEN::Hud
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
-		bool IsOffscreen() const;
-		void Update(const Vector3& cameraPos, bool doPulse, bool isActive);
+		Vector2 Get2DPositionOffset(short segmentOrient2D) const;
+		bool	IsOffscreen() const;
+		void	Update(const Vector3& cameraPos, bool doPulse, bool isActive);
 	};
 
 	class TargetHighlighterController
@@ -44,9 +45,7 @@ namespace TEN::Hud
 
 	public:
 		// Setters
-		void SetPrimary(std::vector<int> entityIds);
 		void SetPrimary(int entityID);
-		void SetPeripheral(std::vector<int> entityIds);
 		void SetPeripheral(int entityID);
 
 		// Utilities
@@ -57,6 +56,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
+		std::optional<CrosshairData&> GetCrosshair(int entityID);
 		CrosshairData& GetNewCrosshair(int entityID);
 		void		   AddCrosshair(int entityID, const Vector3& pos);
 		void		   ClearInactiveCrosshairs();

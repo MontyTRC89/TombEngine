@@ -381,7 +381,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
 										 const Vector4& color, const Vector2& size)
 	{
-		if (!CheckIfSlotExists(spriteID, "Screen sprite rendering"))
+		if (!CheckIfSlotExists(spriteID, "2D space sprite rendering"))
 			return;
 
 		constexpr auto VERTEX_COUNT	  = 4;
