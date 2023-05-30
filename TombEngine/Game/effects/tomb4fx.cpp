@@ -850,7 +850,7 @@ void UpdateGunShells()
 			else
 				gunshell->fallspeed += 6;
 
-			gunshell->pos.Orientation.x += (gunshell->speed >> 1 + 7) * ANGLE(1.0f);
+			gunshell->pos.Orientation.x += ((gunshell->speed / 2) + 7) * ANGLE(1.0f);
 			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);
 			gunshell->pos.Orientation.z += ANGLE(23.0f);
 

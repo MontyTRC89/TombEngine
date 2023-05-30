@@ -29,7 +29,7 @@ using namespace TEN::Math;
 	// NOTE: Some precision drift may occur.
 	AxisAngle::AxisAngle(const Quaternion& quat)
 	{
-		float scale = sqrt(1.0f - quat.w * quat.w);
+		float scale = sqrt(1.0f - (quat.w * quat.w));
 		auto axis = Vector3(quat) / scale;
 		axis.Normalize();
 		float angle = 2.0f * acos(quat.w);
