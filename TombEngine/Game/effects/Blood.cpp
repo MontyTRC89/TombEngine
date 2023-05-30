@@ -359,19 +359,20 @@ namespace TEN::Effects::Blood
 
 	void BloodMistEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
 	{
-		constexpr auto COUNT_MAX	 = 256;
-		constexpr auto LIFE_MAX		 = 0.75f;
-		constexpr auto LIFE_MIN		 = 0.25f;
-		constexpr auto VEL_MAX		 = 16.0f;
-		constexpr auto SCALE_MAX	 = 128.0f;
-		constexpr auto SCALE_MIN	 = 64.0f;
-		constexpr auto OPACITY_MAX	 = 0.7f;
-		constexpr auto GRAVITY_MAX	 = 2.0f;
-		constexpr auto GRAVITY_MIN	 = 1.0f;
-		constexpr auto FRICTION		 = 4.0f;
-		constexpr auto ROT_MAX		 = ANGLE(10.0f);
-		constexpr auto SPHERE_RADIUS = BLOCK(1 / 8.0f);
-		constexpr auto SEMIANGLE	 = 20.0f;
+		constexpr auto COUNT_MAX		  = 256;
+		constexpr auto LIFE_MAX			  = 0.75f;
+		constexpr auto LIFE_MIN			  = 0.25f;
+		constexpr auto VEL_MAX			  = 16.0f;
+		constexpr auto MIST_SIZE_MAX	  = 128.0f;
+		constexpr auto MIST_SIZE_MIN	  = 64.0f;
+		constexpr auto MIST_SIZE_MAX_MULT = 4.0f;
+		constexpr auto OPACITY_MAX		  = 0.7f;
+		constexpr auto GRAVITY_MAX		  = 2.0f;
+		constexpr auto GRAVITY_MIN		  = 1.0f;
+		constexpr auto FRICTION			  = 4.0f;
+		constexpr auto ROT_MAX			  = ANGLE(10.0f);
+		constexpr auto SPHERE_RADIUS	  = BLOCK(1 / 8.0f);
+		constexpr auto CONE_SEMIANGLE	  = 20.0f;
 
 		// Sprite missing; return early.
 		if (!CheckIfSlotExists(ID_BLOOD_MIST_SPRITES, "Blood mist sprite missing."))
@@ -391,12 +392,12 @@ namespace TEN::Effects::Blood
 			part.Position = Random::GeneratePointInSphere(sphere);
 			part.RoomNumber = roomNumber;
 			part.Orientation2D = Random::GenerateAngle();
-			part.Velocity = Random::GenerateDirectionInCone(dir, SEMIANGLE) * Random::GenerateFloat(0.0f, VEL_MAX);
+			part.Velocity = Random::GenerateDirectionInCone(dir, CONE_SEMIANGLE) * Random::GenerateFloat(0.0f, VEL_MAX);
 			part.Color = BLOOD_COLOR_RED;
 			part.Life =
 			part.LifeMax = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
-			part.Size = Random::GenerateFloat(SCALE_MIN, SCALE_MAX);
-			part.SizeMax = part.Size * 4;
+			part.Size = Random::GenerateFloat(MIST_SIZE_MIN, MIST_SIZE_MAX);
+			part.SizeMax = part.Size * MIST_SIZE_MAX_MULT;
 			part.SizeMin = part.Size;
 			part.Opacity =
 			part.OpacityMax = OPACITY_MAX;
