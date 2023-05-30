@@ -212,6 +212,6 @@ namespace TEN::Hud
 
 	void PickupSummaryController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("Num. display pickups: %d", DisplayPickups.size());
+		g_Renderer.PrintDebugMessage("Display pickups: %d", DisplayPickups.size());
 	}
 }

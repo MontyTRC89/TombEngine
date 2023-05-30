@@ -272,6 +272,7 @@ namespace TEN::Hud
 		return crosshair;
 	}
 
+	// TODO: If crosshair happens to be in view upon spawn, first frame is garbage.
 	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
 	{
 		constexpr auto SIZE_START		   = SCREEN_SPACE_RES.x / 2;
@@ -310,15 +311,8 @@ namespace TEN::Hud
 	{
 		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
 		{
-			// Clear crosshair if inactive and size is near 0.
-			if (!it->second.IsActive && it->second.Size <= EPSILON)
-			{
-				it = Crosshairs.erase(it);
-			}
-			else
-			{
-				++it;
-			}
+			(!it->second.IsActive && it->second.Size <= EPSILON) ?
+				(it = Crosshairs.erase(it)) : ++it;
 		}
 	}
 

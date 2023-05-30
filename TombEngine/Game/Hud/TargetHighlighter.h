@@ -14,7 +14,7 @@ namespace TEN::Hud
 		};
 
 	public:
-		static constexpr auto COLOR_GREEN	= Vector4(0.0f, 0.9f, 0.1f, 9.0f);
+		static constexpr auto COLOR_GREEN	= Vector4(0.0f, 0.9f, 0.2f, 9.0f);
 		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
 		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
 		static constexpr auto SEGMENT_COUNT = 4;
