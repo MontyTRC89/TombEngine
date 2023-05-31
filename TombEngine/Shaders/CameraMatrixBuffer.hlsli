@@ -1,3 +1,5 @@
+#include "./Math.hlsli"
+
 cbuffer CameraMatrixBuffer : register(b0)
 {
 	float4x4 ViewProjection;
@@ -15,5 +17,7 @@ cbuffer CameraMatrixBuffer : register(b0)
 	int FogMinDistance;
 	int FogMaxDistance;
 	float NearPlane;
-	float FarPlane;
+	float FarPlane;		
+	int NumFogBulbs;
+	ShaderFogBulb FogBulbs[MAX_FOG_BULBS];
 };

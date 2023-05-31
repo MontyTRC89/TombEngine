@@ -3,49 +3,49 @@
 
 namespace TEN::Renderer
 {
-	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) 
+	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : Camera(cam, roll, fov, nearPlane, farPlane, w, h) 
 	{
-		viewport = {};
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = w;
-		viewport.Height = h;
-		viewport.MinDepth = 0;
-		viewport.MaxDepth = 1;
+		Viewport = {};
+		Viewport.TopLeftX = 0;
+		Viewport.TopLeftY = 0;
+		Viewport.Width = w;
+		Viewport.Height = h;
+		Viewport.MinDepth = 0;
+		Viewport.MaxDepth = 1;
 	}
 
-	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) 
+	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : Camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) 
 	{
 
-		viewport = {};
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = w;
-		viewport.Height = h;
-		viewport.MinDepth = 0;
-		viewport.MaxDepth = 1;
+		Viewport = {};
+		Viewport.TopLeftX = 0;
+		Viewport.TopLeftY = 0;
+		Viewport.Width = w;
+		Viewport.Height = h;
+		Viewport.MinDepth = 0;
+		Viewport.MaxDepth = 1;
 	}
 
 	void RenderView::fillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
 	{
-		bufferToFill.Projection = camera.Projection;
-		bufferToFill.View = camera.View;
-		bufferToFill.ViewProjection = camera.ViewProjection;
-		bufferToFill.InverseProjection = camera.Projection.Invert();   
-		bufferToFill.CamDirectionWS = Vector4(camera.WorldDirection);
-		bufferToFill.CamPositionWS = Vector4(camera.WorldPosition);
-		bufferToFill.ViewSize = camera.ViewSize;
-		bufferToFill.InvViewSize = camera.InvViewSize;
-		bufferToFill.RoomNumber = camera.RoomNumber;
-		bufferToFill.NearPlane = camera.NearPlane;
-		bufferToFill.FarPlane = camera.FarPlane;
+		bufferToFill.Projection = Camera.Projection;
+		bufferToFill.View = Camera.View;
+		bufferToFill.ViewProjection = Camera.ViewProjection;
+		bufferToFill.InverseProjection = Camera.Projection.Invert();
+		bufferToFill.CamDirectionWS = Vector4(Camera.WorldDirection);
+		bufferToFill.CamPositionWS = Vector4(Camera.WorldPosition);
+		bufferToFill.ViewSize = Camera.ViewSize;
+		bufferToFill.InvViewSize = Camera.InvViewSize;
+		bufferToFill.RoomNumber = Camera.RoomNumber;
+		bufferToFill.NearPlane = Camera.NearPlane;
+		bufferToFill.FarPlane = Camera.FarPlane;
 	}
 
 	void RenderView::clear() 
 	{
-		roomsToDraw.clear();
-		lightsToDraw.clear();
-		spritesToDraw.clear();
+		RoomsToDraw.clear();
+		LightsToDraw.clear();
+		SpritesToDraw.clear();
 		StaticsToDraw.clear();
 	}
 

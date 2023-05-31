@@ -39,8 +39,6 @@ namespace TEN::Effects::Environment
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
 
-	constexpr auto SKY_POSITION_LIMIT = 9728;
-
 	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const
@@ -114,13 +112,13 @@ namespace TEN::Effects::Environment
 				continue;
 
 			SkyCurrentPosition[i] += level->GetSkyLayerSpeed(i);
-			if (SkyCurrentPosition[i] <= SKY_POSITION_LIMIT)
+			if (SkyCurrentPosition[i] <= SKY_SIZE)
 			{
 				if (SkyCurrentPosition[i] < 0)
-					SkyCurrentPosition[i] += SKY_POSITION_LIMIT;
+					SkyCurrentPosition[i] += SKY_SIZE;
 			}
 			else
-				SkyCurrentPosition[i] -= SKY_POSITION_LIMIT;
+				SkyCurrentPosition[i] -= SKY_SIZE;
 		}
 	}
 
