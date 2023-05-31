@@ -34,6 +34,7 @@ Version 1.0.9
 * Allow key hole animation to be played via OCB number:
 	- Default OCB 0 will play Lara use key animation. 
 	- Any positive OCB number will play the animation according to the OCB number.
+* Reimplement fog bulbs.
 * Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
 * Add ability to pick up a single inactive flare as an inventory item.
 * Add log reports if title level or other levels don't exist.
