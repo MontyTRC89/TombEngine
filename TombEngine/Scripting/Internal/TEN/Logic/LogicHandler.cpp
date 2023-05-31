@@ -182,13 +182,12 @@ void LogicHandler::ResetGameTables()
 @advancedDesc
 This is intended for module/library developers who want their modules to do
 stuff during level start/load/end/save/control phase, but don't want the level
-designer to add calls to OnStart, OnLoad, etc. in their level script.
+designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
 Possible values for CallbackPoint:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
-
 
 	PRESAVE -- will be called immediately before OnSave
 	POSTSAVE -- will be called immediately after OnSave
@@ -211,7 +210,7 @@ Any returned value will be discarded.
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
