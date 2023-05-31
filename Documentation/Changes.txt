@@ -17,6 +17,7 @@ Version 1.0.9
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
 * Fix grenade firing angle.
+* Fix inconsistent multiline string spacing on different display modes.
 * Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
