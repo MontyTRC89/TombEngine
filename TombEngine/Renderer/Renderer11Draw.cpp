@@ -2184,66 +2184,26 @@ namespace TEN::Renderer
 		// Draw the sky
 		Matrix rotation = Matrix::CreateRotationX(PI);
 
-		RendererVertex vertices[4];
-		float size = 9728.0f;
-
-		vertices[0].Position.x = -size / 2.0f;
-		vertices[0].Position.y = 0.0f;
-		vertices[0].Position.z = size / 2.0f;
-		vertices[0].UV.x = 0.0f;
-		vertices[0].UV.y = 0.0f;
-		vertices[0].Color.x = 1.0f;
-		vertices[0].Color.y = 1.0f;
-		vertices[0].Color.z = 1.0f;
-		vertices[0].Color.w = 1.0f;
-
-		vertices[1].Position.x = size / 2.0f;
-		vertices[1].Position.y = 0.0f;
-		vertices[1].Position.z = size / 2.0f;
-		vertices[1].UV.x = 1.0f;
-		vertices[1].UV.y = 0.0f;
-		vertices[1].Color.x = 1.0f;
-		vertices[1].Color.y = 1.0f;
-		vertices[1].Color.z = 1.0f;
-		vertices[1].Color.w = 1.0f;
-
-		vertices[2].Position.x = size / 2.0f;
-		vertices[2].Position.y = 0.0f;
-		vertices[2].Position.z = -size / 2.0f;
-		vertices[2].UV.x = 1.0f;
-		vertices[2].UV.y = 1.0f;
-		vertices[2].Color.x = 1.0f;
-		vertices[2].Color.y = 1.0f;
-		vertices[2].Color.z = 1.0f;
-		vertices[2].Color.w = 1.0f;
-
-		vertices[3].Position.x = -size / 2.0f;
-		vertices[3].Position.y = 0.0f;
-		vertices[3].Position.z = -size / 2.0f;
-		vertices[3].UV.x = 0.0f;
-		vertices[3].UV.y = 1.0f;
-		vertices[3].Color.x = 1.0f;
-		vertices[3].Color.y = 1.0f;
-		vertices[3].Color.z = 1.0f;
-		vertices[3].Color.w = 1.0f;
-
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
+		m_context->IASetVertexBuffers(0, 1, m_skyVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetIndexBuffer(m_skyIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
 
 		for (int s = 0; s < 2; s++)
+		{
 			for (int i = 0; i < 2; i++)
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * 9728.0f,
-															   Camera.pos.y - 1536.0f, Camera.pos.z);
+				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * 10240.0f,
+					Camera.pos.y - 1536.0f, Camera.pos.z);
 				Matrix world = rotation * translation;
 
 				m_stStatic.World = (rotation * translation);
@@ -2255,10 +2215,10 @@ namespace TEN::Renderer
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-				m_primitiveBatch->Begin();
-				m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-				m_primitiveBatch->End();
+				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 			}
+		}
+
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 		// Draw horizon
@@ -2270,7 +2230,7 @@ namespace TEN::Renderer
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
-
+			 
 			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stStatic.Color = Vector4::One;
 			m_stStatic.AmbientLight = Vector4::One;

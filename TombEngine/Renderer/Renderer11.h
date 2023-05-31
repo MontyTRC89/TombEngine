@@ -408,6 +408,9 @@ namespace TEN::Renderer
 		fast_vector<int> m_transparentFacesIndices;
 		std::vector<RendererTransparentFace> m_transparentFaces;
 
+		VertexBuffer m_skyVertexBuffer;
+		IndexBuffer m_skyIndexBuffer;
+
 		std::vector<RendererRoom> m_rooms;
 		bool m_invalidateCache;
 
@@ -518,6 +521,7 @@ namespace TEN::Renderer
 		void InitializeCommonTextures();
 		void InitializeGameBars();
 		void InitializeMenuBars(int y);
+		void InitializeSky();
 
 		void DrawAllStrings();
 		void DrawLaserBarriers(RenderView& view);

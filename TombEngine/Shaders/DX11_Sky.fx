@@ -46,7 +46,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	DoAlphaTest(output);
 	
 	output.xyz = output.xyz * Color;
-	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w) * 2.0f;
 	output.xyz = saturate(output.xyz);
 	output.xyz += saturate(input.FogBulbs.xyz);
 
