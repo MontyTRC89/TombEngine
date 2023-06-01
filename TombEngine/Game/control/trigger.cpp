@@ -879,7 +879,7 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (block->Material == MaterialType::Water)
+			if (block->Material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, block->Room))
 				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
 			else
 				ItemBurn(item);
