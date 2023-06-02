@@ -59,7 +59,7 @@ void SaveGame::LoadSavegameInfos()
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 		SavegameInfos[i].Present = false;
 
-	if (!std::filesystem::exists(FullSaveDirectory))
+	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
 	// Try loading savegame.
@@ -1321,7 +1321,7 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
-	if (!std::filesystem::exists(FullSaveDirectory))
+	if (!std::filesystem::is_directory(FullSaveDirectory))
 		std::filesystem::create_directory(FullSaveDirectory);
 
 	std::ofstream fileOut{};

@@ -340,44 +340,44 @@ void FreeSamples()
 void EnumerateLegacyTracks()
 {
 	auto dir = std::filesystem::path{ FullAudioDirectory };
-	if (std::filesystem::exists(dir))
+
+    if (!std::filesystem::is_directory(dir))
+    {
+        TENLog("Folder \"" + dir.string() + "\" does not exist. ", LogLevel::Warning, LogConfig::All);
+        return;
+    }
+
+	try 
 	{
-		try 
+		// Capture three-digit filenames, or those which start with three digits.
+
+		std::regex upToThreeDigits("((\\d{1,3})[^\\.]*)");
+		std::smatch result;
+		for (const auto& file : std::filesystem::directory_iterator{ dir })
 		{
-			// Capture three-digit filenames, or those which start with three digits.
-
-			std::regex upToThreeDigits("((\\d{1,3})[^\\.]*)");
-			std::smatch result;
-			for (const auto& file : std::filesystem::directory_iterator{ dir })
+			std::string fileName = file.path().filename().string();
+			auto bResult = std::regex_search(fileName, result, upToThreeDigits);
+			if (!result.empty())
 			{
-				std::string fileName = file.path().filename().string();
-				auto bResult = std::regex_search(fileName, result, upToThreeDigits);
-				if (!result.empty())
-				{
-					// result[0] is the whole match including the leading backslash, so ignore it
-					// result[1] is the full file name, not including the extension
-					int index = std::stoi(result[2].str());
-					SoundTrackInfo s;
+				// result[0] is the whole match including the leading backslash, so ignore it
+				// result[1] is the full file name, not including the extension
+				int index = std::stoi(result[2].str());
+				SoundTrackInfo s;
 
-					// TRLE default looping tracks
-					if (index >= LegacyLoopingTrackMin && index <= LegacyLoopingTrackMax)
-					{
-						s.Mode = SoundTrackType::BGM;
-					}
-					s.Name = result[1];
-					SoundTracks.insert(std::make_pair(index, s));
-					SecretSoundIndex = std::max(SecretSoundIndex, index);
+				// TRLE default looping tracks
+				if (index >= LegacyLoopingTrackMin && index <= LegacyLoopingTrackMax)
+				{
+					s.Mode = SoundTrackType::BGM;
 				}
+				s.Name = result[1];
+				SoundTracks.insert(std::make_pair(index, s));
+				SecretSoundIndex = std::max(SecretSoundIndex, index);
 			}
 		}
-		catch (std::filesystem::filesystem_error const& e)
-		{
-			TENLog(e.what(), LogLevel::Error, LogConfig::All);
-		}
 	}
-	else
+	catch (std::filesystem::filesystem_error const& e)
 	{
-		TENLog("Folder \"" + dir.string() + "\" does not exist. ", LogLevel::Warning, LogConfig::All);
+		TENLog(e.what(), LogLevel::Error, LogConfig::All);
 	}
 
 }
@@ -419,13 +419,13 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	}
 
 	auto fullTrackName = FullAudioDirectory + track + ".ogg";
-	if (!std::filesystem::exists(fullTrackName))
+	if (!std::filesystem::is_regular_file(fullTrackName))
 	{
 		fullTrackName = FullAudioDirectory + track + ".mp3";
-		if (!std::filesystem::exists(fullTrackName))
+		if (!std::filesystem::is_regular_file(fullTrackName))
 		{
 			fullTrackName = FullAudioDirectory + track + ".wav";
-			if (!std::filesystem::exists(fullTrackName))
+			if (!std::filesystem::is_regular_file(fullTrackName))
 			{
 				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);
 				return;

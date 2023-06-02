@@ -329,7 +329,7 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 	if (!isAbsolute)
 		requestedPath = std::filesystem::path{ GetGameDir() + fileName };
 
-	if (std::filesystem::exists(requestedPath))
+	if (std::filesystem::is_regular_file(requestedPath))
 	{
 		auto lcFileName = TEN::Utils::ToLower(fileNameWithForwardSlashes);
 
