@@ -1797,7 +1797,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
-		if (m_staticsTextures.size() == 0 || view.SortedStatics.size() == 0)
+		if (m_staticsTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
 		{
 			return;
 		}
@@ -1817,7 +1817,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto it = view.SortedStatics.begin(); it != view.SortedStatics.end(); it++)
+		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 		{
 			int staticObjectNumber = it->first;
 			std::vector<RendererStatic*> statics = it->second;
@@ -1910,7 +1910,7 @@ namespace TEN::Renderer
 
 			for (auto room : view.RoomsToDraw)
 			{
-				for (auto& msh : view.StaticsToDraw)
+				for (auto& msh : room->StaticsToDraw)
 				{
 					RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 

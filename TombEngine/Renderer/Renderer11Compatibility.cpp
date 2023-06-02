@@ -261,6 +261,7 @@ namespace TEN::Renderer
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
 					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
 				}

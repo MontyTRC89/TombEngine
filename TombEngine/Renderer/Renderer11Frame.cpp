@@ -56,14 +56,7 @@ namespace TEN::Renderer
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		} 
 
-		// Sort statics for doing instancing later
-		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
-			{
-				return a->ObjectNumber < b->ObjectNumber;
-			});
-
 		// Collect fog bulbs
-		renderView.FogBulbsToDraw.clear();
 		vector<RendererFogBulb> tempFogBulbs;
 		for (auto room : m_rooms)     
 		{  
@@ -459,12 +452,12 @@ namespace TEN::Renderer
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
 
-			if (renderView.SortedStatics.find(mesh->ObjectNumber) == renderView.SortedStatics.end())
+			if (renderView.SortedStaticsToDraw.find(mesh->ObjectNumber) == renderView.SortedStaticsToDraw.end())
 			{
 				std::vector<RendererStatic*> vec;
-				renderView.SortedStatics.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+				renderView.SortedStaticsToDraw.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
 			}
-			renderView.SortedStatics[mesh->ObjectNumber].push_back(mesh);
+			renderView.SortedStaticsToDraw[mesh->ObjectNumber].push_back(mesh);
 		}
 	}
 
