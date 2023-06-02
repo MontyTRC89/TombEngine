@@ -58,11 +58,11 @@ namespace TEN::Hud
 	{
 		constexpr auto INVALID_2D_POS		   = Vector2(FLT_MAX);
 		constexpr auto ROT					   = ANGLE(2.0f);
-		constexpr auto CARDINAL_ANGLE_STEP	   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SCALE_PERIPHERAL		   = 0.7f;
-		constexpr auto PULSE_SCALE			   = 1.2f;
-		constexpr auto RADIUS_SCALE_PRIMARY	   = 1.0f * SQRT_2;
-		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.5f * SQRT_2;
+		constexpr auto DIVISION_ANGLE_STEP	   = ANGLE(360.0f / SEGMENT_COUNT);
+		constexpr auto SIZE_SCALE_PERIPHERAL   = 0.5f;
+		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f * SQRT_2;
+		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f * SQRT_2;
+		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
 		constexpr auto MORPH_LERP_ALPHA		   = 0.3f;
 		constexpr auto ORIENT_LERP_ALPHA	   = 0.1f;
 		constexpr auto RADIUS_LERP_ALPHA	   = 0.2f;
@@ -82,8 +82,8 @@ namespace TEN::Hud
 		}
 		else
 		{
-			short closestCardinalAngle = (Orientation2D / CARDINAL_ANGLE_STEP) * CARDINAL_ANGLE_STEP;
-			Orientation2D = (short)round(Lerp(Orientation2D, closestCardinalAngle, ORIENT_LERP_ALPHA));
+			short closestDivisionAngle = (Orientation2D / DIVISION_ANGLE_STEP) * DIVISION_ANGLE_STEP;
+			Orientation2D = (short)round(Lerp(Orientation2D, closestDivisionAngle, ORIENT_LERP_ALPHA));
 		}
 
 		// Update color.
@@ -101,7 +101,7 @@ namespace TEN::Hud
 
 			float sizeTarget = GetCrosshairSize(cameraDist);
 			if (!IsPrimary)
-				sizeTarget *= SCALE_PERIPHERAL;
+				sizeTarget *= SIZE_SCALE_PERIPHERAL;
 
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
 		}
@@ -111,7 +111,7 @@ namespace TEN::Hud
 		}
 
 		// Update pulse scale.
-		PulseScale = doPulse ? PULSE_SCALE : Lerp(PulseScale, 1.0f, MORPH_LERP_ALPHA);
+		PulseScale = doPulse ? PULSE_SCALE_MAX : Lerp(PulseScale, 1.0f, MORPH_LERP_ALPHA);
 
 		// Update radius scale.
 		float radiusScaleTarget = IsPrimary ? RADIUS_SCALE_PRIMARY : RADIUS_SCALE_PERIPHERAL;
@@ -227,6 +227,9 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Draw() const
 	{
+		constexpr auto SPRITE_STATIC_ELEMENT_INDEX	= 0;
+		constexpr auto SPRITE_SEGMENT_ELEMENT_INDEX = 1;
+
 		DrawDebug();
 
 		if (Crosshairs.empty())
@@ -237,12 +240,20 @@ namespace TEN::Hud
 			if (crosshair.IsOffscreen())
 				continue;
 
-			for (const auto& segment : crosshair.Segments)
+			g_Renderer.DrawSpriteIn2DSpace(
+				ID_CROSSHAIR, SPRITE_STATIC_ELEMENT_INDEX,
+				crosshair.Position2D, crosshair.Orientation2D,
+				crosshair.Color, Vector2(crosshair.Size));
+
+			if (crosshair.RadiusScale > EPSILON)
 			{
-				g_Renderer.DrawSpriteIn2DSpace(
-					ID_CROSSHAIR_SEGMENT, 0,
-					crosshair.Position2D + segment.PosOffset2D, crosshair.Orientation2D + segment.OrientOffset2D,
-					crosshair.Color, Vector2(crosshair.Size / 2));
+				for (const auto& segment : crosshair.Segments)
+				{
+					g_Renderer.DrawSpriteIn2DSpace(
+						ID_CROSSHAIR, SPRITE_SEGMENT_ELEMENT_INDEX,
+						crosshair.Position2D + segment.PosOffset2D, crosshair.Orientation2D + segment.OrientOffset2D,
+						crosshair.Color, Vector2(crosshair.Size / 2));
+				}
 			}
 		}
 	}
