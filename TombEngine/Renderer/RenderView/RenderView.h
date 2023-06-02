@@ -55,8 +55,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererFogBulb> FogBulbsToDraw;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
-		std::vector<RendererStatic*> StaticsToDraw;
-		std::map<int, std::vector<RendererStatic*>> SortedStatics;
+		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw;
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);

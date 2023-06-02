@@ -56,14 +56,7 @@ namespace TEN::Renderer
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		} 
 
-		// Sort statics for doing instancing later
-		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
-			{
-				return a->ObjectNumber < b->ObjectNumber;
-			});
-
 		// Collect fog bulbs
-		renderView.FogBulbsToDraw.clear();
 		vector<RendererFogBulb> tempFogBulbs;
 		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
@@ -77,10 +70,10 @@ namespace TEN::Renderer
 				if (light.Type != LIGHT_TYPE_FOG_BULB)
 					continue;
 
-				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out))
+				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
 				{
 					RendererFogBulb bulb;
-
+					
 					bulb.Position = light.Position;
 					bulb.Density = light.Intensity;
 					bulb.Color = light.Color;
@@ -464,12 +457,12 @@ namespace TEN::Renderer
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
 
-			if (renderView.SortedStatics.find(mesh->ObjectNumber) == renderView.SortedStatics.end())
+			if (renderView.SortedStaticsToDraw.find(mesh->ObjectNumber) == renderView.SortedStaticsToDraw.end())
 			{
 				std::vector<RendererStatic*> vec;
-				renderView.SortedStatics.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+				renderView.SortedStaticsToDraw.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
 			}
-			renderView.SortedStatics[mesh->ObjectNumber].push_back(mesh);
+			renderView.SortedStaticsToDraw[mesh->ObjectNumber].push_back(mesh);
 		}
 	}
 
