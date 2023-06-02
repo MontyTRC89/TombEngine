@@ -331,9 +331,9 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
 	auto triggerIndex = GetTriggerIndex(item);
-	short triggerType = (*(triggerIndex++) >> 8) & TRIGGER_BITS;
+	short triggerType = (triggerIndex != nullptr) ? (*(triggerIndex++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
-	if (triggerIndex != nullptr && triggerType == TRIGGER_TYPES::SWITCH)
+	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
 		item->ItemFlags[1] = true;
 
