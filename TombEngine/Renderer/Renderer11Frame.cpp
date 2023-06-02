@@ -65,25 +65,30 @@ namespace TEN::Renderer
 		// Collect fog bulbs
 		renderView.FogBulbsToDraw.clear();
 		vector<RendererFogBulb> tempFogBulbs;
-		for (auto room : m_rooms)     
-		{  
-			for (RendererLight light : room.Lights)
+		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
+
+		for (auto& room : m_rooms)     
+		{
+			if (!g_Level.Rooms[room.RoomNumber].Active())
+				continue;
+
+			for (auto& light : room.Lights)
 			{
-				if (light.Type == LIGHT_TYPE_FOG_BULB)
-				{                                        
+				if (light.Type != LIGHT_TYPE_FOG_BULB)
+					continue;
+
+				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out))
+				{
 					RendererFogBulb bulb;
 
-					if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out))
-					{
-						bulb.Position = light.Position;
-						bulb.Density = light.Intensity;
-						bulb.Color = light.Color;
-						bulb.Radius = light.Out;
-						bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
-						bulb.Distance = bulb.FogBulbToCameraVector.Length();
+					bulb.Position = light.Position;
+					bulb.Density = light.Intensity;
+					bulb.Color = light.Color;
+					bulb.Radius = light.Out;
+					bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
+					bulb.Distance = bulb.FogBulbToCameraVector.Length();
 
-						tempFogBulbs.push_back(bulb);
-					}		
+					tempFogBulbs.push_back(bulb);
 				}
 			}
 		}
@@ -97,7 +102,7 @@ namespace TEN::Renderer
 			}
 		);
 
-		for (int i = 0; i < std::min(MAX_FOG_BULBS, (int)tempFogBulbs.size()); i++)
+		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
 		{
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
 		}
