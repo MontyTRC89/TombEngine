@@ -333,7 +333,21 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	auto triggerIndex = GetTriggerIndex(item);
 
 	if (triggerIndex == 0)
+	{
+		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.ActiveState = GetAnimData(item).ActiveState;
+		item->Animation.TargetState = GetAnimData(item).ActiveState;
+		item->Animation.RequiredState = NO_STATE;
+		item->ResetModelToDefault();
+
+		AddActiveItem(itemNumber);
+
+		item->Flags |= IFLAG_ACTIVATION_MASK;
+		item->Status = ITEM_ACTIVE;
 		return;
+	}
 
 	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
 
