@@ -6,6 +6,12 @@ namespace TEN::Hud
 {
 	struct CrosshairData
 	{
+	public:
+		static constexpr auto COLOR_GREEN	= Vector4(0.0f, 0.8f, 0.2f, 9.0f);
+		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
+		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
+		static constexpr auto SEGMENT_COUNT = 4;
+
 	private:
 		struct SegmentData
 		{
@@ -14,11 +20,6 @@ namespace TEN::Hud
 		};
 
 	public:
-		static constexpr auto COLOR_GREEN	= Vector4(0.0f, 0.9f, 0.2f, 9.0f);
-		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.1f, 0.1f, 9.0f);
-		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 6.0f);
-		static constexpr auto SEGMENT_COUNT = 4;
-
 		bool IsActive  = false;
 		bool IsPrimary = false;
 
@@ -27,11 +28,13 @@ namespace TEN::Hud
 		Vector4 Color		  = Vector4::Zero;
 		Vector4 ColorTarget	  = Vector4::Zero;
 
-		float Size		   = 0.0f;
-		float RadiusScalar = 0.0f;
+		float Size		  = 0.0f;
+		float RadiusScale = 0.0f;
+		float PulseScale  = 0.0f;
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
+		float	GetRadius() const;
 		Vector2 Get2DPositionOffset(short orientOffset2D) const;
 		bool	IsOffscreen() const;
 		void	Update(const Vector3& cameraPos, bool doPulse, bool isActive);

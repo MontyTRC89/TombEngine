@@ -13,13 +13,20 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
+// TODO: Appearance.
+
 namespace TEN::Hud
 {
+	float CrosshairData::GetRadius() const
+	{
+		return ((Size / 2) * (RadiusScale * PulseScale));
+	}
+
 	Vector2 CrosshairData::Get2DPositionOffset(short orientOffset2D) const
 	{
 		constexpr auto ANGLE_OFFSET = ANGLE(-360.0f / (SEGMENT_COUNT * 2));
 
-		float offsetDist = (Size / 2) * RadiusScalar;
+		float offsetDist = GetRadius();
 		auto relPosOffset2D = Vector2(offsetDist, 0.0f);
 		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + orientOffset2D + ANGLE_OFFSET));
 
@@ -29,7 +36,7 @@ namespace TEN::Hud
 
 	bool CrosshairData::IsOffscreen() const
 	{
-		float screenEdgeThreshold = ((Size / 2) * SQRT_2) * RadiusScalar;
+		float screenEdgeThreshold = GetRadius();
 
 		return (Position2D.x <= -screenEdgeThreshold ||
 				Position2D.y <= -screenEdgeThreshold ||
@@ -49,16 +56,16 @@ namespace TEN::Hud
 
 	void CrosshairData::Update(const Vector3& cameraPos, bool doPulse, bool isActive)
 	{
-		constexpr auto INVALID_2D_POS			= Vector2(FLT_MAX);
-		constexpr auto ROT						= ANGLE(2.0f);
-		constexpr auto CARDINAL_ANGLE_STEP		= ANGLE(90.0f);
-		constexpr auto SCALE_PERIPHERAL			= 0.7f;
-		constexpr auto SCALE_PULSE				= 1.1f;
-		constexpr auto RADIUS_SCALAR_PRIMARY	= 1.0f * SQRT_2;
-		constexpr auto RADIUS_SCALAR_PERIPHERAL = 0.5f * SQRT_2;
-		constexpr auto MORPH_LERP_ALPHA			= 0.3f;
-		constexpr auto ORIENT_LERP_ALPHA		= 0.1f;
-		constexpr auto RADIUS_LERP_ALPHA		= 0.2f;
+		constexpr auto INVALID_2D_POS		   = Vector2(FLT_MAX);
+		constexpr auto ROT					   = ANGLE(2.0f);
+		constexpr auto CARDINAL_ANGLE_STEP	   = ANGLE(360.0f / SEGMENT_COUNT);
+		constexpr auto SCALE_PERIPHERAL		   = 0.7f;
+		constexpr auto PULSE_SCALE			   = 1.2f;
+		constexpr auto RADIUS_SCALE_PRIMARY	   = 1.0f * SQRT_2;
+		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.5f * SQRT_2;
+		constexpr auto MORPH_LERP_ALPHA		   = 0.3f;
+		constexpr auto ORIENT_LERP_ALPHA	   = 0.1f;
+		constexpr auto RADIUS_LERP_ALPHA	   = 0.2f;
 
 		// Update active status.
 		IsActive = isActive;
@@ -67,6 +74,7 @@ namespace TEN::Hud
 		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
 		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
 
+		// TODO: Unnecessary?
 		// Update 2D orientation.
 		if (IsPrimary)
 		{
@@ -96,20 +104,21 @@ namespace TEN::Hud
 				sizeTarget *= SCALE_PERIPHERAL;
 
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
-			if (doPulse)
-				Size *= SCALE_PULSE;
 		}
 		else
 		{
 			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
 		}
 
-		// Update radius scalar.
-		float radiusScalarTarget = IsPrimary ? RADIUS_SCALAR_PRIMARY : RADIUS_SCALAR_PERIPHERAL;
-		if (!IsActive)
-			radiusScalarTarget = RADIUS_SCALAR_PERIPHERAL;
+		// Update pulse scale.
+		PulseScale = doPulse ? PULSE_SCALE : Lerp(PulseScale, 1.0f, MORPH_LERP_ALPHA);
 
-		RadiusScalar = Lerp(RadiusScalar, radiusScalarTarget, RADIUS_LERP_ALPHA);
+		// Update radius scale.
+		float radiusScaleTarget = IsPrimary ? RADIUS_SCALE_PRIMARY : RADIUS_SCALE_PERIPHERAL;
+		if (!IsActive)
+			radiusScaleTarget = RADIUS_SCALE_PERIPHERAL;
+
+		RadiusScale = Lerp(RadiusScale, radiusScaleTarget, RADIUS_LERP_ALPHA);
 
 		// Update segments.
 		for (auto& segment : Segments)
@@ -176,7 +185,6 @@ namespace TEN::Hud
 			if (it != entityIds.end())
 				continue;
 
-			// Get position.
 			const auto& item = g_Level.Items[entityID];
 			auto pos = GetJointPosition(item, 0).ToVector3();
 
@@ -199,7 +207,8 @@ namespace TEN::Hud
 				continue;
 
 			// Set crosshair as primary or peripheral.
-			if (player.TargetEntity != nullptr && entityPtr->Index == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr &&
+				entityPtr->Index == player.TargetEntity->Index)
 			{
 				SetPrimary(entityPtr->Index);
 			}
@@ -275,9 +284,9 @@ namespace TEN::Hud
 	// TODO: If crosshair happens to be in view upon spawn, first frame is garbage.
 	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
 	{
-		constexpr auto SIZE_START		   = SCREEN_SPACE_RES.x / 2;
-		constexpr auto RADIUS_SCALAR_START = 1.5f * SQRT_2;
-		constexpr auto ANGLE_STEP		   = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
+		constexpr auto SIZE_START		  = SCREEN_SPACE_RES.x / 2;
+		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
+		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos2D = g_Renderer.Get2DPosition(pos);
 		if (!pos2D.has_value())
@@ -294,7 +303,8 @@ namespace TEN::Hud
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
 		crosshair.Size = SIZE_START;
-		crosshair.RadiusScalar = RADIUS_SCALAR_START;
+		crosshair.RadiusScale = RADIUS_SCALE_START;
+		crosshair.PulseScale = 1.0f;
 
 		// Initialize segments.
 		short angleOffset = 0;
@@ -311,7 +321,8 @@ namespace TEN::Hud
 	{
 		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
 		{
-			(!it->second.IsActive && it->second.Size <= EPSILON) ?
+			const auto& crosshair = it->second;
+			(!crosshair.IsActive && crosshair.Size <= EPSILON) ?
 				(it = Crosshairs.erase(it)) : ++it;
 		}
 	}
@@ -320,12 +331,19 @@ namespace TEN::Hud
 	{
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
+		unsigned int visibleCount = 0;
 
 		for (const auto& [entityID, crosshair] : Crosshairs)
+		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
+			
+			if (!crosshair.IsOffscreen())
+				visibleCount++;
+		}
 
-		g_Renderer.PrintDebugMessage("Crosshairs: %d", Crosshairs.size());
+		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
+		g_Renderer.PrintDebugMessage("Visible: %d", peripheralCount);
 	}
 }
