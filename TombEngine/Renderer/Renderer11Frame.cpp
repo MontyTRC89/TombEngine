@@ -73,7 +73,7 @@ namespace TEN::Renderer
 				{                                        
 					RendererFogBulb bulb;
 
-					if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out))
+					if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
 					{
 						bulb.Position = light.Position;
 						bulb.Density = light.Intensity;
