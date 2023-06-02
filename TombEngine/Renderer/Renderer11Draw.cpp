@@ -2202,7 +2202,7 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * 10240.0f,
+				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
 					Camera.pos.y - 1536.0f, Camera.pos.z);
 				Matrix world = rotation * translation;
 
