@@ -11,6 +11,7 @@ Version 1.0.9
 * Fix zipline not working properly.
 * Fix missing heavytrigger checks for node events activated from classic triggers.
 * Fix death flag burning enemies underwater.
+* Fix pickups and object collision not working properly in flipped rooms without portals.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
 * Fix soundtrack position not restoring if same track is already playing.
