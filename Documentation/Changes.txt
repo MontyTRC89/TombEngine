@@ -10,12 +10,17 @@ Version 1.0.9
 * Fix classic rollingball rolling in place into some closed doors.
 * Fix zipline not working properly.
 * Fix missing heavytrigger checks for node events activated from classic triggers.
+* Fix death flag burning enemies underwater.
+* Fix pickups and object collision not working properly in flipped rooms without portals.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Fix soundtrack position not restoring if same track is already playing.
 * Fix inventory input interference when entering inventory via puzzle.
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
 * Fix grenade firing angle.
+* Fix rendering for static meshes with custom blending modes and alpha transparency.
+* Fix inconsistent multiline string spacing on different display modes.
 * Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
@@ -33,6 +38,7 @@ Version 1.0.9
 * Allow key hole animation to be played via OCB number:
 	- Default OCB 0 will play Lara use key animation. 
 	- Any positive OCB number will play the animation according to the OCB number.
+* Reimplement fog bulbs.
 * Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
 * Add ability to pick up a single inactive flare as an inventory item.
 * Add log reports if title level or other levels don't exist.
@@ -42,8 +48,8 @@ Version 1.0.9
 
 Lua API changes:
 * Add Vec2 class.
-* Add function String::SetTranslated()
-* Add function Misc::IsStringDisplaying()
+* Add function String::SetTranslated().
+* Add function Misc::IsStringDisplaying().
 * Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART
 	- PREEND, POSTEND

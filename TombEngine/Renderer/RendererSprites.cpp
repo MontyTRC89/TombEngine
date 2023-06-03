@@ -34,7 +34,7 @@ namespace TEN::Renderer
 		spr.color = color;
 		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
@@ -69,7 +69,7 @@ namespace TEN::Renderer
 		spr.color = color;
 		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
@@ -104,7 +104,7 @@ namespace TEN::Renderer
 		spr.color = color;
 		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
@@ -148,7 +148,7 @@ namespace TEN::Renderer
 		spr.SoftParticle = isSoftParticle;
 		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
@@ -181,7 +181,7 @@ namespace TEN::Renderer
 		sprite.SoftParticle = false;
 		sprite.renderType = renderType;
 
-		view.spritesToDraw.push_back(sprite);
+		view.SpritesToDraw.push_back(sprite);
 	}
 }
 

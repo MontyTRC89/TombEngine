@@ -48,12 +48,12 @@ namespace TEN::Renderer
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
-		for (auto& room : renderView.roomsToDraw) 
+		for (auto& room : renderView.RoomsToDraw) 
 		{
 			for (auto& i : room->ItemsToDraw) 
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
-
+				 
 				// Skip everything that isn't alive or a vehicle.
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
@@ -1015,8 +1015,8 @@ namespace TEN::Renderer
 	void Renderer11::DrawSortedFaces(RenderView& view)
 	{
 		std::for_each(std::execution::par_unseq,
-					  view.roomsToDraw.begin(),
-					  view.roomsToDraw.end(),
+					  view.RoomsToDraw.begin(),
+					  view.RoomsToDraw.end(),
 					  [](RendererRoom* room)
 					  {
 						  std::sort(
@@ -1030,9 +1030,9 @@ namespace TEN::Renderer
 					  }
 		);
 
-		for (int r = (int)view.roomsToDraw.size() - 1; r >= 0; r--)
+		for (int r = (int)view.RoomsToDraw.size() - 1; r >= 0; r--)
 		{
-			RendererRoom& room = *view.roomsToDraw[r];
+			RendererRoom& room = *view.RoomsToDraw[r];
 
 			m_transparentFacesVertices.clear();
 			m_transparentFacesIndices.clear();
@@ -1271,7 +1271,7 @@ namespace TEN::Renderer
 			m_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_stRoom.AmbientColor = info->room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.lightsToDraw);
+			BindRoomLights(view.LightsToDraw);
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
@@ -1399,7 +1399,7 @@ namespace TEN::Renderer
 	{
 		ResetDebugVariables();
 		m_Locked = false;
-
+		 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
@@ -1432,20 +1432,17 @@ namespace TEN::Renderer
 
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
-		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		                                 1.0f, 0);
+		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
-		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
+		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		ID3D11RenderTargetView* m_pRenderViews[2]; 
 		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
 		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
-		m_context->OMSetRenderTargets(2, &m_pRenderViews[0],
-		                              m_renderTarget.DepthStencilView.Get());
+		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
 
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		// The camera constant buffer contains matrices, camera position, fog values and other 
@@ -1465,15 +1462,28 @@ namespace TEN::Renderer
 		else
 		{
 			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
+		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
+
+		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
+		{
+			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
+			cameraConstantBuffer.FogBulbs[i].Density = 1.0f / std::max(14.0f, ((90.0F - view.FogBulbsToDraw[i].Density) * 0.8F + 0.2F));
+			cameraConstantBuffer.FogBulbs[i].SquaredRadius = SQUARE(view.FogBulbsToDraw[i].Radius);
+			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
+			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
+			cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
+		}
+		
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
-
+		
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
-
+		
 		// Draw opaque and alpha test faces
 		DrawRooms(view, false);
 		DrawItems(view, false);
@@ -1569,7 +1579,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		// Opaque geometry
@@ -1605,7 +1615,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto room : view.RoomsToDraw)
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
@@ -1640,7 +1650,7 @@ namespace TEN::Renderer
 
 		if (g_Configuration.ShadowType != ShadowMode::None)
 		{
-			for (auto room : renderView.roomsToDraw)
+			for (auto room : renderView.RoomsToDraw)
 				for (auto itemToDraw : room->ItemsToDraw)
 					RenderShadowMap(itemToDraw, renderView);
 		}
@@ -1787,7 +1797,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
-		if (m_staticsTextures.size() == 0 || view.SortedStatics.size() == 0)
+		if (m_staticsTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
 		{
 			return;
 		}
@@ -1807,7 +1817,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto it = view.SortedStatics.begin(); it != view.SortedStatics.end(); it++)
+		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 		{
 			int staticObjectNumber = it->first;
 			std::vector<RendererStatic*> statics = it->second;
@@ -1898,9 +1908,9 @@ namespace TEN::Renderer
 		{
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-			for (auto room : view.roomsToDraw)
+			for (auto room : view.RoomsToDraw)
 			{
-				for (auto& msh : view.StaticsToDraw)
+				for (auto& msh : room->StaticsToDraw)
 				{
 					RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 
@@ -2000,10 +2010,10 @@ namespace TEN::Renderer
 		}
 
 		m_numRoomsTransparentPolygons = 0;
-		for (int i = (int)view.roomsToDraw.size() - 1; i >= 0; i--)
+		for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
-			RendererRoom* room = view.roomsToDraw[index];
+			RendererRoom* room = view.RoomsToDraw[index];
 			m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
 
 			BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
@@ -2017,7 +2027,7 @@ namespace TEN::Renderer
 			m_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_stRoom.AmbientColor = room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.lightsToDraw);
+			BindRoomLights(view.LightsToDraw);
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
 			 
 			SetScissor(room->ClipBounds);
@@ -2152,9 +2162,9 @@ namespace TEN::Renderer
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
-		for (int k = 0; k < renderView.roomsToDraw.size(); k++)
+		for (int k = 0; k < renderView.RoomsToDraw.size(); k++)
 		{
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.roomsToDraw[k]->RoomNumber];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
 			{
 				anyOutsideRooms = true;
@@ -2174,81 +2184,40 @@ namespace TEN::Renderer
 		// Draw the sky
 		Matrix rotation = Matrix::CreateRotationX(PI);
 
-		RendererVertex vertices[4];
-		float size = 9728.0f;
-
-		vertices[0].Position.x = -size / 2.0f;
-		vertices[0].Position.y = 0.0f;
-		vertices[0].Position.z = size / 2.0f;
-		vertices[0].UV.x = 0.0f;
-		vertices[0].UV.y = 0.0f;
-		vertices[0].Color.x = 1.0f;
-		vertices[0].Color.y = 1.0f;
-		vertices[0].Color.z = 1.0f;
-		vertices[0].Color.w = 1.0f;
-
-		vertices[1].Position.x = size / 2.0f;
-		vertices[1].Position.y = 0.0f;
-		vertices[1].Position.z = size / 2.0f;
-		vertices[1].UV.x = 1.0f;
-		vertices[1].UV.y = 0.0f;
-		vertices[1].Color.x = 1.0f;
-		vertices[1].Color.y = 1.0f;
-		vertices[1].Color.z = 1.0f;
-		vertices[1].Color.w = 1.0f;
-
-		vertices[2].Position.x = size / 2.0f;
-		vertices[2].Position.y = 0.0f;
-		vertices[2].Position.z = -size / 2.0f;
-		vertices[2].UV.x = 1.0f;
-		vertices[2].UV.y = 1.0f;
-		vertices[2].Color.x = 1.0f;
-		vertices[2].Color.y = 1.0f;
-		vertices[2].Color.z = 1.0f;
-		vertices[2].Color.w = 1.0f;
-
-		vertices[3].Position.x = -size / 2.0f;
-		vertices[3].Position.y = 0.0f;
-		vertices[3].Position.z = -size / 2.0f;
-		vertices[3].UV.x = 0.0f;
-		vertices[3].UV.y = 1.0f;
-		vertices[3].Color.x = 1.0f;
-		vertices[3].Color.y = 1.0f;
-		vertices[3].Color.z = 1.0f;
-		vertices[3].Color.w = 1.0f;
-
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
+		m_context->IASetVertexBuffers(0, 1, m_skyVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetIndexBuffer(m_skyIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
 
 		for (int s = 0; s < 2; s++)
+		{
 			for (int i = 0; i < 2; i++)
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * 9728.0f,
-															   Camera.pos.y - 1536.0f, Camera.pos.z);
+				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					Camera.pos.y - 1536.0f, Camera.pos.z);
 				Matrix world = rotation * translation;
 
-				m_stStatic.World = (rotation * translation);
-				m_stStatic.Color = weather.SkyColor(s);
-				m_stStatic.AmbientLight = Vector4::One;
-				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+				m_stSky.World = (rotation * translation);
+				m_stSky.Color = weather.SkyColor(s);
+				m_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
 
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+				m_cbSky.updateData(m_stSky, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+				BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
-				m_primitiveBatch->Begin();
-				m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-				m_primitiveBatch->End();
+				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 			}
+		}
+
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 		// Draw horizon
@@ -2261,14 +2230,13 @@ namespace TEN::Renderer
 
 			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
 
-			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			m_stStatic.Color = Vector4::One;
-			m_stStatic.AmbientLight = Vector4::One;
-			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+			m_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			m_stSky.Color = Vector4::One;
+			m_stSky.ApplyFogBulbs = 1;
 
-			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+			m_cbSky.updateData(m_stSky, m_context.Get());
+			BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+			BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
@@ -2280,9 +2248,9 @@ namespace TEN::Renderer
 						continue;
 
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_ANISOTROPIC_CLAMP);
+						SAMPLER_ANISOTROPIC_CLAMP);
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_NONE);
+						SAMPLER_NONE);
 
 					// Always render horizon as alpha-blended surface
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);

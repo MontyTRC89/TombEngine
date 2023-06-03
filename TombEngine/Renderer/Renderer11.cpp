@@ -278,7 +278,7 @@ namespace TEN::Renderer
 		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)
+		switch (samplerType)  
 		{
 		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
@@ -526,11 +526,11 @@ namespace TEN::Renderer
 
 	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
 	{
-		if (m_stBlending.AlphaTest != static_cast<int>(mode) ||
+		if (m_stBlending.AlphaTest != (int)mode ||
 			m_stBlending.AlphaThreshold != threshold ||
 			force)
 		{
-			m_stBlending.AlphaTest = static_cast<int>(mode);
+			m_stBlending.AlphaTest = (int)mode;
 			m_stBlending.AlphaThreshold = threshold;
 			m_cbBlending.updateData(m_stBlending, m_context.Get());
 			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());
