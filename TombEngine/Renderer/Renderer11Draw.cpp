@@ -2206,14 +2206,13 @@ namespace TEN::Renderer
 					Camera.pos.y - 1536.0f, Camera.pos.z);
 				Matrix world = rotation * translation;
 
-				m_stStatic.World = (rotation * translation);
-				m_stStatic.Color = weather.SkyColor(s);
-				m_stStatic.AmbientLight = Vector4::One;
-				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+				m_stSky.World = (rotation * translation);
+				m_stSky.Color = weather.SkyColor(s);
+				m_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
 
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+				m_cbSky.updateData(m_stSky, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+				BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 			}
@@ -2230,15 +2229,14 @@ namespace TEN::Renderer
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
-			 
-			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			m_stStatic.Color = Vector4::One;
-			m_stStatic.AmbientLight = Vector4::One;
-			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+			m_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			m_stSky.Color = Vector4::One;
+			m_stSky.ApplyFogBulbs = 1;
+
+			m_cbSky.updateData(m_stSky, m_context.Get());
+			BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+			BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
@@ -2250,9 +2248,9 @@ namespace TEN::Renderer
 						continue;
 
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_ANISOTROPIC_CLAMP);
+						SAMPLER_ANISOTROPIC_CLAMP);
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_NONE);
+						SAMPLER_NONE);
 
 					// Always render horizon as alpha-blended surface
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);

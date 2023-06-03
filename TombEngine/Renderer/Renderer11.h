@@ -51,6 +51,7 @@
 #include "Renderer/Texture2D/Texture2D.h"
 #include "Renderer/RenderTarget2D/RenderTarget2D.h"
 #include "Renderer/Structures/RendererDoor.h"
+#include "Renderer/ConstantBuffers/SkyBuffer.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -367,6 +368,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 		CInstancedStaticMeshBuffer m_stInstancedStaticMeshBuffer;
 		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
+		CSkyBuffer m_stSky;
+		ConstantBuffer<CSkyBuffer> m_cbSky;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;

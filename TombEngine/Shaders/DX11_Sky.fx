@@ -8,8 +8,7 @@ cbuffer StaticMatrixBuffer : register(b8)
 {
 	float4x4 World;
 	float4 Color;
-	float4 AmbientLight;
-	int LightType;
+	int ApplyFogBulbs;
 };
 
 struct PixelShaderInput
@@ -34,7 +33,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
-	output.FogBulbs = DoFogBulbsForSky(worldPosition);
+	output.FogBulbs = ApplyFogBulbs == 1 ? DoFogBulbsForSky(worldPosition) : 0;
 
 	return output;
 }
@@ -42,12 +41,11 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	
+
 	DoAlphaTest(output);
-	
-	output.xyz = output.xyz * Color;
-	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w) * 2.0f;
-	output.xyz = saturate(output.xyz);
+
+	float3 light = saturate(Color.xyz - float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w) * 1.4f);
+	output.xyz *= light;
 	output.xyz += saturate(input.FogBulbs.xyz);
 
 	return output;
