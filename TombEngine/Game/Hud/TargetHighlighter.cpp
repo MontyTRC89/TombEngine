@@ -58,7 +58,7 @@ namespace TEN::Hud
 	{
 		constexpr auto INVALID_2D_POS		   = Vector2(FLT_MAX);
 		constexpr auto ROT					   = ANGLE(2.0f);
-		constexpr auto DIVISION_ANGLE_STEP	   = ANGLE(360.0f / SEGMENT_COUNT);
+		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
 		constexpr auto SIZE_SCALE_PERIPHERAL   = 0.5f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f * SQRT_2;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f * SQRT_2;
@@ -82,8 +82,8 @@ namespace TEN::Hud
 		}
 		else
 		{
-			short closestDivisionAngle = (Orientation2D / DIVISION_ANGLE_STEP) * DIVISION_ANGLE_STEP;
-			Orientation2D = (short)round(Lerp(Orientation2D, closestDivisionAngle, ORIENT_LERP_ALPHA));
+			short closestAlignAngle = (Orientation2D / ALIGN_ANGLE_STEP) * ALIGN_ANGLE_STEP;
+			Orientation2D = (short)round(Lerp(Orientation2D, closestAlignAngle, ORIENT_LERP_ALPHA));
 		}
 
 		// Update color.
@@ -110,15 +110,15 @@ namespace TEN::Hud
 			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
 		}
 
-		// Update pulse scale.
-		PulseScale = doPulse ? PULSE_SCALE_MAX : Lerp(PulseScale, 1.0f, MORPH_LERP_ALPHA);
-
 		// Update radius scale.
 		float radiusScaleTarget = IsPrimary ? RADIUS_SCALE_PRIMARY : RADIUS_SCALE_PERIPHERAL;
 		if (!IsActive)
 			radiusScaleTarget = RADIUS_SCALE_PERIPHERAL;
 
 		RadiusScale = Lerp(RadiusScale, radiusScaleTarget, RADIUS_LERP_ALPHA);
+
+		// Update pulse scale.
+		PulseScale = doPulse ? PULSE_SCALE_MAX : Lerp(PulseScale, 1.0f, MORPH_LERP_ALPHA);
 
 		// Update segments.
 		for (auto& segment : Segments)
