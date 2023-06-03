@@ -48,8 +48,8 @@ Version 1.0.9
 
 Lua API changes:
 * Add Vec2 class.
-* Add function String::SetTranslated()
-* Add function Misc::IsStringDisplaying()
+* Add function String::SetTranslated().
+* Add function Misc::IsStringDisplaying().
 * Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART
 	- PREEND, POSTEND
