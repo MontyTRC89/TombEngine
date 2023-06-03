@@ -13,8 +13,6 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-// TODO: Appearance.
-
 namespace TEN::Hud
 {
 	float CrosshairData::GetRadius() const
@@ -74,7 +72,6 @@ namespace TEN::Hud
 		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
 		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
 
-		// TODO: Unnecessary?
 		// Update 2D orientation.
 		if (IsPrimary)
 		{
