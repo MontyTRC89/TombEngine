@@ -3932,8 +3932,8 @@ __Default: empty__</description>
 		<parameter>
 			<name>shouldTranslate</name>
 			<type>bool</type>
-			<description>if true this will be the string key for the translation that will be displayed.
- If false, this will be the string that's displayed</description>
+			<description>if true, the string's key will be used as the key for the translation that will be displayed.
+ If false, the key itself will be displayed</description>
 		</parameter>
 	</parameters>
 </function>
