@@ -27,9 +27,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto LIZARD_VAULT_SHIFT = 260;
 
-	const auto LizardBiteAttackBite	 = BiteInfo(Vector3(0.0f, -120.0f, 120.0f), 10);
-	const auto LizardSwipeAttackBite = BiteInfo(Vector3::Zero, 5);
-	const auto LizardGasBite		 = BiteInfo(Vector3(0.0f, -64.0f, 56.0f), 9);
+	const auto LizardBiteAttackBite	 = CreatureBiteInfo(Vector3i(0, -120, 120), 10);
+	const auto LizardSwipeAttackBite = CreatureBiteInfo(Vector3i::Zero, 5);
+	const auto LizardGasBite		 = CreatureBiteInfo(Vector3i(0, -64, 56), 9);
 	const auto LizardSwipeAttackJoints = std::vector<unsigned int>{ 5 };
 	const auto LizardBiteAttackJoints  = std::vector<unsigned int>{ 10 };
 
@@ -72,14 +72,14 @@ namespace TEN::Entities::Creatures::TR3
 			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
 	}
 
-	static void SpawnLizardGas(int itemNumber, const BiteInfo& bite, int speed)
+	static void SpawnLizardGas(int itemNumber, const CreatureBiteInfo& bite, int speed)
 	{
-		static constexpr auto numPoisonThrows = 2;
+		constexpr auto THROW_COUNT = 2;
 
-		for (int i = 0; i < numPoisonThrows; i++)
-			ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0.0f, -100.0f, speed << 2), Vector3(0.0f, 1.0f, 0.0f));
+		for (int i = 0; i < THROW_COUNT; i++)
+			ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 2), Vector3(0.0f, 1.0f, 0.0f));
 
-		ThrowPoison(itemNumber, bite.meshNum, Vector3i(bite.Position), Vector3i(0.0f, -100.0f, speed << 1), Vector3(0.0f, 1.0f, 0.0f));
+		ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 1), Vector3(0.0f, 1.0f, 0.0f));
 	}
 
 	void LizardControl(short itemNumber)
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 				SetAnimation(&item, LIZARD_ANIM_DEATH);
 
 			// Explode if summoned.
-			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == GetFrameNumber(&item, 50))
+			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == GetFrameIndex(&item, 50))
 				CreatureDie(itemNumber, true);
 		}
 		else

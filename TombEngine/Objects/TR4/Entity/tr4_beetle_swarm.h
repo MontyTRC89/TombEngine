@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 	extern BeetleData BeetleSwarm[NUM_BEETLES];
 	extern int NextBeetle;
 
-	void InitialiseBeetleSwarm(short itemNumber);
+	void InitializeBeetleSwarm(short itemNumber);
 	void BeetleSwarmControl(short itemNumber);
 	short GetFreeBeetle();
 	void ClearBeetleSwarm();

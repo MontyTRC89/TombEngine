@@ -4,9 +4,10 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/missile.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
@@ -45,7 +46,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = SharkControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -62,7 +63,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BARRACUDA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = BarracudaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -79,7 +80,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_EAGLE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseEagle;
+		obj->Initialize = InitializeEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -94,7 +95,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_CROW];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseEagle;
+		obj->Initialize = InitializeEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -109,7 +110,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_RAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->control = RatControl;
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 5;
@@ -123,7 +124,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_YETI];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseYeti;
+		obj->Initialize = InitializeYeti;
 		obj->collision = CreatureCollision;
 		obj->control = YetiControl;
 		obj->HitPoints = 30;
@@ -140,12 +141,11 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GOON_SILENCER1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -158,12 +158,11 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER2", "ID_GOON_SILENCER1");
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -176,12 +175,11 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		AssignObjectAnimations(*obj, ID_GOON_SILENCER1, "ID_GOON_SILENCER3", "ID_GOON_SILENCER1");
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -193,11 +191,10 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WORKER_SHOTGUN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWorkerShotgun;
+		obj->Initialize = InitializeWorkerShotgun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 25;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -210,7 +207,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WORKER_MACHINEGUN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWorkerMachineGun;
+		obj->Initialize = InitializeWorkerMachineGun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerMachineGunControl;
 		obj->shadowType = ShadowMode::All;
@@ -226,7 +223,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SMALL_SPIDER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SmallSpiderControl;
 		obj->shadowType = ShadowMode::All;
@@ -241,7 +238,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BIG_SPIDER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = BigSpiderControl;
 		obj->shadowType = ShadowMode::All;
@@ -255,7 +252,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerDualGunControl;
 		obj->shadowType = ShadowMode::All;
@@ -271,7 +268,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BIRDMONSTER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = BirdMonsterControl;
 		obj->shadowType = ShadowMode::All;
@@ -286,7 +283,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WORKER_FLAMETHROWER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWorkerFlamethrower;
+		obj->Initialize = InitializeWorkerFlamethrower;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerFlamethrower;
 		obj->shadowType = ShadowMode::All;
@@ -302,7 +299,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_KNIFETHROWER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = KnifeThrowerControl;
 		obj->shadowType = ShadowMode::All;
@@ -315,14 +312,10 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_KNIFETHROWER_KNIFE];
-	if (obj->loaded)
-		obj->control = KnifeControl;
-
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryUziControl;
 		obj->shadowType = ShadowMode::All;
@@ -338,7 +331,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
 		obj->shadowType = ShadowMode::All;
@@ -355,7 +348,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		AssignObjectAnimations(*obj, ID_MERCENARY_AUTOPISTOLS1, "ID_MERCENARY_AUTOPISTOLS2", "ID_MERCENARY_AUTOPISTOLS1");
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
 		obj->shadowType = ShadowMode::All;
@@ -371,7 +364,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MONK1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MonkControl;
 		obj->shadowType = ShadowMode::All;
@@ -386,7 +379,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MONK2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MonkControl;
 		obj->shadowType = ShadowMode::All;
@@ -401,8 +394,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
-		obj->initialise = InitialiseSwordGuardian;
+		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, GetObjectName(ID_SWORD_GUARDIAN));
+		obj->Initialize = InitializeSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
 		obj->HitRoutine = SwordGuardianHit;
@@ -419,8 +412,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
-		obj->initialise = InitialiseSpearGuardian;
+		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, GetObjectName(ID_SPEAR_GUARDIAN));
+		obj->Initialize = InitializeSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
 		obj->HitRoutine = SpearGuardianHit;
@@ -439,7 +432,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
 		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_FRONT", "ID_MARCO_BARTOLI");
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->HitPoints = 300;
@@ -455,7 +448,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_BACK", "ID_DRAGON_FRONT");
 		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
-		obj->initialise = InitialiseCreature;
+		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;
@@ -467,6 +460,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_MARCO_BARTOLI", "ID_DRAGON_FRONT");
+		obj->Initialize = InitializeBartoli;
 		obj->control = BartoliControl;
 	}
 
@@ -480,21 +474,24 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::SnowmobileGun;
 		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSkidooMan;
+		CheckIfSlotExists(ID_SNOWMOBILE_GUN, GetObjectName(ID_SNOWMOBILE_DRIVER));
+		obj->Initialize = InitializeSkidooMan;
 		obj->control = SkidooManControl;
-		obj->HitPoints = 1;
 		obj->SetupHitEffect(true);
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
+	InitProjectile(obj, ControlMissile, ID_KNIFETHROWER_KNIFE);
+
 	obj = &Objects[ID_SPHERE_OF_DOOM];
 	if (obj->loaded)
 		obj->control = ControlDragonTransformationSphere;
@@ -513,7 +510,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSpinningBlade;
+		obj->Initialize = InitializeSpinningBlade;
 		obj->control = SpinningBladeControl;
 		obj->collision = ObjectCollision;
 	}
@@ -527,7 +524,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_STATUE_WITH_BLADE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseKillerStatue;
+		obj->Initialize = InitializeKillerStatue;
 		obj->control = KillerStatueControl;
 		obj->collision = ObjectCollision;
 		obj->SetupHitEffect(true);
@@ -541,7 +538,7 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_SPEEDBOAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSpeedboat;
+		obj->Initialize = InitializeSpeedboat;
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
 		obj->shadowType = ShadowMode::Lara;
@@ -552,14 +549,14 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_SNOWMOBILE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSkidoo;
+		obj->Initialize = InitializeSkidoo;
 		obj->collision = SkidooPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
 		obj->SetupHitEffect(true);
 	}
 }
 
-void InitialiseTR2Objects()
+void InitializeTR2Objects()
 {
 	ObjectInfo* objectPtr = nullptr;
 	StartEntity(objectPtr);

@@ -3,9 +3,9 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseBridge(short itemNumber)
+void InitializeBridge(short itemNumber)
 {
 	UpdateBridgeItem(itemNumber);
 }

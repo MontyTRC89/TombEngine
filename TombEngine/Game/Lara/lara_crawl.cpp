@@ -45,7 +45,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	AlignLaraToSurface(item);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_PICKUP_FLARE)
 		return;
 
 	if (item->HitPoints <= 0)
@@ -378,9 +379,6 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -388,8 +386,12 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	AlignLaraToSurface(item);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_CROUCH_IDLE)
 		return;
+
+	auto* lara = GetLaraInfo(item);
+	lara->Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
 	{
@@ -434,7 +436,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
 				lara->Control.TurnRate = 0;
-				ResetLaraFlex(item);
+				ResetPlayerFlex(item);
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
@@ -864,7 +866,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = 0;
 	Camera.targetDistance = SECTOR(1);
 
-	ResetLaraLean(item, 6.0f);
+	ResetPlayerLean(item, 1 / 6.0f);
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
 	{

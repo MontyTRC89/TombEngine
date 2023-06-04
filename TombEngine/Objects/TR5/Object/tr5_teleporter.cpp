@@ -10,7 +10,7 @@
 
 using namespace TEN::Effects::Environment;
 
-void InitialiseTeleporter(short itemNumber)
+void InitializeTeleporter(short itemNumber)
 {
 	/*ItemInfo* item = &g_Level.Items[itemNumber];
 
@@ -183,10 +183,7 @@ void ControlTeleporter(short itemNumber)
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, nullptr);
 		}
 
-		LaraItem->Animation.AnimNumber = LA_ELEVATOR_RECOVER;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.TargetState = LS_MISC_CONTROL;
-		LaraItem->Animation.ActiveState = LS_MISC_CONTROL;
+		SetAnimation(*LaraItem, LA_ELEVATOR_RECOVER);
 
 		item->ItemFlags[0]++;
 		if (item->ItemFlags[0] >= 150)

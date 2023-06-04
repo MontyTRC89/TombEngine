@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -28,8 +28,8 @@ namespace TEN::Entities::TR4
 	constexpr auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
 	constexpr auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
 
-	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
-	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
+	const auto MummyBite1 = CreatureBiteInfo(Vector3i::Zero, 11);
+	const auto MummyBite2 = CreatureBiteInfo(Vector3i::Zero, 14);
 	const auto MummySwipeAttackJoints = std::vector<unsigned int>{ 11, 14 };
 
 	enum MummyState
@@ -72,11 +72,11 @@ namespace TEN::Entities::TR4
 		MUMMY_ANIM_ARMS_UP_RECOIL = 20
 	};
 
-	void InitialiseMummy(short itemNumber)
+	void InitializeMummy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (item->TriggerFlags == 2)
 		{
@@ -141,7 +141,7 @@ namespace TEN::Entities::TR4
 								item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_RECOIL;
 							}
 
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+							item->Animation.FrameNumber = GetAnimData(item).frameBase;
 							item->Pose.Orientation.y += AI.angle;
 						}
 					}
@@ -200,7 +200,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = 0;
 
-					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 						item->TriggerFlags = 0;
 				}
 				else
@@ -282,8 +282,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.Test(MummySwipeAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase &&
+							item->Animation.FrameNumber < GetAnimData(item).frameEnd)
 						{
 							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 

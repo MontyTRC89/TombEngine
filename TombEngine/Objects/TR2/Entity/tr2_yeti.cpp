@@ -8,16 +8,16 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
-	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
+	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3i(12, 101, 19), 13);
+	const auto YetiBiteRight = CreatureBiteInfo(Vector3i(12, 101, 19), 10);
 	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
 	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 
@@ -33,11 +33,11 @@ namespace TEN::Entities::Creatures::TR2
 
 	};
 
-	void InitialiseYeti(short itemNumber)
+	void InitializeYeti(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 19);
 	}
 
@@ -61,7 +61,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 8)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 31;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 8;
 			}
 		}
@@ -290,25 +290,25 @@ namespace TEN::Entities::Creatures::TR2
 			{
 			case 2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 34;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 10;
 				break;
 
 			case 3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 33;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 11;
 				break;
 
 			case 4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 12;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 13;
 				break;
 			}

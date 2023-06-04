@@ -1,16 +1,18 @@
 #include "framework.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+
 #include <filesystem>
 
-#include "FlowHandler.h"
-#include "ReservedScriptNames.h"
-#include "Sound/sound.h"
-#include "Game/savegame.h"
-#include "Flow/InventoryItem/InventoryItem.h"
 #include "Game/Gui.h"
-#include "Logic/LevelFunc.h"
-#include "Vec3/Vec3.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Game/savegame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
+#include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Sound/sound.h"
 #include "Specific/trutils.h"
 
 /***
@@ -20,10 +22,6 @@ scripts too.
 @tentable Flow 
 @pragma nostrip
 */
-
-using std::string;
-using std::vector;
-using std::unordered_map;
 
 ScriptInterfaceGame* g_GameScript;
 ScriptInterfaceObjectsHandler* g_GameScriptEntities;
@@ -194,6 +192,7 @@ Specify which translations in the strings table correspond to which languages.
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
+	Vec2::Register(parent);
 	Vec3::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
@@ -216,12 +215,22 @@ FlowHandler::~FlowHandler()
 		delete lev;
 }
 
+std::string FlowHandler::GetGameDir()
+{
+	return m_gameDir;
+}
+
+void FlowHandler::SetGameDir(const std::string& assetDir)
+{
+	m_gameDir = assetDir;
+}
+
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
 {
 	m_languageNames = std::move(src);
 }
 
-void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src)
+void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
 	m_translationsMap = std::move(src);
 }
@@ -241,12 +250,12 @@ void FlowHandler::AddLevel(Level const& level)
 	Levels.push_back(new Level{ level });
 }
 
-void FlowHandler::SetIntroImagePath(std::string const& path)
+void FlowHandler::SetIntroImagePath(const std::string& path)
 {
 	IntroImagePath = path;
 }
 
-void FlowHandler::SetTitleScreenImagePath(std::string const& path)
+void FlowHandler::SetTitleScreenImagePath(const std::string& path)
 {
 	TitleScreenImagePath = path;
 }
@@ -258,19 +267,33 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript("Scripts/Gameflow.lua");
-	m_handler.ExecuteScript("Scripts/Strings.lua");
-	m_handler.ExecuteScript("Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
+	
+	// Check if levels exist in Gameflow.lua.
+	if (Levels.empty())
+	{
+		throw TENScriptException("No levels found. Check Gameflow.lua file integrity.");
+	}
+	else
+	{
+		TENLog("Level count: " + std::to_string(Levels.size()), LogLevel::Info);
+	}
 }
 
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	{
 		return "String not found.";
+	}
 	else
-		return m_translationsMap.at(string(id)).at(0).c_str();
+	{
+		return m_translationsMap.at(std::string(id)).at(0).c_str();
+	}
 }
 
 Settings* FlowHandler::GetSettings()
@@ -290,24 +313,56 @@ Level* FlowHandler::GetCurrentLevel()
 
 int	FlowHandler::GetNumLevels() const
 {
-	return Levels.size();
+	return (int)Levels.size();
 }
 
-int FlowHandler::GetLevelNumber(std::string const& fileName)
+int FlowHandler::GetLevelNumber(const std::string& fileName)
 {
 	if (fileName.empty())
 		return -1;
 
-	auto lcFilename = TEN::Utils::ToLower(fileName);
+	auto fileNameWithForwardSlashes = fileName;
+	std::replace(fileNameWithForwardSlashes.begin(), fileNameWithForwardSlashes.end(), '\\', '/');
 
-	for (int i = 0; i < Levels.size(); i++)
+	auto requestedPath = std::filesystem::path{ fileName };
+	bool isAbsolute = requestedPath.is_absolute();
+	if (!isAbsolute)
+		requestedPath = std::filesystem::path{ GetGameDir() + fileName };
+
+	if (std::filesystem::is_regular_file(requestedPath))
 	{
-		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
-		if (level == lcFilename && std::filesystem::exists(fileName))
-			return i;
+		auto lcFileName = TEN::Utils::ToLower(fileNameWithForwardSlashes);
+
+		if (isAbsolute)
+		{
+			for (int i = 0; i < Levels.size(); i++)
+			{
+				auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(GetGameDir() + GetLevel(i)->FileName);
+				std::replace(lcFullLevelPathFromFlow.begin(), lcFullLevelPathFromFlow.end(), '\\', '/');
+
+				if (lcFullLevelPathFromFlow == lcFileName)
+					return i;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < Levels.size(); i++)
+			{
+				auto lcLevelNameFromFlow = TEN::Utils::ToLower(GetLevel(i)->FileName);
+				std::replace(lcLevelNameFromFlow.begin(), lcLevelNameFromFlow.end(), '\\', '/');
+
+				if (lcLevelNameFromFlow == lcFileName)
+					return i;
+			}
+		}
+	}
+	else
+	{
+		TENLog("Provided -level arg \"" + fileName + "\" does not exist.");
+		return -1;
 	}
 
-	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
+	TENLog("Provided -level arg \"" + fileName + "\" was not found in gameflow.lua.");
 	return -1;
 }
 
@@ -404,6 +459,13 @@ bool FlowHandler::DoFlow()
 
 	while (DoTheGame)
 	{
+		// Check if called level exists in script.
+		if (CurrentLevel >= Levels.size())
+		{
+			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
+			CurrentLevel = 0;
+		}
+		
 		// First we need to fill some legacy variables in PCTomb5.exe
 		Level* level = Levels[CurrentLevel];
 
@@ -455,6 +517,7 @@ bool FlowHandler::DoFlow()
 				TENLog(msg, LogLevel::Error, LogConfig::All);
 				status = GameStatus::ExitToTitle;
 			}
+
 			loadFromSavegame = false;
 		}
 
@@ -463,14 +526,18 @@ bool FlowHandler::DoFlow()
 		case GameStatus::ExitGame:
 			DoTheGame = false;
 			break;
+
 		case GameStatus::ExitToTitle:
+		case GameStatus::LaraDead:
 			CurrentLevel = 0;
 			break;
+
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
-			InitialiseGame = true;
+			InitializeGame = true;
 			break;
+
 		case GameStatus::LoadGame:
 			// Load the header of the savegame for getting the level to load
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
@@ -479,13 +546,18 @@ bool FlowHandler::DoFlow()
 			CurrentLevel = header.Level;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
-
 			break;
+
 		case GameStatus::LevelComplete:
 			if (LevelComplete >= Levels.size())
+			{
 				CurrentLevel = 0; // TODO: final credits
+			}
 			else
+			{
 				CurrentLevel = LevelComplete;
+			}
+
 			LevelComplete = 0;
 			break;
 		}
@@ -499,4 +571,3 @@ bool FlowHandler::IsLevelSelectEnabled() const
 {
 	return LevelSelect;
 }
-

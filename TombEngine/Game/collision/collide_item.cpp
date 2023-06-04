@@ -14,11 +14,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -51,6 +51,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 				if (item->ItemFlags[2] != 0)
 					collidedBits &= ~1;
+				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
 
 				while (collidedBits)
 				{
@@ -107,6 +108,9 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	// Collect all the rooms where to check
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
+		if (!g_Level.Rooms[i].Active())
+			continue;
+
 		auto* room = &g_Level.Rooms[i];
 
 		if (collidedMeshes)
@@ -170,7 +174,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
-					/*this is awful*/
+					// TODO: This is awful and we need a better system.
 					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
 					{
 						itemNumber = item->NextItem;
@@ -181,14 +185,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						itemNumber = item->NextItem;
 						continue;
 					}
-					/*we need a better system*/
 
 					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
 					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
-					// TODO: Don't modify object animation data!!!
-					auto& bounds = GetBestFrame(*item).BoundingBox;
+					auto bounds = GetBestFrame(*item).BoundingBox;
 
 					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
 						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
@@ -202,6 +204,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						int rx = (dx * cosY) - (dz * sinY);
 						int rz = (dz * cosY) + (dx * sinY);
 
+						// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
 						if (item->ObjectNumber == ID_TURN_SWITCH)
 						{
 							bounds.X1 = -CLICK(1);
@@ -230,6 +233,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 								int rx = (dx * cosY) - (dz * sinY);
 								int rz = (dz * cosY) + (dx * sinY);
 
+								// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
 								if (item->ObjectNumber == ID_TURN_SWITCH)
 								{
 									bounds.X1 = -CLICK(1);

@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	void UPVInitialise(short itemNumber);
+	void UPVInitialize(short itemNumber);
 
 	void UPVPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoUPVMount(ItemInfo* UPVItem, ItemInfo* laraItem, VehicleMountType mountType);

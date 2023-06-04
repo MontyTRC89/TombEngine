@@ -7,8 +7,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Entity/PunaBoss.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Creatures::TR3;
@@ -33,7 +33,7 @@ namespace TEN::Effects::Boss
 		shieldItem.Pose.Orientation = item.Pose.Orientation;
 		shieldItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		shieldItem.Model.Color = color;
 		shieldItem.Collidable = true;
@@ -67,7 +67,7 @@ namespace TEN::Effects::Boss
 		shockwaveItem.RoomNumber = item.RoomNumber;
 		shockwaveItem.Flags |= IFLAG_ACTIVATION_MASK;
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		auto result = color;
 		result.w = 1.0f;

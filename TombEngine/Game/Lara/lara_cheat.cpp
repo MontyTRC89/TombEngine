@@ -10,10 +10,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Gui;
 using namespace TEN::Input;
@@ -62,7 +62,7 @@ void LaraCheatyBits(ItemInfo* item)
 		static bool dbFlyCheat = true;
 		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
-			if (lara->Vehicle == NO_ITEM)
+			if (lara->Context.Vehicle == NO_ITEM)
 			{
 				LaraCheatGetStuff(item);
 				DelsGiveLaraItemsCheat(item);
@@ -77,7 +77,7 @@ void LaraCheatyBits(ItemInfo* item)
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
-					ResetLaraFlex(item);
+					ResetPlayerFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
 					lara->Control.Count.Death = 0;
 					lara->Status.Air = LARA_AIR_MAX;

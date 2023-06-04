@@ -7,9 +7,9 @@
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Random.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 #include "ScriptInterfaceLevel.h"
 
@@ -38,8 +38,6 @@ namespace TEN::Effects::Environment
 	constexpr auto DUST_SPAWN_DENSITY = 300;
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
-
-	constexpr auto SKY_POSITION_LIMIT = 9728;
 
 	EnvironmentController Weather;
 
@@ -114,13 +112,13 @@ namespace TEN::Effects::Environment
 				continue;
 
 			SkyCurrentPosition[i] += level->GetSkyLayerSpeed(i);
-			if (SkyCurrentPosition[i] <= SKY_POSITION_LIMIT)
+			if (SkyCurrentPosition[i] <= SKY_SIZE)
 			{
 				if (SkyCurrentPosition[i] < 0)
-					SkyCurrentPosition[i] += SKY_POSITION_LIMIT;
+					SkyCurrentPosition[i] += SKY_SIZE;
 			}
 			else
-				SkyCurrentPosition[i] -= SKY_POSITION_LIMIT;
+				SkyCurrentPosition[i] -= SKY_SIZE;
 		}
 	}
 
