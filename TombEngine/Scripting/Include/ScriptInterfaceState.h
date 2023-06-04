@@ -11,5 +11,5 @@ public:
 	static ScriptInterfaceFlowHandler* CreateFlow();
 	static ScriptInterfaceObjectsHandler* CreateObjectsHandler();
 	static ScriptInterfaceStringsHandler* CreateStringsHandler();
-	static void ScriptInterfaceState::Init();
+	static void ScriptInterfaceState::Init(const std::string& assetsDir);
 };

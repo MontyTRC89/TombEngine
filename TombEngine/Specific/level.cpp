@@ -35,8 +35,6 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 
 char* LevelDataPtr;
-bool IsLevelLoading;
-bool LoadedSuccessfully;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
 LEVEL g_Level;
@@ -1021,33 +1019,35 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 		inflateEnd(&strm);
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
-unsigned int _stdcall LoadLevel(void* data)
+bool LoadLevel(int levelIndex)
 {
-	const int levelIndex = (int)reinterpret_cast<size_t>(data);
-
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
+	auto assetDir = g_GameFlow->GetGameDir();
+	auto levelPath = assetDir + level->FileName;
+	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
+	bool LoadedSuccessfully;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
+	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(level->FileName.c_str());
+		filePtr = FileOpen(levelPath.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
+			throw std::exception{ (std::string{ "Unable to read level file: " } + levelPath).c_str() };
 
 		char header[4];
 		unsigned char version[4];
@@ -1063,8 +1063,8 @@ unsigned int _stdcall LoadLevel(void* data)
 		// Check file header
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
-		else
-			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+		
+		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
 		// Check if level version is higher than engine version
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
@@ -1175,9 +1175,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		dataPtr = LevelDataPtr = nullptr;
 	}
 
-	// Level loaded
-	IsLevelLoading = false;
-	_endthreadex(1);
 	return LoadedSuccessfully;
 }
 
@@ -1269,27 +1266,16 @@ void LoadBoxes()
 	}
 }
 
-int LoadLevelFile(int levelIndex)
+bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
 	CleanUp();
 	FreeLevel();
 	
-	// Loading level is done is two threads, one for loading level and one for drawing loading screen
-	IsLevelLoading = true;
+	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelIndex);
 
-	_beginthreadex(
-		nullptr,
-		0, 
-		LoadLevel, 
-		reinterpret_cast<void*>((size_t)levelIndex), 
-		0, 
-		nullptr);
-
-	while (IsLevelLoading);
-
-	return LoadedSuccessfully;
+	return LevelLoadTask.get();
 }
 
 void LoadSprites()
@@ -1380,7 +1366,7 @@ void GetAIPickups()
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{
-					item->AIBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
+					item->AIBits = (1 << (object->objectNumber - ID_AI_GUARD)) & 0x1F;
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)

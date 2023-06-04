@@ -741,7 +741,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -1766,9 +1766,9 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 			spark->gravity = -8 - (r >> 3 & 3);
 			spark->scalar = 2;
 			spark->maxYvel = -4 - (r >> 6 & 3);
-			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->dSize = ((r >> 8) & 0xF) + 24;
+			spark->sSize = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->size  = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->dSize =  ((r >> 8) & 0xF) + 24;
 		}
 	}
 }

@@ -155,6 +155,10 @@ struct boolTable;
 struct boolTableBuilder;
 struct boolTableT;
 
+struct vec2Table;
+struct vec2TableBuilder;
+struct vec2TableT;
+
 struct vec3Table;
 struct vec3TableBuilder;
 struct vec3TableT;
@@ -233,21 +237,23 @@ enum class VarUnion : uint8_t {
   tab = 2,
   num = 3,
   boolean = 4,
-  vec3 = 5,
-  rotation = 6,
-  color = 7,
-  funcName = 8,
+  vec2 = 5,
+  vec3 = 6,
+  rotation = 7,
+  color = 8,
+  funcName = 9,
   MIN = NONE,
   MAX = funcName
 };
 
-inline const VarUnion (&EnumValuesVarUnion())[9] {
+inline const VarUnion (&EnumValuesVarUnion())[10] {
   static const VarUnion values[] = {
     VarUnion::NONE,
     VarUnion::str,
     VarUnion::tab,
     VarUnion::num,
     VarUnion::boolean,
+    VarUnion::vec2,
     VarUnion::vec3,
     VarUnion::rotation,
     VarUnion::color,
@@ -257,12 +263,13 @@ inline const VarUnion (&EnumValuesVarUnion())[9] {
 }
 
 inline const char * const *EnumNamesVarUnion() {
-  static const char * const names[10] = {
+  static const char * const names[11] = {
     "NONE",
     "str",
     "tab",
     "num",
     "boolean",
+    "vec2",
     "vec3",
     "rotation",
     "color",
@@ -296,6 +303,10 @@ template<> struct VarUnionTraits<TEN::Save::doubleTable> {
 
 template<> struct VarUnionTraits<TEN::Save::boolTable> {
   static const VarUnion enum_value = VarUnion::boolean;
+};
+
+template<> struct VarUnionTraits<TEN::Save::vec2Table> {
+  static const VarUnion enum_value = VarUnion::vec2;
 };
 
 template<> struct VarUnionTraits<TEN::Save::vec3Table> {
@@ -377,6 +388,14 @@ struct VarUnionUnion {
   const TEN::Save::boolTableT *Asboolean() const {
     return type == VarUnion::boolean ?
       reinterpret_cast<const TEN::Save::boolTableT *>(value) : nullptr;
+  }
+  TEN::Save::vec2TableT *Asvec2() {
+    return type == VarUnion::vec2 ?
+      reinterpret_cast<TEN::Save::vec2TableT *>(value) : nullptr;
+  }
+  const TEN::Save::vec2TableT *Asvec2() const {
+    return type == VarUnion::vec2 ?
+      reinterpret_cast<const TEN::Save::vec2TableT *>(value) : nullptr;
   }
   TEN::Save::vec3TableT *Asvec3() {
     return type == VarUnion::vec3 ?
@@ -5924,6 +5943,64 @@ struct boolTable::Traits {
 
 flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct vec2TableT : public flatbuffers::NativeTable {
+  typedef vec2Table TableType;
+  std::unique_ptr<TEN::Save::Vector2> vec{};
+};
+
+struct vec2Table FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef vec2TableT NativeTableType;
+  typedef vec2TableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VEC = 4
+  };
+  const TEN::Save::Vector2 *vec() const {
+    return GetStruct<const TEN::Save::Vector2 *>(VT_VEC);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::Vector2>(verifier, VT_VEC) &&
+           verifier.EndTable();
+  }
+  vec2TableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(vec2TableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<vec2Table> Pack(flatbuffers::FlatBufferBuilder &_fbb, const vec2TableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct vec2TableBuilder {
+  typedef vec2Table Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_vec(const TEN::Save::Vector2 *vec) {
+    fbb_.AddStruct(vec2Table::VT_VEC, vec);
+  }
+  explicit vec2TableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<vec2Table> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<vec2Table>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<vec2Table> Createvec2Table(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::Vector2 *vec = 0) {
+  vec2TableBuilder builder_(_fbb);
+  builder_.add_vec(vec);
+  return builder_.Finish();
+}
+
+struct vec2Table::Traits {
+  using type = vec2Table;
+  static auto constexpr Create = Createvec2Table;
+};
+
+flatbuffers::Offset<vec2Table> Createvec2Table(flatbuffers::FlatBufferBuilder &_fbb, const vec2TableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct vec3TableT : public flatbuffers::NativeTable {
   typedef vec3Table TableType;
   std::unique_ptr<TEN::Save::Vector3> vec{};
@@ -6198,6 +6275,9 @@ struct UnionTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::boolTable *u_as_boolean() const {
     return u_type() == TEN::Save::VarUnion::boolean ? static_cast<const TEN::Save::boolTable *>(u()) : nullptr;
   }
+  const TEN::Save::vec2Table *u_as_vec2() const {
+    return u_type() == TEN::Save::VarUnion::vec2 ? static_cast<const TEN::Save::vec2Table *>(u()) : nullptr;
+  }
   const TEN::Save::vec3Table *u_as_vec3() const {
     return u_type() == TEN::Save::VarUnion::vec3 ? static_cast<const TEN::Save::vec3Table *>(u()) : nullptr;
   }
@@ -6236,6 +6316,10 @@ template<> inline const TEN::Save::doubleTable *UnionTable::u_as<TEN::Save::doub
 
 template<> inline const TEN::Save::boolTable *UnionTable::u_as<TEN::Save::boolTable>() const {
   return u_as_boolean();
+}
+
+template<> inline const TEN::Save::vec2Table *UnionTable::u_as<TEN::Save::vec2Table>() const {
+  return u_as_vec2();
 }
 
 template<> inline const TEN::Save::vec3Table *UnionTable::u_as<TEN::Save::vec3Table>() const {
@@ -9115,6 +9199,32 @@ inline flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBui
       _scalar);
 }
 
+inline vec2TableT *vec2Table::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<vec2TableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void vec2Table::UnPackTo(vec2TableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = vec(); if (_e) _o->vec = std::unique_ptr<TEN::Save::Vector2>(new TEN::Save::Vector2(*_e)); }
+}
+
+inline flatbuffers::Offset<vec2Table> vec2Table::Pack(flatbuffers::FlatBufferBuilder &_fbb, const vec2TableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return Createvec2Table(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<vec2Table> Createvec2Table(flatbuffers::FlatBufferBuilder &_fbb, const vec2TableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const vec2TableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _vec = _o->vec ? _o->vec.get() : 0;
+  return TEN::Save::Createvec2Table(
+      _fbb,
+      _vec);
+}
+
 inline vec3TableT *vec3Table::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<vec3TableT>();
   UnPackTo(_o.get(), _resolver);
@@ -9556,6 +9666,10 @@ inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, Var
       auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case VarUnion::vec2: {
+      auto ptr = reinterpret_cast<const TEN::Save::vec2Table *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     case VarUnion::vec3: {
       auto ptr = reinterpret_cast<const TEN::Save::vec3Table *>(obj);
       return verifier.VerifyTable(ptr);
@@ -9606,6 +9720,10 @@ inline void *VarUnionUnion::UnPack(const void *obj, VarUnion type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
       return ptr->UnPack(resolver);
     }
+    case VarUnion::vec2: {
+      auto ptr = reinterpret_cast<const TEN::Save::vec2Table *>(obj);
+      return ptr->UnPack(resolver);
+    }
     case VarUnion::vec3: {
       auto ptr = reinterpret_cast<const TEN::Save::vec3Table *>(obj);
       return ptr->UnPack(resolver);
@@ -9644,6 +9762,10 @@ inline flatbuffers::Offset<void> VarUnionUnion::Pack(flatbuffers::FlatBufferBuil
       auto ptr = reinterpret_cast<const TEN::Save::boolTableT *>(value);
       return CreateboolTable(_fbb, ptr, _rehasher).Union();
     }
+    case VarUnion::vec2: {
+      auto ptr = reinterpret_cast<const TEN::Save::vec2TableT *>(value);
+      return Createvec2Table(_fbb, ptr, _rehasher).Union();
+    }
     case VarUnion::vec3: {
       auto ptr = reinterpret_cast<const TEN::Save::vec3TableT *>(value);
       return Createvec3Table(_fbb, ptr, _rehasher).Union();
@@ -9680,6 +9802,10 @@ inline VarUnionUnion::VarUnionUnion(const VarUnionUnion &u) : type(u.type), valu
     }
     case VarUnion::boolean: {
       value = new TEN::Save::boolTableT(*reinterpret_cast<TEN::Save::boolTableT *>(u.value));
+      break;
+    }
+    case VarUnion::vec2: {
+      FLATBUFFERS_ASSERT(false);  // TEN::Save::vec2TableT not copyable.
       break;
     }
     case VarUnion::vec3: {
@@ -9722,6 +9848,11 @@ inline void VarUnionUnion::Reset() {
     }
     case VarUnion::boolean: {
       auto ptr = reinterpret_cast<TEN::Save::boolTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::vec2: {
+      auto ptr = reinterpret_cast<TEN::Save::vec2TableT *>(value);
       delete ptr;
       break;
     }

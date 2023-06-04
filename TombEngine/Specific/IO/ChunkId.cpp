@@ -7,7 +7,7 @@ ChunkId::ChunkId(char* bytes, int length)
 {
 	if (length == 0)
 	{
-		m_chunkBytes = NULL;
+		m_chunkBytes = nullptr;
 		m_length = 0;
 	}
 	else
@@ -20,18 +20,18 @@ ChunkId::ChunkId(char* bytes, int length)
 
 ChunkId::~ChunkId()
 {
-	if (m_chunkBytes != NULL)
+	if (m_chunkBytes != nullptr)
 		delete m_chunkBytes;
 }
 
 std::unique_ptr<ChunkId> ChunkId::FromString(const char* str)
 {
-	return std::make_unique<ChunkId>((char*)str, strlen(str));
+	return std::make_unique<ChunkId>((char*)str, (int)strlen(str));
 }
 
 std::unique_ptr<ChunkId> ChunkId::FromString(string* str)
 {
-	return std::make_unique<ChunkId>( (char*)str->c_str(), str->length());
+	return std::make_unique<ChunkId>((char*)str->c_str(), (int)str->length());
 }
 
 std::unique_ptr<ChunkId> ChunkId::FromStream(BaseStream* stream)

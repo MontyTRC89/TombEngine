@@ -936,7 +936,6 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 
 	// Do a two-pass surface test for all possible planes in a block.
 	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
-
 	for (int h = 0; h < 2; h++)
 	{
 		// Use either bottom or top vertical point for test.
@@ -955,7 +954,7 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 		for (int p = 0; p < 3; p++)
 		{
 			// Prepare test data.
-			float distance = 0.0f;
+			float dist = 0.0f;
 
 			// Determine horizontal probe coordinates.
 			float eX = x;
@@ -1059,14 +1058,14 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 				for (int i = 0; i < 4; i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
 						closestPlane[p] = plane[i];
-						closestDistance[p] = distance;
+						closestDistance[p] = dist;
 						auto normal = closestPlane[p].Normal();
 						result[p] = FROM_RAD(atan2(normal.x, normal.z));
 						hasHitBridge = true;
@@ -1111,7 +1110,7 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Intersection point is out of block bounds; discard.
@@ -1120,9 +1119,9 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
-						closestDistance[p] = distance;
+						closestDistance[p] = dist;
 						closestPlane[p] = plane[i];
 
 						// Store according rotation.

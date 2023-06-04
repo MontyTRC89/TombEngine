@@ -36,11 +36,11 @@ namespace TEN::Renderer
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
-	constexpr auto MenuVerticalNarrowLineSpacing = 25;
+	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 15;
+	constexpr auto MenuVerticalTop = 11;
 	constexpr auto MenuVerticalDisplaySettings = 200;
 	constexpr auto MenuVerticalOtherSettings = 150;
 	constexpr auto MenuVerticalBottomCenter = 400;
@@ -272,12 +272,16 @@ namespace TEN::Renderer
 					GetNextBlockPosition(&y);
 			}
 
+			// Defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			GetNextLinePosition(&y);
+
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 19));
 			break;
 		}
 	}
@@ -398,7 +402,7 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		LoadSavegameInfos();
+		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -567,8 +571,8 @@ namespace TEN::Renderer
 		{
 			auto frameData = AnimFrameInterpData
 			{
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
 				0.0f
 			};
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
@@ -928,7 +932,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Statics: %d", m_numStaticsDrawCalls);
 				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Triangles: %d", m_numPolygons);
-				PrintDebugMessage("Sprites: %d", view.spritesToDraw.size());
+				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
@@ -936,7 +940,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Transparent room polys: %d", m_numRoomsTransparentPolygons);
-				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", m_dotProducts);

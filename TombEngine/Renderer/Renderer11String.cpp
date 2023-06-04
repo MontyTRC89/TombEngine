@@ -40,10 +40,9 @@ namespace TEN::Renderer
 				rString.Scale = (UIScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str()));
-				float width = size.x * rString.Scale;
+				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
 
-				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (width / 2.0f)) : (pos.x * factor.x);
+				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (size.x / 2.0f)) : (pos.x * factor.x);
 				rString.Y = (pos.y * UIScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
@@ -71,7 +70,7 @@ namespace TEN::Renderer
 
 				m_strings.push_back(rString);
 
-				yOffset += fontSpacing * 1.1f;
+				yOffset += size.y;
 			}
 
 		}

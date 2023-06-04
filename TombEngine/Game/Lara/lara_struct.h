@@ -961,16 +961,14 @@ enum class JumpDirection
 
 struct Ammo
 {
-	using CountType = unsigned short;
-
 private:
-	CountType Count		 = 0;
-	bool	  IsInfinite = false;
+	unsigned int Count		= 0;
+	bool		 IsInfinite = false;
 
 public:
-	static CountType Clamp(int value)
+	static unsigned int Clamp(long value)
 	{
-		return std::clamp(value, 0, (int)std::numeric_limits<CountType>::max());
+		return std::clamp<unsigned int>(value, 0, UINT_MAX);
 	}
 
 	bool HasInfinite() const
@@ -978,7 +976,7 @@ public:
 		return IsInfinite;
 	}
 
-	CountType GetCount() const
+	unsigned int GetCount() const
 	{
 		return Count;
 	}
@@ -1015,15 +1013,15 @@ public:
 		return temp;
 	}
 
-	Ammo& operator =(size_t value)
+	Ammo& operator =(unsigned int value)
 	{
-		Count = Clamp(value);
+		Count = value;
 		return *this;
 	}
 
-	bool operator ==(size_t value)
+	bool operator ==(unsigned int value)
 	{
-		return (Count == Clamp(value));
+		return (Count == value);
 	}
 
 	Ammo& operator =(Ammo& ammo)
@@ -1033,30 +1031,30 @@ public:
 		return *this;
 	}
 
-	Ammo operator +(size_t value)
+	Ammo operator +(unsigned int value)
 	{
 		auto temp = *this;
 		temp += value;
 		return temp;
 	}
 
-	Ammo operator -(size_t value)
+	Ammo operator -(unsigned int value)
 	{
 		auto temp = *this;
 		temp -= value;
 		return temp;
 	}
 
-	Ammo& operator +=(size_t value)
+	Ammo& operator +=(unsigned int value)
 	{
-		int temp = Count + value;
+		long temp = Count + value;
 		Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t value)
+	Ammo& operator -=(unsigned int value)
 	{
-		int temp = Count - value;
+		long temp = Count - value;
 		Count = Clamp(temp);
 		return *this;
 	}
@@ -1222,19 +1220,12 @@ struct RopeControlData
 };
 
 // TODO: Give tightrope a property for difficulty?
-// TODO: Remove old tightrope functionality.
 struct TightropeControlData
 {
-#if NEW_TIGHTROPE
 	short		 TightropeItem	 = 0;
 	bool		 CanDismount	 = false;
 	float		 Balance		 = 0.0f;
 	unsigned int TimeOnTightrope = 0;
-#else // !NEW_TIGHTROPE
-	unsigned int OnCount;
-	byte Off;
-	byte Fall;
-#endif
 };
 
 struct SubsuitControlData
@@ -1350,6 +1341,8 @@ struct LaraInfo
 			Context.FeetAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);*/
 	}
 
+	static constexpr auto TARGET_COUNT_MAX = 8;
+
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};
@@ -1362,12 +1355,15 @@ struct LaraInfo
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
-	EulerAngles ExtraHeadRot	= {};
-	EulerAngles ExtraTorsoRot	= {};
+	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
+	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
+	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
-	EulerAngles TargetArmOrient = EulerAngles::Zero;
-	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
+
+	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
 	int		 HitFrame	  = 0;		 // Frame index.

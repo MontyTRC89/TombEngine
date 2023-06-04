@@ -34,11 +34,6 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-constexpr auto TARGET_COUNT_MAX = 8;
-
-std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
-std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
-
 int FlashGrenadeAftershockTimer = 0;
 
 // States in which Lara will hold an active flare out in front.
@@ -337,8 +332,8 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 		break;
 
 	default:
-		player.RightArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
-		player.LeftArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
+		player.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
+		player.LeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }
@@ -517,7 +512,10 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
-				if (!player.LeftArm.FrameNumber)
+				// NOTE: Original engines for some reason do this check, but it introduces a bug when player
+				// can't drop a flare underwater after it was dropped and picked up again once. -- Lwmte, 20/05/23
+
+				//if (!player.LeftArm.FrameNumber)
 				{
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
@@ -910,7 +908,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
 			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
-			TargetList[targetCount] = &item;
+			player.TargetList[targetCount] = &item;
 			++targetCount;
 
 			if (distance < closestDistance &&
@@ -923,14 +921,14 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		}
 	}
 
-	TargetList[targetCount] = nullptr;
-	if (TargetList[0] == nullptr)
+	player.TargetList[targetCount] = nullptr;
+	if (player.TargetList[0] == nullptr)
 	{
 		player.TargetEntity = nullptr;
 	}
 	else
 	{
-		for (const auto* targetPtr : TargetList)
+		for (const auto* targetPtr : player.TargetList)
 		{
 			if (targetPtr == nullptr)
 				player.TargetEntity = nullptr;
@@ -944,17 +942,17 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			if (player.TargetEntity == nullptr)
 			{
 				player.TargetEntity = closestEntityPtr;
-				LastTargets[0] = nullptr;
+				player.LastTargets[0] = nullptr;
 			}
 			else if (IsClicked(In::SwitchTarget))
 			{
 				player.TargetEntity = nullptr;
 				bool flag = true;
 
-				for (const auto& targetPtr : TargetList)
+				for (const auto& targetPtr : player.TargetList)
 				{
 					bool doLoop = false;
-					for (const auto* lastTargetPtr : LastTargets)
+					for (const auto* lastTargetPtr : player.LastTargets)
 					{
 						if (lastTargetPtr == targetPtr)
 						{
@@ -976,18 +974,18 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				if (flag)
 				{
 					player.TargetEntity = closestEntityPtr;
-					LastTargets[0] = nullptr;
+					player.LastTargets[0] = nullptr;
 				}
 			}
 		}
 	}
 
-	if (player.TargetEntity != LastTargets[0])
+	if (player.TargetEntity != player.LastTargets[0])
 	{
-		for (int slot = TARGET_COUNT_MAX - 1; slot > 0; --slot)
-			LastTargets[slot] = LastTargets[slot - 1];
+		for (int slot = LaraInfo::TARGET_COUNT_MAX - 1; slot > 0; --slot)
+			player.LastTargets[slot] =  player.LastTargets[slot - 1];
 		
-		LastTargets[0] = player.TargetEntity;
+		player.LastTargets[0] = player.TargetEntity;
 	}
 
 	LaraTargetInfo(laraItem, weaponInfo);

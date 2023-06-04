@@ -106,7 +106,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.AnimNumber == object->animIndex + 1)
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
-				SetAnimation(item, DogDeathAnims[Random::GenerateInt(0, DogDeathAnims.size() - 1)]);
+				SetAnimation(item, DogDeathAnims[Random::GenerateInt(0, (int)DogDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

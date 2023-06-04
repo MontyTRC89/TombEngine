@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	#define TR5_LARSON_MIN_HP 40
 
-	const auto LarsonGun  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
-	const auto PierreGunLeft = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
+	const auto LarsonGun	  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
+	const auto PierreGunLeft  = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
 	const auto PierreGunRight = CreatureBiteInfo(Vector3i(-40, 200, 0), 14);
 
 	void InitializeLarson(short itemNumber)
@@ -81,6 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
+
 		if (creature->MuzzleFlash[1].Delay != 0)
 			creature->MuzzleFlash[1].Delay--;
 
@@ -318,14 +319,17 @@ namespace TEN::Entities::Creatures::TR5
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 				
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
 						ShotLara(item, &AI, PierreGunLeft, joint0, 20);
 						ShotLara(item, &AI, PierreGunRight, joint0, 20);
+
 						creature->MuzzleFlash[0].Bite = PierreGunLeft;
 						creature->MuzzleFlash[0].Delay = 2;
 						creature->MuzzleFlash[1].Bite = PierreGunRight;
@@ -352,7 +356,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			// When Larson dies, it activates trigger at start position
 			if (item->ObjectNumber == ID_LARSON &&
-				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 			{
 				short roomNumber = item->ItemFlags[2] & 0xFF;
 				short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -376,7 +380,7 @@ namespace TEN::Entities::Creatures::TR5
 			else
 				item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
 		}
 

@@ -24,6 +24,7 @@ enum class SavedVarType
 	String,
 	Number,
 	IndexTable,
+	Vec2,
 	Vec3,
 	Rotation,
 	Color,
@@ -37,6 +38,7 @@ using SavedVar = std::variant<
 	std::string,
 	double,
 	IndexTable,
+	Vector2i, // Vec2
 	Vector3i, // Vec3
 	Vector3,  // Rotation
 	D3DCOLOR, // Color
