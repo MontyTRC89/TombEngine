@@ -1470,7 +1470,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
 		{
 			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
-			cameraConstantBuffer.FogBulbs[i].Density = 1.0f / std::max(14.0f, ((90.0F - view.FogBulbsToDraw[i].Density) * 0.8F + 0.2F));
+			cameraConstantBuffer.FogBulbs[i].Density = view.FogBulbsToDraw[i].Density * (CLICK(1) / view.FogBulbsToDraw[i].Radius);
 			cameraConstantBuffer.FogBulbs[i].SquaredRadius = SQUARE(view.FogBulbsToDraw[i].Radius);
 			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
 			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
