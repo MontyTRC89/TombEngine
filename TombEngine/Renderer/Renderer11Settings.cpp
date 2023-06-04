@@ -68,7 +68,7 @@ namespace TEN::Renderer
 	{
 		texture = Texture2D();
 
-		if (std::filesystem::exists(path))
+		if (std::filesystem::is_regular_file(path))
 			texture = Texture2D(m_device.Get(), path);
 		else
 		{

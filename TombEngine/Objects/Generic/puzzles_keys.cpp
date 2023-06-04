@@ -232,10 +232,10 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	// NOTE: Only execute code below if Triggertype is switch trigger.
 	auto triggerIndex = GetTriggerIndex(&receptacleItem);
 
-	if (triggerIndex == 0)
+	if (triggerIndex == nullptr)
 		return;
 
-	int triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+	int triggerType = (*(triggerIndex++) >> 8) & TRIGGER_BITS;
 
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
@@ -331,25 +331,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
 	auto triggerIndex = GetTriggerIndex(item);
-
-	if (triggerIndex == 0)
-	{
-		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
-		item->Animation.ActiveState = GetAnimData(item).ActiveState;
-		item->Animation.TargetState = GetAnimData(item).ActiveState;
-		item->Animation.RequiredState = NO_STATE;
-		item->ResetModelToDefault();
-
-		AddActiveItem(itemNumber);
-
-		item->Flags |= IFLAG_ACTIVATION_MASK;
-		item->Status = ITEM_ACTIVE;
-		return;
-	}
-
-	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+	short triggerType = (triggerIndex != nullptr) ? (*(triggerIndex++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
@@ -461,10 +443,10 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
 
-	if (triggerIndexPtr == 0)
+	if (triggerIndexPtr == nullptr)
 		return;
 
-	short triggerType = (*(triggerIndexPtr++) >> 8) & 0x3F;
+	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 

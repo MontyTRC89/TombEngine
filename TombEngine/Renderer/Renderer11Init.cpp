@@ -116,6 +116,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
+	m_cbSky = CreateConstantBuffer<CSkyBuffer>();
 
 	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
@@ -404,7 +405,7 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
-	if (!std::filesystem::exists(fontPath))
+	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), fontPath.c_str());

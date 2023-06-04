@@ -1470,7 +1470,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
 		{
 			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
-			cameraConstantBuffer.FogBulbs[i].Density = 1.0f / std::max(14.0f, ((90.0F - view.FogBulbsToDraw[i].Density) * 0.8F + 0.2F));
+			cameraConstantBuffer.FogBulbs[i].Density = view.FogBulbsToDraw[i].Density * (CLICK(1) / view.FogBulbsToDraw[i].Radius);
 			cameraConstantBuffer.FogBulbs[i].SquaredRadius = SQUARE(view.FogBulbsToDraw[i].Radius);
 			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
 			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
@@ -1797,7 +1797,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
-		if (m_staticsTextures.size() == 0 || view.SortedStatics.size() == 0)
+		if (m_staticsTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
 		{
 			return;
 		}
@@ -1817,7 +1817,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto it = view.SortedStatics.begin(); it != view.SortedStatics.end(); it++)
+		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 		{
 			int staticObjectNumber = it->first;
 			std::vector<RendererStatic*> statics = it->second;
@@ -1910,7 +1910,7 @@ namespace TEN::Renderer
 
 			for (auto room : view.RoomsToDraw)
 			{
-				for (auto& msh : view.StaticsToDraw)
+				for (auto& msh : room->StaticsToDraw)
 				{
 					RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 
@@ -2206,14 +2206,13 @@ namespace TEN::Renderer
 					Camera.pos.y - 1536.0f, Camera.pos.z);
 				Matrix world = rotation * translation;
 
-				m_stStatic.World = (rotation * translation);
-				m_stStatic.Color = weather.SkyColor(s);
-				m_stStatic.AmbientLight = Vector4::One;
-				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+				m_stSky.World = (rotation * translation);
+				m_stSky.Color = weather.SkyColor(s);
+				m_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
 
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+				m_cbSky.updateData(m_stSky, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+				BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 			}
@@ -2230,15 +2229,14 @@ namespace TEN::Renderer
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
-			 
-			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			m_stStatic.Color = Vector4::One;
-			m_stStatic.AmbientLight = Vector4::One;
-			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+			m_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			m_stSky.Color = Vector4::One;
+			m_stSky.ApplyFogBulbs = 1;
+
+			m_cbSky.updateData(m_stSky, m_context.Get());
+			BindConstantBufferVS(CB_STATIC, m_cbSky.get());
+			BindConstantBufferPS(CB_STATIC, m_cbSky.get());
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
@@ -2250,9 +2248,9 @@ namespace TEN::Renderer
 						continue;
 
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_ANISOTROPIC_CLAMP);
+						SAMPLER_ANISOTROPIC_CLAMP);
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-					            SAMPLER_NONE);
+						SAMPLER_NONE);
 
 					// Always render horizon as alpha-blended surface
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);

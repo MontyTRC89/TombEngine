@@ -49,27 +49,27 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 13)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 13;
 			}
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, false);
-			CreatureMood(item, &AI, false);
+			GetCreatureMood(item, &ai, false);
+			CreatureMood(item, &ai, false);
 
 			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case 1:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				creature->MaxTurn = 0;
@@ -78,9 +78,9 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					item->Animation.TargetState = 2;
 				}
-				else if (Targetable(item, &AI))
+				else if (Targetable(item, &ai))
 				{
-					if (AI.distance > pow(BLOCK(2), 2))
+					if (ai.distance > pow(BLOCK(2), 2))
 						item->Animation.TargetState = 2;
 
 					if (GetRandomControl() >= 0x2000)
@@ -105,7 +105,7 @@ namespace TEN::Entities::Creatures::TR2
 					{
 						item->Animation.TargetState = 3;
 					}
-					else if (!AI.ahead)
+					else if (!ai.ahead)
 					{
 						item->Animation.TargetState = 2;
 					}
@@ -120,19 +120,19 @@ namespace TEN::Entities::Creatures::TR2
 			case 2:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
 				{
 					item->Animation.TargetState = 3;
 				}
-				else if (Targetable(item, &AI))
+				else if (Targetable(item, &ai))
 				{
-					if (AI.distance <= pow(BLOCK(2), 2) || AI.zoneNumber != AI.enemyZone)
+					if (ai.distance <= pow(BLOCK(2), 2) || ai.zoneNumber != ai.enemyZone)
 					{
 						item->Animation.TargetState = 1;
 					}
@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (AI.ahead)
+					if (ai.ahead)
 					{
 						item->Animation.TargetState = 2;
 					}
@@ -164,15 +164,15 @@ namespace TEN::Entities::Creatures::TR2
 				tiltAngle = headingAngle / 3;
 				creature->MaxTurn = ANGLE(10.0f);
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				if (creature->Mood != MoodType::Escape)
 				{
-					if (Targetable(item, &AI))
+					if (Targetable(item, &ai))
 					{
 						item->Animation.TargetState = 1;
 					}
@@ -190,44 +190,44 @@ namespace TEN::Entities::Creatures::TR2
 			case 9:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
-					if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
+					if (!ShotLara(item, &ai, MercenaryUziBite, extraTorsoRot.y, 8))
 						item->Animation.TargetState = 1;
 
 					creature->MuzzleFlash[0].Bite = MercenaryUziBite;
 					creature->MuzzleFlash[0].Delay = 2;
 				}
 
-				if (AI.distance < pow(BLOCK(2), 2))
+				if (ai.distance < pow(BLOCK(2), 2))
 					item->Animation.TargetState = 1;
 
 				break;
 
 			case 10:
 			case 14:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
 				{
-					if (!ShotLara(item, &AI, MercenaryUziBite, extraTorsoRot.y, 8))
+					if (!ShotLara(item, &ai, MercenaryUziBite, extraTorsoRot.y, 8))
 						item->Animation.TargetState = 1;
 
 					creature->MuzzleFlash[0].Bite = MercenaryUziBite;
 					creature->MuzzleFlash[0].Delay = 2;
 				}
 
-				if (AI.distance < pow(BLOCK(2), 2))
+				if (ai.distance < pow(BLOCK(2), 2))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -250,8 +250,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
@@ -269,32 +269,32 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case 2:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
 				{
 					item->Animation.TargetState = 4;
 				}
-				else if (Targetable(item, &AI))
+				else if (Targetable(item, &ai))
 				{
-					if (AI.distance <= pow(BLOCK(2), 2))
+					if (ai.distance <= pow(BLOCK(2), 2))
 					{
 						if (GetRandomControl() >= 0x2000)
 						{
@@ -322,7 +322,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (creature->Mood == MoodType::Attack)
 						item->Animation.TargetState = 4;
 
-					if (!AI.ahead || GetRandomControl() < 0x100)
+					if (!ai.ahead || GetRandomControl() < 0x100)
 						item->Animation.TargetState = 3;
 				}
 
@@ -331,19 +331,19 @@ namespace TEN::Entities::Creatures::TR2
 			case 3:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
 				{
 					item->Animation.TargetState = 4;
 				}
-				else if (Targetable(item, &AI))
+				else if (Targetable(item, &ai))
 				{
-					if (AI.distance < pow(BLOCK(2), 2) || AI.zoneNumber == AI.enemyZone || GetRandomControl() < 1024)
+					if (ai.distance < pow(BLOCK(2), 2) || ai.zoneNumber == ai.enemyZone || GetRandomControl() < 1024)
 					{
 						item->Animation.TargetState = 2;
 					}
@@ -356,7 +356,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					item->Animation.TargetState = 4;
 				}
-				else if (AI.ahead && GetRandomControl() < 1024)
+				else if (ai.ahead && GetRandomControl() < 1024)
 				{
 					item->Animation.TargetState = 2;
 				}
@@ -364,16 +364,16 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 4:
-				tilt = angle / 3;
+				tiltAngle = headingAngle / 3;
 				creature->MaxTurn = ANGLE(10.0f);
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraHeadRot.x = AI.xAngle;
-					extraHeadRot.y = AI.angle;
+					extraHeadRot.x = ai.xAngle;
+					extraHeadRot.y = ai.angle;
 				}
 
-				if (creature->Mood != MoodType::Escape && (creature->Mood == MoodType::Escape || Targetable(item, &AI)))
+				if (creature->Mood != MoodType::Escape && (creature->Mood == MoodType::Escape || Targetable(item, &ai)))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -383,10 +383,10 @@ namespace TEN::Entities::Creatures::TR2
 			case 6:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
 				break;
@@ -394,17 +394,17 @@ namespace TEN::Entities::Creatures::TR2
 			case 7:
 			case 8:
 			case 13:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 
 					if (creature->Flags == 0)
 					{
 						if (GetRandomControl() < 0x2000)
 							item->Animation.TargetState = 2;
 
-						ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50);
+						ShotLara(item, &ai, MercenaryAutoPistolBite, extraTorsoRot.y, 50);
 						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
 						creature->MuzzleFlash[0].Delay = 2;
 						creature->Flags = 1;
@@ -418,17 +418,17 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 9:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 
-					if (AI.distance < pow(BLOCK(2), 2))
+					if (ai.distance < pow(BLOCK(2), 2))
 						item->Animation.TargetState = 3;
 
 					if (creature->Flags == 0)
 					{
-						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
+						if (!ShotLara(item, &ai, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
 							item->Animation.TargetState = 3;
 
 						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
@@ -446,13 +446,13 @@ namespace TEN::Entities::Creatures::TR2
 			case 12:
 				creature->Flags = 0;
 
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 				}
 
-				if (Targetable(item, &AI))
+				if (Targetable(item, &ai))
 				{
 					item->Animation.TargetState = 13;
 				}
@@ -464,17 +464,17 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 10:
-				if (AI.ahead)
+				if (ai.ahead)
 				{
-					extraTorsoRot.x = AI.xAngle;
-					extraTorsoRot.y = AI.angle;
+					extraTorsoRot.x = ai.xAngle;
+					extraTorsoRot.y = ai.angle;
 
-					if (AI.distance < pow(BLOCK(2), 2))
+					if (ai.distance < pow(BLOCK(2), 2))
 						item->Animation.TargetState = 3;
 
 					if (creature->Flags != 2)
 					{
-						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
+						if (!ShotLara(item, &ai, MercenaryAutoPistolBite, extraTorsoRot.y, 50))
 							item->Animation.TargetState = 3;
 
 						creature->MuzzleFlash[0].Bite = MercenaryAutoPistolBite;
@@ -491,11 +491,11 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		CreatureTilt(item, tilt);
+		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, extraTorsoRot.y);
 		CreatureJoint(item, 1, extraTorsoRot.x);
 		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureJoint(item, 3, extraHeadRot.x);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }

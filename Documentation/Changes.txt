@@ -1,3 +1,10 @@
+Version 1.0.10
+==============
+
+* Fix sprint value going below zero.
+* Fix fog bulb density formula.
+* Fix electricity effect crashing 64-bit version of the engine.
+
 Version 1.0.9
 =============
 
@@ -11,6 +18,7 @@ Version 1.0.9
 * Fix zipline not working properly.
 * Fix missing heavytrigger checks for node events activated from classic triggers.
 * Fix death flag burning enemies underwater.
+* Fix pickups and object collision not working properly in flipped rooms without portals.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
 * Fix soundtrack position not restoring if same track is already playing.
@@ -18,6 +26,7 @@ Version 1.0.9
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
 * Fix flare brightness.
 * Fix grenade firing angle.
+* Fix rendering for static meshes with custom blending modes and alpha transparency.
 * Fix inconsistent multiline string spacing on different display modes.
 * Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
@@ -46,8 +55,8 @@ Version 1.0.9
 
 Lua API changes:
 * Add Vec2 class.
-* Add function String::SetTranslated()
-* Add function Misc::IsStringDisplaying()
+* Add function String::SetTranslated().
+* Add function Misc::IsStringDisplaying().
 * Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART
 	- PREEND, POSTEND

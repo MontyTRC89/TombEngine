@@ -224,7 +224,6 @@ constexpr auto FADE_FACTOR = 0.0625f;
 
 constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
 constexpr auto MAX_LIGHTS_PER_ITEM = 8;
-constexpr auto MAX_FOG_BULBS = 32;
 constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEP = 1.0f / 10.0f;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
