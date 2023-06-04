@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32 >> factor;
+		spark->sSize = spark->size = ((GetRandomControl() & 0x0F) + 32) >> factor;
 		spark->dSize = spark->size * 2;
 	}
 

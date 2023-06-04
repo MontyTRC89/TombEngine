@@ -10,17 +10,11 @@ constexpr auto SWONESHOT	 = 0x0040;
 constexpr auto ATONESHOT	 = 0x0080;
 constexpr auto VALUE_BITS	 = 0x03FF;
 constexpr auto TIMER_BITS	 = 0x00FF;
+constexpr auto TRIGGER_BITS  = 0x003F;
 constexpr auto FUNCTION_BITS = 0x001F;
 constexpr auto CODE_BITS	 = 0x3E00;
 constexpr auto END_BIT		 = 0x8000;
-constexpr auto TRIGGERED	 = 0x20;
-
-enum FLOORDATA_MASKS
-{
-	FD_MASK_FUNCTION = 0x001F,
-	FD_MASK_SUBFUNCTION = 0x7F00,
-	FD_MASK_END_DATA = 0x8000
-};
+constexpr auto TRIGGERED	 = 0x0020;
 
 enum TRIGGER_TYPES
 {

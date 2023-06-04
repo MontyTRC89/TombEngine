@@ -106,17 +106,21 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
-	bool isMeshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
-							 Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+	bool isMeshSwapPresent = (Objects[ObjectNumber].meshSwapSlot != -1 && 
+							  Objects[Objects[ObjectNumber].meshSwapSlot].loaded);
 
-	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
 	{
 		if (isMeshSwapPresent && (flags & (1 << i)))
 		{
 			if (clear)
+			{
 				Model.MeshIndex[i] = Model.BaseMesh + i;
+			}
 			else
+			{
 				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
+			}
 		}
 		else
 		{

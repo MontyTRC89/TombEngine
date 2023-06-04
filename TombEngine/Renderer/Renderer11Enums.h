@@ -36,7 +36,8 @@ enum LIGHT_TYPES
 	LIGHT_TYPE_SUN = 0,
 	LIGHT_TYPE_POINT = 1,
 	LIGHT_TYPE_SPOT = 2,
-	LIGHT_TYPE_SHADOW = 3
+	LIGHT_TYPE_SHADOW = 3,
+	LIGHT_TYPE_FOG_BULB = 4
 };
 
 enum BLEND_MODES
@@ -241,7 +242,6 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 constexpr auto MAX_BONES = 32;
 
 constexpr auto SCREEN_SPACE_RES	   = Vector2(800.0f, 600.0f);
-constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
 constexpr auto REFERENCE_FONT_SIZE = 35.0f;
 constexpr auto HUD_ZERO_Y		   = -SCREEN_SPACE_RES.y;
 
@@ -253,6 +253,12 @@ constexpr auto MIN_FAR_VIEW = 3200.0f;
 constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
 
 constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 512;
+
+constexpr auto SKY_TILES_COUNT = 20;
+constexpr auto SKY_SIZE = 10240.0f;
+constexpr auto SKY_VERTICES_COUNT = 4 * SKY_TILES_COUNT * SKY_TILES_COUNT;
+constexpr auto SKY_INDICES_COUNT = 6 * SKY_TILES_COUNT * SKY_TILES_COUNT;
+constexpr auto SKY_TRIANGLES_COUNT = 2 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 
 // FUTURE
 /*

@@ -40,7 +40,7 @@ namespace TEN::Utils
 
 	unsigned int BitField::GetSize() const
 	{
-		return Bits.size();
+		return (unsigned int)Bits.size();
 	}
 
 	unsigned int BitField::GetCount() const

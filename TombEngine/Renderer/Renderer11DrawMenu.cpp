@@ -403,7 +403,7 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		LoadSavegameInfos();
+		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -572,8 +572,8 @@ namespace TEN::Renderer
 		{
 			auto frameData = AnimFrameInterpData
 			{
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
 				0.0f
 			};
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
@@ -933,7 +933,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Statics: %d", m_numStaticsDrawCalls);
 				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Triangles: %d", m_numPolygons);
-				PrintDebugMessage("Sprites: %d", view.spritesToDraw.size());
+				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
@@ -941,7 +941,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Transparent room polys: %d", m_numRoomsTransparentPolygons);
-				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", m_dotProducts);

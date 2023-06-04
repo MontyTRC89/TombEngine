@@ -57,13 +57,14 @@
 
 // Traps
 #include "Objects/Effects/tr5_electricity.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/ZipLine.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
-#include "Objects/TR5/Trap/tr5_explosion.h"
-#include "Objects/TR5/Trap/tr5_fallingceiling.h"
-#include "Objects/TR5/Trap/tr5_romehammer.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_explosion.h"
 #include "Objects/TR5/Trap/tr5_wreckingball.h"
-#include "Objects/TR5/Trap/tr5_zip_line.h"
 
 // Switches
 #include "Objects/TR5/Switch/tr5_crowdove_switch.h"
@@ -73,6 +74,7 @@
 
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Traps::TR5;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -860,7 +862,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeZipLine;
-		obj->collision = ZipLineCollision;
+		obj->collision = CollideZipLine;
 		obj->control = ControlZipLine;
 		obj->SetupHitEffect(true);
 	}
@@ -951,6 +953,16 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExplosion;
 		obj->control = ExplosionControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASER_BARRIER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeLaserBarrier;
+		obj->control = ControlLaserBarrier;
+		obj->collision = CollideLaserBarrier;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

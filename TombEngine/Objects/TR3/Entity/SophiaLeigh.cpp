@@ -721,7 +721,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != SOPHIALEIGH_STATE_DEATH)
 				SetAnimation(&item, SOPHIALEIGH_ANIM_DEATH);
 
-			int frameEnd = g_Level.Anims[object.animIndex + SOPHIALEIGH_ANIM_DEATH].frameEnd;
+			int frameEnd = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.

@@ -182,12 +182,12 @@ namespace TEN::Input
 				}
 
 				// If controller is XInput and default bindings were successfully assigned, save configuration.
-                if (ApplyDefaultXInputBindings())
-                {
-                    g_Configuration.EnableRumble = (OisRumble != nullptr);
-                    g_Configuration.EnableThumbstickCameraControl = true;
-                    SaveConfiguration();
-                }
+				if (ApplyDefaultXInputBindings())
+				{
+					g_Configuration.EnableRumble = (OisRumble != nullptr);
+					g_Configuration.EnableThumbstickCameraControl = true;
+					SaveConfiguration();
+				}
 			}
 			catch (OIS::Exception& ex)
 			{
@@ -759,11 +759,11 @@ namespace TEN::Input
 		}
 	}
 
-    void ApplyDefaultBindings()
-    {
-        ApplyBindings(DefaultBindings);
-        ApplyDefaultXInputBindings();
-    }
+	void ApplyDefaultBindings()
+	{
+		ApplyBindings(DefaultBindings);
+		ApplyDefaultXInputBindings();
+	}
 
 	bool ApplyDefaultXInputBindings()
 	{
@@ -783,6 +783,9 @@ namespace TEN::Input
 
 			for (int i = 0; i < KEY_COUNT; i++)
 				g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
+
+			// Additionally turn on thumbstick camera and vibration.
+			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;
 
 			return true;
 		}

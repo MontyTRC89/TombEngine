@@ -66,7 +66,7 @@ bool GetKeyTrigger(ItemInfo* item)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex == 0)
+	if (triggerIndex == nullptr)
 		return false;
 
 	short* trigger = triggerIndex;
@@ -88,7 +88,7 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitc
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
-	if (triggerIndex == 0)
+	if (triggerIndex == nullptr)
 		return 0;
 
 	short* trigger = triggerIndex;
@@ -116,8 +116,6 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitc
 	} while (true);
 
 	return k;
-
-	return 0;
 }
 
 int SwitchTrigger(short itemNumber, short timer)
@@ -221,10 +219,6 @@ int SwitchTrigger(short itemNumber, short timer)
 		}
 
 		return ((item.Flags & ONESHOT) >> 8);
-	}
-	else
-	{
-		return 0;
 	}
 
 	return 0;
@@ -424,7 +418,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 	if (!data)
 		return;
 
-	short triggerType = (*(data++) >> 8) & 0x3F;
+	short triggerType = (*(data++) >> 8) & TRIGGER_BITS;
 	short flags = *(data++);
 	short timer = flags & TIMER_BITS;
 
@@ -792,6 +786,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 											 (int)VolumeActivatorFlags::Moveable | 
 											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
 
+				if (!((int)set.Activators & activatorType))
+					continue;
+
 				switch (trigger & TIMER_BITS)
 				{
 				case 0:
@@ -882,7 +879,7 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (block->Material == MaterialType::Water)
+			if (block->Material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, block->Room))
 				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
 			else
 				ItemBurn(item);
