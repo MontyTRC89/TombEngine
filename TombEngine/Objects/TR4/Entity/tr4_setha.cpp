@@ -15,10 +15,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
@@ -300,7 +300,7 @@ namespace TEN::Entities::TR4
 				if (canJump)
 				{
 					if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_START) &&
-						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+						item->Animation.FrameNumber == GetAnimData(item).frameBase)
 					{
 						creature.MaxTurn = 0;
 						creature.ReachedGoal = true;
@@ -340,7 +340,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_HARD_RECOIL:
 				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_HARD_RECOIL_START) &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 				{
 					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
 						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
@@ -367,8 +367,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
-							item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_IDLE_TO_HOVER))
+						if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
+							item->Animation.FrameNumber < (GetAnimData(item).frameBase + SETH_ANIM_IDLE_TO_HOVER))
 						{
 							DoDamage(creature.Enemy, SETH_KILL_ATTACK_DAMAGE);
 							CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);

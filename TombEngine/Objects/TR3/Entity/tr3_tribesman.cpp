@@ -11,11 +11,11 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TRIBESMAN_STATE_RUN_AXE_ATTACK_HIGH:
 				item->ItemFlags[0] = 1;
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				creature->Flags = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if (creature->Enemy->IsLara())
 				{
@@ -655,7 +655,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Pose.Orientation.y += ANGLE(2.0f);
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 15)
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 					TribesmanShotDart(item);

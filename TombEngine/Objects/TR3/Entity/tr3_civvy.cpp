@@ -9,10 +9,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -36,7 +36,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	const auto CivvyBiteLeft = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 10);
 	const auto CivvyBiteRight = CreatureBiteInfo(Vector3i::Zero, 13);
 	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };
   

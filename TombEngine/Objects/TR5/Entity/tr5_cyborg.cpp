@@ -15,10 +15,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
@@ -568,9 +568,9 @@ namespace TEN::Entities::Creatures::TR5
 					item.Pose.Orientation.y += AI.angle;
 				}
 
-				if (item.Animation.FrameNumber > g_Level.Anims[item.Animation.AnimNumber].frameBase + 6 &&
-					item.Animation.FrameNumber < g_Level.Anims[item.Animation.AnimNumber].frameBase + 16 &&
-					((byte)item.Animation.FrameNumber - (byte)g_Level.Anims[item.Animation.AnimNumber].frameBase) & 1)
+				if (item.Animation.FrameNumber > GetAnimData(item).frameBase + 6 &&
+					item.Animation.FrameNumber < GetAnimData(item).frameBase + 16 &&
+					((byte)item.Animation.FrameNumber - (byte)GetAnimData(item).frameBase) & 1)
 				{
 					ShotLara(&item, &AI, CyborgGunBite, joint0, CYBORG_GUN_ATTACK_DAMAGE);
 					creature.MuzzleFlash[0].Bite = CyborgGunBite;

@@ -8,11 +8,12 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Utils/object_helper.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
@@ -130,6 +131,9 @@ namespace TEN::Effects::Footprint
 
 	void SpawnFootprint(bool isRight, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints)
 	{
+		if (!CheckIfSlotExists(ID_MISC_SPRITES, "Footprint rendering"))
+			return;
+
 		constexpr auto LIFE_MAX			 = 20.0f;
 		constexpr auto LIFE_START_FADING = 10.0f;
 		constexpr auto OPACITY_MAX		 = 0.5f;

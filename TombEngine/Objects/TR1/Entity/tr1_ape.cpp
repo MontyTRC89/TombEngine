@@ -8,9 +8,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, ApeDeathAnims.size() - 1)]);
+				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, (int)ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{

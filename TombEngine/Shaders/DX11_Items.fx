@@ -5,7 +5,7 @@
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
 #include "./AnimatedTextures.hlsli"
-#include "./Shadows.hlsli"
+//#include "./Shadows.hlsli"
 
 #define MAX_BONES 32
 
@@ -25,12 +25,13 @@ struct PixelShaderInput
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
 	float3 WorldPosition: POSITION;
-	float2 UV: TEXCOORD;
+	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen: SHEEN;
 	float3x3 TBN: TBN;
-	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 	unsigned int Bone: BONE;
 };
 
@@ -74,17 +75,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
 	output.Color = float4(col, input.Color.w);
 	output.Color *= Color;
-
-	// Apply distance fog
-	float d = distance(CamPositionWS.xyz, worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-	
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
 	output.Bone = input.Bone;
+
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
+
 	return output;
 }
 
@@ -111,16 +108,17 @@ PixelShaderOutput PS(PixelShaderInput input)
 			normal, 
 			input.Sheen,
 			ItemLights, 
-			NumItemLights) :
-		StaticLight(input.Color.xyz, tex.xyz);
+			NumItemLights,
+			input.FogBulbs.w) :
+		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
 	output.Color = saturate(float4(color, tex.w));
+	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-	
-	output.Color = DoFog(output.Color, FogColor, input.Fog);
-	
+
 	return output;
 }

@@ -7,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -70,7 +70,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != BARRACUDA_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + BARRACUDA_ANIM_DEATH_START;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BARRACUDA_STATE_DEATH;
 			}
 

@@ -17,11 +17,11 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/people.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
@@ -127,7 +127,7 @@ namespace TEN::Entities::TR4
 			item.Animation.TargetState = item.Animation.ActiveState = 4;
 		}
 
-		item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+		item.Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
 	void SasControl(short itemNumber)
@@ -474,7 +474,7 @@ namespace TEN::Entities::TR4
 					angle2 = 0;
 				}
 
-				if (item.Animation.FrameNumber == (g_Level.Anims[item.Animation.AnimNumber].frameBase + 20))
+				if (item.Animation.FrameNumber == (GetAnimData(item).frameBase + 20))
 				{
 					if (!creature.Enemy->Animation.Velocity.z)
 					{

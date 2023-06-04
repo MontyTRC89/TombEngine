@@ -5,7 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/missile.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 
 // Creatures
@@ -170,7 +170,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_COWBOY];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitialiseCowboy;
+		obj->Initialize = InitializeCowboy;
 		obj->control = CowboyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;

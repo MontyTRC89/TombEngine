@@ -8,10 +8,10 @@
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Effects/Boss.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Effects::Electricity;
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (lizardList.size() == 1)
 			return lizardList[0];
 		else
-			return lizardList[Random::GenerateInt(0, lizardList.size() - 1)];
+			return lizardList[Random::GenerateInt(0, (int)lizardList.size() - 1)];
 	}
 
 	static bool IsLizardActiveNearby(const ItemInfo& item, bool isInitializing = false)
@@ -326,7 +326,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 			}
 
-			int frameEnd = g_Level.Anims[object.animIndex + PUNA_ANIM_DEATH].frameEnd;
+			int frameEnd =  GetAnimData(object, PUNA_ANIM_DEATH).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.

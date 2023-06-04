@@ -6,16 +6,16 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/effects/simple_particle.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -210,7 +210,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_JUMP);
 			break;
 		} 
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 		if (laraItem->RoomNumber != speedboatItem->RoomNumber)
 			ItemNewRoom(lara->ItemNumber, speedboatItem->RoomNumber);

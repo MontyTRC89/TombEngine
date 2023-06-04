@@ -20,10 +20,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR5
 				case HEAVY_GUARD_STATE_FALL_START:
 				{
 					int frame = item.Animation.FrameNumber;
-					int frameStart = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+					int frameStart = GetAnimData(item).frameBase;
 
 					if (frame == GetFrameIndex(&item, 48) || frame == GetFrameIndex(&item, 15))
 					{
@@ -406,7 +406,7 @@ namespace TEN::Entities::Creatures::TR5
 			case HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT:
 				headOrient.y = laraAI.angle;
 
-				if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
+				if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					if (item.Animation.ActiveState == HEAVY_GUARD_STATE_WALK_RAYGUN_ATTACK_LEFT)
 						FireHeavyGuardRaygun(item, false, false);

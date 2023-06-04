@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;

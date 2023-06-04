@@ -10,9 +10,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -320,7 +320,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += AI.angle;
 				
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
@@ -352,7 +352,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			// When Larson dies, it activates trigger at start position
 			if (item->ObjectNumber == ID_LARSON &&
-				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 			{
 				short roomNumber = item->ItemFlags[2] & 0xFF;
 				short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -376,7 +376,7 @@ namespace TEN::Entities::Creatures::TR5
 			else
 				item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
 		}
 

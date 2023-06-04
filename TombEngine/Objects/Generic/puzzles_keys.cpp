@@ -5,18 +5,17 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
+#include "Game/control/trigger.h"
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Game/control/trigger.h"
-#include "Game/items.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Gui;
@@ -66,9 +65,10 @@ void InitializePuzzleHole(short itemNumber)
 void InitializePuzzleDone(short itemNumber)
 {
 	auto& receptacleItem = g_Level.Items[itemNumber];
+	const auto& anim = GetAnimData(receptacleItem);
 
 	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = g_Level.Anims[receptacleItem.Animation.AnimNumber].frameBase + g_Level.Anims[receptacleItem.Animation.AnimNumber].frameEnd;
+	receptacleItem.Animation.FrameNumber = anim.frameBase + anim.frameEnd;
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -175,7 +175,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			ResetPlayerFlex(laraItem);
-			laraItem->Animation.FrameNumber = GetAnimData(*laraItem, laraItem->Animation.AnimNumber).frameBase;
+			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = itemNumber;
@@ -231,7 +231,11 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
 	auto triggerIndex = GetTriggerIndex(&receptacleItem);
-	int triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+
+	if (triggerIndex == nullptr)
+		return;
+
+	int triggerType = (*(triggerIndex++) >> 8) & TRIGGER_BITS;
 
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
@@ -327,7 +331,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
 	auto triggerIndex = GetTriggerIndex(item);
-	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+	short triggerType = (triggerIndex != nullptr) ? (*(triggerIndex++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
@@ -342,9 +346,9 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	{
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-		item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.ActiveState = GetAnimData(item).ActiveState;
+		item->Animation.TargetState = GetAnimData(item).ActiveState;
 		item->Animation.RequiredState = NO_STATE;
 		item->ResetModelToDefault();
 
@@ -438,7 +442,11 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	auto* player = GetLaraInfo(laraItem);
 
 	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
-	short triggerType = (*(triggerIndexPtr++) >> 8) & 0x3F;
+
+	if (triggerIndexPtr == nullptr)
+		return;
+
+	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 
@@ -485,10 +493,17 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					keyHoleItem->ItemFlags[1] = true;
 				}
 
-				laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				if (keyHoleItem->TriggerFlags == 0)
+				{
+					laraItem->Animation.AnimNumber = LA_USE_KEY;
+				}
+				else
+				{
+					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				player->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
 				player->Control.HandStatus = HandStatus::Busy;

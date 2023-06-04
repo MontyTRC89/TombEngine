@@ -15,10 +15,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
@@ -155,7 +155,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_SCALE | SP_DEF;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
@@ -417,7 +417,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				pos = Vector3i((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2);
 
-				deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if (deltaFrame > 68 && deltaFrame < 130)
 				{
@@ -537,7 +537,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += ai.angle;
 				}
 
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
 				{
 					pos = GetJointPosition(item, 16);
 
@@ -582,7 +582,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos1 = GetJointPosition(item, 14, Vector3i(-40, 64, 360));
 						pos1.y = item->Pose.Position.y - 64;
 
-						if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
+						if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 34 && item->Animation.ActiveState == 3)
 						{
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
@@ -593,8 +593,8 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 						}
 
-						deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						int deltaFrame2 = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
+						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+						int deltaFrame2 = GetAnimData(item).frameEnd - item->Animation.FrameNumber;
 
 						if (deltaFrame2 >= 16)
 						{
@@ -672,7 +672,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -688,7 +688,7 @@ namespace TEN::Entities::Creatures::TR5
 					TriggerDynamicLight(RomanStatueData.Position.x, RomanStatueData.Position.y, RomanStatueData.Position.z, 16, 0, color, color / 2);
 				}
 
-				deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if (deltaFrame == 34)
 				{

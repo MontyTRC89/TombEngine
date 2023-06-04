@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -347,7 +347,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
-					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
+					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
 					if (creature->Enemy->RoomNumber == NO_ROOM ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
@@ -382,7 +382,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH &&
-					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
+					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
 					item->AIBits = 0;
 

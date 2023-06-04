@@ -8,8 +8,8 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -41,13 +41,13 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->ObjectNumber == ID_CROW)
 		{
 			item->Animation.AnimNumber = Objects[ID_CROW].animIndex + 14;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = item->Animation.TargetState = 7;
 		}
 		else
 		{
 			item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 5;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = item->Animation.TargetState = 2;
 		}
 	}
@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 8;
 
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 4;
 				item->Animation.Velocity.z = 0;
 				item->Animation.IsAirborne = true;

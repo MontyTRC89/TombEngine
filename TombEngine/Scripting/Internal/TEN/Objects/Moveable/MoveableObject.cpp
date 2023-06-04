@@ -6,20 +6,20 @@
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
 
-#include "ScriptAssert.h"
-#include "MoveableObject.h"
-#include "ScriptUtil.h"
-#include "Objects/ObjectsHandler.h"
-#include "ReservedScriptNames.h"
-#include "Color/Color.h"
-#include "Logic/LevelFunc.h"
-#include "Rotation/Rotation.h"
-#include "Vec3/Vec3.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Items;
 
@@ -814,7 +814,7 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	return (m_item->Animation.FrameNumber - GetAnimData(*m_item).frameBase);
 }
 
 Vec3 Moveable::GetVelocity() const
@@ -835,15 +835,15 @@ void Moveable::SetVelocity(Vec3 velocity)
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
-	auto frameCount = fEnd - fBase;
+	const auto& anim = GetAnimData(*m_item);
+
+	unsigned int frameCount = anim.frameEnd - anim.frameBase;
 	
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
 	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
 	{
-		m_item->Animation.FrameNumber = frameNumber + fBase;
+		m_item->Animation.FrameNumber = frameNumber + anim.frameBase;
 	}
 	else
 	{
@@ -1168,18 +1168,19 @@ bool Moveable::MeshExists(int index) const
 	return true;
 }
 
-//Attach camera and camera target to a mesh of an object.
+// Attach camera and camera target to object mesh.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
 	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
 		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
 }
 
-//Borrow an animtaion and state id from an object.
-void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+// Borrow animtaion and state ID from object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
 {
-	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.AnimObjectID = objectID;
+	m_item->Animation.AnimNumber = Objects[objectID].animIndex + animNumber;
 	m_item->Animation.ActiveState = stateID;
-	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
 	AnimateItem(m_item);
 }

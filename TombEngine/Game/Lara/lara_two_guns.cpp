@@ -11,12 +11,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -89,7 +89,7 @@ static void SetArmInfo(const ItemInfo& laraItem, ArmInfo& arm, int frame)
 	}
 
 	arm.FrameNumber = frame;
-	arm.FrameBase = g_Level.Anims[arm.AnimNumber].FramePtr;
+	arm.FrameBase = GetAnimData(arm.AnimNumber).FramePtr;
 }
 
 static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)

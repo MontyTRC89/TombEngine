@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "tr4_senet.h"
+#include "Objects/TR4/Object/tr4_senet.h"
+
 #include "Sound/sound.h"
 #include "Game/items.h"
 #include "Game/control/control.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_struct.h"
@@ -442,7 +443,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (MoveLaraPosition(GameStixPosition, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
+				laraItem->Animation.FrameNumber = GetAnimData(*laraItem, LA_SENET_ROLL).frameBase;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.ExtraTorsoRot = { 0, 0, 0 };
