@@ -4,6 +4,7 @@ Version 1.0.10
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.
+* Fix clockwork beetle activation crashing the game.
 
 Version 1.0.9
 =============
