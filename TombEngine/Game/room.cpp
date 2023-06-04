@@ -37,7 +37,7 @@ void DoFlipMap(short group)
 
 			auto* flipped = &g_Level.Rooms[room->flippedRoom];
 
-			ROOM_INFO temp = *room;
+			auto temp = *room;
 			*room = *flipped;
 			*flipped = temp;
 
@@ -266,20 +266,20 @@ void InitializeNeighborRoomList()
 	}
 
 	// Add flipped variations of itself.
-
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto& room = g_Level.Rooms[i];
+		if (room.flippedRoom == NO_ROOM)
+			continue;
 
-		if (room.flippedRoom != NO_ROOM)
-		{
-			if (std::find(room.neighbors.begin(), room.neighbors.end(), room.flippedRoom) == room.neighbors.end())
-				room.neighbors.push_back(room.flippedRoom);
+		auto it = std::find(room.neighbors.begin(), room.neighbors.end(), room.flippedRoom);
+		if (it == room.neighbors.end())
+			room.neighbors.push_back(room.flippedRoom);
 
-			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+		auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+		auto it2 = std::find(flippedRoom.neighbors.begin(), flippedRoom.neighbors.end(), i);
 
-			if (std::find(flippedRoom.neighbors.begin(), flippedRoom.neighbors.end(), i) == flippedRoom.neighbors.end())
-				flippedRoom.neighbors.push_back(i);
-		}
+		if (it2 == flippedRoom.neighbors.end())
+			flippedRoom.neighbors.push_back(i);
 	}
 }

@@ -843,13 +843,13 @@ namespace TEN::Renderer
 		if (BinocularRange > 0)
 			return true;
 
-		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.ItemNumber];
+		const auto& room = m_rooms[LaraItem->RoomNumber];
+		auto* itemPtr = &m_items[Lara.ItemNumber];
 
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-		BindStaticLights(item->LightsToDraw);
+		BindStaticLights(itemPtr->LightsToDraw);
 
 		short length = 0;
 		short zOffset = 0;
@@ -881,6 +881,7 @@ namespace TEN::Renderer
 				zOffset = 92;
 				rotationX = -14560;
 				break;
+
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
@@ -889,7 +890,7 @@ namespace TEN::Renderer
 				break;
 			}
 
-			// Use MP5 flash if available
+			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
 			{
@@ -898,11 +899,10 @@ namespace TEN::Renderer
 				zOffset += 10;
 			}
 
-			ObjectInfo* flashObj = &Objects[gunflash];
-			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
-			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+			const auto& flashMoveable = *m_moveableObjects[gunflash];
+			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
 
-			for (auto& flashBucket : flashMesh->Buckets) 
+			for (const auto& flashBucket : flashMesh.Buckets) 
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
@@ -912,18 +912,17 @@ namespace TEN::Renderer
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-				Matrix rotation = Matrix::CreateRotationX(TO_RAD(rotationX));
+				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
+				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-				Matrix world;
-
+				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_LHAND] * item->World;
-					world = offset * world;
-					world = rotation * world;
+					worldMatrix = itemPtr->AnimationTransforms[LM_LHAND] * itemPtr->World;
+					worldMatrix = tMatrix * worldMatrix;
+					worldMatrix = rotMatrix * worldMatrix;
 
-					m_stStatic.World = world;
+					m_stStatic.World = worldMatrix;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -933,11 +932,11 @@ namespace TEN::Renderer
 
 				if (Lara.RightArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_RHAND] * item->World;
-					world = offset * world;
-					world = rotation * world;
+					worldMatrix = itemPtr->AnimationTransforms[LM_RHAND] * itemPtr->World;
+					worldMatrix = tMatrix * worldMatrix;
+					worldMatrix = rotMatrix * worldMatrix;
 
-					m_stStatic.World = world;
+					m_stStatic.World = worldMatrix;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -948,7 +947,6 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(BLENDMODE_OPAQUE);
-
 		return true;
 	}
 
@@ -965,52 +963,58 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto* room : view.RoomsToDraw)
+		for (auto* rRoomPtr : view.RoomsToDraw)
 		{
-			for (auto* item : room->ItemsToDraw)
+			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
 			{
-				// Does the item need gunflash?
-				auto* nativeItem = &g_Level.Items[item->ItemNumber];
-				auto* obj = &Objects[nativeItem->ObjectNumber];
+				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
 
-				if (!nativeItem->IsCreature())
+				if (!nativeItem.IsCreature())
 					continue;
-				auto* creature = GetCreatureInfo(nativeItem);
-				auto const& room_item = m_rooms[nativeItem->RoomNumber];
+
+				auto& creature = *GetCreatureInfo(&nativeItem);
+				const auto& rRoom = m_rooms[nativeItem.RoomNumber];
 
 				m_stStatic.Color = Vector4::One;
-				m_stStatic.AmbientLight = room_item.AmbientLight;
+				m_stStatic.AmbientLight = rRoom.AmbientLight;
 				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				if (creature->MuzzleFlash[0].Delay != 0 && creature->MuzzleFlash[0].Bite.BoneID != -1)
+				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
 				{
-					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[0].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
-					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
-					for (RendererBucket& flashBucket : flashMoveable->Buckets)
+					auto flashObjectID = creature.MuzzleFlash[0].SwitchToMuzzle2 ?
+						m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						ID_GUN_FLASH;
+
+					const auto& flashMoveable = *m_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					
+					for (const auto& flashBucket : flashMoveable.Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
+
 						if (flashBucket.Polygons.size() == 0)
 							continue;
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[0].Bite.Position.ToVector3());
-						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
-						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position.ToVector3());
+						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[0].Bite.BoneID] * item->World;
-						world = offset * world;
-						if (creature->MuzzleFlash[0].ApplyXRotation)
-							world = rotationX * world;
-						if (creature->MuzzleFlash[0].ApplyZRotation)
-							world = rotationZ * world;
+						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[0].Bite.BoneID] * rItemPtr->World;
+						worldMatrix = tMatrix * worldMatrix;
 
-						m_stStatic.World = world;
+						if (creature.MuzzleFlash[0].ApplyXRotation)
+							worldMatrix = rotMatrixX * worldMatrix;
+
+						if (creature.MuzzleFlash[0].ApplyZRotation)
+							worldMatrix = rotMatrixZ * worldMatrix;
+
+						m_stStatic.World = worldMatrix;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -1018,31 +1022,38 @@ namespace TEN::Renderer
 					}
 				}
 
-				if (creature->MuzzleFlash[1].Delay != 0 && creature->MuzzleFlash[1].Bite.BoneID != -1)
+				if (creature.MuzzleFlash[1].Delay != 0 && creature.MuzzleFlash[1].Bite.BoneID != -1)
 				{
-					GAME_OBJECT_ID flashObjID = creature->MuzzleFlash[1].SwitchToMuzzle2 ? m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH : ID_GUN_FLASH;
-					auto* flashMoveable = m_moveableObjects[flashObjID]->ObjectMeshes.at(0);
-					for (RendererBucket& flashBucket : flashMoveable->Buckets)
+					auto flashObjectID = creature.MuzzleFlash[1].SwitchToMuzzle2 ?
+						m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						ID_GUN_FLASH;
+
+					const auto& flashMoveable = *m_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					
+					for (auto& flashBucket : flashMoveable.Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
+
 						if (flashBucket.Polygons.size() == 0)
 							continue;
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(creature->MuzzleFlash[1].Bite.Position.ToVector3());
-						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
-						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position.ToVector3());
+						auto rtoMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[creature->MuzzleFlash[1].Bite.BoneID] * item->World;
-						world = offset * world;
-						if (creature->MuzzleFlash[1].ApplyXRotation)
-							world = rotationX * world;
-						if (creature->MuzzleFlash[1].ApplyZRotation)
-							world = rotationZ * world;
+						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
+						worldMatrix = tMatrix * worldMatrix;
 
-						m_stStatic.World = world;
+						if (creature.MuzzleFlash[1].ApplyXRotation)
+							worldMatrix = rtoMatrixX * worldMatrix;
+
+						if (creature.MuzzleFlash[1].ApplyZRotation)
+							worldMatrix = rotMatrixZ * worldMatrix;
+
+						m_stStatic.World = worldMatrix;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
