@@ -133,15 +133,16 @@ struct LevelData
 
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
-extern bool IsLevelLoading;
 extern LevelData g_Level;
+
+inline std::future<bool> LevelLoadTask;
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream);
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
 bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
-int LoadLevelFile(int levelIndex);
+bool LoadLevelFile(int levelIndex);
 void FreeLevel();
 
 void LoadTextures();
@@ -161,5 +162,3 @@ void LoadPortal(ROOM_INFO& room);
 void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();
-
-unsigned _stdcall LoadLevel(void* data);

@@ -238,8 +238,8 @@ namespace TEN::Entities::Effects
 					{
 						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							10,
-							((GetRandomControl() & 0x3F) + 192) * item->ItemFlags[3] >> 8,
-							(GetRandomControl() & 0x1F) + 96 * item->ItemFlags[3] >> 8,
+							(((GetRandomControl() & 0x3F) + 192) * item->ItemFlags[3]) >> 8,
+							((GetRandomControl() & 0x1F) + 96 * item->ItemFlags[3]) >> 8,
 							0);
 					}
 					else

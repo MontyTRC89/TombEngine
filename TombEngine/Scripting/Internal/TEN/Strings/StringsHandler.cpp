@@ -38,6 +38,7 @@ with a call to @{ShowString}, or this function will have no effect.
 
 /***
 Checks if the string is shown
+@function IsStringDisplaying
 @tparam DisplayString str the string object to be checked
 @treturn bool true if it is shown, false if it is hidden
 */

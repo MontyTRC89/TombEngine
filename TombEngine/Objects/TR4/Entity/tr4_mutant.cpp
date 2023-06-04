@@ -271,38 +271,45 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		auto head = EulerAngles::Zero, torso = EulerAngles::Zero;
+		short headingAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
+
 		int frameNumber;
-		short angle = 0;
-		short headY = 0;
 
 		if (item->AIBits & ALL_AIOBJ)
+		{
 			GetAITarget(creature);
+		}
 		else if (creature->HurtByLara)
+		{
 			creature->Enemy = LaraItem;
+		}
 		else
+		{
 			TargetNearestEntity(item, creature);
+		}
 
-		AI_INFO AI;
-		MutantAIFix(item, &AI);
+		AI_INFO ai;
+		MutantAIFix(item, &ai);
 
-		RotateHeadToTarget(item, creature, 9, head.y);
-		GetCreatureMood(item, &AI, true);
-		CreatureMood(item, &AI, true);
+		RotateHeadToTarget(item, creature, 9, extraHeadRot.y);
+		GetCreatureMood(item, &ai, true);
+		CreatureMood(item, &ai, true);
 
 		creature->MaxTurn = 0;
-		angle = CreatureTurn(item, 0);
+		headingAngle = CreatureTurn(item, 0);
 
 		switch (item->Animation.ActiveState)
 		{
 		case MUTANT_STATE_IDLE:
-			if (AI.ahead)
+			if (ai.ahead)
 			{
-				if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
+				if (Random::TestProbability(0.28f) && ai.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_PROJECTILE_ATTACK;
-				else if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
+				else if (Random::TestProbability(0.28f) && ai.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_1;
-				else if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
+				else if (Random::TestProbability(0.28f) && ai.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_2;
 			}
 
@@ -351,15 +358,15 @@ namespace TEN::Entities::TR4
 
 		if (item->Animation.ActiveState != MUTANT_STATE_LOCUST_ATTACK_1)
 		{
-			head.x = AI.xAngle;
-			torso.x = AI.xAngle;
-			torso.y = AI.angle;
+			extraHeadRot.x = ai.xAngle;
+			extraTorsoRot.x = ai.xAngle;
+			extraTorsoRot.y = ai.angle;
 		}
 
-		CreatureJoint(item, 0, head.y);
-		CreatureJoint(item, 1, head.x);
-		CreatureJoint(item, 2, torso.y);
-		CreatureJoint(item, 3, torso.x);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureJoint(item, 0, extraHeadRot.y);
+		CreatureJoint(item, 1, extraHeadRot.x);
+		CreatureJoint(item, 2, extraTorsoRot.y);
+		CreatureJoint(item, 3, extraTorsoRot.x);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

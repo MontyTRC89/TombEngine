@@ -131,7 +131,7 @@ namespace TEN::Effects::Smoke
 		s.gravity = -.1f;
 		s.affectedByWind = TestEnvironment(ENV_FLAG_WIND, pos.x, pos.y, pos.z, roomNumber);
 		s.sourceColor = Vector4(0.4f, 0.4f, 0.4f, 1);
-		s.destinationColor = Vector4(0, 0, 0, 0);
+		s.destinationColor = Vector4::Zero;
 
 		if (initial)
 		{
@@ -207,7 +207,7 @@ namespace TEN::Effects::Smoke
 
 		s.velocity = Vector3(xVel, Random::GenerateFloat(-1, 4), zVel);
 		s.sourceColor = Vector4(1, 1, 1, 1);
-		s.destinationColor = Vector4(0, 0, 0, 0);
+		s.destinationColor = Vector4::Zero;
 		s.sourceSize = Random::GenerateFloat(8,24);
 		s.active = true;
 		s.affectedByWind = true;
@@ -225,7 +225,7 @@ namespace TEN::Effects::Smoke
 		s = {};
 		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f));
 		s.sourceColor = Vector4(0.8f, 0.8f, 1, 1);
-		s.destinationColor = Vector4(0, 0, 0, 0);
+		s.destinationColor = Vector4::Zero;
 		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
 		s.active = true;
 		s.velocity = Random::GenerateDirection() * Random::GenerateFloat(1.0f, 3.0f);

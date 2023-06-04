@@ -27,6 +27,7 @@ namespace TEN::Entities::TR4
 	const auto HorsemanKickAttackJoints	   = std::vector<unsigned int>{ 14 };
 	const auto HorsemanMountedAttackJoints = std::vector<unsigned int>{ 5, 6, 10 };
 	const auto HorsemanShieldAttackJoints  = std::vector<unsigned int>{ 10 };
+
 	const auto HorseBite1 = CreatureBiteInfo(Vector3i::Zero, 13);
 	const auto HorseBite2 = CreatureBiteInfo(Vector3i::Zero, 17);
 	const auto HorseBite3 = CreatureBiteInfo(Vector3i::Zero, 19);

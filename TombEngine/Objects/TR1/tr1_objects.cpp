@@ -169,7 +169,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_COWBOY];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitialiseCowboy;
+		obj->Initialize = InitializeCowboy;
 		obj->control = CowboyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;

@@ -729,7 +729,7 @@ void FireGrenade(ItemInfo& laraItem)
 	if (!player.LeftArm.Locked)
 		grenadeItem.Pose.Orientation += player.ExtraTorsoRot;
 
-	grenadeItem.Animation.Velocity.y = CLICK(2) * phd_sin(grenadeItem.Pose.Orientation.x);
+	grenadeItem.Animation.Velocity.y = CLICK(1) * phd_sin(grenadeItem.Pose.Orientation.x);
 	grenadeItem.Animation.Velocity.z = GRENADE_VELOCITY;
 	grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 	grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
