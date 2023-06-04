@@ -6,9 +6,9 @@ struct ItemInfo;
 namespace TEN::Entities::Creatures::TR2
 {
 	void InitializeBartoli(short itemNumber);
-	void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	void DragonControl(short backNumber);
-	void BartoliControl(short itemNumber);
+	void ControlBartoli(short itemNumber);
+	void CollideDragon(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void ControlDragon(short backNumber);
 
 	void ControlDragonTransformationSphere(short itemNumber);
 }

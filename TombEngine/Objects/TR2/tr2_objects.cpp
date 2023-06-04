@@ -433,8 +433,8 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
 		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_FRONT", "ID_MARCO_BARTOLI");
 		obj->Initialize = InitializeCreature;
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
+		obj->collision = CollideDragon;
+		obj->control = ControlDragon;
 		obj->HitPoints = 300;
 		obj->pivotLength = 300;
 		obj->radius = 256;
@@ -449,8 +449,8 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_BACK", "ID_DRAGON_FRONT");
 		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
 		obj->Initialize = InitializeCreature;
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
+		obj->collision = CollideDragon;
+		obj->control = ControlDragon;
 		obj->radius = 256;
 		obj->SetupHitEffect();
 	}
@@ -461,7 +461,7 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_MARCO_BARTOLI", "ID_DRAGON_FRONT");
 		obj->Initialize = InitializeBartoli;
-		obj->control = BartoliControl;
+		obj->control = ControlBartoli;
 	}
 
 	// TODO: Recreate renderer for skidoo.
