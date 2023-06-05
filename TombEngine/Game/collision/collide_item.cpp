@@ -190,7 +190,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
-					auto bounds = GetBestFrame(*item).BoundingBox;
+					auto bounds = GetClosestKeyframe(*item).BoundingBox;
 
 					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
 						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
@@ -272,7 +272,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	const auto& bounds = GetBestFrame(*laraItem).BoundingBox;
+	const auto& bounds = GetClosestKeyframe(*laraItem).BoundingBox;
 
 	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + bounds.Y1))
 		return false;
@@ -583,8 +583,8 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
-	const auto& bounds = GetBestFrame(*item).BoundingBox;
-	const auto& playerBounds = GetBestFrame(*laraItem).BoundingBox;
+	const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
+	const auto& playerBounds = GetClosestKeyframe(*laraItem).BoundingBox;
 
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
@@ -618,7 +618,7 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
-	const auto& itemBounds = GetBestFrame(*item).BoundingBox;
+	const auto& itemBounds = GetClosestKeyframe(*item).BoundingBox;
 	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + itemBounds.Y1)
 		return false;
 
@@ -659,7 +659,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	int rx = (direction.x * cosY) - (direction.z * sinY);
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
-	const auto& bounds = (bigPush & 2) ? GlobalCollisionBounds : GetBestFrame(*item).BoundingBox;
+	const auto& bounds = (bigPush & 2) ? GlobalCollisionBounds : GetClosestKeyframe(*item).BoundingBox;
 
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
@@ -1866,7 +1866,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		float sinY = phd_sin(item->Pose.Orientation.y);
 		float cosY = phd_cos(item->Pose.Orientation.y);
 
-		const auto& bounds = GetBestFrame(*item).BoundingBox;
+		const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
 		int rx = (bounds.X1 + bounds.X2) / 2;
 		int rz = (bounds.X2 + bounds.Z2) / 2;
 

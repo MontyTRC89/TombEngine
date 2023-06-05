@@ -1385,7 +1385,7 @@ void UpdateShockwaves()
 
 		if (LaraItem->HitPoints > 0 && shockwave.damage)
 		{
-			const auto& bounds = GetBestFrame(*LaraItem).BoundingBox;
+			const auto& bounds = GetClosestKeyframe(*LaraItem).BoundingBox;
 			auto dx = LaraItem->Pose.Position.x - shockwave.x;
 			auto dz = LaraItem->Pose.Position.z - shockwave.z;
 			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));

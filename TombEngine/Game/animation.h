@@ -114,17 +114,19 @@ void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
-const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
+const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
 const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 
+AnimFrameInterpData GetFrameInterpData(const AnimData& anim, int frameNumber = 0);
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
-const AnimFrame&	GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
-const AnimFrame*	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
-const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&	GetBestFrame(const ItemInfo& item);
+const AnimFrame&	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
+const AnimFrame&	GetFrame(const ItemInfo& item, int animNumber, int frameNumber = 0);
+const AnimFrame&	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
+const AnimFrame&	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
+const AnimFrame&	GetClosestKeyframe(const AnimData& anim, int frameNumber = 0);
+const AnimFrame&	GetClosestKeyframe(const ItemInfo& item);
 
 int GetFrameNumber(const ItemInfo& item);
 int GetFrameNumber(ItemInfo* item); // Deprecated.

@@ -24,7 +24,7 @@
 
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
-		*this = GetFrame(objectID, animNumber, frameNumber)->BoundingBox;
+		*this = GetFrame(objectID, animNumber, frameNumber).BoundingBox;
 	}
 
 	// TODO: This shouldn't be a method. Make it a function in animation.cpp.

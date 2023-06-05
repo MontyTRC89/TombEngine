@@ -166,7 +166,7 @@ namespace TEN::Effects::Hair
 			return frame.BoundingBox.GetCenter();
 		}
 
-		const auto& frame = GetBestFrame(item);
+		const auto& frame = GetClosestKeyframe(item);
 		return frame.BoundingBox.GetCenter();
 	}
 	
