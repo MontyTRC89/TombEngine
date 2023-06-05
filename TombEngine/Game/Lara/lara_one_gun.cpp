@@ -342,7 +342,6 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(&item);
 
-	player.LeftArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(item).FramePtr;
 	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = item.Animation.AnimNumber;
@@ -361,8 +360,6 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
-	player.LeftArm.AnimObjectID =
-	player.RightArm.AnimObjectID = animObjectID;
 	player.LeftArm.FrameBase =
 	player.RightArm.FrameBase = animObjectNumber.frameBase;
 	player.TargetEntity = nullptr;
@@ -467,8 +464,6 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		weaponItemPtr->RoomNumber = NO_ROOM;
 		weaponItemPtr->Pose = laraItem.Pose;
 
-		player.LeftArm.AnimObjectID =
-		player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 		player.LeftArm.FrameBase =
 		player.RightArm.FrameBase = Objects[weaponItemPtr->ObjectNumber].frameBase;
 	}
@@ -496,7 +491,6 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		ReadyShotgun(laraItem, weaponType);
 	}
 
-	player.LeftArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(weaponItemPtr).FramePtr;
 	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = weaponItemPtr->Animation.AnimNumber;
@@ -532,8 +526,6 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		}
 	}
 
-	player.RightArm.AnimObjectID =
-	player.LeftArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.RightArm.FrameBase =
 	player.LeftArm.FrameBase = GetAnimData(item).FramePtr;
 	player.RightArm.FrameNumber =

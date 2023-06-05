@@ -132,12 +132,10 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 
-		auto& leftArmAnimObject = Objects[Lara.LeftArm.AnimObjectID];
-		auto& leftArmAnim = GetAnimData(leftArmAnimObject, Lara.LeftArm.AnimNumber);
+		auto& leftArmAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
 		auto& leftArmFrame = g_Level.Frames[(Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber) - leftArmAnim.frameBase];
 		
-		auto& rightArmAnimObject = Objects[Lara.RightArm.AnimObjectID];
-		auto& rightArmAnim = GetAnimData(rightArmAnimObject, Lara.RightArm.AnimNumber);
+		auto& rightArmAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
 		auto& rightArmFrame = g_Level.Frames[(Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber) - rightArmAnim.frameBase];
 
 		// HACK: Back guns are handled differently.

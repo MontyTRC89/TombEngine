@@ -435,6 +435,12 @@ const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
 
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
+	if (animNumber < 0 || animNumber >= object.Animations.size())
+	{
+		TENLog("Attempted to fetch missing animation.", LogLevel::Warning);
+		return object.Animations.front();
+	}
+
 	return object.Animations[animNumber];
 }
 
@@ -593,14 +599,7 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 {
 	if (angle <= rotation)
 	{
-		if (angle >= -rotation)
-		{
-			outPose.Orientation.y += angle;
-		}
-		else
-		{
-			outPose.Orientation.y -= rotation;
-		}
+		outPose.Orientation.y += (angle >= -rotation) ? angle : -rotation;
 	}
 	else
 	{
@@ -637,12 +636,12 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
 	static const auto REF_DIRECTION = Vector3::UnitZ;
 
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
+	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID);
+	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIRECTION);
 
 	auto direction = target - origin;
 	direction.Normalize();
@@ -650,13 +649,13 @@ Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.
-float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
+float GetBoneLength(GAME_OBJECT_ID objectID, int boneID)
 {
 	const auto& object = Objects[objectID];
 
-	if (object.nmeshes == boneIndex)
+	if (object.nmeshes == boneID)
 		return 0.0f;
 
-	auto nextBoneOffset = GetJointOffset(objectID, boneIndex + 1);
+	auto nextBoneOffset = GetJointOffset(objectID, boneID + 1);
 	return nextBoneOffset.Length();
 }

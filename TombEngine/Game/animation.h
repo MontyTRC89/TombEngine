@@ -74,8 +74,7 @@ struct AnimFrameInterpData
 	const AnimFrame& Frame1;
 	float Alpha = 0.0f;
 
-	AnimFrameInterpData(const AnimFrame& frame0, const AnimFrame& frame1, float alpha)
-		: Frame0(frame0), Frame1(frame1)
+	AnimFrameInterpData(const AnimFrame& frame0, const AnimFrame& frame1, float alpha) : Frame0(frame0), Frame1(frame1)
 	{
 		Alpha = alpha;
 	}
@@ -147,5 +146,5 @@ Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
 Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 
 Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);
-float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
+float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);

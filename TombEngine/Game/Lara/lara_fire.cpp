@@ -505,7 +505,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		// Draw weapon.
 		if (IsHeld(In::DrawWeapon))
 		{
-			// No weapon - no any actions.
+			// No weapon; no actions.
 			if (player.Control.Weapon.LastGunType != LaraWeaponType::None)
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
