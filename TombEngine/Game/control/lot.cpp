@@ -7,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -146,6 +146,12 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 
 			break;
 
+		case LotType::SnowmobileGun:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
+			break;
+
 		// Can climb.
 		case LotType::Human:
 			creature->LOT.Step = BLOCK(1);
@@ -239,7 +245,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -257,7 +263,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

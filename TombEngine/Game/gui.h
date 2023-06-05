@@ -126,6 +126,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
+		float TimeInMenu = 0.0f;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -150,7 +151,6 @@ namespace TEN::Gui
 		short NormalRingFadeVal;
 		short NormalRingFadeDir;
 		unsigned char AmmoActive;
-		int OBJLIST_SPACING;
 		MenuOption CurrentOptions[3];
 		InventoryMode InvMode;
 		int InventoryItemChosen;

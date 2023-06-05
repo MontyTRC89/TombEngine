@@ -11,11 +11,11 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_slide.h"
+#include "Game/Setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Player;

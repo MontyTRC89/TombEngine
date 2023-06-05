@@ -20,7 +20,7 @@ public:
 
 	[[nodiscard]] std::string ToString() const;
 
-	void ToLength(int newLength);
+	void ToLength(float newLength);
 	void StoreInPose(Pose& pos) const;
 	void StoreInGameVector(GameVector& vector) const;
 

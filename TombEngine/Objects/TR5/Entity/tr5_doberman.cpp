@@ -8,15 +8,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
+	const auto DobermanBite = CreatureBiteInfo(Vector3i(0, 30, 141), 20);
 
 	enum DobermanState
 	{
@@ -74,7 +74,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.ActiveState = DOBERMAN_STATE_STAND_IDLE;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
 	void DobermanControl(short itemNumber)
@@ -263,7 +263,7 @@ namespace TEN::Entities::Creatures::TR5
 		else if (item->Animation.ActiveState != DOBERMAN_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_DOBERMAN].animIndex + DOBERMAN_ANIM_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.ActiveState = DOBERMAN_STATE_DEATH;
 		}
 

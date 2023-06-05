@@ -17,22 +17,23 @@ void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::s
 		TENLog("Slot " + requiredName + " not loaded. Meshswap issues with " + baseName + " may result in incorrect behaviour.", LogLevel::Warning);
 }
 
-bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName, const std::string& requiredName)
+bool AssignObjectAnimations(ObjectInfo& object, int requiredObjectID, const std::string& baseName, const std::string& requiredName)
 {
-	// Check if the object has at least 1 animation with more than 1 frame.
-	const auto& anim = g_Level.Anims[object.animIndex];
+	// Check if object has at least 1 animation with more than 1 frame.
+	const auto& anim = GetAnimData(object.animIndex);
 	if ((anim.frameEnd - anim.frameBase) > 1)
 		return true;
 
 	// Use slot if loaded.
-	if (Objects[requiredObject].loaded)
+	const auto& requiredObject = Objects[requiredObjectID];
+	if (requiredObject.loaded)
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
-		const auto& anim = g_Level.Anims[Objects[requiredObject].animIndex];
-		if ((anim.frameEnd - anim.frameBase) > 1)
+		const auto& newAnim = GetAnimData(requiredObject.animIndex);
+		if ((newAnim.frameEnd - newAnim.frameBase) > 1)
 		{
-			object.animIndex = Objects[requiredObject].animIndex;
-			object.frameBase = Objects[requiredObject].frameBase;
+			object.animIndex = requiredObject.animIndex;
+			object.frameBase = requiredObject.frameBase;
 			return true;
 		}
 		else
@@ -48,10 +49,17 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::s
 	return false;
 }
 
-void CheckIfSlotExists(int requiredObject, const std::string& baseName, const std::string& requiredName)
+bool CheckIfSlotExists(GAME_OBJECT_ID requiredObj, const std::string& baseName)
 {
-	if (!Objects[requiredObject].loaded)
-		TENLog("Slot " + requiredName + " not loaded. " + baseName + " may work incorrectly or crash.", LogLevel::Warning);
+	bool result = Objects[requiredObj].loaded;
+
+	if (!result)
+	{
+		TENLog("Slot " + GetObjectName(requiredObj) + " (" + std::to_string(requiredObj) + ") not loaded. " + 
+				baseName + " may not work.", LogLevel::Warning);
+	}
+
+	return result;
 }
 
 void InitSmashObject(ObjectInfo* object, int objectNumber)

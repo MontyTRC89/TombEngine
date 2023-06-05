@@ -53,8 +53,11 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	AlignLaraToSurface(item);
 
 	// HACK: Prevent pickup interference.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_PICKUP_FLARE)
+	{
 		return;
+	}
 
 	if (item->HitPoints <= 0)
 	{
@@ -388,9 +391,15 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	// HACK: Prevent pickup interference.
-	if (item->Animation.TargetState == LS_PICKUP)
+	// TODO: Dispatch pickups from within states.
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_CROUCH_IDLE)
+	{
 		return;
+	}
+
+	auto* lara = GetLaraInfo(item);
+	lara->Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
 	{

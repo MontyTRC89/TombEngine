@@ -9,12 +9,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3);
+	const auto DogBite = CreatureBiteInfo(Vector3i(0, 0, 100), 3);
 	static BYTE DogAnims[] = { 20, 21, 22, 20 };
 
 	void InitializeTr5Dog(short itemNumber)
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR5
 			// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
 	void Tr5DogControl(short itemNumber)
@@ -54,7 +54,7 @@ namespace TEN::Entities::Creatures::TR5
 			else if (item->Animation.ActiveState != 11)
 			{
 				item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 11;
 			}
 		}
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			short random = GetRandomControl();
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

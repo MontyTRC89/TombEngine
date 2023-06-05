@@ -8,9 +8,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -21,7 +21,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
-	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
+	const auto BigBeetleBite = CreatureBiteInfo(Vector3i::Zero, 12);
 	const auto BigBeetleAttackJoints = std::vector<unsigned int>{ 5, 6 };
 
 	enum BigBeetleState

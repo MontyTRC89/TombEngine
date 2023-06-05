@@ -9,26 +9,25 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "RenderView/RenderView.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 
 	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
+		{ 
 			RendererRoom* room = &m_rooms[i];
-
-			room->ItemsToDraw.clear();
+			                         
+			room->ItemsToDraw.clear();        
 			room->EffectsToDraw.clear();
 			room->TransparentFacesToDraw.clear();
 			room->StaticsToDraw.clear();
@@ -44,24 +43,62 @@ namespace TEN::Renderer
 			}
 		}
 
-		GetVisibleRooms(NO_ROOM, renderView.camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
+		GetVisibleRooms(NO_ROOM, renderView.Camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 
-		m_invalidateCache = false;
+		m_invalidateCache = false; 
 
 		// Prepae the real DX scissor test rectangle
-		for (auto room : renderView.roomsToDraw)
+		for (auto room : renderView.RoomsToDraw)
 		{
 			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
 			room->ClipBounds.bottom = (1.0f - room->ViewPort.y) * m_screenHeight * 0.5f;
 			room->ClipBounds.right = (room->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
-		}
+		} 
 
-		// Sort statics for doing instancing later
-		std::sort(renderView.StaticsToDraw.begin(), renderView.StaticsToDraw.end(), [](const RendererStatic* a, const RendererStatic* b)
+		// Collect fog bulbs
+		vector<RendererFogBulb> tempFogBulbs;
+		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
+
+		for (auto& room : m_rooms)     
+		{
+			if (!g_Level.Rooms[room.RoomNumber].Active())
+				continue;
+
+			for (auto& light : room.Lights)
 			{
-				return a->ObjectNumber < b->ObjectNumber;
-			});
+				if (light.Type != LIGHT_TYPE_FOG_BULB)
+					continue;
+
+				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
+				{
+					RendererFogBulb bulb;
+					
+					bulb.Position = light.Position;
+					bulb.Density = light.Intensity;
+					bulb.Color = light.Color;
+					bulb.Radius = light.Out;
+					bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
+					bulb.Distance = bulb.FogBulbToCameraVector.Length();
+
+					tempFogBulbs.push_back(bulb);
+				}
+			}
+		}
+		
+		std::sort(
+			tempFogBulbs.begin(),
+			tempFogBulbs.end(),
+			[](RendererFogBulb a, RendererFogBulb b)
+			{
+				return a.Distance < b.Distance;
+			}
+		);
+
+		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
+		{
+			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+		}
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -80,7 +117,7 @@ namespace TEN::Renderer
 		{
 			if (!door->Visited)
 			{
-				p[i] = Vector4::Transform(door->AbsoluteVertices[i], renderView.camera.ViewProjection);
+				p[i] = Vector4::Transform(door->AbsoluteVertices[i], renderView.Camera.ViewProjection);
 				if (p[i].w > 0.0f)
 				{
 					p[i].x *= (1.0f / p[i].w);
@@ -184,7 +221,7 @@ namespace TEN::Renderer
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
 			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
-				   " was reached with room " + std::to_string(to), LogLevel::Warning);
+				   " was reached with room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
 			return;
 		}
 
@@ -197,7 +234,7 @@ namespace TEN::Renderer
 		{
 			room->Visited = true;
 
-			renderView.roomsToDraw.push_back(room);
+			renderView.RoomsToDraw.push_back(room);
 
 			CollectLightsForRoom(to, renderView);
 
@@ -317,7 +354,7 @@ namespace TEN::Renderer
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < cnt; i++)
 					// Blow up sphere radius by half for cases of too small calculated spheres.
-					if (renderView.camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
+					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
 				
 				if (!inFrustum)
@@ -352,7 +389,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() == 0)
+		if (r->mesh.empty())
 		{
 			return;
 		}
@@ -386,13 +423,13 @@ namespace TEN::Renderer
 
 			auto& obj = *m_staticObjects[mesh->ObjectNumber];
 
-			if (obj.ObjectMeshes.size() == 0)
+			if (obj.ObjectMeshes.empty())
 			{
 				continue;
 			}
 
 			auto length = Vector3(mesh->VisibilityBox.Extents).Length();
-			if (!renderView.camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, length))
+			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, length))
 			{
 				continue;
 			}
@@ -420,12 +457,12 @@ namespace TEN::Renderer
 			// At this point, we are sure that we must draw the static mesh
 			room.StaticsToDraw.push_back(mesh);
 
-			if (renderView.SortedStatics.find(mesh->ObjectNumber) == renderView.SortedStatics.end())
+			if (renderView.SortedStaticsToDraw.find(mesh->ObjectNumber) == renderView.SortedStaticsToDraw.end())
 			{
 				std::vector<RendererStatic*> vec;
-				renderView.SortedStatics.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+				renderView.SortedStaticsToDraw.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
 			}
-			renderView.SortedStatics[mesh->ObjectNumber].push_back(mesh);
+			renderView.SortedStaticsToDraw[mesh->ObjectNumber].push_back(mesh);
 		}
 	}
 
@@ -482,7 +519,7 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				RendererRoom& currentRoom = m_rooms[roomToCheck];
-				int numLights = currentRoom.Lights.size();
+				int numLights = (int)currentRoom.Lights.size();
 
 				for (int j = 0; j < numLights; j++)
 				{
@@ -722,13 +759,13 @@ namespace TEN::Renderer
 			}
 
 			// Light buffer is full
-			if (renderView.lightsToDraw.size() >= NUM_LIGHTS_PER_BUFFER)
+			if (renderView.LightsToDraw.size() >= NUM_LIGHTS_PER_BUFFER)
 			{
 				break;
 			}
 
 			// Light already on a list
-			if (std::find(renderView.lightsToDraw.begin(), renderView.lightsToDraw.end(), light) != renderView.lightsToDraw.end())
+			if (std::find(renderView.LightsToDraw.begin(), renderView.LightsToDraw.end(), light) != renderView.LightsToDraw.end())
 			{
 				continue;
 			}
@@ -739,7 +776,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			renderView.lightsToDraw.push_back(light);
+			renderView.LightsToDraw.push_back(light);
 			room.LightsToDraw.push_back(light);
 		}
 	}

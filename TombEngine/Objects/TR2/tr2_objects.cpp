@@ -4,9 +4,10 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/missile.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
@@ -145,7 +146,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -163,7 +163,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -181,7 +180,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -197,7 +195,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 25;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -315,10 +312,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_KNIFETHROWER_KNIFE];
-	if (obj->loaded)
-		obj->control = KnifeControl;
-
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
 	{
@@ -401,7 +394,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, "ID_SWORD_GUARDIAN", "ID_SWORD_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SWORD_GUARDIAN_STATUE, GetObjectName(ID_SWORD_GUARDIAN));
 		obj->Initialize = InitializeSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
@@ -419,7 +412,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SPEAR_GUARDIAN];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, "ID_SPEAR_GUARDIAN", "ID_SPEAR_GUARDIAN_STATUE");
+		CheckIfSlotExists(ID_SPEAR_GUARDIAN_STATUE, GetObjectName(ID_SPEAR_GUARDIAN));
 		obj->Initialize = InitializeSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
@@ -437,7 +430,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_FRONT", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_DRAGON_FRONT));
 		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -452,7 +445,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_DRAGON_BACK", "ID_MARCO_BARTOLI");
+		CheckIfSlotExists(ID_MARCO_BARTOLI, GetObjectName(ID_DRAGON_BACK));
 		obj->Initialize = InitializeCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -463,7 +456,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, "ID_MARCO_BARTOLI", "ID_DRAGON_BACK");
+		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_MARCO_BARTOLI));
 		obj->Initialize = InitializeBartoli;
 		obj->control = BartoliControl;
 	}
@@ -478,22 +471,23 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->LotType = LotType::SnowmobileGun;
 		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SNOWMOBILE_GUN, GetObjectName(ID_SNOWMOBILE_DRIVER));
 		obj->Initialize = InitializeSkidooMan;
 		obj->control = SkidooManControl;
-		obj->HitPoints = 1;
 		obj->SetupHitEffect(true);
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
-	
+	InitProjectile(obj, ControlMissile, ID_KNIFETHROWER_KNIFE);
 }
 
 static void StartTrap(ObjectInfo* obj)

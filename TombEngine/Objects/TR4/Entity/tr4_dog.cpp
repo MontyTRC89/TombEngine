@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.55));
 	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1));
 	
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
+	const auto DogBite = CreatureBiteInfo(Vector3i(0, 0, 100), 3);
 	const auto DogJumpAttackJoints = std::vector<unsigned int>{ 3, 6, 9, 10, 13, 14 };
 	const auto DogBiteAttackJoints = std::vector<unsigned int>{ 3, 6 };
 
@@ -106,7 +106,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.AnimNumber == object->animIndex + 1)
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
-				SetAnimation(item, DogDeathAnims[Random::GenerateInt(0, DogDeathAnims.size() - 1)]);
+				SetAnimation(item, DogDeathAnims[Random::GenerateInt(0, (int)DogDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

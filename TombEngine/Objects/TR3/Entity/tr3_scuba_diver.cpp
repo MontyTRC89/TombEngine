@@ -10,16 +10,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
-
 	constexpr auto SCUBA_DIVER_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto ScubaGunBite = BiteInfo(Vector3(17.0f, 164.0f, 44.0f), 18);
+	const auto ScubaGunBite = CreatureBiteInfo(Vector3i(17, 164, 44), 18);
 
 	enum ScubaDiverState
 	{

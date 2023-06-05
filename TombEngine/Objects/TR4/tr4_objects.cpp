@@ -5,9 +5,9 @@
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 
 // Creatures
@@ -204,7 +204,6 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
-			obj->biteOffset = 9;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
@@ -226,7 +225,6 @@ namespace TEN::Entities
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
 			obj->pivotLength = 50;
-			obj->biteOffset = 9;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
@@ -243,7 +241,6 @@ namespace TEN::Entities
 			obj->control = SasControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 10;
 			obj->HitPoints = 40;
 			obj->pivotLength = 50;
 			obj->radius = 102;
@@ -400,7 +397,6 @@ namespace TEN::Entities
 			obj->control = TroopsControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 11;
 			obj->HitPoints = 40;
 			obj->pivotLength = 50;
 			obj->radius = 102;
@@ -757,6 +753,13 @@ namespace TEN::Entities
 			obj->control = WraithTrapControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
+		}
+
+		for (int objectID = ID_WATERFALL1; objectID <= ID_WATERFALL6; objectID++)
+		{
+			obj = &Objects[objectID];
+			if (obj->loaded)
+				obj->control = nullptr;
 		}
 	}
 

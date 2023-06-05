@@ -15,10 +15,10 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/pickup/pickup.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Player;
@@ -310,7 +310,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		}
-		else if (IsHeld(In::Sprint) && player.Status.Stamina != 0)
+		else if (IsHeld(In::Sprint) && player.Status.Stamina > LARA_STAMINA_MIN)
 		{
 			item->Animation.TargetState = LS_SPRINT;
 		}

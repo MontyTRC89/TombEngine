@@ -7,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -16,7 +16,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto BARRACUDA_IDLE_ATTACK_RANGE		= SQUARE(BLOCK(0.67f));
 	constexpr auto BARRACUDA_SWIM_FAST_ATTACK_RANGE = SQUARE(BLOCK(0.34f));
 
-	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
+	const auto BarracudaBite = CreatureBiteInfo(Vector3i(2, -60, 121), 7);
 	const auto BarracudaAttackJoints = std::vector<unsigned int>{ 5, 6, 7 };
 
 	enum BarracudaState
@@ -70,7 +70,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != BARRACUDA_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + BARRACUDA_ANIM_DEATH_START;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BARRACUDA_STATE_DEATH;
 			}
 

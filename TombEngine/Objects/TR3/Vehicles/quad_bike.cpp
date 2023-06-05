@@ -14,29 +14,30 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	BiteInfo QuadBikeEffectsPositions[6] =
+	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		{ -56, -32, -380, 0	},
-		{ 56, -32, -380, 0 },
-		{ -8, 180, -48, 3 },
-		{ 8, 180, -48, 4 },
-		{ 90, 180, -32, 6 },
-		{ -90, 180, -32, 7 }
+		CreatureBiteInfo(Vector3i(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3i(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3i(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3i(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
 	};
-	const vector<VehicleMountType> QuadBikeMountTypes =
+
+	const std::vector<VehicleMountType> QuadBikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -1207,9 +1208,9 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i].meshNum, Vector3i(QuadBikeEffectsPositions[i].Position));
-
+				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i]);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
+
 				if (quadBikeItem->Animation.Velocity.z > 32)
 				{
 					if (quadBikeItem->Animation.Velocity.z < 64)

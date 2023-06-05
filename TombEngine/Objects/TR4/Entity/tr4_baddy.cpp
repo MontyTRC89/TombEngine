@@ -14,9 +14,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -54,8 +54,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(-5, 200, 50), 11);
+	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_IDLE;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_IDLE;
 			item->Animation.ActiveState = BADDY_STATE_IDLE;
 			return;
@@ -252,7 +252,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 1)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_RIGHT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_JUMP_RIGHT;
 			item->Animation.ActiveState = BADDY_STATE_JUMP_RIGHT;
 			return;
@@ -262,7 +262,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 2)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_ROLL_LEFT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_ROLL_LEFT;
 			item->Animation.ActiveState = BADDY_STATE_ROLL_LEFT;
 			return;
@@ -272,7 +272,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 3)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			return;
@@ -282,7 +282,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 4)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
@@ -294,7 +294,7 @@ namespace TEN::Entities::TR4
 		if (ocb > 100)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
@@ -303,7 +303,7 @@ namespace TEN::Entities::TR4
 			return;
 		}
 	
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
 	void BaddyControl(short itemNumber)
@@ -329,6 +329,9 @@ namespace TEN::Entities::TR4
 
 		// TODO: better add a second control routine for baddy 2 instead of mixing them?
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
+
+		if (creature->MuzzleFlash[0].Delay != 0)
+			creature->MuzzleFlash[0].Delay--;
 
 		bool roll = false;
 		bool jump = false;
@@ -419,14 +422,6 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		// Handle baddy firing.
-		if (creature->FiredWeapon)
-		{
-			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
-			creature->FiredWeapon--;
-		}
-
 		CollisionResult probe;
 
 		if (item->HitPoints <= 0)
@@ -475,14 +470,14 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_MONKEY_IDLE:
 			case BADDY_STATE_MONKEY_FORWARD:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_MONKEY_TO_FREEFALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BADDY_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity.z = 0;
 				break;
 
 			default:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = BADDY_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
 
@@ -690,7 +685,7 @@ namespace TEN::Entities::TR4
 					currentCreature->LOT.IsJumping = true;
 
 					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = GetAnimData(item).frameBase;
 					item->Animation.ActiveState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 
 					if (!canJump2Sectors)
@@ -868,7 +863,7 @@ namespace TEN::Entities::TR4
 				
 				if (Random::GenerateInt(0, 30) > 20 &&
 					objectNumber == ID_BADDY2 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
+					item->Animation.FrameNumber == GetAnimData(item).frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) && AI.distance < pow(SECTOR(3), 2) || height2 >= (height1 + CLICK(2))))
@@ -918,7 +913,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.ActiveState != BADDY_STATE_SWORD_HIT_FRONT ||
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
+					item->Animation.FrameNumber < GetAnimData(item).frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
@@ -935,8 +930,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.Test(BaddySwordAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < GetAnimData(item).frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 						{
 							DoDamage(creature->Enemy, 120);
 							CreatureEffect2(item, BaddySwordBite, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -945,7 +940,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd - 1)
 					currentCreature->Flags = 0;
 
 				break;
@@ -1078,7 +1073,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_CROUCH_PICKUP:
 				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != GetAnimData(item).frameBase + FRAME_BADDY_CROUCH_PICKUP)
 					break;
 
 				if (!currentCreature->Enemy)
@@ -1152,45 +1147,45 @@ namespace TEN::Entities::TR4
 				}
 				ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 
-				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
+				if (item->Animation.FrameNumber >= GetAnimData(item).frameBase + FRAME_BADDY_FIRE_MAX ||
+					item->Animation.FrameNumber == GetAnimData(item).frameBase + FRAME_BADDY_FIRE_MIN)
 				{
 					break;
 				}
 
-				creature->FiredWeapon = 1;
-
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
-				
+
 				if (!ShotLara(item, &AI, BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 
+				creature->MuzzleFlash[0].Bite = BaddyGunBite;
+				creature->MuzzleFlash[0].Delay = 2;
 				break;
 
 			default:
 				break;
 
 			case BADDY_STATE_HOLSTER_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + FRAME_BADDY_HOLSTER_GUN)
 					item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_EMPTY);
 
 				break;
 
 			case BADDY_STATE_DRAW_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_GUN)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + FRAME_BADDY_DRAW_GUN)
 					item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN);
 
 				break;
 
 			case BADDY_STATE_HOLSTER_SWORD:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + FRAME_BADDY_HOLSTER_SWORD)
 					item->SetMeshSwapFlags(MESHSWAPFLAGS_BADDY_EMPTY);
 				
 				break;
 
 			case BADDY_STATE_DRAW_SWORD:
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
+				if (item->Animation.FrameNumber != GetAnimData(item).frameBase + FRAME_BADDY_DRAW_SWORD)
 					break;
 
 				if (item->ObjectNumber == ID_BADDY1)
@@ -1229,7 +1224,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber != (g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF))
+				if (item->Animation.FrameNumber != (GetAnimData(item).frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF))
 					break;
 
 				currentCreature->LOT.IsJumping = true;
