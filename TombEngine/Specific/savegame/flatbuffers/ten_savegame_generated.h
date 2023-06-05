@@ -599,6 +599,7 @@ flatbuffers::Offset<Room> CreateRoom(flatbuffers::FlatBufferBuilder &_fbb, const
 
 struct ItemT : public flatbuffers::NativeTable {
   typedef Item TableType;
+  int32_t anim_object_id = 0;
   int32_t active_state = 0;
   int32_t anim_number = 0;
   int32_t frame_number = 0;
@@ -649,51 +650,55 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ItemBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ACTIVE_STATE = 4,
-    VT_ANIM_NUMBER = 6,
-    VT_FRAME_NUMBER = 8,
-    VT_IS_AIRBORNE = 10,
-    VT_REQUIRED_STATE = 12,
-    VT_TARGET_STATE = 14,
-    VT_VELOCITY = 16,
-    VT_FLOOR = 18,
-    VT_TOUCH_BITS = 20,
-    VT_MESH_BITS = 22,
-    VT_OBJECT_ID = 24,
-    VT_ROOM_NUMBER = 26,
-    VT_HIT_POINTS = 28,
-    VT_BOX_NUMBER = 30,
-    VT_TIMER = 32,
-    VT_COLOR = 34,
-    VT_FLAGS = 36,
-    VT_TRIGGER_FLAGS = 38,
-    VT_CARRIED_ITEM = 40,
-    VT_AFTER_DEATH = 42,
-    VT_ITEM_FLAGS = 44,
-    VT_POSE = 46,
-    VT_NEXT_ITEM = 48,
-    VT_NEXT_ITEM_ACTIVE = 50,
-    VT_ACTIVE = 52,
-    VT_STATUS = 54,
-    VT_HIT_STAUTS = 56,
-    VT_COLLIDABLE = 58,
-    VT_LOOKED_AT = 60,
-    VT_AI_BITS = 62,
-    VT_DATA_TYPE = 64,
-    VT_DATA = 66,
-    VT_BASE_MESH = 68,
-    VT_MESH_POINTERS = 70,
-    VT_EFFECT_TYPE = 72,
-    VT_EFFECT_LIGHT_COLOUR = 74,
-    VT_EFFECT_PRIMARY_COLOUR = 76,
-    VT_EFFECT_SECONDARY_COLOUR = 78,
-    VT_EFFECT_COUNT = 80,
-    VT_LUA_NAME = 82,
-    VT_LUA_ON_KILLED_NAME = 84,
-    VT_LUA_ON_HIT_NAME = 86,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 88,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 90
+    VT_ANIM_OBJECT_ID = 4,
+    VT_ACTIVE_STATE = 6,
+    VT_ANIM_NUMBER = 8,
+    VT_FRAME_NUMBER = 10,
+    VT_IS_AIRBORNE = 12,
+    VT_REQUIRED_STATE = 14,
+    VT_TARGET_STATE = 16,
+    VT_VELOCITY = 18,
+    VT_FLOOR = 20,
+    VT_TOUCH_BITS = 22,
+    VT_MESH_BITS = 24,
+    VT_OBJECT_ID = 26,
+    VT_ROOM_NUMBER = 28,
+    VT_HIT_POINTS = 30,
+    VT_BOX_NUMBER = 32,
+    VT_TIMER = 34,
+    VT_COLOR = 36,
+    VT_FLAGS = 38,
+    VT_TRIGGER_FLAGS = 40,
+    VT_CARRIED_ITEM = 42,
+    VT_AFTER_DEATH = 44,
+    VT_ITEM_FLAGS = 46,
+    VT_POSE = 48,
+    VT_NEXT_ITEM = 50,
+    VT_NEXT_ITEM_ACTIVE = 52,
+    VT_ACTIVE = 54,
+    VT_STATUS = 56,
+    VT_HIT_STAUTS = 58,
+    VT_COLLIDABLE = 60,
+    VT_LOOKED_AT = 62,
+    VT_AI_BITS = 64,
+    VT_DATA_TYPE = 66,
+    VT_DATA = 68,
+    VT_BASE_MESH = 70,
+    VT_MESH_POINTERS = 72,
+    VT_EFFECT_TYPE = 74,
+    VT_EFFECT_LIGHT_COLOUR = 76,
+    VT_EFFECT_PRIMARY_COLOUR = 78,
+    VT_EFFECT_SECONDARY_COLOUR = 80,
+    VT_EFFECT_COUNT = 82,
+    VT_LUA_NAME = 84,
+    VT_LUA_ON_KILLED_NAME = 86,
+    VT_LUA_ON_HIT_NAME = 88,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 90,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 92
   };
+  int32_t anim_object_id() const {
+    return GetField<int32_t>(VT_ANIM_OBJECT_ID, 0);
+  }
   int32_t active_state() const {
     return GetField<int32_t>(VT_ACTIVE_STATE, 0);
   }
@@ -895,6 +900,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_ANIM_OBJECT_ID) &&
            VerifyField<int32_t>(verifier, VT_ACTIVE_STATE) &&
            VerifyField<int32_t>(verifier, VT_ANIM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
@@ -1046,6 +1052,9 @@ struct ItemBuilder {
   typedef Item Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_anim_object_id(int32_t anim_object_id) {
+    fbb_.AddElement<int32_t>(Item::VT_ANIM_OBJECT_ID, anim_object_id, 0);
+  }
   void add_active_state(int32_t active_state) {
     fbb_.AddElement<int32_t>(Item::VT_ACTIVE_STATE, active_state, 0);
   }
@@ -1191,6 +1200,7 @@ struct ItemBuilder {
 
 inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t anim_object_id = 0,
     int32_t active_state = 0,
     int32_t anim_number = 0,
     int32_t frame_number = 0,
@@ -1274,6 +1284,7 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_frame_number(frame_number);
   builder_.add_anim_number(anim_number);
   builder_.add_active_state(active_state);
+  builder_.add_anim_object_id(anim_object_id);
   builder_.add_data_type(data_type);
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
@@ -1290,6 +1301,7 @@ struct Item::Traits {
 
 inline flatbuffers::Offset<Item> CreateItemDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t anim_object_id = 0,
     int32_t active_state = 0,
     int32_t anim_number = 0,
     int32_t frame_number = 0,
@@ -1343,6 +1355,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
   auto lua_on_collided_with_room_name__ = lua_on_collided_with_room_name ? _fbb.CreateString(lua_on_collided_with_room_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
+      anim_object_id,
       active_state,
       anim_number,
       frame_number,
@@ -7556,6 +7569,7 @@ inline ItemT *Item::UnPack(const flatbuffers::resolver_function_t *_resolver) co
 inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = anim_object_id(); _o->anim_object_id = _e; }
   { auto _e = active_state(); _o->active_state = _e; }
   { auto _e = anim_number(); _o->anim_number = _e; }
   { auto _e = frame_number(); _o->frame_number = _e; }
@@ -7610,6 +7624,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ItemT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _anim_object_id = _o->anim_object_id;
   auto _active_state = _o->active_state;
   auto _anim_number = _o->anim_number;
   auto _frame_number = _o->frame_number;
@@ -7656,6 +7671,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _lua_on_collided_with_room_name = _o->lua_on_collided_with_room_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_room_name);
   return TEN::Save::CreateItem(
       _fbb,
+      _anim_object_id,
       _active_state,
       _anim_number,
       _frame_number,
