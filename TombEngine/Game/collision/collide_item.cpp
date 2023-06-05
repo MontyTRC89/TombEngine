@@ -108,6 +108,9 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	// Collect all the rooms where to check
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
+		if (!g_Level.Rooms[i].Active())
+			continue;
+
 		auto* room = &g_Level.Rooms[i];
 
 		if (collidedMeshes)

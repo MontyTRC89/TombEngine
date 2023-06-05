@@ -116,6 +116,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
+	m_cbSky = CreateConstantBuffer<CSkyBuffer>();
 
 	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
@@ -229,6 +230,83 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 
 	InitializeGameBars();
 	initQuad(m_device.Get());
+	InitializeSky();
+}
+
+void TEN::Renderer::Renderer11::InitializeSky()
+{
+	RendererVertex vertices[SKY_VERTICES_COUNT];
+	int indices[SKY_INDICES_COUNT];
+	int size = SKY_SIZE;
+
+	int lastVertex = 0;
+	int lastIndex = 0;
+
+	for (int x = 0; x < SKY_TILES_COUNT; x++)
+	{
+		for (int z = 0; z < SKY_TILES_COUNT; z++)
+		{
+			indices[lastIndex + 0] = lastVertex + 0;
+			indices[lastIndex + 1] = lastVertex + 1;
+			indices[lastIndex + 2] = lastVertex + 2;
+			indices[lastIndex + 3] = lastVertex + 0;
+			indices[lastIndex + 4] = lastVertex + 2;
+			indices[lastIndex + 5] = lastVertex + 3;
+
+			lastIndex += 6;
+
+			vertices[lastVertex].Position.x = -size / 2.0f + x * 512.0f;
+			vertices[lastVertex].Position.y = 0.0f;
+			vertices[lastVertex].Position.z = -size / 2.0f + (z + 1) * 512.0f;
+			vertices[lastVertex].UV.x = x / 20.0f;
+			vertices[lastVertex].UV.y = (z + 1) / 20.0f;
+			vertices[lastVertex].Color.x = 1.0f;
+			vertices[lastVertex].Color.y = 1.0f;
+			vertices[lastVertex].Color.z = 1.0f;
+			vertices[lastVertex].Color.w = 1.0f;
+
+			lastVertex++;
+
+			vertices[lastVertex].Position.x = -size / 2.0f + (x + 1) * 512.0f;
+			vertices[lastVertex].Position.y = 0.0f;
+			vertices[lastVertex].Position.z = -size / 2.0f + (z + 1) * 512.0f;
+			vertices[lastVertex].UV.x = (x + 1) / 20.0f;
+			vertices[lastVertex].UV.y = (z + 1) / 20.0f;
+			vertices[lastVertex].Color.x = 1.0f;
+			vertices[lastVertex].Color.y = 1.0f;
+			vertices[lastVertex].Color.z = 1.0f;
+			vertices[lastVertex].Color.w = 1.0f;
+
+			lastVertex++;
+
+			vertices[lastVertex].Position.x = -size / 2.0f + (x + 1) * 512.0f;
+			vertices[lastVertex].Position.y = 0.0f;
+			vertices[lastVertex].Position.z = -size / 2.0f + z * 512.0f;
+			vertices[lastVertex].UV.x = (x + 1) / 20.0f;
+			vertices[lastVertex].UV.y = z / 20.0f;
+			vertices[lastVertex].Color.x = 1.0f;
+			vertices[lastVertex].Color.y = 1.0f;
+			vertices[lastVertex].Color.z = 1.0f;
+			vertices[lastVertex].Color.w = 1.0f;
+
+			lastVertex++;
+
+			vertices[lastVertex].Position.x = -size / 2.0f + x * 512.0f;
+			vertices[lastVertex].Position.y = 0.0f;
+			vertices[lastVertex].Position.z = -size / 2.0f + z * 512.0f;
+			vertices[lastVertex].UV.x = x / 20.0f;
+			vertices[lastVertex].UV.y = z / 20.0f;
+			vertices[lastVertex].Color.x = 1.0f;
+			vertices[lastVertex].Color.y = 1.0f;
+			vertices[lastVertex].Color.z = 1.0f;
+			vertices[lastVertex].Color.w = 1.0f;
+
+			lastVertex++;
+		}
+	}
+
+	m_skyVertexBuffer = VertexBuffer(m_device.Get(), SKY_VERTICES_COUNT, vertices);
+	m_skyIndexBuffer = IndexBuffer(m_device.Get(), SKY_INDICES_COUNT, indices);
 }
 
 void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool reset)
@@ -327,7 +405,7 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
-	if (!std::filesystem::exists(fontPath))
+	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), fontPath.c_str());

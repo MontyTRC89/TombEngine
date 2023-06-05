@@ -66,7 +66,7 @@ namespace TEN::Utils
 					// it means this is a valid asset folder.
 
 					auto testDir = result + (useCustomSubdirectory ? "/" : "") + testPath;
-					if (std::filesystem::exists(testDir))
+					if (std::filesystem::is_regular_file(testDir))
 						return result;
 				}
 			}

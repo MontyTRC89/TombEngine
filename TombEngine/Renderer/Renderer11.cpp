@@ -278,7 +278,7 @@ namespace TEN::Renderer
 		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)
+		switch (samplerType)  
 		{
 		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();

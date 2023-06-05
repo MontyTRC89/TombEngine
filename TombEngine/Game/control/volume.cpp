@@ -191,7 +191,7 @@ namespace TEN::Control::Volumes
 	{
 		std::string nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
 
-		if (!std::filesystem::exists(nodeScriptPath))
+		if (!std::filesystem::is_directory(nodeScriptPath))
 			return;
 		
 		std::vector<std::string> nodeCatalogs;

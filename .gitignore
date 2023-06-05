@@ -22,3 +22,4 @@ packages/
 *.trc
 *.str
 *.ten
+Logs/
