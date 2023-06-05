@@ -519,9 +519,9 @@ namespace TEN::Renderer
 			gameCamera.Camera.WorldPosition.z,
 			1.0f);
 		auto cameraDir = Vector4(
-			gameCamera.camera.WorldDirection.x,
-			gameCamera.camera.WorldDirection.y,
-			gameCamera.camera.WorldDirection.z,
+			gameCamera.Camera.WorldDirection.x,
+			gameCamera.Camera.WorldDirection.y,
+			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
 		// Point is behind camera; return nullopt.

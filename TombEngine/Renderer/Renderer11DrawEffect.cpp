@@ -1095,7 +1095,7 @@ namespace TEN::Renderer
 		{
 		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD:
 		{
-			auto cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
 			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
