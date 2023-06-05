@@ -397,12 +397,11 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[(int)mode].Channel);
 	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0)
 	{
-		// Same track is incoming with zero playhead, ignore it.
-		if (position == 0)
-			return;
-
-		// Same track is incoming with different playhead, restart it with a new position.
-		StopSoundTrack(mode, SOUND_XFADETIME_CUTSOUND);
+		// Same track is incoming with different playhead, set it to a new position.
+		auto stream = BASS_Soundtrack[(int)mode].Channel;
+		if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
+			BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
+		return;
 	}
 
 	switch (mode)
