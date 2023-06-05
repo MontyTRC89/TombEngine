@@ -59,7 +59,7 @@ struct AnimData
 	std::vector<StateDispatchData> Dispatches = {};
 	
 	int NextAnimNumber	= 0;
-	int NextFrameNumber = 0; // g_Level.Frames index.
+	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Remove in animation refactors tier 5.
 	int NumCommands		= 0;
 	int CommandIndex	= 0;
 
@@ -70,9 +70,15 @@ struct AnimData
 
 struct AnimFrameInterpData
 {
-	const AnimFrame* FramePtr0 = nullptr;
-	const AnimFrame* FramePtr1 = nullptr;
+	const AnimFrame& Frame0;
+	const AnimFrame& Frame1;
 	float Alpha = 0.0f;
+
+	AnimFrameInterpData(const AnimFrame& frame0, const AnimFrame& frame1, float alpha)
+		: Frame0(frame0), Frame1(frame1)
+	{
+		Alpha = alpha;
+	}
 };
 
 struct BoneMutator
@@ -135,10 +141,10 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
-Vector3i   GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i   GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i   GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
-Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
+Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
+Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 
 Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
 Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);

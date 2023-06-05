@@ -156,18 +156,18 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			auto& frame = g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
-			auto shotgunFrameData = AnimFrameInterpData{ &frame, &frame, 0.0f };
-			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
+			const auto& frameLeft = g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
+			auto frameDataLeft = AnimFrameInterpData(frameLeft, frameLeft, 0.0f);
+			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			frame = g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
-			shotgunFrameData = AnimFrameInterpData{ &frame, &frame, 0.0f };
-			UpdateAnimation(&rItem, playerObject, shotgunFrameData, mask);
+			const auto& frameRight = g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
+			auto frameDataRight = AnimFrameInterpData(frameRight, frameRight, 0.0f);
+			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
 
 		break;
@@ -176,13 +176,13 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		{
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto revolverFrameData = AnimFrameInterpData{ &leftArmFrame, &leftArmFrame, 0.0f };
-			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
+			auto frameDataLeft = AnimFrameInterpData(leftArmFrame, leftArmFrame, 0.0f);
+			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverFrameData = AnimFrameInterpData{ &rightArmFrame, &rightArmFrame, 0.0f };
-			UpdateAnimation(&rItem, playerObject, revolverFrameData, mask);
+			auto frameDataRight = AnimFrameInterpData(rightArmFrame, rightArmFrame, 0.0f);
+			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
 
 		break;
@@ -194,18 +194,18 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto pistolFrameData = AnimFrameInterpData{ &leftArmFrame, &leftArmFrame, 0.0f };
+			auto frameDataLeft = AnimFrameInterpData(leftArmFrame, leftArmFrame, 0.0f);
 
-			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);
+			UpdateAnimation(&rItem, playerObject, frameDataLeft, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFrameData = AnimFrameInterpData{ &rightArmFrame, &rightArmFrame, 0.0f };
+			auto frameDataRight = AnimFrameInterpData(rightArmFrame, rightArmFrame, 0.0f);
 			
-			UpdateAnimation(&rItem, playerObject, pistolFrameData, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, pistolFrameData, mask);
+			UpdateAnimation(&rItem, playerObject, frameDataRight, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
 
 		break;
@@ -227,13 +227,13 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 
-			auto frameData = GetFrameInterpData(tempItem);
-			UpdateAnimation(&rItem, playerObject, frameData, mask);
+			auto frameDataLeft = GetFrameInterpData(tempItem);
+			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frameData = GetFrameInterpData(*LaraItem);
-			UpdateAnimation(&rItem, playerObject, frameData, mask);
+			auto frameDataRight = GetFrameInterpData(*LaraItem);
+			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 			break;
 		}
 	}

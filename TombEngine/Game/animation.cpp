@@ -200,8 +200,21 @@ void AnimateItem(ItemInfo* item)
 		item->Animation.FrameNumber = animPtr->NextFrameNumber;
 
 		animPtr = &GetAnimData(*item);
+		
+		if (item->Animation.ActiveState != animPtr->ActiveState)
+		{
+			item->Animation.ActiveState =
+			item->Animation.TargetState = animPtr->ActiveState;
+		}
 
 		if (!item->IsLara())
+		{
+			if (item->Animation.RequiredState == item->Animation.ActiveState)
+				item->Animation.RequiredState = NO_STATE;
+		}
+
+		// NOTE: The two blocks above replace this one. Keeping legacy version here just in case. To be removed later. -- Sezz 2023.06.05
+		/*if (!item->IsLara())
 		{
 			if (item->Animation.ActiveState != animPtr->ActiveState)
 			{
@@ -215,19 +228,6 @@ void AnimateItem(ItemInfo* item)
 		else
 		{
 			item->Animation.ActiveState = animPtr->ActiveState;
-		}
-
-		// TODO: Theoretically this is better than above block, but it must be checked. -- Sezz 2023.03.31
-		/*if (item->Animation.ActiveState != animPtr->ActiveState)
-		{
-			item->Animation.ActiveState =
-			item->Animation.TargetState = animPtr->ActiveState;
-		}
-
-		if (!item->IsLara())
-		{
-			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
 		}*/
 	}
 
@@ -459,17 +459,17 @@ AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 	int frameNumber = GetFrameNumber(item);
 	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
 
-	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
-	int frame0 = (int)floor(frameNumberNorm);
-	int frame1 = (int)ceil(frameNumberNorm);
-	const auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
-	const auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
+	// Determine keyframe numbers defining interpolated frame and get references to them.
+	int frameNumber0 = (int)floor(frameNumberNorm);
+	int frameNumber1 = (int)ceil(frameNumberNorm);
+	const auto& frame0 = g_Level.Frames[anim.FramePtr + frameNumber0];
+	const auto& frame1 = g_Level.Frames[anim.FramePtr + frameNumber1];
 
 	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
 
 	// Return frame interpolation data.
-	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
+	return AnimFrameInterpData(frame0, frame1, alpha);
 }
 
 const AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber)
@@ -505,7 +505,7 @@ const AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 const AnimFrame& GetBestFrame(const ItemInfo& item)
 {
 	auto frameData = GetFrameInterpData(item);
-	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
+	return ((frameData.Alpha <= 0.5f) ? frameData.Frame0 : frameData.Frame1);
 }
 
 int GetFrameNumber(const ItemInfo& item)

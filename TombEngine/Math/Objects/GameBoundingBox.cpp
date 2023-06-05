@@ -33,11 +33,11 @@
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)
 		{
-			*this = frameData.FramePtr0->BoundingBox;
+			*this = frameData.Frame0.BoundingBox;
 		}
 		else
 		{
-			*this = frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha));
+			*this = frameData.Frame0.BoundingBox + (((frameData.Frame1.BoundingBox - frameData.Frame0.BoundingBox) * frameData.Alpha));
 		}
 	}
 
