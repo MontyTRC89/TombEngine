@@ -305,7 +305,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && lara->Status.Stamina)
+		else if (TrInput & IN_SPRINT && lara->Status.Stamina > LARA_STAMINA_MIN)
 			item->Animation.TargetState = LS_SPRINT;
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_RUN_FORWARD;
