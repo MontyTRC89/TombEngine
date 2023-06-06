@@ -16,6 +16,7 @@ struct PixelShaderInput
 	float4 PositionCopy: TEXCOORD2;
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
+	uint InstanceID : SV_InstanceID;
 };
 
 struct InstancedSprite
@@ -58,6 +59,7 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.PositionCopy = output.Position;
 	output.Color = Sprites[InstanceID].Color;
 	output.UV = float2(Sprites[InstanceID].UV[0][input.PolyIndex], Sprites[InstanceID].UV[1][input.PolyIndex]);
+	output.InstanceID  = InstanceID;
 
 	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
@@ -81,13 +83,11 @@ float Contrast(float Input, float ContrastPower)
 #endif
 }
 
-float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
+float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
-	//DoAlphaTest(output);
-
-	if (Sprites[InstanceID].IsSoftParticle == 1)
+	if (Sprites[input.InstanceID].IsSoftParticle == 1)
 	{
 		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 		input.PositionCopy.xy /= input.PositionCopy.w;
