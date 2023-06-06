@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Animation/Commands.h"
+#include "Game/Animation/Commands.h"
 
 #include "control/flipeffect.h"
 #include "Game/camera.h"
