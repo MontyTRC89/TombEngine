@@ -1,6 +1,5 @@
 #pragma once
 #include "Math/Math.h"
-#include "Objects/game_object_ids.h"
 
 using namespace TEN::Math;
 
@@ -18,7 +17,6 @@ struct ObjectInfo;
 // animIndex:  Index of animation in giant g_Level.Anims vector. Temporary.
 
 constexpr auto NO_STATE = -1;
-constexpr auto NO_ANIM	= -1;
 
 enum class AnimCommandType
 {
@@ -42,7 +40,7 @@ struct StateDispatchData
 {
 	int TargetState		= 0;
 	int NextAnimNumber	= 0;
-	int NextFrameNumber = 0; // g_Level.Frames index.
+	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.
 	std::pair<int, int> FrameRange = {};
 };
 
