@@ -63,7 +63,8 @@ namespace TEN::Animation
 		if (isFrameBased)
 			return;
 
-		if (Objects[item.ObjectNumber].intelligent && !item.AfterDeath)
+		const auto& object = Objects[item.ObjectNumber];
+		if (object.intelligent && !item.AfterDeath)
 			item.AfterDeath = 1;
 
 		item.Status = ITEM_DEACTIVATED;

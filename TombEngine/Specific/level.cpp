@@ -280,8 +280,9 @@ void LoadObjects()
 	}
 
 	int numCommands = ReadInt32();
-	g_Level.Commands.resize(numCommands);
-	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
+	auto animCommands = std::vector<short>{};
+	animCommands.resize(numCommands);
+	ReadBytes(animCommands.data(), sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
 	g_Level.Bones.resize(numBones);
@@ -354,7 +355,7 @@ void LoadObjects()
 			// Port commands. TODO: Update compiler in animation refactors tier 5 to do this natively.
 			if (commandCount != 0)
 			{
-				short* commandDataPtr = &g_Level.Commands[commandIndex];
+				short* commandDataPtr = &animCommands[commandIndex];
 				for (int i = commandCount; i > 0; i--)
 				{
 					auto animCommand = (AnimCommandType)commandDataPtr[0];
@@ -907,7 +908,6 @@ void FreeLevel()
 	MoveablesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
-	g_Level.Commands.resize(0);
 	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
 	g_Level.SoundDetails.resize(0);

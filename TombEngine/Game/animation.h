@@ -39,8 +39,14 @@ struct AnimData
 {
 	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-	int ActiveState	  = 0;
-	int Interpolation = 0;
+	int ActiveState		= 0;
+	int Interpolation	= 0;
+	int NextAnimNumber	= 0;
+	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.
+
+	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
+	Vector3 VelocityStart = Vector3::Zero;
+	Vector3 VelocityEnd	  = Vector3::Zero;
 
 	// TODO: Remove in animation refactors tier 5.
 	int FramePtr  = 0; // g_Level.Frames base index?
@@ -51,13 +57,6 @@ struct AnimData
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
-	int NextAnimNumber	= 0;
-	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.
-
-	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
-	Vector3 VelocityStart = Vector3::Zero;
-	Vector3 VelocityEnd	  = Vector3::Zero;
-
 	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
 	const AnimFrame&	GetClosestKeyframe(int frameNumber) const;
 };

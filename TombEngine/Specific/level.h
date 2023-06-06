@@ -97,8 +97,7 @@ struct LevelData
 	std::vector<int>	  Bones	   = {};
 
 	// Animation data
-	std::vector<AnimFrame> Frames	= {};
-	std::vector<short>	   Commands = {};
+	std::vector<AnimFrame> Frames = {};
 
 	// Collision data
 	std::vector<ROOM_INFO> Rooms	 = {};
