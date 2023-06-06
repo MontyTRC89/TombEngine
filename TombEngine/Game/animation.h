@@ -1,6 +1,8 @@
 #pragma once
+#include "Game/Animation/AnimationCommands.h"
 #include "Math/Math.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 enum GAME_OBJECT_ID : short;
@@ -17,17 +19,6 @@ struct ObjectInfo;
 // animIndex:  Index of animation in giant g_Level.Anims vector. Temporary.
 
 constexpr auto NO_STATE = -1;
-
-enum class AnimCommandType
-{
-	None,
-	MoveOrigin, // "Post-animation adjustment"
-	JumpVelocity,
-	AttackReady,
-	Deactivate,
-	SoundEffect,
-	Flipeffect
-};
 
 struct AnimFrame
 {
@@ -46,6 +37,8 @@ struct StateDispatchData
 
 struct AnimData
 {
+	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
+
 	int ActiveState	  = 0;
 	int Interpolation = 0;
 
@@ -53,11 +46,10 @@ struct AnimData
 	int FramePtr  = 0; // g_Level.Frames base index?
 	int frameBase = 0; // g_Level.Frames start index.
 	int frameEnd  = 0; // g_Level.Frames end index.
-	int NumCommands	 = 0;
-	int CommandIndex = 0; // g_Level.Commands index.
 
 	//std::vector<AnimFrame>		   Frames	  = {}; // TODO: Animation refactors tier 5.
 	std::vector<StateDispatchData> Dispatches = {};
+	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.

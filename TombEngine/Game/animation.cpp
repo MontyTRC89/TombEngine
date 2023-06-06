@@ -50,144 +50,12 @@ static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 	return ((frameCount > 0) ? frameCount : 1);
 }
 
-static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
+static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);
-
-	// No commands; return early.
-	if (anim.NumCommands == 0)
-		return;
-
-	// Get command data pointer.
-	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
-
-	for (int i = anim.NumCommands; i > 0; i--)
-	{
-		auto animCommand = (AnimCommandType)commandDataPtr[0];
-		commandDataPtr++;
-
-		switch (animCommand)
-		{
-		case AnimCommandType::MoveOrigin:
-			if (!isFrameBased)
-			{
-				TranslateItem(&item, item.Pose.Orientation.y, commandDataPtr[2], commandDataPtr[1], commandDataPtr[0]);
-
-				if (item.IsLara())
-				{
-					auto bounds = GameBoundingBox(&item);
-					UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -commandDataPtr[0], -commandDataPtr[2]);
-				}
-				else
-				{
-					UpdateItemRoom(item.Index);
-				}
-			}
-
-			commandDataPtr += 3;
-			break;
-
-		case AnimCommandType::JumpVelocity:
-			if (!isFrameBased)
-			{
-				item.Animation.IsAirborne = true;
-				item.Animation.Velocity.y = commandDataPtr[0];
-				item.Animation.Velocity.z = commandDataPtr[1];
-
-				if (item.IsLara())
-				{
-					auto& player = GetLaraInfo(item);
-
-					if (player.Context.CalcJumpVelocity != 0)
-					{
-						item.Animation.Velocity.y = player.Context.CalcJumpVelocity;
-						player.Context.CalcJumpVelocity = 0;
-					}
-				}
-			}
-
-			commandDataPtr += 2;
-			break;
-
-		case AnimCommandType::Deactivate:
-			if (!isFrameBased)
-			{
-				if (Objects[item.ObjectNumber].intelligent && !item.AfterDeath)
-					item.AfterDeath = 1;
-
-				item.Status = ITEM_DEACTIVATED;
-			}
-
-			break;
-
-		case AnimCommandType::AttackReady:
-			if (!isFrameBased && item.IsLara())
-			{
-				auto& player = GetLaraInfo(item);
-
-				if (player.Control.HandStatus != HandStatus::Special)
-					player.Control.HandStatus = HandStatus::Free;
-			}
-
-			break;
-
-		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-			{
-				if (!Objects[item.ObjectNumber].waterCreature)
-				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
-
-					if (item.IsLara())
-					{
-						auto& player = GetLaraInfo(item);
-
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-				}
-				else
-				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-				}
-			}
-
-			commandDataPtr += 2;
-			break;
-
-		case AnimCommandType::Flipeffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
-
-			commandDataPtr += 2;
-			break;
-
-		default:
-			break;
-		}
-	}
+	
+	for (const auto& command : anim.Commands)
+		command->Execute(item, isFrameBased);
 }
 
 void AnimateItem(ItemInfo* item)
@@ -198,7 +66,7 @@ void AnimateItem(ItemInfo* item)
 		item->HitStatus = false;
 	}
 
-	PerformAnimCommands(*item, true);
+	ExecuteAnimCommands(*item, true);
 	item->Animation.FrameNumber++;
 
 	const auto* animPtr = &GetAnimData(*item);
@@ -218,7 +86,7 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
 	{
-		PerformAnimCommands(*item, false);
+		ExecuteAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->NextAnimNumber;
 		item->Animation.FrameNumber = animPtr->NextFrameNumber;

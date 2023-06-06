@@ -5,7 +5,6 @@
 #include <zlib.h>
 
 #include "Game/animation.h"
-#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -346,8 +345,68 @@ void LoadObjects()
 			anim.frameEnd = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-			anim.NumCommands = ReadInt32();
-			anim.CommandIndex = ReadInt32();
+
+			int commandCount = ReadInt32();
+			anim.Commands.reserve(commandCount);
+
+			int commandIndex = ReadInt32();
+
+			// Port commands. TODO: Update compiler in animation refactors tier 5 to do this natively.
+			if (commandCount != 0)
+			{
+				short* commandDataPtr = &g_Level.Commands[commandIndex];
+				for (int i = commandCount; i > 0; i--)
+				{
+					auto animCommand = (AnimCommandType)commandDataPtr[0];
+					commandDataPtr++;
+
+					switch (animCommand)
+					{
+					case AnimCommandType::MoveOrigin:
+						{
+							auto command = std::make_unique<MoveOriginCommand>(Vector3(commandDataPtr[0], commandDataPtr[1], commandDataPtr[2]));
+							anim.Commands.push_back(std::move(command));
+
+							commandDataPtr += 3;
+						}
+						break;
+
+					case AnimCommandType::JumpVelocity:
+						{
+							auto command = std::make_unique<JumpVelocityCommand>(Vector3(0.0f, commandDataPtr[0], commandDataPtr[1]));
+							anim.Commands.push_back(std::move(command));
+
+							commandDataPtr += 2;
+						}
+						break;
+
+					case AnimCommandType::AttackReady:
+						anim.Commands.push_back(std::make_unique<AttackReadyCommand>());
+						break;
+
+					case AnimCommandType::Deactivate:
+						anim.Commands.push_back(std::move(std::make_unique<DeactivateCommand>()));
+						break;
+
+					case AnimCommandType::SoundEffect:
+						{
+							auto command = std::make_unique<SoundEffectCommand>(commandDataPtr[1], commandDataPtr[0]);
+							anim.Commands.push_back(std::move(command));
+						}
+						break;
+
+					case AnimCommandType::Flipeffect:
+						{
+							auto command = std::make_unique<FlipeffectCommand>(commandDataPtr[1], commandDataPtr[0]);
+							anim.Commands.push_back(std::move(command));
+						}
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
 
 			// Load state dispatches.
 			int dispatchCount = ReadInt32();
