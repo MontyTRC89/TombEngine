@@ -1210,6 +1210,7 @@ namespace TEN::Entities::Vehicles
 			{
 				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i]);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
+
 				if (quadBikeItem->Animation.Velocity.z > 32)
 				{
 					if (quadBikeItem->Animation.Velocity.z < 64)
