@@ -279,11 +279,6 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int numCommands = ReadInt32();
-	auto animCommands = std::vector<short>{};
-	animCommands.resize(numCommands);
-	ReadBytes(animCommands.data(), sizeof(short) * numCommands);
-
 	int numBones = ReadInt32();
 	g_Level.Bones.resize(numBones);
 	ReadBytes(g_Level.Bones.data(), 4 * numBones);
@@ -319,6 +314,7 @@ void LoadObjects()
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
 
+	// Load moveables.
 	for (int i = 0; i < numModels; i++)
 	{
 		int objectID = ReadInt32();
@@ -347,68 +343,6 @@ void LoadObjects()
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
 
-			int commandCount = ReadInt32();
-			anim.Commands.reserve(commandCount);
-
-			int commandIndex = ReadInt32();
-
-			// Port commands. TODO: Update compiler in animation refactors tier 5 to do this natively.
-			if (commandCount != 0)
-			{
-				short* commandDataPtr = &animCommands[commandIndex];
-				for (int i = commandCount; i > 0; i--)
-				{
-					auto animCommand = (AnimCommandType)commandDataPtr[0];
-					commandDataPtr++;
-
-					switch (animCommand)
-					{
-					case AnimCommandType::MoveOrigin:
-						{
-							auto command = std::make_unique<MoveOriginCommand>(Vector3(commandDataPtr[0], commandDataPtr[1], commandDataPtr[2]));
-							anim.Commands.push_back(std::move(command));
-
-							commandDataPtr += 3;
-						}
-						break;
-
-					case AnimCommandType::JumpVelocity:
-						{
-							auto command = std::make_unique<JumpVelocityCommand>(Vector3(0.0f, commandDataPtr[0], commandDataPtr[1]));
-							anim.Commands.push_back(std::move(command));
-
-							commandDataPtr += 2;
-						}
-						break;
-
-					case AnimCommandType::AttackReady:
-						anim.Commands.push_back(std::make_unique<AttackReadyCommand>());
-						break;
-
-					case AnimCommandType::Deactivate:
-						anim.Commands.push_back(std::move(std::make_unique<DeactivateCommand>()));
-						break;
-
-					case AnimCommandType::SoundEffect:
-						{
-							auto command = std::make_unique<SoundEffectCommand>(commandDataPtr[1], commandDataPtr[0]);
-							anim.Commands.push_back(std::move(command));
-						}
-						break;
-
-					case AnimCommandType::Flipeffect:
-						{
-							auto command = std::make_unique<FlipeffectCommand>(commandDataPtr[1], commandDataPtr[0]);
-							anim.Commands.push_back(std::move(command));
-						}
-						break;
-
-					default:
-						break;
-					}
-				}
-			}
-
 			// Load state dispatches.
 			int dispatchCount = ReadInt32();
 			anim.Dispatches.resize(dispatchCount);
@@ -419,6 +353,63 @@ void LoadObjects()
 				dispatch.NextFrameNumber = ReadInt32();
 				dispatch.FrameRange.first = ReadInt32();
 				dispatch.FrameRange.second = ReadInt32();
+			}
+
+			int commandCount = ReadInt32();
+			int commandDataSize = ReadInt32();
+
+			// Load commands.
+			if (commandCount != 0)
+			{
+				anim.Commands.reserve(commandCount);
+
+				auto animCommands = std::vector<short>{};
+				animCommands.resize(commandDataSize);
+				ReadBytes(animCommands.data(), sizeof(short) * commandDataSize);
+
+				short* commandDataPtr = &animCommands.front();
+				for (int i = 0; i < commandCount; i++)
+				{
+					auto animCommand = (AnimCommandType)commandDataPtr[0];
+					commandDataPtr++;
+
+					auto command = std::unique_ptr<AnimCommand>{};
+					switch (animCommand)
+					{
+					case AnimCommandType::MoveOrigin:
+						command = std::make_unique<MoveOriginCommand>(Vector3(commandDataPtr[0], commandDataPtr[1], commandDataPtr[2]));
+						commandDataPtr += 3;
+						break;
+
+					case AnimCommandType::JumpVelocity:
+						command = std::make_unique<JumpVelocityCommand>(Vector3(0.0f, commandDataPtr[0], commandDataPtr[1]));
+						commandDataPtr += 2;
+						break;
+
+					case AnimCommandType::AttackReady:
+						command = std::make_unique<AttackReadyCommand>();
+						break;
+
+					case AnimCommandType::Deactivate:
+						command = std::make_unique<DeactivateCommand>();
+						break;
+
+					case AnimCommandType::SoundEffect:
+						command = std::make_unique<SoundEffectCommand>(commandDataPtr[1], commandDataPtr[0]);
+						commandDataPtr += 2;
+						break;
+
+					case AnimCommandType::Flipeffect:
+						command = std::make_unique<FlipeffectCommand>(commandDataPtr[1], commandDataPtr[0]);
+						commandDataPtr += 2;
+						break;
+
+					default:
+						continue;
+					}
+
+					anim.Commands.push_back(std::move(command));
+				}
 			}
 		}
 
