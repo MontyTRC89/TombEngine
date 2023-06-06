@@ -36,8 +36,10 @@ Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
 Texture2D NormalTexture : register(t1);
+SamplerState NormalTextureSampler : register(s1);
 
 Texture2D CausticsTexture : register(t2);
+SamplerState CausticsTextureSampler : register(s2);
 
 struct PixelShaderOutput
 {
@@ -114,12 +116,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 	DoAlphaTest(output.Color);
 
-	float3 normal = UnpackNormalMap(NormalTexture.Sample(Sampler, input.UV).rgb);
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV).rgb);
 	normal = normalize(mul(normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
+#ifdef SHADOW_MAP
 	if (CastShadows)
 	{
         if (Light.Type == LT_POINT)
@@ -132,7 +135,8 @@ PixelShaderOutput PS(PixelShaderInput input)
             DoSpotLightShadow(input.WorldPosition, lighting);
         }
 	}
-	
+#endif
+
     DoBlobShadows(input.WorldPosition, lighting);
 
 	if (doLights)
@@ -175,9 +179,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 		blending /= float3(b, b, b);
 
 		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
-		float3 xaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 yaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 zaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
+		float3 xaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 yaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 zaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}

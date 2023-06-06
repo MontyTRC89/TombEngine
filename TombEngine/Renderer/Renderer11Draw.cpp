@@ -167,7 +167,7 @@ namespace TEN::Renderer
 
 			// Set texture
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
-			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
 
 			// Set camera matrices
 			Matrix view;
@@ -312,7 +312,7 @@ namespace TEN::Renderer
 				}
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 				DrawIndexedInstancedTriangles(bucket.NumIndices, gunShellsCount, bucket.StartIndex, 0);
 
@@ -598,7 +598,7 @@ namespace TEN::Renderer
 				SetBlendMode(bucket.BlendMode);
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 				DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
 
@@ -1276,7 +1276,7 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_animatedTextures[info->texture]),
 				SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_animatedTextures[info->texture]),
-				SAMPLER_NONE);
+				SAMPLER_ANISOTROPIC_CLAMP);
 
 			RendererAnimatedTextureSet& set = m_animatedTextureSets[info->texture];
 			m_stAnimated.NumFrames = set.NumTextures;
@@ -1298,7 +1298,7 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_roomTextures[info->texture]),
 				SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_roomTextures[info->texture]),
-				SAMPLER_NONE);
+				SAMPLER_ANISOTROPIC_CLAMP);
 		}
 
 		SetBlendMode(info->blendMode);
@@ -1348,7 +1348,7 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
 		            SAMPLER_ANISOTROPIC_CLAMP);
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
-		            SAMPLER_NONE);
+					SAMPLER_ANISOTROPIC_CLAMP);
 
 		if (resetPipeline)
 		{
@@ -1757,7 +1757,7 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
 		            SAMPLER_ANISOTROPIC_CLAMP);
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[info->bucket->Texture]),
-		            SAMPLER_NONE);
+					SAMPLER_ANISOTROPIC_CLAMP);
 
 		SetBlendMode(info->blendMode);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -1881,7 +1881,7 @@ namespace TEN::Renderer
 								&std::get<0>(m_staticsTextures[bucket.Texture]),
 								SAMPLER_ANISOTROPIC_CLAMP);
 							BindTexture(TEXTURE_NORMAL_MAP,
-								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
+								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 							DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
 
@@ -1965,7 +1965,14 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind pixel shaders
-		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
+		if (m_shadowLight != nullptr)
+		{
+			m_context->PSSetShader(m_psRooms_ShadowMap.Get(), nullptr, 0);
+		}
+		else
+		{
+			m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
+		}
 
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
@@ -1976,7 +1983,7 @@ namespace TEN::Renderer
 			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 			int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
-			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_ANISOTROPIC_CLAMP);
 
 			// Strange packing due to particular HLSL 16 bytes alignment requirements
 			RendererSprite* causticsSprite = &m_sprites[causticsFrame];
@@ -2103,7 +2110,7 @@ namespace TEN::Renderer
 								            &std::get<0>(m_animatedTextures[bucket.Texture]),
 								            SAMPLER_ANISOTROPIC_CLAMP);
 								BindTexture(TEXTURE_NORMAL_MAP,
-								            &std::get<1>(m_animatedTextures[bucket.Texture]), SAMPLER_NONE);
+								            &std::get<1>(m_animatedTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
@@ -2130,7 +2137,7 @@ namespace TEN::Renderer
 								BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_roomTextures[bucket.Texture]),
 								            SAMPLER_ANISOTROPIC_CLAMP);
 								BindTexture(TEXTURE_NORMAL_MAP,
-								            &std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_NONE);
+								            &std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -2238,7 +2245,7 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
 						SAMPLER_ANISOTROPIC_CLAMP);
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-						SAMPLER_NONE);
+						SAMPLER_ANISOTROPIC_CLAMP);
 
 					// Always render horizon as alpha-blended surface
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);
@@ -2313,7 +2320,7 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
 				            SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-				            SAMPLER_NONE);
+					SAMPLER_ANISOTROPIC_CLAMP);
 
 				for (int pass = 0; pass < passes; pass++)
 				{

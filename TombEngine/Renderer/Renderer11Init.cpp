@@ -38,7 +38,8 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	// Load shaders
 	ComPtr<ID3D10Blob> blob;
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
-	   
+	const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
+
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
 
 	// Initialize input layout using the first vertex shader
@@ -61,6 +62,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	// TODO: If shader loading moves to a less hardcoded system we should take the opportunity to apply GetAssetPath more gracefully - squidshire 13/05/2023
 	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
 	m_psRooms = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
+	m_psRooms_ShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", &roomDefinesShadowMap[0], blob);
 	m_vsItems = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psItems = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsStatics = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_4_0", nullptr, blob);
