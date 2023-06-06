@@ -14,10 +14,6 @@ struct CreatureBiteInfo;
 struct ItemInfo;
 struct ObjectInfo;
 
-// NOTES:
-// animNumber: Relative animation number.
-// animIndex:  Index of animation in giant g_Level.Anims vector. Temporary.
-
 constexpr auto NO_STATE = -1;
 
 struct AnimFrame
