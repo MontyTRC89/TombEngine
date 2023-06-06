@@ -643,7 +643,7 @@ namespace TEN::Entities::Creatures::TR3
 			item->Animation.ActiveState == TONY_STATE_SHOOT_RIGHT_HAND ||
 			item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 		{
-			int bright = GetFrameNumber(item);
+			int bright = GetFrameNumber(*item);
 			if (bright > 16)
 				bright = 16;
 

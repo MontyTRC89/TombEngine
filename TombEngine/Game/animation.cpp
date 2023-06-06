@@ -528,11 +528,6 @@ int GetFrameNumber(const ItemInfo& item)
 	return (item.Animation.FrameNumber - anim.frameBase);
 }
 
-int GetFrameNumber(ItemInfo* item)
-{
-	return GetFrameNumber(*item);
-}
-
 int GetFrameIndex(ItemInfo* item, int frameNumber)
 {
 	int animNumber = item->Animation.AnimNumber;
@@ -542,16 +537,18 @@ int GetFrameIndex(ItemInfo* item, int frameNumber)
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);
-
 	return (anim.frameBase + frameNumber);
 }
 
-int GetFrameCount(int animIndex)
+int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
-	// TODO: Can't exist anymore.
-	const auto& anim = GetAnimData(ID_LARA, animIndex);
-
+	const auto& anim = GetAnimData(objectID, animNumber);
 	return (anim.frameEnd - anim.frameBase);
+}
+
+int GetFrameCount(const ItemInfo& item)
+{
+	return GetFrameCount(item.ObjectNumber, item.Animation.AnimNumber);
 }
 
 int GetNextAnimState(const ItemInfo& item)

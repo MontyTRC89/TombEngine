@@ -426,7 +426,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 			else if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON &&
-					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
+					item.Animation.FrameNumber >= (GetFrameCount(item) - 2))
 			{
 				// Charged state.
 				item.ItemFlags[4] = 1;
@@ -620,7 +620,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 			else if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON &&
-				item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
+				item.Animation.FrameNumber >= (GetFrameCount(item) - 2))
 			{
 				// Charged state.
 				item.ItemFlags[4] = 1;

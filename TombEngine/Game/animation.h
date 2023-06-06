@@ -131,11 +131,10 @@ const AnimFrame&	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame&	GetClosestKeyframe(const ItemInfo& item);
 
 int GetFrameNumber(const ItemInfo& item);
-int GetFrameNumber(ItemInfo* item); // Deprecated.
 int GetFrameIndex(ItemInfo* item, int frameNumber);
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
-
-int GetFrameCount(int animIndex);
+int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber);
+int GetFrameCount(const ItemInfo& item);
 
 int	 GetNextAnimState(const ItemInfo& item);
 int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);

@@ -641,8 +641,8 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetFrameNumber(item);
-		int length = GetFrameCount(item->Animation.AnimNumber);
+		int frame = GetFrameNumber(*item);
+		int length = GetFrameCount(*item);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
 		TranslateItem(item, 0, dPos, dPos);
@@ -671,8 +671,8 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetFrameNumber(item);
-		int length = GetFrameCount(item->Animation.AnimNumber);
+		int frame = GetFrameNumber(*item);
+		int length = GetFrameCount(*item);
 		int dPos = frame * CLICK(1) / length;
 
 		TranslateItem(item, 0, dPos, dPos);
@@ -688,8 +688,8 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during monkey to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
 	{
-		int frame = GetFrameNumber(item);
-		int numFrames = GetFrameCount(item->Animation.AnimNumber);
+		int frame = GetFrameNumber(*item);
+		int numFrames = GetFrameCount(*item);
 
 		float frac = (frame * 1.5f) / (float)(numFrames);
 		if (frac > 1.0f)
@@ -744,8 +744,8 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during concave slope to monkey transition.
 	else if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
 	{
-		int frame = GetFrameNumber(item);
-		int numFrames = GetFrameCount(item->Animation.AnimNumber);
+		int frame = GetFrameNumber(*item);
+		int numFrames = GetFrameCount(*item);
 
 		float frac = (frame * 1.25f) / (float)(numFrames);
 		if (frac > 1.0f)
