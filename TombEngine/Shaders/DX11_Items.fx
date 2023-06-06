@@ -45,8 +45,7 @@ Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
 Texture2D NormalTexture : register(t1);
-
-//TextureCube Reflection : register (t4);
+SamplerState NormalSampler : register(s1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
