@@ -1,7 +1,7 @@
 #pragma once
-#include "Objects/objectslist.h"
 #include "Game/control/box.h"
 #include "Math/Math.h"
+#include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
@@ -21,9 +21,9 @@ enum class LotType
 	HumanPlusJump,
 	HumanPlusJumpAndMonkey,
 	Flyer,
-	Blockable, // For large creatures such as trex and shiva.
-	Spider,    // Only 2 block vault allowed.
-	Ape,	   // Only 2 block vault allowed.
+	Blockable,	  // For large creatures such as trex and shiva.
+	Spider,		  // Only 2 block vault allowed.
+	Ape,		  // Only 2 block vault allowed.
 	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
@@ -80,32 +80,26 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)>										   Initialize;
-	std::function<void(short itemNumber)>										   control;
+	std::function<void(short itemNumber)> Initialize;
+	std::function<void(short itemNumber)> control;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
-	std::function<void(ItemInfo* item)>																									 drawRoutine;
+	std::function<void(ItemInfo* item)> drawRoutine;
 
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
 	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)>								   floorBorder;
-	std::function<int(short itemNumber)>								   ceilingBorder;
+	std::function<int(short itemNumber)> floorBorder;
+	std::function<int(short itemNumber)> ceilingBorder;
 
-	/// <summary>
-	/// ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
-	/// </summary>
-	/// <param name="boneNumber:">Mesh number - 1.</param>
-	/// <param name="flags:">JointRotationFlags enum.</param>
+	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
 	void SetBoneRotationFlags(int boneNumber, int flags)
 	{
 		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
 	}
 
-	/// <summary>
-	/// Set up hit effect for object based on its value.
-	/// </summary>
-	/// <param name="isAlive:">Use if object is alive but not intelligent to set up blood effects.</param>
+	// Set up hit effect for object based on its value.
+	// Use if object is alive but not intelligent to set up blood effects.
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
 		// Avoid some objects such as ID_SAS_DYING having None.
