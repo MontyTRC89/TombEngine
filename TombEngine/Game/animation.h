@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/Animation/AnimationCommands.h"
+#include "Game/Animation/Commands.h"
 #include "Math/Math.h"
 
 using namespace TEN::Animation;
