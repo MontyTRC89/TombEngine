@@ -97,6 +97,9 @@ void AnimateItem(ItemInfo* item)
 		{
 			item->Animation.ActiveState =
 			item->Animation.TargetState = animPtr->ActiveState;
+
+			// NOTE: Legacy code only set TargetState for the player.
+			// Remove this comment if no issues arise with new generic behaviour. -- Sezz 2023.06.07
 		}
 
 		if (!item->IsLara())
@@ -104,23 +107,6 @@ void AnimateItem(ItemInfo* item)
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
 				item->Animation.RequiredState = NO_STATE;
 		}
-
-		// NOTE: The two blocks above replace this one. Keeping legacy version here just in case. To be removed later. -- Sezz 2023.06.05
-		/*if (!item->IsLara())
-		{
-			if (item->Animation.ActiveState != animPtr->ActiveState)
-			{
-				item->Animation.ActiveState = animPtr->ActiveState;
-				item->Animation.TargetState = animPtr->ActiveState;
-			}
-
-			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
-		}
-		else
-		{
-			item->Animation.ActiveState = animPtr->ActiveState;
-		}*/
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
