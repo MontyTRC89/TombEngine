@@ -23,6 +23,8 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
+		m_visitedRoomsStack.clear();
+
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{ 
 			RendererRoom* room = &m_rooms[i];
@@ -47,7 +49,7 @@ namespace TEN::Renderer
 
 		m_invalidateCache = false; 
 
-		// Prepae the real DX scissor test rectangle
+		// Prepare the real DX scissor test rectangle
 		for (auto room : renderView.RoomsToDraw)
 		{
 			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
@@ -216,6 +218,18 @@ namespace TEN::Renderer
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
 		// NOTE by MontyTRC: I'd keep this as a failsafe solution for 0.00000001% of cases we could have problems
 
+		int stackSize = (int) m_visitedRoomsStack.size();
+		int stackMinIndex = std::max(0, (int)(stackSize - 5));
+
+		for (int i = stackSize - 1; i >= stackMinIndex; i--)
+		{
+			if (m_visitedRoomsStack[i] == to)
+			{
+				TENLog("Circle detected! Room " + std::to_string(to));
+				return;
+			}
+		}
+		
 		static constexpr int MAX_SEARCH_DEPTH = 64;
 		if (m_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
@@ -223,6 +237,8 @@ namespace TEN::Renderer
 				   " was reached with room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
 			return;
 		}
+
+		m_visitedRoomsStack.push_back(to);
 
 		m_numGetVisibleRoomsCalls++;
 
@@ -291,6 +307,8 @@ namespace TEN::Renderer
 				GetVisibleRooms(to, door->RoomNumber, clipPort, water, count + 1, onlyRooms, renderView);
 			}
 		}
+
+		m_visitedRoomsStack.pop_back();
 	}
 
 	void Renderer11::CollectItems(short roomNumber, RenderView& renderView)

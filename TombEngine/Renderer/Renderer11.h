@@ -303,6 +303,8 @@ namespace TEN::Renderer
 
 		Texture2DArray m_shadowMap;
 
+		std::vector<short> m_visitedRoomsStack;
+
 		// Shaders
 		ComPtr<ID3D11VertexShader> m_vsRooms;
 		ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
