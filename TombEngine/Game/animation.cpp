@@ -19,6 +19,30 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
+{
+	// Normalize animation's current frame number into keyframe range.
+	float frameNumberNorm = frameNumber / (float)Interpolation;
+
+	// Determine keyframe numbers defining interpolated frame and get references to them.
+	int frameNumber0 = (int)floor(frameNumberNorm);
+	int frameNumber1 = (int)ceil(frameNumberNorm);
+	const auto& frame0 = g_Level.Frames[FramePtr + frameNumber0];
+	const auto& frame1 = g_Level.Frames[FramePtr + frameNumber1];
+
+	// Calculate interpolation alpha between keyframes.
+	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
+
+	// Return frame interpolation data.
+	return AnimFrameInterpData(frame0, frame1, alpha);
+}
+
+const AnimFrame& AnimData::GetClosestKeyframe(int frameNumber) const
+{
+	auto frameData = GetFrameInterpData(frameNumber);
+	return ((frameData.Alpha <= 0.5f) ? frameData.Frame0 : frameData.Frame1);
+}
+
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 {
@@ -457,29 +481,11 @@ const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber)
 	return GetAnimData(*item, animNumber);
 }
 
-AnimFrameInterpData GetFrameInterpData(const AnimData& anim, int frameNumber)
-{
-	// Normalize animation's current frame number into keyframe range.
-	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
-
-	// Determine keyframe numbers defining interpolated frame and get references to them.
-	int frameNumber0 = (int)floor(frameNumberNorm);
-	int frameNumber1 = (int)ceil(frameNumberNorm);
-	const auto& frame0 = g_Level.Frames[anim.FramePtr + frameNumber0];
-	const auto& frame1 = g_Level.Frames[anim.FramePtr + frameNumber1];
-
-	// Calculate interpolation alpha between keyframes.
-	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
-
-	// Return frame interpolation data.
-	return AnimFrameInterpData(frame0, frame1, alpha);
-}
-
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 	int frameNumber = GetFrameNumber(item);
-	return GetFrameInterpData(anim, frameNumber);
+	return anim.GetFrameInterpData(frameNumber);
 }
 
 const AnimFrame& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
@@ -491,7 +497,7 @@ const AnimFrame& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	if (frameNumber > frameCount)
 		frameNumber = frameCount;
 
-	return GetClosestKeyframe(anim, frameNumber);
+	return anim.GetClosestKeyframe(frameNumber);
 }
 
 const AnimFrame& GetFrame(const ItemInfo& item, int animNumber, int frameNumber)
@@ -509,17 +515,11 @@ const AnimFrame& GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 	return GetFrame(objectID, animNumber, INT_MAX);
 }
 
-const AnimFrame& GetClosestKeyframe(const AnimData& anim, int frameNumber)
-{
-	auto frameData = GetFrameInterpData(anim, frameNumber);
-	return ((frameData.Alpha <= 0.5f) ? frameData.Frame0 : frameData.Frame1);
-}
-
 const AnimFrame& GetClosestKeyframe(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 	int frameNumber = GetFrameNumber(item);
-	return GetClosestKeyframe(anim, frameNumber);
+	return anim.GetClosestKeyframe(frameNumber);
 }
 
 int GetFrameNumber(const ItemInfo& item)

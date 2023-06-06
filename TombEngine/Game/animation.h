@@ -8,6 +8,7 @@ enum GAME_OBJECT_ID : short;
 class EulerAngles;
 class Pose;
 class Vector3i;
+struct AnimFrameInterpData;
 struct CreatureBiteInfo;
 struct ItemInfo;
 struct ObjectInfo;
@@ -54,18 +55,21 @@ struct AnimData
 	int FramePtr  = 0; // g_Level.Frames base index?
 	int frameBase = 0; // g_Level.Frames start index.
 	int frameEnd  = 0; // g_Level.Frames end index.
+	int NumCommands	 = 0;
+	int CommandIndex = 0; // g_Level.Commands index.
 
 	//std::vector<AnimFrame>		   Frames	  = {}; // TODO: Animation refactors tier 5.
 	std::vector<StateDispatchData> Dispatches = {};
 	
 	int NextAnimNumber	= 0;
-	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Remove in animation refactors tier 5.
-	int NumCommands		= 0;
-	int CommandIndex	= 0;
+	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.
 
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
+
+	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
+	const AnimFrame&	GetClosestKeyframe(int frameNumber) const;
 };
 
 struct AnimFrameInterpData
@@ -119,13 +123,11 @@ const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
 const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 
-AnimFrameInterpData GetFrameInterpData(const AnimData& anim, int frameNumber = 0);
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 const AnimFrame&	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 const AnimFrame&	GetFrame(const ItemInfo& item, int animNumber, int frameNumber = 0);
 const AnimFrame&	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame&	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&	GetClosestKeyframe(const AnimData& anim, int frameNumber = 0);
 const AnimFrame&	GetClosestKeyframe(const ItemInfo& item);
 
 int GetFrameNumber(const ItemInfo& item);
