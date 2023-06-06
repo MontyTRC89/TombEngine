@@ -548,7 +548,7 @@ int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 
 int GetFrameCount(const ItemInfo& item)
 {
-	return GetFrameCount(item.ObjectNumber, item.Animation.AnimNumber);
+	return GetFrameCount(item.Animation.AnimObjectID, item.Animation.AnimNumber);
 }
 
 int GetNextAnimState(const ItemInfo& item)
