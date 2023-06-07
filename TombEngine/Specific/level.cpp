@@ -283,34 +283,6 @@ void LoadObjects()
 	g_Level.Bones.resize(numBones);
 	ReadBytes(g_Level.Bones.data(), 4 * numBones);
 
-	int numFrames = ReadInt32();
-	g_Level.Frames.resize(numFrames);
-	for (int i = 0; i < numFrames; i++)
-	{
-		auto* frame = &g_Level.Frames[i];
-
-		frame->BoundingBox.X1 = ReadInt16();
-		frame->BoundingBox.X2 = ReadInt16();
-		frame->BoundingBox.Y1 = ReadInt16();
-		frame->BoundingBox.Y2 = ReadInt16();
-		frame->BoundingBox.Z1 = ReadInt16();
-		frame->BoundingBox.Z2 = ReadInt16();
-
-		// NOTE: Braces are necessary to ensure correct value init order.
-		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };
-
-		int numAngles = ReadInt16();
-		frame->BoneOrientations.resize(numAngles);
-		for (int j = 0; j < numAngles; j++)
-		{
-			auto* q = &frame->BoneOrientations[j];
-			q->x = ReadFloat();
-			q->y = ReadFloat();
-			q->z = ReadFloat();
-			q->w = ReadFloat();
-		}
-	}
-
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
 
@@ -342,6 +314,35 @@ void LoadObjects()
 			anim.frameEnd = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
+
+			// Load keyframes.
+			int frameCount = ReadInt32();
+			for (int i = 0; i < frameCount; i++)
+			{
+				auto keyframe = Keyframe{};
+
+				keyframe.BoundingBox.X1 = ReadInt32();
+				keyframe.BoundingBox.X2 = ReadInt32();
+				keyframe.BoundingBox.Y1 = ReadInt32();
+				keyframe.BoundingBox.Y2 = ReadInt32();
+				keyframe.BoundingBox.Z1 = ReadInt32();
+				keyframe.BoundingBox.Z2 = ReadInt32();
+
+				keyframe.Offset = ReadVector3();
+
+				int orientCount = ReadInt32();
+				keyframe.BoneOrientations.resize(orientCount);
+				for (auto& orient : keyframe.BoneOrientations)
+				{
+					orient.x = ReadFloat();
+					orient.y = ReadFloat();
+					orient.z = ReadFloat();
+					orient.w = ReadFloat();
+				}
+
+				// TODO: Remove g_Level.Frames in animation refactors tier 5 and store keyframes inside AnimData.
+				g_Level.Frames.push_back(keyframe);
+			}
 
 			// Load state dispatches.
 			int dispatchCount = ReadInt32();
