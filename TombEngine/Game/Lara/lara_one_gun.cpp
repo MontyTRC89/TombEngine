@@ -190,7 +190,6 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						break;
 
 					case LaraWeaponType::HarpoonGun:
-					
 						FireHarpoon(laraItem);
 
 						if (!(player.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
