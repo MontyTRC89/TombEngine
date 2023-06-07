@@ -55,7 +55,7 @@
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
-struct AnimFrameInterpData;
+struct KeyframeInterpData;
 struct CAMERA_INFO;
 struct RendererRectangle;
 

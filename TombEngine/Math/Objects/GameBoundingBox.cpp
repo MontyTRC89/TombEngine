@@ -24,7 +24,7 @@
 
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
-		*this = GetFrame(objectID, animNumber, frameNumber).BoundingBox;
+		*this = GetKeyframe(objectID, animNumber, frameNumber).BoundingBox;
 	}
 
 	// TODO: This shouldn't be a method. Make it a function in animation.cpp.
@@ -33,11 +33,11 @@
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)
 		{
-			*this = frameData.Frame0.BoundingBox;
+			*this = frameData.Keyframe0.BoundingBox;
 		}
 		else
 		{
-			*this = frameData.Frame0.BoundingBox + (((frameData.Frame1.BoundingBox - frameData.Frame0.BoundingBox) * frameData.Alpha));
+			*this = frameData.Keyframe0.BoundingBox + (((frameData.Keyframe1.BoundingBox - frameData.Keyframe0.BoundingBox) * frameData.Alpha));
 		}
 	}
 

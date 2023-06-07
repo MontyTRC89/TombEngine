@@ -207,7 +207,7 @@ namespace TEN::Entities::Generic
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PUSH:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber).BoundingBox.Z2;
+			displaceDepth = GetLastKeyframe(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber).BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
 			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
@@ -298,7 +298,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case LA_PUSHABLE_PULL:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber).BoundingBox.Z2;
+			displaceDepth = GetLastKeyframe(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber).BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
 			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)

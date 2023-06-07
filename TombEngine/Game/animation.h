@@ -16,7 +16,7 @@ struct ObjectInfo;
 
 constexpr auto NO_STATE = -1;
 
-struct AnimFrame
+struct Keyframe
 {
 	GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;
 	Vector3					Offset			 = Vector3::Zero;
@@ -49,21 +49,21 @@ struct AnimData
 	int frameBase = 0; // g_Level.Frames start index.
 	int frameEnd  = 0; // g_Level.Frames end index.
 
-	//std::vector<AnimFrame>		   Frames	  = {}; // TODO: Animation refactors tier 5.
+	//std::vector<Keyframe>		   Keyframes  = {}; // TODO: Animation refactors tier 5.
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
 	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
-	const AnimFrame&	GetClosestKeyframe(int frameNumber) const;
+	const Keyframe&		GetClosestKeyframe(int frameNumber) const;
 };
 
 struct AnimFrameInterpData
 {
-	const AnimFrame& Frame0;
-	const AnimFrame& Frame1;
+	const Keyframe& Keyframe0;
+	const Keyframe& Keyframe1;
 	float Alpha = 0.0f;
 
-	AnimFrameInterpData(const AnimFrame& frame0, const AnimFrame& frame1, float alpha) : Frame0(frame0), Frame1(frame1)
+	AnimFrameInterpData(const Keyframe& keyframe0, const Keyframe& keyframe1, float alpha) : Keyframe0(keyframe0), Keyframe1(keyframe1)
 	{
 		Alpha = alpha;
 	}
@@ -109,11 +109,11 @@ const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber 
 const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
-const AnimFrame&	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
-const AnimFrame&	GetFrame(const ItemInfo& item, int animNumber, int frameNumber = 0);
-const AnimFrame&	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&	GetClosestKeyframe(const ItemInfo& item);
+const Keyframe&		GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
+const Keyframe&		GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
+const Keyframe&		GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
+const Keyframe&		GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
+const Keyframe&		GetClosestKeyframe(const ItemInfo& item);
 
 int GetFrameNumber(const ItemInfo& item);
 int GetFrameIndex(ItemInfo* item, int frameNumber);
