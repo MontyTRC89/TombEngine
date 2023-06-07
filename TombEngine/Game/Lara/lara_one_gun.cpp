@@ -22,6 +22,7 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -29,7 +30,6 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -481,7 +481,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	if (weaponItemPtr->Animation.ActiveState != WEAPON_STATE_AIM &&
 		weaponItemPtr->Animation.ActiveState != WEAPON_STATE_UNDERWATER_AIM)
 	{
-		if ((weaponItemPtr->Animation.FrameNumber - g_Level.Anims[weaponItemPtr->Animation.AnimNumber].frameBase) == Weapons[(int)weaponType].DrawFrame)
+		if ((weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase) == Weapons[(int)weaponType].DrawFrame)
 		{
 			DrawShotgunMeshes(laraItem, weaponType);
 		}
@@ -495,8 +495,8 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		ReadyShotgun(laraItem, weaponType);
 	}
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = g_Level.Anims[weaponItemPtr->Animation.AnimNumber].FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - g_Level.Anims[weaponItemPtr->Animation.AnimNumber].frameBase;
+	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(weaponItemPtr).FramePtr;
+	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = weaponItemPtr->Animation.AnimNumber;
 }
 
@@ -523,19 +523,19 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 	else if (item.Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 21 ||
-			(weaponType == LaraWeaponType::GrenadeLauncher && (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 15))
+		if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber - GetAnimData(item).frameBase == 15))
 		{
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
 
-	player.LeftArm.FrameBase =
-	player.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	player.LeftArm.FrameNumber =
-	player.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
-	player.LeftArm.AnimNumber =
-	player.RightArm.AnimNumber = item.Animation.AnimNumber;
+	player.RightArm.FrameBase =
+	player.LeftArm.FrameBase = GetAnimData(item).FramePtr;
+	player.RightArm.FrameNumber =
+	player.LeftArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+	player.RightArm.AnimNumber =
+	player.LeftArm.AnimNumber = player.RightArm.AnimNumber;
 }
 
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
@@ -715,7 +715,7 @@ void FireGrenade(ItemInfo& laraItem)
 	if (!player.LeftArm.Locked)
 		grenadeItem.Pose.Orientation += player.ExtraTorsoRot;
 
-	grenadeItem.Animation.Velocity.y = CLICK(2) * phd_sin(grenadeItem.Pose.Orientation.x);
+	grenadeItem.Animation.Velocity.y = CLICK(1) * phd_sin(grenadeItem.Pose.Orientation.x);
 	grenadeItem.Animation.Velocity.z = GRENADE_VELOCITY;
 	grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 	grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;

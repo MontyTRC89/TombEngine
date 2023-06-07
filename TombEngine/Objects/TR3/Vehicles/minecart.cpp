@@ -12,13 +12,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
@@ -310,11 +310,11 @@ namespace TEN::Entities::Vehicles
 							{
 								if (item->ObjectNumber == ID_MINECART_SWITCH)
 								{
-									if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+									if (item->Animation.FrameNumber == GetAnimData(item).frameBase &&
 										(laraItem->Animation.ActiveState == MINECART_STATE_SWIPE &&
 											TestAnimNumber(*laraItem, MINECART_ANIM_SWIPE_WRENCH)))
 									{
-										int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+										int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
 										if (frame >= 12 && frame <= 22)
 										{
 											SoundEffect(SFX_TR3_VEHICLE_MINECART_WRENCH, &item->Pose, SoundEnvironment::Always);

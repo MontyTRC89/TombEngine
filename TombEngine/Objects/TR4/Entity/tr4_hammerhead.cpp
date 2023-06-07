@@ -8,15 +8,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(BLOCK(0.66f));
 
-	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
+	const auto HammerheadBite = CreatureBiteInfo(Vector3i::Zero, 12);
 	const auto HammerheadBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	enum HammerheadState

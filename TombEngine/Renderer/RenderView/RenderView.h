@@ -8,6 +8,7 @@
 #include "Specific/memory/LinearArrayBuffer.h"
 #include "RendererSprites.h"
 #include "RendererTransparentFace.h"
+#include "Renderer/Structures/RendererFogBulb.h"
 
 namespace TEN::Renderer 
 {
@@ -22,6 +23,7 @@ namespace TEN::Renderer
 	constexpr auto MAX_EFFECTS_DRAW = 16;
 	constexpr auto MAX_ITEMS_DRAW = 128;
 	constexpr auto MAX_LIGHTS_DRAW = 48;
+	constexpr auto MAX_FOG_BULBS_DRAW = 32;
 	constexpr auto MAX_SPRITES_DRAW = 512;
 	using DirectX::SimpleMath::Vector3;
 	using DirectX::SimpleMath::Vector2;
@@ -47,13 +49,13 @@ namespace TEN::Renderer
 
 	struct RenderView
 	{
-		RenderViewCamera camera;
-		D3D11_VIEWPORT viewport;
-		std::vector<RendererRoom*> roomsToDraw;
-		std::vector<RendererLight*> lightsToDraw;
-		std::vector<RendererSpriteToDraw> spritesToDraw;
-		std::vector<RendererStatic*> StaticsToDraw;
-		std::map<int, std::vector<RendererStatic*>> SortedStatics;
+		RenderViewCamera Camera;
+		D3D11_VIEWPORT Viewport;
+		std::vector<RendererRoom*> RoomsToDraw;
+		std::vector<RendererLight*> LightsToDraw;
+		std::vector<RendererFogBulb> FogBulbsToDraw;
+		std::vector<RendererSpriteToDraw> SpritesToDraw;
+		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw;
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);

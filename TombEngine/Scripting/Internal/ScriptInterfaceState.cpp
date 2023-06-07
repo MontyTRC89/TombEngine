@@ -1,20 +1,21 @@
 #include "framework.h"
-#include "ScriptInterfaceState.h"
-#include "Logic/LogicHandler.h"
-#include "Flow/FlowHandler.h"
-#include "Objects/ObjectsHandler.h"
-#include "Strings/StringsHandler.h"
-#include "Inventory/InventoryHandler.h"
-#include "ReservedScriptNames.h"
-#include "Misc/Miscellanous.h"
-#include "Effects/EffectsFunctions.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
+#include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
+#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
+#include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
+#include "Scripting/Internal/TEN/Strings/StringsHandler.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
 
-int lua_exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
+int lua_exception_handler(lua_State* luaStatePtr, sol::optional<const std::exception&> exception, sol::string_view description)
 {
-	return luaL_error(L, description.data());
+	return luaL_error(luaStatePtr, description.data());
 }
 
 ScriptInterfaceGame* ScriptInterfaceState::CreateGame()
@@ -37,10 +38,11 @@ ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
 	return new StringsHandler(&s_solState, s_rootTable);
 }
 
-void ScriptInterfaceState::Init()
+void ScriptInterfaceState::Init(const std::string& assetsDir)
 {
 	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine, sol::lib::table, sol::lib::string, sol::lib::debug);
-	s_solState.script("package.path=\"Scripts/?.lua\"");
+
+	s_solState.script("package.path=\"" + assetsDir + "Scripts/?.lua\"");
 	s_solState.set_exception_handler(lua_exception_handler);
 
 	s_rootTable = sol::table{ s_solState.lua_state(), sol::create };

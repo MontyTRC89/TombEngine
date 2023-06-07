@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
 
-#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
@@ -216,8 +215,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_MESHSWAP_MONKEY_KEY, "ID_MONKEY", "ID_MESHSWAP_MONKEY_KEY");
-		CheckIfSlotExists(ID_MESHSWAP_MONKEY_MEDIPACK, "ID_MONKEY", "ID_MESHSWAP_MONKEY_MEDIPACK");
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_KEY, GetObjectName(ID_MONKEY));
+		CheckIfSlotExists(ID_MESHSWAP_MONKEY_MEDIPACK, GetObjectName(ID_MONKEY));
 		obj->Initialize = InitializeMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
@@ -242,7 +241,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->biteOffset = 0;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -268,7 +266,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_SHIVA_STATUE, "ID_SHIVA", "ID_SHIVA_STATUE");
+		CheckIfSlotExists(ID_SHIVA_STATUE, GetObjectName(ID_SHIVA));
 		obj->Initialize = InitializeShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;

@@ -7,11 +7,11 @@
 #include "Game/Lara/lara_initialise.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 // Creatures
 #include "Objects/TR5/Entity/AutoGun.h"			 // OK
@@ -40,39 +40,41 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "tr5_smoke_emitter.h"
+#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 
 // Objects
+#include "Objects/TR5/Light/tr5_light.h"
+#include "Objects/TR5/Object/tr5_bodypart.h"
+#include "Objects/TR5/Object/tr5_expandingplatform.h"
+#include "Objects/TR5/Object/tr5_genslot.h"
+#include "Objects/TR5/Object/tr5_highobject.h"
+#include "Objects/TR5/Object/tr5_missile.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "tr5_twoblockplatform.h"
-#include "tr5_raisingcog.h"
-#include "tr5_raisingblock.h"
-#include "tr5_expandingplatform.h"
-#include "tr5_light.h"
-#include "tr5_bodypart.h"
-#include "tr5_teleporter.h"
-#include "tr5_highobject.h"
-#include "tr5_missile.h"
-#include "tr5_genslot.h"
+#include "Objects/TR5/Object/tr5_raisingblock.h"
+#include "Objects/TR5/Switch/tr5_raisingcog.h"
+#include "Objects/TR5/Object/tr5_teleporter.h"
+#include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
-#include "tr5_ventilator.h"
-#include "tr5_zip_line.h"
 #include "Objects/Effects/tr5_electricity.h"
-#include "tr5_romehammer.h"
-#include "tr5_fallingceiling.h"
-#include "tr5_rollingball.h"
-#include "tr5_explosion.h"
-#include "tr5_wreckingball.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/ZipLine.h"
+#include "Objects/TR5/Object/tr5_rollingball.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_wreckingball.h"
 
 // Switches
-#include "tr5_crowdove_switch.h"
+#include "Objects/TR5/Switch/tr5_crowdove_switch.h"
 
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Traps::TR5;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -109,7 +111,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -129,7 +130,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->radius = 102;
 		obj->pivotLength = 50;
@@ -151,7 +151,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -172,7 +171,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -215,7 +213,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -237,7 +234,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -277,7 +273,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 0;
 		obj->intelligent = true;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -354,7 +349,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = Mafia2Control;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 7;
 		obj->HitPoints = 26;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -374,7 +368,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 1;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -392,7 +385,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 3;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -410,7 +402,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = CyborgControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 5;
 		obj->HitPoints = 50;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -430,7 +421,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = SniperControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 6;
 		obj->HitPoints = 35;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -447,9 +437,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->Initialize = InitializeHeavyGuard;
 		obj->collision = CreatureCollision;
 		obj->control = HeavyGuardControl;
-		obj->shadowType = ShadowMode::All;
 		obj->HitRoutine = HeavyGuardHit;
-		obj->biteOffset = 0;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 128;
@@ -470,7 +459,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 30;
 		obj->pivotLength = 50;
 		obj->radius = 102;
-		obj->biteOffset = 1024;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -502,7 +490,6 @@ static void StartEntity(ObjectInfo *obj)
 		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = nullptr;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->radius = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
@@ -520,7 +507,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = ControlBrowsBeast;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 341;
@@ -537,7 +523,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = LagoonWitchControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -556,7 +541,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = InvisibleGhostControl;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 256;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
 		obj->radius = 256;
@@ -601,7 +585,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlGladiator;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->biteOffset = 0;
 		obj->HitPoints = 20;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -621,7 +604,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->control = RomanStatueControl;
 			obj->HitRoutine = RomanStatueHit;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 0;
 			obj->HitPoints = 300;
 			obj->pivotLength = 50;
 			obj->radius = 256;
@@ -645,6 +627,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->nonLot = true;
 		obj->SetupHitEffect(true);
 	}
+
+	InitAnimating(obj, ID_LASERHEAD_BASE);
+	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
 
 	obj = &Objects[ID_AUTOGUN];
 	if (obj->loaded)
@@ -806,10 +791,26 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
+	obj = &Objects[ID_HIGH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
+		obj->control = HighObject2Control;
+	}
+
 	obj = &Objects[ID_GEN_SLOT1];
 	if (obj->loaded)
 	{
 		obj->control = GenSlot1Control;
+	}
+
+	obj = &Objects[ID_GEN_SLOT2];
+	if (obj->loaded)
+	{
+		/*obj->Initialize = InitializeGenSlot2;
+		obj->control = GenSlot2Control;
+		obj->drawRoutine = DrawGenSlot2;*/
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
@@ -821,6 +822,35 @@ static void StartObject(ObjectInfo *obj)
 			obj->collision = AIPickupCollision;
 		}
 	}
+
+	obj = &Objects[ID_PORTAL];
+	if (obj->loaded)
+	{
+		//obj->Initialize = InitializePortal;
+		//obj->control = PortalControl;        // TODO: found the control procedure !
+		obj->drawRoutine = nullptr;             // go to nullsub_44() !
+
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LENS_FLARE];
+	if (obj->loaded)
+	{
+		//obj->drawRoutine = DrawLensFlare;
+
+	}
+
+	obj = &Objects[ID_WATERFALLSS1];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
+	}
+
+	obj = &Objects[ID_WATERFALLSS2];
+	if (obj->loaded)
+	{
+		obj->control = nullptr;
+	}
 }
 
 static void StartTrap(ObjectInfo *obj)
@@ -829,7 +859,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeZipLine;
-		obj->collision = ZipLineCollision;
+		obj->collision = CollideZipLine;
 		obj->control = ControlZipLine;
 		obj->SetupHitEffect(true);
 	}
@@ -920,6 +950,16 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExplosion;
 		obj->control = ExplosionControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASER_BARRIER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeLaserBarrier;
+		obj->control = ControlLaserBarrier;
+		obj->collision = CollideLaserBarrier;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

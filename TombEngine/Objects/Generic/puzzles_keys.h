@@ -3,6 +3,13 @@
 struct CollisionInfo;
 struct ItemInfo;
 
+enum class ReusableReceptacleState
+{
+	None = 0,
+	Done = 1,
+	Empty = 2
+};
+
 // Puzzles
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

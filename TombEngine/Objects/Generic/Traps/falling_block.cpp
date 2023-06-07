@@ -7,13 +7,13 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/debris.h"
 #include "Game/room.h"
-#include "Math/Random.h"
+#include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED		= 10;
 constexpr auto FALLINGBLOCK_MAX_SPEED			= 100;
@@ -73,9 +73,9 @@ void FallingBlockControl(short itemNumber)
 				for (auto& mutator : item->Model.Mutators)
 				{
 					mutator.Rotation = EulerAngles(
-						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
-						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
-						ANGLE(GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)));
+						ANGLE(Random::GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
+						ANGLE(Random::GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)),
+						ANGLE(Random::GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE)));
 				}
 			}
 			else
@@ -87,9 +87,9 @@ void FallingBlockControl(short itemNumber)
 					rotRate += i % 3 ? (rotRate / 2) : rotRate;
 
 					item->Model.Mutators[i].Rotation += EulerAngles(
-						ANGLE(rotRate + GenerateFloat(-1, 1)),
-						ANGLE(rotRate + GenerateFloat(-1, 1)),
-						ANGLE(rotRate + GenerateFloat(-1, 1)));
+						ANGLE(rotRate + Random::GenerateFloat(-1, 1)),
+						ANGLE(rotRate + Random::GenerateFloat(-1, 1)),
+						ANGLE(rotRate + Random::GenerateFloat(-1, 1)));
 				}
 
 				if (item->ItemFlags[0] == FALLINGBLOCK_DELAY)

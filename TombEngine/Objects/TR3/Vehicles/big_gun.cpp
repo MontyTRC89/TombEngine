@@ -13,12 +13,12 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -125,7 +125,7 @@ namespace TEN::Entities::Vehicles
 
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
-		auto pos = GetJointPosition(bigGunItem, BigGunBite.meshNum, BigGunBite.Position);
+		auto pos = GetJointPosition(bigGunItem, BigGunBite);
 		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
 		projectileItem->RoomNumber = probe.RoomNumber;
 		projectileItem->Pose.Position = pos;

@@ -17,12 +17,13 @@ struct ConsumablePickupInfo
 	int Amount;
 };
 
-static constexpr std::array<ConsumablePickupInfo, 3> kConsumables =
+static constexpr std::array<ConsumablePickupInfo, 4> kConsumables =
 {
 	{
 		{ ID_SMALLMEDI_ITEM, &LaraInventoryData::TotalSmallMedipacks, 1 },
 		{ ID_BIGMEDI_ITEM, &LaraInventoryData::TotalLargeMedipacks, 1 },
-		{ ID_FLARE_INV_ITEM, &LaraInventoryData::TotalFlares, 12 }
+		{ ID_FLARE_INV_ITEM, &LaraInventoryData::TotalFlares, 12 },
+		{ ID_FLARE_ITEM, &LaraInventoryData::TotalFlares, 1 }
 	}
  };
 

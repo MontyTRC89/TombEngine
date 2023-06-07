@@ -13,10 +13,10 @@
 #include "Game/Lara/lara_monkey.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
@@ -298,7 +298,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && lara->Status.Stamina)
+		else if (TrInput & IN_SPRINT && lara->Status.Stamina > LARA_STAMINA_MIN)
 			item->Animation.TargetState = LS_SPRINT;
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_RUN_FORWARD;
