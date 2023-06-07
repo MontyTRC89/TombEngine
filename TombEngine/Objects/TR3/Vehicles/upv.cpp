@@ -227,21 +227,15 @@ namespace TEN::Entities::Vehicles
 		// FireHarpoon(*laraItem, nullptr);
 		// GianC.- Use this if the code misbehaves. It shoots the harpoon from pos 0 (under Lara)
 
-		auto UPV = GetUPVInfo(UPVItem);
-		//auto orient = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
-		// GianC.- Obsolete,  flag is now set inside FireHarpoon
-		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230)));
-		FireHarpoon(*laraItem, &harpoonPose);
+		auto& upv = *GetUPVInfo(UPVItem);
 
-		if (UPV->Flags & UPV_FLAG_SURFACE)
-		SoundEffect(SFX_TR4_HARPOON_FIRE_DRY, &harpoonPose, SoundEnvironment::Always);
-		
-		else
-		SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &harpoonPose, SoundEnvironment::Always);
+		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230)));
+		FireHarpoon(*laraItem, harpoonPose);
 
-		//harpoon->ItemFlags[0] = 1;
-		//GianC.- Obsolete, flag is now set inside FireHarpoon 
-		UPV->HarpoonLeft = !UPV->HarpoonLeft;
+		auto soundID = (upv.Flags & UPV_FLAG_SURFACE) ? SFX_TR4_HARPOON_FIRE_DRY : SFX_TR4_HARPOON_FIRE_UNDERWATER;
+		SoundEffect(soundID, &harpoonPose, SoundEnvironment::Always);
+
+		upv.HarpoonLeft = !upv.HarpoonLeft;
 	}
 
 	static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)

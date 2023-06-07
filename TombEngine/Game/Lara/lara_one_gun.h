@@ -1,9 +1,9 @@
 #pragma once
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 enum class LaraWeaponType;
-class GameVector;
-class Pose;
-class Vector3i;
 struct ItemInfo;
 
 enum class GrenadeType
@@ -34,13 +34,13 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 
-void FireHarpoon(ItemInfo& laraItem, Pose* pos);
+void FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nullopt);
 void HarpoonBoltControl(short itemNumber);
 void FireGrenade(ItemInfo& laraItem);
 void GrenadeControl(short itemNumber);
 void FireRocket(ItemInfo& laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ItemInfo& laraItem, Pose* pos);
+void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nullopt);
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target);
 void CrossbowBoltControl(short itemNumber);
 
