@@ -363,17 +363,17 @@ void LoadObjects()
 			{
 				anim.Commands.reserve(commandCount);
 
-				auto animCommands = std::vector<short>{};
-				animCommands.resize(commandDataSize);
-				ReadBytes(animCommands.data(), sizeof(short) * commandDataSize);
+				auto animCommandData = std::vector<short>{};
+				animCommandData.resize(commandDataSize);
+				ReadBytes(animCommandData.data(), sizeof(short) * commandDataSize);
 
-				short* commandDataPtr = &animCommands.front();
+				short* commandDataPtr = &animCommandData.front();
 				for (int i = 0; i < commandCount; i++)
 				{
 					auto animCommand = (AnimCommandType)commandDataPtr[0];
 					commandDataPtr++;
 
-					auto command = std::unique_ptr<AnimCommand>{};
+					auto command = AnimData::AnimCommandPtr{};
 					switch (animCommand)
 					{
 					case AnimCommandType::MoveOrigin:

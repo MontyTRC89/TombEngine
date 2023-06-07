@@ -25,7 +25,7 @@ namespace TEN::Animation
 	{
 	private:
 		const Vector3 RelOffset = Vector3::Zero;
-
+		
 	public:
 		MoveOriginCommand(const Vector3& relOffset) : RelOffset(relOffset) {};
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
@@ -58,7 +58,7 @@ namespace TEN::Animation
 	class SoundEffectCommand : public AnimCommand
 	{
 	private:
-		const int SoundID     = 0;
+		const int SoundID	  = 0;
 		const int FrameNumber = 0;
 
 	public:
