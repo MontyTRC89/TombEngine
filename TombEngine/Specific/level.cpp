@@ -330,8 +330,8 @@ void LoadObjects()
 
 				keyframe.Offset = ReadVector3();
 
-				int orientCount = ReadInt32();
-				keyframe.BoneOrientations.resize(orientCount);
+				int boneCount = ReadInt32();
+				keyframe.BoneOrientations.resize(boneCount);
 				for (auto& orient : keyframe.BoneOrientations)
 				{
 					orient.x = ReadFloat();

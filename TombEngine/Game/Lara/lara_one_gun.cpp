@@ -342,8 +342,10 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(&item);
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(item).FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+	player.LeftArm.FrameBase =
+	player.RightArm.FrameBase = GetAnimData(item).FramePtr;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = item.Animation.AnimNumber;
 }
 
@@ -351,7 +353,7 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
 	auto& player = GetLaraInfo(laraItem);
 	auto animObjectID = GetWeaponObjectID(weaponType);
-	auto& animObjectNumber = Objects[animObjectID];
+	auto& animObject = Objects[animObjectID];
 
 	player.Control.HandStatus = HandStatus::WeaponReady;
 	player.LeftArm.Orientation =
@@ -361,7 +363,7 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.LeftArm.FrameBase =
-	player.RightArm.FrameBase = animObjectNumber.frameBase;
+	player.RightArm.FrameBase = animObject.frameBase;
 	player.TargetEntity = nullptr;
 }
 
@@ -491,8 +493,10 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		ReadyShotgun(laraItem, weaponType);
 	}
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(weaponItemPtr).FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase;
+	player.LeftArm.FrameBase =
+	player.RightArm.FrameBase = GetAnimData(weaponItemPtr).FramePtr;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase;
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = weaponItemPtr->Animation.AnimNumber;
 }
 
