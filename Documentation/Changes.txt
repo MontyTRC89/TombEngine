@@ -1,6 +1,7 @@
 Version 1.0.10
 ==============
 
+* Pause all sounds when entering inventory or pause menu.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.
