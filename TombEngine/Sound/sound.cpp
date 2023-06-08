@@ -303,14 +303,52 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	return true;
 }
 
-void PauseAllSounds()
+void PauseAllSounds(SoundPauseMode mode)
 {
-	BASS_Pause();
+	if (mode == SoundPauseMode::Global)
+	{
+		BASS_Pause();
+		return;
+	}
+
+	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
+	{
+		if ((SoundSlot[i].Channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PLAYING))
+			BASS_ChannelPause(SoundSlot[i].Channel);
+	}
+
+	if (mode == SoundPauseMode::Inventory)
+		return;
+
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
+	{
+		if ((BASS_Soundtrack[i].Channel != NULL) && (BASS_ChannelIsActive(BASS_Soundtrack[i].Channel) == BASS_ACTIVE_PLAYING))
+			BASS_ChannelPause(BASS_Soundtrack[i].Channel);
+	}
 }
 
-void ResumeAllSounds()
+void ResumeAllSounds(SoundPauseMode mode)
 {
-	BASS_Start();
+	if (mode == SoundPauseMode::Global)
+	{
+		BASS_Start();
+		return;
+	}
+
+	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
+	{
+		if ((SoundSlot[i].Channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PAUSED))
+			BASS_ChannelStart(SoundSlot[i].Channel);
+	}
+
+	if (mode == SoundPauseMode::Inventory)
+		return;
+
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
+	{
+		if ((BASS_Soundtrack[i].Channel != NULL) && (BASS_ChannelIsActive(BASS_Soundtrack[i].Channel) == BASS_ACTIVE_PAUSED))
+			BASS_ChannelStart(BASS_Soundtrack[i].Channel);
+	}
 }
 
 void StopSoundEffect(short effectID)
@@ -676,7 +714,7 @@ float Sound_Attenuate(float gain, float distance, float radius)
 
 void Sound_FreeSlot(int index, unsigned int fadeout)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return;
 
 	if (SoundSlot[index].Channel != NULL && BASS_ChannelIsActive(SoundSlot[index].Channel))
@@ -696,7 +734,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return false;
 
 	if (position)
@@ -726,7 +764,7 @@ bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 // Update gain and pitch.
 bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return false;
 
 	BASS_ChannelSetAttribute(SoundSlot[index].Channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
