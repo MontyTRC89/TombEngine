@@ -464,7 +464,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	}
 
 	// Play default background music.
-	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+	if (!loadGame)
+		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
