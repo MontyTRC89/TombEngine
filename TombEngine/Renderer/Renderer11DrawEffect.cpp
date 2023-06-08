@@ -832,6 +832,9 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -957,6 +960,9 @@ namespace TEN::Renderer
 	{
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1439,6 +1445,9 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -1464,6 +1473,9 @@ namespace TEN::Renderer
 	{		
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
