@@ -1795,6 +1795,9 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
 		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
 
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
 		BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 		BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
