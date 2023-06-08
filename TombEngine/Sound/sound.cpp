@@ -330,24 +330,21 @@ void PauseAllSounds(SoundPauseMode mode)
 void ResumeAllSounds(SoundPauseMode mode)
 {
 	if (mode == SoundPauseMode::Global)
-	{
 		BASS_Start();
-		return;
-	}
-
-	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-	{
-		if ((SoundSlot[i].Channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PAUSED))
-			BASS_ChannelStart(SoundSlot[i].Channel);
-	}
-
-	if (mode == SoundPauseMode::Inventory)
-		return;
 
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
 		if ((BASS_Soundtrack[i].Channel != NULL) && (BASS_ChannelIsActive(BASS_Soundtrack[i].Channel) == BASS_ACTIVE_PAUSED))
 			BASS_ChannelStart(BASS_Soundtrack[i].Channel);
+	}
+
+	if (mode == SoundPauseMode::Global)
+		return;
+
+	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
+	{
+		if ((SoundSlot[i].Channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PAUSED))
+			BASS_ChannelStart(SoundSlot[i].Channel);
 	}
 }
 
