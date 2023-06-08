@@ -43,7 +43,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto& creature = *GetCreatureInfo(item);
 		const auto& anim = GetAnimData(item);
 
-		long c;
+		long c, f;
 
 		Vector3i pos;
 
@@ -69,7 +69,7 @@ namespace TEN::Entities::Creatures::TR3
 					//TriggerFireFlame(pos.x, pos.y, pos.z, -1, 255); not sure how to translate this
 				}
 
-				c = anim.frameEnd - GetAnimData(item).frameBase;
+				c = anim.frameEnd - anim.frameBase;
 
 				if (c > 16)
 				{
@@ -88,7 +88,27 @@ namespace TEN::Entities::Creatures::TR3
 				*/ 
 			}
 
-			else if (item->Animation.FrameNumber >= )
+			else if (item->Animation.FrameNumber >= anim.frameBase + 1 && item->Animation.FrameNumber <= anim.frameBase + 8)
+			{
+				f = anim.frameEnd - item->Animation.FrameNumber + 1;
+
+				if (f > 24)
+				{
+					f = anim.frameEnd - item->Animation.FrameNumber - 8;
+
+					if (f <= 0)
+						f = 1;
+
+					if (f > 24)
+						f = (GetRandomControl() & 0xF) + 8;
+				}
+
+				//TriggerSealmuteGasThrower(item, &seal_gas, (short)f); ??
+			}
+		}
+		else
+		{
+
 		}
 	}
 }
