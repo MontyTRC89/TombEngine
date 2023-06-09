@@ -33,10 +33,13 @@ namespace TEN::Hud
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
+		bool	IsOffscreen() const;
 		float	GetRadius() const;
 		Vector2 Get2DPositionOffset(short orientOffset2D) const;
-		bool	IsOffscreen() const;
-		void	Update(const Vector3& cameraPos, bool doPulse, bool isActive);
+
+		void SetPrimary();
+		void SetPeripheral();
+		void Update(const Vector3& cameraPos, bool doPulse, bool isActive);
 	};
 
 	class TargetHighlighterController
@@ -46,10 +49,6 @@ namespace TEN::Hud
 		std::unordered_map<int, CrosshairData> Crosshairs = {}; // Key = entity ID.
 
 	public:
-		// Setters
-		void SetPrimary(int entityID);
-		void SetPeripheral(int entityID);
-
 		// Utilities
 		void Update(std::vector<int> entityIds);
 		void Update(const ItemInfo& playerItem);

@@ -15,6 +15,17 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
+	// TODO: Not working?
+	bool CrosshairData::IsOffscreen() const
+	{
+		float screenEdgeThreshold = GetRadius();
+
+		return (Position2D.x <= -screenEdgeThreshold ||
+				Position2D.y <= -screenEdgeThreshold ||
+				Position2D.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
+				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+	}
+
 	float CrosshairData::GetRadius() const
 	{
 		return ((Size / 2) * (RadiusScale * PulseScale));
@@ -32,21 +43,23 @@ namespace TEN::Hud
 		return GetAspectCorrect2DPosition(posOffset2D);
 	}
 
-	bool CrosshairData::IsOffscreen() const
+	void CrosshairData::SetPrimary()
 	{
-		float screenEdgeThreshold = GetRadius();
+		IsPrimary = true;
+		ColorTarget = COLOR_GREEN;
+	}
 
-		return (Position2D.x <= -screenEdgeThreshold ||
-				Position2D.y <= -screenEdgeThreshold ||
-				Position2D.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
-				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+	void CrosshairData::SetPeripheral()
+	{
+		IsPrimary = false;
+		ColorTarget = COLOR_GRAY;
 	}
 
 	static float GetCrosshairSize(float cameraDist)
 	{
 		constexpr auto RANGE			  = BLOCK(10);
 		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
-		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 5;
+		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 4;
 
 		auto alpha = cameraDist / RANGE;
 		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
@@ -122,28 +135,6 @@ namespace TEN::Hud
 			segment.PosOffset2D = Get2DPositionOffset(segment.OrientOffset2D);
 	}
 
-	void TargetHighlighterController::SetPrimary(int entityID)
-	{
-		auto it = Crosshairs.find(entityID);
-		if (it == Crosshairs.end())
-			return;
-
-		auto& crosshair = it->second;
-		crosshair.IsPrimary = true;
-		crosshair.ColorTarget = CrosshairData::COLOR_GREEN;
-	}
-
-	void TargetHighlighterController::SetPeripheral(int entityID)
-	{
-		auto it = Crosshairs.find(entityID);
-		if (it == Crosshairs.end())
-			return;
-
-		auto& crosshair = it->second;
-		crosshair.IsPrimary = false;
-		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
-	}
-
 	void TargetHighlighterController::Update(std::vector<int> entityIds)
 	{
 		constexpr auto TARGET_BONE_ID = 0;
@@ -196,26 +187,32 @@ namespace TEN::Hud
 	{
 		const auto& player = GetLaraInfo(playerItem);
 
-		// Loop through player targets.
+		// Loop over player targets.
 		auto entityIds = std::vector<int>{};
 		for (const auto* entityPtr : player.TargetList)
 		{
 			if (entityPtr == nullptr)
 				continue;
 
+			// Collect entity ID.
+			entityIds.push_back(entityPtr->Index);
+
+			// Find crosshair at entity ID key.
+			auto it = Crosshairs.find(entityPtr->Index);
+			if (it == Crosshairs.end())
+				continue;
+
 			// Set crosshair as primary or peripheral.
+			auto& crosshair = it->second;
 			if (player.TargetEntity != nullptr &&
 				entityPtr->Index == player.TargetEntity->Index)
 			{
-				SetPrimary(entityPtr->Index);
+				crosshair.SetPrimary();
 			}
 			else
 			{
-				SetPeripheral(entityPtr->Index);
+				crosshair.SetPeripheral();
 			}
-
-			// Collect entity ID.
-			entityIds.push_back(entityPtr->Index);
 		}
 
 		// Update crosshairs.
@@ -264,22 +261,22 @@ namespace TEN::Hud
 	{
 		constexpr auto COUNT_MAX = 16;
 
-		// Clear smallest crosshair if map is full.
+		// Map is full; clear smallest crosshair.
 		if (Crosshairs.size() >= COUNT_MAX)
 		{
-			int entityIDKey = 0;
+			int key = 0;
 			float smallestSize = INFINITY;
 			
 			for (auto& [entityID, crosshair] : Crosshairs)
 			{
 				if (crosshair.Size < smallestSize)
 				{
-					entityIDKey = entityID;
+					key = entityID;
 					smallestSize = crosshair.Size;
 				}
 			}
 
-			Crosshairs.erase(entityIDKey);
+			Crosshairs.erase(key);
 		}
 
 		// Return new crosshair.
@@ -352,6 +349,6 @@ namespace TEN::Hud
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
-		g_Renderer.PrintDebugMessage("Visible: %d", peripheralCount);
+		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", peripheralCount);
 	}
 }

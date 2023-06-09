@@ -22,7 +22,7 @@ namespace TEN::Renderer
 		{
 			auto screenRes = GetScreenResolution();
 			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
-			float UIScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
+			float uiScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
 			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
 
@@ -37,13 +37,13 @@ namespace TEN::Renderer
 				rString.X = 0;
 				rString.Y = 0;
 				rString.Color = color.ToVector3() * UCHAR_MAX;
-				rString.Scale = (UIScale * fontScale) * scale;
+				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
 				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
 
 				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (size.x / 2.0f)) : (pos.x * factor.x);
-				rString.Y = (pos.y * UIScale) + yOffset;
+				rString.Y = (pos.y * uiScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
 				{
@@ -72,7 +72,6 @@ namespace TEN::Renderer
 
 				yOffset += size.y;
 			}
-
 		}
 		catch (std::exception& ex)
 		{

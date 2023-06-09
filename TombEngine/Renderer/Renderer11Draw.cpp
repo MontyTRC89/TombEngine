@@ -541,9 +541,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawBats(RenderView& view)
 	{
 		if (!Objects[ID_BATS_EMITTER].loaded)
-		{
 			return;
-		}
 
 		ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
 		RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
@@ -1403,9 +1401,9 @@ namespace TEN::Renderer
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+		auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		// Prepare the scene to draw
+		// Prepare scene to draw.
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
 		auto timeRoomsCollector = std::chrono::high_resolution_clock::now();
@@ -1425,12 +1423,12 @@ namespace TEN::Renderer
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
 
-		// Reset GPU state
+		// Reset GPU state.
 		SetBlendMode(BLENDMODE_OPAQUE, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
 		SetCullMode(CULL_MODE_CCW, true);
 
-		// Bind and clear render target
+		// Bind and clear render target.
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -1445,8 +1443,7 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		// The camera constant buffer contains matrices, camera position, fog values and other 
-		// things that are shared for all shaders
+		// Camera constant buffer contains matrices, camera position, fog values, and other things shared for all shaders.
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
@@ -1480,11 +1477,11 @@ namespace TEN::Renderer
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
-		
-		// Draw the horizon and the sky
+
+		// Draw horizon and sky.
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
-		
-		// Draw opaque and alpha test faces
+
+		// Draw opaque and alpha test faces.
 		DrawRooms(view, false);
 		DrawItems(view, false);
 		DrawStatics(view, false);
@@ -1500,8 +1497,8 @@ namespace TEN::Renderer
 		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
 			m_renderTarget.DepthStencilView.Get());
 
-		// Do special effects and weather 
-		// NOTE: functions here just fill the sprites to draw array
+		// Do special effects and weather .
+		// NOTE: These functions merely fill sprite array to draw later.
 		DrawFires(view);
 		DrawSmokes(view);
 		DrawSmokeParticles(view);
@@ -1524,11 +1521,11 @@ namespace TEN::Renderer
 		DrawStreamers(view);
 		DrawLaserBarriers(view);
 
-		// Here is where we actually output sprites
+		// Output sprites.
 		DrawSprites(view);
 		DrawLines3D(view);
 
-		// Draw immediately additive and unsorted blended faces, and collect all sorted blend modes faces for later
+		// Draw additive and unsorted blended faces, and collect all sorted blend modes faces for later.
 		DrawRooms(view, true);
 		DrawItems(view, true);
 		DrawStatics(view, true);
@@ -1537,18 +1534,18 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		// Draw all sorted blend mode faces collected in the previous steps
+		// Draw all sorted blend mode faces collected in previous steps.
 		DrawSortedFaces(view);
-
 		DrawPostprocess(target, depthTarget, view);
 
-		// Draw GUI stuff at the end
+		// Draw 2D space elements.
+		//Draw2DSprites(); // TODO
 		DrawLines2D();
 
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);
 
-		// Draw binoculars or lasersight
+		// Draw binoculars or lasersight.
 		DrawOverlays(view); 
 
 		time2 = std::chrono::high_resolution_clock::now();
