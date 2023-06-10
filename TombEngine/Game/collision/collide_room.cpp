@@ -229,6 +229,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
+	constexpr auto ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
+
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
 	bool doPlayerCollision = item->IsLara();
@@ -412,17 +414,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->Front.FloorSlope && 
-		coll->Front.Floor < coll->Middle.Floor && 
-		coll->Front.Floor < 0 &&
-		height < coll->Front.Floor)
+	auto floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	short aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->Front.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->Front.FloorSlope && 
-		coll->Front.Floor > coll->Middle.Floor)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->Front.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
@@ -477,15 +481,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleLeft.FloorSlope && 
-		coll->MiddleLeft.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleLeft.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->MiddleLeft.FloorSlope && 
-		coll->MiddleLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->MiddleLeft.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
@@ -534,15 +542,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontLeft.FloorSlope && 
-		coll->FrontLeft.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontLeft.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->FrontLeft.FloorSlope && 
-		coll->FrontLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->FrontLeft.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
@@ -596,15 +608,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleRight.FloorSlope && 
-		coll->MiddleRight.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleRight.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->MiddleRight.FloorSlope && 
-		coll->MiddleRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->MiddleRight.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
@@ -653,15 +669,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontRight.FloorSlope && 
-		coll->FrontRight.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontRight.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->FrontRight.FloorSlope && 
-		coll->FrontRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->FrontRight.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
