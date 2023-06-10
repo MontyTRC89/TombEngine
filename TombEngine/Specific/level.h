@@ -102,9 +102,10 @@ struct LEVEL
 	std::vector<short>					Commands = {};
 
 	// Collision data
-	std::vector<ROOM_INFO> Rooms	 = {};
-	std::vector<short>	   FloorData = {};
-	std::vector<SinkInfo>  Sinks	 = {};
+	std::vector<ROOM_INFO> Rooms	  = {};
+	std::vector<short>	   FloorData  = {};
+	std::vector<SinkInfo>  Sinks	  = {};
+	std::unordered_map<int, Attractor> BridgeAttractors = {}; // Key = bridge ID
 
 	// Pathfinding data
 	std::vector<BOX_INFO> Boxes	   = {};
@@ -130,10 +131,6 @@ struct LEVEL
 	std::vector<TEXTURE> AnimatedTextures  = {};
 	std::vector<TEXTURE> SpritesTextures   = {};
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
-
-	// TODO: Reserve map entries for all bridge items that can ever exist in the level
-	// and update them as needed.
-	std::unordered_map<int, Attractor> BridgeAttractors = {};
 };
 
 extern std::vector<int> MoveablesIds;

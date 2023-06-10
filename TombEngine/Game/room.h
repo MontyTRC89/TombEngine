@@ -130,17 +130,17 @@ struct ROOM_INFO
 	std::vector<std::string> tags = {};
 
 	std::vector<FloorInfo>	   floor		  = {};
-	std::vector<ROOM_LIGHT>	   lights		  = {};
-	std::vector<MESH_INFO>	   mesh			  = {};
 	std::vector<TriggerVolume> triggerVolumes = {};
 	std::vector<Attractor>	   Attractors	  = {}; // TODO: Generate edge attractors for each room.
 
-	std::vector<Vector3>   positions = {};
-	std::vector<Vector3>   normals	 = {};
-	std::vector<Vector3>   colors	 = {};
-	std::vector<Vector3>   effects	 = {};
-	std::vector<BUCKET>	   buckets	 = {};
-	std::vector<ROOM_DOOR> doors	 = {};
+	std::vector<MESH_INFO>	mesh	  = {};
+	std::vector<ROOM_LIGHT> lights	  = {};
+	std::vector<Vector3>	positions = {};
+	std::vector<Vector3>	normals	  = {};
+	std::vector<Vector3>	colors	  = {};
+	std::vector<Vector3>	effects	  = {};
+	std::vector<BUCKET>		buckets	  = {};
+	std::vector<ROOM_DOOR>	doors	  = {};
 
 	std::vector<int> neighbors = {};
 

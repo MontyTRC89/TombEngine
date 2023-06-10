@@ -218,7 +218,7 @@ namespace TEN::Collision::Attractors
 		}
 		else if (lineDist >= Length)
 		{
-			return (Points.size() - 1);
+			return ((int)Points.size() - 1);
 		}
 
 		// Find segment at distance along attractor.
@@ -234,7 +234,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		// FAILSAFE: Return last segment index.
-		return (Points.size() - 1);
+		return ((int)Points.size() - 1);
 	}
 
 	bool Attractor::IsEdge() const
@@ -369,7 +369,7 @@ namespace TEN::Collision::Attractors
 		return std::clamp(lineDist, 0.0f, Length);
 	}
 
-	// Fake version.
+	// Debug.
 	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
 		constexpr auto RANGE	 = BLOCK(5);
@@ -399,7 +399,6 @@ namespace TEN::Collision::Attractors
 
 		auto nearbyAttracPtrMap = std::multimap<float, const Attractor*>{};
 
-		// --------------debug
 		// Get debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
 		for (const auto* attracPtr : debugAttracPtrs)
@@ -408,15 +407,24 @@ namespace TEN::Collision::Attractors
 			if (dist <= range)
 				nearbyAttracPtrMap.insert({ dist, attracPtr });
 		}
-		// --------------
 
 		// Get attractors in current room.
-		const auto& room = g_Level.Rooms[roomNumber];
+		auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
 			float dist = attrac.GetProximityData(refPoint).Distance;
 			if (dist <= range)
 				nearbyAttracPtrMap.insert({ dist, &attrac });
+		}
+
+		for (auto& floor : room.floor)
+		{
+			for (int bridgeID : floor.BridgeItemNumbers)
+			{
+				auto& bridge = g_Level.Items[bridgeID];
+
+				g_Level.BridgeAttractors.insert{{}}
+			}
 		}
 
 		// TODO: Check if it actually has search depth of 2.
@@ -432,18 +440,25 @@ namespace TEN::Collision::Attractors
 			}
 		}
 
-		// TODO
 		// Get bridge attractors.
-		/*for (const auto& [bridgeItemNumber, attracs] : g_Level.BridgeAttractors)
+		for (auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
-			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			const auto& bridge = g_Level.Items[bridgeID];
 
-			if (Vector3::Distance(refPoint, bridgeItem.Pose.Position.ToVector3()) > range)
+			float bridgeDist = Vector3::Distance(bridge.Pose.Position.ToVector3(), refPoint);
+			if (bridgeDist > range)
 				continue;
-		}*/
+
+			// Update bridge attractor.
+			attrac = GenerateBridgeAttractor(bridge);
+
+			float dist = attrac.GetProximityData(refPoint).Distance;
+			if (dist <= range)
+				nearbyAttracPtrMap.insert({ dist, &attrac });
+		}
 
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		nearbyAttracPtrs.reserve(COUNT_MAX);
+		nearbyAttracPtrs.reserve(std::max((int)nearbyAttracPtrMap.size(), COUNT_MAX));
 
 		// Move attractor pointers to capped vector.
 		auto it = nearbyAttracPtrMap.begin();
@@ -486,16 +501,16 @@ namespace TEN::Collision::Attractors
 		return Attractor(type, points, roomNumber);
 	}
 
-	static Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
+	Attractor GenerateBridgeAttractor(const ItemInfo& bridge)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
 
 		// Get bounding box.
-		auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
+		auto box = GameBoundingBox(&bridge).ToBoundingOrientedBox(bridge.Pose);
 
 		// Determine tilt offset.
 		int tiltOffset = 0;
-		switch (bridgeItem.ObjectNumber)
+		switch (bridge.ObjectNumber)
 		{
 		default:
 		case ID_BRIDGE_FLAT:
@@ -535,7 +550,7 @@ namespace TEN::Collision::Attractors
 		};
 
 		// Generate and return attractor.
-		return GenerateAttractorFromPoints(points, bridgeItem.RoomNumber, AttractorType::Edge);
+		return GenerateAttractorFromPoints(points, bridge.RoomNumber, AttractorType::Edge);
 	}
 
 	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl)
@@ -547,8 +562,8 @@ namespace TEN::Collision::Attractors
 		// Generate and return bridge attractor.
 		if (pointColl.Position.Bridge >= 0)
 		{
-			const auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
-			return GenerateBridgeAttractor(bridgeItem);
+			const auto& bridge = g_Level.Items[pointColl.Position.Bridge];
+			return GenerateBridgeAttractor(bridge);
 		}
 
 		// Generate and return floor attractor.

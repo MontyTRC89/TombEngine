@@ -1134,7 +1134,7 @@ LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll)
 						continue;
 
 					// Intersection point is out of block bounds; discard.
-					auto cPoint = ray.position + ray.direction * distance;
+					auto cPoint = ray.position + ray.direction * dist;
 					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
 						continue;
 

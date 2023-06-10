@@ -94,5 +94,6 @@ namespace TEN::Collision::Attractors
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range);
 
 	Attractor				 GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
+	Attractor				 GenerateBridgeAttractor(const ItemInfo& bridge);
 	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl);
 }
